@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 import oxlib
 
 import utils
+import managers
 
 
 class Movie(models.Model):
@@ -15,9 +16,9 @@ class Movie(models.Model):
     modified = models.DateTimeField(auto_now=True)
     accessed = models.DateTimeField(null=True, blank=True)
 
-    movieId = models.CharField(max_length=128, blank=True)
-    imdbId = models.CharField(max_length=7, blank=True)
-    oxdbId = models.CharField(max_length=42, blank=True)
+    movieId = models.CharField(max_length=128, unique=True, blank=True)
+    imdbId = models.CharField(max_length=7, unique=True, blank=True)
+    oxdbId = models.CharField(max_length=42, unique=True, blank=True)
     title = models.CharField(max_length=1000)
     year = models.CharField(max_length=4)
     runtime = models.IntegerField(null=True, blank=True)
@@ -42,6 +43,8 @@ class Movie(models.Model):
 
     #length = models.IntegerField(null=True, blank=True)
     duration = models.FloatField(null=True, blank=True)
+
+    objects = managers.MovieManager()
 
     #FIXME: should this be a done via a manager for person?
     def directors(self):
@@ -134,6 +137,7 @@ class Movie(models.Model):
         'season': 'season',
         'episode': 'episode',
         'filtered_reviews': 'reviews',
+        'trivia': 'trivia',
     }
     def json(self, fields=None):
         movie = {}
@@ -143,7 +147,7 @@ class Movie(models.Model):
                 value = getattr(self, key)
                 if key in ('directors', 'writers', 'filtered_reviews'):
                     movie[pub_key] = tuple([v.json() for v in value()])
-                elif key in ('countries', 'keywords', 'genres'):
+                elif key in ('countries', 'keywords', 'genres', 'trivia'):
                     movie[pub_key] = tuple([v.json() for v in value.all()])
                 else:
                     movie[pub_key] = value
@@ -179,7 +183,7 @@ class Movie(models.Model):
     used to search movies, all search values are in here
 '''
 class MovieFind(models.Model):
-    movie = models.ForeignKey('Movie')
+    movie = models.ForeignKey('Movie', related_name='find')
 
     title = models.CharField(max_length=1000)
     director = models.TextField(blank=True)
@@ -221,7 +225,7 @@ class MovieFind(models.Model):
     used to sort movies, all sort values are in here
 '''
 class MovieSort(models.Model):
-    movie = models.ForeignKey('Movie')
+    movie = models.ForeignKey('Movie', related_name='sort')
 
     title = models.CharField(max_length=1000)
     director = models.TextField(blank=True)
@@ -313,7 +317,7 @@ class Person(models.Model):
         if imdbId:
             q = model.objects.filter(name=name, imdbId=imdbId)
         else:
-            q = model.objects.get(name=name)
+            q = model.objects.all().filter(name=name)
         if q.count() > 0:
             o = q[0]
         else:
@@ -361,11 +365,14 @@ class Cast(models.Model):
         return (self.person.json(), self.character)
 
 class Country(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     movies = models.ManyToManyField(Movie, related_name='countries', through='MovieCountry')
 
     class Meta:
-        ordering = ('moviecountry__position', 'name', )
+        #!! adding this to ordering, breaks:
+        #   models.Country.objects.values("name").annotate(movies=Count('movies')) 
+        #'moviecountry__position',
+        ordering = ('name', )
 
     def __unicode__(self):
         return self.name
@@ -403,7 +410,7 @@ class MovieCountry(models.Model):
 
 
 class Language(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     movies = models.ManyToManyField(Movie, related_name='language', through="MovieLanguage")
 
     class Meta:
@@ -443,7 +450,7 @@ class MovieLanguage(models.Model):
     link = classmethod(link)
 
 class Keyword(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     movies = models.ManyToManyField(Movie, related_name='keywords')
 
     class Meta:
@@ -459,7 +466,7 @@ class Keyword(models.Model):
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     movies = models.ManyToManyField(Movie, related_name='genres')
 
     class Meta:
@@ -474,7 +481,7 @@ class Genre(models.Model):
         return self.name
 
 class Location(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     movies = models.ManyToManyField(Movie, related_name='locations')
     #fixme: geo data
 
@@ -507,9 +514,9 @@ class MovieFile(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    oshash = models.CharField(blank=True, max_length=16)
-    sha1hash = models.CharField(blank=True, max_length=40)
-    md5sum = models.CharField(blank=True, max_length=32)
+    oshash = models.CharField(blank=True, unique=True, max_length=16)
+    sha1hash = models.CharField(blank=True, unique=True, max_length=40)
+    md5sum = models.CharField(blank=True, unique=True, max_length=32)
 
     movie = models.ForeignKey('Movie', related_name="files")
 
@@ -587,8 +594,37 @@ class Review(models.Model):
     def json(self):
         return (self.name(), self.url)
 
-
 class ReviewWhitelist(models.Model):
     name = models.CharField(max_length=255, unique=True)
     url = models.CharField(max_length=255, unique=True)
+
+class List(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User)
+    title = models.CharField(max_length=255, unique=True)
+    movies = models.ManyToManyField(Movie, related_name='lists', through='ListItem')
+
+    def add(self, movie):
+        q = self.movies.filter(id=movie.id)
+        if q.count() == 0:
+            l = ListItem()
+            l.list = self
+            l.movie = movie
+            l.save()
+
+    def remove(self, movie):
+        self.ListItem.objects.all().filter(movie=movie, list=self).delete()
+
+    def __unicode__(self):
+        return u"%s (%s)" % (self.title, unicode(self.user))
+
+class ListItem(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+    list = models.ForeignKey(List)
+    movie = models.ForeignKey(Movie)
+
+    def __unicode__(self):
+        return u"%s in %s" % (unicode(self.movie), unicode(self.list))
 
