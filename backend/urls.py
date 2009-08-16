@@ -24,9 +24,10 @@ urlpatterns = patterns("oxdb.backend.views",
     (r'^find', 'find'),
     (r'^files/find', 'find_files'),
     (r'^files/info', 'file_info'),
-    (r'^files/add', 'add_file'),
-    (r'^files/remove', 'remove_file'),
-    (r'^subtitle/get', 'get_subtitle'),
+    (r'^files/(?P<archive>.+)/add', 'add_file'),
+    (r'^files/(?P<archive>.+)/remove', 'remove_file'),
+    (r'^subtitle/get', 'subtitles'),
+    (r'^preferences', 'preferences'),
 
     # Example:
     # (r'^oxdata/', include('oxdata.foo.urls')),

@@ -59,25 +59,34 @@ def loadIMDb(imdbId):
         setattr(movie, key, business[key])
 
     movie.save()
+    models.AlternativeTitle.objects.filter(movie=movie).delete()
+    for i in oxweb.imdb.getMovieAKATitles(imdbId):
+        t = models.AlternativeTitle()
+        t.movie = movie
+        t.title = i[0]
+        t.type = i[1]
+        t.save()
 
     #FIXME: related tables should be cleaned to not accumulate cruft
     #Country
     models.MovieCountry.objects.filter(movie=movie).delete()
     position = 0
-    for i in info['country']:
-        debug("add country", i)
-        country = models.Country.get_or_create(i)
-        models.MovieCountry.link(movie, country, position)
-        position += 1
+    if 'country' in info:
+        for i in info['country']:
+            debug("add country", i)
+            country = models.Country.get_or_create(i)
+            models.MovieCountry.link(movie, country, position)
+            position += 1
 
     #Language
     models.MovieLanguage.objects.filter(movie=movie).delete()
     position = 0
-    for i in info['language']:
-        debug("add language", i)
-        language = models.Language.get_or_create(i)
-        models.MovieLanguage.link(movie, language, position)
-        position += 1
+    if 'language' in info:
+        for i in info['language']:
+            debug("add language", i)
+            language = models.Language.get_or_create(i)
+            models.MovieLanguage.link(movie, language, position)
+            position += 1
 
     #Location
     movie.locations.all().delete()
@@ -89,10 +98,11 @@ def loadIMDb(imdbId):
 
     #Genre
     movie.genres.all().delete()
-    for i in info['genre']:
-        debug("add genre", i)
-        genre = models.Genre.get_or_create(i)
-        genre.movies.add(movie)
+    if 'genre' in info:
+        for i in info['genre']:
+            debug("add genre", i)
+            genre = models.Genre.get_or_create(i)
+            genre.movies.add(movie)
 
     #Keyword
     movie.keywords.all().delete()
@@ -106,7 +116,7 @@ def loadIMDb(imdbId):
     position = 0
     trivia = oxweb.imdb.getMovieTrivia(imdbId)
     for i in trivia:
-        debug("add trivia", g)
+        debug("add trivia", i)
         t = models.Trivia()
         t.movie = movie
         t.trivia = i
@@ -127,8 +137,16 @@ def loadIMDb(imdbId):
             models.Cast.link(movie, person, role, character, position)
             position += 1
 
-    #FIXME: connections
-    #m.addMovieConnections(IMDb['connections'])
+    movie.connections.all().delete()
+    connections = oxweb.imdb.getMovieConnections(imdbId)
+    for relation in connections:
+        for otherId in connections[relation]:
+            try:
+                object = models.Movie.objects.get(imdbId=otherId)
+                debug("add connection", relation, object)
+                models.Connection.get_or_create(movie, relation, object)
+            except models.Movie.DoesNotExist:
+                pass
 
     reviews = oxweb.imdb.getMovieExternalReviews(imdbId)
     for r in reviews:

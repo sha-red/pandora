@@ -1,4 +1,10 @@
-# Django settings for oxdata project.
+# -*- coding: utf-8 -*-
+# vi:si:et:sw=4:sts=4:ts=4
+# Django settings for oxdb project.
+import os
+from os.path import join
+
+PROJECT_PATH = os.path.normpath(os.path.dirname(__file__))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -21,7 +27,7 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 # although not all choices may be available on all operating systems.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'Europe/Berlin'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -35,7 +41,8 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = join(PROJECT_PATH, 'media')
+STATIC_ROOT = join(PROJECT_PATH, 'static')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -45,7 +52,7 @@ MEDIA_URL = ''
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/'
+ADMIN_MEDIA_PREFIX = '/admin/media/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '3fh^twg4!7*xcise#3d5%ty+^-#9+*f0innkjcco+y0dag_nr-'
@@ -66,9 +73,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'oxdb.urls'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+    join(PROJECT_PATH, 'templates'),
 )
 
 INSTALLED_APPS = (
@@ -76,5 +81,20 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.admin',
+    'django.contrib.humanize',
+
     'oxdb.backend',
 )
+
+try:
+    import socket
+    # hostname = socket.gethostname().replace('.','_')
+    # exec "from host_settings.%s import *" % hostname
+    local_settings_module = socket.gethostname().split(".")[0]
+    if local_settings_module:
+        execfile(os.path.join(PROJECT_PATH, "host_settings", "%s.py" % local_settings_module))
+except ImportError, e:
+    raise e
+
+
