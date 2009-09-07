@@ -4,7 +4,7 @@
 import os
 from os.path import join
 
-PROJECT_PATH = os.path.normpath(os.path.dirname(__file__))
+PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -41,8 +41,8 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = join(PROJECT_PATH, 'media')
-STATIC_ROOT = join(PROJECT_PATH, 'static')
+MEDIA_ROOT = join(PROJECT_ROOT, 'media')
+STATIC_ROOT = join(PROJECT_ROOT, 'static')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -53,9 +53,6 @@ MEDIA_URL = ''
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '/admin/media/'
-
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = '3fh^twg4!7*xcise#3d5%ty+^-#9+*f0innkjcco+y0dag_nr-'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -73,7 +70,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'oxdb.urls'
 
 TEMPLATE_DIRS = (
-    join(PROJECT_PATH, 'templates'),
+    join(PROJECT_ROOT, 'templates'),
 )
 
 INSTALLED_APPS = (
@@ -83,18 +80,31 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.humanize',
+    'south',
 
     'oxdb.backend',
 )
 
+#overwrite default settings with local settings
 try:
-    import socket
-    # hostname = socket.gethostname().replace('.','_')
-    # exec "from host_settings.%s import *" % hostname
-    local_settings_module = socket.gethostname().split(".")[0]
-    if local_settings_module:
-        execfile(os.path.join(PROJECT_PATH, "host_settings", "%s.py" % local_settings_module))
-except ImportError, e:
-    raise e
+    from local_settings import *
+except ImportError:
+    pass
 
+# Make this unique, creates random key first at first time.
+try:
+    SECRET_KEY
+except NameError:
+    SECRET_FILE = os.path.join(PROJECT_ROOT, 'secret.txt')
+    try:
+        SECRET_KEY = open(SECRET_FILE).read().strip()
+    except IOError:
+        try:
+            from random import choice
+            SECRET_KEY = ''.join([choice('abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
+            secret = file(SECRET_FILE, 'w')
+            secret.write(SECRET_KEY)
+            secret.close()
+        except IOError:
+            Exception('Please create a %s file with random characters to generate your secret key!' % SECRET_FILE)
 
