@@ -12,14 +12,14 @@ from django.shortcuts import render_to_response, get_object_or_404, get_list_or_
 from django.template import RequestContext
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
-
+from django.utils import simplejson as json
 from oxdb.utils.shortcuts import render_to_json_response
 
 import models
-
+import utils
+from decorators import login_required_json
     
 '''
-
 field.length -> movie.sort.all()[0].field
 o=0&n=100
 
@@ -27,7 +27,6 @@ o=0&n=100
 a & b  | c & d
 
 query
-
 
 l=user:name or l=name
 q=year:1980,hello,country:usa
@@ -58,14 +57,25 @@ q=year:<1960,year:>1950,title:sex
 
 s=director:asc,year:desc               default: director:asc,year:desc
 r=0:100 or r=100 or r=100:             default: 0:100
-k=id,title,director,date,cast.length   default: title,director,year,country
+p=id,title,director,date,cast.length   default: title,director,year,country
+q
 
+List data backend spec:
+    url = //url for request
+    params = [] //additional params passed to url, i.e. query, or group
 
-id=0133093
+the url must understand the following requests:
+number of items:
+    url?params&n=1
+    > {items: N}
+items sorted by key range X to Y:
+    url?params&s=key:asc|desc&r=X:Y
+    > {items: [{k0:v0, k1:v1...}, {k0:v0, k1:v1...}]}
 
-/json/find?l=all&s=date&f=all&q=&a=desc&p=id,title,director,date,cast.length
+Examples:
+/json/find?l=all&s=title&f=all&q=&a=desc&p=id,title,director,date,cast.length
 
-/json/find?o=0&n=100&l=all&s=date&f=all&q=&a=desc&p=id,title,director,date,cast.length
+/json/find?r=0:100&l=all&s=title&f=all&q=&a=desc&p=id,title,director,date,cast.length
     {
         movies=[
             {
@@ -77,7 +87,7 @@ id=0133093
     }
 
 #get sort order for all ids
-/json/find?o=0&n=1000&l=all&s=date&f=all&q=&a=desc&p=id
+/json/find?r=0:1000&l=all&s=title&f=all&q=&a=desc&p=id
     {
         movies=[
             {
@@ -86,7 +96,7 @@ id=0133093
         ]
     }
 
-/json/find?l=all&s=date&f=all&q=&a=desc
+/json/find?l=all&s=title&f=all&q=&a=desc
     {
         movies: 1234,
         files: 2345,
@@ -96,7 +106,7 @@ id=0133093
 
     }
 
-/json/find?o=0&n=100&l=all&s=[name, items]&f=all&q=&a=desc&g=country
+/json/find?r=0:100&l=all&s=[name, items]&f=all&q=&a=desc&g=country
     {
         groups = [ {name:"USA", movies: 123}, {name:"UK", movies: 1234} ]
     }
@@ -106,13 +116,13 @@ id=0133093
 #auto compleat in find box
 
 '''
-
 def order_query(qs, s, prefix='sort__'):
     order_by = []
     for e in s.split(','):
         o = e.split(':')
         if len(o) == 1: o.append('asc')
-        order = '%s%s' % (prefix, o[0])
+        order = {'id': 'movieId'}.get(o[0], o[0])
+        order = '%s%s' % (prefix, order)
         if o[1] == 'desc':
            order = '-%s' % order
         order_by.append(order)
@@ -129,9 +139,9 @@ def parse_query(request):
     def parse_dict(s):
         d = s.split(",")
         return [i.strip() for i in d]
-    _dicts = ['k', ]
-    _ints = ['o', 'n']
-    for key in ('s', 'k', 'g', 'l'):
+    _dicts = ['p', ]
+    _ints = ['n', ]
+    for key in ('s', 'p', 'g', 'l', 'n'):
         if key in get:
             if key in _ints:
                 query[key] = int(get[key])
@@ -147,25 +157,31 @@ def parse_query(request):
         if r[1] == '': r[0] = -1
         query['i'] = int(r[0])
         query['o'] = int(r[1])
+    #group by only allows sorting by name or number of itmes
     return query
 
 def find(request):
     query = parse_query(request)
     response = {}
-    if 'k' in query:
-        response['movies'] = []
+    if 'p' in query:
+        response['items'] = []
         qs = order_query(query['q'], query['s'])
-        qs = qs[query['i']:query['o']]
-        p = Paginator(qs, 100)
-        for i in p.page_range:
-            page = p.page(i)
-            for m in page.object_list:
-                  response['movies'].append(m.json(query['k']))
+        if 'n' in query:
+            response = {'items': qs.count()}
+        else:
+            qs = qs[query['i']:query['o']]
+            p = Paginator(qs, 100)
+            for i in p.page_range:
+                page = p.page(i)
+                for m in page.object_list:
+                      response['items'].append(m.json(query['p']))
     elif 'g' in query:
+        if query['s'].split(':')[0] not in ('name', 'items'):
+            query['s'] = 'name'
         #FIXME: also filter lists here
-        response['groups'] = []
+        response['items'] = []
         name = 'name'
-        movies = 'movies'
+        items = 'movies'
         movie_qs = query['q']
         _objects = {
             'country': models.Country.objects,
@@ -176,18 +192,29 @@ def find(request):
         if query['g'] in _objects:
             qs = _objects[query['g']].filter(movies__id__in=movie_qs).values('name').annotate(movies=Count('movies'))
         elif query['g'] == "year":
-            qs = movie_qs.values('year').annotate(movies=Count('id'))
-            name='year'
-        qs = order_query(qs, query['s'], '')
-        qs = qs[query['i']:query['o']]
-        for i in qs:
-            group = {'name': i[name], 'movies': i[movies]}
-            response['groups'].append(group)
+            qs = movie_qs.values('imdb__year').annotate(movies=Count('id'))
+            name='imdb__year'
+        if 'n' in query:
+            response['items'] = qs.count()
+        else:
+            #replace normalized items/name sort with actual db value
+            order_by = query['s'].split(":")
+            if len(order_by) == 1:
+                order_by.append('desc')
+            if order_by[0] == 'name':
+                order_by = "%s:%s" % (name, order_by[1])
+            else:
+                order_by = "%s:%s" % (items, order_by[1])
+            qs = order_query(qs, order_by, '')
+            qs = qs[query['i']:query['o']]
+            for i in qs:
+                group = {'title': i[name], 'items': i[items]}
+                response['items'].append(group)
     else:
         #FIXME: also filter lists here
-        movies = models.Movie.objects.all()
-        files = models.MovieFile.objects.all()
-        response['movies'] = movies.count()
+        movies = models.Movie.objects.filter(available=True)
+        files = models.File.objects.all()
+        response['items'] = movies.count()
         response['files'] = files.count()
         r = files.aggregate(Count('size'), Count('pixels'), Count('duration'))
         response['pixels'] = r['pixels__count']
@@ -260,7 +287,7 @@ GET list
       }
     }
 '''
-@login_required
+@login_required_json
 def list_files(request):
     response['files'] = {}
     qs = models.UserFile.filter(user=request.user)
@@ -284,7 +311,7 @@ def find_files(request):
 
 '''
 POST add
-    > {
+    > file: {
         "duration": 5.266667,
         "video_codec": "mpeg1",
         "pixel_format": "yuv420p",
@@ -303,12 +330,14 @@ POST add
         "md5":..
       }
 '''
-@login_required
+#@login_required_json
 def add_file(request, archive):
-    oshash = request.POST['oshash']
+    print request.POST
+    info = json.loads(request.POST['file'])
+    oshash = info['oshash']
     archive = models.Archive.objects.get(name=archive)
     if archive.users.filter(user=request.user).count() == 1:
-        user_file = models.ArchiveFiles.get_or_create(request.user, oshash)
+        user_file = models.ArchiveFile.get_or_create(archive, oshash)
         user_file.update(request.POST)
         response = {'status': 200}
     else:
@@ -318,7 +347,7 @@ def add_file(request, archive):
 '''
 POST remove?oshash=
 '''
-@login_required
+@login_required_json
 def remove_file(request, archive):
     oshash = request.POST['oshash']
     archive = models.Archive.objects.get(name=archive)
@@ -326,11 +355,15 @@ def remove_file(request, archive):
     response = {'status': 200}
     return render_to_json_response(response)
 
+def file_parse(request):
+    response = utils.parsePath(request.POST['path'])
+    return render_to_json_response(response)
+
 '''
 POST preferences/get?key=
 POST preferences/set?key=&value
 '''
-@login_required
+@login_required_json
 def preferences(request):
     oshash = request.POST['oshash']
     return ''

@@ -10,6 +10,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Example:
     (r'^json/', include('backend.urls')),
+    (r'^$', 'app.views.index'),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
@@ -25,6 +26,8 @@ if settings.DEBUG:
             {'document_root': settings.MEDIA_ROOT}),
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.STATIC_ROOT}),
+        (r'^tests/(?P<path>.*)$', 'django.views.static.serve',
+            {'document_root': settings.TESTS_ROOT}),
     )
 
 

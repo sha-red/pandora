@@ -2,10 +2,11 @@
 # vi:si:et:sw=4:sts=4:ts=4
 import re
 import os.path
+import random
+
 from django.db import models
 from django.db.models import Q
 from django.contrib.auth.models import User
-
 import oxlib
 from oxlib import stripTags
 from oxlib.normalize import canonicalTitle, canonicalName
@@ -14,90 +15,165 @@ import utils
 import managers
 
 
-class Movie(models.Model):
+class MovieImdb(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    accessed = models.DateTimeField(null=True, blank=True)
 
-    movieId = models.CharField(max_length=128, unique=True, blank=True)
-    imdbId = models.CharField(max_length=7, unique=True, blank=True)
-    oxdbId = models.CharField(max_length=42, unique=True, blank=True)
+    imdbId = models.CharField(max_length=7, unique=True)
     title = models.CharField(max_length=1000)
     year = models.CharField(max_length=4)
     runtime = models.IntegerField(null=True, blank=True)
     release_date = models.DateField(null=True, blank=True)
-
     tagline = models.TextField(blank=True)
     plot = models.TextField(blank=True)
     plot_outline = models.TextField(blank=True)
 
-    rating = models.IntegerField(null=True, blank=True)
+    rating = models.FloatField(null=True, blank=True)
     votes = models.IntegerField(null=True, blank=True)
 
     budget = models.IntegerField(null=True, blank=True)
     gross = models.IntegerField(null=True, blank=True)
     profit = models.IntegerField(null=True, blank=True)
 
-    #FIXME: how to deal with files now?
-    #files =
-    files_modified = models.DateTimeField(auto_now=True)
-    filename = models.TextField(blank=True)
-    extracted = models.IntegerField(null=True, blank=True)
-
-    #length = models.IntegerField(null=True, blank=True)
-    duration = models.FloatField(null=True, blank=True)
-
-    objects = managers.MovieManager()
-
-    #FIXME: should this be a done via a manager for person?
-    def directors(self):
-        return self.people.filter(cast__role='directors').order_by('cast__position')
-    def writers(self):
-        return self.people.filter(cast__role='writers').order_by('cast__position')
-    def editors(self):
-        return self.people.filter(cast__role='editors').order_by('cast__position')
-    def producers(self):
-        return self.people.filter(cast__role='producers').order_by('cast__position')
-    def cinematographers(self):
-        return self.people.filter(cast__role='cinematographers').order_by('cast__position')
-
-    #FIXME: include role and character
-    def cast(self):
-        cast = []
-        for c in Cast.objects.filter(movie=self, role='cast').order_by('position'):
-            cast.append((c.person.name, c.character))
-        return tuple(cast)
-        #return self.person.filter(cast__role='cast').order_by('cast__position')
-
-    def connections_json(self):
-        connections = {}
-        for connection in self.connections.all():
-            if connection.relation not in connections:
-                connections[connection.relation] = []
-            connections[connection.relation].append(connection.object.movieId)
-        return connections
-
-    def filtered_reviews(self):
-        whitelist = ReviewWhitelist.objects.all()
-        q = Q(id=-1)
-        for w in whitelist:
-            q = q | Q(url__contains=w.url)
-        return self.reviews.filter(q)
-
-    rights_level = models.IntegerField(default=-1)
-   
-    #FIXME: use data.0xdb.org
-    tpb_id = models.CharField(max_length=128, blank=True)
-    kg_id = models.CharField(max_length=128, blank=True)
-    open_subtitle_id = models.IntegerField(null=True, blank=True)
-    wikipedia_url = models.TextField(blank=True)
-
-    #Series information
     series_imdb = models.CharField(max_length=7, default='')
     series_title = models.TextField(blank=True, default='')
     episode_title = models.TextField(blank=True, default='')
     season = models.IntegerField(default=-1)
     episode = models.IntegerField(default=-1)
+
+class MovieOxdb(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    title = models.CharField(max_length=1000)
+    year = models.CharField(max_length=4)
+    runtime = models.IntegerField(null=True, blank=True)
+    release_date = models.DateField(null=True, blank=True)
+    tagline = models.TextField(blank=True)
+    plot = models.TextField(blank=True)
+    plot_outline = models.TextField(blank=True)
+
+    rating = models.FloatField(null=True, blank=True)
+    votes = models.IntegerField(null=True, blank=True)
+
+    budget = models.IntegerField(null=True, blank=True)
+    gross = models.IntegerField(null=True, blank=True)
+    profit = models.IntegerField(null=True, blank=True)
+
+    series_imdb = models.CharField(max_length=7, default='')
+    series_title = models.TextField(blank=True, default='')
+    episode_title = models.TextField(blank=True, default='')
+    season = models.IntegerField(default=-1)
+    episode = models.IntegerField(default=-1)
+
+def newMovie(title, director, year):
+    movie = Movie()
+    oxdb = MovieOxdb()
+    oxdb.save()
+    movie.oxdb = oxdb
+    movie.oxdb.title = title
+    movie.oxdb.year = str(year)
+    movie.oxdb.save()
+    movie.oxdbId = "__init__%s" % random.randint(0, 100000)
+    movie.save()
+    movie.oxdbId = movie.oxid()
+    movie.save()
+    return movie
+
+class Movie(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    #only movies that have metadata from files are available,
+    #this is indicated by setting available to True 
+    available = models.BooleanField(default=False)
+
+    movieId = models.CharField(max_length=128, unique=True, blank=True)
+    oxdbId = models.CharField(max_length=42, unique=True, blank=True)
+
+    imdb = models.OneToOneField('MovieImdb', null=True, related_name='movie')
+    oxdb = models.OneToOneField('MovieOxdb', null=True, related_name='movie')
+
+    objects = managers.MovieManager()
+
+    def get(self, key, default=None):
+        if self.oxdb and getattr(self.oxdb, key):
+            return getattr(self.oxdb, key)
+        if self.imdb:
+            return getattr(self.imdb, key)
+        return default
+
+    def _manual(self, qs, f='manual'):
+        if qs.filter(**{f:True}).count() > 0:
+            return qs.exclude(**{f:False})
+        return qs.exclude(**{f:True})
+
+    def directors(self):
+        qs = self.people.filter(cast__role='directors').order_by('cast__position')
+        return self._manual(qs, 'cast__manual')
+    def writers(self):
+        qs = self.people.filter(cast__role='writers').order_by('cast__position')
+        return self._manual(qs, 'cast__manual')
+    def editors(self):
+        qs = self.people.filter(cast__role='editors').order_by('cast__position')
+        return self._manual(qs, 'cast__manual')
+    def producers(self):
+        qs = self.people.filter(cast__role='producers').order_by('cast__position')
+        return self._manual(qs, 'cast__manual')
+    def cinematographers(self):
+        qs = self.people.filter(cast__role='cinematographers').order_by('cast__position')
+        return self._manual(qs, 'cast__manual')
+
+    def cast(self):
+        cast = []
+        qs = Cast.objects.filter(movie=self, role='cast').order_by('position')
+        qs = self._manual(qs)
+        for c in qs:
+            cast.append((c.person.name, c.character))
+        return tuple(cast)
+
+    def alternative_titles(self):
+        return self._manual(self.alternative_titles_all)
+    def genres(self):
+        return self._manual(self.genres_all)
+    def keywords(self):
+        return self._manual(self.keywords_all)
+    def countries(self):
+        return self._manual(self.countries_all, 'moviecountry__manual')
+    def languages(self):
+        return self._manual(self.languages_all, 'movielanguage__manual')
+    def trivia(self):
+        return self._manual(self.trivia_all)
+    def locations(self):
+        return self._manual(self.locations_all)
+    def connections(self):
+        return self._manual(self.connections_all)
+
+    def connections_json(self):
+        connections = {}
+        for connection in self.connections():
+            if connection.relation not in connections:
+                connections[connection.relation] = []
+            connections[connection.relation].append(connection.object.movieId)
+        return connections
+
+    def reviews(self):
+        q = self.reviews_all.filter(manual=True)
+        if q.count() > 0:
+            return q
+        whitelist = ReviewWhitelist.objects.all()
+        q = Q(id=-1)
+        for w in whitelist:
+            q = q | Q(url__contains=w.url)
+        return self.reviews_all.filter(q).filter(manual=False)
+
+    rights_level = models.IntegerField(default=-1)
+
+    #FIXME: use data.0xdb.org
+    tpb_id = models.CharField(max_length=128, blank=True)
+    kg_id = models.CharField(max_length=128, blank=True)
+    open_subtitle_id = models.IntegerField(null=True, blank=True)
+    wikipedia_url = models.TextField(blank=True)
 
     #what of this is still required?
     still_pos = models.IntegerField(null=True, blank=True)
@@ -110,11 +186,16 @@ class Movie(models.Model):
     scene_height = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
-        return u'%s (%s)' % (self.title, self.year)
+        return u'%s (%s)' % (self.get('title'), self.get('year'))
+
 
     def save(self, *args, **kwargs):
-        if self.imdbId:
-            mid = self.imdbId
+        if not self.oxdb:
+            oxdb = MovieOxdb()
+            oxdb.save()
+            self.oxdb = oxdb
+        if self.imdb:
+            mid = self.imdb.imdbId
         else:
             mid = self.oxdbId
         self.movieId = mid
@@ -133,33 +214,41 @@ class Movie(models.Model):
 
         'countries': 'country',
         'directors': 'director',
-        'genres': 'genres',
-        'keywords': 'keywords',
+        'languages': 'language',
+        'genres': 'genre',
+        'keywords': 'keyword',
         'cast': 'cast',
         'series_title': 'series_title',
         'episode_title': 'episode_title',
         'season': 'season',
         'episode': 'episode',
-        'filtered_reviews': 'reviews',
+        'reviews': 'reviews',
         'trivia': 'trivia',
+        'rating': 'rating',
+        'votes': 'votes',
         'alternative_titles': 'alternative_titles',
-        'connections': 'connections_json'
+        'connections_json': 'connections'
     }
     def json(self, fields=None):
         movie = {}
         for key in self._public_fields:
             pub_key = self._public_fields.get(key, key)
             if not fields or pub_key in fields:
-                value = getattr(self, key)
-                if key in ('directors', 'writers', 'filtered_reviews'):
+                if hasattr(self, key):
+                    value = getattr(self, key)
+                else:
+                    value = self.get(key)
+                if key in ('directors', 'writers', 'reviews', 
+                           'countries', 'languages', 'keywords', 'genres', 'trivia', 'alternative_titles'):
                     movie[pub_key] = tuple([v.json() for v in value()])
-                elif key in ('countries', 'keywords', 'genres', 'trivia', 'alternative_titles'):
-                    movie[pub_key] = tuple([v.json() for v in value.all()])
+                elif callable(value):
+                    movie[pub_key] = value()
                 else:
                     movie[pub_key] = value
-        for f in fields:
-            if f.endswith('.length') and f[:-7] in ('cast', 'genre', 'trivia'):
-                movie[f] = getattr(self.sort.all()[0], f[:-7])
+        if fields:
+            for f in fields:
+                if f.endswith('.length') and f[:-7] in ('cast', 'genre', 'trivia'):
+                    movie[f] = getattr(self.sort.all()[0], f[:-7])
         return movie
 
     def fields(self):
@@ -181,7 +270,7 @@ class Movie(models.Model):
     byMovieId = classmethod(byMovieId)
 
     def byImdbId(self, imdbId):
-        return self.objects.get(imdbId=imdbId)
+        return self.objects.get(imdb__imdbId=imdbId)
     byImdbId = classmethod(byImdbId)
 
     def byOxdbId(self, oxdbId):
@@ -190,43 +279,44 @@ class Movie(models.Model):
 
     def oxid(self):
         directors = ','.join([d.name for d in self.directors()])
-        return utils.oxid(self.title, directors, self.year,
-                          self.series_title, self.episode_title, self.season, self.episode)
+        return utils.oxid(self.get('title', ''), directors, self.get('year', ''),
+                          self.get('series_title', ''), self.get('episode_title', ''),
+                          self.get('season', ''), self.get('episode', ''))
 
     def updateFind(self):
-        if self.find.count() == 0:
-            f = MovieFind()
-            f.movie = self
-        else:
-            f = self.find.all()[0]
-        f.title = self.title + ' '.join([t.title for t in self.alternative_titles.all()])
+        try:
+            f = self.find
+        except MovieFind.DoesNotExist:
+            f = MovieFind(movie=self)
+
+        f.title = self.get('title') + ' '.join([t.title for t in self.alternative_titles()])
         f.director = ' '.join([i.name for i in self.directors()])
-        f.country = ' '.join([i.name for i in self.countries.all()])
-        f.year = self.year
-        f.language = ' '.join([i.name for i in self.languages.all()])
+        f.country = ' '.join([i.name for i in self.countries()])
+        f.year = self.get('year', '')
+        f.language = ' '.join([i.name for i in self.languages()])
         f.writer = ' '.join([i.name for i in self.writers()])
         f.producer = ' '.join([i.name for i in self.producers()])
         f.editor = ' '.join([i.name for i in self.editors()])
         f.cinematographer = ' '.join([i.name for i in self.cinematographers()])
         f.cast = ' '.join(['%s %s' % i for i in self.cast()])
-        f.genre = ' '.join([i.name for i in self.genres.all()])
-        f.keywords = ' '.join([i.name for i in self.keywords.all()])
-        f.summary = self.plot + self.plot_outline
-        f.trivia = ' '.join([i.trivia for i in self.trivia.all()])
-        f.location = ' '.join([i.name for i in self.locations.all()])
-        f.filename = self.filename
-        f.all = ' '.join([f.title, f.director, f.country, f.year, f.language,
+        f.genre = ' '.join([i.name for i in self.genres()])
+        f.keywords = ' '.join([i.name for i in self.keywords()])
+        f.summary = self.get('plot', '') + self.get('plot_outline', '')
+        f.trivia = ' '.join([i.trivia for i in self.trivia()])
+        f.location = ' '.join([i.name for i in self.locations()])
+        #FIXME: collate filenames
+        #f.filename = self.filename
+        f.all = ' '.join(filter(None, [f.title, f.director, f.country, f.year, f.language,
                           f.writer, f.producer, f.editor, f.cinematographer,
                           f.cast, f.genre, f.keywords, f.summary, f.trivia,
-                          f.location, f.filename])
+                          f.location, f.filename]))
         f.save()
 
     def updateSort(self):
-        if self.sort.count() == 0:
-            s = MovieSort()
-            s.movie = self
-        else:
-            s = self.sort.all()[0]
+        try:
+            s = self.sort
+        except MovieSort.DoesNotExist:
+            s = MovieSort(movie=self)
 
         def sortName(value):
             sort_value = '~'
@@ -239,7 +329,7 @@ class Movie(models.Model):
             return sort_value
 
         #title
-        title = canonicalTitle(self.title)
+        title = canonicalTitle(self.get('title'))
         title = re.sub(u'[\'!¿¡,\.;\-"\:\*\[\]]', '', title)
         title = title.replace(u'Æ', 'Ae')
         #pad numbered titles
@@ -253,8 +343,8 @@ class Movie(models.Model):
         directors = ','.join([i.name for i in self.directors()])
         s.director = sortName(directors)
 
-        s.country = ','.join([i.name for i in self.countries.all()])
-        s.year = self.year
+        s.country = ','.join([i.name for i in self.countries()])
+        s.year = self.get('year', '')
 
         names = ','.join([i.name for i in self.producers()])
         s.producer = sortName(names)
@@ -265,16 +355,19 @@ class Movie(models.Model):
         names = ','.join([i.name for i in self.cinematographers()])
         s.cinematographer = sortName(names)
 
-        s.country = ','.join([i.name for i in self.languages.all()])
-        s.runtime = self.runtime
+        s.language = ','.join([i.name for i in self.languages()])
+        s.country = ','.join([i.name for i in self.countries()])
+        s.runtime = self.get('runtime', 0)
 
-        s.keywords = self.keywords.all().count()
-        s.genre = self.genres.all().count()
+        s.keywords = self.keywords().count()
+        s.genre = self.genres().count()
         s.cast = len(self.cast())
-        s.summary = len(self.plot.split())
-        s.trivia = self.trivia.all().count()
-        s.connections = self.connections.all().count()
+        s.summary = len(self.get('plot', '').split())
+        s.trivia = self.trivia().count()
+        s.connections = self.connections().count()
         s.movieId = self.movieId
+        s.rating = self.get('rating', -1)
+        s.votes = self.get('votes', -1)
 
         # data from related subtitles
         s.scenes = 0 #FIXME
@@ -296,29 +389,29 @@ class MovieFind(models.Model):
     """
         used to search movies, all search values are in here
     """
-    movie = models.ForeignKey('Movie', related_name='find', unique=True)
+    movie = models.OneToOneField('Movie', related_name='find', primary_key=True)
 
     all = models.TextField(blank=True)
     title = models.CharField(max_length=1000)
-    director = models.TextField(blank=True)
-    country = models.TextField(blank=True)
+    director = models.TextField(blank=True, default='')
+    country = models.TextField(blank=True, default='')
     year = models.CharField(max_length=4)
-    language = models.TextField(blank=True)
-    writer = models.TextField(blank=True)
-    producer = models.TextField(blank=True)
-    editor = models.TextField(blank=True)
-    cinematographer = models.TextField(blank=True)
-    cast = models.TextField(blank=True)
+    language = models.TextField(blank=True, default='')
+    writer = models.TextField(blank=True, default='')
+    producer = models.TextField(blank=True, default='')
+    editor = models.TextField(blank=True, default='')
+    cinematographer = models.TextField(blank=True, default='')
+    cast = models.TextField(blank=True, default='')
     #person
 
     genre = models.TextField(blank=True)
     keywords = models.TextField(blank=True)
     summary = models.TextField(blank=True)
     trivia = models.TextField(blank=True)
-    locations = models.TextField(blank=True)
+    locations = models.TextField(blank=True, default='')
 
     #only for own files or as admin?
-    filename = models.TextField(blank=True)
+    filename = models.TextField(blank=True, default='')
 
     _private_fields = ('id', 'movie')
     _public_names = {
@@ -338,7 +431,7 @@ class MovieSort(models.Model):
     """
         used to sort movies, all sort values are in here
     """
-    movie = models.ForeignKey('Movie', related_name='sort', unique=True)
+    movie = models.OneToOneField('Movie', related_name='sort', primary_key=True)
 
     title = models.CharField(max_length=1000)
     director = models.TextField(blank=True)
@@ -360,6 +453,8 @@ class MovieSort(models.Model):
     trivia = models.IntegerField(blank=True)
     connections = models.IntegerField(blank=True)
 
+    rating = models.FloatField(blank=True)
+    votes = models.IntegerField(blank=True)
     scenes = models.IntegerField(blank=True)
     words = models.IntegerField(null=True, blank=True)
     wpm = models.IntegerField(null=True, blank=True)
@@ -391,9 +486,10 @@ class MovieSort(models.Model):
     options = classmethod(options)
 
 class AlternativeTitle(models.Model):
-    movie = models.ForeignKey(Movie, related_name='alternative_titles')
+    movie = models.ForeignKey(Movie, related_name='alternative_titles_all')
     title = models.TextField()
     type = models.CharField(max_length=1000)
+    manual = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('title', )
@@ -453,6 +549,7 @@ class Cast(models.Model):
     role = models.CharField(max_length=200)
     character = models.CharField(max_length=200, blank=True)
     position = models.IntegerField()
+    manual = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('position', 'person__name_sort')
@@ -460,11 +557,12 @@ class Cast(models.Model):
     def __unicode__(self):
         return "%s <> %s" % (self.person, self.movie)
 
-    def link(self, movie, person, role, character, position):
+    def link(self, movie, person, role, character, position, manual=False):
         q = self.objects.filter(movie=movie, person=person, role=role, character=character)
         if q.count() > 0:
             link = q[0]
             link.position = position
+            link.manual = manual
             link.save()
         else:
             link = self()
@@ -473,6 +571,7 @@ class Cast(models.Model):
             link.role=role
             link.character=character
             link.position = position
+            link.manual = manual
             link.save()
         return link
     link = classmethod(link)
@@ -482,7 +581,7 @@ class Cast(models.Model):
 
 class Country(models.Model):
     name = models.CharField(max_length=200, unique=True)
-    movies = models.ManyToManyField(Movie, related_name='countries', through='MovieCountry')
+    movies = models.ManyToManyField(Movie, related_name='countries_all', through='MovieCountry')
 
     class Meta:
         #!! adding this to ordering, breaks:
@@ -502,6 +601,7 @@ class MovieCountry(models.Model):
     movie = models.ForeignKey(Movie)
     country = models.ForeignKey(Country)
     position = models.IntegerField()
+    manual = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('position', 'country')
@@ -526,7 +626,7 @@ class MovieCountry(models.Model):
 
 class Language(models.Model):
     name = models.CharField(max_length=200, unique=True)
-    movies = models.ManyToManyField(Movie, related_name='languages', through="MovieLanguage")
+    movies = models.ManyToManyField(Movie, related_name='languages_all', through="MovieLanguage")
 
     class Meta:
         ordering = ('name', )
@@ -542,6 +642,7 @@ class MovieLanguage(models.Model):
     movie = models.ForeignKey(Movie)
     language = models.ForeignKey(Language)
     position = models.IntegerField()
+    manual = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('position', 'language')
@@ -566,7 +667,8 @@ class MovieLanguage(models.Model):
 
 class Keyword(models.Model):
     name = models.CharField(max_length=200, unique=True)
-    movies = models.ManyToManyField(Movie, related_name='keywords')
+    manual = models.BooleanField(default=False)
+    movies = models.ManyToManyField(Movie, related_name='keywords_all')
 
     class Meta:
         ordering = ('name', )
@@ -581,7 +683,8 @@ class Keyword(models.Model):
 
 class Genre(models.Model):
     name = models.CharField(max_length=200, unique=True)
-    movies = models.ManyToManyField(Movie, related_name='genres')
+    manual = models.BooleanField(default=False)
+    movies = models.ManyToManyField(Movie, related_name='genres_all')
 
     class Meta:
         ordering = ('name', )
@@ -596,7 +699,8 @@ class Genre(models.Model):
 
 class Location(models.Model):
     name = models.CharField(max_length=200, unique=True)
-    movies = models.ManyToManyField(Movie, related_name='locations')
+    manual = models.BooleanField(default=False)
+    movies = models.ManyToManyField(Movie, related_name='locations_all')
     #fixme: geo data
 
     lat_sw = models.FloatField(default=0)
@@ -620,8 +724,9 @@ class Location(models.Model):
 
 class Trivia(models.Model):
     trivia = models.TextField()
-    movie = models.ForeignKey(Movie, related_name='trivia')
+    manual = models.BooleanField(default=False)
     position = models.IntegerField()
+    movie = models.ForeignKey(Movie, related_name='trivia_all')
 
     class Meta:
         ordering = ('position', )
@@ -637,16 +742,17 @@ class Trivia(models.Model):
         return trivia
 
 class Connection(models.Model):
-    subject = models.ForeignKey(Movie, related_name='connections')
+    subject = models.ForeignKey(Movie, related_name='connections_all')
     relation = models.CharField(max_length=512)
     object = models.ForeignKey(Movie)
+    manual = models.BooleanField(default=False)
 
-    def get_or_create(model, subject, relation, object, reverse=True):
+    def get_or_create(model, subject, relation, object, reverse=True, manual=False):
         q = model.objects.filter(subject=subject, relation=relation, object=object)
         if q.count() > 0:
             o = q[0]
         else:
-            o = model.objects.create(subject=subject, relation=relation, object=object)
+            o = model.objects.create(subject=subject, relation=relation, object=object, manual=manual)
             o.save()
         if reverse:
             _map = {
@@ -672,119 +778,11 @@ class Connection(models.Model):
     def __unicode__(self):
         return '%s %s %s' % (self.subject, self.relation, self.object)
 
-class File(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-
-    oshash = models.CharField(blank=True, unique=True, max_length=16)
-    sha1 = models.CharField(blank=True, unique=True, max_length=40)
-    md5 = models.CharField(blank=True, unique=True, max_length=32)
-
-    movie = models.ForeignKey('Movie', related_name="files", default=None)
-
-    computed_path = models.CharField(blank=True, max_length=2048)
-    size = models.IntegerField(default=-1)
-    duration = models.FloatField(default=-1)
-
-    video_codec = models.CharField(blank=True, max_length=256)
-    pixel_format = models.CharField(blank=True, max_length=256)
-    width = models.IntegerField(default=-1)
-    height = models.IntegerField(default=-1)
-    pixel_aspect_ratio = models.CharField(blank=True, max_length=256)
-    display_aspect_ratio = models.CharField(blank=True, max_length=256)
-    framerate = models.CharField(blank=True, max_length=256)
-
-    audio_codec = models.CharField(blank=True, max_length=256)
-    samplerate = models.IntegerField(default=-1)
-    channels = models.IntegerField(default=-1)
-
-    #computed values
-    bpp = models.FloatField(default=-1)
-    pixels = models.IntegerField(default=0)
-
-    part = models.IntegerField(default=0)
-
-    def get_or_create(model, oshash):
-        try:
-            f = model.objects.get(oshash=oshash)
-        except model.DoesNotExist:
-            f = model.objects.create(oshash=oshash)
-            f.save()
-        return f
-    get_or_create = classmethod(get_or_create)
-
-    def __unicode__(self):
-        return "%s (%s)" % (self.computed_path, self.oshash)
-
-class Archive(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=255, unique=True)
-    users = models.ManyToManyField(User, related_name='archives')
-
-class ArchiveFile(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    archive = models.ForeignKey(Archive)
-    movie_file = models.ForeignKey(File)
-    path = models.CharField(blank=True, max_length=2048)
-
-    objects = managers.ArchiveFileManager()
-    
-    def update(self, data):
-        """
-            only add, do not overwrite keys in movie_file
-        """
-        for key in ('duration', 'video_codec', 'pixel_format', 'width', 'height',
-                    'pixel_aspect_ratio', 'display_aspect_ratio', 'framerate',
-                    'audio_codec', 'samplerate', 'channels', 'size', 'sha1', 'md5'):
-            if key in data and not getattr(self.movie_file, key):
-                setattr(self.movie_file, key, data[key])
-        self.path = data.get('path', '')
-        self.movie_file.save()
-        self.save()
-
-    def get_or_create(model, archive, oshash):
-        try:
-            f = model.objects.by_oshash(oshash=oshash)
-        except model.DoesNotExist:
-            f = model.objects.create()
-            f.movie_file = File.get_or_create(oshash)
-            f.archive = archive
-            f.save()
-        return f
-    get_or_create = classmethod(get_or_create)
-
-    def __unicode__(self):
-        return '%s (%s)' % (self.path, unicode(self.user))
-
-class Subtitle(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User)
-
-    movie_file = models.ForeignKey(File)
-    language = models.CharField(max_length=16)
-    srt = models.TextField(blank=True)
-
-    def get_or_create(model, user, oshash, language):
-        q = model.objects.filter(movie_file__oshash=oshash, language=language, user=user)
-        if q.count() > 0:
-            s = q[0]
-        else:
-            movie_file = models.File.get_or_create(oshash=oshash)
-            s = model.objects.create(user=user, language=language, movie_file=movie_file)
-            s.save()
-        return s
-    get_or_create = classmethod(get_or_create)
-
-    def __unicode__(self):
-        return '%s.%s.srt' % (os.path.splitext(self.movie_file.computed_path)[0], self.language)
-
 class Review(models.Model):
-    movie = models.ForeignKey('Movie', related_name='reviews')
+    movie = models.ForeignKey('Movie', related_name='reviews_all')
     title = models.CharField(blank=True, max_length=2048)
     url = models.CharField(blank=True, max_length=2048)
+    manual = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.title
@@ -842,4 +840,159 @@ class ListItem(models.Model):
 
     def __unicode__(self):
         return u'%s in %s' % (unicode(self.movie), unicode(self.list))
+
+def stream_path(f, size):
+    name = "%s.%s" % (size, 'ogv')
+    url_hash = f.oshash
+    return os.path.join('stream', url_hash[:2], url_hash[2:4], url_hash[4:6], name)
+
+class File(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    oshash = models.CharField(blank=True, unique=True, max_length=16)
+    sha1 = models.CharField(blank=True, unique=True, max_length=40)
+    md5 = models.CharField(blank=True, unique=True, max_length=32)
+
+    movie = models.ForeignKey(Movie, related_name="files", default=None)
+
+    computed_path = models.CharField(blank=True, max_length=2048)
+    size = models.IntegerField(default=-1)
+    duration = models.FloatField(default=-1)
+    
+    is_video = models.BooleanField(default=False)
+
+    video_codec = models.CharField(blank=True, max_length=256)
+    pixel_format = models.CharField(blank=True, max_length=256)
+    width = models.IntegerField(default=-1)
+    height = models.IntegerField(default=-1)
+    pixel_aspect_ratio = models.CharField(blank=True, max_length=256)
+    display_aspect_ratio = models.CharField(blank=True, max_length=256)
+    framerate = models.CharField(blank=True, max_length=256)
+
+    audio_codec = models.CharField(blank=True, max_length=256)
+    samplerate = models.IntegerField(default=-1)
+    channels = models.IntegerField(default=-1)
+
+    #computed values
+    bpp = models.FloatField(default=-1)
+    pixels = models.IntegerField(default=0)
+
+    part = models.IntegerField(default=0)
+
+    #stream related fields
+    available = models.BooleanField(default=False)
+    stream128 = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, '128'))
+    stream320 = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, '320'))
+    stream640 = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, '640'))
+
+    def save_chunk(self, chunk, name='video.ogv'):
+        if not self.available:
+            #FIXME: this should use stream128 or stream640 depending on configuration
+            video = getattr(self, 'stream128')
+            if not video:
+                video.save(name, ContentFile(chunk))
+                self.save()
+            else:
+                f = open(video.path, 'a')
+                f.write(chunk)
+                f.close()
+            return True
+        return False
+
+    objects = managers.FileManager()
+
+    def get_or_create(model, oshash):
+        try:
+            f = model.objects.get(oshash=oshash)
+        except model.DoesNotExist:
+            f = model.objects.create(oshash=oshash)
+            f.save()
+        return f
+    get_or_create = classmethod(get_or_create)
+
+    def __unicode__(self):
+        return "%s (%s)" % (self.computed_path, self.oshash)
+
+class Subtitle(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User)
+
+    file = models.ForeignKey(File, related_name="subtitles")
+    language = models.CharField(max_length=16)
+    srt = models.TextField(blank=True)
+
+    def get_or_create(model, user, oshash, language):
+        q = model.objects.filter(file__oshash=oshash, language=language, user=user)
+        if q.count() > 0:
+            s = q[0]
+        else:
+            f = models.File.get_or_create(oshash=oshash)
+            s = model.objects.create(user=user, language=language, file=f)
+            s.save()
+        return s
+    get_or_create = classmethod(get_or_create)
+
+    def __unicode__(self):
+        return '%s.%s.srt' % (os.path.splitext(self.movie_file.computed_path)[0], self.language)
+
+class Layer(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User)
+    movie = models.ForeignKey(Movie)
+
+    #seconds
+    time_in = models.FloatField(default=-1)
+    time_out = models.FloatField(default=-1)
+
+    type = models.CharField(blank=True, max_length=255)
+    value = models.TextField()
+
+    #location = models.ForeignKey('Location', default=None)
+
+class Archive(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+    name = models.CharField(max_length=255, unique=True)
+    public = models.BooleanField(default=False)
+    users = models.ManyToManyField(User, related_name='archives')
+
+class ArchiveFile(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+    archive = models.ForeignKey(Archive, related_name='files')
+    file = models.ForeignKey(File)
+    path = models.CharField(blank=True, max_length=2048)
+
+    objects = managers.ArchiveFileManager()
+    
+    def update(self, data):
+        """
+            only add, do not overwrite keys in file
+        """
+        for key in ('duration', 'video_codec', 'pixel_format', 'width', 'height',
+                    'pixel_aspect_ratio', 'display_aspect_ratio', 'framerate',
+                    'audio_codec', 'samplerate', 'channels', 'size', 'sha1', 'md5'):
+            if key in data and not getattr(self.file, key):
+                setattr(self.file, key, data[key])
+        self.path = data.get('path', '')
+        self.file.save()
+        self.save()
+
+    def get_or_create(model, archive, oshash):
+        try:
+            f = model.objects.by_oshash(oshash=oshash)
+        except model.DoesNotExist:
+            f = model.objects.create()
+            f.file = File.get_or_create(oshash)
+            f.archive = archive
+            f.save()
+        return f
+    get_or_create = classmethod(get_or_create)
+
+    def __unicode__(self):
+        return '%s (%s)' % (self.path, unicode(self.user))
+
 

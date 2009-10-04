@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+import random
 import os.path
 from django.db import models
 from django.contrib.auth.models import User
@@ -26,8 +27,15 @@ def loadIMDb(imdbId):
     try:
         movie = models.Movie.byImdbId(imdbId)
     except models.Movie.DoesNotExist:
+        #this shound not happen, just in case previous imports failed
+        try:
+            imdb = models.MovieImdb.objects.get(imdbId=imdbId)
+        except models.MovieImdb.DoesNotExist:
+            imdb = models.MovieImdb()
+            imdb.imdbId = imdbId
+            imdb.save()
         movie = models.Movie()
-        movie.imdbId = imdbId
+        movie.imdb = imdb
 
     info = oxweb.imdb.getMovieInfo(imdbId)
     for key in ('title',
@@ -40,7 +48,7 @@ def loadIMDb(imdbId):
                 'season',
                 'episode'):
         if key in info:
-            setattr(movie, key, info[key])
+            setattr(movie.imdb, key, info[key])
             debug(key, info[key])
     _info_map = {
         'episode title': 'episode_title',
@@ -48,18 +56,20 @@ def loadIMDb(imdbId):
     }
     for key in _info_map.keys():
         if key in info:
-            setattr(movie, _info_map.get(key, key), info[key])
+            setattr(movie.imdb, _info_map.get(key, key), info[key])
 
-    movie.plot = oxweb.imdb.getMoviePlot(imdbId)
-    debug("plot", movie.plot)
+    movie.imdb.plot = oxweb.imdb.getMoviePlot(imdbId)
+    debug("plot", movie.imdb.plot)
 
-    movie.runtime = oxweb.imdb.getMovieRuntimeSeconds(imdbId)
+    movie.imdb.runtime = oxweb.imdb.getMovieRuntimeSeconds(imdbId)
     business = oxweb.imdb.getMovieBusinessSum(imdbId)
     for key in ('gross', 'profit', 'budget'):
-        setattr(movie, key, business[key])
+        setattr(movie.imdb, key, business[key])
 
+    movie.imdb.save()
+    movie.oxdbId = "__init__%s" % random.randint(0, 100000)
     movie.save()
-    models.AlternativeTitle.objects.filter(movie=movie).delete()
+    models.AlternativeTitle.objects.filter(movie=movie, manual=False).delete()
     for i in oxweb.imdb.getMovieAKATitles(imdbId):
         t = models.AlternativeTitle()
         t.movie = movie
@@ -69,7 +79,7 @@ def loadIMDb(imdbId):
 
     #FIXME: related tables should be cleaned to not accumulate cruft
     #Country
-    models.MovieCountry.objects.filter(movie=movie).delete()
+    models.MovieCountry.objects.filter(movie=movie, manual=False).delete()
     position = 0
     if 'country' in info:
         for i in info['country']:
@@ -79,7 +89,7 @@ def loadIMDb(imdbId):
             position += 1
 
     #Language
-    models.MovieLanguage.objects.filter(movie=movie).delete()
+    models.MovieLanguage.objects.filter(movie=movie, manual=False).delete()
     position = 0
     if 'language' in info:
         for i in info['language']:
@@ -89,7 +99,7 @@ def loadIMDb(imdbId):
             position += 1
 
     #Location
-    movie.locations.all().delete()
+    movie.locations_all.filter(manual=False).delete()
     locations = oxweb.imdb.getMovieLocations(imdbId)
     for i in locations:
         debug("add location", i)
@@ -97,7 +107,7 @@ def loadIMDb(imdbId):
         location.movies.add(movie)
 
     #Genre
-    movie.genres.all().delete()
+    movie.genres_all.filter(manual=False).delete()
     if 'genre' in info:
         for i in info['genre']:
             debug("add genre", i)
@@ -105,14 +115,14 @@ def loadIMDb(imdbId):
             genre.movies.add(movie)
 
     #Keyword
-    movie.keywords.all().delete()
+    movie.keywords_all.filter(manual=False).delete()
     keywords = oxweb.imdb.getMovieKeywords(imdbId)
     for g in keywords:
         debug("add keyword", g)
         keyword = models.Keyword.get_or_create(g)
         keyword.movies.add(movie)
 
-    movie.trivia.all().delete()
+    movie.trivia_all.filter(manual=False).delete()
     position = 0
     trivia = oxweb.imdb.getMovieTrivia(imdbId)
     for i in trivia:
@@ -125,6 +135,7 @@ def loadIMDb(imdbId):
         position += 1
 
     position = 0
+    models.Cast.objects.filter(movie=movie).filter(manual=False).delete()
     credits = oxweb.imdb.getMovieCredits(imdbId)
     for role in credits:
         for p in credits[role]:
@@ -137,18 +148,19 @@ def loadIMDb(imdbId):
             models.Cast.link(movie, person, role, character, position)
             position += 1
 
-    movie.connections.all().delete()
+    movie.connections_all.filter(manual=False).delete()
     connections = oxweb.imdb.getMovieConnections(imdbId)
     for relation in connections:
         for otherId in connections[relation]:
             try:
-                object = models.Movie.objects.get(imdbId=otherId)
+                object = models.Movie.objects.get(imdb__imdbId=otherId)
                 debug("add connection", relation, object)
                 models.Connection.get_or_create(movie, relation, object)
             except models.Movie.DoesNotExist:
                 pass
 
     reviews = oxweb.imdb.getMovieExternalReviews(imdbId)
+    movie.reviews_all.filter(manual=False).delete()
     for r in reviews:
         debug("add review", r)
         review = models.Review.get_or_create(movie, r)

@@ -10,6 +10,7 @@ from django.db.models import Q, Manager
 
 import models
 
+
 def keyType(key):
     if key in ('released'):
         return "date"
@@ -29,6 +30,7 @@ class MovieManager(Manager):
             also checks for lists.
             range and order must be applied later
         '''
+        q = ''
         for i in request.META['QUERY_STRING'].split('&'):
           if i.startswith('q='):
             q = i[2:]
@@ -96,6 +98,8 @@ class MovieManager(Manager):
 
         #join query with operator
         qs = self.get_query_set()
+        #only include movies that have hard metadata
+        qs = qs.filter(available=True)
         if conditions:
             q = conditions[0]
             for c in conditions[1:]:
@@ -122,15 +126,27 @@ class MovieManager(Manager):
                     qs = qs.filter(listitem__list__id=lqs[0].id)
         return qs
 
+class FileManager(Manager):
+    def get_query_set(self):
+        return super(FileManager, self).get_query_set()
+
+    def movie_files(self, movie):
+        q = self.get_query_set()
+        return q.filter(is_video=True, movie=movie)
+
 class ArchiveFileManager(Manager):
     def get_query_set(self):
-        return super(UserFileManager, self).get_query_set()
+        return super(ArchiveFileManager, self).get_query_set()
+
+    def movie_files(self, movie):
+        q = self.get_query_set()
+        return q.filter(file__is_video=True, file__movie=movie)
 
     def by_oshash(self, oshash):
         q = self.get_query_set()
         q.filter(movie_file__oshash=oshash)
         if q.count() == 0:
-            raise models.UserFile.DoesNotExist("%s matching oshash %s does not exist." %
-                 (models.UserFile._meta.object_name, oshash))
+            raise models.ArchiveFile.DoesNotExist("%s matching oshash %s does not exist." %
+                 (models.ArchiveFile._meta.object_name, oshash))
         return q[0]
 
