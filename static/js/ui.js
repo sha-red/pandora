@@ -568,7 +568,7 @@ $(function() {
             items.push({
                 size: 64,
                 id: code,
-                icon: "/static/tmp/flags/" + flag + ".png",
+                icon: "http://oil21.org/tmp/flags/" + flag + ".png",
                 title: strings[0] + (strings.length > 1 ? "<br/>" + strings[1] : ""),
                 info: Ox.formatNumber(v.items) + " Movie" + (v.items > 1 ? "s" : "")
             });
