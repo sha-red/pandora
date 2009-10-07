@@ -727,7 +727,7 @@ $(function() {
         sort: user.prefs.sortGroups,
         order: user.prefs.orderGroups,
         url: "/json/find",
-        params: ["g=country"]
+        params: {g:"country"}
     }).attr({
         id: "groups"
     });
@@ -1062,6 +1062,11 @@ $(function() {
     }).attr({
         id: "find"
     }).appendTo($topMenu.$element).trigger("blur");
+    $find.change(function(that) {
+        var q = $(this).val();
+        $main.setUrl("/json/find", {q:q});
+        $mainBrowser.setUrl("/json/find", {g:"country", q:q});
+    });
 
     /*
     $find = $("<input/>")

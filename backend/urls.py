@@ -28,7 +28,6 @@ urlpatterns = patterns("oxdb.backend.views",
     (r'^archive/(?P<archive>.+)/remove', 'remove_file'),
     (r'^file/parse', 'file_parse'),
     (r'^subtitle/get', 'subtitles'),
-    (r'^preferences', 'preferences'),
 
     # Example:
     # (r'^oxdata/', include('oxdata.foo.urls')),
@@ -40,3 +39,8 @@ urlpatterns = patterns("oxdb.backend.views",
     # Uncomment the next line to enable the admin:
     # (r'^admin/(.*)', admin.site.root),
 )
+
+#add user urls. login, logout, preferences etc
+import user_management.urls
+urlpatterns += user_management.urls.urlpatterns
+

@@ -5,7 +5,6 @@ import re
 from datetime import datetime
 from urllib2 import unquote
 
-from django.db import models
 from django.db.models import Q, Avg, Count
 from django.contrib.auth.models import User
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
@@ -14,10 +13,10 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.utils import simplejson as json
 from oxdb.utils.shortcuts import render_to_json_response
+from oxdb.utils.decorators import login_required_json
 
 import models
 import utils
-from decorators import login_required_json
     
 '''
 field.length -> movie.sort.all()[0].field
@@ -358,14 +357,5 @@ def remove_file(request, archive):
 def file_parse(request):
     response = utils.parsePath(request.POST['path'])
     return render_to_json_response(response)
-
-'''
-POST preferences/get?key=
-POST preferences/set?key=&value
-'''
-@login_required_json
-def preferences(request):
-    oshash = request.POST['oshash']
-    return ''
 
 
