@@ -5,7 +5,6 @@ from django.http import HttpResponse
 from django.utils import simplejson
 from django.conf import settings
 
-
 def render_to_json_response(dictionary, content_type="text/json"):
     indent=None
     if settings.DEBUG:

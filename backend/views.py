@@ -169,6 +169,7 @@ def find(request):
             response = {'items': qs.count()}
         else:
             qs = qs[query['i']:query['o']]
+            print qs.query.as_sql()
             p = Paginator(qs, 100)
             for i in p.page_range:
                 page = p.page(i)
