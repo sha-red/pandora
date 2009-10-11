@@ -7,9 +7,9 @@ import random
 from django.db import models
 from django.db.models import Q
 from django.contrib.auth.models import User
-import oxlib
-from oxlib import stripTags
-from oxlib.normalize import canonicalTitle, canonicalName
+import ox
+from ox import stripTags
+from ox.normalize import canonicalTitle, canonicalName
 
 import utils
 import managers
@@ -522,7 +522,7 @@ class Person(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.name_sort:
-            self.name_sort = oxlib.normalize.canonicalName(self.name)
+            self.name_sort = ox.normalize.canonicalName(self.name)
         super(Person, self).save(*args, **kwargs)
 
     def get_or_create(model, name, imdbId=None):
@@ -736,7 +736,7 @@ class Trivia(models.Model):
 
     def json(self):
         trivia = self.trivia
-        trivia = oxlib.fixAmpersands(trivia)
+        trivia = ox.fixAmpersands(trivia)
         trivia = re.sub('<a href="(/name/nm.*?)">(.*?)</a>', '<a href="/?f=name&amp;q=\\2">\\2</a>', trivia)
         trivia = re.sub('<a href="/title/tt(.*?)/">(.*?)</a>', '<a href="/\\1">\\2</a>', trivia)
         return trivia

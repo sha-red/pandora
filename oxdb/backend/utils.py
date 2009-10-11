@@ -8,9 +8,9 @@ import sys
 import re
 import hashlib
 
-import oxlib
-import oxlib.iso
-from oxlib.normalize import normalizeName
+import ox
+import ox.iso
+from ox.normalize import normalizeName
 
 def oxid(title, director, year='', seriesTitle='', episodeTitle='', season=0, episode=0):
     oxid_value = u"\n".join([title, director, year])
@@ -62,7 +62,7 @@ def oxdb_title(_title, searchTitle = False):
     return title
 
 def oxdb_year(data):
-    return oxlib.findRe(data, '\.(\d{4})\.')
+    return ox.findRe(data, '\.(\d{4})\.')
 
 def oxdb_series_title(path):
     seriesTitle = u''
