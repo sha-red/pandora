@@ -6,8 +6,8 @@ from django.shortcuts import render_to_response, get_object_or_404, get_list_or_
 from django.template import RequestContext
 from django.utils import simplejson as json
 
-from ox.django.shortcuts import render_to_json_response
-from ox.django.decorators import login_required_json
+from oxdjango.shortcuts import render_to_json_response
+from oxdjango.decorators import login_required_json
 
 import models
 
@@ -51,7 +51,7 @@ def recover(request):
         if q.count() > 0:
             user = q[0]
     if user:
-        user.sendmail(...) #FIXME: send recovery mail
+        #user.sendmail(...) #FIXME: send recovery mail
         response = {'status': 200, 'message': 'recovert email sent.'}
     else:
         response = {'status': 500, 'message': 'user or email not found.'}
@@ -80,7 +80,7 @@ def preferences(request):
         if key == 'password':
             user.set_password(value)
             user.save()
-        elsif key == 'email':
+        elif key == 'email':
             user.email = vaule
             user.save()
         else:

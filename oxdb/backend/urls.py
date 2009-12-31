@@ -20,12 +20,11 @@ subtitles/add?oshash&language
 subtitles/remove?oshash&language
 '''
 
-urlpatterns = patterns("oxdb.backend.views",
+urlpatterns = patterns("backend.views",
     (r'^find', 'find'),
     (r'^files/find', 'find_files'),
     (r'^files/info', 'file_info'),
-    (r'^archive/(?P<archive>.+)/add', 'add_file'),
-    (r'^archive/(?P<archive>.+)/remove', 'remove_file'),
+    (r'^archive/(?P<archive>.+)/update', 'update_archive'),
     (r'^file/parse', 'file_parse'),
     (r'^subtitle/get', 'subtitles'),
 

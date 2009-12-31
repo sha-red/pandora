@@ -4,16 +4,22 @@ import os.path
 import re
 from datetime import datetime
 from urllib2 import unquote
+import json
 
 from django.db.models import Q, Avg, Count
 from django.contrib.auth.models import User
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from django.template import RequestContext
 from django.core.paginator import Paginator
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.utils import simplejson as json
-from ox.django.shortcuts import render_to_json_response
-from ox.django.decorators import login_required_json
+try:
+    import simplejson as json
+except ImportError:
+    from django.utils import simplejson as json
+from oxdjango.shortcuts import render_to_json_response
+from oxdjango.decorators import login_required_json
+
 
 import models
 import utils
@@ -168,13 +174,18 @@ def find(request):
         if 'n' in query:
             response = {'items': qs.count()}
         else:
+            _p = query['p']
+            def only_p(m):
+                r = {}
+                if m:
+                    m = json.loads(m)
+                    for p in _p:
+                        r[p] = m[p]
+                return r
             qs = qs[query['i']:query['o']]
-            print qs.query.as_sql()
-            p = Paginator(qs, 100)
-            for i in p.page_range:
-                page = p.page(i)
-                for m in page.object_list:
-                      response['items'].append(m.json(query['p']))
+
+            response['items'] = [only_p(m['json']) for m in qs.values('json')]
+
     elif 'g' in query:
         if query['s'].split(':')[0] not in ('name', 'items'):
             query['s'] = 'name'
@@ -207,9 +218,9 @@ def find(request):
                 order_by = "%s:%s" % (items, order_by[1])
             qs = order_query(qs, order_by, '')
             qs = qs[query['i']:query['o']]
-            for i in qs:
-                group = {'title': i[name], 'items': i[items]}
-                response['items'].append(group)
+
+            response['items'] = [{'title': i[name], 'items': i[items]} for i in qs]
+
     else:
         #FIXME: also filter lists here
         movies = models.Movie.objects.filter(available=True)
@@ -225,23 +236,15 @@ def find(request):
 '''
 GET info?oshash=a41cde31c581e11d
     > {
-        "movie_id": 0123456,
-        "duration": 5.266667,
-        "video_codec": "mpeg1",
-        "pixel_format": "yuv420p",
-        "width": 352,
-        "height": 240,
-        "pixel_aspect_ratio": "1:1",
-        "display_aspect_ratio": "22:15",
-        "framerate": "30:1",
-        "audio_codec": "mp2",
-        "samplerate": 44100,
-        "channels": 1,
-        "path": "E/Example, The/An Example.avi",
-        "size": 1646274
+        "movie_id": 0123456, ??
         "oshash": "a41cde31c581e11d",
         "sha1":..,
         "md5":..
+        "duration": 5.266667,
+        "video": [],
+        "audio": [],
+        "path": "E/Example, The/An Example.avi",
+        "size": 1646274
       }
 '''
 def file_info(request):
@@ -264,7 +267,7 @@ srt =
 def subtitles(request):
     oshash = request.GET['oshash']
     language = request.GET.get('language', None)
-    if requeset.method == 'POST':
+    if request.method == 'POST':
         user = request.user
         sub = models.Subtitles.get_or_create(user, oshash, language)
         sub.srt = request.POST['srt']
@@ -289,6 +292,7 @@ GET list
 '''
 @login_required_json
 def list_files(request):
+    response = {}
     response['files'] = {}
     qs = models.UserFile.filter(user=request.user)
     p = Paginator(qs, 1000)
@@ -299,9 +303,10 @@ def list_files(request):
     return render_to_json_response(response)
 
 def find_files(request):
+    response = {}
     query = parse_query(request)
     response['files'] = {}
-    qs = models.UserFile.filter(user=request.user).filter(movie_file__movie__id__in=quert['q'])
+    qs = models.UserFile.filter(user=request.user).filter(movie_file__movie__id__in=query['q'])
     p = Paginator(qs, 1000)
     for i in p.page_range:
         page = p.page(i)
@@ -310,7 +315,7 @@ def find_files(request):
     return render_to_json_response(response)
 
 '''
-POST add
+POST metadata
     > file: {
         "duration": 5.266667,
         "video_codec": "mpeg1",
@@ -331,8 +336,7 @@ POST add
       }
 '''
 #@login_required_json
-def add_file(request, archive):
-    print request.POST
+def add_metadata(request, archive):
     info = json.loads(request.POST['file'])
     oshash = info['oshash']
     archive = models.Archive.objects.get(name=archive)
@@ -344,15 +348,99 @@ def add_file(request, archive):
         response = {'status': 404}
     return render_to_json_response(response)
 
+class StillForm(forms.Form):
+    still = forms.FileField()
+    position = forms.FloatField()
+
+#@login_required_json
+def add_still(request, oshash):
+    response = {'status': 500}
+    f = get_object_or_404(models.File, oshash=oshash)
+
+    form = TimelineForm(request.POST, request.FILES)
+    if form.is_valid():
+        ff = form.cleaned_data['still']
+        position = form.cleaned_data['position']
+
+        still = models.Still(file=f, position=position)
+        still.save()
+        still.still.save(ff, ff.name)
+        response = {'status': 200}
+        response['url'] = still.url()
+    return render_to_json_response(response)
+
+class TimelineForm(forms.Form):
+    timeline = forms.FileField()
+
+#FIXME: should everybody be able to overwrite timelines?
+#@login_required_json
+def add_timeline(request, oshash):
+    response = {'status': 500}
+    f = get_object_or_404(models.File, oshash=oshash)
+
+    form = TimelineForm(request.POST, request.FILES)
+    if form.is_valid():
+        ff = form.cleaned_data['timeline']
+        f.timeline.save(ff.name, ff)
+        response = {'status': 200}
+        response['url'] = f.timeline.url()
+    return render_to_json_response(response)
+
+
+class VideoForm(forms.Form):
+    video = forms.FileField()
+
+#@login_required_json
+def add_video(request, oshash):
+    response = {'status': 500}
+    f = get_object_or_404(models.File, oshash=oshash)
+
+    form = VideoForm(request.POST, request.FILES)
+    if form.is_valid():
+        ff = form.cleaned_data['video']
+        f.stream128.save(ff.name, ff)
+        response = {'status': 200}
+        response['url'] = f.stream128.url()
+    return render_to_json_response(response)
+
 '''
-POST remove?oshash=
+POST update
+    > files: {
+        oshash: { 'path': .., ..},
+        oshash: { 'path': .., ..},
+      }
 '''
-@login_required_json
-def remove_file(request, archive):
-    oshash = request.POST['oshash']
+#@login_required_json
+def update_archive(request, archive):
+    print "update request"
     archive = models.Archive.objects.get(name=archive)
-    models.UserFiles.objects.filter(movie_file__oshash=oshash, user=request.user).delete()
-    response = {'status': 200}
+    files = json.loads(request.POST['files'])
+    print "update request for", archive.name
+    needs_data = []
+    rename = {}
+    for oshash in files:
+        print 'checking', oshash
+        data = files[oshash]
+        q = models.ArchiveFile.objects.filter(archive=archive, file__oshash=oshash)
+        if q.count() == 0:
+            print "adding file", oshash, data['path']
+            f = models.ArchiveFile.get_or_create(archive, oshash)
+            f.update(data)
+            #FIXME: only add if it was not in File
+        else:
+            f = q[0]
+            if data['path'] != f.path:
+                f.path = data['path']
+                f.save()
+        if f.file.needs_data:
+            needs_data.append(oshash)
+        if f.path != f.file.path:
+            rename[oshash] = f.file.path
+    print "processed files for", archive.name
+    #remove all files not in files.keys() from ArchiveFile
+    response = {}
+    response['info'] = needs_data
+    response['rename'] = rename
     return render_to_json_response(response)
 
 def file_parse(request):

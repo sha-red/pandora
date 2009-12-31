@@ -52,6 +52,8 @@ TESTS_ROOT = join(PROJECT_ROOT, 'tests')
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = ''
 
+STATIC_URL = '/static/'
+
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
@@ -61,7 +63,7 @@ ADMIN_MEDIA_PREFIX = '/admin/media/'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.load_template_source',
     'django.template.loaders.app_directories.load_template_source',
-#     'django.template.loaders.eggs.load_template_source',
+    'django.template.loaders.eggs.load_template_source',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -87,6 +89,14 @@ INSTALLED_APPS = (
 
     'backend',
 )
+
+#rabbitmq connection settings
+BROKER_HOST = "127.0.0.1"
+BROKER_PORT = 5672
+BROKER_USER = "oxdb"
+BROKER_PASSWORD = "0xdb"
+BROKER_VHOST = "/oxdb"
+
 
 #overwrite default settings with local settings
 try:

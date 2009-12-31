@@ -1,0 +1,36 @@
+
+To setup a local instance of 0xdb:
+
+    bzr branch http://code.0xdb.org/oxdb oxdb
+    cd oxdb
+    virtualenv .
+    pip -E . install -r requirements.txt
+
+
+you need python, bazaar, pip and virtualenv:
+
+    apt-get install python-setuptools bzr
+    east_install pip
+    pip install virtualenv
+
+also it uses system python moduels, so make sure you have
+ ipython, dbmodule(psycopg2, python-mysqldb,..)
+installed via apt-get/pip/easy_install in your system path.
+
+
+Install rabbitmq and carrot:
+    sudo apt-get install rabbitmq-server
+    
+    sudo rabbitmqctl add_user oxdb password
+    sudo rabbitmqctl add_vhost /oxdb
+    sudo rabbitmqctl set_permissions -p /oxdb oxdb "^oxdb-.*" ".*" ".*"
+
+
+    update BROKER_* settings in local_settings.py:
+
+Development:
+    we are using django, http://docs.djangoproject.com/en/dev/
+    communication between webserver and background tasks is done via rabbitmq
+    http://github.com/ask/carrot/ for more info on the lib used to communicate
+
+    

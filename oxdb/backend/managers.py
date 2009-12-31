@@ -132,7 +132,7 @@ class FileManager(Manager):
 
     def movie_files(self, movie):
         q = self.get_query_set()
-        return q.filter(is_video=True, movie=movie)
+        return q.filter(type=1, movie=movie)
 
 class ArchiveFileManager(Manager):
     def get_query_set(self):
@@ -144,9 +144,10 @@ class ArchiveFileManager(Manager):
 
     def by_oshash(self, oshash):
         q = self.get_query_set()
-        q.filter(movie_file__oshash=oshash)
+        q = q.filter(file__oshash=oshash)
         if q.count() == 0:
             raise models.ArchiveFile.DoesNotExist("%s matching oshash %s does not exist." %
                  (models.ArchiveFile._meta.object_name, oshash))
-        return q[0]
+        else:
+            return q[0]
 

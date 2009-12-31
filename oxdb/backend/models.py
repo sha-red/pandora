@@ -7,13 +7,15 @@ import random
 from django.db import models
 from django.db.models import Q
 from django.contrib.auth.models import User
-import ox
-from ox import stripTags
-from ox.normalize import canonicalTitle, canonicalName
+from django.core.files.base import ContentFile
+import oxlib
+from oxlib import stripTags
+from oxlib.normalize import canonicalTitle, canonicalName
+from django.utils import simplejson as json
 
 import utils
 import managers
-
+import fields
 
 class MovieImdb(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -36,10 +38,13 @@ class MovieImdb(models.Model):
     profit = models.IntegerField(null=True, blank=True)
 
     series_imdb = models.CharField(max_length=7, default='')
-    series_title = models.TextField(blank=True, default='')
-    episode_title = models.TextField(blank=True, default='')
+    series_title = models.CharField(max_length=1000, blank=True, default='')
+    episode_title = models.CharField(max_length=1000, blank=True, default='')
     season = models.IntegerField(default=-1)
     episode = models.IntegerField(default=-1)
+    
+    def __unicode__(self):
+        return u"%s (%s)" % (self.title, self.imdbId)
 
 class MovieOxdb(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -66,6 +71,9 @@ class MovieOxdb(models.Model):
     season = models.IntegerField(default=-1)
     episode = models.IntegerField(default=-1)
 
+    def __unicode__(self):
+        return u"%s (%s)" % (self.title, self.year)
+
 def newMovie(title, director, year):
     movie = Movie()
     oxdb = MovieOxdb()
@@ -80,13 +88,18 @@ def newMovie(title, director, year):
     movie.save()
     return movie
 
+def movie_path(f, size):
+    name = "%s.%s" % (size, 'ogv')
+    url_hash = f.movieId
+    return os.path.join('movie', url_hash[:2], url_hash[2:4], url_hash[4:6], name)
+
 class Movie(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
     #only movies that have metadata from files are available,
     #this is indicated by setting available to True 
-    available = models.BooleanField(default=False)
+    available = models.BooleanField(default=False, db_index=True)
 
     movieId = models.CharField(max_length=128, unique=True, blank=True)
     oxdbId = models.CharField(max_length=42, unique=True, blank=True)
@@ -139,9 +152,9 @@ class Movie(models.Model):
     def keywords(self):
         return self._manual(self.keywords_all)
     def countries(self):
-        return self._manual(self.countries_all, 'moviecountry__manual')
+        return self._manual(self.countries_all, 'moviecountry__manual').order_by('moviecountry__position')
     def languages(self):
-        return self._manual(self.languages_all, 'movielanguage__manual')
+        return self._manual(self.languages_all, 'movielanguage__manual').order_by('movielanguage__position')
     def trivia(self):
         return self._manual(self.trivia_all)
     def locations(self):
@@ -169,12 +182,59 @@ class Movie(models.Model):
 
     rights_level = models.IntegerField(default=-1)
 
+    '''
+    #these values get populated with imdb/oxdb values on save()
+    #edits will be overwritten
+    title = models.CharField(max_length=1000)
+    year = models.CharField(max_length=4)
+    runtime = models.IntegerField(null=True, blank=True)
+    release_date = models.DateField(null=True, blank=True)
+    tagline = models.TextField(blank=True)
+    plot = models.TextField(blank=True)
+    plot_outline = models.TextField(blank=True)
+
+    rating = models.FloatField(null=True, blank=True)
+    votes = models.IntegerField(null=True, blank=True)
+
+    budget = models.IntegerField(null=True, blank=True)
+    gross = models.IntegerField(null=True, blank=True)
+    profit = models.IntegerField(null=True, blank=True)
+
+    series_imdb = models.CharField(max_length=7, default='')
+    series_title = models.TextField(blank=True, default='')
+    episode_title = models.TextField(blank=True, default='')
+    season = models.IntegerField(default=-1)
+    episode = models.IntegerField(default=-1)
+    '''
+
+    json = fields.DictField(default={}, editable=False)
+
+    '''
+    directors = fields.TupleField(default=())
+    writers = fields.TupleField(default=())
+    editors = fields.TupleField(default=())
+    producers = fields.TupleField(default=())
+    cinematographers = fields.TupleField(default=())
+    cast = fields.TupleField(default=())
+    alternative_titles = fields.TupleField(default=())
+    genres = fields.TupleField(default=())
+    keywords = fields.TupleField(default=())
+    countries = fields.TupleField(default=())
+    languages = fields.TupleField(default=())
+    trivia = fields.TupleField(default=())
+    locations = fields.TupleField(default=())
+    connections = fields.DictField(default={})
+    reviews = fields.TupleField(default=())
+    '''
+
     #FIXME: use data.0xdb.org
+    '''
     tpb_id = models.CharField(max_length=128, blank=True)
     kg_id = models.CharField(max_length=128, blank=True)
     open_subtitle_id = models.IntegerField(null=True, blank=True)
     wikipedia_url = models.TextField(blank=True)
 
+    #FIXME: use data.0xdb.org/posters for that
     #what of this is still required?
     still_pos = models.IntegerField(null=True, blank=True)
     poster = models.TextField(blank=True)
@@ -182,12 +242,19 @@ class Movie(models.Model):
     posters_available = models.TextField(blank=True)
     poster_height = models.IntegerField(null=True, blank=True)
     poster_width = models.IntegerField(null=True, blank=True)
+    '''
 
+    #stream related fields
+    '''
+    '''
+    stream128 = models.FileField(default=None, blank=True, upload_to=lambda f, x: movie_path(f, '128'))
+    stream320 = models.FileField(default=None, blank=True, upload_to=lambda f, x: movie_path(f, '320'))
+    stream640 = models.FileField(default=None, blank=True, upload_to=lambda f, x: movie_path(f, '640'))
+    #FIXME: is this still required? should this not be aspect ratio? depends on stream???
     scene_height = models.IntegerField(null=True, blank=True)
 
     def __unicode__(self):
         return u'%s (%s)' % (self.get('title'), self.get('year'))
-
 
     def save(self, *args, **kwargs):
         if not self.oxdb:
@@ -200,6 +267,26 @@ class Movie(models.Model):
             mid = self.oxdbId
         self.movieId = mid
         
+        if self.id:
+            self.json = self.get_json()
+        '''
+        #populate auto values for faster results
+        #FIXME: why is it not possible to use setattr to set List instead of db value?
+        common_fields = [f.name for f in MovieImdb._meta.fields]
+        only_relevant = lambda f: f not in ('id', 'created', 'modified', 'imdbId')
+        common_fields = filter(only_relevant, common_fields)
+        for f in common_fields:
+            setattr(self, f, self.get(f))
+        for f in ('directors', 'writers', 'editors',  'producers', 'cinematographers', 
+                  'reviews', 'countries', 'languages',
+                  'keywords', 'genres', 'trivia', 'alternative_titles'):
+           value = getattr(self, 'get_' + f)
+           setattr(self, f, tuple([v.json() for v in value()]))
+        for f in ('cast', ):
+           value = getattr(self, 'get_' + f)
+           setattr(self, f, value())
+        self.connections = self.connections_json()
+        '''
         super(Movie, self).save(*args, **kwargs)
         self.updateFind()
         self.updateSort()
@@ -229,7 +316,7 @@ class Movie(models.Model):
         'alternative_titles': 'alternative_titles',
         'connections_json': 'connections'
     }
-    def json(self, fields=None):
+    def get_json(self, fields=None):
         movie = {}
         for key in self._public_fields:
             pub_key = self._public_fields.get(key, key)
@@ -238,8 +325,9 @@ class Movie(models.Model):
                     value = getattr(self, key)
                 else:
                     value = self.get(key)
-                if key in ('directors', 'writers', 'reviews', 
-                           'countries', 'languages', 'keywords', 'genres', 'trivia', 'alternative_titles'):
+                if key in ('directors', 'writers', 'editors', 'cinematographers', 'producers',
+                           'reviews', 'countries', 'languages',
+                           'keywords', 'genres', 'trivia', 'alternative_titles'):
                     movie[pub_key] = tuple([v.json() for v in value()])
                 elif callable(value):
                     movie[pub_key] = value()
@@ -392,7 +480,7 @@ class MovieFind(models.Model):
     movie = models.OneToOneField('Movie', related_name='find', primary_key=True)
 
     all = models.TextField(blank=True)
-    title = models.CharField(max_length=1000)
+    title = models.TextField(blank=True)
     director = models.TextField(blank=True, default='')
     country = models.TextField(blank=True, default='')
     year = models.CharField(max_length=4)
@@ -414,18 +502,17 @@ class MovieFind(models.Model):
     filename = models.TextField(blank=True, default='')
 
     _private_fields = ('id', 'movie')
-    _public_names = {
-        'movieId': 'id'
-    }
-    def options(self):
-        options = []
+    #return available find fields
+    #FIXME: should return mapping name -> verbose_name
+    def fields(self):
+        fields = []
         for f in self._meta.fields:
             if f.name not in self._private_fields:
-                name = f.name
-                name = self._public_names.get(name, name)
-                options.append((name, 'Find: %s' % name.capitalize()))
-        return tuple(options)
-    options = classmethod(options)
+                name = f.verbose_name
+                name = name[0].capitalize() + name[1:]
+                fields.append(name)
+        return tuple(fields)
+    fields = classmethod(fields)
 
 class MovieSort(models.Model):
     """
@@ -457,14 +544,14 @@ class MovieSort(models.Model):
     votes = models.IntegerField(blank=True)
     scenes = models.IntegerField(blank=True)
     words = models.IntegerField(null=True, blank=True)
-    wpm = models.IntegerField(null=True, blank=True)
+    wpm = models.IntegerField('Words per Minute', null=True, blank=True)
     risk = models.IntegerField(null=True, blank=True)
 
-    movieId = models.CharField(max_length=128, blank=True)
+    movieId = models.CharField('ID', max_length=128, blank=True)
 
     duration = models.FloatField(default=-1)
     resolution = models.IntegerField(blank=True)
-    aspectratio = models.IntegerField(blank=True)
+    aspectratio = models.IntegerField('Aspect Ratio', blank=True)
     bitrate = models.IntegerField(blank=True)
     pixels = models.IntegerField(blank=True)
     filename = models.IntegerField(blank=True)
@@ -472,18 +559,17 @@ class MovieSort(models.Model):
     size = models.IntegerField(blank=True)
 
     _private_fields = ('id', 'movie')
-    _public_names = {
-        'movieId': 'id'
-    }
-    def options(self):
-        options = []
+    #return available sort fields
+    #FIXME: should return mapping name -> verbose_name
+    def fields(self):
+        fields = []
         for f in self._meta.fields:
             if f.name not in self._private_fields:
-                name = f.name
-                name = self._public_names.get(name, name)
-                options.append((name, 'Sort: %s' % name.capitalize()))
-        return tuple(options)
-    options = classmethod(options)
+                name = f.verbose_name
+                name = name[0].capitalize() + name[1:]
+                fields.append(name)
+        return tuple(fields)
+    fields = classmethod(fields)
 
 class AlternativeTitle(models.Model):
     movie = models.ForeignKey(Movie, related_name='alternative_titles_all')
@@ -522,7 +608,7 @@ class Person(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.name_sort:
-            self.name_sort = ox.normalize.canonicalName(self.name)
+            self.name_sort = oxlib.normalize.canonicalName(self.name)
         super(Person, self).save(*args, **kwargs)
 
     def get_or_create(model, name, imdbId=None):
@@ -544,10 +630,10 @@ class Person(models.Model):
         return self.name
 
 class Cast(models.Model):
-    movie = models.ForeignKey(Movie)
+    movie = models.ForeignKey(Movie, related_name='cast_relation')
     person = models.ForeignKey(Person)
     role = models.CharField(max_length=200)
-    character = models.CharField(max_length=200, blank=True)
+    character = models.CharField(max_length=1000, blank=True)
     position = models.IntegerField()
     manual = models.BooleanField(default=False)
 
@@ -736,7 +822,8 @@ class Trivia(models.Model):
 
     def json(self):
         trivia = self.trivia
-        trivia = ox.fixAmpersands(trivia)
+        trivia = oxlib.fixAmpersands(trivia)
+        trivia = re.sub('<a name="#tr\d{7}"></a> ', '', trivia)
         trivia = re.sub('<a href="(/name/nm.*?)">(.*?)</a>', '<a href="/?f=name&amp;q=\\2">\\2</a>', trivia)
         trivia = re.sub('<a href="/title/tt(.*?)/">(.*?)</a>', '<a href="/\\1">\\2</a>', trivia)
         return trivia
@@ -764,6 +851,7 @@ class Connection(models.Model):
                 'Spin off from': 'Spin off',
                 'Spoofs': 'Spoofed in',
                 'Version of': 'Version of',
+                'Alternate language version of': 'Alternate language version of',
             }
             if relation in _map.values():
                 for k in _map:
@@ -846,22 +934,37 @@ def stream_path(f, size):
     url_hash = f.oshash
     return os.path.join('stream', url_hash[:2], url_hash[2:4], url_hash[4:6], name)
 
+def still_path(f, still):
+    name = "%s.%s" % (still, 'png')
+    url_hash = f.oshash
+    return os.path.join('still', url_hash[:2], url_hash[2:4], url_hash[4:6], name)
+
+FILE_TYPES = (
+    (0, 'unknown'),
+    (1, 'video'),
+    (2, 'audio'),
+    (3, 'subtitle'),
+)
+
 class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    verified = models.BooleanField(default=False)
 
     oshash = models.CharField(blank=True, unique=True, max_length=16)
-    sha1 = models.CharField(blank=True, unique=True, max_length=40)
-    md5 = models.CharField(blank=True, unique=True, max_length=32)
+    sha1 = models.CharField(blank=True, null=True, unique=True, max_length=40)
+    md5 = models.CharField(blank=True, null=True, unique=True, max_length=32)
 
-    movie = models.ForeignKey(Movie, related_name="files", default=None)
+    movie = models.ForeignKey(Movie, related_name="files", default=None, null=True)
 
-    computed_path = models.CharField(blank=True, max_length=2048)
-    size = models.IntegerField(default=-1)
+    type = models.IntegerField(default=0, choices=FILE_TYPES)
+    info = fields.DictField(default={})
+    #FIMXE: why do i need those in the db? could jsut have them in info
+
+    path = models.CharField(blank=True, max_length=2048)
+    size = models.BigIntegerField(default=-1)
     duration = models.FloatField(default=-1)
     
-    is_video = models.BooleanField(default=False)
-
     video_codec = models.CharField(blank=True, max_length=256)
     pixel_format = models.CharField(blank=True, max_length=256)
     width = models.IntegerField(default=-1)
@@ -876,15 +979,19 @@ class File(models.Model):
 
     #computed values
     bpp = models.FloatField(default=-1)
-    pixels = models.IntegerField(default=0)
+    pixels = models.BigIntegerField(default=0)
 
     part = models.IntegerField(default=0)
+
+    needs_data = models.BooleanField(default=True)
 
     #stream related fields
     available = models.BooleanField(default=False)
     stream128 = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, '128'))
     stream320 = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, '320'))
     stream640 = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, '640'))
+
+    timeline = models.ImageField(default=None, null=True, upload_to=lambda f, x: still_path(f, '0'))
 
     def save_chunk(self, chunk, name='video.ogv'):
         if not self.available:
@@ -912,7 +1019,56 @@ class File(models.Model):
     get_or_create = classmethod(get_or_create)
 
     def __unicode__(self):
-        return "%s (%s)" % (self.computed_path, self.oshash)
+        return "%s (%s)" % (self.path, self.oshash)
+
+    def update(self, data=None):
+        """
+            only add, do not overwrite keys in file
+        """
+        if data and not self.info:
+            self.info = data
+        _video_map = {
+            'codec': 'video_codec',
+        }
+        if 'video' in self.info and self.info['video']:
+            for key in ('codec', 'pixel_format', 'width', 'height',
+                        'pixel_aspect_ratio', 'display_aspect_ratio', 'framerate'):
+                if key in self.info['video'][0]:
+                    setattr(self, _video_map.get(key, key), self.info['video'][0][key])
+        _audio_map = {
+            'codec': 'audio_codec',
+        }
+        if 'audio' in self.info and self.info['audio']:
+            for key in ('codec', 'samplerate', 'channels'):
+                if key in self.info['audio'][0]:
+                    setattr(self, _audio_map.get(key, key), self.info['audio'][0][key])
+
+        for key in ('duration', 'size', 'sha1', 'md5'):
+            if key in self.info:
+                setattr(self, key, self.info[key])
+
+        #detect and assign type based on extension or detected video track
+        if os.path.splitext(self.info['path'])[-1] in ('.rar', '.sub', '.idx'):
+            self.type = 0
+        elif 'video' in self.info:
+            self.type = 1
+        elif os.path.splitext(self.info['path'])[-1] in ('.mp3', '.oga'):
+            self.type = 2
+        elif os.path.splitext(self.info['path'])[-1] in ('.srt', ):
+            self.type = 3
+        #FIXME: this should be computed and not submitted path
+        self.path = self.info['path']
+        self.save()
+
+class Still(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+    file = models.ForeignKey(File, related_name="stills")
+    position = models.FloatField()
+    still = models.ImageField(default=None, null=True, upload_to=lambda f, x: still_path(f, '0'))
+
+    def __unicode__(self):
+        return '%s at %s' % (self.file, self.position)
 
 class Subtitle(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -935,7 +1091,7 @@ class Subtitle(models.Model):
     get_or_create = classmethod(get_or_create)
 
     def __unicode__(self):
-        return '%s.%s.srt' % (os.path.splitext(self.movie_file.computed_path)[0], self.language)
+        return '%s.%s.srt' % (os.path.splitext(self.movie_file.path)[0], self.language)
 
 class Layer(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -958,6 +1114,9 @@ class Archive(models.Model):
     name = models.CharField(max_length=255, unique=True)
     public = models.BooleanField(default=False)
     users = models.ManyToManyField(User, related_name='archives')
+    
+    def __unicode__(self):
+        return '%s' % (self.name)
 
 class ArchiveFile(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -967,32 +1126,27 @@ class ArchiveFile(models.Model):
     path = models.CharField(blank=True, max_length=2048)
 
     objects = managers.ArchiveFileManager()
-    
+
     def update(self, data):
         """
             only add, do not overwrite keys in file
         """
-        for key in ('duration', 'video_codec', 'pixel_format', 'width', 'height',
-                    'pixel_aspect_ratio', 'display_aspect_ratio', 'framerate',
-                    'audio_codec', 'samplerate', 'channels', 'size', 'sha1', 'md5'):
-            if key in data and not getattr(self.file, key):
-                setattr(self.file, key, data[key])
+        self.file.update(data)
         self.path = data.get('path', '')
-        self.file.save()
         self.save()
 
     def get_or_create(model, archive, oshash):
         try:
             f = model.objects.by_oshash(oshash=oshash)
         except model.DoesNotExist:
-            f = model.objects.create()
-            f.file = File.get_or_create(oshash)
-            f.archive = archive
+            file = File.get_or_create(oshash)
+            file.save()
+            f = model.objects.create(archive=archive, file=file)
             f.save()
         return f
     get_or_create = classmethod(get_or_create)
 
     def __unicode__(self):
-        return '%s (%s)' % (self.path, unicode(self.user))
+        return '%s (%s)' % (self.path, unicode(self.archive))
 
 

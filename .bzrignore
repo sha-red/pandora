@@ -1,2 +1,6 @@
 secret.txt
 local_settings.py
+lib
+include
+src
+bin

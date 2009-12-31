@@ -1,0 +1,24 @@
+<VirtualHost *:80>
+
+    <Location />
+        Options -Indexes
+    </Location>
+    <Directory __PREFIX__>
+        Order deny,allow
+        Allow from all
+    </Directory>
+
+    Alias /.bzr        /oxdb/.bzr
+    Alias /static      __PREFIX__/oxdb/static
+    Alias /favicon.ico __PREFIX__/oxdb/static/favicon.ico
+    Alias /media       __PREFIX__/oxdb/media
+    Alias /admin/media __PREFIX__/src/django/django/contrib/admin/media
+    WSGIScriptAlias / __PREFIX__/wsgi/django.wsgi
+
+    WSGIDaemonProcess oxdb user=oxdb group=oxdb threads=25 python-path=__PREFIX__/lib/python2.6/site-packages/
+    WSGIProcessGroup oxdb
+
+    ServerSignature Off
+</VirtualHost>
+
+

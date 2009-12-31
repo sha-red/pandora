@@ -9,6 +9,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Example:
+    (r'^ajax_filtered_fields/', include('ajax_filtered_fields.urls')),
     (r'^json/', include('backend.urls')),
     (r'^$', 'app.views.index'),
 

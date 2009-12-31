@@ -2,7 +2,7 @@
 
 from south.db import db
 from django.db import models
-from oxdb.backend.models import *
+from backend.models import *
 
 class Migration:
     
@@ -12,8 +12,9 @@ class Migration:
         db.create_table('backend_trivia', (
             ('id', orm['backend.Trivia:id']),
             ('trivia', orm['backend.Trivia:trivia']),
-            ('movie', orm['backend.Trivia:movie']),
+            ('manual', orm['backend.Trivia:manual']),
             ('position', orm['backend.Trivia:position']),
+            ('movie', orm['backend.Trivia:movie']),
         ))
         db.send_create_signal('backend', ['Trivia'])
         
@@ -23,6 +24,7 @@ class Migration:
             ('movie', orm['backend.AlternativeTitle:movie']),
             ('title', orm['backend.AlternativeTitle:title']),
             ('type', orm['backend.AlternativeTitle:type']),
+            ('manual', orm['backend.AlternativeTitle:manual']),
         ))
         db.send_create_signal('backend', ['AlternativeTitle'])
         
@@ -32,6 +34,7 @@ class Migration:
             ('movie', orm['backend.MovieLanguage:movie']),
             ('language', orm['backend.MovieLanguage:language']),
             ('position', orm['backend.MovieLanguage:position']),
+            ('manual', orm['backend.MovieLanguage:manual']),
         ))
         db.send_create_signal('backend', ['MovieLanguage'])
         
@@ -40,10 +43,12 @@ class Migration:
             ('id', orm['backend.Movie:id']),
             ('created', orm['backend.Movie:created']),
             ('modified', orm['backend.Movie:modified']),
-            ('accessed', orm['backend.Movie:accessed']),
+            ('available', orm['backend.Movie:available']),
             ('movieId', orm['backend.Movie:movieId']),
-            ('imdbId', orm['backend.Movie:imdbId']),
             ('oxdbId', orm['backend.Movie:oxdbId']),
+            ('imdb', orm['backend.Movie:imdb']),
+            ('oxdb', orm['backend.Movie:oxdb']),
+            ('rights_level', orm['backend.Movie:rights_level']),
             ('title', orm['backend.Movie:title']),
             ('year', orm['backend.Movie:year']),
             ('runtime', orm['backend.Movie:runtime']),
@@ -56,26 +61,29 @@ class Migration:
             ('budget', orm['backend.Movie:budget']),
             ('gross', orm['backend.Movie:gross']),
             ('profit', orm['backend.Movie:profit']),
-            ('files_modified', orm['backend.Movie:files_modified']),
-            ('filename', orm['backend.Movie:filename']),
-            ('extracted', orm['backend.Movie:extracted']),
-            ('duration', orm['backend.Movie:duration']),
-            ('rights_level', orm['backend.Movie:rights_level']),
-            ('tpb_id', orm['backend.Movie:tpb_id']),
-            ('kg_id', orm['backend.Movie:kg_id']),
-            ('open_subtitle_id', orm['backend.Movie:open_subtitle_id']),
-            ('wikipedia_url', orm['backend.Movie:wikipedia_url']),
             ('series_imdb', orm['backend.Movie:series_imdb']),
             ('series_title', orm['backend.Movie:series_title']),
             ('episode_title', orm['backend.Movie:episode_title']),
             ('season', orm['backend.Movie:season']),
             ('episode', orm['backend.Movie:episode']),
-            ('still_pos', orm['backend.Movie:still_pos']),
-            ('poster', orm['backend.Movie:poster']),
-            ('posters_disabled', orm['backend.Movie:posters_disabled']),
-            ('posters_available', orm['backend.Movie:posters_available']),
-            ('poster_height', orm['backend.Movie:poster_height']),
-            ('poster_width', orm['backend.Movie:poster_width']),
+            ('directors', orm['backend.Movie:directors']),
+            ('writers', orm['backend.Movie:writers']),
+            ('editors', orm['backend.Movie:editors']),
+            ('producers', orm['backend.Movie:producers']),
+            ('cinematographers', orm['backend.Movie:cinematographers']),
+            ('cast', orm['backend.Movie:cast']),
+            ('alternative_titles', orm['backend.Movie:alternative_titles']),
+            ('genres', orm['backend.Movie:genres']),
+            ('keywords', orm['backend.Movie:keywords']),
+            ('countries', orm['backend.Movie:countries']),
+            ('languages', orm['backend.Movie:languages']),
+            ('trivia', orm['backend.Movie:trivia']),
+            ('locations', orm['backend.Movie:locations']),
+            ('connections', orm['backend.Movie:connections']),
+            ('reviews', orm['backend.Movie:reviews']),
+            ('stream128', orm['backend.Movie:stream128']),
+            ('stream320', orm['backend.Movie:stream320']),
+            ('stream640', orm['backend.Movie:stream640']),
             ('scene_height', orm['backend.Movie:scene_height']),
         ))
         db.send_create_signal('backend', ['Movie'])
@@ -86,6 +94,7 @@ class Migration:
             ('created', orm['backend.Archive:created']),
             ('modified', orm['backend.Archive:modified']),
             ('name', orm['backend.Archive:name']),
+            ('public', orm['backend.Archive:public']),
         ))
         db.send_create_signal('backend', ['Archive'])
         
@@ -95,10 +104,35 @@ class Migration:
             ('created', orm['backend.ArchiveFile:created']),
             ('modified', orm['backend.ArchiveFile:modified']),
             ('archive', orm['backend.ArchiveFile:archive']),
-            ('movie_file', orm['backend.ArchiveFile:movie_file']),
+            ('file', orm['backend.ArchiveFile:file']),
             ('path', orm['backend.ArchiveFile:path']),
         ))
         db.send_create_signal('backend', ['ArchiveFile'])
+        
+        # Adding model 'MovieOxdb'
+        db.create_table('backend_movieoxdb', (
+            ('id', orm['backend.MovieOxdb:id']),
+            ('created', orm['backend.MovieOxdb:created']),
+            ('modified', orm['backend.MovieOxdb:modified']),
+            ('title', orm['backend.MovieOxdb:title']),
+            ('year', orm['backend.MovieOxdb:year']),
+            ('runtime', orm['backend.MovieOxdb:runtime']),
+            ('release_date', orm['backend.MovieOxdb:release_date']),
+            ('tagline', orm['backend.MovieOxdb:tagline']),
+            ('plot', orm['backend.MovieOxdb:plot']),
+            ('plot_outline', orm['backend.MovieOxdb:plot_outline']),
+            ('rating', orm['backend.MovieOxdb:rating']),
+            ('votes', orm['backend.MovieOxdb:votes']),
+            ('budget', orm['backend.MovieOxdb:budget']),
+            ('gross', orm['backend.MovieOxdb:gross']),
+            ('profit', orm['backend.MovieOxdb:profit']),
+            ('series_imdb', orm['backend.MovieOxdb:series_imdb']),
+            ('series_title', orm['backend.MovieOxdb:series_title']),
+            ('episode_title', orm['backend.MovieOxdb:episode_title']),
+            ('season', orm['backend.MovieOxdb:season']),
+            ('episode', orm['backend.MovieOxdb:episode']),
+        ))
+        db.send_create_signal('backend', ['MovieOxdb'])
         
         # Adding model 'Language'
         db.create_table('backend_language', (
@@ -115,9 +149,22 @@ class Migration:
         ))
         db.send_create_signal('backend', ['ReviewWhitelist'])
         
+        # Adding model 'Layer'
+        db.create_table('backend_layer', (
+            ('id', orm['backend.Layer:id']),
+            ('created', orm['backend.Layer:created']),
+            ('modified', orm['backend.Layer:modified']),
+            ('user', orm['backend.Layer:user']),
+            ('movie', orm['backend.Layer:movie']),
+            ('time_in', orm['backend.Layer:time_in']),
+            ('time_out', orm['backend.Layer:time_out']),
+            ('type', orm['backend.Layer:type']),
+            ('value', orm['backend.Layer:value']),
+        ))
+        db.send_create_signal('backend', ['Layer'])
+        
         # Adding model 'MovieSort'
         db.create_table('backend_moviesort', (
-            ('id', orm['backend.MovieSort:id']),
             ('movie', orm['backend.MovieSort:movie']),
             ('title', orm['backend.MovieSort:title']),
             ('director', orm['backend.MovieSort:director']),
@@ -135,6 +182,8 @@ class Migration:
             ('summary', orm['backend.MovieSort:summary']),
             ('trivia', orm['backend.MovieSort:trivia']),
             ('connections', orm['backend.MovieSort:connections']),
+            ('rating', orm['backend.MovieSort:rating']),
+            ('votes', orm['backend.MovieSort:votes']),
             ('scenes', orm['backend.MovieSort:scenes']),
             ('words', orm['backend.MovieSort:words']),
             ('wpm', orm['backend.MovieSort:wpm']),
@@ -163,6 +212,7 @@ class Migration:
             ('computed_path', orm['backend.File:computed_path']),
             ('size', orm['backend.File:size']),
             ('duration', orm['backend.File:duration']),
+            ('is_video', orm['backend.File:is_video']),
             ('video_codec', orm['backend.File:video_codec']),
             ('pixel_format', orm['backend.File:pixel_format']),
             ('width', orm['backend.File:width']),
@@ -176,6 +226,10 @@ class Migration:
             ('bpp', orm['backend.File:bpp']),
             ('pixels', orm['backend.File:pixels']),
             ('part', orm['backend.File:part']),
+            ('available', orm['backend.File:available']),
+            ('stream128', orm['backend.File:stream128']),
+            ('stream320', orm['backend.File:stream320']),
+            ('stream640', orm['backend.File:stream640']),
         ))
         db.send_create_signal('backend', ['File'])
         
@@ -190,6 +244,7 @@ class Migration:
         db.create_table('backend_genre', (
             ('id', orm['backend.Genre:id']),
             ('name', orm['backend.Genre:name']),
+            ('manual', orm['backend.Genre:manual']),
         ))
         db.send_create_signal('backend', ['Genre'])
         
@@ -199,6 +254,7 @@ class Migration:
             ('movie', orm['backend.MovieCountry:movie']),
             ('country', orm['backend.MovieCountry:country']),
             ('position', orm['backend.MovieCountry:position']),
+            ('manual', orm['backend.MovieCountry:manual']),
         ))
         db.send_create_signal('backend', ['MovieCountry'])
         
@@ -208,6 +264,7 @@ class Migration:
             ('movie', orm['backend.Review:movie']),
             ('title', orm['backend.Review:title']),
             ('url', orm['backend.Review:url']),
+            ('manual', orm['backend.Review:manual']),
         ))
         db.send_create_signal('backend', ['Review'])
         
@@ -217,7 +274,7 @@ class Migration:
             ('created', orm['backend.Subtitle:created']),
             ('modified', orm['backend.Subtitle:modified']),
             ('user', orm['backend.Subtitle:user']),
-            ('movie_file', orm['backend.Subtitle:movie_file']),
+            ('file', orm['backend.Subtitle:file']),
             ('language', orm['backend.Subtitle:language']),
             ('srt', orm['backend.Subtitle:srt']),
         ))
@@ -231,6 +288,7 @@ class Migration:
             ('role', orm['backend.Cast:role']),
             ('character', orm['backend.Cast:character']),
             ('position', orm['backend.Cast:position']),
+            ('manual', orm['backend.Cast:manual']),
         ))
         db.send_create_signal('backend', ['Cast'])
         
@@ -247,8 +305,35 @@ class Migration:
         db.create_table('backend_keyword', (
             ('id', orm['backend.Keyword:id']),
             ('name', orm['backend.Keyword:name']),
+            ('manual', orm['backend.Keyword:manual']),
         ))
         db.send_create_signal('backend', ['Keyword'])
+        
+        # Adding model 'MovieImdb'
+        db.create_table('backend_movieimdb', (
+            ('id', orm['backend.MovieImdb:id']),
+            ('created', orm['backend.MovieImdb:created']),
+            ('modified', orm['backend.MovieImdb:modified']),
+            ('imdbId', orm['backend.MovieImdb:imdbId']),
+            ('title', orm['backend.MovieImdb:title']),
+            ('year', orm['backend.MovieImdb:year']),
+            ('runtime', orm['backend.MovieImdb:runtime']),
+            ('release_date', orm['backend.MovieImdb:release_date']),
+            ('tagline', orm['backend.MovieImdb:tagline']),
+            ('plot', orm['backend.MovieImdb:plot']),
+            ('plot_outline', orm['backend.MovieImdb:plot_outline']),
+            ('rating', orm['backend.MovieImdb:rating']),
+            ('votes', orm['backend.MovieImdb:votes']),
+            ('budget', orm['backend.MovieImdb:budget']),
+            ('gross', orm['backend.MovieImdb:gross']),
+            ('profit', orm['backend.MovieImdb:profit']),
+            ('series_imdb', orm['backend.MovieImdb:series_imdb']),
+            ('series_title', orm['backend.MovieImdb:series_title']),
+            ('episode_title', orm['backend.MovieImdb:episode_title']),
+            ('season', orm['backend.MovieImdb:season']),
+            ('episode', orm['backend.MovieImdb:episode']),
+        ))
+        db.send_create_signal('backend', ['MovieImdb'])
         
         # Adding model 'List'
         db.create_table('backend_list', (
@@ -267,6 +352,7 @@ class Migration:
             ('subject', orm['backend.Connection:subject']),
             ('relation', orm['backend.Connection:relation']),
             ('object', orm['backend.Connection:object']),
+            ('manual', orm['backend.Connection:manual']),
         ))
         db.send_create_signal('backend', ['Connection'])
         
@@ -274,6 +360,7 @@ class Migration:
         db.create_table('backend_location', (
             ('id', orm['backend.Location:id']),
             ('name', orm['backend.Location:name']),
+            ('manual', orm['backend.Location:manual']),
             ('lat_sw', orm['backend.Location:lat_sw']),
             ('lng_sw', orm['backend.Location:lng_sw']),
             ('lat_ne', orm['backend.Location:lat_ne']),
@@ -286,7 +373,6 @@ class Migration:
         
         # Adding model 'MovieFind'
         db.create_table('backend_moviefind', (
-            ('id', orm['backend.MovieFind:id']),
             ('movie', orm['backend.MovieFind:movie']),
             ('all', orm['backend.MovieFind:all']),
             ('title', orm['backend.MovieFind:title']),
@@ -368,11 +454,17 @@ class Migration:
         # Deleting model 'ArchiveFile'
         db.delete_table('backend_archivefile')
         
+        # Deleting model 'MovieOxdb'
+        db.delete_table('backend_movieoxdb')
+        
         # Deleting model 'Language'
         db.delete_table('backend_language')
         
         # Deleting model 'ReviewWhitelist'
         db.delete_table('backend_reviewwhitelist')
+        
+        # Deleting model 'Layer'
+        db.delete_table('backend_layer')
         
         # Deleting model 'MovieSort'
         db.delete_table('backend_moviesort')
@@ -403,6 +495,9 @@ class Migration:
         
         # Deleting model 'Keyword'
         db.delete_table('backend_keyword')
+        
+        # Deleting model 'MovieImdb'
+        db.delete_table('backend_movieimdb')
         
         # Deleting model 'List'
         db.delete_table('backend_list')
@@ -463,7 +558,8 @@ class Migration:
         },
         'backend.alternativetitle': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'movie': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'alternative_titles'", 'to': "orm['backend.Movie']"}),
+            'manual': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'movie': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'alternative_titles_all'", 'to': "orm['backend.Movie']"}),
             'title': ('django.db.models.fields.TextField', [], {}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '1000'})
         },
@@ -472,29 +568,32 @@ class Migration:
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'}),
+            'public': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'users': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.User']"})
         },
         'backend.archivefile': {
-            'archive': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['backend.Archive']"}),
+            'archive': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'files'", 'to': "orm['backend.Archive']"}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'file': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['backend.File']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'movie_file': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['backend.File']"}),
             'path': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'blank': 'True'})
         },
         'backend.cast': {
-            'character': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),
+            'character': ('django.db.models.fields.CharField', [], {'max_length': '1000', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'movie': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['backend.Movie']"}),
+            'manual': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'movie': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'cast_relation'", 'to': "orm['backend.Movie']"}),
             'person': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['backend.Person']"}),
             'position': ('django.db.models.fields.IntegerField', [], {}),
             'role': ('django.db.models.fields.CharField', [], {'max_length': '200'})
         },
         'backend.connection': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'manual': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'object': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['backend.Movie']"}),
             'relation': ('django.db.models.fields.CharField', [], {'max_length': '512'}),
-            'subject': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'connections'", 'to': "orm['backend.Movie']"})
+            'subject': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'connections_all'", 'to': "orm['backend.Movie']"})
         },
         'backend.country': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -503,6 +602,7 @@ class Migration:
         },
         'backend.file': {
             'audio_codec': ('django.db.models.fields.CharField', [], {'max_length': '256', 'blank': 'True'}),
+            'available': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'bpp': ('django.db.models.fields.FloatField', [], {'default': '-1'}),
             'channels': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
             'computed_path': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'blank': 'True'}),
@@ -512,6 +612,7 @@ class Migration:
             'framerate': ('django.db.models.fields.CharField', [], {'max_length': '256', 'blank': 'True'}),
             'height': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_video': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'md5': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32', 'blank': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'movie': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'files'", 'to': "orm['backend.Movie']"}),
@@ -523,16 +624,21 @@ class Migration:
             'samplerate': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
             'sha1': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '40', 'blank': 'True'}),
             'size': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
+            'stream128': ('django.db.models.fields.files.FileField', [], {'default': 'None', 'max_length': '100'}),
+            'stream320': ('django.db.models.fields.files.FileField', [], {'default': 'None', 'max_length': '100'}),
+            'stream640': ('django.db.models.fields.files.FileField', [], {'default': 'None', 'max_length': '100'}),
             'video_codec': ('django.db.models.fields.CharField', [], {'max_length': '256', 'blank': 'True'}),
             'width': ('django.db.models.fields.IntegerField', [], {'default': '-1'})
         },
         'backend.genre': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'manual': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'movies': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['backend.Movie']"}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '200'})
         },
         'backend.keyword': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'manual': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'movies': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['backend.Movie']"}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '200'})
         },
@@ -540,6 +646,17 @@ class Migration:
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'movies': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['backend.Movie']"}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '200'})
+        },
+        'backend.layer': {
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'movie': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['backend.Movie']"}),
+            'time_in': ('django.db.models.fields.FloatField', [], {'default': '-1'}),
+            'time_out': ('django.db.models.fields.FloatField', [], {'default': '-1'}),
+            'type': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'value': ('django.db.models.fields.TextField', [], {})
         },
         'backend.list': {
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -566,83 +683,135 @@ class Migration:
             'lng_center': ('django.db.models.fields.FloatField', [], {'default': '0'}),
             'lng_ne': ('django.db.models.fields.FloatField', [], {'default': '0'}),
             'lng_sw': ('django.db.models.fields.FloatField', [], {'default': '0'}),
+            'manual': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'movies': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['backend.Movie']"}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '200'})
         },
         'backend.movie': {
-            'accessed': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'alternative_titles': ('fields.TupleField', [], {'default': '()'}),
+            'available': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'db_index': 'True', 'blank': 'True'}),
             'budget': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'cast': ('fields.TupleField', [], {'default': '()'}),
+            'cinematographers': ('fields.TupleField', [], {'default': '()'}),
+            'connections': ('fields.TupleField', [], {'default': '()'}),
+            'countries': ('fields.TupleField', [], {'default': '()'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'duration': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
+            'directors': ('fields.TupleField', [], {'default': '()'}),
+            'editors': ('fields.TupleField', [], {'default': '()'}),
             'episode': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
             'episode_title': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
-            'extracted': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'filename': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'files_modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'genres': ('fields.TupleField', [], {'default': '()'}),
             'gross': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'imdbId': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '7', 'blank': 'True'}),
-            'kg_id': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
+            'imdb': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'movie'", 'unique': 'True', 'null': 'True', 'to': "orm['backend.MovieImdb']"}),
+            'keywords': ('fields.TupleField', [], {'default': '()'}),
+            'languages': ('fields.TupleField', [], {'default': '()'}),
+            'locations': ('fields.TupleField', [], {'default': '()'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'movieId': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '128', 'blank': 'True'}),
-            'open_subtitle_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'oxdb': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'movie'", 'unique': 'True', 'null': 'True', 'to': "orm['backend.MovieOxdb']"}),
             'oxdbId': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '42', 'blank': 'True'}),
             'plot': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'plot_outline': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'poster': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'poster_height': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'poster_width': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'posters_available': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'posters_disabled': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'producers': ('fields.TupleField', [], {'default': '()'}),
             'profit': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'rating': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'rating': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'release_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'reviews': ('fields.TupleField', [], {'default': '()'}),
             'rights_level': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
             'runtime': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'scene_height': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'season': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
             'series_imdb': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '7'}),
             'series_title': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
-            'still_pos': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'stream128': ('django.db.models.fields.files.FileField', [], {'default': 'None', 'max_length': '100'}),
+            'stream320': ('django.db.models.fields.files.FileField', [], {'default': 'None', 'max_length': '100'}),
+            'stream640': ('django.db.models.fields.files.FileField', [], {'default': 'None', 'max_length': '100'}),
             'tagline': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '1000'}),
-            'tpb_id': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
+            'trivia': ('fields.TupleField', [], {'default': '()'}),
             'votes': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'wikipedia_url': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'writers': ('fields.TupleField', [], {'default': '()'}),
             'year': ('django.db.models.fields.CharField', [], {'max_length': '4'})
         },
         'backend.moviecountry': {
             'country': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['backend.Country']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'manual': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'movie': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['backend.Movie']"}),
             'position': ('django.db.models.fields.IntegerField', [], {})
         },
         'backend.moviefind': {
             'all': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'cast': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'cinematographer': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'country': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'director': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'editor': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'filename': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'cast': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
+            'cinematographer': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
+            'country': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
+            'director': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
+            'editor': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
+            'filename': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
             'genre': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'keywords': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'language': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'locations': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'movie': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'find'", 'unique': 'True', 'to': "orm['backend.Movie']"}),
-            'producer': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'language': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
+            'locations': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
+            'movie': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'find'", 'unique': 'True', 'primary_key': 'True', 'to': "orm['backend.Movie']"}),
+            'producer': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
             'summary': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '1000'}),
+            'title': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'trivia': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'writer': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'writer': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
+            'year': ('django.db.models.fields.CharField', [], {'max_length': '4'})
+        },
+        'backend.movieimdb': {
+            'budget': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'episode': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
+            'episode_title': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '1000', 'blank': 'True'}),
+            'gross': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'imdbId': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '7'}),
+            'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'plot': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'plot_outline': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'profit': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'rating': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
+            'release_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'runtime': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'season': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
+            'series_imdb': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '7'}),
+            'series_title': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '1000', 'blank': 'True'}),
+            'tagline': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '1000'}),
+            'votes': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'year': ('django.db.models.fields.CharField', [], {'max_length': '4'})
         },
         'backend.movielanguage': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['backend.Language']"}),
+            'manual': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'movie': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['backend.Movie']"}),
             'position': ('django.db.models.fields.IntegerField', [], {})
+        },
+        'backend.movieoxdb': {
+            'budget': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'episode': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
+            'episode_title': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
+            'gross': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'plot': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'plot_outline': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'profit': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'rating': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
+            'release_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'runtime': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'season': ('django.db.models.fields.IntegerField', [], {'default': '-1'}),
+            'series_imdb': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '7'}),
+            'series_title': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
+            'tagline': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '1000'}),
+            'votes': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'year': ('django.db.models.fields.CharField', [], {'max_length': '4'})
         },
         'backend.moviesort': {
             'aspectratio': ('django.db.models.fields.IntegerField', [], {'blank': 'True'}),
@@ -657,13 +826,13 @@ class Migration:
             'filename': ('django.db.models.fields.IntegerField', [], {'blank': 'True'}),
             'files': ('django.db.models.fields.IntegerField', [], {'blank': 'True'}),
             'genre': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'keywords': ('django.db.models.fields.IntegerField', [], {'blank': 'True'}),
             'language': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'movie': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'sort'", 'unique': 'True', 'to': "orm['backend.Movie']"}),
+            'movie': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'sort'", 'unique': 'True', 'primary_key': 'True', 'to': "orm['backend.Movie']"}),
             'movieId': ('django.db.models.fields.CharField', [], {'max_length': '128', 'blank': 'True'}),
             'pixels': ('django.db.models.fields.IntegerField', [], {'blank': 'True'}),
             'producer': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'rating': ('django.db.models.fields.FloatField', [], {'blank': 'True'}),
             'resolution': ('django.db.models.fields.IntegerField', [], {'blank': 'True'}),
             'risk': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'runtime': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
@@ -672,6 +841,7 @@ class Migration:
             'summary': ('django.db.models.fields.IntegerField', [], {'blank': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '1000'}),
             'trivia': ('django.db.models.fields.IntegerField', [], {'blank': 'True'}),
+            'votes': ('django.db.models.fields.IntegerField', [], {'blank': 'True'}),
             'words': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'wpm': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'writer': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
@@ -686,7 +856,8 @@ class Migration:
         },
         'backend.review': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'movie': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'reviews'", 'to': "orm['backend.Movie']"}),
+            'manual': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'movie': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'reviews_all'", 'to': "orm['backend.Movie']"}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'blank': 'True'}),
             'url': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'blank': 'True'})
         },
@@ -697,16 +868,17 @@ class Migration:
         },
         'backend.subtitle': {
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'file': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'subtitles'", 'to': "orm['backend.File']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'movie_file': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['backend.File']"}),
             'srt': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
         'backend.trivia': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'movie': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'trivia'", 'to': "orm['backend.Movie']"}),
+            'manual': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'movie': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'trivia_all'", 'to': "orm['backend.Movie']"}),
             'position': ('django.db.models.fields.IntegerField', [], {}),
             'trivia': ('django.db.models.fields.TextField', [], {})
         },
