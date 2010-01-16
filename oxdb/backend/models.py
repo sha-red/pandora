@@ -3,6 +3,7 @@
 import re
 import os.path
 import random
+from datetime import datetime
 
 from django.db import models
 from django.db.models import Q
@@ -16,6 +17,7 @@ from django.utils import simplejson as json
 import utils
 import managers
 import fields
+import load
 
 class MovieImdb(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -74,6 +76,39 @@ class MovieOxdb(models.Model):
     def __unicode__(self):
         return u"%s (%s)" % (self.title, self.year)
 
+class MovieExtra(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    title = models.CharField(max_length=1000)
+    description = models.TextField(blank=True)
+    contributor = models.CharField(max_length=1000)
+
+def getMovie(info):
+    '''
+        info dict with:
+            imdbId, title, director, episode_title, season, series
+    '''
+    if 'imdbId' in info:
+        try:
+            movie = models.Movie.byImdbId(imdbId)
+        except models.Movie.DoesNotExist:
+            movie = load.loadIMDb(movieId==info['imdbId'])
+    else:
+        q = Movie.objects.filter(title=info['title'], year=info['director'])
+        if q.count() > 1:
+            movie = q[0]
+        else:
+            movie = newMovie(info['title'], info['director'], '')
+            updated = False
+            for key in ('episode_title', 'season', 'year'):
+                if key in info:
+                    setattr(movie.oxdb, key, info[key])
+                    updated = True
+            if updated:
+            movie.save()
+    return movie
+
 def newMovie(title, director, year):
     movie = Movie()
     oxdb = MovieOxdb()
@@ -96,6 +131,7 @@ def movie_path(f, size):
 class Movie(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    published = models.DateTimeField(default=datetime.now, editable=False)
 
     #only movies that have metadata from files are available,
     #this is indicated by setting available to True 
@@ -106,10 +142,13 @@ class Movie(models.Model):
 
     imdb = models.OneToOneField('MovieImdb', null=True, related_name='movie')
     oxdb = models.OneToOneField('MovieOxdb', null=True, related_name='movie')
+    extra = models.OneToOneField('MovieOxdb', null=True, related_name='movie')
 
     objects = managers.MovieManager()
 
     def get(self, key, default=None):
+        if self.extra and getattr(self.extra, key):
+            return getattr(self.extra, key)
         if self.oxdb and getattr(self.oxdb, key):
             return getattr(self.oxdb, key)
         if self.imdb:
@@ -949,6 +988,8 @@ FILE_TYPES = (
 class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    published = models.DateTimeField(default=datetime.now, editable=False)
+
     verified = models.BooleanField(default=False)
 
     oshash = models.CharField(blank=True, unique=True, max_length=16)
@@ -1058,6 +1099,11 @@ class File(models.Model):
             self.type = 3
         #FIXME: this should be computed and not submitted path
         self.path = self.info['path']
+        self.save()
+
+    def findMovie(self):
+        info = utils.parsePath(self.path)
+        self.movie = getMovie(info)
         self.save()
 
 class Still(models.Model):

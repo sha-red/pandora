@@ -23,6 +23,7 @@ from oxdjango.decorators import login_required_json
 
 import models
 import utils
+from daemon import send_bg_message
     
 '''
 field.length -> movie.sort.all()[0].field
@@ -426,6 +427,8 @@ def update_archive(request, archive):
             print "adding file", oshash, data['path']
             f = models.ArchiveFile.get_or_create(archive, oshash)
             f.update(data)
+            if not f.movie:
+                send_bg_message({'findMovie': f.id})
             #FIXME: only add if it was not in File
         else:
             f = q[0]

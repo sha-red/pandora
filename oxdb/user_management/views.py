@@ -68,6 +68,7 @@ def preferences(request):
     key = request.GET.get('key', None)
     value = request.GET.get('value', None)
     user = request.user
+    response['preferences'] = {}
     if not key: # return all preferences for current user
         for p in models.Preference.objects.filter(user=user):
             response['preferences'][p.key] = p.value
@@ -76,6 +77,7 @@ def preferences(request):
         p, created = models.Preference.objects.get_or_create(user=user, key=key)
         response['preferences'][key] = p.value
     else: # set preference
+        del response['preferences']
         response['message'] = '%s saved.' % key
         if key == 'password':
             user.set_password(value)
