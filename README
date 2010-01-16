@@ -1,7 +1,7 @@
 
 To setup a local instance of 0xdb:
 
-    bzr branch http://code.0xdb.org/oxdb oxdb
+    bzr branch http://code.0xdb.org/oxdb2 oxdb
     cd oxdb
     virtualenv .
     pip -E . install -r requirements.txt
