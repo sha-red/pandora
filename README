@@ -10,7 +10,7 @@ To setup a local instance of 0xdb:
 you need python, bazaar, pip and virtualenv:
 
     apt-get install python-setuptools bzr
-    east_install pip
+    easy_install pip
     pip install virtualenv
 
 also it uses system python moduels, so make sure you have
