@@ -15,7 +15,7 @@ sys.path.append(root_dir)
 sys.path.append(os.path.join(root_dir, project_module))
 
 #reload if this django.wsgi gets touched
-from ox.django import monitor
+from oxdjango import monitor
 monitor.start(interval=1.0)
 
 monitor.track(os.path.abspath(os.path.dirname(__file__)))
