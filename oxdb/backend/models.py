@@ -106,7 +106,7 @@ def getMovie(info):
                     setattr(movie.oxdb, key, info[key])
                     updated = True
             if updated:
-            movie.save()
+                movie.save()
     return movie
 
 def newMovie(title, director, year):
