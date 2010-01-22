@@ -142,7 +142,7 @@ class Movie(models.Model):
 
     imdb = models.OneToOneField('MovieImdb', null=True, related_name='movie')
     oxdb = models.OneToOneField('MovieOxdb', null=True, related_name='movie')
-    extra = models.OneToOneField('MovieOxdb', null=True, related_name='movie')
+    extra = models.OneToOneField('MovieExtra', null=True, related_name='movie')
 
     objects = managers.MovieManager()
 
