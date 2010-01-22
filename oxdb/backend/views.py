@@ -11,6 +11,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from django.template import RequestContext
 from django.core.paginator import Paginator
+from django import forms
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 try:
@@ -427,8 +428,8 @@ def update_archive(request, archive):
             print "adding file", oshash, data['path']
             f = models.ArchiveFile.get_or_create(archive, oshash)
             f.update(data)
-            if not f.movie:
-                send_bg_message({'findMovie': f.id})
+            if not f.file.movie:
+                send_bg_message({'findMovie': f.file.id})
             #FIXME: only add if it was not in File
         else:
             f = q[0]

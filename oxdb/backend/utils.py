@@ -78,7 +78,7 @@ def oxdb_episode_title(path):
     episodeTitle = u''
     ep = re.compile('.Episode \d+?\.(.*?)\.[a-zA-Z]').findall(path)
     if ep:
-        episodeTitle = ep[0][0]
+        episodeTitle = ep[0]
     return episodeTitle
 
 def oxdb_season_episode(path):

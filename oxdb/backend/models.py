@@ -90,16 +90,18 @@ def getMovie(info):
         info dict with:
             imdbId, title, director, episode_title, season, series
     '''
-    if 'imdbId' in info:
+    if 'imdbId' in info and info['imdbId']:
         try:
-            movie = models.Movie.byImdbId(imdbId)
-        except models.Movie.DoesNotExist:
-            movie = load.loadIMDb(movieId==info['imdbId'])
+            movie = Movie.byImdbId(info['imdbId'])
+        except Movie.DoesNotExist:
+            movie = load.loadIMDb(info['imdbId'])
     else:
-        q = Movie.objects.filter(title=info['title'], year=info['director'])
+        q = Movie.objects.filter(oxdb__title=info['title'])
         if q.count() > 1:
+            print "FIXME: check more than title here!!"
             movie = q[0]
         else:
+            print info
             movie = newMovie(info['title'], info['director'], '')
             updated = False
             for key in ('episode_title', 'season', 'year'):
