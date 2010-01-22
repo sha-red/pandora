@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-# Written 2009 by j@mailb.org
 
 from django.contrib import admin
 
@@ -25,7 +24,6 @@ class MovieAdmin(admin.ModelAdmin):
 
 admin.site.register(models.Movie, MovieAdmin)
 
-
 class FileAdmin(admin.ModelAdmin):
     search_fields = ['path', 'video_codec']
 
@@ -38,7 +36,6 @@ class ArchiveFileAdmin(admin.ModelAdmin):
     form = ArchiveFileAdminForm
 
 admin.site.register(models.ArchiveFile, ArchiveFileAdmin)
-
 
 class ArchiveAdmin(admin.ModelAdmin):
     search_fields = ['name']

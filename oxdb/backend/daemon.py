@@ -19,10 +19,10 @@ def run():
                                          exchange="oxdb-bg",
                                          routing_key="oxdb-bg")
     def handle_background_tasks_callback(data, message):
-        print("Got feed import message")
+        print("Got bg message")
         print data
         if 'loadIMDb' in data:
-            imdbId = message_data['loadIMDb']
+            imdbId = data['loadIMDb']
             load.loadIMDb(imdbId)
         elif 'findMovie' in data:
             f = models.File.objects.get(pk=data['findMovie'])

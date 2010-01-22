@@ -1107,6 +1107,10 @@ class File(models.Model):
         self.movie = getMovie(info)
         self.save()
 
+    def extract(self):
+        #FIXME: do stuff, like create timeline or create smaller videos etc
+        return
+
 class Still(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
