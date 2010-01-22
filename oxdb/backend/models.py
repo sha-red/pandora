@@ -9,14 +9,15 @@ from django.db import models
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
+from django.utils import simplejson as json
+
 import oxlib
 from oxlib import stripTags
 from oxlib.normalize import canonicalTitle, canonicalName
-from django.utils import simplejson as json
+from oxdjango import fields
 
 import utils
 import managers
-import fields
 import load
 
 class MovieImdb(models.Model):
