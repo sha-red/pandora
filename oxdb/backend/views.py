@@ -21,11 +21,35 @@ except ImportError:
 from oxdjango.shortcuts import render_to_json_response
 from oxdjango.decorators import login_required_json
 
-
 import models
 import utils
 from daemon import send_bg_message
-    
+
+from oxuser.views import api_login, api_logout, api_register, api_recover, api_preferences
+
+
+def api(request):
+    function = request.POST['function']
+    #FIXME: possible to do this in f
+    #data = json.loads(request.POST['data'])
+
+    #FIXME: security considerations, web facing api should not call anything in globals!!!
+    f = globals().get('api_'+function, None)
+    if f:
+        response = f(request)
+    else:
+        response = {'status': 404, 'statusText': 'Unknown function %s' % function}
+    return render_to_json_response(response)
+
+def api_hello(request):
+    '''
+        function: helo
+    '''
+    response = {'status': 200, 'statusText': 'ok'}
+    response.user = request.user.json()
+    return render_to_json_response(response)
+
+
 '''
 field.length -> movie.sort.all()[0].field
 o=0&n=100
@@ -123,7 +147,7 @@ Examples:
 #auto compleat in find box
 
 '''
-def order_query(qs, s, prefix='sort__'):
+def _order_query(qs, s, prefix='sort__'):
     order_by = []
     for e in s.split(','):
         o = e.split(':')
@@ -137,7 +161,7 @@ def order_query(qs, s, prefix='sort__'):
         qs = qs.order_by(*order_by)
     return qs
 
-def parse_query(request):
+def _parse_query(request):
     get = request.GET
     query = {}
     query['i'] = 0
@@ -167,12 +191,21 @@ def parse_query(request):
     #group by only allows sorting by name or number of itmes
     return query
 
-def find(request):
-    query = parse_query(request)
+def api_find(request):
+    '''
+        function: find
+        data: {'q': query, 's': sort, 'r': range}
+        
+        query: query string, can contain field:search more on query syntax at
+               http://wiki.0xdb.org/wiki/QuerySyntax
+        sort:  comma seperated list of field:order, default: director:asc,year:desc 
+        range: result ragne, from:to or from
+    '''
+    query = _parse_query(request)
     response = {}
     if 'p' in query:
         response['items'] = []
-        qs = order_query(query['q'], query['s'])
+        qs = _order_query(query['q'], query['s'])
         if 'n' in query:
             response = {'items': qs.count()}
         else:
@@ -218,7 +251,7 @@ def find(request):
                 order_by = "%s:%s" % (name, order_by[1])
             else:
                 order_by = "%s:%s" % (items, order_by[1])
-            qs = order_query(qs, order_by, '')
+            qs = _order_query(qs, order_by, '')
             qs = qs[query['i']:query['o']]
 
             response['items'] = [{'title': i[name], 'items': i[items]} for i in qs]
@@ -235,6 +268,129 @@ def find(request):
         response['duration'] = r['duration__count']
     return render_to_json_response(response)
 
+def api_getItem(request):
+    '''
+        function: getItem
+
+        api('getItem', id)
+            return item with id
+    '''
+    response = {'status': 200, 'statusText': 'ok'}
+    itemId = json.loads(request.POST['data'])
+    item = models.Movie.objects.get(movieId=itemId)
+    response['item'] = item.json()
+    return render_to_json_response(response)
+
+def api_editItem(request):
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+def api_removeItem(request):
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+def api_addLayer(request):
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+def api_removeLayer(request):
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+def api_editLayer(request):
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+def api_addListItem(request):
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+def api_removeListItem(request):
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+def api_addList(request):
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+def api_editList(request):
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+def api_removeList(request):
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+
+'''
+POST update
+    > files: {
+        oshash: { 'path': .., ..},
+        oshash: { 'path': .., ..},
+      }
+'''
+#@login_required_json
+def api_update(request, archive):
+    print "update request"
+    data = json.loads(request.POST['data'])
+    archive = data['archive']
+    files = data['files']
+    archive = models.Archive.objects.get(name=archive)
+    print "update request for", archive.name
+    needs_data = []
+    rename = {}
+    for oshash in files:
+        print 'checking', oshash
+        data = files[oshash]
+        q = models.ArchiveFile.objects.filter(archive=archive, file__oshash=oshash)
+        if q.count() == 0:
+            print "adding file", oshash, data['path']
+            f = models.ArchiveFile.get_or_create(archive, oshash)
+            f.update(data)
+            if not f.file.movie:
+                send_bg_message({'findMovie': f.file.id})
+            #FIXME: only add if it was not in File
+        else:
+            f = q[0]
+            if data['path'] != f.path:
+                f.path = data['path']
+                f.save()
+        if f.file.needs_data:
+            needs_data.append(oshash)
+        if f.path != f.file.path:
+            rename[oshash] = f.file.path
+    print "processed files for", archive.name
+    #remove all files not in files.keys() from ArchiveFile
+    response = {'status': 200, 'statusText': 'ok'}
+    response['info'] = needs_data
+    response['rename'] = rename
+    return render_to_json_response(response)
+
+
+def api_upload(request): #video, timeline, frame
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+
+def api_file(request): #FIXME: should this be file.files. or part of update
+    '''
+        change file / imdb link
+    '''
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+
+def api_parse(request): #parse path and return info
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+
+def api_guess(request): #guess imdb based on title, director, year
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#FIXME: old stuff below...
 '''
 GET info?oshash=a41cde31c581e11d
     > {
@@ -306,7 +462,7 @@ def list_files(request):
 
 def find_files(request):
     response = {}
-    query = parse_query(request)
+    query = _parse_query(request)
     response['files'] = {}
     qs = models.UserFile.filter(user=request.user).filter(movie_file__movie__id__in=query['q'])
     p = Paginator(qs, 1000)
@@ -405,47 +561,6 @@ def add_video(request, oshash):
         response['url'] = f.stream128.url()
     return render_to_json_response(response)
 
-'''
-POST update
-    > files: {
-        oshash: { 'path': .., ..},
-        oshash: { 'path': .., ..},
-      }
-'''
-#@login_required_json
-def update_archive(request, archive):
-    print "update request"
-    archive = models.Archive.objects.get(name=archive)
-    files = json.loads(request.POST['files'])
-    print "update request for", archive.name
-    needs_data = []
-    rename = {}
-    for oshash in files:
-        print 'checking', oshash
-        data = files[oshash]
-        q = models.ArchiveFile.objects.filter(archive=archive, file__oshash=oshash)
-        if q.count() == 0:
-            print "adding file", oshash, data['path']
-            f = models.ArchiveFile.get_or_create(archive, oshash)
-            f.update(data)
-            if not f.file.movie:
-                send_bg_message({'findMovie': f.file.id})
-            #FIXME: only add if it was not in File
-        else:
-            f = q[0]
-            if data['path'] != f.path:
-                f.path = data['path']
-                f.save()
-        if f.file.needs_data:
-            needs_data.append(oshash)
-        if f.path != f.file.path:
-            rename[oshash] = f.file.path
-    print "processed files for", archive.name
-    #remove all files not in files.keys() from ArchiveFile
-    response = {}
-    response['info'] = needs_data
-    response['rename'] = rename
-    return render_to_json_response(response)
 
 def file_parse(request):
     response = utils.parsePath(request.POST['path'])

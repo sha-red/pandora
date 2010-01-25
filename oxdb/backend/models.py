@@ -123,6 +123,10 @@ def newMovie(title, director, year):
     movie.oxdbId = "__init__%s" % random.randint(0, 100000)
     movie.save()
     movie.oxdbId = movie.oxid()
+    print title, director, year
+    print movie.oxdbId
+    print movie.movieId
+
     movie.save()
     return movie
 

@@ -122,6 +122,6 @@ def parsePath(path):
     r['season'], r['episode'] = oxdb_season_episode(path)
     r['series'] = oxdb_series_title(path)
     r['part'] = oxdb_part(path)
-    r['imdbId'] = oxweb.imdb.guess(search_title, r['director'])
+    r['imdbId'] = oxweb.imdb.guess(search_title, r['director'], timeout=-1)
     return r
 
