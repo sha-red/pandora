@@ -3,6 +3,7 @@
 import re
 from datetime import datetime
 from urllib2 import unquote
+import json
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -30,10 +31,14 @@ class MovieManager(Manager):
             also checks for lists.
             range and order must be applied later
         '''
+        '''
         q = ''
         for i in request.META['QUERY_STRING'].split('&'):
           if i.startswith('q='):
             q = i[2:]
+		'''
+		q = json.loads(request.POST['data'])['q']
+		print q
         op = ','
         if '|' in q:
             op = '|'

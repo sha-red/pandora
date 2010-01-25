@@ -10,7 +10,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Example:
     (r'^ajax_filtered_fields/', include('ajax_filtered_fields.urls')),
-    (r'^api/', include('backend.views.api')),
+    (r'^api/', 'backend.views.api'),
     (r'^$', 'app.views.index'),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 

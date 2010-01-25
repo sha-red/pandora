@@ -25,8 +25,8 @@ def run():
             imdbId = data['loadIMDb']
             load.loadIMDb(imdbId)
         elif 'findMovie' in data:
-            f = models.File.objects.get(pk=data['findMovie'])
-            f.findMovie()
+			f = models.File.objects.get(pk=data['findMovie'])
+			f.findMovie()
         message.ack()
     consumer.register_callback(handle_background_tasks_callback)
     consumer.wait() # Go into the consumer loop.

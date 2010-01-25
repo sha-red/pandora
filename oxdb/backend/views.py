@@ -39,7 +39,8 @@ def api(request):
         response = f(request)
     else:
         response = {'status': 404, 'statusText': 'Unknown function %s' % function}
-    return render_to_json_response(response)
+        response = render_to_json_response(response)
+    return response
 
 def api_hello(request):
     '''
@@ -162,7 +163,7 @@ def _order_query(qs, s, prefix='sort__'):
     return qs
 
 def _parse_query(request):
-    get = request.GET
+    get = json.loads(request.POST['data'])
     query = {}
     query['i'] = 0
     query['o'] = 100
@@ -320,7 +321,7 @@ POST update
       }
 '''
 #@login_required_json
-def api_update(request, archive):
+def api_update(request):
     print "update request"
     data = json.loads(request.POST['data'])
     archive = data['archive']
