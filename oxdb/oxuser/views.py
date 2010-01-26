@@ -24,6 +24,8 @@ def api_login(request):
         
         return {'status': {'code': int, 'text': string}}
     '''
+    print "lgin"
+
     response = {'status': {'code': 403, 'text': 'login failed'}}
     data = json.loads(request.POST['data'])
     form = LoginForm(data, request.FILES)
@@ -68,24 +70,28 @@ def api_register(request):
         
         return {'status': {'code': int, 'text': string}}
     '''
+    print "register"
     data = json.loads(request.POST['data'])
     form = RegisterForm(data, request.FILES)
     if form.is_valid():
         if models.User.objects.filter(username=form.data['username']).count() > 0:
-            response = {'status': 422, 'statusText': 'username or email exists'}
+            print "username taken", form.data['username']
+            response = {'status': {'code':422, 'text': 'username or email exists'}}
         elif models.User.objects.filter(email=form.data['email']).count() > 0:
+            print "username taken", form.data['email']
             response = {'status': {'code':422, 'text': 'username or email exists'}}
         else:
             user = models.User(username=form.data['username'], email=form.data['email'])
             user.set_password(form.data['password'])
+            user.save()
             user = authenticate(username=form.data['username'],
                                 password=form.data['password'])
             login(request, user)
             response = {'status': {'code':200, 'text': 'account created'}}
     else:
+        print "form invalid"
+        print form.errors
         response = {'status': {'code':422, 'text': 'username exists'}}
-
-    response = {'status': {'code':420, 'text': 'username or email exists'}}
     return render_to_json_response(response)
 
 class RecoverForm(forms.Form):
