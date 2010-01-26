@@ -8,4 +8,4 @@ simplejson
 -e hg+https://django-ajax-filtered-fields.googlecode.com/hg/#egg=django-ajax-filtered-fields 
 #rabbitmq interface
 carrot
-
+django_extensions
