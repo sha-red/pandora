@@ -2,92 +2,137 @@
 # vi:si:et:sw=4:sts=4:ts=4
 
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from django.template import RequestContext
 from django.utils import simplejson as json
+from django import forms
 
 from oxdjango.shortcuts import render_to_json_response
 from oxdjango.decorators import login_required_json
 
 import models
 
+class LoginForm(forms.Form):
+    username = forms.TextInput()
+    password = forms.TextInput()
 
 def api_login(request):
     '''
-        data: {'username': username, 'password': password}
+        param data
+            {'username': username, 'password': password}
         
-        username/password to login
+        return {'status': {'code': int, 'text': string}}
     '''
-    response = {'status': 403, 'statusText': 'login failed'}
+    response = {'status': {'code': 403, 'text': 'login failed'}}
     data = json.loads(request.POST['data'])
-
-    from django.contrib.auth import authenticate, login
-    user = authenticate(username=data['username'], password=data['password'])
-    if user is not None:
-        if user.is_active:
-            user_json = {} #FIXME: preferences etc should be in here
-            login(request, user)
-            response = {'status': 200, 'message': 'You are logged in.', 'user': user_json}
+    form = LoginForm(data, request.FILES)
+    if form.is_valid():
+        user = authenticate(username=data['username'], password=data['password'])
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                user_json = models.getUserJSON(user)
+                response = {'status': {'code': 200, 'message': 'You are logged in.', 'user': user_json}}
+            else:
+                response = {'status': {'code': 403, 'text': 'Your account is disabled.'}}
+                print "Your account has been disabled!"
         else:
-            response = {'status': 403, 'statusText': 'Your account is disabled.'}
-            print "Your account has been disabled!"
+            response = {'status': {'code': 403, 'text': 'Your username and password were incorrect.'}}
     else:
-        response = {'status': 403, 'statusText': 'Your username and password were incorrect.'}
+        response = {'status': {'code':422, 'text': 'invalid data'}}
+
     return render_to_json_response(response)
 
 def api_logout(request):
     '''
-		loggs out currenly logged in user
+        param data
+            {}
+        
+        return {'status': {'code': int, 'text': string}}
     '''
-    response = {'status': 200, 'statusText': 'logged out'}
+    response = {'status': {'code': 200, 'text': 'logged out'}}
     if request.user.is_authenticated():
-        request.user.logout()
+        logout(request)
     return render_to_json_response(response)
+
+class RegisterForm(forms.Form):
+    username = forms.TextInput()
+    password = forms.TextInput()
+    email = forms.TextInput()
 
 def api_register(request):
     '''
-        data: {'username': username, 'password': password, 'email': email}
+        param data
+            {'username': username, 'password': password, 'email': email}
         
-        username
-        password
-        email
+        return {'status': {'code': int, 'text': string}}
     '''
     data = json.loads(request.POST['data'])
-    response = {'status': 422, 'statusText': 'username exists'}
+    form = RegisterForm(data, request.FILES)
+    if form.is_valid():
+        if models.User.objects.filter(username=form.data['username']).count() > 0:
+            response = {'status': 422, 'statusText': 'username or email exists'}
+        elif models.User.objects.filter(email=form.data['email']).count() > 0:
+            response = {'status': {'code':422, 'text': 'username or email exists'}}
+        else:
+            user = models.User(username=form.data['username'], email=form.data['email'])
+            user.set_password(form.data['password'])
+            user = authenticate(username=form.data['username'],
+                                password=form.data['password'])
+            login(request, user)
+            response = {'status': {'code':200, 'text': 'account created'}}
+    else:
+        response = {'status': {'code':422, 'text': 'username exists'}}
+
+    response = {'status': {'code':420, 'text': 'username or email exists'}}
     return render_to_json_response(response)
 
-def api_recover(request):
-    data = json.loads(request.POST['data'])
+class RecoverForm(forms.Form):
+    username_or_email = forms.TextInput()
 
-    username = data['username']
-    user = None
-    q = models.User.objects.filter(username=username)
-    if q.count() > 0:
-        user = q[0]
-    else:
-        q = models.User.objects.filter(email=username)
+def api_recover(request):
+    '''
+        param data
+            {'username_or_email': username}
+        
+        return {'status': {'code': int, 'text': string}}
+    '''
+    data = json.loads(request.POST['data'])
+    form = RegisterForm(data, request.FILES)
+    if form.is_valid():
+        username = data['username_or_email']
+        user = None
+        q = models.User.objects.filter(username=username)
         if q.count() > 0:
             user = q[0]
-    if user:
-        #user.sendmail(...) #FIXME: send recovery mail
-        response = {'status': 200, 'statusText': 'recover email sent.'}
+        else:
+            q = models.User.objects.filter(email=username)
+            if q.count() > 0:
+                user = q[0]
+        if user:
+            #user.sendmail(...) #FIXME: send recovery mail
+            response = {'status': {'code': 200, 'text': 'recover email sent.'}}
+        else:
+            response = {'status': {'code': 404, 'text': 'user or email not found.'}}
     else:
-        response = {'status': 404, 'statusText': 'user or email not found.'}
+        response = {'status': {'code':422, 'text': 'username exists'}}
     return render_to_json_response(response)
 
 @login_required_json
 def api_preferences(request):
     '''
-        function: preferences
-
-        api('preferences')
-            return all preferences
-        api('preferences', 'key1')
-            return preference key1
-        api('preferences', [key1, key2])
-            return preference key1, key2
-        api('preferences', {key: value})
-            set preference key to value
+        param data
+            string
+            list
+            dict
+        return
+        if data is string:
+            return preference with name
+        if data is list:
+            return preferences with names
+        if data is dict:
+            set key values in dict as preferences
     '''
     response = {'status': 200, 'statusText': 'ok'}
     if 'data' not in request.POST:

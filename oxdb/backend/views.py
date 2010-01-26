@@ -26,11 +26,12 @@ import utils
 from daemon import send_bg_message
 
 from oxuser.views import api_login, api_logout, api_register, api_recover, api_preferences
+from oxuser.models import getUserJSON
 
-	
+    
 def api(request):
-	if not 'function' in request.POST:
-		return apidoc(request)
+    if not 'function' in request.POST:
+        return apidoc(request)
     function = request.POST['function']
     #FIXME: possible to do this in f
     #data = json.loads(request.POST['data'])
@@ -40,116 +41,23 @@ def api(request):
     if f:
         response = f(request)
     else:
-        response = {'status': 404, 'statusText': 'Unknown function %s' % function}
-        response = render_to_json_response(response)
+        response = render_to_json_response(
+            {'status': {'code': 404, 'text': 'Unknown function %s' % function}})
     return response
 
 def api_hello(request):
     '''
-        api('hello', functio(result) { result.user })
+        return {'status': {'code': int, 'text': string},
+                'data': {user: dict}}
     '''
-    response = {'status': 200, 'statusText': 'ok'}
-    response.user = request.user.json()
+    response = {'status': {'code': 200, 'text': 'ok'}, 'data': {}}
+    if request.user.is_authenticated():
+        response['data']['user'] = getUserJSON(request.user)
+    else:
+        response['data']['user'] = {'name': 'Guest'}
     return render_to_json_response(response)
 
 
-'''
-field.length -> movie.sort.all()[0].field
-o=0&n=100
-
-
-a & b  | c & d
-
-query
-
-l=user:name or l=name
-q=year:1980,hello,country:usa
-q=year:1980,hello,country:!usa
-q=title:^the$
-q=title:^100%24$
-q=year:<1970,year:>1960
-q=year:<1960,year:>1950,title:sex
-
-!1960-1970
-2009.08.02.22.26.35-2009.08.02.22.26.35
-
-!^the
-
- (dddd.dd.dd)-(dddd.dd.dd)
-
-5-8
-10000-20000
-
-<2009-08-02-22-26-35
-
->2009-08-02-22-26-35
-2009-08-02-22-26-35<
-
-^the the*
-*foo foo$
-*foo* foo
-
-s=director:asc,year:desc               default: director:asc,year:desc
-r=0:100 or r=100 or r=100:             default: 0:100
-p=id,title,director,date,cast.length   default: title,director,year,country
-q
-
-List data backend spec:
-    url = //url for request
-    params = [] //additional params passed to url, i.e. query, or group
-
-the url must understand the following requests:
-number of items:
-    url?params&n=1
-    > {items: N}
-items sorted by key range X to Y:
-    url?params&s=key:asc|desc&r=X:Y
-    > {items: [{k0:v0, k1:v1...}, {k0:v0, k1:v1...}]}
-
-Examples:
-/json/find?l=all&s=title&f=all&q=&a=desc&p=id,title,director,date,cast.length
-
-/json/find?r=0:100&l=all&s=title&f=all&q=&a=desc&p=id,title,director,date,cast.length
-    {
-        movies=[
-            {
-                "id":
-                "title": "fsdf",
-                "director":
-            },
-        ]
-    }
-
-#get sort order for all ids
-/json/find?r=0:1000&l=all&s=title&f=all&q=&a=desc&p=id
-    {
-        movies=[
-            {
-                "id": id
-            },
-        ]
-    }
-
-/json/find?l=all&s=title&f=all&q=&a=desc
-    {
-        movies: 1234,
-        files: 2345,
-        pixels: 1242345345,
-        size: 1235,
-        duration: 1235,
-
-    }
-
-/json/find?r=0:100&l=all&s=[name, items]&f=all&q=&a=desc&g=country
-    {
-        groups = [ {name:"USA", movies: 123}, {name:"UK", movies: 1234} ]
-    }
-
-#find as you type: in table, by sort string
-
-#auto compleat in find box
-
-'''
 def _order_query(qs, s, prefix='sort__'):
     order_by = []
     for e in s.split(','):
@@ -196,17 +104,36 @@ def _parse_query(request):
 
 def api_find(request):
     '''
-        data: {'q': query, 's': sort, 'r': range}
+        param data
+            {'q': query, 's': sort, 'r': range}
         
-        query: query string, can contain field:search more on query syntax at
-               http://wiki.0xdb.org/wiki/QuerySyntax
-        sort:  comma seperated list of field:order, default: director:asc,year:desc 
-        range: result ragne, from:to or from
+            q:  query string, can contain field:search more on query syntax at
+                   http://wiki.0xdb.org/wiki/QuerySyntax
+            s:  comma seperated list of field:order, default: director:asc,year:desc 
+            r:  result ragne, from:to or from
+            p:  properties to return, if obmited stats are returned
+            g:  group elements by, country, genre, director...
+
+        with p, items is list of dicts with requested properties:
+          return {'status': {'code': int, 'text': string},
+                'data': {items: list}}
+
+        with g, items contains list of {'title': string, 'items': int}:
+          return {'status': {'code': int, 'text': string},
+                'data': {items: list}}
+
+        with g + n=1, return number of items in given query
+          return {'status': {'code': int, 'text': string},
+                'data': {items: int}}
+
+        without p or g, return stats about query:
+          return {'status': {'code': int, 'text': string},
+                'data': {items=int, files=int, pixels=int, size=int, duration=int}}
     '''
     query = _parse_query(request)
-    response = {}
+    response = {'status': {'code': 200, 'text':'ok'}, 'data':{}}
     if 'p' in query:
-        response['items'] = []
+        response['data']['items'] = []
         qs = _order_query(query['q'], query['s'])
         if 'n' in query:
             response = {'items': qs.count()}
@@ -221,13 +148,13 @@ def api_find(request):
                 return r
             qs = qs[query['i']:query['o']]
 
-            response['items'] = [only_p(m['json']) for m in qs.values('json')]
+            response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]
 
     elif 'g' in query:
         if query['s'].split(':')[0] not in ('name', 'items'):
             query['s'] = 'name'
         #FIXME: also filter lists here
-        response['items'] = []
+        response['data']['items'] = []
         name = 'name'
         items = 'movies'
         movie_qs = query['q']
@@ -243,7 +170,7 @@ def api_find(request):
             qs = movie_qs.values('imdb__year').annotate(movies=Count('id'))
             name='imdb__year'
         if 'n' in query:
-            response['items'] = qs.count()
+            response['data']['items'] = qs.count()
         else:
             #replace normalized items/name sort with actual db value
             order_by = query['s'].split(":")
@@ -256,18 +183,18 @@ def api_find(request):
             qs = _order_query(qs, order_by, '')
             qs = qs[query['i']:query['o']]
 
-            response['items'] = [{'title': i[name], 'items': i[items]} for i in qs]
+            response['data']['items'] = [{'title': i[name], 'items': i[items]} for i in qs]
 
     else:
         #FIXME: also filter lists here
         movies = models.Movie.objects.filter(available=True)
         files = models.File.objects.all()
-        response['items'] = movies.count()
-        response['files'] = files.count()
+        response['data']['items'] = movies.count()
+        response['data']['files'] = files.count()
         r = files.aggregate(Count('size'), Count('pixels'), Count('duration'))
-        response['pixels'] = r['pixels__count']
-        response['size'] = r['size__count']
-        response['duration'] = r['duration__count']
+        response['data']['pixels'] = r['pixels__count']
+        response['data']['size'] = r['size__count']
+        response['data']['duration'] = r['duration__count']
     return render_to_json_response(response)
 
 def api_getItem(request):
@@ -275,99 +202,129 @@ def api_getItem(request):
         api('getItem', id)
             return item with id
     '''
-    response = {'status': 200, 'statusText': 'ok'}
+    response = {'status': {'code': 200, 'text': 'ok'}}
     itemId = json.loads(request.POST['data'])
     item = models.Movie.objects.get(movieId=itemId)
     response['item'] = item.json()
     return render_to_json_response(response)
 
+@login_required_json
 def api_editItem(request):
     '''
-        api('editItem', {key: value})
-			{'status': 500, 'statusText': 'not implemented'}
+        param data
+            {key: value}
+        return {'status': {'code': int, 'text': string},
+                'data': {}}
     '''
-    response = {'status': 500, 'statusText': 'not implemented'}
+    response = {'status': {'code': 500, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
+@login_required_json
 def api_removeItem(request):
     '''
-        api('removeItem', itemId)
-			{'status': 500, 'statusText': 'not implemented'}
+        param data
+            {key: value}
+        return {'status': {'code': int, 'text': string},
+                'data': {}}
     '''
-    response = {'status': 500, 'statusText': 'not implemented'}
+    response = {'status': {'code': 500, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
+@login_required_json
 def api_addLayer(request):
     '''
-        api('addItem', {key: value})
-			{'status': 500, 'statusText': 'not implemented'}
+        param data
+            {key: value}
+        return {'status': {'code': int, 'text': string},
+                'data': {}}
     '''
-    response = {'status': 500, 'statusText': 'not implemented'}
+    response = {'status': {'code': 500, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
+@login_required_json
 def api_removeLayer(request):
     '''
-        api('removeItem', layerId)
-			{'status': 500, 'statusText': 'not implemented'}
+        param data
+            {key: value}
+        return {'status': {'code': int, 'text': string},
+                'data': {}}
     '''
-    response = {'status': 500, 'statusText': 'not implemented'}
+    response = {'status': {'code': 500, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
+@login_required_json
 def api_editLayer(request):
     '''
-        api('editLayer', {key: value})
-			{'status': 500, 'statusText': 'not implemented'}
+        param data
+            {key: value}
+        return {'status': {'code': int, 'text': string},
+                'data': {}}
     '''
-    response = {'status': 500, 'statusText': 'not implemented'}
+    response = {'status': {'code': 500, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
+@login_required_json
 def api_addListItem(request):
     '''
-        api('addListItem', {key: value})
-			{'status': 500, 'statusText': 'not implemented'}
+        param data
+            {key: value}
+        return {'status': {'code': int, 'text': string},
+                'data': {}}
     '''
-    response = {'status': 500, 'statusText': 'not implemented'}
+    response = {'status': {'code': 500, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
+@login_required_json
 def api_removeListItem(request):
     '''
-        api('removeListItem', {key: value})
-			{'status': 500, 'statusText': 'not implemented'}
+        param data
+            {key: value}
+        return {'status': {'code': int, 'text': string},
+                'data': {}}
     '''
-    response = {'status': 500, 'statusText': 'not implemented'}
+    response = {'status': {'code': 500, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
+@login_required_json
 def api_addList(request):
     '''
-        api('addList', {key: value})
-			{'status': 500, 'statusText': 'not implemented'}
+        param data
+            {key: value}
+        return {'status': {'code': int, 'text': string},
+                'data': {}}
     '''
-    response = {'status': 500, 'statusText': 'not implemented'}
+    response = {'status': {'code': 500, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
+@login_required_json
 def api_editList(request):
     '''
-        api('editList', {key: value})
-			{'status': 500, 'statusText': 'not implemented'}
+        param data
+            {key: value}
+        return {'status': {'code': int, 'text': string},
+                'data': {}}
     '''
-    response = {'status': 500, 'statusText': 'not implemented'}
+    response = {'status': {'code': 500, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
 def api_removeList(request):
     '''
-        api('removeList', {key: value})
-			{'status': 500, 'statusText': 'not implemented'}
+        param data
+            {key: value}
+        return {'status': {'code': int, 'text': string},
+                'data': {}}
     '''
-    response = {'status': 500, 'statusText': 'not implemented'}
+    response = {'status': {'code': 500, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
 #@login_required_json
 def api_update(request):
-	'''
-	params:
-		archive = string
-		files = json
-	'''
+    '''
+        param data
+            {archive: string, files: json}
+        return {'status': {'code': int, 'text': string},
+                'data': {info: dict, rename: dict}}
+    '''
     print "update request"
     data = json.loads(request.POST['data'])
     archive = data['archive']
@@ -398,41 +355,55 @@ def api_update(request):
             rename[oshash] = f.file.path
     print "processed files for", archive.name
     #remove all files not in files.keys() from ArchiveFile
-    response = {'status': 200, 'statusText': 'ok'}
-    response['info'] = needs_data
-    response['rename'] = rename
+    response = {'status': {'code': 200, 'text': 'ok'}, 'data': {}}
+    response['data']['info'] = needs_data
+    response['data']['rename'] = rename
     return render_to_json_response(response)
 
 def api_upload(request): #video, timeline, frame
-	'''
-		upload video, timeline or frame
-	'''
-    response = {'status': 500, 'statusText': 'not implemented'}
+    '''
+        upload video, timeline or frame
+        param data
+        param file
+        return {'status': {'code': int, 'text': string},
+                'data': {}}
+    '''
+    response = {'status': {'code': 500, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
+@login_required_json
 def api_editFile(request): #FIXME: should this be file.files. or part of update
     '''
         change file / imdb link
     '''
-    response = {'status': 500, 'statusText': 'not implemented'}
+    response = {'status': {'code': 500, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
 def api_parse(request): #parse path and return info
-	'''
-		api('guess', {path:'Foobar/The Matrix.avi'})
-			{imdb: ...}
-	'''
-	path = json.loads(request.POST['data'])['path']
+    '''
+        param data
+            {path: string}
+        return {'status': {'code': int, 'text': string},
+                data: {imdb: string}}
+    '''
+    path = json.loads(request.POST['data'])['path']
     response = utils.parsePath(path)
     response = {'status': 500, 'statusText': 'ok', data: response}
     return render_to_json_response(response)
 
-def api_guess(request): #guess imdb based on title, director, year
-	'''
-		api('guess', {title:'The Matrix'})
-			{imdb: ...}
-	'''
-    response = {'status': 500, 'statusText': 'not implemented'}
+def api_getImdbId(request):
+    '''
+        param data
+            {title: string, director: string, year: string}
+        return {'status': {'code': int, 'text': string},
+                'data': {imdbId:string }}
+    '''
+    imdbId = oxweb.imdb.guess(search_title, r['director'], timeout=-1)
+    if imdbId:
+        response = {'status': {'code': 200, 'text': 'ok'},
+                    'data': {'imdbId': imdbId}}
+    else:
+        response = {'status': {'code': 404, 'text': 'not found'}}
     return render_to_json_response(response)
 
 
@@ -615,41 +586,41 @@ def add_video(request, oshash):
 
 
 def apidoc(request):
-	'''
-		this is used for online documentation at http://127.0.0.1:8000/api/
-	'''
-	import sys
-	def trim(docstring):
-		if not docstring:
-			return ''
-		# Convert tabs to spaces (following the normal Python rules)
-		# and split into a list of lines:
-		lines = docstring.expandtabs().splitlines()
-		# Determine minimum indentation (first line doesn't count):
-		indent = sys.maxint
-		for line in lines[1:]:
-			stripped = line.lstrip()
-			if stripped:
-				indent = min(indent, len(line) - len(stripped))
-		# Remove indentation (first line is special):
-		trimmed = [lines[0].strip()]
-		if indent < sys.maxint:
-			for line in lines[1:]:
-				trimmed.append(line[indent:].rstrip())
-		# Strip off trailing and leading blank lines:
-		while trimmed and not trimmed[-1]:
-			trimmed.pop()
-		while trimmed and not trimmed[0]:
-			trimmed.pop(0)
-		# Return a single string:
-		return '\n'.join(trimmed)
+    '''
+        this is used for online documentation at http://127.0.0.1:8000/api/
+    '''
+    import sys
+    def trim(docstring):
+        if not docstring:
+            return ''
+        # Convert tabs to spaces (following the normal Python rules)
+        # and split into a list of lines:
+        lines = docstring.expandtabs().splitlines()
+        # Determine minimum indentation (first line doesn't count):
+        indent = sys.maxint
+        for line in lines[1:]:
+            stripped = line.lstrip()
+            if stripped:
+                indent = min(indent, len(line) - len(stripped))
+        # Remove indentation (first line is special):
+        trimmed = [lines[0].strip()]
+        if indent < sys.maxint:
+            for line in lines[1:]:
+                trimmed.append(line[indent:].rstrip())
+        # Strip off trailing and leading blank lines:
+        while trimmed and not trimmed[-1]:
+            trimmed.pop()
+        while trimmed and not trimmed[0]:
+            trimmed.pop(0)
+        # Return a single string:
+        return '\n'.join(trimmed)
 
     functions = filter(lambda x: x.startswith('api_'), globals().keys())
-	api = []
-	for f in sorted(functions):
-		api.append({
-			'name': f[4:],
-			'doc': trim(globals()[f].__doc__).replace('\n', '<br>\n')
-		})
+    api = []
+    for f in sorted(functions):
+        api.append({
+            'name': f[4:],
+            'doc': trim(globals()[f].__doc__).replace('\n', '<br>\n')
+        })
     context = RequestContext(request, {'api': api})
     return render_to_response('api.html', context)

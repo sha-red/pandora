@@ -5,18 +5,25 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-class Group(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    name = models.CharField(blank=True, max_length=255, unique=True)
-    users = models.ManyToManyField(User, related_name='groups')
-
 class Preference(models.Model):
+    user = models.ForeignKey(User, related_name='preferences')
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, related_name='preferences')
     key = models.CharField(blank=True, max_length=255)
     value = models.TextField(blank=True)
+
+def getUserJSON(user):
+    json = {}
+    for key in ('username', 'email'):
+        json[key] = getattr(user, key)
+    json['preferences'] = getPreferences(user)
+    return json
+
+def getPreferences(user):
+    prefs = {}
+    for p in Preference.objects.filter(user=user):
+        prefs[key] = json.loads(p.value)
+    return prefs
 
 def getPreference(user, key, value=None):
     q = Preference.objects.filter(user=user, key=key)

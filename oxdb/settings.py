@@ -30,6 +30,7 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
 TIME_ZONE = 'Europe/Berlin'
+TIME_ZONE = 'Asia/Kolkata'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -85,9 +86,12 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.humanize',
+    'django_extensions',
+
 #    'south',
 
     'backend',
+    'oxuser',
 )
 
 #rabbitmq connection settings
