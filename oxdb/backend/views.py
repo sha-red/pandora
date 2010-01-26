@@ -27,8 +27,10 @@ from daemon import send_bg_message
 
 from oxuser.views import api_login, api_logout, api_register, api_recover, api_preferences
 
-
+	
 def api(request):
+	if not 'function' in request.POST:
+		return apidoc(request)
     function = request.POST['function']
     #FIXME: possible to do this in f
     #data = json.loads(request.POST['data'])
@@ -44,7 +46,7 @@ def api(request):
 
 def api_hello(request):
     '''
-        function: helo
+        api('hello', functio(result) { result.user })
     '''
     response = {'status': 200, 'statusText': 'ok'}
     response.user = request.user.json()
@@ -194,7 +196,6 @@ def _parse_query(request):
 
 def api_find(request):
     '''
-        function: find
         data: {'q': query, 's': sort, 'r': range}
         
         query: query string, can contain field:search more on query syntax at
@@ -271,8 +272,6 @@ def api_find(request):
 
 def api_getItem(request):
     '''
-        function: getItem
-
         api('getItem', id)
             return item with id
     '''
@@ -283,45 +282,92 @@ def api_getItem(request):
     return render_to_json_response(response)
 
 def api_editItem(request):
-    response = {'status': 500, 'statusText': 'not implemented'}
-    return render_to_json_response(response)
-def api_removeItem(request):
-    response = {'status': 500, 'statusText': 'not implemented'}
-    return render_to_json_response(response)
-def api_addLayer(request):
-    response = {'status': 500, 'statusText': 'not implemented'}
-    return render_to_json_response(response)
-def api_removeLayer(request):
-    response = {'status': 500, 'statusText': 'not implemented'}
-    return render_to_json_response(response)
-def api_editLayer(request):
-    response = {'status': 500, 'statusText': 'not implemented'}
-    return render_to_json_response(response)
-def api_addListItem(request):
-    response = {'status': 500, 'statusText': 'not implemented'}
-    return render_to_json_response(response)
-def api_removeListItem(request):
-    response = {'status': 500, 'statusText': 'not implemented'}
-    return render_to_json_response(response)
-def api_addList(request):
-    response = {'status': 500, 'statusText': 'not implemented'}
-    return render_to_json_response(response)
-def api_editList(request):
-    response = {'status': 500, 'statusText': 'not implemented'}
-    return render_to_json_response(response)
-def api_removeList(request):
+    '''
+        api('editItem', {key: value})
+			{'status': 500, 'statusText': 'not implemented'}
+    '''
     response = {'status': 500, 'statusText': 'not implemented'}
     return render_to_json_response(response)
 
-'''
-POST update
-    > files: {
-        oshash: { 'path': .., ..},
-        oshash: { 'path': .., ..},
-      }
-'''
+def api_removeItem(request):
+    '''
+        api('removeItem', itemId)
+			{'status': 500, 'statusText': 'not implemented'}
+    '''
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+
+def api_addLayer(request):
+    '''
+        api('addItem', {key: value})
+			{'status': 500, 'statusText': 'not implemented'}
+    '''
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+
+def api_removeLayer(request):
+    '''
+        api('removeItem', layerId)
+			{'status': 500, 'statusText': 'not implemented'}
+    '''
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+
+def api_editLayer(request):
+    '''
+        api('editLayer', {key: value})
+			{'status': 500, 'statusText': 'not implemented'}
+    '''
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+
+def api_addListItem(request):
+    '''
+        api('addListItem', {key: value})
+			{'status': 500, 'statusText': 'not implemented'}
+    '''
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+
+def api_removeListItem(request):
+    '''
+        api('removeListItem', {key: value})
+			{'status': 500, 'statusText': 'not implemented'}
+    '''
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+
+def api_addList(request):
+    '''
+        api('addList', {key: value})
+			{'status': 500, 'statusText': 'not implemented'}
+    '''
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+
+def api_editList(request):
+    '''
+        api('editList', {key: value})
+			{'status': 500, 'statusText': 'not implemented'}
+    '''
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+
+def api_removeList(request):
+    '''
+        api('removeList', {key: value})
+			{'status': 500, 'statusText': 'not implemented'}
+    '''
+    response = {'status': 500, 'statusText': 'not implemented'}
+    return render_to_json_response(response)
+
 #@login_required_json
 def api_update(request):
+	'''
+	params:
+		archive = string
+		files = json
+	'''
     print "update request"
     data = json.loads(request.POST['data'])
     archive = data['archive']
@@ -357,12 +403,14 @@ def api_update(request):
     response['rename'] = rename
     return render_to_json_response(response)
 
-
 def api_upload(request): #video, timeline, frame
+	'''
+		upload video, timeline or frame
+	'''
     response = {'status': 500, 'statusText': 'not implemented'}
     return render_to_json_response(response)
 
-def api_file(request): #FIXME: should this be file.files. or part of update
+def api_editFile(request): #FIXME: should this be file.files. or part of update
     '''
         change file / imdb link
     '''
@@ -370,21 +418,22 @@ def api_file(request): #FIXME: should this be file.files. or part of update
     return render_to_json_response(response)
 
 def api_parse(request): #parse path and return info
-    response = {'status': 500, 'statusText': 'not implemented'}
+	'''
+		api('guess', {path:'Foobar/The Matrix.avi'})
+			{imdb: ...}
+	'''
+	path = json.loads(request.POST['data'])['path']
+    response = utils.parsePath(path)
+    response = {'status': 500, 'statusText': 'ok', data: response}
     return render_to_json_response(response)
 
 def api_guess(request): #guess imdb based on title, director, year
+	'''
+		api('guess', {title:'The Matrix'})
+			{imdb: ...}
+	'''
     response = {'status': 500, 'statusText': 'not implemented'}
     return render_to_json_response(response)
-
-
-
-
-
-
-
-
-
 
 
 
@@ -563,8 +612,44 @@ def add_video(request, oshash):
     return render_to_json_response(response)
 
 
-def file_parse(request):
-    response = utils.parsePath(request.POST['path'])
-    return render_to_json_response(response)
 
 
+def apidoc(request):
+	'''
+		this is used for online documentation at http://127.0.0.1:8000/api/
+	'''
+	import sys
+	def trim(docstring):
+		if not docstring:
+			return ''
+		# Convert tabs to spaces (following the normal Python rules)
+		# and split into a list of lines:
+		lines = docstring.expandtabs().splitlines()
+		# Determine minimum indentation (first line doesn't count):
+		indent = sys.maxint
+		for line in lines[1:]:
+			stripped = line.lstrip()
+			if stripped:
+				indent = min(indent, len(line) - len(stripped))
+		# Remove indentation (first line is special):
+		trimmed = [lines[0].strip()]
+		if indent < sys.maxint:
+			for line in lines[1:]:
+				trimmed.append(line[indent:].rstrip())
+		# Strip off trailing and leading blank lines:
+		while trimmed and not trimmed[-1]:
+			trimmed.pop()
+		while trimmed and not trimmed[0]:
+			trimmed.pop(0)
+		# Return a single string:
+		return '\n'.join(trimmed)
+
+    functions = filter(lambda x: x.startswith('api_'), globals().keys())
+	api = []
+	for f in sorted(functions):
+		api.append({
+			'name': f[4:],
+			'doc': trim(globals()[f].__doc__).replace('\n', '<br>\n')
+		})
+    context = RequestContext(request, {'api': api})
+    return render_to_response('api.html', context)

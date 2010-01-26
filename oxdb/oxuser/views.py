@@ -14,7 +14,6 @@ import models
 
 def api_login(request):
     '''
-        function: login
         data: {'username': username, 'password': password}
         
         username/password to login
@@ -38,7 +37,7 @@ def api_login(request):
 
 def api_logout(request):
     '''
-        function: logout
+		loggs out currenly logged in user
     '''
     response = {'status': 200, 'statusText': 'logged out'}
     if request.user.is_authenticated():
@@ -47,7 +46,6 @@ def api_logout(request):
 
 def api_register(request):
     '''
-        function: register
         data: {'username': username, 'password': password, 'email': email}
         
         username
