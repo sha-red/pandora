@@ -8,6 +8,7 @@ PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+JSON_DEBUG = False
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),

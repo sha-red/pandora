@@ -40,4 +40,3 @@ def setPreference(user, key, value):
     else:
         p = Preference(user=user, key=key, value=value)
         p.save()
-

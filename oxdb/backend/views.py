@@ -18,7 +18,7 @@ try:
     import simplejson as json
 except ImportError:
     from django.utils import simplejson as json
-from oxdjango.shortcuts import render_to_json_response
+from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json
 from oxdjango.decorators import login_required_json
 
 import models
@@ -199,35 +199,50 @@ def api_find(request):
 
 def api_getItem(request):
     '''
-        api('getItem', id)
-            return item with id
+        param data
+            string id
+
+		return item dict
     '''
     response = {'status': {'code': 200, 'text': 'ok'}}
     itemId = json.loads(request.POST['data'])
-    item = models.Movie.objects.get(movieId=itemId)
-    response['item'] = item.json()
+    item = get_object_or_404_json(models.Movie, movieId=itemId)
+	#FIXME: check permissions
+	response['data'] = {'item': item.json}
     return render_to_json_response(response)
 
 @login_required_json
 def api_editItem(request):
     '''
         param data
-            {key: value}
+            {id: string, key: value,..}
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = {'status': {'code': 500, 'text': 'not implemented'}}
+    data = json.loads(request.POST['data'])
+    item = get_object_or_404_json(models.Movie, movieId=data['id'])
+    if item.editable(request.user):
+		response = {'status': {'code': 500, 'text': 'not implemented'}}
+		item.edit(data)
+	else:
+		response = {'status': {'code': 403, 'text': 'permission denied'}}
     return render_to_json_response(response)
 
 @login_required_json
 def api_removeItem(request):
     '''
         param data
-            {key: value}
-        return {'status': {'code': int, 'text': string},
-                'data': {}}
+            string id
+
+        return {'status': {'code': int, 'text': string}}
     '''
-    response = {'status': {'code': 500, 'text': 'not implemented'}}
+    response = {'status': {'code': 200, 'text': 'ok'}}
+    itemId = json.loads(request.POST['data'])
+    item = get_object_or_404_json(models.Movie, movieId=itemId)
+	if item.editable(request.user):
+		response = {'status': {'code': 500, 'text': 'not implemented'}}
+	else:
+		response = {'status': {'code': 403, 'text': 'permission denied'}}
     return render_to_json_response(response)
 
 @login_required_json
@@ -260,6 +275,15 @@ def api_editLayer(request):
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
+    response = {'status': {'code': 200, 'text': 'ok'}}
+    data = json.loads(request.POST['data'])
+    layer = get_object_or_404_json(models.Layer, pk=data['id'])
+	if layer.editable(request.user):
+		response = {'status': {'code': 500, 'text': 'not implemented'}}
+	else:
+		response = {'status': {'code': 403, 'text': 'permission denied'}}
+    return render_to_json_response(response)
+
     response = {'status': {'code': 500, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
@@ -368,6 +392,10 @@ def api_upload(request): #video, timeline, frame
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
+    data = json.loads(request.POST['data'])
+    if data['item'] == 'timeline':
+		print "not implemented"
+    
     response = {'status': {'code': 500, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
@@ -406,32 +434,20 @@ def api_getImdbId(request):
         response = {'status': {'code': 404, 'text': 'not found'}}
     return render_to_json_response(response)
 
-
-
-
-
-
-#FIXME: old stuff below...
-'''
-GET info?oshash=a41cde31c581e11d
-    > {
-        "movie_id": 0123456, ??
-        "oshash": "a41cde31c581e11d",
-        "sha1":..,
-        "md5":..
-        "duration": 5.266667,
-        "video": [],
-        "audio": [],
-        "path": "E/Example, The/An Example.avi",
-        "size": 1646274
-      }
-'''
-def file_info(request):
-    oshash = request.GET['oshash']
+def api_getFileInfo(request):
+    '''
+        param data
+            oshash string
+        return {'status': {'code': int, 'text': string},
+                'data': {imdbId:string }}
+    '''
+    if 'data' in request.POST:
+		oshash = json.loads(request.POST['data'])
+	elif 'oshash' in request.GET:
+		oshash = request.GET['oshash']
     f = models.MovieFile.objects.get(oshash=oshash)
-    response = f.json()
+    response = {'data': f.json()}
     return render_to_json_response(response)
-
 
 '''
 GET subtitles?oshash=a41cde31c581e11d

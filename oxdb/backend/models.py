@@ -162,6 +162,18 @@ class Movie(models.Model):
             return getattr(self.imdb, key)
         return default
 
+    def editable(user):
+        #FIXME: make permissions work
+        return False
+
+    def edit(self, data):
+        #FIXME: how to map the keys to the right place to write them to?
+		for key in data:
+			if key != 'id':
+				setattr(self.oxdb, key, data[key])
+        self.oxdb.save()
+        self.save()
+
     def _manual(self, qs, f='manual'):
         if qs.filter(**{f:True}).count() > 0:
             return qs.exclude(**{f:False})
@@ -966,6 +978,10 @@ class List(models.Model):
     def __unicode__(self):
         return u'%s (%s)' % (self.title, unicode(self.user))
 
+    def editable(user):
+        #FIXME: make permissions work
+        return False
+
 class ListItem(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -1007,8 +1023,8 @@ class File(models.Model):
 
     type = models.IntegerField(default=0, choices=FILE_TYPES)
     info = fields.DictField(default={})
-    #FIMXE: why do i need those in the db? could jsut have them in info
 
+    #FIXME: why do i need those in the db? could just have them in info
     path = models.CharField(blank=True, max_length=2048)
     size = models.BigIntegerField(default=-1)
     duration = models.FloatField(default=-1)
@@ -1117,6 +1133,10 @@ class File(models.Model):
         #FIXME: do stuff, like create timeline or create smaller videos etc
         return
 
+    def editable(user):
+        #FIXME: make permissions work
+        return False
+
 class Still(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -1126,29 +1146,6 @@ class Still(models.Model):
 
     def __unicode__(self):
         return '%s at %s' % (self.file, self.position)
-
-class Subtitle(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User)
-
-    file = models.ForeignKey(File, related_name="subtitles")
-    language = models.CharField(max_length=16)
-    srt = models.TextField(blank=True)
-
-    def get_or_create(model, user, oshash, language):
-        q = model.objects.filter(file__oshash=oshash, language=language, user=user)
-        if q.count() > 0:
-            s = q[0]
-        else:
-            f = models.File.get_or_create(oshash=oshash)
-            s = model.objects.create(user=user, language=language, file=f)
-            s.save()
-        return s
-    get_or_create = classmethod(get_or_create)
-
-    def __unicode__(self):
-        return '%s.%s.srt' % (os.path.splitext(self.movie_file.path)[0], self.language)
 
 class Layer(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -1163,7 +1160,13 @@ class Layer(models.Model):
     type = models.CharField(blank=True, max_length=255)
     value = models.TextField()
 
+    #FIXME: relational layers, Locations, clips etc
     #location = models.ForeignKey('Location', default=None)
+
+    def editable(user):
+        #FIXME: make permissions work
+        return False
+
 
 class Archive(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -1174,6 +1177,11 @@ class Archive(models.Model):
     
     def __unicode__(self):
         return '%s' % (self.name)
+
+    def editable(user):
+        #FIXME: make permissions work
+        return False
+
 
 class ArchiveFile(models.Model):
     created = models.DateTimeField(auto_now_add=True)
