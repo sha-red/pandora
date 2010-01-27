@@ -117,6 +117,7 @@ def api_recover(request):
             if q.count() > 0:
                 user = q[0]
         if user:
+            user.email_user('recovert','not yest, but soon you will be able to recover')
             #user.sendmail(...) #FIXME: send recovery mail
             response = {'status': {'code': 200, 'text': 'recover email sent.'}}
         else:
@@ -140,22 +141,21 @@ def api_preferences(request):
         if data is dict:
             set key values in dict as preferences
     '''
-    response = {'status': 200, 'statusText': 'ok'}
+    response = {'status': {'code': 200, 'text': 'ok'}, 'data':{}}
     if 'data' not in request.POST:
-        response['preferences'] = request.user.preferences
+        response['data']['preferences'] = models.getPreferences(request.user)
     else:
         data = json.loads(request.POST['data'])
         if isinstance(data, basestring):
-            response = {'status': 500, 'statusText': 'fixme: get preferences not implemented'}
-            response['preferences'][data] = models.getPreference(user, data)
+            response['data']['preferences'] = {}
+            response['data']['preferences'][data] = models.getPreference(request.user, data)
         elif isinstance(data, list):
-            response = {'status': 500, 'statusText': 'fixme: get preferences not implemented'}
-            response['preferences'] = {}
+            response['data']['preferences'] = {}
             for preference in data:
-                response['preferences'][preference] = models.getPreference(user, preference)
+                response['preferences'][preference] = models.getPreference(request.user, preference)
         elif isinstance(data, dict):
-            response = {'status': 500, 'statusText': 'fixme: set preferences not implemented'}
+            del response['data']
             for key in data:
-                models.setPreference(user, key, data[key])
+                models.setPreference(request.user, key, data[key])
     return render_to_json_response(response)
 

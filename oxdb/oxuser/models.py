@@ -3,6 +3,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import simplejson as json
 
 
 class Preference(models.Model):
@@ -22,7 +23,7 @@ def getUserJSON(user):
 def getPreferences(user):
     prefs = {}
     for p in Preference.objects.filter(user=user):
-        prefs[key] = json.loads(p.value)
+        prefs[p.key] = json.loads(p.value)
     return prefs
 
 def getPreference(user, key, value=None):
