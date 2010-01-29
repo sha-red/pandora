@@ -131,14 +131,16 @@ def api_preferences(request):
     '''
         param data
             string
-            list
-            dict
+            array
+            object
+
         return
+        if data is empy or {}
         if data is string:
             return preference with name
-        if data is list:
+        if data is array:
             return preferences with names
-        if data is dict:
+        if data is object:
             set key values in dict as preferences
     '''
     response = {'status': {'code': 200, 'text': 'ok'}, 'data':{}}
@@ -154,8 +156,11 @@ def api_preferences(request):
             for preference in data:
                 response['preferences'][preference] = models.getPreference(request.user, preference)
         elif isinstance(data, dict):
-            del response['data']
-            for key in data:
-                models.setPreference(request.user, key, data[key])
+            if not data:
+                response['data']['preferences'] = models.getPreferences(request.user)
+            else:
+                del response['data']
+                for key in data:
+                    models.setPreference(request.user, key, data[key])
     return render_to_json_response(response)
 

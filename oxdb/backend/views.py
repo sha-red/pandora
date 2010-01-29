@@ -30,6 +30,11 @@ from oxuser.models import getUserJSON
 
     
 def api(request):
+    if request.META['REQUEST_METHOD'] == "OPTIONS":
+        response = HttpResponse('')
+        #response = render_to_json_response({'status': {'code': 200, 'text': 'please use POST'}})
+        #response['Access-Control-Allow-Origin'] = '*'
+        return response
     if not 'function' in request.POST:
         return apidoc(request)
     function = request.POST['function']
@@ -43,12 +48,13 @@ def api(request):
     else:
         response = render_to_json_response(
             {'status': {'code': 404, 'text': 'Unknown function %s' % function}})
+    #response['Access-Control-Allow-Origin'] = '*'
     return response
 
 def api_hello(request):
     '''
         return {'status': {'code': int, 'text': string},
-                'data': {user: dict}}
+                'data': {user: object}}
     '''
     response = {'status': {'code': 200, 'text': 'ok'}, 'data': {}}
     if request.user.is_authenticated():
@@ -116,11 +122,11 @@ def api_find(request):
 
         with p, items is list of dicts with requested properties:
           return {'status': {'code': int, 'text': string},
-                'data': {items: list}}
+                'data': {items: array}}
 
         with g, items contains list of {'title': string, 'items': int}:
           return {'status': {'code': int, 'text': string},
-                'data': {items: list}}
+                'data': {items: array}}
 
         with g + n=1, return number of items in given query
           return {'status': {'code': int, 'text': string},
@@ -202,7 +208,7 @@ def api_getItem(request):
         param data
             string id
 
-		return item dict
+		return item array
     '''
     response = {'status': {'code': 200, 'text': 'ok'}}
     itemId = json.loads(request.POST['data'])
@@ -222,7 +228,7 @@ def api_editItem(request):
     data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Movie, movieId=data['id'])
     if item.editable(request.user):
-		response = {'status': {'code': 500, 'text': 'not implemented'}}
+		response = {'status': {'code': 501, 'text': 'not implemented'}}
 		item.edit(data)
 	else:
 		response = {'status': {'code': 403, 'text': 'permission denied'}}
@@ -240,7 +246,7 @@ def api_removeItem(request):
     itemId = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Movie, movieId=itemId)
 	if item.editable(request.user):
-		response = {'status': {'code': 500, 'text': 'not implemented'}}
+		response = {'status': {'code': 501, 'text': 'not implemented'}}
 	else:
 		response = {'status': {'code': 403, 'text': 'permission denied'}}
     return render_to_json_response(response)
@@ -253,7 +259,7 @@ def api_addLayer(request):
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = {'status': {'code': 500, 'text': 'not implemented'}}
+    response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
 @login_required_json
@@ -264,7 +270,7 @@ def api_removeLayer(request):
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = {'status': {'code': 500, 'text': 'not implemented'}}
+    response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
 @login_required_json
@@ -279,12 +285,12 @@ def api_editLayer(request):
     data = json.loads(request.POST['data'])
     layer = get_object_or_404_json(models.Layer, pk=data['id'])
 	if layer.editable(request.user):
-		response = {'status': {'code': 500, 'text': 'not implemented'}}
+		response = {'status': {'code': 501, 'text': 'not implemented'}}
 	else:
 		response = {'status': {'code': 403, 'text': 'permission denied'}}
     return render_to_json_response(response)
 
-    response = {'status': {'code': 500, 'text': 'not implemented'}}
+    response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
 @login_required_json
@@ -295,7 +301,7 @@ def api_addListItem(request):
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = {'status': {'code': 500, 'text': 'not implemented'}}
+    response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
 @login_required_json
@@ -306,7 +312,7 @@ def api_removeListItem(request):
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = {'status': {'code': 500, 'text': 'not implemented'}}
+    response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
 @login_required_json
@@ -317,7 +323,7 @@ def api_addList(request):
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = {'status': {'code': 500, 'text': 'not implemented'}}
+    response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
 @login_required_json
@@ -328,7 +334,7 @@ def api_editList(request):
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = {'status': {'code': 500, 'text': 'not implemented'}}
+    response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
 def api_removeList(request):
@@ -338,7 +344,7 @@ def api_removeList(request):
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = {'status': {'code': 500, 'text': 'not implemented'}}
+    response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
 #@login_required_json
@@ -347,41 +353,42 @@ def api_update(request):
         param data
             {archive: string, files: json}
         return {'status': {'code': int, 'text': string},
-                'data': {info: dict, rename: dict}}
+                'data': {info: object, rename: object}}
     '''
-    print "update request"
     data = json.loads(request.POST['data'])
     archive = data['archive']
     files = data['files']
-    archive = models.Archive.objects.get(name=archive)
-    print "update request for", archive.name
-    needs_data = []
-    rename = {}
-    for oshash in files:
-        print 'checking', oshash
-        data = files[oshash]
-        q = models.ArchiveFile.objects.filter(archive=archive, file__oshash=oshash)
-        if q.count() == 0:
-            print "adding file", oshash, data['path']
-            f = models.ArchiveFile.get_or_create(archive, oshash)
-            f.update(data)
-            if not f.file.movie:
-                send_bg_message({'findMovie': f.file.id})
-            #FIXME: only add if it was not in File
-        else:
-            f = q[0]
-            if data['path'] != f.path:
-                f.path = data['path']
-                f.save()
-        if f.file.needs_data:
-            needs_data.append(oshash)
-        if f.path != f.file.path:
-            rename[oshash] = f.file.path
-    print "processed files for", archive.name
-    #remove all files not in files.keys() from ArchiveFile
-    response = {'status': {'code': 200, 'text': 'ok'}, 'data': {}}
-    response['data']['info'] = needs_data
-    response['data']['rename'] = rename
+    archive = get_object_or_404_json(models.Archive, name=archive)
+    if archive.editable(request.user):
+		needs_data = []
+		rename = {}
+		for oshash in files:
+			print 'checking', oshash
+			data = files[oshash]
+			q = models.ArchiveFile.objects.filter(archive=archive, file__oshash=oshash)
+			if q.count() == 0:
+				print "adding file", oshash, data['path']
+				f = models.ArchiveFile.get_or_create(archive, oshash)
+				f.update(data)
+				if not f.file.movie:
+					send_bg_message({'findMovie': f.file.id})
+				#FIXME: only add if it was not in File
+			else:
+				f = q[0]
+				if data['path'] != f.path:
+					f.path = data['path']
+					f.save()
+			if f.file.needs_data:
+				needs_data.append(oshash)
+			if f.path != f.file.path:
+				rename[oshash] = f.file.path
+		print "processed files for", archive.name
+		#remove all files not in files.keys() from ArchiveFile
+		response = {'status': {'code': 200, 'text': 'ok'}, 'data': {}}
+		response['data']['info'] = needs_data
+		response['data']['rename'] = rename
+	else:
+        response = {'status': {'code': 403, 'text': 'permission denied'}}
     return render_to_json_response(response)
 
 def api_upload(request): #video, timeline, frame
@@ -396,7 +403,7 @@ def api_upload(request): #video, timeline, frame
     if data['item'] == 'timeline':
 		print "not implemented"
     
-    response = {'status': {'code': 500, 'text': 'not implemented'}}
+    response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
 @login_required_json
@@ -404,7 +411,7 @@ def api_editFile(request): #FIXME: should this be file.files. or part of update
     '''
         change file / imdb link
     '''
-    response = {'status': {'code': 500, 'text': 'not implemented'}}
+    response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
 def api_parse(request): #parse path and return info
@@ -416,7 +423,7 @@ def api_parse(request): #parse path and return info
     '''
     path = json.loads(request.POST['data'])['path']
     response = utils.parsePath(path)
-    response = {'status': 500, 'statusText': 'ok', data: response}
+    response = {'status': {'code': 500, 'text': 'ok'}, data: response}
     return render_to_json_response(response)
 
 def api_getImdbId(request):
@@ -434,7 +441,7 @@ def api_getImdbId(request):
         response = {'status': {'code': 404, 'text': 'not found'}}
     return render_to_json_response(response)
 
-def api_getFileInfo(request):
+def api_fileInfo(request):
     '''
         param data
             oshash string
@@ -449,32 +456,39 @@ def api_getFileInfo(request):
     response = {'data': f.json()}
     return render_to_json_response(response)
 
-'''
-GET subtitles?oshash=a41cde31c581e11d
-  > {
-    "languages": ['en', 'fr', 'de']
-  }
-GET subtitles?oshash=a41cde31c581e11d&language=en
-    > srt file
-POST subtitle?oshash=a41cde31c581e11d&language=en
-srt =
-'''
-def subtitles(request):
-    oshash = request.GET['oshash']
-    language = request.GET.get('language', None)
-    if request.method == 'POST':
+def api_subtitles(request):
+	'''
+	param data
+		oshash string
+		language string
+		subtitle string
+	return
+		if no language is provided:
+			{data: {languages: array}}
+		if language is set:
+			{data: {subtitle: string}}
+		if subtitle is set:
+			saves subtitle for given language
+	'''
+    if 'data' in request.POST:
+		data = json.loads(request.POST['data'])
+		oshash = data['oshash']
+		language = data.get('language', None)
+		srt = data.get('subtitle', None)
+	if srt:
         user = request.user
         sub = models.Subtitles.get_or_create(user, oshash, language)
-        sub.srt = request.POST['srt']
+        sub.srt = srt
         sub.save()
     else:
+		response = {'status': {'code': 200, 'text': 'ok'}, 'data':{}}
         if language:
             q = models.Subtitles.objects.filter(movie_file__oshash=oshash, language=language)
             if q.count() > 0:
-                return HttpResponse(q[0].srt, content_type='text/x-srt')
-        response = {}
+				response['data']['subtitle'] = q[0].srt
+				return render_to_json_response(response)
         l = models.Subtitles.objects.filter(movie_file__oshash=oshash).values('language')
-        response['languages'] = [f['language'] for f in l]
+        response['data']['languages'] = [f['language'] for f in l]
         return render_to_json_response(response)
 
 '''
@@ -507,40 +521,6 @@ def find_files(request):
         page = p.page(i)
         for f in page.object_list:
               response['files'][f.movie_file.oshash] = {'path': f.path, 'size': f.movie_file.size}
-    return render_to_json_response(response)
-
-'''
-POST metadata
-    > file: {
-        "duration": 5.266667,
-        "video_codec": "mpeg1",
-        "pixel_format": "yuv420p",
-        "width": 352,
-        "height": 240,
-        "pixel_aspect_ratio": "1:1",
-        "display_aspect_ratio": "22:15",
-        "framerate": "30:1",
-        "audio_codec": "mp2",
-        "samplerate": 44100,
-        "channels": 1,
-        "path": "E/Example, The/An Example.avi",
-        "size": 1646274
-        "oshash": "a41cde31c581e11d",
-        "sha1":..,
-        "md5":..
-      }
-'''
-#@login_required_json
-def add_metadata(request, archive):
-    info = json.loads(request.POST['file'])
-    oshash = info['oshash']
-    archive = models.Archive.objects.get(name=archive)
-    if archive.users.filter(user=request.user).count() == 1:
-        user_file = models.ArchiveFile.get_or_create(archive, oshash)
-        user_file.update(request.POST)
-        response = {'status': 200}
-    else:
-        response = {'status': 404}
     return render_to_json_response(response)
 
 class StillForm(forms.Form):

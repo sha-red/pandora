@@ -13,6 +13,7 @@
     Alias /favicon.ico __PREFIX__/oxdb/static/favicon.ico
     Alias /media       __PREFIX__/oxdb/media
     Alias /admin/media __PREFIX__/src/django/django/contrib/admin/media
+    Alias /static/js/jquery.js __PREFIX__/src/django/django/contrib/admin/media/js/jquery.min.js
     WSGIScriptAlias / __PREFIX__/wsgi/django.wsgi
 
     WSGIDaemonProcess oxdb user=oxdb group=oxdb threads=25 python-path=__PREFIX__/lib/python2.6/site-packages/

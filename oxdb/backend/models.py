@@ -84,6 +84,7 @@ class MovieExtra(models.Model):
     title = models.CharField(max_length=1000)
     description = models.TextField(blank=True)
     contributor = models.CharField(max_length=1000)
+    rights_level = models.IntegerField(default=-1)
 
 def getMovie(info):
     '''
@@ -237,8 +238,6 @@ class Movie(models.Model):
         for w in whitelist:
             q = q | Q(url__contains=w.url)
         return self.reviews_all.filter(q).filter(manual=False)
-
-    rights_level = models.IntegerField(default=-1)
 
     '''
     #these values get populated with imdb/oxdb values on save()
