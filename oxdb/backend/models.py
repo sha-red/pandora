@@ -163,7 +163,7 @@ class Movie(models.Model):
             return getattr(self.imdb, key)
         return default
 
-    def editable(user):
+    def editable(self, user):
         #FIXME: make permissions work
         return False
 
@@ -977,7 +977,7 @@ class List(models.Model):
     def __unicode__(self):
         return u'%s (%s)' % (self.title, unicode(self.user))
 
-    def editable(user):
+    def editable(self, user):
         #FIXME: make permissions work
         return False
 
@@ -1132,7 +1132,7 @@ class File(models.Model):
         #FIXME: do stuff, like create timeline or create smaller videos etc
         return
 
-    def editable(user):
+    def editable(self, user):
         #FIXME: make permissions work
         return False
 
@@ -1162,7 +1162,7 @@ class Layer(models.Model):
     #FIXME: relational layers, Locations, clips etc
     #location = models.ForeignKey('Location', default=None)
 
-    def editable(user):
+    def editable(self, user):
         #FIXME: make permissions work
         return False
 
@@ -1177,9 +1177,8 @@ class Archive(models.Model):
     def __unicode__(self):
         return '%s' % (self.name)
 
-    def editable(user):
-        #FIXME: make permissions work
-        return False
+    def editable(self, user):
+        return self.users.filter(id=user.id).count() > 0
 
 
 class ArchiveFile(models.Model):

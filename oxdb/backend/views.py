@@ -35,9 +35,9 @@ def api(request):
         #response = render_to_json_response({'status': {'code': 200, 'text': 'please use POST'}})
         #response['Access-Control-Allow-Origin'] = '*'
         return response
-    if not 'function' in request.POST:
+    if not 'action' in request.POST:
         return apidoc(request)
-    function = request.POST['function']
+    function = request.POST['action']
     #FIXME: possible to do this in f
     #data = json.loads(request.POST['data'])
 
@@ -347,6 +347,64 @@ def api_removeList(request):
     response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
 
+@login_required_json
+def api_addArchive(request):
+    '''
+        ARCHIVE API NEED CLEANUP
+        param data
+            {name: string}
+        return {'status': {'code': int, 'text': string},
+                'data': {}}
+    '''
+    data = json.loads(request.POST['data'])
+    try:
+        archive = models.Archive.objects.get(name=data['name'])
+        response = {'status': {'code': 403, 'text': 'archive with this name exists'}}
+    except models.Archive.DoesNotExist:
+        archive = models.Archive(name=data['name'])
+        archive.save()
+        archive.users.add(request.user)
+        response = {'status': {'code': 200, 'text': 'archive created'}}
+    return render_to_json_response(response)
+
+@login_required_json
+def api_editArchive(request):
+    '''
+        ARCHIVE API NEED CLEANUP
+        param data
+            {id: string, key: value,..}
+        return {'status': {'code': int, 'text': string},
+                'data': {}}
+    '''
+    data = json.loads(request.POST['data'])
+    item = get_object_or_404_json(models.Archive, name=data['name'])
+    if item.editable(request.user):
+		response = {'status': {'code': 501, 'text': 'not implemented'}}
+		item.edit(data)
+	else:
+		response = {'status': {'code': 403, 'text': 'permission denied'}}
+    return render_to_json_response(response)
+
+@login_required_json
+def api_removeArchive(request):
+    '''
+        ARCHIVE API NEED CLEANUP
+        param data
+            string id
+
+        return {'status': {'code': int, 'text': string}}
+    '''
+    response = {'status': {'code': 200, 'text': 'ok'}}
+    itemId = json.loads(request.POST['data'])
+    item = get_object_or_404_json(models.Archive, movieId=itemId)
+	if item.editable(request.user):
+		response = {'status': {'code': 501, 'text': 'not implemented'}}
+	else:
+		response = {'status': {'code': 403, 'text': 'permission denied'}}
+    return render_to_json_response(response)
+
+
+
 #@login_required_json
 def api_update(request):
     '''
@@ -363,11 +421,10 @@ def api_update(request):
 		needs_data = []
 		rename = {}
 		for oshash in files:
-			print 'checking', oshash
 			data = files[oshash]
 			q = models.ArchiveFile.objects.filter(archive=archive, file__oshash=oshash)
 			if q.count() == 0:
-				print "adding file", oshash, data['path']
+				#print "adding file", oshash, data['path']
 				f = models.ArchiveFile.get_or_create(archive, oshash)
 				f.update(data)
 				if not f.file.movie:
@@ -382,7 +439,7 @@ def api_update(request):
 				needs_data.append(oshash)
 			if f.path != f.file.path:
 				rename[oshash] = f.file.path
-		print "processed files for", archive.name
+		#print "processed files for", archive.name
 		#remove all files not in files.keys() from ArchiveFile
 		response = {'status': {'code': 200, 'text': 'ok'}, 'data': {}}
 		response['data']['info'] = needs_data
@@ -401,7 +458,7 @@ def api_upload(request): #video, timeline, frame
     '''
     data = json.loads(request.POST['data'])
     if data['item'] == 'timeline':
-		print "not implemented"
+		#print "not implemented"
     
     response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)

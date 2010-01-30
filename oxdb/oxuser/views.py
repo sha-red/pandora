@@ -24,8 +24,6 @@ def api_login(request):
         
         return {'status': {'code': int, 'text': string}}
     '''
-    print "lgin"
-
     response = {'status': {'code': 403, 'text': 'login failed'}}
     data = json.loads(request.POST['data'])
     form = LoginForm(data, request.FILES)
@@ -38,7 +36,6 @@ def api_login(request):
                 response = {'status': {'code': 200, 'message': 'You are logged in.', 'user': user_json}}
             else:
                 response = {'status': {'code': 403, 'text': 'Your account is disabled.'}}
-                print "Your account has been disabled!"
         else:
             response = {'status': {'code': 403, 'text': 'Your username and password were incorrect.'}}
     else:
@@ -70,15 +67,12 @@ def api_register(request):
         
         return {'status': {'code': int, 'text': string}}
     '''
-    print "register"
     data = json.loads(request.POST['data'])
     form = RegisterForm(data, request.FILES)
     if form.is_valid():
         if models.User.objects.filter(username=form.data['username']).count() > 0:
-            print "username taken", form.data['username']
             response = {'status': {'code':422, 'text': 'username or email exists'}}
         elif models.User.objects.filter(email=form.data['email']).count() > 0:
-            print "username taken", form.data['email']
             response = {'status': {'code':422, 'text': 'username or email exists'}}
         else:
             user = models.User(username=form.data['username'], email=form.data['email'])
@@ -89,8 +83,6 @@ def api_register(request):
             login(request, user)
             response = {'status': {'code':200, 'text': 'account created'}}
     else:
-        print "form invalid"
-        print form.errors
         response = {'status': {'code':422, 'text': 'username exists'}}
     return render_to_json_response(response)
 
