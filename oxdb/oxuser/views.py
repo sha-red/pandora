@@ -35,11 +35,11 @@ def api_login(request):
                 user_json = models.getUserJSON(user)
                 response = {'status': {'code': 200, 'message': 'You are logged in.', 'user': user_json}}
             else:
-                response = {'status': {'code': 403, 'text': 'Your account is disabled.'}}
+                response = {'status': {'code': 401, 'text': 'Your account is disabled.'}}
         else:
-            response = {'status': {'code': 403, 'text': 'Your username and password were incorrect.'}}
+            response = {'status': {'code': 401, 'text': 'Your username and password were incorrect.'}}
     else:
-        response = {'status': {'code':422, 'text': 'invalid data'}}
+        response = {'status': {'code': 400, 'text': 'invalid data'}}
 
     return render_to_json_response(response)
 
@@ -71,9 +71,9 @@ def api_register(request):
     form = RegisterForm(data, request.FILES)
     if form.is_valid():
         if models.User.objects.filter(username=form.data['username']).count() > 0:
-            response = {'status': {'code':422, 'text': 'username or email exists'}}
+            response = {'status': {'code': 400, 'text': 'username or email exists'}}
         elif models.User.objects.filter(email=form.data['email']).count() > 0:
-            response = {'status': {'code':422, 'text': 'username or email exists'}}
+            response = {'status': {'code': 400, 'text': 'username or email exists'}}
         else:
             user = models.User(username=form.data['username'], email=form.data['email'])
             user.set_password(form.data['password'])
@@ -83,7 +83,7 @@ def api_register(request):
             login(request, user)
             response = {'status': {'code':200, 'text': 'account created'}}
     else:
-        response = {'status': {'code':422, 'text': 'username exists'}}
+        response = {'status': {'code': 400, 'text': 'username exists'}}
     return render_to_json_response(response)
 
 class RecoverForm(forms.Form):
@@ -115,7 +115,7 @@ def api_recover(request):
         else:
             response = {'status': {'code': 404, 'text': 'user or email not found.'}}
     else:
-        response = {'status': {'code':422, 'text': 'username exists'}}
+        response = {'status': {'code': 400, 'text': 'username exists'}}
     return render_to_json_response(response)
 
 @login_required_json

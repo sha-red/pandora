@@ -47,7 +47,7 @@ def api(request):
         response = f(request)
     else:
         response = render_to_json_response(
-            {'status': {'code': 404, 'text': 'Unknown function %s' % function}})
+            {'status': {'code': 400, 'text': 'Unknown function %s' % function}})
     #response['Access-Control-Allow-Origin'] = '*'
     return response
 
@@ -63,6 +63,12 @@ def api_hello(request):
         response['data']['user'] = {'name': 'Guest'}
     return render_to_json_response(response)
 
+def api_error(request):
+    '''
+        trows 503 error
+    '''
+    this = is_an_error
+    return render_to_json_response({})
 
 def _order_query(qs, s, prefix='sort__'):
     order_by = []
@@ -359,7 +365,7 @@ def api_addArchive(request):
     data = json.loads(request.POST['data'])
     try:
         archive = models.Archive.objects.get(name=data['name'])
-        response = {'status': {'code': 403, 'text': 'archive with this name exists'}}
+        response = {'status': {'code': 401, 'text': 'archive with this name exists'}}
     except models.Archive.DoesNotExist:
         archive = models.Archive(name=data['name'])
         archive.save()
@@ -481,7 +487,7 @@ def api_parse(request): #parse path and return info
     '''
     path = json.loads(request.POST['data'])['path']
     response = utils.parsePath(path)
-    response = {'status': {'code': 500, 'text': 'ok'}, data: response}
+    response = {'status': {'code': 200, 'text': 'ok'}, data: response}
     return render_to_json_response(response)
 
 def api_getImdbId(request):
