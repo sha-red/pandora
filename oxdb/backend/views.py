@@ -33,7 +33,7 @@ def api(request):
     if request.META['REQUEST_METHOD'] == "OPTIONS":
         response = HttpResponse('')
         #response = render_to_json_response({'status': {'code': 200, 'text': 'please use POST'}})
-        #response['Access-Control-Allow-Origin'] = '*'
+        response['Access-Control-Allow-Origin'] = '*'
         return response
     if not 'action' in request.POST:
         return apidoc(request)
@@ -67,7 +67,7 @@ def api_error(request):
     '''
         trows 503 error
     '''
-    this = is_an_error
+    success = error_is_success
     return render_to_json_response({})
 
 def _order_query(qs, s, prefix='sort__'):
@@ -454,6 +454,10 @@ def api_update(request):
         response = {'status': {'code': 403, 'text': 'permission denied'}}
     return render_to_json_response(response)
 
+class UploadForm(forms.Form):
+    data = forms.TextInput()
+    file = forms.FileField()
+
 def api_upload(request): #video, timeline, frame
     '''
         upload video, timeline or frame
@@ -462,10 +466,12 @@ def api_upload(request): #video, timeline, frame
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    data = json.loads(request.POST['data'])
-    if data['item'] == 'timeline':
-        pass
-		#print "not implemented"
+    form = LoginForm(request.POST, request.FILES)
+    if form.is_valid():
+        data = json.loads(request.POST['data'])
+        if data['item'] == 'timeline':
+            pass
+            #print "not implemented"
     
     response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
