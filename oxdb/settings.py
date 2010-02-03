@@ -4,6 +4,7 @@
 import os
 from os.path import join
 
+SITENAME = 'Pad.ma'
 PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 
 DEBUG = True
@@ -42,6 +43,7 @@ SITE_ID = 1
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
+APPEND_SLASH = False
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
@@ -94,6 +96,8 @@ INSTALLED_APPS = (
     'backend',
     'oxuser',
 )
+
+AUTH_PROFILE_MODULE = 'oxuser.UserProfile'
 
 #rabbitmq connection settings
 BROKER_HOST = "127.0.0.1"

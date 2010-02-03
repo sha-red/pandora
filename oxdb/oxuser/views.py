@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+import uuid
+import hashlib
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
-from django.template import RequestContext
+from django.template import RequestContext, loader, Context
 from django.utils import simplejson as json
 from django import forms
 
@@ -109,8 +111,19 @@ def api_recover(request):
             if q.count() > 0:
                 user = q[0]
         if user:
-            user.email_user('recovert','not yest, but soon you will be able to recover')
-            #user.sendmail(...) #FIXME: send recovery mail
+            key = hashlib.sha1(str(uuid.uuid4())).hexdigest()
+            user_profile = user.get_profile()
+            user_profile.recover_key = key
+            user_profile.save()
+
+            template = loader.get_template('recover_mail.txt')
+            context = RequestContext({
+                'recover_url': request.build_absolute_uri("/r/%s" % key),
+                'sitename': settings.SITENAME,
+            })
+            message = template.render(context)
+            subject = '%s account recovery' % settings.SITENAME
+            user.email_user(subject, message)
             response = {'status': {'code': 200, 'text': 'recover email sent.'}}
         else:
             response = {'status': {'code': 404, 'text': 'user or email not found.'}}

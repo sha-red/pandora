@@ -356,7 +356,7 @@ def api_removeList(request):
 @login_required_json
 def api_addArchive(request):
     '''
-        ARCHIVE API NEED CLEANUP
+        ARCHIVE API NEEDS CLEANUP
         param data
             {name: string}
         return {'status': {'code': int, 'text': string},
@@ -376,7 +376,7 @@ def api_addArchive(request):
 @login_required_json
 def api_editArchive(request):
     '''
-        ARCHIVE API NEED CLEANUP
+        ARCHIVE API NEEDS CLEANUP
         param data
             {id: string, key: value,..}
         return {'status': {'code': int, 'text': string},
@@ -394,7 +394,7 @@ def api_editArchive(request):
 @login_required_json
 def api_removeArchive(request):
     '''
-        ARCHIVE API NEED CLEANUP
+        ARCHIVE API NEEDS CLEANUP
         param data
             string id
 
@@ -454,9 +454,23 @@ def api_update(request):
         response = {'status': {'code': 403, 'text': 'permission denied'}}
     return render_to_json_response(response)
 
+def api_encodingSettings(request):
+    '''
+        returns Firefogg encoding settings as specified by site
+        return {'status': {'code': int, 'text': string},
+                'data': {'options': {'videoQuality':...}}}
+    '''
+    response = {'status': {'code': 200, 'text': 'ok'}}
+    response['data'] = {'options': {'preset': 'padma'}}
+    return render_to_json_response(response)
+
 class UploadForm(forms.Form):
     data = forms.TextInput()
     file = forms.FileField()
+
+class VideoChunkForm(forms.Form):
+    chunk = forms.FileField()
+    done = forms.IntegerField(required=False)
 
 def api_upload(request): #video, timeline, frame
     '''
@@ -466,14 +480,57 @@ def api_upload(request): #video, timeline, frame
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    form = LoginForm(request.POST, request.FILES)
+    form = UploadForm(request.POST, request.FILES)
     if form.is_valid():
         data = json.loads(request.POST['data'])
         if data['item'] == 'timeline':
             pass
             #print "not implemented"
-    
+
     response = {'status': {'code': 501, 'text': 'not implemented'}}
+    return render_to_json_response(response)
+
+@login_required_json
+def firefogg_upload(request):
+    #handle video upload
+    if request.method == 'POST':
+        #init upload
+        if 'oshash' in request.POST:
+            #FIXME: what to do if requested oshash is not in db?
+            #FIXME: should existing data be reset here? or better, should this fail if an upload was there
+            f = get_object_or_404(models.File, oshash=request.POST['oshash'])
+            if f.stream128:
+                f.stream128.delete()
+                f.available = False
+                f.save()
+            response = {
+                'uploadUrl': request.build_absolute_uri('/api/upload/?oshash=%s' % f.oshash),
+                'result': 1
+            }
+            return render_to_json_response(response)
+        #post next chunk
+        if 'chunk' in request.FILES and 'oshash' in request.GET:
+            print "all chunk now"
+            f = get_object_or_404(models.File, oshash=request.GET['oshash'])
+            form = VideoChunkForm(request.POST, request.FILES)
+            #FIXME: 
+            if form.is_valid() and f.editable(request.user):
+                c = form.cleaned_data['chunk']
+                response = {
+                    'result': 1,
+                    'resultUrl': request.build_absolute_uri('/')
+                }
+                if not f.save_chunk(c, c.name):
+                    response['result'] = -1
+                elif form.cleaned_data['done']:
+                    #FIXME: send message to encode deamon to create derivates instead
+                    f.available = True
+                    f.save()
+                    response['result'] = 1
+                    response['done'] = 1
+                return render_to_json_response(response)
+    print request.GET, request.POST
+    response = {'status': {'code': 400, 'text': 'this request requires POST'}}
     return render_to_json_response(response)
 
 @login_required_json

@@ -993,7 +993,7 @@ class ListItem(models.Model):
 def stream_path(f, size):
     name = "%s.%s" % (size, 'ogv')
     url_hash = f.oshash
-    return os.path.join('stream', url_hash[:2], url_hash[2:4], url_hash[4:6], name)
+    return os.path.join('stream', url_hash[:2], url_hash[2:4], url_hash[4:6], url_hash, name)
 
 def still_path(f, still):
     name = "%s.%s" % (still, 'png')
@@ -1061,13 +1061,14 @@ class File(models.Model):
             #FIXME: this should use stream128 or stream640 depending on configuration
             video = getattr(self, 'stream128')
             if not video:
-                video.save(name, ContentFile(chunk))
+                video.save(name, chunk)
                 self.save()
             else:
                 f = open(video.path, 'a')
-                f.write(chunk)
+                f.write(chunk.read())
                 f.close()
             return True
+        print "somehing failed, not sure what?"
         return False
 
     objects = managers.FileManager()
@@ -1134,7 +1135,7 @@ class File(models.Model):
 
     def editable(self, user):
         #FIXME: make permissions work
-        return False
+        return True
 
 class Still(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -1213,3 +1214,9 @@ class ArchiveFile(models.Model):
         return '%s (%s)' % (self.path, unicode(self.archive))
 
 
+class Collection(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+    name = models.CharField(blank=True, max_length=2048)
+    subdomain = models.CharField(unique=True, max_length=2048)
+    movies = models.ForeignKey(Movie)
