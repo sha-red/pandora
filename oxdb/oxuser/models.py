@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 
+from django.contrib.auth.models import User
 from django.db import models
-from django.contrib.auth.models import User
-from django.utils import simplejson as json
-
-from django.contrib.auth.models import User
 from django.db.models import signals
 from django.dispatch import dispatcher
+from django.utils import simplejson as json
 
 
 class UserProfile(models.Model):

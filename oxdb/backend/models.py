@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-import re
+from datetime import datetime
 import os.path
 import random
-from datetime import datetime
+import re
 
 from django.db import models
 from django.db.models import Q
@@ -11,14 +11,15 @@ from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.utils import simplejson as json
 
+from oxdjango import fields
 import oxlib
 from oxlib import stripTags
 from oxlib.normalize import canonicalTitle, canonicalName
-from oxdjango import fields
 
-import utils
 import managers
 import load
+import utils
+
 
 class MovieImdb(models.Model):
     created = models.DateTimeField(auto_now_add=True)

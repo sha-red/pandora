@@ -3,12 +3,12 @@
 import uuid
 import hashlib
 
+from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from django.template import RequestContext, loader, Context
 from django.utils import simplejson as json
-from django import forms
 
 from oxdjango.shortcuts import render_to_json_response
 from oxdjango.decorators import login_required_json

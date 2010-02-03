@@ -6,27 +6,29 @@ from datetime import datetime
 from urllib2 import unquote
 import json
 
-from django.db.models import Q, Avg, Count
+from django import forms
+from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Q, Avg, Count
+from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from django.template import RequestContext
-from django.core.paginator import Paginator
-from django import forms
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
+
 try:
     import simplejson as json
 except ImportError:
     from django.utils import simplejson as json
-from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json
+
 from oxdjango.decorators import login_required_json
+from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json
 
 import models
 import utils
 from daemon import send_bg_message
 
-from oxuser.views import api_login, api_logout, api_register, api_recover, api_preferences
 from oxuser.models import getUserJSON
+from oxuser.views import api_login, api_logout, api_register, api_recover, api_preferences
 
     
 def api(request):
