@@ -644,13 +644,6 @@ class AlternativeTitle(models.Model):
     def json(self):
         return (self.title, self.type)
 
-def get_or_create(model, name):
-    try:
-        o = model.objects.get(name=name)
-    except model.DoesNotExist:
-        o = model.objects.create(name=name)
-        o.save()
-    return o
 
 class Person(models.Model):
     name = models.CharField(max_length=200)
@@ -736,8 +729,6 @@ class Country(models.Model):
     def __unicode__(self):
         return self.name
 
-    get_or_create = classmethod(get_or_create)
-
     def json(self):
         return self.name
 
@@ -777,7 +768,6 @@ class Language(models.Model):
 
     def __unicode__(self):
         return self.name
-    get_or_create = classmethod(get_or_create)
 
     def json(self):
         return self.name
@@ -820,8 +810,6 @@ class Keyword(models.Model):
     def __unicode__(self):
         return self.name
 
-    get_or_create = classmethod(get_or_create)
-
     def json(self):
         return self.name
 
@@ -835,8 +823,6 @@ class Genre(models.Model):
 
     def __unicode__(self):
         return self.name
-
-    get_or_create = classmethod(get_or_create)
 
     def json(self):
         return self.name
@@ -860,8 +846,6 @@ class Location(models.Model):
 
     def __unicode__(self):
         return self.name
-
-    get_or_create = classmethod(get_or_create)
 
     def json(self):
         return self.name
@@ -1074,15 +1058,6 @@ class File(models.Model):
 
     objects = managers.FileManager()
 
-    def get_or_create(model, oshash):
-        try:
-            f = model.objects.get(oshash=oshash)
-        except model.DoesNotExist:
-            f = model.objects.create(oshash=oshash)
-            f.save()
-        return f
-    get_or_create = classmethod(get_or_create)
-
     def __unicode__(self):
         return "%s (%s)" % (self.path, self.oshash)
 
@@ -1204,7 +1179,7 @@ class ArchiveFile(models.Model):
         try:
             f = model.objects.by_oshash(oshash=oshash)
         except model.DoesNotExist:
-            file = File.get_or_create(oshash)
+            file = File.objects.get_or_create(oshash)
             file.save()
             f = model.objects.create(archive=archive, file=file)
             f.save()

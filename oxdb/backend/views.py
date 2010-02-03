@@ -606,7 +606,7 @@ def api_subtitles(request):
 		srt = data.get('subtitle', None)
 	if srt:
         user = request.user
-        sub = models.Subtitles.get_or_create(user, oshash, language)
+        sub = models.Subtitles.objects.get_or_create(user, oshash, language)
         sub.srt = srt
         sub.save()
     else:
