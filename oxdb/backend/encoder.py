@@ -5,6 +5,7 @@ from django.conf import settings
 import load
 import models
 
+
 def send_encoder_message(msg):
     conn = DjangoBrokerConnection()
     publisher = Publisher(connection=conn, exchange="oxdb-encoder",

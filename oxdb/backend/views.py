@@ -484,7 +484,18 @@ def api_upload(request): #video, timeline, frame
     '''
     form = UploadForm(request.POST, request.FILES)
     if form.is_valid():
-        data = json.loads(request.POST['data'])
+        data = json.loads(form.cleaned_data['data'])
+        oshash = data['oshash']
+        f = get_object_or_404(models.File, oshash=oshash)
+        if data['item'] == 'frame':
+            ff = form.cleaned_data['file']
+            position = data['position']
+            frame = models.Frame.objects.get_or_create(file=f, position=position)
+            frame.frame.save(ff.name, ff)
+            frame.save()
+            response = {'status': {'code': 200, 'text': 'ok'}}
+            response['url'] = still.url()
+            return render_to_json_response(response)
         if data['item'] == 'timeline':
             pass
             #print "not implemented"
@@ -652,26 +663,6 @@ def find_files(request):
               response['files'][f.movie_file.oshash] = {'path': f.path, 'size': f.movie_file.size}
     return render_to_json_response(response)
 
-class StillForm(forms.Form):
-    still = forms.FileField()
-    position = forms.FloatField()
-
-#@login_required_json
-def add_still(request, oshash):
-    response = {'status': 500}
-    f = get_object_or_404(models.File, oshash=oshash)
-
-    form = TimelineForm(request.POST, request.FILES)
-    if form.is_valid():
-        ff = form.cleaned_data['still']
-        position = form.cleaned_data['position']
-
-        still = models.Still(file=f, position=position)
-        still.save()
-        still.still.save(ff, ff.name)
-        response = {'status': 200}
-        response['url'] = still.url()
-    return render_to_json_response(response)
 
 class TimelineForm(forms.Form):
     timeline = forms.FileField()

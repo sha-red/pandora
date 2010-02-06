@@ -6,9 +6,10 @@ import hashlib
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
+from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404, redirect
 from django.template import RequestContext, loader, Context
 from django.utils import simplejson as json
+from django.conf import settings
 
 from oxdjango.shortcuts import render_to_json_response
 from oxdjango.decorators import login_required_json
@@ -116,8 +117,8 @@ def api_recover(request):
             user_profile.recover_key = key
             user_profile.save()
 
-            template = loader.get_template('recover_mail.txt')
-            context = RequestContext({
+            template = loader.get_template('recover_email.txt')
+            context = RequestContext(request, {
                 'recover_url': request.build_absolute_uri("/r/%s" % key),
                 'sitename': settings.SITENAME,
             })
@@ -130,6 +131,22 @@ def api_recover(request):
     else:
         response = {'status': {'code': 400, 'text': 'username exists'}}
     return render_to_json_response(response)
+
+def recover(request, key):
+    qs = models.UserProfile.objects.filter(recover_key=key)
+    if qs.count() == 1:
+        user = qs[0].user
+        user.set_password(key)
+        user.save()
+        user_profile = user.get_profile()
+        user_profile.recover_key = ''
+        user_profile.save()
+        user = authenticate(username=user.username, password=key)
+        login(request, user)
+        
+        #FIXME: set message to notify user to update password
+        return redirect('/#settings')
+    return redirect('/')
 
 @login_required_json
 def api_preferences(request):

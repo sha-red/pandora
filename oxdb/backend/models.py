@@ -964,6 +964,8 @@ class List(models.Model):
 
     def editable(self, user):
         #FIXME: make permissions work
+        if self.user == user or user.has_perm('Ox.admin'):
+            return True
         return False
 
 class ListItem(models.Model):
@@ -978,12 +980,18 @@ class ListItem(models.Model):
 def stream_path(f, size):
     name = "%s.%s" % (size, 'ogv')
     url_hash = f.oshash
-    return os.path.join('stream', url_hash[:2], url_hash[2:4], url_hash[4:6], url_hash, name)
+    return os.path.join(url_hash[:2], url_hash[2:4], url_hash[4:6], url_hash, name)
 
-def still_path(f, still):
-    name = "%s.%s" % (still, 'png')
+def timeline_path(f):
+    name = "timeline.png"
     url_hash = f.oshash
-    return os.path.join('still', url_hash[:2], url_hash[2:4], url_hash[4:6], name)
+    return os.path.join(url_hash[:2], url_hash[2:4], url_hash[4:6], url_hash, name)
+
+def frame_path(f):
+    position = oxlib.formatTime(f.position*1000).replace(':', '.')
+    name = "%s.%s" % (position, 'png')
+    url_hash = f.file.oshash
+    return os.path.join(url_hash[:2], url_hash[2:4], url_hash[4:6], url_hash, name)
 
 FILE_TYPES = (
     (0, 'unknown'),
@@ -1039,7 +1047,7 @@ class File(models.Model):
     stream320 = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, '320'))
     stream640 = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, '640'))
 
-    timeline = models.ImageField(default=None, null=True, upload_to=lambda f, x: still_path(f, '0'))
+    timeline = models.ImageField(default=None, null=True, upload_to=lambda f, x: timeline_path(f))
 
     def save_chunk(self, chunk, name='video.ogv'):
         if not self.available:
@@ -1105,23 +1113,68 @@ class File(models.Model):
         self.movie = getMovie(info)
         self.save()
 
+    def extract_timeline(self):
+        if self.stream640:
+            video = self.stream640.path
+        elif stream320:
+            video = self.stream320.path
+        elif stream128:
+            video = self.stream128.path
+        else:
+            return False
+        prefix = os.path.join(os.path.dirname(video), 'timeline')
+        cmd = ['oxtimeline', '-i', video, '-o', prefix]
+        p = subprocess.Popen(cmd)
+        p.wait()
+        return p.returncode == 0
+
+    def extract_video(self):
+        ogg = Firefogg()
+        if self.stream640:
+            #320 stream
+            self.stream320.name = stream_path(self, '320')
+            self.stream320.save()
+            ogg.encode(self.stream640.path, self.stream320.path, settings.VIDEO320)
+            #128 stream
+            self.stream128.name = stream_path(self, '128')
+            self.stream128.save()
+            ogg.encode(self.stream640.path, self.stream128.path, settings.VIDEO128)
+        elif self.stream320:
+            self.stream128.name = stream_path(self, '128')
+            self.stream128.save()
+            ogg.encode(self.stream320.path, self.stream128.path, settings.VIDEO128)
+
     def extract(self):
         #FIXME: do stuff, like create timeline or create smaller videos etc
+        self.extract_video()
+        self.extract_timeline()
         return
 
     def editable(self, user):
-        #FIXME: make permissions work
-        return True
+        '''
+        #FIXME: this should use a queryset!!!
+        archives = []
+        for a in self.archive_files.all():
+            archives.append(a.archive)
+        users = []
+        for a in archives:
+            users += a.users.all()
+        return user in users
+        '''
+        return self.archive_files.filter(archive__users__id=user.id).count() > 0
 
-class Still(models.Model):
+class Frame(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    file = models.ForeignKey(File, related_name="stills")
+    file = models.ForeignKey(File, related_name="frames")
     position = models.FloatField()
-    still = models.ImageField(default=None, null=True, upload_to=lambda f, x: still_path(f, '0'))
+    frame = models.ImageField(default=None, null=True, upload_to=lambda f, x: frame_path(f))
+
+    #FIXME: frame path should be renamed on save to match current position
 
     def __unicode__(self):
         return '%s at %s' % (self.file, self.position)
+
 
 class Layer(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -1140,9 +1193,12 @@ class Layer(models.Model):
     #location = models.ForeignKey('Location', default=None)
 
     def editable(self, user):
-        #FIXME: make permissions work
+        if user.is_authenticated():
+            if obj.user == user.id or user.has_perm('0x.admin'):
+                return True
+            if user.groups.filter(id__in=obj.groups.all()).count() > 0:
+                return True
         return False
-
 
 class Archive(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -1162,7 +1218,7 @@ class ArchiveFile(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     archive = models.ForeignKey(Archive, related_name='files')
-    file = models.ForeignKey(File)
+    file = models.ForeignKey(File, related_name='archive_files')
     path = models.CharField(blank=True, max_length=2048)
 
     objects = managers.ArchiveFileManager()
@@ -1189,10 +1245,16 @@ class ArchiveFile(models.Model):
     def __unicode__(self):
         return '%s (%s)' % (self.path, unicode(self.archive))
 
+    def editable(self, user):
+        return self.archive.editable(user)
 
 class Collection(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    users = models.ManyToManyField(User, related_name='collections')
     name = models.CharField(blank=True, max_length=2048)
     subdomain = models.CharField(unique=True, max_length=2048)
     movies = models.ForeignKey(Movie)
+
+    def editable(self, user):
+        return self.users.filter(id=user.id).count() > 0

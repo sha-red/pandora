@@ -26,7 +26,7 @@ class Preference(models.Model):
 
 def getUserJSON(user):
     json = {}
-    for key in ('username', 'email'):
+    for key in ('username', ):
         json[key] = getattr(user, key)
     json['preferences'] = getPreferences(user)
     return json
@@ -35,19 +35,29 @@ def getPreferences(user):
     prefs = {}
     for p in Preference.objects.filter(user=user):
         prefs[p.key] = json.loads(p.value)
+    prefs['email'] = user.email
     return prefs
 
 def getPreference(user, key, value=None):
-    q = Preference.objects.filter(user=user, key=key)
-    if q.count() > 0:
-        value = json.loads(q[0].value)
+    if key in ('email', ):
+        value = getattr(user, key)
+    else:
+        q = Preference.objects.filter(user=user, key=key)
+        if q.count() > 0:
+            value = json.loads(q[0].value)
     return value
 
 def setPreference(user, key, value):
-    value = json.dumps(value)
-    q = Preference.objects.filter(user=user, key=key)
-    if q.count() > 0:
-        q[0].value = value
+    if key in ('email', ):
+        setattr(user, key, value)
+        user.save()
     else:
-        p = Preference(user=user, key=key, value=value)
-        p.save()
+        value = json.dumps(value)
+        q = Preference.objects.filter(user=user, key=key)
+        if q.count() > 0:
+            p = q[0]
+            p.value = value
+            p.save()
+        else:
+            p = Preference(user=user, key=key, value=value)
+            p.save()

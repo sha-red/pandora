@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     (r'^ajax_filtered_fields/', include('ajax_filtered_fields.urls')),
     (r'^api/', include('backend.urls')),
     (r'^$', 'app.views.index'),
+    (r'^r/(?P<key>.*)$', 'oxuser.views.recover'),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:

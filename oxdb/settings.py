@@ -12,8 +12,10 @@ TEMPLATE_DEBUG = DEBUG
 JSON_DEBUG = False
 
 ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
+     ('j', 'j@mailb.org'),
 )
+
+DEFAULT_FROM_EMAIL='bot@0xdb.org'
 
 MANAGERS = ADMINS
 
@@ -106,6 +108,10 @@ BROKER_USER = "oxdb"
 BROKER_PASSWORD = "0xdb"
 BROKER_VHOST = "/oxdb"
 
+#Video encoding settings
+VIDEO128 = {'profile': 'padma-stream', 'samplerate': 44100, 'noUpscaling': True}
+VIDEO320 = {'maxSize': 320, 'samplerate': 44100, 'videoBitrate': 500, 'audioQuality': 0, 'channels': 1, 'noUpscaling': True}
+VIDEO640 = {'profile': 'padma'}
 
 #overwrite default settings with local settings
 try:
