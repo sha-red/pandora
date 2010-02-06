@@ -989,10 +989,10 @@ def timeline_path(f):
     return os.path.join(url_hash[:2], url_hash[2:4], url_hash[4:6], url_hash, name)
 
 def frame_path(f):
-    position = oxlib.formatTime(f.position*1000).replace(':', '.')
+    position = oxlib.formatDuration(f.position*1000).replace(':', '.')
     name = "%s.%s" % (position, 'png')
     url_hash = f.file.oshash
-    return os.path.join(url_hash[:2], url_hash[2:4], url_hash[4:6], url_hash, name)
+    return os.path.join(url_hash[:2], url_hash[2:4], url_hash[4:6], url_hash, 'frames', name)
 
 FILE_TYPES = (
     (0, 'unknown'),
@@ -1236,8 +1236,9 @@ class ArchiveFile(models.Model):
         try:
             f = model.objects.by_oshash(oshash=oshash)
         except model.DoesNotExist:
-            file = File.objects.get_or_create(oshash)
-            file.save()
+            file, created = File.objects.get_or_create(oshash)
+            if created:
+                file.save()
             f = model.objects.create(archive=archive, file=file)
             f.save()
         return f

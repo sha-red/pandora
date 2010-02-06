@@ -484,17 +484,19 @@ def api_upload(request): #video, timeline, frame
     '''
     form = UploadForm(request.POST, request.FILES)
     if form.is_valid():
-        data = json.loads(form.cleaned_data['data'])
+        data = json.loads(request.POST['data'])
         oshash = data['oshash']
         f = get_object_or_404(models.File, oshash=oshash)
         if data['item'] == 'frame':
             ff = form.cleaned_data['file']
             position = data['position']
-            frame = models.Frame.objects.get_or_create(file=f, position=position)
+            frame, created = models.Frame.objects.get_or_create(file=f, position=position)
+            if not created and frame.frame:
+                frame.frame.delete()
             frame.frame.save(ff.name, ff)
             frame.save()
             response = {'status': {'code': 200, 'text': 'ok'}}
-            response['url'] = still.url()
+            response['url'] = frame.frame.url
             return render_to_json_response(response)
         if data['item'] == 'timeline':
             pass
@@ -662,43 +664,6 @@ def find_files(request):
         for f in page.object_list:
               response['files'][f.movie_file.oshash] = {'path': f.path, 'size': f.movie_file.size}
     return render_to_json_response(response)
-
-
-class TimelineForm(forms.Form):
-    timeline = forms.FileField()
-
-#FIXME: should everybody be able to overwrite timelines?
-#@login_required_json
-def add_timeline(request, oshash):
-    response = {'status': 500}
-    f = get_object_or_404(models.File, oshash=oshash)
-
-    form = TimelineForm(request.POST, request.FILES)
-    if form.is_valid():
-        ff = form.cleaned_data['timeline']
-        f.timeline.save(ff.name, ff)
-        response = {'status': 200}
-        response['url'] = f.timeline.url()
-    return render_to_json_response(response)
-
-
-class VideoForm(forms.Form):
-    video = forms.FileField()
-
-#@login_required_json
-def add_video(request, oshash):
-    response = {'status': 500}
-    f = get_object_or_404(models.File, oshash=oshash)
-
-    form = VideoForm(request.POST, request.FILES)
-    if form.is_valid():
-        ff = form.cleaned_data['video']
-        f.stream128.save(ff.name, ff)
-        response = {'status': 200}
-        response['url'] = f.stream128.url()
-    return render_to_json_response(response)
-
-
 
 
 def apidoc(request):

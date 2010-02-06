@@ -86,7 +86,7 @@ def loadIMDb(imdbId):
     if 'country' in info:
         for i in info['country']:
             debug("add country", i)
-            country = models.Country.objects.get_or_create(name=i)
+            country, created = models.Country.objects.get_or_create(name=i)
             models.MovieCountry.link(movie, country, position)
             position += 1
 
@@ -96,7 +96,7 @@ def loadIMDb(imdbId):
     if 'language' in info:
         for i in info['language']:
             debug("add language", i)
-            language = models.Language.objects.get_or_create(name=i)
+            language, created = models.Language.objects.get_or_create(name=i)
             models.MovieLanguage.link(movie, language, position)
             position += 1
 
@@ -105,7 +105,7 @@ def loadIMDb(imdbId):
     locations = oxweb.imdb.getMovieLocations(imdbId)
     for i in locations:
         debug("add location", i)
-        location = models.Location.objects.get_or_create(name=i)
+        location, created = models.Location.objects.get_or_create(name=i)
         location.movies.add(movie)
 
     #Genre
@@ -113,7 +113,7 @@ def loadIMDb(imdbId):
     if 'genre' in info:
         for i in info['genre']:
             debug("add genre", i)
-            genre = models.Genre.objects.get_or_create(name=i)
+            genre, created = models.Genre.objects.get_or_create(name=i)
             genre.movies.add(movie)
 
     #Keyword
@@ -121,7 +121,7 @@ def loadIMDb(imdbId):
     keywords = oxweb.imdb.getMovieKeywords(imdbId)
     for g in keywords:
         debug("add keyword", g)
-        keyword = models.Keyword.objects.get_or_create(name=g)
+        keyword, created = models.Keyword.objects.get_or_create(name=g)
         keyword.movies.add(movie)
 
     movie.trivia_all.filter(manual=False).delete()
