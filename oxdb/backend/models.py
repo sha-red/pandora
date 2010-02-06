@@ -15,6 +15,7 @@ from oxdjango import fields
 import oxlib
 from oxlib import stripTags
 from oxlib.normalize import canonicalTitle, canonicalName
+from firefogg import Firefogg
 
 import managers
 import load
