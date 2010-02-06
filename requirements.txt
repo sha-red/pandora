@@ -9,3 +9,5 @@ simplejson
 #rabbitmq interface
 carrot
 django_extensions
+-e bzr+http://firefogg.org/dev/python-firefogg/#egg=python-firefogg
+
