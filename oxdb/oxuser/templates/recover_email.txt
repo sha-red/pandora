@@ -1,0 +1,10 @@
+Somebody requested a new password for your {{sitename}} account.
+
+If it is you, and if you forgot your password, you can login
+by clicking the following url:
+
+{{recover_url}}
+
+If you did not request a password, you can safely ignore this e-mail.
+
+{{sitename}}

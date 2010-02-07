@@ -306,7 +306,7 @@ class Movie(models.Model):
     #stream related fields
     '''
     '''
-    stream128 = models.FileField(default=None, blank=True, upload_to=lambda f, x: movie_path(f, '128'))
+    stream96p = models.FileField(default=None, blank=True, upload_to=lambda f, x: movie_path(f, '96p'))
     stream320 = models.FileField(default=None, blank=True, upload_to=lambda f, x: movie_path(f, '320'))
     stream640 = models.FileField(default=None, blank=True, upload_to=lambda f, x: movie_path(f, '640'))
     #FIXME: is this still required? should this not be aspect ratio? depends on stream???
@@ -1044,16 +1044,17 @@ class File(models.Model):
 
     #stream related fields
     available = models.BooleanField(default=False)
-    stream128 = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, '128'))
+    stream96p = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, '96p'))
     stream320 = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, '320'))
     stream640 = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, '640'))
 
-    timeline = models.ImageField(default=None, null=True, upload_to=lambda f, x: timeline_path(f))
+    def timeline_base_url(self):
+        return '%s/timeline' % os.path.dirname(self.stream96p.url)
 
     def save_chunk(self, chunk, name='video.ogv'):
         if not self.available:
-            #FIXME: this should use stream128 or stream640 depending on configuration
-            video = getattr(self, 'stream128')
+            #FIXME: this should use stream96p or stream640 depending on configuration
+            video = getattr(self, 'stream96p')
             if not video:
                 video.save(name, chunk)
                 self.save()
@@ -1062,7 +1063,7 @@ class File(models.Model):
                 f.write(chunk.read())
                 f.close()
             return True
-        print "somehing failed, not sure what?"
+        print "somehing failed, not sure what?", self.available
         return False
 
     objects = managers.FileManager()
@@ -1119,8 +1120,8 @@ class File(models.Model):
             video = self.stream640.path
         elif stream320:
             video = self.stream320.path
-        elif stream128:
-            video = self.stream128.path
+        elif stream96p:
+            video = self.stream96p.path
         else:
             return False
         prefix = os.path.join(os.path.dirname(video), 'timeline')
@@ -1136,14 +1137,14 @@ class File(models.Model):
             self.stream320.name = stream_path(self, '320')
             self.stream320.save()
             ogg.encode(self.stream640.path, self.stream320.path, settings.VIDEO320)
-            #128 stream
-            self.stream128.name = stream_path(self, '128')
-            self.stream128.save()
-            ogg.encode(self.stream640.path, self.stream128.path, settings.VIDEO128)
+            #96p stream
+            self.stream96p.name = stream_path(self, '96p')
+            self.stream96p.save()
+            ogg.encode(self.stream640.path, self.stream96p.path, settings.VIDEO96P)
         elif self.stream320:
-            self.stream128.name = stream_path(self, '128')
-            self.stream128.save()
-            ogg.encode(self.stream320.path, self.stream128.path, settings.VIDEO128)
+            self.stream96p.name = stream_path(self, '96p')
+            self.stream96p.save()
+            ogg.encode(self.stream320.path, self.stream96p.path, settings.VIDEO96P)
 
     def extract(self):
         #FIXME: do stuff, like create timeline or create smaller videos etc

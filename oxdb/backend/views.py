@@ -474,6 +474,7 @@ class VideoChunkForm(forms.Form):
     chunk = forms.FileField()
     done = forms.IntegerField(required=False)
 
+@login_required_json
 def api_upload(request): #video, timeline, frame
     '''
         upload video, timeline or frame
@@ -514,10 +515,10 @@ def firefogg_upload(request):
             #FIXME: what to do if requested oshash is not in db?
             #FIXME: should existing data be reset here? or better, should this fail if an upload was there
             f = get_object_or_404(models.File, oshash=request.POST['oshash'])
-            if f.stream128:
-                f.stream128.delete()
-                f.available = False
-                f.save()
+            if f.stream96p:
+                f.stream96p.delete()
+            f.available = False
+            f.save()
             response = {
                 'uploadUrl': request.build_absolute_uri('/api/upload/?oshash=%s' % f.oshash),
                 'result': 1

@@ -109,8 +109,10 @@ BROKER_PASSWORD = "0xdb"
 BROKER_VHOST = "/oxdb"
 
 #Video encoding settings
-VIDEO128 = {'profile': 'padma-stream', 'samplerate': 44100, 'noUpscaling': True}
-VIDEO320 = {'maxSize': 320, 'samplerate': 44100, 'videoBitrate': 500, 'audioQuality': 0, 'channels': 1, 'noUpscaling': True}
+VIDEO96P = {'height': 96, 'videoBitrate': 180, 'softTarget': True,
+            'samplerate': 44100, 'audioQuality': -1, 'channels': 1, 'noUpscaling': True}
+VIDEO320 = {'maxSize': 320, 'videoBitrate': 500,
+            'samplerate': 44100, 'audioQuality': 0, 'channels': 1, 'noUpscaling': True}
 VIDEO640 = {'profile': 'padma'}
 
 #overwrite default settings with local settings
