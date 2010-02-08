@@ -30,6 +30,13 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 
 #CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
 
+#rabbitmq connection settings
+BROKER_HOST = "127.0.0.1"
+BROKER_PORT = 5672
+BROKER_USER = "oxdb"
+BROKER_PASSWORD = "0xdb"
+BROKER_VHOST = "/oxdb"
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -102,13 +109,6 @@ INSTALLED_APPS = (
 )
 
 AUTH_PROFILE_MODULE = 'oxuser.UserProfile'
-
-#rabbitmq connection settings
-BROKER_HOST = "127.0.0.1"
-BROKER_PORT = 5672
-BROKER_USER = "oxdb"
-BROKER_PASSWORD = "0xdb"
-BROKER_VHOST = "/oxdb"
 
 #Video encoding settings
 VIDEO_PROFILE = 'low' # possible values low, mid or high

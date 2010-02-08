@@ -5,7 +5,7 @@ from django.conf.urls.defaults import *
 
 
 urlpatterns = patterns("backend.views",
-    (r'^upload/', 'firefogg_upload'),
+    (r'^upload/$', 'firefogg_upload'),
     (r'^$', 'api'),
 )
 
