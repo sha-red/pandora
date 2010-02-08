@@ -28,6 +28,11 @@ def getUserJSON(user):
     json = {}
     for key in ('username', ):
         json[key] = getattr(user, key)
+    json['group'] = 'user'
+    if user.is_staff:
+        json['group'] = 'admin'
+    elif user.has_perm('0x.vip'): #FIXME: permissions
+        json['group'] = 'vip'
     json['preferences'] = getPreferences(user)
     return json
 

@@ -14,6 +14,7 @@ from django.db.models import Q, Avg, Count
 from django.http import HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from django.template import RequestContext
+from django.conf import settings
 
 try:
     import simplejson as json
@@ -62,7 +63,7 @@ def api_hello(request):
     if request.user.is_authenticated():
         response['data']['user'] = getUserJSON(request.user)
     else:
-        response['data']['user'] = {'name': 'Guest'}
+        response['data']['user'] = {'name': 'Guest', 'group': 'guest', 'preferences': {}}
     return render_to_json_response(response)
 
 def api_error(request):
@@ -463,7 +464,7 @@ def api_encodingSettings(request):
                 'data': {'options': {'videoQuality':...}}}
     '''
     response = {'status': {'code': 200, 'text': 'ok'}}
-    response['data'] = {'options': {'preset': 'padma'}}
+    response['data'] = {'options': settings.VIDEO_ENCODING[settings.VIDEO_PROFILE]}
     return render_to_json_response(response)
 
 class UploadForm(forms.Form):
@@ -515,8 +516,9 @@ def firefogg_upload(request):
             #FIXME: what to do if requested oshash is not in db?
             #FIXME: should existing data be reset here? or better, should this fail if an upload was there
             f = get_object_or_404(models.File, oshash=request.POST['oshash'])
-            if f.stream96p:
-                f.stream96p.delete()
+            stream = getattr(f, 'stream_%s'%settings.VIDEO_UPLOAD)
+            if stream:
+                stream.delete()
             f.available = False
             f.save()
             response = {

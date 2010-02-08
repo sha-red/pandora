@@ -4,7 +4,9 @@
 import os
 from os.path import join
 
-SITENAME = 'Pad.ma'
+SITENAME = 'Oxdb'
+URL = 'Oxdb.org'
+
 PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 
 DEBUG = True
@@ -109,11 +111,14 @@ BROKER_PASSWORD = "0xdb"
 BROKER_VHOST = "/oxdb"
 
 #Video encoding settings
-VIDEO96P = {'height': 96, 'videoBitrate': 180, 'softTarget': True,
-            'samplerate': 44100, 'audioQuality': -1, 'channels': 1, 'noUpscaling': True}
-VIDEO320 = {'maxSize': 320, 'videoBitrate': 500,
-            'samplerate': 44100, 'audioQuality': 0, 'channels': 1, 'noUpscaling': True}
-VIDEO640 = {'profile': 'padma'}
+VIDEO_PROFILE = 'low' # possible values low, mid or high
+VIDEO_ENCODING = {
+    'low': {'height': 96, 'videoBitrate': 180, 'softTarget': True,
+            'samplerate': 44100, 'audioQuality': -1, 'channels': 1, 'noUpscaling': True},
+    'mid': {'maxSize': 320, 'videoBitrate': 500,
+            'samplerate': 44100, 'audioQuality': 0, 'channels': 1, 'noUpscaling': True},
+    'high': {'profile': 'padma'}
+}
 
 #overwrite default settings with local settings
 try:

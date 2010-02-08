@@ -6,6 +6,9 @@ from django.conf import settings
 
 
 def index(request):
-    context = RequestContext(request, {})
+    context = RequestContext(request, {'settings':settings})
     return render_to_response('index.html', context)
 
+def site_js(request):
+    context = RequestContext(request, {'settings':settings})
+    return render_to_response('site.js', context, mimetype="application/javascript")

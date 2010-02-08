@@ -306,9 +306,9 @@ class Movie(models.Model):
     #stream related fields
     '''
     '''
-    stream96p = models.FileField(default=None, blank=True, upload_to=lambda f, x: movie_path(f, '96p'))
-    stream320 = models.FileField(default=None, blank=True, upload_to=lambda f, x: movie_path(f, '320'))
-    stream640 = models.FileField(default=None, blank=True, upload_to=lambda f, x: movie_path(f, '640'))
+    stream_low = models.FileField(default=None, blank=True, upload_to=lambda f, x: movie_path(f, 'low'))
+    stream_mid = models.FileField(default=None, blank=True, upload_to=lambda f, x: movie_path(f, 'mid'))
+    stream_high = models.FileField(default=None, blank=True, upload_to=lambda f, x: movie_path(f, 'high'))
     #FIXME: is this still required? should this not be aspect ratio? depends on stream???
     scene_height = models.IntegerField(null=True, blank=True)
 
@@ -612,10 +612,10 @@ class MovieSort(models.Model):
     resolution = models.IntegerField(blank=True)
     aspectratio = models.IntegerField('Aspect Ratio', blank=True)
     bitrate = models.IntegerField(blank=True)
-    pixels = models.IntegerField(blank=True)
+    pixels = models.BigIntegerField(blank=True)
     filename = models.IntegerField(blank=True)
     files = models.IntegerField(blank=True)
-    size = models.IntegerField(blank=True)
+    size = models.BigIntegerField(blank=True)
 
     _private_fields = ('id', 'movie')
     #return available sort fields
@@ -923,7 +923,7 @@ class Review(models.Model):
         if q.count() > 0:
             o = q[0]
         else:
-            o = self.objects.create(movie=movie, url=url)
+            o = self.objects.create(movie=movie, url=g)
             o.save()
         return o
     get_or_create = classmethod(get_or_create)
@@ -1044,17 +1044,17 @@ class File(models.Model):
 
     #stream related fields
     available = models.BooleanField(default=False)
-    stream96p = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, '96p'))
-    stream320 = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, '320'))
-    stream640 = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, '640'))
+    stream_low = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, 'low'))
+    stream_mid = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, 'mid'))
+    stream_high = models.FileField(default=None, upload_to=lambda f, x: stream_path(f, 'high'))
 
     def timeline_base_url(self):
-        return '%s/timeline' % os.path.dirname(self.stream96p.url)
+        return '%s/timeline' % os.path.dirname(self.stream_low.url)
 
     def save_chunk(self, chunk, name='video.ogv'):
         if not self.available:
-            #FIXME: this should use stream96p or stream640 depending on configuration
-            video = getattr(self, 'stream96p')
+            #FIXME: this should use stream_low or stream_high depending on configuration
+            video = getattr(self, 'stream_%s'%settings.VIDEO_PROFILE)
             if not video:
                 video.save(name, chunk)
                 self.save()
@@ -1116,12 +1116,12 @@ class File(models.Model):
         self.save()
 
     def extract_timeline(self):
-        if self.stream640:
-            video = self.stream640.path
-        elif stream320:
-            video = self.stream320.path
-        elif stream96p:
-            video = self.stream96p.path
+        if self.stream_high:
+            video = self.stream_high.path
+        elif self.stream_mid:
+            video = self.stream_mid.path
+        elif self.stream_low:
+            video = self.stream_low.path
         else:
             return False
         prefix = os.path.join(os.path.dirname(video), 'timeline')
@@ -1132,19 +1132,19 @@ class File(models.Model):
 
     def extract_video(self):
         ogg = Firefogg()
-        if self.stream640:
-            #320 stream
-            self.stream320.name = stream_path(self, '320')
-            self.stream320.save()
-            ogg.encode(self.stream640.path, self.stream320.path, settings.VIDEO320)
-            #96p stream
-            self.stream96p.name = stream_path(self, '96p')
-            self.stream96p.save()
-            ogg.encode(self.stream640.path, self.stream96p.path, settings.VIDEO96P)
-        elif self.stream320:
-            self.stream96p.name = stream_path(self, '96p')
-            self.stream96p.save()
-            ogg.encode(self.stream320.path, self.stream96p.path, settings.VIDEO96P)
+        if self.stream_high:
+            #mid stream
+            self.stream_mid.name = stream_path(self, 'mid')
+            self.stream_mid.save()
+            ogg.encode(self.stream_height.path, self.stream_mid.path, settings.VIDEO_MID)
+            #low stream
+            self.stream_low.name = stream_path(self, 'low')
+            self.stream_low.save()
+            ogg.encode(self.stream_high.path, self.stream_low.path, settings.VIDEO_LOW)
+        elif self.stream_mid:
+            self.stream_low.name = stream_path(self, 'low')
+            self.stream_low.save()
+            ogg.encode(self.stream_mid.path, self.stream_low.path, settings.VIDEO_LOW)
 
     def extract(self):
         #FIXME: do stuff, like create timeline or create smaller videos etc

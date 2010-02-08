@@ -1,6 +1,29 @@
 $(function() {
     Ox.initLoading();
-    oxdb = {};
+    var oxdb = new Ox.App({
+            requestURL: "/api/"
+        }),
+        $dialog = new Ox.Dialog({
+            title: "Application Error",
+            buttons: [
+                {
+                    value: "Change Title",
+                    click: function() {
+                        Ox.print("click to change title")
+                        $dialog.options({
+                            title: "New Title"
+                        });
+                        $dialog.$buttons[0].toggleDisabled();
+                    }
+                },
+                {
+                    value: "Close",
+                    click: function() {
+                        $dialog.close();
+                    }
+                }
+            ]
+        });
 
     var user = {
         username: "",
