@@ -22,7 +22,7 @@ except ImportError:
     from django.utils import simplejson as json
 
 from oxdjango.decorators import login_required_json
-from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json
+from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 
 import models
 import utils
@@ -49,8 +49,8 @@ def api(request):
     if f:
         response = f(request)
     else:
-        response = render_to_json_response(
-            {'status': {'code': 400, 'text': 'Unknown function %s' % function}})
+        response = render_to_json_response(json_response(status=400,
+                                text='Unknown function %s' % function))
     #response['Access-Control-Allow-Origin'] = '*'
     return response
 
@@ -59,7 +59,7 @@ def api_hello(request):
         return {'status': {'code': int, 'text': string},
                 'data': {user: object}}
     '''
-    response = {'status': {'code': 200, 'text': 'ok'}, 'data': {}}
+    response = json_response({})
     if request.user.is_authenticated():
         response['data']['user'] = getUserJSON(request.user)
     else:
@@ -146,7 +146,7 @@ def api_find(request):
                 'data': {items=int, files=int, pixels=int, size=int, duration=int}}
     '''
     query = _parse_query(request)
-    response = {'status': {'code': 200, 'text':'ok'}, 'data':{}}
+    response = json_response({})
     if 'p' in query:
         response['data']['items'] = []
         qs = _order_query(query['q'], query['s'])
@@ -219,7 +219,7 @@ def api_getItem(request):
 
 		return item array
     '''
-    response = {'status': {'code': 200, 'text': 'ok'}}
+    response = json_response({})
     itemId = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Movie, movieId=itemId)
 	#FIXME: check permissions
@@ -237,10 +237,10 @@ def api_editItem(request):
     data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Movie, movieId=data['id'])
     if item.editable(request.user):
-		response = {'status': {'code': 501, 'text': 'not implemented'}}
+        response = json_response(status=501, text='not implemented')
 		item.edit(data)
 	else:
-		response = {'status': {'code': 403, 'text': 'permission denied'}}
+        response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
 
 @login_required_json
@@ -251,13 +251,13 @@ def api_removeItem(request):
 
         return {'status': {'code': int, 'text': string}}
     '''
-    response = {'status': {'code': 200, 'text': 'ok'}}
+    response = json_response({})
     itemId = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Movie, movieId=itemId)
 	if item.editable(request.user):
-		response = {'status': {'code': 501, 'text': 'not implemented'}}
+        response = json_response(status=501, text='not implemented')
 	else:
-		response = {'status': {'code': 403, 'text': 'permission denied'}}
+        response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
 
 @login_required_json
@@ -290,16 +290,16 @@ def api_editLayer(request):
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = {'status': {'code': 200, 'text': 'ok'}}
+    response = json_response({})
     data = json.loads(request.POST['data'])
     layer = get_object_or_404_json(models.Layer, pk=data['id'])
 	if layer.editable(request.user):
-		response = {'status': {'code': 501, 'text': 'not implemented'}}
+		response = json_response(status=501, text='not implemented')
 	else:
-		response = {'status': {'code': 403, 'text': 'permission denied'}}
+		response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 
-    response = {'status': {'code': 501, 'text': 'not implemented'}}
+    response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
 
 @login_required_json
@@ -310,7 +310,7 @@ def api_addListItem(request):
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = {'status': {'code': 501, 'text': 'not implemented'}}
+    response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
 
 @login_required_json
@@ -321,7 +321,7 @@ def api_removeListItem(request):
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = {'status': {'code': 501, 'text': 'not implemented'}}
+    response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
 
 @login_required_json
@@ -332,7 +332,7 @@ def api_addList(request):
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = {'status': {'code': 501, 'text': 'not implemented'}}
+    response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
 
 @login_required_json
@@ -343,7 +343,7 @@ def api_editList(request):
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = {'status': {'code': 501, 'text': 'not implemented'}}
+    response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
 
 def api_removeList(request):
@@ -353,7 +353,7 @@ def api_removeList(request):
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = {'status': {'code': 501, 'text': 'not implemented'}}
+    response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
 
 @login_required_json
@@ -373,7 +373,8 @@ def api_addArchive(request):
         archive = models.Archive(name=data['name'])
         archive.save()
         archive.users.add(request.user)
-        response = {'status': {'code': 200, 'text': 'archive created'}}
+        response = json_response({})
+        response['status']['text'] = 'archive created'
     return render_to_json_response(response)
 
 @login_required_json
@@ -388,10 +389,10 @@ def api_editArchive(request):
     data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Archive, name=data['name'])
     if item.editable(request.user):
-		response = {'status': {'code': 501, 'text': 'not implemented'}}
+		response = json_response(status=501, text='not implemented')
 		item.edit(data)
 	else:
-		response = {'status': {'code': 403, 'text': 'permission denied'}}
+		response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 
 @login_required_json
@@ -403,13 +404,13 @@ def api_removeArchive(request):
 
         return {'status': {'code': int, 'text': string}}
     '''
-    response = {'status': {'code': 200, 'text': 'ok'}}
+    response = json_response({})
     itemId = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Archive, movieId=itemId)
 	if item.editable(request.user):
-		response = {'status': {'code': 501, 'text': 'not implemented'}}
+		response = json_response(status=501, text='not implemented')
 	else:
-		response = {'status': {'code': 403, 'text': 'permission denied'}}
+		response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 
 
@@ -450,11 +451,9 @@ def api_update(request):
 				rename[oshash] = f.file.path
 		#print "processed files for", archive.name
 		#remove all files not in files.keys() from ArchiveFile
-		response = {'status': {'code': 200, 'text': 'ok'}, 'data': {}}
-		response['data']['info'] = needs_data
-		response['data']['rename'] = rename
+        response = json_response({'info': needs_data, 'rename': rename})
 	else:
-        response = {'status': {'code': 403, 'text': 'permission denied'}}
+		response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 
 def api_encodingSettings(request):
@@ -463,8 +462,7 @@ def api_encodingSettings(request):
         return {'status': {'code': int, 'text': string},
                 'data': {'options': {'videoQuality':...}}}
     '''
-    response = {'status': {'code': 200, 'text': 'ok'}}
-    response['data'] = {'options': settings.VIDEO_ENCODING[settings.VIDEO_PROFILE]}
+    response = json_response({'options': settings.VIDEO_ENCODING[settings.VIDEO_PROFILE]})
     return render_to_json_response(response)
 
 class UploadForm(forms.Form):
@@ -497,14 +495,13 @@ def api_upload(request): #video, timeline, frame
                 frame.frame.delete()
             frame.frame.save(ff.name, ff)
             frame.save()
-            response = {'status': {'code': 200, 'text': 'ok'}}
-            response['url'] = frame.frame.url
+            response = json_response({'url': frame.frame.url})
             return render_to_json_response(response)
         if data['item'] == 'timeline':
             pass
             #print "not implemented"
 
-    response = {'status': {'code': 501, 'text': 'not implemented'}}
+    response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
 
 @login_required_json
@@ -548,7 +545,7 @@ def firefogg_upload(request):
                     response['done'] = 1
                 return render_to_json_response(response)
     print request.GET, request.POST
-    response = {'status': {'code': 400, 'text': 'this request requires POST'}}
+    response = json_response(status=400, text='this request requires POST')
     return render_to_json_response(response)
 
 @login_required_json
@@ -556,7 +553,7 @@ def api_editFile(request): #FIXME: should this be file.files. or part of update
     '''
         change file / imdb link
     '''
-    response = {'status': {'code': 501, 'text': 'not implemented'}}
+    response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
 
 def api_parse(request): #parse path and return info
@@ -567,8 +564,7 @@ def api_parse(request): #parse path and return info
                 data: {imdb: string}}
     '''
     path = json.loads(request.POST['data'])['path']
-    response = utils.parsePath(path)
-    response = {'status': {'code': 200, 'text': 'ok'}, data: response}
+    response = json_response(utils.parsePath(path))
     return render_to_json_response(response)
 
 def api_getImdbId(request):
@@ -580,10 +576,9 @@ def api_getImdbId(request):
     '''
     imdbId = oxweb.imdb.guess(search_title, r['director'], timeout=-1)
     if imdbId:
-        response = {'status': {'code': 200, 'text': 'ok'},
-                    'data': {'imdbId': imdbId}}
+        response = json_response({'imdbId': imdbId})
     else:
-        response = {'status': {'code': 404, 'text': 'not found'}}
+		response = json_response(status=404, text='not found')
     return render_to_json_response(response)
 
 def api_fileInfo(request):
@@ -626,7 +621,7 @@ def api_subtitles(request):
         sub.srt = srt
         sub.save()
     else:
-		response = {'status': {'code': 200, 'text': 'ok'}, 'data':{}}
+        response = json_response({})
         if language:
             q = models.Subtitles.objects.filter(movie_file__oshash=oshash, language=language)
             if q.count() > 0:

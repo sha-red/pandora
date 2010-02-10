@@ -11,7 +11,7 @@ from django.template import RequestContext, loader, Context
 from django.utils import simplejson as json
 from django.conf import settings
 
-from oxdjango.shortcuts import render_to_json_response
+from oxdjango.shortcuts import render_to_json_response, json_response
 from oxdjango.decorators import login_required_json
 
 import models
@@ -27,7 +27,7 @@ def api_login(request):
         
         return {'status': {'code': int, 'text': string}}
     '''
-    response = {'status': {'code': 403, 'text': 'login failed'}}
+    response = json_response(status=403, text='login failed')
     data = json.loads(request.POST['data'])
     form = LoginForm(data, request.FILES)
     if form.is_valid():
@@ -36,13 +36,15 @@ def api_login(request):
             if user.is_active:
                 login(request, user)
                 user_json = models.getUserJSON(user)
-                response = {'status': {'code': 200, 'message': 'You are logged in.', 'user': user_json}}
+                response = json_response({'user': user_json}, text='You are logged in.')
             else:
-                response = {'status': {'code': 401, 'text': 'Your account is disabled.'}}
+                response = json_response(status=401,
+                    text='Your account is disabled.')
         else:
-            response = {'status': {'code': 401, 'text': 'Your username and password were incorrect.'}}
+                response = json_response(status=401,
+                    text='Your username and password were incorrect.')
     else:
-        response = {'status': {'code': 400, 'text': 'invalid data'}}
+        response = json_response(status=400, text='invalid data')
 
     return render_to_json_response(response)
 
@@ -53,7 +55,7 @@ def api_logout(request):
         
         return {'status': {'code': int, 'text': string}}
     '''
-    response = {'status': {'code': 200, 'text': 'logged out'}}
+    response = json_response(text='logged out')
     if request.user.is_authenticated():
         logout(request)
     return render_to_json_response(response)
@@ -74,9 +76,9 @@ def api_register(request):
     form = RegisterForm(data, request.FILES)
     if form.is_valid():
         if models.User.objects.filter(username=form.data['username']).count() > 0:
-            response = {'status': {'code': 400, 'text': 'username or email exists'}}
+            response = json_response(status=400, text='username or email exists')
         elif models.User.objects.filter(email=form.data['email']).count() > 0:
-            response = {'status': {'code': 400, 'text': 'username or email exists'}}
+            response = json_response(status=400, text='username or email exists')
         else:
             user = models.User(username=form.data['username'], email=form.data['email'])
             user.set_password(form.data['password'])
@@ -84,9 +86,9 @@ def api_register(request):
             user = authenticate(username=form.data['username'],
                                 password=form.data['password'])
             login(request, user)
-            response = {'status': {'code':200, 'text': 'account created'}}
+            response = json_response(text='account created')
     else:
-        response = {'status': {'code': 400, 'text': 'username exists'}}
+        response = json_response(status=400, text='username exists')
     return render_to_json_response(response)
 
 class RecoverForm(forms.Form):
@@ -125,11 +127,11 @@ def api_recover(request):
             message = template.render(context)
             subject = '%s account recovery' % settings.SITENAME
             user.email_user(subject, message)
-            response = {'status': {'code': 200, 'text': 'recover email sent.'}}
+            response = json_response(text='recover email sent')
         else:
-            response = {'status': {'code': 404, 'text': 'user or email not found.'}}
+            response = json_response(status=404, text='username or email not found')
     else:
-        response = {'status': {'code': 400, 'text': 'username exists'}}
+        response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)
 
 def recover(request, key):
@@ -165,7 +167,7 @@ def api_preferences(request):
         if data is object:
             set key values in dict as preferences
     '''
-    response = {'status': {'code': 200, 'text': 'ok'}, 'data':{}}
+    response = json_response()
     if 'data' not in request.POST:
         response['data']['preferences'] = models.getPreferences(request.user)
     else:
@@ -185,4 +187,3 @@ def api_preferences(request):
                 for key in data:
                     models.setPreference(request.user, key, data[key])
     return render_to_json_response(response)
-
