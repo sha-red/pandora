@@ -85,6 +85,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'oxdjango.middleware.ExceptionMiddleware',
 )
 
 ROOT_URLCONF = 'oxdb.urls'
@@ -101,7 +102,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.humanize',
     'django_extensions',
-
+    'devserver',
 #    'south',
 
     'backend',
