@@ -105,6 +105,7 @@ INSTALLED_APPS = (
     'devserver',
 #    'south',
 
+    'app',
     'backend',
     'oxuser',
 )
