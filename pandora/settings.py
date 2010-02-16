@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-# Django settings for oxdb project.
+# Django settings for pandora project.
 import os
 from os.path import join
 
-SITENAME = 'Oxdb'
-URL = 'Oxdb.org'
+SITENAME = 'Pandora'
+URL = 'pandora.Oxdb.org'
 
 PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 
@@ -33,9 +33,9 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 #rabbitmq connection settings
 BROKER_HOST = "127.0.0.1"
 BROKER_PORT = 5672
-BROKER_USER = "oxdb"
-BROKER_PASSWORD = "0xdb"
-BROKER_VHOST = "/oxdb"
+BROKER_USER = "pandora"
+BROKER_PASSWORD = "box"
+BROKER_VHOST = "/pandora"
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -88,7 +88,7 @@ MIDDLEWARE_CLASSES = (
     'oxdjango.middleware.ExceptionMiddleware',
 )
 
-ROOT_URLCONF = 'oxdb.urls'
+ROOT_URLCONF = 'pandora.urls'
 
 TEMPLATE_DIRS = (
     join(PROJECT_ROOT, 'templates'),

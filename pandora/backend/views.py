@@ -701,5 +701,6 @@ def apidoc(request):
             'name': f[4:],
             'doc': trim(globals()[f].__doc__).replace('\n', '<br>\n')
         })
-    context = RequestContext(request, {'api': api})
+    context = RequestContext(request, {'api': api,
+                                       'sitename': settings.SITENAME,})
     return render_to_response('api.html', context)
