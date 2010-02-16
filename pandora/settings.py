@@ -13,6 +13,8 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 JSON_DEBUG = False
 
+XSENDFILE = False
+
 ADMINS = (
      ('j', 'j@mailb.org'),
 )

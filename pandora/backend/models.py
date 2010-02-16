@@ -10,6 +10,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.utils import simplejson as json
+from django.conf import settings
 
 from oxdjango import fields
 import oxlib
@@ -429,6 +430,11 @@ class Movie(models.Model):
         return utils.oxid(self.get('title', ''), directors, self.get('year', ''),
                           self.get('series_title', ''), self.get('episode_title', ''),
                           self.get('season', ''), self.get('episode', ''))
+
+    def frame(self, position, width=128):
+        #FIXME: compute offset and so on
+        f = self.files.all()[0]
+        return f.frame(position, width)
 
     def updateFind(self):
         try:
@@ -1155,7 +1161,9 @@ class File(models.Model):
     def frame(self, position, width=128):
         videoFile = getattr(self, 'stream_%s'%settings.VIDEO_PROFILE).path
         frameFolder = os.path.join(os.path.dirname(videoFile), 'frames')
-        extract.frame(videoFile, position, frameFolder, width)
+        if position<= self.duration:
+            return extract.frame(videoFile, position, frameFolder, width)
+        return None
 
     def editable(self, user):
         '''

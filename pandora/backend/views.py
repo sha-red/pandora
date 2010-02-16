@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import division
 import os.path
 import re
 from datetime import datetime
 from urllib2 import unquote
 import json
+import mimetypes
 
 from django import forms
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q, Avg, Count
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from django.template import RequestContext
 from django.conf import settings
@@ -23,6 +25,8 @@ except ImportError:
 
 from oxdjango.decorators import login_required_json
 from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response
+from oxdjango.http import HttpFileResponse
+import oxlib
 
 import models
 import utils
@@ -630,6 +634,24 @@ def api_subtitles(request):
         l = models.Subtitles.objects.filter(movie_file__oshash=oshash).values('language')
         response['data']['languages'] = [f['language'] for f in l]
         return render_to_json_response(response)
+    
+def video(request, id, quality):
+    movie = get_object_or_404(models.Movie, movieId=id)
+    if quality not in settings.VIDEO_ENCODING:
+        raise Http404
+    stream = getattr(movie, 'stream_'+quality)
+    response = HttpFileResponse(stream.path, content_type='video/ogg')
+    #FIXME: movie needs duration field
+    #response['Content-Duration'] = movie.duration
+    return response
+
+def frame(request, id, position, size):
+    movie = get_object_or_404(models.Movie, movieId=id)
+    position = oxlib.time2ms(position)/1000
+    frame = movie.frame(position, int(size))
+    if not frame:
+        raise Http404
+    return HttpFileResponse(frame, content_type='image/jpeg')
 
 '''
 GET list

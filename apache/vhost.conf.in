@@ -8,16 +8,21 @@
         Allow from all
     </Directory>
 
-    Alias /.bzr        /oxdb/.bzr
-    Alias /static      __PREFIX__/oxdb/static
-    Alias /favicon.ico __PREFIX__/oxdb/static/favicon.ico
-    Alias /media       __PREFIX__/oxdb/media
+    <Location />
+        XSendFile on
+        XSendFileAllowAbove on
+    </Location>
+
+    Alias /.bzr        __PREFIX__/.bzr
+    Alias /static      __PREFIX__/pandora/static
+    Alias /favicon.ico __PREFIX__/pandora/static/favicon.ico
+    Alias /media       __PREFIX__/pandora/media
     Alias /admin/media __PREFIX__/src/django/django/contrib/admin/media
     Alias /static/js/jquery.js __PREFIX__/src/django/django/contrib/admin/media/js/jquery.min.js
     WSGIScriptAlias / __PREFIX__/wsgi/django.wsgi
 
-    WSGIDaemonProcess oxdb user=oxdb group=oxdb threads=25 python-path=__PREFIX__/lib/python2.6/site-packages/
-    WSGIProcessGroup oxdb
+    WSGIDaemonProcess pandora user=pandora group=pandora threads=25 python-path=__PREFIX__/lib/python2.6/site-packages/
+    WSGIProcessGroup pandora
 
     ServerSignature Off
 </VirtualHost>

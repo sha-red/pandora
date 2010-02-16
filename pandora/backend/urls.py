@@ -6,6 +6,8 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns("backend.views",
     (r'^upload/$', 'firefogg_upload'),
+    (r'^frame/(?P<id>.*)/(?P<position>.*)\.(?P<size>\d+).jpg$', 'frame'),
+    (r'^stream/(?P<id>.*).(?P<quality>.*).ogv$', 'video'),
     (r'^$', 'api'),
 )
 
