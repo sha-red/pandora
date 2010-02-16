@@ -20,7 +20,7 @@ from firefogg import Firefogg
 import managers
 import load
 import utils
-
+import extract
 
 class MovieImdb(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -1132,25 +1132,30 @@ class File(models.Model):
 
     def extract_video(self):
         ogg = Firefogg()
+        source = None
+        profiles = []
         if self.stream_high:
-            #mid stream
-            self.stream_mid.name = stream_path(self, 'mid')
-            self.stream_mid.save()
-            ogg.encode(self.stream_height.path, self.stream_mid.path, settings.VIDEO_MID)
-            #low stream
-            self.stream_low.name = stream_path(self, 'low')
-            self.stream_low.save()
-            ogg.encode(self.stream_high.path, self.stream_low.path, settings.VIDEO_LOW)
+            source = self.stream_high
+            profiles = ['low', 'mid']
         elif self.stream_mid:
-            self.stream_low.name = stream_path(self, 'low')
-            self.stream_low.save()
-            ogg.encode(self.stream_mid.path, self.stream_low.path, settings.VIDEO_LOW)
-
+            source = self.stream_mid
+            profiles = ['low', ]
+        for profile in profiles:
+            output = getattr(self, 'stream_%s'%profile)
+            output.name = stream_path(self, profile)
+            output.save()
+            ogg.encode(source.path, output.path, settings.VIDEO_ENCODING[profile])
+ 
     def extract(self):
         #FIXME: do stuff, like create timeline or create smaller videos etc
         self.extract_video()
         self.extract_timeline()
         return
+
+    def frame(self, position, width=128):
+        videoFile = getattr(self, 'stream_%s'%settings.VIDEO_PROFILE).path
+        frameFolder = os.path.join(os.path.dirname(videoFile), 'frames')
+        extract.frame(videoFile, position, frameFolder, width)
 
     def editable(self, user):
         '''
