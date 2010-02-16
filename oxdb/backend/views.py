@@ -29,7 +29,7 @@ import utils
 from daemon import send_bg_message
 
 from oxuser.models import getUserJSON
-from oxuser.views import api_login, api_logout, api_register, api_recover, api_preferences
+from oxuser.views import api_login, api_logout, api_register, api_contact, api_recover, api_preferences
 
     
 def api(request):

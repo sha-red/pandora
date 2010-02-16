@@ -10,6 +10,7 @@ from django.shortcuts import render_to_response, get_object_or_404, get_list_or_
 from django.template import RequestContext, loader, Context
 from django.utils import simplejson as json
 from django.conf import settings
+from django.core.mail import send_mail, BadHeaderError
 
 from oxdjango.shortcuts import render_to_json_response, json_response
 from oxdjango.decorators import login_required_json
@@ -36,13 +37,15 @@ def api_login(request):
             if user.is_active:
                 login(request, user)
                 user_json = models.getUserJSON(user)
-                response = json_response({'user': user_json}, text='You are logged in.')
+                response = json_response({'user': user_json},
+                                         text='You are logged in.')
             else:
                 response = json_response(status=401,
                     text='Your account is disabled.')
         else:
-                response = json_response(status=401,
-                    text='Your username and password were incorrect.')
+                errors = json_errors(form)
+                response = json_response(errors,
+                    status=401, text='Your username and password were incorrect.')
     else:
         response = json_response(status=400, text='invalid data')
 
@@ -149,6 +152,40 @@ def recover(request, key):
         #FIXME: set message to notify user to update password
         return redirect('/#settings')
     return redirect('/')
+
+class ContactForm(forms.Form):
+    email = forms.EmailField()
+    subject = forms.TextInput()
+    message = forms.TextInput()
+
+def api_contact(request):
+    '''
+        param data
+            {'email': string, 'message': string}
+        
+        return {'status': {'code': int, 'text': string}}
+    '''
+    data = json.loads(request.POST['data'])
+    form = ContactForm(data, request.FILES)
+    if form.is_valid():
+        email = data['email']
+        template = loader.get_template('contact_email.txt')
+        context = RequestContext(request, {
+            'sitename': settings.SITENAME,
+            'email': email,
+            'message': data['message'],
+        })
+        message = template.render(context)
+        subject = '%s contact: %s' % (settings.SITENAME, data['subject'])
+        response = json_response(text='message sent')
+        try:
+            send_mail(subject, message, email, [settings.DEFAULT_FROM_EMAIL, ])
+        except BadHeaderError:
+            response = json_response(status=400, text='invalid data')
+    else:
+        response = json_response(status=400, text='invalid data')
+    return render_to_json_response(response)
+
 
 @login_required_json
 def api_preferences(request):
