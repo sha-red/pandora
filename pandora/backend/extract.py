@@ -38,9 +38,12 @@ def frame(videoFile, position, baseFolder, width=128, redo=False):
             width of frame
             redo boolean to extract file even if it exists
     '''
+    def frame_path(size):
+        return os.path.join(baseFolder, "%s.%s.%s" % (oxlib.ms2time(position*1000), size, img_extension))
+
     #not using input file, to slow to extract frame right now
     base_size = 320
-    frame = os.path.join(baseFolder, "%f.%s.%s" % (position, base_size, img_extension))
+    frame = frame_path(base_size)
 
     if exists(videoFile):
         if redo or not exists(frame):
@@ -50,7 +53,7 @@ def frame(videoFile, position, baseFolder, width=128, redo=False):
             run_command(cmd)
     if width != base_size:
         frame_base = frame
-        frame = os.path.join(baseFolder, "%f.%s.%s" % (position, width, img_extension))
+        frame = frame_path(width)
         if not exists(frame):
             resize_image(frame_base, frame, width)
     return frame

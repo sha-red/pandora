@@ -442,7 +442,9 @@ class Movie(models.Model):
         except MovieFind.DoesNotExist:
             f = MovieFind(movie=self)
 
-        f.title = self.get('title') + ' '.join([t.title for t in self.alternative_titles()])
+        f.title = self.get('title')
+        #FIXME: filter us/int  title
+        #f.title += ' '.join([t.title for t in self.alternative_titles()])
         f.director = ' '.join([i.name for i in self.directors()])
         f.country = ' '.join([i.name for i in self.countries()])
         f.year = self.get('year', '')

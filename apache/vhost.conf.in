@@ -19,6 +19,7 @@
     Alias /media       __PREFIX__/pandora/media
     Alias /admin/media __PREFIX__/src/django/django/contrib/admin/media
     Alias /static/js/jquery.js __PREFIX__/src/django/django/contrib/admin/media/js/jquery.min.js
+
     WSGIScriptAlias / __PREFIX__/wsgi/django.wsgi
 
     WSGIDaemonProcess pandora user=pandora group=pandora threads=25 python-path=__PREFIX__/lib/python2.6/site-packages/
