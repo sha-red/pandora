@@ -20,9 +20,11 @@ def api_getPage(request):
     return render_to_json_response(response)
 
     return render_to_response('site.js', context, mimetype="application/javascript")
-    
 
 def site_js(request):
     pages = models.Page.objects.all()
-    context = RequestContext(request, {'settings':settings, 'pages': pages})
+    siteSettings = {}
+    for s in models.SiteSettings.objects.all():
+        siteSettings[s.key] = s.value
+    context = RequestContext(request, {'settings':settings, 'pages': pages, 'siteSettings': siteSettings})
     return render_to_response('site.js', context, mimetype="application/javascript")
