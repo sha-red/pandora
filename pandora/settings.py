@@ -117,9 +117,9 @@ AUTH_PROFILE_MODULE = 'oxuser.UserProfile'
 #Video encoding settings
 VIDEO_PROFILE = 'low' # possible values low, mid or high
 VIDEO_ENCODING = {
-    'low': {'height': 96, 'videoBitrate': 180, 'softTarget': True,
+    'low':  {'height': 96, 'videoBitrate': 180, 'softTarget': True,
             'samplerate': 44100, 'audioQuality': -1, 'channels': 1, 'noUpscaling': True},
-    'mid': {'maxSize': 320, 'videoBitrate': 500,
+    'mid':  {'maxSize': 320, 'videoBitrate': 500,
             'samplerate': 44100, 'audioQuality': 0, 'channels': 1, 'noUpscaling': True},
     'high': {'profile': 'padma'}
 }
