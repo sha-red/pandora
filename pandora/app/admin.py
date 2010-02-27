@@ -10,3 +10,9 @@ class PageAdmin(admin.ModelAdmin):
     search_fields = ['name', 'body']
 
 admin.site.register(models.Page, PageAdmin)
+
+
+class SiteSettingsAdmin(admin.ModelAdmin):
+    search_fields = ['key', 'value']
+
+admin.site.register(models.SiteSettings, SiteSettingsAdmin)
