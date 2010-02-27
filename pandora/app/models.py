@@ -1,7 +1,6 @@
+# -*- coding: utf-8 -*-
+# vi:si:et:sw=4:sts=4:ts=4
 from django.db import models
-
-# Create your models here.
-
 
 class Page(models.Model):
     created = models.DateTimeField(auto_now_add=True)
