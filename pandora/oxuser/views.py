@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+    # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 import uuid
 import hashlib
@@ -16,6 +16,9 @@ from oxdjango.shortcuts import render_to_json_response, json_response
 from oxdjango.decorators import login_required_json
 
 import models
+
+def json_errors(form):
+    return {'status': {'code': 402, 'text': 'form error'}}
 
 class LoginForm(forms.Form):
     username = forms.TextInput()
