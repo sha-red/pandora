@@ -18,7 +18,7 @@ from oxdjango.decorators import login_required_json
 import models
 
 def json_errors(form):
-    return {'status': {'code': 402, 'text': 'form error'}}
+    return {'status': {'code': 402, 'text': 'form error', 'data': form.errors}}
 
 class LoginForm(forms.Form):
     username = forms.TextInput()
