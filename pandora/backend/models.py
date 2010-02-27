@@ -461,7 +461,6 @@ class Movie(models.Model):
         f.location = ' '.join([i.name for i in self.locations()])
         #FIXME: collate filenames
         #f.filename = self.filename
-
         f.all = ' '.join(filter(None, [f.title, f.director, f.country, f.year, f.language,
                           f.writer, f.producer, f.editor, f.cinematographer,
                           f.cast, f.genre, f.keywords, f.summary, f.trivia,
