@@ -5,7 +5,6 @@ import os.path
 import re
 from datetime import datetime
 from urllib2 import unquote
-import json
 import mimetypes
 
 from django import forms
