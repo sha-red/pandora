@@ -3,7 +3,7 @@ import os
 import sys
 import site
  
-project_module = 'oxdb'
+project_module = 'pandora'
 
 root_dir = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 

@@ -1,0 +1,4 @@
+Hi {{sitename}} admin,
+
+someone sent you a message:
+{{message}}
