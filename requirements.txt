@@ -1,9 +1,9 @@
 -e svn+http://code.djangoproject.com/svn/django/trunk#egg=django
 -e hg+http://bitbucket.org/andrewgodwin/south/#egg=south
 chardet
--e bzr+http://code.0xdb.org/python-oxlib/#egg=python-oxlib
--e bzr+http://code.0xdb.org/python-oxweb/#egg=python-oxweb
--e bzr+http://code.0xdb.org/python-oxdjango/#egg=python-oxdjango
+-e bzr+http://code.0x2620.org/python-oxlib/#egg=python-oxlib
+-e bzr+http://code.0x2620.org/python-oxweb/#egg=python-oxweb
+-e bzr+http://code.0x2620.org/python-oxdjango/#egg=python-oxdjango
 simplejson
 -e hg+https://django-ajax-filtered-fields.googlecode.com/hg/#egg=django-ajax-filtered-fields 
 #rabbitmq interface
