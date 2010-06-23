@@ -7,17 +7,17 @@ import models
 
 def send_bg_message(msg):
     conn = DjangoBrokerConnection()
-    publisher = Publisher(connection=conn, exchange="oxdb-bg",
-                                           routing_key="oxdb-bg")
+    publisher = Publisher(connection=conn, exchange="pandora-bg",
+                                           routing_key="pandora-bg")
     publisher.send(msg)
     publisher.close()
 
 def run():
     conn = DjangoBrokerConnection()
 
-    consumer = Consumer(connection=conn, queue="oxdb-bg",
-                                         exchange="oxdb-bg",
-                                         routing_key="oxdb-bg")
+    consumer = Consumer(connection=conn, queue="pandora-bg",
+                                         exchange="pandora-bg",
+                                         routing_key="pandora-bg")
     def handle_background_tasks_callback(data, message):
         print("Got bg message")
         print data
