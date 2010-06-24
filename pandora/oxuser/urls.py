@@ -4,7 +4,7 @@
 from django.conf.urls.defaults import *
 
 
-urlpatterns = patterns("oxdb.oxuser.views",
+urlpatterns = patterns("oxuser.views",
     (r'^preferences', 'api_preferences'),
     (r'^login', 'api_login'),
     (r'^logout', 'api_logout'),

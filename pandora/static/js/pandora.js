@@ -91,7 +91,7 @@ $(function(){
                     ],
         menus: [
             {
-                id: "oxdbMM",
+                id: "pandoraMM",
                 title: site.name,
                 items: [
                     { id: "about", title: "About " + site.name },

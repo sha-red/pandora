@@ -8,17 +8,17 @@ import models
 
 def send_encoder_message(msg):
     conn = DjangoBrokerConnection()
-    publisher = Publisher(connection=conn, exchange="oxdb-encoder",
-                                           routing_key="oxdb-encoder")
+    publisher = Publisher(connection=conn, exchange="pandora-encoder",
+                                           routing_key="pandora-encoder")
     publisher.send(msg)
     publisher.close()
 
 def run():
     conn = DjangoBrokerConnection()
 
-    consumer = Consumer(connection=conn, queue="oxdb-encoder",
-                                         exchange="oxdb-encoder",
-                                         routing_key="oxdb-encoder")
+    consumer = Consumer(connection=conn, queue="pandora-encoder",
+                                         exchange="pandora-encoder",
+                                         routing_key="pandora-encoder")
     def handle_background_tasks_callback(data, message):
         print("Got encoder message")
         print data

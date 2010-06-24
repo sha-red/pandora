@@ -1,6 +1,6 @@
 $(function() {
     Ox.initLoading();
-    var oxdb = new Ox.App({
+    var pandora = new Ox.App({
             requestURL: "/api/"
         }),
         $dialog = new Ox.Dialog({
@@ -78,8 +78,8 @@ $(function() {
     }
 
     var m = [
-        ["oxdb", "0xdb", [
-            ["about", "About 0xdb", {
+        ["pandora", "Pandora", [
+            ["about", "About Pandora", {
                 click: loadPage
             }],
             [],
@@ -366,7 +366,7 @@ $(function() {
             ["advanced", "Advanced Find...", {}]
         ]],
         ["help", "Help", [
-            ["help", "0xdb Help", {
+            ["help", "Pandora Help", {
                 shortcut: "SHIFT ?"
             }]
         ]]
@@ -398,8 +398,8 @@ $(function() {
         }
         if (group == "viewIcons") {
             items.push([]);
-            items.push(["oxdb", "Always Use 0xdb Posters", {
-                group: "oxdbPosters",
+            items.push(["pandora", "Always Use 0xdb Posters", {
+                group: "pandoraPosters",
                 checked: false
             }]);
         }
@@ -456,7 +456,7 @@ $(function() {
                 ["stills", "Stills", function() {}],
                 ["timelines", "Timelines", function() {}],
                 [],
-                ["oxdb", "Always Use 0xdb Posters", function() {}],
+                ["pandora", "Always Use 0xdb Posters", function() {}],
             ]],
             [],
             ["open", "Open Movie", [
@@ -534,7 +534,7 @@ $(function() {
             ["advanced", "Advanced Find", function() {}]
         ]],
         ["help", "Help", [
-            ["help", "0xdb Help", { shortcut: "SHIFT ?" }, function() {}]
+            ["help", "Pandora Help", { shortcut: "SHIFT ?" }, function() {}]
         ]],
         ["test", "Test", [
             ["me", "Check Me", function() { $topMenu.toggleChecked("test/me"); }],
@@ -591,7 +591,7 @@ $(function() {
             items.push({
                 size: 64,
                 id: code,
-                icon: "http://localhost/oxdbstatic/flags/" + flag + ".png",
+                icon: "http://localhost/pandorastatic/flags/" + flag + ".png",
                 title: strings[0] + (strings.length > 1 ? "<br/>" + strings[1] : ""),
                 info: Ox.formatNumber(v.items) + " Movie" + (v.items > 1 ? "s" : "")
             });
@@ -637,13 +637,13 @@ $(function() {
                     width *= maxHeight / height;
                     height = maxHeight;
                 }
-                oxdb.$dialog = new Ox.Dialog({
+                pandora.$dialog = new Ox.Dialog({
                     title: "Foo",
                     buttons: [
                         new Ox.Button()
                             .val("Close")
                             .click(function() {
-                                oxdb.$dialog.close();
+                                pandora.$dialog.close();
                             })
                     ],
                     width: width,
@@ -697,7 +697,7 @@ $(function() {
         $featuresPanel.append("Item #" + (i + 1) + "<br/>")
     }
 
-    oxdb.$sideView = new Ox.SplitView({
+    pandora.$sideView = new Ox.SplitView({
         orientation: "vertical",
         elements: [
             {
@@ -861,7 +861,7 @@ $(function() {
             $main.$body.order(order);
         }
         if (data.menu == "topmenu" && data.item == "view/toggleSidebar") {
-            oxdb.$sideView.toggle();
+            pandora.$sideView.toggle();
             $topMenu.toggleDisabled("view/toggleInfo");
         }
         if (data.menu == "topmenu" && data.item == "view/toggleInfo") {
@@ -875,13 +875,13 @@ $(function() {
             $find.setPlaceholder("Find: " + Ox.toTitleCase(find));
         }
         if (data.menu == "topmenu" && data.item == "help/help") {
-            oxdb.$dialog = new Ox.Dialog({
-                title: "0xdb Help",
+            pandora.$dialog = new Ox.Dialog({
+                title: "Pandora Help",
                 buttons: [
                     new Ox.Button()
                         .val("Close")
                         .click(function() {
-                            oxdb.$dialog.close();
+                            pandora.$dialog.close();
                         })
                 ],
                 width: $(document).width() / 2,
@@ -910,7 +910,7 @@ $(function() {
         orientation: "horizontal",
         elements: [
             {
-                element: oxdb.$sideView,
+                element: pandora.$sideView,
                 size: 192,
                 resizable: [128, 192, 256],
                 resize: resizePlayer
@@ -930,8 +930,8 @@ $(function() {
         $sideBrowser.$element.parent().parent().css({
             height: height + "px"
         });
-        if (oxdb.$sideView.$element.css("bottom") != "0px") {
-            oxdb.$sideView.css({
+        if (pandora.$sideView.$element.css("bottom") != "0px") {
+            pandora.$sideView.css({
                 bottom: (4 - height) + "px"
             })
         }
@@ -988,13 +988,13 @@ $(function() {
         ["space", function(data) {
             var height = $(document).height() - 96,
                 width = height * 5/8;
-            oxdb.$dialog = new Ox.Dialog({
+            pandora.$dialog = new Ox.Dialog({
                 title: data.items[0].title,
                 buttons: [
                     new Ox.Button()
                         .val("Close")
                         .click(function() {
-                            oxdb.$dialog.close();
+                            pandora.$dialog.close();
                         })
                 ],
                 width: width,
