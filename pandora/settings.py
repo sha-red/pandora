@@ -110,6 +110,7 @@ INSTALLED_APPS = (
     'app',
     'backend',
     'oxuser',
+    'torrent',
 )
 
 AUTH_PROFILE_MODULE = 'oxuser.UserProfile'
@@ -123,6 +124,11 @@ VIDEO_ENCODING = {
             'samplerate': 44100, 'audioQuality': 0, 'channels': 1, 'noUpscaling': True},
     'high': {'profile': 'padma'}
 }
+
+TRANSMISSON_HOST='localhost'
+TRANSMISSON_PORT=9091
+TRANSMISSON_USER='transmission'
+TRANSMISSON_PASSWORD='transmission'
 
 #overwrite default settings with local settings
 try:
