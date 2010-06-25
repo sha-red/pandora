@@ -5,7 +5,7 @@ import os
 from os.path import join
 
 SITENAME = 'Pandora'
-URL = 'pandora.Oxdb.org'
+URL = 'pan.do/ra'
 
 PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 
@@ -33,6 +33,7 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 #CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
 
 #rabbitmq connection settings
+CELERY_RESULT_BACKEND = "database"
 BROKER_HOST = "127.0.0.1"
 BROKER_PORT = 5672
 BROKER_USER = "pandora"
@@ -106,6 +107,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'devserver',
 #    'south',
+    'djcelery',
 
     'app',
     'backend',

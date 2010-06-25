@@ -7,7 +7,8 @@ chardet
 simplejson
 -e hg+https://django-ajax-filtered-fields.googlecode.com/hg/#egg=django-ajax-filtered-fields 
 #rabbitmq interface
-carrot
+-e git+git://github.com/ask/celery.git#egg=celery
+django-celery
 django_extensions
 -e bzr+http://firefogg.org/dev/python-firefogg/#egg=python-firefogg
 -e git+git://github.com/dcramer/django-devserver#egg=django_devserver

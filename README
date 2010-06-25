@@ -19,9 +19,9 @@ installed via apt-get/pip/easy_install in your system path.
 Install rabbitmq and carrot:
     sudo apt-get install rabbitmq-server
     
-    sudo rabbitmqctl add_user pandora password
+    sudo rabbitmqctl add_user pandora box
     sudo rabbitmqctl add_vhost /pandora
-    sudo rabbitmqctl set_permissions -p /pandora pandora "^pandora-.*" ".*" ".*"
+    sudo rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
 
 
     update BROKER_* settings in local_settings.py:

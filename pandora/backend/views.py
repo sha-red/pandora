@@ -29,7 +29,7 @@ import oxlib
 
 import models
 import utils
-from daemon import send_bg_message
+import tasks
 
 from oxuser.models import getUserJSON
 from oxuser.views import api_login, api_logout, api_register, api_contact, api_recover, api_preferences
@@ -477,7 +477,7 @@ def api_update(request):
 				f = models.ArchiveFile.get_or_create(archive, oshash)
 				f.update(data)
 				if not f.file.movie:
-					send_bg_message({'findMovie': f.file.id})
+					task.findMovie(f.file.id)
 				#FIXME: only add if it was not in File
 			else:
 				f = q[0]
