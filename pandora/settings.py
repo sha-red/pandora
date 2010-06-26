@@ -11,7 +11,7 @@ PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-JSON_DEBUG = False
+JSON_DEBUG = True
 
 XSENDFILE = False
 
@@ -46,7 +46,7 @@ BROKER_VHOST = "/pandora"
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
 TIME_ZONE = 'Europe/Berlin'
-TIME_ZONE = 'Asia/Kolkata'
+#TIME_ZONE = 'Asia/Kolkata'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
