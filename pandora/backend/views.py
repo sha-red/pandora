@@ -54,7 +54,7 @@ def api(request):
     else:
         response = render_to_json_response(json_response(status=400,
                                 text='Unknown function %s' % function))
-    #response['Access-Control-Allow-Origin'] = '*'
+    response['Access-Control-Allow-Origin'] = '*'
     return response
 
 def api_hello(request):
@@ -111,47 +111,13 @@ def _parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
     query['sort'] = (['title', 'asc'])
-    _dicts = ['p', ]
-    _ints = ['n', ]
-    for key in ('sort', 'keys', 'group', 'list', 'range', 'n'):
+    for key in ('sort', 'keys', 'group', 'list', 'range'):
         if key in data:
             query[key] = data[key]
     print query
     query['qs'] = models.Movie.objects.find(data, user)
     #group by only allows sorting by name or number of itmes
     return query
-'''
-def _parse_query(data, user):
-    query = {}
-    query['i'] = 0
-    query['o'] = 100
-    query['s'] = 'title:asc'
-    def parse_dict(s):
-        d = s.split(",")
-        return [i.strip() for i in d]
-    _dicts = ['p', ]
-    _ints = ['n', ]
-    for key in ('s', 'p', 'g', 'l', 'n'):
-        if key in data:
-            if key in _ints:
-                query[key] = int(data[key])
-            elif key in _dicts:
-                query[key] = parse_dict(data[key])
-            else:
-                query[key] = data[key]
-
-    print query
-    query['q'] = models.Movie.objects.find(data, user)
-    if 'r' in data:
-        r = data['r'].split(':')
-        if len(r) == 1: r.append(0)
-        if r[0] == '': r[0] = 0
-        if r[1] == '': r[0] = -1
-        query['i'] = int(r[0])
-        query['o'] = int(r[1])
-    #group by only allows sorting by name or number of itmes
-    return query
-'''
 
 def api_find(request):
     '''
@@ -159,7 +125,7 @@ def api_find(request):
             {'query': query, 'sort': string, 'range': array}
         
             query: query object, more on query syntax at
-                   http://wiki.0xdb.org/wiki/QuerySyntax
+                   https://wiki.0x2620.org/wiki/0xdb2QuerySyntax
             sort:  string or arrays of keys; to sort key in descending order prefix with -
                    default: ['director', '-year'] 
             range:       result range, array [from, to]
@@ -184,25 +150,25 @@ def api_find(request):
                 'data': {items=int, files=int, pixels=int, size=int, duration=int}}
     '''
     data = json.loads(request.POST['data'])
+    if settings.JSON_DEBUG:
+        print json.dumps(data, indent=2)
     query = _parse_query(data, request.user)
+    
     response = json_response({})
     if 'keys' in query:
         response['data']['items'] = []
         qs = _order_query(query['qs'], query['sort'])
-        if 'n' in query:
-            response = {'items': qs.count()}
-        else:
-            _p = query['keys']
-            def only_p(m):
-                r = {}
-                if m:
-                    m = json.loads(m)
-                    for p in _p:
-                        r[p] = m[p]
-                return r
-            qs = qs[query['range'][0]:query['range'][1]]
+        _p = query['keys']
+        def only_p(m):
+            r = {}
+            if m:
+                m = json.loads(m)
+                for p in _p:
+                    r[p] = m[p]
+            return r
+        qs = qs[query['range'][0]:query['range'][1]]
 
-            response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]
+        response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]
 
     elif 'group' in query:
         if query['s'].split(':')[0] not in ('name', 'items'):
@@ -242,7 +208,8 @@ def api_find(request):
     else:
         #FIXME: also filter lists here
         movies = models.Movie.objects.filter(available=True)
-        files = models.File.objects.all()
+        movies = query['qs']
+        files = models.File.objects.all().filter(movie__in=movies)
         response['data']['items'] = movies.count()
         response['data']['files'] = files.count()
         r = files.aggregate(Count('size'), Count('pixels'), Count('duration'))
