@@ -86,21 +86,6 @@ def _order_query(qs, sort, prefix='sort__'):
         qs = qs.order_by(*order_by)
     return qs
 
-'''
-def _order_query(qs, sort, prefix='sort__'):
-    order_by = []
-    for e in sort.split(','):
-        o = e.split(':')
-        if len(o) == 1: o.append('asc')
-        order = {'id': 'movieId'}.get(o[0], o[0])
-        order = '%s%s' % (prefix, order)
-        if o[1] == 'desc':
-           order = '-%s' % order
-        order_by.append(order)
-    if order_by:
-        qs = qs.order_by(*order_by)
-    return qs
-'''
 def _parse_query(data, user):
     query = {}
     query['range'] = [0, 100]

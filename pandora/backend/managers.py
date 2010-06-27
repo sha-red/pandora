@@ -74,8 +74,6 @@ class MovieManager(Manager):
             else:
                 exclude = False
             if keyType(k) == "string":
-                startswith = op.startswith('^')
-                endswith = op.endswith('$')
                 if op == '=':
                     k = '%s__iexact' % k
                 elif op == '^':
@@ -146,101 +144,6 @@ class MovieManager(Manager):
         l = data.get('list', 'all')
         qs = self.filter_list(qs, l, user)
         return qs
-
-    """
-    def find(self, data, user):
-        '''
-            construct query set from q value in request,
-            also checks for lists.
-            range and order must be applied later
-        '''
-        '''
-        q = ''
-        for i in request.META['QUERY_STRING'].split('&'):
-          if i.startswith('q='):
-            q = i[2:]
-		'''
-		q = data['q']
-        op = ','
-        if '|' in q:
-            op = '|'
-        conditions = []
-        for e in q.split(op):
-            e = e.split(':')
-            if len(e) == 1: e = ['all'] + e
-            k, v = e
-            exclude = False
-            if v.startswith('!'):
-                v = v[1:]
-                exclude = True
-            if keyType(k) == "string":
-                startswith = v.startswith('^')
-                endswith = v.endswith('$')
-                if startswith and endswith:
-                    v = v[1:-1]
-                    k = '%s__iexact' % k
-                elif startswith:
-                    v = v[1:]
-                    k = '%s__istartswith' % k
-                elif v.endswith('$'):
-                    v = v[:-1]
-                    k = '%s__iendswith' % k
-                else:
-                    k = '%s__icontains' % k
-                k = 'find__%s' % k
-                v = unquote(v)
-                if exclude:
-                    conditions.append(~Q(**{k:v}))
-                else:
-                    conditions.append(Q(**{k:v}))
-            else:
-                def parseDate(d):
-                    while len(d) < 3:
-                        d.append(1)
-                    return datetime(*[int(i) for i in d])
-                #1960-1970
-                match = re.compile("(-?[\d\.]+?)-(-?[\d\.]+$)").findall(v)
-                if match:
-                    v1 = match[0][0]
-                    v2 = match[0][1]
-                    if keyType(k) == "date":
-                        v1 = parseDate(v1.split('.'))
-                        v2 = parseDate(v2.split('.'))
-                    if exclude: #!1960-1970
-                        k1 = str('%s__lt' % k)
-                        k2 = str('%s__gte' % k)
-                        conditions.append(Q(**{k1:v1})|Q(**{k2:v2}))
-                    else: #1960-1970
-                        k1 = str('%s__gte' % k)
-                        k2 = str('%s__lt' % k)
-                        conditions.append(Q(**{k1:v1})&Q(**{k2:v2}))
-                else:
-                    if keyType(k) == "date":
-                        v = parseDate(v.split('.'))
-                    k = str('%s' % k)
-                    if exclude: #!1960
-                        conditions.append(~Q(**{k:v}))
-                    else: #1960
-                        conditions.append(Q(**{k:v}))
-
-        #join query with operator
-        qs = self.get_query_set()
-        #only include movies that have hard metadata
-        qs = qs.filter(available=True)
-        if conditions:
-            q = conditions[0]
-            for c in conditions[1:]:
-                if op == '|':
-                    q = q | c
-                else:
-                    q = q & c
-            qs = qs.filter(q)
-
-        # filter list, works for own or public lists
-        l = data.get('l', 'all')
-        qs = self.filter_list(qs, l, user)
-        return qs
-    """
 
 class FileManager(Manager):
     def get_query_set(self):
