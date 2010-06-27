@@ -78,15 +78,9 @@ def api_error(request):
 
 def _order_query(qs, sort, prefix='sort__'):
     order_by = []
-    if isinstance(sort, basestring):
-        sort = [sort, ]
     for e in sort:
-        desc = ''
-        if e.startswith('-'):
-            e = e[1:]
-            desc = '-'
-        order = {'id': 'movieId'}.get(e, e)
-        order = '%s%s%s' % (desc, prefix, order)
+        key = {'id': 'movieId'}.get(e['key'], e['key'])
+        order = '%s%s%s' % (e['operator'], prefix, key)
         order_by.append(order)
     if order_by:
         qs = qs.order_by(*order_by)
@@ -122,12 +116,21 @@ def _parse_query(data, user):
 def api_find(request):
     '''
         param data
-            {'query': query, 'sort': string, 'range': array}
+            {'query': query, 'sort': array, 'range': array}
         
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/0xdb2QuerySyntax
-            sort:  string or arrays of keys; to sort key in descending order prefix with -
-                   default: ['director', '-year'] 
+            sort: array of key, operator dics
+                [
+                    {
+                        key: "year",
+                        operator: "-"
+                    },
+                    {
+                        key: "director",
+                        operator: ""
+                    }
+                ]
             range:       result range, array [from, to]
             keys:  array of keys to return
             group:    group elements by, country, genre, director...
