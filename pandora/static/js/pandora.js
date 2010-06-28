@@ -429,7 +429,6 @@ $(function(){
     }).appendTo(mainPanel)
     */
     var content = new Ox.Container()
-                        .css({'background-color': 'red'})
                         .appendTo(mainPanel);
 
     /*
@@ -449,10 +448,70 @@ $(function(){
         }
     });
     */
-    var results = new Ox.List({
-        
-    }).appendTo(content);
+    var loadResult = function(find) {
+        var columns = [ {
+                align: "left",
+                id: "title",
+                operator: "+",
+                title: "Title",
+                width: 160
+            },
+            {
+                align: "left",
+                id: "director",
+                operator: "+",
+                title: "Director",
+                width: 160
+            },
+            {
+                align: "right",
+                id: "year",
+                operator: "-",
+                title: "Year",
+                width: 80
+            }
+        ];
+        if(find.key=='country') {
+            columns[columns.length] = {
+                align: "right",
+                id: "country",
+                operator: "+",
+                title: "Country",
+                width: 80
+            };
+        }
+        return new Ox.TextList({
+            columns: columns,
+            request: function(options) {
+                app.request("find", $.extend(options, {
+                    query: {
+                        conditions: [
+                            {
+                                key: find.key,
+                                value: find.value,
+                                operator: "="
+                            }
+                        ],
+                        operator: "&"
+                    }
+                }), options.callback);
+            },
+            sort: {
+                key: "year",
+                operator: "-"
+            }
+        });
+    }
+    var results = loadResult({value:'', key:'title'}).appendTo(content);
 
+    Ox.Event.bind(false, 'submit_find', function(event, data) {
+        var r = loadResult({
+            'value': data.value,
+            'key': data.option.substr(6).toLowerCase()
+        });
+        results.replaceWith(r);
+        results = r;
+    });
     
     app.launch();
 });
