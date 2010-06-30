@@ -106,7 +106,7 @@ def api_find(request):
             {'query': query, 'sort': array, 'range': array}
         
             query: query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/0xdb2QuerySyntax
+                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
             sort: array of key, operator dics
                 [
                     {
@@ -131,7 +131,7 @@ Groups
             {'query': query, 'key': string, 'group': string, 'range': array}
         
             query: query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/0xdb2QuerySyntax
+                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
             range:       result range, array [from, to]
             keys:  array of keys to return
             group:    group elements by, country, genre, director...
@@ -152,7 +152,7 @@ Positions
             {'query': query, 'ids': []}
         
             query: query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/0xdb2QuerySyntax
+                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
             ids:  ids of items for which positions are required
     '''
     data = json.loads(request.POST['data'])
