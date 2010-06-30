@@ -931,7 +931,7 @@ class Review(models.Model):
         if q.count() > 0:
             o = q[0]
         else:
-            o = self.objects.create(movie=movie, url=g)
+            o = self.objects.create(movie=movie, url=url)
             o.save()
         return o
     get_or_create = classmethod(get_or_create)

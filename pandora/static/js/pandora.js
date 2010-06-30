@@ -1,4 +1,5 @@
 $(function(){
+    Ox.theme("modern");
     app = new Ox.App({
         requestURL: "/api/"
     });
@@ -481,6 +482,7 @@ $(function(){
                     query: query
                 }), options.callback);
             },
+            id: "results",
             sort: [{
                 key: "year",
                 operator: "-"
