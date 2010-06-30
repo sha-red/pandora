@@ -55,7 +55,7 @@ $(function(){
                                     Ox.print('app.menu.find.autocomplete: field: ', field);
                                     if(field == 'all') {
                                         callback([]);
-                                    } else {
+                                    } else {                                    
                                         value = value.toLowerCase();
                                         //var order = $.inArray(field, ['year', 'date'])?'-':'';
                                         app.request('find', {
@@ -69,7 +69,7 @@ $(function(){
                                                 ]
                                             },
                                             list: 'all',
-                                            sort: field,
+                                            sort: [{key:field, operator: ''}],
                                             keys: [field],
                                             range: [0, 10]
                                         }, function(result) {
@@ -448,12 +448,13 @@ $(function(){
         }
     });
     */
-    var loadResult = function(find) {
+    var loadResult = function(query) {
         var columns = [ {
                 align: "left",
                 id: "title",
                 operator: "+",
                 title: "Title",
+                visible: true,
                 width: 160
             },
             {
@@ -461,6 +462,7 @@ $(function(){
                 id: "director",
                 operator: "+",
                 title: "Director",
+                visible: true,
                 width: 160
             },
             {
@@ -468,46 +470,38 @@ $(function(){
                 id: "year",
                 operator: "-",
                 title: "Year",
+                visible: true,
                 width: 80
-            }
+            }	
         ];
-        if(find.key=='country') {
-            columns[columns.length] = {
-                align: "right",
-                id: "country",
-                operator: "+",
-                title: "Country",
-                width: 80
-            };
-        }
         return new Ox.TextList({
             columns: columns,
             request: function(options) {
                 app.request("find", $.extend(options, {
-                    query: {
-                        conditions: [
-                            {
-                                key: find.key,
-                                value: find.value,
-                                operator: "="
-                            }
-                        ],
-                        operator: "&"
-                    }
+                    query: query
                 }), options.callback);
             },
-            sort: {
+            sort: [{
                 key: "year",
                 operator: "-"
-            }
+            }]
         });
     }
-    var results = loadResult({value:'', key:'title'}).appendTo(content);
+    var results = loadResult({
+        conditions: [],
+        operator: "&"
+    }).appendTo(content);
 
     Ox.Event.bind(false, 'submit_find', function(event, data) {
         var r = loadResult({
-            'value': data.value,
-            'key': data.option.substr(6).toLowerCase()
+            conditions: [
+                {
+                    key: data.option.substr(6).toLowerCase(),
+                    value: data.value,
+                    operator: "~"
+                }
+            ],
+            operator: "&"
         });
         results.replaceWith(r);
         results = r;
