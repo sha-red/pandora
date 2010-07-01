@@ -188,9 +188,13 @@ Positions
             'country': models.Country.objects,
             'genre': models.Genre.objects,
             'language': models.Language.objects,
-            'director': models.Person.objects.filter(cast__role='directors'),
+            'director': models.Cast.objects.filter(role='directors'),
         }
-        if query['group'] in _objects:
+        if query['group'] == "director":
+            qs = _objects[query['group']].filter(movie__id__in=movie_qs).values('person__name').annotate(movies=Count('person__id')).order_by()
+            name = 'person__name'
+
+        elif query['group'] in _objects:
             qs = _objects[query['group']].filter(movies__id__in=movie_qs).values('name').annotate(movies=Count('movies'))
         elif query['group'] == "year":
             qs = models.MovieSort.objects.filter(movie__id__in=movie_qs).values('year').annotate(movies=Count('year'))
@@ -199,7 +203,7 @@ Positions
         for i in range(0, len(query['sort'])):
             if query['sort'][i]['key'] == 'name':
                 if query['group'] in ('director', ):
-                    query['sort'][i]['key'] = name+'_sort'
+                    query['sort'][i]['key'] = 'person__name_sort'
                 else:
                     query['sort'][i]['key'] = name
             if query['sort'][i]['key'] == 'items':
