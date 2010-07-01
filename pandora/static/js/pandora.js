@@ -1,4 +1,7 @@
 $(function(){
+    Ox.debug = Ox.print;
+    Ox.print = function() {};
+
     Ox.theme("modern");
     app = new Ox.App({
         requestURL: "/api/"
@@ -52,11 +55,15 @@ $(function(){
                         new Ox.Input({
                             autocomplete: function(option, value, callback) {
                                     var field = option.substring(6).toLowerCase();
-                                    Ox.print('app.menu.find.autocomplete: option: ', option, 'value: ', value, ', callback:',callback);
-                                    Ox.print('app.menu.find.autocomplete: field: ', field);
+                                    if(typeof(callback) == 'undefined') {
+                                        callback = value;
+                                        value = null;
+                                    }
+                                    Ox.debug('app.menu.find.autocomplete: option: ', option, 'value: ', value, ', callback:',callback);
+                                    Ox.debug('app.menu.find.autocomplete: field: ', field);
                                     if(field == 'all') {
                                         callback([]);
-                                    } else {                                    
+                                    } else if (value) {
                                         value = value.toLowerCase();
                                         //var order = $.inArray(field, ['year', 'date'])?'-':'';
                                         app.request('find', {
@@ -173,7 +180,7 @@ $(function(){
     });
 
     var pageDialog = function(title, page) {
-        Ox.print(title, page);
+        Ox.debug(title, page);
         var $dialog = new Ox.Dialog({
             title: title,
             buttons: [
@@ -187,18 +194,18 @@ $(function(){
         .open();
     };
     //this should be: mainMenu.bind('click_about', function(event) {
-    Ox.Event.bind(app.menu.id, 'click_about', function() {
+    app.menu.bindEvent('click_about', function() {
         pageDialog('About ' + site.name, site.pages.about);
     });
-    Ox.Event.bind(app.menu.id, 'click_faq', function() {
+    app.menu.bindEvent('click_faq', function() {
         pageDialog(app.menu.getItem('faq').options('title')[0],
                    site.pages.faq);
     });
-    Ox.Event.bind(app.menu.id, 'click_tos', function() {
+    app.menu.bindEvent('click_tos', function() {
         pageDialog(app.menu.getItem('tos').options('title')[0],
                    site.pages.tos);
     });
-    Ox.Event.bind(app.menu.id, 'click_sas', function() {
+    app.menu.bindEvent('click_sas', function() {
         pageDialog(app.menu.getItem('sas').options('title')[0],
                    site.pages.sas);
     });
@@ -225,7 +232,7 @@ $(function(){
         return that;
     };
 
-    Ox.Event.bind(app.menu.id, 'click_contact', function() {
+    app.menu.bindEvent('click_contact', function() {
         var labelWidth = 64;
         var inputWidth = 380;
 
@@ -285,15 +292,15 @@ $(function(){
         .append(form)
         .open();
     });
-    Ox.Event.bind(app.menu.id, 'click_technology', function() {
+    app.menu.bindEvent('click_technology', function() {
         pageDialog(app.menu.getItem('technology').options('title')[0],
                    site.pages.technology);
     });
-    Ox.Event.bind(app.menu.id, 'click_source', function() {
+    app.menu.bindEvent('click_source', function() {
         pageDialog(app.menu.getItem('source').options('title')[0],
                    site.pages.source);
     });
-    Ox.Event.bind(app.menu.id, 'click_report', function() {
+    app.menu.bindEvent('click_report', function() {
         pageDialog(app.menu.getItem('report').options('title')[0],
                    site.pages.report);
     });
@@ -304,10 +311,10 @@ $(function(){
         this.menu.getItem('logout').toggle();
         this.menu.getItem('status').options('title', "User: not logged in");
     };
-    Ox.Event.bind(app.menu.id, 'click_logout', function(event, data) {
+    app.menu.bindEvent('click_logout', function(event, data) {
         app.logout();
     });
-    Ox.Event.bind(app.menu.id, 'click_login', function(element) {
+    app.menu.bindEvent('click_login', function(element) {
         var labelWidth = 64;
         var inputWidth = labelWidth+200;
         var loginForm = new OxForm({
@@ -434,8 +441,8 @@ $(function(){
 
     /*
     tabbar.bind('OxButtonToggle', function(event, data) {
-        Ox.print('tabbar selected');
-        Ox.print(data.value);
+        Ox.debug('tabbar selected');
+        Ox.debug(data.value);
         if(data.value=='Info') {
             content.html('this is for testing purposes only, lets get down to it...');
         } else if(data.value=='Scenes') {
@@ -449,8 +456,8 @@ $(function(){
         }
     });
     */
-    var loadResult = function(query) {
-        var columns = [ {
+    app.results = new Ox.TextList({
+        columns: [ {
                 align: "left",
                 id: "title",
                 operator: "+",
@@ -474,40 +481,35 @@ $(function(){
                 visible: true,
                 width: 80
             }	
-        ];
-        return new Ox.TextList({
-            columns: columns,
-            request: function(options) {
-                app.request("find", $.extend(options, {
-                    query: query
-                }), options.callback);
-            },
-            id: "results",
-            sort: [{
-                key: "year",
-                operator: "-"
-            }]
-        });
-    }
-    var results = loadResult({
-        conditions: [],
-        operator: "&"
+        ],
+        request: function(options) {
+            app.request("find", $.extend(options, {
+                query: {
+                    conditions: [],
+                    operator: "&"
+                }
+            }), options.callback);
+        },
+        id: "results",
+        sort: [{
+            key: "year",
+            operator: "-"
+        }]
     }).appendTo(content);
 
-    Ox.Event.bind(false, 'submit_find', function(event, data) {
-        var r = loadResult({
-            conditions: [
-                {
-                    key: data.option.substr(6).toLowerCase(),
-                    value: data.value,
-                    operator: "~"
-                }
-            ],
-            operator: "&"
+    app.bindEvent('submit_find', function(event, data) {
+        app.results.options({
+            request: function(options) {
+                app.request("find", $.extend(options, {
+                    query: {
+                        key: data.option.substr(6).toLowerCase(),
+                        value: data.value,
+                        operator: "~"
+                    }
+                }), options.callback);
+            },
         });
-        results.replaceWith(r);
-        results = r;
     });
-    
     app.launch();
 });
+
