@@ -101,6 +101,8 @@ class MovieManager(Manager):
                     if keyType(k) == "date":
                         v1 = parseDate(v1.split('.'))
                         v2 = parseDate(v2.split('.'))
+
+                    k = 'find__%s' % k
                     if exclude: #!1960-1970
                         k1 = str('%s__lt' % k)
                         k2 = str('%s__gte' % k)
@@ -112,15 +114,18 @@ class MovieManager(Manager):
                 else:
                     if keyType(k) == "date":
                         v = parseDate(v.split('.'))
-                    if op == '>':
-                        k = str('%s__gt' % k)
+                    if op == '=':
+                        k = '%s__exact' % k
+                    elif op == '>':
+                        k = '%s__gt' % k
                     elif op == '>=':
-                        k = str('%s__gte' % k)
+                        k = '%s__gte' % k
                     elif op == '<':
-                        k = str('%s__lt' % k)
+                        k = '%s__lt' % k
                     elif op == '<=':
-                        k = str('%s__lte' % k)
+                        k = '%s__lte' % k
 
+                    k = 'find__%s' % k
                     k = str(k)
                     if exclude: #!1960
                         conditions.append(~Q(**{k:v}))

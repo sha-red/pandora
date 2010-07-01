@@ -11,7 +11,7 @@ from django import forms
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.db.models import Q, Avg, Count
+from django.db.models import Q, Avg, Count, Sum
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from django.template import RequestContext
@@ -38,7 +38,7 @@ from oxuser.views import api_login, api_logout, api_register, api_contact, api_r
 def api(request):
     if request.META['REQUEST_METHOD'] == "OPTIONS":
         response = HttpResponse('')
-        #response = render_to_json_response({'status': {'code': 200, 'text': 'please use POST'}})
+        response = render_to_json_response({'status': {'code': 200, 'text': 'use POST'}})
         response['Access-Control-Allow-Origin'] = '*'
         return response
     if not 'action' in request.POST:
@@ -91,7 +91,7 @@ def _order_query(qs, sort, prefix='sort__'):
 def _parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
-    query['sort'] = (['title', 'asc'])
+    query['sort'] = [{'key':'title', 'operator':'+'}]
     for key in ('sort', 'keys', 'group', 'list', 'range', 'ids'):
         if key in data:
             query[key] = data[key]
@@ -99,6 +99,15 @@ def _parse_query(data, user):
     query['qs'] = models.Movie.objects.find(data, user)
     #group by only allows sorting by name or number of itmes
     return query
+
+def _get_positions(ids, get_ids):
+    positions = {}
+    for i in get_ids:
+        try:
+            positions[i] = ids.index(i)
+        except:
+            pass
+    return positions
 
 def api_find(request):
     '''
@@ -161,23 +170,15 @@ Positions
     query = _parse_query(data, request.user)
     
     response = json_response({})
-    if 'keys' in query:
-        response['data']['items'] = []
-        qs = _order_query(query['qs'], query['sort'])
-        _p = query['keys']
-        def only_p(m):
-            r = {}
-            if m:
-                m = json.loads(m)
-                for p in _p:
-                    r[p] = m.get(p, '')
-            return r
-        qs = qs[query['range'][0]:query['range'][1]]
-
-        response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]
-    elif 'group' in query:
-        if 'sort' in query and query['sort'][0] not in ('name', 'items'):
-            query['sort'] = [{'key': 'name', 'operator':'-'}, ]
+    if 'group' in query:
+        if 'sort' in query:
+            if len(query['sort']) == 1 and query['sort'][0]['key'] == 'items':
+                if query['group'] == "year":
+                    query['sort'].append({'key': 'name', 'operator':'-'})
+                else:
+                    query['sort'].append({'key': 'name', 'operator':'+'})
+        else:
+            query['sort'] = [{'key': 'name', 'operator':'+'}]
         #FIXME: also filter lists here
         response['data']['items'] = []
         name = 'name'
@@ -191,39 +192,67 @@ Positions
         }
         if query['group'] in _objects:
             qs = _objects[query['group']].filter(movies__id__in=movie_qs).values('name').annotate(movies=Count('movies'))
-            qs = qs.order_by('name')
         elif query['group'] == "year":
             qs = models.MovieSort.objects.filter(movie__id__in=movie_qs).values('year').annotate(movies=Count('year'))
-            qs = qs.order_by('-year')
             name='year'
-        if 'range' in data:
-            #replace normalized items/name sort with actual db value
-            query['sort'][0]['key'] = name
+        #replace normalized items/name sort with actual db value
+        for i in range(0, len(query['sort'])):
+            if query['sort'][i]['key'] == 'name':
+                if query['group'] in ('director', ):
+                    query['sort'][i]['key'] = name+'_sort'
+                else:
+                    query['sort'][i]['key'] = name
+            if query['sort'][i]['key'] == 'items':
+                query['sort'][i]['key'] = items
+        qs = _order_query(qs, query['sort'], prefix='')
+        if 'ids' in query:
+            #FIXME: this does not scale for larger results
+            response['data']['positions'] = {}
+            ids = [j[name] for j in qs]
+            response['data']['positions'] = _get_positions(ids, query['ids'])
 
-            #qs = _order_query(qs, query['sort'])
+        elif 'range' in data:
             qs = qs[query['range'][0]:query['range'][1]]
-            print qs.query 
-            response['data']['items'] = [{'title': i[name], 'items': i[items]} for i in qs]
+            response['data']['items'] = [{'name': i[name], 'items': i[items]} for i in qs]
         else:
             response['data']['items'] = qs.count()
     elif 'ids' in query:
+        #FIXME: this does not scale for larger results
         qs = _order_query(query['qs'], query['sort'])
         
         response['data']['positions'] = {}
         ids = [j['movieId'] for j in qs.values('movieId')]
-        for i in query['ids']:
-            response['data']['positions'][i] = ids.index(i)
-    else:
-        #FIXME: also filter lists here
-        movies = models.Movie.objects.filter(available=True)
+        response['data']['positions'] = _get_positions(ids, query['ids'])
+
+    elif 'keys' in query:
+        response['data']['items'] = []
+        qs = _order_query(query['qs'], query['sort'])
+        _p = query['keys']
+        def only_p(m):
+            r = {}
+            if m:
+                m = json.loads(m)
+                for p in _p:
+                    r[p] = m.get(p, '')
+            return r
+
+        qs = qs[query['range'][0]:query['range'][1]]
+        response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]
+    else: # otherwise stats
+        #movies = models.Movie.objects.filter(available=True)
         movies = query['qs']
         files = models.File.objects.all().filter(movie__in=movies)
-        response['data']['items'] = movies.count()
-        response['data']['files'] = files.count()
-        r = files.aggregate(Count('size'), Count('pixels'), Count('duration'))
-        response['data']['pixels'] = r['pixels__count']
-        response['data']['size'] = r['size__count']
+        r = files.aggregate(
+            Count('duration'),
+            Count('pixels'),
+            Count('size')
+        )
         response['data']['duration'] = r['duration__count']
+        response['data']['files'] = files.count()
+        response['data']['items'] = movies.count()
+        response['data']['pixels'] = r['pixels__count']
+        response['data']['runtime'] = movies.aggregate(Sum('sort__runtime'))['sort__runtime__sum']
+        response['data']['size'] = r['size__count']
     return render_to_json_response(response)
 
 def api_getItem(request):
