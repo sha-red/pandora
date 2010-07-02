@@ -184,18 +184,15 @@ Positions
         name = 'name'
         items = 'movies'
         movie_qs = query['qs']
-        _objects = {
-            'country': models.Country.objects,
-            'genre': models.Genre.objects,
-            'language': models.Language.objects,
-            'director': models.Cast.objects.filter(role='directors'),
-        }
         if query['group'] == "director":
-            qs = _objects[query['group']].filter(movie__id__in=movie_qs).values('person__name').annotate(movies=Count('person__id')).order_by()
+            qs = models.Cast.objects.filter(role='directors').filter(movie__id__in=movie_qs).values('person__name').annotate(movies=Count('person__id')).order_by()
             name = 'person__name'
-
-        elif query['group'] in _objects:
-            qs = _objects[query['group']].filter(movies__id__in=movie_qs).values('name').annotate(movies=Count('movies'))
+        elif query['group'] == "country":
+            qs = models.Country.objects.filter(movies__id__in=movie_qs).values('name').annotate(movies=Count('id'))
+        elif query['group'] == "genre":
+            qs = models.Genre.objects.filter(movies__id__in=movie_qs).values('name').annotate(movies=Count('id'))
+        elif query['group'] == "language":
+            qs = models.Language.objects.filter(movies__id__in=movie_qs).values('name').annotate(movies=Count('id'))
         elif query['group'] == "year":
             qs = models.MovieSort.objects.filter(movie__id__in=movie_qs).values('year').annotate(movies=Count('year'))
             name='year'
