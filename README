@@ -1,6 +1,6 @@
 To setup a local instance of pandora:
 
-    bzr branch http://code.0xdb.org/pandora pandora
+    bzr branch http://code.0x2620.org/pandora pandora
     cd pandora
     virtualenv .
     pip -E . install -r requirements.txt
@@ -11,6 +11,7 @@ you need python, bazaar, pip and virtualenv:
     apt-get install python-setuptools bzr
     easy_install pip
     pip install virtualenv
+    apt-get install python-dev python-imaging
 
 also it uses system python moduels, so make sure you have
  ipython, dbmodule(psycopg2, python-mysqldb,..)
@@ -28,9 +29,7 @@ Install rabbitmq and carrot:
 
 Development:
     we are using django, http://docs.djangoproject.com/en/dev/
-    communication between webserver and background tasks is done via rabbitmq
-    http://github.com/ask/carrot/ for more info on the lib used to communicate
-
+    
 
 Apache setup:
     sudo apt-get install libapache2-mod-wsgi libapache2-mod-xsendfile
