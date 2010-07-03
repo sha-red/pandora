@@ -13,7 +13,7 @@ import models
 
 
 def keyType(key):
-    if key in ('released'):
+    if key in ('released', ):
         return "date"
     if key in ('year', 'cast.length'):
         return "int"
@@ -66,8 +66,10 @@ class MovieManager(Manager):
         conditions = []
         for condition in data['query']['conditions']:
             k = condition.get('key', 'all')
+            if not k: k = 'all'
             v = condition['value']
             op = condition.get('operator', None)
+            if not op: op = '~'
             if op.startswith('!'):
                 op = op[1:]
                 exclude = True
