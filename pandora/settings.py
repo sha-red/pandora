@@ -106,7 +106,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'django_extensions',
     'devserver',
-#    'south',
+    'south',
     'djcelery',
 
     'app',

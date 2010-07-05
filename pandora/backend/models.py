@@ -300,9 +300,9 @@ class Movie(models.Model):
     poster = models.TextField(blank=True)
     posters_disabled = models.TextField(blank=True)
     posters_available = models.TextField(blank=True)
-    poster_height = models.IntegerField(null=True, blank=True)
-    poster_width = models.IntegerField(null=True, blank=True)
     '''
+    poster_height = models.IntegerField(default=0)
+    poster_width = models.IntegerField(default=0)
 
     #stream related fields
     '''
@@ -374,7 +374,9 @@ class Movie(models.Model):
         'rating': 'rating',
         'votes': 'votes',
         'alternative_titles': 'alternative_titles',
-        'connections_json': 'connections'
+        'connections_json': 'connections',
+        'posterWidth': 'poster_width',
+        'posterHeight': 'poster_height'
     }
     def get_json(self, fields=None):
         movie = {}
