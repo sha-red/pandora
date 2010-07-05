@@ -375,8 +375,8 @@ class Movie(models.Model):
         'votes': 'votes',
         'alternative_titles': 'alternative_titles',
         'connections_json': 'connections',
-        'posterWidth': 'poster_width',
-        'posterHeight': 'poster_height'
+        'poster_width': 'posterWidth',
+        'poster_height': 'posterHeight'
     }
     def get_json(self, fields=None):
         movie = {}
