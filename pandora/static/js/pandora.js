@@ -391,6 +391,8 @@ $(function(){
         .open();
     });
 
+    Ox.print("--------");
+
     var bottomPanel = Ox.Toolbar({size: "small"})
         .css({
             zIndex: 2,
@@ -429,9 +431,6 @@ $(function(){
     }).appendTo(sidePanel);
 
     historyPanel.$content.html("Paris<br/>Matirx<br/>Godard")
-
-    Ox.print("--------");
-
 
     /*
     var tabbar = new Ox.Tabbar({
