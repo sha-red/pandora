@@ -369,6 +369,7 @@ $(function(){
             orientation: "vertical"
         }).appendTo(d);
 
+        Ox.print("--------");
 
         var $dialog = new Ox.Dialog({
             title: "Login",
@@ -390,8 +391,6 @@ $(function(){
         .append(d)
         .open();
     });
-
-    Ox.print("--------");
 
     var bottomPanel = Ox.Toolbar({size: "small"})
         .css({
