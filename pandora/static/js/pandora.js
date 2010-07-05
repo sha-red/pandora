@@ -13,9 +13,9 @@ $(function(){
         $toolbars = [];
 
     var sidePanel = new Ox.Panel();
-    var mainPanel = new Ox.Panel().css({
+    var mainPanel = new Ox.Panel()/*.css({
         //borderLeft: "1px solid rgb(160, 160, 160)"
-    });
+    })*/;
     var middleSplitPanel = Ox.SplitPanel({
         elements: [
             {
