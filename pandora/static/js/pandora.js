@@ -2,8 +2,6 @@ $(function(){
     //Ox.debug = Ox.print;
     //Ox.print = function() {};
 
-    Ox.print("--------");
-
     Ox.theme("modern");
     app = new Ox.App({
         requestURL: "/api/"
@@ -16,6 +14,7 @@ $(function(){
     var mainPanel = new Ox.Panel()/*.css({
         //borderLeft: "1px solid rgb(160, 160, 160)"
     })*/;
+    Ox.print("--------");
     var middleSplitPanel = Ox.SplitPanel({
         elements: [
             {
