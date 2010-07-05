@@ -337,6 +337,8 @@ $(function(){
             'padding-top': '48px',
         });
 
+        Ox.print(-1);
+
         var submit = function() {
             app.request('login', loginForm.values(), function(result) {
                 if(result.status.code == 200) {
