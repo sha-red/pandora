@@ -14,7 +14,6 @@ $(function(){
     var mainPanel = new Ox.Panel()/*.css({
         //borderLeft: "1px solid rgb(160, 160, 160)"
     })*/;
-    Ox.print("--------");
     var middleSplitPanel = Ox.SplitPanel({
         elements: [
             {
@@ -179,6 +178,8 @@ $(function(){
         ],
         size: "large"
     });
+
+    Ox.print("--------");
 
     var pageDialog = function(title, page) {
         Ox.debug(title, page);
