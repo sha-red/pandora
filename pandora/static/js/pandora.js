@@ -70,7 +70,7 @@ $(function() {
                 { id: "profit", title: "Profit", operator: "-", align: "right", width: 90 },
                 { id: "rating", title: "Rating", operator: "-", align: "right", width: 60 },
                 { id: "votes", title: "Votes", operator: "-", align: "right", width: 90 },
-                { id: "id", title: "ID", operator: "", align: "left", width: 90 }
+                { id: "id", title: "ID", operator: "", align: "left", width: 90 },
                 { id: "aspectratio", title: "Aspect Ratio", operator: "-", align: "left", width: 90 },
                 { id: "duration", title: "Duration", operator: "-", align: "right", width: 90 },
                 { id: "color", title: "Color", operator: "", align: "left", width: 90 },
