@@ -1,6 +1,6 @@
 $(function(){
     Ox.debug = Ox.print;
-    Ox.print = function() {};
+    //Ox.print = function() {};
 
     Ox.theme("modern");
     app = new Ox.App({
@@ -49,54 +49,7 @@ $(function(){
         .css({
             marginLeft: "4px"
         });
-
     app.menu = new Ox.MainMenu({
-                    extras: [
-                        new Ox.Input({
-                            autocomplete: function(option, value, callback) {
-                                    var field = option.substring(6).toLowerCase();
-                                    if(typeof(callback) == 'undefined') {
-                                        callback = value;
-                                        value = null;
-                                    }
-                                    Ox.debug('app.menu.find.autocomplete: option: ', option, 'value: ', value, ', callback:',callback);
-                                    Ox.debug('app.menu.find.autocomplete: field: ', field);
-                                    if(field == 'all') {
-                                        callback([]);
-                                    } else if (value) {
-                                        value = value.toLowerCase();
-                                        //var order = $.inArray(field, ['year', 'date'])?'-':'';
-                                        app.request('find', {
-                                            query: {
-                                                conditions: [
-                                                {
-                                                    key: field,
-                                                    value: value,
-                                                    operator: '~'
-                                                }
-                                                ]
-                                            },
-                                            list: 'all',
-                                            sort: [{key:field, operator: ''}],
-                                            keys: [field],
-                                            range: [0, 10]
-                                        }, function(result) {
-                                            var items = $.map(
-                                                result.data.items,
-                                                function(item, i) { return item.title; }
-                                            );
-                                            callback(items);
-                                        });
-                                    }
-                            },
-                            clear: true,
-                            highlight: false,
-                            id: "find",
-                            label: ["Find: Title", "Find: All", "Find: Director", "Find: Country", "Find: Cinematographer"],
-                            labelWidth: 96
-                        }).width(320),
-                        loadingIcon
-                    ],
         menus: [
             {
                 id: "pandoraMM",
@@ -314,6 +267,7 @@ $(function(){
     app.menu.bindEvent('click_logout', function(event, data) {
         app.logout();
     });
+
     app.menu.bindEvent('click_login', function(element) {
         var labelWidth = 64;
         var inputWidth = labelWidth+200;
@@ -390,7 +344,6 @@ $(function(){
         .append(d)
         .open();
     });
-
     var bottomPanel = Ox.Toolbar({size: "small"})
         .css({
             zIndex: 2,
@@ -497,7 +450,7 @@ $(function(){
         }]
     }).appendTo(content);
 
-    app.bindEvent('submit_find', function(event, data) {
+    app.menu.bindEvent('submit_find', function(event, data) {
         app.results.options({
             request: function(options) {
                 app.request("find", $.extend(options, {
