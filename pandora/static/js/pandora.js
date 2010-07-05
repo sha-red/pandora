@@ -351,12 +351,16 @@ $(function(){
             });
         }
 
+        Ox.print(0);
+
         var d = new Ox.Container();
         var registerInfo = new Ox.Panel();
 
+        Ox.print(1);
+
         registerInfo.append(Ox.Element().css({'margin-left': '4px'}).append('<br>Forgot your password? <a href="">Recover Password</a><br>Dont have an account? <a href="">Register Now</a>'));
 
-        /*
+        Ox.print(2);
 
         var panel = Ox.SplitPanel({
             elements: [
@@ -371,7 +375,7 @@ $(function(){
             orientation: "vertical"
         }).appendTo(d);
 
-        */
+        Ox.print(3);
 
         var $dialog = new Ox.Dialog({
             title: "Login",
