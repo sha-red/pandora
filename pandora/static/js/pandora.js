@@ -11,9 +11,9 @@ $(function(){
         $toolbars = [];
 
     var sidePanel = new Ox.Panel();
-    var mainPanel = new Ox.Panel().css({
+    var mainPanel = new Ox.Panel()/*.css({
         //borderLeft: "1px solid rgb(160, 160, 160)"
-    });
+    })*/;
     var middleSplitPanel = Ox.SplitPanel({
         elements: [
             {
@@ -291,6 +291,8 @@ $(function(){
             'padding-top': '48px',
         });
 
+        Ox.print(-1);
+
         var submit = function() {
             app.request('login', loginForm.values(), function(result) {
                 if(result.status.code == 200) {
@@ -305,10 +307,16 @@ $(function(){
             });
         }
 
+        Ox.print(0);
+
         var d = new Ox.Container();
         var registerInfo = new Ox.Panel();
 
+        Ox.print(1);
+
         registerInfo.append(Ox.Element().css({'margin-left': '4px'}).append('<br>Forgot your password? <a href="">Recover Password</a><br>Dont have an account? <a href="">Register Now</a>'));
+
+        Ox.print(2);
 
         var panel = Ox.SplitPanel({
             elements: [
@@ -323,6 +331,7 @@ $(function(){
             orientation: "vertical"
         }).appendTo(d);
 
+        Ox.print(3);
 
         var $dialog = new Ox.Dialog({
             title: "Login",
