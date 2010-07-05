@@ -351,9 +351,6 @@ $(function(){
             });
         }
 
-        Ox.print("--------");
-
-
         var d = new Ox.Container();
         var registerInfo = new Ox.Panel();
 
@@ -432,6 +429,9 @@ $(function(){
     }).appendTo(sidePanel);
 
     historyPanel.$content.html("Paris<br/>Matirx<br/>Godard")
+
+    Ox.print("--------");
+
 
     /*
     var tabbar = new Ox.Tabbar({
