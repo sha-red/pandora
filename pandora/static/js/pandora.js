@@ -179,8 +179,6 @@ $(function(){
         size: "large"
     });
 
-    Ox.print("--------");
-
     var pageDialog = function(title, page) {
         Ox.debug(title, page);
         var $dialog = new Ox.Dialog({
@@ -352,6 +350,9 @@ $(function(){
                 }
             });
         }
+
+        Ox.print("--------");
+
 
         var d = new Ox.Container();
         var registerInfo = new Ox.Panel();
