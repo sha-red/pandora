@@ -1,6 +1,6 @@
 $(function(){
     Ox.debug = Ox.print;
-    Ox.print = function() {};
+    //Ox.print = function() {};
 
     Ox.theme("modern");
     app = new Ox.App({
