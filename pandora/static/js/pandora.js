@@ -30,6 +30,8 @@ $(function(){
         borderBottom: "1px solid rgb(160, 160, 160)"
     })*/;
 
+    Ox.print("-----");
+
     //FIXME: how to properly overwrite functions without replacing them
     var super_launch = app.launch;
     app.launch = function() {
