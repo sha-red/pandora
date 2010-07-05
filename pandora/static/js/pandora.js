@@ -1,6 +1,6 @@
 $(function(){
-    //Ox.debug = Ox.print;
-    //Ox.print = function() {};
+    Ox.debug = Ox.print;
+    Ox.print = function() {};
 
     Ox.theme("modern");
     app = new Ox.App({
@@ -92,7 +92,25 @@ $(function(){
                             clear: true,
                             highlight: false,
                             id: "find",
-                            label: ["Find: Title", "Find: All", "Find: Director", "Find: Country", "Find: Cinematographer"],
+                            label: [
+                                { id: "all", title: "Find: All" },
+                                { id: "title", title: "Find: Title" },
+                                { id: "director", title: "Find: Director" },
+                                { id: "country", title: "Find: Country" },
+                                { id: "year", title: "Find: Year" },
+                                { id: "language", title: "Find: Language" },
+                                { id: "writer", title: "Find: Writer" },
+                                { id: "producer", title: "Find: Producer" },
+                                { id: "cinematographer", title: "Find: Cinematographer" },
+                                { id: "editor", title: "Find: Editor" },
+                                { id: "actor", title: "Find: Actor" },
+                                { id: "character", title: "Find: Character" },
+                                { id: "name", title: "Find: Name" },
+                                { id: "genre", title: "Find: Genre" },
+                                { id: "keyword", title: "Find: Keyword" },
+                                { id: "summary", title: "Find: Summary" },
+                                { id: "dialog", title: "Find: Dialog" }
+                            ],
                             labelWidth: 96
                         }).width(320),
                         loadingIcon
@@ -337,8 +355,6 @@ $(function(){
             'padding-top': '48px',
         });
 
-        Ox.print(-1);
-
         var submit = function() {
             app.request('login', loginForm.values(), function(result) {
                 if(result.status.code == 200) {
@@ -353,16 +369,10 @@ $(function(){
             });
         }
 
-        Ox.print(0);
-
         var d = new Ox.Container();
         var registerInfo = new Ox.Panel();
 
-        Ox.print(1);
-
         registerInfo.append(Ox.Element().css({'margin-left': '4px'}).append('<br>Forgot your password? <a href="">Recover Password</a><br>Dont have an account? <a href="">Register Now</a>'));
-
-        Ox.print(2);
 
         var panel = Ox.SplitPanel({
             elements: [
@@ -376,8 +386,6 @@ $(function(){
             ],
             orientation: "vertical"
         }).appendTo(d);
-
-        Ox.print(3);
 
         var $dialog = new Ox.Dialog({
             title: "Login",
