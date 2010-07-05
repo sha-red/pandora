@@ -1,7 +1,7 @@
 $(function() {
 
-    Ox.debug = Ox.print;
-    Ox.print = function() {};
+    //Ox.debug = Ox.print;
+    //Ox.print = function() {};
 
     var $body = $("body"),
         $document = $(document),
@@ -684,6 +684,16 @@ $(function() {
 
     return;
 
+
+
+
+    var loadingIcon = new Ox.LoadingIcon({
+            size: "medium"
+        })
+        .css({
+            marginLeft: "4px"
+        });
+
     app.menu = new Ox.MainMenu({
                     extras: [
                         new Ox.Input({
@@ -966,6 +976,7 @@ $(function() {
     app.menu.bindEvent('click_logout', function(event, data) {
         app.logout();
     });
+
     app.menu.bindEvent('click_login', function(element) {
         var labelWidth = 64;
         var inputWidth = labelWidth+200;
@@ -1041,7 +1052,6 @@ $(function() {
         .append(d)
         .open();
     });
-
     var bottomPanel = Ox.Toolbar({size: "small"})
         .css({
             zIndex: 2,
@@ -1148,7 +1158,7 @@ $(function() {
         }]
     }).appendTo(content);
 
-    app.bindEvent('submit_find', function(event, data) {
+    app.menu.bindEvent('submit_find', function(event, data) {
         app.results.options({
             request: function(options) {
                 app.request("find", $.extend(options, {

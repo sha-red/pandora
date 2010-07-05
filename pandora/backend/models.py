@@ -139,6 +139,12 @@ def movie_path(f, size):
     url_hash = f.movieId
     return os.path.join('movie', url_hash[:2], url_hash[2:4], url_hash[4:6], name)
 
+def poster_path(f):
+    name = "%s.%s" % (f.movieId, 'jpg')
+    url_hash = f.movieId
+    return os.path.join('poster', url_hash[:2], url_hash[2:4], url_hash[4:6], name)
+
+
 class Movie(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -242,50 +248,8 @@ class Movie(models.Model):
             q = q | Q(url__contains=w.url)
         return self.reviews_all.filter(q).filter(manual=False)
 
-    '''
-    #these values get populated with imdb/oxdb values on save()
-    #edits will be overwritten
-    title = models.CharField(max_length=1000)
-    year = models.CharField(max_length=4)
-    runtime = models.IntegerField(null=True, blank=True)
-    release_date = models.DateField(null=True, blank=True)
-    tagline = models.TextField(blank=True)
-    plot = models.TextField(blank=True)
-    plot_outline = models.TextField(blank=True)
-
-    rating = models.FloatField(null=True, blank=True)
-    votes = models.IntegerField(null=True, blank=True)
-
-    budget = models.IntegerField(null=True, blank=True)
-    gross = models.IntegerField(null=True, blank=True)
-    profit = models.IntegerField(null=True, blank=True)
-
-    series_imdb = models.CharField(max_length=7, default='')
-    series_title = models.TextField(blank=True, default='')
-    episode_title = models.TextField(blank=True, default='')
-    season = models.IntegerField(default=-1)
-    episode = models.IntegerField(default=-1)
-    '''
 
     json = fields.DictField(default={}, editable=False)
-
-    '''
-    directors = fields.TupleField(default=())
-    writers = fields.TupleField(default=())
-    editors = fields.TupleField(default=())
-    producers = fields.TupleField(default=())
-    cinematographers = fields.TupleField(default=())
-    cast = fields.TupleField(default=())
-    alternative_titles = fields.TupleField(default=())
-    genres = fields.TupleField(default=())
-    keywords = fields.TupleField(default=())
-    countries = fields.TupleField(default=())
-    languages = fields.TupleField(default=())
-    trivia = fields.TupleField(default=())
-    locations = fields.TupleField(default=())
-    connections = fields.DictField(default={})
-    reviews = fields.TupleField(default=())
-    '''
 
     #FIXME: use data.0xdb.org
     '''
@@ -300,6 +264,7 @@ class Movie(models.Model):
     poster = models.TextField(blank=True)
     posters_disabled = models.TextField(blank=True)
     posters_available = models.TextField(blank=True)
+    poster = models.ImageField(default=None, blank=True, upload_to=poster_path)
     '''
     poster_height = models.IntegerField(default=0)
     poster_width = models.IntegerField(default=0)
@@ -329,24 +294,7 @@ class Movie(models.Model):
         
         if self.id:
             self.json = self.get_json()
-        '''
-        #populate auto values for faster results
-        #FIXME: why is it not possible to use setattr to set List instead of db value?
-        common_fields = [f.name for f in MovieImdb._meta.fields]
-        only_relevant = lambda f: f not in ('id', 'created', 'modified', 'imdbId')
-        common_fields = filter(only_relevant, common_fields)
-        for f in common_fields:
-            setattr(self, f, self.get(f))
-        for f in ('directors', 'writers', 'editors',  'producers', 'cinematographers', 
-                  'reviews', 'countries', 'languages',
-                  'keywords', 'genres', 'trivia', 'alternative_titles'):
-           value = getattr(self, 'get_' + f)
-           setattr(self, f, tuple([v.json() for v in value()]))
-        for f in ('cast', ):
-           value = getattr(self, 'get_' + f)
-           setattr(self, f, value())
-        self.connections = self.connections_json()
-        '''
+
         super(Movie, self).save(*args, **kwargs)
         self.updateFind()
         self.updateSort()
@@ -398,7 +346,7 @@ class Movie(models.Model):
         if fields:
             for f in fields:
                 if f.endswith('.length') and f[:-7] in ('cast', 'genre', 'trivia'):
-                    movie[f] = getattr(self.sort.all()[0], f[:-7])
+                    movie[f] = getattr(self.sort, f[:-7])
         return movie
 
     def fields(self):
