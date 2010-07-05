@@ -77,7 +77,11 @@ class MovieManager(Manager):
                 exclude = False
             if keyType(k) == "string":
                 if op == '=':
-                    k = '%s__iexact' % k
+                    if k in ('director', 'country', 'language', 'genre', 'keywords', 'location', 'writer', 'producer', 'editor', 'cinematographer'):
+                        k = '%s__icontains' % k
+                        v = u'|%s|'%v
+                    else:
+                        k = '%s__iexact' % k
                 elif op == '^':
                     v = v[1:]
                     k = '%s__istartswith' % k
