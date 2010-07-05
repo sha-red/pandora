@@ -2,6 +2,8 @@ $(function(){
     //Ox.debug = Ox.print;
     //Ox.print = function() {};
 
+    Ox.print("--------");
+
     Ox.theme("modern");
     app = new Ox.App({
         requestURL: "/api/"
@@ -29,8 +31,6 @@ $(function(){
         borderTop: "1px solid rgb(160, 160, 160)",
         borderBottom: "1px solid rgb(160, 160, 160)"
     })*/;
-
-    Ox.print("-----");
 
     //FIXME: how to properly overwrite functions without replacing them
     var super_launch = app.launch;
