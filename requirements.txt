@@ -13,3 +13,5 @@ django_extensions
 -e bzr+http://firefogg.org/dev/python-firefogg/#egg=python-firefogg
 -e git+git://github.com/dcramer/django-devserver#egg=django_devserver
 transmissionrpc
+-e git+git://github.com/toastdriven/django-haystack.git#egg=django-haystack
+pysolr
