@@ -56,6 +56,7 @@ $(function() {
                 { id: "country", title: "Country", operator: "", align: "left", width: 120 },
                 { id: "year", title: "Year", operator: "-", align: "right", width: 60 },
                 { id: "language", title: "Language", operator: "", align: "left", width: 120 },
+                { id: "runtime", title: "Runtime", operator: "", align: "right", width: 60 },
                 { id: "writer", title: "Writer", operator: "", align: "left", width: 180 },
                 { id: "producer", title: "Producer", operator: "", align: "left", width: 180 },
                 { id: "cinematographer", title: "Cinematographer", operator: "", align: "left", width: 180 },
@@ -106,10 +107,11 @@ $(function() {
                     columns: ["title", "director", "country", "year", "language", "runtime", "genre"],
                     find: { key: "all", value: "", operator: "" },
                     itemView: "info",
+                    listsSize: 192,
                     listView: "list",
                     showGroups: true,
                     showInfo: true,
-                    showList: true,
+                    showLists: true,
                     showMovies: true,
                     sort: [
                         { key: "director", operator: "" }
@@ -152,22 +154,22 @@ $(function() {
             { id: "user", title: "User", items: [
                 { id: "username", title: "User: not logged in", disabled: true },
                 {},
-                { id: "preferences", title: "Preferences", disabled: true },
+                { id: "preferences", title: "Preferences", disabled: true, keyboard: "control ," },
                 {},
                 { id: "login", title: "Login" }
             ] },
             { id: "edit", title: "Edit", items: [
-                { id: "undo", title: "Undo", disabled: true },
-                { id: "redo", title: "Redo", disabled: true },
+                { id: "undo", title: "Undo", disabled: true, keyboard: "control z" },
+                { id: "redo", title: "Redo", disabled: true, keyboard: "shift control z" },
                 {},
-                { id: "cut", title: "Cut", disabled: true },
-                { id: "copy", title: "Copy", disabled: true },
-                { id: "paste", title: "Paste", disabled: true },
-                { id: "delete", title: "Delete", disabled: true },
+                { id: "cut", title: "Cut", disabled: true, keyboard: "control x" },
+                { id: "copy", title: "Copy", disabled: true, keyboard: "control c" },
+                { id: "paste", title: "Paste", disabled: true, keyboard: "control v" },
+                { id: "delete", title: "Delete", disabled: true, keyboard: "delete" },
                 {},
-                { id: "selectall", title: "Select All", disabled: true },
-                { id: "selectnone", title: "Select None", disabled: true },
-                { id: "invertselection", title: "Invert Selection", disabled: true }
+                { id: "selectall", title: "Select All", disabled: true, keyboard: "control a" },
+                { id: "selectnone", title: "Select None", disabled: true, keyboard: "shift control a" },
+                { id: "invertselection", title: "Invert Selection", disabled: true, keyboard: "alt control a" }
             ] },
             { id: "list", title: "List", items: [
                 { id: "history", title: "History", items: [
@@ -181,9 +183,9 @@ $(function() {
                     { id: "timelines", title: "Timelines" }
                 ] },
                 {},
-                { id: "newlist", title: "New List..." },
-                { id: "newlistfromselection", title: "New List from Selection...", disabled: true },
-                { id: "newsmartlist", title: "New Smart List..." },
+                { id: "newlist", title: "New List...", keyboard: "control n" },
+                { id: "newlistfromselection", title: "New List from Selection...", disabled: true, keyboard: "shift control n" },
+                { id: "newsmartlist", title: "New Smart List...", keyboard: "alt control n" },
                 {},
                 { id: "addtolist", title: "Add Selected Movie to List...", disabled: true },
                 {},
@@ -210,10 +212,10 @@ $(function() {
                     return view;
                 }) },
                 {},
-                { id: "lists", title: "Hide Lists" },
-                { id: "info", title: "Hide Info" },
-                { id: "groups", title: "Hide Groups" },
-                { id: "movies", title: "Hide Movies", disabled: true }
+                { id: "lists", title: "Hide Lists", keyboard: "shift l" },
+                { id: "info", title: "Hide Info", keyboard: "shift i" },
+                { id: "groups", title: "Hide Groups", keyboard: "shift g" },
+                { id: "movies", title: "Hide Movies", disabled: true, keyboard: "shift m" }
             ]},
             { id: "sort", title: "Sort", items: [
                 { id: "sortmovies", title: "Sort Movies by", items: $.map(config.sortKeys, function(key, i) {
@@ -226,7 +228,7 @@ $(function() {
                     { id: "ascending", title: "Ascending", group: "ordermovies", checked: user.ui.sort[0].operator == "" },
                     { id: "descending", title: "Descending", group: "ordermovies", checked: user.ui.sort[0].operator == "-" }
                 ]},
-                { id: "advancedsort", title: "Advanced Sort..." },
+                { id: "advancedsort", title: "Advanced Sort...", keyboard: "shift control s" },
                 {},
                 { id: "groupsstuff", title: "Groups Stuff" }
             ] },
@@ -237,7 +239,7 @@ $(function() {
                         group: "find"
                     }, key)
                 }) },
-                { id: "advancedfind", title: "Advanced Find..." }
+                { id: "advancedfind", title: "Advanced Find...", keyboard: "shift control f" }
             ] },
             { id: "code", title: "Code", items: [
                 { id: "download", title: "Download" },
@@ -245,7 +247,7 @@ $(function() {
                 { id: "report", title: "Report a Bug" },
             ] },
             { id: "help", title: "Help", items: [
-                { id: "help", title: config.archiveName + " Help" }
+                { id: "help", title: config.archiveName + " Help", keyboard: "shift ?" }
             ] },
             { id: "debug", title: "Debug", items: [
                 { id: "query", title: "Show Query" }
@@ -339,7 +341,7 @@ $(function() {
 
 // Groups
 
-    var rightPanelWidth = $document.width() - 256,
+    var rightPanelWidth = $document.width() - user.ui.listsSize - 1,
         groups = $.map(config.groups, function(id, i) {
             var size = rightPanelWidth / 5 + (rightPanelWidth % 5 > i),
                 title = Ox.getObjectById(config.sortKeys, id).title;
@@ -392,12 +394,12 @@ $ui.statusbar = new Ox.Bar({
         size: 16
     })
     .css({
-        paddingTop: "3px",
         textAlign: "center"
     })
     .append(
         new Ox.Element()
             .css({
+                marginTop: "2px",
                 fontSize: "9px"
             })
             .append(
@@ -423,19 +425,28 @@ $ui.statusbar = new Ox.Bar({
                 element: $ui.mainPanel = new Ox.SplitPanel({
                     elements: [
                         {
+                            collapsible: true,
                             element: $ui.leftPanel = new Ox.SplitPanel({
                                 elements: [
                                     {
-                                        element: $ui.sidebar = new Ox.Element()
+                                        element: $ui.lists = new Ox.Element({
+                                            id: "listsPanel"
+                                        })
                                     },
                                     {
-                                        element: $ui.info = new Ox.Element(),
-                                        size: 128
+                                        collapsible: true,
+                                        element: $ui.info = new Ox.Element({
+                                            id: "infoPanel"
+                                        }),
+                                        size: 144
                                     }
                                 ],
+                                id: "leftPanel",
                                 orientation: "vertical"
                             }),
-                            size: 256
+                            size: user.ui.listsSize,
+                            resizable: true,
+                            resize: [128, 192, 256]
                         },
                         {
                             element: $ui.rightPanel = new Ox.SplitPanel({
@@ -494,8 +505,9 @@ $ui.statusbar = new Ox.Bar({
                                         size: 16
                                     }
                                 ],
+                                id: "rightPanel",
                                 orientation: "vertical"
-                            })
+                            }),
                         }
                     ],
                     orientation: "horizontal"
@@ -600,10 +612,10 @@ $ui.statusbar = new Ox.Bar({
                     return {
                         key: "id",
                         value: id,
-                        operator: ""
+                        operator: "="
                     }
                 }),
-                operator: ","
+                operator: "|"
             }
         }, function(result) {
             $ui.selected.html(constructStatus("selected", result.data));
@@ -703,8 +715,6 @@ $ui.statusbar = new Ox.Bar({
             Ox.formatValue(data.pixels, "px")
         ].join(", ");
     }
-
-
 
 
 
