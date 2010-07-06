@@ -66,6 +66,7 @@ class MovieManager(Manager):
         conditions = []
         for condition in data['query']['conditions']:
             k = condition.get('key', 'all')
+            k = {'id': 'movieId'}.get(k, k)
             if not k: k = 'all'
             v = condition['value']
             op = condition.get('operator', None)
@@ -90,7 +91,8 @@ class MovieManager(Manager):
                     k = '%s__iendswith' % k
                 else: # elif op == '~':
                     k = '%s__icontains' % k
-                k = 'find__%s' % k
+                if not k.startswith('movieId'):
+                    k = 'find__%s' % k
                 k = str(k)
                 if exclude:
                     conditions.append(~Q(**{k:v}))
