@@ -39,15 +39,16 @@ $(function() {
                 { id: "files", title: "Files", admin: true }
             ],
             listViews: [
-                { id: "list", title: "View as List" },
-                { id: "icons", title: "View as Icons" },
-                { id: "clips", title: "View with Clips" },
-                { id: "timelines", title: "View with Timelines" },
-                { id: "maps", title: "View with Maps" },
-                { id: "calendars", title: "View with Calendars" },
-                { id: "clip", title: "View as Clips" },
-                { id: "map", title: "View on Map" },
-                { id: "calendar", title: "View on Calendar" },
+                { id: "list", title: "as List" },
+                { id: "icons", title: "as Icons" },
+                { id: "info", title: "with Info" },
+                { id: "clips", title: "with Clips" },
+                { id: "timelines", title: "with Timelines" },
+                { id: "maps", title: "with Maps" },
+                { id: "calendars", title: "with Calendars" },
+                { id: "clip", title: "as Clips" },
+                { id: "map", title: "on Map" },
+                { id: "calendar", title: "on Calendar" },
             ],
             sortKeys: [
                 { id: "title", title: "Title", operator: "", align: "left", width: 180 },
@@ -70,7 +71,7 @@ $(function() {
                 { id: "profit", title: "Profit", operator: "-", align: "right", width: 90 },
                 { id: "rating", title: "Rating", operator: "-", align: "right", width: 60 },
                 { id: "votes", title: "Votes", operator: "-", align: "right", width: 90 },
-                { id: "id", title: "ID", operator: "", align: "left", width: 90 }
+                { id: "id", title: "ID", operator: "", align: "left", width: 90 },
                 { id: "aspectratio", title: "Aspect Ratio", operator: "-", align: "left", width: 90 },
                 { id: "duration", title: "Duration", operator: "-", align: "right", width: 90 },
                 { id: "color", title: "Color", operator: "", align: "left", width: 90 },
@@ -90,6 +91,14 @@ $(function() {
                 { id: "filename", title: "Filename", operator: "", align: "left", width: 180 },
                 { id: "published", title: "Date Published", operator: "-", align: "left", width: 90 },
                 { id: "modified", title: "Date Modified", operator: "-", align: "left", width: 90 }
+            ],
+            totals: [
+                { id: "items" },
+                { id: "runtime" },
+                { id: "files", admin: true },
+                { id: "duration", admin: true },
+                { id: "size", admin: true },
+                { id: "pixels" }
             ],
             userSettings: {
                 group: "guest",
@@ -111,7 +120,9 @@ $(function() {
             }
         },
         user = config.userSettings,
-        $ui = {};
+        $ui = {
+            groups: []
+        };
 
 // App
 
@@ -171,8 +182,8 @@ $(function() {
                 ] },
                 {},
                 { id: "newlist", title: "New List..." },
-                { id: "newlistfromselection", title: "New List from Selection...", disabled: true},
-                { id: "newsmartlist", title: "New Smart List..." }
+                { id: "newlistfromselection", title: "New List from Selection...", disabled: true },
+                { id: "newsmartlist", title: "New Smart List..." },
                 {},
                 { id: "addtolist", title: "Add Selected Movie to List...", disabled: true },
                 {},
@@ -180,10 +191,10 @@ $(function() {
             ]},
             { id: "view", title: "View", items: [
                 { id: "movies", title: "View Movies", items: $.map(config.listViews, function(view, i) {
-                    return $.extend(view, {
+                    return $.extend({
                         checked: user.ui.listView == view.id,
                         group: "viewmovies"
-                    });
+                    }, view);
                 }) },
                 { id: "icons", title: "Icons", items: [
                     { id: "poster", title: "Poster" },
@@ -195,7 +206,7 @@ $(function() {
                     { id: "video", title: "Video" }
                 ] },
                 {},
-                { id: "movie", title: "Open Movie", items: $.map(config.listViews, function(view, i) {
+                { id: "movie", title: "Open Movie", items: $.map(config.itemViews, function(view, i) {
                     return view;
                 }) },
                 {},
@@ -206,27 +217,27 @@ $(function() {
             ]},
             { id: "sort", title: "Sort", items: [
                 { id: "sortmovies", title: "Sort Movies by", items: $.map(config.sortKeys, function(key, i) {
-                    return $.extend(key, {
+                    return $.extend({
                         checked: user.ui.sort[0].key == key,
                         group: "sortmovies"
-                    });
+                    }, key);
                 }) },
                 { id: "ordermovies", title: "Order Movies", items: [
                     { id: "ascending", title: "Ascending", group: "ordermovies", checked: user.ui.sort[0].operator == "" },
                     { id: "descending", title: "Descending", group: "ordermovies", checked: user.ui.sort[0].operator == "-" }
                 ]},
-                { id: "advancedsort", title: "Advanced Sort..." }
+                { id: "advancedsort", title: "Advanced Sort..." },
                 {},
                 { id: "groupsstuff", title: "Groups Stuff" }
             ] },
             { id: "find", title: "Find", items: [
                 { id: "find", title: "Find", items: $.map(config.findKeys, function(key, i) {
-                    return $.extend(key, {
+                    return $.extend({
                         checked: user.ui.find.key == key,
                         group: "find"
-                    })
+                    }, key)
                 }) },
-                { id: "advancedfind", "Advanced Find..." }
+                { id: "advancedfind", title: "Advanced Find..." }
             ] },
             { id: "code", title: "Code", items: [
                 { id: "download", title: "Download" },
@@ -262,9 +273,10 @@ $(function() {
             $ui.viewSelect = new Ox.Select({
                     id: "viewSelect",
                     items: $.map(config.listViews, function(view, i) {
-                        return $.extend(view, {
-                            checked: user.ui.listView == view.id
-                        });
+                        view.title = "View " + view.title
+                        return $.extend({
+                            checked: user.ui.listView == view.id,
+                        }, view);
                     })
                 })
                 .css({
@@ -318,19 +330,19 @@ $(function() {
                     }),
                     labelWidth: 85
                 })
-                css({
+                .css({
                     float: "right",
                     margin: "4px"
                 })
                 .width(300)
         );
 
-
 // Groups
 
     var rightPanelWidth = $document.width() - 256,
         groups = $.map(config.groups, function(id, i) {
-            var title = Ox.getObjectById(sortKeys, id).title;
+            var size = rightPanelWidth / 5 + (rightPanelWidth % 5 > i),
+                title = Ox.getObjectById(config.sortKeys, id).title;
             return {
                 id: id,
                 conditions: [],
@@ -369,10 +381,35 @@ $(function() {
                         }
                     ]
                 }),
-                size: rightPanelWidth / 5 + (rightPanelWidth % 5 > i),
+                size: size,
                 title: title
             };
         });
+
+// Statusbar
+
+$ui.statusbar = new Ox.Bar({
+        size: 16
+    })
+    .css({
+        paddingTop: "3px",
+        textAlign: "center"
+    })
+    .append(
+        new Ox.Element()
+            .css({
+                fontSize: "9px"
+            })
+            .append(
+                $ui.total = new Ox.Element("span")
+            )
+            .append(
+                new Ox.Element("span").html(" &mdash; ")
+            )
+            .append(
+                $ui.selected = new Ox.Element("span")
+            )
+    );
 
 // Interface
 
@@ -395,7 +432,8 @@ $(function() {
                                         element: $ui.info = new Ox.Element(),
                                         size: 128
                                     }
-                                ]
+                                ],
+                                orientation: "vertical"
                             }),
                             size: 256
                         },
@@ -413,71 +451,77 @@ $(function() {
                                                     element: $ui.groupsOuterPanel = new Ox.SplitPanel({
                                                         elements: [
                                                             {
-                                                                element: groups[0].element,
+                                                                element: $ui.groups[0] = groups[0].element,
                                                                 size: groups[0].size
                                                             },
                                                             {
                                                                 element: $ui.groupsInnerPanel = new Ox.SplitPanel({
                                                                     elements: [
                                                                         {
-                                                                            element: groups[1].element,
+                                                                            element: $ui.groups[1] = groups[1].element,
                                                                             size: groups[1].size
                                                                         },
                                                                         {
-                                                                            element: groups[2].element,
+                                                                            element: $ui.groups[2] = groups[2].element,
                                                                             size: groups[2].size
                                                                         },
                                                                         {
-                                                                            element: groups[3].element,
+                                                                            element: $ui.groups[3] = groups[3].element,
                                                                             size: groups[3].size
                                                                         }
-                                                                    ]
+                                                                    ],
+                                                                    orientation: "horizontal"
                                                                 })
                                                             },
                                                             {
-                                                                element: groups[4].element,
+                                                                element: $ui.groups[4] = groups[4].element,
                                                                 size: groups[4].size
-                                                            }
-                                                        ]
+                                                            },
+                                                        ],
+                                                        orientation: "horizontal"
                                                     }),
                                                     size: 128
                                                 },
                                                 {
                                                     element: $ui.list = constructList(user.ui.listView)
                                                 }
-                                            ]
+                                            ],
+                                            orientation: "vertical"
                                         })
-                                    }
+                                    },
                                     {
-                                        element: $ui.statusbar = new Ox.Bar({ size: 16 }),
+                                        element: $ui.statusbar,
                                         size: 16
                                     }
-                                ]
-                            }),
+                                ],
+                                orientation: "vertical"
+                            })
                         }
-                    ]
+                    ],
+                    orientation: "horizontal"
                 })
             }
-        ]
+        ],
+        orientation: "vertical"
     }).appendTo($body);
 
 // Events
 
-    Ox.Request.requests() && $loadingIcon.start();
+    Ox.Request.requests() && $ui.loadingIcon.start();
     Ox.Event.bind("requestStart", function() {
         Ox.print("requestStart")
-        $loadingIcon.start();
+        $ui.loadingIcon.start();
     });
     Ox.Event.bind("requestStop", function() {
         Ox.print("requestStop")
-        $loadingIcon.stop();
+        $ui.loadingIcon.stop();
     });
 
     Ox.Event.bind("change_viewSelect", function(event, data) {
-        $list.replaceWith(constructList(data.id));
+        $ui.list.replaceWith(constructList(data.id));
     });
 
-    Ox.Event.bind("submit_find", function(event, data) {
+    Ox.Event.bind("submit_findInput", function(event, data) {
         findCondition = {
             key: data.key == "all" ? "" : data.key,
             value: data.value,
@@ -485,7 +529,7 @@ $(function() {
         };
         $.each(groups, function(i, group) {
             groups[i].conditions = [];
-            $group[i].options({
+            $ui.groups[i].options({
                 request: function(options) {
                     delete options.keys;
                     return app.request("find", $.extend(options, {
@@ -495,7 +539,7 @@ $(function() {
                 }
             });
         });
-        $list.options({
+        $ui.list.options({
             request: function(options) {
                 return app.request("find", $.extend(options, {
                     query: constructQuery()
@@ -506,7 +550,7 @@ $(function() {
 
     $.each(groups, function(i, group) {
         Ox.Event.bind("select_group_" + group.id, function(event, data) {
-            $list.options({
+            $ui.list.options({
                 request: function(options) {
                     groups[i].conditions = $.map(data.ids, function(v) {
                         return {
@@ -522,7 +566,7 @@ $(function() {
             });
             $.each(groups, function(i_, group_) {
                 if (i_ != i) {
-                    $group[i_].options({
+                    $ui.groups[i_].options({
                         request: function(options) {
                             delete options.keys;
                             return app.request("find", $.extend(options, {
@@ -539,32 +583,31 @@ $(function() {
 
     });
     Ox.Event.bind("load_list", function(event, data) {
-        $totals.html(constructStatus({
-            "total": data,
-            "selected": {}
-        }));
-        var html = [
-            Ox.formatNumber(data.items) + " movie" + (data.items != 1 ? "s" : ""),
-            Ox.formatDuration(data.runtime, "medium"),
-            data.files + " file" + (data.files != 1 ? "s" : ""),
-            Ox.formatDuration(data.duration, "short"),
-            Ox.formatValue(data.size, "B"),
-            Ox.formatValue(data.pixels, "px")
-        ];
-        $totals.html("Total: " + constructStatus(data) + " &mdash; Selected: " + constructStatus({
-            duration: 0,
-            files: 0,
-            items: 0,
-            pixels: 0,
-            runtime: 0,
-            size: 0
-        }));
+        $ui.total.html(constructStatus("total", data));
+        data = [];
+        $.each(config.totals, function(i, v) {
+            data[v.id] = 0;
+        });
+        $ui.selected.html(constructStatus("selected", data));
     });
     Ox.Event.bind("sort_list", function(event, data) {
         
     });
     Ox.Event.bind("select_list", function(event, data) {
-        
+        app.request("find", {
+            query: {
+                conditions: $.map(data.ids, function(id, i) {
+                    return {
+                        key: "id",
+                        value: id,
+                        operator: ""
+                    }
+                }),
+                operator: ","
+            }
+        }, function(result) {
+            $ui.selected.html(constructStatus("selected", result.data));
+        });
     });
     Ox.Event.bind("click_show_query", function(event, data) {
         var query = constructQuery(),
@@ -590,13 +633,13 @@ $(function() {
 
     function constructList(view) {
         var $list;
-        if (view == "text") {
+        if (view == "list") {
             $list = new Ox.TextList({
                 columns: $.map(config.sortKeys, function(key, i) {
-                    return $.extend(key, {
+                    return $.extend({
                         visible: $.inArray(key.id, user.ui.columns) > -1,
                         unique: key.id == "id"
-                    });
+                    }, key);
                 }),
                 id: "list",
                 request: function(options) {
@@ -639,30 +682,26 @@ $(function() {
     }
 
     function constructQuery(groupId) {
-        var conditions = $.merge(!Ox.isUndefined(user.ui.find.key) ? [user.ui.find] : [], $.map(groups, function(v, i) {
+        var conditions = $.merge(!Ox.isUndefined(user.ui.find.key) ? [user.ui.find] : [], groups ? $.map(groups, function(v, i) {
             if (v.id != groupId) {
                 return v.conditions;
             }
-        }));
+        }) : []);
         return {
             conditions: conditions,
             operator: conditions.length ? "," : ""
         };
     }
 
-    function constructStatus(data) {
-        var html = [];
-        $.each(data, function(k, v) {
-            html.push(Ox.toTitleCase(k) + ": " + [
-                Ox.formatNumber(data.items) + " movie" + (data.items != 1 ? "s" : ""),
-                Ox.formatDuration(data.runtime, "medium"),
-                data.files + " file" + (data.files != 1 ? "s" : ""),
-                Ox.formatDuration(data.duration, "short"),
-                Ox.formatValue(data.size, "B"),
-                Ox.formatValue(data.pixels, "px")
-            ].join(", "));
-        })
-        return html.join(" &mdash; ");
+    function constructStatus(key, data) {
+        return Ox.toTitleCase(key) + ": " + [
+            Ox.formatNumber(data.items) + " movie" + (data.items != 1 ? "s" : ""),
+            Ox.formatDuration(data.runtime, "medium"),
+            data.files + " file" + (data.files != 1 ? "s" : ""),
+            Ox.formatDuration(data.duration, "short"),
+            Ox.formatValue(data.size, "B"),
+            Ox.formatValue(data.pixels, "px")
+        ].join(", ");
     }
 
 
