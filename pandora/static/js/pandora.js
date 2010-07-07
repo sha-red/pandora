@@ -51,8 +51,8 @@ $(function() {
                 { id: "calendar", title: "on Calendar" },
             ],
             sortKeys: [
-                { id: "title", title: "Title", operator: "", align: "left", width: 180 },
-                { id: "director", title: "Director", operator: "", align: "left", width: 180 },
+                { id: "title", title: "Title", operator: "", align: "left", width: 180, removable: false },
+                { id: "director", title: "Director", operator: "", align: "left", width: 180, removable: false },
                 { id: "country", title: "Country", operator: "", align: "left", width: 120 },
                 { id: "year", title: "Year", operator: "-", align: "right", width: 60 },
                 { id: "language", title: "Language", operator: "", align: "left", width: 120 },
@@ -188,8 +188,9 @@ $(function() {
                 { id: "newlist", title: "New List...", keyboard: "control n" },
                 { id: "newlistfromselection", title: "New List from Selection...", disabled: true, keyboard: "shift control n" },
                 { id: "newsmartlist", title: "New Smart List...", keyboard: "alt control n" },
+                { id: "newsmartlistfromresults", title: "New Smart List from Results...", keyboard: "shift alt control n" },
                 {},
-                { id: "addtolist", title: "Add Selected Movie to List...", disabled: true },
+                { id: "addmovietolist", title: ["Add Selected Movie to List...", "Add Selected Movies to List..."], disabled: true },
                 {},
                 { id: "setposterframe", title: "Set Poster Frame", disabled: true }
             ]},
@@ -210,7 +211,7 @@ $(function() {
                     { id: "video", title: "Video" }
                 ] },
                 {},
-                { id: "movie", title: "Open Movie", items: $.map(config.itemViews, function(view, i) {
+                { id: "openmovie", title: ["Open Movie", "Open Movies"], disabled: true, items: $.map(config.itemViews, function(view, i) {
                     return view;
                 }) },
                 {},
@@ -433,9 +434,7 @@ $ui.statusbar = new Ox.Bar({
                                     {
                                         element: $ui.lists = new Ox.Element({
                                             id: "listsPanel"
-                                        }).css({
-                                            background: "rgb(48, 48, 48)"
-                                        })
+                                        }).append(new Ox.CollapsePanel({ title: "My Lists" }).append(Ox.repeat("foo<br/>", 20)))
                                     },
                                     {
                                         collapsible: true,
@@ -648,6 +647,13 @@ $ui.statusbar = new Ox.Bar({
         $ui.mainMenu.checkItem("sort_ordermovies_" + (data.operator === "" ? "ascending" : "descending"));
     });
     Ox.Event.bind("select_list", function(event, data) {
+        if (data.ids.length) {
+            $ui.mainMenu.enableItem("copy");
+            $ui.mainMenu.enableItem("openmovie");
+        } else {
+            $ui.mainMenu.disableItem("copy");
+            $ui.mainMenu.disableItem("openmovie");            
+        }
         app.request("find", {
             query: {
                 conditions: $.map(data.ids, function(id, i) {
