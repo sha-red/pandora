@@ -7,8 +7,8 @@ $(function() {
         $document = $(document),
         $window = $(window),
         config = {
-            archiveId: "oxdb",
-            archiveName: "0xDB",
+            appId: "oxdb",
+            appName: "0xDB",
             findKeys: [
                 { id: "all", title: "All" },
                 { id: "title", title: "Title" },
@@ -116,7 +116,7 @@ $(function() {
                     sort: [
                         { key: "director", operator: "" }
                     ],
-                    theme: "modern"
+                    theme: $.browser.mozilla ? "classic" : "modern"
                 },
                 username: ""
             }
@@ -128,8 +128,10 @@ $(function() {
 
 // App
 
+    document.title = config.appName;
     Ox.theme(user.ui.theme);
     app = new Ox.App({
+        name: config.appName,
         requestURL: "/api/"
     });
 
@@ -142,7 +144,7 @@ $(function() {
             })
         ],
         menus: [
-            { id: config.archiveId, title: config.archiveName, items: [
+            { id: config.appId, title: config.appName, items: [
                 { id: "about", title: "About" },
                 {},
                 { id: "home", title: "Home Screen" },
@@ -220,12 +222,12 @@ $(function() {
             { id: "sort", title: "Sort", items: [
                 { id: "sortmovies", title: "Sort Movies by", items: $.map(config.sortKeys, function(key, i) {
                     return $.extend({
-                        checked: user.ui.sort[0].key == key,
+                        checked: user.ui.sort[0].key == key.id,
                         group: "sortmovies"
                     }, key);
                 }) },
                 { id: "ordermovies", title: "Order Movies", items: [
-                    { id: "ascending", title: "Ascending", group: "ordermovies", checked: user.ui.sort[0].operator == "" },
+                    { id: "ascending", title: "Ascending", group: "ordermovies", checked: user.ui.sort[0].operator === "" },
                     { id: "descending", title: "Descending", group: "ordermovies", checked: user.ui.sort[0].operator == "-" }
                 ]},
                 { id: "advancedsort", title: "Advanced Sort...", keyboard: "shift control s" },
@@ -235,7 +237,7 @@ $(function() {
             { id: "find", title: "Find", items: [
                 { id: "find", title: "Find", items: $.map(config.findKeys, function(key, i) {
                     return $.extend({
-                        checked: user.ui.find.key == key,
+                        checked: user.ui.find.key == key.id || user.ui.find.key === "" && key.id == "all",
                         group: "find"
                     }, key)
                 }) },
@@ -247,7 +249,7 @@ $(function() {
                 { id: "report", title: "Report a Bug" },
             ] },
             { id: "help", title: "Help", items: [
-                { id: "help", title: config.archiveName + " Help", keyboard: "shift ?" }
+                { id: "help", title: config.appName + " Help", keyboard: "shift ?" }
             ] },
             { id: "debug", title: "Debug", items: [
                 { id: "query", title: "Show Query" }
@@ -532,8 +534,32 @@ $ui.statusbar = new Ox.Bar({
         $ui.loadingIcon.stop();
     });
 
+    // Menu
+
+    Ox.Event.bind("change_viewmovies", function(event, data) {
+        $ui.viewSelect.selectItem(data.id);
+    });
+    Ox.Event.bind("change_sortmovies", function(event, data) {
+        var operator = Ox.getObjectById(config.sortKeys, data.id).operator;
+        $ui.mainMenu.checkItem("sort_ordermovies_" + (operator === "" ? "ascending" : "descending"));
+        $ui.list.sort(data.id, operator);
+        Ox.print(user.ui.sort[0].key, user.ui.sort[0].operator);
+    });
+    Ox.Event.bind("change_ordermovies", function(event, data) {
+        $ui.list.sort(user.ui.sort[0].key, data.id == "ascending" ? "" : "-");
+        Ox.print(user.ui.sort[0].key, user.ui.sort[0].operator);
+    });
+    Ox.Event.bind("change_find", function(event, data) {
+        $ui.findInput.changeLabel(data.id);
+    });
+
+    // Toolbar
+
     Ox.Event.bind("change_viewSelect", function(event, data) {
         $ui.list.replaceWith(constructList(data.id));
+    });
+    Ox.Event.bind("change_findInputLabel", function(event, data) {
+        $ui.mainMenu.checkItem("find_find_" + data.id);
     });
 
     Ox.Event.bind("submit_findInput", function(event, data) {
@@ -562,6 +588,8 @@ $ui.statusbar = new Ox.Bar({
             }
         })
     });
+
+    // Groups
 
     $.each(groups, function(i, group) {
         Ox.Event.bind("select_group_" + group.id, function(event, data) {
@@ -594,9 +622,9 @@ $ui.statusbar = new Ox.Bar({
             });
         });
     });
-    Ox.Event.bind("change_sort_movies", function(event, data) {
 
-    });
+    // List
+
     Ox.Event.bind("load_list", function(event, data) {
         $ui.total.html(constructStatus("total", data));
         data = [];
@@ -606,7 +634,18 @@ $ui.statusbar = new Ox.Bar({
         $ui.selected.html(constructStatus("selected", data));
     });
     Ox.Event.bind("sort_list", function(event, data) {
-        
+        /* some magic has already set user.ui.sort
+        Ox.print(":", user.ui.sort[0])
+        if (data.key != user.ui.sort[0].key) {
+            $ui.mainMenu.checkItem("sort_sortmovies_" + data.key);
+        }
+        if (data.operator != user.ui.sort[0].operator) {
+            $ui.mainMenu.checkItem("sort_ordermovies_" + data.operator === "" ? "ascending" : "descending");
+        }
+        user.ui.sort[0] = data;
+        */
+        $ui.mainMenu.checkItem("sort_sortmovies_" + data.key);
+        $ui.mainMenu.checkItem("sort_ordermovies_" + (data.operator === "" ? "ascending" : "descending"));
     });
     Ox.Event.bind("select_list", function(event, data) {
         app.request("find", {
@@ -624,6 +663,8 @@ $ui.statusbar = new Ox.Bar({
             $ui.selected.html(constructStatus("selected", result.data));
         });
     });
+
+    // Resize
 
     Ox.Event.bind("resize_leftPanel", function(event, data) {
         $ui.leftPanel.resize("infoPanel", data * 0.75);
@@ -703,7 +744,7 @@ $ui.statusbar = new Ox.Bar({
                 sort: [
                     {
                         key: "director",
-                        operator: "+"
+                        operator: ""
                     }
                 ],
                 unique: "id"
