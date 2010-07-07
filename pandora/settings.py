@@ -41,10 +41,6 @@ BROKER_PASSWORD = "box"
 BROKER_VHOST = "/pandora"
 
 
-HAYSTACK_SITECONF='backend.find'
-HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr'
-HAYSTACK_SEARCH_ENGINE = 'solr'
-
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -114,7 +110,6 @@ INSTALLED_APPS = (
     'south',
     'djcelery',
 
-    'haystack',
     'app',
     'backend',
     'oxuser',

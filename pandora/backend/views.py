@@ -95,7 +95,7 @@ def _parse_query(data, user):
     for key in ('sort', 'keys', 'group', 'list', 'range', 'ids'):
         if key in data:
             query[key] = data[key]
-    query['qs'] = models.Movie.objects.finddb(data, user)
+    query['qs'] = models.Movie.objects.find(data, user)
     #group by only allows sorting by name or number of itmes
     return query
 

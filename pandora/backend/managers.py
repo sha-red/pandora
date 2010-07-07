@@ -8,7 +8,6 @@ import json
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, Manager
-from haystack.query import SearchQuerySet
  
 import models
 
@@ -42,7 +41,7 @@ class MovieManager(Manager):
                     qs = qs.filter(listitem__list__id=lqs[0].id)
         return qs
 
-    def finddb(self, data, user):
+    def find(self, data, user):
         '''
             query: {
                 conditions: [
@@ -154,114 +153,6 @@ class MovieManager(Manager):
                     q = q & c
             qs = qs.filter(q)
 
-        # filter list, works for own or public lists
-        l = data.get('list', 'all')
-        qs = self.filter_list(qs, l, user)
-        return qs
-
-    def find(self, data, user):
-        '''
-            query: {
-                conditions: [
-                    {
-                        value: "war""
-                    }
-                    {
-                        key: "year",
-                        value: "1970-1980,
-                        operator: "!="
-                    },
-                    {
-                        key: "country",
-                        value: "f",
-                        operator: "^"
-                    }
-                ],
-                operator: "&"
-            }
-		'''
-        qs = SearchQuerySet()
-        query_operator = data['query'].get('operator', '&')
-        conditions = []
-        for condition in data['query']['conditions']:
-            k = condition.get('key', 'all')
-            v = qs.query.clean(condition['value'])
-            op = condition.get('operator', None)
-            if op.startswith('!'):
-                op = op[1:]
-                exclude = True
-            else:
-                exclude = False
-            if keyType(k) == "string":
-                if op == '=':
-                    k = '%s__exact' % k
-                elif op == '^':
-                    v = v[1:]
-                    k = '%s__startswith' % k
-                elif op == '$':
-                    v = v[:-1]
-                    k = '%s__endswith' % k
-                else: # elif op == '~':
-                    k = '%s' % k
-                k = str(k)
-                print k,v
-                if exclude:
-                    conditions.append(~Q(**{k:v}))
-                else:
-                    conditions.append(Q(**{k:v}))
-            else: #number or date
-                def parseDate(d):
-                    while len(d) < 3:
-                        d.append(1)
-                    return datetime(*[int(i) for i in d])
-                if op == '-':
-                    v1 = v[1]
-                    v2 = v[2]
-                    if keyType(k) == "date":
-                        v1 = parseDate(v1.split('.'))
-                        v2 = parseDate(v2.split('.'))
-
-                    if exclude: #!1960-1970
-                        k1 = str('%s__lt' % k)
-                        k2 = str('%s__gte' % k)
-                        conditions.append(Q(**{k1:v1})|Q(**{k2:v2}))
-                    else: #1960-1970
-                        k1 = str('%s__gte' % k)
-                        k2 = str('%s__lt' % k)
-                        conditions.append(Q(**{k1:v1})&Q(**{k2:v2}))
-                else:
-                    if keyType(k) == "date":
-                        v = parseDate(v.split('.'))
-                    if op == '=':
-                        k = '%s__exact' % k
-                    elif op == '>':
-                        k = '%s__gt' % k
-                    elif op == '>=':
-                        k = '%s__gte' % k
-                    elif op == '<':
-                        k = '%s__lt' % k
-                    elif op == '<=':
-                        k = '%s__lte' % k
-
-                    k = str(k)
-                    print k,v
-                    if exclude: #!1960
-                        conditions.append(~Q(**{k:v}))
-                    else: #1960
-                        conditions.append(Q(**{k:v}))
-
-        #join query with operator
-        #only include movies that have hard metadata
-        qs = qs.filter(available=True)
-        if conditions:
-            q = conditions[0]
-            for c in conditions[1:]:
-                if query_operator == '|':
-                    q = q | c
-                else:
-                    q = q & c
-            qs = qs.filter(q)
-        return qs
         # filter list, works for own or public lists
         l = data.get('list', 'all')
         qs = self.filter_list(qs, l, user)
