@@ -7,8 +7,8 @@ $(function() {
         $document = $(document),
         $window = $(window),
         config = {
-            archiveId: "oxdb",
-            archiveName: "0xDB",
+            appId: "oxdb",
+            appName: "0xDB",
             findKeys: [
                 { id: "all", title: "All" },
                 { id: "title", title: "Title" },
@@ -56,6 +56,7 @@ $(function() {
                 { id: "country", title: "Country", operator: "", align: "left", width: 120 },
                 { id: "year", title: "Year", operator: "-", align: "right", width: 60 },
                 { id: "language", title: "Language", operator: "", align: "left", width: 120 },
+                { id: "runtime", title: "Runtime", operator: "", align: "right", width: 60 },
                 { id: "writer", title: "Writer", operator: "", align: "left", width: 180 },
                 { id: "producer", title: "Producer", operator: "", align: "left", width: 180 },
                 { id: "cinematographer", title: "Cinematographer", operator: "", align: "left", width: 180 },
@@ -106,15 +107,16 @@ $(function() {
                     columns: ["title", "director", "country", "year", "language", "runtime", "genre"],
                     find: { key: "all", value: "", operator: "" },
                     itemView: "info",
+                    listsSize: 192,
                     listView: "list",
                     showGroups: true,
                     showInfo: true,
-                    showList: true,
+                    showLists: true,
                     showMovies: true,
                     sort: [
                         { key: "director", operator: "" }
                     ],
-                    theme: "modern"
+                    theme: $.browser.mozilla ? "classic" : "modern"
                 },
                 username: ""
             }
@@ -126,8 +128,10 @@ $(function() {
 
 // App
 
+    document.title = config.appName;
     Ox.theme(user.ui.theme);
     app = new Ox.App({
+        name: config.appName,
         requestURL: "/api/"
     });
 
@@ -140,7 +144,7 @@ $(function() {
             })
         ],
         menus: [
-            { id: config.archiveId, title: config.archiveName, items: [
+            { id: config.appId, title: config.appName, items: [
                 { id: "about", title: "About" },
                 {},
                 { id: "home", title: "Home Screen" },
@@ -152,22 +156,22 @@ $(function() {
             { id: "user", title: "User", items: [
                 { id: "username", title: "User: not logged in", disabled: true },
                 {},
-                { id: "preferences", title: "Preferences", disabled: true },
+                { id: "preferences", title: "Preferences", disabled: true, keyboard: "control ," },
                 {},
                 { id: "login", title: "Login" }
             ] },
             { id: "edit", title: "Edit", items: [
-                { id: "undo", title: "Undo", disabled: true },
-                { id: "redo", title: "Redo", disabled: true },
+                { id: "undo", title: "Undo", disabled: true, keyboard: "control z" },
+                { id: "redo", title: "Redo", disabled: true, keyboard: "shift control z" },
                 {},
-                { id: "cut", title: "Cut", disabled: true },
-                { id: "copy", title: "Copy", disabled: true },
-                { id: "paste", title: "Paste", disabled: true },
-                { id: "delete", title: "Delete", disabled: true },
+                { id: "cut", title: "Cut", disabled: true, keyboard: "control x" },
+                { id: "copy", title: "Copy", disabled: true, keyboard: "control c" },
+                { id: "paste", title: "Paste", disabled: true, keyboard: "control v" },
+                { id: "delete", title: "Delete", disabled: true, keyboard: "delete" },
                 {},
-                { id: "selectall", title: "Select All", disabled: true },
-                { id: "selectnone", title: "Select None", disabled: true },
-                { id: "invertselection", title: "Invert Selection", disabled: true }
+                { id: "selectall", title: "Select All", disabled: true, keyboard: "control a" },
+                { id: "selectnone", title: "Select None", disabled: true, keyboard: "shift control a" },
+                { id: "invertselection", title: "Invert Selection", disabled: true, keyboard: "alt control a" }
             ] },
             { id: "list", title: "List", items: [
                 { id: "history", title: "History", items: [
@@ -181,9 +185,9 @@ $(function() {
                     { id: "timelines", title: "Timelines" }
                 ] },
                 {},
-                { id: "newlist", title: "New List..." },
-                { id: "newlistfromselection", title: "New List from Selection...", disabled: true },
-                { id: "newsmartlist", title: "New Smart List..." },
+                { id: "newlist", title: "New List...", keyboard: "control n" },
+                { id: "newlistfromselection", title: "New List from Selection...", disabled: true, keyboard: "shift control n" },
+                { id: "newsmartlist", title: "New Smart List...", keyboard: "alt control n" },
                 {},
                 { id: "addtolist", title: "Add Selected Movie to List...", disabled: true },
                 {},
@@ -210,34 +214,34 @@ $(function() {
                     return view;
                 }) },
                 {},
-                { id: "lists", title: "Hide Lists" },
-                { id: "info", title: "Hide Info" },
-                { id: "groups", title: "Hide Groups" },
-                { id: "movies", title: "Hide Movies", disabled: true }
+                { id: "lists", title: "Hide Lists", keyboard: "shift l" },
+                { id: "info", title: "Hide Info", keyboard: "shift i" },
+                { id: "groups", title: "Hide Groups", keyboard: "shift g" },
+                { id: "movies", title: "Hide Movies", disabled: true, keyboard: "shift m" }
             ]},
             { id: "sort", title: "Sort", items: [
                 { id: "sortmovies", title: "Sort Movies by", items: $.map(config.sortKeys, function(key, i) {
                     return $.extend({
-                        checked: user.ui.sort[0].key == key,
+                        checked: user.ui.sort[0].key == key.id,
                         group: "sortmovies"
                     }, key);
                 }) },
                 { id: "ordermovies", title: "Order Movies", items: [
-                    { id: "ascending", title: "Ascending", group: "ordermovies", checked: user.ui.sort[0].operator == "" },
+                    { id: "ascending", title: "Ascending", group: "ordermovies", checked: user.ui.sort[0].operator === "" },
                     { id: "descending", title: "Descending", group: "ordermovies", checked: user.ui.sort[0].operator == "-" }
                 ]},
-                { id: "advancedsort", title: "Advanced Sort..." },
+                { id: "advancedsort", title: "Advanced Sort...", keyboard: "shift control s" },
                 {},
                 { id: "groupsstuff", title: "Groups Stuff" }
             ] },
             { id: "find", title: "Find", items: [
                 { id: "find", title: "Find", items: $.map(config.findKeys, function(key, i) {
                     return $.extend({
-                        checked: user.ui.find.key == key,
+                        checked: user.ui.find.key == key.id || user.ui.find.key === "" && key.id == "all",
                         group: "find"
                     }, key)
                 }) },
-                { id: "advancedfind", title: "Advanced Find..." }
+                { id: "advancedfind", title: "Advanced Find...", keyboard: "shift control f" }
             ] },
             { id: "code", title: "Code", items: [
                 { id: "download", title: "Download" },
@@ -245,7 +249,7 @@ $(function() {
                 { id: "report", title: "Report a Bug" },
             ] },
             { id: "help", title: "Help", items: [
-                { id: "help", title: config.archiveName + " Help" }
+                { id: "help", title: config.appName + " Help", keyboard: "shift ?" }
             ] },
             { id: "debug", title: "Debug", items: [
                 { id: "query", title: "Show Query" }
@@ -339,10 +343,10 @@ $(function() {
 
 // Groups
 
-    var rightPanelWidth = $document.width() - 256,
+    var panelWidth = $document.width() - user.ui.listsSize - 1,
         groups = $.map(config.groups, function(id, i) {
-            var size = rightPanelWidth / 5 + (rightPanelWidth % 5 > i),
-                title = Ox.getObjectById(config.sortKeys, id).title;
+            var title = Ox.getObjectById(config.sortKeys, id).title,
+                width = getGroupWidth(i, panelWidth);
             return {
                 id: id,
                 conditions: [],
@@ -355,7 +359,7 @@ $(function() {
                             title: title,
                             unique: true,
                             visible: true,
-                            width: size - 40 - ($.browser.mozilla ? 16 : 12)
+                            width: width.column
                         },
                         {
                             align: "right",
@@ -381,7 +385,7 @@ $(function() {
                         }
                     ]
                 }),
-                size: size,
+                size: width.list,
                 title: title
             };
         });
@@ -392,12 +396,12 @@ $ui.statusbar = new Ox.Bar({
         size: 16
     })
     .css({
-        paddingTop: "3px",
         textAlign: "center"
     })
     .append(
         new Ox.Element()
             .css({
+                marginTop: "2px",
                 fontSize: "9px"
             })
             .append(
@@ -423,19 +427,32 @@ $ui.statusbar = new Ox.Bar({
                 element: $ui.mainPanel = new Ox.SplitPanel({
                     elements: [
                         {
+                            collapsible: true,
                             element: $ui.leftPanel = new Ox.SplitPanel({
                                 elements: [
                                     {
-                                        element: $ui.sidebar = new Ox.Element()
+                                        element: $ui.lists = new Ox.Element({
+                                            id: "listsPanel"
+                                        }).css({
+                                            background: "rgb(48, 48, 48)"
+                                        })
                                     },
                                     {
-                                        element: $ui.info = new Ox.Element(),
-                                        size: 128
+                                        collapsible: true,
+                                        element: $ui.info = new Ox.Element({
+                                            id: "infoPanel"
+                                        }).css({
+                                            background: "rgb(64, 64, 64)"
+                                        }),
+                                        size: 144
                                     }
                                 ],
+                                id: "leftPanel",
                                 orientation: "vertical"
                             }),
-                            size: 256
+                            size: user.ui.listsSize,
+                            resizable: true,
+                            resize: [128, 192, 256]
                         },
                         {
                             element: $ui.rightPanel = new Ox.SplitPanel({
@@ -463,7 +480,6 @@ $ui.statusbar = new Ox.Bar({
                                                                         },
                                                                         {
                                                                             element: $ui.groups[2] = groups[2].element,
-                                                                            size: groups[2].size
                                                                         },
                                                                         {
                                                                             element: $ui.groups[3] = groups[3].element,
@@ -494,8 +510,9 @@ $ui.statusbar = new Ox.Bar({
                                         size: 16
                                     }
                                 ],
+                                id: "rightPanel",
                                 orientation: "vertical"
-                            })
+                            }),
                         }
                     ],
                     orientation: "horizontal"
@@ -517,8 +534,32 @@ $ui.statusbar = new Ox.Bar({
         $ui.loadingIcon.stop();
     });
 
+    // Menu
+
+    Ox.Event.bind("change_viewmovies", function(event, data) {
+        $ui.viewSelect.selectItem(data.id);
+    });
+    Ox.Event.bind("change_sortmovies", function(event, data) {
+        var operator = Ox.getObjectById(config.sortKeys, data.id).operator;
+        $ui.mainMenu.checkItem("sort_ordermovies_" + (operator === "" ? "ascending" : "descending"));
+        $ui.list.sort(data.id, operator);
+        Ox.print(user.ui.sort[0].key, user.ui.sort[0].operator);
+    });
+    Ox.Event.bind("change_ordermovies", function(event, data) {
+        $ui.list.sort(user.ui.sort[0].key, data.id == "ascending" ? "" : "-");
+        Ox.print(user.ui.sort[0].key, user.ui.sort[0].operator);
+    });
+    Ox.Event.bind("change_find", function(event, data) {
+        $ui.findInput.changeLabel(data.id);
+    });
+
+    // Toolbar
+
     Ox.Event.bind("change_viewSelect", function(event, data) {
         $ui.list.replaceWith(constructList(data.id));
+    });
+    Ox.Event.bind("change_findInputLabel", function(event, data) {
+        $ui.mainMenu.checkItem("find_find_" + data.id);
     });
 
     Ox.Event.bind("submit_findInput", function(event, data) {
@@ -547,6 +588,8 @@ $ui.statusbar = new Ox.Bar({
             }
         })
     });
+
+    // Groups
 
     $.each(groups, function(i, group) {
         Ox.Event.bind("select_group_" + group.id, function(event, data) {
@@ -579,9 +622,9 @@ $ui.statusbar = new Ox.Bar({
             });
         });
     });
-    Ox.Event.bind("change_sort_movies", function(event, data) {
 
-    });
+    // List
+
     Ox.Event.bind("load_list", function(event, data) {
         $ui.total.html(constructStatus("total", data));
         data = [];
@@ -591,7 +634,18 @@ $ui.statusbar = new Ox.Bar({
         $ui.selected.html(constructStatus("selected", data));
     });
     Ox.Event.bind("sort_list", function(event, data) {
-        
+        /* some magic has already set user.ui.sort
+        Ox.print(":", user.ui.sort[0])
+        if (data.key != user.ui.sort[0].key) {
+            $ui.mainMenu.checkItem("sort_sortmovies_" + data.key);
+        }
+        if (data.operator != user.ui.sort[0].operator) {
+            $ui.mainMenu.checkItem("sort_ordermovies_" + data.operator === "" ? "ascending" : "descending");
+        }
+        user.ui.sort[0] = data;
+        */
+        $ui.mainMenu.checkItem("sort_sortmovies_" + data.key);
+        $ui.mainMenu.checkItem("sort_ordermovies_" + (data.operator === "" ? "ascending" : "descending"));
     });
     Ox.Event.bind("select_list", function(event, data) {
         app.request("find", {
@@ -600,15 +654,33 @@ $ui.statusbar = new Ox.Bar({
                     return {
                         key: "id",
                         value: id,
-                        operator: ""
+                        operator: "="
                     }
                 }),
-                operator: ","
+                operator: "|"
             }
         }, function(result) {
             $ui.selected.html(constructStatus("selected", result.data));
         });
     });
+
+    // Resize
+
+    Ox.Event.bind("resize_leftPanel", function(event, data) {
+        $ui.leftPanel.resize("infoPanel", data * 0.75);
+    });
+    Ox.Event.bind("resize_rightPanel", function(event, data) {
+        var widths = $.map(groups, function(v, i) {
+            return getGroupWidth(i, data);
+        });
+        Ox.print("widths", widths);
+        $ui.groupsOuterPanel.resize(0, widths[0].list).resize(2, widths[4].list);
+        $ui.groupsInnerPanel.resize(0, widths[1].list).resize(2, widths[3].list);
+        $.each($ui.groups, function(i, list) {
+            list.resizeColumn("name", widths[i].column);
+        });
+    });
+
     Ox.Event.bind("click_show_query", function(event, data) {
         var query = constructQuery(),
             html = "Conditions<br/><br/>" + $.map(query.conditions, function(v) {
@@ -672,7 +744,7 @@ $ui.statusbar = new Ox.Bar({
                 sort: [
                     {
                         key: "director",
-                        operator: "+"
+                        operator: ""
                     }
                 ],
                 unique: "id"
@@ -704,7 +776,12 @@ $ui.statusbar = new Ox.Bar({
         ].join(", ");
     }
 
-
+    function getGroupWidth(pos, panelWidth) {
+        var width = {};
+        width.list = Math.floor(panelWidth / 5) + (panelWidth % 5 > pos);
+        width.column = width.list - 40 - ($.browser.mozilla ? 16 : 12);
+        return width;
+    }
 
 
 

@@ -252,6 +252,8 @@ Positions
         response['data']['items'] = movies.count()
         response['data']['pixels'] = r['pixels__count']
         response['data']['runtime'] = movies.aggregate(Sum('sort__runtime'))['sort__runtime__sum']
+        if response['data']['runtime'] == None:
+            response['data']['runtime'] = 1337
         response['data']['size'] = r['size__count']
     return render_to_json_response(response)
 
