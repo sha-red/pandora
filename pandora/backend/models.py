@@ -13,9 +13,9 @@ from django.utils import simplejson as json
 from django.conf import settings
 
 from oxdjango import fields
-import oxlib
-from oxlib import stripTags
-from oxlib.normalize import canonicalTitle, canonicalName
+import ox
+from ox import stripTags
+from ox.normalize import canonicalTitle, canonicalName
 from firefogg import Firefogg
 
 import managers
@@ -618,7 +618,7 @@ class Person(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.name_sort:
-            self.name_sort = oxlib.normalize.canonicalName(self.name)
+            self.name_sort = ox.normalize.canonicalName(self.name)
         super(Person, self).save(*args, **kwargs)
 
     def get_or_create(model, name, imdbId=None):
@@ -823,7 +823,7 @@ class Trivia(models.Model):
 
     def json(self):
         trivia = self.trivia
-        trivia = oxlib.fixAmpersands(trivia)
+        trivia = ox.fixAmpersands(trivia)
         trivia = re.sub('<a name="#tr\d{7}"></a> ', '', trivia)
         trivia = re.sub('<a href="(/name/nm.*?)">(.*?)</a>', '<a href="/?f=name&amp;q=\\2">\\2</a>', trivia)
         trivia = re.sub('<a href="/title/tt(.*?)/">(.*?)</a>', '<a href="/\\1">\\2</a>', trivia)
@@ -947,7 +947,7 @@ def timeline_path(f):
     return os.path.join(url_hash[:2], url_hash[2:4], url_hash[4:6], url_hash, name)
 
 def frame_path(f):
-    position = oxlib.formatDuration(f.position*1000).replace(':', '.')
+    position = ox.formatDuration(f.position*1000).replace(':', '.')
     name = "%s.%s" % (position, 'png')
     url_hash = f.file.oshash
     return os.path.join(url_hash[:2], url_hash[2:4], url_hash[4:6], url_hash, 'frames', name)

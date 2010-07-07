@@ -6,8 +6,8 @@ import os.path
 from django.db import models
 from django.contrib.auth.models import User
 
-from oxlib import stripTags, findRe
-import oxweb.imdb
+from ox import stripTags, findRe
+import ox.web.imdb
 
 import models
 
@@ -39,7 +39,7 @@ def loadIMDb(imdbId):
         movie = models.Movie()
         movie.imdb = imdb
 
-    info = oxweb.imdb.getMovieInfo(imdbId)
+    info = ox.web.imdb.getMovieInfo(imdbId)
     for key in ('title',
                 'tagline',
                 'year',
@@ -60,11 +60,11 @@ def loadIMDb(imdbId):
         if key in info:
             setattr(movie.imdb, _info_map.get(key, key), info[key])
 
-    movie.imdb.plot = oxweb.imdb.getMoviePlot(imdbId)
+    movie.imdb.plot = ox.web.imdb.getMoviePlot(imdbId)
     debug("plot", movie.imdb.plot)
 
-    movie.imdb.runtime = oxweb.imdb.getMovieRuntimeSeconds(imdbId)
-    business = oxweb.imdb.getMovieBusinessSum(imdbId)
+    movie.imdb.runtime = ox.web.imdb.getMovieRuntimeSeconds(imdbId)
+    business = ox.web.imdb.getMovieBusinessSum(imdbId)
     for key in ('gross', 'profit', 'budget'):
         setattr(movie.imdb, key, business[key])
 
@@ -72,7 +72,7 @@ def loadIMDb(imdbId):
     movie.oxdbId = "__init__%s" % random.randint(0, 100000)
     movie.save()
     models.AlternativeTitle.objects.filter(movie=movie, manual=False).delete()
-    for i in oxweb.imdb.getMovieAKATitles(imdbId):
+    for i in ox.web.imdb.getMovieAKATitles(imdbId):
         t = models.AlternativeTitle()
         t.movie = movie
         t.title = i[0]
@@ -102,7 +102,7 @@ def loadIMDb(imdbId):
 
     #Location
     movie.locations_all.filter(manual=False).delete()
-    locations = oxweb.imdb.getMovieLocations(imdbId)
+    locations = ox.web.imdb.getMovieLocations(imdbId)
     for i in locations:
         debug("add location", i)
         location, created = models.Location.objects.get_or_create(name=i)
@@ -118,7 +118,7 @@ def loadIMDb(imdbId):
 
     #Keyword
     movie.keywords_all.filter(manual=False).delete()
-    keywords = oxweb.imdb.getMovieKeywords(imdbId)
+    keywords = ox.web.imdb.getMovieKeywords(imdbId)
     for g in keywords:
         debug("add keyword", g)
         keyword, created = models.Keyword.objects.get_or_create(name=g)
@@ -126,7 +126,7 @@ def loadIMDb(imdbId):
 
     movie.trivia_all.filter(manual=False).delete()
     position = 0
-    trivia = oxweb.imdb.getMovieTrivia(imdbId)
+    trivia = ox.web.imdb.getMovieTrivia(imdbId)
     for i in trivia:
         debug("add trivia", i)
         t = models.Trivia()
@@ -138,7 +138,7 @@ def loadIMDb(imdbId):
 
     position = 0
     models.Cast.objects.filter(movie=movie).filter(manual=False).delete()
-    credits = oxweb.imdb.getMovieCredits(imdbId)
+    credits = ox.web.imdb.getMovieCredits(imdbId)
     for role in credits:
         for p in credits[role]:
             name = stripTags(p[0])
@@ -151,7 +151,7 @@ def loadIMDb(imdbId):
             position += 1
 
     movie.connections_all.filter(manual=False).delete()
-    connections = oxweb.imdb.getMovieConnections(imdbId)
+    connections = ox.web.imdb.getMovieConnections(imdbId)
     for relation in connections:
         for otherId in connections[relation]:
             try:
@@ -161,7 +161,7 @@ def loadIMDb(imdbId):
             except models.Movie.DoesNotExist:
                 pass
 
-    reviews = oxweb.imdb.getMovieExternalReviews(imdbId)
+    reviews = ox.web.imdb.getMovieExternalReviews(imdbId)
     movie.reviews_all.filter(manual=False).delete()
     for r in reviews:
         debug("add review", r)

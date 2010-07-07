@@ -7,7 +7,7 @@ import base64
 from subprocess import Popen
 
 from django.conf import settings
-import oxlib.torrent
+import ox.torrent
 import transmissionrpc
 
 def connect():
@@ -32,7 +32,7 @@ def add(torrent_file):
     download_dir = os.path.dirname(torrent_file)
     with open(torrent_file) as f:
         torrent_data = base64.b64encode(f.read())
-    info_hash = oxlib.torrent.getInfoHash(torrent_file)
+    info_hash = ox.torrent.getInfoHash(torrent_file)
     try:
         tc = connect()
         if not is_seeding(info_hash):

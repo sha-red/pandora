@@ -25,7 +25,7 @@ except ImportError:
 from oxdjango.decorators import login_required_json
 from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 from oxdjango.http import HttpFileResponse
-import oxlib
+import ox
 
 import models
 import utils
@@ -619,7 +619,7 @@ def api_getImdbId(request):
         return {'status': {'code': int, 'text': string},
                 'data': {imdbId:string }}
     '''
-    imdbId = oxweb.imdb.guess(search_title, r['director'], timeout=-1)
+    imdbId = ox.web.imdb.guess(search_title, r['director'], timeout=-1)
     if imdbId:
         response = json_response({'imdbId': imdbId})
     else:
@@ -688,7 +688,7 @@ def video(request, id, quality):
 
 def frame(request, id, position, size):
     movie = get_object_or_404(models.Movie, movieId=id)
-    position = oxlib.time2ms(position)/1000
+    position = ox.time2ms(position)/1000
     frame = movie.frame(position, int(size))
     if not frame:
         raise Http404

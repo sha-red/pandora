@@ -10,7 +10,7 @@ import time
 import warnings
 import subprocess
 
-import oxlib
+import ox
 import Image
 import simplejson as json
 
@@ -39,7 +39,7 @@ def frame(videoFile, position, baseFolder, width=128, redo=False):
             redo boolean to extract file even if it exists
     '''
     def frame_path(size):
-        return os.path.join(baseFolder, "%s.%s.%s" % (oxlib.ms2time(position*1000), size, img_extension))
+        return os.path.join(baseFolder, "%s.%s.%s" % (ox.ms2time(position*1000), size, img_extension))
 
     #not using input file, to slow to extract frame right now
     base_size = 320
