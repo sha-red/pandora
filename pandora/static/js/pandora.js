@@ -341,10 +341,10 @@ $(function() {
 
 // Groups
 
-    var rightPanelWidth = $document.width() - user.ui.listsSize - 1,
+    var panelWidth = $document.width() - user.ui.listsSize - 1,
         groups = $.map(config.groups, function(id, i) {
-            var size = rightPanelWidth / 5 + (rightPanelWidth % 5 > i),
-                title = Ox.getObjectById(config.sortKeys, id).title;
+            var title = Ox.getObjectById(config.sortKeys, id).title,
+                width = getGroupWidth(i, panelWidth);
             return {
                 id: id,
                 conditions: [],
@@ -357,7 +357,7 @@ $(function() {
                             title: title,
                             unique: true,
                             visible: true,
-                            width: size - 40 - ($.browser.mozilla ? 16 : 12)
+                            width: width.column
                         },
                         {
                             align: "right",
@@ -383,7 +383,7 @@ $(function() {
                         }
                     ]
                 }),
-                size: size,
+                size: width.list,
                 title: title
             };
         });
@@ -431,12 +431,16 @@ $ui.statusbar = new Ox.Bar({
                                     {
                                         element: $ui.lists = new Ox.Element({
                                             id: "listsPanel"
+                                        }).css({
+                                            background: "rgb(48, 48, 48)"
                                         })
                                     },
                                     {
                                         collapsible: true,
                                         element: $ui.info = new Ox.Element({
                                             id: "infoPanel"
+                                        }).css({
+                                            background: "rgb(64, 64, 64)"
                                         }),
                                         size: 144
                                     }
@@ -474,7 +478,6 @@ $ui.statusbar = new Ox.Bar({
                                                                         },
                                                                         {
                                                                             element: $ui.groups[2] = groups[2].element,
-                                                                            size: groups[2].size
                                                                         },
                                                                         {
                                                                             element: $ui.groups[3] = groups[3].element,
@@ -621,6 +624,9 @@ $ui.statusbar = new Ox.Bar({
             $ui.selected.html(constructStatus("selected", result.data));
         });
     });
+    Ox.Event.bind("resize_leftPanel", function(event, data) {
+        $ui.leftPanel.resize("infoPanel", data * 0.75);
+    });
     Ox.Event.bind("click_show_query", function(event, data) {
         var query = constructQuery(),
             html = "Conditions<br/><br/>" + $.map(query.conditions, function(v) {
@@ -714,6 +720,13 @@ $ui.statusbar = new Ox.Bar({
             Ox.formatValue(data.size, "B"),
             Ox.formatValue(data.pixels, "px")
         ].join(", ");
+    }
+
+    function getGroupWidth(pos, panelWidth) {
+        var width = {};
+        width.list = Math.floor(panelWidth / 5) + (panelWidth % 5 > pos);
+        width.column = width.list - 40 - ($.browser.mozilla ? 16 : 12);
+        return width;
     }
 
 
