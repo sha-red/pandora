@@ -2,7 +2,6 @@
 -e hg+http://bitbucket.org/andrewgodwin/south/#egg=south
 chardet
 -e bzr+http://code.0x2620.org/python-ox/#egg=python-ox
--e bzr+http://code.0x2620.org/python-ox.web/#egg=python-ox.web
 -e bzr+http://code.0x2620.org/python-oxdjango/#egg=python-oxdjango
 simplejson
 -e hg+https://django-ajax-filtered-fields.googlecode.com/hg/#egg=django-ajax-filtered-fields 
@@ -13,5 +12,3 @@ django_extensions
 -e bzr+http://firefogg.org/dev/python-firefogg/#egg=python-firefogg
 -e git+git://github.com/dcramer/django-devserver#egg=django_devserver
 transmissionrpc
--e git+git://github.com/toastdriven/django-haystack.git#egg=django-haystack
-pysolr
