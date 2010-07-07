@@ -624,9 +624,22 @@ $ui.statusbar = new Ox.Bar({
             $ui.selected.html(constructStatus("selected", result.data));
         });
     });
+
     Ox.Event.bind("resize_leftPanel", function(event, data) {
         $ui.leftPanel.resize("infoPanel", data * 0.75);
     });
+    Ox.Event.bind("resize_rightPanel", function(event, data) {
+        var widths = $.map(groups, function(v, i) {
+            return getGroupWidth(i, data);
+        });
+        Ox.print("widths", widths);
+        $ui.groupsOuterPanel.resize(0, widths[0].list).resize(2, widths[4].list);
+        $ui.groupsInnerPanel.resize(0, widths[1].list).resize(2, widths[3].list);
+        $.each($ui.groups, function(i, list) {
+            list.resizeColumn("name", widths[i].column);
+        });
+    });
+
     Ox.Event.bind("click_show_query", function(event, data) {
         var query = constructQuery(),
             html = "Conditions<br/><br/>" + $.map(query.conditions, function(v) {
