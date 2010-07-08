@@ -124,6 +124,10 @@ $(function() {
         user = config.userSettings,
         $ui = {
             groups: []
+        },
+        ui = {
+            infoRatio: 4 / 3,
+            selectedMovies: []
         };
 
 // App
@@ -158,20 +162,8 @@ $(function() {
                 {},
                 { id: "preferences", title: "Preferences", disabled: true, keyboard: "control ," },
                 {},
-                { id: "login", title: "Login" }
-            ] },
-            { id: "edit", title: "Edit", items: [
-                { id: "undo", title: "Undo", disabled: true, keyboard: "control z" },
-                { id: "redo", title: "Redo", disabled: true, keyboard: "shift control z" },
-                {},
-                { id: "cut", title: "Cut", disabled: true, keyboard: "control x" },
-                { id: "copy", title: "Copy", disabled: true, keyboard: "control c" },
-                { id: "paste", title: "Paste", disabled: true, keyboard: "control v" },
-                { id: "delete", title: "Delete", disabled: true, keyboard: "delete" },
-                {},
-                { id: "selectall", title: "Select All", disabled: true, keyboard: "control a" },
-                { id: "selectnone", title: "Select None", disabled: true, keyboard: "shift control a" },
-                { id: "invertselection", title: "Invert Selection", disabled: true, keyboard: "alt control a" }
+                { id: "register", title: "Create an Account..." },
+                { id: "login", title: "Login..." }
             ] },
             { id: "list", title: "List", items: [
                 { id: "history", title: "History", items: [
@@ -194,6 +186,19 @@ $(function() {
                 {},
                 { id: "setposterframe", title: "Set Poster Frame", disabled: true }
             ]},
+            { id: "edit", title: "Edit", items: [
+                { id: "undo", title: "Undo", disabled: true, keyboard: "control z" },
+                { id: "redo", title: "Redo", disabled: true, keyboard: "shift control z" },
+                {},
+                { id: "cut", title: "Cut", disabled: true, keyboard: "control x" },
+                { id: "copy", title: "Copy", disabled: true, keyboard: "control c" },
+                { id: "paste", title: "Paste", disabled: true, keyboard: "control v" },
+                { id: "delete", title: "Delete", disabled: true, keyboard: "delete" },
+                {},
+                { id: "selectall", title: "Select All", disabled: true, keyboard: "control a" },
+                { id: "selectnone", title: "Select None", disabled: true, keyboard: "shift control a" },
+                { id: "invertselection", title: "Invert Selection", disabled: true, keyboard: "alt control a" }
+            ] },
             { id: "view", title: "View", items: [
                 { id: "movies", title: "View Movies", items: $.map(config.listViews, function(view, i) {
                     return $.extend({
@@ -257,6 +262,27 @@ $(function() {
             ]}
         ]
     });
+
+// info
+
+    $ui.info = new Ox.Element()
+        .append(
+            $ui.infoStill = new Ox.Element("img")
+                .css({
+                    position: "absolute",
+                    left: 0,
+                    top: 0
+                })
+        )
+        .append(
+            $ui.infoTimeline = new Ox.Element("img")
+                .css({
+                    position: "absolute",
+                    left: 0,
+                    bottom: 0,
+                    height: "16px",
+                })
+        );
 
 // Toolbar
 
@@ -438,12 +464,10 @@ $ui.statusbar = new Ox.Bar({
                                     },
                                     {
                                         collapsible: true,
-                                        element: $ui.info = new Ox.Element({
+                                        element: $ui.info.options({
                                             id: "infoPanel"
-                                        }).css({
-                                            background: "rgb(64, 64, 64)"
                                         }),
-                                        size: 144
+                                        size: user.ui.listsSize / ui.infoRatio + 16
                                     }
                                 ],
                                 id: "leftPanel",
@@ -647,12 +671,77 @@ $ui.statusbar = new Ox.Bar({
         $ui.mainMenu.checkItem("sort_ordermovies_" + (data.operator === "" ? "ascending" : "descending"));
     });
     Ox.Event.bind("select_list", function(event, data) {
+        var $still, $timeline;
+        ui.selectedMovies = data.ids;
         if (data.ids.length) {
             $ui.mainMenu.enableItem("copy");
             $ui.mainMenu.enableItem("openmovie");
         } else {
             $ui.mainMenu.disableItem("copy");
             $ui.mainMenu.disableItem("openmovie");            
+        }
+        if (data.ids.length == 1) {
+            $still = $("<img>")
+                .attr({
+                    src: "http://0xdb.org/" + data.ids[0] + "/still.jpg"
+                })
+                .one("load", function() {
+                    if (data.ids[0] != ui.selectedMovies[0]) {
+                        return;
+                    }
+                    var image = $still[0],
+                        imageWidth = image.width,
+                        imageHeight = image.height,
+                        width = $ui.info.width(),
+                        height = imageHeight * width / imageWidth;
+                    ui.infoRatio = width / height;
+                    $still.css({
+                            position: "absolute",
+                            left: 0,
+                            top: 0,
+                            //width: width + "px",
+                            //height: height + "px",
+                            width: "100%",
+                            opacity: 0
+                        })
+                        .appendTo($ui.info.$element)
+                        .animate({
+                            opacity: 1
+                        });
+                    $ui.infoStill.animate({
+                        opacity: 0
+                    }, 250);
+                    $ui.info.animate({
+                        height: (height + 16) + "px"
+                    }, 250, function() {
+                        $ui.infoStill.remove();
+                        $ui.infoStill = $still;
+                    });
+                });
+            /*
+            $timeline = $("<img>")
+                .attr({
+                    src: "http://0xdb.org/" + data.ids[0] + "/timeline/timeline.png"
+                })
+                .one("load", function() {
+                    $timeline.css({
+                            position: "absolute",
+                            left: 0,
+                            bottom: "16px",
+                            opacity: 0
+                        })
+                        .appendTo($ui.info.$element)
+                        .animate({
+                            opacity: 1
+                        });
+                    $ui.infoTimeline.animate({
+                        opacity: 0
+                    }, 250, function() {
+                        $ui.infoTimeline.remove();
+                        $ui.infoTimeline = $timeline;
+                    });
+                });
+            */
         }
         app.request("find", {
             query: {
@@ -673,7 +762,7 @@ $ui.statusbar = new Ox.Bar({
     // Resize
 
     Ox.Event.bind("resize_leftPanel", function(event, data) {
-        $ui.leftPanel.resize("infoPanel", data * 0.75);
+        $ui.leftPanel.resize("infoPanel", data / ui.infoRatio + 16);
     });
     Ox.Event.bind("resize_rightPanel", function(event, data) {
         var widths = $.map(groups, function(v, i) {
