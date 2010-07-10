@@ -681,67 +681,74 @@ $ui.statusbar = new Ox.Bar({
             $ui.mainMenu.disableItem("openmovie");            
         }
         if (data.ids.length == 1) {
-            $still = $("<img>")
-                .attr({
-                    src: "http://0xdb.org/" + data.ids[0] + "/still.jpg"
-                })
-                .one("load", function() {
-                    if (data.ids[0] != ui.selectedMovies[0]) {
-                        return;
-                    }
-                    var image = $still[0],
-                        imageWidth = image.width,
-                        imageHeight = image.height,
-                        width = $ui.info.width(),
-                        height = imageHeight * width / imageWidth;
-                    ui.infoRatio = width / height;
-                    $still.css({
-                            position: "absolute",
-                            left: 0,
-                            top: 0,
-                            //width: width + "px",
-                            //height: height + "px",
-                            width: "100%",
+            setTimeout(function() {
+                if (data.ids[0] != ui.selectedMovies[0]) {
+                    Ox.print("cancel after timeout...")
+                    return;
+                }
+                $still = $("<img>")
+                    .attr({
+                        src: "http://0xdb.org/" + data.ids[0] + "/still.jpg"
+                    })
+                    .one("load", function() {
+                        if (data.ids[0] != ui.selectedMovies[0]) {
+                            Ox.print("cancel after load...")
+                            return;
+                        }
+                        var image = $still[0],
+                            imageWidth = image.width,
+                            imageHeight = image.height,
+                            width = $ui.info.width(),
+                            height = imageHeight * width / imageWidth;
+                        ui.infoRatio = width / height;
+                        $still.css({
+                                position: "absolute",
+                                left: 0,
+                                top: 0,
+                                //width: width + "px",
+                                //height: height + "px",
+                                width: "100%",
+                                opacity: 0
+                            })
+                            .appendTo($ui.info.$element)
+                            .animate({
+                                opacity: 1
+                            });
+                        $ui.infoStill.animate({
                             opacity: 0
-                        })
-                        .appendTo($ui.info.$element)
-                        .animate({
-                            opacity: 1
+                        }, 250);
+                        $ui.info.animate({
+                            height: (height + 16) + "px"
+                        }, 250, function() {
+                            $ui.infoStill.remove();
+                            $ui.infoStill = $still;
                         });
-                    $ui.infoStill.animate({
-                        opacity: 0
-                    }, 250);
-                    $ui.info.animate({
-                        height: (height + 16) + "px"
-                    }, 250, function() {
-                        $ui.infoStill.remove();
-                        $ui.infoStill = $still;
                     });
-                });
-            /*
-            $timeline = $("<img>")
-                .attr({
-                    src: "http://0xdb.org/" + data.ids[0] + "/timeline/timeline.png"
-                })
-                .one("load", function() {
-                    $timeline.css({
-                            position: "absolute",
-                            left: 0,
-                            bottom: "16px",
+                /*
+                $timeline = $("<img>")
+                    .attr({
+                        src: "http://0xdb.org/" + data.ids[0] + "/timeline/timeline.png"
+                    })
+                    .one("load", function() {
+                        $timeline.css({
+                                position: "absolute",
+                                left: 0,
+                                bottom: "16px",
+                                opacity: 0
+                            })
+                            .appendTo($ui.info.$element)
+                            .animate({
+                                opacity: 1
+                            });
+                        $ui.infoTimeline.animate({
                             opacity: 0
-                        })
-                        .appendTo($ui.info.$element)
-                        .animate({
-                            opacity: 1
+                        }, 250, function() {
+                            $ui.infoTimeline.remove();
+                            $ui.infoTimeline = $timeline;
                         });
-                    $ui.infoTimeline.animate({
-                        opacity: 0
-                    }, 250, function() {
-                        $ui.infoTimeline.remove();
-                        $ui.infoTimeline = $timeline;
                     });
-                });
-            */
+                */
+            }, 100);
         }
         app.request("find", {
             query: {
@@ -850,8 +857,11 @@ $ui.statusbar = new Ox.Bar({
 
     function constructQuery(groupId) {
         var conditions = $.merge(!Ox.isUndefined(user.ui.find.key) ? [user.ui.find] : [], groups ? $.map(groups, function(v, i) {
-            if (v.id != groupId) {
-                return v.conditions;
+            if (v.id != groupId && v.conditions.length) {
+                return v.conditions.length == 1 ? v.conditions : {
+                    conditions: v.conditions,
+                    operator: "|"
+                };
             }
         }) : []);
         return {
