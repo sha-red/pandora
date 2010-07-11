@@ -50,6 +50,12 @@ $(function() {
                 { id: "map", title: "on Map" },
                 { id: "calendar", title: "on Calendar" },
             ],
+            sections: [
+                { id: "history", title: "History" },
+                { id: "lists", title: "My Lists" },
+                { id: "public", title: "Public Lists" },
+                { id: "featured", title: "Featured Lists" }
+            ],
             sortKeys: [
                 { id: "title", title: "Title", operator: "", align: "left", width: 180, removable: false },
                 { id: "director", title: "Director", operator: "", align: "left", width: 180, removable: false },
@@ -109,6 +115,7 @@ $(function() {
                     itemView: "info",
                     listsSize: 192,
                     listView: "list",
+                    sections: ["history", "lists", "public", "featured"],
                     showGroups: true,
                     showInfo: true,
                     showLists: true,
@@ -263,7 +270,31 @@ $(function() {
         ]
     });
 
-// info
+// Lists
+
+    $ui.lists = new Ox.Element();
+    $ui.sections = [];
+    $.each(user.ui.sections, function(i, id) {
+        var section = new Ox.CollapsePanel({
+            size: "small",
+            title: Ox.getObjectById(config.sections, id).title
+        });
+        $ui.sections.push(section);
+        section.$content.append(
+            $("<div>").css({ height: "20px" }).append(
+                $("<div>").css({ float: "left", width: "16px", height: "16px", margin: "1px"}).append(
+                    $("<img>").attr({ src: "static/oxjs/build/png/ox.ui.modern/iconFind.png" }).css({ width: "16px", height: "16px", border: 0, background: "rgb(64, 64, 64)", WebkitBorderRadius: "2px" })
+                )
+            ).append(
+                $("<div>").css({ float: "left", width: "122px", height: "14px", margin: "2px" }).html("Foo")
+            ).append(
+                $("<div>").css({ float: "left", width: "40px", height: "14px", margin: "2px", textAlign: "right" }).html("23")
+            )
+        );
+        $ui.lists.append(section);
+    })
+
+// Info
 
     $ui.info = new Ox.Element()
         .append(
@@ -458,9 +489,9 @@ $ui.statusbar = new Ox.Bar({
                             element: $ui.leftPanel = new Ox.SplitPanel({
                                 elements: [
                                     {
-                                        element: $ui.lists = new Ox.Element({
+                                        element: $ui.lists.options({
                                             id: "listsPanel"
-                                        }).append(new Ox.CollapsePanel({ title: "My Lists" }).append(Ox.repeat("foo<br/>", 20)))
+                                        })
                                     },
                                     {
                                         collapsible: true,
