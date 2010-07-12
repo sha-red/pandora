@@ -33,8 +33,10 @@ import tasks
 
 from oxuser.models import getUserJSON
 from oxuser.views import api_login, api_logout, api_register, api_contact, api_recover, api_preferences
+from archive.views import api_update, api_addArchive, api_editArchive, api_removeArchive
 
-    
+from archive.models import File
+
 def api(request):
     if request.META['REQUEST_METHOD'] == "OPTIONS":
         response = HttpResponse('')
@@ -78,10 +80,18 @@ def api_error(request):
 
 def _order_query(qs, sort, prefix='sort__'):
     order_by = []
+    if len(sort) == 1:
+        if sort[0]['key'] in ('title', 'director'):
+            sort.append({'operator': '-', 'key': 'year'})
+        if sort[0]['key'] in ('year', ):
+            sort.append({'operator': '+', 'key': 'director'})
     for e in sort:
         operator = e['operator']
         if operator != '-': operator = ''
         key = {'id': 'movieId'}.get(e['key'], e['key'])
+        #FIXME: this should be a property of models.MovieSort!!!
+        if operator=='-' and key in ('title', 'director', 'writer', 'producer', 'editor', 'cinematographer', 'language', 'country', 'year'):
+            key = '%s_desc' % key
         order = '%s%s%s' % (operator, prefix, key)
         order_by.append(order)
     if order_by:
@@ -180,29 +190,23 @@ Positions
             query['sort'] = [{'key': 'name', 'operator':'+'}]
         #FIXME: also filter lists here
         response['data']['items'] = []
-        name = 'name'
         items = 'movies'
         movie_qs = query['qs']
-        if query['group'] == "director":
-            qs = models.Cast.objects.filter(role='directors').filter(movie__id__in=movie_qs).values('person__name').annotate(movies=Count('person__id')).order_by()
-            name = 'person__name'
-        elif query['group'] == "country":
-            qs = models.Country.objects.filter(movies__id__in=movie_qs).values('name').annotate(movies=Count('id'))
-        elif query['group'] == "genre":
-            qs = models.Genre.objects.filter(movies__id__in=movie_qs).values('name').annotate(movies=Count('id'))
-        elif query['group'] == "language":
-            qs = models.Language.objects.filter(movies__id__in=movie_qs).values('name').annotate(movies=Count('id'))
-        elif query['group'] == "year":
+        if query['group'] == "year":
             qs = models.MovieSort.objects.filter(movie__id__in=movie_qs).values('year').annotate(movies=Count('year'))
             name='year'
+            name_sort='year'
+        else:
+            qs = models.Facet.objects.filter(key=query['group']).filter(movie__id__in=movie_qs)
+            qs = qs.values('value').annotate(movies=Count('id')).order_by()
+            name = 'value'
+            name_sort = 'value_sort'
+
         #replace normalized items/name sort with actual db value
         for i in range(0, len(query['sort'])):
             if query['sort'][i]['key'] == 'name':
-                if query['group'] in ('director', ):
-                    query['sort'][i]['key'] = 'person__name_sort'
-                else:
-                    query['sort'][i]['key'] = name
-            if query['sort'][i]['key'] == 'items':
+                query['sort'][i]['key'] = name_sort
+            elif query['sort'][i]['key'] == 'items':
                 query['sort'][i]['key'] = items
         qs = _order_query(qs, query['sort'], prefix='')
         if 'ids' in query:
@@ -235,26 +239,25 @@ Positions
                 for p in _p:
                     r[p] = m.get(p, '')
             return r
-
         qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]
     else: # otherwise stats
         #movies = models.Movie.objects.filter(available=True)
         movies = query['qs']
-        files = models.File.objects.all().filter(movie__in=movies)
+        files = File.objects.all().filter(movie__in=movies)
         r = files.aggregate(
-            Count('duration'),
-            Count('pixels'),
-            Count('size')
+            Sum('duration'),
+            Sum('pixels'),
+            Sum('size')
         )
-        response['data']['duration'] = r['duration__count']
+        response['data']['duration'] = r['duration__sum']
         response['data']['files'] = files.count()
         response['data']['items'] = movies.count()
-        response['data']['pixels'] = r['pixels__count']
+        response['data']['pixels'] = r['pixels__sum']
         response['data']['runtime'] = movies.aggregate(Sum('sort__runtime'))['sort__runtime__sum']
         if response['data']['runtime'] == None:
             response['data']['runtime'] = 1337
-        response['data']['size'] = r['size__count']
+        response['data']['size'] = r['size__sum']
     return render_to_json_response(response)
 
 def api_getItem(request):
@@ -399,106 +402,6 @@ def api_removeList(request):
                 'data': {}}
     '''
     response = json_response(status=501, text='not implemented')
-    return render_to_json_response(response)
-
-@login_required_json
-def api_addArchive(request):
-    '''
-        ARCHIVE API NEEDS CLEANUP
-        param data
-            {name: string}
-        return {'status': {'code': int, 'text': string},
-                'data': {}}
-    '''
-    data = json.loads(request.POST['data'])
-    try:
-        archive = models.Archive.objects.get(name=data['name'])
-        response = {'status': {'code': 401, 'text': 'archive with this name exists'}}
-    except models.Archive.DoesNotExist:
-        archive = models.Archive(name=data['name'])
-        archive.save()
-        archive.users.add(request.user)
-        response = json_response({})
-        response['status']['text'] = 'archive created'
-    return render_to_json_response(response)
-
-@login_required_json
-def api_editArchive(request):
-    '''
-        ARCHIVE API NEEDS CLEANUP
-        param data
-            {id: string, key: value,..}
-        return {'status': {'code': int, 'text': string},
-                'data': {}}
-    '''
-    data = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Archive, name=data['name'])
-    if item.editable(request.user):
-		response = json_response(status=501, text='not implemented')
-		item.edit(data)
-	else:
-		response = json_response(status=403, text='permission denied')
-    return render_to_json_response(response)
-
-@login_required_json
-def api_removeArchive(request):
-    '''
-        ARCHIVE API NEEDS CLEANUP
-        param data
-            string id
-
-        return {'status': {'code': int, 'text': string}}
-    '''
-    response = json_response({})
-    itemId = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Archive, movieId=itemId)
-	if item.editable(request.user):
-		response = json_response(status=501, text='not implemented')
-	else:
-		response = json_response(status=403, text='permission denied')
-    return render_to_json_response(response)
-
-
-
-#@login_required_json
-def api_update(request):
-    '''
-        param data
-            {archive: string, files: json}
-        return {'status': {'code': int, 'text': string},
-                'data': {info: object, rename: object}}
-    '''
-    data = json.loads(request.POST['data'])
-    archive = data['archive']
-    files = data['files']
-    archive = get_object_or_404_json(models.Archive, name=archive)
-    if archive.editable(request.user):
-		needs_data = []
-		rename = {}
-		for oshash in files:
-			data = files[oshash]
-			q = models.ArchiveFile.objects.filter(archive=archive, file__oshash=oshash)
-			if q.count() == 0:
-				#print "adding file", oshash, data['path']
-				f = models.ArchiveFile.get_or_create(archive, oshash)
-				f.update(data)
-				if not f.file.movie:
-					task.findMovie(f.file.id)
-				#FIXME: only add if it was not in File
-			else:
-				f = q[0]
-				if data['path'] != f.path:
-					f.path = data['path']
-					f.save()
-			if f.file.needs_data:
-				needs_data.append(oshash)
-			if f.path != f.file.path:
-				rename[oshash] = f.file.path
-		#print "processed files for", archive.name
-		#remove all files not in files.keys() from ArchiveFile
-        response = json_response({'info': needs_data, 'rename': rename})
-	else:
-		response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 
 def api_encodingSettings(request):

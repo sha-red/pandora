@@ -112,6 +112,7 @@ INSTALLED_APPS = (
 
     'app',
     'backend',
+    'archive',
     'oxuser',
     'torrent',
 )

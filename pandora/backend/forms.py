@@ -10,7 +10,7 @@ ajax_filtered_js = (
     settings.STATIC_URL + 'js/jquery/jquery.js',
     settings.STATIC_URL + 'js/ajax_filtered_fields.js',
 )
-
+"""
 class FileAdminForm(forms.ModelForm):
     movie = ForeignKeyByLetter(models.Movie, field_name='imdb__title')
 
@@ -39,4 +39,4 @@ class MovieAdminForm(forms.ModelForm):
 
     class Media:
         js = ajax_filtered_js
-
+"""

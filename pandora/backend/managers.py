@@ -46,7 +46,7 @@ class MovieManager(Manager):
             query: {
                 conditions: [
                     {
-                        value: "war""
+                        value: "war"
                     }
                     {
                         key: "year",
@@ -59,10 +59,10 @@ class MovieManager(Manager):
                         operator: "^"
                     }
                 ],
-                operator: "&"
+                operator: ","
             }
 		'''
-        query_operator = data['query'].get('operator', '&')
+        query_operator = data['query'].get('operator', ',')
         conditions = []
         for condition in data['query']['conditions']:
             k = condition.get('key', 'all')

@@ -12,7 +12,8 @@ import ox
 import ox.iso
 from ox.normalize import normalizeName
 
-def oxid(title, director, year='', seriesTitle='', episodeTitle='', season=0, episode=0):
+def oxid(title, directors, year='', seriesTitle='', episodeTitle='', season=0, episode=0):
+    director = ', '.join(directors)
     oxid_value = u"\n".join([title, director, year])
     oxid = hashlib.sha1(oxid_value.encode('utf-8')).hexdigest()
     if seriesTitle:
@@ -22,15 +23,19 @@ def oxid(title, director, year='', seriesTitle='', episodeTitle='', season=0, ep
         oxid += hashlib.sha1(oxid_value.encode('utf-8')).hexdigest()[:20]
     return u"0x" + oxid
 
-def oxdb_director(director):
+def oxdb_directors(director):
     director = os.path.basename(os.path.dirname(director))
     if director.endswith('_'):
         director = "%s." % director[:-1]
-    director = ", ".join([normalizeName(d) for d in director.split('; ')])
-    director = director.replace('Series', '')
-    director = director.replace('Unknown Director', '')
-    director = director.replace('Various Directors', '')
-    return director
+    directors = [normalizeName(d) for d in director.split('; ')]
+    def cleanup(director):
+        director = director.strip()
+        director = director.replace('Series', '')
+        director = director.replace('Unknown Director', '')
+        director = director.replace('Various Directors', '')
+        return director
+    directors = filter(None, [cleanup(d) for d in directors])
+    return directors
 
 def oxdb_title(_title, searchTitle = False):
     '''
@@ -117,11 +122,15 @@ def parsePath(path):
     search_title = oxdb_title(path, True)
     r = {}
     r['title'] = oxdb_title(path)
-    r['director'] = oxdb_director(path)
+    r['directors'] = oxdb_directors(path)
     r['episode_title'] = oxdb_episode_title(path)
     r['season'], r['episode'] = oxdb_season_episode(path)
-    r['series'] = oxdb_series_title(path)
+    r['series_title'] = oxdb_series_title(path)
     r['part'] = oxdb_part(path)
-    r['imdbId'] = ox.web.imdb.guess(search_title, r['director'], timeout=-1)
+    r['imdbId'] = ox.web.imdb.guess(search_title, ', '.join(r['directors']), timeout=-1)
+    r['oxdbId'] = oxid(r['title'], r['directors'],
+                       seriesTitle=r['series_title'],
+                       episodeTitle=r['episode_title'],
+                       season=r['season'], episode=r['episode'])
     return r
 

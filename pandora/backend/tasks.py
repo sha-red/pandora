@@ -12,16 +12,17 @@ import models
 def cronjob(**kwargs):
     print "do some cleanup stuff once a day"
 
-@task(ignore_resulsts=True)
-def loadIMDb(imdbId):
-    load.loadIMDb(imdbId)
+@task(ignore_resulsts=True, queue='default')
+def updateImdb(imdbId):
+    movie = models.Movie.objects.get(movieId=imdbId)
+    movie.updateImdb()
 
 @task(ignore_resulsts=True)
 def findMovie(fileId):
     f = models.File.objects.get(pk=fileId)
     f.findMovie()
 
-@task(ignore_resulsts=True, exchange="encoding")
+@task(ignore_resulsts=True, queue="encoding")
 def extractData(fileId):
     '''
         update file stuff
@@ -30,7 +31,7 @@ def extractData(fileId):
     f = models.File.objects.get(pk=fileId)
     f.extract()
 
-@task(ignore_resulsts=True, exchange="encoding")
+@task(ignore_resulsts=True, queue="encoding")
 def updateMovie(movidId):
     '''
         update movie
