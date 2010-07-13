@@ -260,7 +260,9 @@ class Movie(models.Model):
         f.trivia = ' '.join(self.get('trivia', []))
         f.location = '|%s|'%'|'.join(self.get('filming_locations', []))
 
-        f.dialog = 'fixme'
+        #FIXME:
+        #f.dialog = 'fixme'
+        f.dialog = '\n'.join([l.value for l in Layer.objects.filter(type='subtitle', movie=self).order_by('start')])
 
         #FIXME: collate filenames
         #f.filename = self.filename
@@ -312,12 +314,13 @@ class Movie(models.Model):
         s.summary = len(self.get('plot', '').split())
         s.trivia = len(self.get('trivia', []))
         s.connections = len(self.get('connections', []))
-        s.movieId = self.movieId
+        s.movieId = self.movieId.replace('0x', 'xx')
         s.rating = self.get('rating', -1)
         s.votes = self.get('votes', -1)
 
         # data from related subtitles
         s.scenes = 0 #FIXME
+        s.dialog =  0 #FIXME
         s.words =  0 #FIXME
         s.wpm =    0 #FIXME
         s.risk =   0 #FIXME
@@ -338,6 +341,7 @@ class Movie(models.Model):
         if not s.year:
             s.year_desc = '';
             s.year = '9999';
+        #FIXME: also deal with number based rows like genre, keywords etc
         s.save()
 
     def updateFacets(self):
@@ -361,6 +365,12 @@ class Movie(models.Model):
                     f = Facet(key=key, value=value, value_sort=value_sort)
                     f.movie = self
                     f.save()
+        year = self.get('year', None)
+        if year:
+            f, created = Facet.objects.get_or_create(key='year', value=year, value_sort=year, movie=self)
+        else:
+            Facet.objects.filter(movie=self, key='year').delete()
+
 
 class MovieFind(models.Model):
     """
@@ -380,6 +390,8 @@ class MovieFind(models.Model):
     cinematographer = models.TextField(blank=True, default='')
     actor = models.TextField(blank=True, default='')
     character = models.TextField(blank=True, default='')
+
+    dialog = models.TextField(blank=True, default='')
     #person
 
     genre = models.TextField(blank=True)
@@ -433,6 +445,7 @@ class MovieSort(models.Model):
     rating = models.FloatField(blank=True, db_index=True)
     votes = models.IntegerField(blank=True, db_index=True)
     scenes = models.IntegerField(blank=True, db_index=True)
+    dialog = models.IntegerField(null=True, blank=True, db_index=True)
     words = models.IntegerField(null=True, blank=True, db_index=True)
     wpm = models.IntegerField('Words per Minute', null=True, blank=True, db_index=True)
     risk = models.IntegerField(null=True, blank=True, db_index=True)
@@ -590,14 +603,15 @@ class ListItem(models.Model):
         return u'%s in %s' % (unicode(self.movie), unicode(self.list))
 
 class Layer(models.Model):
+    #FIXME: here having a movie,start index would be good
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User)
     movie = models.ForeignKey(Movie)
 
     #seconds
-    time_in = models.FloatField(default=-1)
-    time_out = models.FloatField(default=-1)
+    start = models.FloatField(default=-1)
+    stop = models.FloatField(default=-1)
 
     type = models.CharField(blank=True, max_length=255)
     value = models.TextField()

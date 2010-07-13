@@ -192,15 +192,10 @@ Positions
         response['data']['items'] = []
         items = 'movies'
         movie_qs = query['qs']
-        if query['group'] == "year":
-            qs = models.MovieSort.objects.filter(movie__id__in=movie_qs).values('year').annotate(movies=Count('year'))
-            name='year'
-            name_sort='year'
-        else:
-            qs = models.Facet.objects.filter(key=query['group']).filter(movie__id__in=movie_qs)
-            qs = qs.values('value').annotate(movies=Count('id')).order_by()
-            name = 'value'
-            name_sort = 'value_sort'
+        qs = models.Facet.objects.filter(key=query['group']).filter(movie__id__in=movie_qs)
+        qs = qs.values('value').annotate(movies=Count('id')).order_by()
+        name = 'value'
+        name_sort = 'value_sort'
 
         #replace normalized items/name sort with actual db value
         for i in range(0, len(query['sort'])):
@@ -217,7 +212,10 @@ Positions
 
         elif 'range' in data:
             qs = qs[query['range'][0]:query['range'][1]]
-            response['data']['items'] = [{'name': i[name], 'items': i[items]} for i in qs]
+            if name == 'year':
+                response['data']['items'] = [{'name': i.year, 'items': i.movies} for i in qs]
+            else:
+                response['data']['items'] = [{'name': i[name], 'items': i[items]} for i in qs]
         else:
             response['data']['items'] = qs.count()
     elif 'ids' in query:
