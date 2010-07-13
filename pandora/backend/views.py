@@ -212,10 +212,7 @@ Positions
 
         elif 'range' in data:
             qs = qs[query['range'][0]:query['range'][1]]
-            if name == 'year':
-                response['data']['items'] = [{'name': i.year, 'items': i.movies} for i in qs]
-            else:
-                response['data']['items'] = [{'name': i[name], 'items': i[items]} for i in qs]
+            response['data']['items'] = [{'name': i[name], 'items': i[items]} for i in qs]
         else:
             response['data']['items'] = qs.count()
     elif 'ids' in query:
