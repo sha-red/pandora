@@ -188,7 +188,6 @@ Positions
                     query['sort'].append({'key': 'name', 'operator':'+'})
         else:
             query['sort'] = [{'key': 'name', 'operator':'+'}]
-        #FIXME: also filter lists here
         response['data']['items'] = []
         items = 'movies'
         movie_qs = query['qs']
@@ -237,7 +236,6 @@ Positions
         qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]
     else: # otherwise stats
-        #movies = models.Movie.objects.filter(available=True)
         movies = query['qs']
         files = File.objects.all().filter(movie__in=movies)
         r = files.aggregate(

@@ -21,6 +21,135 @@ def keyType(key):
         return "float"
     return "string"
 
+def parseCondition(condition):
+    '''
+    condition: {
+            value: "war"
+    }
+    or
+    condition: {
+            key: "year",
+            value: "1970-1980,
+            operator: "!="
+    }
+    ...
+	'''
+
+    k = condition.get('key', 'all')
+    k = {'id': 'movieId'}.get(k, k)
+    if not k: k = 'all'
+    v = condition['value']
+    op = condition.get('operator', None)
+    if not op: op = '~'
+    if op.startswith('!'):
+        op = op[1:]
+        exclude = True
+    else:
+        exclude = False
+    if keyType(k) == "string":
+        if op == '=':
+            if k in ('director', 'country', 'language', 'genre',
+                     'keywords', 'location', 'writer', 'producer',
+                     'editor', 'cinematographer'):
+                k = '%s__icontains' % k
+                v = u'|%s|'%v
+            else:
+                k = '%s__iexact' % k
+        elif op == '^':
+            v = v[1:]
+            k = '%s__istartswith' % k
+        elif op == '$':
+            v = v[:-1]
+            k = '%s__iendswith' % k
+        else: # elif op == '~':
+            k = '%s__icontains' % k
+        if not k.startswith('movieId'):
+            k = 'find__%s' % k
+        k = str(k)
+        if exclude:
+            return ~Q(**{k:v})
+        else:
+            return Q(**{k:v})
+    else: #number or date
+        def parseDate(d):
+            while len(d) < 3:
+                d.append(1)
+            return datetime(*[int(i) for i in d])
+        if op == '-':
+            v1 = v[1]
+            v2 = v[2]
+            if keyType(k) == "date":
+                v1 = parseDate(v1.split('.'))
+                v2 = parseDate(v2.split('.'))
+
+            k = 'find__%s' % k
+            if exclude: #!1960-1970
+                k1 = str('%s__lt' % k)
+                k2 = str('%s__gte' % k)
+                return Q(**{k1:v1})|Q(**{k2:v2})
+            else: #1960-1970
+                k1 = str('%s__gte' % k)
+                k2 = str('%s__lt' % k)
+                return Q(**{k1:v1})&Q(**{k2:v2})
+        else:
+            if keyType(k) == "date":
+                v = parseDate(v.split('.'))
+            if op == '=':
+                k = '%s__exact' % k
+            elif op == '>':
+                k = '%s__gt' % k
+            elif op == '>=':
+                k = '%s__gte' % k
+            elif op == '<':
+                k = '%s__lt' % k
+            elif op == '<=':
+                k = '%s__lte' % k
+
+            k = 'find__%s' % k
+            k = str(k)
+            if exclude: #!1960
+                return ~Q(**{k:v})
+            else: #1960
+                return Q(**{k:v})
+
+def parseConditions(conditions, operator):
+    '''
+    conditions: [
+        {
+            value: "war"
+        }
+        {
+            key: "year",
+            value: "1970-1980,
+            operator: "!="
+        },
+        {
+            key: "country",
+            value: "f",
+            operator: "^"
+        }
+    ],
+    operator: "&"
+	'''
+    conn = []
+    for condition in conditions:
+        if 'conditions' in condition:
+            q = parseConditions(condition['conditions'],
+                             condition.get('operator', '&'))
+            if q: conn.append(q)
+            pass
+        else:
+            conn.append(parseCondition(condition))
+    if conn:
+        q = conn[0]
+        for c in conn[1:]:
+            if operator == '|':
+                q = q | c
+            else:
+                q = q & c
+        return q
+    return None
+
 class MovieManager(Manager):
     def get_query_set(self):
         return super(MovieManager, self).get_query_set()
@@ -59,100 +188,20 @@ class MovieManager(Manager):
                         operator: "^"
                     }
                 ],
-                operator: ","
+                operator: "&"
             }
 		'''
-        query_operator = data['query'].get('operator', ',')
-        conditions = []
-        for condition in data['query']['conditions']:
-            k = condition.get('key', 'all')
-            k = {'id': 'movieId'}.get(k, k)
-            if not k: k = 'all'
-            v = condition['value']
-            op = condition.get('operator', None)
-            if not op: op = '~'
-            if op.startswith('!'):
-                op = op[1:]
-                exclude = True
-            else:
-                exclude = False
-            if keyType(k) == "string":
-                if op == '=':
-                    if k in ('director', 'country', 'language', 'genre', 'keywords', 'location', 'writer', 'producer', 'editor', 'cinematographer'):
-                        k = '%s__icontains' % k
-                        v = u'|%s|'%v
-                    else:
-                        k = '%s__iexact' % k
-                elif op == '^':
-                    v = v[1:]
-                    k = '%s__istartswith' % k
-                elif op == '$':
-                    v = v[:-1]
-                    k = '%s__iendswith' % k
-                else: # elif op == '~':
-                    k = '%s__icontains' % k
-                if not k.startswith('movieId'):
-                    k = 'find__%s' % k
-                k = str(k)
-                if exclude:
-                    conditions.append(~Q(**{k:v}))
-                else:
-                    conditions.append(Q(**{k:v}))
-            else: #number or date
-                def parseDate(d):
-                    while len(d) < 3:
-                        d.append(1)
-                    return datetime(*[int(i) for i in d])
-                if op == '-':
-                    v1 = v[1]
-                    v2 = v[2]
-                    if keyType(k) == "date":
-                        v1 = parseDate(v1.split('.'))
-                        v2 = parseDate(v2.split('.'))
-
-                    k = 'find__%s' % k
-                    if exclude: #!1960-1970
-                        k1 = str('%s__lt' % k)
-                        k2 = str('%s__gte' % k)
-                        conditions.append(Q(**{k1:v1})|Q(**{k2:v2}))
-                    else: #1960-1970
-                        k1 = str('%s__gte' % k)
-                        k2 = str('%s__lt' % k)
-                        conditions.append(Q(**{k1:v1})&Q(**{k2:v2}))
-                else:
-                    if keyType(k) == "date":
-                        v = parseDate(v.split('.'))
-                    if op == '=':
-                        k = '%s__exact' % k
-                    elif op == '>':
-                        k = '%s__gt' % k
-                    elif op == '>=':
-                        k = '%s__gte' % k
-                    elif op == '<':
-                        k = '%s__lt' % k
-                    elif op == '<=':
-                        k = '%s__lte' % k
-
-                    k = 'find__%s' % k
-                    k = str(k)
-                    if exclude: #!1960
-                        conditions.append(~Q(**{k:v}))
-                    else: #1960
-                        conditions.append(Q(**{k:v}))
 
         #join query with operator
         qs = self.get_query_set()
         #only include movies that have hard metadata
         qs = qs.filter(available=True)
+        conditions = parseConditions(data['query']['conditions'],
+                                     data['query'].get('operator', '&'))
         if conditions:
-            q = conditions[0]
-            for c in conditions[1:]:
-                if query_operator == '|':
-                    q = q | c
-                else:
-                    q = q & c
-            qs = qs.filter(q)
+            qs = qs.filter(conditions)
 
+        #FIXME: lists are part of query now
         # filter list, works for own or public lists
         l = data.get('list', 'all')
         qs = self.filter_list(qs, l, user)

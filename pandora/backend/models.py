@@ -23,6 +23,11 @@ import load
 import utils
 import extract
 
+def plural_key(term):
+    return {
+        'country': 'countries',
+    }.get(term, term + 's')
+
 
 def getMovie(info):
     '''
@@ -242,20 +247,19 @@ class Movie(models.Model):
         except MovieFind.DoesNotExist:
             f = MovieFind(movie=self)
 
-        f.title = self.get('title')
+        f.title = '\n'.join([self.get('title'), self.get('original_title', '')])
         #FIXME: filter us/int  title
         #f.title += ' '.join([t.title for t in self.alternative_titles()])
-        f.director = '|%s|'%'|'.join(self.get('directors', []))
-        f.country = '|%s|'%'|'.join(self.get('countries', []))
+
         f.year = self.get('year', '')
-        for key in ('language', 'writer', 'producer', 'editor', 'cinematographer'):
-            setattr(f, key, '|%s|'%'|'.join(self.get('%ss'%key, [])))
+
+        for key in ('directors', 'country', 'language', 'writer', 'producer',
+                    'editor', 'cinematographer', 'genre', 'keyword'):
+            setattr(f, key, '|%s|'%'|'.join(self.get(plural_key(key), [])))
 
         f.actor = '|%s|'%'|'.join([i[0] for i in self.get('actor', [])])
         f.character = '|%s|'%'|'.join([stripTagsl(i[1]) for i in self.get('actor', [])])
 
-        f.genre = '|%s|'%'|'.join(self.get('genres', []))
-        f.keyword = '|%s|'%'|'.join(self.get('keywords', []))
         f.summary = self.get('plot', '') + self.get('plot_outline', '')
         f.trivia = ' '.join(self.get('trivia', []))
         f.location = '|%s|'%'|'.join(self.get('filming_locations', []))
@@ -302,10 +306,11 @@ class Movie(models.Model):
         s.year = self.get('year', '')
 
         for key in ('director', 'writer', 'producer', 'editor', 'cinematographer'):
-            setattr(s, key, sortNames(self.get('%ss'%key, [])))
+            setattr(s, key, sortNames(self.get(plural_key(key), [])))
 
-        s.language = ','.join(self.get('languages', []))
-        s.country = ','.join(self.get('countries', []))
+        for key in ('language', 'country'):
+            setattr(s, key, ','.join(self.get(plural_key(key), [])))
+
         s.runtime = self.get('runtime', 0)
 
         s.keywords = len(self.get('keywords', []))
@@ -347,12 +352,8 @@ class Movie(models.Model):
     def updateFacets(self):
         #"year", is extra is it?
         #FIXME: what to do with Unkown Director, Year, Country etc. 
-        def plural(term):
-            return {
-                'country': 'countries',
-            }.get(term, term + 's')
-        for key in ("director", "country", "language", "genre"):
-            current_values = self.get(plural(key), [])
+        for key in ("director", "country", 'writer', 'producer', 'editor', 'cinematographer', "language", "genre"):
+            current_values = self.get(plural_key(key), [])
             saved_values = [i.value for i in Facet.objects.filter(movie=self, key=key)]
             removed_values = filter(lambda x: x not in current_values, saved_values)
             if removed_values:
