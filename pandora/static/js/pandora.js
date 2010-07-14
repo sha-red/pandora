@@ -170,9 +170,9 @@ $(function() {
                         conditions: [],
                         operator: ""
                     },
-                    subconditions = str.match(/\[.*?\]/) || [];
+                    subconditions = str.match(/\[.*?\]/g) || [];
                 $.each(subconditions, function(i, v) {
-                    subconditions[i] = subconditions[i].substr(1, -1);
+                    subconditions[i] = v.substr(1, v.length - 2);
                     str = str.replace(v, "[" + i + "]");
                 });
                 if (str.indexOf(",") > -1) {
@@ -180,14 +180,16 @@ $(function() {
                 } else if (str.indexOf("|") > -1) {
                     find.operator = "|";
                 }
-                Ox.print("pF", str)
+                Ox.print("pF", str, find.operator)
                 find.conditions = $.map(find.operator === "" ? [str] : str.split(find.operator == "&" ? "," : "|"), function(v, i) {
+                    Ox.print("v", v)
                     var ret, kv;
                     if (v[0] == "[") {
-                        Ox.print("recursion")
-                        ret = parseFind(subconditions[parseInt(v[0].substr(1, -1))]);
+                        Ox.print("recursion", subconditions)
+                        ret = parseFind(subconditions[parseInt(v.substr(1, v.length - 2))]);
                     } else {
-                        kv = ((str.indexOf(":") > - 1 ? "" : ":") + str).split(":");
+                        kv = ((v.indexOf(":") > - 1 ? "" : ":") + v).split(":");
+                        Ox.print("kv", kv)
                         ret = $.extend({
                             key: kv[0]
                         }, parseValue(kv[1]));
@@ -213,7 +215,7 @@ $(function() {
                 }
                 if (value.value.substr(-1) == "$") {
                     value.operator += "$";
-                    value.value = value.value.substr(0, -1);
+                    value.value = value.value.substr(0, value.value.length - 1);
                 }
                 value.operator.replace("^$", "=");
                 return value;
