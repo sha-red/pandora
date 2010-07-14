@@ -189,12 +189,10 @@ $(function() {
                         ret = parseFind(subconditions[parseInt(v.substr(1, v.length - 2))]);
                     } else {
                         kv = ((v.indexOf(":") > - 1 ? "" : ":") + v).split(":");
-                        Ox.print("kv", kv)
                         ret = $.extend({
                             key: kv[0]
                         }, parseValue(kv[1]));
                     }
-                    Ox.print("ret", ret)
                     return ret;
                 });
                 return find;
@@ -217,7 +215,7 @@ $(function() {
                     value.operator += "$";
                     value.value = value.value.substr(0, value.value.length - 1);
                 }
-                value.operator.replace("^$", "=");
+                value.operator = value.operator.replace("^$", "=");
                 return value;
             }
 
