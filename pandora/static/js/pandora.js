@@ -112,6 +112,7 @@ $(function() {
                 ui: {
                     columns: ["id", "title", "director", "country", "year", "language", "runtime", "genre"],
                     find: { conditions: [{ key: "", value: "", operator: "" }], operator: "" },
+                    groupsSize: 128,
                     itemView: "info",
                     listsSize: 192,
                     listView: "list",
@@ -647,9 +648,9 @@ $ui.statusbar = new Ox.Bar({
                                 id: "leftPanel",
                                 orientation: "vertical"
                             }),
-                            size: user.ui.listsSize,
                             resizable: true,
-                            resize: [128, 192, 256]
+                            resize: [128, 192, 256],
+                            size: user.ui.listsSize
                         },
                         {
                             element: $ui.rightPanel = new Ox.SplitPanel({
@@ -662,6 +663,7 @@ $ui.statusbar = new Ox.Bar({
                                         element: $ui.contentPanel = new Ox.SplitPanel({
                                             elements: [
                                                 {
+                                                    collapsible: true,
                                                     element: $ui.groupsOuterPanel = new Ox.SplitPanel({
                                                         elements: [
                                                             {
@@ -693,7 +695,9 @@ $ui.statusbar = new Ox.Bar({
                                                         ],
                                                         orientation: "horizontal"
                                                     }),
-                                                    size: 128
+                                                    resizable: true,
+                                                    resize: [96, 112, 128, 144, 160, 176],
+                                                    size: user.ui.groupsSize
                                                 },
                                                 {
                                                     element: $ui.list = constructList(user.ui.listView)
