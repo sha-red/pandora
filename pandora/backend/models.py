@@ -83,6 +83,9 @@ def poster_path(f):
     return os.path.join('poster', url_hash[:2], url_hash[2:4], url_hash[4:6], name)
 
 class Movie(models.Model):
+    person_keys = ('director', 'writer', 'producer', 'editor', 'cinematographer')
+    facet_keys = person_keys + ('country', 'language', 'genre', 'keyword')
+
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     published = models.DateTimeField(default=datetime.now, editable=False)
@@ -253,8 +256,7 @@ class Movie(models.Model):
 
         f.year = self.get('year', '')
 
-        for key in ('directors', 'country', 'language', 'writer', 'producer',
-                    'editor', 'cinematographer', 'genre', 'keyword'):
+        for key in self.facet_keys:
             setattr(f, key, '|%s|'%'|'.join(self.get(plural_key(key), [])))
 
         f.actor = '|%s|'%'|'.join([i[0] for i in self.get('actor', [])])
@@ -305,7 +307,7 @@ class Movie(models.Model):
         s.country = ','.join(self.get('countries', []))
         s.year = self.get('year', '')
 
-        for key in ('director', 'writer', 'producer', 'editor', 'cinematographer'):
+        for key in self.person_keys:
             setattr(s, key, sortNames(self.get(plural_key(key), [])))
 
         for key in ('language', 'country'):
@@ -339,7 +341,7 @@ class Movie(models.Model):
         s.files = 0 #FIXME
         s.size = 0 #FIXME
 
-        for key in ('title', 'director', 'writer', 'producer', 'editor', 'cinematographer', 'language', 'country'):
+        for key in ('title', 'language', 'country') + self.person_keys:
             setattr(s, '%s_desc'%key, getattr(s, key))
             if not getattr(s, key):
                 setattr(s, key, u'zzzzzzzzzzzzzzzzzzzzzzzzz')
@@ -352,7 +354,7 @@ class Movie(models.Model):
     def updateFacets(self):
         #"year", is extra is it?
         #FIXME: what to do with Unkown Director, Year, Country etc. 
-        for key in ("director", "country", 'writer', 'producer', 'editor', 'cinematographer', "language", "genre"):
+        for key in self.facet_keys:
             current_values = self.get(plural_key(key), [])
             saved_values = [i.value for i in Facet.objects.filter(movie=self, key=key)]
             removed_values = filter(lambda x: x not in current_values, saved_values)
@@ -361,7 +363,7 @@ class Movie(models.Model):
             for value in current_values:
                 if value not in saved_values:
                     value_sort = value
-                    if key in ('director', ):
+                    if key in self.person_keys:
                         value_sort = getPersonSort(value)
                     f = Facet(key=key, value=value, value_sort=value_sort)
                     f.movie = self
@@ -371,7 +373,6 @@ class Movie(models.Model):
             f, created = Facet.objects.get_or_create(key='year', value=year, value_sort=year, movie=self)
         else:
             Facet.objects.filter(movie=self, key='year').delete()
-
 
 class MovieFind(models.Model):
     """

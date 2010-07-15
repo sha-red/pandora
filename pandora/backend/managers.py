@@ -47,12 +47,19 @@ def parseCondition(condition):
     else:
         exclude = False
     if keyType(k) == "string":
+        in_find=True
         if op == '=':
+            '''
             if k in ('director', 'country', 'language', 'genre',
                      'keywords', 'location', 'writer', 'producer',
                      'editor', 'cinematographer'):
                 k = '%s__icontains' % k
                 v = u'|%s|'%v
+            '''
+            if k in models.Movie.facet_keys:
+                in_find=False
+                v = models.Movie.objects.filter(facets__key=k, facets__value=v)
+                k = 'id__in'
             else:
                 k = '%s__iexact' % k
         elif op == '^':
@@ -63,7 +70,7 @@ def parseCondition(condition):
             k = '%s__iendswith' % k
         else: # elif op == '~':
             k = '%s__icontains' % k
-        if not k.startswith('movieId'):
+        if in_find and not k.startswith('movieId'):
             k = 'find__%s' % k
         k = str(k)
         if exclude:
