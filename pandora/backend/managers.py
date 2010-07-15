@@ -139,7 +139,8 @@ def parseConditions(conditions, operator):
             if q: conn.append(q)
             pass
         else:
-            conn.append(parseCondition(condition))
+            if condition.get('value', '') != '' or condition.get('operator', '') == '=':
+                conn.append(parseCondition(condition))
     if conn:
         q = conn[0]
         for c in conn[1:]:
