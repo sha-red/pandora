@@ -492,7 +492,7 @@ $(function() {
         .append(
             $ui.findInput = new Ox.Input({
                     autocomplete: function(key, value, callback) {
-                        var findKey = getObjectById(config.findKeys, key)
+                        var findKey = Ox.getObjectById(config.findKeys, key)
                         Ox.print("autocomplete", key, value);
                         value === "" && Ox.print("Warning: autocomplete function should never be called with empty value");
                         if ("autocomplete" in findKey && findKey.autocomplete) {
