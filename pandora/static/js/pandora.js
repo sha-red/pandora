@@ -11,20 +11,20 @@ $(function() {
             appName: "0xDB",
             findKeys: [
                 { id: "all", title: "All" },
-                { id: "title", title: "Title" },
-                { id: "director", title: "Director" },
-                { id: "country", title: "Country" },
-                { id: "year", title: "Year" },
-                { id: "language", title: "Language" },
-                { id: "writer", title: "Writer" },
-                { id: "producer", title: "Producer" },
-                { id: "cinematographer", title: "Cinematographer" },
-                { id: "editor", title: "Editor" },
-                { id: "actor", title: "Actor" },
-                { id: "character", title: "Character" },
-                { id: "name", title: "Name" },
-                { id: "genre", title: "Genre" },
-                { id: "keyword", title: "Keyword" },
+                { id: "title", title: "Title", autocomplete: true },
+                { id: "director", title: "Director", autocomplete: true },
+                { id: "country", title: "Country", autocomplete: true },
+                { id: "year", title: "Year", autocomplete: true },
+                { id: "language", title: "Language", autocomplete: true },
+                { id: "writer", title: "Writer", autocomplete: true },
+                { id: "producer", title: "Producer", autocomplete: true },
+                { id: "cinematographer", title: "Cinematographer", autocomplete: true },
+                { id: "editor", title: "Editor", autocomplete: true },
+                { id: "actor", title: "Actor", autocomplete: true },
+                { id: "character", title: "Character", autocomplete: true },
+                { id: "name", title: "Name", autocomplete: true },
+                { id: "genre", title: "Genre", autocomplete: true },
+                { id: "keyword", title: "Keyword", autocomplete: true },
                 { id: "summary", title: "Summary" },
                 { id: "dialog", title: "Dialog" }
             ],
@@ -110,8 +110,8 @@ $(function() {
             userSettings: {
                 group: "guest",
                 ui: {
-                    columns: ["title", "director", "country", "year", "language", "runtime", "genre"],
-                    find: { key: "all", value: "", operator: "" },
+                    columns: ["id", "title", "director", "country", "year", "language", "runtime", "genre"],
+                    find: { conditions: [{ key: "", value: "", operator: "" }], operator: "" },
                     itemView: "info",
                     listsSize: 192,
                     listView: "list",
@@ -135,10 +135,152 @@ $(function() {
         ui = {
             infoRatio: 4 / 3,
             selectedMovies: []
-        };
+        },
+
+// Objects
+
+        Query = (function() {
+
+            function constructFind(query) {
+                Ox.print("cF", query)
+                return $.map(query.conditions, function(v, i) {
+                    if (!Ox.isUndefined(v.conditions)) {
+                        return "[" + constructFind(v) + "]";
+                    } else {
+                        return v.value !== "" ? v.key + (v.key ? ":" : "") + constructValue(v.value, v.operator) : null;
+                    }
+                }).join(query.operator);
+            }
+
+            function constructValue(value, operator) {
+                operator = operator.replace("=", "^$");
+                if (operator.indexOf("$") > -1) {
+                    value = operator.substr(0, operator.length - 1) + value + "$"
+                } else {
+                    value = operator + value;
+                }
+                return value;
+            }
+
+            function mergeFind() {
+            }
+
+            function parseFind(str) {
+                var find = {
+                        conditions: [],
+                        operator: ""
+                    },
+                    subconditions = str.match(/\[.*?\]/g) || [];
+                $.each(subconditions, function(i, v) {
+                    subconditions[i] = v.substr(1, v.length - 2);
+                    str = str.replace(v, "[" + i + "]");
+                });
+                if (str.indexOf(",") > -1) {
+                    find.operator = "&";
+                } else if (str.indexOf("|") > -1) {
+                    find.operator = "|";
+                }
+                Ox.print("pF", str, find.operator)
+                find.conditions = $.map(find.operator === "" ? [str] : str.split(find.operator == "&" ? "," : "|"), function(v, i) {
+                    Ox.print("v", v)
+                    var ret, kv;
+                    if (v[0] == "[") {
+                        Ox.print("recursion", subconditions)
+                        ret = parseFind(subconditions[parseInt(v.substr(1, v.length - 2))]);
+                    } else {
+                        kv = ((v.indexOf(":") > - 1 ? "" : ":") + v).split(":");
+                        ret = $.extend({
+                            key: kv[0]
+                        }, parseValue(kv[1]));
+                    }
+                    return ret;
+                });
+                return find;
+            }
+
+            function parseValue(str) {
+                var value = {
+                        value: str,
+                        operator: ""
+                    };
+                if (value.value[0] == "!") {
+                    value.operator = "!"
+                    value.value = value.value.substr(1);
+                }
+                if ("^<>".indexOf(value.value[0]) > -1) {
+                    value.operator += value.value[0];
+                    value.value = value.value.substr(1);
+                }
+                if (value.value.substr(-1) == "$") {
+                    value.operator += "$";
+                    value.value = value.value.substr(0, value.value.length - 1);
+                }
+                value.operator = value.operator.replace("^$", "=");
+                return value;
+            }
+
+            return {
+
+                fromString: function(str) {
+                    var query = Ox.unserialize(str),
+                        sort = [];
+                    if ("find" in query) {
+                        user.ui.find = parseFind(query.find);
+                        Ox.print("user.ui.find", user.ui.find)
+                    }
+                    if ("sort" in query) {
+                        sort = query.sort.split(",")
+                        user.ui.sort = $.map(query.sort.split(","), function(v, i) {
+                            var hasOperator = "+-".indexOf(v[0]) > -1,
+                                key = hasOperator ? query.sort.substr(1) : query.sort,
+                                operator = hasOperator ? v[0].replace("+", "") : Ox.getObjectById(config.sortKeys, key).operator;
+                            return {
+                                key: key,
+                                operator: operator
+                            };
+                        });
+                    }
+                    if ("view" in query) {
+                        user.ui.listView = query.view;
+                    }
+                },
+
+                toObject: function(groupId) {
+                    Ox.print("tO", user.ui.find.conditions)
+                    // the inner $.merge() creates a clone
+                    var conditions = $.merge($.merge([], user.ui.find.conditions), groups ? $.map(groups, function(v, i) {
+                            if (v.id != groupId && v.conditions.length) {
+                                return v.conditions.length == 1 ? v.conditions : {
+                                    conditions: v.conditions,
+                                    operator: "|"
+                                };
+                            }
+                        }) : []),
+                        operator = conditions.length < 2 ? "" : ",";
+                    Ox.print(groupId, user.ui.find, conditions);
+                    return {
+                        conditions: conditions,
+                        operator: operator
+                    };
+                },
+
+                toString: function() {
+                    Ox.print("tS", user.ui.find)
+                    return Ox.serialize({
+                        find: constructFind(Query.toObject()),
+                        sort: user.ui.sort[0].operator + user.ui.sort[0].key,
+                        view: user.ui.listView
+                    });
+                }
+
+            };
+
+        })();
 
 // App
 
+    Query.fromString(location.hash.substr(1));
+    Ox.print("user.ui", user.ui)
     document.title = config.appName;
     Ox.theme(user.ui.theme);
     app = new Ox.App({
@@ -350,11 +492,10 @@ $(function() {
         .append(
             $ui.findInput = new Ox.Input({
                     autocomplete: function(key, value, callback) {
+                        var findKey = getObjectById(config.findKeys, key)
                         Ox.print("autocomplete", key, value);
                         value === "" && Ox.print("Warning: autocomplete function should never be called with empty value");
-                        if (key == "all") {
-                            callback();
-                        } else {
+                        if ("autocomplete" in findKey && findKey.autocomplete) {
                             app.request("find", {
                                 keys: [key],
                                 query: {
@@ -379,6 +520,8 @@ $(function() {
                                     return v.title;
                                 }));
                             });
+                        } else {
+                            callback();                            
                         }
                     },
                     clear: true,
@@ -433,7 +576,7 @@ $(function() {
                         delete options.keys;
                         app.request("find", $.extend(options, {
                             group: id,
-                            query: constructQuery()
+                            query: Query.toObject()
                         }), options.callback);
                     },
                     sort: [
@@ -590,6 +733,22 @@ $ui.statusbar = new Ox.Bar({
 
     // Menu
 
+    Ox.Event.bind("click_about", function(event, data) {
+        var $dialog = new Ox.Dialog({
+            buttons: [
+                {
+                    click: function() {
+                        $dialog.close();
+                    },
+                    id: "close",
+                    title: "Close",
+                    value: "Close"
+                }
+            ],
+            id: "about",
+            title: "About"
+        }).open();
+    });
     Ox.Event.bind("change_viewmovies", function(event, data) {
         $ui.viewSelect.selectItem(data.id);
     });
@@ -606,6 +765,22 @@ $ui.statusbar = new Ox.Bar({
     Ox.Event.bind("change_find", function(event, data) {
         $ui.findInput.changeLabel(data.id);
     });
+    Ox.Event.bind("click_query", function(event, data) {
+        var $dialog = new Ox.Dialog({
+            buttons: [
+                {
+                    click: function() {
+                        $dialog.close();
+                    },
+                    id: "close",
+                    title: "Close",
+                    value: "Close"
+                }
+            ],
+            id: "query",
+            title: "Query"
+        }).append(Query.toString() + "<br/><br/>" + JSON.stringify(Query.toObject())).open();
+    });
 
     // Toolbar
 
@@ -617,9 +792,15 @@ $ui.statusbar = new Ox.Bar({
     });
 
     Ox.Event.bind("submit_findInput", function(event, data) {
-        findCondition = {
-            key: data.key == "all" ? "" : data.key,
-            value: data.value,
+        var query;
+        user.ui.find = {
+            conditions: [
+                {
+                    key: data.key == "all" ? "" : data.key,
+                    value: data.value,
+                    operator: ""
+                }
+            ],
             operator: ""
         };
         $.each(groups, function(i, group) {
@@ -629,7 +810,7 @@ $ui.statusbar = new Ox.Bar({
                     delete options.keys;
                     return app.request("find", $.extend(options, {
                         group: group.id,
-                        query: constructQuery(group.id)
+                        query: Query.toObject(group.id)
                     }), options.callback);
                 }
             });
@@ -637,27 +818,30 @@ $ui.statusbar = new Ox.Bar({
         $ui.list.options({
             request: function(options) {
                 return app.request("find", $.extend(options, {
-                    query: constructQuery()
+                    query: query = Query.toObject()
                 }), options.callback);
             }
-        })
+        });
+        location.hash = Query.toString(query);
     });
 
     // Groups
 
     $.each(groups, function(i, group) {
         Ox.Event.bind("select_group_" + group.id, function(event, data) {
+            var query;
+            groups[i].conditions = $.map(data.ids, function(v) {
+                return {
+                    key: group.id,
+                    value: v,
+                    operator: "="
+                };
+            });
+            query = Query.toObject();
             $ui.list.options({
                 request: function(options) {
-                    groups[i].conditions = $.map(data.ids, function(v) {
-                        return {
-                            key: group.id,
-                            value: v,
-                            operator: "="
-                        };
-                    });
                     return app.request("find", $.extend(options, {
-                        query: constructQuery()
+                        query: query
                     }), options.callback);
                 }
             });
@@ -668,12 +852,13 @@ $ui.statusbar = new Ox.Bar({
                             delete options.keys;
                             return app.request("find", $.extend(options, {
                                 group: group_.id,
-                                query: constructQuery(group_.id)
+                                query: Query.toObject(group_.id)
                             }), options.callback);
                         }
                     });
                 }
             });
+            location.hash = Query.toString(query);
         });
     });
 
@@ -848,8 +1033,9 @@ $ui.statusbar = new Ox.Bar({
                 }),
                 id: "list",
                 request: function(options) {
+                    Ox.print("options, Query.toObject", options, Query.toObject())
                     app.request("find", $.extend(options, {
-                        query: constructQuery()
+                        query: Query.toObject()
                     }), options.callback);
                 },
                 sort: user.ui.sort
@@ -870,7 +1056,7 @@ $ui.statusbar = new Ox.Bar({
                 keys: ["director", "id", "posterHeight", "posterWidth", "posterURL", "title"],
                 request: function(options) {
                     app.request("find", $.extend(options, {
-                        query: constructQuery()
+                        query: Query.toObject()
                     }), options.callback);
                 },
                 size: 128,
@@ -884,21 +1070,6 @@ $ui.statusbar = new Ox.Bar({
             });
         }
         return $list;
-    }
-
-    function constructQuery(groupId) {
-        var conditions = $.merge(!Ox.isUndefined(user.ui.find.key) ? [user.ui.find] : [], groups ? $.map(groups, function(v, i) {
-            if (v.id != groupId && v.conditions.length) {
-                return v.conditions.length == 1 ? v.conditions : {
-                    conditions: v.conditions,
-                    operator: "|"
-                };
-            }
-        }) : []);
-        return {
-            conditions: conditions,
-            operator: conditions.length ? "," : ""
-        };
     }
 
     function constructStatus(key, data) {
@@ -1399,7 +1570,7 @@ $ui.statusbar = new Ox.Bar({
             app.request("find", $.extend(options, {
                 query: {
                     conditions: [],
-                    operator: "&"
+                    operator: "," // fixme: should be &
                 }
             }), options.callback);
         },
