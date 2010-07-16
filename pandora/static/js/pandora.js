@@ -656,7 +656,7 @@ $ui.statusbar = new Ox.Bar({
                             element: $ui.rightPanel = new Ox.SplitPanel({
                                 elements: [
                                     {
-                                        element: $ui.toolbar,
+                                        element: $ui.toolbar.css({ zIndex: 2 }), // fixme: remove later
                                         size: 24
                                     },
                                     {
@@ -893,97 +893,100 @@ $ui.statusbar = new Ox.Bar({
     Ox.Event.bind("select_list", function(event, data) {
         var $still, $timeline;
         ui.selectedMovies = data.ids;
-        if (data.ids.length) {
-            $ui.mainMenu.enableItem("copy");
-            $ui.mainMenu.enableItem("openmovie");
-        } else {
-            $ui.mainMenu.disableItem("copy");
-            $ui.mainMenu.disableItem("openmovie");            
-        }
-        if (data.ids.length == 1) {
-            setTimeout(function() {
-                if (data.ids[0] != ui.selectedMovies[0]) {
-                    Ox.print("cancel after timeout...")
-                    return;
+        setTimeout(function() {
+            if (
+                data.ids.length == ui.selectedMovies.length &&
+                (data.ids.length == 0 || data.ids[0] == ui.selectedMovies[0])
+            ) {
+                if (data.ids.length) {
+                    $ui.mainMenu.enableItem("copy");
+                    $ui.mainMenu.enableItem("openmovie");
+                } else {
+                    $ui.mainMenu.disableItem("copy");
+                    $ui.mainMenu.disableItem("openmovie");            
                 }
-                $still = $("<img>")
-                    .attr({
-                        src: "http://0xdb.org/" + data.ids[0] + "/still.jpg"
-                    })
-                    .one("load", function() {
-                        if (data.ids[0] != ui.selectedMovies[0]) {
-                            Ox.print("cancel after load...")
-                            return;
-                        }
-                        var image = $still[0],
-                            imageWidth = image.width,
-                            imageHeight = image.height,
-                            width = $ui.info.width(),
-                            height = imageHeight * width / imageWidth;
-                        ui.infoRatio = width / height;
-                        $still.css({
-                                position: "absolute",
-                                left: 0,
-                                top: 0,
-                                //width: width + "px",
-                                //height: height + "px",
-                                width: "100%",
+                if (data.ids.length == 1) {
+                    $still = $("<img>")
+                        .attr({
+                            src: "http://0xdb.org/" + data.ids[0] + "/still.jpg"
+                        })
+                        .one("load", function() {
+                            if (data.ids[0] != ui.selectedMovies[0]) {
+                                Ox.print("cancel after load...")
+                                return;
+                            }
+                            var image = $still[0],
+                                imageWidth = image.width,
+                                imageHeight = image.height,
+                                width = $ui.info.width(),
+                                height = imageHeight * width / imageWidth;
+                            ui.infoRatio = width / height;
+                            $still.css({
+                                    position: "absolute",
+                                    left: 0,
+                                    top: 0,
+                                    //width: width + "px",
+                                    //height: height + "px",
+                                    width: "100%",
+                                    opacity: 0
+                                })
+                                .appendTo($ui.info.$element)
+                                .animate({
+                                    opacity: 1
+                                });
+                            $ui.infoStill.animate({
                                 opacity: 0
-                            })
-                            .appendTo($ui.info.$element)
-                            .animate({
-                                opacity: 1
+                            }, 250);
+                            $ui.info.animate({
+                                height: (height + 16) + "px"
+                            }, 250, function() {
+                                $ui.infoStill.remove();
+                                $ui.infoStill = $still;
                             });
-                        $ui.infoStill.animate({
-                            opacity: 0
-                        }, 250);
-                        $ui.info.animate({
-                            height: (height + 16) + "px"
-                        }, 250, function() {
-                            $ui.infoStill.remove();
-                            $ui.infoStill = $still;
                         });
-                    });
-                /*
-                $timeline = $("<img>")
-                    .attr({
-                        src: "http://0xdb.org/" + data.ids[0] + "/timeline/timeline.png"
-                    })
-                    .one("load", function() {
-                        $timeline.css({
-                                position: "absolute",
-                                left: 0,
-                                bottom: "16px",
+                    /*
+                    $timeline = $("<img>")
+                        .attr({
+                            src: "http://0xdb.org/" + data.ids[0] + "/timeline/timeline.png"
+                        })
+                        .one("load", function() {
+                            $timeline.css({
+                                    position: "absolute",
+                                    left: 0,
+                                    bottom: "16px",
+                                    opacity: 0
+                                })
+                                .appendTo($ui.info.$element)
+                                .animate({
+                                    opacity: 1
+                                });
+                            $ui.infoTimeline.animate({
                                 opacity: 0
-                            })
-                            .appendTo($ui.info.$element)
-                            .animate({
-                                opacity: 1
+                            }, 250, function() {
+                                $ui.infoTimeline.remove();
+                                $ui.infoTimeline = $timeline;
                             });
-                        $ui.infoTimeline.animate({
-                            opacity: 0
-                        }, 250, function() {
-                            $ui.infoTimeline.remove();
-                            $ui.infoTimeline = $timeline;
                         });
-                    });
-                */
-            }, 100);
-        }
-        app.request("find", {
-            query: {
-                conditions: $.map(data.ids, function(id, i) {
-                    return {
-                        key: "id",
-                        value: id,
-                        operator: "="
+                    */
+                }
+                app.request("find", {
+                    query: {
+                        conditions: $.map(data.ids, function(id, i) {
+                            return {
+                                key: "id",
+                                value: id,
+                                operator: "="
+                            }
+                        }),
+                        operator: "|"
                     }
-                }),
-                operator: "|"
+                }, function(result) {
+                    $ui.selected.html(constructStatus("selected", result.data));
+                });
+            } else {
+                Ox.print("cancelled after timeout");
             }
-        }, function(result) {
-            $ui.selected.html(constructStatus("selected", result.data));
-        });
+        }, 100);
     });
 
     // Resize
