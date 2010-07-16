@@ -49,13 +49,6 @@ def parseCondition(condition):
     if keyType(k) == "string":
         in_find=True
         if op == '=':
-            '''
-            if k in ('director', 'country', 'language', 'genre',
-                     'keywords', 'location', 'writer', 'producer',
-                     'editor', 'cinematographer'):
-                k = '%s__icontains' % k
-                v = u'|%s|'%v
-            '''
             if k in models.Movie.facet_keys:
                 in_find=False
                 v = models.Movie.objects.filter(facets__key=k, facets__value=v)

@@ -83,7 +83,7 @@ def poster_path(f):
     return os.path.join('poster', url_hash[:2], url_hash[2:4], url_hash[4:6], name)
 
 class Movie(models.Model):
-    person_keys = ('director', 'writer', 'producer', 'editor', 'cinematographer')
+    person_keys = ('director', 'writer', 'producer', 'editor', 'cinematographer', 'actor', 'character')
     facet_keys = person_keys + ('country', 'language', 'genre', 'keyword')
 
     created = models.DateTimeField(auto_now_add=True)
@@ -257,10 +257,13 @@ class Movie(models.Model):
         f.year = self.get('year', '')
 
         for key in self.facet_keys:
-            setattr(f, key, '|%s|'%'|'.join(self.get(plural_key(key), [])))
-
-        f.actor = '|%s|'%'|'.join([i[0] for i in self.get('actor', [])])
-        f.character = '|%s|'%'|'.join([stripTagsl(i[1]) for i in self.get('actor', [])])
+            if key == 'actor':
+                values = [i[0] for i in self.get('actor', [])]
+            elif key == 'character':
+                values = [i[1] for i in self.get('actor', [])]
+            else:
+                values = self.get(plural_key(key), [])
+            setattr(f, key, '|%s|'%'|'.join(values))
 
         f.summary = self.get('plot', '') + self.get('plot_outline', '')
         f.trivia = ' '.join(self.get('trivia', []))
@@ -315,12 +318,9 @@ class Movie(models.Model):
 
         s.runtime = self.get('runtime', 0)
 
-        s.keywords = len(self.get('keywords', []))
-        s.genre = len(self.get('genres', []))
-        s.cast = len(self.get('cast', []))
-        s.summary = len(self.get('plot', '').split())
-        s.trivia = len(self.get('trivia', []))
-        s.connections = len(self.get('connections', []))
+        for key in ('keywords', 'genres', 'cast', 'summary', 'trivia', 'connections'):
+            setattr(s, key, len(self.get(key, '')))
+            
         s.movieId = self.movieId.replace('0x', 'xx')
         s.rating = self.get('rating', -1)
         s.votes = self.get('votes', -1)
@@ -352,10 +352,14 @@ class Movie(models.Model):
         s.save()
 
     def updateFacets(self):
-        #"year", is extra is it?
         #FIXME: what to do with Unkown Director, Year, Country etc. 
         for key in self.facet_keys:
-            current_values = self.get(plural_key(key), [])
+            if key == 'actor':
+                current_values = [i[0] for i in self.get('actor', [])]
+            elif key == 'character':
+                current_values = [i[1] for i in self.get('actor', [])]
+            else:
+                current_values = self.get(plural_key(key), [])
             saved_values = [i.value for i in Facet.objects.filter(movie=self, key=key)]
             removed_values = filter(lambda x: x not in current_values, saved_values)
             if removed_values:
