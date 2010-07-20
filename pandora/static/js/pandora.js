@@ -110,10 +110,13 @@ $(function() {
             userSettings: {
                 group: "guest",
                 ui: {
-                    columns: ["id", "title", "director", "country", "year", "language", "runtime", "genre"],
-                    find: { conditions: [{ key: "", value: "", operator: "" }], operator: "" },
+                    columns: ["id", "title", "director", "country", "year", "language", "runtime", "genre", "releasedate"],
+                    // find: { conditions: [{ key: "", value: "", operator: "" }], operator: "" },
+                    findQuery: { conditions: [], operator: "" },
+                    groupsQuery: { conditions: [], operator: "|" },
                     groupsSize: 128,
                     itemView: "info",
+                    listQuery: { conditions: [], operator: "" },
                     listsSize: 192,
                     listView: "list",
                     sections: ["history", "lists", "public", "featured"],
@@ -144,13 +147,13 @@ $(function() {
 
             function constructFind(query) {
                 Ox.print("cF", query)
-                return $.map(query.conditions, function(v, i) {
+                return /*encodeURI(*/$.map(query.conditions, function(v, i) {
                     if (!Ox.isUndefined(v.conditions)) {
                         return "[" + constructFind(v) + "]";
                     } else {
                         return v.value !== "" ? v.key + (v.key ? ":" : "") + constructValue(v.value, v.operator) : null;
                     }
-                }).join(query.operator);
+                }).join(query.operator)/*)*/;
             }
 
             function constructValue(value, operator) {
@@ -201,7 +204,7 @@ $(function() {
 
             function parseValue(str) {
                 var value = {
-                        value: str,
+                        value: decodeURI(str),
                         operator: ""
                     };
                 if (value.value[0] == "!") {
@@ -226,8 +229,8 @@ $(function() {
                     var query = Ox.unserialize(str),
                         sort = [];
                     if ("find" in query) {
-                        user.ui.find = parseFind(query.find);
-                        Ox.print("user.ui.find", user.ui.find)
+                        user.ui.findQuery = parseFind(query.find);
+                        Ox.print("user.ui.findQuery", user.ui.findQuery)
                     }
                     if ("sort" in query) {
                         sort = query.sort.split(",")
@@ -247,17 +250,16 @@ $(function() {
                 },
 
                 toObject: function(groupId) {
-                    Ox.print("tO", user.ui.find.conditions)
+                    Ox.print("tO", user.ui.findQuery.conditions)
                     // the inner $.merge() creates a clone
-                    var conditions = $.merge($.merge([], user.ui.find.conditions), groups ? $.map(groups, function(v, i) {
-                            if (v.id != groupId && v.conditions.length) {
-                                return v.conditions.length == 1 ? v.conditions : {
-                                    conditions: v.conditions,
-                                    operator: "|"
-                                };
+                    var conditions = $.merge($.merge([], user.ui.listQuery.conditions), user.ui.findQuery.conditions);
+                    $.merge(conditions, groups ? $.map(groups, function(v, i) {
+                            if (v.id != groupId && v.query.conditions.length) {
+                                return v.query.conditions.length == 1 ?
+                                    v.query.conditions : v.query;
                             }
                         }) : []),
-                        operator = conditions.length < 2 ? "" : ",";
+                        operator = conditions.length < 2 ? "" : ","; // fixme: should be &
                     Ox.print(groupId, user.ui.find, conditions);
                     return {
                         conditions: conditions,
@@ -393,7 +395,9 @@ $(function() {
             { id: "find", title: "Find", items: [
                 { id: "find", title: "Find", items: $.map(config.findKeys, function(key, i) {
                     return $.extend({
-                        checked: user.ui.find.key == key.id || user.ui.find.key === "" && key.id == "all",
+                        checked: user.ui.findQuery.conditions.length && 
+                                (user.ui.findQuery.conditions[0].key == key.id ||
+                                (user.ui.findQuery.conditions[0].key === "" && key.id == "all")),
                         group: "find"
                     }, key)
                 }) },
@@ -551,7 +555,6 @@ $(function() {
                 width = getGroupWidth(i, panelWidth);
             return {
                 id: id,
-                conditions: [],
                 element: new Ox.TextList({
                     columns: [
                         {
@@ -587,6 +590,10 @@ $(function() {
                         }
                     ]
                 }),
+                query: {
+                    conditions: [],
+                    operator: "|"
+                },
                 size: width.list,
                 title: title
             };
@@ -745,13 +752,89 @@ $ui.statusbar = new Ox.Bar({
                         $dialog.close();
                     },
                     id: "close",
-                    title: "Close",
                     value: "Close"
                 }
             ],
             id: "about",
             title: "About"
         }).open();
+    });
+    Ox.Event.bind("click_login", function(event, data) {
+        /*
+        var $form = $("<div>"),
+            $username = new Ox.Input({
+                id: "username",
+                label: "Username",
+                labelWidth: 96,
+            }).width(256).appendTo($form),
+            $password = new Ox.Input({
+                id: "password",
+                label: "Password",
+                labelWidth: 96,
+                type: "password"
+            }).width(256).css({ marginTop: "8px" }).appendTo($form),
+        */
+        var $form = new Ox.Form({
+                error: "Unknown username or wrong password",
+                items: [
+                    {
+                        element: new Ox.Input({
+                            id: "username",
+                            label: "Username",
+                            labelWidth: 96,
+                        }).width(256),
+                        regexp: /.+/
+                    },
+                    {
+                        element: new Ox.Input({
+                            id: "password",
+                            label: "Password",
+                            labelWidth: 96,
+                            type: "password"
+                        }).width(256),
+                        regexp: /.+/
+                    }
+                ]
+            }),
+            $dialog = new Ox.Dialog({
+                buttons: [
+                    [
+                        {
+                            click: function() {
+                            
+                            },
+                            id: "create",
+                            value: "Create Account..."
+                        },
+                        {
+                            click: function() {
+                            
+                            },
+                            id: "reset",
+                            value: "Reset Password..."
+                        }
+                    ],
+                    [
+                        {
+                            click: function() {
+                                $dialog.close();
+                            },
+                            id: "cancel",
+                            value: "Cancel"
+                        },
+                        {
+                            click: function() {
+                            
+                            },
+                            disabled: true,
+                            id: "login",
+                            value: "Login"
+                        }
+                    ]
+                ],
+                id: "login",
+                title: "Login"
+            }).append($form).open();
     });
     Ox.Event.bind("change_viewmovies", function(event, data) {
         $ui.viewSelect.selectItem(data.id);
@@ -797,18 +880,15 @@ $ui.statusbar = new Ox.Bar({
 
     Ox.Event.bind("submit_findInput", function(event, data) {
         var query;
-        user.ui.find = {
-            conditions: [
-                {
-                    key: data.key == "all" ? "" : data.key,
-                    value: data.value,
-                    operator: ""
-                }
-            ],
-            operator: ""
-        };
+        user.ui.findQuery.conditions = [
+            {
+                key: data.key == "all" ? "" : data.key,
+                value: data.value,
+                operator: ""
+            }
+        ];
         $.each(groups, function(i, group) {
-            groups[i].conditions = [];
+            groups[i].query.conditions = [];
             $ui.groups[i].options({
                 request: function(options) {
                     delete options.keys;
@@ -834,7 +914,7 @@ $ui.statusbar = new Ox.Bar({
     $.each(groups, function(i, group) {
         Ox.Event.bind("select_group_" + group.id, function(event, data) {
             var query;
-            groups[i].conditions = $.map(data.ids, function(v) {
+            groups[i].query.conditions = $.map(data.ids, function(v) {
                 return {
                     key: group.id,
                     value: v,
@@ -893,100 +973,168 @@ $ui.statusbar = new Ox.Bar({
     Ox.Event.bind("select_list", function(event, data) {
         var $still, $timeline;
         ui.selectedMovies = data.ids;
-        setTimeout(function() {
-            if (
-                data.ids.length == ui.selectedMovies.length &&
-                (data.ids.length == 0 || data.ids[0] == ui.selectedMovies[0])
-            ) {
-                if (data.ids.length) {
-                    $ui.mainMenu.enableItem("copy");
-                    $ui.mainMenu.enableItem("openmovie");
-                } else {
-                    $ui.mainMenu.disableItem("copy");
-                    $ui.mainMenu.disableItem("openmovie");            
-                }
-                if (data.ids.length == 1) {
-                    $still = $("<img>")
-                        .attr({
-                            src: "http://0xdb.org/" + data.ids[0] + "/still.jpg"
-                        })
-                        .one("load", function() {
-                            if (data.ids[0] != ui.selectedMovies[0]) {
-                                Ox.print("cancel after load...")
-                                return;
-                            }
-                            var image = $still[0],
-                                imageWidth = image.width,
-                                imageHeight = image.height,
-                                width = $ui.info.width(),
-                                height = imageHeight * width / imageWidth;
-                            ui.infoRatio = width / height;
-                            $still.css({
-                                    position: "absolute",
-                                    left: 0,
-                                    top: 0,
-                                    //width: width + "px",
-                                    //height: height + "px",
-                                    width: "100%",
-                                    opacity: 0
-                                })
-                                .appendTo($ui.info.$element)
-                                .animate({
-                                    opacity: 1
-                                });
-                            $ui.infoStill.animate({
-                                opacity: 0
-                            }, 250);
-                            $ui.info.animate({
-                                height: (height + 16) + "px"
-                            }, 250, function() {
-                                $ui.infoStill.remove();
-                                $ui.infoStill = $still;
-                            });
-                        });
-                    /*
-                    $timeline = $("<img>")
-                        .attr({
-                            src: "http://0xdb.org/" + data.ids[0] + "/timeline/timeline.png"
-                        })
-                        .one("load", function() {
-                            $timeline.css({
-                                    position: "absolute",
-                                    left: 0,
-                                    bottom: "16px",
-                                    opacity: 0
-                                })
-                                .appendTo($ui.info.$element)
-                                .animate({
-                                    opacity: 1
-                                });
-                            $ui.infoTimeline.animate({
-                                opacity: 0
-                            }, 250, function() {
-                                $ui.infoTimeline.remove();
-                                $ui.infoTimeline = $timeline;
-                            });
-                        });
-                    */
-                }
-                app.request("find", {
-                    query: {
-                        conditions: $.map(data.ids, function(id, i) {
-                            return {
-                                key: "id",
-                                value: id,
-                                operator: "="
-                            }
-                        }),
-                        operator: "|"
+        if (data.ids.length) {
+            $ui.mainMenu.enableItem("copy");
+            $ui.mainMenu.enableItem("openmovie");
+        } else {
+            $ui.mainMenu.disableItem("copy");
+            $ui.mainMenu.disableItem("openmovie");            
+        }
+        if (data.ids.length == 1) {
+            $still = $("<img>")
+                .attr({
+                    src: "http://0xdb.org/" + data.ids[0] + "/still.jpg"
+                })
+                .one("load", function() {
+                    if (data.ids[0] != ui.selectedMovies[0]) {
+                        Ox.print("cancel after load...")
+                        return;
                     }
-                }, function(result) {
-                    $ui.selected.html(constructStatus("selected", result.data));
+                    var image = $still[0],
+                        imageWidth = image.width,
+                        imageHeight = image.height,
+                        width = $ui.info.width(),
+                        height = imageHeight * width / imageWidth;
+                    ui.infoRatio = width / height;
+                    $still.css({
+                            position: "absolute",
+                            left: 0,
+                            top: 0,
+                            //width: width + "px",
+                            //height: height + "px",
+                            width: "100%",
+                            opacity: 0
+                        })
+                        .appendTo($ui.info.$element)
+                        .animate({
+                            opacity: 1
+                        });
+                    $ui.infoStill.animate({
+                        opacity: 0
+                    }, 250);
+                    $ui.info.animate({
+                        height: (height + 16) + "px"
+                    }, 250, function() {
+                        $ui.infoStill.remove();
+                        $ui.infoStill = $still;
+                    });
+                });
+            /*
+            $timeline = $("<img>")
+                .attr({
+                    src: "http://0xdb.org/" + data.ids[0] + "/timeline/timeline.png"
+                })
+                .one("load", function() {
+                    $timeline.css({
+                            position: "absolute",
+                            left: 0,
+                            bottom: "16px",
+                            opacity: 0
+                        })
+                        .appendTo($ui.info.$element)
+                        .animate({
+                            opacity: 1
+                        });
+                    $ui.infoTimeline.animate({
+                        opacity: 0
+                    }, 250, function() {
+                        $ui.infoTimeline.remove();
+                        $ui.infoTimeline = $timeline;
+                    });
+                });
+            */
+        }
+        app.request("find", {
+            query: {
+                conditions: $.map(data.ids, function(id, i) {
+                    return {
+                        key: "id",
+                        value: id,
+                        operator: "="
+                    }
+                }),
+                operator: "|"
+            }
+        }, function(result) {
+            $ui.selected.html(constructStatus("selected", result.data));
+        });
+    });
+    Ox.Event.bind("openpreview_list", function(event, data) {
+        app.request("find", {
+            keys: ["director", "id", "posterHeight", "posterWidth", "posterURL", "title"],
+            query: {
+                conditions: $.map(data.ids, function(id, i) {
+                    return {
+                        key: "id",
+                        value: id,
+                        operator: "="
+                    }
+                }),
+                operator: "|"
+            }
+        }, function(result) {
+            var item = result.data.items[0],
+                title = item.title + (item.director ? " (" + item.director + ")" : ""),
+                height = $window.height() - 40,
+                width = height * 0.75,
+                $image = $("<img>")
+                    .attr({
+                        src: "http://0xdb.org/" + item.id + "/poster.large.jpg"
+                    })
+                    .css({
+                        height: height + "px",
+                        width: width + "px",
+                        margin: "-16px -16px -16px -16px"
+                    })
+                    .one("load", function() {
+                        var image = $image[0],
+                            imageHeight = image.height,
+                            imageWidth = image.width;
+                        $image.css({
+                            height: imageHeight + "px",
+                            width: imageWidth + "px"
+                        });
+                    });
+            if ("previewDialog" in $ui) {
+                $ui.previewDialog.options({
+                    title: title
+                });
+                $ui.previewImage.animate({
+                    opacity: 0
+                }, 250, function() {
+                    $ui.previewImage.replaceWith(
+                        $image.css({
+                            opacity: 0
+                        }).animate({
+                            opacity: 1
+                        }, 250));
+                    $ui.previewImage = $image;
                 });
             } else {
-                Ox.print("cancelled after timeout");
+                $ui.previewDialog = new Ox.Dialog({
+                        buttons: [
+                            {
+                                value: "Close",
+                                click: function() {
+                                    $ui.previewDialog.close();
+                                    delete $ui.previewDialog;
+                                    $ui.list.closePreview();
+                                }
+                            }
+                        ],
+                        height: height,
+                        title: title,
+                        width: width
+                    })
+                    .append($image)
+                    .open();
+                $ui.previewImage = $image;
             }
-        }, 100);
+        });
+    });
+    Ox.Event.bind("closepreview_list", function(event, data) {
+        $ui.previewDialog.close();
+        delete $ui.previewDialog;
     });
 
     // Resize
@@ -1012,7 +1160,6 @@ $ui.statusbar = new Ox.Bar({
                 return v.key + " " + v.operator + " " + v.value;
             }).join("<br/>") + "<br/><br/>Operator: " + query.operator,
             $dialog = new Ox.Dialog({
-                title: "Show Query",
                 buttons: [
                     {
                         value: "Close",
@@ -1020,7 +1167,8 @@ $ui.statusbar = new Ox.Bar({
                             $dialog.close();
                         }
                     }
-                ]
+                ],
+                title: "Show Query"
             })
             .append(html)
             .open();
