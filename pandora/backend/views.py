@@ -32,7 +32,7 @@ import utils
 import tasks
 
 from oxuser.models import getUserJSON
-from oxuser.views import api_login, api_logout, api_register, api_contact, api_recover, api_preferences
+from oxuser.views import api_login, api_logout, api_register, api_contact, api_recover, api_preferences, api_findUser
 from archive.views import api_update, api_addArchive, api_editArchive, api_removeArchive
 
 from archive.models import File

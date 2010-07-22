@@ -140,6 +140,24 @@ def api_recover(request):
         response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)
 
+def api_findUser(request):
+    '''
+        param data
+            {key: "username", value: "foo", operator: "="}
+        
+        return {
+            'status': {'code': int, 'text': string}
+            'data': {
+                users = ['user1', 'user2']
+            }
+        }
+    '''
+    #FIXME: support other operators and keys
+    data = json.loads(request.POST['data'])
+    response = json_response(status=200, text='ok')
+    response['data']['users'] = [u.username for u in User.objects.filter(username__iexact=data['value'])]
+    return render_to_json_response(response)
+
 def recover(request, key):
     qs = models.UserProfile.objects.filter(recover_key=key)
     if qs.count() == 1:
