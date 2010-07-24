@@ -930,11 +930,138 @@ $ui.statusbar = new Ox.Bar({
         $ui.findInput.changeLabel(data.id);
     });
     Ox.Event.bind("click_places", function(event, data) {
-        var $map = new Ox.Map({
-                places: ["Boston", "Barcelona", "Berlin", "Beirut", "Bombay", "Bangalore", "Beijing"]
+        var $manage = new Ox.SplitPanel({
+                elements: [
+                    {
+                        collapsible: true,
+                        element: new Ox.SplitPanel({
+                            elements: [
+                                {
+                                    element: new Ox.Toolbar({
+                                        orientation: "horizontal",
+                                        size: 44
+                                    }).append(
+                                        $ui.findPlacesInput = new Ox.Input({
+                                            clear: true,
+                                            id: "findPlacesInput",
+                                            placeholder: [
+                                                { id: "name", title: "Find: Name" },
+                                                { id: "region", title: "Find: Region" },
+                                                { id: "user", title: "Find: User" }
+                                            ]
+                                        })
+                                        .css({
+                                            float: "left",
+                                            margin: "4px"
+                                        })
+                                        .width(128)
+                                    ).append(
+                                        $ui.findPlacesInput = new Ox.Select({
+                                            id: "sortPlacesSelect",
+                                            items: [
+                                                { id: "name", title: "Sort by Name", checked: true },
+                                                { id: "region", title: "Sort by Region" },
+                                                { id: "size", title: "Sort by Size" },
+                                                { id: "latitude", title: "Sort by Latitude" },
+                                                { id: "longitude", title: "Sort by Longitude" },
+                                                { id: "clips", title: "Sort by Number of Clips" },
+                                                { id: "user", title: "Sort by User" },
+                                                { id: "datecreated", title: "Sort by Date Added" },
+                                                { id: "datemodified", title: "Sort by Date Modified" }
+                                            ]
+                                        })
+                                        .css({
+                                            float: "left",
+                                            margin: "0 4px 4px 2px"
+                                        })
+                                        .width(128)
+                                    ),
+                                    size: 44
+                                },
+                                {
+                                    element: new Ox.Element("div")
+                                },
+                                {
+                                    element: new Ox.Toolbar({
+                                        orientation: "horizontal",
+                                        size: 16
+                                    }),
+                                    size: 16
+                                }
+                            ],
+                            orientation: "vertical"
+                        }),
+                        resizable: true,
+                        resize: [128, 192, 256],
+                        size: 192
+                    },
+                    {
+                        element: new Ox.SplitPanel({
+                            elements: [
+                                {
+                                    element: new Ox.Toolbar({
+                                        orientation: "horizontal",
+                                        size: 24
+                                    }).append(
+                                        $ui.labelsButton = new Ox.Button({
+                                                id: "labelsButton",
+                                                value: ["Show Labels", "Hide Labels"]
+                                            })
+                                            .css({
+                                                float: "left",
+                                                margin: "4px"
+                                            })
+                                            .width(80)
+                                    ).append(
+                                        $ui.findMapInput = new Ox.Input({
+                                            clear: true,
+                                            id: "findMapInput",
+                                            placeholder: [{ id: "foo", title: "Find on Map" }]
+                                        })
+                                        .css({
+                                            float: "right",
+                                            margin: "4px"
+                                        })
+                                        .width(200)
+                                    ),
+                                    size: 24
+                                },
+                                {
+                                    element: $ui.map = new Ox.Map({
+                                        places: ["Boston", "Barcelona", "Berlin", "Beirut", "Bombay", "Bangalore", "Beijing"]
+                                    }).css({
+                                        left: 0,
+                                        top: 0,
+                                        right: 0,
+                                        bottom: 0
+                                    })
+                                },
+                                {
+                                    element: new Ox.Toolbar({
+                                        orientation: "horizontal",
+                                        size: 24
+                                    }).append(
+                                        $ui.newPlaceButton = new Ox.Button({
+                                            id: "newPlaceButton",
+                                            value: "New Place..."
+                                        })
+                                        .css({
+                                            float: "left",
+                                            margin: "4px"
+                                        })
+                                        .width(80)
+                                    ),
+                                    size: 24
+                                }
+                            ],
+                            orientation: "vertical"
+                        })
+                    }
+                ],
+                orientation: "horizontal"
             }).css({
-                height: "100%",
-                width: "100%"
+                top: "24px",
+                bottom: "24px",
             }),
             $dialog = new Ox.Dialog({
                 buttons: [
@@ -947,14 +1074,16 @@ $ui.statusbar = new Ox.Bar({
                         value: "Close"
                     }
                 ],
-                height: 498,
+                height: parseInt($document.height() * 0.8),
                 id: "places",
                 minHeight: 400,
                 minWidth: 600,
                 padding: 0,
                 title: "Manage Places",
-                width: 800
-            }).append($map).open(),
+                width: parseInt($document.width() * 0.8)
+            }).css({
+                overflow: "hidden"
+            }).append($manage).open(),
     });
     Ox.Event.bind("click_query", function(event, data) {
         var $dialog = new Ox.Dialog({
