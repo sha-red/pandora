@@ -107,7 +107,7 @@ $(function() {
                 { id: "size", admin: true },
                 { id: "pixels" }
             ],
-            userSettings: {
+            user: {
                 group: "guest",
                 ui: {
                     columns: ["id", "title", "director", "country", "year", "language", "runtime", "genre", "releasedate"],
@@ -132,7 +132,7 @@ $(function() {
                 username: ""
             }
         },
-        user = config.userSettings,
+        user = config.user,
         $ui = {
             groups: []
         },
@@ -291,6 +291,14 @@ $(function() {
         requestURL: "/api/"
     });
 
+    $("<script>")
+        .attr({
+            src: "http://maps.google.com/maps/api/js?callback=foo&sensor=false",
+            type: "text/javascript"
+        })
+        .appendTo($body);
+    foo = function() {};
+
 // MainMenu
 
     $ui.mainMenu = new Ox.MainMenu({
@@ -312,10 +320,10 @@ $(function() {
             { id: "user", title: "User", items: [
                 { id: "username", title: "User: not logged in", disabled: true },
                 {},
-                { id: "preferences", title: "Preferences", disabled: true, keyboard: "control ," },
+                { id: "preferences", title: "Preferences...", disabled: true, keyboard: "control ," },
                 {},
                 { id: "register", title: "Create an Account..." },
-                { id: "login", title: "Login..." }
+                { id: "loginlogout", title: ["Login...", "Logout..."] }
             ] },
             { id: "list", title: "List", items: [
                 { id: "history", title: "History", items: [
@@ -402,6 +410,19 @@ $(function() {
                     }, key)
                 }) },
                 { id: "advancedfind", title: "Advanced Find...", keyboard: "shift control f" }
+            ] },
+            { id: "data", title: "Data", items: [
+                { id: "titles", title: "Manage Titles..." },
+                { id: "names", title: "Manage Names..." },
+                {},
+                { id: "posters", title: "Manage Stills..." },
+                { id: "posters", title: "Manage Posters..." },
+                {},
+                { id: "places", title: "Manage Places..." },
+                { id: "events", title: "Manage Events..." },
+                {},
+                { id: "users", title: "Manage Users..." },
+                { id: "lists", title: "Manage Lists..." },
             ] },
             { id: "code", title: "Code", items: [
                 { id: "download", title: "Download" },
@@ -759,42 +780,94 @@ $ui.statusbar = new Ox.Bar({
             title: "About"
         }).open();
     });
-    Ox.Event.bind("click_login", function(event, data) {
-        /*
-        var $form = $("<div>"),
-            $username = new Ox.Input({
-                id: "username",
-                label: "Username",
-                labelWidth: 96,
-            }).width(256).appendTo($form),
-            $password = new Ox.Input({
-                id: "password",
-                label: "Password",
-                labelWidth: 96,
-                type: "password"
-            }).width(256).css({ marginTop: "8px" }).appendTo($form),
-        */
+    Ox.Event.bind("click_home", function(event, data) {
+        var $dialog = new Ox.Dialog({
+            buttons: [
+                {
+                    click: function() {
+                        $dialog.close();
+                    },
+                    id: "close",
+                    value: "Close"
+                }
+            ],
+            height: 498,
+            id: "home",
+            title: config.appName,
+            width: 800
+        }).open();
+    });
+    Ox.Event.bind("click_loginlogout", function(event, data) {
         var $form = new Ox.Form({
                 error: "Unknown username or wrong password",
+                id: "login",
                 items: [
                     {
                         element: new Ox.Input({
+                            autocorrect: function(value, blur) {
+                                var length = value.length;
+                                value = $.map(value.toLowerCase().split(""), function(v, i) {
+                                    if (new RegExp("[a-z0-9" + ((i == 0 || (i == length - 1 && blur)) ? "" : "\- ") + "]")(v)) {
+                                        return v
+                                    } else {
+                                        return null;
+                                    }
+                                }).join("");
+                                $.each(["--", "- ", " -", "--"], function(i, v) {
+                                    while (value.indexOf(v) > -1) {
+                                        value = value.replace(new RegExp(v, "g"), v[0]);
+                                    }
+                                })
+                                return value;
+                            },
                             id: "username",
                             label: "Username",
-                            labelWidth: 96,
-                        }).width(256),
-                        regexp: /.+/
+                            labelWidth: 120,
+                            validate: function(value, callback) {
+                                app.request("findUser", {
+                                    key: "username",
+                                    value: value,
+                                    operator: "="
+                                }, function(result) {
+                                    Ox.print("result", result)
+                                    var valid = result.data.users.length == 1;
+                                    callback({
+                                        message: "Unknown Username",
+                                        valid: valid
+                                    });
+                                });
+                            }
+                        }).width(300)
                     },
                     {
                         element: new Ox.Input({
                             id: "password",
                             label: "Password",
-                            labelWidth: 96,
-                            type: "password"
-                        }).width(256),
-                        regexp: /.+/
+                            labelWidth: 120,
+                            type: "password",
+                            validate: /.+/
+                        }).width(300)
                     }
-                ]
+                ],
+                submit: function(data, callback) {
+                    app.request("login", data, function(result) {
+                        if (result.status.code == 200) {
+                            $dialog.close();
+                            user = result.data.user;
+                            $ui.mainMenu.getItem("username").options({
+                                title: "User: " + user.username
+                            });
+                            $ui.mainMenu.getItem("preferences").options({
+                                disabled: false
+                            });
+                            $ui.mainMenu.getItem("register").options({
+                                disabled: true
+                            });
+                        } else {
+                            callback([{ id: "password", message: "Incorrect Password" }]);
+                        }
+                    });
+                }
             }),
             $dialog = new Ox.Dialog({
                 buttons: [
@@ -803,8 +876,8 @@ $ui.statusbar = new Ox.Bar({
                             click: function() {
                             
                             },
-                            id: "create",
-                            value: "Create Account..."
+                            id: "signup",
+                            value: "Sign up..."
                         },
                         {
                             click: function() {
@@ -818,23 +891,27 @@ $ui.statusbar = new Ox.Bar({
                         {
                             click: function() {
                                 $dialog.close();
+                                $ui.mainMenu.getItem("loginlogout").toggleTitle();
                             },
                             id: "cancel",
                             value: "Cancel"
                         },
                         {
-                            click: function() {
-                            
-                            },
+                            click: $form.submit,
                             disabled: true,
-                            id: "login",
-                            value: "Login"
+                            id: "signin",
+                            value: "Sign in"
                         }
                     ]
                 ],
                 id: "login",
-                title: "Login"
+                minWidth: 332,
+                title: "Sign in",
+                width: 332
             }).append($form).open();
+        Ox.Event.bind("validate_login", function(event, data) {
+            $dialog[(data.valid ? "enable" : "disable") + "Button"]("signin");
+        });
     });
     Ox.Event.bind("change_viewmovies", function(event, data) {
         $ui.viewSelect.selectItem(data.id);
@@ -851,6 +928,33 @@ $ui.statusbar = new Ox.Bar({
     });
     Ox.Event.bind("change_find", function(event, data) {
         $ui.findInput.changeLabel(data.id);
+    });
+    Ox.Event.bind("click_places", function(event, data) {
+        var $map = new Ox.Map({
+                places: ["Boston", "Barcelona", "Berlin", "Beirut", "Bombay", "Bangalore", "Beijing"]
+            }).css({
+                height: "100%",
+                width: "100%"
+            }),
+            $dialog = new Ox.Dialog({
+                buttons: [
+                    {
+                        click: function() {
+                            $dialog.close();
+                        },
+                        id: "close",
+                        title: "Close",
+                        value: "Close"
+                    }
+                ],
+                height: 498,
+                id: "places",
+                minHeight: 400,
+                minWidth: 600,
+                padding: 0,
+                title: "Manage Places",
+                width: 800
+            }).append($map).open(),
     });
     Ox.Event.bind("click_query", function(event, data) {
         var $dialog = new Ox.Dialog({
@@ -1075,21 +1179,25 @@ $ui.statusbar = new Ox.Bar({
         }, function(result) {
             var item = result.data.items[0],
                 title = item.title + (item.director ? " (" + item.director + ")" : ""),
-                height = $window.height() - 40,
-                width = height * 0.75,
+                documentHeight = $document.height(),
+                dialogHeight = documentHeight - 40,
+                dialogWidth = parseInt((dialogHeight - 48) * 0.75),
                 $image = $("<img>")
                     .attr({
                         src: "http://0xdb.org/" + item.id + "/poster.large.jpg"
                     })
                     .css({
-                        height: height + "px",
-                        width: width + "px",
-                        margin: "-16px -16px -16px -16px"
+                        height: (dialogHeight - 48) + "px",
+                        width: dialogWidth + "px"
                     })
-                    .one("load", function() {
+                    .load(function() {
                         var image = $image[0],
-                            imageHeight = image.height,
-                            imageWidth = image.width;
+                            imageHeight = Math.min(image.height, documentHeight - 88),
+                            imageWidth = parseInt(image.width * imageHeight / image.height);
+                        $ui.previewDialog.options({
+                            height: imageHeight + 48,
+                            width: imageWidth
+                        });
                         $image.css({
                             height: imageHeight + "px",
                             width: imageWidth + "px"
@@ -1122,9 +1230,10 @@ $ui.statusbar = new Ox.Bar({
                                 }
                             }
                         ],
-                        height: height,
+                        height: dialogHeight,
+                        padding: 0,
                         title: title,
-                        width: width
+                        width: dialogWidth
                     })
                     .append($image)
                     .open();
