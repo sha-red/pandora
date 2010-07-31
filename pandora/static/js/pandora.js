@@ -1083,7 +1083,7 @@ $ui.statusbar = new Ox.Bar({
                 width: parseInt($document.width() * 0.8)
             }).css({
                 overflow: "hidden"
-            }).append($manage).open(),
+            }).append($manage).open();
     });
     Ox.Event.bind("click_query", function(event, data) {
         var $dialog = new Ox.Dialog({
