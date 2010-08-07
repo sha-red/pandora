@@ -30,31 +30,41 @@ def parse_decimal(string):
     d = string.split('/')
     return Decimal(d[0]) / Decimal(d[1])
 
-#ARCHIVE stuff
-class Volume(models.Model):
-    start = models.CharField(max_length=1)
-    end = models.CharField(max_length=1)
-    name = models.CharField(max_length=255)
+def stream_path(f):
+    h = f.oshash
+    return os.path.join('stream', h[:2], h[2:4], h[4:6], h[6:], f.profile)
 
-class Archive(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    published = models.DateTimeField(default=datetime.now, editable=False)
+class Stream(models.Model):
+    file = models.ForeignKey(File, related_name='streams')
+    profile = models.CharField(max_length=255, default='96p.webm')
+    video = models.FileField(default=None, blank=True, upload_to=lambda f, x: stream_path(f))
+    source = models.ForeignKey(Stream, related_name='derivatives', default=None, blank=True)
+    available = models.BooleanField(default=False)
 
-    name = models.CharField(max_length=255)
-    user = models.ForeignKey(User, related_name='owned_archives')
+    def extract_derivates(self):
+        #here based on settings derivates like smaller versions or other formats would be created
 
-    users = models.ManyToManyField(User, related_name='archives')
-    volumes = models.ManyToManyField(Volume, related_name='archives')
-   
     def editable(self, user):
-        return self.users.filter(username=user.username).count() > 0
+        #FIXME: possibly needs user setting for stream
+        return True
+
+    def save_chunk(self, chunk, chunk_id=-1):
+        if not self.available:
+            if not self.video:
+                self.video.save(self.profile, ContentFile(chunk))
+            else:
+                f = open(self.file.path, 'a')
+                #FIXME: should check that chunk_id/offset is right
+                f.write(chunk)
+                f.close()
+            return True
+        return False
 
 class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    verified = models.BooleanField(default = False)
+    verified = models.BooleanField(default=False)
 
     oshash = models.CharField(max_length=16)
     movie = models.ForeignKey(Movie, related_name='files')
@@ -88,12 +98,16 @@ class File(models.Model):
     bits_per_pixel = models.FloatField(default=-1)
     pixels = models.BigIntegerField(default=0)
 
+    #This is true if derivative is available or subtitles where uploaded
+    available = models.BooleanField(default = False)
+
     is_audio = models.BooleanField(default = False)
     is_video = models.BooleanField(default = False)
     is_extra = models.BooleanField(default = False)
     is_main = models.BooleanField(default = False)
     is_subtitle = models.BooleanField(default = False)
     is_version = models.BooleanField(default = False)
+
 
     def __unicode__(self):
         return self.name
@@ -152,28 +166,36 @@ class File(models.Model):
 class FileInstance(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    published = models.DateTimeField(default=datetime.now, editable=False)
-    accessed = models.DateTimeField(default=datetime.now, editable=False)
+
+    ctime = models.DateTimeField(default=datetime.now, editable=False)
+    mtime = models.DateTimeField(default=datetime.now, editable=False)
+    atime = models.DateTimeField(default=datetime.now, editable=False)
 
     path = models.CharField(max_length=2048)
     folder = models.CharField(max_length=255)
 
     file = models.ForeignKey(File, related_name='instances')
-    archive = models.ForeignKey(Archive, related_name='files')
+    user = models.ForeignKey(User, related_name='files')
 
     def __unicode__(self):
-        return u'%s <%s> in %s'% (self.path, self.oshash, self.archive.name)
+        return u"%s's %s <%s>"% (self.user, self.path, self.oshash)
 
     @property
     def movieId(self):
         return File.objects.get(oshash=self.oshash).movieId
+
+def frame_path(f, name):
+    ext = os.path.splitext(name)
+    name = "%s.%s" % (f.position, ext)
+    h = f.file.oshash
+    return os.path.join('frame', h[:2], h[2:4], h[4:6], name)
 
 class Frame(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     file = models.ForeignKey(File, related_name="frames")
     position = models.FloatField()
-    frame = models.ImageField(default=None, null=True, upload_to=lambda f, x: frame_path(f))
+    frame = models.ImageField(default=None, null=True, upload_to=frame_path)
 
     #FIXME: frame path should be renamed on save to match current position
 

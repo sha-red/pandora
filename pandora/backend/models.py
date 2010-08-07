@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import division, with_statement
+
 from datetime import datetime
 import os.path
 import random
@@ -45,9 +47,9 @@ def getMovie(info):
                     'directors': info['directors'],
                     'year': info.get('year', '')
                 }
-                #FIXME: this should be done async
-                #movie.save()
-                #tasks.updateImdb.delay(movie.movieId)
+            #FIXME: this should be done async
+            #movie.save()
+            #tasks.updateImdb.delay(movie.movieId)
             movie.updateImdb()
     else:
         q = Movie.objects.filter(find__title=info['title'])
@@ -67,7 +69,7 @@ def getMovie(info):
                 movie.movieId = info['oxdbId']
 
                 for key in ('episode_title', 'series_title', 'season', 'episode'):
-                    if key in info:
+                    if key in info and info[key]:
                         movie.metadata[key] = info[key]
                 movie.save()
     return movie
@@ -138,32 +140,20 @@ class Movie(models.Model):
             self.imdb = ox.web.imdb.Imdb(self.movieId)
             self.save()
 
-    #FIXME: use data.0xdb.org
-    '''
-    tpb_id = models.CharField(max_length=128, blank=True)
-    kg_id = models.CharField(max_length=128, blank=True)
-    open_subtitle_id = models.IntegerField(null=True, blank=True)
-    wikipedia_url = models.TextField(blank=True)
-
-    #FIXME: use data.0xdb.org/posters for that
-    #what of this is still required?
-    still_pos = models.IntegerField(null=True, blank=True)
-    poster = models.TextField(blank=True)
-    posters_disabled = models.TextField(blank=True)
-    posters_available = models.TextField(blank=True)
-    poster = models.ImageField(default=None, blank=True, upload_to=poster_path)
-    '''
+    poster = models.ImageField(default=None, blank=True, upload_to=lambda f, x: poster_path(f))
+    posters_url = models.TextField(blank=True)
     poster_height = models.IntegerField(default=0)
     poster_width = models.IntegerField(default=0)
+    poster_frame = models.FloatField(default=-1)
+
+    def get_poser(self):
+        url = self.poster_url:
+        if not url:
+            url = self.poster.url
+        return url
 
     #stream related fields
-    '''
-    '''
-    stream_low = models.FileField(default=None, blank=True, upload_to=lambda f, x: movie_path(f, 'low'))
-    stream_mid = models.FileField(default=None, blank=True, upload_to=lambda f, x: movie_path(f, 'mid'))
-    stream_high = models.FileField(default=None, blank=True, upload_to=lambda f, x: movie_path(f, 'high'))
-    #FIXME: is this still required? should this not be aspect ratio? depends on stream???
-    scene_height = models.IntegerField(null=True, blank=True)
+    stream_aspect = models.FloatField(default=4/3)
 
     def __unicode__(self):
         return u'%s (%s)' % (self.get('title'), self.get('year'))

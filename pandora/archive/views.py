@@ -29,136 +29,265 @@ import ox
 
 import models
 
-from backend.utils import oxid, parsePath
+from backend.utils import oxid, parse_path
 import backend.models
-
-
 
 #@login_required_json
 def api_update(request):
     '''
+        //both are optional, idea is to have 2 requests first with files, and
+          after that with info for the requested oshashes
         param data
-            {archive: string, files: json}
+            files: [
+                {oshash:, name:, folder:, oshash:, ctime:, atime:, mtime:, }
+            ]
+            info: {oshash: object}
+
         return {'status': {'code': int, 'text': string},
-                'data': {info: object, rename: object}}
+                'data': {info: list, data: list, file: list}}
     '''
     data = json.loads(request.POST['data'])
-    archive = data['archive']
-    folder = data['folder']
-    files = data['files']
-    needs_data = []
-    rename = []
-    archive, created = models.Archive.objects.get_or_create(name=archive, user=request.user)
-    if archive.editable(request.user):
-        print 'editing'
-        same_folder = models.FileInstance.objects.filter(folder=folder)
-        if same_folder.count() > 0:
-            movie = same_folder[0].file.movie
-        else:
-            movie = None
-        for filename in files:
-			data = files[filename]
-			oshash = data['oshash']
-			path = os.path.join(folder, filename)
+    user = request.user
 
-            instance = models.FileInstance.objects.filter(file__oshash=oshash)
+    response = json_response({'info': [], 'rename': [], 'file': []})
+    
+    if 'files' in data:
+        all_files = []
+        for f in data['files']:
+            folder = f['folder']
+            name   = f['name']
+            oshash = f['oshash']
+            all_files.append(oshash)
+
+            same_folder = models.FileInstance.objects.filter(folder=folder, user=user)
+            if same_folder.count() > 0:
+                movie = same_folder[0].file.movie
+            else:
+                movie = None
+
+	        path = os.path.join(folder, name)
+
+            instance = models.FileInstance.objects.filter(file__oshash=oshash, user=user)
             if instance.count()>0:
                 instance = instance[0]
-				if path != instance.path: #file was movied
-					instance.path = path
-					instance.folder = folder
-					f.save()
-                    print "file movied, so other shit"
+                updated = False
+                for key in ('atime', 'mtime', 'ctime', 'name', 'folder'):
+                    if f[key] != getattr(instance, key):
+                        setattr(instance, key, f[key])
+                        updated=True
+                if updated:
+			        f.save()
             else:
                 #look if oshash is known
-                f = models.File.objects.filter(oshash=oshash)
-                if f.count() > 0:
-                    f = f[0]
+                file_object = models.File.objects.filter(oshash=oshash)
+                if file_object.count() > 0:
+                    file_object = file_object[0]
                     instance = models.FileInstance()
-                    instance.file = f
-                    instance.path=data['path']
-                    instance.folder=folder
+                    instance.file = file_object
+                    for key in ('atime', 'mtime', 'ctime', 'name', 'folder'):
+                        setattr(instance, key, f[key])
                     instance.save()
-                    movie = f.movie
                 #new oshash, add to database
                 else:
                     if not movie:
-                        movie_info = parsePath(folder)
+                        movie_info = parse_path(folder)
                         movie = backend.models.getMovie(movie_info)
                     f = models.File()
                     f.oshash = oshash
-                    f.info = data
-                    del f.info['oshash']
-                    f.name = filename
+                    f.name = name
                     f.movie = movie
                     f.save()
+                    response['info'].append(oshash)
+
                     instance = models.FileInstance()
-                    instance.archive = archive
+                    instance.user = user
                     instance.file = f
-                    instance.path = path
-                    instance.folder = folder
+                    for key in ('atime', 'mtime', 'ctime', 'name', 'folder'):
+                        setattr(instance, key, f[key])
                     instance.save()
 
-        response = json_response({'info': needs_data, 'rename': rename})
-	else:
-		response = json_response(status=403, text='permission denied')
+        #remove deleted files
+        #FIXME: can this have any bad consequences? i.e. on the selction of used movie files.
+        models.FileInstance.objects.filter(user=user).exclude(file__oshash__in=all_files).delete()
+
+        user_profile = user.get_profile()
+        user_profile.files_updated = datetime.now()
+        user_profile.save()
+
+    if 'info' in data:
+        for oshash in data['info']:
+            info = data['info'][oshash]
+            instance = models.FileInstance.objects.filter(file__oshash=oshash, user=user)
+            if instance.count()>0:
+                instance = instance[0]
+                if not instance.file.info:
+                    instance.file.info = info
+                    instance.file.save()
+
+    files = models.FileInstance.objects.filter(user=user, file__available=False)
+    response['data'] = [f.file.oshash for f in files.filter(file__is_video=True)]
+    response['files'] = [f.file.oshash for f in files.filter(file__is_subtitle=True)]
+
     return render_to_json_response(response)
 
-@login_required_json
-def api_addArchive(request):
+
+#@login_required_json
+#FIXME: is this part of the api or does it have to be outside due to multipart?
+def api_upload(request):
     '''
-        ARCHIVE API NEEDS CLEANUP
+        multipart
         param data
-            {name: string}
+            oshash: string
+            frame: [] //multipart frames
         return {'status': {'code': int, 'text': string},
-                'data': {}}
+                'data': {info: object, rename: object}}
     '''
-    data = json.loads(request.POST['data'])
-    try:
-        archive = models.Archive.objects.get(name=data['name'])
-        response = {'status': {'code': 401, 'text': 'archive with this name exists'}}
-    except models.Archive.DoesNotExist:
-        archive = models.Archive(name=data['name'])
-        archive.user = request.user
-        archive.save()
-        archive.users.add(request.user)
+    user = request.user
+    f = get_object_or_404(models.File, oshash=request.POST['oshash'])
+    if f.frames.count() == 0 and 'frame' in request.FILES:
+        for frame in request.FILES['frame']:
+            name = frame.name
+            position = float(os.path.splitext(name)[0])
+            fr = models.Frame(file=f, position=position)
+            fr.save()
+            fr.frame.save(frame, name)
         response = json_response({})
-        response['status']['text'] = 'archive created'
+    else:
+        response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
 
+class VideoChunkForm(forms.Form):
+    chunk = forms.FileField()
+    chunkId = forms.IntegerField(required=False)
+    done = forms.IntegerField(required=False)
+
 @login_required_json
-def api_editArchive(request):
+def firefogg_upload(request):
+    #handle video upload
+    if request.method == 'POST':
+        #init upload
+        profile = request.POST.get('profile', request.GET['profile'])
+        #FIXME: check for valid profile
+        if 'oshash' in request.POST:
+            #404 if oshash is not know, files must be registered via update api first
+            f = get_object_or_404(models.File, oshash=request.POST['oshash'])
+            stream, created = models.Stream.objects.get_or_create(file=file, profile=profile)
+            if stream.video: #FIXME: check permission here instead of just starting over
+                stream.video.delete()
+            stream.available = False
+            stream.save()
+            response = {
+                #is it possible to no hardcode url here?
+                'uploadUrl': request.build_absolute_uri('/api/upload/?oshash=%s&profile=%s' % (f.oshash, profile)),
+                'result': 1
+            }
+            return render_to_json_response(response)
+        #post next chunk
+        if 'chunk' in request.FILES and 'oshash' in request.GET:
+            print "all chunk now"
+            stream = get_object_or_404(models.Stream, oshash=request.GET['oshash'], profile=profile)
+
+            form = VideoChunkForm(request.POST, request.FILES)
+            if form.is_valid() and stream.editable(request.user):
+                c = form.cleaned_data['chunk']
+                chunk_id = form.cleaned_data['chunkId']
+                response = {
+                    'result': 1,
+                    'resultUrl': request.build_absolute_uri('/')
+                }
+                if not stream.save_chunk(c, chunk_id):
+                    response['result'] = -1
+                elif form.cleaned_data['done']:
+                    #FIXME: send message to encode deamon to create derivates instead
+                    stream.available = True
+                    stream.save()
+                    response['result'] = 1
+                    response['done'] = 1
+                return render_to_json_response(response)
+    print request.GET, request.POST
+    response = json_response(status=400, text='this request requires POST')
+    return render_to_json_response(response)
+
+"""
+@login_required_json
+def list_files(request):
     '''
-        ARCHIVE API NEEDS CLEANUP
+    GET list
+        > {
+          "files": {
+            "a41cde31c581e11d": {"path": "E/Example, The/An Example.avi", "size":1646274},
+          }
+        }
+    '''
+    response = {}
+    response['files'] = {}
+    qs = models.UserFile.filter(user=request.user)
+    p = Paginator(qs, 1000)
+    for i in p.page_range:
+        page = p.page(i)
+        for f in page.object_list:
+              response['files'][f.movie_file.oshash] = {'path': f.path, 'size': f.movie_file.size}
+    return render_to_json_response(response)
+
+def find_files(request):
+    response = {}
+    query = _parse_query(request)
+    response['files'] = {}
+    qs = models.UserFile.filter(user=request.user).filter(movie_file__movie__id__in=query['q'])
+    p = Paginator(qs, 1000)
+    for i in p.page_range:
+        page = p.page(i)
+        for f in page.object_list:
+              response['files'][f.movie_file.oshash] = {'path': f.path, 'size': f.movie_file.size}
+    return render_to_json_response(response)
+
+def api_fileInfo(request):
+    '''
         param data
-            {id: string, key: value,..}
+            oshash string
         return {'status': {'code': int, 'text': string},
-                'data': {}}
+                'data': {imdbId:string }}
     '''
-    data = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Archive, name=data['name'])
-    if item.editable(request.user):
-		response = json_response(status=501, text='not implemented')
-		item.edit(data)
-	else:
-		response = json_response(status=403, text='permission denied')
+    if 'data' in request.POST:
+		oshash = json.loads(request.POST['data'])
+	elif 'oshash' in request.GET:
+		oshash = request.GET['oshash']
+    f = models.MovieFile.objects.get(oshash=oshash)
+    response = {'data': f.json()}
     return render_to_json_response(response)
 
-@login_required_json
-def api_removeArchive(request):
-    '''
-        ARCHIVE API NEEDS CLEANUP
-        param data
-            string id
-
-        return {'status': {'code': int, 'text': string}}
-    '''
-    response = json_response({})
-    itemId = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Archive, movieId=itemId)
-	if item.editable(request.user):
-		response = json_response(status=501, text='not implemented')
-	else:
-		response = json_response(status=403, text='permission denied')
-    return render_to_json_response(response)
-
+def api_subtitles(request):
+	'''
+	param data
+		oshash string
+		language string
+		subtitle string
+	return
+		if no language is provided:
+			{data: {languages: array}}
+		if language is set:
+			{data: {subtitle: string}}
+		if subtitle is set:
+			saves subtitle for given language
+	'''
+    if 'data' in request.POST:
+		data = json.loads(request.POST['data'])
+		oshash = data['oshash']
+		language = data.get('language', None)
+		srt = data.get('subtitle', None)
+	if srt:
+        user = request.user
+        sub = models.Subtitles.objects.get_or_create(user, oshash, language)
+        sub.srt = srt
+        sub.save()
+    else:
+        response = json_response({})
+        if language:
+            q = models.Subtitles.objects.filter(movie_file__oshash=oshash, language=language)
+            if q.count() > 0:
+				response['data']['subtitle'] = q[0].srt
+				return render_to_json_response(response)
+        l = models.Subtitles.objects.filter(movie_file__oshash=oshash).values('language')
+        response['data']['languages'] = [f['language'] for f in l]
+        return render_to_json_response(response)
+"""

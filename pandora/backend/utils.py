@@ -10,7 +10,7 @@ import hashlib
 
 import ox
 import ox.iso
-from ox.normalize import normalizeName
+from ox.normalize import normalizeName, normalizeTitle
 
 def oxid(title, directors, year='', seriesTitle='', episodeTitle='', season=0, episode=0):
     director = ', '.join(directors)
@@ -64,6 +64,10 @@ def oxdb_title(_title, searchTitle = False):
     title = title.replace('_dot_dot_dot_', '... ')
     title = title.replace('_dot__space_', '. ')
     title = title.replace('_space__dot_', ' .')
+    year = ox.findRe(title, '(\(\d{4}\))')
+    if title.endswith(year):
+        title = title[:-len(year)].strip()
+    title = normalizeTitle(title)
     return title
 
 def oxdb_year(data):
@@ -117,16 +121,21 @@ def oxdb_part(path):
             part = p[0]
     return part
 
-def parsePath(path):
+def parse_path(path):
     import ox.web.imdb
     search_title = oxdb_title(path, True)
     r = {}
     r['title'] = oxdb_title(path)
     r['directors'] = oxdb_directors(path)
+    year = ox.findRe(path, '\((\d{4})\)')
+    if year:
+        r['year'] = year
+
+    #FIXME: only include it its actually a series
     r['episode_title'] = oxdb_episode_title(path)
     r['season'], r['episode'] = oxdb_season_episode(path)
     r['series_title'] = oxdb_series_title(path)
-    r['part'] = oxdb_part(path)
+
     r['imdbId'] = ox.web.imdb.guess(search_title, ', '.join(r['directors']), timeout=-1)
     r['oxdbId'] = oxid(r['title'], r['directors'],
                        seriesTitle=r['series_title'],

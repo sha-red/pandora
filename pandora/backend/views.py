@@ -33,7 +33,8 @@ import tasks
 
 from oxuser.models import getUserJSON
 from oxuser.views import api_login, api_logout, api_register, api_contact, api_recover, api_preferences, api_findUser
-from archive.views import api_update, api_addArchive, api_editArchive, api_removeArchive
+
+from archive.views import api_update, api_upload
 
 from archive.models import File
 
@@ -406,88 +407,6 @@ def api_encodingSettings(request):
     response = json_response({'options': settings.VIDEO_ENCODING[settings.VIDEO_PROFILE]})
     return render_to_json_response(response)
 
-class UploadForm(forms.Form):
-    data = forms.TextInput()
-    file = forms.FileField()
-
-class VideoChunkForm(forms.Form):
-    chunk = forms.FileField()
-    done = forms.IntegerField(required=False)
-
-@login_required_json
-def api_upload(request): #video, timeline, frame
-    '''
-        upload video, timeline or frame
-        param data
-        param file
-        return {'status': {'code': int, 'text': string},
-                'data': {}}
-    '''
-    form = UploadForm(request.POST, request.FILES)
-    if form.is_valid():
-        data = json.loads(request.POST['data'])
-        oshash = data['oshash']
-        f = get_object_or_404(models.File, oshash=oshash)
-        if data['item'] == 'frame':
-            ff = form.cleaned_data['file']
-            position = data['position']
-            frame, created = models.Frame.objects.get_or_create(file=f, position=position)
-            if not created and frame.frame:
-                frame.frame.delete()
-            frame.frame.save(ff.name, ff)
-            frame.save()
-            response = json_response({'url': frame.frame.url})
-            return render_to_json_response(response)
-        if data['item'] == 'timeline':
-            pass
-            #print "not implemented"
-
-    response = json_response(status=501, text='not implemented')
-    return render_to_json_response(response)
-
-@login_required_json
-def firefogg_upload(request):
-    #handle video upload
-    if request.method == 'POST':
-        #init upload
-        if 'oshash' in request.POST:
-            #FIXME: what to do if requested oshash is not in db?
-            #FIXME: should existing data be reset here? or better, should this fail if an upload was there
-            f = get_object_or_404(models.File, oshash=request.POST['oshash'])
-            stream = getattr(f, 'stream_%s'%settings.VIDEO_UPLOAD)
-            if stream:
-                stream.delete()
-            f.available = False
-            f.save()
-            response = {
-                'uploadUrl': request.build_absolute_uri('/api/upload/?oshash=%s' % f.oshash),
-                'result': 1
-            }
-            return render_to_json_response(response)
-        #post next chunk
-        if 'chunk' in request.FILES and 'oshash' in request.GET:
-            print "all chunk now"
-            f = get_object_or_404(models.File, oshash=request.GET['oshash'])
-            form = VideoChunkForm(request.POST, request.FILES)
-            #FIXME: 
-            if form.is_valid() and f.editable(request.user):
-                c = form.cleaned_data['chunk']
-                response = {
-                    'result': 1,
-                    'resultUrl': request.build_absolute_uri('/')
-                }
-                if not f.save_chunk(c, c.name):
-                    response['result'] = -1
-                elif form.cleaned_data['done']:
-                    #FIXME: send message to encode deamon to create derivates instead
-                    f.available = True
-                    f.save()
-                    response['result'] = 1
-                    response['done'] = 1
-                return render_to_json_response(response)
-    print request.GET, request.POST
-    response = json_response(status=400, text='this request requires POST')
-    return render_to_json_response(response)
 
 @login_required_json
 def api_editFile(request): #FIXME: should this be file.files. or part of update
@@ -505,7 +424,47 @@ def api_parse(request): #parse path and return info
                 data: {imdb: string}}
     '''
     path = json.loads(request.POST['data'])['path']
-    response = json_response(utils.parsePath(path))
+    response = json_response(utils.parse_path(path))
+    return render_to_json_response(response)
+
+
+def api_setPosterFrame(request): #parse path and return info
+    '''
+        param data
+            {id: movieId, position: float}
+        return {'status': {'code': int, 'text': string},
+                data: {}}
+    '''
+    data = json.loads(request.POST['data'])
+    item = get_object_or_404_json(models.Movie, movieId=data['id'])
+    if item.editable(request.user):
+        #FIXME: some things need to be updated after changing this
+        item.poster_frame = data['position']
+        item.save()
+        response = json_response(status=200, text='ok')
+	else:
+        response = json_response(status=403, text='permissino denied')
+    return render_to_json_response(response)
+
+def api_setPoster(request): #parse path and return info
+    '''
+        param data
+            {id: movieId, url: string}
+        return {'status': {'code': int, 'text': string},
+                data: {poster: url}}
+    '''
+    data = json.loads(request.POST['data'])
+    item = get_object_or_404_json(models.Movie, movieId=data['id'])
+    if item.editable(request.user):
+        #FIXME: check that poster is from allowed url
+        item.poster_url = data['url']
+        if item.poster:
+            item.poster.delete()
+        item.save()
+        response = json_response(status=200, text='ok')
+        response['data']['poster'] = item.get_poster()
+	else:
+        response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
 
 def api_getImdbId(request):
@@ -522,56 +481,6 @@ def api_getImdbId(request):
 		response = json_response(status=404, text='not found')
     return render_to_json_response(response)
 
-def api_fileInfo(request):
-    '''
-        param data
-            oshash string
-        return {'status': {'code': int, 'text': string},
-                'data': {imdbId:string }}
-    '''
-    if 'data' in request.POST:
-		oshash = json.loads(request.POST['data'])
-	elif 'oshash' in request.GET:
-		oshash = request.GET['oshash']
-    f = models.MovieFile.objects.get(oshash=oshash)
-    response = {'data': f.json()}
-    return render_to_json_response(response)
-
-def api_subtitles(request):
-	'''
-	param data
-		oshash string
-		language string
-		subtitle string
-	return
-		if no language is provided:
-			{data: {languages: array}}
-		if language is set:
-			{data: {subtitle: string}}
-		if subtitle is set:
-			saves subtitle for given language
-	'''
-    if 'data' in request.POST:
-		data = json.loads(request.POST['data'])
-		oshash = data['oshash']
-		language = data.get('language', None)
-		srt = data.get('subtitle', None)
-	if srt:
-        user = request.user
-        sub = models.Subtitles.objects.get_or_create(user, oshash, language)
-        sub.srt = srt
-        sub.save()
-    else:
-        response = json_response({})
-        if language:
-            q = models.Subtitles.objects.filter(movie_file__oshash=oshash, language=language)
-            if q.count() > 0:
-				response['data']['subtitle'] = q[0].srt
-				return render_to_json_response(response)
-        l = models.Subtitles.objects.filter(movie_file__oshash=oshash).values('language')
-        response['data']['languages'] = [f['language'] for f in l]
-        return render_to_json_response(response)
-    
 def video(request, id, quality):
     movie = get_object_or_404(models.Movie, movieId=id)
     if quality not in settings.VIDEO_ENCODING:
@@ -589,39 +498,6 @@ def frame(request, id, position, size):
     if not frame:
         raise Http404
     return HttpFileResponse(frame, content_type='image/jpeg')
-
-'''
-GET list
-    > {
-      "files": {
-        "a41cde31c581e11d": {"path": "E/Example, The/An Example.avi", "size":1646274},
-      }
-    }
-'''
-@login_required_json
-def list_files(request):
-    response = {}
-    response['files'] = {}
-    qs = models.UserFile.filter(user=request.user)
-    p = Paginator(qs, 1000)
-    for i in p.page_range:
-        page = p.page(i)
-        for f in page.object_list:
-              response['files'][f.movie_file.oshash] = {'path': f.path, 'size': f.movie_file.size}
-    return render_to_json_response(response)
-
-def find_files(request):
-    response = {}
-    query = _parse_query(request)
-    response['files'] = {}
-    qs = models.UserFile.filter(user=request.user).filter(movie_file__movie__id__in=query['q'])
-    p = Paginator(qs, 1000)
-    for i in p.page_range:
-        page = p.page(i)
-        for f in page.object_list:
-              response['files'][f.movie_file.oshash] = {'path': f.path, 'size': f.movie_file.size}
-    return render_to_json_response(response)
-
 
 def apidoc(request):
     '''

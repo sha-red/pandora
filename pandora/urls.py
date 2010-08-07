@@ -11,6 +11,7 @@ urlpatterns = patterns('',
     # Example:
     (r'^ajax_filtered_fields/', include('ajax_filtered_fields.urls')),
     (r'^api/', include('backend.urls')),
+    (r'^api/upload/$', 'archive.views.firefogg_upload'),
     (r'^site.js$', 'app.views.site_js'),
     (r'^$', 'app.views.index'),
     (r'^r/(?P<key>.*)$', 'oxuser.views.recover'),
