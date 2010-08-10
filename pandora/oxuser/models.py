@@ -6,13 +6,14 @@ from django.db import models
 from django.db.models import signals
 from django.dispatch import dispatcher
 from django.utils import simplejson as json
+from datetime import datetime
 
 
 class UserProfile(models.Model):
     recover_key = models.TextField()
     user = models.ForeignKey(User, unique=True)
     
-    files_updated = models.DateTimeField(default=None)
+    files_updated = models.DateTimeField(default=datetime.now)
 
 def user_post_save(sender, instance, **kwargs):
     profile, new = UserProfile.objects.get_or_create(user=instance)
