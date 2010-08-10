@@ -32,34 +32,62 @@ import models
 from backend.utils import oxid, parse_path
 import backend.models
 
-#@login_required_json
+@login_required_json
+def api_removeVolume(request):
+    data = json.loads(request.POST['data'])
+    user = request.user
+    try:
+        volume = models.Volume.objects.get(user=user, name=data['volume'])
+        volume.files.delete()
+        volume.delete()
+        response = json_response(status=200, text='ok')
+    except models.Volume.DoesNotExist:
+        response = json_response(status=404, text='volume not found')
+    return render_to_json_response(response)
+
+@login_required_json
 def api_update(request):
     '''
-        //both are optional, idea is to have 2 requests first with files, and
-          after that with info for the requested oshashes
+        2 calls possible:
+            volume/files
+            info
+        call volume/files first and fill in requested info after that
+
         param data
+            volume: '',
             files: [
-                {oshash:, name:, folder:, oshash:, ctime:, atime:, mtime:, }
+                {oshash:, path:, ctime:, atime:, mtime:, }
             ]
             info: {oshash: object}
 
         return {'status': {'code': int, 'text': string},
                 'data': {info: list, data: list, file: list}}
     '''
+    print "here we go fucker", request.user
     data = json.loads(request.POST['data'])
     user = request.user
 
-    response = json_response({'info': [], 'rename': [], 'file': []})
+    response = json_response({'info': [], 'data': [], 'file': []})
     
     if 'files' in data:
+        volume, created = models.Volume.objects.get_or_create(user=user, name=data['volume'])
         all_files = []
         for f in data['files']:
-            folder = f['folder']
-            name   = f['name']
+            print f
+            path = f['path']
+            folder = path.split('/')
+            name = folder.pop()
+            if folder and folder[-1] in ('Extras', 'Versions', 'DVDs'):
+                name = '/'.join([folder.pop(), name])
+            folder = '/'.join(folder)
+            print folder
+            print name
+            f['folder'] = folder
+            f['name'] = name
             oshash = f['oshash']
             all_files.append(oshash)
 
-            same_folder = models.FileInstance.objects.filter(folder=folder, user=user)
+            same_folder = models.FileInstance.objects.filter(folder=folder, volume=volume)
             if same_folder.count() > 0:
                 movie = same_folder[0].file.movie
             else:
@@ -67,7 +95,7 @@ def api_update(request):
 
 	        path = os.path.join(folder, name)
 
-            instance = models.FileInstance.objects.filter(file__oshash=oshash, user=user)
+            instance = models.FileInstance.objects.filter(file__oshash=oshash, volume=volume)
             if instance.count()>0:
                 instance = instance[0]
                 updated = False
@@ -76,39 +104,33 @@ def api_update(request):
                         setattr(instance, key, f[key])
                         updated=True
                 if updated:
-			        f.save()
+			        instance.save()
             else:
                 #look if oshash is known
-                file_object = models.File.objects.filter(oshash=oshash)
-                if file_object.count() > 0:
-                    file_object = file_object[0]
-                    instance = models.FileInstance()
-                    instance.file = file_object
-                    for key in ('atime', 'mtime', 'ctime', 'name', 'folder'):
-                        setattr(instance, key, f[key])
-                    instance.save()
+                file_objects = models.File.objects.filter(oshash=oshash)
+                if file_objects.count() > 0:
+                    file_object = file_objects[0]
                 #new oshash, add to database
                 else:
                     if not movie:
                         movie_info = parse_path(folder)
                         movie = backend.models.getMovie(movie_info)
-                    f = models.File()
-                    f.oshash = oshash
-                    f.name = name
-                    f.movie = movie
-                    f.save()
-                    response['info'].append(oshash)
-
-                    instance = models.FileInstance()
-                    instance.user = user
-                    instance.file = f
-                    for key in ('atime', 'mtime', 'ctime', 'name', 'folder'):
-                        setattr(instance, key, f[key])
-                    instance.save()
+                    file_object = models.File()
+                    file_object.oshash = oshash
+                    file_object.name = name
+                    file_object.movie = movie
+                    file_object.save()
+                    response['data']['info'].append(oshash)
+                instance = models.FileInstance()
+                instance.volume = volume
+                instance.file = file_object
+                for key in ('atime', 'mtime', 'ctime', 'name', 'folder'):
+                    setattr(instance, key, f[key])
+                instance.save()
 
         #remove deleted files
         #FIXME: can this have any bad consequences? i.e. on the selction of used movie files.
-        models.FileInstance.objects.filter(user=user).exclude(file__oshash__in=all_files).delete()
+        models.FileInstance.objects.filter(volume=volume).exclude(file__oshash__in=all_files).delete()
 
         user_profile = user.get_profile()
         user_profile.files_updated = datetime.now()
@@ -117,21 +139,26 @@ def api_update(request):
     if 'info' in data:
         for oshash in data['info']:
             info = data['info'][oshash]
-            instance = models.FileInstance.objects.filter(file__oshash=oshash, user=user)
+            instance = models.FileInstance.objects.filter(file__oshash=oshash, volume__user=user)
             if instance.count()>0:
                 instance = instance[0]
                 if not instance.file.info:
+                    for key in ('atime', 'mtime', 'ctime'):
+                        if key in info:
+                            del info[key]
                     instance.file.info = info
                     instance.file.save()
 
-    files = models.FileInstance.objects.filter(user=user, file__available=False)
-    response['data'] = [f.file.oshash for f in files.filter(file__is_video=True)]
-    response['files'] = [f.file.oshash for f in files.filter(file__is_subtitle=True)]
+    files = models.FileInstance.objects.filter(volume__user=user, file__available=False)
+    response['data']['info'] = [f.file.oshash for f in files.filter(file__info='{}')]
+    #needs some flag to find those that are actually used main is to generic
+    response['data']['data'] = [f.file.oshash for f in files.filter(file__is_video=True, file__is_main=True)]
+    response['data']['file'] = [f.file.oshash for f in files.filter(file__is_subtitle=True)]
 
     return render_to_json_response(response)
 
 
-#@login_required_json
+@login_required_json
 #FIXME: is this part of the api or does it have to be outside due to multipart?
 def api_upload(request):
     '''

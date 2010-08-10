@@ -14,12 +14,8 @@ class FileAdmin(admin.ModelAdmin):
 admin.site.register(models.File, FileAdmin)
 
 class FileInstanceAdmin(admin.ModelAdmin):
-    search_fields = ['path', 'archive__name']
+    search_fields = ['path', 'volume__name']
     #form = ArchiveFileAdminForm
 
 admin.site.register(models.FileInstance, FileInstanceAdmin)
-
-class ArchiveAdmin(admin.ModelAdmin):
-    search_fields = ['name']
-admin.site.register(models.Archive, ArchiveAdmin)
 

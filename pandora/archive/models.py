@@ -5,6 +5,7 @@ import os.path
 import random
 import re
 from decimal import Decimal
+import time
 
 from django.db import models
 from django.db.models import Q
@@ -30,43 +31,13 @@ def parse_decimal(string):
     d = string.split('/')
     return Decimal(d[0]) / Decimal(d[1])
 
-def stream_path(f):
-    h = f.oshash
-    return os.path.join('stream', h[:2], h[2:4], h[4:6], h[6:], f.profile)
-
-class Stream(models.Model):
-    file = models.ForeignKey(File, related_name='streams')
-    profile = models.CharField(max_length=255, default='96p.webm')
-    video = models.FileField(default=None, blank=True, upload_to=lambda f, x: stream_path(f))
-    source = models.ForeignKey(Stream, related_name='derivatives', default=None, blank=True)
-    available = models.BooleanField(default=False)
-
-    def extract_derivates(self):
-        #here based on settings derivates like smaller versions or other formats would be created
-
-    def editable(self, user):
-        #FIXME: possibly needs user setting for stream
-        return True
-
-    def save_chunk(self, chunk, chunk_id=-1):
-        if not self.available:
-            if not self.video:
-                self.video.save(self.profile, ContentFile(chunk))
-            else:
-                f = open(self.file.path, 'a')
-                #FIXME: should check that chunk_id/offset is right
-                f.write(chunk)
-                f.close()
-            return True
-        return False
-
 class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
     verified = models.BooleanField(default=False)
 
-    oshash = models.CharField(max_length=16)
+    oshash = models.CharField(max_length=16, unique=True)
     movie = models.ForeignKey(Movie, related_name='files')
 
     name = models.CharField(max_length=2048, default="") # canoncial path/file
@@ -76,11 +47,11 @@ class File(models.Model):
     version = models.CharField(default="", max_length=255) # sort path/file name
     language = models.CharField(default="", max_length=8)
 
-    season = models.IntegerField(default = -1)
-    episode = models.IntegerField(default = -1)
+    season = models.IntegerField(default=-1)
+    episode = models.IntegerField(default=-1)
 
-    size = models.BigIntegerField(default = 0)
-    duration = models.IntegerField(default = 0)
+    size = models.BigIntegerField(default=0)
+    duration = models.IntegerField(default=0)
 
     info = fields.DictField(default={})
 
@@ -92,8 +63,8 @@ class File(models.Model):
     framerate = models.CharField(max_length=255)
 
     audio_codec = models.CharField(max_length=255)
-    channels = models.IntegerField(default = 0)
-    samplerate = models.IntegerField(default = 0)
+    channels = models.IntegerField(default=0)
+    samplerate = models.IntegerField(default=0)
 
     bits_per_pixel = models.FloatField(default=-1)
     pixels = models.BigIntegerField(default=0)
@@ -101,13 +72,12 @@ class File(models.Model):
     #This is true if derivative is available or subtitles where uploaded
     available = models.BooleanField(default = False)
 
-    is_audio = models.BooleanField(default = False)
-    is_video = models.BooleanField(default = False)
-    is_extra = models.BooleanField(default = False)
-    is_main = models.BooleanField(default = False)
-    is_subtitle = models.BooleanField(default = False)
-    is_version = models.BooleanField(default = False)
-
+    is_audio = models.BooleanField(default=False)
+    is_video = models.BooleanField(default=False)
+    is_extra = models.BooleanField(default=False)
+    is_main = models.BooleanField(default=False)
+    is_subtitle = models.BooleanField(default=False)
+    is_version = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name
@@ -148,7 +118,7 @@ class File(models.Model):
         if not self.is_audio and not self.is_video and self.name.endswith('.srt'):
             self.is_subtitle = True
 
-        if self.name and self.name.startswith('Extra/'):
+        if self.name and self.name.startswith('Extras/'):
             self.is_extra = True
             self.is_main = False
         else:
@@ -163,22 +133,38 @@ class File(models.Model):
             r[k] = unicode(self[k])
         return r
 
-class FileInstance(models.Model):
+class Volume(models.Model):
+    class Meta:
+        unique_together = ("user", "name")
+
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    ctime = models.DateTimeField(default=datetime.now, editable=False)
-    mtime = models.DateTimeField(default=datetime.now, editable=False)
-    atime = models.DateTimeField(default=datetime.now, editable=False)
+    user = models.ForeignKey(User, related_name='volumes')
+    name = models.CharField(max_length=1024)
 
-    path = models.CharField(max_length=2048)
+    def __unicode__(self):
+        return u"%s's %s"% (self.user, self.name)
+
+class FileInstance(models.Model):
+    class Meta:
+        unique_together = ("name", "folder", "volume")
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    atime = models.IntegerField(default=lambda: int(time.time()), editable=False)
+    ctime = models.IntegerField(default=lambda: int(time.time()), editable=False)
+    mtime = models.IntegerField(default=lambda: int(time.time()), editable=False)
+
+    name = models.CharField(max_length=2048)
     folder = models.CharField(max_length=255)
 
     file = models.ForeignKey(File, related_name='instances')
-    user = models.ForeignKey(User, related_name='files')
+    volume = models.ForeignKey(Volume, related_name='files')
 
     def __unicode__(self):
-        return u"%s's %s <%s>"% (self.user, self.path, self.oshash)
+        return u"%s's %s <%s>"% (self.volume.user, self.name, self.file.oshash)
 
     @property
     def movieId(self):
@@ -191,6 +177,8 @@ def frame_path(f, name):
     return os.path.join('frame', h[:2], h[2:4], h[4:6], name)
 
 class Frame(models.Model):
+    class Meta:
+        unique_together = ("file", "position")
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     file = models.ForeignKey(File, related_name="frames")
@@ -201,4 +189,38 @@ class Frame(models.Model):
 
     def __unicode__(self):
         return '%s at %s' % (self.file, self.position)
+
+def stream_path(f):
+    h = f.oshash
+    return os.path.join('stream', h[:2], h[2:4], h[4:6], h[6:], f.profile)
+
+class Stream(models.Model):
+    class Meta:
+        unique_together = ("file", "profile")
+
+    file = models.ForeignKey(File, related_name='streams')
+    profile = models.CharField(max_length=255, default='96p.webm')
+    video = models.FileField(default=None, blank=True, upload_to=lambda f, x: stream_path(f))
+    source = models.ForeignKey('Stream', related_name='derivatives', default=None, blank=True)
+    available = models.BooleanField(default=False)
+
+    def extract_derivates(self):
+        #here based on settings derivates like smaller versions or other formats would be created
+        return True
+
+    def editable(self, user):
+        #FIXME: possibly needs user setting for stream
+        return True
+
+    def save_chunk(self, chunk, chunk_id=-1):
+        if not self.available:
+            if not self.video:
+                self.video.save(self.profile, ContentFile(chunk))
+            else:
+                f = open(self.file.path, 'a')
+                #FIXME: should check that chunk_id/offset is right
+                f.write(chunk)
+                f.close()
+            return True
+        return False
 
