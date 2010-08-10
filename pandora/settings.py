@@ -134,6 +134,10 @@ TRANSMISSON_PORT=9091
 TRANSMISSON_USER='transmission'
 TRANSMISSON_PASSWORD='transmission'
 
+
+#list of poster services, https://wiki.0x2620.org/wiki/pandora/posterservice
+POSTER_SERVICES=[]
+
 #overwrite default settings with local settings
 try:
     from local_settings import *

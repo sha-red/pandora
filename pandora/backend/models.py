@@ -144,11 +144,12 @@ class Movie(models.Model):
     posters_url = models.TextField(blank=True)
     poster_height = models.IntegerField(default=0)
     poster_width = models.IntegerField(default=0)
+
     poster_frame = models.FloatField(default=-1)
 
-    def get_poser(self):
-        url = self.poster_url:
-        if not url:
+    def get_poster(self):
+        url = self.poster_url
+        if not url and self.poster:
             url = self.poster.url
         return url
 
@@ -208,6 +209,7 @@ class Movie(models.Model):
                     movie[pub_key] = value()
                 else:
                     movie[pub_key] = value
+        movie['poster'] = self.get_poster()
         if fields:
             for f in fields:
                 if f.endswith('.length') and f[:-7] in ('cast', 'genre', 'trivia'):
