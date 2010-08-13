@@ -190,29 +190,16 @@ class VideoChunkForm(forms.Form):
 
 @login_required_json
 def firefogg_upload(request):
+    profile = request.GET['profile']
+    oshash = request.GET['oshash']
     #handle video upload
     if request.method == 'POST':
         #init upload
-        profile = request.POST.get('profile', request.GET['profile'])
-        #FIXME: check for valid profile
-        if 'oshash' in request.POST:
-            #404 if oshash is not know, files must be registered via update api first
-            f = get_object_or_404(models.File, oshash=request.POST['oshash'])
-            stream, created = models.Stream.objects.get_or_create(file=file, profile=profile)
-            if stream.video: #FIXME: check permission here instead of just starting over
-                stream.video.delete()
-            stream.available = False
-            stream.save()
-            response = {
-                #is it possible to no hardcode url here?
-                'uploadUrl': request.build_absolute_uri('/api/upload/?oshash=%s&profile=%s' % (f.oshash, profile)),
-                'result': 1
-            }
-            return render_to_json_response(response)
+
         #post next chunk
-        if 'chunk' in request.FILES and 'oshash' in request.GET:
+        if 'chunk' in request.FILES and oshash:
             print "all chunk now"
-            stream = get_object_or_404(models.Stream, oshash=request.GET['oshash'], profile=profile)
+            stream = get_object_or_404(models.Stream, file__oshash=oshash, profile=profile)
 
             form = VideoChunkForm(request.POST, request.FILES)
             if form.is_valid() and stream.editable(request.user):
@@ -231,6 +218,21 @@ def firefogg_upload(request):
                     response['result'] = 1
                     response['done'] = 1
                 return render_to_json_response(response)
+        #FIXME: check for valid profile
+        elif oshash:
+            #404 if oshash is not know, files must be registered via update api first
+            f = get_object_or_404(models.File, oshash=oshash)
+            stream, created = models.Stream.objects.get_or_create(file=f, profile=profile)
+            if stream.video: #FIXME: check permission here instead of just starting over
+                stream.video.delete()
+            stream.available = False
+            stream.save()
+            response = {
+                #is it possible to no hardcode url here?
+                'uploadUrl': request.build_absolute_uri('/api/upload/?oshash=%s&profile=%s' % (f.oshash, profile)),
+                'result': 1
+            }
+            return render_to_json_response(response)
     print request.GET, request.POST
     response = json_response(status=400, text='this request requires POST')
     return render_to_json_response(response)

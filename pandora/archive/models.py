@@ -191,7 +191,7 @@ class Frame(models.Model):
         return '%s at %s' % (self.file, self.position)
 
 def stream_path(f):
-    h = f.oshash
+    h = f.file.oshash
     return os.path.join('stream', h[:2], h[2:4], h[4:6], h[6:], f.profile)
 
 class Stream(models.Model):
@@ -201,7 +201,7 @@ class Stream(models.Model):
     file = models.ForeignKey(File, related_name='streams')
     profile = models.CharField(max_length=255, default='96p.webm')
     video = models.FileField(default=None, blank=True, upload_to=lambda f, x: stream_path(f))
-    source = models.ForeignKey('Stream', related_name='derivatives', default=None, blank=True)
+    source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True)
     available = models.BooleanField(default=False)
 
     def extract_derivates(self):
@@ -215,12 +215,19 @@ class Stream(models.Model):
     def save_chunk(self, chunk, chunk_id=-1):
         if not self.available:
             if not self.video:
-                self.video.save(self.profile, ContentFile(chunk))
+                self.video.save(self.profile, chunk)
             else:
-                f = open(self.file.path, 'a')
+                f = open(self.video.path, 'a')
                 #FIXME: should check that chunk_id/offset is right
-                f.write(chunk)
+                f.write(chunk.read())
                 f.close()
             return True
         return False
+
+    def save(self, *args, **kwargs):
+        if self.available and not self.file.available:
+            self.file.available = True
+            self.file.save()
+        super(Stream, self).save(*args, **kwargs)
+
 
