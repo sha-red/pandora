@@ -141,7 +141,7 @@ class Movie(models.Model):
             self.save()
 
     poster = models.ImageField(default=None, blank=True, upload_to=lambda f, x: poster_path(f))
-    posters_url = models.TextField(blank=True)
+    poster_url = models.TextField(blank=True)
     poster_height = models.IntegerField(default=0)
     poster_width = models.IntegerField(default=0)
 
