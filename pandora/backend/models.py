@@ -25,11 +25,6 @@ import load
 import utils
 import extract
 
-def plural_key(term):
-    return {
-        'country': 'countries',
-    }.get(term, term + 's')
-
 
 def getMovie(info):
     '''
@@ -210,6 +205,7 @@ class Movie(models.Model):
                 else:
                     movie[pub_key] = value
         movie['poster'] = self.get_poster()
+        
         if fields:
             for f in fields:
                 if f.endswith('.length') and f[:-7] in ('cast', 'genre', 'trivia'):
@@ -230,6 +226,13 @@ class Movie(models.Model):
         return utils.oxid(self.get('title', ''), self.get('directors', []), str(self.get('year', '')),
                           self.get('series title', ''), self.get('episode title', ''),
                           self.get('season', ''), self.get('episode', ''))
+
+    def streams(self):
+        streams = []
+        for f in self.files.filter(is_main=True, available=True):
+            for s in f.streams.all():
+                streams.append(s.video.url)
+        return streams
 
     def frame(self, position, width=128):
         #FIXME: compute offset and so on
@@ -254,7 +257,7 @@ class Movie(models.Model):
             elif key == 'character':
                 values = [i[1] for i in self.get('actor', [])]
             else:
-                values = self.get(plural_key(key), [])
+                values = self.get(utils.plural_key(key), [])
             setattr(f, key, '|%s|'%'|'.join(values))
 
         f.summary = self.get('plot', '') + self.get('plot_outline', '')
@@ -303,10 +306,10 @@ class Movie(models.Model):
         s.year = self.get('year', '')
 
         for key in self.person_keys:
-            setattr(s, key, sortNames(self.get(plural_key(key), [])))
+            setattr(s, key, sortNames(self.get(utils.plural_key(key), [])))
 
         for key in ('language', 'country'):
-            setattr(s, key, ','.join(self.get(plural_key(key), [])))
+            setattr(s, key, ','.join(self.get(utils.plural_key(key), [])))
 
         s.runtime = self.get('runtime', 0)
 
@@ -351,7 +354,7 @@ class Movie(models.Model):
             elif key == 'character':
                 current_values = [i[1] for i in self.get('actor', [])]
             else:
-                current_values = self.get(plural_key(key), [])
+                current_values = self.get(utils.plural_key(key), [])
             saved_values = [i.value for i in Facet.objects.filter(movie=self, key=key)]
             removed_values = filter(lambda x: x not in current_values, saved_values)
             if removed_values:
@@ -624,7 +627,6 @@ class Layer(models.Model):
             if user.groups.filter(id__in=obj.groups.all()).count() > 0:
                 return True
         return False
-
 
 class Collection(models.Model):
     created = models.DateTimeField(auto_now_add=True)

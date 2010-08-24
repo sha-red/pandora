@@ -24,6 +24,9 @@ from backend import utils
 from backend import extract
 from pandora.backend.models import Movie
 
+import extract
+
+
 def parse_decimal(string):
     string = string.replace(':', '/')
     if '/' not in string:
@@ -133,6 +136,11 @@ class File(models.Model):
             r[k] = unicode(self[k])
         return r
 
+    def contents(self):
+        if self.contents_set.count() > 0:
+            return self.contents_set.all()[0].data
+        return None
+
 class Volume(models.Model):
     class Meta:
         unique_together = ("user", "name")
@@ -171,8 +179,8 @@ class FileInstance(models.Model):
         return File.objects.get(oshash=self.oshash).movieId
 
 def frame_path(f, name):
-    ext = os.path.splitext(name)
-    name = "%s.%s" % (f.position, ext)
+    ext = os.path.splitext(name)[-1]
+    name = "%s%s" % (f.position, ext)
     h = f.file.oshash
     return os.path.join('frame', h[:2], h[2:4], h[4:6], name)
 
@@ -188,7 +196,7 @@ class Frame(models.Model):
     #FIXME: frame path should be renamed on save to match current position
 
     def __unicode__(self):
-        return '%s at %s' % (self.file, self.position)
+        return u'%s at %s' % (self.file, self.position)
 
 def stream_path(f):
     h = f.file.oshash
@@ -204,9 +212,42 @@ class Stream(models.Model):
     source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True)
     available = models.BooleanField(default=False)
 
+    def __unicode__(self):
+        return self.video
+
     def extract_derivates(self):
-        #here based on settings derivates like smaller versions or other formats would be created
+        if settings.VIDEO_H264:
+            profile = self.profile.replace('.webm', '.mp4')
+            if Stream.objects.filter(profile=profile, source=self).count() == 0:
+                derivate = Stream(file=self.file, source=self, profile=profile)
+                derivate.video.name = self.video.name.replace(self.profile, profile)
+                derivate.encode()
+
+        for p in settings.VIDEO_DERIVATIVES:
+            profile = p + '.webm'
+            target = self.video.path.replace(self.profile, profile)
+            if Stream.objects.filter(profile=profile, source=self).count() == 0:
+                derivate = Stream(file=self.file, source=self, profile=profile)
+                derivate.video.name = self.video.name.replace(self.profile, profile)
+                derivate.encode()
+
+            if settings.VIDEO_H264:
+                profile = p + '.mp4'
+                if Stream.objects.filter(profile=profile, source=self).count() == 0:
+                    derivate = Stream(file=self.file, source=self, profile=profile)
+                    derivate.video.name = self.video.name.replace(self.profile, profile)
+                    derivate.encode()
         return True
+
+    def encode(self):
+        if self.source:
+            video = self.source.video.path
+            target = self.video.path
+            profile = self.profile
+            info = self.file.info
+            if extract.stream(video, target, profile, info):
+                self.available=True
+                self.save()
 
     def editable(self, user):
         #FIXME: possibly needs user setting for stream
@@ -230,4 +271,15 @@ class Stream(models.Model):
             self.file.save()
         super(Stream, self).save(*args, **kwargs)
 
+class FileContents(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+    file = models.ForeignKey(File, related_name="contents_set")
+    data = models.TextField(default=u'')
+
+    def save(self, *args, **kwargs):
+        if self.data and not self.file.available:
+            self.file.available = True
+            self.file.save()
+        super(FileContents, self).save(*args, **kwargs)
 

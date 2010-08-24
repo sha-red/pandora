@@ -120,14 +120,18 @@ INSTALLED_APPS = (
 AUTH_PROFILE_MODULE = 'oxuser.UserProfile'
 
 #Video encoding settings
-VIDEO_PROFILE = 'low' # possible values low, mid or high
-VIDEO_ENCODING = {
-    'low':  {'height': 96, 'videoBitrate': 180, 'softTarget': True,
-            'samplerate': 44100, 'audioQuality': -1, 'channels': 1, 'noUpscaling': True},
-    'mid':  {'maxSize': 320, 'videoBitrate': 500,
-            'samplerate': 44100, 'audioQuality': 0, 'channels': 1, 'noUpscaling': True},
-    'high': {'profile': 'padma'}
-}
+#available profiles: 96p, 270p, 360p, 480p, 720p, 1080p
+
+VIDEO_PROFILE = '96p'
+VIDEO_DERIVATIVES = []
+VIDEO_H264 = True
+
+
+#Pad.ma
+#VIDEO_PROFILE = '480p'
+#VIDEO_DERIVATIVES = ['96p', '270p', '360p']
+#VIDEO_H264 = False
+
 
 TRANSMISSON_HOST='localhost'
 TRANSMISSON_PORT=9091

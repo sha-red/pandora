@@ -159,28 +159,37 @@ def api_update(request):
 
 
 @login_required_json
-#FIXME: is this part of the api or does it have to be outside due to multipart?
 def api_upload(request):
     '''
-        multipart
-        param data
-            oshash: string
-            frame: [] //multipart frames
+        oshash: string
+        frame: [] //multipart frames
+        file: [] //multipart file
+
         return {'status': {'code': int, 'text': string},
                 'data': {info: object, rename: object}}
     '''
     user = request.user
     f = get_object_or_404(models.File, oshash=request.POST['oshash'])
-    if f.frames.count() == 0 and 'frame' in request.FILES:
-        for frame in request.FILES['frame']:
-            name = frame.name
-            position = float(os.path.splitext(name)[0])
-            fr = models.Frame(file=f, position=position)
-            fr.save()
-            fr.frame.save(frame, name)
-        response = json_response({})
-    else:
-        response = json_response(status=403, text='permissino denied')
+    if 'frame' in request.FILES:
+        if f.frames.count() == 0:
+            for frame in request.FILES.getlist('frame'):
+                name = frame.name
+                #float required?
+                position = float(os.path.splitext(name)[0])
+                fr = models.Frame(file=f, position=position)
+                fr.save()
+                fr.frame.save(name, frame)
+            response = json_response({})
+        else:
+            response = json_response(status=403, text='permissino denied')
+    if 'file' in request.FILES:
+        if f.contents.count() == 0:
+            contents = models.FileContents(file=f)
+            contents.data = request.FILES['file'].read()
+            contents.save()
+            response = json_response({})
+        else:
+            response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
 
 class VideoChunkForm(forms.Form):
@@ -198,7 +207,6 @@ def firefogg_upload(request):
 
         #post next chunk
         if 'chunk' in request.FILES and oshash:
-            print "all chunk now"
             stream = get_object_or_404(models.Stream, file__oshash=oshash, profile=profile)
 
             form = VideoChunkForm(request.POST, request.FILES)
@@ -233,7 +241,6 @@ def firefogg_upload(request):
                 'result': 1
             }
             return render_to_json_response(response)
-    print request.GET, request.POST
     response = json_response(status=400, text='this request requires POST')
     return render_to_json_response(response)
 

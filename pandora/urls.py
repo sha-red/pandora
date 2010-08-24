@@ -13,7 +13,8 @@ urlpatterns = patterns('',
     (r'^api/', include('backend.urls')),
     (r'^api/upload/$', 'archive.views.firefogg_upload'),
     (r'^site.js$', 'app.views.site_js'),
-    (r'^$', 'app.views.index'),
+    (r'^$', 'app.views.intro'),
+    (r'^ra$', 'app.views.index'),
     (r'^r/(?P<key>.*)$', 'oxuser.views.recover'),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 

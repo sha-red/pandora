@@ -12,6 +12,12 @@ import ox
 import ox.iso
 from ox.normalize import normalizeName, normalizeTitle
 
+
+def plural_key(term):
+    return {
+        'country': 'countries',
+    }.get(term, term + 's')
+
 def oxid(title, directors, year='', seriesTitle='', episodeTitle='', season=0, episode=0):
     director = ', '.join(directors)
     oxid_value = u"\n".join([title, director, year])

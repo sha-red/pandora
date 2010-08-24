@@ -8,6 +8,10 @@ from oxdjango.shortcuts import json_response, render_to_json_response, get_objec
 
 import models
 
+def intro(request):
+    context = RequestContext(request, {'settings':settings})
+    return render_to_response('intro.html', context)
+
 def index(request):
     context = RequestContext(request, {'settings':settings})
     return render_to_response('index.html', context)

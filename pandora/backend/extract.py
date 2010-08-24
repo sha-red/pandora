@@ -73,3 +73,5 @@ def resize_image(image_source, image_output, width):
             resize_method = Image.BICUBIC
         output = source.resize((width, height), resize_method)
         output.save(image_output)
+
+
