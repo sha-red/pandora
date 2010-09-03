@@ -183,10 +183,8 @@ def api_upload(request):
         else:
             response = json_response(status=403, text='permissino denied')
     if 'file' in request.FILES:
-        if f.contents.count() == 0:
-            contents = models.FileContents(file=f)
-            contents.data = request.FILES['file'].read()
-            contents.save()
+        if not f.data:
+            f.data.save('data.raw', request.FILES['file'])
             response = json_response({})
         else:
             response = json_response(status=403, text='permissino denied')
@@ -203,44 +201,42 @@ def firefogg_upload(request):
     oshash = request.GET['oshash']
     #handle video upload
     if request.method == 'POST':
-        #init upload
 
         #post next chunk
         if 'chunk' in request.FILES and oshash:
-            stream = get_object_or_404(models.Stream, file__oshash=oshash, profile=profile)
-
+            f = get_object_or_404(models.File, oshash=oshash)
             form = VideoChunkForm(request.POST, request.FILES)
-            if form.is_valid() and stream.editable(request.user):
+            if form.is_valid() and profile == settings.VIDEO_PROFILE and f.editable(request.user):
                 c = form.cleaned_data['chunk']
                 chunk_id = form.cleaned_data['chunkId']
                 response = {
                     'result': 1,
                     'resultUrl': request.build_absolute_uri('/')
                 }
-                if not stream.save_chunk(c, chunk_id):
+                if not f.save_chunk(c, chunk_id):
                     response['result'] = -1
                 elif form.cleaned_data['done']:
                     #FIXME: send message to encode deamon to create derivates instead
-                    stream.available = True
-                    stream.save()
+                    f.available = True
+                    f.save()
                     response['result'] = 1
                     response['done'] = 1
                 return render_to_json_response(response)
-        #FIXME: check for valid profile
-        elif oshash:
+        #init upload
+        elif oshash and profile == settings.VIDEO_PROFILE:
             #404 if oshash is not know, files must be registered via update api first
             f = get_object_or_404(models.File, oshash=oshash)
-            stream, created = models.Stream.objects.get_or_create(file=f, profile=profile)
-            if stream.video: #FIXME: check permission here instead of just starting over
-                stream.video.delete()
-            stream.available = False
-            stream.save()
-            response = {
-                #is it possible to no hardcode url here?
-                'uploadUrl': request.build_absolute_uri('/api/upload/?oshash=%s&profile=%s' % (f.oshash, profile)),
-                'result': 1
-            }
-            return render_to_json_response(response)
+            if f.editable(request.user):
+                if f.video:
+                    f.video.delete()
+                f.video_available = False
+                f.save()
+                response = {
+                    #is it possible to no hardcode url here?
+                    'uploadUrl': request.build_absolute_uri('/api/upload/?oshash=%s&profile=%s' % (f.oshash, profile)),
+                    'result': 1
+                }
+                return render_to_json_response(response)
     response = json_response(status=400, text='this request requires POST')
     return render_to_json_response(response)
 

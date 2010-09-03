@@ -10,7 +10,7 @@ import hashlib
 
 import ox
 import ox.iso
-from ox.normalize import normalizeName, normalizeTitle
+from ox.normalize import normalizeName, normalizeTitle, canonicalTitle
 
 
 def plural_key(term):
@@ -148,4 +148,12 @@ def parse_path(path):
                        episodeTitle=r['episode_title'],
                        season=r['season'], episode=r['episode'])
     return r
+
+def sort_title(title):
+    #title
+    title = re.sub(u'[\'!¿¡,\.;\-"\:\*\[\]]', '', title)
+    title = title.replace(u'Æ', 'Ae')
+    #pad numbered titles
+    title = re.sub('(\d+)', lambda x: '%010d' % int(x.group(0)), title)
+    return title.strip()
 

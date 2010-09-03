@@ -34,6 +34,10 @@ def parse_decimal(string):
     d = string.split('/')
     return Decimal(d[0]) / Decimal(d[1])
 
+def file_path(f, name):
+    h = f.oshash
+    return os.path.join('file', h[:2], h[2:4], h[4:6], h[6:], name)
+
 class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -136,10 +140,31 @@ class File(models.Model):
             r[k] = unicode(self[k])
         return r
 
+    #upload and data handling
+    video_available = models.BooleanField(default=False)
+    video = models.FileField(null=True, blank=True, upload_to=lambda f, x: file_path(f, '%s.webm'%settings.VIDEO_PROFILE))
+    data = models.FileField(null=True, blank=True, upload_to=lambda f, x: file_path(f, 'data.raw'))
+
     def contents(self):
-        if self.contents_set.count() > 0:
-            return self.contents_set.all()[0].data
+        if self.data:
+            return self.data.read()
         return None
+
+    def editable(self, user):
+        #FIXME: check that user has instance of this file
+        return True
+
+    def save_chunk(self, chunk, chunk_id=-1):
+        if not self.video_available:
+            if not self.video:
+                self.video.save('%s.webm'%settings.VIDEO_PROFILE, chunk)
+            else:
+                f = open(self.video.path, 'a')
+                #FIXME: should check that chunk_id/offset is right
+                f.write(chunk.read())
+                f.close()
+            return True
+        return False
 
 class Volume(models.Model):
     class Meta:
@@ -198,88 +223,4 @@ class Frame(models.Model):
     def __unicode__(self):
         return u'%s at %s' % (self.file, self.position)
 
-def stream_path(f):
-    h = f.file.oshash
-    return os.path.join('stream', h[:2], h[2:4], h[4:6], h[6:], f.profile)
-
-class Stream(models.Model):
-    class Meta:
-        unique_together = ("file", "profile")
-
-    file = models.ForeignKey(File, related_name='streams')
-    profile = models.CharField(max_length=255, default='96p.webm')
-    video = models.FileField(default=None, blank=True, upload_to=lambda f, x: stream_path(f))
-    source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True)
-    available = models.BooleanField(default=False)
-
-    def __unicode__(self):
-        return self.video
-
-    def extract_derivates(self):
-        if settings.VIDEO_H264:
-            profile = self.profile.replace('.webm', '.mp4')
-            if Stream.objects.filter(profile=profile, source=self).count() == 0:
-                derivate = Stream(file=self.file, source=self, profile=profile)
-                derivate.video.name = self.video.name.replace(self.profile, profile)
-                derivate.encode()
-
-        for p in settings.VIDEO_DERIVATIVES:
-            profile = p + '.webm'
-            target = self.video.path.replace(self.profile, profile)
-            if Stream.objects.filter(profile=profile, source=self).count() == 0:
-                derivate = Stream(file=self.file, source=self, profile=profile)
-                derivate.video.name = self.video.name.replace(self.profile, profile)
-                derivate.encode()
-
-            if settings.VIDEO_H264:
-                profile = p + '.mp4'
-                if Stream.objects.filter(profile=profile, source=self).count() == 0:
-                    derivate = Stream(file=self.file, source=self, profile=profile)
-                    derivate.video.name = self.video.name.replace(self.profile, profile)
-                    derivate.encode()
-        return True
-
-    def encode(self):
-        if self.source:
-            video = self.source.video.path
-            target = self.video.path
-            profile = self.profile
-            info = self.file.info
-            if extract.stream(video, target, profile, info):
-                self.available=True
-                self.save()
-
-    def editable(self, user):
-        #FIXME: possibly needs user setting for stream
-        return True
-
-    def save_chunk(self, chunk, chunk_id=-1):
-        if not self.available:
-            if not self.video:
-                self.video.save(self.profile, chunk)
-            else:
-                f = open(self.video.path, 'a')
-                #FIXME: should check that chunk_id/offset is right
-                f.write(chunk.read())
-                f.close()
-            return True
-        return False
-
-    def save(self, *args, **kwargs):
-        if self.available and not self.file.available:
-            self.file.available = True
-            self.file.save()
-        super(Stream, self).save(*args, **kwargs)
-
-class FileContents(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    file = models.ForeignKey(File, related_name="contents_set")
-    data = models.TextField(default=u'')
-
-    def save(self, *args, **kwargs):
-        if self.data and not self.file.available:
-            self.file.available = True
-            self.file.save()
-        super(FileContents, self).save(*args, **kwargs)
 

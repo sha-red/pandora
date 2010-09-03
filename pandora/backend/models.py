@@ -4,8 +4,10 @@ from __future__ import division, with_statement
 
 from datetime import datetime
 import os.path
+import math
 import random
 import re
+import subprocess
 
 from django.db import models
 from django.db.models import Q
@@ -23,7 +25,7 @@ from firefogg import Firefogg
 import managers
 import load
 import utils
-import extract
+from archive import extract
 
 
 def getMovie(info):
@@ -204,13 +206,27 @@ class Movie(models.Model):
                     movie[pub_key] = value()
                 else:
                     movie[pub_key] = value
-        movie['poster'] = self.get_poster()
-        
+        if not fields:
+            movie['poster'] = self.get_poster()
+            movie['stream'] = self.get_stream()
         if fields:
             for f in fields:
                 if f.endswith('.length') and f[:-7] in ('cast', 'genre', 'trivia'):
                     movie[f] = getattr(self.sort, f[:-7])
         return movie
+
+    def get_stream(self):
+        stream = {}
+        if self.streams.all().count():
+            s = self.streams.all()[0]
+            if s.video and s.info:
+                stream['duration'] = s.info['duration']
+                if 'video' in s.info and s.info['video']: 
+                    stream['aspectRatio'] = s.info['video'][0]['width'] / s.info['video'][0]['height']
+
+                stream['baseUrl'] = os.path.dirname(s.video.url)
+                stream['profiles'] = list(set(map(lambda s: int(os.path.splitext(s['profile'])[0][:-1]), self.streams.all().values('profile'))))
+        return stream
 
     def fields(self):
         fields = {}
@@ -226,13 +242,6 @@ class Movie(models.Model):
         return utils.oxid(self.get('title', ''), self.get('directors', []), str(self.get('year', '')),
                           self.get('series title', ''), self.get('episode title', ''),
                           self.get('season', ''), self.get('episode', ''))
-
-    def streams(self):
-        streams = []
-        for f in self.files.filter(is_main=True, available=True):
-            for s in f.streams.all():
-                streams.append(s.video.url)
-        return streams
 
     def frame(self, position, width=128):
         #FIXME: compute offset and so on
@@ -292,15 +301,7 @@ class Movie(models.Model):
 
         #title
         title = canonicalTitle(self.get('title'))
-        title = re.sub(u'[\'!¿¡,\.;\-"\:\*\[\]]', '', title)
-        title = title.replace(u'Æ', 'Ae')
-        #pad numbered titles
-        numbers = re.compile('^(\d+)').findall(title)
-        if numbers:
-            padded = '%010d' % int(numbers[0])
-            title = re.sub('^(\d+)', padded, title)
-
-        s.title = title.strip()
+        s.title = utils.sort_title(title)
 
         s.country = ','.join(self.get('countries', []))
         s.year = self.get('year', '')
@@ -372,6 +373,55 @@ class Movie(models.Model):
             f, created = Facet.objects.get_or_create(key='year', value=year, value_sort=year, movie=self)
         else:
             Facet.objects.filter(movie=self, key='year').delete()
+
+    def updatePoster(self):
+        n = self.files.count() * 3
+        frame = int(math.floor(n/2))
+        part = 1
+        for f in self.files.filter(is_main=True, video_available=True):
+            for frame in f.frames.all():
+                path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster_path(self)))
+                path = path.replace('.jpg', '%s.%s.jpg'%(part, frame.pos))
+                cmd = ['oxposter',
+                       '-t', self.get('title'),
+                       '-d', self.get('director'),
+                       '-f', frame.frame.path,
+                       '-p', path
+                      ]
+                if len(self.movieId) == 7:
+                    cmd += ['-i', self.movieId]
+                else:
+                    cmd += ['-o', self.movieId]
+                print cmd
+                subprocess.Popen(cmd)
+            part += 1
+
+    def updateStreams(self):
+        files = {}
+        for f in self.files.filter(is_main=True, video_available=True):
+            files[utils.sort_title(f.name)] = f.video.path
+        
+        if files:
+            stream, created = Stream.objects.get_or_create(movie=self, profile='%s.webm' % settings.VIDEO_PROFILE)
+            stream.video.name = stream_path(stream)
+            cmd = []
+            
+            for f in sorted(files):
+                if not cmd:
+                    cmd.append(files[f])
+                else:
+                    cmd.append('+')
+                    cmd.append(files[f])
+            cmd = [ 'mkvmerge', '-o', stream.video.path ] + cmd
+            subprocess.Popen(cmd)
+            stream.save()
+
+            extract.timeline(stream.video.path, os.path.join(stream.video.path[:-len(stream.profile)], 'timeline'))
+            stream.extract_derivatives()
+            
+            #something with poster
+            self.available = True
+            self.save()
 
 class MovieFind(models.Model):
     """
@@ -638,3 +688,61 @@ class Collection(models.Model):
 
     def editable(self, user):
         return self.users.filter(id=user.id).count() > 0
+        
+def stream_path(f):
+    h = f.movie.movieId
+    return os.path.join('stream', h[:2], h[2:4], h[4:6], h[6:], f.profile)
+
+class Stream(models.Model):
+    class Meta:
+        unique_together = ("movie", "profile")
+
+    movie = models.ForeignKey(Movie, related_name='streams')
+    profile = models.CharField(max_length=255, default='96p.webm')
+    video = models.FileField(default=None, blank=True, upload_to=lambda f, x: stream_path(f))
+    source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True)
+    available = models.BooleanField(default=False)
+    info = fields.DictField(default={})
+
+    #def __unicode__(self):
+    #    return self.video
+
+    def extract_derivatives(self):
+        if settings.VIDEO_H264:
+            profile = self.profile.replace('.webm', '.mp4')
+            if Stream.objects.filter(profile=profile, source=self).count() == 0:
+                derivative = Stream(movie=self.movie, source=self, profile=profile)
+                derivative.video.name = self.video.name.replace(self.profile, profile)
+                derivative.encode()
+
+        for p in settings.VIDEO_DERIVATIVES:
+            profile = p + '.webm'
+            target = self.video.path.replace(self.profile, profile)
+            if Stream.objects.filter(profile=profile, source=self).count() == 0:
+                derivative = Stream(movie=movie.file, source=self, profile=profile)
+                derivative.video.name = self.video.name.replace(self.profile, profile)
+                derivative.encode()
+
+            if settings.VIDEO_H264:
+                profile = p + '.mp4'
+                if Stream.objects.filter(profile=profile, source=self).count() == 0:
+                    derivative = Stream(movie=self.movie, source=self, profile=profile)
+                    derivative.video.name = self.video.name.replace(self.profile, profile)
+                    derivative.encode()
+        return True
+
+    def encode(self):
+        if self.source:
+            video = self.source.video.path
+            target = self.video.path
+            profile = self.profile
+            info = ox.avinfo(video)
+            if extract.stream(video, target, profile, info):
+                self.available=True
+                self.save()
+
+    def save(self, *args, **kwargs):
+        if self.video and not self.info:
+            self.info = ox.avinfo(self.video.path)
+        super(Stream, self).save(*args, **kwargs)
+    
