@@ -62,7 +62,7 @@ $(function() {
                 { id: 'country', title: 'Country', operator: '', align: 'left', width: 120 },
                 { id: 'year', title: 'Year', operator: '-', align: 'right', width: 60 },
                 { id: 'language', title: 'Language', operator: '', align: 'left', width: 120 },
-                { id: 'runtime', title: 'Runtime', operator: '', align: 'right', width: 60 },
+                { id: 'runtime', title: 'Runtime', operator: '-', align: 'right', width: 60 },
                 { id: 'writer', title: 'Writer', operator: '', align: 'left', width: 180 },
                 { id: 'producer', title: 'Producer', operator: '', align: 'left', width: 180 },
                 { id: 'cinematographer', title: 'Cinematographer', operator: '', align: 'left', width: 180 },
@@ -110,7 +110,7 @@ $(function() {
             user: {
                 group: 'guest',
                 ui: {
-                    columns: ['id', 'title', 'director', 'country', 'year', 'language', 'runtime', 'genre', 'releasedate'],
+                    columns: ['id', 'title', 'director', 'country', 'year', 'language', 'genre'],
                     // find: { conditions: [{ key: '', value: '', operator: '' }], operator: '' },
                     findQuery: { conditions: [{key: '', value: '', operator: ''}], operator: '' },
                     groupsQuery: { conditions: [], operator: '|' },
@@ -497,6 +497,125 @@ $(function() {
                         title: config.appName,
                         width: 800
                     }).open();
+                } else if (data.id == 'loginlogout') {
+                    var $form = new Ox.Form({
+                            error: 'Unknown username or wrong password',
+                            id: 'login',
+                            items: [
+                                {
+                                    element: new Ox.Input({
+                                        autovalidate: function(value, blur, callback) {
+                                            var length = value.length;
+                                            value = $.map(value.toLowerCase().split(''), function(v, i) {
+                                                if (new RegExp('[a-z0-9' + ((i == 0 || (i == length - 1 && blur)) ? '' : '\- ') + ']')(v)) {
+                                                    return v
+                                                } else {
+                                                    return null;
+                                                }
+                                            }).join('');
+                                            $.each(['--', '- ', ' -', '--'], function(i, v) {
+                                                while (value.indexOf(v) > -1) {
+                                                    value = value.replace(new RegExp(v, 'g'), v[0]);
+                                                }
+                                            })
+                                            callback(value);
+                                        },
+                                        id: 'username',
+                                        label: 'Username',
+                                        labelWidth: 120,
+                                        validate: function(value, callback) {
+                                            app.request('findUser', {
+                                                key: 'username',
+                                                value: value,
+                                                operator: '='
+                                            }, function(result) {
+                                                Ox.print('result', result)
+                                                var valid = result.data.users.length == 1;
+                                                callback({
+                                                    message: 'Unknown Username',
+                                                    valid: valid
+                                                });
+                                            });
+                                        },
+                                        width: 300
+                                    })
+                                    .bindEvent({
+                                        validate: function(event, data) {
+                                            $dialog[(data.valid ? 'enable' : 'disable') + 'Button']('signin');
+                                        }
+                                    })
+                                },
+                                {
+                                    element: new Ox.Input({
+                                        id: 'password',
+                                        label: 'Password',
+                                        labelWidth: 120,
+                                        type: 'password',
+                                        validate: /.+/,
+                                        width: 300
+                                    })
+                                }
+                            ],
+                            submit: function(data, callback) {
+                                app.request('login', data, function(result) {
+                                    if (result.status.code == 200) {
+                                        $dialog.close();
+                                        user = result.data.user;
+                                        $ui.mainMenu.getItem('username').options({
+                                            title: 'User: ' + user.username
+                                        });
+                                        $ui.mainMenu.getItem('preferences').options({
+                                            disabled: false
+                                        });
+                                        $ui.mainMenu.getItem('register').options({
+                                            disabled: true
+                                        });
+                                    } else {
+                                        callback([{ id: 'password', message: 'Incorrect Password' }]);
+                                    }
+                                });
+                            }
+                        }),
+                        $dialog = new Ox.Dialog({
+                            buttons: [
+                                [
+                                    {
+                                        click: function() {
+
+                                        },
+                                        id: 'signup',
+                                        title: 'Sign up...'
+                                    },
+                                    {
+                                        click: function() {
+
+                                        },
+                                        id: 'reset',
+                                        title: 'Reset Password...'
+                                    }
+                                ],
+                                [
+                                    {
+                                        click: function() {
+                                            $dialog.close();
+                                            $ui.mainMenu.getItem('loginlogout').toggleTitle();
+                                        },
+                                        id: 'cancel',
+                                        title: 'Cancel'
+                                    },
+                                    {
+                                        click: $form.submit,
+                                        disabled: true,
+                                        id: 'signin',
+                                        title: 'Sign in'
+                                    }
+                                ]
+                            ],
+                            id: 'login',
+                            minWidth: 332,
+                            title: 'Sign in',
+                            width: 332
+                        }).append($form).open();
                 } else if (data.id == 'places') {
                     var $manage = new Ox.SplitPanel({
                             elements: [
@@ -509,22 +628,41 @@ $(function() {
                                                     orientation: 'horizontal',
                                                     size: 44
                                                 }).append(
-                                                    $ui.findPlacesInput = new Ox.Input({
-                                                        clear: true,
-                                                        id: 'findPlacesInput',
-                                                        placeholder: [
-                                                            { id: 'name', title: 'Find: Name' },
-                                                            { id: 'region', title: 'Find: Region' },
-                                                            { id: 'user', title: 'Find: User' }
-                                                        ]
-                                                    })
+                                                    $ui.findPlacesElement = new Ox.FormElementGroup({
+                                                        elements: [
+                                                            $ui.findPlacesSelect = new Ox.Select({
+                                                                    id: 'findPlacesSelect',
+                                                                    items: [
+                                                                        { id: 'name', title: 'Find: Name' },
+                                                                        { id: 'region', title: 'Find: Region' },
+                                                                        { id: 'user', title: 'Find: User' }
+                                                                    ],
+                                                                    overlap: 'right',
+                                                                    type: 'image'
+                                                                })
+                                                                .bindEvent({
+                                                                    change: function(event, data) {
+                                                                        $ui.findPlacesSelect.loseFocus();
+                                                                        $ui.findPlacesInput.options({
+                                                                            placeholder: data.selected[0].title
+                                                                        });
+                                                                    }
+                                                                }),
+                                                            $ui.findPlacesInput = new Ox.Input({
+                                                                clear: true,
+                                                                id: 'findPlacesInput',
+                                                                placeholder: 'Find: Name',
+                                                                width: 168
+                                                            })
+                                                        ],
+                                                        id: 'findPlacesElement'
+                                                    }) 
                                                     .css({
                                                         float: 'left',
                                                         margin: '4px'
                                                     })
-                                                    .width(128)
                                                 ).append(
-                                                    $ui.findPlacesInput = new Ox.Select({
+                                                    $ui.sortPlacesSelect = new Ox.Select({
                                                         id: 'sortPlacesSelect',
                                                         items: [
                                                             { id: 'name', title: 'Sort by Name', checked: true },
@@ -536,13 +674,13 @@ $(function() {
                                                             { id: 'user', title: 'Sort by User' },
                                                             { id: 'datecreated', title: 'Sort by Date Added' },
                                                             { id: 'datemodified', title: 'Sort by Date Modified' }
-                                                        ]
+                                                        ],
+                                                        width: 184
                                                     })
                                                     .css({
                                                         float: 'left',
-                                                        margin: '0 4px 4px 2px'
+                                                        margin: '0 4px 4px 4px'
                                                     })
-                                                    .width(128)
                                                 ),
                                                 size: 44
                                             },
@@ -573,24 +711,27 @@ $(function() {
                                                 }).append(
                                                     $ui.labelsButton = new Ox.Button({
                                                             id: 'labelsButton',
-                                                            value: ['Show Labels', 'Hide Labels']
+                                                            title: [
+                                                                {id: 'show', title: 'Show Labels'},
+                                                                {id: 'hide', title: 'Hide Labels'}
+                                                            ],
+                                                            width: 96
                                                         })
                                                         .css({
                                                             float: 'left',
                                                             margin: '4px'
                                                         })
-                                                        .width(80)
                                                 ).append(
                                                     $ui.findMapInput = new Ox.Input({
                                                         clear: true,
                                                         id: 'findMapInput',
-                                                        placeholder: [{ id: 'foo', title: 'Find on Map' }]
+                                                        placeholder: 'Find on Map',
+                                                        width: 192
                                                     })
                                                     .css({
                                                         float: 'right',
                                                         margin: '4px'
                                                     })
-                                                    .width(200)
                                                 ),
                                                 size: 24
                                             },
@@ -611,13 +752,13 @@ $(function() {
                                                 }).append(
                                                     $ui.newPlaceButton = new Ox.Button({
                                                         id: 'newPlaceButton',
-                                                        value: 'New Place...'
+                                                        title: 'New Place...',
+                                                        width: 96
                                                     })
                                                     .css({
                                                         float: 'left',
                                                         margin: '4px'
                                                     })
-                                                    .width(80)
                                                 ),
                                                 size: 24
                                             }
@@ -737,7 +878,7 @@ $(function() {
                     margin: '4px'
                 })
                 .bindEvent('change', function(event, data) {
-                    var id = data.checked[0].id;
+                    var id = data.selected[0].id;
                     $ui.mainMenu.checkItem('viewMenu_movies_' + id);
                     //$ui.list.$element.replaceWith(constructList(id));
                     Ox.print('change ... id', id, list = constructList(id), list.options(), list.options('id'))
@@ -760,9 +901,10 @@ $(function() {
                                 width: 112
                             })
                             .bindEvent('change', function(event, data) {
-                                var key = data.checked[0].id;
+                                var key = data.selected[0].id;
                                 user.ui.findQuery.conditions[0].key = key
                                 $ui.mainMenu.checkItem('findMenu_find_' + key);
+                                $ui.findInput.focus();
                             }),
                         $ui.findInput = new Ox.Input({
                                 autocomplete: function(value, callback) {
@@ -839,7 +981,7 @@ $(function() {
                             location.hash = Query.toString(query);
                         })
                     ],
-                    id: 'findInput'
+                    id: 'findElement'
                 })
                 .css({
                     float: 'right',
@@ -1146,122 +1288,7 @@ $ui.statusbar = new Ox.Bar({
 
     // Menu
 
-    Ox.Event.bind('click_loginlogout', function(event, data) {
-        var $form = new Ox.Form({
-                error: 'Unknown username or wrong password',
-                id: 'login',
-                items: [
-                    {
-                        element: new Ox.Input({
-                            autocorrect: function(value, blur) {
-                                var length = value.length;
-                                value = $.map(value.toLowerCase().split(''), function(v, i) {
-                                    if (new RegExp('[a-z0-9' + ((i == 0 || (i == length - 1 && blur)) ? '' : '\- ') + ']')(v)) {
-                                        return v
-                                    } else {
-                                        return null;
-                                    }
-                                }).join('');
-                                $.each(['--', '- ', ' -', '--'], function(i, v) {
-                                    while (value.indexOf(v) > -1) {
-                                        value = value.replace(new RegExp(v, 'g'), v[0]);
-                                    }
-                                })
-                                return value;
-                            },
-                            id: 'username',
-                            label: 'Username',
-                            labelWidth: 120,
-                            validate: function(value, callback) {
-                                app.request('findUser', {
-                                    key: 'username',
-                                    value: value,
-                                    operator: '='
-                                }, function(result) {
-                                    Ox.print('result', result)
-                                    var valid = result.data.users.length == 1;
-                                    callback({
-                                        message: 'Unknown Username',
-                                        valid: valid
-                                    });
-                                });
-                            }
-                        }).width(300)
-                    },
-                    {
-                        element: new Ox.Input({
-                            id: 'password',
-                            label: 'Password',
-                            labelWidth: 120,
-                            type: 'password',
-                            validate: /.+/
-                        }).width(300)
-                    }
-                ],
-                submit: function(data, callback) {
-                    app.request('login', data, function(result) {
-                        if (result.status.code == 200) {
-                            $dialog.close();
-                            user = result.data.user;
-                            $ui.mainMenu.getItem('username').options({
-                                title: 'User: ' + user.username
-                            });
-                            $ui.mainMenu.getItem('preferences').options({
-                                disabled: false
-                            });
-                            $ui.mainMenu.getItem('register').options({
-                                disabled: true
-                            });
-                        } else {
-                            callback([{ id: 'password', message: 'Incorrect Password' }]);
-                        }
-                    });
-                }
-            }),
-            $dialog = new Ox.Dialog({
-                buttons: [
-                    [
-                        {
-                            click: function() {
-                            
-                            },
-                            id: 'signup',
-                            value: 'Sign up...'
-                        },
-                        {
-                            click: function() {
-                            
-                            },
-                            id: 'reset',
-                            value: 'Reset Password...'
-                        }
-                    ],
-                    [
-                        {
-                            click: function() {
-                                $dialog.close();
-                                $ui.mainMenu.getItem('loginlogout').toggleTitle();
-                            },
-                            id: 'cancel',
-                            value: 'Cancel'
-                        },
-                        {
-                            click: $form.submit,
-                            disabled: true,
-                            id: 'signin',
-                            value: 'Sign in'
-                        }
-                    ]
-                ],
-                id: 'login',
-                minWidth: 332,
-                title: 'Sign in',
-                width: 332
-            }).append($form).open();
-        Ox.Event.bind('validate_login', function(event, data) {
-            $dialog[(data.valid ? 'enable' : 'disable') + 'Button']('signin');
-        });
-    });
+
     Ox.Event.bind('change_viewmovies', function(event, data) {
         $ui.viewSelect.selectItem(data.id);
     });
@@ -1328,6 +1355,8 @@ $ui.statusbar = new Ox.Bar({
                         unique: key.id == 'id'
                     }, key);
                 }),
+                columnsMovable: true,
+                columnsRemovable: true,
                 id: 'list',
                 request: function(options) {
                     Ox.print('options, Query.toObject', options, Query.toObject())
