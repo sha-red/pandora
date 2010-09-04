@@ -401,6 +401,7 @@ class Movie(models.Model):
         for f in self.files.filter(is_main=True, video_available=True):
             files[utils.sort_title(f.name)] = f.video.path
         
+        #FIXME: how to detect if something changed?
         if files:
             stream, created = Stream.objects.get_or_create(movie=self, profile='%s.webm' % settings.VIDEO_PROFILE)
             stream.video.name = stream_path(stream)
