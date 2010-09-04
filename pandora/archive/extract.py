@@ -262,7 +262,7 @@ def average_color(prefix):
     for i in range(0, len(pixels)):
         p = np.sum(pixels[i], axis=0) / frames
         color += p
-    print list(color)
+    return list(color)
 
 def get_distance(rgb0, rgb1):
     dst = math.sqrt(pow(rgb0[0] - rgb1[0], 2) + pow(rgb0[0] - rgb1[0], 2) + pow(rgb0[0] - rgb1[0], 2))
