@@ -37,7 +37,14 @@ var app = new Ox.App({
     app.$ui.statusbar = app.constructStatusbar();
 
     app.$ui.app = app.constructApp();
+
+    app.$body.css({
+        opacity: 0
+    });
     app.$ui.app.appendTo(app.$body);
+    app.$body.animate({
+        opacity: 1
+    }, 2000);
 
     Ox.Request.requests() && app.$ui.loadingIcon.start();
     Ox.Event.bind('', 'requestStart', function() {
@@ -183,7 +190,7 @@ app.Query = (function() {
         toString: function() {
             Ox.print('tS', app.user.ui.find)
             return Ox.serialize({
-                find: constructFind(Query.toObject()),
+                find: constructFind(app.Query.toObject()),
                 sort: app.user.ui.sort[0].operator + app.user.ui.sort[0].key,
                 view: app.user.ui.listView
             });
@@ -413,9 +420,9 @@ app.constructGroups = function() {
                 })
                 .bindEvent('select', function(event, data) {
                     Ox.print('select', i)
-                    var group = groups[i],
+                    var group = app.ui.groups[i],
                         query;
-                    groups[i].query.conditions = $.map(data.ids, function(v) {
+                    app.ui.groups[i].query.conditions = $.map(data.ids, function(v) {
                         return {
                             key: group.id,
                             value: v,
@@ -430,7 +437,7 @@ app.constructGroups = function() {
                             }), options.callback);
                         }
                     });
-                    $.each(groups, function(i_, group_) {
+                    $.each(app.ui.groups, function(i_, group_) {
                         if (i_ != i) {
                             app.$ui.groups[i_].options({
                                 request: function(options) {
@@ -515,7 +522,7 @@ app.constructList = function(view) {
             keys: ['director', 'id', 'posterHeight', 'posterWidth', 'posterURL', 'title'],
             request: function(options) {
                 app.request('find', $.extend(options, {
-                    query: Query.toObject()
+                    query: app.Query.toObject()
                 }), options.callback);
             },
             size: 128,
@@ -795,4 +802,1142 @@ app.constructMainMenu = function() {
                     { id: 'redo', title: 'Redo', disabled: true, keyboard: 'shift control z' },
                     {},
                     { id: 'cut', title: 'Cut', disabled: true, keyboard: 'control x' },
-                    { id: 'copy', title: 'Copy', disabled: true, keyboard: 'control c
+                    { id: 'copy', title: 'Copy', disabled: true, keyboard: 'control c' },
+                    { id: 'paste', title: 'Paste', disabled: true, keyboard: 'control v' },
+                    { id: 'delete', title: 'Delete', disabled: true, keyboard: 'delete' },
+                    {},
+                    { id: 'selectall', title: 'Select All', disabled: true, keyboard: 'control a' },
+                    { id: 'selectnone', title: 'Select None', disabled: true, keyboard: 'shift control a' },
+                    { id: 'invertselection', title: 'Invert Selection', disabled: true, keyboard: 'alt control a' }
+                ] },
+                { id: 'viewMenu', title: 'View', items: [
+                    { id: 'movies', title: 'View Movies', items: [
+                        { group: 'viewmovies', min: 1, max: 1, items: $.map(app.config.listViews, function(view, i) {
+                            return $.extend({
+                                checked: app.user.ui.listView == view.id,
+                            }, view);
+                        }) },
+                    ]},
+                    { id: 'icons', title: 'Icons', items: [
+                        { id: 'poster', title: 'Poster' },
+                        { id: 'still', title: 'Still' },
+                        { id: 'timeline', title: 'Timeline' }
+                    ] },
+                    { id: 'info', title: 'Info', items: [
+                        { id: 'poster', title: 'Poster' },
+                        { id: 'video', title: 'Video' }
+                    ] },
+                    {},
+                    { id: 'openmovie', title: ['Open Movie', 'Open Movies'], disabled: true, items: $.map(app.config.itemViews, function(view, i) {
+                        return view;
+                    }) },
+                    {},
+                    { id: 'lists', title: 'Hide Lists', keyboard: 'shift l' },
+                    { id: 'info', title: 'Hide Info', keyboard: 'shift i' },
+                    { id: 'groups', title: 'Hide Groups', keyboard: 'shift g' },
+                    { id: 'movies', title: 'Hide Movies', disabled: true, keyboard: 'shift m' }
+                ]},
+                { id: 'sortMenu', title: 'Sort', items: [
+                    { id: 'sortmovies', title: 'Sort Movies by', items: [
+                        { group: 'sortmovies', min: 1, max: 1, items: $.map(app.config.sortKeys, function(key, i) {
+                            return $.extend({
+                                checked: app.user.ui.sort[0].key == key.id,
+                            }, key);
+                        }) }
+                    ] },
+                    { id: 'ordermovies', title: 'Order Movies', items: [
+                        { group: 'ordermovies', min: 1, max: 1, items: [
+                            { id: 'ascending', title: 'Ascending', checked: app.user.ui.sort[0].operator === '' },
+                            { id: 'descending', title: 'Descending', checked: app.user.ui.sort[0].operator == '-' }
+                        ]}
+                    ] },
+                    { id: 'advancedsort', title: 'Advanced Sort...', keyboard: 'shift control s' },
+                    {},
+                    { id: 'groupsstuff', title: 'Groups Stuff' }
+                ] },
+                { id: 'findMenu', title: 'Find', items: [
+                    { id: 'find', title: 'Find', items: [
+                        { group: 'find', min: 1, max: 1, items: $.map(app.config.findKeys, function(key, i) {
+                            return $.extend({
+                                checked: app.user.ui.findQuery.conditions.length && 
+                                        (app.user.ui.findQuery.conditions[0].key == key.id ||
+                                        (app.user.ui.findQuery.conditions[0].key === '' && key.id == 'all')),
+                            }, key)
+                        }) }
+                    ] },
+                    { id: 'advancedfind', title: 'Advanced Find...', keyboard: 'shift control f' }
+                ] },
+                { id: 'dataMenu', title: 'Data', items: [
+                    { id: 'titles', title: 'Manage Titles...' },
+                    { id: 'names', title: 'Manage Names...' },
+                    {},
+                    { id: 'posters', title: 'Manage Stills...' },
+                    { id: 'posters', title: 'Manage Posters...' },
+                    {},
+                    { id: 'places', title: 'Manage Places...' },
+                    { id: 'events', title: 'Manage Events...' },
+                    {},
+                    { id: 'users', title: 'Manage Users...' },
+                    { id: 'lists', title: 'Manage Lists...' },
+                ] },
+                { id: 'codeMenu', title: 'Code', items: [
+                    { id: 'download', title: 'Download' },
+                    { id: 'contribute', title: 'Contribute' },
+                    { id: 'report', title: 'Report a Bug' },
+                ] },
+                { id: 'helpMenu', title: 'Help', items: [
+                    { id: 'help', title: app.options('name') + ' Help', keyboard: 'shift ?' }
+                ] },
+                { id: 'debugMenu', title: 'Debug', items: [
+                    { id: 'query', title: 'Show Query' }
+                ] },
+                { id: 'testMenu', title: 'Test', items: [
+                    { group: 'foogroup', items: [
+                        { id: 'item1', title: 'Item 1' },
+                        { id: 'item2', title: 'Item 2' }
+                    ] }
+                ] }
+            ]
+        })
+        .bindEvent({
+            change: function(event, data) {
+                if (data.id == 'find') {
+                    var id = data.checked[0].id;
+                    app.$ui.findSelect.selectItem(id);
+                } else if (data.id == 'ordermovies') {
+                    var id = data.checked[0].id;
+                    app.$ui.list.sort(user.ui.sort[0].key, id == 'ascending' ? '' : '-');
+                } else if (data.id == 'sortmovies') {
+                    var id = data.checked[0].id,
+                        operator = Ox.getObjectById(app.config.sortKeys, id).operator;
+                    app.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator === '' ? 'ascending' : 'descending'));
+                    app.$ui.list.sort(id, operator);
+                }
+            },
+            click: function(event, data) {
+                if (data.id == 'about') {
+                    var $dialog = new Ox.Dialog({
+                        buttons: [
+                            {
+                                click: function() {
+                                    $dialog.close();
+                                },
+                                id: 'close',
+                                title: 'Close'
+                            }
+                        ],
+                        id: 'about',
+                        title: 'About'
+                    }).open();
+                } else if (data.id == 'home') {
+                    var $dialog = new Ox.Dialog({
+                        buttons: [
+                            {
+                                click: function() {
+                                    $dialog.close();
+                                },
+                                id: 'close',
+                                title: 'Close'
+                            }
+                        ],
+                        height: 498,
+                        id: 'home',
+                        title: app.options('name'),
+                        width: 800
+                    }).open();
+                } else if (data.id == 'loginlogout') {
+                    var $form = new Ox.Form({
+                            error: 'Unknown username or wrong password',
+                            id: 'login',
+                            items: [
+                                {
+                                    element: new Ox.Input({
+                                        autovalidate: function(value, blur, callback) {
+                                            var length = value.length;
+                                            value = $.map(value.toLowerCase().split(''), function(v, i) {
+                                                if (new RegExp('[a-z0-9' + ((i == 0 || (i == length - 1 && blur)) ? '' : '\- ') + ']')(v)) {
+                                                    return v
+                                                } else {
+                                                    return null;
+                                                }
+                                            }).join('');
+                                            $.each(['--', '- ', ' -', '--'], function(i, v) {
+                                                while (value.indexOf(v) > -1) {
+                                                    value = value.replace(new RegExp(v, 'g'), v[0]);
+                                                }
+                                            })
+                                            callback(value);
+                                        },
+                                        id: 'username',
+                                        label: 'Username',
+                                        labelWidth: 120,
+                                        validate: function(value, callback) {
+                                            app.request('findUser', {
+                                                key: 'username',
+                                                value: value,
+                                                operator: '='
+                                            }, function(result) {
+                                                Ox.print('result', result)
+                                                var valid = result.data.users.length == 1;
+                                                callback({
+                                                    message: 'Unknown Username',
+                                                    valid: valid
+                                                });
+                                            });
+                                        },
+                                        width: 300
+                                    })
+                                    .bindEvent({
+                                        validate: function(event, data) {
+                                            $dialog[(data.valid ? 'enable' : 'disable') + 'Button']('signin');
+                                        }
+                                    })
+                                },
+                                {
+                                    element: new Ox.Input({
+                                        id: 'password',
+                                        label: 'Password',
+                                        labelWidth: 120,
+                                        type: 'password',
+                                        validate: /.+/,
+                                        width: 300
+                                    })
+                                }
+                            ],
+                            submit: function(data, callback) {
+                                app.request('login', data, function(result) {
+                                    if (result.status.code == 200) {
+                                        $dialog.close();
+                                        app.user = result.data.user;
+                                        app.$ui.mainMenu.getItem('username').options({
+                                            title: 'User: ' + app.user.name
+                                        });
+                                        app.$ui.mainMenu.getItem('preferences').options({
+                                            disabled: false
+                                        });
+                                        app.$ui.mainMenu.getItem('register').options({
+                                            disabled: true
+                                        });
+                                    } else {
+                                        callback([{ id: 'password', message: 'Incorrect Password' }]);
+                                    }
+                                });
+                            }
+                        }),
+                        $dialog = new Ox.Dialog({
+                            buttons: [
+                                [
+                                    {
+                                        click: function() {
+
+                                        },
+                                        id: 'signup',
+                                        title: 'Sign up...'
+                                    },
+                                    {
+                                        click: function() {
+
+                                        },
+                                        id: 'reset',
+                                        title: 'Reset Password...'
+                                    }
+                                ],
+                                [
+                                    {
+                                        click: function() {
+                                            $dialog.close();
+                                            app.$ui.mainMenu.getItem('loginlogout').toggleTitle();
+                                        },
+                                        id: 'cancel',
+                                        title: 'Cancel'
+                                    },
+                                    {
+                                        click: $form.submit,
+                                        disabled: true,
+                                        id: 'signin',
+                                        title: 'Sign in'
+                                    }
+                                ]
+                            ],
+                            id: 'login',
+                            minWidth: 332,
+                            title: 'Sign in',
+                            width: 332
+                        }).append($form).open();
+                } else if (data.id == 'places') {
+                    var $manage = new Ox.SplitPanel({
+                            elements: [
+                                {
+                                    collapsible: true,
+                                    element: new Ox.SplitPanel({
+                                        elements: [
+                                            {
+                                                element: new Ox.Toolbar({
+                                                    orientation: 'horizontal',
+                                                    size: 44
+                                                }).append(
+                                                    app.$ui.findPlacesElement = new Ox.FormElementGroup({
+                                                        elements: [
+                                                            app.$ui.findPlacesSelect = new Ox.Select({
+                                                                    id: 'findPlacesSelect',
+                                                                    items: [
+                                                                        { id: 'name', title: 'Find: Name' },
+                                                                        { id: 'region', title: 'Find: Region' },
+                                                                        { id: 'user', title: 'Find: User' }
+                                                                    ],
+                                                                    overlap: 'right',
+                                                                    type: 'image'
+                                                                })
+                                                                .bindEvent({
+                                                                    change: function(event, data) {
+                                                                        app.$ui.findPlacesSelect.loseFocus();
+                                                                        app.$ui.findPlacesInput.options({
+                                                                            placeholder: data.selected[0].title
+                                                                        });
+                                                                    }
+                                                                }),
+                                                            app.$ui.findPlacesInput = new Ox.Input({
+                                                                clear: true,
+                                                                id: 'findPlacesInput',
+                                                                placeholder: 'Find: Name',
+                                                                width: 168
+                                                            })
+                                                        ],
+                                                        id: 'findPlacesElement'
+                                                    }) 
+                                                    .css({
+                                                        float: 'left',
+                                                        margin: '4px'
+                                                    })
+                                                ).append(
+                                                    app.$ui.sortPlacesSelect = new Ox.Select({
+                                                        id: 'sortPlacesSelect',
+                                                        items: [
+                                                            { id: 'name', title: 'Sort by Name', checked: true },
+                                                            { id: 'region', title: 'Sort by Region' },
+                                                            { id: 'size', title: 'Sort by Size' },
+                                                            { id: 'latitude', title: 'Sort by Latitude' },
+                                                            { id: 'longitude', title: 'Sort by Longitude' },
+                                                            { id: 'clips', title: 'Sort by Number of Clips' },
+                                                            { id: 'user', title: 'Sort by User' },
+                                                            { id: 'datecreated', title: 'Sort by Date Added' },
+                                                            { id: 'datemodified', title: 'Sort by Date Modified' }
+                                                        ],
+                                                        width: 184
+                                                    })
+                                                    .css({
+                                                        float: 'left',
+                                                        margin: '0 4px 4px 4px'
+                                                    })
+                                                ),
+                                                size: 44
+                                            },
+                                            {
+                                                element: new Ox.Element('div')
+                                            },
+                                            {
+                                                element: new Ox.Toolbar({
+                                                    orientation: 'horizontal',
+                                                    size: 16
+                                                }),
+                                                size: 16
+                                            }
+                                        ],
+                                        orientation: 'vertical'
+                                    }),
+                                    resizable: true,
+                                    resize: [128, 192, 256],
+                                    size: 192
+                                },
+                                {
+                                    element: new Ox.SplitPanel({
+                                        elements: [
+                                            {
+                                                element: new Ox.Toolbar({
+                                                    orientation: 'horizontal',
+                                                    size: 24
+                                                }).append(
+                                                    app.$ui.labelsButton = new Ox.Button({
+                                                            id: 'labelsButton',
+                                                            title: [
+                                                                {id: 'show', title: 'Show Labels'},
+                                                                {id: 'hide', title: 'Hide Labels'}
+                                                            ],
+                                                            width: 96
+                                                        })
+                                                        .css({
+                                                            float: 'left',
+                                                            margin: '4px'
+                                                        })
+                                                ).append(
+                                                    app.$ui.findMapInput = new Ox.Input({
+                                                        clear: true,
+                                                        id: 'findMapInput',
+                                                        placeholder: 'Find on Map',
+                                                        width: 192
+                                                    })
+                                                    .css({
+                                                        float: 'right',
+                                                        margin: '4px'
+                                                    })
+                                                ),
+                                                size: 24
+                                            },
+                                            {
+                                                element: app.$ui.map = new Ox.Map({
+                                                    places: ['Boston', 'Barcelona', 'Berlin', 'Beirut', 'Bombay', 'Bangalore', 'Beijing']
+                                                }).css({
+                                                    left: 0,
+                                                    top: 0,
+                                                    right: 0,
+                                                    bottom: 0
+                                                })
+                                            },
+                                            {
+                                                element: new Ox.Toolbar({
+                                                    orientation: 'horizontal',
+                                                    size: 24
+                                                }).append(
+                                                    app.$ui.newPlaceButton = new Ox.Button({
+                                                        id: 'newPlaceButton',
+                                                        title: 'New Place...',
+                                                        width: 96
+                                                    })
+                                                    .css({
+                                                        float: 'left',
+                                                        margin: '4px'
+                                                    })
+                                                ),
+                                                size: 24
+                                            }
+                                        ],
+                                        orientation: 'vertical'
+                                    })
+                                }
+                            ],
+                            orientation: 'horizontal'
+                        }).css({
+                            top: '24px',
+                            bottom: '24px',
+                        }),
+                        $dialog = new Ox.Dialog({
+                            buttons: [
+                                {
+                                    click: function() {
+                                        $dialog.close();
+                                    },
+                                    id: 'close',
+                                    title: 'Close',
+                                    value: 'Close'
+                                }
+                            ],
+                            height: parseInt(app.$document.height() * 0.8),
+                            id: 'places',
+                            minHeight: 400,
+                            minWidth: 600,
+                            padding: 0,
+                            title: 'Manage Places',
+                            width: parseInt(app.$document.width() * 0.8)
+                        }).css({
+                            overflow: 'hidden'
+                        }).append($manage).open();
+                }
+            }
+        });
+}
+
+app.constructSections = function() {
+    var $sections = [];
+    $.each(app.user.ui.sections, function(i, id) {
+        var $section = new Ox.CollapsePanel({
+            id: id,
+            size: 'small',
+            title: Ox.getObjectById(app.config.sections, id).title
+        });
+        $sections.push($section);
+        $section.$content.append(
+            $('<div>').css({ height: '20px' }).append(
+                $('<div>').css({ float: 'left', width: '16px', height: '16px', margin: '1px'}).append(
+                    $('<img>').attr({ src: 'static/oxjs/build/png/ox.ui.modern/iconFind.png' }).css({ width: '16px', height: '16px', border: 0, background: 'rgb(64, 64, 64)', WebkitBorderRadius: '2px' })
+                )
+            ).append(
+                $('<div>').css({ float: 'left', width: '122px', height: '14px', margin: '2px' }).html('Foo')
+            ).append(
+                $('<div>').css({ float: 'left', width: '40px', height: '14px', margin: '2px', textAlign: 'right' }).html('23')
+            )
+        );
+    });
+    return $sections;
+}
+
+app.constructStatusbar = function() {
+    return new Ox.Bar({
+            size: 16
+        })
+        .css({
+            textAlign: 'center'
+        })
+        .append(
+            new Ox.Element()
+                .css({
+                    marginTop: '2px',
+                    fontSize: '9px'
+                })
+                .append(
+                    app.$ui.total = new Ox.Element('span')
+                )
+                .append(
+                    new Ox.Element('span').html(' &mdash; ')
+                )
+                .append(
+                    app.$ui.selected = new Ox.Element('span')
+                )
+        );
+}
+
+app.constructStatus = function(key, data) {
+    return Ox.toTitleCase(key) + ': ' + [
+        Ox.formatNumber(data.items) + ' movie' + (data.items != 1 ? 's' : ''),
+        Ox.formatDuration(data.runtime, 'medium'),
+        data.files + ' file' + (data.files != 1 ? 's' : ''),
+        Ox.formatDuration(data.duration, 'short'),
+        Ox.formatValue(data.size, 'B'),
+        Ox.formatValue(data.pixels, 'px')
+    ].join(', ');
+}
+
+app.constructToolbar = function() {
+    return new Ox.Bar({
+            size: 24
+        })
+        .append(
+            app.$ui.groupsButton = new Ox.Button({
+                    id: 'groupsButton',
+                    title: [
+                        {id: 'show', title: 'Show Groups'},
+                        {id: 'hide', title: 'Hide Groups'}
+                    ],
+                    width: 96
+                })
+                .css({
+                    float: 'left',
+                    margin: '4px'
+                })
+        )
+        .append(
+            app.$ui.viewSelect = new Ox.Select({
+                    id: 'viewSelect',
+                    items: $.map(app.config.listViews, function(view, i) {
+                        view.title = 'View ' + view.title
+                        return $.extend({
+                            checked: app.user.ui.listView == view.id,
+                        }, view);
+                    }),
+                    width: 144
+                })
+                .css({
+                    float: 'left',
+                    margin: '4px'
+                })
+                .bindEvent('change', function(event, data) {
+                    var id = data.selected[0].id;
+                    app.$ui.mainMenu.checkItem('viewMenu_movies_' + id);
+                    //$ui.list.$element.replaceWith(constructList(id));
+                    Ox.print('change ... id', id, list = app.constructList(id), list.options(), list.options('id'))
+                    //$ui.contentPanel.replace('list', constructList(id));
+                    app.$ui.contentPanel.replace(1, app.constructList(id));
+                })
+        )
+        .append(
+            app.$ui.findElement = new Ox.FormElementGroup({
+                    elements: [
+                        app.$ui.findSelect = new Ox.Select({
+                                id: 'select',
+                                items: $.map(app.config.findKeys, function(key, i) {
+                                    return {
+                                        id: key.id,
+                                        title: 'Find: ' + key.title
+                                    };
+                                }),
+                                overlap: 'right',
+                                width: 112
+                            })
+                            .bindEvent('change', function(event, data) {
+                                var key = data.selected[0].id;
+                                app.user.ui.findQuery.conditions[0].key = key
+                                app.$ui.mainMenu.checkItem('findMenu_find_' + key);
+                                app.$ui.findInput.focus();
+                            }),
+                        app.$ui.findInput = new Ox.Input({
+                                autocomplete: function(value, callback) {
+                                    var key = 'title';
+                                    var findKey = Ox.getObjectById(app.config.findKeys, key);
+                                    Ox.print('autocomplete', key, value);
+                                    value === '' && Ox.print('Warning: autocomplete function should never be called with empty value');
+                                    if ('autocomplete' in findKey && findKey.autocomplete) {
+                                        app.request('find', {
+                                            keys: [key],
+                                            query: {
+                                                conditions: [
+                                                    {
+                                                        key: key,
+                                                        value: value,
+                                                        operator: ''
+                                                    }
+                                                ],
+                                                operator: ''
+                                            },
+                                            sort: [
+                                                {
+                                                    key: key,
+                                                    operator: ''
+                                                }
+                                            ],
+                                            range: [0, 10]
+                                        }, function(result) {
+                                            callback($.map(result.data.items, function(v) {
+                                                return v.title;
+                                            }));
+                                        });
+                                    } else {
+                                        callback();                            
+                                    }
+                                },
+                                autocompleteSelect: true,
+                                autocompleteSelectHighlight: true,
+                                autocompleteSelectSubmit: true,
+                                clear: true,
+                                id: 'input',
+                                width: 192
+                            })
+                        .bindEvent('submit', function(event, data) {
+                            var key = app.user.ui.findQuery.conditions[0].key,
+                                query;
+                            Ox.print('key', key);
+                            app.user.ui.findQuery.conditions = [
+                                {
+                                    key: key == 'all' ? '' : key,
+                                    value: data.value,
+                                    operator: ''
+                                }
+                            ];
+                            $.each(groups, function(i, group) {
+                                groups[i].query.conditions = [];
+                                app.$ui.groups[i].options({
+                                    request: function(options) {
+                                        delete options.keys;
+                                        return app.request('find', $.extend(options, {
+                                            group: group.id,
+                                            query: app.Query.toObject(group.id)
+                                        }), options.callback);
+                                    }
+                                });
+                            });
+                            app.$ui.list.options({
+                                request: function(options) {
+                                    return app.request('find', $.extend(options, {
+                                        query: query = app.Query.toObject()
+                                    }), options.callback);
+                                }
+                            });
+                            location.hash = app.Query.toString(query);
+                        })
+                    ],
+                    id: 'findElement'
+                })
+                .css({
+                    float: 'right',
+                    margin: '4px'
+                })
+        );
+}
+
+app.getGroupWidth = function(pos, panelWidth) {
+    var width = {};
+    width.list = Math.floor(panelWidth / 5) + (panelWidth % 5 > pos);
+    width.column = width.list - 40 - ($.browser.mozilla ? 16 : 12);
+    return width;
+}
+
+
+
+
+/*
+
+    //FIXME: how to properly overwrite functions without replacing them
+    var super_launch = app.launch;
+    app.launch = function() {
+        app.request('hello', function(result) {
+            app.user = result.data.user;
+            if(app.user.group!='guest') {
+                app.menu.getItem('status').options('title', 'User: ' + app.user.username);
+                app.menu.getItem('login').options('title', 'Logout');
+            }
+        });
+        super_launch();
+    };
+
+
+    var loadingIcon = new Ox.LoadingIcon({
+            size: 'medium'
+        })
+        .css({
+            marginLeft: '4px'
+        });
+
+    app.menu = new Ox.MainMenu({
+                    extras: [
+                        new Ox.Input({
+                            autocomplete: function(option, value, callback) {
+                                    var field = option.substring(6).toLowerCase();
+                                    if(typeof(callback) == 'undefined') {
+                                        callback = value;
+                                        value = null;
+                                    }
+                                    Ox.debug('app.menu.find.autocomplete: option: ', option, 'value: ', value, ', callback:',callback);
+                                    Ox.debug('app.menu.find.autocomplete: field: ', field);
+                                    if(field == 'all') {
+                                        callback([]);
+                                    } else if (value) {
+                                        value = value.toLowerCase();
+                                        //var order = $.inArray(field, ['year', 'date'])?'-':'';
+                                        app.request('find', {
+                                            query: {
+                                                conditions: [
+                                                {
+                                                    key: field,
+                                                    value: value,
+                                                    operator: '~'
+                                                }
+                                                ]
+                                            },
+                                            list: 'all',
+                                            sort: [{key:field, operator: ''}],
+                                            keys: [field],
+                                            range: [0, 10]
+                                        }, function(result) {
+                                            var items = $.map(
+                                                result.data.items,
+                                                function(item, i) { return item.title; }
+                                            );
+                                            callback(items);
+                                        });
+                                    }
+                            },
+                            clear: true,
+                            highlight: false,
+                            id: 'find',
+                            label: [
+                                { id: 'all', title: 'Find: All' },
+                                { id: 'title', title: 'Find: Title' },
+                                { id: 'director', title: 'Find: Director' },
+                                { id: 'country', title: 'Find: Country' },
+                                { id: 'year', title: 'Find: Year' },
+                                { id: 'language', title: 'Find: Language' },
+                                { id: 'writer', title: 'Find: Writer' },
+                                { id: 'producer', title: 'Find: Producer' },
+                                { id: 'cinematographer', title: 'Find: Cinematographer' },
+                                { id: 'editor', title: 'Find: Editor' },
+                                { id: 'actor', title: 'Find: Actor' },
+                                { id: 'character', title: 'Find: Character' },
+                                { id: 'name', title: 'Find: Name' },
+                                { id: 'genre', title: 'Find: Genre' },
+                                { id: 'keyword', title: 'Find: Keyword' },
+                                { id: 'summary', title: 'Find: Summary' },
+                                { id: 'dialog', title: 'Find: Dialog' }
+                            ],
+                            labelWidth: 96
+                        }).width(320),
+                        loadingIcon
+                    ],
+        menus: [
+            {
+                id: 'pandoraMM',
+                title: site.name,
+                items: [
+                    { id: 'about', title: 'About ' + site.name },
+                    {},
+                    { id: 'faq', title: 'Frequently Asked Questions'},
+                    { id: 'tos', title: 'Terms of Service'},
+                    { id: 'sas', title: 'Security Advisory System'},
+                    {},
+                    { id: 'contact', title: 'Contact'},
+                    {},
+                    { id: 'technology', title: 'Technology'},
+                    { id: 'source', title: 'Source Code'},
+                    { id: 'report', title: 'Report a Bug...'},
+                ]
+            },
+            {
+                id: 'user',
+                id: 'user',
+                title: 'User',
+                items: [
+                    { id: 'status', title: 'User: not logged in', disabled:true },
+                    {},
+                    { id: 'accunt', title: 'Account', disabled:true},
+                    { id: 'preferences', title: 'Preferences', disabled:true},
+                    {},
+                    {id: 'login', title: 'Login'},
+                ]
+            },
+            {
+                id: 'file',
+                title: 'File',
+                items: [
+                    { id: 'load', keyboard: 'control o', title: 'Open' },
+                    { id: 'save', keyboard: 'control a', title: 'Save' },
+                    { id: 'save_ad', keyboard: 'shift control s', title: 'Save As...'}
+                ]
+            },
+            {
+                id: 'edit',
+                title: 'Edit',
+                items: [
+                    { id: 'undo', keyboard: 'control z', title: 'Undo' },
+                    { id: 'redo', keyboard: 'shift control z', title: 'Redo' },
+                    {},
+                    { id: 'cut', keyboard: 'control x', title: 'Cut' },
+                    { id: 'copy', keyboard: 'control c', title: 'Copy' },
+                    { id: 'paste', keyboard: 'control v', title: 'Paste'},
+                    { id: 'delete', keyboard: 'delete', title: 'Delete'},
+                    {},
+                    { id: 'select_all', keyboard: 'control a', title: 'Select All' },
+                    { id: 'select_none', keyboard: 'shift control a', title: 'Select None' },
+                    { id: 'invert_selection', keyboard: 'alt control a', title: 'Invert Selection' },
+                ]
+            },
+            {
+                id: 'sort',
+                title: 'Sort',
+                items: [
+                    { id: 'sort_movies', title: 'Sort Movies by', items: [
+                        { checked: true, group: 'sort_movies', id: 'title', title: 'Title'},
+                        { checked: false, group: 'sort_movies', id: 'director', title: 'Director' },
+                    ] },
+                    { id: 'order_movies', title: 'Order Movies', items: [
+                        { checked: false, group: 'order_movies', id: 'ascending', title: 'Ascending'},
+                        { checked: true, group: 'order_movies', id: 'descending', title: 'Descending' },
+                    ] }
+                ]
+            },
+            {
+                id: 'help',
+                title: 'Help',
+                items: [
+                    { id: 'help', keyboard: 'control h', title: 'Help' }
+                ]
+            }
+        ],
+        size: 'large'
+    });
+
+    function pageDialog(title, page) {
+        //Ox.debug(title, page);
+        var $dialog = new Ox.Dialog({
+            title: title,
+            buttons: [
+                {
+                    title: 'Close',
+                    click: function() { $dialog.close(); }
+                }
+            ]
+        })
+        .append(page)
+        .open();
+    };
+    //this should be: mainMenu.bind('click_about', function(event) {
+    app.menu.bindEvent('click_about', function() {
+        pageDialog('About ' + site.name, site.pages.about);
+    });
+    app.menu.bindEvent('click_faq', function() {
+        pageDialog(app.menu.getItem('faq').options('title')[0],
+                   site.pages.faq);
+    });
+    app.menu.bindEvent('click_tos', function() {
+        pageDialog(app.menu.getItem('tos').options('title')[0],
+                   site.pages.tos);
+    });
+    app.menu.bindEvent('click_sas', function() {
+        pageDialog(app.menu.getItem('sas').options('title')[0],
+                   site.pages.sas);
+    });
+
+    OxForm = function(options, self) {
+        var self = self || {},
+            that = new Ox.Element({}, self)
+                .defaults({
+                    elements: [],
+                })
+                .options(options || {})
+                .addClass('OxForm'),
+            length = self.options.elements.length;
+        $.each(self.options.elements, function(i, v) {
+            that.append(Ox.Container().css({'margin': '5px'}).append(v));
+        });
+        that.values = function() {
+            var values = {};
+            $.each(self.options.elements, function(i, v) {
+                values[v.$input.attr('name')] = v.$input.val();
+            });
+            return values;
+        }
+        return that;
+    };
+
+    app.menu.bindEvent('click_contact', function() {
+        var labelWidth = 64;
+        var inputWidth = 380;
+
+        var u = new Ox.Input({
+            label: 'Your Email',
+            labelWidth: labelWidth,
+            name:'email',
+            size: 'medium'
+        }).width(inputWidth).addClass('margin');
+        if(app.user && app.user.preferences.email) {
+            u.val(app.user.preferences.email);
+        }
+
+        var form = new OxForm({
+            elements: [
+                u,
+                new Ox.Input({
+                    label: 'Subject',
+                    labelWidth: labelWidth,
+                    name: 'subject',
+                    size: 'medium'
+                }).width(inputWidth).addClass('margin'),
+                new Ox.Input({
+                    label: 'Message',
+                    labelWidth: labelWidth,
+                    type: 'textarea',
+                    size: 'medium',
+                    name: 'message'
+                }).width(380).height(176).addClass('margin')
+            ]
+        });
+
+        var $dialog = new Ox.Dialog({
+            title: 'Contact',
+            width: 424,
+            height: 320,
+            buttons: [
+                {
+                    value: 'Cancel',
+                    click: function() { $dialog.close(); }
+                },
+                {
+                    value: 'Contact',
+                    click: function() {
+                        app.request('contact', form.values(),
+                        function(result) {
+                            if(result.status.code == 200) {
+                                $dialog.close();                               
+                            } else {
+                                $dialog.append(result.status.text);
+                            }
+                        });
+                    }
+                }
+            ]
+        })
+        .append(form)
+        .open();
+    });
+    app.menu.bindEvent('click_technology', function() {
+        pageDialog(app.menu.getItem('technology').options('title')[0],
+                   site.pages.technology);
+    });
+    app.menu.bindEvent('click_source', function() {
+        pageDialog(app.menu.getItem('source').options('title')[0],
+                   site.pages.source);
+    });
+    app.menu.bindEvent('click_report', function() {
+        pageDialog(app.menu.getItem('report').options('title')[0],
+                   site.pages.report);
+    });
+
+    app.logout = function () {
+        this.request('logout');
+        this.user = {};
+        this.menu.getItem('logout').toggle();
+        this.menu.getItem('status').options('title', 'User: not logged in');
+    };
+    app.menu.bindEvent('click_logout', function(event, data) {
+        app.logout();
+    });
+
+    app.menu.bindEvent('click_login', function(element) {
+        var labelWidth = 64;
+        var inputWidth = labelWidth+200;
+        var loginForm = new OxForm({
+            elements: [
+                new Ox.Input({
+                    label: 'Username',
+                    labelWidth: labelWidth,
+                    name:'username',
+                    size: 'medium'
+                }).addClass('margin').width(inputWidth),
+                new Ox.Input({
+                    label: 'Password',
+                    labelWidth: labelWidth,
+                    name:'password',
+                    type: 'password',
+                    size: 'medium'
+                }).addClass('margin').width(inputWidth)
+            ]
+        }).css({
+            'padding-top': '48px',
+        });
+
+        var submit = function() {
+            app.request('login', loginForm.values(), function(result) {
+                if(result.status.code == 200) {
+                    $dialog.close();
+                    app.user = result.data.user;
+                    app.menu.getItem('status').options(title, 'User: ' + app.user.username);
+                    app.menu.getItem('login').toggle();
+                    
+                } else {
+                    $dialog.append('Login failed ' + result.status.text);
+                }
+            });
+        }
+
+        var d = new Ox.Container();
+        var registerInfo = new Ox.Panel();
+
+        registerInfo.append(Ox.Element().css({'margin-left': '4px'}).append('<br>Forgot your password? <a href="">Recover Password</a><br>Dont have an account? <a href="">Register Now</a>'));
+
+        var panel = Ox.SplitPanel({
+            elements: [
+                {
+                    element: loginForm,
+                },
+                {
+                    element: registerInfo,
+                    size: 80
+                }
+            ],
+            orientation: 'vertical'
+        }).appendTo(d);
+
+        var $dialog = new Ox.Dialog({
+            title: 'Login',
+            width: inputWidth+24,
+            height: 184,
+            buttons: [
+                [],[
+                    {
+                        value: 'Cancel',
+                        click: function() { $dialog.close(); }
+                    },
+                    {
+                        value: 'Login',
+                        click: submit
+                    }
+                ]
+            ]
+        })
+        .append(d)
+        .open();
+    });
+    var bottomPanel = Ox.Toolbar({size: 'small'})
+        .css({
+            zIndex: 2,
+            MozBoxShadow: '0 0 4px rgb(0, 0, 0)',
+            WebkitBoxShadow: '0 0 4px rgb(0, 0, 0)'
+        })
+        .append(
+            $('<div/>')
+                .addClass('bottom')
+                .html(site.url + ' - a rather unique kind of movie database.')
+        );
+    var mainSplitPanel = Ox.SplitPanel({
+        elements: [
+            {
+                element: app.menu,
+                size: 24
+            },
+            {
+                element: middleSplitPanel
+            },
+            {
+                element: bottomPanel,
+                size: 24
+            }
+        ],
+        orientation: 'vertical'
+    }).appendTo($body);
+
+    var listPanel = new Ox.CollapsePanel({
+        title: 'Lists'
+    }).appendTo(sidePanel);
+    listPanel.$content.html('Nouvelle Vague<br/>Hollywood 40\'s<br/>Pirate Cinema Berlin')
+
+    var historyPanel = new Ox.CollapsePanel({
+        title: 'Search History'
+    }).appendTo(sidePanel);
+
+    historyPanel.$content.html('Paris<br/>Matirx<br/>Godard')
+
+    app.results = new Ox.TextList({
+        columns: [ {
+                align: 'left',
+                id: 'title',
+                operator: '+',
+                title: 'Title',
+                visible: true,
+                width: 160
+            },
+            {
+                align: 'left',
+                id: 'director',
+                operator: '+',
+                title: 'Director',
+                visible: true,
+                width: 160
+            },
+            {
+                align: 'right',
+                id: 'year',
+                operator: '-',
+                title: 'Year',
+                visible: true,
+                width: 80
+            }	
+        ],
+        request: function(options) {
+            app.request('find', $.extend(options, {
+                query: {
+                    conditions: [],
+                    operator: ',' // fixme: should be &
+                }
+            }), options.callback);
+        },
+        id: 'results',
+        sort: [{
+            key: 'year',
+            operator: '-'
+        }]
+    }).appendTo(content);
+
+    app.menu.bindEvent('submit_find', function(event, data) {
+        app.results.options({
+            request: function(options) {
+                app.request('find', $.extend(options, {
+                    query: {
+                        key: data.option.substr(6).toLowerCase(),
+                        value: data.value,
+                        operator: '~'
+                    }
+                }), options.callback);
+            },
+        });
+    });
+    app.launch();
+
+});
+
+*/
