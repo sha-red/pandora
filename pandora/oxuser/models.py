@@ -37,7 +37,29 @@ def getUserJSON(user):
     elif user.has_perm('0x.vip'): #FIXME: permissions
         json['group'] = 'vip'
     json['preferences'] = getPreferences(user)
+    json['ui'] = getUI(user)
     return json
+
+def getUI(user):
+    return {
+        "columns": ["id", "title", "director", "country", "year", "language", "genre"],
+        "findQuery": {"conditions": [{"key": "", "value": "", "operator": ""}], "operator": ""},
+        "groupsQuery": {"conditions": [], "operator": "|"},
+        "groupsSize": 128,
+        "itemView": "info",
+        "listQuery": {"conditions": [], "operator": ""},
+        "listsSize": 192,
+        "listView": "list",
+        "sections": ["history", "lists", "public", "featured"],
+        "showGroups": True,
+        "showInfo": True,
+        "showLists": True,
+        "showMovies": True,
+        "sort": [
+            {"key": "director", "operator": ""}
+        ],
+        "theme": "classic"
+    }
 
 def getPreferences(user):
     prefs = {}
