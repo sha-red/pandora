@@ -161,6 +161,10 @@ class Movie(models.Model):
         if not self.oxdbId:
             self.oxdbId = self.oxid()
 
+        if self.poster:
+            self.poster_height = self.poster.height
+            self.poster_width = self.poster.width
+
         super(Movie, self).save(*args, **kwargs)
         self.updateFind()
         self.updateSort()

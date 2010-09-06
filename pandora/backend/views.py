@@ -60,6 +60,17 @@ def api(request):
     response['Access-Control-Allow-Origin'] = '*'
     return response
 
+def api_api(request):
+    '''
+        returns list of all known api action
+        return {'status': {'code': int, 'text': string},
+                'data': {actions: ['api', 'hello', ...]}}
+    '''
+    actions = globals().keys()
+    actions = map(lambda a: a[4:], filter(lambda a: a.startswith('api_'), actions))
+    actions.sort()
+    return render_to_json_response(json_response({'actions': actions}))
+
 def api_hello(request):
     '''
         return {'status': {'code': int, 'text': string},
