@@ -55,7 +55,7 @@ var app = new Ox.App({
         Ox.print('requestStop')
         app.$ui.loadingIcon.stop();
     });
-
+    $.each(app.afterLaunch, function(i, fn){ fn() });
 });
 
 
