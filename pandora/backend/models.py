@@ -197,6 +197,16 @@ class Movie(models.Model):
         'poster_width': 'posterWidth',
         'poster_height': 'posterHeight'
     }
+    def poster_json(self):
+        poster = {}
+        poster['width'] = self.poster_width
+        poster['height'] = self.poster_height
+        if self.poster:
+            poster['url'] = self.poster.url
+        else:
+            poster['url'] = self.poster_url
+        return poster
+
     def get_json(self, fields=None):
         movie = {}
         for key in self._public_fields:
@@ -213,6 +223,7 @@ class Movie(models.Model):
         if not fields:
             movie['poster'] = self.get_poster()
             movie['stream'] = self.get_stream()
+        movie['poster'] = self.poster_json()
         if fields:
             for f in fields:
                 if f.endswith('.length') and f[:-7] in ('cast', 'genre', 'trivia'):
