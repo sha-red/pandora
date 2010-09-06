@@ -180,6 +180,10 @@ class Movie(models.Model):
 
         'countries': 'country',
         'directors': 'director',
+        'writers': 'writer',
+        'editors': 'editor',
+        'producers': 'producer',
+        'cinematographer': 'cinematographer',
         'languages': 'language',
         'genres': 'genre',
         'keywords': 'keyword',

@@ -11,7 +11,7 @@ you need python, bazaar, pip and virtualenv:
     apt-get install python-setuptools bzr
     easy_install pip
     pip install virtualenv
-    apt-get install python-dev python-imaging
+    apt-get install python-dev python-imaging python-numpy
 
 also it uses system python moduels, so make sure you have
  ipython, dbmodule(psycopg2, python-mysqldb,..)
