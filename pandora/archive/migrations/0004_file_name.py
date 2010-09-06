@@ -15,7 +15,7 @@ class Migration(SchemaMigration):
         db.add_column('archive_fileinstance', 'name', self.gf('django.db.models.fields.CharField')(default='', max_length=2048), keep_default=False)
 
         # Removing unique constraint on 'FileInstance', fields ['volume', 'path', 'folder']
-        db.delete_unique('archive_fileinstance', ['volume_id', 'path', 'folder'])
+        #db.delete_unique('archive_fileinstance', ['volume_id', 'path', 'folder'])
 
         # Adding unique constraint on 'FileInstance', fields ['volume', 'folder', 'name']
         db.create_unique('archive_fileinstance', ['volume_id', 'folder', 'name'])

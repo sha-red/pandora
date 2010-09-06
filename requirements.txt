@@ -1,10 +1,10 @@
--e svn+http://code.djangoproject.com/svn/django/branches/releases/1.2.X/#egg=django
+-e svn+http://code.djangoproject.com/svn/django/branches/releases/1.2.X#egg=django
 South
 chardet
 -e bzr+http://code.0x2620.org/python-ox/#egg=python-ox
 -e bzr+http://code.0x2620.org/python-oxdjango/#egg=python-oxdjango
 simplejson
--e hg+https://django-ajax-filtered-fields.googlecode.com/hg/#egg=django-ajax-filtered-fields 
+#-e hg+https://django-ajax-filtered-fields.googlecode.com/hg/#egg=django-ajax-filtered-fields 
 #rabbitmq interface
 -e git+git://github.com/ask/celery.git#egg=celery
 django-celery

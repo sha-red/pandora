@@ -9,7 +9,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         
         # Removing M2M table for field movies on 'list'
-        db.delete_table('backend_list_movies')
+        #db.delete_table('backend_list_movies')
 
         # Deleting field 'movie.stream_mid'
         db.delete_column('backend_movie', 'stream_mid')

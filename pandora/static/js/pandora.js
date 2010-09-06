@@ -38,13 +38,17 @@ var app = new Ox.App({
 
     app.$ui.app = app.constructApp();
 
+    ///*
     app.$body.css({
         opacity: 0
     });
+    //*/
     app.$ui.app.appendTo(app.$body);
+    ///*
     app.$body.animate({
         opacity: 1
     }, 2000);
+    //*/
 
     Ox.Request.requests() && app.$ui.loadingIcon.start();
     Ox.Event.bind('', 'requestStart', function() {
@@ -55,7 +59,7 @@ var app = new Ox.App({
         Ox.print('requestStop')
         app.$ui.loadingIcon.stop();
     });
-    $.each(app.afterLaunch, function(i, fn){ fn() });
+
 });
 
 
@@ -485,7 +489,9 @@ app.constructInfo = function() {
 }
 
 app.constructList = function(view) {
-    var $list;
+    var $list,
+        info = $.inArray(app.user.ui.sort[0].key, ['title', 'director']) > -1 ? 'year' : app.user.ui.sort[0].key,
+        keys = Ox.unique(['director', 'id', 'poster', 'title', info]);
     Ox.print('constructList', view);
     if (view == 'list' || view == 'calendar') {
         $list = new Ox.TextList({
@@ -511,29 +517,24 @@ app.constructList = function(view) {
             id: 'list',
             item: function(data, sort, size) {
                 return {
-                    height: data.posterHeight,
+                    height: data.poster.height || 128, // fixme: remove later
                     id: data['id'],
-                    info: data[$.inArray(sort[0].key, ['title', 'director']) > -1 ? 'year' : sort[0].key],
+                    info: data[info],
                     title: data.title + (data.director ? ' (' + data.director + ')' : ''),
                     url: 'http://0xdb.org/' + data.id + '/poster.' + size + '.' + 'jpg',
-                    width: data.posterWidth
+                    width: data.poster.width || 80 // fixme: remove later
                 };
             },
-            keys: ['director', 'id', 'posterHeight', 'posterWidth', 'posterURL', 'title'],
+            keys: keys,
             request: function(options) {
                 app.request('find', $.extend(options, {
                     query: app.Query.toObject()
                 }), options.callback);
             },
             size: 128,
-            sort: [
-                {
-                    key: 'director',
-                    operator: ''
-                }
-            ],
+            sort: app.user.ui.sort,
             unique: 'id'
-        }).css('background', 'blue');
+        });
     } else {
         $list = new Ox.Element('<div>')
             .css({
@@ -1185,7 +1186,7 @@ app.constructMainMenu = function() {
                                             },
                                             {
                                                 element: app.$ui.map = new Ox.Map({
-                                                    places: ['Boston', 'Barcelona', 'Berlin', 'Beirut', 'Bombay', 'Bangalore', 'Beijing']
+                                                    places: ['Boston', 'Brussels', 'Barcelona', 'Berlin', 'Beirut', 'Bombay', 'Bangalore', 'Beijing']
                                                 }).css({
                                                     left: 0,
                                                     top: 0,

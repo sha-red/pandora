@@ -9,13 +9,16 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         
         # Changing field 'FileInstance.ctime'
-        db.alter_column('archive_fileinstance', 'ctime', self.gf('django.db.models.fields.IntegerField')())
+        db.delete_column('archive_fileinstance', 'ctime')
+        db.add_column('archive_fileinstance', 'ctime', self.gf('django.db.models.fields.IntegerField')())
 
         # Changing field 'FileInstance.mtime'
-        db.alter_column('archive_fileinstance', 'mtime', self.gf('django.db.models.fields.IntegerField')())
+        db.delete_column('archive_fileinstance', 'mtime')
+        db.add_column('archive_fileinstance', 'mtime', self.gf('django.db.models.fields.IntegerField')())
 
         # Changing field 'FileInstance.atime'
-        db.alter_column('archive_fileinstance', 'atime', self.gf('django.db.models.fields.IntegerField')())
+        db.delete_column('archive_fileinstance', 'atime')
+        db.add_column('archive_fileinstance', 'atime', self.gf('django.db.models.fields.IntegerField')())
 
 
     def backwards(self, orm):
