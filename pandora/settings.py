@@ -5,6 +5,7 @@ import os
 from os.path import join
 
 SITENAME = 'Pandora'
+SITEID = 'pandora'
 URL = 'pan.do/ra'
 
 PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))

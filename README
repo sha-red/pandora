@@ -33,3 +33,9 @@ Development:
 
 Apache setup:
     sudo apt-get install libapache2-mod-wsgi libapache2-mod-xsendfile
+
+add pandora repository:
+    sudo apt-get install python-software-properties   
+    sudo add-apt-repository ppa:j/pandora
+    sudo apt-get update
+    sudo apt-get install oxtools mkvtoolnix

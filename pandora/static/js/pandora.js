@@ -3,10 +3,10 @@
 ***/
 
 var app = new Ox.App({
-    config: '/static/json/pandora.json',
+    config: '/pandora.json',
     init: 'hello',
-    id: 'oxdb',
-    name: 'OxDB',
+    id: site.id,
+    name: site.name,
     requestURL: '/api/'
 }).launch(function(data) {
     Ox.print('data', data)
@@ -521,7 +521,7 @@ app.constructList = function(view) {
                     id: data['id'],
                     info: data[info],
                     title: data.title + (data.director ? ' (' + data.director + ')' : ''),
-                    url: 'http://0xdb.org/' + data.id + '/poster.' + size + '.' + 'jpg',
+                    url: 'http://0xdb.org/' + data.id + '/poster.' + size + '.' + 'jpg', //url: data.poster.url.replace(/.jpg/, size + '.jpg'),
                     width: data.poster.width || 80 // fixme: remove later
                 };
             },

@@ -32,3 +32,11 @@ def site_js(request):
         siteSettings[s.key] = s.value
     context = RequestContext(request, {'settings':settings, 'pages': pages, 'siteSettings': siteSettings})
     return render_to_response('site.js', context, mimetype="application/javascript")
+
+def pandora_json(request):
+    siteSettings = {}
+    for s in models.SiteSettings.objects.all():
+        siteSettings[s.key] = s.value
+    context = RequestContext(request, {'settings':settings, 'siteSettings': siteSettings})
+    return render_to_response('pandora.json', context, mimetype="application/javascript")
+
