@@ -10,13 +10,13 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Example:
     (r'^ajax_filtered_fields/', include('ajax_filtered_fields.urls')),
-    (r'^api/', include('backend.urls')),
     (r'^api/upload/$', 'archive.views.firefogg_upload'),
     (r'^site.js$', 'app.views.site_js'),
     (r'^pandora.json$', 'app.views.pandora_json'),
     (r'^$', 'app.views.intro'),
     (r'^ra$', 'app.views.index'),
     (r'^r/(?P<key>.*)$', 'oxuser.views.recover'),
+    (r'', include('backend.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:

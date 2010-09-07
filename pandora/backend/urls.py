@@ -7,6 +7,8 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns("backend.views",
     (r'^frame/(?P<id>.*)/(?P<position>.*)\.(?P<size>\d+).jpg$', 'frame'),
     (r'^stream/(?P<id>.*).(?P<quality>.*).ogv$', 'video'),
-    (r'^$', 'api'),
+    (r'^poster/(?P<id>.*)\.(?P<size>\d+)\.jpg$', 'poster'),
+    (r'^poster/(?P<id>.*)\.jpg$', 'poster'),
+    (r'^api/$', 'api'),
 )
 

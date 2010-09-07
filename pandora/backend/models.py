@@ -144,12 +144,6 @@ class Movie(models.Model):
 
     poster_frame = models.FloatField(default=-1)
 
-    def get_poster(self):
-        url = self.poster_url
-        if not url and self.poster:
-            url = self.poster.url
-        return url
-
     #stream related fields
     stream_aspect = models.FloatField(default=4/3)
 
@@ -201,14 +195,17 @@ class Movie(models.Model):
         'poster_width': 'posterWidth',
         'poster_height': 'posterHeight'
     }
-    def poster_json(self):
+    def get_poster(self):
         poster = {}
         poster['width'] = self.poster_width
         poster['height'] = self.poster_height
+        poster['url'] = '/poster/%s.jpg' % self.movieId
+        '''
         if self.poster:
             poster['url'] = self.poster.url
         else:
             poster['url'] = self.poster_url
+        '''
         return poster
 
     def get_json(self, fields=None):
@@ -225,9 +222,8 @@ class Movie(models.Model):
                 else:
                     movie[pub_key] = value
         if not fields:
-            movie['poster'] = self.get_poster()
             movie['stream'] = self.get_stream()
-        movie['poster'] = self.poster_json()
+        movie['poster'] = self.get_poster()
         if fields:
             for f in fields:
                 if f.endswith('.length') and f[:-7] in ('cast', 'genre', 'trivia'):

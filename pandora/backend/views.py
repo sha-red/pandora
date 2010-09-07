@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q, Avg, Count, Sum
 from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
+from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404, redirect
 from django.template import RequestContext
 from django.conf import settings
 
@@ -37,6 +37,8 @@ from oxuser.views import api_login, api_logout, api_register, api_contact, api_r
 from archive.views import api_update, api_upload
 
 from archive.models import File
+from archive import extract
+
 
 def api(request):
     if request.META['REQUEST_METHOD'] == "OPTIONS":
@@ -491,6 +493,27 @@ def api_getImdbId(request):
     else:
 		response = json_response(status=404, text='not found')
     return render_to_json_response(response)
+
+def poster(request, id, size=None):
+    print id, size
+    movie = get_object_or_404(models.Movie, movieId=id)
+    if movie.poster:
+        if size:
+            size = int(size)
+            poster_path = movie.poster.path.replace('.jpg', '.%d.jpg'%size)
+            if not os.path.exists(poster_path):
+                poster_size = max(movie.poster.width, movie.poster.height)
+                size = min(size, poster_size)
+                poster_path = movie.poster.path.replace('.jpg', '.%d.jpg'%size)
+                extract.resize_image(movie.poster.path, poster_path, size=size)
+            url = movie.poster.url.replace('.jpg', '.%d.jpg'%size)
+        elif movie.poster:
+                url = movie.poster.url
+    else:
+        url = movie.poster_url
+    if not url:
+        url = '/static/png/posterDark.48.png'
+    return redirect(url)
 
 def video(request, id, quality):
     movie = get_object_or_404(models.Movie, movieId=id)

@@ -21,7 +21,6 @@ from ox.normalize import canonicalTitle, canonicalName
 from firefogg import Firefogg
 
 from backend import utils
-from backend import extract
 from pandora.backend.models import Movie
 
 import extract

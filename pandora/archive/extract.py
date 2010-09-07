@@ -223,14 +223,24 @@ def frame(videoFile, position, baseFolder, width=128, redo=False):
             resize_image(frame_base, frame, width)
     return frame
 
-def resize_image(image_source, image_output, width):
+def resize_image(image_source, image_output, width=None, size=None):
     if exists(image_source):
         source = Image.open(image_source)
         source_width = source.size[0]
         source_height = source.size[1]
-
-        height = int(width / (float(source_width) / source_height))
-        height = height - height % 2
+        if size:
+            if source_width > source_height:
+                width = size
+                height = int(width / (float(source_width) / source_height))
+                height = height - height % 2
+            else:
+                height = size
+                width = int(height * (float(source_width) / source_height))
+                width = width - width % 2
+            
+        else:
+            height = int(width / (float(source_width) / source_height))
+            height = height - height % 2
 
         if width < source_width:
             resize_method = Image.ANTIALIAS

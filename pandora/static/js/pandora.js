@@ -516,12 +516,13 @@ app.constructList = function(view) {
         $list = new Ox.IconList({
             id: 'list',
             item: function(data, sort, size) {
+                size = size || 128;
                 return {
                     height: data.poster.height || 128, // fixme: remove later
                     id: data['id'],
                     info: data[info],
                     title: data.title + (data.director ? ' (' + data.director + ')' : ''),
-                    url: 'http://0xdb.org/' + data.id + '/poster.' + size + '.' + 'jpg', //url: data.poster.url.replace(/.jpg/, size + '.jpg'),
+                    url: data.poster.url.replace(/jpg$/, size + '.jpg'),
                     width: data.poster.width || 80 // fixme: remove later
                 };
             },
