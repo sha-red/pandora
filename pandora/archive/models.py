@@ -140,7 +140,6 @@ class File(models.Model):
         return r
 
     #upload and data handling
-    video_available = models.BooleanField(default=False)
     video = models.FileField(null=True, blank=True, upload_to=lambda f, x: file_path(f, '%s.webm'%settings.VIDEO_PROFILE))
     data = models.FileField(null=True, blank=True, upload_to=lambda f, x: file_path(f, 'data.raw'))
 
@@ -154,7 +153,7 @@ class File(models.Model):
         return True
 
     def save_chunk(self, chunk, chunk_id=-1):
-        if not self.video_available:
+        if not self.available:
             if not self.video:
                 self.video.save('%s.webm'%settings.VIDEO_PROFILE, chunk)
             else:
@@ -202,11 +201,10 @@ class FileInstance(models.Model):
     def movieId(self):
         return File.objects.get(oshash=self.oshash).movieId
 
-def frame_path(f, name):
+def frame_path(frame, name):
     ext = os.path.splitext(name)[-1]
-    name = "%s%s" % (f.position, ext)
-    h = f.file.oshash
-    return os.path.join('frame', h[:2], h[2:4], h[4:6], name)
+    name = "%s%s" % (frame.position, ext)
+    return file_path(frame.file, name)
 
 class Frame(models.Model):
     class Meta:

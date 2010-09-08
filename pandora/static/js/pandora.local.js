@@ -1,4 +1,6 @@
-$(function() {
+if(typeof(app.afterLaunch) == "undefined")
+    app.afterLaunch = [];
+app.afterLaunch.push(function() {
     if (typeof(OxFF) == 'undefined')
         return;
     app.local = {
@@ -53,6 +55,7 @@ $(function() {
                 if(!cb)
                     return null;
                 return function(result) {
+                    Ox.print("you called upload", result);
                     var data = JSON.parse(result);
                     cb(data)
                 }
@@ -211,41 +214,58 @@ $(function() {
                         });
                     } else {
                         app.local.files(name, function(result) {
+                            var fileInfo = result.info;
                             app.request('update', {
                                 'volume': name, 'files': result.files
                             }, function(result) {
                                 var videos = {};
-                                $.each(result.data.data, function(i, oshash) {
-                                    $.each(folder_ids, function(i, ids) {
-                                        if($.inArray(oshash, ids) > -1) {
-                                            if(!videos[i]) {
-                                                videos[i] = [];
-                                                var button = new Ox.Button({
-                                                            id: 'upload_' + oshash,
-                                                            title: 'Upload',
-                                                            width: 48
-                                                }).bindEvent('click', function(fid) { return function(event, data) {
-                                                    Ox.print(videos[fid]);
-                                                    //$($('#'+fid).find('.OxCell')[2]).html('extracting data...');
-                                                    app.local.uploadVideos(
-                                                        videos[fid],
-                                                        function(data) { 
-                                                            $($('#'+fid).find('.OxCell')[2]).html('done');
-                                                        },
-                                                        function(data) { 
-                                                            $($('#'+fid).find('.OxCell')[2]).html(data.status +': '+ data.progress);
-                                                        }
-                                                    );
-                                                }}(i));
-                                                $($('#'+i).find('.OxCell')[2]).html(button.$element);
-                                                $('#'+i).css({'font-weight': 'bold'});
+                                function parseResult(result) {
+                                    $.each(result.data.data, function(i, oshash) {
+                                        $.each(folder_ids, function(i, ids) {
+                                            if($.inArray(oshash, ids) > -1) {
+                                                if(!videos[i]) {
+                                                    videos[i] = [];
+                                                    var button = new Ox.Button({
+                                                                id: 'upload_' + oshash,
+                                                                title: 'Upload',
+                                                                width: 48
+                                                    }).bindEvent('click', function(fid) { return function(event, data) {
+                                                        Ox.print(videos[fid]);
+                                                        //$($('#'+fid).find('.OxCell')[2]).html('extracting data...');
+                                                        app.local.uploadVideos(
+                                                            videos[fid],
+                                                            function(data) { 
+                                                                $($('#'+fid).find('.OxCell')[2]).html('done');
+                                                            },
+                                                            function(data) { 
+                                                                $($('#'+fid).find('.OxCell')[2]).html(data.status +': '+ data.progress);
+                                                            }
+                                                        );
+                                                    }}(i));
+                                                    $($('#'+i).find('.OxCell')[2]).html(button.$element);
+                                                    $('#'+i).css({'font-weight': 'bold'});
+                                                }
+                                                videos[i].push(oshash);
+                                                //add some double click callback here to trigger video upload
+                                                return false;
                                             }
-                                            videos[i].push(oshash);
-                                            //add some double click callback here to trigger video upload
-                                            return false;
+                                        });
+                                    });
+                                };
+                                if (result.data.info.length>0) {
+                                    var post = {'info': {}};
+                                    $.each(result.data.info, function(i, oshash) {
+                                        if(fileInfo[oshash]) {
+                                            post.info[oshash] = fileInfo[oshash];
                                         }
                                     });
-                                });
+                                    app.request('update', post, function(result) {
+                                        parseResult(result);
+                                    });
+                                } else {
+                                    parseResult(result);
+                                }
+
                             });
                             var data = {
                                 items: []
@@ -303,10 +323,5 @@ $(function() {
             return url;
         },
     };
-    
-    if(typeof(app.afterLaunch) == "undefined")
-        app.afterLaunch = [];
-    app.afterLaunch.push(function() {
-        app.local.loadVolumes();
-    });
+    app.local.loadVolumes();
 });

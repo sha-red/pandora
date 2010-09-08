@@ -71,16 +71,6 @@ def getMovie(info):
                 movie.save()
     return movie
 
-def movie_path(f, size):
-    name = "%s.%s" % (size, 'ogv')
-    url_hash = f.movieId
-    return os.path.join('movie', url_hash[:2], url_hash[2:4], url_hash[4:6], name)
-
-def poster_path(f):
-    name = "%s.%s" % (f.movieId, 'jpg')
-    url_hash = f.movieId
-    return os.path.join('poster', url_hash[:2], url_hash[2:4], url_hash[4:6], name)
-
 class Movie(models.Model):
     person_keys = ('director', 'writer', 'producer', 'editor', 'cinematographer', 'actor', 'character')
     facet_keys = person_keys + ('country', 'language', 'genre', 'keyword')
@@ -137,7 +127,7 @@ class Movie(models.Model):
             self.imdb = ox.web.imdb.Imdb(self.movieId)
             self.save()
 
-    poster = models.ImageField(default=None, blank=True, upload_to=lambda f, x: poster_path(f))
+    poster = models.ImageField(default=None, blank=True, upload_to=lambda m, x: os.path.join(movieid_path(m.movieId), "poster.jpg"))
     poster_url = models.TextField(blank=True)
     poster_height = models.IntegerField(default=0)
     poster_width = models.IntegerField(default=0)
@@ -395,7 +385,7 @@ class Movie(models.Model):
         n = self.files.count() * 3
         frame = int(math.floor(n/2))
         part = 1
-        for f in self.files.filter(is_main=True, video_available=True):
+        for f in self.files.filter(is_main=True, available=True):
             for frame in f.frames.all():
                 path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster_path(self)))
                 path = path.replace('.jpg', '%s.%s.jpg'%(part, frame.pos))
@@ -415,11 +405,11 @@ class Movie(models.Model):
 
     @property
     def timeline_prefix(self):
-        return os.path.join(settings.MEDIA_ROOT, 'stream', movieid_path(self.movieId), 'timeline')
+        return os.path.join(settings.MEDIA_ROOT, movieid_path(self.movieId), 'timeline')
 
     def updateStreams(self):
         files = {}
-        for f in self.files.filter(is_main=True, video_available=True):
+        for f in self.files.filter(is_main=True, available=True):
             files[utils.sort_title(f.name)] = f.video.path
         
         #FIXME: how to detect if something changed?
@@ -429,24 +419,23 @@ class Movie(models.Model):
             cmd = []
             
             for f in sorted(files):
-                if not cmd:
-                    cmd.append(files[f])
-                else:
-                    cmd.append('+')
-                    cmd.append(files[f])
+                cmd.append('+')
+                cmd.append(files[f])
             if not os.path.exists(os.path.dirname(stream.video.path)):
                 os.makedirs(os.path.dirname(stream.video.path))
-            cmd = [ 'mkvmerge', '-o', stream.video.path ] + cmd
-            subprocess.Popen(cmd)
+            cmd = [ 'mkvmerge', '-o', stream.video.path ] + cmd[1:]
+            p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p.wait()
             stream.save()
 
-            extract.timeline(stream.video.path, self.timeline_prefix)
-
-            extract.timeline_strip(self, self.metadata['cuts'], stream.info, self.timeline_prefix[:-8])
+            if 'video' in stream.info:
+                extract.timeline(stream.video.path, self.timeline_prefix)
+                self.stream_aspect = stream.info['video'][0]['width']/stream.info['video'][0]['height']
+                self.metadata['cuts'] = extract.cuts(self.timeline_prefix)
+                self.metadata['average_color'] = extract.average_color(self.timeline_prefix)
+                extract.timeline_strip(self, self.metadata['cuts'], stream.info, self.timeline_prefix[:-8])
 
             stream.extract_derivatives()
-            self.metadata['cuts'] = extract.cuts(self.timeline_prefix)
-            self.metadata['average_color'] = extract.average_color(self.timeline_prefix)
             #something with poster
             self.available = True
             self.save()
@@ -719,10 +708,10 @@ class Collection(models.Model):
 
 
 def movieid_path(h):
-    return os.path.join(h[:2], h[2:4], h[4:6], h[6:])
-def stream_path(f):
-    h = f.movie.movieId
-    return os.path.join('stream', movieid_path(h), f.profile)
+    return os.path.join('movie', h[:2], h[2:4], h[4:6], h[6:])
+
+def stream_path(stream):
+    return os.path.join(movieid_path(stream.movie.movieId), stream.profile)
 
 class Stream(models.Model):
     class Meta:

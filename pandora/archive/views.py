@@ -170,6 +170,7 @@ def api_upload(request):
     '''
     user = request.user
     f = get_object_or_404(models.File, oshash=request.POST['oshash'])
+    print request.FILES
     if 'frame' in request.FILES:
         if f.frames.count() == 0:
             for frame in request.FILES.getlist('frame'):
@@ -230,7 +231,7 @@ def firefogg_upload(request):
             if f.editable(request.user):
                 if f.video:
                     f.video.delete()
-                f.video_available = False
+                f.available = False
                 f.save()
                 response = {
                     #is it possible to no hardcode url here?

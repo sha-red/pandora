@@ -298,7 +298,7 @@ def divide(num, by):
     arr = []
     div = int(num / by)
     mod = num % by
-    for i in range(by):
+    for i in range(int(by)):
         arr.append(div + (i > by - 1 - mod))
     return arr
 
@@ -313,7 +313,7 @@ def timeline_strip(movie, cuts, info, prefix):
     timeline_height = 64
     timeline_width = 1500
     fps = 25
-    frames = duration * fps
+    frames = int(duration * fps)
     if cuts[0] != 0:
         cuts.insert(0, 0)
 
@@ -327,31 +327,33 @@ def timeline_strip(movie, cuts, info, prefix):
             timeline_image = Image.new('RGB', (timeline_width, timeline_height))
         if frame in cuts:
             c = cuts.index(frame)
-            duration = cuts[c + 1] - cuts[c]
-            stills = math.ceil(duration / (video_width * timeline_height / video_height))
-            widths = divide(duration, stills)
-            still = frame
-            if _debug:
-                print widths, duration, stills, cuts[c], cuts[c + 1]
-            for s in range(int(stills)):
-                still_ratio = widths[s] / timeline_height
-                if video_ratio > still_ratio:
-                    width = int(round(video_height * still_ratio))
-                    left = int((video_width - width) / 2)
-                    box = (left, 0, left + width, video_height)
-                else:
-                    height = int(round(video_width / still_ratio))
-                    top = int((video_height - height) / 2)
-                    box = (0, top, video_width, top + height)
+            if c +1 < len(cuts):
+                duration = cuts[c + 1] - cuts[c]
+                stills = math.ceil(duration / (video_width * timeline_height / video_height))
+                widths = divide(duration, stills)
+                still = frame
                 if _debug:
-                    print frame, 'cut', c, 'still', s, still, 'width', widths[s], box
-                #FIXME: why does this have to be still+1?
-                frame_image = Image.open(movie.frame((still+1)/fps))
-                frame_image = frame_image.crop(box).resize((widths[s], timeline_height), Image.ANTIALIAS)
-                for x_ in range(widths[s]):
-                    line_image.append(frame_image.crop((x_, 0, x_ + 1, timeline_height)))
-                still += widths[s]
-        timeline_image.paste(line_image[frame], (x, 0))
+                    print widths, duration, stills, cuts[c], cuts[c + 1]
+                for s in range(int(stills)):
+                    still_ratio = widths[s] / timeline_height
+                    if video_ratio > still_ratio:
+                        width = int(round(video_height * still_ratio))
+                        left = int((video_width - width) / 2)
+                        box = (left, 0, left + width, video_height)
+                    else:
+                        height = int(round(video_width / still_ratio))
+                        top = int((video_height - height) / 2)
+                        box = (0, top, video_width, top + height)
+                    if _debug:
+                        print frame, 'cut', c, 'still', s, still, 'width', widths[s], box
+                    #FIXME: why does this have to be still+1?
+                    frame_image = Image.open(movie.frame((still+1)/fps))
+                    frame_image = frame_image.crop(box).resize((widths[s], timeline_height), Image.ANTIALIAS)
+                    for x_ in range(widths[s]):
+                        line_image.append(frame_image.crop((x_, 0, x_ + 1, timeline_height)))
+                    still += widths[s]
+        if len(line_image) > frame:
+            timeline_image.paste(line_image[frame], (x, 0))
         if x == timeline_width - 1:
             timeline_file = '%sstrip.64.%04d.png' % (prefix, i)
             if _debug:
