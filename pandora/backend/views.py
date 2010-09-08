@@ -494,45 +494,6 @@ def api_getImdbId(request):
 		response = json_response(status=404, text='not found')
     return render_to_json_response(response)
 
-def poster(request, id, size=None):
-    print id, size
-    movie = get_object_or_404(models.Movie, movieId=id)
-    if movie.poster:
-        if size:
-            size = int(size)
-            poster_path = movie.poster.path.replace('.jpg', '.%d.jpg'%size)
-            if not os.path.exists(poster_path):
-                poster_size = max(movie.poster.width, movie.poster.height)
-                size = min(size, poster_size)
-                poster_path = movie.poster.path.replace('.jpg', '.%d.jpg'%size)
-                extract.resize_image(movie.poster.path, poster_path, size=size)
-            url = movie.poster.url.replace('.jpg', '.%d.jpg'%size)
-        elif movie.poster:
-                url = movie.poster.url
-    else:
-        url = movie.poster_url
-    if not url:
-        url = '/static/png/posterDark.48.png'
-    return redirect(url)
-
-def video(request, id, quality):
-    movie = get_object_or_404(models.Movie, movieId=id)
-    if quality not in settings.VIDEO_ENCODING:
-        raise Http404
-    stream = getattr(movie, 'stream_'+quality)
-    response = HttpFileResponse(stream.path, content_type='video/ogg')
-    #FIXME: movie needs duration field
-    #response['Content-Duration'] = movie.duration
-    return response
-
-def frame(request, id, position, size):
-    movie = get_object_or_404(models.Movie, movieId=id)
-    position = ox.time2ms(position)/1000
-    frame = movie.frame(position, int(size))
-    if not frame:
-        raise Http404
-    return HttpFileResponse(frame, content_type='image/jpeg')
-
 def apidoc(request):
     '''
         this is used for online documentation at http://127.0.0.1:8000/api/
@@ -573,3 +534,53 @@ def apidoc(request):
     context = RequestContext(request, {'api': api,
                                        'sitename': settings.SITENAME,})
     return render_to_response('api.html', context)
+
+def data(request, id, data):
+    movie = get_object_or_404(models.Movie, movieId=id)
+    response = {}
+    if data == 'video':
+        response = movie.get_stream()
+    return render_to_json_response(response)
+
+#media delivery
+def frame(request, id, position, size):
+    movie = get_object_or_404(models.Movie, movieId=id)
+    position = float(position.replace(',', '.'))
+    frame = movie.frame(position, int(size))
+    if not frame:
+        raise Http404
+    return HttpFileResponse(frame, content_type='image/jpeg')
+
+def poster(request, id, size=128):
+    movie = get_object_or_404(models.Movie, movieId=id)
+    if size == 'large':
+        size = None
+    if movie.poster:
+        if size:
+            size = int(size)
+            poster_path = movie.poster.path.replace('.jpg', '.%d.jpg'%size)
+            if not os.path.exists(poster_path):
+                poster_size = max(movie.poster.width, movie.poster.height)
+                if size > poster_size:
+                    return redirect('/%s/poster.large.jpg' % movie.movieId)
+                extract.resize_image(movie.poster.path, poster_path, size=size)
+        else:
+            poster_path = movie.poster.path
+    else:
+        poster_path = os.path.join(settings.STATIC_ROOT, 'png/posterDark.48.png')
+    return HttpFileResponse(poster_path, content_type='image/jpeg')
+
+def timeline(request, id, size, position):
+    movie = get_object_or_404(models.Movie, movieId=id)
+    timeline = os.path.join(settings.MEDIA_ROOT, '%s.%s.%04d.png' %(movie.timeline_prefix, size, int(position)))
+    return HttpFileResponse(timeline, content_type='image/png')
+
+def video(request, id, profile):
+    movie = get_object_or_404(models.Movie, movieId=id)
+    stream = get_object_or_404(movie.streams, profile=profile)
+    path = stream.video.path
+    content_type = path.endswith('.mp4') and 'video/mp4' or 'video/webm'
+    #url = 'http://127.0.0.1/pandora_media' + path[len(settings.MEDIA_ROOT):]
+    #return redirect(url)
+    return HttpFileResponse(path, content_type=content_type)
+

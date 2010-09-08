@@ -194,34 +194,22 @@ def run_command(cmd, timeout=10):
         killedpid, stat = os.waitpid(p.pid, os.WNOHANG)
     return p.returncode
 
-def frame(videoFile, position, baseFolder, width=128, redo=False):
+def frame(videoFile, frame, position, width=128, redo=False):
     '''
         params:
-            videoFile
+            videoFile input
+            frame     output
             position as float in seconds
-            baseFolder to write frames to
             width of frame
             redo boolean to extract file even if it exists
     '''
-    def frame_path(size):
-        return os.path.join(baseFolder, "%s.%s.%s" % (ox.ms2time(position*1000), size, img_extension))
-
-    #not using input file, to slow to extract frame right now
-    base_size = 320
-    frame = frame_path(base_size)
-
     if exists(videoFile):
+        frameFolder = os.path.dirname(frame)
         if redo or not exists(frame):
-            if not exists(baseFolder):
-                os.makedirs(baseFolder)
-            cmd = ['oggThumb', '-t', str(position), '-n', frame, '-s', '%dx0'%base_size, videoFile]
+            if not exists(frameFolder):
+                os.makedirs(frameFolder)
+            cmd = ['oxframe', '-i', videoFile, '-o', frame, '-p', str(position), '-x', str(width)]
             run_command(cmd)
-    if width != base_size:
-        frame_base = frame
-        frame = frame_path(width)
-        if not exists(frame):
-            resize_image(frame_base, frame, width)
-    return frame
 
 def resize_image(image_source, image_output, width=None, size=None):
     if exists(image_source):

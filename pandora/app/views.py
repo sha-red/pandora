@@ -16,6 +16,10 @@ def index(request):
     context = RequestContext(request, {'settings':settings})
     return render_to_response('index.html', context)
 
+def timeline(request):
+    context = RequestContext(request, {'settings':settings})
+    return render_to_response('timeline.html', context)
+
 def api_getPage(request):
     data = json.loads(request.POST['data'])
     name = data['page']

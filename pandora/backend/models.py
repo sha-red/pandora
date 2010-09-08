@@ -259,9 +259,11 @@ class Movie(models.Model):
                           self.get('season', ''), self.get('episode', ''))
 
     def frame(self, position, width=128):
-        #FIXME: compute offset and so on
-        f = self.files.all()[0]
-        return f.frame(position, width)
+        stream = self.streams.filter(profile=settings.VIDEO_PROFILE+'.webm')[0]
+        path = os.path.join(settings.MEDIA_ROOT, 'frame', self.movieId, "%d"%width, "%s.jpg"%position)
+        if not os.path.exists(path):
+            extract.frame(stream.video.path, path, position, width)
+        return path
 
     def updateFind(self):
         try:
@@ -411,6 +413,10 @@ class Movie(models.Model):
                 subprocess.Popen(cmd)
             part += 1
 
+    @property
+    def timeline_prefix(self):
+        return os.path.join('stream', movieid_path(self.movieId), 'timeline')
+
     def updateStreams(self):
         files = {}
         for f in self.files.filter(is_main=True, video_available=True):
@@ -428,11 +434,13 @@ class Movie(models.Model):
                 else:
                     cmd.append('+')
                     cmd.append(files[f])
+            if not os.path.exists(os.path.dirname(stream.video.path)):
+                os.makedirs(os.path.dirname(stream.video.path))
             cmd = [ 'mkvmerge', '-o', stream.video.path ] + cmd
             subprocess.Popen(cmd)
             stream.save()
 
-            extract.timeline(stream.video.path, os.path.join(stream.video.path[:-len(stream.profile)], 'timeline'))
+            extract.timeline(stream.video.path, os.path.join(settings.MEDIA_ROOT, self.timeline_prefix))
             stream.extract_derivatives()
             
             #something with poster
@@ -704,10 +712,13 @@ class Collection(models.Model):
 
     def editable(self, user):
         return self.users.filter(id=user.id).count() > 0
-        
+
+
+def movieid_path(h):
+    return os.path.join(h[:2], h[2:4], h[4:6], h[6:])
 def stream_path(f):
     h = f.movie.movieId
-    return os.path.join('stream', h[:2], h[2:4], h[4:6], h[6:], f.profile)
+    return os.path.join('stream', movieid_path(h), f.profile)
 
 class Stream(models.Model):
     class Meta:

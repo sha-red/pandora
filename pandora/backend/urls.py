@@ -5,10 +5,13 @@ from django.conf.urls.defaults import *
 
 
 urlpatterns = patterns("backend.views",
-    (r'^frame/(?P<id>.*)/(?P<position>.*)\.(?P<size>\d+).jpg$', 'frame'),
-    (r'^stream/(?P<id>.*).(?P<quality>.*).ogv$', 'video'),
-    (r'^poster/(?P<id>.*)\.(?P<size>\d+)\.jpg$', 'poster'),
-    (r'^poster/(?P<id>.*)\.jpg$', 'poster'),
+    (r'^(?P<id>.*)/frame/(?P<size>\d+)/(?P<position>[0-9\.,]+).jpg$', 'frame'),
+    (r'^(?P<id>.*)/(?P<profile>.*.webm)$', 'video'),
+    (r'^(?P<id>.*)/(?P<profile>.*.mp4)$', 'video'),
+    (r'^(?P<id>.*)/poster\.(?P<size>\d+)\.jpg$', 'poster'),
+    (r'^(?P<id>.*)/poster\.jpg$', 'poster'),
+    (r'^(?P<id>.*)/timelines/timeline\.(?P<size>\d+)\.(?P<position>\d+)\.png$', 'timeline'),
+    (r'^(?P<id>.*)/data/(?P<data>.+)\.json$', 'data'),
     (r'^api/$', 'api'),
 )
 

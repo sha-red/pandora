@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     (r'^pandora.json$', 'app.views.pandora_json'),
     (r'^$', 'app.views.intro'),
     (r'^ra$', 'app.views.index'),
+    (r'^timeline$', 'app.views.timeline'),
     (r'^r/(?P<key>.*)$', 'oxuser.views.recover'),
     (r'', include('backend.urls')),
 

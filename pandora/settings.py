@@ -14,7 +14,20 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 JSON_DEBUG = True
 
+#with apache x-sendfile or lighttpd set this to True
 XSENDFILE = False
+
+XACCELREDIRECT = False
+# with nginx:
+#XACCELREDIRECT=[/some/path/, /protected/]
+'''
+this assumes the following configuration:
+location /protected/ {
+  internal;
+  root   /some/path/;
+}
+'''
+
 
 ADMINS = (
      ('j', 'j@mailb.org'),
