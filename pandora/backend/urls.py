@@ -10,7 +10,7 @@ urlpatterns = patterns("backend.views",
     (r'^(?P<id>.*)/(?P<profile>.*.mp4)$', 'video'),
     (r'^(?P<id>.*)/poster\.(?P<size>\d+)\.jpg$', 'poster'),
     (r'^(?P<id>.*)/poster\.jpg$', 'poster'),
-    (r'^(?P<id>.*)/timelines/timeline\.(?P<size>\d+)\.(?P<position>\d+)\.png$', 'timeline'),
+    (r'^(?P<id>.*)/timelines/(?P<timeline>.+)\.(?P<size>\d+)\.(?P<position>\d+)\.png$', 'timeline'),
     (r'^(?P<id>.*)/data/(?P<data>.+)\.json$', 'data'),
     (r'^api/$', 'api'),
 )

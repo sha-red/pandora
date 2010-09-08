@@ -23,8 +23,9 @@ $(function() {
         posterFrame = 1515,
         points = [2059, 2748],
         videoId = document.location.hash.substring(1),
-        videoUrl = "/" + videoId + "/96p." + ($.support.video.webm ? "webm": "mp4");
-
+        videoUrl = "/" + videoId + "/96p." + ($.support.video.webm ? "webm": "mp4").
+        stripTimeline = false;
+        
     $.getJSON("/" + videoId + "/data/video.json", function(video) {
         var duration = video.duration,
             videoRatio = video.aspectRatio,
@@ -33,6 +34,8 @@ $(function() {
             position = duration/2;
 
         videoWidth += videoWidth%2;
+        videoUrl = video.baseUrl + "/96p." + ($.support.video.webm ? "webm": "mp4");
+
         //resizeVideoPlayers(pageWidth);
 
         Ox.Editor = function(options, self) {
@@ -577,7 +580,7 @@ $(function() {
                     if (!self.$tiles[v]) {
                         self.$tiles[v] = $("<img>")
                             .attr({
-                                src: "/" + self.options.videoId + "/timelines/" + (window.location.hash == "#strip" ? "strip" : "timeline") + ".64." + v + ".png"
+                                src: "/" + self.options.videoId + "/timelines/" + (stripTimeline ? "strip" : "timeline") + ".64." + v + ".png"
                             })
                             .css({
                                 left: (v * self.tileWidth) + "px"

@@ -540,6 +540,8 @@ def data(request, id, data):
     response = {}
     if data == 'video':
         response = movie.get_stream()
+    if data == 'cuts':
+        response = movie.metadata.get('cuts', {})
     return render_to_json_response(response)
 
 #media delivery
@@ -570,9 +572,12 @@ def poster(request, id, size=128):
         poster_path = os.path.join(settings.STATIC_ROOT, 'png/posterDark.48.png')
     return HttpFileResponse(poster_path, content_type='image/jpeg')
 
-def timeline(request, id, size, position):
+def timeline(request, id, timeline, size, position):
     movie = get_object_or_404(models.Movie, movieId=id)
-    timeline = os.path.join(settings.MEDIA_ROOT, '%s.%s.%04d.png' %(movie.timeline_prefix, size, int(position)))
+    if timeline == 'strip':
+        timeline = '%s.%s.%04d.png' %(movie.timeline_prefix[:-8] + 'strip', size, int(position))
+    else:
+        timeline = '%s.%s.%04d.png' %(movie.timeline_prefix, size, int(position))
     return HttpFileResponse(timeline, content_type='image/png')
 
 def video(request, id, profile):
@@ -580,7 +585,5 @@ def video(request, id, profile):
     stream = get_object_or_404(movie.streams, profile=profile)
     path = stream.video.path
     content_type = path.endswith('.mp4') and 'video/mp4' or 'video/webm'
-    #url = 'http://127.0.0.1/pandora_media' + path[len(settings.MEDIA_ROOT):]
-    #return redirect(url)
     return HttpFileResponse(path, content_type=content_type)
 

@@ -260,7 +260,7 @@ def average_color(prefix):
     for i in range(0, len(pixels)):
         p = np.sum(pixels[i], axis=0) / frames
         color += p
-    return list(color)
+    return list(map(float, color))
 
 def get_distance(rgb0, rgb1):
     dst = math.sqrt(pow(rgb0[0] - rgb1[0], 2) + pow(rgb0[0] - rgb1[0], 2) + pow(rgb0[0] - rgb1[0], 2))
@@ -291,4 +291,70 @@ def cuts(prefix):
             if dst > 0.1:
                 cuts.append(frame / fps)
     return cuts
+
+def divide(num, by):
+    # >>> divide(100, 3)
+    # [33, 33, 34]
+    arr = []
+    div = int(num / by)
+    mod = num % by
+    for i in range(by):
+        arr.append(div + (i > by - 1 - mod))
+    return arr
+
+def strip_timeline(movie, cuts, info, prefix):
+    _debug = False
+    duration =  info['duration']
+    video_height = info['video'][0]['height']
+    video_width = info['video'][0]['width']
+    video_ratio = video_width / video_height
+
+    line_image = []
+    timeline_height = 64
+    timeline_width = 1500
+    fps = 25
+    frames = duration * fps
+    if cuts[0] != 0:
+        cuts.insert(0, 0)
+
+    cuts = map(lambda x: int(round(x * fps)), cuts)
+
+    for frame in range(frames):
+        i = int(frame / timeline_width)
+        x = frame % timeline_width
+        if x == 0:
+            timeline_width = min(timeline_width, frames - frame)
+            timeline_image = Image.new('RGB', (timeline_width, timeline_height))
+        if frame in cuts:
+            c = cuts.index(frame)
+            duration = cuts[c + 1] - cuts[c]
+            stills = math.ceil(duration / (video_width * timeline_height / video_height))
+            widths = divide(duration, stills)
+            still = frame
+            if _debug:
+                print widths, duration, stills, cuts[c], cuts[c + 1]
+            for s in range(int(stills)):
+                still_ratio = widths[s] / timeline_height
+                if video_ratio > still_ratio:
+                    width = int(round(video_height * still_ratio))
+                    left = int((video_width - width) / 2)
+                    box = (left, 0, left + width, video_height)
+                else:
+                    height = int(round(video_width / still_ratio))
+                    top = int((video_height - height) / 2)
+                    box = (0, top, video_width, top + height)
+                if _debug:
+                    print frame, 'cut', c, 'still', s, still, 'width', widths[s], box
+                #FIXME: why does this have to be still+1?
+                frame_image = Image.open(movie.frame((still+1)/fps))
+                frame_image = frame_image.crop(box).resize((widths[s], timeline_height), Image.ANTIALIAS)
+                for x_ in range(widths[s]):
+                    line_image.append(frame_image.crop((x_, 0, x_ + 1, timeline_height)))
+                still += widths[s]
+        timeline_image.paste(line_image[frame], (x, 0))
+        if x == timeline_width - 1:
+            timeline_file = '%sstrip.64.%04d.png' % (prefix, i)
+            if _debug:
+                print 'writing', timeline_file
+            timeline_image.save(timeline_file)
 

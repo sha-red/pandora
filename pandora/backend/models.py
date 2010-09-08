@@ -415,7 +415,7 @@ class Movie(models.Model):
 
     @property
     def timeline_prefix(self):
-        return os.path.join('stream', movieid_path(self.movieId), 'timeline')
+        return os.path.join(settings.MEDIA_ROOT, 'stream', movieid_path(self.movieId), 'timeline')
 
     def updateStreams(self):
         files = {}
@@ -440,9 +440,10 @@ class Movie(models.Model):
             subprocess.Popen(cmd)
             stream.save()
 
-            extract.timeline(stream.video.path, os.path.join(settings.MEDIA_ROOT, self.timeline_prefix))
+            extract.timeline(stream.video.path, self.timeline_prefix)
             stream.extract_derivatives()
-            
+            self.metadata['cuts'] = extract.cuts(self.timeline_prefix)
+            self.metadata['average_color'] = extract.average_color(self.timeline_prefix)
             #something with poster
             self.available = True
             self.save()
