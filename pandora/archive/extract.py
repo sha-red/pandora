@@ -302,7 +302,7 @@ def divide(num, by):
         arr.append(div + (i > by - 1 - mod))
     return arr
 
-def strip_timeline(movie, cuts, info, prefix):
+def timeline_strip(movie, cuts, info, prefix):
     _debug = False
     duration =  info['duration']
     video_height = info['video'][0]['height']

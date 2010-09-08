@@ -441,6 +441,9 @@ class Movie(models.Model):
             stream.save()
 
             extract.timeline(stream.video.path, self.timeline_prefix)
+
+            extract.timeline_strip(self, self.metadata['cuts'], stream.info, self.timeline_prefix[:-8])
+
             stream.extract_derivatives()
             self.metadata['cuts'] = extract.cuts(self.timeline_prefix)
             self.metadata['average_color'] = extract.average_color(self.timeline_prefix)
