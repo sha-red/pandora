@@ -250,7 +250,7 @@ class Movie(models.Model):
 
     def frame(self, position, width=128):
         stream = self.streams.filter(profile=settings.VIDEO_PROFILE+'.webm')[0]
-        path = os.path.join(settings.MEDIA_ROOT, 'frame', self.movieId, "%d"%width, "%s.jpg"%position)
+        path = os.path.join(settings.MEDIA_ROOT, movieid_path(self.movieId), 'frame', "%d"%width, "%s.jpg"%position)
         if not os.path.exists(path):
             extract.frame(stream.video.path, path, position, width)
         return path

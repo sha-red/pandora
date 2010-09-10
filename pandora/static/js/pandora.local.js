@@ -1,5 +1,6 @@
 if(typeof(app.afterLaunch) == "undefined")
     app.afterLaunch = [];
+
 app.afterLaunch.push(function() {
     if (typeof(OxFF) == 'undefined')
         return;
@@ -55,7 +56,6 @@ app.afterLaunch.push(function() {
                 if(!cb)
                     return null;
                 return function(result) {
-                    Ox.print("you called upload", result);
                     var data = JSON.parse(result);
                     cb(data)
                 }
@@ -81,16 +81,20 @@ app.afterLaunch.push(function() {
             }
         },
         loadVolumes: function() {
+            var _this = this;
             Ox.print("load volumes");
             var $section = new Ox.CollapsePanel({
                 id: 'volumes',
                 size: 'small',
                 title: 'Volumes'
             });
+
             app.$ui.sections.push($section);
             app.local.volumes(function(data) {
                 Ox.print("got volumes", data);
+                var volumes = 0;
                 $.each(data, function(name, info) {
+                    volumes ++;
                     Ox.print("add volume", name, info);
                     var status = info.available?"online":"offline";
                     var $line = $('<div>').css({ height: '20px' }).append(
@@ -112,7 +116,30 @@ app.afterLaunch.push(function() {
                     });
                     $section.$content.append($line);
                 });
+
+                add_button = new Ox.Button({
+                            id: 'add_volume',
+                            title: 'add',
+                            width: 32
+                }).bindEvent('click', function(event, data) {
+                    if(_this.api.setLocation("Volume "+(volumes+1))) _this.loadVolumes();
+                });
+                var update_button = new Ox.Button({
+                            id: 'update_archive',
+                            title: 'update',
+                            width: 48
+                }).bindEvent('click', function(event, data) {
+                    update_button.options({disabled: true});
+                    _this.api.update(function() {
+                        update_button.options({disabled: false});
+                    })
+                });
                 app.$ui.lists.replaceWith(app.constructLists());
+                $section.find('.OxBar').append($('<div>')
+                                                .css({'text-align': 'right', 'margin': '2px'})
+                                                .append(update_button.$element)
+                                                .append(add_button.$element)
+                );
             });
         },
         uploadVideos: function(ids, done, progress, total) {
@@ -164,8 +191,12 @@ app.afterLaunch.push(function() {
                 }
             );
         },
+        cancel: function(oshash) {
+            Ox.print('this function needs to be implemented: cancel ', oshash);
+        },
         constructFileList: function(name) {
-            var $list = new Ox.TextList({
+            var _this = this,
+                $list = new Ox.TextList({
                 columns: [
                     {
                         align: "left",
@@ -231,14 +262,25 @@ app.afterLaunch.push(function() {
                                                                 width: 48
                                                     }).bindEvent('click', function(fid) { return function(event, data) {
                                                         Ox.print(videos[fid]);
+                                                        $($('#'+fid).find('.OxCell')[1]).html(function(fid) {
+                                                            var button = new Ox.Button({
+                                                                        title: 'Cancel',
+                                                                        width: 48
+                                                            }).bindEvent('click', function(event, data) { 
+                                                              $.each(videos[fid], function(i, oshash) {
+                                                                _this.cancel(oshash);
+                                                              });
+                                                            });
+                                                            return button.$element;
+                                                        }(fid));
                                                         //$($('#'+fid).find('.OxCell')[2]).html('extracting data...');
                                                         app.local.uploadVideos(
                                                             videos[fid],
                                                             function(data) { 
                                                                 $($('#'+fid).find('.OxCell')[2]).html('done');
                                                             },
-                                                            function(data) { 
-                                                                $($('#'+fid).find('.OxCell')[2]).html(data.status +': '+ data.progress);
+                                                            function(data) {
+                                                                $($('#'+fid).find('.OxCell')[2]).html(parseInt(data.progress*100));
                                                             }
                                                         );
                                                     }}(i));
