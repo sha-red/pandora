@@ -516,13 +516,20 @@ app.constructList = function(view) {
             id: 'list',
             item: function(data, sort, size) {
                 size = size || 128;
+                if(data.poster.height>data.poster.width) {
+                    var height = size,
+                        width  = height * data.poster.width / data.poster.height;
+                } else {
+                    var width = size,
+                        height  = width * data.poster.height / data.poster.width;
+                }
                 return {
-                    height: data.poster.height || 128, // fixme: remove later
+                    height: height,
                     id: data['id'],
                     info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
                     title: data.title + (data.director ? ' (' + data.director + ')' : ''),
                     url: data.poster.url.replace(/jpg$/, size + '.jpg'),
-                    width: data.poster.width || 80 // fixme: remove later
+                    width: width
                 };
             },
             keys: keys,
@@ -559,7 +566,7 @@ app.constructList = function(view) {
         },
         openpreview: function(event, data) {
             app.request('find', {
-                keys: ['director', 'id', 'posterHeight', 'posterWidth', 'posterURL', 'title'],
+                keys: ['director', 'id', 'poster', 'title'],
                 query: {
                     conditions: $.map(data.ids, function(id, i) {
                         return {
@@ -575,27 +582,14 @@ app.constructList = function(view) {
                     title = item.title + (item.director ? ' (' + item.director + ')' : ''),
                     documentHeight = app.$document.height(),
                     dialogHeight = documentHeight - 40,
-                    dialogWidth = parseInt((dialogHeight - 48) * 0.75),
+                    dialogWidth = parseInt((dialogHeight - 48) * item.poster.width/item.poster.height),
                     $image = $('<img>')
                         .attr({
-                            src: 'http://0xdb.org/' + item.id + '/poster.large.jpg'
+                            src: item.poster.url.replace(/jpg/, 'large.jpg')
                         })
                         .css({
-                            height: (dialogHeight - 48) + 'px',
-                            width: dialogWidth + 'px'
-                        })
-                        .load(function() {
-                            var image = $image[0],
-                                imageHeight = Math.min(image.height, documentHeight - 88),
-                                imageWidth = parseInt(image.width * imageHeight / image.height);
-                            app.$ui.previewDialog.options({
-                                height: imageHeight + 48,
-                                width: imageWidth
-                            });
-                            $image.css({
-                                height: imageHeight + 'px',
-                                width: imageWidth + 'px'
-                            });
+                            height: (dialogHeight - 48 -3) + 'px',
+                            width: (dialogWidth - 3*item.poster.width/item.poster.height) + 'px'
                         });
                 if ('previewDialog' in app.$ui) {
                     app.$ui.previewDialog.options({

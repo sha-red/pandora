@@ -148,7 +148,9 @@ class Movie(models.Model):
         if self.poster:
             self.poster_height = self.poster.height
             self.poster_width = self.poster.width
-
+        else:
+            self.poster_height = 128
+            self.poster_width = 80
         super(Movie, self).save(*args, **kwargs)
         self.updateFind()
         self.updateSort()
