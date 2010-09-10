@@ -490,8 +490,7 @@ app.constructInfo = function() {
 
 app.constructList = function(view) {
     var $list,
-        info = $.inArray(app.user.ui.sort[0].key, ['title', 'director']) > -1 ? 'year' : app.user.ui.sort[0].key,
-        keys = Ox.unique(['director', 'id', 'poster', 'title', info]);
+        keys = ['director', 'id', 'poster', 'title', 'year'];
     Ox.print('constructList', view);
     if (view == 'list' || view == 'calendar') {
         $list = new Ox.TextList({
@@ -520,7 +519,7 @@ app.constructList = function(view) {
                 return {
                     height: data.poster.height || 128, // fixme: remove later
                     id: data['id'],
-                    info: data[info],
+                    info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
                     title: data.title + (data.director ? ' (' + data.director + ')' : ''),
                     url: data.poster.url.replace(/jpg$/, size + '.jpg'),
                     width: data.poster.width || 80 // fixme: remove later
@@ -528,6 +527,7 @@ app.constructList = function(view) {
             },
             keys: keys,
             request: function(options) {
+                Ox.print('options, Query.toObject', options, app.Query.toObject())
                 app.request('find', $.extend(options, {
                     query: app.Query.toObject()
                 }), options.callback);
@@ -908,12 +908,12 @@ app.constructMainMenu = function() {
                     app.$ui.findSelect.selectItem(id);
                 } else if (data.id == 'ordermovies') {
                     var id = data.checked[0].id;
-                    app.$ui.list.sort(user.ui.sort[0].key, id == 'ascending' ? '' : '-');
+                    app.$ui.list.sortList(user.ui.sort[0].key, id == 'ascending' ? '' : '-');
                 } else if (data.id == 'sortmovies') {
                     var id = data.checked[0].id,
                         operator = Ox.getObjectById(app.config.sortKeys, id).operator;
                     app.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator === '' ? 'ascending' : 'descending'));
-                    app.$ui.list.sort(id, operator);
+                    app.$ui.list.sortList(id, operator);
                 }
             },
             click: function(event, data) {

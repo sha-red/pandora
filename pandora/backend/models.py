@@ -189,7 +189,7 @@ class Movie(models.Model):
         poster = {}
         poster['width'] = self.poster_width
         poster['height'] = self.poster_height
-        poster['url'] = '/poster/%s.jpg' % self.movieId
+        poster['url'] = '/%s/poster.jpg' % self.movieId
         '''
         if self.poster:
             poster['url'] = self.poster.url

@@ -108,7 +108,7 @@
             "itemView": "info",
             "listQuery": {"conditions": [], "operator": ""},
             "listsSize": 192,
-            "listView": "list",
+            "listView": "icons",
             "sections": ["history", "lists", "public", "featured"],
             "showGroups": true,
             "showInfo": true,
@@ -119,6 +119,6 @@
             ],
             "theme": "classic"
         },
-        "name": ""
+        "username": ""
     }
 }

@@ -569,6 +569,8 @@ def poster(request, id, size=128):
         else:
             poster_path = movie.poster.path
     else:
+        if not size: size='large'
+        return redirect('http:///0xdb.org/%s/poster.%s.jpg' % (movie.movieId, size))
         poster_path = os.path.join(settings.STATIC_ROOT, 'png/posterDark.48.png')
     return HttpFileResponse(poster_path, content_type='image/jpeg')
 
