@@ -8,6 +8,7 @@ import math
 import random
 import re
 import subprocess
+from glob import glob
 
 from django.db import models
 from django.db.models import Q
@@ -138,7 +139,10 @@ class Movie(models.Model):
     stream_aspect = models.FloatField(default=4/3)
 
     def __unicode__(self):
-        return u'%s (%s)' % (self.get('title'), self.get('year'))
+        year = self.get('year')
+        if year:
+            return u'%s (%s)' % (self.get('title'), self.get('year'))
+        return self.get('title')
 
     def save(self, *args, **kwargs):
         self.json = self.get_json()
@@ -383,27 +387,79 @@ class Movie(models.Model):
         else:
             Facet.objects.filter(movie=self, key='year').delete()
 
-    def updatePoster(self):
-        n = self.files.count() * 3
-        frame = int(math.floor(n/2))
+    def updatePosterUrls(self):
+        _current = {}
+        for s in settings.POSTER_SERVICES:
+            url = s + '?movieId=' + self.movieId
+            try:
+                data = json.loads(ox.net.readUrlUnicode(url))
+            except:
+                continue
+            for service in data:
+                if service not in _current:
+                    _current[service] = []
+                for poster in data[service]:
+                    _current[service].append(poster)
+        #FIXME: remove urls that are no longer listed
+        for service in _current:
+            for poster in _current[service]:
+                p, created = PosterUrl.objects.get_or_create(movie=self, url=poster['url'], service=service)
+                if created:
+                    p.width = poster['width']
+                    p.height = poster['height']
+                    p.save()
+
+    def poster_delete(self):
+        path = self.poster.path
+        self.poster.delete()
+        for f in glob(path.replace('.jpg', '*.jpg')):
+            os.unlink(f)
+
+    def poster_download(self):
+        if not self.poster:
+            url = self.poster_url
+            if not url:
+                self.updatePosterUrls()
+                if self.poster_urls.count() > 0:
+                    url = self.poster_urls.all().order_by('-height')[0].url
+            if url:
+                print url
+                data = ox.net.readUrl(url)
+                self.poster.save('poster.jpg', ContentFile(data))
+                self.save()
+            else:
+                local_posters = self.make_local_posters()
+                if local_posters:
+                    with open(local_posters[0]) as f:
+                        self.poster.save('poster.jpg', ContentFile(f.read()))
+
+    def local_posters(self):
         part = 1
+        posters = {}
         for f in self.files.filter(is_main=True, available=True):
             for frame in f.frames.all():
-                path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster_path(self)))
-                path = path.replace('.jpg', '%s.%s.jpg'%(part, frame.pos))
-                cmd = ['oxposter',
-                       '-t', self.get('title'),
-                       '-d', self.get('director'),
-                       '-f', frame.frame.path,
-                       '-p', path
-                      ]
-                if len(self.movieId) == 7:
-                    cmd += ['-i', self.movieId]
-                else:
-                    cmd += ['-o', self.movieId]
-                print cmd
-                subprocess.Popen(cmd)
+                path = os.path.join(movieid_path(self.movieId), 'poster.pandora.%s.%s.jpg'%(part, frame.position))
+                path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, path))
+                posters[path] = frame.frame.path
             part += 1
+        return posters
+
+    def make_local_posters(self):
+        posters = self.local_posters()
+        for poster in posters:
+            frame = posters[poster]
+            cmd = ['oxposter',
+                   '-t', self.get('title'),
+                   '-d', ', '.join(self.get('directors', ['Unknown Director'])),
+                   '-f', frame,
+                   '-p', poster
+                  ]
+            if len(self.movieId) == 7:
+                cmd += ['-i', self.movieId]
+            cmd += ['-o', self.oxdbId]
+            p = subprocess.Popen(cmd)
+            p.wait()
+        return posters.keys()
 
     @property
     def timeline_prefix(self):
@@ -767,4 +823,18 @@ class Stream(models.Model):
         if self.video and not self.info:
             self.info = ox.avinfo(self.video.path)
         super(Stream, self).save(*args, **kwargs)
-    
+
+class PosterUrl(models.Model):
+    class Meta:
+        unique_together = ("movie", "service", "url")
+        ordering = ('height', )
+
+    movie = models.ForeignKey(Movie, related_name='poster_urls')
+    url = models.CharField(max_length=1024)
+    service = models.CharField(max_length=1024)
+    width = models.IntegerField(default=80)
+    height = models.IntegerField(default=128)
+
+    def __unicode__(self):
+        return u'%s %s %dx%d' % (unicode(self.movie), self.service, self.width, self.height)
+

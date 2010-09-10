@@ -213,7 +213,7 @@ def frame(videoFile, frame, position, width=128, redo=False):
 
 def resize_image(image_source, image_output, width=None, size=None):
     if exists(image_source):
-        source = Image.open(image_source)
+        source = Image.open(image_source).convert('RGB')
         source_width = source.size[0]
         source_height = source.size[1]
         if size:
