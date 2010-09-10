@@ -78,6 +78,7 @@ def api_hello(request):
         return {'status': {'code': int, 'text': string},
                 'data': {user: object}}
     '''
+    #data = json.loads(request.POST['data'])
     response = json_response({})
     if request.user.is_authenticated():
         response['data']['user'] = getUserJSON(request.user)
@@ -278,7 +279,7 @@ def api_getItem(request):
     itemId = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Movie, movieId=itemId)
 	#FIXME: check permissions
-	response['data'] = {'item': item.json}
+	response['data'] = {'item': item.get_json()}
     return render_to_json_response(response)
 
 @login_required_json
@@ -464,20 +465,24 @@ def api_setPoster(request): #parse path and return info
         param data
             {id: movieId, url: string}
         return {'status': {'code': int, 'text': string},
-                data: {poster: url}}
+                data: {poster: {url,width,height}}}
     '''
     data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Movie, movieId=data['id'])
     if item.editable(request.user):
-        #FIXME: check that poster is from allowed url
-        item.poster_url = data['url']
-        if item.poster:
-            item.poster.delete()
-        item.save()
-        response = json_response(status=200, text='ok')
-        response['data']['poster'] = item.get_poster()
+        valid_urls = [p.url for p in item.poster_urls.all()]
+        if data['url'] in valid_urls:
+            item.poster_url = data['url']
+            if item.poster:
+                item.poster.delete()
+            item.save()
+            tasks.updatePoster.delay(item.movieId)
+            response = json_response(status=200, text='ok')
+            response['data']['poster'] = item.get_poster()
+        else:
+            response = json_response(status=403, text='invalid poster url')
 	else:
-        response = json_response(status=403, text='permissino denied')
+        response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 
 def api_getImdbId(request):

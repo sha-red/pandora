@@ -13,6 +13,11 @@ def cronjob(**kwargs):
     print "do some cleanup stuff once a day"
 
 @task(ignore_resulsts=True, queue='default')
+def updatePoster(movieId):
+    movie = models.Movie.objects.get(movieId=movieId)
+    movie.download_poster(True)
+
+@task(ignore_resulsts=True, queue='default')
 def updateImdb(imdbId):
     movie = models.Movie.objects.get(movieId=imdbId)
     movie.updateImdb()

@@ -160,6 +160,9 @@ class Movie(models.Model):
         self.updateSort()
         self.updateFacets()
 
+    '''
+        JSON cache related functions
+    '''
     _public_fields = {
         'movieId': 'id',
         'title':   'title',
@@ -188,8 +191,6 @@ class Movie(models.Model):
         'votes': 'votes',
         'alternative_titles': 'alternative_titles',
         'connections_json': 'connections',
-        'poster_width': 'posterWidth',
-        'poster_height': 'posterHeight'
     }
     def get_poster(self):
         poster = {}
@@ -203,6 +204,35 @@ class Movie(models.Model):
             poster['url'] = self.poster_url
         '''
         return poster
+
+    def get_posters(self):
+        posters = {}
+        for p in self.poster_urls.all():
+            if p.service not in posters:
+                posters[p.service] = []
+            posters[p.service].append({'url': p.url, 'width': p.width, 'height': p.height})
+        local_posters = self.local_posters().keys()
+        if local_posters:
+            posters['local'] = []
+            for p in local_posters:
+                url = p.replace(settings.MEDIA_ROOT, settings.MEDIA_URL)
+                width = 640
+                height = 1024
+                posters['local'].append({'url': url, 'width': width, 'height': height})
+        return posters
+
+    def get_stream(self):
+        stream = {}
+        if self.streams.all().count():
+            s = self.streams.all()[0]
+            if s.video and s.info:
+                stream['duration'] = s.info['duration']
+                if 'video' in s.info and s.info['video']: 
+                    stream['aspectRatio'] = s.info['video'][0]['width'] / s.info['video'][0]['height']
+
+                stream['baseUrl'] = os.path.dirname(s.video.url)
+                stream['profiles'] = list(set(map(lambda s: int(os.path.splitext(s['profile'])[0][:-1]), self.streams.all().values('profile'))))
+        return stream
 
     def get_json(self, fields=None):
         movie = {}
@@ -220,24 +250,12 @@ class Movie(models.Model):
         if not fields:
             movie['stream'] = self.get_stream()
         movie['poster'] = self.get_poster()
+        movie['posters'] = self.get_posters()
         if fields:
             for f in fields:
                 if f.endswith('.length') and f[:-7] in ('cast', 'genre', 'trivia'):
                     movie[f] = getattr(self.sort, f[:-7])
         return movie
-
-    def get_stream(self):
-        stream = {}
-        if self.streams.all().count():
-            s = self.streams.all()[0]
-            if s.video and s.info:
-                stream['duration'] = s.info['duration']
-                if 'video' in s.info and s.info['video']: 
-                    stream['aspectRatio'] = s.info['video'][0]['width'] / s.info['video'][0]['height']
-
-                stream['baseUrl'] = os.path.dirname(s.video.url)
-                stream['profiles'] = list(set(map(lambda s: int(os.path.splitext(s['profile'])[0][:-1]), self.streams.all().values('profile'))))
-        return stream
 
     def fields(self):
         fields = {}
@@ -254,13 +272,10 @@ class Movie(models.Model):
                           self.get('series title', ''), self.get('episode title', ''),
                           self.get('season', ''), self.get('episode', ''))
 
-    def frame(self, position, width=128):
-        stream = self.streams.filter(profile=settings.VIDEO_PROFILE+'.webm')[0]
-        path = os.path.join(settings.MEDIA_ROOT, movieid_path(self.movieId), 'frame', "%d"%width, "%s.jpg"%position)
-        if not os.path.exists(path):
-            extract.frame(stream.video.path, path, position, width)
-        return path
 
+    '''
+        Search related functions
+    '''
     def updateFind(self):
         try:
             f = self.find
@@ -387,79 +402,15 @@ class Movie(models.Model):
         else:
             Facet.objects.filter(movie=self, key='year').delete()
 
-    def updatePosterUrls(self):
-        _current = {}
-        for s in settings.POSTER_SERVICES:
-            url = s + '?movieId=' + self.movieId
-            try:
-                data = json.loads(ox.net.readUrlUnicode(url))
-            except:
-                continue
-            for service in data:
-                if service not in _current:
-                    _current[service] = []
-                for poster in data[service]:
-                    _current[service].append(poster)
-        #FIXME: remove urls that are no longer listed
-        for service in _current:
-            for poster in _current[service]:
-                p, created = PosterUrl.objects.get_or_create(movie=self, url=poster['url'], service=service)
-                if created:
-                    p.width = poster['width']
-                    p.height = poster['height']
-                    p.save()
-
-    def poster_delete(self):
-        path = self.poster.path
-        self.poster.delete()
-        for f in glob(path.replace('.jpg', '*.jpg')):
-            os.unlink(f)
-
-    def poster_download(self):
-        if not self.poster:
-            url = self.poster_url
-            if not url:
-                self.updatePosterUrls()
-                if self.poster_urls.count() > 0:
-                    url = self.poster_urls.all().order_by('-height')[0].url
-            if url:
-                print url
-                data = ox.net.readUrl(url)
-                self.poster.save('poster.jpg', ContentFile(data))
-                self.save()
-            else:
-                local_posters = self.make_local_posters()
-                if local_posters:
-                    with open(local_posters[0]) as f:
-                        self.poster.save('poster.jpg', ContentFile(f.read()))
-
-    def local_posters(self):
-        part = 1
-        posters = {}
-        for f in self.files.filter(is_main=True, available=True):
-            for frame in f.frames.all():
-                path = os.path.join(movieid_path(self.movieId), 'poster.pandora.%s.%s.jpg'%(part, frame.position))
-                path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, path))
-                posters[path] = frame.frame.path
-            part += 1
-        return posters
-
-    def make_local_posters(self):
-        posters = self.local_posters()
-        for poster in posters:
-            frame = posters[poster]
-            cmd = ['oxposter',
-                   '-t', self.get('title'),
-                   '-d', ', '.join(self.get('directors', ['Unknown Director'])),
-                   '-f', frame,
-                   '-p', poster
-                  ]
-            if len(self.movieId) == 7:
-                cmd += ['-i', self.movieId]
-            cmd += ['-o', self.oxdbId]
-            p = subprocess.Popen(cmd)
-            p.wait()
-        return posters.keys()
+    '''
+        Video related functions
+    '''
+    def frame(self, position, width=128):
+        stream = self.streams.filter(profile=settings.VIDEO_PROFILE+'.webm')[0]
+        path = os.path.join(settings.MEDIA_ROOT, movieid_path(self.movieId), 'frame', "%d"%width, "%s.jpg"%position)
+        if not os.path.exists(path):
+            extract.frame(stream.video.path, path, position, width)
+        return path
 
     @property
     def timeline_prefix(self):
@@ -497,6 +448,87 @@ class Movie(models.Model):
             #something with poster
             self.available = True
             self.save()
+
+    '''
+        Poster related functions
+    '''
+    def update_poster_urls(self):
+        _current = {}
+        for s in settings.POSTER_SERVICES:
+            url = s + '?movieId=' + self.movieId
+            try:
+                data = json.loads(ox.net.readUrlUnicode(url))
+            except:
+                continue
+            for service in data:
+                if service not in _current:
+                    _current[service] = []
+                for poster in data[service]:
+                    _current[service].append(poster)
+        #FIXME: remove urls that are no longer listed
+        for service in _current:
+            for poster in _current[service]:
+                p, created = PosterUrl.objects.get_or_create(movie=self, url=poster['url'], service=service)
+                if created:
+                    p.width = poster['width']
+                    p.height = poster['height']
+                    p.save()
+
+    def delete_poster(self):
+        path = self.poster.path
+        self.poster.delete()
+        for f in glob(path.replace('.jpg', '*.jpg')):
+            os.unlink(f)
+
+    def download_poster(self, force=True):
+        if not self.poster or force:
+            url = self.poster_url
+            if not url:
+                self.update_poster_urls()
+                if self.poster_urls.count() > 0:
+                    url = self.poster_urls.all().order_by('-height')[0].url
+            if url:
+                data = ox.net.readUrl(url)
+                if force:
+                    self.delete_poster()
+                self.poster.save('poster.jpg', ContentFile(data))
+                self.save()
+            else:
+                if force:
+                    self.delete_poster()
+                local_posters = self.make_local_posters()
+                if local_posters:
+                    with open(local_posters[0]) as f:
+                        self.poster.save('poster.jpg', ContentFile(f.read()))
+
+    def local_posters(self):
+        part = 1
+        posters = {}
+        for f in self.files.filter(is_main=True, available=True):
+            for frame in f.frames.all():
+                path = os.path.join(movieid_path(self.movieId), 'poster.pandora.%s.%s.jpg'%(part, frame.position))
+                path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, path))
+                posters[path] = frame.frame.path
+            part += 1
+        return posters
+
+    def make_local_posters(self):
+        posters = self.local_posters()
+        for poster in posters:
+            frame = posters[poster]
+            cmd = ['oxposter',
+                   '-t', self.get('title'),
+                   '-d', ', '.join(self.get('directors', ['Unknown Director'])),
+                   '-f', frame,
+                   '-p', poster
+                  ]
+            if len(self.movieId) == 7:
+                cmd += ['-i', self.movieId]
+            cmd += ['-o', self.oxdbId]
+            p = subprocess.Popen(cmd)
+            p.wait()
+        return posters.keys()
+
 
 class MovieFind(models.Model):
     """

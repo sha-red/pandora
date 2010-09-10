@@ -34,7 +34,7 @@ $(function() {
             position = duration/2;
 
         videoWidth += videoWidth%2;
-        videoUrl = video.baseUrl + "/96p." + ($.support.video.webm ? "webm": "mp4");
+        videoUrl = video.baseUrl + "/" + video.profiles[0] + "p." + ($.support.video.webm ? "webm": "mp4");
 
         //resizeVideoPlayers(pageWidth);
 
