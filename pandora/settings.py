@@ -30,10 +30,11 @@ location /protected/ {
 
 
 ADMINS = (
-     ('j', 'j@mailb.org'),
+     #('admin', 'admin@example.com'),
 )
 
-DEFAULT_FROM_EMAIL='bot@0xdb.org'
+DEFAULT_FROM_EMAIL='admin@' + URL.split('/')[0]
+#DEFAULT_FROM_EMAIL='admin@example.com'
 
 MANAGERS = ADMINS
 
@@ -44,7 +45,6 @@ DATABASE_PASSWORD = ''         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
-#CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
 
 #rabbitmq connection settings
 CELERY_RESULT_BACKEND = "database"
@@ -140,7 +140,6 @@ VIDEO_PROFILE = '96p'
 VIDEO_DERIVATIVES = []
 VIDEO_H264 = True
 
-
 #Pad.ma
 #VIDEO_PROFILE = '480p'
 #VIDEO_DERIVATIVES = ['96p', '270p', '360p']
@@ -155,6 +154,9 @@ TRANSMISSON_PASSWORD='transmission'
 
 #list of poster services, https://wiki.0x2620.org/wiki/pandora/posterservice
 POSTER_SERVICES=[]
+
+#0xdb.org
+#POSTER_SERVICES=['http://data.0xdb.org/poster/']
 
 #overwrite default settings with local settings
 try:

@@ -160,6 +160,37 @@ class Movie(models.Model):
         self.updateSort()
         self.updateFacets()
 
+    def delete(self, *args, **kwargs):
+        self.delete_poster()
+        for f in glob("%s*"%self.timeline_prefix):
+            os.unlink(f)
+        for f in glob("%sstrip*"%self.timeline_prefix[:-8]):
+            os.unlink(f)
+        super(Movie, self).delete(*args, **kwargs)
+
+    def mergeWith(self, other):
+        '''
+            move all related tables to other and delete self
+        '''
+        for stream in self.streams.all():
+            stream.movie = other
+            stream.save()
+        for l in self.lists.all():
+            l.movies.remove(self)
+            if l.movies.filter(id=other.id) == 0:
+                l.movies.add(other)
+        #FIXME: should this really happen for layers?
+        for l in self.layer.all():
+            l.movies.remove(self)
+            if l.movies.filter(id=other.id) == 0:
+                l.movies.add(other)
+        if hasattr(self, 'files'):
+            for f in self.files.all():
+                f.movie = other
+                f.save()
+        self.delete()
+        other.save()
+
     '''
         JSON cache related functions
     '''
@@ -455,7 +486,7 @@ class Movie(models.Model):
     def update_poster_urls(self):
         _current = {}
         for s in settings.POSTER_SERVICES:
-            url = s + '?movieId=' + self.movieId
+            url = '%s?movieId=%s'%(s, self.movieId)
             try:
                 data = json.loads(ox.net.readUrlUnicode(url))
             except:
@@ -528,7 +559,6 @@ class Movie(models.Model):
             p = subprocess.Popen(cmd)
             p.wait()
         return posters.keys()
-
 
 class MovieFind(models.Model):
     """
@@ -631,7 +661,6 @@ class MovieSort(models.Model):
     cinematographer_desc = models.TextField(blank=True, db_index=True)
 
     language_desc = models.TextField(blank=True, db_index=True)
-
 
     _private_fields = ('id', 'movie')
     #return available sort fields
@@ -795,7 +824,6 @@ class Collection(models.Model):
 
     def editable(self, user):
         return self.users.filter(id=user.id).count() > 0
-
 
 def movieid_path(h):
     return os.path.join('movie', h[:2], h[2:4], h[4:6], h[6:])
