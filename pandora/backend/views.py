@@ -548,7 +548,7 @@ def frame(request, id, position, size):
         raise Http404
     return HttpFileResponse(frame, content_type='image/jpeg')
 
-def poster(request, id, size=128):
+def poster(request, id, size=None):
     movie = get_object_or_404(models.Movie, movieId=id)
     if size == 'large':
         size = None
@@ -559,7 +559,7 @@ def poster(request, id, size=128):
             if not os.path.exists(poster_path):
                 poster_size = max(movie.poster.width, movie.poster.height)
                 if size > poster_size:
-                    return redirect('/%s/poster.large.jpg' % movie.movieId)
+                    return redirect('/%s/poster.jpg' % movie.movieId)
                 extract.resize_image(movie.poster.path, poster_path, size=size)
         else:
             poster_path = movie.poster.path

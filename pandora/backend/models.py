@@ -887,7 +887,7 @@ class Stream(models.Model):
 class PosterUrl(models.Model):
     class Meta:
         unique_together = ("movie", "service", "url")
-        ordering = ('height', )
+        ordering = ('-height', )
 
     movie = models.ForeignKey(Movie, related_name='poster_urls')
     url = models.CharField(max_length=1024)
