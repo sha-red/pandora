@@ -242,39 +242,15 @@ def firefogg_upload(request):
     response = json_response(status=400, text='this request requires POST')
     return render_to_json_response(response)
 
-"""
 @login_required_json
-def list_files(request):
+def api_editFile(request): #FIXME: should this be file.files. or part of update
     '''
-    GET list
-        > {
-          "files": {
-            "a41cde31c581e11d": {"path": "E/Example, The/An Example.avi", "size":1646274},
-          }
-        }
+        change file / imdb link
     '''
-    response = {}
-    response['files'] = {}
-    qs = models.UserFile.filter(user=request.user)
-    p = Paginator(qs, 1000)
-    for i in p.page_range:
-        page = p.page(i)
-        for f in page.object_list:
-              response['files'][f.movie_file.oshash] = {'path': f.path, 'size': f.movie_file.size}
+    response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
 
-def find_files(request):
-    response = {}
-    query = _parse_query(request)
-    response['files'] = {}
-    qs = models.UserFile.filter(user=request.user).filter(movie_file__movie__id__in=query['q'])
-    p = Paginator(qs, 1000)
-    for i in p.page_range:
-        page = p.page(i)
-        for f in page.object_list:
-              response['files'][f.movie_file.oshash] = {'path': f.path, 'size': f.movie_file.size}
-    return render_to_json_response(response)
-
+"""
 def api_fileInfo(request):
     '''
         param data

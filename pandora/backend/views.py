@@ -34,7 +34,7 @@ import tasks
 from oxuser.models import getUserJSON
 from oxuser.views import api_login, api_logout, api_register, api_contact, api_recover, api_preferences, api_findUser
 
-from archive.views import api_update, api_upload
+from archive.views import api_update, api_upload, api_editFile
 
 from archive.models import File
 from archive import extract
@@ -358,6 +358,9 @@ def api_editLayer(request):
     response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
 
+'''
+    List API
+'''
 @login_required_json
 def api_addListItem(request):
     '''
@@ -412,24 +415,9 @@ def api_removeList(request):
     response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
 
-def api_encodingSettings(request):
-    '''
-        returns Firefogg encoding settings as specified by site
-        return {'status': {'code': int, 'text': string},
-                'data': {'options': {'videoQuality':...}}}
-    '''
-    response = json_response({'options': settings.VIDEO_ENCODING[settings.VIDEO_PROFILE]})
-    return render_to_json_response(response)
-
-
-@login_required_json
-def api_editFile(request): #FIXME: should this be file.files. or part of update
-    '''
-        change file / imdb link
-    '''
-    response = json_response(status=501, text='not implemented')
-    return render_to_json_response(response)
-
+'''
+    Poster API
+'''
 def api_parse(request): #parse path and return info
     '''
         param data
@@ -540,6 +528,9 @@ def apidoc(request):
                                        'sitename': settings.SITENAME,})
     return render_to_response('api.html', context)
 
+'''
+    media and data delivery
+'''
 def data(request, id, data):
     movie = get_object_or_404(models.Movie, movieId=id)
     response = {}
@@ -549,7 +540,6 @@ def data(request, id, data):
         response = movie.metadata.get('cuts', {})
     return render_to_json_response(response)
 
-#media delivery
 def frame(request, id, position, size):
     movie = get_object_or_404(models.Movie, movieId=id)
     position = float(position.replace(',', '.'))
@@ -574,10 +564,8 @@ def poster(request, id, size=128):
         else:
             poster_path = movie.poster.path
     else:
-        '''
         if not size: size='large'
         return redirect('http:///0xdb.org/%s/poster.%s.jpg' % (movie.movieId, size))
-        '''
         poster_path = os.path.join(settings.STATIC_ROOT, 'png/posterDark.48.png')
     return HttpFileResponse(poster_path, content_type='image/jpeg')
 
