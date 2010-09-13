@@ -21,6 +21,7 @@ var app = new Ox.App({
     app.$document = $(document);
     app.$window = $(window);
     app.$ui = {};
+    app.requests = {};
     app.ui = {
         infoRatio: 4 / 3,
         selectedMovies: []
@@ -408,12 +409,13 @@ app.constructGroups = function() {
                         }
                     ],
                     id: 'group_' + id,
-                    request: function(options) {
-                        delete options.keys;
-                        app.request('find', $.extend(options, {
+                    request: function(data, callback) {
+                        Ox.print('sending request', data)
+                        delete data.keys;
+                        return app.api.find($.extend(data, {
                             group: id,
                             query: app.Query.toObject()
-                        }), options.callback);
+                        }), callback);
                     },
                     sort: [
                         {
@@ -435,21 +437,21 @@ app.constructGroups = function() {
                     });
                     query = app.Query.toObject();
                     app.$ui.list.options({
-                        request: function(options) {
-                            return app.request('find', $.extend(options, {
+                        request: function(data, callback) {
+                            return app.api.find($.extend(data, {
                                 query: query
-                            }), options.callback);
+                            }), callback);
                         }
                     });
                     $.each(app.ui.groups, function(i_, group_) {
                         if (i_ != i) {
                             app.$ui.groups[i_].options({
-                                request: function(options) {
-                                    delete options.keys;
-                                    return app.request('find', $.extend(options, {
+                                request: function(data, callback) {
+                                    delete data.keys;
+                                    return app.api.find($.extend(data, {
                                         group: group_.id,
                                         query: app.Query.toObject(group_.id)
-                                    }), options.callback);
+                                    }), callback);
                                 }
                             });
                         }
@@ -463,6 +465,7 @@ app.constructGroups = function() {
             size: width.list,
             title: title
         };
+        Ox.print('--OK--');
     });
     return $groups;
 }
@@ -503,11 +506,11 @@ app.constructList = function(view) {
             columnsMovable: true,
             columnsRemovable: true,
             id: 'list',
-            request: function(options) {
-                Ox.print('options, Query.toObject', options, app.Query.toObject())
-                app.request('find', $.extend(options, {
+            request: function(data, callback) {
+                Ox.print('data, Query.toObject', data, app.Query.toObject())
+                app.api.find($.extend(data, {
                     query: app.Query.toObject()
-                }), options.callback);
+                }), callback);
             },
             sort: app.user.ui.sort
         });
@@ -525,11 +528,11 @@ app.constructList = function(view) {
                 };
             },
             keys: keys,
-            request: function(options) {
-                Ox.print('options, Query.toObject', options, app.Query.toObject())
-                app.request('find', $.extend(options, {
+            request: function(data, callback) {
+                Ox.print('data, Query.toObject', data, app.Query.toObject())
+                app.api.find($.extend(data, {
                     query: app.Query.toObject()
-                }), options.callback);
+                }), callback);
             },
             size: 128,
             sort: app.user.ui.sort,
@@ -557,7 +560,8 @@ app.constructList = function(view) {
             app.$ui.selected.html(app.constructStatus('selected', data));
         },
         openpreview: function(event, data) {
-            app.request('find', {
+            app.requests.preview && app.api.cancel(app.requests.preview);
+            app.requests.preview = app.api.find({
                 keys: ['director', 'id', 'poster', 'title'],
                 query: {
                     conditions: $.map(data.ids, function(id, i) {
@@ -733,7 +737,7 @@ app.constructList = function(view) {
                     });
                 */
             }
-            app.request('find', {
+            app.api.find({
                 query: {
                     conditions: $.map(data.ids, function(id, i) {
                         return {
@@ -998,7 +1002,7 @@ app.constructMainMenu = function() {
                                         label: 'Username',
                                         labelWidth: 120,
                                         validate: function(value, callback) {
-                                            app.request('findUser', {
+                                            app.api.findUser({
                                                 key: 'username',
                                                 value: value,
                                                 operator: '='
@@ -1031,7 +1035,7 @@ app.constructMainMenu = function() {
                                 }
                             ],
                             submit: function(data, callback) {
-                                app.request('login', data, function(result) {
+                                app.api.login(data, function(result) {
                                     if (result.status.code == 200) {
                                         $dialog.close();
                                         app.user = result.data.user;
@@ -1401,7 +1405,7 @@ app.constructToolbar = function() {
                                     Ox.print('autocomplete', key, value);
                                     value === '' && Ox.print('Warning: autocomplete function should never be called with empty value');
                                     if ('autocomplete' in findKey && findKey.autocomplete) {
-                                        app.request('find', {
+                                        app.api.find({
                                             keys: [key],
                                             query: {
                                                 conditions: [
@@ -1450,20 +1454,20 @@ app.constructToolbar = function() {
                             $.each(groups, function(i, group) {
                                 groups[i].query.conditions = [];
                                 app.$ui.groups[i].options({
-                                    request: function(options) {
-                                        delete options.keys;
-                                        return app.request('find', $.extend(options, {
+                                    request: function(data, callback) {
+                                        delete data.keys;
+                                        return app.api.find($.extend(data, {
                                             group: group.id,
                                             query: app.Query.toObject(group.id)
-                                        }), options.callback);
+                                        }), callback);
                                     }
                                 });
                             });
                             app.$ui.list.options({
-                                request: function(options) {
-                                    return app.request('find', $.extend(options, {
+                                request: function(data, callback) {
+                                    return app.api.find($.extend(data, {
                                         query: query = app.Query.toObject()
-                                    }), options.callback);
+                                    }), callback);
                                 }
                             });
                             location.hash = app.Query.toString(query);
@@ -1493,7 +1497,7 @@ app.getGroupWidth = function(pos, panelWidth) {
     //FIXME: how to properly overwrite functions without replacing them
     var super_launch = app.launch;
     app.launch = function() {
-        app.request('hello', function(result) {
+        app.request.send('hello', function(result) {
             app.user = result.data.user;
             if(app.user.group!='guest') {
                 app.menu.getItem('status').options('title', 'User: ' + app.user.username);
@@ -1527,7 +1531,7 @@ app.getGroupWidth = function(pos, panelWidth) {
                                     } else if (value) {
                                         value = value.toLowerCase();
                                         //var order = $.inArray(field, ['year', 'date'])?'-':'';
-                                        app.request('find', {
+                                        app.request.send('find', {
                                             query: {
                                                 conditions: [
                                                 {
@@ -1756,7 +1760,7 @@ app.getGroupWidth = function(pos, panelWidth) {
                 {
                     value: 'Contact',
                     click: function() {
-                        app.request('contact', form.values(),
+                        app.request.send('contact', form.values(),
                         function(result) {
                             if(result.status.code == 200) {
                                 $dialog.close();                               
@@ -1818,7 +1822,7 @@ app.getGroupWidth = function(pos, panelWidth) {
         });
 
         var submit = function() {
-            app.request('login', loginForm.values(), function(result) {
+            app.request.send('login', loginForm.values(), function(result) {
                 if(result.status.code == 200) {
                     $dialog.close();
                     app.user = result.data.user;
@@ -1935,7 +1939,7 @@ app.getGroupWidth = function(pos, panelWidth) {
             }	
         ],
         request: function(options) {
-            app.request('find', $.extend(options, {
+            app.request.send('find', $.extend(options, {
                 query: {
                     conditions: [],
                     operator: ',' // fixme: should be &
@@ -1952,7 +1956,7 @@ app.getGroupWidth = function(pos, panelWidth) {
     app.menu.bindEvent('submit_find', function(event, data) {
         app.results.options({
             request: function(options) {
-                app.request('find', $.extend(options, {
+                app.request.send('find', $.extend(options, {
                     query: {
                         key: data.option.substr(6).toLowerCase(),
                         value: data.value,
