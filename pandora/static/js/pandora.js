@@ -558,7 +558,7 @@ app.constructList = function(view) {
         },
         openpreview: function(event, data) {
             app.request('find', {
-                keys: ['director', 'id', 'posterHeight', 'posterWidth', 'posterURL', 'title'],
+                keys: ['director', 'id', 'poster', 'title'],
                 query: {
                     conditions: $.map(data.ids, function(id, i) {
                         return {
@@ -570,48 +570,54 @@ app.constructList = function(view) {
                     operator: '|'
                 }
             }, function(result) {
-                var item = result.data.items[0],
+                var documentHeight = app.$document.height(),
+                    item = result.data.items[0],
                     title = item.title + (item.director ? ' (' + item.director + ')' : ''),
-                    documentHeight = app.$document.height(),
-                    dialogHeight = documentHeight - 40,
-                    dialogWidth = parseInt((dialogHeight - 48) * 0.75),
-                    $image = $('<img>')
-                        .attr({
-                            src: 'http://0xdb.org/' + item.id + '/poster.large.jpg'
-                        })
-                        .css({
-                            height: (dialogHeight - 48) + 'px',
-                            width: dialogWidth + 'px'
-                        })
-                        .load(function() {
-                            var image = $image[0],
-                                imageHeight = Math.min(image.height, documentHeight - 88),
-                                imageWidth = parseInt(image.width * imageHeight / image.height);
-                            app.$ui.previewDialog.options({
-                                height: imageHeight + 48,
-                                width: imageWidth
-                            });
-                            $image.css({
-                                height: imageHeight + 'px',
-                                width: imageWidth + 'px'
-                            });
-                        });
+                    dialogHeight = documentHeight - 100,
+                    dialogWidth;
+                app.ui.previewRatio = item.poster.width / item.poster.height,
+                dialogWidth = parseInt((dialogHeight - 48) * app.ui.previewRatio);
                 if ('previewDialog' in app.$ui) {
                     app.$ui.previewDialog.options({
                         title: title
                     });
                     app.$ui.previewImage.animate({
                         opacity: 0
-                    }, 250, function() {
-                        app.$ui.previewImage.replaceWith(
-                            $image.css({
-                                opacity: 0
-                            }).animate({
-                                opacity: 1
-                            }, 250));
-                        app.$ui.previewImage = $image;
+                    }, 100, function() {
+                        app.$ui.previewDialog.resize(dialogWidth, dialogHeight, function() {
+                            app.$ui.previewImage
+                                .attr({
+                                    src: item.poster.url,
+                                })
+                                .one('load', function() {
+                                    app.$ui.previewImage
+                                        .css({
+                                            width: dialogWidth + 'px',
+                                            height: (dialogHeight - 48 - 2) + 'px', // fixme: why -2 ?
+                                            opacity: 0
+                                        })
+                                        .animate({
+                                            opacity: 1
+                                        }, 100);
+                                });
+                        });
                     });
+                    Ox.print(app.$document.height(), dialogWidth, 'x', dialogHeight, dialogWidth / (dialogHeight - 48), item.poster.width, 'x', item.poster.height, item.poster.width / item.poster.height)
                 } else {
+                    app.$ui.previewImage = $('<img>')
+                        .attr({
+                            src: item.poster.url
+                        })
+                        .css({
+                            position: 'absolute',
+                            width: dialogWidth + 'px',
+                            height: (dialogHeight - 48 - 2) + 'px', // fixme: why -2 ?
+                            left: 0,
+                            top: 0,
+                            right: 0,
+                            bottom: 0,
+                            margin: 'auto',
+                        });
                     app.$ui.previewDialog = new Ox.Dialog({
                             buttons: [
                                 {
@@ -624,13 +630,32 @@ app.constructList = function(view) {
                                 }
                             ],
                             height: dialogHeight,
+                            id: 'previewDialog',
+                            minHeight: app.ui.previewRatio >= 1 ? 128 / app.ui.previewRatio + 48 : 176,
+                            minWidth: app.ui.previewRatio >= 1 ? 128 : 176 * app.ui.previewRatio,
                             padding: 0,
                             title: title,
                             width: dialogWidth
                         })
-                        .append($image)
+                        .append(app.$ui.previewImage)
+                        .bindEvent('resize', function(event, data) {
+                            var dialogRatio = data.width / (data.height - 48),
+                                height, width;
+                            if (dialogRatio < app.ui.previewRatio) {
+                                width = data.width;
+                                height = width / app.ui.previewRatio;
+                            } else {
+                                height = (data.height - 48 - 2);
+                                width = height * app.ui.previewRatio;
+                            }
+                            app.$ui.previewImage.css({
+                                width: width + 'px',
+                                height: height + 'px', // fixme: why -2 ?
+                            })
+                        })
                         .open();
-                    app.$ui.previewImage = $image;
+                    //app.$ui.previewImage = $image;
+                    //Ox.print(app.$document.height(), dialogWidth, 'x', dialogHeight, dialogWidth / (dialogHeight - 48), item.poster.width, 'x', item.poster.height, item.poster.width / item.poster.height)
                 }
             });
         },
