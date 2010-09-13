@@ -506,12 +506,13 @@ class Movie(models.Model):
                     p.save()
 
     def delete_poster(self):
-        path = self.poster.path
-        self.poster.delete()
-        for f in glob(path.replace('.jpg', '*.jpg')):
-            os.unlink(f)
+        if self.poster:
+            path = self.poster.path
+            self.poster.delete()
+            for f in glob(path.replace('.jpg', '*.jpg')):
+                os.unlink(f)
 
-    def download_poster(self, force=True):
+    def download_poster(self, force=False):
         if not self.poster or force:
             url = self.poster_url
             if not url:
