@@ -409,12 +409,13 @@ app.constructGroups = function() {
                         }
                     ],
                     id: 'group_' + id,
-                    request: function(options) {
-                        delete options.keys;
-                        app.api.find($.extend(options, {
+                    request: function(data, callback) {
+                        Ox.print('sending request', data)
+                        delete data.keys;
+                        return app.api.find($.extend(data, {
                             group: id,
                             query: app.Query.toObject()
-                        }), options.callback);
+                        }), callback);
                     },
                     sort: [
                         {
@@ -436,21 +437,21 @@ app.constructGroups = function() {
                     });
                     query = app.Query.toObject();
                     app.$ui.list.options({
-                        request: function(options) {
-                            return app.api.find($.extend(options, {
+                        request: function(data, callback) {
+                            return app.api.find($.extend(data, {
                                 query: query
-                            }), options.callback);
+                            }), callback);
                         }
                     });
                     $.each(app.ui.groups, function(i_, group_) {
                         if (i_ != i) {
                             app.$ui.groups[i_].options({
-                                request: function(options) {
-                                    delete options.keys;
-                                    return app.api.find($.extend(options, {
+                                request: function(data, callback) {
+                                    delete data.keys;
+                                    return app.api.find($.extend(data, {
                                         group: group_.id,
                                         query: app.Query.toObject(group_.id)
-                                    }), options.callback);
+                                    }), callback);
                                 }
                             });
                         }
@@ -464,6 +465,7 @@ app.constructGroups = function() {
             size: width.list,
             title: title
         };
+        Ox.print('--OK--');
     });
     return $groups;
 }
@@ -504,11 +506,11 @@ app.constructList = function(view) {
             columnsMovable: true,
             columnsRemovable: true,
             id: 'list',
-            request: function(options) {
-                Ox.print('options, Query.toObject', options, app.Query.toObject())
-                app.api.find($.extend(options, {
+            request: function(data, callback) {
+                Ox.print('data, Query.toObject', data, app.Query.toObject())
+                app.api.find($.extend(data, {
                     query: app.Query.toObject()
-                }), options.callback);
+                }), callback);
             },
             sort: app.user.ui.sort
         });
@@ -529,16 +531,16 @@ app.constructList = function(view) {
                     id: data['id'],
                     info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
                     title: data.title + (data.director ? ' (' + data.director + ')' : ''),
-                    url: 'http://0xdb.org/' + data.id + '/poster.' + size + '.' + 'jpg',
+                    url: data.poster.url.replace(/jpg/, size + '.jpg'),
                     width: width
                 };
             },
             keys: keys,
-            request: function(options) {
-                Ox.print('options, Query.toObject', options, app.Query.toObject())
-                app.api.find($.extend(options, {
+            request: function(data, callback) {
+                Ox.print('data, Query.toObject', data, app.Query.toObject())
+                app.api.find($.extend(data, {
                     query: app.Query.toObject()
-                }), options.callback);
+                }), callback);
             },
             size: 128,
             sort: app.user.ui.sort,
@@ -597,7 +599,7 @@ app.constructList = function(view) {
                         app.$ui.previewDialog.resize(dialogWidth, dialogHeight, function() {
                             app.$ui.previewImage
                                 .attr({
-                                    src: item.poster.url,
+                                    src: item.poster.url.replace(/jpg/, 'large.jpg'),
                                 })
                                 .one('load', function() {
                                     app.$ui.previewImage
@@ -616,7 +618,7 @@ app.constructList = function(view) {
                 } else {
                     app.$ui.previewImage = $('<img>')
                         .attr({
-                            src: item.poster.url
+                            src: item.poster.url.replace(/jpg/, 'large.jpg')
                         })
                         .css({
                             position: 'absolute',
@@ -1460,20 +1462,20 @@ app.constructToolbar = function() {
                             $.each(groups, function(i, group) {
                                 groups[i].query.conditions = [];
                                 app.$ui.groups[i].options({
-                                    request: function(options) {
-                                        delete options.keys;
-                                        return app.api.find($.extend(options, {
+                                    request: function(data, callback) {
+                                        delete data.keys;
+                                        return app.api.find($.extend(data, {
                                             group: group.id,
                                             query: app.Query.toObject(group.id)
-                                        }), options.callback);
+                                        }), callback);
                                     }
                                 });
                             });
                             app.$ui.list.options({
-                                request: function(options) {
-                                    return app.api.find($.extend(options, {
+                                request: function(data, callback) {
+                                    return app.api.find($.extend(data, {
                                         query: query = app.Query.toObject()
-                                    }), options.callback);
+                                    }), callback);
                                 }
                             });
                             location.hash = app.Query.toString(query);
