@@ -1,4 +1,7 @@
 {
+    "name": "{{settings.SITENAME}}",
+    "id": "{{settings.SITEID}}",
+    "url": "{{settings.URL}}",
     "findKeys": [
         {"id": "all", "title": "All"},
         {"id": "title", "title": "Title", "autocomplete": true},
