@@ -21,6 +21,7 @@ var app = new Ox.App({
     app.$document = $(document);
     app.$window = $(window);
     app.$ui = {};
+    app.requests = {};
     app.ui = {
         infoRatio: 4 / 3,
         selectedMovies: []
@@ -59,7 +60,7 @@ var app = new Ox.App({
         Ox.print('requestStop')
         app.$ui.loadingIcon.stop();
     });
-    $.each(app.afterLaunch, function(i, f) { f() });
+
 });
 
 
@@ -410,7 +411,7 @@ app.constructGroups = function() {
                     id: 'group_' + id,
                     request: function(options) {
                         delete options.keys;
-                        app.request('find', $.extend(options, {
+                        app.api.find($.extend(options, {
                             group: id,
                             query: app.Query.toObject()
                         }), options.callback);
@@ -436,7 +437,7 @@ app.constructGroups = function() {
                     query = app.Query.toObject();
                     app.$ui.list.options({
                         request: function(options) {
-                            return app.request('find', $.extend(options, {
+                            return app.api.find($.extend(options, {
                                 query: query
                             }), options.callback);
                         }
@@ -446,7 +447,7 @@ app.constructGroups = function() {
                             app.$ui.groups[i_].options({
                                 request: function(options) {
                                     delete options.keys;
-                                    return app.request('find', $.extend(options, {
+                                    return app.api.find($.extend(options, {
                                         group: group_.id,
                                         query: app.Query.toObject(group_.id)
                                     }), options.callback);
@@ -505,7 +506,7 @@ app.constructList = function(view) {
             id: 'list',
             request: function(options) {
                 Ox.print('options, Query.toObject', options, app.Query.toObject())
-                app.request('find', $.extend(options, {
+                app.api.find($.extend(options, {
                     query: app.Query.toObject()
                 }), options.callback);
             },
@@ -528,14 +529,14 @@ app.constructList = function(view) {
                     id: data['id'],
                     info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
                     title: data.title + (data.director ? ' (' + data.director + ')' : ''),
-                    url: data.poster.url.replace(/jpg$/, size + '.jpg'),
+                    url: 'http://0xdb.org/' + data.id + '/poster.' + size + '.' + 'jpg',
                     width: width
                 };
             },
             keys: keys,
             request: function(options) {
                 Ox.print('options, Query.toObject', options, app.Query.toObject())
-                app.request('find', $.extend(options, {
+                app.api.find($.extend(options, {
                     query: app.Query.toObject()
                 }), options.callback);
             },
@@ -565,7 +566,8 @@ app.constructList = function(view) {
             app.$ui.selected.html(app.constructStatus('selected', data));
         },
         openpreview: function(event, data) {
-            app.request('find', {
+            app.requests.preview && app.api.cancel(app.requests.preview);
+            app.requests.preview = app.api.find({
                 keys: ['director', 'id', 'poster', 'title'],
                 query: {
                     conditions: $.map(data.ids, function(id, i) {
@@ -578,35 +580,54 @@ app.constructList = function(view) {
                     operator: '|'
                 }
             }, function(result) {
-                var item = result.data.items[0],
+                var documentHeight = app.$document.height(),
+                    item = result.data.items[0],
                     title = item.title + (item.director ? ' (' + item.director + ')' : ''),
-                    documentHeight = app.$document.height(),
-                    dialogHeight = documentHeight - 40,
-                    dialogWidth = parseInt((dialogHeight - 48) * item.poster.width/item.poster.height),
-                    $image = $('<img>')
-                        .attr({
-                            src: item.poster.url.replace(/jpg/, 'large.jpg')
-                        })
-                        .css({
-                            height: (dialogHeight - 48 -3) + 'px',
-                            width: (dialogWidth - 3*item.poster.width/item.poster.height) + 'px'
-                        });
+                    dialogHeight = documentHeight - 100,
+                    dialogWidth;
+                app.ui.previewRatio = item.poster.width / item.poster.height,
+                dialogWidth = parseInt((dialogHeight - 48) * app.ui.previewRatio);
                 if ('previewDialog' in app.$ui) {
                     app.$ui.previewDialog.options({
                         title: title
                     });
                     app.$ui.previewImage.animate({
                         opacity: 0
-                    }, 250, function() {
-                        app.$ui.previewImage.replaceWith(
-                            $image.css({
-                                opacity: 0
-                            }).animate({
-                                opacity: 1
-                            }, 250));
-                        app.$ui.previewImage = $image;
+                    }, 100, function() {
+                        app.$ui.previewDialog.resize(dialogWidth, dialogHeight, function() {
+                            app.$ui.previewImage
+                                .attr({
+                                    src: item.poster.url,
+                                })
+                                .one('load', function() {
+                                    app.$ui.previewImage
+                                        .css({
+                                            width: dialogWidth + 'px',
+                                            height: (dialogHeight - 48 - 2) + 'px', // fixme: why -2 ?
+                                            opacity: 0
+                                        })
+                                        .animate({
+                                            opacity: 1
+                                        }, 100);
+                                });
+                        });
                     });
+                    Ox.print(app.$document.height(), dialogWidth, 'x', dialogHeight, dialogWidth / (dialogHeight - 48), item.poster.width, 'x', item.poster.height, item.poster.width / item.poster.height)
                 } else {
+                    app.$ui.previewImage = $('<img>')
+                        .attr({
+                            src: item.poster.url
+                        })
+                        .css({
+                            position: 'absolute',
+                            width: dialogWidth + 'px',
+                            height: (dialogHeight - 48 - 2) + 'px', // fixme: why -2 ?
+                            left: 0,
+                            top: 0,
+                            right: 0,
+                            bottom: 0,
+                            margin: 'auto',
+                        });
                     app.$ui.previewDialog = new Ox.Dialog({
                             buttons: [
                                 {
@@ -619,13 +640,32 @@ app.constructList = function(view) {
                                 }
                             ],
                             height: dialogHeight,
+                            id: 'previewDialog',
+                            minHeight: app.ui.previewRatio >= 1 ? 128 / app.ui.previewRatio + 48 : 176,
+                            minWidth: app.ui.previewRatio >= 1 ? 128 : 176 * app.ui.previewRatio,
                             padding: 0,
                             title: title,
                             width: dialogWidth
                         })
-                        .append($image)
+                        .append(app.$ui.previewImage)
+                        .bindEvent('resize', function(event, data) {
+                            var dialogRatio = data.width / (data.height - 48),
+                                height, width;
+                            if (dialogRatio < app.ui.previewRatio) {
+                                width = data.width;
+                                height = width / app.ui.previewRatio;
+                            } else {
+                                height = (data.height - 48 - 2);
+                                width = height * app.ui.previewRatio;
+                            }
+                            app.$ui.previewImage.css({
+                                width: width + 'px',
+                                height: height + 'px', // fixme: why -2 ?
+                            })
+                        })
                         .open();
-                    app.$ui.previewImage = $image;
+                    //app.$ui.previewImage = $image;
+                    //Ox.print(app.$document.height(), dialogWidth, 'x', dialogHeight, dialogWidth / (dialogHeight - 48), item.poster.width, 'x', item.poster.height, item.poster.width / item.poster.height)
                 }
             });
         },
@@ -703,7 +743,7 @@ app.constructList = function(view) {
                     });
                 */
             }
-            app.request('find', {
+            app.api.find({
                 query: {
                     conditions: $.map(data.ids, function(id, i) {
                         return {
@@ -968,7 +1008,7 @@ app.constructMainMenu = function() {
                                         label: 'Username',
                                         labelWidth: 120,
                                         validate: function(value, callback) {
-                                            app.request('findUser', {
+                                            app.api.findUser({
                                                 key: 'username',
                                                 value: value,
                                                 operator: '='
@@ -1001,7 +1041,7 @@ app.constructMainMenu = function() {
                                 }
                             ],
                             submit: function(data, callback) {
-                                app.request('login', data, function(result) {
+                                app.api.login(data, function(result) {
                                     if (result.status.code == 200) {
                                         $dialog.close();
                                         app.user = result.data.user;
@@ -1371,7 +1411,7 @@ app.constructToolbar = function() {
                                     Ox.print('autocomplete', key, value);
                                     value === '' && Ox.print('Warning: autocomplete function should never be called with empty value');
                                     if ('autocomplete' in findKey && findKey.autocomplete) {
-                                        app.request('find', {
+                                        app.api.find({
                                             keys: [key],
                                             query: {
                                                 conditions: [
@@ -1422,7 +1462,7 @@ app.constructToolbar = function() {
                                 app.$ui.groups[i].options({
                                     request: function(options) {
                                         delete options.keys;
-                                        return app.request('find', $.extend(options, {
+                                        return app.api.find($.extend(options, {
                                             group: group.id,
                                             query: app.Query.toObject(group.id)
                                         }), options.callback);
@@ -1431,7 +1471,7 @@ app.constructToolbar = function() {
                             });
                             app.$ui.list.options({
                                 request: function(options) {
-                                    return app.request('find', $.extend(options, {
+                                    return app.api.find($.extend(options, {
                                         query: query = app.Query.toObject()
                                     }), options.callback);
                                 }
@@ -1463,7 +1503,7 @@ app.getGroupWidth = function(pos, panelWidth) {
     //FIXME: how to properly overwrite functions without replacing them
     var super_launch = app.launch;
     app.launch = function() {
-        app.request('hello', function(result) {
+        app.request.send('hello', function(result) {
             app.user = result.data.user;
             if(app.user.group!='guest') {
                 app.menu.getItem('status').options('title', 'User: ' + app.user.username);
@@ -1497,7 +1537,7 @@ app.getGroupWidth = function(pos, panelWidth) {
                                     } else if (value) {
                                         value = value.toLowerCase();
                                         //var order = $.inArray(field, ['year', 'date'])?'-':'';
-                                        app.request('find', {
+                                        app.request.send('find', {
                                             query: {
                                                 conditions: [
                                                 {
@@ -1726,7 +1766,7 @@ app.getGroupWidth = function(pos, panelWidth) {
                 {
                     value: 'Contact',
                     click: function() {
-                        app.request('contact', form.values(),
+                        app.request.send('contact', form.values(),
                         function(result) {
                             if(result.status.code == 200) {
                                 $dialog.close();                               
@@ -1788,7 +1828,7 @@ app.getGroupWidth = function(pos, panelWidth) {
         });
 
         var submit = function() {
-            app.request('login', loginForm.values(), function(result) {
+            app.request.send('login', loginForm.values(), function(result) {
                 if(result.status.code == 200) {
                     $dialog.close();
                     app.user = result.data.user;
@@ -1905,7 +1945,7 @@ app.getGroupWidth = function(pos, panelWidth) {
             }	
         ],
         request: function(options) {
-            app.request('find', $.extend(options, {
+            app.request.send('find', $.extend(options, {
                 query: {
                     conditions: [],
                     operator: ',' // fixme: should be &
@@ -1922,7 +1962,7 @@ app.getGroupWidth = function(pos, panelWidth) {
     app.menu.bindEvent('submit_find', function(event, data) {
         app.results.options({
             request: function(options) {
-                app.request('find', $.extend(options, {
+                app.request.send('find', $.extend(options, {
                     query: {
                         key: data.option.substr(6).toLowerCase(),
                         value: data.value,
