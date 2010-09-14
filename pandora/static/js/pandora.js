@@ -3,11 +3,9 @@
 ***/
 
 var app = new Ox.App({
+    apiURL: '/api/',
     config: '/pandora.json',
     init: 'hello',
-    id: site.id,
-    name: site.name,
-    requestURL: '/api/'
 }).launch(function(data) {
     Ox.print('data', data)
     app.config = data.config;
@@ -599,7 +597,7 @@ app.constructList = function(view) {
                         app.$ui.previewDialog.resize(dialogWidth, dialogHeight, function() {
                             app.$ui.previewImage
                                 .attr({
-                                    src: item.poster.url.replace(/jpg/, 'large.jpg'),
+                                    src: item.poster.url
                                 })
                                 .one('load', function() {
                                     app.$ui.previewImage
@@ -618,7 +616,7 @@ app.constructList = function(view) {
                 } else {
                     app.$ui.previewImage = $('<img>')
                         .attr({
-                            src: item.poster.url.replace(/jpg/, 'large.jpg')
+                            src: item.poster.url
                         })
                         .css({
                             position: 'absolute',
@@ -797,7 +795,7 @@ app.constructMainMenu = function() {
             ],
             id: 'mainMenu',
             menus: [
-                { id: app.options('id') + 'Menu', title: app.options('name'), items: [
+                { id: app.config.site.id + 'Menu', title: app.config.site.name, items: [
                     { id: 'about', title: 'About' },
                     {},
                     { id: 'home', title: 'Home Screen' },

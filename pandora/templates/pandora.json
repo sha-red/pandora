@@ -1,7 +1,4 @@
 {
-    "name": "{{settings.SITENAME}}",
-    "id": "{{settings.SITEID}}",
-    "url": "{{settings.URL}}",
     "findKeys": [
         {"id": "all", "title": "All"},
         {"id": "title", "title": "Title", "autocomplete": true},
@@ -43,6 +40,11 @@
         {"id": "map", "title": "on Map"},
         {"id": "calendar", "title": "on Calendar"}
     ],
+    "site": {
+        "name": "{{settings.SITENAME}}",
+        "id": "{{settings.SITEID}}",
+        "url": "{{settings.URL}}"
+    },
     "sections": [
         {"id": "history", "title": "History"},
         {"id": "lists", "title": "My Lists"},
@@ -90,7 +92,8 @@
         {"id": "files", "title": "Files", "operator": "-", "align": "right", "width": 60},
         {"id": "filename", "title": "Filename", "operator": "", "align": "left", "width": 180},
         {"id": "published", "title": "Date Published", "operator": "-", "align": "left", "width": 90},
-        {"id": "modified", "title": "Date Modified", "operator": "-", "align": "left", "width": 90}
+        {"id": "modified", "title": "Date Modified", "operator": "-", "align": "left", "width": 90},
+        {"id": "popularity", "title": "Popularity", "operator": "-", "align": "left", "width": 60}
     ],
     "totals": [
         {"id": "items"},
