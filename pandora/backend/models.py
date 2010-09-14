@@ -263,8 +263,10 @@ class Movie(models.Model):
                 stream['duration'] = s.info['duration']
                 if 'video' in s.info and s.info['video']: 
                     stream['aspectRatio'] = s.info['video'][0]['width'] / s.info['video'][0]['height']
-
-                stream['baseUrl'] = os.path.dirname(s.video.url)
+                if settings.XSENDFILE or settings.XACCELREDIRECT:
+                    stream['baseUrl'] = '/%s' % self.movieId
+                else:
+                    stream['baseUrl'] = os.path.dirname(s.video.url)
                 stream['profiles'] = list(set(map(lambda s: int(os.path.splitext(s['profile'])[0][:-1]), self.streams.all().values('profile'))))
         return stream
 

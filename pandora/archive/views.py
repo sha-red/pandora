@@ -63,7 +63,6 @@ def api_update(request):
         return {'status': {'code': int, 'text': string},
                 'data': {info: list, data: list, file: list}}
     '''
-    print "here we go fucker", request.user
     data = json.loads(request.POST['data'])
     user = request.user
 
