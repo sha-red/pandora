@@ -37,5 +37,6 @@ Apache setup:
 add pandora repository:
     sudo apt-get install python-software-properties   
     sudo add-apt-repository ppa:j/pandora
+    sudo add-apt-repository ppa:gstreamer-developers/ppa
     sudo apt-get update
     sudo apt-get install oxtools mkvtoolnix
