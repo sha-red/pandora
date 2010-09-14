@@ -16,6 +16,8 @@ urlpatterns = patterns('',
     (r'^$', 'app.views.intro'),
     (r'^ra$', 'app.views.index'),
     (r'^timeline$', 'app.views.timeline'),
+    (r'^file/(?P<oshash>.*)$', 'archive.views.lookup_file'),
+
     (r'^r/(?P<key>.*)$', 'oxuser.views.recover'),
     (r'', include('backend.urls')),
 

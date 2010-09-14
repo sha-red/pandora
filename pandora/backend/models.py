@@ -144,6 +144,9 @@ class Movie(models.Model):
             return u'%s (%s)' % (self.get('title'), self.get('year'))
         return self.get('title')
 
+    def get_absolute_url(self):
+        return '/timeline#%s' % self.movieId
+
     def save(self, *args, **kwargs):
         self.json = self.get_json()
         if not self.oxdbId:

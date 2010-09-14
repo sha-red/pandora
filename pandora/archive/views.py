@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q, Avg, Count, Sum
 from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
+from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404, redirect
 from django.template import RequestContext
 from django.conf import settings
 
@@ -249,6 +249,12 @@ def api_editFile(request): #FIXME: should this be file.files. or part of update
     '''
     response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
+
+
+def lookup_file(request, oshash):
+    f = get_object_or_404(models.File, oshash=oshash)
+    return redirect(f.movie.get_absolute_url())
+    
 
 """
 def api_fileInfo(request):

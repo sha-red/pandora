@@ -235,10 +235,10 @@ app.afterLaunch.push(function() {
                     },
                 ],
                 id: "volume",
-                request: function(options) {
+                request: function(options, callback) {
                     Ox.print("options, volumes", options)
                     if(!options.range) {
-                        options.callback({
+                        callback({
                             data: {
                                 items: 58
                             }
@@ -246,7 +246,7 @@ app.afterLaunch.push(function() {
                     } else {
                         app.local.files(name, function(result) {
                             var fileInfo = result.info;
-                            app.request('update', {
+                            app.api.update({
                                 'volume': name, 'files': result.files
                             }, function(result) {
                                 var videos = {};
@@ -301,7 +301,7 @@ app.afterLaunch.push(function() {
                                             post.info[oshash] = fileInfo[oshash];
                                         }
                                     });
-                                    app.request('update', post, function(result) {
+                                    app.api.update(post, function(result) {
                                         parseResult(result);
                                     });
                                 } else {
@@ -337,7 +337,7 @@ app.afterLaunch.push(function() {
                                 data: data,
                             }
                             Ox.print(r);
-                            options.callback(r);
+                            callback(r);
 
                         });
                     }

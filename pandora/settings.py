@@ -19,12 +19,12 @@ XSENDFILE = False
 
 XACCELREDIRECT = False
 # with nginx:
-#XACCELREDIRECT=[/some/path/, /protected/]
+#XACCELREDIRECT=['/srv/pandora/pandora/media/', '/media/']
 '''
 this assumes the following configuration:
-location /protected/ {
+location /media/ {
   internal;
-  root   /some/path/;
+  root   /srv/pandora/pandora/media/;
 }
 '''
 
