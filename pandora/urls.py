@@ -1,4 +1,9 @@
+# -*- coding: utf-8 -*-
+# vi:si:et:sw=4:sts=4:ts=4
+import os
+
 from django.conf.urls.defaults import *
+from oxdjango.http import HttpFileResponse
 
 from django.conf import settings
 
@@ -6,9 +11,10 @@ from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
 
+def serve_static_file(path, location, content_type):
+    return HttpFileResponse(location, content_type=content_type)
 
 urlpatterns = patterns('',
-    # Example:
     (r'^ajax_filtered_fields/', include('ajax_filtered_fields.urls')),
     (r'^api/upload/$', 'archive.views.firefogg_upload'),
     (r'^site.js$', 'app.views.site_js'),
@@ -27,6 +33,8 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     (r'^admin/(.*)', include(admin.site.urls)),
+    (r'^robots.txt$', serve_static_file, {'location': os.path.join(settings.STATIC_ROOT, 'robots.txt'), 'content_type': 'text/plain'}),
+    (r'^favicon.ico$', serve_static_file, {'location': os.path.join(settings.STATIC_ROOT, 'static/png/icon.16.png'), 'content_type': 'image/x-icon'}),
 )
 
 if settings.DEBUG:
