@@ -173,17 +173,18 @@ def stream(video, target, profile, info):
         cmd += ['-f','webm', target]
 
     print cmd
-    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    p.wait()
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=open('/dev/null', 'w'), stderr=subprocess.STDOUT)
+    p.communicate()
     if format == 'mp4':
         cmd = ['qt-faststart',  "%s.mp4"%target, target]
         print cmd
-        p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        p.wait()
+        p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=open('/dev/null', 'w'), stderr=subprocess.STDOUT)
+        p.communicate()
         os.unlink("%s.mp4"%target)
+    return True
 
 def run_command(cmd, timeout=10):
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(cmd, stdout=open('/dev/null', 'w'), stderr=subprocess.STDOUT)
     while timeout > 0:
         time.sleep(0.2)
         timeout -= 0.2

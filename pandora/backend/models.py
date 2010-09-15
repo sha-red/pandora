@@ -443,7 +443,7 @@ class Movie(models.Model):
     '''
     def frame(self, position, width=128):
         stream = self.streams.filter(profile=settings.VIDEO_PROFILE+'.webm')[0]
-        path = os.path.join(settings.MEDIA_ROOT, movieid_path(self.movieId), 'frame', "%d"%width, "%s.jpg"%position)
+        path = os.path.join(settings.MEDIA_ROOT, movieid_path(self.movieId), 'frames', "%d"%width, "%s.jpg"%position)
         if not os.path.exists(path):
             extract.frame(stream.video.path, path, position, width)
         return path
@@ -832,7 +832,7 @@ class Collection(models.Model):
         return self.users.filter(id=user.id).count() > 0
 
 def movieid_path(h):
-    return os.path.join('movie', h[:2], h[2:4], h[4:6], h[6:])
+    return os.path.join('movies', h[:2], h[2:4], h[4:6], h[6:])
 
 def stream_path(stream):
     return os.path.join(movieid_path(stream.movie.movieId), stream.profile)
@@ -854,25 +854,31 @@ class Stream(models.Model):
     def extract_derivatives(self):
         if settings.VIDEO_H264:
             profile = self.profile.replace('.webm', '.mp4')
-            if Stream.objects.filter(profile=profile, source=self).count() == 0:
-                derivative = Stream(movie=self.movie, source=self, profile=profile)
+            derivative, created = Stream.objects.get_or_create(profile=profile, movie=self.movie)
+            if created:
+                derivative.source = self
                 derivative.video.name = self.video.name.replace(self.profile, profile)
                 derivative.encode()
+                derivative.save()
 
         for p in settings.VIDEO_DERIVATIVES:
             profile = p + '.webm'
             target = self.video.path.replace(self.profile, profile)
-            if Stream.objects.filter(profile=profile, source=self).count() == 0:
-                derivative = Stream(movie=movie.file, source=self, profile=profile)
+            derivative, created = Stream.objects.get_or_create(profile=profile, movie=self.movie)
+            if created:
+                derivative.source = self
                 derivative.video.name = self.video.name.replace(self.profile, profile)
                 derivative.encode()
+                derivative.save()
 
             if settings.VIDEO_H264:
                 profile = p + '.mp4'
-                if Stream.objects.filter(profile=profile, source=self).count() == 0:
-                    derivative = Stream(movie=self.movie, source=self, profile=profile)
+                derivative, created = Stream.objects.get_or_create(profile=profile, movie=self.movie)
+                if created:
+                    derivative.source = self
                     derivative.video.name = self.video.name.replace(self.profile, profile)
                     derivative.encode()
+                    derivative.save()
         return True
 
     def encode(self):

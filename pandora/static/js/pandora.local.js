@@ -1,6 +1,7 @@
 if(typeof(app.afterLaunch) == "undefined")
     app.afterLaunch = [];
 
+//app.afterLaunch[0]();
 app.afterLaunch.push(function() {
     if (typeof(OxFF) == 'undefined')
         return;
@@ -32,7 +33,6 @@ app.afterLaunch.push(function() {
                         .append("For this part of the page to work, you have to allow OxFF to send data to this site")
                         .open();
                 } else {
-                    Ox.print('we got it, lets party');
                     _this.api.login(app.user.username);
                     _this.api.volumes(function(result) {
                         var data = JSON.parse(result);
