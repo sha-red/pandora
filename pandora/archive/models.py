@@ -35,7 +35,7 @@ def parse_decimal(string):
 
 def file_path(f, name):
     h = f.oshash
-    return os.path.join('file', h[:2], h[2:4], h[4:6], h[6:], name)
+    return os.path.join('files', h[:2], h[2:4], h[4:6], h[6:], name)
 
 class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)
