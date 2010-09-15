@@ -891,6 +891,9 @@ class Stream(models.Model):
                 self.available=True
                 self.save()
 
+    def __unicode__(self):
+        return u"%s (%s)" % (self.profile, self.movie)
+
     def save(self, *args, **kwargs):
         if self.video and not self.info:
             self.info = ox.avinfo(self.video.path)
