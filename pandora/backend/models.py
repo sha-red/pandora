@@ -517,13 +517,18 @@ class Movie(models.Model):
             for f in glob(path.replace('.jpg', '*.jpg')):
                 os.unlink(f)
 
+    def prefered_poster_url(self):
+        if self.poster_url:
+            return self.poster_url
+        self.update_poster_urls()
+        for service in settings.POSTER_PRECEDENCE:
+            for u in self.poster_urls.filter(service=service).order_by('-height'):
+                return u.url
+        return None
+
     def download_poster(self, force=False):
         if not self.poster or force:
-            url = self.poster_url
-            if not url:
-                self.update_poster_urls()
-                if self.poster_urls.count() > 0:
-                    url = self.poster_urls.all().order_by('-height')[0].url
+            url = self.prefered_poster_url()
             if url:
                 data = ox.net.readUrl(url)
                 if force:

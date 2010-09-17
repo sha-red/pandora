@@ -17,17 +17,8 @@ JSON_DEBUG = True
 #with apache x-sendfile or lighttpd set this to True
 XSENDFILE = False
 
+#with nginx X-Accel-Redirect set this to True
 XACCELREDIRECT = False
-# with nginx:
-#XACCELREDIRECT=['/srv/pandora/pandora/media/', '/media/']
-'''
-this assumes the following configuration:
-location /media/ {
-  internal;
-  root   /srv/pandora/pandora/media/;
-}
-'''
-
 
 ADMINS = (
      #('admin', 'admin@example.com'),
@@ -154,6 +145,7 @@ TRANSMISSON_PASSWORD='transmission'
 
 #list of poster services, https://wiki.0x2620.org/wiki/pandora/posterservice
 POSTER_SERVICES=[]
+POSTER_PRECEDENCE=('local', 'criterion.com', 'wikipedia.org', 'impawards.com', 'movieposterdb.com', 'imdb.com', 'allmovie.com', 'other')
 
 #0xdb.org
 #POSTER_SERVICES=['http://data.0xdb.org/poster/']
