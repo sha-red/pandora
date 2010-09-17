@@ -191,6 +191,20 @@ app.afterLaunch.push(function() {
                 }
             );
         },
+        uploadFile: function(oshash) {
+            Ox.print('upload file', oshash);
+            var url = app.local.absolute_url('/api/');
+            app.local.upload({
+                url: url,
+                data: {action: 'upload', oshash: oshash},
+                oshash: oshash,
+                action: 'file'
+                },
+                function(result) {
+                    Ox.print(result);
+                }
+            );
+        },
         cancel: function(oshash) {
             Ox.print('this function needs to be implemented: cancel ', oshash);
         },
@@ -251,6 +265,7 @@ app.afterLaunch.push(function() {
                             }, function(result) {
                                 var videos = {};
                                 function parseResult(result) {
+                                    //extract and upload requested videos
                                     $.each(result.data.data, function(i, oshash) {
                                         $.each(folder_ids, function(i, ids) {
                                             if($.inArray(oshash, ids) > -1) {
@@ -292,6 +307,10 @@ app.afterLaunch.push(function() {
                                                 return false;
                                             }
                                         });
+                                    });
+                                    //upload requested files
+                                    $.each(result.data.file, function(i, oshash) {
+                                        app.local.uploadFile(oshash);
                                     });
                                 };
                                 if (result.data.info.length>0) {

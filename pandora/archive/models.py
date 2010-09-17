@@ -144,7 +144,8 @@ class File(models.Model):
     data = models.FileField(null=True, blank=True, upload_to=lambda f, x: file_path(f, 'data.raw'))
 
     def contents(self):
-        if self.data:
+        if self.data != None:
+            self.data.seek(0)
             return self.data.read()
         return None
 

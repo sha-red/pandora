@@ -67,7 +67,7 @@ def api_update(request):
     user = request.user
 
     response = json_response({'info': [], 'data': [], 'file': []})
-    
+    volume = None
     if 'files' in data:
         volume, created = models.Volume.objects.get_or_create(user=user, name=data['volume'])
         all_files = []
@@ -149,6 +149,8 @@ def api_update(request):
                     instance.file.save()
 
     files = models.FileInstance.objects.filter(volume__user=user, file__available=False)
+    if volume:
+        files = files.filter(volume=volume)
     response['data']['info'] = [f.file.oshash for f in files.filter(file__info='{}')]
     #needs some flag to find those that are actually used main is to generic
     response['data']['data'] = [f.file.oshash for f in files.filter(file__is_video=True, file__is_main=True)]
@@ -169,7 +171,6 @@ def api_upload(request):
     '''
     user = request.user
     f = get_object_or_404(models.File, oshash=request.POST['oshash'])
-    print request.FILES
     if 'frame' in request.FILES:
         if f.frames.count() == 0:
             for frame in request.FILES.getlist('frame'):
@@ -183,9 +184,11 @@ def api_upload(request):
         else:
             response = json_response(status=403, text='permissino denied')
     if 'file' in request.FILES:
-        if not f.data:
+        if not f.available:
             f.data.save('data.raw', request.FILES['file'])
-            response = json_response({})
+            f.available = True
+            f.save()
+            response = json_response(status=200, text='file saved')
         else:
             response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
