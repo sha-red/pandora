@@ -25,7 +25,7 @@ var app = new Ox.App({
         selectedMovies: []
     };
 
-    app.Query.fromString(location.hash.substr(1));
+    app.Query.fromString(location.hash.substr(2));
 
     app.$ui.mainMenu = app.constructMainMenu();
     app.$ui.sections = app.constructSections();
@@ -192,7 +192,7 @@ app.Query = (function() {
 
         toString: function() {
             Ox.print('tS', app.user.ui.find)
-            return Ox.serialize({
+            return '!' + Ox.serialize({
                 find: constructFind(app.Query.toObject()),
                 sort: app.user.ui.sort[0].operator + app.user.ui.sort[0].key,
                 view: app.user.ui.listView
@@ -258,6 +258,20 @@ app.Query = (function() {
 */
 
 app.constructApp = function() {
+    /*
+    app
+        mainMenu
+        mainPanel
+            leftPanel
+                lists
+                info
+            rightPanel
+                toolbar
+                contentPanel
+                    (browser)
+                    (content)
+                statusbar
+    */
     return new Ox.SplitPanel({
         elements: [
             {
@@ -516,21 +530,15 @@ app.constructList = function(view) {
         $list = new Ox.IconList({
             id: 'list',
             item: function(data, sort, size) {
+                var ratio = data.poster.width / data.poster.height;
                 size = size || 128;
-                if(data.poster.height>data.poster.width) {
-                    var height = size,
-                        width  = height * data.poster.width / data.poster.height;
-                } else {
-                    var width = size,
-                        height  = width * data.poster.height / data.poster.width;
-                }
                 return {
-                    height: height,
+                    height: ratio <= 1 ? size : size / ratio,
                     id: data['id'],
                     info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
                     title: data.title + (data.director ? ' (' + data.director + ')' : ''),
                     url: data.poster.url.replace(/jpg/, size + '.jpg'),
-                    width: width
+                    width: ratio >= 1 ? size : size * ratio
                 };
             },
             keys: keys,

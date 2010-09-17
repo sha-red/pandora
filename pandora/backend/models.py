@@ -478,7 +478,7 @@ class Movie(models.Model):
                 self.stream_aspect = stream.info['video'][0]['width']/stream.info['video'][0]['height']
                 self.metadata['cuts'] = extract.cuts(self.timeline_prefix)
                 self.metadata['average_color'] = extract.average_color(self.timeline_prefix)
-                extract.timeline_strip(self, self.metadata['cuts'], stream.info, self.timeline_prefix[:-8])
+                #extract.timeline_strip(self, self.metadata['cuts'], stream.info, self.timeline_prefix[:-8])
 
             stream.extract_derivatives()
             #something with poster
