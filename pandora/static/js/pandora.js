@@ -503,6 +503,60 @@ app.constructInfo = function() {
         );
 }
 
+app.constructItem = function(id, view) {
+    var $item;
+    //location.hash = '!' + id;
+    app.$ui.contentPanel.resize(0, 80);
+    app.$ui.groupsOuterPanel.empty();
+    if (view == 'timeline') {
+        // fixme: this should be one app request, not three getJSONs
+        $.getJSON('/' + id + '/data/video.json', function(data) {
+            var video = data;
+            video.height = 96;
+            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
+            video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
+            $.getJSON('/' + id + '/data/subtitles.json', function(data) {
+                var subtitles = data;
+                $.getJSON('/' + id + '/data/cuts.json', function(data) {
+                    var cuts = data;
+                    $item = new Ox.VideoEditor({
+                        cuts: cuts,
+                        duration: video.duration,
+                        find: '',
+                        id: 'editor',
+                        largeTimeline: true,
+                        matches: [],
+                        points: [0, 0],
+                        position: 0,
+                        posterFrame: parseInt(video.duration / 2),
+                        subtitles: subtitles,
+                        videoHeight: video.height,
+                        videoId: id,
+                        videoWidth: video.width,
+                        videoSize: 'small',
+                        videoURL: video.url,
+                        width: app.$document.width() - app.$ui.leftPanel.width() - 1 - 256 - 1
+                    });
+                    app.$ui.contentPanel.replace(1, $item);
+                    app.$ui.rightPanel
+                        /*.unbindEvent('resize')*/
+                        .bindEvent('resize', function(event, data) {
+                            Ox.print('seems to work', data)
+                            $item.options({
+                                width: data - 256 - 1
+                            });
+                        });
+                    app.$window.resize(function() {
+                        $item.options({
+                            width: app.$document.width() - app.$ui.leftPanel.width() - 1 - 256 - 1
+                        });
+                    });
+                });
+            });
+        });
+    }
+}
+
 app.constructList = function(view) {
     var $list,
         keys = ['director', 'id', 'poster', 'title', 'year'];
@@ -572,6 +626,9 @@ app.constructList = function(view) {
                 data[v.id] = 0;
             });
             app.$ui.selected.html(app.constructStatus('selected', data));
+        },
+        open: function(event, data) {
+            app.constructItem(data.ids[0], 'timeline')
         },
         openpreview: function(event, data) {
             app.requests.preview && app.api.cancel(app.requests.preview);
@@ -703,6 +760,7 @@ app.constructList = function(view) {
                             width = app.$ui.info.width(),
                             height = imageHeight * width / imageWidth;
                         app.ui.infoRatio = width / height;
+                        app.$ui.leftPanel.resize('infoPanel', height + 16);
                         $still.css({
                                 position: 'absolute',
                                 left: 0,
@@ -930,7 +988,7 @@ app.constructMainMenu = function() {
                     { id: 'report', title: 'Report a Bug' },
                 ] },
                 { id: 'helpMenu', title: 'Help', items: [
-                    { id: 'help', title: app.options('name') + ' Help', keyboard: 'shift ?' }
+                    { id: 'help', title: app.config.site.name + ' Help', keyboard: 'shift ?' }
                 ] },
                 { id: 'debugMenu', title: 'Debug', items: [
                     { id: 'query', title: 'Show Query' }
