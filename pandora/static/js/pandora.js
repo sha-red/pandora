@@ -350,7 +350,14 @@ app.constructApp = function() {
                                                                 size: app.ui.groups[4].size
                                                             },
                                                         ],
+                                                        id: 'browser',
                                                         orientation: 'horizontal'
+                                                    })
+                                                    .bindEvent('resize', function(event, data) {
+                                                        Ox.print('resizing groups...')
+                                                        $.each(app.$ui.groups, function(i, list) {
+                                                            list.resize();
+                                                        });
                                                     }),
                                                     resizable: true,
                                                     resize: [96, 112, 128, 144, 160, 176],
@@ -381,6 +388,7 @@ app.constructApp = function() {
                                 $.each(app.$ui.groups, function(i, list) {
                                     list.resizeColumn('name', widths[i].column);
                                 });
+                                app.$ui.list.resize();
                             })
                         }
                     ],
@@ -580,6 +588,11 @@ app.constructList = function(view) {
                 }), callback);
             },
             sort: app.user.ui.sort
+        })
+        .bindEvent({
+            resize: function(event, data) {
+                $list.resize();
+            }
         });
     } else if (view == 'icons') {
         $list = new Ox.IconList({
