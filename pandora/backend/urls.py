@@ -12,7 +12,6 @@ urlpatterns = patterns("backend.views",
     (r'^(?P<id>.*)/poster\.(?P<size>large)\.jpg$', 'poster'),
     (r'^(?P<id>.*)/poster\.jpg$', 'poster'),
     (r'^(?P<id>.*)/timelines/(?P<timeline>.+)\.(?P<size>\d+)\.(?P<position>\d+)\.png$', 'timeline'),
-    (r'^(?P<id>.*)/data/(?P<data>.+)\.json$', 'data'),
     (r'^api/$', 'api'),
 )
 

@@ -373,7 +373,9 @@ app.afterLaunch.push(function() {
         absolute_url: function (url) {
             var base = document.location.href;
             if (url.substring(0, 1) == '/') {
-                url = document.location.href.substring(0, document.location.href.length-document.location.pathname.length) + url;
+                base = document.location.protocol + '//' + document.location.hostname;
+                if(document.location.port) base += ':'+document.location.port
+                url = base + url;
             }
             else {
                 if(base.substring(base.length-1) == '/')

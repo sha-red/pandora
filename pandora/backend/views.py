@@ -532,17 +532,8 @@ def apidoc(request):
     return render_to_response('api.html', context)
 
 '''
-    media and data delivery
+    media delivery
 '''
-def data(request, id, data):
-    movie = get_object_or_404(models.Movie, movieId=id)
-    response = {}
-    if data == 'video':
-        response = movie.get_stream()
-    if data == 'cuts':
-        response = movie.metadata.get('cuts', {})
-    return render_to_json_response(response)
-
 def frame(request, id, position, size):
     movie = get_object_or_404(models.Movie, movieId=id)
     position = float(position.replace(',', '.'))
