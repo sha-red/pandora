@@ -270,6 +270,16 @@ class Movie(models.Model):
                 stream['profiles'] = list(set(map(lambda s: int(os.path.splitext(s['profile'])[0][:-1]), self.streams.all().values('profile'))))
         return stream
 
+    def get_layers(self):
+        layers = {}
+        layers['cuts'] = self.metadata.get('cuts', {})
+        
+        layers['subtitles'] = {}
+        qs = self.files.filter(is_subtitle=True, is_main=True, available=True)
+        if qs.count()>0:
+            layers['subtitles'] = qs[0].srt()
+        return layers
+
     def get_json(self, fields=None):
         movie = {}
         for key in self._public_fields:

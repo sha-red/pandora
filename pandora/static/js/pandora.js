@@ -518,56 +518,51 @@ app.constructItem = function(id, view) {
     app.$ui.contentPanel.resize(0, 80);
     app.$ui.groupsOuterPanel.empty();
     if (view == 'timeline') {
-        // fixme: this should be one app request, not three getJSONs
-        $.getJSON('/' + id + '/data/video.json', function(data) {
-            var video = data;
-            video.height = 96;
-            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
-            video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
-            $.getJSON('/' + id + '/data/subtitles.json', function(data) {
-                var subtitles = data;
-                subtitles = [{
+        app.api.getItem(id, function(result) {
+            item_debug = result.data.item;
+            var video = result.data.item.stream,
+                cuts = result.data.item.layers.cuts || {},
+                subtitles = result.data.item.layers.subtitles || [{
                     'in': 5,
                     'out': 10,
                     'text': 'This subtitle is just a test...'
                 }];
-                $.getJSON('/' + id + '/data/cuts.json', function(data) {
-                    var cuts = data;
-                    $item = new Ox.VideoEditor({
-                        cuts: cuts,
-                        duration: video.duration,
-                        find: '',
-                        frameURL: function(position) {
-                            return '/' + id + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
-                        },
-                        id: 'editor',
-                        largeTimeline: true,
-                        matches: [],
-                        points: [0, 0],
-                        position: 0,
-                        posterFrame: parseInt(video.duration / 2),
-                        subtitles: subtitles,
-                        videoHeight: video.height,
-                        videoId: id,
-                        videoWidth: video.width,
-                        videoSize: 'small',
-                        videoURL: video.url,
-                        width: app.$document.width() - app.$ui.leftPanel.width() - 1 - 256 - 1
+            video.height = 96;
+            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
+            video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
+            $item = new Ox.VideoEditor({
+                cuts: cuts,
+                duration: video.duration,
+                find: '',
+                frameURL: function(position) {
+                    return '/' + id + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
+                },
+                id: 'editor',
+                largeTimeline: true,
+                matches: [],
+                points: [0, 0],
+                position: 0,
+                posterFrame: parseInt(video.duration / 2),
+                subtitles: subtitles,
+                videoHeight: video.height,
+                videoId: id,
+                videoWidth: video.width,
+                videoSize: 'small',
+                videoURL: video.url,
+                width: app.$document.width() - app.$ui.leftPanel.width() - 1 - 256 - 1
+            });
+            app.$ui.contentPanel.replace(1, $item);
+            app.$ui.rightPanel
+                /*.unbindEvent('resize')*/
+                .bindEvent('resize', function(event, data) {
+                    Ox.print('seems to work', data)
+                    $item.options({
+                        width: data - 256 - 1
                     });
-                    app.$ui.contentPanel.replace(1, $item);
-                    app.$ui.rightPanel
-                        /*.unbindEvent('resize')*/
-                        .bindEvent('resize', function(event, data) {
-                            Ox.print('seems to work', data)
-                            $item.options({
-                                width: data - 256 - 1
-                            });
-                        });
-                    app.$window.resize(function() {
-                        $item.options({
-                            width: app.$document.width() - app.$ui.leftPanel.width() - 1 - 256 - 1
-                        });
-                    });
+                });
+            app.$window.resize(function() {
+                $item.options({
+                    width: app.$document.width() - app.$ui.leftPanel.width() - 1 - 256 - 1
                 });
             });
         });
