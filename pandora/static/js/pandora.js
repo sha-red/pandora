@@ -183,7 +183,7 @@ app.Query = (function() {
                     }
                 }) : []),
                 operator = conditions.length < 2 ? '' : ','; // fixme: should be &
-            Ox.print(groupId, app.user.ui.find, conditions);
+            Ox.print('>>', groupId, app.user.ui.find, conditions);
             return {
                 conditions: conditions,
                 operator: operator
@@ -393,8 +393,8 @@ app.constructApp = function() {
 }
 
 app.constructGroups = function() {
-    $groups = [];
-    var panelWidth = app.$document.width() - app.user.ui.listsSize - 1;
+    var $groups = [],
+        panelWidth = app.$document.width() - app.user.ui.listsSize - 1;
     app.ui.groups = $.map(app.config.groups, function(id, i) {
         var title = Ox.getObjectById(app.config.sortKeys, id).title,
             width = app.getGroupWidth(i, panelWidth);
@@ -457,6 +457,7 @@ app.constructGroups = function() {
                     });
                     $.each(app.ui.groups, function(i_, group_) {
                         if (i_ != i) {
+                            Ox.print('setting groups request', i, i_)
                             app.$ui.groups[i_].options({
                                 request: function(data, callback) {
                                     delete data.keys;
@@ -1523,8 +1524,8 @@ app.constructToolbar = function() {
                                     operator: ''
                                 }
                             ];
-                            $.each(groups, function(i, group) {
-                                groups[i].query.conditions = [];
+                            $.each(app.ui.groups, function(i, group) {
+                                group.query.conditions = [];
                                 app.$ui.groups[i].options({
                                     request: function(data, callback) {
                                         delete data.keys;

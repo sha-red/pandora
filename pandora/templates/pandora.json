@@ -108,7 +108,7 @@
         "preferences": {},
         "ui": {
             "columns": ["id", "title", "director", "country", "year", "language", "genre"],
-            "findQuery": {"conditions": [{"key": "", "value": "", "operator": ""}], "operator": ""},
+            "findQuery": {"conditions": [], "operator": ""},
             "groupsQuery": {"conditions": [], "operator": "|"},
             "groupsSize": 128,
             "itemView": "info",
