@@ -273,13 +273,13 @@ def api_getItem(request):
         param data
             string id
 
-		return item array
+        return item array
     '''
     response = json_response({})
     itemId = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Movie, movieId=itemId)
-	#FIXME: check permissions
-	response['data'] = {'item': item.get_json()}
+    #FIXME: check permissions
+    response['data'] = {'item': item.get_json()}
     return render_to_json_response(response)
 
 @login_required_json
@@ -294,8 +294,8 @@ def api_editItem(request):
     item = get_object_or_404_json(models.Movie, movieId=data['id'])
     if item.editable(request.user):
         response = json_response(status=501, text='not implemented')
-		item.edit(data)
-	else:
+        item.edit(data)
+    else:
         response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
 
@@ -310,9 +310,9 @@ def api_removeItem(request):
     response = json_response({})
     itemId = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Movie, movieId=itemId)
-	if item.editable(request.user):
+    if item.editable(request.user):
         response = json_response(status=501, text='not implemented')
-	else:
+    else:
         response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
 
@@ -326,7 +326,7 @@ def api_info(request):
     response = json_response({})
     itemId = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Movie, movieId=itemId)
-	response['data'] = {'info': movie.get_stream())}
+    response['data'] = {'info': movie.get_stream())}
     return render_to_json_response(response)
 
 def api_subtitles(request):
@@ -339,7 +339,7 @@ def api_subtitles(request):
     response = json_response({})
     itemId = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Movie, movieId=itemId)
-	response['data'] = {'subtitles': movie.metadata.get('subtitles', {})}
+    response['data'] = {'subtitles': movie.metadata.get('subtitles', {})}
     return render_to_json_response(response)
 
 def api_cuts(request):
@@ -352,7 +352,7 @@ def api_cuts(request):
     response = json_response({})
     itemId = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Movie, movieId=itemId)
-	response['data'] = {'cuts': movie.metadata.get('cuts', {})}
+    response['data'] = {'cuts': movie.metadata.get('cuts', {})}
     return render_to_json_response(response)
 
 @login_required_json
@@ -388,10 +388,10 @@ def api_editLayer(request):
     response = json_response({})
     data = json.loads(request.POST['data'])
     layer = get_object_or_404_json(models.Layer, pk=data['id'])
-	if layer.editable(request.user):
-		response = json_response(status=501, text='not implemented')
-	else:
-		response = json_response(status=403, text='permission denied')
+    if layer.editable(request.user):
+        response = json_response(status=501, text='not implemented')
+    else:
+        response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 
     response = json_response(status=501, text='not implemented')
@@ -483,7 +483,7 @@ def api_setPosterFrame(request): #parse path and return info
         item.poster_frame = data['position']
         item.save()
         response = json_response(status=200, text='ok')
-	else:
+    else:
         response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
 
@@ -508,7 +508,7 @@ def api_setPoster(request): #parse path and return info
             response['data']['poster'] = item.get_poster()
         else:
             response = json_response(status=403, text='invalid poster url')
-	else:
+    else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 
@@ -523,7 +523,7 @@ def api_getImdbId(request):
     if imdbId:
         response = json_response({'imdbId': imdbId})
     else:
-		response = json_response(status=404, text='not found')
+        response = json_response(status=404, text='not found')
     return render_to_json_response(response)
 
 def apidoc(request):
