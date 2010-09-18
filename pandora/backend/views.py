@@ -326,7 +326,7 @@ def api_info(request):
     response = json_response({})
     itemId = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Movie, movieId=itemId)
-    response['data'] = {'info': movie.get_stream())}
+    response['data'] = {'info': movie.get_stream()}
     return render_to_json_response(response)
 
 def api_subtitles(request):
