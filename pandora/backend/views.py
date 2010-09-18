@@ -316,6 +316,45 @@ def api_removeItem(request):
         response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
 
+def api_info(request):
+    '''
+        param data
+            string id
+
+        return {'status': {'code': int, 'text': string}, 'data': {'info': {}}}
+    '''
+    response = json_response({})
+    itemId = json.loads(request.POST['data'])
+    item = get_object_or_404_json(models.Movie, movieId=itemId)
+	response['data'] = {'info': movie.get_stream())}
+    return render_to_json_response(response)
+
+def api_subtitles(request):
+    '''
+        param data
+            string id
+
+        return {'status': {'code': int, 'text': string}, 'data': {'subtitles': {}}}
+    '''
+    response = json_response({})
+    itemId = json.loads(request.POST['data'])
+    item = get_object_or_404_json(models.Movie, movieId=itemId)
+	response['data'] = {'subtitles': movie.metadata.get('subtitles', {})}
+    return render_to_json_response(response)
+
+def api_cuts(request):
+    '''
+        param data
+            string id
+
+        return {'status': {'code': int, 'text': string}, 'data': {'cuts': {}}}
+    '''
+    response = json_response({})
+    itemId = json.loads(request.POST['data'])
+    item = get_object_or_404_json(models.Movie, movieId=itemId)
+	response['data'] = {'cuts': movie.metadata.get('cuts', {})}
+    return render_to_json_response(response)
+
 @login_required_json
 def api_addLayer(request):
     '''
