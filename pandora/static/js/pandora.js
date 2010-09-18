@@ -526,12 +526,20 @@ app.constructItem = function(id, view) {
             video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
             $.getJSON('/' + id + '/data/subtitles.json', function(data) {
                 var subtitles = data;
+                subtitles = [{
+                    'in': 5,
+                    'out': 10,
+                    'text': 'This subtitle is just a test...'
+                }];
                 $.getJSON('/' + id + '/data/cuts.json', function(data) {
                     var cuts = data;
                     $item = new Ox.VideoEditor({
                         cuts: cuts,
                         duration: video.duration,
                         find: '',
+                        frameURL: function(position) {
+                            return '/' + id + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
+                        },
                         id: 'editor',
                         largeTimeline: true,
                         matches: [],
