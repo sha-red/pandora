@@ -72,15 +72,15 @@ def api_update(request):
         volume, created = models.Volume.objects.get_or_create(user=user, name=data['volume'])
         all_files = []
         for f in data['files']:
-            print f
+            #print f
             path = f['path']
             folder = path.split('/')
             name = folder.pop()
             if folder and folder[-1] in ('Extras', 'Versions', 'DVDs'):
                 name = '/'.join([folder.pop(), name])
             folder = '/'.join(folder)
-            print folder
-            print name
+            #print folder
+            #print name
             f['folder'] = folder
             f['name'] = name
             oshash = f['oshash']
