@@ -8,12 +8,16 @@ from oxdjango.shortcuts import json_response, render_to_json_response, get_objec
 
 import models
 
+from backend.views import html_snapshot
+
 def intro(request):
     context = RequestContext(request, {'settings':settings})
     return render_to_response('intro.html', context)
 
 def index(request):
     context = RequestContext(request, {'settings':settings})
+    if request.GET.get('_escaped_fragment_', None):
+        return html_snapshot(request)
     return render_to_response('index.html', context)
 
 def timeline(request):

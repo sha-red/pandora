@@ -578,3 +578,14 @@ def video(request, id, profile):
     content_type = path.endswith('.mp4') and 'video/mp4' or 'video/webm'
     return HttpFileResponse(path, content_type=content_type)
 
+
+'''
+    ajax html snapshots
+    http://code.google.com/web/ajaxcrawling/docs/html-snapshot.html    
+'''
+def html_snapshot(request):
+    fragment = unquote(request.GET['_escaped_fragment_'])
+    url = request.build_absolute_uri('/ra')
+    url = 'http://'+settings.URL
+    response = HttpResponse('sorry, server side rendering for %s!#%s not yet implemented'%(url, fragment))
+    return response
