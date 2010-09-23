@@ -3,7 +3,7 @@
 
 from django.contrib import admin
 
-#from forms import FileAdminForm, MovieAdminForm, ArchiveFileAdminForm
+#from forms import FileAdminForm, ItemAdminForm, ArchiveFileAdminForm
 import models
 
 class FileAdmin(admin.ModelAdmin):

@@ -103,8 +103,8 @@ def _order_query(qs, sort, prefix='sort__'):
     for e in sort:
         operator = e['operator']
         if operator != '-': operator = ''
-        key = {'id': 'movieId'}.get(e['key'], e['key'])
-        #FIXME: this should be a property of models.MovieSort!!!
+        key = {'id': 'itemId'}.get(e['key'], e['key'])
+        #FIXME: this should be a property of models.ItemSort!!!
         if operator=='-' and key in ('title', 'director', 'writer', 'producer', 'editor', 'cinematographer', 'language', 'country', 'year'):
             key = '%s_desc' % key
         order = '%s%s%s' % (operator, prefix, key)
@@ -120,7 +120,7 @@ def _parse_query(data, user):
     for key in ('sort', 'keys', 'group', 'list', 'range', 'ids'):
         if key in data:
             query[key] = data[key]
-    query['qs'] = models.Movie.objects.find(data, user)
+    query['qs'] = models.Item.objects.find(data, user)
     #group by only allows sorting by name or number of itmes
     return query
 
@@ -204,10 +204,10 @@ Positions
         else:
             query['sort'] = [{'key': 'name', 'operator':'+'}]
         response['data']['items'] = []
-        items = 'movies'
-        movie_qs = query['qs']
-        qs = models.Facet.objects.filter(key=query['group']).filter(movie__id__in=movie_qs)
-        qs = qs.values('value').annotate(movies=Count('id')).order_by()
+        items = 'items'
+        item_qs = query['qs']
+        qs = models.Facet.objects.filter(key=query['group']).filter(item__id__in=item_qs)
+        qs = qs.values('value').annotate(items=Count('id')).order_by()
         name = 'value'
         name_sort = 'value_sort'
 
@@ -234,7 +234,7 @@ Positions
         qs = _order_query(query['qs'], query['sort'])
         
         response['data']['positions'] = {}
-        ids = [j['movieId'] for j in qs.values('movieId')]
+        ids = [j['itemId'] for j in qs.values('itemId')]
         response['data']['positions'] = _get_positions(ids, query['ids'])
 
     elif 'keys' in query:
@@ -251,8 +251,8 @@ Positions
         qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]
     else: # otherwise stats
-        movies = query['qs']
-        files = File.objects.all().filter(movie__in=movies)
+        items = query['qs']
+        files = File.objects.all().filter(item__in=items)
         r = files.aggregate(
             Sum('duration'),
             Sum('pixels'),
@@ -260,9 +260,9 @@ Positions
         )
         response['data']['duration'] = r['duration__sum']
         response['data']['files'] = files.count()
-        response['data']['items'] = movies.count()
+        response['data']['items'] = items.count()
         response['data']['pixels'] = r['pixels__sum']
-        response['data']['runtime'] = movies.aggregate(Sum('sort__runtime'))['sort__runtime__sum']
+        response['data']['runtime'] = items.aggregate(Sum('sort__runtime'))['sort__runtime__sum']
         if response['data']['runtime'] == None:
             response['data']['runtime'] = 1337
         response['data']['size'] = r['size__sum']
@@ -277,7 +277,7 @@ def api_getItem(request):
     '''
     response = json_response({})
     itemId = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Movie, movieId=itemId)
+    item = get_object_or_404_json(models.Item, itemId=itemId)
     #FIXME: check permissions
     info = item.get_json()
     info['stream'] = item.get_stream()
@@ -294,7 +294,7 @@ def api_editItem(request):
                 'data': {}}
     '''
     data = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Movie, movieId=data['id'])
+    item = get_object_or_404_json(models.Item, itemId=data['id'])
     if item.editable(request.user):
         response = json_response(status=501, text='not implemented')
         item.edit(data)
@@ -312,7 +312,7 @@ def api_removeItem(request):
     '''
     response = json_response({})
     itemId = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Movie, movieId=itemId)
+    item = get_object_or_404_json(models.Item, itemId=itemId)
     if item.editable(request.user):
         response = json_response(status=501, text='not implemented')
     else:
@@ -436,12 +436,12 @@ def api_parse(request): #parse path and return info
 def api_setPosterFrame(request): #parse path and return info
     '''
         param data
-            {id: movieId, position: float}
+            {id: itemId, position: float}
         return {'status': {'code': int, 'text': string},
                 data: {}}
     '''
     data = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Movie, movieId=data['id'])
+    item = get_object_or_404_json(models.Item, itemId=data['id'])
     if item.editable(request.user):
         #FIXME: some things need to be updated after changing this
         item.poster_frame = data['position']
@@ -454,12 +454,12 @@ def api_setPosterFrame(request): #parse path and return info
 def api_setPoster(request): #parse path and return info
     '''
         param data
-            {id: movieId, url: string}
+            {id: itemId, url: string}
         return {'status': {'code': int, 'text': string},
                 data: {poster: {url,width,height}}}
     '''
     data = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Movie, movieId=data['id'])
+    item = get_object_or_404_json(models.Item, itemId=data['id'])
     if item.editable(request.user):
         valid_urls = [p.url for p in item.poster_urls.all()]
         if data['url'] in valid_urls:
@@ -467,7 +467,7 @@ def api_setPoster(request): #parse path and return info
             if item.poster:
                 item.poster.delete()
             item.save()
-            tasks.updatePoster.delay(item.movieId)
+            tasks.updatePoster.delay(item.itemId)
             response = json_response(status=200, text='ok')
             response['data']['poster'] = item.get_poster()
         else:
@@ -535,45 +535,45 @@ def apidoc(request):
     media delivery
 '''
 def frame(request, id, position, size):
-    movie = get_object_or_404(models.Movie, movieId=id)
+    item = get_object_or_404(models.Item, itemId=id)
     position = float(position.replace(',', '.'))
-    frame = movie.frame(position, int(size))
+    frame = item.frame(position, int(size))
     if not frame:
         raise Http404
     return HttpFileResponse(frame, content_type='image/jpeg')
 
 def poster(request, id, size=None):
-    movie = get_object_or_404(models.Movie, movieId=id)
+    item = get_object_or_404(models.Item, itemId=id)
     if size == 'large':
         size = None
-    if movie.poster:
+    if item.poster:
         if size:
             size = int(size)
-            poster_path = movie.poster.path.replace('.jpg', '.%d.jpg'%size)
+            poster_path = item.poster.path.replace('.jpg', '.%d.jpg'%size)
             if not os.path.exists(poster_path):
-                poster_size = max(movie.poster.width, movie.poster.height)
+                poster_size = max(item.poster.width, item.poster.height)
                 if size > poster_size:
-                    return redirect('/%s/poster.jpg' % movie.movieId)
-                extract.resize_image(movie.poster.path, poster_path, size=size)
+                    return redirect('/%s/poster.jpg' % item.itemId)
+                extract.resize_image(item.poster.path, poster_path, size=size)
         else:
-            poster_path = movie.poster.path
+            poster_path = item.poster.path
     else:
         if not size: size='large'
-        return redirect('http://0xdb.org/%s/poster.%s.jpg' % (movie.movieId, size))
+        return redirect('http://0xdb.org/%s/poster.%s.jpg' % (item.itemId, size))
         poster_path = os.path.join(settings.STATIC_ROOT, 'png/posterDark.48.png')
     return HttpFileResponse(poster_path, content_type='image/jpeg')
 
 def timeline(request, id, timeline, size, position):
-    movie = get_object_or_404(models.Movie, movieId=id)
+    item = get_object_or_404(models.Item, itemId=id)
     if timeline == 'strip':
-        timeline = '%s.%s.%04d.png' %(movie.timeline_prefix[:-8] + 'strip', size, int(position))
+        timeline = '%s.%s.%04d.png' %(item.timeline_prefix[:-8] + 'strip', size, int(position))
     else:
-        timeline = '%s.%s.%04d.png' %(movie.timeline_prefix, size, int(position))
+        timeline = '%s.%s.%04d.png' %(item.timeline_prefix, size, int(position))
     return HttpFileResponse(timeline, content_type='image/png')
 
 def video(request, id, profile):
-    movie = get_object_or_404(models.Movie, movieId=id)
-    stream = get_object_or_404(movie.streams, profile=profile)
+    item = get_object_or_404(models.Item, itemId=id)
+    stream = get_object_or_404(item.streams, profile=profile)
     path = stream.video.path
     content_type = path.endswith('.mp4') and 'video/mp4' or 'video/webm'
     return HttpFileResponse(path, content_type=content_type)

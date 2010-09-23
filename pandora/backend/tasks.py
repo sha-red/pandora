@@ -13,19 +13,19 @@ def cronjob(**kwargs):
     print "do some cleanup stuff once a day"
 
 @task(ignore_resulsts=True, queue='default')
-def updatePoster(movieId):
-    movie = models.Movie.objects.get(movieId=movieId)
-    movie.download_poster(True)
+def updatePoster(itemId):
+    item = models.Item.objects.get(itemId=itemId)
+    item.download_poster(True)
 
 @task(ignore_resulsts=True, queue='default')
 def updateImdb(imdbId):
-    movie = models.Movie.objects.get(movieId=imdbId)
-    movie.updateImdb()
+    item = models.Item.objects.get(itemId=imdbId)
+    item.updateImdb()
 
 @task(ignore_resulsts=True)
-def findMovie(fileId):
+def findItem(fileId):
     f = models.File.objects.get(pk=fileId)
-    f.findMovie()
+    f.findItem()
 
 @task(ignore_resulsts=True, queue="encoding")
 def extractData(fileId):
@@ -37,11 +37,11 @@ def extractData(fileId):
     f.extract()
 
 @task(ignore_resulsts=True, queue="encoding")
-def updateMovie(movidId):
+def updateItem(movidId):
     '''
-        update movie
-        create proxy stream and other related files extracted from movieFiles
+        update item
+        create proxy stream and other related files extracted from itemFiles
     '''
-    m = models.Movie.objects.get(pk=movieId)
+    m = models.Item.objects.get(pk=itemId)
     m.extract()
 

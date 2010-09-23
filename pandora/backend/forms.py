@@ -12,7 +12,7 @@ ajax_filtered_js = (
 )
 """
 class FileAdminForm(forms.ModelForm):
-    movie = ForeignKeyByLetter(models.Movie, field_name='imdb__title')
+    item = ForeignKeyByLetter(models.Item, field_name='imdb__title')
 
     class Meta:
         model = models.File
@@ -30,12 +30,12 @@ class ArchiveFileAdminForm(forms.ModelForm):
         js = ajax_filtered_js
 
 
-class MovieAdminForm(forms.ModelForm):
-    imdb = ForeignKeyByLetter(models.MovieImdb, field_name='title')
-    oxdb = ForeignKeyByLetter(models.MovieOxdb, field_name='title')
+class ItemAdminForm(forms.ModelForm):
+    imdb = ForeignKeyByLetter(models.ItemImdb, field_name='title')
+    oxdb = ForeignKeyByLetter(models.ItemOxdb, field_name='title')
 
     class Meta:
-        model = models.Movie
+        model = models.Item
 
     class Media:
         js = ajax_filtered_js

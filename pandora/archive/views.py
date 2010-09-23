@@ -56,7 +56,7 @@ def api_update(request):
         param data
             volume: '',
             files: [
-                {oshash:, path:, ctime:, atime:, mtime:, }
+                {oshash:, path:, mtime:, }
             ]
             info: {oshash: object}
 
@@ -88,9 +88,9 @@ def api_update(request):
 
             same_folder = models.FileInstance.objects.filter(folder=folder, volume=volume)
             if same_folder.count() > 0:
-                movie = same_folder[0].file.movie
+                item = same_folder[0].file.item
             else:
-                movie = None
+                item = None
 
 	        path = os.path.join(folder, name)
 
@@ -98,7 +98,7 @@ def api_update(request):
             if instance.count()>0:
                 instance = instance[0]
                 updated = False
-                for key in ('atime', 'mtime', 'ctime', 'name', 'folder'):
+                for key in ('mtime', 'name', 'folder'):
                     if f[key] != getattr(instance, key):
                         setattr(instance, key, f[key])
                         updated=True
@@ -111,24 +111,24 @@ def api_update(request):
                     file_object = file_objects[0]
                 #new oshash, add to database
                 else:
-                    if not movie:
-                        movie_info = parse_path(folder)
-                        movie = backend.models.getMovie(movie_info)
+                    if not item:
+                        item_info = parse_path(folder)
+                        item = backend.models.getItem(item_info)
                     file_object = models.File()
                     file_object.oshash = oshash
                     file_object.name = name
-                    file_object.movie = movie
+                    file_object.item = item
                     file_object.save()
                     response['data']['info'].append(oshash)
                 instance = models.FileInstance()
                 instance.volume = volume
                 instance.file = file_object
-                for key in ('atime', 'mtime', 'ctime', 'name', 'folder'):
+                for key in ('mtime', 'name', 'folder'):
                     setattr(instance, key, f[key])
                 instance.save()
 
         #remove deleted files
-        #FIXME: can this have any bad consequences? i.e. on the selction of used movie files.
+        #FIXME: can this have any bad consequences? i.e. on the selction of used item files.
         models.FileInstance.objects.filter(volume=volume).exclude(file__oshash__in=all_files).delete()
 
         user_profile = user.get_profile()
@@ -255,7 +255,7 @@ def api_editFile(request): #FIXME: should this be file.files. or part of update
 
 def lookup_file(request, oshash):
     f = get_object_or_404(models.File, oshash=oshash)
-    return redirect(f.movie.get_absolute_url())
+    return redirect(f.item.get_absolute_url())
     
 
 """
@@ -270,7 +270,7 @@ def api_fileInfo(request):
 		oshash = json.loads(request.POST['data'])
 	elif 'oshash' in request.GET:
 		oshash = request.GET['oshash']
-    f = models.MovieFile.objects.get(oshash=oshash)
+    f = models.ItemFile.objects.get(oshash=oshash)
     response = {'data': f.json()}
     return render_to_json_response(response)
 
@@ -301,11 +301,11 @@ def api_subtitles(request):
     else:
         response = json_response({})
         if language:
-            q = models.Subtitles.objects.filter(movie_file__oshash=oshash, language=language)
+            q = models.Subtitles.objects.filter(item_file__oshash=oshash, language=language)
             if q.count() > 0:
 				response['data']['subtitle'] = q[0].srt
 				return render_to_json_response(response)
-        l = models.Subtitles.objects.filter(movie_file__oshash=oshash).values('language')
+        l = models.Subtitles.objects.filter(item_file__oshash=oshash).values('language')
         response['data']['languages'] = [f['language'] for f in l]
         return render_to_json_response(response)
 """

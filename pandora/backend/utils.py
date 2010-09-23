@@ -57,7 +57,7 @@ def oxdb_directors(director):
 
 def oxdb_title(_title, searchTitle = False):
     '''
-      normalize filename to get movie title
+      normalize filename to get item title
     '''
     _title = os.path.basename(_title)
     _title = _title.replace('... ', '_dot_dot_dot_')

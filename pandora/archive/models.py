@@ -23,7 +23,7 @@ from firefogg import Firefogg
 import chardet
 
 from backend import utils
-from pandora.backend.models import Movie
+from pandora.backend.models import Item
 
 import extract
 
@@ -46,7 +46,7 @@ class File(models.Model):
     verified = models.BooleanField(default=False)
 
     oshash = models.CharField(max_length=16, unique=True)
-    movie = models.ForeignKey(Movie, related_name='files')
+    item = models.ForeignKey(Item, related_name='files')
 
     name = models.CharField(max_length=2048, default="") # canoncial path/file
     sort_name = models.CharField(max_length=2048, default="") # sort path/file name
@@ -260,8 +260,8 @@ class FileInstance(models.Model):
         return u"%s's %s <%s>"% (self.volume.user, self.name, self.file.oshash)
 
     @property
-    def movieId(self):
-        return File.objects.get(oshash=self.oshash).movieId
+    def itemId(self):
+        return File.objects.get(oshash=self.oshash).itemId
 
 def frame_path(frame, name):
     ext = os.path.splitext(name)[-1]

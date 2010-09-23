@@ -3,27 +3,27 @@
 
 from django.contrib import admin
 
-#from forms import FileAdminForm, MovieAdminForm, ArchiveFileAdminForm
+#from forms import FileAdminForm, ItemAdminForm, ArchiveFileAdminForm
 import models
 
 
 
 '''
-#class MovieImdbAdmin(admin.ModelAdmin):
+#class ItemImdbAdmin(admin.ModelAdmin):
 #    search_fields = ['imdbId', 'title']
-#admin.site.register(models.MovieImdb, MovieImdbAdmin)
-class MovieImdbInline(admin.StackedInline):
-    model = models.MovieImdb
+#admin.site.register(models.ItemImdb, ItemImdbAdmin)
+class ItemImdbInline(admin.StackedInline):
+    model = models.ItemImdb
 
-class MovieOxdbInline(admin.StackedInline):
-    model = models.MovieOxdb
+class ItemOxdbInline(admin.StackedInline):
+    model = models.ItemOxdb
 '''
 
-class MovieAdmin(admin.ModelAdmin):
-    search_fields = ['movieId', 'imdb__title', 'oxdb__title']
-    #form = MovieAdminForm
-    #inlines = [MovieImdbInline, MovieOxdbInline]
+class ItemAdmin(admin.ModelAdmin):
+    search_fields = ['itemId', 'imdb__title', 'oxdb__title']
+    #form = ItemAdminForm
+    #inlines = [ItemImdbInline, ItemOxdbInline]
 
-admin.site.register(models.Movie, MovieAdmin)
+admin.site.register(models.Item, ItemAdmin)
 
 

@@ -29,50 +29,50 @@ import utils
 from archive import extract
 
 
-def getMovie(info):
+def getItem(info):
     '''
         info dict with:
             imdbId, title, director, episode_title, season, series
     '''
     if 'imdbId' in info and info['imdbId']:
         try:
-            movie = Movie.objects.get(movieId=info['imdbId'])
-        except Movie.DoesNotExist:
-            movie = Movie(movieId=info['imdbId'])
+            item = Item.objects.get(itemId=info['imdbId'])
+        except Item.DoesNotExist:
+            item = Item(itemId=info['imdbId'])
             if 'title' in info and 'directors' in info:
-                movie.imdb = {
+                item.imdb = {
                     'title': info['title'],
                     'directors': info['directors'],
                     'year': info.get('year', '')
                 }
             #FIXME: this should be done async
-            #movie.save()
-            #tasks.updateImdb.delay(movie.movieId)
-            movie.updateImdb()
+            #item.save()
+            #tasks.updateImdb.delay(item.itemId)
+            item.updateImdb()
     else:
-        q = Movie.objects.filter(find__title=info['title'])
+        q = Item.objects.filter(find__title=info['title'])
         if q.count() > 1:
             print "FIXME: check more than title here!!?"
-            movie = q[0]
+            item = q[0]
         else:
             try:
-                movie = Movie.objects.get(movieId=info['oxdbId'])
-            except Movie.DoesNotExist:
-                movie = Movie()
-                movie.metadata = {
+                item = Item.objects.get(itemId=info['oxdbId'])
+            except Item.DoesNotExist:
+                item = Item()
+                item.metadata = {
                     'title': info['title'],
                     'directors': info['directors'],
                     'year': info.get('year', '')
                 }
-                movie.movieId = info['oxdbId']
+                item.itemId = info['oxdbId']
 
                 for key in ('episode_title', 'series_title', 'season', 'episode'):
                     if key in info and info[key]:
-                        movie.metadata[key] = info[key]
-                movie.save()
-    return movie
+                        item.metadata[key] = info[key]
+                item.save()
+    return item
 
-class Movie(models.Model):
+class Item(models.Model):
     person_keys = ('director', 'writer', 'producer', 'editor', 'cinematographer', 'actor', 'character')
     facet_keys = person_keys + ('country', 'language', 'genre', 'keyword')
 
@@ -80,14 +80,14 @@ class Movie(models.Model):
     modified = models.DateTimeField(auto_now=True)
     published = models.DateTimeField(default=datetime.now, editable=False)
 
-    #only movies that have metadata from files are available,
+    #only items that have metadata from files are available,
     #this is indicated by setting available to True 
     available = models.BooleanField(default=False, db_index=True)
 
-    movieId = models.CharField(max_length=128, unique=True, blank=True)
+    itemId = models.CharField(max_length=128, unique=True, blank=True)
     oxdbId = models.CharField(max_length=42, unique=True, blank=True)
 
-    objects = managers.MovieManager()
+    objects = managers.ItemManager()
 
     def get(self, key, default=None):
         if self.metadata and key in self.metadata:
@@ -124,11 +124,11 @@ class Movie(models.Model):
     json = fields.DictField(default={}, editable=False)
 
     def updateImdb(self):
-        if len(self.movieId) == 7:
-            self.imdb = ox.web.imdb.Imdb(self.movieId)
+        if len(self.itemId) == 7:
+            self.imdb = ox.web.imdb.Imdb(self.itemId)
             self.save()
 
-    poster = models.ImageField(default=None, blank=True, upload_to=lambda m, x: os.path.join(movieid_path(m.movieId), "poster.jpg"))
+    poster = models.ImageField(default=None, blank=True, upload_to=lambda m, x: os.path.join(itemid_path(m.itemId), "poster.jpg"))
     poster_url = models.TextField(blank=True)
     poster_height = models.IntegerField(default=0)
     poster_width = models.IntegerField(default=0)
@@ -145,7 +145,7 @@ class Movie(models.Model):
         return self.get('title')
 
     def get_absolute_url(self):
-        return '/timeline#%s' % self.movieId
+        return '/timeline#%s' % self.itemId
 
     def save(self, *args, **kwargs):
         self.json = self.get_json()
@@ -158,7 +158,7 @@ class Movie(models.Model):
         else:
             self.poster_height = 128
             self.poster_width = 80
-        super(Movie, self).save(*args, **kwargs)
+        super(Item, self).save(*args, **kwargs)
         self.updateFind()
         self.updateSort()
         self.updateFacets()
@@ -169,27 +169,27 @@ class Movie(models.Model):
             os.unlink(f)
         for f in glob("%sstrip*"%self.timeline_prefix[:-8]):
             os.unlink(f)
-        super(Movie, self).delete(*args, **kwargs)
+        super(Item, self).delete(*args, **kwargs)
 
     def mergeWith(self, other):
         '''
             move all related tables to other and delete self
         '''
         for stream in self.streams.all():
-            stream.movie = other
+            stream.item = other
             stream.save()
         for l in self.lists.all():
-            l.movies.remove(self)
-            if l.movies.filter(id=other.id) == 0:
-                l.movies.add(other)
+            l.items.remove(self)
+            if l.items.filter(id=other.id) == 0:
+                l.items.add(other)
         #FIXME: should this really happen for layers?
         for l in self.layer.all():
-            l.movies.remove(self)
-            if l.movies.filter(id=other.id) == 0:
-                l.movies.add(other)
+            l.items.remove(self)
+            if l.items.filter(id=other.id) == 0:
+                l.items.add(other)
         if hasattr(self, 'files'):
             for f in self.files.all():
-                f.movie = other
+                f.item = other
                 f.save()
         self.delete()
         other.save()
@@ -198,7 +198,7 @@ class Movie(models.Model):
         JSON cache related functions
     '''
     _public_fields = {
-        'movieId': 'id',
+        'itemId': 'id',
         'title':   'title',
         'year':    'year',
 
@@ -230,7 +230,7 @@ class Movie(models.Model):
         poster = {}
         poster['width'] = self.poster_width
         poster['height'] = self.poster_height
-        poster['url'] = '/%s/poster.jpg' % self.movieId
+        poster['url'] = '/%s/poster.jpg' % self.itemId
         '''
         if self.poster:
             poster['url'] = self.poster.url
@@ -264,7 +264,7 @@ class Movie(models.Model):
                 if 'video' in s.info and s.info['video']: 
                     stream['aspectRatio'] = s.info['video'][0]['width'] / s.info['video'][0]['height']
                 if settings.XSENDFILE or settings.XACCELREDIRECT:
-                    stream['baseUrl'] = '/%s' % self.movieId
+                    stream['baseUrl'] = '/%s' % self.itemId
                 else:
                     stream['baseUrl'] = os.path.dirname(s.video.url)
                 stream['profiles'] = list(set(map(lambda s: int(os.path.splitext(s['profile'])[0][:-1]), self.streams.all().values('profile'))))
@@ -281,7 +281,7 @@ class Movie(models.Model):
         return layers
 
     def get_json(self, fields=None):
-        movie = {}
+        item = {}
         for key in self._public_fields:
             pub_key = self._public_fields.get(key, key)
             if not fields or pub_key in fields:
@@ -290,18 +290,18 @@ class Movie(models.Model):
                 else:
                     value = self.get(key)
                 if callable(value):
-                    movie[pub_key] = value()
+                    item[pub_key] = value()
                 else:
-                    movie[pub_key] = value
+                    item[pub_key] = value
         if not fields:
-            movie['stream'] = self.get_stream()
-        movie['poster'] = self.get_poster()
-        movie['posters'] = self.get_posters()
+            item['stream'] = self.get_stream()
+        item['poster'] = self.get_poster()
+        item['posters'] = self.get_posters()
         if fields:
             for f in fields:
                 if f.endswith('.length') and f[:-7] in ('cast', 'genre', 'trivia'):
-                    movie[f] = getattr(self.sort, f[:-7])
-        return movie
+                    item[f] = getattr(self.sort, f[:-7])
+        return item
 
     def fields(self):
         fields = {}
@@ -325,8 +325,8 @@ class Movie(models.Model):
     def updateFind(self):
         try:
             f = self.find
-        except MovieFind.DoesNotExist:
-            f = MovieFind(movie=self)
+        except ItemFind.DoesNotExist:
+            f = ItemFind(item=self)
 
         f.title = '\n'.join([self.get('title'), self.get('original_title', '')])
         #FIXME: filter us/int  title
@@ -349,7 +349,7 @@ class Movie(models.Model):
 
         #FIXME:
         #f.dialog = 'fixme'
-        f.dialog = '\n'.join([l.value for l in Layer.objects.filter(type='subtitle', movie=self).order_by('start')])
+        f.dialog = '\n'.join([l.value for l in Layer.objects.filter(type='subtitle', item=self).order_by('start')])
 
         #FIXME: collate filenames
         #f.filename = self.filename
@@ -362,8 +362,8 @@ class Movie(models.Model):
     def updateSort(self):
         try:
             s = self.sort
-        except MovieSort.DoesNotExist:
-            s = MovieSort(movie=self)
+        except ItemSort.DoesNotExist:
+            s = ItemSort(item=self)
 
         def sortNames(values):
             sort_value = ''
@@ -391,7 +391,7 @@ class Movie(models.Model):
         for key in ('keywords', 'genres', 'cast', 'summary', 'trivia', 'connections'):
             setattr(s, key, len(self.get(key, '')))
             
-        s.movieId = self.movieId.replace('0x', 'xx')
+        s.itemId = self.itemId.replace('0x', 'xx')
         s.rating = self.get('rating', -1)
         s.votes = self.get('votes', -1)
 
@@ -430,37 +430,37 @@ class Movie(models.Model):
                 current_values = [i[1] for i in self.get('actor', [])]
             else:
                 current_values = self.get(utils.plural_key(key), [])
-            saved_values = [i.value for i in Facet.objects.filter(movie=self, key=key)]
+            saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
             removed_values = filter(lambda x: x not in current_values, saved_values)
             if removed_values:
-                Facet.objects.filter(movie=self, key=key, value__in=removed_values).delete()
+                Facet.objects.filter(item=self, key=key, value__in=removed_values).delete()
             for value in current_values:
                 if value not in saved_values:
                     value_sort = value
                     if key in self.person_keys:
                         value_sort = getPersonSort(value)
                     f = Facet(key=key, value=value, value_sort=value_sort)
-                    f.movie = self
+                    f.item = self
                     f.save()
         year = self.get('year', None)
         if year:
-            f, created = Facet.objects.get_or_create(key='year', value=year, value_sort=year, movie=self)
+            f, created = Facet.objects.get_or_create(key='year', value=year, value_sort=year, item=self)
         else:
-            Facet.objects.filter(movie=self, key='year').delete()
+            Facet.objects.filter(item=self, key='year').delete()
 
     '''
         Video related functions
     '''
     def frame(self, position, width=128):
         stream = self.streams.filter(profile=settings.VIDEO_PROFILE+'.webm')[0]
-        path = os.path.join(settings.MEDIA_ROOT, movieid_path(self.movieId), 'frames', "%d"%width, "%s.jpg"%position)
+        path = os.path.join(settings.MEDIA_ROOT, itemid_path(self.itemId), 'frames', "%d"%width, "%s.jpg"%position)
         if not os.path.exists(path):
             extract.frame(stream.video.path, path, position, width)
         return path
 
     @property
     def timeline_prefix(self):
-        return os.path.join(settings.MEDIA_ROOT, movieid_path(self.movieId), 'timeline')
+        return os.path.join(settings.MEDIA_ROOT, itemid_path(self.itemId), 'timeline')
 
     def updateStreams(self):
         files = {}
@@ -469,7 +469,7 @@ class Movie(models.Model):
         
         #FIXME: how to detect if something changed?
         if files:
-            stream, created = Stream.objects.get_or_create(movie=self, profile='%s.webm' % settings.VIDEO_PROFILE)
+            stream, created = Stream.objects.get_or_create(item=self, profile='%s.webm' % settings.VIDEO_PROFILE)
             stream.video.name = stream_path(stream)
             cmd = []
             
@@ -501,7 +501,7 @@ class Movie(models.Model):
     def update_poster_urls(self):
         _current = {}
         for s in settings.POSTER_SERVICES:
-            url = '%s?movieId=%s'%(s, self.movieId)
+            url = '%s?itemId=%s'%(s, self.itemId)
             try:
                 data = json.loads(ox.net.readUrlUnicode(url))
             except:
@@ -514,7 +514,7 @@ class Movie(models.Model):
         #FIXME: remove urls that are no longer listed
         for service in _current:
             for poster in _current[service]:
-                p, created = PosterUrl.objects.get_or_create(movie=self, url=poster['url'], service=service)
+                p, created = PosterUrl.objects.get_or_create(item=self, url=poster['url'], service=service)
                 if created:
                     p.width = poster['width']
                     p.height = poster['height']
@@ -558,7 +558,7 @@ class Movie(models.Model):
         posters = {}
         for f in self.files.filter(is_main=True, available=True):
             for frame in f.frames.all():
-                path = os.path.join(movieid_path(self.movieId), 'poster.pandora.%s.%s.jpg'%(part, frame.position))
+                path = os.path.join(itemid_path(self.itemId), 'poster.pandora.%s.%s.jpg'%(part, frame.position))
                 path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, path))
                 posters[path] = frame.frame.path
             part += 1
@@ -574,18 +574,18 @@ class Movie(models.Model):
                    '-f', frame,
                    '-p', poster
                   ]
-            if len(self.movieId) == 7:
-                cmd += ['-i', self.movieId]
+            if len(self.itemId) == 7:
+                cmd += ['-i', self.itemId]
             cmd += ['-o', self.oxdbId]
             p = subprocess.Popen(cmd)
             p.wait()
         return posters.keys()
 
-class MovieFind(models.Model):
+class ItemFind(models.Model):
     """
-        used to search movies, all search values are in here
+        used to search items, all search values are in here
     """
-    movie = models.OneToOneField('Movie', related_name='find', primary_key=True)
+    item = models.OneToOneField('Item', related_name='find', primary_key=True)
 
     all = models.TextField(blank=True)
     title = models.TextField(blank=True)
@@ -612,7 +612,7 @@ class MovieFind(models.Model):
     #only for own files or as admin?
     filename = models.TextField(blank=True, default='')
 
-    _private_fields = ('id', 'movie')
+    _private_fields = ('id', 'item')
     #return available find fields
     #FIXME: should return mapping name -> verbose_name
     def fields(self):
@@ -625,11 +625,11 @@ class MovieFind(models.Model):
         return tuple(fields)
     fields = classmethod(fields)
 
-class MovieSort(models.Model):
+class ItemSort(models.Model):
     """
-        used to sort movies, all sort values are in here
+        used to sort items, all sort values are in here
     """
-    movie = models.OneToOneField('Movie', related_name='sort', primary_key=True)
+    item = models.OneToOneField('Item', related_name='sort', primary_key=True)
 
     title = models.CharField(max_length=1000, db_index=True)
     director = models.TextField(blank=True, db_index=True)
@@ -659,7 +659,7 @@ class MovieSort(models.Model):
     wpm = models.IntegerField('Words per Minute', null=True, blank=True, db_index=True)
     risk = models.IntegerField(null=True, blank=True, db_index=True)
 
-    movieId = models.CharField('ID', max_length=128, blank=True, db_index=True)
+    itemId = models.CharField('ID', max_length=128, blank=True, db_index=True)
 
     duration = models.FloatField(default=-1, db_index=True)
     resolution = models.IntegerField(blank=True, db_index=True)
@@ -683,7 +683,7 @@ class MovieSort(models.Model):
 
     language_desc = models.TextField(blank=True, db_index=True)
 
-    _private_fields = ('id', 'movie')
+    _private_fields = ('id', 'item')
     #return available sort fields
     #FIXME: should return mapping name -> verbose_name
     def fields(self):
@@ -697,7 +697,7 @@ class MovieSort(models.Model):
     fields = classmethod(fields)
 
 class Facet(models.Model):
-    movie = models.ForeignKey('Movie', related_name='facets')
+    item = models.ForeignKey('Item', related_name='facets')
     key = models.CharField(max_length=200, db_index=True)
     value = models.CharField(max_length=200)
     value_sort = models.CharField(max_length=200)
@@ -749,7 +749,7 @@ class Person(models.Model):
 class Location(models.Model):
     name = models.CharField(max_length=200, unique=True)
     manual = models.BooleanField(default=False)
-    movies = models.ManyToManyField(Movie, related_name='locations_all')
+    items = models.ManyToManyField(Item, related_name='locations_all')
     #fixme: geo data
 
     lat_sw = models.FloatField(default=0)
@@ -779,18 +779,18 @@ class List(models.Model):
     user = models.ForeignKey(User)
     name = models.CharField(max_length=255, unique=True)
     public = models.BooleanField(default=False)
-    movies = models.ManyToManyField(Movie, related_name='lists', through='ListItem')
+    items = models.ManyToManyField(Item, related_name='lists', through='ListItem')
 
-    def add(self, movie):
-        q = self.movies.filter(id=movie.id)
+    def add(self, item):
+        q = self.items.filter(id=item.id)
         if q.count() == 0:
             l = ListItem()
             l.list = self
-            l.movie = movie
+            l.item = item
             l.save()
 
-    def remove(self, movie):
-        self.ListItem.objects.all().filter(movie=movie, list=self).delete()
+    def remove(self, item):
+        self.ListItem.objects.all().filter(item=item, list=self).delete()
 
     def __unicode__(self):
         return u'%s (%s)' % (self.title, unicode(self.user))
@@ -805,17 +805,17 @@ class ListItem(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     list = models.ForeignKey(List)
-    movie = models.ForeignKey(Movie)
+    item = models.ForeignKey(Item)
 
     def __unicode__(self):
-        return u'%s in %s' % (unicode(self.movie), unicode(self.list))
+        return u'%s in %s' % (unicode(self.item), unicode(self.list))
 
 class Layer(models.Model):
-    #FIXME: here having a movie,start index would be good
+    #FIXME: here having a item,start index would be good
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User)
-    movie = models.ForeignKey(Movie)
+    item = models.ForeignKey(Item)
 
     #seconds
     start = models.FloatField(default=-1)
@@ -841,22 +841,22 @@ class Collection(models.Model):
     users = models.ManyToManyField(User, related_name='collections')
     name = models.CharField(blank=True, max_length=2048)
     subdomain = models.CharField(unique=True, max_length=2048)
-    movies = models.ForeignKey(Movie)
+    items = models.ForeignKey(Item)
 
     def editable(self, user):
         return self.users.filter(id=user.id).count() > 0
 
-def movieid_path(h):
-    return os.path.join('movies', h[:2], h[2:4], h[4:6], h[6:])
+def itemid_path(h):
+    return os.path.join('items', h[:2], h[2:4], h[4:6], h[6:])
 
 def stream_path(stream):
-    return os.path.join(movieid_path(stream.movie.movieId), stream.profile)
+    return os.path.join(itemid_path(stream.item.itemId), stream.profile)
 
 class Stream(models.Model):
     class Meta:
-        unique_together = ("movie", "profile")
+        unique_together = ("item", "profile")
 
-    movie = models.ForeignKey(Movie, related_name='streams')
+    item = models.ForeignKey(Item, related_name='streams')
     profile = models.CharField(max_length=255, default='96p.webm')
     video = models.FileField(default=None, blank=True, upload_to=lambda f, x: stream_path(f))
     source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True)
@@ -869,7 +869,7 @@ class Stream(models.Model):
     def extract_derivatives(self):
         if settings.VIDEO_H264:
             profile = self.profile.replace('.webm', '.mp4')
-            derivative, created = Stream.objects.get_or_create(profile=profile, movie=self.movie)
+            derivative, created = Stream.objects.get_or_create(profile=profile, item=self.item)
             if created:
                 derivative.source = self
                 derivative.video.name = self.video.name.replace(self.profile, profile)
@@ -879,7 +879,7 @@ class Stream(models.Model):
         for p in settings.VIDEO_DERIVATIVES:
             profile = p + '.webm'
             target = self.video.path.replace(self.profile, profile)
-            derivative, created = Stream.objects.get_or_create(profile=profile, movie=self.movie)
+            derivative, created = Stream.objects.get_or_create(profile=profile, item=self.item)
             if created:
                 derivative.source = self
                 derivative.video.name = self.video.name.replace(self.profile, profile)
@@ -888,7 +888,7 @@ class Stream(models.Model):
 
             if settings.VIDEO_H264:
                 profile = p + '.mp4'
-                derivative, created = Stream.objects.get_or_create(profile=profile, movie=self.movie)
+                derivative, created = Stream.objects.get_or_create(profile=profile, item=self.item)
                 if created:
                     derivative.source = self
                     derivative.video.name = self.video.name.replace(self.profile, profile)
@@ -907,7 +907,7 @@ class Stream(models.Model):
                 self.save()
 
     def __unicode__(self):
-        return u"%s (%s)" % (self.profile, self.movie)
+        return u"%s (%s)" % (self.profile, self.item)
 
     def save(self, *args, **kwargs):
         if self.video and not self.info:
@@ -916,15 +916,15 @@ class Stream(models.Model):
 
 class PosterUrl(models.Model):
     class Meta:
-        unique_together = ("movie", "service", "url")
+        unique_together = ("item", "service", "url")
         ordering = ('-height', )
 
-    movie = models.ForeignKey(Movie, related_name='poster_urls')
+    item = models.ForeignKey(Item, related_name='poster_urls')
     url = models.CharField(max_length=1024)
     service = models.CharField(max_length=1024)
     width = models.IntegerField(default=80)
     height = models.IntegerField(default=128)
 
     def __unicode__(self):
-        return u'%s %s %dx%d' % (unicode(self.movie), self.service, self.width, self.height)
+        return u'%s %s %dx%d' % (unicode(self.item), self.service, self.width, self.height)
 

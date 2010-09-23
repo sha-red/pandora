@@ -36,7 +36,7 @@ def parseCondition(condition):
 	'''
 
     k = condition.get('key', 'all')
-    k = {'id': 'movieId'}.get(k, k)
+    k = {'id': 'itemId'}.get(k, k)
     if not k: k = 'all'
     v = condition['value']
     op = condition.get('operator', None)
@@ -49,9 +49,9 @@ def parseCondition(condition):
     if keyType(k) == "string":
         in_find=True
         if op == '=':
-            if k in models.Movie.facet_keys:
+            if k in models.Item.facet_keys:
                 in_find=False
-                v = models.Movie.objects.filter(facets__key=k, facets__value=v)
+                v = models.Item.objects.filter(facets__key=k, facets__value=v)
                 k = 'id__in'
             else:
                 k = '%s__iexact' % k
@@ -63,7 +63,7 @@ def parseCondition(condition):
             k = '%s__iendswith' % k
         else: # elif op == '~':
             k = '%s__icontains' % k
-        if in_find and not k.startswith('movieId'):
+        if in_find and not k.startswith('itemId'):
             k = 'find__%s' % k
         k = str(k)
         if exclude:
@@ -151,9 +151,9 @@ def parseConditions(conditions, operator):
         return q
     return None
 
-class MovieManager(Manager):
+class ItemManager(Manager):
     def get_query_set(self):
-        return super(MovieManager, self).get_query_set()
+        return super(ItemManager, self).get_query_set()
 
     def filter_list(self, qs, l, user):
         if l != "all":
@@ -195,7 +195,7 @@ class MovieManager(Manager):
 
         #join query with operator
         qs = self.get_query_set()
-        #only include movies that have hard metadata
+        #only include items that have hard metadata
         qs = qs.filter(available=True)
         conditions = parseConditions(data['query']['conditions'],
                                      data['query'].get('operator', '&'))
@@ -212,17 +212,17 @@ class FileManager(Manager):
     def get_query_set(self):
         return super(FileManager, self).get_query_set()
 
-    def movie_files(self, movie):
+    def item_files(self, item):
         q = self.get_query_set()
-        return q.filter(type=1, movie=movie)
+        return q.filter(type=1, item=item)
 
 class ArchiveFileManager(Manager):
     def get_query_set(self):
         return super(ArchiveFileManager, self).get_query_set()
 
-    def movie_files(self, movie):
+    def item_files(self, item):
         q = self.get_query_set()
-        return q.filter(file__is_video=True, file__movie=movie)
+        return q.filter(file__is_video=True, file__item=item)
 
     def by_oshash(self, oshash):
         q = self.get_query_set()
