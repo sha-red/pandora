@@ -59,6 +59,7 @@ var app = new Ox.App({
         app.$ui.loadingIcon.stop();
     });
 
+    $.each(app.afterLaunch, function(i, f) {f()});
 });
 
 
