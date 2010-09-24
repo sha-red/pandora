@@ -21,8 +21,8 @@ class Migration(SchemaMigration):
         db.rename_column('backend_listitem', 'movie_id', 'item_id')
         db.create_unique('backend_posterurl', ['url', 'item_id', 'service'])
         
-        db.execute("UPDATE backend_item SET poster=REPLACE(poster,'movies/','items/') WHERE poster LIKE 'movies/%'")
-        db.execute("UPDATE backend_stream SET video=REPLACE(video,'movies/','items/') WHERE video LIKE 'movies/%'")
+        db.execute("UPDATE backend_item SET poster=REPLACE(poster,'movies/','items/') WHERE poster LIKE 'movies/%%'")
+        db.execute("UPDATE backend_stream SET video=REPLACE(video,'movies/','items/') WHERE video LIKE 'movies/%%'")
 
     def backwards(self, orm):
         db.rename_table('backend_itemsort', 'backend_moviesort')
