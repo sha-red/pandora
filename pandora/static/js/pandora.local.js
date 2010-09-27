@@ -9,6 +9,9 @@ app.afterLaunch.push(function() {
         api: new OxFF(),
         volumes: function(cb) {
             var _this = this;
+            Ox.print('api.volumes');
+            this.api.login(window, app.user.username);
+            Ox.print('api.now access');
             this.api.access(function(access) {
                 Ox.print('access callback', access);
                 if(!access) {
@@ -33,7 +36,6 @@ app.afterLaunch.push(function() {
                         .append("For this part of the page to work, you have to allow OxFF to send data to this site")
                         .open();
                 } else {
-                    _this.api.login(app.user.username);
                     _this.api.volumes(function(result) {
                         var data = JSON.parse(result);
                         cb(data);
@@ -42,9 +44,9 @@ app.afterLaunch.push(function() {
             });
         },
         files: function(archive, cb) {
+            this.api.login(window, app.user.username);
             if(!this.api.access())
                 return false;
-            this.api.login(app.user.username);
             this.api.files(archive, function(result) {
                 var data = JSON.parse(result);
                 cb(data);
