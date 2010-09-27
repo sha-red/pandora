@@ -464,7 +464,7 @@ class Item(models.Model):
 
     def updateStreams(self):
         files = {}
-        for f in self.files.filter(is_main=True, available=True):
+        for f in self.files.filter(is_main=True, is_video=True, available=True):
             files[utils.sort_title(f.name)] = f.video.path
         
         #FIXME: how to detect if something changed?

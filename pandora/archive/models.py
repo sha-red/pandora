@@ -195,6 +195,7 @@ class File(models.Model):
         encoding = _detectEncoding(f)
         data = f.read()
         f.close()
+        data = data.replace('\r\n', '\n')
         try:
             data = unicode(data, encoding)
         except:
