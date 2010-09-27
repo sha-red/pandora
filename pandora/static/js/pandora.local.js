@@ -59,7 +59,7 @@ app.afterLaunch.push(function() {
                     return null;
                 return function(result) {
                     var data = JSON.parse(result);
-                    cb(data)
+                    cb(data);
                 }
             }
             this.api.upload(JSON.stringify(options),

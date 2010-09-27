@@ -95,6 +95,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'oxdjango.middleware.ExceptionMiddleware',
+    'oxdjango.middleware.ChromeFrameMiddleware',
 )
 
 ROOT_URLCONF = 'pandora.urls'
@@ -129,7 +130,7 @@ AUTH_PROFILE_MODULE = 'oxuser.UserProfile'
 
 VIDEO_PROFILE = '96p'
 VIDEO_DERIVATIVES = []
-VIDEO_H264 = True
+VIDEO_H264 = False
 
 #Pad.ma
 #VIDEO_PROFILE = '480p'
