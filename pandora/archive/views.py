@@ -31,6 +31,7 @@ import models
 
 from backend.utils import oxid, parse_path
 import backend.models
+import backend.tasks
 
 @login_required_json
 def api_removeVolume(request):
@@ -220,9 +221,9 @@ def firefogg_upload(request):
                 if not f.save_chunk(c, chunk_id):
                     response['result'] = -1
                 elif form.cleaned_data['done']:
-                    #FIXME: send message to encode deamon to create derivates instead
                     f.available = True
                     f.save()
+                    backend.tasks.updateStreams.delay(f.item.itemId)
                     response['result'] = 1
                     response['done'] = 1
                 return render_to_json_response(response)

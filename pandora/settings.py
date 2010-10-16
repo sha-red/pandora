@@ -151,6 +151,10 @@ POSTER_PRECEDENCE=('local', 'criterion.com', 'wikipedia.org', 'impawards.com', '
 #0xdb.org
 #POSTER_SERVICES=['http://data.0xdb.org/poster/']
 
+ITEM_POSTER = join('scripts', 'oxdb_poster')
+ITEM_ICON   = join('scripts', 'item_icon')
+LIST_ICON   = join('scripts', 'list_icon')
+
 #overwrite default settings with local settings
 try:
     from local_settings import *

@@ -28,20 +28,11 @@ def findItem(fileId):
     f.findItem()
 
 @task(ignore_resulsts=True, queue="encoding")
-def extractData(fileId):
+def updateStreams(itemId):
     '''
-        update file stuff
-        create derivates and other related stuff for a file
+        create stream, extract timeline and create derivatives
     '''
-    f = models.File.objects.get(pk=fileId)
-    f.extract()
-
-@task(ignore_resulsts=True, queue="encoding")
-def updateItem(movidId):
-    '''
-        update item
-        create proxy stream and other related files extracted from itemFiles
-    '''
-    m = models.Item.objects.get(pk=itemId)
-    m.extract()
+    item = models.Item.objects.get(itemId=itemId)
+    if item.files.filter(is_main=True, is_video=True, availble=False).count() == 0:
+        item.updateStreams()
 

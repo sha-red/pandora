@@ -275,6 +275,7 @@ class Item(models.Model):
         layers['cuts'] = self.metadata.get('cuts', {})
         
         layers['subtitles'] = {}
+        #FIXME: subtitles should be stored in Layer
         qs = self.files.filter(is_subtitle=True, is_main=True, available=True)
         if qs.count()>0:
             layers['subtitles'] = qs[0].srt()
@@ -462,9 +463,13 @@ class Item(models.Model):
     def timeline_prefix(self):
         return os.path.join(settings.MEDIA_ROOT, itemid_path(self.itemId), 'timeline')
 
+    def main_videos(self):
+        #FIXME: needs to check if more than one user has main files and only take from "higher" user
+        return self.files.filter(is_main=True, is_video=True, available=True)
+
     def updateStreams(self):
         files = {}
-        for f in self.files.filter(is_main=True, is_video=True, available=True):
+        for f in self.main_videos():
             files[utils.sort_title(f.name)] = f.video.path
         
         #FIXME: how to detect if something changed?
@@ -556,7 +561,7 @@ class Item(models.Model):
     def local_posters(self):
         part = 1
         posters = {}
-        for f in self.files.filter(is_main=True, available=True):
+        for f in self.main_videos():
             for frame in f.frames.all():
                 path = os.path.join(itemid_path(self.itemId), 'poster.pandora.%s.%s.jpg'%(part, frame.position))
                 path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, path))
@@ -568,7 +573,7 @@ class Item(models.Model):
         posters = self.local_posters()
         for poster in posters:
             frame = posters[poster]
-            cmd = ['oxposter',
+            cmd = [settings.ITEM_POSTER,
                    '-t', self.get('title'),
                    '-d', ', '.join(self.get('directors', ['Unknown Director'])),
                    '-f', frame,
