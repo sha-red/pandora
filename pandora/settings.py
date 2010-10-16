@@ -119,11 +119,11 @@ INSTALLED_APPS = (
     'app',
     'backend',
     'archive',
-    'oxuser',
+    'user',
     'torrent',
 )
 
-AUTH_PROFILE_MODULE = 'oxuser.UserProfile'
+AUTH_PROFILE_MODULE = 'user.UserProfile'
 
 #Video encoding settings
 #available profiles: 96p, 270p, 360p, 480p, 720p, 1080p
@@ -151,7 +151,9 @@ POSTER_PRECEDENCE=('local', 'criterion.com', 'wikipedia.org', 'impawards.com', '
 #0xdb.org
 #POSTER_SERVICES=['http://data.0xdb.org/poster/']
 
+#copy scripts and adjust to customize
 ITEM_POSTER = join('scripts', 'oxdb_poster')
+#ITEM_POSTER = join('scripts', 'padma_poster')
 ITEM_ICON   = join('scripts', 'item_icon')
 LIST_ICON   = join('scripts', 'list_icon')
 

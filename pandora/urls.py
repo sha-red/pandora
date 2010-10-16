@@ -24,7 +24,7 @@ urlpatterns = patterns('',
     (r'^timeline$', 'app.views.timeline'),
     (r'^file/(?P<oshash>.*)$', 'archive.views.lookup_file'),
 
-    (r'^r/(?P<key>.*)$', 'oxuser.views.recover'),
+    (r'^r/(?P<key>.*)$', 'user.views.recover'),
     (r'', include('backend.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
