@@ -52,7 +52,6 @@ def api(request):
     #FIXME: possible to do this in f
     #data = json.loads(request.POST['data'])
 
-    #FIXME: security considerations, web facing api should not call anything in globals!!!
     f = globals().get('api_'+function, None)
     if f:
         response = f(request)
