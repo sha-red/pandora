@@ -3,6 +3,7 @@ South
 chardet
 -e bzr+http://code.0x2620.org/python-ox/#egg=python-ox
 -e bzr+http://code.0x2620.org/python-oxdjango/#egg=python-oxdjango
+-e bzr+http://code.0x2620.org/oxtimeline/#egg=oxtimeline
 simplejson
 #-e hg+https://django-ajax-filtered-fields.googlecode.com/hg/#egg=django-ajax-filtered-fields 
 #rabbitmq interface
