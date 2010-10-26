@@ -2,40 +2,40 @@
 
 from south.db import db
 from django.db import models
-from oxuser.models import *
+from user.models import *
 
 class Migration:
     
     def forwards(self, orm):
         
         # Adding model 'Preference'
-        db.create_table('oxuser_preference', (
-            ('id', orm['oxuser.Preference:id']),
-            ('user', orm['oxuser.Preference:user']),
-            ('created', orm['oxuser.Preference:created']),
-            ('modified', orm['oxuser.Preference:modified']),
-            ('key', orm['oxuser.Preference:key']),
-            ('value', orm['oxuser.Preference:value']),
+        db.create_table('user_preference', (
+            ('id', orm['user.Preference:id']),
+            ('user', orm['user.Preference:user']),
+            ('created', orm['user.Preference:created']),
+            ('modified', orm['user.Preference:modified']),
+            ('key', orm['user.Preference:key']),
+            ('value', orm['user.Preference:value']),
         ))
-        db.send_create_signal('oxuser', ['Preference'])
+        db.send_create_signal('user', ['Preference'])
         
         # Adding model 'UserProfile'
-        db.create_table('oxuser_userprofile', (
-            ('id', orm['oxuser.UserProfile:id']),
-            ('recover_key', orm['oxuser.UserProfile:recover_key']),
-            ('user', orm['oxuser.UserProfile:user']),
+        db.create_table('user_userprofile', (
+            ('id', orm['user.UserProfile:id']),
+            ('recover_key', orm['user.UserProfile:recover_key']),
+            ('user', orm['user.UserProfile:user']),
         ))
-        db.send_create_signal('oxuser', ['UserProfile'])
+        db.send_create_signal('user', ['UserProfile'])
         
     
     
     def backwards(self, orm):
         
         # Deleting model 'Preference'
-        db.delete_table('oxuser_preference')
+        db.delete_table('user_preference')
         
         # Deleting model 'UserProfile'
-        db.delete_table('oxuser_userprofile')
+        db.delete_table('user_userprofile')
         
     
     
@@ -74,7 +74,7 @@ class Migration:
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'oxuser.preference': {
+        'user.preference': {
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'key': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
@@ -82,11 +82,11 @@ class Migration:
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'preferences'", 'to': "orm['auth.User']"}),
             'value': ('django.db.models.fields.TextField', [], {'blank': 'True'})
         },
-        'oxuser.userprofile': {
+        'user.userprofile': {
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'recover_key': ('django.db.models.fields.TextField', [], {}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'unique': 'True'})
         }
     }
     
-    complete_apps = ['oxuser']
+    complete_apps = ['user']
