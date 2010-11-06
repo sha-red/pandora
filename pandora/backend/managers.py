@@ -34,7 +34,6 @@ def parseCondition(condition):
     }
     ...
 	'''
-
     k = condition.get('key', 'all')
     k = {'id': 'itemId'}.get(k, k)
     if not k: k = 'all'
@@ -48,29 +47,36 @@ def parseCondition(condition):
         exclude = False
     if keyType(k) == "string":
         in_find=True
+        value_key = 'find__value'
         if op == '=':
             if k in models.Item.facet_keys:
                 in_find=False
                 v = models.Item.objects.filter(facets__key=k, facets__value=v)
                 k = 'id__in'
             else:
-                k = '%s__iexact' % k
+                value_key = 'find__value__iexact'
         elif op == '^':
             v = v[1:]
-            k = '%s__istartswith' % k
+            value_key = 'find__value__istartswith'
         elif op == '$':
             v = v[:-1]
-            k = '%s__iendswith' % k
+            value_key = 'find__value__iendswith'
         else: # elif op == '~':
-            k = '%s__icontains' % k
-        if in_find and not k.startswith('itemId'):
-            k = 'find__%s' % k
+            value_key = 'find__value__icontains'
         k = str(k)
         if exclude:
-            return ~Q(**{k:v})
+            if in_find and not k.startswith('itemId'):
+                q = ~Q(**{'find__key':k, value_key:v})
+            else:
+                q = ~Q(**{k:v})
         else:
-            return Q(**{k:v})
+            if in_find and not k.startswith('itemId'):
+                q = Q(**{'find__key':k, value_key:v})
+            else:
+                q = Q(**{k:v})
+        return q
     else: #number or date
+        #FIXME: this part needs to be moved to use key/value find db 
         def parseDate(d):
             while len(d) < 3:
                 d.append(1)
@@ -207,29 +213,4 @@ class ItemManager(Manager):
         l = data.get('list', 'all')
         qs = self.filter_list(qs, l, user)
         return qs
-
-class FileManager(Manager):
-    def get_query_set(self):
-        return super(FileManager, self).get_query_set()
-
-    def item_files(self, item):
-        q = self.get_query_set()
-        return q.filter(type=1, item=item)
-
-class ArchiveFileManager(Manager):
-    def get_query_set(self):
-        return super(ArchiveFileManager, self).get_query_set()
-
-    def item_files(self, item):
-        q = self.get_query_set()
-        return q.filter(file__is_video=True, file__item=item)
-
-    def by_oshash(self, oshash):
-        q = self.get_query_set()
-        q = q.filter(file__oshash=oshash)
-        if q.count() == 0:
-            raise models.ArchiveFile.DoesNotExist("%s matching oshash %s does not exist." %
-                 (models.ArchiveFile._meta.object_name, oshash))
-        else:
-            return q[0]
 

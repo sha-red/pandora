@@ -324,16 +324,20 @@ class Item(models.Model):
         Search related functions
     '''
     def updateFind(self):
-        try:
-            f = self.find
-        except ItemFind.DoesNotExist:
-            f = ItemFind(item=self)
+        def save(key, value):
+            f, created = ItemFind.objects.get_or_create(item=self, key=key)
+            if value not in ('', '||'):
+                f.value = value
+                f.save()
+            else:
+                f.delete()
 
-        f.title = '\n'.join([self.get('title'), self.get('original_title', '')])
+        save('title', '\n'.join([self.get('title'), self.get('original_title', '')]))
+        
         #FIXME: filter us/int  title
         #f.title += ' '.join([t.title for t in self.alternative_titles()])
 
-        f.year = self.get('year', '')
+        save('year', self.get('year', ''))
 
         for key in self.facet_keys:
             if key == 'actor':
@@ -342,23 +346,19 @@ class Item(models.Model):
                 values = [i[1] for i in self.get('actor', [])]
             else:
                 values = self.get(utils.plural_key(key), [])
-            setattr(f, key, '|%s|'%'|'.join(values))
-
-        f.summary = self.get('plot', '') + self.get('plot_outline', '')
-        f.trivia = ' '.join(self.get('trivia', []))
-        f.location = '|%s|'%'|'.join(self.get('filming_locations', []))
+            save(key, '|%s|'%'|'.join(values))
+        save('summary', self.get('plot', '') + self.get('plot_outline', ''))
+        save('trivia', ' '.join(self.get('trivia', [])))
+        save('location', '|%s|'%'|'.join(self.get('filming_locations', [])))
 
         #FIXME:
         #f.dialog = 'fixme'
-        f.dialog = '\n'.join([l.value for l in Layer.objects.filter(type='subtitle', item=self).order_by('start')])
+        save('dialog', '\n'.join([l.value for l in Layer.objects.filter(type='subtitle', item=self).order_by('start')]))
 
         #FIXME: collate filenames
         #f.filename = self.filename
-        f.all = ' '.join(filter(None, [f.title, f.director, f.country, str(f.year), f.language,
-                          f.writer, f.producer, f.editor, f.cinematographer,
-                          f.actor, f.character, f.genre, f.keyword, f.summary, f.trivia,
-                          f.location, f.filename]))
-        f.save()
+        all_find = ' '.join([f.value for f in ItemFind.objects.filter(item=self).exclude(key='all')])
+        save('all', all_find)
 
     def updateSort(self):
         try:
@@ -588,47 +588,16 @@ class Item(models.Model):
 
 class ItemFind(models.Model):
     """
-        used to search items, all search values are in here
+        used to find items,
+        item.updateFind populates this table
+        its used in manager.ItemManager
     """
-    item = models.OneToOneField('Item', related_name='find', primary_key=True)
+    class Meta:
+        unique_together = ("item", "key")
 
-    all = models.TextField(blank=True)
-    title = models.TextField(blank=True)
-    director = models.TextField(blank=True, default='')
-    country = models.TextField(blank=True, default='')
-    year = models.CharField(max_length=4)
-    language = models.TextField(blank=True, default='')
-    writer = models.TextField(blank=True, default='')
-    producer = models.TextField(blank=True, default='')
-    editor = models.TextField(blank=True, default='')
-    cinematographer = models.TextField(blank=True, default='')
-    actor = models.TextField(blank=True, default='')
-    character = models.TextField(blank=True, default='')
-
-    dialog = models.TextField(blank=True, default='')
-    #person
-
-    genre = models.TextField(blank=True)
-    keyword = models.TextField(blank=True)
-    summary = models.TextField(blank=True)
-    trivia = models.TextField(blank=True)
-    location = models.TextField(blank=True, default='')
-
-    #only for own files or as admin?
-    filename = models.TextField(blank=True, default='')
-
-    _private_fields = ('id', 'item')
-    #return available find fields
-    #FIXME: should return mapping name -> verbose_name
-    def fields(self):
-        fields = []
-        for f in self._meta.fields:
-            if f.name not in self._private_fields:
-                name = f.verbose_name
-                name = name[0].capitalize() + name[1:]
-                fields.append(name)
-        return tuple(fields)
-    fields = classmethod(fields)
+    item = models.ForeignKey('Item', related_name='find', db_index=True)
+    key = models.CharField(max_length=200, db_index=True)
+    value = models.TextField(blank=True)
 
 class ItemSort(models.Model):
     """
