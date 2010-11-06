@@ -278,7 +278,13 @@ class Frame(models.Model):
     position = models.FloatField()
     frame = models.ImageField(default=None, null=True, upload_to=frame_path)
 
-    #FIXME: frame path should be renamed on save to match current position
+    '''
+    def save(self, *args, **kwargs):
+        name = "%d.jpg" % self.position
+        if file.name != name:
+            #FIXME: frame path should be renamed on save to match current position
+        super(Frame, self).save(*args, **kwargs)
+    '''
 
     def __unicode__(self):
         return u'%s at %s' % (self.file, self.position)

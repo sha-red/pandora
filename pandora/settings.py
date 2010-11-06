@@ -4,9 +4,9 @@
 import os
 from os.path import join
 
-SITENAME = 'Pandora'
-SITEID = 'pandora'
-URL = 'pan.do/ra'
+SITENAME = 'Pan.do/ra'
+SITEID =   'pandora'
+URL =      'pan.do/ra'
 
 PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 
@@ -67,14 +67,14 @@ APPEND_SLASH = False
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = join(PROJECT_ROOT, 'media')
-STATIC_ROOT = join(PROJECT_ROOT, 'static')
+MEDIA_ROOT = join(PROJECT_ROOT, '..', 'data')
+STATIC_ROOT = join(PROJECT_ROOT, '..', 'static')
 TESTS_ROOT = join(PROJECT_ROOT, 'tests')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '/media/'
+MEDIA_URL = '/data/'
 
 STATIC_URL = '/static/'
 
@@ -138,15 +138,24 @@ VIDEO_H264 = False
 #VIDEO_H264 = False
 
 
-TRANSMISSON_HOST='localhost'
-TRANSMISSON_PORT=9091
-TRANSMISSON_USER='transmission'
-TRANSMISSON_PASSWORD='transmission'
+TRANSMISSON_HOST = 'localhost'
+TRANSMISSON_PORT = 9091
+TRANSMISSON_USER = 'transmission'
+TRANSMISSON_PASSWORD = 'transmission'
 
 
 #list of poster services, https://wiki.0x2620.org/wiki/pandora/posterservice
-POSTER_SERVICES=[]
-POSTER_PRECEDENCE=('local', 'criterion.com', 'wikipedia.org', 'impawards.com', 'movieposterdb.com', 'imdb.com', 'allmovie.com', 'other')
+POSTER_SERVICES = []
+POSTER_PRECEDENCE = (
+    'local',
+    'criterion.com',
+    'wikipedia.org',
+    'impawards.com',
+    'movieposterdb.com',
+    'imdb.com',
+    'allmovie.com',
+    'other'
+)
 
 #0xdb.org
 #POSTER_SERVICES=['http://data.0xdb.org/poster/']
