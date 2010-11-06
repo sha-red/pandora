@@ -31,20 +31,10 @@ def api_getPage(request):
     response = json_response({'name': page.name, 'body': page.body})
     return render_to_json_response(response)
 
-    return render_to_response('site.js', context, mimetype="application/javascript")
-
-def site_js(request):
-    pages = models.Page.objects.all()
-    siteSettings = {}
-    for s in models.SiteSettings.objects.all():
-        siteSettings[s.key] = s.value
-    context = RequestContext(request, {'settings':settings, 'pages': pages, 'siteSettings': siteSettings})
-    return render_to_response('site.js', context, mimetype="application/javascript")
-
-def pandora_json(request):
+def site_json(request):
     siteSettings = {}
     for s in models.SiteSettings.objects.all():
         siteSettings[s.key] = s.value
     context = RequestContext(request, {'settings':settings, 'siteSettings': siteSettings})
-    return render_to_response('pandora.json', context, mimetype="application/javascript")
+    return render_to_response('site.json', context, mimetype="application/javascript")
 

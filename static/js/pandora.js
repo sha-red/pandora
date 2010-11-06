@@ -4,7 +4,7 @@
 
 var app = new Ox.App({
     apiURL: '/api/',
-    config: '/pandora.json',
+    config: '/site.json',
     init: 'hello',
 }).launch(function(data) {
     Ox.print('data', data)
