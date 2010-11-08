@@ -8,7 +8,7 @@ from oxdjango.shortcuts import json_response, render_to_json_response, get_objec
 
 import models
 
-from backend.views import html_snapshot
+from api.views import html_snapshot
 
 def intro(request):
     context = RequestContext(request, {'settings':settings})

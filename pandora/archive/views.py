@@ -29,9 +29,9 @@ import ox
 
 import models
 
-from backend.utils import oxid, parse_path
-import backend.models
-import backend.tasks
+from item.utils import oxid, parse_path
+import item.models
+import item.tasks
 
 @login_required_json
 def api_removeVolume(request):
@@ -114,7 +114,7 @@ def api_update(request):
                 else:
                     if not item:
                         item_info = parse_path(folder)
-                        item = backend.models.getItem(item_info)
+                        item = item.models.getItem(item_info)
                     file_object = models.File()
                     file_object.oshash = oshash
                     file_object.name = name
@@ -223,7 +223,7 @@ def firefogg_upload(request):
                 elif form.cleaned_data['done']:
                     f.available = True
                     f.save()
-                    backend.tasks.updateStreams.delay(f.item.itemId)
+                    item.tasks.updateStreams.delay(f.item.itemId)
                     response['result'] = 1
                     response['done'] = 1
                 return render_to_json_response(response)

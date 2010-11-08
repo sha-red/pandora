@@ -24,7 +24,8 @@ urlpatterns = patterns('',
     (r'^file/(?P<oshash>.*)$', 'archive.views.lookup_file'),
 
     (r'^r/(?P<key>.*)$', 'user.views.recover'),
-    (r'', include('backend.urls')),
+    (r'^api/$', include('api.urls')),
+    (r'', include('item.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:

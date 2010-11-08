@@ -22,8 +22,8 @@ from ox.normalize import canonicalTitle, canonicalName
 from firefogg import Firefogg
 import chardet
 
-from backend import utils
-from pandora.backend.models import Item
+from item import utils
+from item.models import Item
 
 import extract
 
@@ -143,7 +143,7 @@ class File(models.Model):
 
     #upload and data handling
     video = models.FileField(null=True, blank=True, upload_to=lambda f, x: file_path(f, '%s.webm'%settings.VIDEO_PROFILE))
-    data = models.FileField(null=True, blank=True, upload_to=lambda f, x: file_path(f, 'data.raw'))
+    data = models.FileField(null=True, blank=True, upload_to=lambda f, x: file_path(f, 'data.bin'))
 
     def contents(self):
         if self.data != None:

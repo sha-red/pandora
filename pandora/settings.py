@@ -117,7 +117,8 @@ INSTALLED_APPS = (
     'djcelery',
 
     'app',
-    'backend',
+    'api',
+    'item',
     'archive',
     'user',
     'torrent',
