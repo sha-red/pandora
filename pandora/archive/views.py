@@ -87,7 +87,7 @@ def api_update(request):
             oshash = f['oshash']
             all_files.append(oshash)
 
-            same_folder = models.FileInstance.objects.filter(folder=folder, volume=volume)
+            same_folder = models.Instance.objects.filter(folder=folder, volume=volume)
             if same_folder.count() > 0:
                 item = same_folder[0].file.item
             else:
@@ -95,7 +95,7 @@ def api_update(request):
 
 	        path = os.path.join(folder, name)
 
-            instance = models.FileInstance.objects.filter(file__oshash=oshash, volume=volume)
+            instance = models.Instance.objects.filter(file__oshash=oshash, volume=volume)
             if instance.count()>0:
                 instance = instance[0]
                 updated = False
@@ -121,7 +121,7 @@ def api_update(request):
                     file_object.item = item
                     file_object.save()
                     response['data']['info'].append(oshash)
-                instance = models.FileInstance()
+                instance = models.Instance()
                 instance.volume = volume
                 instance.file = file_object
                 for key in ('mtime', 'name', 'folder'):
@@ -130,7 +130,7 @@ def api_update(request):
 
         #remove deleted files
         #FIXME: can this have any bad consequences? i.e. on the selction of used item files.
-        models.FileInstance.objects.filter(volume=volume).exclude(file__oshash__in=all_files).delete()
+        models.Instance.objects.filter(volume=volume).exclude(file__oshash__in=all_files).delete()
 
         user_profile = user.get_profile()
         user_profile.files_updated = datetime.now()
@@ -139,7 +139,7 @@ def api_update(request):
     if 'info' in data:
         for oshash in data['info']:
             info = data['info'][oshash]
-            instance = models.FileInstance.objects.filter(file__oshash=oshash, volume__user=user)
+            instance = models.Instance.objects.filter(file__oshash=oshash, volume__user=user)
             if instance.count()>0:
                 instance = instance[0]
                 if not instance.file.info:
@@ -149,7 +149,7 @@ def api_update(request):
                     instance.file.info = info
                     instance.file.save()
 
-    files = models.FileInstance.objects.filter(volume__user=user, file__available=False)
+    files = models.Instance.objects.filter(volume__user=user, file__available=False)
     if volume:
         files = files.filter(volume=volume)
     response['data']['info'] = [f.file.oshash for f in files.filter(file__info='{}')]

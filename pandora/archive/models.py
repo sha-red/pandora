@@ -240,7 +240,7 @@ class Volume(models.Model):
     def __unicode__(self):
         return u"%s's %s"% (self.user, self.name)
 
-class FileInstance(models.Model):
+class Instance(models.Model):
     class Meta:
         unique_together = ("name", "folder", "volume")
 

@@ -67,19 +67,19 @@ class Migration(SchemaMigration):
         # Deleting field 'fileinstance.archive'
         db.delete_column('archive_fileinstance', 'archive_id')
 
-        # Adding field 'FileInstance.ctime'
+        # Adding field 'Instance.ctime'
         db.add_column('archive_fileinstance', 'ctime', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now), keep_default=False)
 
-        # Adding field 'FileInstance.mtime'
+        # Adding field 'Instance.mtime'
         db.add_column('archive_fileinstance', 'mtime', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now), keep_default=False)
 
-        # Adding field 'FileInstance.atime'
+        # Adding field 'Instance.atime'
         db.add_column('archive_fileinstance', 'atime', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now), keep_default=False)
 
-        # Adding field 'FileInstance.volume'
+        # Adding field 'Instance.volume'
         db.add_column('archive_fileinstance', 'volume', self.gf('django.db.models.fields.related.ForeignKey')(default=None, related_name='files', to=orm['archive.Volume']), keep_default=False)
 
-        # Adding unique constraint on 'FileInstance', fields ['volume', 'path', 'folder']
+        # Adding unique constraint on 'Instance', fields ['volume', 'path', 'folder']
         db.create_unique('archive_fileinstance', ['volume_id', 'path', 'folder'])
 
 
@@ -154,19 +154,19 @@ class Migration(SchemaMigration):
         # Adding field 'fileinstance.archive'
         db.add_column('archive_fileinstance', 'archive', self.gf('django.db.models.fields.related.ForeignKey')(default=None, related_name='files', to=orm['archive.Archive']), keep_default=False)
 
-        # Deleting field 'FileInstance.ctime'
+        # Deleting field 'Instance.ctime'
         db.delete_column('archive_fileinstance', 'ctime')
 
-        # Deleting field 'FileInstance.mtime'
+        # Deleting field 'Instance.mtime'
         db.delete_column('archive_fileinstance', 'mtime')
 
-        # Deleting field 'FileInstance.atime'
+        # Deleting field 'Instance.atime'
         db.delete_column('archive_fileinstance', 'atime')
 
-        # Deleting field 'FileInstance.volume'
+        # Deleting field 'Instance.volume'
         db.delete_column('archive_fileinstance', 'volume_id')
 
-        # Removing unique constraint on 'FileInstance', fields ['volume', 'path', 'folder']
+        # Removing unique constraint on 'Instance', fields ['volume', 'path', 'folder']
         db.delete_unique('archive_fileinstance', ['volume_id', 'path', 'folder'])
 
 
@@ -209,7 +209,7 @@ class Migration(SchemaMigration):
             'width': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
         'archive.fileinstance': {
-            'Meta': {'unique_together': "(('path', 'folder', 'volume'),)", 'object_name': 'FileInstance'},
+            'Meta': {'unique_together': "(('path', 'folder', 'volume'),)", 'object_name': 'Instance'},
             'atime': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'ctime': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),

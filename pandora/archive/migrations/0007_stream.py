@@ -99,7 +99,7 @@ class Migration(SchemaMigration):
             'width': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
         'archive.fileinstance': {
-            'Meta': {'unique_together': "(('name', 'folder', 'volume'),)", 'object_name': 'FileInstance'},
+            'Meta': {'unique_together': "(('name', 'folder', 'volume'),)", 'object_name': 'Instance'},
             'atime': ('django.db.models.fields.IntegerField', [], {'default': '1282732467'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'ctime': ('django.db.models.fields.IntegerField', [], {'default': '1282732467'}),

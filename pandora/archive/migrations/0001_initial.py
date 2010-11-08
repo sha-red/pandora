@@ -77,19 +77,19 @@ class Migration:
         ))
         db.send_create_signal('archive', ['File'])
         
-        # Adding model 'FileInstance'
+        # Adding model 'Instance'
         db.create_table('archive_fileinstance', (
-            ('id', orm['archive.FileInstance:id']),
-            ('created', orm['archive.FileInstance:created']),
-            ('modified', orm['archive.FileInstance:modified']),
-            ('published', orm['archive.FileInstance:published']),
-            ('accessed', orm['archive.FileInstance:accessed']),
-            ('path', orm['archive.FileInstance:path']),
-            ('folder', orm['archive.FileInstance:folder']),
-            ('file', orm['archive.FileInstance:file']),
-            ('archive', orm['archive.FileInstance:archive']),
+            ('id', orm['archive.Instance:id']),
+            ('created', orm['archive.Instance:created']),
+            ('modified', orm['archive.Instance:modified']),
+            ('published', orm['archive.Instance:published']),
+            ('accessed', orm['archive.Instance:accessed']),
+            ('path', orm['archive.Instance:path']),
+            ('folder', orm['archive.Instance:folder']),
+            ('file', orm['archive.Instance:file']),
+            ('archive', orm['archive.Instance:archive']),
         ))
-        db.send_create_signal('archive', ['FileInstance'])
+        db.send_create_signal('archive', ['Instance'])
         
     
     
@@ -107,7 +107,7 @@ class Migration:
         # Deleting model 'File'
         db.delete_table('archive_file')
         
-        # Deleting model 'FileInstance'
+        # Deleting model 'Instance'
         db.delete_table('archive_fileinstance')
         
     

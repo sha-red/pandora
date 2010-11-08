@@ -8,31 +8,31 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
-        # Deleting field 'FileInstance.path'
+        # Deleting field 'Instance.path'
         db.delete_column('archive_fileinstance', 'path')
 
-        # Adding field 'FileInstance.name'
+        # Adding field 'Instance.name'
         db.add_column('archive_fileinstance', 'name', self.gf('django.db.models.fields.CharField')(default='', max_length=2048), keep_default=False)
 
-        # Removing unique constraint on 'FileInstance', fields ['volume', 'path', 'folder']
+        # Removing unique constraint on 'Instance', fields ['volume', 'path', 'folder']
         #db.delete_unique('archive_fileinstance', ['volume_id', 'path', 'folder'])
 
-        # Adding unique constraint on 'FileInstance', fields ['volume', 'folder', 'name']
+        # Adding unique constraint on 'Instance', fields ['volume', 'folder', 'name']
         db.create_unique('archive_fileinstance', ['volume_id', 'folder', 'name'])
 
 
     def backwards(self, orm):
         
-        # Adding field 'FileInstance.path'
+        # Adding field 'Instance.path'
         db.add_column('archive_fileinstance', 'path', self.gf('django.db.models.fields.CharField')(default='', max_length=2048), keep_default=False)
 
-        # Deleting field 'FileInstance.name'
+        # Deleting field 'Instance.name'
         db.delete_column('archive_fileinstance', 'name')
 
-        # Adding unique constraint on 'FileInstance', fields ['volume', 'path', 'folder']
+        # Adding unique constraint on 'Instance', fields ['volume', 'path', 'folder']
         db.create_unique('archive_fileinstance', ['volume_id', 'path', 'folder'])
 
-        # Removing unique constraint on 'FileInstance', fields ['volume', 'folder', 'name']
+        # Removing unique constraint on 'Instance', fields ['volume', 'folder', 'name']
         db.delete_unique('archive_fileinstance', ['volume_id', 'folder', 'name'])
 
 
@@ -75,7 +75,7 @@ class Migration(SchemaMigration):
             'width': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
         'archive.fileinstance': {
-            'Meta': {'unique_together': "(('name', 'folder', 'volume'),)", 'object_name': 'FileInstance'},
+            'Meta': {'unique_together': "(('name', 'folder', 'volume'),)", 'object_name': 'Instance'},
             'atime': ('django.db.models.fields.IntegerField', [], {'default': '1281358260'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'ctime': ('django.db.models.fields.IntegerField', [], {'default': '1281358260'}),

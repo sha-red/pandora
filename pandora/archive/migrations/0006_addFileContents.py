@@ -78,7 +78,7 @@ class Migration(SchemaMigration):
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         'archive.fileinstance': {
-            'Meta': {'unique_together': "(('name', 'folder', 'volume'),)", 'object_name': 'FileInstance'},
+            'Meta': {'unique_together': "(('name', 'folder', 'volume'),)", 'object_name': 'Instance'},
             'atime': ('django.db.models.fields.IntegerField', [], {'default': '1282476196'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'ctime': ('django.db.models.fields.IntegerField', [], {'default': '1282476196'}),

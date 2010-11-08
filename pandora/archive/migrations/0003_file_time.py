@@ -8,28 +8,28 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
-        # Changing field 'FileInstance.ctime'
+        # Changing field 'Instance.ctime'
         db.delete_column('archive_fileinstance', 'ctime')
         db.add_column('archive_fileinstance', 'ctime', self.gf('django.db.models.fields.IntegerField')())
 
-        # Changing field 'FileInstance.mtime'
+        # Changing field 'Instance.mtime'
         db.delete_column('archive_fileinstance', 'mtime')
         db.add_column('archive_fileinstance', 'mtime', self.gf('django.db.models.fields.IntegerField')())
 
-        # Changing field 'FileInstance.atime'
+        # Changing field 'Instance.atime'
         db.delete_column('archive_fileinstance', 'atime')
         db.add_column('archive_fileinstance', 'atime', self.gf('django.db.models.fields.IntegerField')())
 
 
     def backwards(self, orm):
         
-        # Changing field 'FileInstance.ctime'
+        # Changing field 'Instance.ctime'
         db.alter_column('archive_fileinstance', 'ctime', self.gf('django.db.models.fields.DateTimeField')())
 
-        # Changing field 'FileInstance.mtime'
+        # Changing field 'Instance.mtime'
         db.alter_column('archive_fileinstance', 'mtime', self.gf('django.db.models.fields.DateTimeField')())
 
-        # Changing field 'FileInstance.atime'
+        # Changing field 'Instance.atime'
         db.alter_column('archive_fileinstance', 'atime', self.gf('django.db.models.fields.DateTimeField')())
 
 
@@ -72,7 +72,7 @@ class Migration(SchemaMigration):
             'width': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
         'archive.fileinstance': {
-            'Meta': {'unique_together': "(('path', 'folder', 'volume'),)", 'object_name': 'FileInstance'},
+            'Meta': {'unique_together': "(('path', 'folder', 'volume'),)", 'object_name': 'Instance'},
             'atime': ('django.db.models.fields.IntegerField', [], {'default': '1281357186.5094559'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'ctime': ('django.db.models.fields.IntegerField', [], {'default': '1281357186.5095601'}),
