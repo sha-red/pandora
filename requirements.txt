@@ -13,3 +13,7 @@ django_extensions
 -e bzr+http://firefogg.org/dev/python-firefogg/#egg=python-firefogg
 -e git+git://github.com/dcramer/django-devserver#egg=django_devserver
 transmissionrpc
+
+#needs git to work with upstart
+#https://github.com/benoitc/gunicorn/commit/f29c61091691135dcfae029a7eadf1663a06a73e
+-e git+https://github.com/benoitc/gunicorn.git#egg=gunicorn
