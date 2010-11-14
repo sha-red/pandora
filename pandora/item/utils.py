@@ -7,6 +7,7 @@ import os
 import sys
 import re
 import hashlib
+import unicodedata
 
 import ox
 import ox.iso
@@ -164,7 +165,10 @@ def parse_path(path):
 def sort_title(title):
     #title
     title = re.sub(u'[\'!¿¡,\.;\-"\:\*\[\]]', '', title)
-    title = title.replace(u'Æ', 'Ae')
+
+    #title = title.replace(u'Æ', 'Ae')
+    title = unicodedata.normalize('NFKD',title)
+
     #pad numbered titles
     title = re.sub('(\d+)', lambda x: '%010d' % int(x.group(0)), title)
     return title.strip()
