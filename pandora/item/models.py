@@ -29,6 +29,195 @@ import utils
 from archive import extract
 
 
+class Property(models.Model):
+    name = models.CharField(null=True, max_length=255, unique=True)
+    title = models.CharField(null=True, max_length=255)
+	#types: string, person, role, location, date, array
+    type = models.CharField(null=True, max_length=255)
+    array = models.BooleanField(default=False)
+    position = models.IntegerField(default=0)
+
+	#sort values: title, string, integer, float, date
+    sort = models.CharField(null=True, max_length=255)
+
+    totals = models.BooleanField(default=False)
+    admin = models.BooleanField(default=False)
+
+	def json(self):
+		j = {}
+		for key in ('type', 'sort', 'title', 'array', 'totals', 'admin'):
+			value = getattr(self, key)
+			if value:
+				j[key] = value
+		return j
+
+class  Bin(models.Model):
+    name = models.CharField(null=True, max_length=255, unique=True)
+    title = models.CharField(null=True, max_length=255)
+	#types: keyword, location, text
+    type = models.CharField(null=True, max_length=255)
+    position = models.IntegerField(default=0)
+
+	overlapping = models.BooleanField(default=True)
+
+	find = models.BooleanField(default=True)
+	#words / item duration(wpm), total words, cuts per minute, cuts, number of layers, number of layers/duration
+    sort = models.CharField(null=True, max_length=255)
+
+    def properties(self):
+        p = {}
+        if self.find:
+            p[self.name] = {'type': 'bin', 'find': True}
+        if self.sort:
+            print 'FIXME: need to add sort stuff'
+        return p
+
+properties = {
+    'title': {'type': 'string', 'sort': 'title', 'find': True},
+    'director': {'type': 'person', 'array': True, 'sort': 'string', 'find': True},
+    'country': {'type': 'string', 'array': True, 'sort': 'sring', 'find': True},
+    'year': {'type': 'string', 'sort': 'string', 'find': True},
+    'language': {'type': 'string', 'array': True, 'sort': 'string', 'find': True},
+    'runtime': {'type': 'integer', 'sort': 'integer'},
+    'writer': {'type': 'person', 'array': True, 'sort': 'string', 'find': True},
+    'producer': {'type': 'person', 'array': True,  'sort': 'string', 'find': True},
+    'cinematographer': {'type': 'person', 'array': True, 'sort': 'string', 'find': True},
+    'editor': {'type': 'person', 'array': True, 'sort': 'string', 'find': True},
+    'actors': {'type': 'role', 'array': True, 'sort': 'length', 'find': True},
+    'genre': {'type': 'string', 'array': True, 'sort': 'length', 'find': True},
+    'keywords': {'type': 'string', 'array': True, 'sort': 'length', 'find': True},
+    'summary': {'type': 'title', 'sort': 'length', 'find': True},
+    'trivia': {'type': 'title', 'sort': 'length', 'find': True},
+    'releasedate': {'type': 'date', 'sort': 'date', 'find': True},
+    'runtime': {'type': 'integer', 'sort': 'integer', 'totals': True},
+
+    'budget': {'type': 'float', 'sort': 'float'},
+    'gross': {'type': 'float', 'sort': 'float'},
+    'profit': {'type': 'float', 'sort': 'float'},
+
+    'rating': {'type': 'integer', 'sort': 'integer'},
+    'votes': {'type': 'integer', 'sort': 'integer'},
+    'published': {'type': 'date', 'sort': 'date'},
+    'modified': {'type': 'date', 'sort': 'date'},
+    'popularity': {'type': 'date', 'sort': 'date'},
+
+    #file properties // are those even configurable? think not
+    'aspectratio': {'type': 'faction', 'sort': 'float'},
+    'duration': {'type': 'float', 'sort': 'float', 'totals': True, "admin": True},
+    'color': {'type': 'color', 'sort': 'color'},
+    'saturation': {'type': 'integer', 'sort': 'integer'},
+    'brightness': {'type': 'integer', 'sort': 'integer'},
+    'volume': {'type': 'integer', 'sort': 'integer'},
+    'resolution': {'type': 'integer', 'array': True, 'sort': 'integer'}, #FIXME
+    'pixels': {'type': 'integer', 'sort': 'string', 'totals': True},
+    'size': {'type': 'title', 'sort': 'string', 'totals': True, 'admin': True},
+    'bitrate': {'type': 'title', 'sort': 'string'},
+    'files': {'type': 'title', 'sort': 'string', 'totals': True, 'admin': True},
+    'filename': {'type': 'title', 'sort': 'string'},
+
+    #Layer properties // those need to be defined with bins
+    'dialog': {'type': 'title', 'find': True},
+    #'clips': {'type': 'title', 'sort': 'string'},
+    #'cuts': {'type': 'title', 'sort': 'string'},
+    'cutsperminute': {'type': 'integer', 'title': 'Cuts per minute', 'sort': 'string'},
+    'words': {'type': 'title', 'sort': 'string'},
+    'wordsperminute': {'type': 'integer','title': 'Words per minute', 'sort': 'string'},
+}
+
+def siteJson():
+	r = {}
+	r['findKeys'] = [{"id": "all", "title": "All"}]
+	for k in properties:
+		i = properties[k]
+		if i.get('find', False):
+		    f = {"id": k, "title": i.get('title', k.capitalize())}
+		    if i.get('autocomplete', False):
+			    f['autocomplete'] = True
+		    r['findKeys'].append(f)
+	r['groups'] = filter(lambda k: 'array' in properties[k], properties.keys())
+    r['itemViews'] = [
+        {"id": "info", "title": "Info"},
+        {"id": "statistics", "title": "Statistics"},
+        {"id": "clips", "title": "Clips"},
+        {"id": "timeline", "title": "Timeline"},
+        {"id": "map", "title": "Map"},
+        {"id": "calendar", "title": "Calendar"},
+        {"id": "files", "title": "Files", "admin": True}
+    ]
+    r['listViews'] = [
+        {"id": "list", "title": "as List"},
+        {"id": "icons", "title": "as Icons"},
+        {"id": "info", "title": "with Info"},
+        {"id": "clips", "title": "with Clips"},
+        {"id": "timelines", "title": "with Timelines"},
+        {"id": "maps", "title": "with Maps"},
+        {"id": "calendars", "title": "with Calendars"},
+        {"id": "clip", "title": "as Clips"},
+        {"id": "map", "title": "on Map"},
+        {"id": "calendar", "title": "on Calendar"}
+    ]
+    r['site'] = {
+        "name": settings.SITENAME,
+        "id": settings.SITEID,
+        "url": settings.URL
+    }
+    r['sections'] = [
+        {"id": "history", "title": "History"},
+        {"id": "lists", "title": "My Lists"},
+        {"id": "public", "title": "Public Lists"},
+        {"id": "featured", "title": "Featured Lists"}
+    ]
+	r['sortKeys'] = []
+	for k in properties:
+		i = properties[k]
+		if 'sort' in i:
+			f = {
+				"id": k,
+				"title": i.get('title', k.capitalize()),
+				"operator": i.get('operator', ''),
+				"align": i.get('align', 'left'),
+				"width": i.get('width', 180),
+			}
+			if not i.get('removable', True):
+				f['removable'] = False
+			r['sortKeys'].append(f)
+
+	r['totals'] = [{"id": "items"}]
+	for k in properties:
+		i = properties[k]
+		if i.get('totals', False):
+			f = {"id": k}
+			if i.get('admin', False):
+				f['admin'] = True
+			r['totals'].append(f)
+
+    #FIXME: defaults should also be populated from properties
+    r["user"] = {
+        "group": "guest",
+        "preferences": {},
+        "ui": {
+            "columns": ["id", "title", "director", "country", "year", "language", "genre"],
+            "findQuery": {"conditions": [], "operator": ""},
+            "groupsQuery": {"conditions": [], "operator": "|"},
+            "groupsSize": 128,
+            "itemView": "info",
+            "listQuery": {"conditions": [], "operator": ""},
+            "listsSize": 192,
+            "listView": "list",
+            "sections": ["history", "lists", "public", "featured"],
+            "showGroups": True,
+            "showInfo": True,
+            "showLists": True,
+            "showMovies": True,
+            "sort": [
+                {"key": "director", "operator": ""}
+            ],
+            "theme": "classic"
+        },
+        "username": ""
+    }
+	return r
+
 def getItem(info):
     '''
         info dict with:
@@ -40,7 +229,7 @@ def getItem(info):
         except Item.DoesNotExist:
             item = Item(itemId=info['imdbId'])
             if 'title' in info and 'directors' in info:
-                item.imdb = {
+                item.external_data = {
                     'title': info['title'],
                     'directors': info['directors'],
                     'year': info.get('year', '')
@@ -59,7 +248,7 @@ def getItem(info):
                 item = Item.objects.get(itemId=info['oxdbId'])
             except Item.DoesNotExist:
                 item = Item()
-                item.metadata = {
+                item.data = {
                     'title': info['title'],
                     'directors': info['directors'],
                     'year': info.get('year', '')
@@ -68,7 +257,7 @@ def getItem(info):
 
                 for key in ('episode_title', 'series_title', 'season', 'episode'):
                     if key in info and info[key]:
-                        item.metadata[key] = info[key]
+                        item.data[key] = info[key]
                 item.save()
     return item
 
@@ -80,7 +269,7 @@ class Item(models.Model):
     modified = models.DateTimeField(auto_now=True)
     published = models.DateTimeField(default=datetime.now, editable=False)
 
-    #only items that have metadata from files are available,
+    #only items that have data from files are available,
     #this is indicated by setting available to True 
     available = models.BooleanField(default=False, db_index=True)
 
@@ -90,10 +279,10 @@ class Item(models.Model):
     objects = managers.ItemManager()
 
     def get(self, key, default=None):
-        if self.metadata and key in self.metadata:
-            return self.metadata[key]
-        if self.imdb and key in self.imdb:
-            return self.imdb[key]
+        if self.data and key in self.data:
+            return self.data[key]
+        if self.external_data and key in self.external_data:
+            return self.external_data[key]
         return default
 
     def editable(self, user):
@@ -104,7 +293,7 @@ class Item(models.Model):
         #FIXME: how to map the keys to the right place to write them to?
 		for key in data:
 			if key != 'id':
-				setattr(self.metadata, key, data[key])
+				setattr(self.data, key, data[key])
         self.oxdb.save()
         self.save()
 
@@ -118,14 +307,14 @@ class Item(models.Model):
                     _reviews[w.title] = r[0]
         return _reviews
 
-    imdb = fields.DictField(default={}, editable=False)
-    metadata = fields.DictField(default={}, editable=False)
+    external_data = fields.DictField(default={}, editable=False)
+    data = fields.DictField(default={}, editable=False)
 
     json = fields.DictField(default={}, editable=False)
 
     def updateImdb(self):
         if len(self.itemId) == 7:
-            self.imdb = ox.web.imdb.Imdb(self.itemId)
+            self.external_data = ox.web.imdb.Imdb(self.itemId)
             self.save()
 
     poster = models.ImageField(default=None, blank=True, upload_to=lambda m, x: os.path.join(itemid_path(m.itemId), "poster.jpg"))
@@ -272,7 +461,7 @@ class Item(models.Model):
 
     def get_layers(self):
         layers = {}
-        layers['cuts'] = self.metadata.get('cuts', {})
+        layers['cuts'] = self.data.get('cuts', {})
         
         layers['subtitles'] = {}
         #FIXME: subtitles should be stored in Layer
@@ -491,9 +680,9 @@ class Item(models.Model):
             if 'video' in stream.info:
                 extract.timeline(stream.video.path, self.timeline_prefix)
                 self.stream_aspect = stream.info['video'][0]['width']/stream.info['video'][0]['height']
-                self.metadata['cuts'] = extract.cuts(self.timeline_prefix)
-                self.metadata['average_color'] = extract.average_color(self.timeline_prefix)
-                #extract.timeline_strip(self, self.metadata['cuts'], stream.info, self.timeline_prefix[:-8])
+                self.data['cuts'] = extract.cuts(self.timeline_prefix)
+                self.data['average_color'] = extract.average_color(self.timeline_prefix)
+                #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
 
             stream.extract_derivatives()
             #something with poster
@@ -683,7 +872,7 @@ class Facet(models.Model):
 
 def getPersonSort(name):
     person, created = Person.objects.get_or_create(name=name)
-    name_sort = person.name_sort.replace(u'\xc5k', 'A')
+    name_sort = unicodedata.normalize('NFKD', person.name_sort)
     return name_sort
 
 class Person(models.Model):

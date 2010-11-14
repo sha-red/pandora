@@ -30,9 +30,11 @@ Install rabbitmq and carrot:
 Development:
     we are using django, http://docs.djangoproject.com/en/dev/
     
+Nginx setup:
+    sudo apt-get install nginx 
 
-Apache setup:
-    sudo apt-get install libapache2-mod-wsgi libapache2-mod-xsendfile
+or if you use apache:
+    sudo apt-get install libapache2-mod-xsendfile
 
 add pandora repository:
     sudo apt-get install python-software-properties   
