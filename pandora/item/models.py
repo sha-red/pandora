@@ -8,6 +8,7 @@ import math
 import random
 import re
 import subprocess
+import unicodedata
 from glob import glob
 
 from django.db import models

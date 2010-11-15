@@ -30,7 +30,7 @@ import ox
 import models
 
 from item.utils import oxid, parse_path
-import item.models
+from item.models import getItem
 import item.tasks
 
 @login_required_json
@@ -73,7 +73,6 @@ def api_update(request):
         volume, created = models.Volume.objects.get_or_create(user=user, name=data['volume'])
         all_files = []
         for f in data['files']:
-            #print f
             path = f['path']
             folder = path.split('/')
             name = folder.pop()
@@ -114,7 +113,7 @@ def api_update(request):
                 else:
                     if not item:
                         item_info = parse_path(folder)
-                        item = item.models.getItem(item_info)
+                        item = getItem(item_info)
                     file_object = models.File()
                     file_object.oshash = oshash
                     file_object.name = name
@@ -159,6 +158,11 @@ def api_update(request):
 
     return render_to_json_response(response)
 
+
+@login_required_json
+def api_encodingProfile(request):
+    response = json_response({'profile': settings.VIDEO_PROFILE})
+    return render_to_json_response(response)
 
 @login_required_json
 def api_upload(request):
@@ -223,6 +227,7 @@ def firefogg_upload(request):
                 elif form.cleaned_data['done']:
                     f.available = True
                     f.save()
+                    #FIXME: this fails badly if rabbitmq goes down
                     item.tasks.updateStreams.delay(f.item.itemId)
                     response['result'] = 1
                     response['done'] = 1

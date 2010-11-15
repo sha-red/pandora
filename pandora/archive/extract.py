@@ -207,6 +207,7 @@ def stream(video, target, profile, info):
     return True
 
 def run_command(cmd, timeout=10):
+    #print cmd
     p = subprocess.Popen(cmd, stdout=open('/dev/null', 'w'), stderr=subprocess.STDOUT)
     while timeout > 0:
         time.sleep(0.2)

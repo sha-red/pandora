@@ -33,6 +33,6 @@ def updateStreams(itemId):
         create stream, extract timeline and create derivatives
     '''
     item = models.Item.objects.get(itemId=itemId)
-    if item.files.filter(is_main=True, is_video=True, availble=False).count() == 0:
+    if item.files.filter(is_main=True, is_video=True, available=False).count() == 0:
         item.updateStreams()
 

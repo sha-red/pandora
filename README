@@ -42,3 +42,8 @@ add pandora repository:
     sudo add-apt-repository ppa:gstreamer-developers/ppa
     sudo apt-get update
     sudo apt-get install oxtools mkvtoolnix
+
+H264:
+    install ffmpeg with x264 enabled, install qt-faststart from (ffmpeg/tools)
+    set VIDEO_H264 = True in local_settings.py
+ 

@@ -34,7 +34,7 @@ import tasks
 from user.models import getUserJSON
 from user.views import api_login, api_logout, api_register, api_contact, api_recover, api_preferences, api_findUser
 
-from archive.views import api_update, api_upload, api_editFile
+from archive.views import api_update, api_upload, api_editFile, api_encodingProfile
 
 from archive.models import File
 from archive import extract

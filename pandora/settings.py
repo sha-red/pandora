@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 # Django settings for pandora project.
 import os
-from os.path import join
+from os.path import join, normpath
 
 SITENAME = 'Pan.do/ra'
 SITEID =   'pandora'
@@ -67,8 +67,8 @@ APPEND_SLASH = False
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = join(PROJECT_ROOT, '..', 'data')
-STATIC_ROOT = join(PROJECT_ROOT, '..', 'static')
+MEDIA_ROOT = normpath(join(PROJECT_ROOT, '..', 'data'))
+STATIC_ROOT = normpath(join(PROJECT_ROOT, '..', 'static'))
 TESTS_ROOT = join(PROJECT_ROOT, 'tests')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
