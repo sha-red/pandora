@@ -75,17 +75,17 @@ class  Bin(models.Model):
 
 properties = {
     'title': {'type': 'string', 'sort': 'title', 'find': True},
-    'director': {'type': 'person', 'array': True, 'sort': 'string', 'find': True},
-    'country': {'type': 'string', 'array': True, 'sort': 'sring', 'find': True},
-    'year': {'type': 'string', 'sort': 'string', 'find': True},
-    'language': {'type': 'string', 'array': True, 'sort': 'string', 'find': True},
+    'director': {'type': 'person', 'array': True, 'sort': 'string', 'find': True, 'group': True},
+    'country': {'type': 'string', 'array': True, 'sort': 'sring', 'find': True, 'group': True},
+    'year': {'type': 'string', 'sort': 'string', 'find': True, 'group': True},
+    'language': {'type': 'string', 'array': True, 'sort': 'string', 'find': True, 'group': True},
     'runtime': {'type': 'integer', 'sort': 'integer'},
     'writer': {'type': 'person', 'array': True, 'sort': 'string', 'find': True},
     'producer': {'type': 'person', 'array': True,  'sort': 'string', 'find': True},
     'cinematographer': {'type': 'person', 'array': True, 'sort': 'string', 'find': True},
     'editor': {'type': 'person', 'array': True, 'sort': 'string', 'find': True},
     'actors': {'type': 'role', 'array': True, 'sort': 'length', 'find': True},
-    'genre': {'type': 'string', 'array': True, 'sort': 'length', 'find': True},
+    'genre': {'type': 'string', 'array': True, 'sort': 'length', 'find': True, 'group': True},
     'keywords': {'type': 'string', 'array': True, 'sort': 'length', 'find': True},
     'summary': {'type': 'title', 'sort': 'length', 'find': True},
     'trivia': {'type': 'title', 'sort': 'length', 'find': True},
@@ -135,7 +135,7 @@ def siteJson():
 		    if i.get('autocomplete', False):
 			    f['autocomplete'] = True
 		    r['findKeys'].append(f)
-	r['groups'] = filter(lambda k: 'array' in properties[k], properties.keys())
+	r['groups'] = filter(lambda k: properties[k].get('group', False), properties.keys())
     r['itemViews'] = [
         {"id": "info", "title": "Info"},
         {"id": "statistics", "title": "Statistics"},
@@ -204,7 +204,7 @@ def siteJson():
             "itemView": "info",
             "listQuery": {"conditions": [], "operator": ""},
             "listsSize": 192,
-            "listView": "list",
+            "listView": "icons",
             "sections": ["history", "lists", "public", "featured"],
             "showGroups": True,
             "showInfo": True,
@@ -655,7 +655,18 @@ class Item(models.Model):
 
     def main_videos(self):
         #FIXME: needs to check if more than one user has main files and only take from "higher" user
-        return self.files.filter(is_main=True, is_video=True, available=True)
+        videos = self.files.filter(is_main=True, is_video=True, available=True)
+        if videos.count()>0:
+            first = videos[0]
+            user = first.instances.all()[0].volume.user
+            #only take videos from same user and with same width/height
+            def check(v):
+                if v.instances.filter(volume__user=user).count()>0 and \
+                    first.width == v.width and first.height == v.height:
+                    return True
+                return False
+            videos = filter(check, videos) 
+        return videos
 
     def updateStreams(self):
         files = {}
@@ -667,14 +678,16 @@ class Item(models.Model):
             stream, created = Stream.objects.get_or_create(item=self, profile='%s.webm' % settings.VIDEO_PROFILE)
             stream.video.name = stream_path(stream)
             cmd = []
-            
+            print files
             for f in sorted(files):
                 cmd.append('+')
                 cmd.append(files[f])
             if not os.path.exists(os.path.dirname(stream.video.path)):
                 os.makedirs(os.path.dirname(stream.video.path))
             cmd = [ 'mkvmerge', '-o', stream.video.path ] + cmd[1:]
+            #print cmd
             p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            #p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
             p.wait()
             stream.save()
 
