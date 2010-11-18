@@ -10,7 +10,7 @@ from ox.image import drawText, wrapText
 import sys
 
 
-static_root = os.path.join(os.path.dirname(__file__), '..', 'static')
+static_root = os.path.join(os.path.dirname(__file__), '..', '..', 'static')
 
 def render_poster(title, director, year, series, oxdb_id, imdb_id, frame, timeline, poster):
     def get_oxdb_color(oxdb_id, series=False):
@@ -37,6 +37,7 @@ def render_poster(title, director, year, series, oxdb_id, imdb_id, frame, timeli
     poster_image = Image.new('RGB', (poster_width, poster_height))
     draw = ImageDraw.Draw(poster_image)
     font_file = os.path.join(static_root, 'ttf', 'DejaVuSansCondensedBold.ttf')
+
     font_size = {
         'small': 28,
         'large': 42,
@@ -109,9 +110,9 @@ def render_poster(title, director, year, series, oxdb_id, imdb_id, frame, timeli
             logo_color = logo_image.getpixel((x, y))[0]
             alpha = logo_image.getpixel((x, y))[3]
             if series:
-                poster_color = tuple(map(lambda x: x - (logo_color - 16) * alpha / 255, poster_color))
+                poster_color = tuple(map(lambda x: int(x - (logo_color - 16) * alpha / 255), poster_color))
             else:
-                poster_color = tuple(map(lambda x: x + (logo_color - 16) * alpha / 255, poster_color))
+                poster_color = tuple(map(lambda x: int(x + (logo_color - 16) * alpha / 255), poster_color))
             poster_image.putpixel((logo_left + x, logo_top + y), poster_color)
 
     poster_image.save(poster)

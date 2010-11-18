@@ -239,6 +239,7 @@ def getItem(info):
             #item.save()
             #tasks.updateImdb.delay(item.itemId)
             item.updateImdb()
+            tasks.updatePoster.delay(item.itemId)
     else:
         q = Item.objects.filter(find__title=info['title'])
         if q.count() > 1:
@@ -776,10 +777,14 @@ class Item(models.Model):
         posters = self.local_posters()
         for poster in posters:
             frame = posters[poster]
+            timeline = os.path.join(itemid_path(self.itemId), 'timeline.64.png')
+            timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
             cmd = [settings.ITEM_POSTER,
                    '-t', self.get('title'),
                    '-d', ', '.join(self.get('directors', ['Unknown Director'])),
+                   '-y', str(self.get('year', '')),
                    '-f', frame,
+                   '-l', timeline,
                    '-p', poster
                   ]
             if len(self.itemId) == 7:
