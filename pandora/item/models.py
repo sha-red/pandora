@@ -18,7 +18,7 @@ from django.core.files.base import ContentFile
 from django.utils import simplejson as json
 from django.conf import settings
 
-from oxdjango import fields
+from ox.django import fields
 import ox
 from ox import stripTags
 from ox.normalize import canonicalTitle, canonicalName
@@ -30,36 +30,19 @@ import utils
 from archive import extract
 
 
-class Property(models.Model):
+class Bin(models.Model):
     name = models.CharField(null=True, max_length=255, unique=True)
     title = models.CharField(null=True, max_length=255)
-	#types: string, person, role, location, date, array
-    type = models.CharField(null=True, max_length=255)
-    array = models.BooleanField(default=False)
-    position = models.IntegerField(default=0)
-
-	#sort values: title, string, integer, float, date
-    sort = models.CharField(null=True, max_length=255)
-
-    totals = models.BooleanField(default=False)
-    admin = models.BooleanField(default=False)
-
-	def json(self):
-		j = {}
-		for key in ('type', 'sort', 'title', 'array', 'totals', 'admin'):
-			value = getattr(self, key)
-			if value:
-				j[key] = value
-		return j
-
-class  Bin(models.Model):
-    name = models.CharField(null=True, max_length=255, unique=True)
-    title = models.CharField(null=True, max_length=255)
-	#types: keyword, location, text
+	#text, string, string from list(fixme), event, place, person
     type = models.CharField(null=True, max_length=255)
     position = models.IntegerField(default=0)
 
 	overlapping = models.BooleanField(default=True)
+	enabled = models.BooleanField(default=True)
+
+	enabled = models.BooleanField(default=True)
+	public = models.BooleanField(default=True)   #false=users only see there own bins
+	subtitle = models.BooleanField(default=True) #bis can be displayed as subtitle, only one bin
 
 	find = models.BooleanField(default=True)
 	#words / item duration(wpm), total words, cuts per minute, cuts, number of layers, number of layers/duration
@@ -262,6 +245,28 @@ def getItem(info):
                         item.data[key] = info[key]
                 item.save()
     return item
+
+class ItemProperty(models.Model):
+    name = models.CharField(null=True, max_length=255, unique=True)
+    title = models.CharField(null=True, max_length=255)
+	#text, string, string from list(fixme), event, place, person
+    type = models.CharField(null=True, max_length=255)
+    array = models.BooleanField(default=False)
+    position = models.IntegerField(default=0)
+
+	#sort values: title, string, integer, float, date
+    sort = models.CharField(null=True, max_length=255)
+
+    totals = models.BooleanField(default=False)
+    admin = models.BooleanField(default=False)
+
+	def json(self):
+		j = {}
+		for key in ('type', 'sort', 'title', 'array', 'totals', 'admin'):
+			value = getattr(self, key)
+			if value:
+				j[key] = value
+		return j
 
 class Item(models.Model):
     person_keys = ('director', 'writer', 'producer', 'editor', 'cinematographer', 'actor', 'character')
@@ -896,8 +901,13 @@ def getPersonSort(name):
 
 class Person(models.Model):
     name = models.CharField(max_length=200)
-    imdbId = models.CharField(max_length=7, blank=True)
     name_sort = models.CharField(max_length=200)
+
+    #FIXME: how to deal with aliases
+    aliases = fields.TupleField(default=[])
+
+
+    imdbId = models.CharField(max_length=7, blank=True)
 
     class Meta:
         ordering = ('name_sort', )
@@ -928,12 +938,20 @@ class Person(models.Model):
     def json(self):
         return self.name
 
-class Location(models.Model):
-    name = models.CharField(max_length=200, unique=True)
-    manual = models.BooleanField(default=False)
-    items = models.ManyToManyField(Item, related_name='locations_all')
-    #fixme: geo data
+class Place(models.Model):
+    '''
+        Places are named locations, they should have geographical information attached to them.
+    '''
 
+    name = models.CharField(max_length=200, unique=True)
+    name_sort = models.CharField(max_length=200)
+    manual = models.BooleanField(default=False)
+    items = models.ManyToManyField(Item, related_name='places')
+
+    #FIXME: how to deal with aliases
+    aliases = fields.TupleField(default=[])
+
+    #FIXME: geo data, is this good enough?
     lat_sw = models.FloatField(default=0)
     lng_sw = models.FloatField(default=0)
     lat_ne = models.FloatField(default=0)
@@ -943,13 +961,53 @@ class Location(models.Model):
     area = models.FloatField(default=-1)
 
     class Meta:
-        ordering = ('name', )
+        ordering = ('name_sort', )
 
     def __unicode__(self):
         return self.name
 
     def json(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.name_sort:
+            self.name_sort = self.name
+
+        #update center
+        self.lat_center = ox.location.center(self.lat_sw, self.lat_ne)
+        self.lng_center = ox.location.center(self.lng_sw, self.lng_ne)
+
+        #update area
+        self.area = location.area(self.lat_sw, self.lng_sw, self.lat_ne, self.lng_ne)
+
+        super(Place, self).save(*args, **kwargs)
+
+class Event(models.Model):
+    '''
+        Events are events in time that can be once or recurring,
+        From Mondays to Spring to 1989 to Roman Empire
+    '''
+    name = models.CharField(null=True, max_length=255, unique=True)
+    name_sort = models.CharField(null=True, max_length=255, unique=True)
+
+    class Meta:
+        ordering = ('name_sort', )
+
+    #FIXME: how to deal with aliases
+    aliases = fields.TupleField(default=[])
+
+    #once|year|week|day
+    recurring = models.IntegerField(default=0)
+
+    #start yyyy-mm-dd|mm-dd|dow 00:00|00:00
+    #end   yyyy-mm-dd|mm-dd|dow 00:00|00:01
+    start = models.CharField(null=True, max_length=255)
+    end = models.CharField(null=True, max_length=255)
+
+    def save(self, *args, **kwargs):
+        if not self.name_sort:
+            self.name_sort = self.name
+        super(Event, self).save(*args, **kwargs)
 
 class ReviewWhitelist(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -1005,7 +1063,7 @@ class Layer(models.Model):
 
     type = models.CharField(blank=True, max_length=255)
     value = models.TextField()
-
+    
     #FIXME: relational layers, Locations, clips etc
     #location = models.ForeignKey('Location', default=None)
 

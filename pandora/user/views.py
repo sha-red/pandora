@@ -12,8 +12,8 @@ from django.utils import simplejson as json
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
 
-from oxdjango.shortcuts import render_to_json_response, json_response
-from oxdjango.decorators import login_required_json
+from ox.django.shortcuts import render_to_json_response, json_response
+from ox.django.decorators import login_required_json
 
 import models
 

@@ -3,7 +3,7 @@
 import os
 
 from django.conf.urls.defaults import *
-from oxdjango.http import HttpFileResponse
+from ox.django.http import HttpFileResponse
 
 from django.conf import settings
 

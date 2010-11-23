@@ -94,8 +94,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'oxdjango.middleware.ExceptionMiddleware',
-    'oxdjango.middleware.ChromeFrameMiddleware',
+    'ox.django.middleware.ExceptionMiddleware',
+    'ox.django.middleware.ChromeFrameMiddleware',
 )
 
 ROOT_URLCONF = 'pandora.urls'

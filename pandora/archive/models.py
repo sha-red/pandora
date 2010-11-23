@@ -15,7 +15,7 @@ from django.core.files.base import ContentFile
 from django.utils import simplejson as json
 from django.conf import settings
 
-from oxdjango import fields
+from ox.django import fields
 import ox
 from ox import stripTags
 from ox.normalize import canonicalTitle, canonicalName

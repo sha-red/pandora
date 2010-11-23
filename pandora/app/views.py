@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response, get_object_or_404, get_list_or_
 from django.template import RequestContext
 from django.conf import settings
 
-from oxdjango.shortcuts import json_response, render_to_json_response, get_object_or_404_json
+from ox.django.shortcuts import json_response, render_to_json_response, get_object_or_404_json
 
 import models
 

@@ -22,9 +22,9 @@ try:
 except ImportError:
     from django.utils import simplejson as json
 
-from oxdjango.decorators import login_required_json
-from oxdjango.shortcuts import render_to_json_response, get_object_or_404_json, json_response
-from oxdjango.http import HttpFileResponse
+from ox.django.decorators import login_required_json
+from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
+from ox.django.http import HttpFileResponse
 import ox
 
 import models
