@@ -906,8 +906,8 @@ class Person(models.Model):
     #FIXME: how to deal with aliases
     aliases = fields.TupleField(default=[])
 
-
     imdbId = models.CharField(max_length=7, blank=True)
+    wikipediaId = models.CharField(max_length=1000, blank=True)
 
     class Meta:
         ordering = ('name_sort', )
@@ -947,6 +947,7 @@ class Place(models.Model):
     name_sort = models.CharField(max_length=200)
     manual = models.BooleanField(default=False)
     items = models.ManyToManyField(Item, related_name='places')
+    wikipediaId = models.CharField(max_length=1000, blank=True)
 
     #FIXME: how to deal with aliases
     aliases = fields.TupleField(default=[])
@@ -989,6 +990,7 @@ class Event(models.Model):
     '''
     name = models.CharField(null=True, max_length=255, unique=True)
     name_sort = models.CharField(null=True, max_length=255, unique=True)
+    wikipediaId = models.CharField(max_length=1000, blank=True)
 
     class Meta:
         ordering = ('name_sort', )
