@@ -121,6 +121,7 @@ INSTALLED_APPS = (
     'item',
     'archive',
     'user',
+    'text',
     'torrent',
 )
 
