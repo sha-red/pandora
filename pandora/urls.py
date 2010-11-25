@@ -11,10 +11,12 @@ from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
 
+
 def serve_static_file(path, location, content_type):
     return HttpFileResponse(location, content_type=content_type)
 
 urlpatterns = patterns('',
+    (r'^admin/', include(admin.site.urls)),
     (r'^ajax_filtered_fields/', include('ajax_filtered_fields.urls')),
     (r'^api/upload/$', 'archive.views.firefogg_upload'),
     (r'^site.json$', 'app.views.site_json'),
@@ -26,13 +28,6 @@ urlpatterns = patterns('',
     (r'^r/(?P<key>.*)$', 'user.views.recover'),
     (r'^api/$', include('api.urls')),
     (r'', include('item.urls')),
-
-    # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
-    # to INSTALLED_APPS to enable admin documentation:
-    # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
-    (r'^admin/(.*)', include(admin.site.urls)),
     (r'^robots.txt$', serve_static_file, {'location': os.path.join(settings.STATIC_ROOT, 'robots.txt'), 'content_type': 'text/plain'}),
     (r'^favicon.ico$', serve_static_file, {'location': os.path.join(settings.STATIC_ROOT, 'png/icon.16.png'), 'content_type': 'image/x-icon'}),
 )
@@ -46,5 +41,4 @@ if settings.DEBUG:
         (r'^tests/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.TESTS_ROOT}),
     )
-
 

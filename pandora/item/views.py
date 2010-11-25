@@ -36,6 +36,7 @@ from user.models import getUserJSON
 from archive.models import File
 from archive import extract
 
+
 def _order_query(qs, sort, prefix='sort__'):
     order_by = []
     if len(sort) == 1:
@@ -259,7 +260,7 @@ def api_removeItem(request):
     if item.editable(request.user):
         response = json_response(status=501, text='not implemented')
     else:
-        response = json_response(status=403, text='permissino denied')
+        response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 
 @login_required_json
@@ -311,33 +312,71 @@ def api_editLayer(request):
 def api_addListItem(request):
     '''
         param data
-            {key: value}
+            {list: listId,
+             item: itemId,
+             quert: ...
+           }
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = json_response(status=501, text='not implemented')
+    data = json.loads(request.POST['data'])
+    list = get_object_or_404_json(models.List, pk=data['list'])
+    if 'item' in data:
+        item = get_object_or_404_json(models.Item, pk=data['item'])
+        if list.editable(request.user):
+            list.add(item)
+            response = json_response(status=200, text='item removed')
+        else:
+            response = json_response(status=403, text='not allowed')
+    elif 'query' in data:
+        response = json_response(status=501, text='not implemented')
+        
+    else:
+        response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
 
 @login_required_json
 def api_removeListItem(request):
     '''
         param data
-            {key: value}
+            {list: listId,
+             item: itemId,
+             quert: ...
+           }
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = json_response(status=501, text='not implemented')
+    data = json.loads(request.POST['data'])
+    list = get_object_or_404_json(models.List, pk=data['list'])
+    if 'item' in data:
+        item = get_object_or_404_json(models.Item, pk=data['item'])
+        if list.editable(request.user):
+            list.remove(item)
+            response = json_response(status=200, text='item removed')
+        else:
+            response = json_response(status=403, text='not allowed')
+    elif 'query' in data:
+        response = json_response(status=501, text='not implemented')
+        
+    else:
+        response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
 
 @login_required_json
 def api_addList(request):
     '''
         param data
-            {key: value}
+            {name: value}
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = json_response(status=501, text='not implemented')
+    data = json.loads(request.POST['data'])
+    if models.List.filter(name=data['name'], user=request.user).count() == 0:
+        list = models.List(name = data['name'], user=request.user)
+        list.save()
+        response = json_response(status=200, text='created')
+    else:
+        response = json_response(status=403, text='list name exists')
     return render_to_json_response(response)
 
 @login_required_json
@@ -345,10 +384,18 @@ def api_editList(request):
     '''
         param data
             {key: value}
+        keys: name, public
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = json_response(status=501, text='not implemented')
+    data = json.loads(request.POST['data'])
+    list = get_object_or_404_json(models.List, pk=data['list'])
+    if list.editable(request.user):
+        for key in data:
+            if key in ('name', 'public'):
+                setattr(list, key, data['key'])
+    else:
+        response = json_response(status=403, text='not allowed')
     return render_to_json_response(response)
 
 def api_removeList(request):
@@ -358,7 +405,12 @@ def api_removeList(request):
         return {'status': {'code': int, 'text': string},
                 'data': {}}
     '''
-    response = json_response(status=501, text='not implemented')
+    data = json.loads(request.POST['data'])
+    list = get_object_or_404_json(models.List, pk=data['list'])
+    if list.editable(request.user):
+        list.delete()
+    else:
+        response = json_response(status=403, text='not allowed')
     return render_to_json_response(response)
 
 '''

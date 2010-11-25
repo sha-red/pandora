@@ -31,6 +31,9 @@ from archive import extract
 
 
 class Bin(models.Model):
+    class Meta:
+        ordering = ('position', )
+
     name = models.CharField(null=True, max_length=255, unique=True)
     title = models.CharField(null=True, max_length=255)
 	#text, string, string from list(fixme), event, place, person
@@ -246,7 +249,10 @@ def getItem(info):
                 item.save()
     return item
 
-class ItemProperty(models.Model):
+class Property(models.Model):
+    class Meta:
+        ordering = ('position', )
+
     name = models.CharField(null=True, max_length=255, unique=True)
     title = models.CharField(null=True, max_length=255)
 	#text, string, string from list(fixme), event, place, person
@@ -259,6 +265,11 @@ class ItemProperty(models.Model):
 
     totals = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        if self.title:
+            return self.title
+        return self.name
 
 	def json(self):
 		j = {}
@@ -1016,10 +1027,13 @@ class ReviewWhitelist(models.Model):
     url = models.CharField(max_length=255, unique=True)
 
 class List(models.Model):
+    class Meta:
+        unique_together = ("user", "name")
+
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User)
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
     public = models.BooleanField(default=False)
     items = models.ManyToManyField(Item, related_name='lists', through='ListItem')
 
