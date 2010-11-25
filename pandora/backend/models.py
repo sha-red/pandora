@@ -318,6 +318,12 @@ class Item(models.Model):
                           self.get('series title', ''), self.get('episode title', ''),
                           self.get('season', ''), self.get('episode', ''))
 
+    def oxid_new(self):
+        return utils.oxdb_id(self.get('title', ''), self.get('directors', []), str(self.get('year', '')),
+                          self.get('season', ''), self.get('episode', ''),
+                          self.get('episode title', ''))
+	#(title, directors=[], year='', season='', episode='', episode_title='', episode_director='', episode_year='')
+
 
     '''
         Search related functions
@@ -568,15 +574,20 @@ class Item(models.Model):
         posters = self.local_posters()
         for poster in posters:
             frame = posters[poster]
+            timeline = os.path.join(itemid_path(self.itemId), 'timeline.64.png')
+            timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
+
             cmd = ['oxposter',
                    '-t', self.get('title'),
                    '-d', ', '.join(self.get('directors', ['Unknown Director'])),
                    '-f', frame,
-                   '-p', poster
+                   '-p', poster,
+                   '-l', timeline, 
                   ]
             if len(self.itemId) == 7:
                 cmd += ['-i', self.itemId]
-            cmd += ['-o', self.oxdbId]
+            cmd += ['-o', self.oxid_new()]
+            print cmd
             p = subprocess.Popen(cmd)
             p.wait()
         return posters.keys()

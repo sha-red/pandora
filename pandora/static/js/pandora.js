@@ -304,7 +304,7 @@ app.constructApp = function() {
                                 })
                                 .bindEvent('resize', function(event, data) {
                                     Ox.print('resize', data, data / app.ui.infoRatio + 16);
-                                    app.$ui.leftPanel.resize('infoPanel', Math.round(data / app.ui.infoRatio) + 16);
+                                    app.$ui.leftPanel.size('infoPanel', Math.round(data / app.ui.infoRatio) + 16);
                                 }),
                             resizable: true,
                             resize: [128, 192, 256],
@@ -322,7 +322,7 @@ app.constructApp = function() {
                                             elements: [
                                                 {
                                                     collapsible: true,
-                                                    element: app.$ui.groupsOuterPanel = new Ox.SplitPanel({
+                                                    element: app.$ui.browser = new Ox.SplitPanel({
                                                         elements: [
                                                             {
                                                                 element: app.$ui.groups[0],
@@ -357,7 +357,7 @@ app.constructApp = function() {
                                                     .bindEvent('resize', function(event, data) {
                                                         Ox.print('resizing groups...')
                                                         $.each(app.$ui.groups, function(i, list) {
-                                                            list.resize();
+                                                            list.size();
                                                         });
                                                     }),
                                                     resizable: true,
@@ -384,12 +384,12 @@ app.constructApp = function() {
                                     return app.getGroupWidth(i, data);
                                 });
                                 Ox.print('widths', widths);
-                                app.$ui.groupsOuterPanel.resize(0, widths[0].list).resize(2, widths[4].list);
-                                app.$ui.groupsInnerPanel.resize(0, widths[1].list).resize(2, widths[3].list);
+                                app.$ui.browser.size(0, widths[0].list).size(2, widths[4].list);
+                                app.$ui.groupsInnerPanel.size(0, widths[1].list).size(2, widths[3].list);
                                 $.each(app.$ui.groups, function(i, list) {
                                     list.resizeColumn('name', widths[i].column);
                                 });
-                                app.$ui.list.resize();
+                                app.$ui.list.size();
                             })
                         }
                     ],
@@ -516,8 +516,8 @@ app.constructInfo = function() {
 app.constructItem = function(id, view) {
     var $item;
     //location.hash = '!' + id;
-    app.$ui.contentPanel.resize(0, 80);
-    app.$ui.groupsOuterPanel.empty();
+    app.$ui.contentPanel.size(0, 80);
+    app.$ui.browser.empty();
     if (view == 'timeline') {
         app.api.getItem(id, function(result) {
             item_debug = result.data.item;
@@ -531,41 +531,74 @@ app.constructItem = function(id, view) {
             video.height = 96;
             video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
             video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
-            $item = new Ox.VideoEditor({
-                cuts: cuts,
-                duration: video.duration,
-                find: '',
-                frameURL: function(position) {
-                    return '/' + id + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
-                },
-                id: 'editor',
-                largeTimeline: true,
-                matches: [],
-                points: [0, 0],
-                position: 0,
-                posterFrame: parseInt(video.duration / 2),
-                subtitles: subtitles,
-                videoHeight: video.height,
-                videoId: id,
-                videoWidth: video.width,
-                videoSize: 'small',
-                videoURL: video.url,
-                width: app.$document.width() - app.$ui.leftPanel.width() - 1 - 256 - 1
-            });
+			$item = new Ox.SplitPanel({
+				elements: [
+					{
+						element: app.$ui.editor = new Ox.VideoEditor({
+			                cuts: cuts,
+			                duration: video.duration,
+			                find: '',
+			                frameURL: function(position) {
+			                    return '/' + id + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
+			                },
+							height: app.$ui.contentPanel.height() - 81,
+			                id: 'editor',
+			                largeTimeline: true,
+			                matches: [],
+			                points: [0, 0],
+			                position: 0,
+			                posterFrame: parseInt(video.duration / 2),
+			                subtitles: subtitles,
+			                videoHeight: video.height,
+			                videoId: id,
+			                videoWidth: video.width,
+			                videoSize: 'small',
+			                videoURL: video.url,
+			                width: app.$document.width() - app.$ui.leftPanel.width() - 1 - 256 - 1
+			            })
+						.bindEvent('resize', function(event, data) {
+							Ox.print('RESIZE:', data)
+							app.$ui.editor.options({
+								width: data
+							});
+						}),
+						size: 'auto'
+					},
+					{
+						collapsible: true,
+						element: app.$ui.annotations = new Ox.Element('div')
+							.options({
+								id: 'annotations'
+							})
+							.bindEvent('resize', function(event, data) {
+								app.$ui.editor.options({
+									width: app.$document.width() - app.$ui.leftPanel.width() - 1 - app.$ui.annotations.width() - 1.
+								})
+							}),
+						resizable: true,
+						resize: [128, 192, 256],
+						size: 256
+					}
+				],
+				orientation: 'horizontal'
+			});
             app.$ui.contentPanel.replace(1, $item);
             app.$ui.rightPanel
                 /*.unbindEvent('resize')*/
                 .bindEvent('resize', function(event, data) {
-                    Ox.print('seems to work', data)
-                    $item.options({
-                        width: data - 256 - 1
+                    //Ox.print('seems to work', data)
+                    app.$ui.editor.options({
+                        width: data - app.$ui.annotations.width() - 1
                     });
                 });
+			///*
             app.$window.resize(function() {
-                $item.options({
-                    width: app.$document.width() - app.$ui.leftPanel.width() - 1 - 256 - 1
+                app.$ui.editor.options({
+					height: app.$document.height() - 24 - 24 - 80 - 1 - 16,
+                    width: app.$document.width() - app.$ui.leftPanel.width() - 1 - app.$ui.annotations.width() - 1
                 });
             });
+			//*/
         });
     }
 }
@@ -595,7 +628,7 @@ app.constructList = function(view) {
         })
         .bindEvent({
             resize: function(event, data) {
-                $list.resize();
+                $list.size();
             }
         });
     } else if (view == 'icons') {
@@ -630,7 +663,7 @@ app.constructList = function(view) {
                 width: '100px',
                 height: '100px',
                 background: 'red'
-            })
+            });
     }
     $list.bindEvent({
         closepreview: function(event, data) {
@@ -677,7 +710,7 @@ app.constructList = function(view) {
                     app.$ui.previewImage.animate({
                         opacity: 0
                     }, 100, function() {
-                        app.$ui.previewDialog.resize(dialogWidth, dialogHeight, function() {
+                        app.$ui.previewDialog.size(dialogWidth, dialogHeight, function() {
                             app.$ui.previewImage
                                 .attr({
                                     src: item.poster.url
@@ -778,7 +811,7 @@ app.constructList = function(view) {
                             width = app.$ui.info.width(),
                             height = imageHeight * width / imageWidth;
                         app.ui.infoRatio = width / height;
-                        app.$ui.leftPanel.resize('infoPanel', height + 16);
+                        app.$ui.leftPanel.size('infoPanel', height + 16);
                         $still.css({
                                 position: 'absolute',
                                 left: 0,
