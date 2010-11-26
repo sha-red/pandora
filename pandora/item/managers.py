@@ -3,7 +3,7 @@
 import re
 from datetime import datetime
 from urllib2 import unquote
-import json
+from ox.utils import json
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist

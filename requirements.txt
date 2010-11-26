@@ -1,12 +1,11 @@
 -e svn+http://code.djangoproject.com/svn/django/branches/releases/1.2.X#egg=django
 South
-chardet
 -e bzr+http://code.0x2620.org/python-ox/#egg=python-ox
 -e bzr+http://code.0x2620.org/oxtimeline/#egg=oxtimeline
 simplejson
 #-e hg+https://django-ajax-filtered-fields.googlecode.com/hg/#egg=django-ajax-filtered-fields 
 #rabbitmq interface
--e git+git://github.com/ask/celery.git#egg=celery
+celery
 django-celery
 django_extensions
 -e bzr+http://firefogg.org/dev/python-firefogg/#egg=python-firefogg

@@ -29,99 +29,23 @@ import load
 import utils
 from archive import extract
 
+from layer.models import Layer
+from person.models import getPersonSort, Person
 
-class Bin(models.Model):
-    class Meta:
-        ordering = ('position', )
-
-    name = models.CharField(null=True, max_length=255, unique=True)
-    title = models.CharField(null=True, max_length=255)
-	#text, string, string from list(fixme), event, place, person
-    type = models.CharField(null=True, max_length=255)
-    position = models.IntegerField(default=0)
-
-	overlapping = models.BooleanField(default=True)
-	enabled = models.BooleanField(default=True)
-
-	enabled = models.BooleanField(default=True)
-	public = models.BooleanField(default=True)   #false=users only see there own bins
-	subtitle = models.BooleanField(default=True) #bis can be displayed as subtitle, only one bin
-
-	find = models.BooleanField(default=True)
-	#words / item duration(wpm), total words, cuts per minute, cuts, number of layers, number of layers/duration
-    sort = models.CharField(null=True, max_length=255)
-
-    def properties(self):
-        p = {}
-        if self.find:
-            p[self.name] = {'type': 'bin', 'find': True}
-        if self.sort:
-            print 'FIXME: need to add sort stuff'
-        return p
-
-properties = {
-    'title': {'type': 'string', 'sort': 'title', 'find': True},
-    'director': {'type': 'person', 'array': True, 'sort': 'string', 'find': True, 'group': True},
-    'country': {'type': 'string', 'array': True, 'sort': 'sring', 'find': True, 'group': True},
-    'year': {'type': 'string', 'sort': 'string', 'find': True, 'group': True},
-    'language': {'type': 'string', 'array': True, 'sort': 'string', 'find': True, 'group': True},
-    'runtime': {'type': 'integer', 'sort': 'integer'},
-    'writer': {'type': 'person', 'array': True, 'sort': 'string', 'find': True},
-    'producer': {'type': 'person', 'array': True,  'sort': 'string', 'find': True},
-    'cinematographer': {'type': 'person', 'array': True, 'sort': 'string', 'find': True},
-    'editor': {'type': 'person', 'array': True, 'sort': 'string', 'find': True},
-    'actors': {'type': 'role', 'array': True, 'sort': 'length', 'find': True},
-    'genre': {'type': 'string', 'array': True, 'sort': 'length', 'find': True, 'group': True},
-    'keywords': {'type': 'string', 'array': True, 'sort': 'length', 'find': True},
-    'summary': {'type': 'title', 'sort': 'length', 'find': True},
-    'trivia': {'type': 'title', 'sort': 'length', 'find': True},
-    'releasedate': {'type': 'date', 'sort': 'date', 'find': True},
-    'runtime': {'type': 'integer', 'sort': 'integer', 'totals': True},
-
-    'budget': {'type': 'float', 'sort': 'float'},
-    'gross': {'type': 'float', 'sort': 'float'},
-    'profit': {'type': 'float', 'sort': 'float'},
-
-    'rating': {'type': 'integer', 'sort': 'integer'},
-    'votes': {'type': 'integer', 'sort': 'integer'},
-    'published': {'type': 'date', 'sort': 'date'},
-    'modified': {'type': 'date', 'sort': 'date'},
-    'popularity': {'type': 'date', 'sort': 'date'},
-
-    #file properties // are those even configurable? think not
-    'aspectratio': {'type': 'faction', 'sort': 'float'},
-    'duration': {'type': 'float', 'sort': 'float', 'totals': True, "admin": True},
-    'color': {'type': 'color', 'sort': 'color'},
-    'saturation': {'type': 'integer', 'sort': 'integer'},
-    'brightness': {'type': 'integer', 'sort': 'integer'},
-    'volume': {'type': 'integer', 'sort': 'integer'},
-    'resolution': {'type': 'integer', 'array': True, 'sort': 'integer'}, #FIXME
-    'pixels': {'type': 'integer', 'sort': 'string', 'totals': True},
-    'size': {'type': 'title', 'sort': 'string', 'totals': True, 'admin': True},
-    'bitrate': {'type': 'title', 'sort': 'string'},
-    'files': {'type': 'title', 'sort': 'string', 'totals': True, 'admin': True},
-    'filename': {'type': 'title', 'sort': 'string'},
-
-    #Layer properties // those need to be defined with bins
-    'dialog': {'type': 'title', 'find': True},
-    #'clips': {'type': 'title', 'sort': 'string'},
-    #'cuts': {'type': 'title', 'sort': 'string'},
-    'cutsperminute': {'type': 'integer', 'title': 'Cuts per minute', 'sort': 'string'},
-    'words': {'type': 'title', 'sort': 'string'},
-    'wordsperminute': {'type': 'integer','title': 'Words per minute', 'sort': 'string'},
-}
 
 def siteJson():
 	r = {}
 	r['findKeys'] = [{"id": "all", "title": "All"}]
-	for k in properties:
-		i = properties[k]
-		if i.get('find', False):
-		    f = {"id": k, "title": i.get('title', k.capitalize())}
-		    if i.get('autocomplete', False):
-			    f['autocomplete'] = True
+	for p in Property.objects.all():
+		if p.find:
+		    title = p.title
+		    if not title:
+		        title = p.name.capitalize()
+		    f = {"id": p.name, "title": title}
+		    f['autocomplete'] = p.autocomplete
 		    r['findKeys'].append(f)
-	r['groups'] = filter(lambda k: properties[k].get('group', False), properties.keys())
+		    
+	r['groups'] = [p.name for p in Property.objects.filter(group=True)]
     r['itemViews'] = [
         {"id": "info", "title": "Info"},
         {"id": "statistics", "title": "Statistics"},
@@ -155,35 +79,34 @@ def siteJson():
         {"id": "featured", "title": "Featured Lists"}
     ]
 	r['sortKeys'] = []
-	for k in properties:
-		i = properties[k]
-		if 'sort' in i:
-			f = {
-				"id": k,
-				"title": i.get('title', k.capitalize()),
-				"operator": i.get('operator', ''),
-				"align": i.get('align', 'left'),
-				"width": i.get('width', 180),
-			}
-			if not i.get('removable', True):
-				f['removable'] = False
-			r['sortKeys'].append(f)
+	for p in Property.objects.exclude(sort=''):
+	    title = p.title
+	    if not title:
+	        title = p.name.capitalize()
+
+		f = {
+			"id": p.name,
+			"title": title,
+			"operator": p.operator,
+			"align": p.align,
+			"width": p.width,
+		}
+		if not p.removable:
+			f['removable'] = False
+		r['sortKeys'].append(f)
+	r['sortKeys'].append([{"id": "id", "title": "ID", "operator": "", "align": "left", "width": 90}])
 
 	r['totals'] = [{"id": "items"}]
-	for k in properties:
-		i = properties[k]
-		if i.get('totals', False):
-			f = {"id": k}
-			if i.get('admin', False):
-				f['admin'] = True
-			r['totals'].append(f)
+	for p in Property.objects.filter(totals=True):
+	    f = {'id': p.name, 'admin': p.admin}
+	    r['totals'].append(f)
 
     #FIXME: defaults should also be populated from properties
     r["user"] = {
         "group": "guest",
         "preferences": {},
         "ui": {
-            "columns": ["id", "title", "director", "country", "year", "language", "genre"],
+            "columns": ["id"] + [p.name for p in Property.objects.filter(default=True)],
             "findQuery": {"conditions": [], "operator": ""},
             "groupsQuery": {"conditions": [], "operator": "|"},
             "groupsSize": 128,
@@ -196,10 +119,8 @@ def siteJson():
             "showInfo": True,
             "showLists": True,
             "showMovies": True,
-            "sort": [
-                {"key": "director", "operator": ""}
-            ],
-            "theme": "classic"
+            "sort": settings.DEFAULT_SORT,
+            "theme": settings.DEFAULT_THEME
         },
         "username": ""
     }
@@ -252,16 +173,25 @@ def getItem(info):
 class Property(models.Model):
     class Meta:
         ordering = ('position', )
-
+        verbose_name_plural = "Properties"
+               
     name = models.CharField(null=True, max_length=255, unique=True)
-    title = models.CharField(null=True, max_length=255)
+    title = models.CharField(null=True, max_length=255, blank=True)
 	#text, string, string from list(fixme), event, place, person
     type = models.CharField(null=True, max_length=255)
     array = models.BooleanField(default=False)
     position = models.IntegerField(default=0)
+    width = models.IntegerField(default=180)
+    align = models.CharField(null=True, max_length=255, default='left')
+    operator = models.CharField(null=True, max_length=5, default='', blank=True)
+	default = models.BooleanField('Enabled by default', default=False)
+	removable = models.BooleanField(default=True)
 
 	#sort values: title, string, integer, float, date
-    sort = models.CharField(null=True, max_length=255)
+    sort = models.CharField(null=True, max_length=255, blank=True)
+	find = models.BooleanField(default=False)
+	autocomplete = models.BooleanField(default=False)
+	group = models.BooleanField(default=False)
 
     totals = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
@@ -279,6 +209,11 @@ class Property(models.Model):
 				j[key] = value
 		return j
 
+    def save(self, *args, **kwargs):
+        if not self.title:
+            self.title = self.name.capitalize()
+        super(Property, self).save(*args, **kwargs)
+    
 class Item(models.Model):
     person_keys = ('director', 'writer', 'producer', 'editor', 'cinematographer', 'actor', 'character')
     facet_keys = person_keys + ('country', 'language', 'genre', 'keyword')
@@ -905,191 +840,10 @@ class Facet(models.Model):
             self.value_sort = self.value
         super(Facet, self).save(*args, **kwargs)
 
-def getPersonSort(name):
-    person, created = Person.objects.get_or_create(name=name)
-    name_sort = unicodedata.normalize('NFKD', person.name_sort)
-    return name_sort
-
-class Person(models.Model):
-    name = models.CharField(max_length=200)
-    name_sort = models.CharField(max_length=200)
-
-    #FIXME: how to deal with aliases
-    aliases = fields.TupleField(default=[])
-
-    imdbId = models.CharField(max_length=7, blank=True)
-    wikipediaId = models.CharField(max_length=1000, blank=True)
-
-    class Meta:
-        ordering = ('name_sort', )
-
-    def __unicode__(self):
-        return self.name
-
-    def save(self, *args, **kwargs):
-        if not self.name_sort:
-            self.name_sort = ox.normalize.canonicalName(self.name)
-        super(Person, self).save(*args, **kwargs)
-
-    def get_or_create(model, name, imdbId=None):
-        if imdbId:
-            q = model.objects.filter(name=name, imdbId=imdbId)
-        else:
-            q = model.objects.all().filter(name=name)
-        if q.count() > 0:
-            o = q[0]
-        else:
-            o = model.objects.create(name=name)
-            if imdbId:
-                o.imdbId = imdbId
-            o.save()
-        return o
-    get_or_create = classmethod(get_or_create)
-
-    def json(self):
-        return self.name
-
-class Place(models.Model):
-    '''
-        Places are named locations, they should have geographical information attached to them.
-    '''
-
-    name = models.CharField(max_length=200, unique=True)
-    name_sort = models.CharField(max_length=200)
-    manual = models.BooleanField(default=False)
-    items = models.ManyToManyField(Item, related_name='places')
-    wikipediaId = models.CharField(max_length=1000, blank=True)
-
-    #FIXME: how to deal with aliases
-    aliases = fields.TupleField(default=[])
-
-    #FIXME: geo data, is this good enough?
-    lat_sw = models.FloatField(default=0)
-    lng_sw = models.FloatField(default=0)
-    lat_ne = models.FloatField(default=0)
-    lng_ne = models.FloatField(default=0)
-    lat_center = models.FloatField(default=0)
-    lng_center = models.FloatField(default=0)
-    area = models.FloatField(default=-1)
-
-    class Meta:
-        ordering = ('name_sort', )
-
-    def __unicode__(self):
-        return self.name
-
-    def json(self):
-        return self.name
-
-    def save(self, *args, **kwargs):
-        if not self.name_sort:
-            self.name_sort = self.name
-
-        #update center
-        self.lat_center = ox.location.center(self.lat_sw, self.lat_ne)
-        self.lng_center = ox.location.center(self.lng_sw, self.lng_ne)
-
-        #update area
-        self.area = location.area(self.lat_sw, self.lng_sw, self.lat_ne, self.lng_ne)
-
-        super(Place, self).save(*args, **kwargs)
-
-class Event(models.Model):
-    '''
-        Events are events in time that can be once or recurring,
-        From Mondays to Spring to 1989 to Roman Empire
-    '''
-    name = models.CharField(null=True, max_length=255, unique=True)
-    name_sort = models.CharField(null=True, max_length=255, unique=True)
-    wikipediaId = models.CharField(max_length=1000, blank=True)
-
-    class Meta:
-        ordering = ('name_sort', )
-
-    #FIXME: how to deal with aliases
-    aliases = fields.TupleField(default=[])
-
-    #once|year|week|day
-    recurring = models.IntegerField(default=0)
-
-    #start yyyy-mm-dd|mm-dd|dow 00:00|00:00
-    #end   yyyy-mm-dd|mm-dd|dow 00:00|00:01
-    start = models.CharField(null=True, max_length=255)
-    end = models.CharField(null=True, max_length=255)
-
-    def save(self, *args, **kwargs):
-        if not self.name_sort:
-            self.name_sort = self.name
-        super(Event, self).save(*args, **kwargs)
-
 class ReviewWhitelist(models.Model):
     name = models.CharField(max_length=255, unique=True)
     url = models.CharField(max_length=255, unique=True)
 
-class List(models.Model):
-    class Meta:
-        unique_together = ("user", "name")
-
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User)
-    name = models.CharField(max_length=255)
-    public = models.BooleanField(default=False)
-    items = models.ManyToManyField(Item, related_name='lists', through='ListItem')
-
-    def add(self, item):
-        q = self.items.filter(id=item.id)
-        if q.count() == 0:
-            l = ListItem()
-            l.list = self
-            l.item = item
-            l.save()
-
-    def remove(self, item):
-        self.ListItem.objects.all().filter(item=item, list=self).delete()
-
-    def __unicode__(self):
-        return u'%s (%s)' % (self.title, unicode(self.user))
-
-    def editable(self, user):
-        #FIXME: make permissions work
-        if self.user == user or user.has_perm('Ox.admin'):
-            return True
-        return False
-
-class ListItem(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    list = models.ForeignKey(List)
-    item = models.ForeignKey(Item)
-
-    def __unicode__(self):
-        return u'%s in %s' % (unicode(self.item), unicode(self.list))
-
-class Layer(models.Model):
-    #FIXME: here having a item,start index would be good
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User)
-    item = models.ForeignKey(Item)
-
-    #seconds
-    start = models.FloatField(default=-1)
-    stop = models.FloatField(default=-1)
-
-    type = models.CharField(blank=True, max_length=255)
-    value = models.TextField()
-    
-    #FIXME: relational layers, Locations, clips etc
-    #location = models.ForeignKey('Location', default=None)
-
-    def editable(self, user):
-        if user.is_authenticated():
-            if obj.user == user.id or user.has_perm('0x.admin'):
-                return True
-            if user.groups.filter(id__in=obj.groups.all()).count() > 0:
-                return True
-        return False
 
 class Collection(models.Model):
     created = models.DateTimeField(auto_now_add=True)

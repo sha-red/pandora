@@ -27,9 +27,16 @@ Install rabbitmq and carrot:
 
     update BROKER_* settings in local_settings.py:
 
+get current oxjs
+    cd static
+    bzr branch http://code.0x2620.org/oxjs
+
+Database:
+    with postresql install python-psycopg2
+
 Development:
     we are using django, http://docs.djangoproject.com/en/dev/
-    
+
 Nginx setup:
     sudo apt-get install nginx 
 

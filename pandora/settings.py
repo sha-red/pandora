@@ -114,22 +114,30 @@ INSTALLED_APPS = (
 
     'django_extensions',
     'devserver',
-    'south',
+#    'south',
     'djcelery',
 
     'app',
     'api',
-    'item',
     'archive',
-    'user',
+    'date',
+    'item',
+    'itemlist',
+    'layer',
+    'person',
+    'place',
     'text',
     'torrent',
+    'user',
 )
 
 AUTH_PROFILE_MODULE = 'user.UserProfile'
 
 #Video encoding settings
 #available profiles: 96p, 270p, 360p, 480p, 720p, 1080p
+
+DEFAULT_SORT = [{"key": "director", "operator": ""}]
+DEFAULT_THEME = "classic"
 
 VIDEO_PROFILE = '96p'
 VIDEO_DERIVATIVES = []

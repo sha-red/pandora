@@ -17,11 +17,7 @@ from django.shortcuts import render_to_response, get_object_or_404, get_list_or_
 from django.template import RequestContext
 from django.conf import settings
 
-try:
-    import simplejson as json
-except ImportError:
-    from django.utils import simplejson as json
-
+from ox.utils import json
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 from ox.django.http import HttpFileResponse
@@ -31,15 +27,18 @@ import models
 import utils
 import tasks
 
-from user.models import getUserJSON
-from user.views import api_login, api_logout, api_register, api_contact, api_recover, api_preferences, api_findUser
+from pandora.user.models import getUserJSON
+from pandora.user.views import api_login, api_logout, api_register, api_contact, api_recover, api_preferences, api_findUser
 
-from archive.views import api_update, api_upload, api_editFile, api_encodingProfile
+from pandora.archive.views import api_update, api_upload, api_editFile, api_encodingProfile
 
-from archive.models import File
-from archive import extract
+from pandora.archive.models import File
+from pandora.archive import extract
 
-from item.views import *
+from pandora.item.views import *
+from pandora.itemlist.views import *
+from pandora.place.views import *
+from pandora.date.views import *
 
 def api(request):
     if request.META['REQUEST_METHOD'] == "OPTIONS":
@@ -73,6 +72,18 @@ def api_api(request):
     actions.sort()
     return render_to_json_response(json_response({'actions': actions}))
 
+def api_apidoc(request):
+    '''
+        returns array of actions with documentation
+    '''
+    actions = globals().keys()
+    actions = map(lambda a: a[4:], filter(lambda a: a.startswith('api_'), actions))
+    actions.sort()
+    docs = {}
+    for f in actions:
+        docs[f] = get_api_doc(f)
+    return render_to_json_response(json_response({'actions': docs}))
+
 def api_hello(request):
     '''
         return {'status': {'code': int, 'text': string},
@@ -93,10 +104,9 @@ def api_error(request):
     success = error_is_success
     return render_to_json_response({})
 
-def apidoc(request):
-    '''
-        this is used for online documentation at http://127.0.0.1:8000/api/
-    '''
+def get_api_doc(f):
+    f = 'api_' + f
+
     import sys
     def trim(docstring):
         if not docstring:
@@ -123,12 +133,19 @@ def apidoc(request):
         # Return a single string:
         return '\n'.join(trimmed)
 
+    return trim(globals()[f].__doc__)
+
+def apidoc(request):
+    '''
+        this is used for online documentation at http://127.0.0.1:8000/api/
+    '''
+
     functions = filter(lambda x: x.startswith('api_'), globals().keys())
     api = []
     for f in sorted(functions):
         api.append({
             'name': f[4:],
-            'doc': trim(globals()[f].__doc__).replace('\n', '<br>\n')
+            'doc': get_api_doc(f[4:]).replace('\n', '<br>\n')
         })
     context = RequestContext(request, {'api': api,
                                        'sitename': settings.SITENAME,})

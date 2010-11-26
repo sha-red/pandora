@@ -5,22 +5,12 @@ from django.contrib import admin
 
 import models
 
-
-class BinAdmin(admin.ModelAdmin):
-    search_fields = ['name', 'title']
-admin.site.register(models.Bin, BinAdmin)
+class ItemAdmin(admin.ModelAdmin):
+    search_fields = ['itemId', 'data', 'external_data']
+admin.site.register(models.Item, ItemAdmin)
 
 class PropertyAdmin(admin.ModelAdmin):
     search_fields = ['name', 'title']
 admin.site.register(models.Property, PropertyAdmin)
 
-
-class PlaceAdmin(admin.ModelAdmin):
-    search_fields = ['name']
-admin.site.register(models.Place, PlaceAdmin)
-
-
-class EventAdmin(admin.ModelAdmin):
-    search_fields = ['name']
-admin.site.register(models.Event, EventAdmin)
 
