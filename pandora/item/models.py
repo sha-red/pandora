@@ -148,7 +148,7 @@ def getItem(info):
             item.updateImdb()
             tasks.updatePoster.delay(item.itemId)
     else:
-        q = Item.objects.filter(find__title=info['title'])
+        q = Item.objects.filter(find__key='title', find__value=info['title'])
         if q.count() > 1:
             print "FIXME: check more than title here!!?"
             item = q[0]
