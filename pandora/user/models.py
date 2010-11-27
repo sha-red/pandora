@@ -27,7 +27,7 @@ class Preference(models.Model):
     key = models.CharField(blank=True, max_length=255)
     value = models.TextField(blank=True)
 
-def getUserJSON(user):
+def get_user_json(user):
     json = {}
     for key in ('username', ):
         json[key] = getattr(user, key)
@@ -36,11 +36,11 @@ def getUserJSON(user):
         json['group'] = 'admin'
     elif user.has_perm('0x.vip'): #FIXME: permissions
         json['group'] = 'vip'
-    json['preferences'] = getPreferences(user)
-    json['ui'] = getUI(user)
+    json['preferences'] = get_preferences(user)
+    json['ui'] = get_ui(user)
     return json
 
-def getUI(user):
+def get_ui(user):
     return {
         "columns": ["id", "title", "director", "country", "year", "language", "genre"],
         "findQuery": {"conditions": [{"key": "", "value": "", "operator": ""}], "operator": ""},
@@ -61,14 +61,14 @@ def getUI(user):
         "theme": "classic"
     }
 
-def getPreferences(user):
+def get_preferences(user):
     prefs = {}
     for p in Preference.objects.filter(user=user):
         prefs[p.key] = json.loads(p.value)
     prefs['email'] = user.email
     return prefs
 
-def getPreference(user, key, value=None):
+def get_preference(user, key, value=None):
     if key in ('email', ):
         value = getattr(user, key)
     else:
@@ -77,7 +77,7 @@ def getPreference(user, key, value=None):
             value = json.loads(q[0].value)
     return value
 
-def setPreference(user, key, value):
+def set_preference(user, key, value):
     if key in ('email', ):
         setattr(user, key, value)
         user.save()

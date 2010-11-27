@@ -28,7 +28,7 @@ import models
 import utils
 import tasks
 
-from user.models import getUserJSON
+from user.models import get_user_json
 
 from archive.models import File
 from archive import extract
@@ -309,7 +309,7 @@ def api_setPoster(request): #parse path and return info
             if item.poster:
                 item.poster.delete()
             item.save()
-            tasks.updatePoster.delay(item.itemId)
+            tasks.update_poster.delay(item.itemId)
             response = json_response(status=200, text='ok')
             response['data']['poster'] = item.get_poster()
         else:

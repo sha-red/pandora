@@ -13,26 +13,26 @@ def cronjob(**kwargs):
     print "do some cleanup stuff once a day"
 
 @task(ignore_resulsts=True, queue='default')
-def updatePoster(itemId):
+def update_poster(itemId):
     item = models.Item.objects.get(itemId=itemId)
     item.download_poster(True)
 
 @task(ignore_resulsts=True, queue='default')
-def updateImdb(imdbId):
+def update_imdb(imdbId):
     item = models.Item.objects.get(itemId=imdbId)
-    item.updateImdb()
+    item.update_imdb()
 
 @task(ignore_resulsts=True)
-def findItem(fileId):
+def find_item(fileId):
     f = models.File.objects.get(pk=fileId)
-    f.findItem()
+    f.find_item()
 
 @task(ignore_resulsts=True, queue="encoding")
-def updateStreams(itemId):
+def update_streams(itemId):
     '''
         create stream, extract timeline and create derivatives
     '''
     item = models.Item.objects.get(itemId=itemId)
     if item.files.filter(is_main=True, is_video=True, available=False).count() == 0:
-        item.updateStreams()
+        item.update_streams()
 

@@ -30,7 +30,7 @@ import ox
 import models
 
 from item.utils import oxid, parse_path
-from item.models import getItem
+from item.models import get_item
 import item.tasks
 
 @login_required_json
@@ -113,7 +113,7 @@ def api_update(request):
                 else:
                     if not item:
                         item_info = parse_path(folder)
-                        item = getItem(item_info)
+                        item = get_item(item_info)
                     file_object = models.File()
                     file_object.oshash = oshash
                     file_object.name = name
@@ -228,7 +228,7 @@ def firefogg_upload(request):
                     f.available = True
                     f.save()
                     #FIXME: this fails badly if rabbitmq goes down
-                    item.tasks.updateStreams.delay(f.item.itemId)
+                    item.tasks.update_streams.delay(f.item.itemId)
                     response['result'] = 1
                     response['done'] = 1
                 return render_to_json_response(response)

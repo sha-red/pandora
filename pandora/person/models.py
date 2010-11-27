@@ -24,7 +24,7 @@ from ox import stripTags
 from ox.normalize import canonicalTitle, canonicalName
 
 
-def getPersonSort(name):
+def get_name_sort(name):
     person, created = Person.objects.get_or_create(name=name)
     name_sort = unicodedata.normalize('NFKD', person.name_sort)
     return name_sort

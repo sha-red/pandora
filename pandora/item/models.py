@@ -27,10 +27,11 @@ from firefogg import Firefogg
 import managers
 import load
 import utils
+import tasks
 from archive import extract
 
 from layer.models import Layer
-from person.models import getPersonSort, Person
+from person.models import get_name_sort, Person
 
 
 def siteJson():
@@ -126,7 +127,7 @@ def siteJson():
     }
 	return r
 
-def getItem(info):
+def get_item(info):
     '''
         info dict with:
             imdbId, title, director, episode_title, season, series
@@ -144,9 +145,9 @@ def getItem(info):
                 }
             #FIXME: this should be done async
             #item.save()
-            #tasks.updateImdb.delay(item.itemId)
-            item.updateImdb()
-            tasks.updatePoster.delay(item.itemId)
+            #tasks.update_imdb.delay(item.itemId)
+            item.update_imdb()
+            tasks.update_poster.delay(item.itemId)
     else:
         q = Item.objects.filter(find__key='title', find__value=info['title'])
         if q.count() > 1:
@@ -268,7 +269,7 @@ class Item(models.Model):
                     _reviews[w.title] = r[0]
         return _reviews
 
-    def updateImdb(self):
+    def update_imdb(self):
         if len(self.itemId) == 7:
             self.external_data = ox.web.imdb.Imdb(self.itemId)
             self.save()
@@ -294,9 +295,9 @@ class Item(models.Model):
             self.poster_height = 128
             self.poster_width = 80
         super(Item, self).save(*args, **kwargs)
-        self.updateFind()
-        self.updateSort()
-        self.updateFacets()
+        self.update_find()
+        self.update_sort()
+        self.update_facets()
 
     def delete(self, *args, **kwargs):
         self.delete_poster()
@@ -306,7 +307,7 @@ class Item(models.Model):
             os.unlink(f)
         super(Item, self).delete(*args, **kwargs)
 
-    def mergeWith(self, other):
+    def merge_with(self, other):
         '''
             move all related tables to other and delete self
         '''
@@ -459,7 +460,7 @@ class Item(models.Model):
     '''
         Search related functions
     '''
-    def updateFind(self):
+    def update_find(self):
         def save(key, value):
             f, created = ItemFind.objects.get_or_create(item=self, key=key)
             if value not in ('', '||'):
@@ -496,7 +497,7 @@ class Item(models.Model):
         all_find = ' '.join([f.value for f in ItemFind.objects.filter(item=self).exclude(key='all')])
         save('all', all_find)
 
-    def updateSort(self):
+    def update_sort(self):
         try:
             s = self.sort
         except ItemSort.DoesNotExist:
@@ -505,7 +506,7 @@ class Item(models.Model):
         def sortNames(values):
             sort_value = ''
             if values:
-                sort_value = '; '.join([getPersonSort(name) for name in values])
+                sort_value = '; '.join([get_name_sort(name) for name in values])
             if not sort_value:
                 sort_value = ''
             return sort_value
@@ -558,7 +559,7 @@ class Item(models.Model):
         #FIXME: also deal with number based rows like genre, keywords etc
         s.save()
 
-    def updateFacets(self):
+    def update_facets(self):
         #FIXME: what to do with Unkown Director, Year, Country etc. 
         for key in self.facet_keys:
             if key == 'actor':
@@ -575,7 +576,7 @@ class Item(models.Model):
                 if value not in saved_values:
                     value_sort = value
                     if key in self.person_keys:
-                        value_sort = getPersonSort(value)
+                        value_sort = get_name_sort(value)
                     f = Facet(key=key, value=value, value_sort=value_sort)
                     f.item = self
                     f.save()
@@ -614,7 +615,7 @@ class Item(models.Model):
             videos = filter(check, videos) 
         return videos
 
-    def updateStreams(self):
+    def update_streams(self):
         files = {}
         for f in self.main_videos():
             files[utils.sort_title(f.name)] = f.video.path
@@ -742,7 +743,7 @@ class Item(models.Model):
 class ItemFind(models.Model):
     """
         used to find items,
-        item.updateFind populates this table
+        item.update_find populates this table
         its used in manager.ItemManager
     """
     class Meta:

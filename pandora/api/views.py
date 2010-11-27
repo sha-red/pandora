@@ -27,7 +27,7 @@ import models
 import utils
 import tasks
 
-from pandora.user.models import getUserJSON
+from pandora.user.models import get_user_json
 from pandora.user.views import api_login, api_logout, api_register, api_contact, api_recover, api_preferences, api_findUser
 
 from pandora.archive.views import api_update, api_upload, api_editFile, api_encodingProfile
@@ -92,7 +92,7 @@ def api_hello(request):
     #data = json.loads(request.POST['data'])
     response = json_response({})
     if request.user.is_authenticated():
-        response['data']['user'] = getUserJSON(request.user)
+        response['data']['user'] = get_user_json(request.user)
     else:
         response['data']['user'] = {'name': 'Guest', 'group': 'guest', 'preferences': {}}
     return render_to_json_response(response)

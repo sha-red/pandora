@@ -39,7 +39,7 @@ def api_login(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                user_json = models.getUserJSON(user)
+                user_json = models.get_user_json(user)
                 response = json_response({'user': user_json},
                                          text='You are logged in.')
             else:
@@ -227,21 +227,21 @@ def api_preferences(request):
     '''
     response = json_response()
     if 'data' not in request.POST:
-        response['data']['preferences'] = models.getPreferences(request.user)
+        response['data']['preferences'] = models.get_preferences(request.user)
     else:
         data = json.loads(request.POST['data'])
         if isinstance(data, basestring):
             response['data']['preferences'] = {}
-            response['data']['preferences'][data] = models.getPreference(request.user, data)
+            response['data']['preferences'][data] = models.get_preference(request.user, data)
         elif isinstance(data, list):
             response['data']['preferences'] = {}
             for preference in data:
-                response['preferences'][preference] = models.getPreference(request.user, preference)
+                response['preferences'][preference] = models.get_preference(request.user, preference)
         elif isinstance(data, dict):
             if not data:
-                response['data']['preferences'] = models.getPreferences(request.user)
+                response['data']['preferences'] = models.get_preferences(request.user)
             else:
                 del response['data']
                 for key in data:
-                    models.setPreference(request.user, key, data[key])
+                    models.set_preference(request.user, key, data[key])
     return render_to_json_response(response)
