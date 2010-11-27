@@ -217,7 +217,6 @@ class Property(models.Model):
 class Item(models.Model):
     person_keys = ('director', 'writer', 'producer', 'editor', 'cinematographer', 'actor', 'character')
     facet_keys = person_keys + ('country', 'language', 'genre', 'keyword')
-
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     published = models.DateTimeField(default=datetime.now, editable=False)
@@ -225,9 +224,18 @@ class Item(models.Model):
     #only items that have data from files are available,
     #this is indicated by setting available to True 
     available = models.BooleanField(default=False, db_index=True)
-
     itemId = models.CharField(max_length=128, unique=True, blank=True)
     oxdbId = models.CharField(max_length=42, unique=True, blank=True)
+    external_data = fields.DictField(default={}, editable=False)
+    data = fields.DictField(default={}, editable=False)
+    json = fields.DictField(default={}, editable=False)
+    poster = models.ImageField(default=None, blank=True, upload_to=lambda m, x: os.path.join(itemid_path(m.itemId), "poster.jpg"))
+    poster_url = models.TextField(blank=True)
+    poster_height = models.IntegerField(default=0)
+    poster_width = models.IntegerField(default=0)
+    poster_frame = models.FloatField(default=-1)
+    #stream related fields
+    stream_aspect = models.FloatField(default=4/3)
 
     objects = managers.ItemManager()
 
@@ -260,25 +268,10 @@ class Item(models.Model):
                     _reviews[w.title] = r[0]
         return _reviews
 
-    external_data = fields.DictField(default={}, editable=False)
-    data = fields.DictField(default={}, editable=False)
-
-    json = fields.DictField(default={}, editable=False)
-
     def updateImdb(self):
         if len(self.itemId) == 7:
             self.external_data = ox.web.imdb.Imdb(self.itemId)
             self.save()
-
-    poster = models.ImageField(default=None, blank=True, upload_to=lambda m, x: os.path.join(itemid_path(m.itemId), "poster.jpg"))
-    poster_url = models.TextField(blank=True)
-    poster_height = models.IntegerField(default=0)
-    poster_width = models.IntegerField(default=0)
-
-    poster_frame = models.FloatField(default=-1)
-
-    #stream related fields
-    stream_aspect = models.FloatField(default=4/3)
 
     def __unicode__(self):
         year = self.get('year')
@@ -368,6 +361,7 @@ class Item(models.Model):
         'alternative_titles': 'alternative_titles',
         'connections_json': 'connections',
     }
+
     def get_poster(self):
         poster = {}
         poster['width'] = self.poster_width
