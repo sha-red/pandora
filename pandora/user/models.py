@@ -43,23 +43,20 @@ def get_user_json(user):
 def get_ui(user):
     return {
         "columns": ["id", "title", "director", "country", "year", "language", "genre"],
-        "findQuery": {"conditions": [{"key": "", "value": "", "operator": ""}], "operator": ""},
+        "findQuery": {"conditions": [], "operator": ""},
         "groupsQuery": {"conditions": [], "operator": "|"},
         "groupsSize": 128,
         "itemView": "info",
         "listQuery": {"conditions": [], "operator": ""},
         "listsSize": 192,
-        "listView": "list",
+        "listView": "icons",
         "sections": ["history", "lists", "public", "featured"],
-		"showAnnotations": True,
         "showGroups": True,
         "showInfo": True,
         "showLists": True,
         "showMovies": True,
-        "sort": [
-            {"key": "director", "operator": ""}
-        ],
-        "theme": "classic"
+        "sort": settings.DEFAULT_SORT,
+        "theme": settings.DEFAULT_THEME
     }
 
 def get_preferences(user):
