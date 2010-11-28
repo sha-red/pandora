@@ -261,6 +261,14 @@ app.Query = (function() {
 // Functions
 */
 
+app.constructAnnotations = function() {
+    var $annotations = new Ox.Element();
+    $.each(app.constructBins(), function(i, $bin) {
+        $annotations.append($bin);
+    });
+    return $annotations;
+}
+
 app.constructApp = function() {
     /*
     app
@@ -307,7 +315,7 @@ app.constructApp = function() {
                                 })
                                 .bindEvent('resize', function(event, data) {
                                     Ox.print('resize', data, data / app.ui.infoRatio + 16);
-                                    app.$ui.leftPanel.resize('infoPanel', Math.round(data / app.ui.infoRatio) + 16);
+                                    app.$ui.leftPanel.size('infoPanel', Math.round(data / app.ui.infoRatio) + 16);
                                 }),
                             resizable: true,
                             resize: [128, 192, 256],
@@ -360,7 +368,7 @@ app.constructApp = function() {
                                                     .bindEvent('resize', function(event, data) {
                                                         Ox.print('resizing groups...')
                                                         $.each(app.$ui.groups, function(i, list) {
-                                                            list.resize();
+                                                            list.size();
                                                         });
                                                     }),
                                                     resizable: true,
@@ -387,12 +395,12 @@ app.constructApp = function() {
                                     return app.getGroupWidth(i, data);
                                 });
                                 Ox.print('widths', widths);
-                                app.$ui.groupsOuterPanel.resize(0, widths[0].list).resize(2, widths[4].list);
-                                app.$ui.groupsInnerPanel.resize(0, widths[1].list).resize(2, widths[3].list);
+                                app.$ui.groupsOuterPanel.size(0, widths[0].list).size(2, widths[4].list);
+                                app.$ui.groupsInnerPanel.size(0, widths[1].list).size(2, widths[3].list);
                                 $.each(app.$ui.groups, function(i, list) {
                                     list.resizeColumn('name', widths[i].column);
                                 });
-                                app.$ui.list.resize();
+                                app.$ui.list.size();
                             })
                         }
                     ],
@@ -402,6 +410,30 @@ app.constructApp = function() {
         ],
         orientation: 'vertical'
     });
+}
+
+app.constructBins = function() {
+    var $bins = [];
+    $.each(app.config.layers, function(i, layer) {
+        var $bin = new Ox.CollapsePanel({
+            id: layer.id,
+            size: 16,
+            title: layer.title
+        });
+        $bins.push($bin);
+        $bin.$content.append(
+            $('<div>').css({ height: '20px' }).append(
+                $('<div>').css({ float: 'left', width: '16px', height: '16px', margin: '1px'}).append(
+                    $('<img>').attr({ src: 'static/oxjs/build/png/ox.ui.modern/iconFind.png' }).css({ width: '16px', height: '16px', border: 0, background: 'rgb(64, 64, 64)', WebkitBorderRadius: '2px' })
+                )
+            ).append(
+                $('<div>').css({ float: 'left', width: '122px', height: '14px', margin: '2px' }).html('Foo')
+            ).append(
+                $('<div>').css({ float: 'left', width: '40px', height: '14px', margin: '2px', textAlign: 'right' }).html('23')
+            )
+        );
+    });
+    return $bins;	
 }
 
 app.constructGroups = function() {
@@ -519,8 +551,7 @@ app.constructInfo = function() {
 app.constructItem = function(id, view) {
     var $item;
     //location.hash = '!' + id;
-    app.$ui.contentPanel.resize(0, 80);
-    app.$ui.groupsOuterPanel.empty();
+    app.$ui.contentPanel.empty();
     if (view == 'timeline') {
         app.api.getItem(id, function(result) {
             item_debug = result.data.item;
@@ -534,41 +565,94 @@ app.constructItem = function(id, view) {
             video.height = 96;
             video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
             video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
-            $item = new Ox.VideoEditor({
-                cuts: cuts,
-                duration: video.duration,
-                find: '',
-                frameURL: function(position) {
-                    return '/' + id + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
-                },
-                id: 'editor',
-                largeTimeline: true,
-                matches: [],
-                points: [0, 0],
-                position: 0,
-                posterFrame: parseInt(video.duration / 2),
-                subtitles: subtitles,
-                videoHeight: video.height,
-                videoId: id,
-                videoWidth: video.width,
-                videoSize: 'small',
-                videoURL: video.url,
-                width: app.$document.width() - app.$ui.leftPanel.width() - 1 - 256 - 1
-            });
-            app.$ui.contentPanel.replace(1, $item);
+			$item = new Ox.SplitPanel({
+				elements: [
+					{
+						collapsible: true,
+						element: app.$ui.browser = new Ox.Element('div')
+							.options({id: 'browser'}),
+						resizable: false,
+						size: 80
+					},
+					{
+						element: app.$ui.timelinePanel = new Ox.SplitPanel({
+							elements: [
+								{
+									element: app.$ui.editor = new Ox.VideoEditor({
+						                cuts: cuts,
+						                duration: video.duration,
+						                find: '',
+						                frameURL: function(position) {
+						                    return '/' + id + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
+						                },
+										height: app.$ui.contentPanel.size(1),
+						                id: 'editor',
+						                largeTimeline: true,
+						                matches: [],
+						                points: [0, 0],
+						                position: 0,
+						                posterFrame: parseInt(video.duration / 2),
+						                subtitles: subtitles,
+						                videoHeight: video.height,
+						                videoId: id,
+						                videoWidth: video.width,
+						                videoSize: 'small',
+						                videoURL: video.url,
+						                width: app.$document.width() - app.$ui.mainPanel.size(0) - 1 - 256 - 1
+						            })
+									.bindEvent('resize', function(event, data) {
+										Ox.print('RESIZE:', data)
+										app.$ui.editor.options({
+											width: data
+										});
+									}),
+									size: 'auto'
+								},
+								/*
+								{
+									collapsible: true,
+									element: app.$ui.annotations = new Ox.Map({
+		                                	places: ['Boston', 'Brussels', 'Barcelona', 'Berlin', 'Beirut', 'Bombay', 'Bangalore', 'Beijing']
+		                                })
+										.bindEvent('resize', function(event, data) {
+											app.$ui.editor.options({
+												width: app.$document.width() - app.$ui.mainPanel.size(0) - app.$ui.timelinePanel.size(1) - 2.
+											})
+										}),
+									resizable: true,
+									resize: [192, 256],
+									size: 256
+								}
+								*/
+								{
+									collapsible: true,
+									element: app.$ui.annotations = app.constructAnnotations(),
+									size: 256
+								}
+							],
+							orientation: 'horizontal'
+						}),
+						size: 'auto'
+					}
+				],
+				orientation: 'vertical'
+			});
+			app.$ui.rightPanel.replace(1, $item);
             app.$ui.rightPanel
-                /*.unbindEvent('resize')*/
                 .bindEvent('resize', function(event, data) {
-                    Ox.print('seems to work', data)
-                    $item.options({
-                        width: data - 256 - 1
+                    Ox.print('rightPanel resize', data, app.$ui.timelinePanel.size(1))
+                    app.$ui.editor.options({
+                        width: data - app.$ui.timelinePanel.size(1) - 1
                     });
                 });
+			///*
             app.$window.resize(function() {
-                $item.options({
-                    width: app.$document.width() - app.$ui.leftPanel.width() - 1 - 256 - 1
+                app.$ui.editor.options({
+					height: app.$document.height() - 20 - 24 - app.$ui.contentPanel.size(0) - 1 - 16,
+                    width: app.$document.width() - app.$ui.mainPanel.size(0) - app.$ui.timelinePanel.size(1) - 2
                 });
             });
+			//*/
         });
     } else if(view == 'info') {
         app.api.getItem(id, function(result) {
@@ -596,10 +680,10 @@ app.constructItem = function(id, view) {
 }
 
 app.constructList = function(view) {
-    var $list,
+    var $list, $map,
         keys = ['director', 'id', 'poster', 'title', 'year'];
     Ox.print('constructList', view);
-    if (view == 'list' || view == 'calendar') {
+    if (view == 'list') {
         $list = new Ox.TextList({
             columns: $.map(app.config.sortKeys, function(key, i) {
                 return $.extend({
@@ -620,7 +704,7 @@ app.constructList = function(view) {
         })
         .bindEvent({
             resize: function(event, data) {
-                $list.resize();
+                $list.size();
             }
         });
     } else if (view == 'icons') {
@@ -649,15 +733,111 @@ app.constructList = function(view) {
             sort: app.user.ui.sort,
             unique: 'id'
         });
+	} else if (view == 'map') {
+		$list = new Ox.SplitPanel({
+			elements: [
+				{
+					element: new Ox.SplitPanel({
+						elements: [
+							{
+								element: new Ox.Toolbar({
+                                    	orientation: 'horizontal',
+                                    	size: 24
+                                	})
+									.append(
+                                        app.$ui.findMapInput = new Ox.Input({
+                                            clear: true,
+                                            id: 'findMapInput',
+                                            placeholder: 'Find on Map',
+                                            width: 192
+                                        })
+                                        .css({
+                                            float: 'right',
+                                            margin: '4px'
+                                        })
+										.bindEvent({
+											submit: function(event, data) {
+												app.$ui.map.find(data.value, function(data) {
+													app.$ui.mapStatusbar.html(data.geoname + ' ' + JSON.stringify(data.points))
+												});
+											}
+										})
+                                    ),
+								size: 24
+							},
+							{
+								element: app.$ui.map = new Ox.Map({
+										places: [
+											{
+												geoname: 'Beirut, Lebanon',
+												name: 'Beirut',
+												points: {
+													'center': [33.8886284, 35.4954794],
+													'northeast': [33.8978909, 35.5114868],
+													'southwest': [33.8793659, 35.479472]
+												}
+											},
+											{
+												geoname: 'Berlin, Germany',
+												name: 'Berlin',
+												points: {
+													'center': [52.506701, 13.4246065],
+													'northeast': [52.675323, 13.760909],
+													'southwest': [52.338079, 13.088304]
+												}
+											},
+											{
+												geoname: 'Mumbai, Maharashtra, India',
+												name: 'Bombay',
+												points: {
+													'center': [19.07871865, 72.8778187],
+													'northeast': [19.2695223, 72.9806562],
+													'southwest': [18.887915, 72.7749812]
+												}
+											}
+										]
+									})
+									.bindEvent({								
+										select: function(event, data) {
+											app.$ui.mapStatusbar.html(data.geoname + ' ' + JSON.stringify(data.points))
+										}
+									}),
+								id: 'map',
+								size: 'auto'
+							},
+							{
+								element: app.$ui.mapStatusbar = new Ox.Toolbar({
+	                                    orientation: 'horizontal',
+	                                    size: 16
+	                                })
+									.css({
+										fontSize: '9px',
+										padding: '2px 4px 0 0',
+										textAlign: 'right'
+									}),
+								size: 16
+							}
+						],
+						orientation: 'vertical'
+					}),
+				},
+				{
+					element: new Ox.Element(),
+					id: 'place',
+					size: 128 + 16 + 12
+				}
+			],
+			orientation: 'horizontal'
+		});
     } else {
         $list = new Ox.Element('<div>')
             .css({
                 width: '100px',
                 height: '100px',
                 background: 'red'
-            })
+            });
     }
-    $list.bindEvent({
+    ['list', 'icons'].indexOf(view) > -1 && $list.bindEvent({
         closepreview: function(event, data) {
             app.$ui.previewDialog.close();
             delete app.$ui.previewDialog;
@@ -702,7 +882,7 @@ app.constructList = function(view) {
                     app.$ui.previewImage.animate({
                         opacity: 0
                     }, 100, function() {
-                        app.$ui.previewDialog.resize(dialogWidth, dialogHeight, function() {
+                        app.$ui.previewDialog.size(dialogWidth, dialogHeight, function() {
                             app.$ui.previewImage
                                 .attr({
                                     src: item.poster.url
@@ -803,7 +983,7 @@ app.constructList = function(view) {
                             width = app.$ui.info.width(),
                             height = imageHeight * width / imageWidth;
                         app.ui.infoRatio = width / height;
-                        app.$ui.leftPanel.resize('infoPanel', height + 16);
+                        app.$ui.leftPanel.size('infoPanel', height + 16);
                         $still.css({
                                 position: 'absolute',
                                 left: 0,
@@ -1245,7 +1425,7 @@ app.constructMainMenu = function() {
                                                                 clear: true,
                                                                 id: 'findPlacesInput',
                                                                 placeholder: 'Find: Name',
-                                                                width: 168
+                                                                width: 234
                                                             })
                                                         ],
                                                         id: 'findPlacesElement'
@@ -1268,7 +1448,7 @@ app.constructMainMenu = function() {
                                                             { id: 'datecreated', title: 'Sort by Date Added' },
                                                             { id: 'datemodified', title: 'Sort by Date Modified' }
                                                         ],
-                                                        width: 184
+                                                        width: 246
                                                     })
                                                     .css({
                                                         float: 'left',
@@ -1290,9 +1470,7 @@ app.constructMainMenu = function() {
                                         ],
                                         orientation: 'vertical'
                                     }),
-                                    resizable: true,
-                                    resize: [128, 192, 256],
-                                    size: 192
+                                    size: 256
                                 },
                                 {
                                     element: new Ox.SplitPanel({
@@ -1325,32 +1503,127 @@ app.constructMainMenu = function() {
                                                         float: 'right',
                                                         margin: '4px'
                                                     })
+													.bindEvent({
+														submit: function(event, data) {
+															app.$ui.map.find(data.value, function(location) {
+																app.$ui.placeNameInput.options({
+																	disabled: false,
+																	value: location.name
+																});
+																app.$ui.placeAliasesInput.options({
+																	disabled: false
+																});
+																app.$ui.placeGeonameLabel.options({
+																	disabled: false,
+																	title: location.names.join(', ')
+																});
+																app.$ui.removePlaceButton.options({
+																	disabled: false
+																});
+																app.$ui.addPlaceButton.options({
+																	disabled: false
+																});
+															});
+														}
+													})
                                                 ),
                                                 size: 24
                                             },
                                             {
                                                 element: app.$ui.map = new Ox.Map({
-                                                    places: ['Boston', 'Brussels', 'Barcelona', 'Berlin', 'Beirut', 'Bombay', 'Bangalore', 'Beijing']
-                                                }).css({
-                                                    left: 0,
-                                                    top: 0,
-                                                    right: 0,
-                                                    bottom: 0
-                                                })
+                                                    	places: ['Boston', 'Brussels', 'Barcelona', 'Berlin', 'Beirut', 'Bombay', 'Bangalore', 'Beijing']
+                                                	})
+													.css({
+                                                    	left: 0,
+                                                    	top: 0,
+                                                    	right: 0,
+                                                    	bottom: 0
+                                                	})
+													.bindEvent({
+														select: function(event, location) {
+															app.$ui.placeNameInput.options({
+																disabled: false,
+																value: location.name
+															});
+															app.$ui.placeAliasesInput.options({
+																disabled: false
+															});
+															app.$ui.placeGeonameLabel.options({
+																disabled: false,
+																title: location.names.join(', ')
+															});
+															app.$ui.removePlaceButton.options({
+																disabled: false
+															});
+															app.$ui.addPlaceButton.options({
+																disabled: false
+															});
+														}
+													})
                                             },
                                             {
-                                                element: new Ox.Toolbar({
+                                                element: app.$ui.bottomBar = new Ox.Toolbar({
                                                     orientation: 'horizontal',
                                                     size: 24
-                                                }).append(
-                                                    app.$ui.newPlaceButton = new Ox.Button({
-                                                        id: 'newPlaceButton',
-                                                        title: 'New Place...',
-                                                        width: 96
+                                                })
+												.append(
+													app.$ui.placeNameInput = new Ox.Input({
+														disabled: true,
+														id: 'placeName',
+														placeholder: 'Name',
+														width: 128
+													})
+													.css({
+														float: 'left',
+														margin: '4px 0 0 4px'
+													})
+												)
+												.append(
+													app.$ui.placeAliasesInput = new Ox.Input({
+														disabled: true,
+														id: 'aliases',
+														placeholder: 'Aliases',
+														width: 128
+													})
+													.css({
+														float: 'left',
+														margin: '4px 0 0 4px'
+													})
+												)
+												.append(
+													app.$ui.placeGeonameLabel = new Ox.Label({
+														disabled: true,
+														id: 'placeGeoname',
+														title: 'Geoname',
+														width: parseInt(app.$document.width() * 0.8) - 256 - 256 - 32 - 24
+													})
+													.css({
+                                                        float: 'left',
+                                                        margin: '4px 0 0 4px'
+                                                    })
+												)
+												.append(
+                                                    app.$ui.addPlaceButton = new Ox.Button({
+														disabled: true,
+                                                        id: 'addPlaceButton',
+                                                        title: 'add',
+														type: 'image'
                                                     })
                                                     .css({
-                                                        float: 'left',
-                                                        margin: '4px'
+                                                        float: 'right',
+                                                        margin: '4px 4px 0 0'
+                                                    })
+                                                )
+												.append(
+                                                    app.$ui.removePlaceButton = new Ox.Button({
+														disabled: true,
+                                                        id: 'removePlaceButton',
+                                                        title: 'remove',
+														type: 'image'
+                                                    })
+                                                    .css({
+                                                        float: 'right',
+                                                        margin: '4px 4px 0 0'
                                                     })
                                                 ),
                                                 size: 24

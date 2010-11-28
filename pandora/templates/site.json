@@ -28,6 +28,10 @@
         {"id": "calendar", "title": "Calendar"},
         {"id": "files", "title": "Files", "admin": true}
     ],
+	"layers": [
+		{"id": "privatenotes", "title": "Private Notes", "type": "text"},
+		{"id": "publicnotes", "title": "Public Notes", "type": "text"}
+	],
     "listViews": [
         {"id": "list", "title": "as List"},
         {"id": "icons", "title": "as Icons"},
@@ -49,7 +53,8 @@
         {"id": "history", "title": "History"},
         {"id": "lists", "title": "My Lists"},
         {"id": "public", "title": "Public Lists"},
-        {"id": "featured", "title": "Featured Lists"}
+        {"id": "featured", "title": "Featured Lists"},
+        {"id": "admin", "title": "Admin"}
     ],
     "sortKeys": [
         {"id": "title", "title": "Title", "operator": "", "align": "left", "width": 180, "removable": false},
@@ -115,7 +120,8 @@
             "listQuery": {"conditions": [], "operator": ""},
             "listsSize": 192,
             "listView": "icons",
-            "sections": ["history", "lists", "public", "featured"],
+            "sections": ["history", "lists", "public", "featured", "admin"],
+            "showAnnotations": true,
             "showGroups": true,
             "showInfo": true,
             "showLists": true,
