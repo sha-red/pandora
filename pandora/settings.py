@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-# Django settings for pandora project.
+# Django settings for pan.do/ra project defaults,
+# create local_settings.py to overwrite
 import os
 from os.path import join, normpath
 

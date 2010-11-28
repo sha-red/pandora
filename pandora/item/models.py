@@ -47,7 +47,7 @@ def siteJson():
 		    r['findKeys'].append(f)
 		    
 	r['groups'] = [p.name for p in Property.objects.filter(group=True)]
-	r['layers'] = [l.json() for l in Layer.objects()]
+	r['layers'] = [l.json() for l in Layer.objects.all()]
 
     r['itemViews'] = [
         {"id": "info", "title": "Info"},

@@ -56,6 +56,9 @@ class Layer(models.Model):
     def json(self):
         return {'id': self.name, 'title': self.title, 'type': self.type}
 
+    def __unicode__(self):
+        return self.title
+
 class Annotation(models.Model):
     #FIXME: here having a item,start index would be good
     created = models.DateTimeField(auto_now_add=True)
@@ -77,4 +80,7 @@ class Annotation(models.Model):
             if user.groups.filter(id__in=obj.groups.all()).count() > 0:
                 return True
         return False
+
+    def __unicode__(self):
+        return "%s/%s-%s" %(self.item, self.start, self.stop)
 
