@@ -15,11 +15,11 @@ from django.db import models
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
-from django.utils import simplejson as json
 from django.conf import settings
 
 from ox.django import fields
 import ox
+from ox.utils import json
 from ox import stripTags
 from ox.normalize import canonicalTitle, canonicalName
 
