@@ -59,6 +59,9 @@ var app = new Ox.App({
         app.$ui.loadingIcon.stop();
     });
 
+    app.template = {};
+    app.template.info = $('<div>').load('/static/html/itemInfo.html');
+
     $.each(app.afterLaunch, function(i, f) {f()});
 });
 
@@ -567,6 +570,28 @@ app.constructItem = function(id, view) {
                 });
             });
         });
+    } else if(view == 'info') {
+        app.api.getItem(id, function(result) {
+            item_debug = result.data.item;
+            var item = result.data.item;
+            $item = new Ox.Container();
+            $item.append(app.template.info.tmpl(item));
+            app.$ui.contentPanel.replace(1, $item);
+            app.$ui.rightPanel
+                /*.unbindEvent('resize')*/
+                .bindEvent('resize', function(event, data) {
+                    Ox.print('seems to work', data)
+                    $item.options({
+                        width: data - 256 - 1
+                    });
+                });
+            app.$window.resize(function() {
+                $item.options({
+                    width: app.$document.width() - app.$ui.leftPanel.width() - 1 - 256 - 1
+                });
+            });
+        });
+
     }
 }
 
