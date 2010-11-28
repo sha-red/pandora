@@ -30,7 +30,7 @@ import utils
 import tasks
 from archive import extract
 
-from layer.models import Layer
+from annotaion.models import Annotation, Layer
 from person.models import get_name_sort, Person
 
 
@@ -47,6 +47,8 @@ def siteJson():
 		    r['findKeys'].append(f)
 		    
 	r['groups'] = [p.name for p in Property.objects.filter(group=True)]
+	r['layers'] = [l.json() for l in Layer.objects()]
+
     r['itemViews'] = [
         {"id": "info", "title": "Info"},
         {"id": "statistics", "title": "Statistics"},
@@ -286,7 +288,7 @@ class Item(models.Model):
     def save(self, *args, **kwargs):
         self.json = self.get_json()
         if not self.oxdbId:
-            self.oxdbId = self.oxid()
+            self.oxdbId = self.oxdb_id()
 
         if self.poster:
             self.poster_height = self.poster.height
@@ -412,7 +414,7 @@ class Item(models.Model):
         layers['cuts'] = self.data.get('cuts', {})
         
         layers['subtitles'] = {}
-        #FIXME: subtitles should be stored in Layer
+        #FIXME: subtitles should be stored in Annotation
         qs = self.files.filter(is_subtitle=True, is_main=True, available=True)
         if qs.count()>0:
             layers['subtitles'] = qs[0].srt()
@@ -456,6 +458,10 @@ class Item(models.Model):
                           self.get('series title', ''), self.get('episode title', ''),
                           self.get('season', ''), self.get('episode', ''))
 
+    def oxdb_id(self):
+        return utils.oxdb_id(self.get('title', ''), self.get('directors', []), str(self.get('year', '')),
+                          self.get('season', ''), self.get('episode', ''),
+                          self.get('episode_title', ''), self.get('episode_directors', ''), self.get('episode_year', ''))
 
     '''
         Search related functions
@@ -490,7 +496,7 @@ class Item(models.Model):
 
         #FIXME:
         #f.dialog = 'fixme'
-        save('dialog', '\n'.join([l.value for l in Layer.objects.filter(type='subtitle', item=self).order_by('start')]))
+        save('dialog', '\n'.join([l.value for l in Annotation.objects.filter(type='subtitle', item=self).order_by('start')]))
 
         #FIXME: collate filenames
         #f.filename = self.filename

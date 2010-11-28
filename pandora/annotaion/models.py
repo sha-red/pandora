@@ -24,7 +24,7 @@ from ox import stripTags
 from ox.normalize import canonicalTitle, canonicalName
 
 
-class Bin(models.Model):
+class Layer(models.Model):
     class Meta:
         ordering = ('position', )
 
@@ -42,7 +42,7 @@ class Bin(models.Model):
 	subtitle = models.BooleanField(default=True) #bis can be displayed as subtitle, only one bin
 
 	find = models.BooleanField(default=True)
-	#words / item duration(wpm), total words, cuts per minute, cuts, number of layers, number of layers/duration
+	#words / item duration(wpm), total words, cuts per minute, cuts, number of annotations, number of annotations/duration
     sort = models.CharField(null=True, max_length=255)
 
     def properties(self):
@@ -53,7 +53,10 @@ class Bin(models.Model):
             print 'FIXME: need to add sort stuff'
         return p
 
-class Layer(models.Model):
+    def json(self):
+        return {'id': self.name, 'title': self.title, 'type': self.type}
+
+class Annotation(models.Model):
     #FIXME: here having a item,start index would be good
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -66,9 +69,6 @@ class Layer(models.Model):
 
     type = models.CharField(blank=True, max_length=255)
     value = models.TextField()
-    
-    #FIXME: relational layers, Locations, clips etc
-    #location = models.ForeignKey('Location', default=None)
 
     def editable(self, user):
         if user.is_authenticated():

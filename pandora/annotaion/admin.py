@@ -6,11 +6,11 @@ from django.contrib import admin
 import models
 
 
-class BinAdmin(admin.ModelAdmin):
-    search_fields = ['name', 'title']
-admin.site.register(models.Bin, BinAdmin)
-
 class LayerAdmin(admin.ModelAdmin):
     search_fields = ['name', 'title']
 admin.site.register(models.Layer, LayerAdmin)
+
+class AnnotationAdmin(admin.ModelAdmin):
+    search_fields = ['name', 'title']
+admin.site.register(models.Annotation, AnnotationAdmin)
 
