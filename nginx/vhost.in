@@ -10,16 +10,16 @@ server {
         autoindex on;
     }
     location /favicon.ico {
-        root   __PREFIX__/pandora/static;
+        root   __PREFIX__/static;
     }
 
-    location /static {
-        root   __PREFIX__/pandora;
+    location /static/ {
+        root   __PREFIX__;
         autoindex on;
     }
-    location /media/ {
+    location /data/ {
         internal;
-        root   __PREFIX__/pandora/;
+        root   __PREFIX__;
     }
 
     location / {
@@ -28,7 +28,7 @@ server {
             proxy_redirect off;
 
             if (!-f $request_filename) {
-                proxy_pass http://127.0.0.1:8083;
+                proxy_pass http://127.0.0.1:2620;
                 break;
             }
     }
@@ -44,6 +44,6 @@ server {
     # redirect server error pages to the static page /50x.html
     error_page   500 502 503 504  /50x.html;
     location  /50x.html {
-        root   __PREFIX__/pandora/static;
+        root   __PREFIX__/static;
     }
 }

@@ -1,56 +1,67 @@
-To setup a local instance of pandora:
+pan.do/ra - open media archive
+
+== DEVELOPMENT ==
+To setup a development instance of pan.do/ra,
+you need python, bazaar, pip and virtualenv and several other python modules:
+
+* Packages
+    apt-get install python-setuptools python-pip python-virtualenv ipython
+    apt-get install python-dev python-imaging python-numpy python-psycopg2 python-pip python-vir
 
     bzr branch http://code.0x2620.org/pandora pandora
     cd pandora
     virtualenv .
     pip -E . install -r requirements.txt
 
+    cd static
+    bzr branch http://code.0x2620.org/oxjs
 
-you need python, bazaar, pip and virtualenv:
+* Additional pandora tools:
+  You need current versions of mkvtoolnix, oxframe, oxtimeline installed.
+  For Ubuntu we provide these packages in a ppa:
+    sudo apt-get install python-software-properties
+    sudo add-apt-repository ppa:j/pandora
+    sudo add-apt-repository ppa:gstreamer-developers/ppa
+    sudo apt-get update
+    sudo apt-get install oxframe oxtimeline mkvtoolnix
 
-    apt-get install python-setuptools bzr
-    easy_install pip
-    pip install virtualenv
-    apt-get install python-dev python-imaging python-numpy
+* Database
+  We use postgresql but other databases might also work
+  (make sure you have the python bindings installed).
 
-also it uses system python moduels, so make sure you have
- ipython, dbmodule(psycopg2, python-mysqldb,..)
-installed via apt-get/pip/easy_install in your system path.
+  create a postgresql database and adjust settings in local_settings.py
+  and run python manage.py syncdb to populate the database
+  you might want to load example configurations from fixutes.
 
-Install rabbitmq and carrot:
+* RabbitMQ
+  For background tasks we use RabbitMQ, to install rabbitmq:
     sudo apt-get install rabbitmq-server
-    
+
+  and create permissions according to BROKER_* in local_settings.py i.e.:
+
     sudo rabbitmqctl add_user pandora box
     sudo rabbitmqctl add_vhost /pandora
     sudo rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
 
+* H264
+    to support h264 videos, install ffmpeg with x264 enabled,
+    install qt-faststart from (ffmpeg/tools)
+    set VIDEO_H264 = True in local_settings.py
 
-    update BROKER_* settings in local_settings.py:
+Running developer environment:
+  in one terminal:
+    python manage.py runserver
+  and in another one:
+    python manage.py celeryd -Q default,encoding
 
-get current oxjs
-    cd static
-    bzr branch http://code.0x2620.org/oxjs
 
-Database:
-    with postresql install python-psycopg2
+== DEPLOYMENT ==
+To run pan.do/ra in production, we use nginx, using apache2 is also possible.
 
-Development:
-    we are using django, http://docs.djangoproject.com/en/dev/
-
-Nginx setup:
+* nginx setup
     sudo apt-get install nginx 
 
-or if you use apache:
+* apache2 setup
+    sudo apt-get install apache2-mpm-prefork
     sudo apt-get install libapache2-mod-xsendfile
 
-add pandora repository:
-    sudo apt-get install python-software-properties   
-    sudo add-apt-repository ppa:j/pandora
-    sudo add-apt-repository ppa:gstreamer-developers/ppa
-    sudo apt-get update
-    sudo apt-get install oxtools mkvtoolnix
-
-H264:
-    install ffmpeg with x264 enabled, install qt-faststart from (ffmpeg/tools)
-    set VIDEO_H264 = True in local_settings.py
- 
