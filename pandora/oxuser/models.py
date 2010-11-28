@@ -51,6 +51,7 @@ def getUI(user):
         "listsSize": 192,
         "listView": "list",
         "sections": ["history", "lists", "public", "featured"],
+		"showAnnotations": True,
         "showGroups": True,
         "showInfo": True,
         "showLists": True,
