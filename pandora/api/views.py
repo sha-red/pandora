@@ -24,8 +24,6 @@ from ox.django.http import HttpFileResponse
 import ox
 
 import models
-import utils
-import tasks
 
 from pandora.user.models import get_user_json
 from pandora.user.views import api_login, api_logout, api_register, api_contact, api_recover, api_preferences, api_findUser
