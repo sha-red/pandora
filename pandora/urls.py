@@ -20,18 +20,14 @@ urlpatterns = patterns('',
     (r'^ajax_filtered_fields/', include('ajax_filtered_fields.urls')),
     (r'^api/upload/$', 'archive.views.firefogg_upload'),
     (r'^site.json$', 'app.views.site_json'),
-    (r'^$', 'app.views.intro'),
-    (r'^ra$', 'app.views.index'),
     (r'^timeline$', 'app.views.timeline'),
     (r'^file/(?P<oshash>.*)$', 'archive.views.lookup_file'),
-
     (r'^r/(?P<key>.*)$', 'user.views.recover'),
     (r'^api/$', include('api.urls')),
     (r'', include('item.urls')),
     (r'^robots.txt$', serve_static_file, {'location': os.path.join(settings.STATIC_ROOT, 'robots.txt'), 'content_type': 'text/plain'}),
     (r'^favicon.ico$', serve_static_file, {'location': os.path.join(settings.STATIC_ROOT, 'png/icon.16.png'), 'content_type': 'image/x-icon'}),
 )
-
 if settings.DEBUG:
     urlpatterns += patterns('',
         (r'^data/(?P<path>.*)$', 'django.views.static.serve',
@@ -41,4 +37,7 @@ if settings.DEBUG:
         (r'^tests/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.TESTS_ROOT}),
     )
+urlpatterns += patterns('',
+    (r'.*', 'app.views.index'),
+)
 
