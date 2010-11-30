@@ -38,6 +38,6 @@ if settings.DEBUG:
             {'document_root': settings.TESTS_ROOT}),
     )
 urlpatterns += patterns('',
-    (r'.*', 'app.views.index'),
+    (r'^[A-Z0-9].*$', 'app.views.index'),
 )
 
