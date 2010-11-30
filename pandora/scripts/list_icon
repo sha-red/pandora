@@ -1,17 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from __future__ import division
+import os
+
 root_dir = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 #using virtualenv's activate_this.py to reorder sys.path
 activate_this = os.path.join(root_dir, 'bin', 'activate_this.py')
 execfile(activate_this, dict(__file__=activate_this))
 
-from __future__ import division
 import Image
 import ImageDraw
 from optparse import OptionParser
-import os
 from ox.image import drawText, wrapText
 import sys
 
