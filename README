@@ -6,7 +6,7 @@ you need python, bazaar, pip and virtualenv and several other python modules:
 
 * Packages
     apt-get install python-setuptools python-pip python-virtualenv ipython
-    apt-get install python-dev python-imaging python-numpy python-psycopg2 python-pip python-vir
+    apt-get install python-dev python-imaging python-numpy python-psycopg2
 
     bzr branch http://code.0x2620.org/pandora pandora
     cd pandora
