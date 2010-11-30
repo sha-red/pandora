@@ -59,7 +59,7 @@ class File(models.Model):
     episode = models.IntegerField(default=-1)
 
     size = models.BigIntegerField(default=0)
-    duration = models.IntegerField(default=0)
+    duration = models.BigIntegerField(default=0)
 
     info = fields.DictField(default={})
 
