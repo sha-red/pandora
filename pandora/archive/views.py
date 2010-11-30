@@ -228,7 +228,10 @@ def firefogg_upload(request):
                     f.available = True
                     f.save()
                     #FIXME: this fails badly if rabbitmq goes down
-                    item.tasks.update_streams.delay(f.item.itemId)
+                    try:
+                        item.tasks.update_streams.delay(f.item.itemId)
+                    except:
+                        pass
                     response['result'] = 1
                     response['done'] = 1
                 return render_to_json_response(response)
