@@ -283,7 +283,7 @@ class Item(models.Model):
         return self.get('title')
 
     def get_absolute_url(self):
-        return '/timeline#%s' % self.itemId
+        return '/%s' % self.itemId
 
     def save(self, *args, **kwargs):
         self.json = self.get_json()

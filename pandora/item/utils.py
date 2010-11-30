@@ -157,10 +157,11 @@ def parse_path(path):
     r['series_title'] = oxdb_series_title(path)
 
     r['imdbId'] = ox.web.imdb.guess(search_title, ', '.join(r['directors']), timeout=-1)
-    r['oxdbId'] = oxid(r['title'], r['directors'],
-                       seriesTitle=r['series_title'],
-                       episodeTitle=r['episode_title'],
-                       season=r['season'], episode=r['episode'])
+    r['oxdbId'] = oxdb_id(r['title'], r['directors'], r.get('year', ''),
+                          r.get('season', ''), r.get('episode', ''),
+                          episode_title=r['episode_title'],
+                          episode_directors=[],
+                          episode_year='')
     return r
 
 def sort_title(title):
