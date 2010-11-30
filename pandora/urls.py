@@ -39,5 +39,6 @@ if settings.DEBUG:
     )
 urlpatterns += patterns('',
     (r'^[A-Z0-9].*$', 'app.views.index'),
+    (r'$', 'app.views.index'),
 )
 
