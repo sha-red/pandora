@@ -61,6 +61,7 @@ def start_daemon():
         tc = connect()
     except:
         Popen(['transmission-daemon',
+            '-M',
             '-a', '127.0.0.1',
             '-r', '127.0.0.1',
             '-p', str(settings.TRANSMISSON_PORT),
