@@ -44,7 +44,7 @@ def oxdb_id(title, directors=[], year='', season='', episode='', episode_title='
     return u'0x' + oxdb_id
 
 def oxdb_directors(director):
-    director = os.path.basename(os.path.dirname(director))
+    director = os.path.basename(os.path.dirname(os.path.dirname(director)))
     if director.endswith('_'):
         director = "%s." % director[:-1]
     directors = [normalizeName(d) for d in director.split('; ')]
@@ -85,7 +85,7 @@ def oxdb_title(_title, searchTitle = False):
     title = title.replace('_dot__space_', '. ')
     title = title.replace('_space__dot_', ' .')
     year = ox.findRe(title, '(\(\d{4}\))')
-    if title.endswith(year):
+    if year and title.endswith(year):
         title = title[:-len(year)].strip()
     title = normalizeTitle(title)
     return title
