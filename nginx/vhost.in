@@ -31,9 +31,7 @@ server {
                 proxy_pass http://127.0.0.1:2620;
                 break;
             }
-    }
-    location /api/upload {
-        client_max_body_size 32m;
+            client_max_body_size 32m;
     }
 
     error_page  404  /404.html;
