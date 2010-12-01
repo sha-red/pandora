@@ -652,7 +652,8 @@ class Item(models.Model):
                 #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
 
             stream.extract_derivatives()
-            #something with poster
+            self.make_local_posters()
+            self.make_poster()
             self.available = True
             self.save()
 
@@ -697,7 +698,7 @@ class Item(models.Model):
                 return u.url
         return None
 
-    def download_poster(self, force=False):
+    def make_poster(self, force=False):
         if not self.poster or force:
             url = self.prefered_poster_url()
             if url:

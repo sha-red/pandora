@@ -15,7 +15,7 @@ def cronjob(**kwargs):
 @task(ignore_resulsts=True, queue='default')
 def update_poster(itemId):
     item = models.Item.objects.get(itemId=itemId)
-    item.download_poster(True)
+    item.make_poster(True)
 
 @task(ignore_resulsts=True, queue='default')
 def update_imdb(imdbId):
@@ -35,4 +35,5 @@ def update_streams(itemId):
     item = models.Item.objects.get(itemId=itemId)
     if item.files.filter(is_main=True, is_video=True, available=False).count() == 0:
         item.update_streams()
+
 
