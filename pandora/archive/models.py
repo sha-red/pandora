@@ -35,10 +35,6 @@ def parse_decimal(string):
     d = string.split('/')
     return Decimal(d[0]) / Decimal(d[1])
 
-def file_path(f, name):
-    h = f.oshash
-    return os.path.join('files', h[:2], h[2:4], h[4:6], h[6:], name)
-
 class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -142,8 +138,12 @@ class File(models.Model):
         return r
 
     #upload and data handling
-    video = models.FileField(null=True, blank=True, upload_to=lambda f, x: file_path(f, '%s.webm'%settings.VIDEO_PROFILE))
-    data = models.FileField(null=True, blank=True, upload_to=lambda f, x: file_path(f, 'data.bin'))
+    video = models.FileField(null=True, blank=True, upload_to=lambda f, x: f.path(name='%s.webm'%settings.VIDEO_PROFILE))
+    data = models.FileField(null=True, blank=True, upload_to=lambda f, x: f.path(name='data.bin'))
+
+    def path(self, name):
+        h = self.oshash
+        return os.path.join('files', h[:2], h[2:4], h[4:6], h[6:], name)
 
     def contents(self):
         if self.data != None:
@@ -267,7 +267,7 @@ class Instance(models.Model):
 def frame_path(frame, name):
     ext = os.path.splitext(name)[-1]
     name = "%s%s" % (frame.position, ext)
-    return file_path(frame.file, name)
+    return frame.file.path(name)
 
 class Frame(models.Model):
     class Meta:
