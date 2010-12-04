@@ -138,8 +138,8 @@ class File(models.Model):
         return r
 
     #upload and data handling
-    video = models.FileField(null=True, blank=True, upload_to=lambda f, x: f.path(name='%s.webm'%settings.VIDEO_PROFILE))
-    data = models.FileField(null=True, blank=True, upload_to=lambda f, x: f.path(name='data.bin'))
+    video = models.FileField(null=True, blank=True, upload_to=lambda f, x: f.path('%s.webm'%settings.VIDEO_PROFILE))
+    data = models.FileField(null=True, blank=True, upload_to=lambda f, x: f.path('data.bin'))
 
     def path(self, name):
         h = self.oshash

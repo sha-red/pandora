@@ -232,7 +232,7 @@ class Item(models.Model):
     external_data = fields.DictField(default={}, editable=False)
     data = fields.DictField(default={}, editable=False)
     json = fields.DictField(default={}, editable=False)
-    poster = models.ImageField(default=None, blank=True, upload_to=lambda m, x: os.path.join(itemid_path(m.itemId), "poster.jpg"))
+    poster = models.ImageField(default=None, blank=True, upload_to=lambda m, x: m.path("poster.jpg"))
     poster_url = models.TextField(blank=True)
     poster_height = models.IntegerField(default=0)
     poster_width = models.IntegerField(default=0)
@@ -591,20 +591,24 @@ class Item(models.Model):
             f, created = Facet.objects.get_or_create(key='year', value=year, value_sort=year, item=self)
         else:
             Facet.objects.filter(item=self, key='year').delete()
+    
+    def path(self, name=''):
+        return os.path.join('items', h[:2], h[2:4], h[4:6], h[6:])
+
 
     '''
         Video related functions
     '''
     def frame(self, position, width=128):
         stream = self.streams.filter(profile=settings.VIDEO_PROFILE+'.webm')[0]
-        path = os.path.join(settings.MEDIA_ROOT, itemid_path(self.itemId), 'frames', "%d"%width, "%s.jpg"%position)
+        path = os.path.join(settings.MEDIA_ROOT, self.path(), 'frames', "%d"%width, "%s.jpg"%position)
         if not os.path.exists(path):
             extract.frame(stream.video.path, path, position, width)
         return path
 
     @property
     def timeline_prefix(self):
-        return os.path.join(settings.MEDIA_ROOT, itemid_path(self.itemId), 'timeline')
+        return os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline')
 
     def main_videos(self):
         #FIXME: needs to check if more than one user has main files and only take from "higher" user
@@ -720,7 +724,7 @@ class Item(models.Model):
         posters = {}
         for f in self.main_videos():
             for frame in f.frames.all():
-                path = os.path.join(itemid_path(self.itemId), 'poster.pandora.%s.%s.jpg'%(part, frame.position))
+                path = self.path('poster.pandora.%s.%s.jpg'%(part, frame.position))
                 path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, path))
                 posters[path] = frame.frame.path
             part += 1
@@ -730,7 +734,7 @@ class Item(models.Model):
         posters = self.local_posters()
         for poster in posters:
             frame = posters[poster]
-            timeline = os.path.join(itemid_path(self.itemId), 'timeline.64.png')
+            timeline = self.path('timeline.64.png')
             timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
             cmd = [settings.ITEM_POSTER,
                    '-t', self.get('title'),
@@ -858,19 +862,13 @@ class Collection(models.Model):
     def editable(self, user):
         return self.users.filter(id=user.id).count() > 0
 
-def itemid_path(h):
-    return os.path.join('items', h[:2], h[2:4], h[4:6], h[6:])
-
-def stream_path(stream):
-    return os.path.join(itemid_path(stream.item.itemId), stream.profile)
-
 class Stream(models.Model):
     class Meta:
         unique_together = ("item", "profile")
 
     item = models.ForeignKey(Item, related_name='streams')
     profile = models.CharField(max_length=255, default='96p.webm')
-    video = models.FileField(default=None, blank=True, upload_to=lambda f, x: stream_path(f))
+    video = models.FileField(default=None, blank=True, upload_to=lambda f, x: f.path())
     source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True)
     available = models.BooleanField(default=False)
     info = fields.DictField(default={})
@@ -878,6 +876,9 @@ class Stream(models.Model):
     #def __unicode__(self):
     #    return self.video
 
+    def path(self):
+        return self.item.(self.profile)
+        
     def extract_derivatives(self):
         if settings.VIDEO_H264:
             profile = self.profile.replace('.webm', '.mp4')
