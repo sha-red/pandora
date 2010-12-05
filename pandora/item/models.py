@@ -593,8 +593,8 @@ class Item(models.Model):
             Facet.objects.filter(item=self, key='year').delete()
     
     def path(self, name=''):
+        h = self.itemId
         return os.path.join('items', h[:2], h[2:4], h[4:6], h[6:])
-
 
     '''
         Video related functions
@@ -877,7 +877,7 @@ class Stream(models.Model):
     #    return self.video
 
     def path(self):
-        return self.item.(self.profile)
+        return self.item.path(self.profile)
         
     def extract_derivatives(self):
         if settings.VIDEO_H264:
