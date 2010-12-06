@@ -88,35 +88,35 @@ def parseCondition(condition):
                 v1 = parseDate(v1.split('.'))
                 v2 = parseDate(v2.split('.'))
 
-            k = 'find__%s' % k
             if exclude: #!1960-1970
-                k1 = str('%s__lt' % k)
-                k2 = str('%s__gte' % k)
-                return Q(**{k1:v1})|Q(**{k2:v2})
+                k1 = 'value__lt'
+                k2 = 'value__gte'
+                return Q(**{'find__key': k, k1:v1})|Q(**{'find__key': k, k2:v2})
             else: #1960-1970
-                k1 = str('%s__gte' % k)
-                k2 = str('%s__lt' % k)
-                return Q(**{k1:v1})&Q(**{k2:v2})
+                k1 = 'value__gte'
+                k2 = 'value__lt'
+                return Q(**{'find__key': k, k1:v1})&Q(**{'find__key': k, k2:v2})
         else:
             if keyType(k) == "date":
                 v = parseDate(v.split('.'))
             if op == '=':
-                k = '%s__exact' % k
+                vk = 'value__exact'
             elif op == '>':
-                k = '%s__gt' % k
+                vk = 'value__gt'
             elif op == '>=':
-                k = '%s__gte' % k
+                vk = 'value__gte'
             elif op == '<':
-                k = '%s__lt' % k
+                vk = 'value__lt'
             elif op == '<=':
-                k = '%s__lte' % k
+                vk = 'value__lte'
 
-            k = 'find__%s' % k
-            k = str(k)
+            vk = 'find__%s' % vk
+            vk = str(vk)
+
             if exclude: #!1960
-                return ~Q(**{k:v})
+                return ~Q(**{'find__key': k, vk:v})
             else: #1960
-                return Q(**{k:v})
+                return Q(**{'find__key': k, vk:v})
 
 def parseConditions(conditions, operator):
     '''
