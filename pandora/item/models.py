@@ -113,7 +113,7 @@ def siteJson():
             "findQuery": {"conditions": [], "operator": ""},
             "groupsQuery": {"conditions": [], "operator": "|"},
             "groupsSize": 128,
-            "itemView": "info",
+            "itemView": "timeline",
             "listQuery": {"conditions": [], "operator": ""},
             "listsSize": 192,
             "listView": "icons",

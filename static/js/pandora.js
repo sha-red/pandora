@@ -63,12 +63,31 @@ var app = new Ox.App({
     app.template.info = $('<div>').load('/static/html/itemInfo.html');
 
     $.each(app.afterLaunch, function(i, f) {f()});
+    
+    app.url();
+    window.onpopstate = function() { app.url()};
 });
 
 
 
 
 // Objects
+app.url = function(url) {
+    if(!url)
+        var url = document.location.pathname;
+    else {
+        var title = document.title + ' '+ url;
+        history.pushState({}, title, url);
+    }
+    if(/[0-9A-Z]/.exec(url.substring(1,2))) {
+        var id = url.split('/')[1];
+        var view = url.split('/')[2] || app.user.ui.itemView;
+        app.constructItem(id, view);
+    } else {
+        app.Query.fromString(location.hash.substr(2));
+        app.$ui.rightPanel.replace(1, app.constructContentPanel());
+    }
+}
 
 app.Query = (function() {
 
@@ -329,58 +348,7 @@ app.constructApp = function() {
                                         size: 24
                                     },
                                     {
-                                        element: app.$ui.contentPanel = new Ox.SplitPanel({
-                                            elements: [
-                                                {
-                                                    collapsible: true,
-                                                    element: app.$ui.groupsOuterPanel = new Ox.SplitPanel({
-                                                        elements: [
-                                                            {
-                                                                element: app.$ui.groups[0],
-                                                                size: app.ui.groups[0].size
-                                                            },
-                                                            {
-                                                                element: app.$ui.groupsInnerPanel = new Ox.SplitPanel({
-                                                                    elements: [
-                                                                        {
-                                                                            element: app.$ui.groups[1],
-                                                                            size: app.ui.groups[1].size
-                                                                        },
-                                                                        {
-                                                                            element: app.$ui.groups[2],
-                                                                        },
-                                                                        {
-                                                                            element: app.$ui.groups[3],
-                                                                            size: app.ui.groups[3].size
-                                                                        }
-                                                                    ],
-                                                                    orientation: 'horizontal'
-                                                                })
-                                                            },
-                                                            {
-                                                                element: app.$ui.groups[4],
-                                                                size: app.ui.groups[4].size
-                                                            },
-                                                        ],
-                                                        id: 'browser',
-                                                        orientation: 'horizontal'
-                                                    })
-                                                    .bindEvent('resize', function(event, data) {
-                                                        Ox.print('resizing groups...')
-                                                        $.each(app.$ui.groups, function(i, list) {
-                                                            list.size();
-                                                        });
-                                                    }),
-                                                    resizable: true,
-                                                    resize: [96, 112, 128, 144, 160, 176],
-                                                    size: app.user.ui.groupsSize
-                                                },
-                                                {
-                                                    element: app.$ui.list = app.constructList(app.user.ui.listView)
-                                                }
-                                            ],
-                                            orientation: 'vertical'
-                                        })
+                                        element: app.constructContentPanel()
                                     },
                                     {
                                         element: app.$ui.statusbar,
@@ -548,9 +516,69 @@ app.constructInfo = function() {
         );
 }
 
+app.constructContentPanel = function(listView) {
+    listView = listView || app.user.ui.listView;
+    return app.$ui.contentPanel = new Ox.SplitPanel({
+        elements: [
+            {
+                collapsible: true,
+                element: app.$ui.groupsOuterPanel = new Ox.SplitPanel({
+                    elements: [
+                        {
+                            element: app.$ui.groups[0],
+                            size: app.ui.groups[0].size
+                        },
+                        {
+                            element: app.$ui.groupsInnerPanel = new Ox.SplitPanel({
+                                elements: [
+                                    {
+                                        element: app.$ui.groups[1],
+                                        size: app.ui.groups[1].size
+                                    },
+                                    {
+                                        element: app.$ui.groups[2],
+                                    },
+                                    {
+                                        element: app.$ui.groups[3],
+                                        size: app.ui.groups[3].size
+                                    }
+                                ],
+                                orientation: 'horizontal'
+                            })
+                        },
+                        {
+                            element: app.$ui.groups[4],
+                            size: app.ui.groups[4].size
+                        },
+                    ],
+                    id: 'browser',
+                    orientation: 'horizontal'
+                })
+                .bindEvent('resize', function(event, data) {
+                    Ox.print('resizing groups...')
+                    $.each(app.$ui.groups, function(i, list) {
+                        list.size();
+                    });
+                }),
+                resizable: true,
+                resize: [96, 112, 128, 144, 160, 176],
+                size: app.user.ui.groupsSize
+            },
+            {
+                element: app.$ui.list = app.constructList(listView)
+            }
+        ],
+        orientation: 'vertical'
+    });
+}
+
 app.constructItem = function(id, view) {
     var $item;
     //location.hash = '!' + id;
+    app.$ui.mainMenu.enableItem('openmovie');
+    app.$ui.mainMenu.checkItem('viewMenu_openmovie_' + view);
+    //FIXME: there should be a menu function for this
+    $.map(app.config.listViews, function(view, i) { app.$ui.mainMenu.uncheckItem('viewMenu_movies_'+view.id); });
     app.$ui.contentPanel.empty();
     if (view == 'timeline') {
         app.api.getItem(id, function(result) {
@@ -658,22 +686,17 @@ app.constructItem = function(id, view) {
         app.api.getItem(id, function(result) {
             item_debug = result.data.item;
             var item = result.data.item;
-            $item = new Ox.Container();
+            var $item = new Ox.Container();
             $item.append(app.template.info.tmpl(item));
-            app.$ui.contentPanel.replace(1, $item);
+            app.$ui.rightPanel.replace(1, $item);
+            /*
             app.$ui.rightPanel
-                /*.unbindEvent('resize')*/
                 .bindEvent('resize', function(event, data) {
-                    Ox.print('seems to work', data)
-                    $item.options({
-                        width: data - 256 - 1
+                    app.$ui.editor.options({
+                        width: data - app.$ui.timelinePanel.size(1) - 1
                     });
                 });
-            app.$window.resize(function() {
-                $item.options({
-                    width: app.$document.width() - app.$ui.leftPanel.width() - 1 - 256 - 1
-                });
-            });
+            */
         });
 
     }
@@ -851,7 +874,8 @@ app.constructList = function(view) {
             app.$ui.selected.html(app.constructStatus('selected', data));
         },
         open: function(event, data) {
-            app.constructItem(data.ids[0], 'timeline')
+            var id = data.ids[0];
+            app.url('/' + id);
         },
         openpreview: function(event, data) {
             app.requests.preview && app.api.cancel(app.requests.preview);
@@ -1137,7 +1161,7 @@ app.constructMainMenu = function() {
                 ] },
                 { id: 'viewMenu', title: 'View', items: [
                     { id: 'movies', title: 'View Movies', items: [
-                        { group: 'viewmovies', min: 1, max: 1, items: $.map(app.config.listViews, function(view, i) {
+                        { group: 'viewmovies', min: 0, max: 1, items: $.map(app.config.listViews, function(view, i) {
                             return $.extend({
                                 checked: app.user.ui.listView == view.id,
                             }, view);
@@ -1153,9 +1177,13 @@ app.constructMainMenu = function() {
                         { id: 'video', title: 'Video' }
                     ] },
                     {},
-                    { id: 'openmovie', title: ['Open Movie', 'Open Movies'], disabled: true, items: $.map(app.config.itemViews, function(view, i) {
-                        return view;
-                    }) },
+                    { id: 'openmovie', title: ['Open Movie', 'Open Movies'], disabled: true, items: [
+                        { group: 'movieview', min: 0, max: 1, items: $.map(app.config.itemViews, function(view, i) {
+                            return $.extend({
+                                checked: app.user.ui.itemView == view.id,
+                            }, view);
+                        }) },
+                    ]},
                     {},
                     { id: 'lists', title: 'Hide Lists', keyboard: 'shift l' },
                     { id: 'info', title: 'Hide Info', keyboard: 'shift i' },
@@ -1229,6 +1257,13 @@ app.constructMainMenu = function() {
                 if (data.id == 'find') {
                     var id = data.checked[0].id;
                     app.$ui.findSelect.selectItem(id);
+                } else if (data.id == 'movieview') {
+                    var view = data.checked[0].id;
+                    var id = document.location.pathname.split('/')[1];
+                    if (view == 'info')
+                        app.url('/'+id+'/info');
+                    else
+                        app.url('/'+id);
                 } else if (data.id == 'ordermovies') {
                     var id = data.checked[0].id;
                     app.$ui.list.sortList(user.ui.sort[0].key, id == 'ascending' ? '' : '-');
@@ -1237,6 +1272,9 @@ app.constructMainMenu = function() {
                         operator = Ox.getObjectById(app.config.sortKeys, id).operator;
                     app.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator === '' ? 'ascending' : 'descending'));
                     app.$ui.list.sortList(id, operator);
+                } else if (data.id == 'viewmovies') {
+                    var view = data.checked[0].id;
+                    app.url('/?v='+view);
                 }
             },
             click: function(event, data) {
