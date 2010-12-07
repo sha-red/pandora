@@ -42,3 +42,6 @@ urlpatterns += patterns('',
     (r'^$', 'app.views.index'),
 )
 
+urlpatterns = +patterns('django.views.generic.simple',
+    ('^ra$', 'redirect_to', {'url': '/'}),
+)
