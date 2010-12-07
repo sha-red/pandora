@@ -37,10 +37,10 @@ def oxdb_id(title, directors=[], year='', season='', episode='', episode_title='
     director = ', '.join(directors)
     episode_director = ', '.join(episode_directors)
     if not episode:
-        oxdb_id = get_hash(director)[:8] + get_hash('\n'.join([title, year]))[:8]
+        oxdb_id = get_hash(director)[:8] + get_hash('\n'.join([title, str(year)]))[:8]
     else:
-        oxdb_id = get_hash('\n'.join([director, title, year, season]))[:8] + \
-            get_hash('\n'.join([episode, episode_director, episode_title, episode_year]))[:8]
+        oxdb_id = get_hash('\n'.join([director, title, str(year), str(season)]))[:8] + \
+                  get_hash('\n'.join([str(episode), episode_director, episode_title, str(episode_year)]))[:8]
     return u'0x' + oxdb_id
 
 def oxdb_directors(director):
