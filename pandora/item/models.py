@@ -594,7 +594,7 @@ class Item(models.Model):
     
     def path(self, name=''):
         h = self.itemId
-        return os.path.join('items', h[:2], h[2:4], h[4:6], h[6:])
+        return os.path.join('items', h[:2], h[2:4], h[4:6], h[6:], name)
 
     '''
         Video related functions
