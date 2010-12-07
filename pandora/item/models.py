@@ -232,7 +232,7 @@ class Item(models.Model):
     external_data = fields.DictField(default={}, editable=False)
     data = fields.DictField(default={}, editable=False)
     json = fields.DictField(default={}, editable=False)
-    poster = models.ImageField(default=None, blank=True, upload_to=lambda m, x: m.path("poster.jpg"))
+    poster = models.ImageField(default=None, blank=True, upload_to=lambda i, x: i.path("poster.jpg"))
     poster_url = models.TextField(blank=True)
     poster_height = models.IntegerField(default=0)
     poster_width = models.IntegerField(default=0)
