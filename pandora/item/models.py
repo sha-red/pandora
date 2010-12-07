@@ -633,7 +633,7 @@ class Item(models.Model):
         #FIXME: how to detect if something changed?
         if files:
             stream, created = Stream.objects.get_or_create(item=self, profile='%s.webm' % settings.VIDEO_PROFILE)
-            stream.video.name = stream_path(stream)
+            stream.video.name = stream.path()
             cmd = []
             print files
             for f in sorted(files):
