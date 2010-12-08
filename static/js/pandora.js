@@ -25,7 +25,7 @@ var app = new Ox.App({
         selectedMovies: []
     };
 
-    app.Query.fromString(location.hash.substr(2));
+    app.Query.fromString(location.hash.substr(1));
 
     app.$ui.mainMenu = app.constructMainMenu();
     app.$ui.sections = app.constructSections();
@@ -84,7 +84,7 @@ app.url = function(url) {
         var view = url.split('/')[2] || app.user.ui.itemView;
         app.constructItem(id, view);
     } else {
-        app.Query.fromString(location.hash.substr(2));
+        app.Query.fromString(location.hash.substr(1));
         app.$ui.rightPanel.replace(1, app.constructContentPanel());
     }
 }
