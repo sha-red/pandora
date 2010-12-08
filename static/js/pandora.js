@@ -1274,7 +1274,7 @@ app.constructMainMenu = function() {
                     app.$ui.list.sortList(id, operator);
                 } else if (data.id == 'viewmovies') {
                     var view = data.checked[0].id;
-                    app.url('/?v='+view);
+                    app.url('/#view='+view);
                 }
             },
             click: function(event, data) {
