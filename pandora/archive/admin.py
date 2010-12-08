@@ -7,14 +7,14 @@ from django.contrib import admin
 import models
 
 class FileAdmin(admin.ModelAdmin):
-    search_fields = ['path', 'video_codec']
+    search_fields = ['name', 'video_codec']
 
     #form = FileAdminForm
 
 admin.site.register(models.File, FileAdmin)
 
 class InstanceAdmin(admin.ModelAdmin):
-    search_fields = ['path', 'volume__name']
+    search_fields = ['name', 'volume', 'volume__name']
     #form = ArchiveFileAdminForm
 
 admin.site.register(models.Instance, InstanceAdmin)

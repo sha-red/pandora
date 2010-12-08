@@ -44,7 +44,7 @@ def oxdb_id(title, directors=[], year='', season='', episode='', episode_title='
     return u'0x' + oxdb_id
 
 def oxdb_directors(director):
-    director = os.path.basename(os.path.dirname(os.path.dirname(director)))
+    director = os.path.basename(os.path.dirname(director))
     if director.endswith('_'):
         director = "%s." % director[:-1]
     directors = [normalizeName(d) for d in director.split('; ')]
@@ -96,7 +96,7 @@ def oxdb_year(data):
 def oxdb_series_title(path):
     seriesTitle = u''
     if path.startswith('Series'):
-        seriesTitle = os.path.basename(os.path.dirname(path))
+        seriesTitle = os.path.basename(path)
     else:
         t = oxdb_title(path)
         if " (S" in t:
@@ -142,6 +142,12 @@ def oxdb_part(path):
     return part
 
 def parse_path(path):
+    '''
+        expects path in the form
+            L/Last, First/Title (YYYY)
+            M/McCarthy, Thomas/The Visitor (2007)
+            G/Godard, Jean-Luc/Histoire(s) du cinema_ Toutes les histoires (1988)
+    '''
     import ox.web.imdb
     search_title = oxdb_title(path, True)
     r = {}
