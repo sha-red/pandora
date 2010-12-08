@@ -70,14 +70,21 @@ var app = new Ox.App({
 
 
 
-
 // Objects
 app.url = function(url) {
+    var current_url = document.location.pathname + document.location.hash;
     if(!url)
-        var url = document.location.pathname;
+        var url = current_url;
     else {
-        var title = document.title + ' '+ url;
-        history.pushState({}, title, url);
+        if(url != current_url) {
+            var title = document.title + ' '+ url;
+            history.pushState({}, title, url);
+        } else {
+            //FIXME: this is a workaround since open gets called twice
+            //       due to a bug with double click
+            Ox.print('ignore double call of app.url, double click need to be fixed');
+            return;
+        }
     }
     if(/[0-9A-Z]/.exec(url.substring(1,2))) {
         var id = url.split('/')[1];
@@ -481,7 +488,7 @@ app.constructGroups = function() {
                             });
                         }
                     });
-                    location.hash = app.Query.toString(query);
+                    history.pushState({}, '', '/#' + app.Query.toString(query));
                 }),
             query: {
                 conditions: [],
@@ -860,6 +867,7 @@ app.constructList = function(view) {
                 background: 'red'
             });
     }
+
     ['list', 'icons'].indexOf(view) > -1 && $list.bindEvent({
         closepreview: function(event, data) {
             app.$ui.previewDialog.close();
@@ -1896,7 +1904,7 @@ app.constructToolbar = function() {
                                     }), callback);
                                 }
                             });
-                            location.hash = app.Query.toString(query);
+                            history.pushState({}, '', '/#' + app.Query.toString(query));
                         })
                     ],
                     id: 'findElement'
