@@ -215,7 +215,7 @@ app.Query = (function() {
 
         toString: function() {
             Ox.print('tS', app.user.ui.find)
-            return '!' + Ox.serialize({
+            return Ox.serialize({
                 find: constructFind(app.Query.toObject()),
                 sort: app.user.ui.sort[0].operator + app.user.ui.sort[0].key,
                 view: app.user.ui.listView
