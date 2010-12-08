@@ -170,7 +170,11 @@ def get_item(info):
                 for key in ('episode_title', 'series_title', 'season', 'episode'):
                     if key in info and info[key]:
                         item.data[key] = info[key]
-                item.save()
+                try:
+                    existing_item = Item.objects.get(oxdbId=item.oxdb_id())
+                    item = existing_item
+                except Item.DoesNotExist:
+                    item.save()
     return item
 
 class Property(models.Model):
@@ -287,8 +291,7 @@ class Item(models.Model):
 
     def save(self, *args, **kwargs):
         self.json = self.get_json()
-        if not self.oxdbId:
-            self.oxdbId = self.oxdb_id()
+        self.oxdbId = self.oxdb_id()
 
         if self.poster:
             self.poster_height = self.poster.height
