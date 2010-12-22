@@ -551,16 +551,17 @@ class Item(models.Model):
         s.risk =   0 #FIXME
         # data from related files
         videos = self.main_videos()
-        s.duration = sum([v.duration for v in videos])
-        s.resolution = videos[0].width * videos[0].height
-        s.aspectratio = int(1000 * utils.parse_decimal(v.display_aspect_ratio))
-        #FIXME: should be average over all files
-        if 'bitrate' in videos[0].info:
-            s.bitrate = videos[0].info['bitrate']
-        s.pixels = sum([v.pixels for v in videos])
-        s.filename = ' '.join([v.name for v in videos])
-        s.files = self.files.all().count()
-        s.size = sum([v.size for v in videos]) #FIXME: only size of movies?
+        if len(videos) > 0:
+            s.duration = sum([v.duration for v in videos])
+            s.resolution = videos[0].width * videos[0].height
+            s.aspectratio = int(1000 * utils.parse_decimal(v.display_aspect_ratio))
+            #FIXME: should be average over all files
+            if 'bitrate' in videos[0].info:
+                s.bitrate = videos[0].info['bitrate']
+            s.pixels = sum([v.pixels for v in videos])
+            s.filename = ' '.join([v.name for v in videos])
+            s.files = self.files.all().count()
+            s.size = sum([v.size for v in videos]) #FIXME: only size of movies?
 
         for key in ('title', 'language', 'country') + self.person_keys:
             setattr(s, '%s_desc'%key, getattr(s, key))
