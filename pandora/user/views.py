@@ -57,7 +57,7 @@ def api_login(request):
     return render_to_json_response(response)
 actions.register(api_login, 'login')
 
-def logout(request):
+def api_logout(request):
     '''
         param data
             {}
