@@ -526,6 +526,7 @@ class Item(models.Model):
 
         s.country = ','.join(self.get('countries', []))
         s.year = self.get('year', '')
+        s.year_desc = s.year
 
         for key in self.person_keys:
             setattr(s, key, sortNames(self.get(utils.plural_key(key), [])))
@@ -549,14 +550,17 @@ class Item(models.Model):
         s.wpm =    0 #FIXME
         s.risk =   0 #FIXME
         # data from related files
-        s.duration = 0 #FIXME
-        s.resolution = 0 #FIXME
-        s.aspectratio = 0 #FIXME
-        s.bitrate = 0 #FIXME
-        s.pixels = 0 #FIXME
-        s.filename = 0 #FIXME
-        s.files = 0 #FIXME
-        s.size = 0 #FIXME
+        videos = self.main_videos()
+        s.duration = sum([v.duration for v in videos])
+        s.resolution = videos[0].width * videos[0].height
+        s.aspectratio = int(1000 * utils.parse_decimal(v.display_aspect_ratio))
+        #FIXME: should be average over all files
+        if 'bitrate' in videos[0].info:
+            s.bitrate = videos[0].info['bitrate']
+        s.pixels = sum([v.pixels for v in videos])
+        s.filename = ' '.join([v.name for v in videos])
+        s.files = self.files.all().count()
+        s.size = sum([v.size for v in videos]) #FIXME: only size of movies?
 
         for key in ('title', 'language', 'country') + self.person_keys:
             setattr(s, '%s_desc'%key, getattr(s, key))
@@ -805,7 +809,7 @@ class ItemSort(models.Model):
     itemId = models.CharField('ID', max_length=128, blank=True, db_index=True)
 
     duration = models.FloatField(default=-1, db_index=True)
-    resolution = models.IntegerField(blank=True, db_index=True)
+    resolution = models.BigIntegerField(blank=True, db_index=True)
     aspectratio = models.IntegerField('Aspect Ratio', blank=True, db_index=True)
     bitrate = models.IntegerField(blank=True, db_index=True)
     pixels = models.BigIntegerField(blank=True, db_index=True)
