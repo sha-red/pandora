@@ -26,7 +26,7 @@ class LoginForm(forms.Form):
     username = forms.TextInput()
     password = forms.TextInput()
 
-def login(request):
+def api_login(request):
     '''
         param data
             {'username': username, 'password': password}
@@ -55,7 +55,7 @@ def login(request):
         response = json_response(status=400, text='invalid data')
 
     return render_to_json_response(response)
-actions.register(login)
+actions.register(api_login, 'login')
 
 def logout(request):
     '''
@@ -68,7 +68,7 @@ def logout(request):
     if request.user.is_authenticated():
         logout(request)
     return render_to_json_response(response)
-actions.register(logout)
+actions.register(api_logout, 'logout')
 
 class RegisterForm(forms.Form):
     username = forms.TextInput()
