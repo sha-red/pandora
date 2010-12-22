@@ -33,6 +33,7 @@ from user.models import get_user_json
 from archive.models import File
 from archive import extract
 
+from api.actions import actions
 
 def _order_query(qs, sort, prefix='sort__'):
     order_by = []
@@ -74,7 +75,7 @@ def _get_positions(ids, get_ids):
             pass
     return positions
 
-def api_find(request):
+def find(request):
     '''
         param data
             {'query': query, 'sort': array, 'range': array}
@@ -209,7 +210,10 @@ Positions
         response['data']['size'] = r['size__sum']
     return render_to_json_response(response)
 
-def api_getItem(request):
+actions.register(find)
+
+
+def getItem(request):
     '''
         param data
             string id
@@ -225,9 +229,10 @@ def api_getItem(request):
     info['layers'] = item.get_layers()
     response['data'] = {'item': info}
     return render_to_json_response(response)
+actions.register(getItem)
 
 @login_required_json
-def api_editItem(request):
+def editItem(request):
     '''
         param data
             {id: string, key: value,..}
@@ -242,9 +247,10 @@ def api_editItem(request):
     else:
         response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
+actions.register(editItem)
 
 @login_required_json
-def api_removeItem(request):
+def removeItem(request):
     '''
         param data
             string id
@@ -259,11 +265,12 @@ def api_removeItem(request):
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
+actions.register(removeItem)
 
 '''
     Poster API
 '''
-def api_parse(request): #parse path and return info
+def parse(request): #parse path and return info
     '''
         param data
             {path: string}
@@ -273,9 +280,10 @@ def api_parse(request): #parse path and return info
     path = json.loads(request.POST['data'])['path']
     response = json_response(utils.parse_path(path))
     return render_to_json_response(response)
+actions.register(parse)
 
 
-def api_setPosterFrame(request): #parse path and return info
+def setPosterFrame(request): #parse path and return info
     '''
         param data
             {id: itemId, position: float}
@@ -292,8 +300,9 @@ def api_setPosterFrame(request): #parse path and return info
     else:
         response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
+actions.register(setPosterFrame)
 
-def api_setPoster(request): #parse path and return info
+def setPoster(request): #parse path and return info
     '''
         param data
             {id: itemId, url: string}
@@ -317,8 +326,9 @@ def api_setPoster(request): #parse path and return info
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
+actions.register(setPoster)
 
-def api_getImdbId(request):
+def getImdbId(request):
     '''
         param data
             {title: string, director: string, year: string}
@@ -331,6 +341,7 @@ def api_getImdbId(request):
     else:
         response = json_response(status=404, text='not found')
     return render_to_json_response(response)
+actions.register(getImdbId)
 
 '''
     media delivery

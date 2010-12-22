@@ -17,6 +17,8 @@ from ox.django.decorators import login_required_json
 
 import models
 
+from api.actions import actions
+
 def json_errors(form):
     return {'status': {'code': 402, 'text': 'form error', 'data': form.errors}}
 
@@ -24,7 +26,7 @@ class LoginForm(forms.Form):
     username = forms.TextInput()
     password = forms.TextInput()
 
-def api_login(request):
+def login(request):
     '''
         param data
             {'username': username, 'password': password}
@@ -53,8 +55,9 @@ def api_login(request):
         response = json_response(status=400, text='invalid data')
 
     return render_to_json_response(response)
+actions.register(login)
 
-def api_logout(request):
+def logout(request):
     '''
         param data
             {}
@@ -65,13 +68,14 @@ def api_logout(request):
     if request.user.is_authenticated():
         logout(request)
     return render_to_json_response(response)
+actions.register(logout)
 
 class RegisterForm(forms.Form):
     username = forms.TextInput()
     password = forms.TextInput()
     email = forms.TextInput()
 
-def api_register(request):
+def register(request):
     '''
         param data
             {'username': username, 'password': password, 'email': email}
@@ -86,8 +90,12 @@ def api_register(request):
         elif models.User.objects.filter(email=form.data['email']).count() > 0:
             response = json_response(status=400, text='username or email exists')
         else:
+            first_user = models.User.objects.count() == 0
             user = models.User(username=form.data['username'], email=form.data['email'])
             user.set_password(form.data['password'])
+            #make first user admin
+            user.is_superuser = first_user
+            user.is_staff = first_user
             user.save()
             user = authenticate(username=form.data['username'],
                                 password=form.data['password'])
@@ -96,6 +104,7 @@ def api_register(request):
     else:
         response = json_response(status=400, text='username exists')
     return render_to_json_response(response)
+actions.register(register)
 
 class RecoverForm(forms.Form):
     username_or_email = forms.TextInput()
@@ -139,8 +148,9 @@ def api_recover(request):
     else:
         response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)
+actions.register(api_recover, 'recover')
 
-def api_findUser(request):
+def findUser(request):
     '''
         param data
             {key: "username", value: "foo", operator: "="}
@@ -157,6 +167,7 @@ def api_findUser(request):
     response = json_response(status=200, text='ok')
     response['data']['users'] = [u.username for u in User.objects.filter(username__iexact=data['value'])]
     return render_to_json_response(response)
+actions.register(findUser)
 
 def recover(request, key):
     qs = models.UserProfile.objects.filter(recover_key=key)
@@ -179,7 +190,7 @@ class ContactForm(forms.Form):
     subject = forms.TextInput()
     message = forms.TextInput()
 
-def api_contact(request):
+def contact(request):
     '''
         param data
             {'email': string, 'message': string}
@@ -206,10 +217,10 @@ def api_contact(request):
     else:
         response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)
-
+actions.register(contact)
 
 @login_required_json
-def api_preferences(request):
+def preferences(request):
     '''
         param data
             string
@@ -245,3 +256,5 @@ def api_preferences(request):
                 for key in data:
                     models.set_preference(request.user, key, data[key])
     return render_to_json_response(response)
+actions.register(preferences)
+

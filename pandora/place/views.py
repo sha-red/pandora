@@ -25,12 +25,13 @@ from ox.django.http import HttpFileResponse
 import ox
 
 import models
+from api.actions import actions
 
 '''
 fixme, require admin
 '''
 @login_required_json
-def api_addPlace(request):
+def addPlace(request):
     '''
         param data
             {
@@ -53,9 +54,10 @@ def api_addPlace(request):
     else:
         response = json_response(status=403, text='place name exists')
     return render_to_json_response(response)
+actions.register(addPlace)
 
 @login_required_json
-def api_editPlace(request):
+def editPlace(request):
     '''
         param data
             {
@@ -82,13 +84,15 @@ def api_editPlace(request):
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
+actions.register(editPlace)
 
 @login_required_json
-def api_removePlace(request):
+def removePlace(request):
     response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
+actions.register(removePlace)
 
-def api_findPlace(request):
+def findPlace(request):
     '''
         param data
             {'query': query, 'sort': array, 'range': array, 'area': array}
@@ -128,4 +132,5 @@ Positions
     for p in  Places.objects.find(data['query']):
         response['data']['places'].append(p.json())
     return render_to_json_response(response)
+actions.register(findPlace)
 

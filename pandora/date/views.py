@@ -25,9 +25,10 @@ from ox.django.http import HttpFileResponse
 import ox
 
 import models
+from api.actions import actions
 
 @login_required_json
-def api_addDate(request):
+def addDate(request):
     data = json.loads(request.POST['data'])
     if models.Date.filter(name=data['name']).count() == 0:
         place = models.Date(name = data['name'])
@@ -36,9 +37,10 @@ def api_addDate(request):
     else:
         response = json_response(status=403, text='place name exists')
     return render_to_json_response(response)
+actions.register(addDate)
 
 @login_required_json
-def api_editDate(request):
+def editDate(request):
     '''
         param data
             {
@@ -65,13 +67,15 @@ def api_editDate(request):
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
+actions.register(editDate)
 
 @login_required_json
-def api_removeDate(request):
+def removeDate(request):
     response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
+actions.register(removeDate)
 
-def api_findDate(request):
+def findDate(request):
     '''
         param data
             {'query': query, 'sort': array, 'range': array}
@@ -110,4 +114,5 @@ Positions
     for p in  Dates.objects.find(data['query']):
         response['data']['dates'].append(p.json())
     return render_to_json_response(response)
+actions.register(findDate)
 

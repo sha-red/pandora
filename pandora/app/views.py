@@ -8,8 +8,9 @@ from ox.django.shortcuts import json_response, render_to_json_response, get_obje
 
 import models
 
-from api.views import html_snapshot
 from item.models import siteJson
+
+from api.actions import actions
 
 def intro(request):
     context = RequestContext(request, {'settings':settings})
@@ -25,14 +26,16 @@ def timeline(request):
     context = RequestContext(request, {'settings':settings})
     return render_to_response('timeline.html', context)
 
-def api_getPage(request):
+def getPage(request):
     data = json.loads(request.POST['data'])
     name = data['page']
     page = get_object_or_404_json(models.Archive, name=name)
     response = json_response({'name': page.name, 'body': page.body})
     return render_to_json_response(response)
+actions.register(getPage)
 
 def site_json(request):
+    '''
     return render_to_json_response(siteJson())
     '''
     siteSettings = {}
@@ -40,4 +43,4 @@ def site_json(request):
         siteSettings[s.key] = s.value
     context = RequestContext(request, {'settings':settings, 'siteSettings': siteSettings})
     return render_to_response('site.json', context, mimetype="application/javascript")
-    '''
+

@@ -26,17 +26,24 @@ import ox
 import models
 
 from pandora.user.models import get_user_json
-from pandora.user.views import api_login, api_logout, api_register, api_contact, api_recover, api_preferences, api_findUser
-
-from pandora.archive.views import api_update, api_upload, api_editFile, api_encodingProfile
 
 from pandora.archive.models import File
 from pandora.archive import extract
 
-from pandora.item.views import *
-from pandora.itemlist.views import *
-from pandora.place.views import *
-from pandora.date.views import *
+
+from actions import actions
+
+#register all api actions
+from django.utils.importlib import import_module
+from django.utils.module_loading import module_has_submodule
+for app in settings.INSTALLED_APPS:
+    if app != 'api':
+        mod = import_module(app)
+        try:
+            import_module('%s.views'%app)
+        except:
+            if module_has_submodule(mod, 'views'):
+                raise 
 
 def api(request):
     if request.META['REQUEST_METHOD'] == "OPTIONS":
@@ -45,12 +52,21 @@ def api(request):
         response['Access-Control-Allow-Origin'] = '*'
         return response
     if not 'action' in request.POST:
-        return apidoc(request)
+        methods = actions.keys()
+        api = []
+        for f in sorted(methods):
+            api.append({
+                'name': f,
+                'doc': actions.doc(f).replace('\n', '<br>\n')
+            })
+        context = RequestContext(request, {'api': api,
+                                           'sitename': settings.SITENAME,})
+        return render_to_response('api.html', context)
     function = request.POST['action']
     #FIXME: possible to do this in f
     #data = json.loads(request.POST['data'])
 
-    f = globals().get('api_'+function, None)
+    f = actions.get(function, None)
     if f:
         response = f(request)
     else:
@@ -59,30 +75,7 @@ def api(request):
     response['Access-Control-Allow-Origin'] = '*'
     return response
 
-def api_api(request):
-    '''
-        returns list of all known api action
-        return {'status': {'code': int, 'text': string},
-                'data': {actions: ['api', 'hello', ...]}}
-    '''
-    actions = globals().keys()
-    actions = map(lambda a: a[4:], filter(lambda a: a.startswith('api_'), actions))
-    actions.sort()
-    return render_to_json_response(json_response({'actions': actions}))
-
-def api_apidoc(request):
-    '''
-        returns array of actions with documentation
-    '''
-    actions = globals().keys()
-    actions = map(lambda a: a[4:], filter(lambda a: a.startswith('api_'), actions))
-    actions.sort()
-    docs = {}
-    for f in actions:
-        docs[f] = get_api_doc(f)
-    return render_to_json_response(json_response({'actions': docs}))
-
-def api_hello(request):
+def hello(request):
     '''
         return {'status': {'code': int, 'text': string},
                 'data': {user: object}}
@@ -94,70 +87,13 @@ def api_hello(request):
     else:
         response['data']['user'] = {'name': 'Guest', 'group': 'guest', 'preferences': {}}
     return render_to_json_response(response)
+actions.register(hello)
 
-def api_error(request):
+def error(request):
     '''
-        trows 503 error
+        this action is used to test api error codes, it should return a 503 error
     '''
     success = error_is_success
     return render_to_json_response({})
+actions.register(error)
 
-def get_api_doc(f):
-    f = 'api_' + f
-
-    import sys
-    def trim(docstring):
-        if not docstring:
-            return ''
-        # Convert tabs to spaces (following the normal Python rules)
-        # and split into a list of lines:
-        lines = docstring.expandtabs().splitlines()
-        # Determine minimum indentation (first line doesn't count):
-        indent = sys.maxint
-        for line in lines[1:]:
-            stripped = line.lstrip()
-            if stripped:
-                indent = min(indent, len(line) - len(stripped))
-        # Remove indentation (first line is special):
-        trimmed = [lines[0].strip()]
-        if indent < sys.maxint:
-            for line in lines[1:]:
-                trimmed.append(line[indent:].rstrip())
-        # Strip off trailing and leading blank lines:
-        while trimmed and not trimmed[-1]:
-            trimmed.pop()
-        while trimmed and not trimmed[0]:
-            trimmed.pop(0)
-        # Return a single string:
-        return '\n'.join(trimmed)
-
-    return trim(globals()[f].__doc__)
-
-def apidoc(request):
-    '''
-        this is used for online documentation at http://127.0.0.1:8000/api/
-    '''
-
-    functions = filter(lambda x: x.startswith('api_'), globals().keys())
-    api = []
-    for f in sorted(functions):
-        api.append({
-            'name': f[4:],
-            'doc': get_api_doc(f[4:]).replace('\n', '<br>\n')
-        })
-    context = RequestContext(request, {'api': api,
-                                       'sitename': settings.SITENAME,})
-    return render_to_response('api.html', context)
-
-
-
-'''
-    ajax html snapshots
-    http://code.google.com/web/ajaxcrawling/docs/html-snapshot.html    
-'''
-def html_snapshot(request):
-    fragment = unquote(request.GET['_escaped_fragment_'])
-    url = request.build_absolute_uri('/ra')
-    url = 'http://'+settings.URL
-    response = HttpResponse('sorry, server side rendering for %s!#%s not yet implemented'%(url, fragment))
-    return response

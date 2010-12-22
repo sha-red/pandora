@@ -27,7 +27,7 @@ def find_item(fileId):
     f = models.File.objects.get(pk=fileId)
     f.find_item()
 
-@task(ignore_resulsts=True, queue="encoding")
+@task(queue="encoding")
 def update_streams(itemId):
     '''
         create stream, extract timeline and create derivatives
@@ -35,5 +35,4 @@ def update_streams(itemId):
     item = models.Item.objects.get(itemId=itemId)
     if item.files.filter(is_main=True, is_video=True, available=False).count() == 0:
         item.update_streams()
-
-
+    return True

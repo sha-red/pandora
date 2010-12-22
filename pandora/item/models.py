@@ -267,12 +267,11 @@ class Item(models.Model):
 
     def reviews(self):
         reviews = self.get('reviews', [])
-        whitelist = [w for w in ReviewWhitelist.objects.all()]
         _reviews = {}
         for r in reviews:
-            for w in whitelist:
-                if w.url in r[0]:
-                    _reviews[w.title] = r[0]
+            for url in settings.REVIEW_WHITELIST:
+                if url in r[0]:
+                    _reviews[settings.REVIEW_WHITELIST[url]] = r[0]
         return _reviews
 
     def update_imdb(self):
@@ -338,6 +337,7 @@ class Item(models.Model):
     '''
         JSON cache related functions
     '''
+    #FIXME: this should not be used
     _public_fields = {
         'itemId': 'id',
         'title':   'title',
@@ -767,6 +767,7 @@ class ItemFind(models.Model):
     key = models.CharField(max_length=200, db_index=True)
     value = models.TextField(blank=True)
 
+#FIXME: make sort based on site.json
 class ItemSort(models.Model):
     """
         used to sort items, all sort values are in here
@@ -849,22 +850,6 @@ class Facet(models.Model):
             self.value_sort = self.value
         super(Facet, self).save(*args, **kwargs)
 
-class ReviewWhitelist(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    url = models.CharField(max_length=255, unique=True)
-
-
-class Collection(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    users = models.ManyToManyField(User, related_name='collections')
-    name = models.CharField(blank=True, max_length=2048)
-    subdomain = models.CharField(unique=True, max_length=2048)
-    items = models.ForeignKey(Item)
-
-    def editable(self, user):
-        return self.users.filter(id=user.id).count() > 0
-
 class Stream(models.Model):
     class Meta:
         unique_together = ("item", "profile")
@@ -876,8 +861,8 @@ class Stream(models.Model):
     available = models.BooleanField(default=False)
     info = fields.DictField(default={})
 
-    #def __unicode__(self):
-    #    return self.video
+    def __unicode__(self):
+        return u"%s/%s" % (self.item, self.profile)
 
     def path(self):
         return self.item.path(self.profile)
@@ -921,9 +906,6 @@ class Stream(models.Model):
             if extract.stream(video, target, profile, info):
                 self.available=True
                 self.save()
-
-    def __unicode__(self):
-        return u"%s (%s)" % (self.profile, self.item)
 
     def save(self, *args, **kwargs):
         if self.video and not self.info:

@@ -23,12 +23,13 @@ from ox.django.shortcuts import render_to_json_response, get_object_or_404_json,
 from ox.django.http import HttpFileResponse
 import ox
 
+from api.actions import actions
 
 '''
     List API
 '''
 @login_required_json
-def api_addListItem(request):
+def addListItem(request):
     '''
         param data
             {list: listId,
@@ -53,9 +54,10 @@ def api_addListItem(request):
     else:
         response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
+actions.register(addListItem)
 
 @login_required_json
-def api_removeListItem(request):
+def removeListItem(request):
     '''
         param data
             {list: listId,
@@ -80,9 +82,10 @@ def api_removeListItem(request):
     else:
         response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
+actions.register(removeListItem)
 
 @login_required_json
-def api_addList(request):
+def addList(request):
     '''
         param data
             {name: value}
@@ -97,9 +100,10 @@ def api_addList(request):
     else:
         response = json_response(status=403, text='list name exists')
     return render_to_json_response(response)
+actions.register(addList)
 
 @login_required_json
-def api_editList(request):
+def editList(request):
     '''
         param data
             {key: value}
@@ -116,8 +120,9 @@ def api_editList(request):
     else:
         response = json_response(status=403, text='not allowed')
     return render_to_json_response(response)
+actions.register(editList)
 
-def api_removeList(request):
+def removeList(request):
     '''
         param data
             {key: value}
@@ -131,4 +136,5 @@ def api_removeList(request):
     else:
         response = json_response(status=403, text='not allowed')
     return render_to_json_response(response)
+actions.register(removeList)
 

@@ -25,6 +25,7 @@ except ImportError:
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 from ox.django.http import HttpFileResponse
+from ox.django.views import task_status
 import ox
 
 import models
@@ -32,9 +33,10 @@ import models
 from item.utils import oxid, parse_path
 from item.models import get_item
 import item.tasks
+from api.actions import actions
 
 @login_required_json
-def api_removeVolume(request):
+def removeVolume(request):
     data = json.loads(request.POST['data'])
     user = request.user
     try:
@@ -45,9 +47,10 @@ def api_removeVolume(request):
     except models.Volume.DoesNotExist:
         response = json_response(status=404, text='volume not found')
     return render_to_json_response(response)
+actions.register(removeVolume)
 
 @login_required_json
-def api_update(request):
+def update(request):
     '''
         2 calls possible:
             volume/files
@@ -157,15 +160,16 @@ def api_update(request):
     response['data']['file'] = [f.file.oshash for f in files.filter(file__is_subtitle=True)]
 
     return render_to_json_response(response)
-
+actions.register(update)
 
 @login_required_json
-def api_encodingProfile(request):
+def encodingProfile(request):
     response = json_response({'profile': settings.VIDEO_PROFILE})
     return render_to_json_response(response)
+actions.register(encodingProfile)
 
 @login_required_json
-def api_upload(request):
+def upload(request):
     '''
         oshash: string
         frame: [] //multipart frames
@@ -197,6 +201,7 @@ def api_upload(request):
         else:
             response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
+actions.register(upload)
 
 class VideoChunkForm(forms.Form):
     chunk = forms.FileField()
@@ -229,7 +234,9 @@ def firefogg_upload(request):
                     f.save()
                     #FIXME: this fails badly if rabbitmq goes down
                     try:
-                        item.tasks.update_streams.delay(f.item.itemId)
+                        task_id = 'update_streams_' + f.item.itemId
+                        t = item.tasks.update_streams.delay(f.item.itemId, task_id=task_id)
+                        data['resultUrl'] = t.task_id
                     except:
                         pass
                     response['result'] = 1
@@ -254,12 +261,23 @@ def firefogg_upload(request):
     return render_to_json_response(response)
 
 @login_required_json
-def api_editFile(request): #FIXME: should this be file.files. or part of update
+def taskStatus(request):
+    #FIXME: should check if user has permissions to get status
+    data = json.loads(request.POST['data'])
+    user = request.user
+    task_id = data['task_id']
+    response = task_status(request, task_id)
+    return render_to_json_response(response)
+actions.register(taskStatus)
+
+@login_required_json
+def editFile(request): #FIXME: should this be file.files. or part of update
     '''
         change file / imdb link
     '''
     response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
+actions.register(editFile)
 
 
 def lookup_file(request, oshash):
@@ -268,7 +286,7 @@ def lookup_file(request, oshash):
     
 
 """
-def api_fileInfo(request):
+def fileInfo(request):
     '''
         param data
             oshash string
@@ -282,8 +300,9 @@ def api_fileInfo(request):
     f = models.ItemFile.objects.get(oshash=oshash)
     response = {'data': f.json()}
     return render_to_json_response(response)
+actions.register(fileInfo)
 
-def api_subtitles(request):
+def subtitles(request):
 	'''
 	param data
 		oshash string
@@ -317,4 +336,5 @@ def api_subtitles(request):
         l = models.Subtitles.objects.filter(item_file__oshash=oshash).values('language')
         response['data']['languages'] = [f['language'] for f in l]
         return render_to_json_response(response)
+actions.register(subtitles)
 """

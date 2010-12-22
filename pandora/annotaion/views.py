@@ -24,9 +24,10 @@ from ox.django.http import HttpFileResponse
 import ox
 
 import models
+from api.actions import actions
 
 @login_required_json
-def api_addLayer(request):
+def addLayer(request):
     '''
         param data
             {key: value}
@@ -35,9 +36,10 @@ def api_addLayer(request):
     '''
     response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
+actions.register(addLayer)
 
 @login_required_json
-def api_removeLayer(request):
+def removeLayer(request):
     '''
         param data
             {key: value}
@@ -46,9 +48,10 @@ def api_removeLayer(request):
     '''
     response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
+actions.register(removeLayer)
 
 @login_required_json
-def api_editLayer(request):
+def editLayer(request):
     '''
         param data
             {key: value}
@@ -66,4 +69,5 @@ def api_editLayer(request):
 
     response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
+actions.register(editLayer)
 

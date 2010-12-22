@@ -5,10 +5,10 @@ from django.conf.urls.defaults import *
 
 
 urlpatterns = patterns("user.views",
-    (r'^preferences', 'api_preferences'),
-    (r'^login', 'api_login'),
-    (r'^logout', 'api_logout'),
-    (r'^register', 'api_register'),
-    (r'^recover', 'api_recover'),
+    (r'^preferences', 'preferences'),
+    (r'^login', 'login'),
+    (r'^logout', 'logout'),
+    (r'^register', 'register'),
+    (r'^recover', 'recover'),
 )
 

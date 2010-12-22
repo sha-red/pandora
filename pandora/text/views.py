@@ -17,9 +17,9 @@ from ox.django.http import HttpFileResponse
 import ox
 
 import models
+from api.actions import actions
 
-
-def api_getNews(request):
+def getNews(request):
     '''
         param data
             string id
@@ -31,14 +31,16 @@ def api_getNews(request):
     item = get_object_or_404_json(models.News, pk=itemId)
     response['data']['page'] = item.html()
     return render_to_json_response(response)
+actions.register(getNews)
 
-def api_findNews(request):
+def findNews(request):
     '''
     '''
     response = json_response({})
     return render_to_json_response(response)
+actions.register(findNews)
 
-def api_getText(request):
+def getText(request):
     '''
         param data
             string id
@@ -50,10 +52,12 @@ def api_getText(request):
     item = get_object_or_404_json(models.Text, pk=itemId)
     response['data']['page'] = item.html()
     return render_to_json_response(response)
+actions.register(getText)
 
-def api_findText(request):
+def findText(request):
     '''
     '''
     response = json_response({})
     return render_to_json_response(response)
+actions.register(findText)
 

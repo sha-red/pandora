@@ -45,6 +45,7 @@ BROKER_PORT = 5672
 BROKER_USER = "pandora"
 BROKER_PASSWORD = "box"
 BROKER_VHOST = "/pandora"
+SEND_CELERY_ERROR_EMAILS=False
 
 
 # Local time zone for this installation. Choices can be found here:
@@ -120,7 +121,6 @@ INSTALLED_APPS = (
 
     'annotaion',
     'app',
-    'api',
     'archive',
     'date',
     'item',
@@ -130,6 +130,7 @@ INSTALLED_APPS = (
     'text',
     'torrent',
     'user',
+    'api',
 )
 
 AUTH_PROFILE_MODULE = 'user.UserProfile'
@@ -168,6 +169,16 @@ POSTER_PRECEDENCE = (
     'allmovie.com',
     'other'
 )
+
+REVIEW_WHITELIST = {
+    u'filmcritic.com': u'Filmcritic',
+    u'metacritic.com': u'Metacritic',
+    u'nytimes.com': u'New York Times',
+    u'rottentomatoes.com': u'Rotten Tomatoes',
+    u'salon.com': u'Salon.com',
+    u'sensesofcinema.com': u'Senses of Cinema',
+    u'villagevoice.com': u'Village Voice'
+}
 
 #0xdb.org
 #POSTER_SERVICES=['http://data.0xdb.org/poster/']

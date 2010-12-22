@@ -76,7 +76,6 @@ def parseCondition(condition):
                 q = Q(**{k:v})
         return q
     else: #number or date
-        #FIXME: this part needs to be moved to use key/value find db 
         def parseDate(d):
             while len(d) < 3:
                 d.append(1)
