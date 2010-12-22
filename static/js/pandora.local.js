@@ -1,21 +1,21 @@
-if(typeof(app.afterLaunch) == "undefined")
-    app.afterLaunch = [];
+if(typeof(pandora.afterLaunch) == "undefined")
+    pandora.afterLaunch = [];
 
-//app.afterLaunch[0]();
-app.afterLaunch.push(function() {
+//pandora.afterLaunch[0]();
+pandora.afterLaunch.push(function() {
     if (typeof(OxFF) == 'undefined')
         return;
-    app.local = {
+    pandora.local = {
         api: new OxFF(),
         volumes: function(cb) {
             var _this = this;
             Ox.print('api.volumes');
-            this.api.login(window, app.user.username);
+            this.api.login(window, pandora.user.username);
             Ox.print('api.now access');
             this.api.access(function(access) {
                 Ox.print('access callback', access);
                 if(!access) {
-                    var dialogHeight = app.$document.height()/2,
+                    var dialogHeight = pandora.$document.height()/2,
                         dialogWidth  = parseInt((dialogHeight - 48) * 0.75);
 
                     var $dialog = new Ox.Dialog({
@@ -44,7 +44,7 @@ app.afterLaunch.push(function() {
             });
         },
         files: function(archive, cb) {
-            this.api.login(window, app.user.username);
+            this.api.login(window, pandora.user.username);
             if(!this.api.access())
                 return false;
             this.api.files(archive, function(result) {
@@ -91,8 +91,8 @@ app.afterLaunch.push(function() {
                 title: 'Volumes'
             });
 
-            app.$ui.sections.push($section);
-            app.local.volumes(function(data) {
+            pandora.$ui.sections.push($section);
+            pandora.local.volumes(function(data) {
                 Ox.print("got volumes", data);
                 var volumes = 0;
                 $.each(data, function(name, info) {
@@ -114,7 +114,7 @@ app.afterLaunch.push(function() {
                     );
                     $line.click(function() {
                         Ox.print("get files", name);
-                        app.local.constructFileList(name);
+                        pandora.local.constructFileList(name);
                     });
                     $section.$content.append($line);
                 });
@@ -136,7 +136,7 @@ app.afterLaunch.push(function() {
                         update_button.options({disabled: false});
                     })
                 });
-                app.$ui.lists.replaceWith(app.constructLists());
+                pandora.$ui.lists.replaceWith(pandora.constructLists());
                 $section.find('.OxBar').append($('<div>')
                                                 .css({'text-align': 'right', 'margin': '2px'})
                                                 .append(update_button.$element)
@@ -168,8 +168,8 @@ app.afterLaunch.push(function() {
         },
         uploadVideo: function(oshash, done, progress) {
             Ox.print('upload', oshash);
-            var url = app.local.absolute_url('/api/');
-            app.local.upload({
+            var url = pandora.local.absolute_url('/api/');
+            pandora.local.upload({
                 url: url,
                 data: {action: 'upload', oshash: oshash},
                 oshash: oshash,
@@ -179,8 +179,8 @@ app.afterLaunch.push(function() {
                     Ox.print(result);
                     //FIXME: check result before posting video
                     profile = '96p.webm';
-                    var url = app.local.absolute_url('/api/upload/') + '?profile=' + profile + '&oshash=' + oshash;
-                    app.local.upload(
+                    var url = pandora.local.absolute_url('/api/upload/') + '?profile=' + profile + '&oshash=' + oshash;
+                    pandora.local.upload(
                         {
                             oshash: oshash,
                             action: 'video',
@@ -195,8 +195,8 @@ app.afterLaunch.push(function() {
         },
         uploadFile: function(oshash) {
             Ox.print('upload file', oshash);
-            var url = app.local.absolute_url('/api/');
-            app.local.upload({
+            var url = pandora.local.absolute_url('/api/');
+            pandora.local.upload({
                 url: url,
                 data: {action: 'upload', oshash: oshash},
                 oshash: oshash,
@@ -260,9 +260,9 @@ app.afterLaunch.push(function() {
                             }
                         });
                     } else {
-                        app.local.files(name, function(result) {
+                        pandora.local.files(name, function(result) {
                             var fileInfo = result.info;
-                            app.api.update({
+                            pandora.api.update({
                                 'volume': name, 'files': result.files
                             }, function(result) {
                                 var videos = {};
@@ -291,7 +291,7 @@ app.afterLaunch.push(function() {
                                                             return button.$element;
                                                         }(fid));
                                                         //$($('#'+fid).find('.OxCell')[2]).html('extracting data...');
-                                                        app.local.uploadVideos(
+                                                        pandora.local.uploadVideos(
                                                             videos[fid],
                                                             function(data) { 
                                                                 $($('#'+fid).find('.OxCell')[2]).html('done');
@@ -312,7 +312,7 @@ app.afterLaunch.push(function() {
                                     });
                                     //upload requested files
                                     $.each(result.data.file, function(i, oshash) {
-                                        app.local.uploadFile(oshash);
+                                        pandora.local.uploadFile(oshash);
                                     });
                                 };
                                 if (result.data.info.length>0) {
@@ -322,7 +322,7 @@ app.afterLaunch.push(function() {
                                             post.info[oshash] = fileInfo[oshash];
                                         }
                                     });
-                                    app.api.update(post, function(result) {
+                                    pandora.api.update(post, function(result) {
                                         parseResult(result);
                                     });
                                 } else {
@@ -336,7 +336,7 @@ app.afterLaunch.push(function() {
                             var folder_ids = {};
                             var folders = {};
                             $.each(result.files, function(i, file) {
-                                var f = app.local.parsePath(file.path);
+                                var f = pandora.local.parsePath(file.path);
                                 if(!folders[f.folder]) {
                                     folders[f.folder] = {
                                         id: file.oshash,
@@ -370,7 +370,7 @@ app.afterLaunch.push(function() {
                     }
                 ]
             });
-            app.$ui.contentPanel.replace(1, $list);
+            pandora.$ui.contentPanel.replace(1, $list);
         },
         absolute_url: function (url) {
             var base = document.location.href;
@@ -388,5 +388,5 @@ app.afterLaunch.push(function() {
             return url;
         },
     };
-    app.local.loadVolumes();
+    pandora.local.loadVolumes();
 });
