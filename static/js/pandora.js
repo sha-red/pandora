@@ -23,6 +23,7 @@ var pandora = new Ox.App({
 			},
 			ui: {
 				infoRatio: 4 / 3,
+				sectionElement: 'buttons',
 		        selectedMovies: []
 			},
 			user: data.user
@@ -57,6 +58,17 @@ var pandora = new Ox.App({
 	    };
 
 		app.$ui.appPanel = ui.appPanel().display();	    
+
+        app.ui.sectionButtonsWidth = app.$ui.sectionButtons.width() + 8;
+
+        app.$ui.window.resize(function(foo) {
+            Ox.print('foo', foo)
+            app.$ui.list.size();
+            resizeGroups(app.$ui.rightPanel.width());
+            if (app.user.ui.listView == 'map') {
+                app.$ui.map.triggerResize();
+            }
+        });
 
 	}
 
@@ -301,7 +313,7 @@ var pandora = new Ox.App({
 		                        delete data.keys;
 		                        return pandora.api.find($.extend(data, {
 		                            group: id,
-		                            query: Query.toObject()
+		                            query: Query.toObject(id)
 		                        }), callback);
 		                    },
 		                    sort: [
@@ -528,7 +540,7 @@ var pandora = new Ox.App({
 			var that = new Ox.SplitPanel({
                     elements: [
 						{
-							element: app.$ui.sectionbar = ui.sectionbar(),
+							element: app.$ui.sectionbar = ui.sectionbar('buttons'),
 							size: 24
 						},
                         {
@@ -548,6 +560,15 @@ var pandora = new Ox.App({
                     orientation: 'vertical'
                 })
                 .bindEvent('resize', function(event, data) {
+                    if (data < app.ui.sectionButtonsWidth && app.$ui.sectionButtons) {
+                        app.$ui.sectionButtons.remove();
+                        delete app.$ui.sectionButtons;
+                        app.$ui.sectionbar.append(app.$ui.sectionSelect = ui.sectionSelect());
+                    } else if (data >= app.ui.sectionButtonsWidth && app.$ui.sectionSelect) {
+                        app.$ui.sectionSelect.remove();
+                        delete app.$ui.sectionSelect;
+                        app.$ui.sectionbar.append(app.$ui.sectionButtons = ui.sectionButtons());
+                    }
                     Ox.print('resize', data, data / app.ui.infoRatio + 16);
                     app.$ui.leftPanel.size('infoPanel', Math.round(data / app.ui.infoRatio) + 16);
                 });
@@ -567,6 +588,7 @@ var pandora = new Ox.App({
 		            }),
 		            columnsMovable: true,
 		            columnsRemovable: true,
+		            columnsResizable: true,
 		            id: 'list',
 		            request: function(data, callback) {
 		                Ox.print('data, Query.toObject', data, Query.toObject())
@@ -702,6 +724,9 @@ var pandora = new Ox.App({
 						}
 					],
 					orientation: 'horizontal'
+				})
+				.bindEvent('resize', function() {
+				    app.$ui.map.triggerResize();
 				});
 		    } else {
 		        $list = new Ox.Element('<div>')
@@ -951,13 +976,15 @@ var pandora = new Ox.App({
 		            id: 'mainMenu',
 		            menus: [
 		                { id: app.config.site.id + 'Menu', title: app.config.site.name, items: [
-		                    { id: 'about', title: 'About' },
+	                        { id: 'home', title: 'Home' },
 		                    {},
-		                    { id: 'home', title: 'Home Screen' },
+		                    { id: 'about', title: 'About' },
+		                    { id: 'tour', title: 'Tour' },
+		                    { id: 'news', title: 'News' },
 		                    { id: 'faq', title: 'Frequently Asked Questions' },
 		                    { id: 'tos', title: 'Terms of Service' },
 		                    {},
-		                    { id: 'contact', title: 'Contact...' }
+		                    { id: 'contact', title: 'Contact' }
 		                ] },
 		                { id: 'userMenu', title: 'User', items: [
 		                    { id: 'username', title: 'User: not logged in', disabled: true },
@@ -1583,43 +1610,43 @@ var pandora = new Ox.App({
                 orientation: 'vertical'
             })
             .bindEvent('resize', function(event, data) {
-                var widths = $.map(app.ui.groups, function(v, i) {
-                    return getGroupWidth(i, data);
-                });
-                Ox.print('widths', widths);
-                app.$ui.browser.size(0, widths[0].list).size(2, widths[4].list);
-                app.$ui.groupsInnerPanel.size(0, widths[1].list).size(2, widths[3].list);
-                $.each(app.$ui.groups, function(i, list) {
-                    list.resizeColumn('name', widths[i].column);
-                });
+                resizeGroups(data);
                 app.$ui.list.size();
+                if (app.user.ui.listView == 'map') {
+                    app.$ui.map.triggerResize();
+                }
             });
 			return that;
 		},
-		sectionbar: function() {
-			var that =new Ox.Bar({
+		sectionbar: function(mode) {
+			var that = new Ox.Bar({
 		            size: 24
 		        })
 		        .append(
-		            app.$ui.sectionButtons = new Ox.ButtonGroup({
-		                    buttons: [
-								{id: 'site', title: app.config.site.name},
-		                        {id: 'items', title: app.config.itemName.plural},
-		                        {id: 'texts', title: 'Texts'},
-								{id: 'admin', title: 'Admin', type: 'image'}
-		                    ],
-		                    id: 'sectionButtons',
-		                    selectable: true
-		                })
-		                .css({
-		                    float: 'left',
-			                margin: '4px'
-		                })
+		            mode == 'buttons' ?
+		            app.$ui.sectionButtons = ui.sectionButtons() :
+		            app.$ui.sectionSelect = ui.sectionSelect()
 		        );
 			that.toggle = function() {
 				
 			};
 			return that;
+		},
+		sectionButtons: function() {
+		    var that = new Ox.ButtonGroup({
+                    buttons: items = [
+    					{id: 'site', title: app.config.site.name},
+                        {id: 'items', title: app.config.itemName.plural},
+                        {id: 'texts', title: 'Texts'},
+    					{id: 'admin', title: 'Admin'}
+                    ],
+                    id: 'sectionButtons',
+                    selectable: true
+                }).css({
+	                float: 'left',
+                    margin: '4px'
+	            });
+	        return that;
 		},
 		sections: function() {
 			var that = new Ox.Element();
@@ -1650,6 +1677,21 @@ var pandora = new Ox.App({
 				
 			}
 			return that;
+		},
+        sectionSelect: function() {
+		    var that = new Ox.Select({
+		            id: 'sectionSelect',
+                    items: items = [
+    					{id: 'site', title: app.config.site.name},
+                        {id: 'items', title: app.config.itemName.plural},
+                        {id: 'texts', title: 'Texts'},
+    					{id: 'admin', title: 'Admin'}
+                    ]
+                }).css({
+	                float: 'left',
+                    margin: '4px'
+	            });
+	        return that;
 		},
 		status: function(key, data) {
 			var that = Ox.toTitleCase(key) + ': ' + [
@@ -1719,6 +1761,7 @@ var pandora = new Ox.App({
                 })
                 .bindEvent('change', function(event, data) {
                     var id = data.selected[0].id;
+                    app.user.ui.listView = id;
                     app.$ui.mainMenu.checkItem('viewMenu_movies_' + id);
                     //$ui.list.$element.replaceWith(constructList(id));
                     // Ox.print('change ... id', id, list = app.constructList(id), list.options(), list.options('id'))
@@ -1735,6 +1778,18 @@ var pandora = new Ox.App({
 	    width.column = width.list - 40 - ($.browser.mozilla ? 16 : 12);
 	    return width;
 	}
+
+    function resizeGroups(width) {
+        var widths = $.map(app.ui.groups, function(v, i) {
+            return getGroupWidth(i, width);
+        });
+        Ox.print('widths', widths);
+        app.$ui.browser.size(0, widths[0].list).size(2, widths[4].list);
+        app.$ui.groupsInnerPanel.size(0, widths[1].list).size(2, widths[3].list);
+        $.each(app.$ui.groups, function(i, list) {
+            list.resizeColumn('name', widths[i].column);
+        });
+    }
 
 	var Query = (function() {
 
