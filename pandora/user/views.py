@@ -170,6 +170,9 @@ def findUser(request):
 actions.register(findUser)
 
 def recover(request, key):
+    '''
+        recover user and redirect to settings
+    '''
     qs = models.UserProfile.objects.filter(recover_key=key)
     if qs.count() == 1:
         user = qs[0].user

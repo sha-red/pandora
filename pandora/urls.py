@@ -11,6 +11,8 @@ from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
 
+from api import actions
+actions.autodiscover()
 
 def serve_static_file(path, location, content_type):
     return HttpFileResponse(location, content_type=content_type)

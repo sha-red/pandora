@@ -157,6 +157,17 @@ TRANSMISSON_USER = 'transmission'
 TRANSMISSON_PASSWORD = 'transmission'
 
 
+#Movie related settings
+REVIEW_WHITELIST = {
+    u'filmcritic.com': u'Filmcritic',
+    u'metacritic.com': u'Metacritic',
+    u'nytimes.com': u'New York Times',
+    u'rottentomatoes.com': u'Rotten Tomatoes',
+    u'salon.com': u'Salon.com',
+    u'sensesofcinema.com': u'Senses of Cinema',
+    u'villagevoice.com': u'Village Voice'
+}
+
 #list of poster services, https://wiki.0x2620.org/wiki/pandora/posterservice
 POSTER_SERVICES = []
 POSTER_PRECEDENCE = (
@@ -169,16 +180,6 @@ POSTER_PRECEDENCE = (
     'allmovie.com',
     'other'
 )
-
-REVIEW_WHITELIST = {
-    u'filmcritic.com': u'Filmcritic',
-    u'metacritic.com': u'Metacritic',
-    u'nytimes.com': u'New York Times',
-    u'rottentomatoes.com': u'Rotten Tomatoes',
-    u'salon.com': u'Salon.com',
-    u'sensesofcinema.com': u'Senses of Cinema',
-    u'villagevoice.com': u'Village Voice'
-}
 
 #0xdb.org
 #POSTER_SERVICES=['http://data.0xdb.org/poster/']

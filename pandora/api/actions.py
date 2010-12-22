@@ -1,6 +1,24 @@
+# -*- coding: utf-8 -*-
+# vi:si:et:sw=4:sts=4:ts=4
 import sys
 
-from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
+from django.conf import settings
+
+from ox.django.shortcuts import render_to_json_response, json_response
+
+
+def autodiscover():
+    #register api actions from all installed apps
+    from django.utils.importlib import import_module
+    from django.utils.module_loading import module_has_submodule
+    for app in settings.INSTALLED_APPS:
+        if app != 'api':
+            mod = import_module(app)
+            try:
+                import_module('%s.views'%app)
+            except:
+                if module_has_submodule(mod, 'views'):
+                    raise 
 
 
 def trim(docstring):
@@ -27,7 +45,6 @@ def trim(docstring):
         trimmed.pop(0)
     # Return a single string:
     return '\n'.join(trimmed)
-
 
 class ApiActions(dict):
     def __init__(self):

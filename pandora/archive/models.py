@@ -5,7 +5,6 @@ from datetime import datetime
 import os.path
 import random
 import re
-from decimal import Decimal
 import time
 
 from django.db import models
@@ -27,13 +26,6 @@ from item.models import Item
 
 import extract
 
-
-def parse_decimal(string):
-    string = string.replace(':', '/')
-    if '/' not in string:
-        string = '%s/1' % string
-    d = string.split('/')
-    return Decimal(d[0]) / Decimal(d[1])
 
 class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -117,7 +109,7 @@ class File(models.Model):
                 self.is_audio = False
 
             if self.framerate:
-                self.pixels = int(self.width * self.height * float(parse_decimal(self.framerate)) * self.duration)
+                self.pixels = int(self.width * self.height * float(utils.parse_decimal(self.framerate)) * self.duration)
 
         if not self.is_audio and not self.is_video and self.name.endswith('.srt'):
             self.is_subtitle = True

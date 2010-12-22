@@ -3,6 +3,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 #
 import errno
+from decimal import Decimal
 import os
 import sys
 import re
@@ -13,6 +14,13 @@ import ox
 import ox.iso
 from ox.normalize import normalizeName, normalizeTitle, canonicalTitle
 
+
+def parse_decimal(string):
+    string = string.replace(':', '/')
+    if '/' not in string:
+        string = '%s/1' % string
+    d = string.split('/')
+    return Decimal(d[0]) / Decimal(d[1])
 
 def plural_key(term):
     return {
