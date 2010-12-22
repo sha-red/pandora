@@ -562,6 +562,15 @@ class Item(models.Model):
             s.filename = ' '.join([v.name for v in videos])
             s.files = self.files.all().count()
             s.size = sum([v.size for v in videos]) #FIXME: only size of movies?
+        else:
+            s.duration = 0
+            s.resolution = 0
+            s.aspectratio = 0
+            s.bitrate = 0
+            s.pixels = 0
+            s.filename = 0
+            s.files = 0
+            s.size = 0
 
         for key in ('title', 'language', 'country') + self.person_keys:
             setattr(s, '%s_desc'%key, getattr(s, key))
