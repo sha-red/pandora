@@ -1,4 +1,7 @@
 #!/bin/sh
+#fails in bootstrap
+apt-get -y install ipython
+
 #ffmpeg
 wget http://firefogg.org/nightly/ffmpeg.linux -O /usr/local/bin/ffmpeg
 chmod 755 /usr/local/bin/ffmpeg

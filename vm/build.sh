@@ -27,7 +27,6 @@ sudo  vmbuilder vbox ubuntu --suite=maverick \
     --addpkg python-setuptools \
     --addpkg python-pip \
     --addpkg python-virtualenv \
-    --addpkg ipython \
     --addpkg python-imaging \
     --addpkg python-dev \
     --addpkg python-imaging \
