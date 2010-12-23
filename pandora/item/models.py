@@ -146,9 +146,9 @@ def get_item(info):
                     'year': info.get('year', '')
                 }
             #FIXME: this should be done async
-            #item.save()
-            #tasks.update_imdb.delay(item.itemId)
-            item.update_imdb()
+            item.save()
+            tasks.update_imdb.delay(item.itemId)
+            #item.update_imdb()
             tasks.update_poster.delay(item.itemId)
     else:
         q = Item.objects.filter(find__key='title', find__value=info['title'])
@@ -652,17 +652,21 @@ class Item(models.Model):
             stream, created = Stream.objects.get_or_create(item=self, profile='%s.webm' % settings.VIDEO_PROFILE)
             stream.video.name = stream.path()
             cmd = []
-            print files
-            for f in sorted(files):
-                cmd.append('+')
-                cmd.append(files[f])
-            if not os.path.exists(os.path.dirname(stream.video.path)):
-                os.makedirs(os.path.dirname(stream.video.path))
-            cmd = [ 'mkvmerge', '-o', stream.video.path ] + cmd[1:]
-            #print cmd
-            p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            #p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
-            p.wait()
+            if os.path.exists(stream.video.path):
+                os.unlink(stream.video.path)
+            if len(files) > 1:
+                for f in sorted(files):
+                    cmd.append('+')
+                    cmd.append(files[f])
+                if not os.path.exists(os.path.dirname(stream.video.path)):
+                    os.makedirs(os.path.dirname(stream.video.path))
+                cmd = [ 'mkvmerge', '-o', stream.video.path ] + cmd[1:]
+                #print cmd
+                p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                #p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+                p.wait()
+            else:
+                os.symlink(files[0], stream.video.path)
             stream.save()
 
             if 'video' in stream.info:
