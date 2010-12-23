@@ -74,7 +74,7 @@ def oxdb_title(_title, searchTitle = False):
     _title = _title.replace('. ', '_dot__space_')
     _title = _title.replace(' .', '_space__dot_')
     title = _title.split('.')[0]
-    title = re.sub('([a-z0-9])_ ', '\\1: ', title)
+    title = re.sub('([A-Za-z0-9])_ ', '\\1: ', title)
     se = re.compile('Season (\d+).Episode (\d+)').findall(_title)
     if se:
         se = "S%02dE%02d" % (int(se[0][0]), int(se[0][1]))
