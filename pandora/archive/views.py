@@ -28,12 +28,13 @@ from ox.django.http import HttpFileResponse
 from ox.django.views import task_status
 import ox
 
-import models
-
 from item.utils import oxid, parse_path
 from item.models import get_item
 import item.tasks
 from api.actions import actions
+
+import models
+import tasks
 
 @login_required_json
 def removeVolume(request):
@@ -73,66 +74,10 @@ def update(request):
     response = json_response({'info': [], 'data': [], 'file': []})
     volume = None
     if 'files' in data:
-        volume, created = models.Volume.objects.get_or_create(user=user, name=data['volume'])
-        all_files = []
-        for f in data['files']:
-            path = f['path']
-            folder = path.split('/')
-            name = folder.pop()
-            if folder and folder[-1] in ('Extras', 'Versions', 'DVDs'):
-                name = '/'.join([folder.pop(), name])
-            folder = '/'.join(folder)
-            #print folder
-            #print name
-            f['folder'] = folder
-            f['name'] = name
-            oshash = f['oshash']
-            all_files.append(oshash)
-
-            same_folder = models.Instance.objects.filter(folder=folder, volume=volume)
-            if same_folder.count() > 0:
-                item = same_folder[0].file.item
-            else:
-                item = None
-
-	        path = os.path.join(folder, name)
-
-            instance = models.Instance.objects.filter(file__oshash=oshash, volume=volume)
-            if instance.count()>0:
-                instance = instance[0]
-                updated = False
-                for key in ('mtime', 'name', 'folder'):
-                    if f[key] != getattr(instance, key):
-                        setattr(instance, key, f[key])
-                        updated=True
-                if updated:
-			        instance.save()
-            else:
-                #look if oshash is known
-                file_objects = models.File.objects.filter(oshash=oshash)
-                if file_objects.count() > 0:
-                    file_object = file_objects[0]
-                #new oshash, add to database
-                else:
-                    if not item:
-                        item_info = parse_path(folder)
-                        item = get_item(item_info)
-                    file_object = models.File()
-                    file_object.oshash = oshash
-                    file_object.name = name
-                    file_object.item = item
-                    file_object.save()
-                    response['data']['info'].append(oshash)
-                instance = models.Instance()
-                instance.volume = volume
-                instance.file = file_object
-                for key in ('mtime', 'name', 'folder'):
-                    setattr(instance, key, f[key])
-                instance.save()
-
-        #remove deleted files
-        #FIXME: can this have any bad consequences? i.e. on the selction of used item files.
-        models.Instance.objects.filter(volume=volume).exclude(file__oshash__in=all_files).delete()
+        #update files info async, this takes to long otherwise
+        #FIXME: how can client know if update is done? possibly with taksStatus?
+        t = tasks.update_files.delay(user.username, data['volume'], data['files'])
+        response['data']['taskId'] = t.task_id
 
         user_profile = user.get_profile()
         user_profile.files_updated = datetime.now()
@@ -234,8 +179,7 @@ def firefogg_upload(request):
                     f.save()
                     #FIXME: this fails badly if rabbitmq goes down
                     try:
-                        task_id = 'update_streams_' + f.item.itemId
-                        t = item.tasks.update_streams.delay(f.item.itemId, task_id=task_id)
+                        t = item.tasks.update_streams.delay(f.item.itemId)
                         data['resultUrl'] = t.task_id
                     except:
                         pass

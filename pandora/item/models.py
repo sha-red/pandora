@@ -572,6 +572,9 @@ class Item(models.Model):
             s.files = 0
             s.size = 0
 
+        s.color = int(sum(self.data.get('color', [])))
+        s.cuts = len(self.data.get('cuts', []))
+        s.cutsperminute = s.cuts / (s.duration/60)
         for key in ('title', 'language', 'country') + self.person_keys:
             setattr(s, '%s_desc'%key, getattr(s, key))
             if not getattr(s, key):
@@ -654,26 +657,26 @@ class Item(models.Model):
             cmd = []
             if os.path.exists(stream.video.path):
                 os.unlink(stream.video.path)
-            if len(files) > 1:
+            elif not os.path.exists(os.path.dirname(stream.video.path)):
+                os.makedirs(os.path.dirname(stream.video.path))
+            if len(files.values()) > 1:
                 for f in sorted(files):
                     cmd.append('+')
                     cmd.append(files[f])
-                if not os.path.exists(os.path.dirname(stream.video.path)):
-                    os.makedirs(os.path.dirname(stream.video.path))
                 cmd = [ 'mkvmerge', '-o', stream.video.path ] + cmd[1:]
                 #print cmd
                 p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 #p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
                 p.wait()
             else:
-                os.symlink(files[0], stream.video.path)
+                os.symlink(files.values()[0], stream.video.path)
             stream.save()
 
             if 'video' in stream.info:
                 extract.timeline(stream.video.path, self.timeline_prefix)
                 self.stream_aspect = stream.info['video'][0]['width']/stream.info['video'][0]['height']
                 self.data['cuts'] = extract.cuts(self.timeline_prefix)
-                self.data['average_color'] = extract.average_color(self.timeline_prefix)
+                self.data['color'] = extract.average_color(self.timeline_prefix)
                 #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
 
             stream.extract_derivatives()
@@ -830,6 +833,12 @@ class ItemSort(models.Model):
     filename = models.CharField(max_length=1024, blank=True, db_index=True)
     files = models.IntegerField(blank=True, db_index=True)
     size = models.BigIntegerField(blank=True, db_index=True)
+    color = models.IntegerField(blank=True, db_index=True)
+    saturation = models.IntegerField(blank=True, db_index=True)
+    brightness = models.IntegerField(blank=True, db_index=True)
+    cuts = models.IntegerField(blank=True, db_index=True)
+    cutsperminute = models.FloatField(blank=True, db_index=True)
+
 
     #required to move empty values to the bottom for both asc and desc sort
     title_desc = models.CharField(max_length=1000, db_index=True)
