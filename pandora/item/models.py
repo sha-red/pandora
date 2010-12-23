@@ -823,7 +823,7 @@ class ItemSort(models.Model):
     aspectratio = models.IntegerField('Aspect Ratio', blank=True, db_index=True)
     bitrate = models.IntegerField(blank=True, db_index=True)
     pixels = models.BigIntegerField(blank=True, db_index=True)
-    filename = models.IntegerField(blank=True, db_index=True)
+    filename = models.CharField(max_length=1024, blank=True, db_index=True)
     files = models.IntegerField(blank=True, db_index=True)
     size = models.BigIntegerField(blank=True, db_index=True)
 

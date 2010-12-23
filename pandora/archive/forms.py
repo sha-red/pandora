@@ -10,14 +10,22 @@ ajax_filtered_js = (
     settings.STATIC_URL + 'js/jquery/jquery.js',
     settings.STATIC_URL + 'js/ajax_filtered_fields.js',
 )
-"""
-class ItemAdminForm(forms.ModelForm):
-    imdb = ForeignKeyByLetter(models.ItemImdb, field_name='title')
-    oxdb = ForeignKeyByLetter(models.ItemOxdb, field_name='title')
+class FileAdminForm(forms.ModelForm):
+    item = ForeignKeyByLetter(models.Item, field_name='itemId')
 
     class Meta:
-        model = models.Item
+        model = models.File
 
     class Media:
         js = ajax_filtered_js
-"""
+
+
+class InstanceAdminForm(forms.ModelForm):
+    file = ForeignKeyByLetter(models.File, field_name='name')
+
+    class Meta:
+        model = models.Instance
+
+    class Media:
+        js = ajax_filtered_js
+
