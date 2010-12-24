@@ -35,7 +35,7 @@ def api_login(request):
             status: {'code': int, 'text': string}
             data: {
                 errors: {
-                    username: 'Unknown User',
+                    username: 'Unknown Username',
                     password: 'Incorrect Password'
                 }
                 user: {
@@ -50,7 +50,7 @@ def api_login(request):
         if models.User.objects.filter(username=form.data['username']).count() == 0:
             response = json_response({
                 'errors': {
-                    'username': 'Unknown User'
+                    'username': 'Unknown Username'
                 }
             })
         else:
@@ -88,8 +88,9 @@ def api_logout(request):
             status: {'code': int, 'text': string}
         }
     '''
-    response = json_response(text='logged out')
+    response = json_response(text='ok')
     if request.user.is_authenticated():
+        response = json_response(text='logged out')
         logout(request)
     return render_to_json_response(response)
 actions.register(api_logout, 'logout')
@@ -111,7 +112,7 @@ def register(request):
             status: {'code': int, 'text': string}
             data: {
                 errors: {
-                    username: 'Unknown User',
+                    username: 'Unknown Username',
                     password: 'Incorrect Password'
                 }
                 user: {
@@ -126,13 +127,13 @@ def register(request):
         if models.User.objects.filter(username=form.data['username']).count() > 0:
             response = json_response({
                 'errors': {
-                    'username': 'Username taken'
+                    'username': 'Username already exists'
                 }
             })
         elif models.User.objects.filter(email=form.data['email']).count() > 0:
             response = json_response({
                 'errors': {
-                    'email': 'Email is used by another account'
+                    'email': 'Email address already exits'
                 }
             })
         else:
@@ -168,7 +169,7 @@ def api_recover(request):
             status: {'code': int, 'text': string}
             data: {
                 errors: {
-                    username_or_email: 'Username or email not found'
+                    username_or_email: 'Username or email address not found'
                 }
             }
         }
@@ -203,7 +204,7 @@ def api_recover(request):
         else:
             response = json_response({
                 'errors': {
-                    'username_or_email': 'Username or email not found'
+                    'username_or_email': 'Username or email address not found'
                 }
             })
     else:

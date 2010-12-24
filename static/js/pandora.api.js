@@ -60,16 +60,16 @@ function constructList() {
         id: 'actionList',
         request: function(data, callback) {
             if(!data.keys) {
-                app.api.apidoc(function(results) {
+                app.api.api(function(results) {
                     var items = [];
-                    $.each(results.data.actions, function(k) {items.push({'name':  k})});
+                    $.each(results.data.actions, function(i, k) {items.push({'name':  k})});
                     var result = {'data': {'items': items.length}};
                     callback(result);
                 });
             } else {
-                app.api.apidoc(function(results) {
+                app.api.api(function(results) {
                     var items = [];
-                    $.each(results.data.actions, function(k) {items.push({'name':  k})});
+                    $.each(results.data.actions, function(i, k) {items.push({'name':  k})});
                     var result = {'data': {'items': items}};
                     callback(result);
                 });
