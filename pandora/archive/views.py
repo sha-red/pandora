@@ -36,6 +36,7 @@ from api.actions import actions
 import models
 import tasks
 
+
 @login_required_json
 def removeVolume(request):
     data = json.loads(request.POST['data'])
@@ -44,7 +45,7 @@ def removeVolume(request):
         volume = models.Volume.objects.get(user=user, name=data['volume'])
         volume.files.delete()
         volume.delete()
-        response = json_response(status=200, text='ok')
+        response = json_response()
     except models.Volume.DoesNotExist:
         response = json_response(status=404, text='volume not found')
     return render_to_json_response(response)
@@ -124,7 +125,7 @@ def upload(request):
                 'data': {info: object, rename: object}}
     '''
     user = request.user
-    f = get_object_or_404(models.File, oshash=request.POST['oshash'])
+    f = get_object_or_404_json(models.File, oshash=request.POST['oshash'])
     if 'frame' in request.FILES:
         if f.frames.count() == 0:
             for frame in request.FILES.getlist('frame'):
@@ -142,7 +143,7 @@ def upload(request):
             f.data.save('data.raw', request.FILES['file'])
             f.available = True
             f.save()
-            response = json_response(status=200, text='file saved')
+            response = json_response(text='file saved')
         else:
             response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
@@ -215,19 +216,36 @@ def taskStatus(request):
 actions.register(taskStatus)
 
 @login_required_json
-def editFile(request): #FIXME: should this be file.files. or part of update
+def editFile(request):
     '''
-        change file / imdb link
+        change file / item link
+        param data
+            oshash hash of file
+            itemId new itemId
+        return {'status': {'code': int, 'text': string},
+                'data': {imdbId:string }}
     '''
-    response = json_response(status=501, text='not implemented')
+    #FIXME: permissions, need to be checked
+    data = json.loads(request.POST['data'])
+    f = get_object_or_404_json(models.File, oshash=data['oshash'])
+    response = json_response()
+    if f.item.id != data['itemId']:
+        if len(data['itemId']) != 7:
+            folder = f.instances.all()[0].folder
+            item_info = parse_path(folder)
+            item = get_item(item_info)
+        else:
+            item = get_item({'imdbId': data['itemId']})
+        f.item = item
+        f.save()
+        #FIXME: other things might need updating here
+        response = json_response(text='updated')
     return render_to_json_response(response)
 actions.register(editFile)
-
 
 def lookup_file(request, oshash):
     f = get_object_or_404(models.File, oshash=oshash)
     return redirect(f.item.get_absolute_url())
-    
 
 """
 def fileInfo(request):

@@ -77,8 +77,11 @@ def _get_positions(ids, get_ids):
 
 def find(request):
     '''
-        param data
-            {'query': query, 'sort': array, 'range': array}
+        param data {
+            'query': query,
+            'sort': array,
+            'range': array
+        }
         
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
@@ -102,8 +105,12 @@ def find(request):
                 'data': {items: array}}
 
 Groups
-        param data
-            {'query': query, 'key': string, 'group': string, 'range': array}
+        param data {
+            'query': query,
+            'key': string,
+            'group': string,
+            'range': array
+        }
         
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
@@ -123,8 +130,10 @@ Groups
                 'data': {items: int}}
 
 Positions
-        param data
-            {'query': query, 'ids': []}
+        param data {
+            'query': query,
+            'ids': []
+        }
         
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
@@ -234,10 +243,14 @@ actions.register(getItem)
 @login_required_json
 def editItem(request):
     '''
-        param data
-            {id: string, key: value,..}
-        return {'status': {'code': int, 'text': string},
-                'data': {}}
+        param data {
+            id: string,
+            key: value,..
+        }
+        return {
+            status: {'code': int, 'text': string},
+            data: {}
+        }
     '''
     data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Item, itemId=data['id'])
@@ -272,10 +285,13 @@ actions.register(removeItem)
 '''
 def parse(request): #parse path and return info
     '''
-        param data
-            {path: string}
-        return {'status': {'code': int, 'text': string},
-                data: {imdb: string}}
+        param data {
+            path: string
+        }
+        return {
+            status: {'code': int, 'text': string},
+            data: {imdb: string}
+        }
     '''
     path = json.loads(request.POST['data'])['path']
     response = json_response(utils.parse_path(path))
@@ -285,10 +301,14 @@ actions.register(parse)
 
 def setPosterFrame(request): #parse path and return info
     '''
-        param data
-            {id: itemId, position: float}
-        return {'status': {'code': int, 'text': string},
-                data: {}}
+        param data {
+            id: itemId,
+            position: float
+        }
+        return {
+            status: {'code': int, 'text': string},
+            data: {}
+        }
     '''
     data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Item, itemId=data['id'])
@@ -296,7 +316,7 @@ def setPosterFrame(request): #parse path and return info
         #FIXME: some things need to be updated after changing this
         item.poster_frame = data['position']
         item.save()
-        response = json_response(status=200, text='ok')
+        response = json_response()
     else:
         response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
@@ -304,10 +324,14 @@ actions.register(setPosterFrame)
 
 def setPoster(request): #parse path and return info
     '''
-        param data
-            {id: itemId, url: string}
-        return {'status': {'code': int, 'text': string},
-                data: {poster: {url,width,height}}}
+        param data {
+            id: itemId,
+            url: string
+        }
+        return {
+            status: {'code': int, 'text': string},
+            data: {poster: {url,width,height}}
+        }
     '''
     data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Item, itemId=data['id'])
@@ -319,7 +343,7 @@ def setPoster(request): #parse path and return info
                 item.poster.delete()
             item.save()
             tasks.update_poster.delay(item.itemId)
-            response = json_response(status=200, text='ok')
+            response = json_response()
             response['data']['poster'] = item.get_poster()
         else:
             response = json_response(status=403, text='invalid poster url')
@@ -330,10 +354,15 @@ actions.register(setPoster)
 
 def getImdbId(request):
     '''
-        param data
-            {title: string, director: string, year: string}
-        return {'status': {'code': int, 'text': string},
-                'data': {imdbId:string }}
+        param data {
+            title: string,
+            director: string,
+            year: string
+        }
+        return {
+            status: {'code': int, 'text': string},
+            data: {imdbId:string }
+        }
     '''
     imdbId = ox.web.imdb.guess(search_title, r['director'], timeout=-1)
     if imdbId:

@@ -19,8 +19,6 @@ import models
 
 from api.actions import actions
 
-def json_errors(form):
-    return {'status': {'code': 402, 'text': 'form error', 'data': form.errors}}
 
 class LoginForm(forms.Form):
     username = forms.TextInput()
@@ -28,41 +26,67 @@ class LoginForm(forms.Form):
 
 def api_login(request):
     '''
-        param data
-            {'username': username, 'password': password}
+        param data {
+            username: 'username',
+            password: 'password'
+        }
         
-        return {'status': {'code': int, 'text': string}}
+        return {
+            status: {'code': int, 'text': string}
+            data: {
+                errors: {
+                    username: 'Unknown User',
+                    password: 'Incorrect Password'
+                }
+                user: {
+                    ...
+                }
+            }
+        }
     '''
-    response = json_response(status=403, text='login failed')
     data = json.loads(request.POST['data'])
     form = LoginForm(data, request.FILES)
     if form.is_valid():
-        user = authenticate(username=data['username'], password=data['password'])
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-                user_json = models.get_user_json(user)
-                response = json_response({'user': user_json},
-                                         text='You are logged in.')
-            else:
-                response = json_response(status=401,
-                    text='Your account is disabled.')
+        if models.User.objects.filter(username=form.data['username']).count() == 0:
+            response = json_response({
+                'errors': {
+                    'username': 'Unknown User'
+                }
+            })
         else:
-                errors = json_errors(form)
-                response = json_response(errors,
-                    status=401, text='Your username and password were incorrect.')
+            user = authenticate(username=data['username'], password=data['password'])
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    user_json = models.get_user_json(user)
+                    response = json_response({
+                        'user': user_json
+                    })
+                else:
+                    response = json_response({
+                        'errors': {
+                            'username': 'User Disabled'
+                        }
+                    })
+            else:
+                response = json_response({
+                    'errors': {
+                        'password': 'Incorrect Password'
+                    }
+                })
     else:
         response = json_response(status=400, text='invalid data')
-
     return render_to_json_response(response)
 actions.register(api_login, 'login')
 
 def api_logout(request):
     '''
-        param data
-            {}
+        param data {
+        }
         
-        return {'status': {'code': int, 'text': string}}
+        return {
+            status: {'code': int, 'text': string}
+        }
     '''
     response = json_response(text='logged out')
     if request.user.is_authenticated():
@@ -77,18 +101,40 @@ class RegisterForm(forms.Form):
 
 def register(request):
     '''
-        param data
-            {'username': username, 'password': password, 'email': email}
+        param data {
+            username: 'username',
+            password: 'password',
+            email: 'emailaddress'
+        }
         
-        return {'status': {'code': int, 'text': string}}
+        return {
+            status: {'code': int, 'text': string}
+            data: {
+                errors: {
+                    username: 'Unknown User',
+                    password: 'Incorrect Password'
+                }
+                user: {
+                    ...
+                }
+            }
+        }
     '''
     data = json.loads(request.POST['data'])
     form = RegisterForm(data, request.FILES)
     if form.is_valid():
         if models.User.objects.filter(username=form.data['username']).count() > 0:
-            response = json_response(status=400, text='username or email exists')
+            response = json_response({
+                'errors': {
+                    'username': 'Username taken'
+                }
+            })
         elif models.User.objects.filter(email=form.data['email']).count() > 0:
-            response = json_response(status=400, text='username or email exists')
+            response = json_response({
+                'errors': {
+                    'email': 'Email is used by another account'
+                }
+            })
         else:
             first_user = models.User.objects.count() == 0
             user = models.User(username=form.data['username'], email=form.data['email'])
@@ -100,9 +146,12 @@ def register(request):
             user = authenticate(username=form.data['username'],
                                 password=form.data['password'])
             login(request, user)
-            response = json_response(text='account created')
+            user_json = models.get_user_json(user)
+            response = json_response({
+                'user': user_json
+            }, text='account created')
     else:
-        response = json_response(status=400, text='username exists')
+        response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)
 actions.register(register)
 
@@ -111,10 +160,18 @@ class RecoverForm(forms.Form):
 
 def api_recover(request):
     '''
-        param data
-            {'username_or_email': username}
+        param data {
+            username_or_email: username
+        }
         
-        return {'status': {'code': int, 'text': string}}
+        return {
+            status: {'code': int, 'text': string}
+            data: {
+                errors: {
+                    username_or_email: 'Username or email not found'
+                }
+            }
+        }
     '''
     data = json.loads(request.POST['data'])
     form = RegisterForm(data, request.FILES)
@@ -144,7 +201,11 @@ def api_recover(request):
             user.email_user(subject, message)
             response = json_response(text='recover email sent')
         else:
-            response = json_response(status=404, text='username or email not found')
+            response = json_response({
+                'errors': {
+                    'username_or_email': 'Username or email not found'
+                }
+            })
     else:
         response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)
@@ -152,8 +213,10 @@ actions.register(api_recover, 'recover')
 
 def findUser(request):
     '''
-        param data
-            {key: "username", value: "foo", operator: "="}
+        param data {
+            key: "username",
+            value: "foo", operator: "="
+        }
         
         return {
             'status': {'code': int, 'text': string}
@@ -195,10 +258,14 @@ class ContactForm(forms.Form):
 
 def contact(request):
     '''
-        param data
-            {'email': string, 'message': string}
+        param data {
+            'email': string,
+            'message': string
+        }
         
-        return {'status': {'code': int, 'text': string}}
+        return {
+            'status': {'code': int, 'text': string}
+        }
     '''
     data = json.loads(request.POST['data'])
     form = ContactForm(data, request.FILES)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+import os
 from datetime import datetime
 
 from django.contrib.auth.models import User
@@ -15,6 +16,7 @@ class UserProfile(models.Model):
     user = models.ForeignKey(User, unique=True)
     
     files_updated = models.DateTimeField(default=datetime.now)
+    newsletter = models.BooleanField(default=True)
 
 def user_post_save(sender, instance, **kwargs):
     profile, new = UserProfile.objects.get_or_create(user=instance)
@@ -42,6 +44,10 @@ def get_user_json(user):
     return json
 
 def get_ui(user):
+    with open(os.path.join(settings.PROJECT_ROOT, 'templates', 'site.json')) as f:
+        site = json.load(f)
+    return site['user']['ui']
+    '''
     return {
         "columns": ["id", "title", "director", "country", "year", "language", "genre"],
         "findQuery": {"conditions": [], "operator": ""},
@@ -59,6 +65,7 @@ def get_ui(user):
         "sort": settings.DEFAULT_SORT,
         "theme": settings.DEFAULT_THEME
     }
+    '''
 
 def get_preferences(user):
     prefs = {}
