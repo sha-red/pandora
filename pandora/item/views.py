@@ -290,7 +290,9 @@ def parse(request): #parse path and return info
         }
         return {
             status: {'code': int, 'text': string},
-            data: {imdb: string}
+            data: {
+                imdb: string
+            }
         }
     '''
     path = json.loads(request.POST['data'])['path']
@@ -307,7 +309,8 @@ def setPosterFrame(request): #parse path and return info
         }
         return {
             status: {'code': int, 'text': string},
-            data: {}
+            data: {
+            }
         }
     '''
     data = json.loads(request.POST['data'])
@@ -330,7 +333,9 @@ def setPoster(request): #parse path and return info
         }
         return {
             status: {'code': int, 'text': string},
-            data: {poster: {url,width,height}}
+            data: {
+                poster: {url,width,height}
+            }
         }
     '''
     data = json.loads(request.POST['data'])
@@ -361,7 +366,9 @@ def getImdbId(request):
         }
         return {
             status: {'code': int, 'text': string},
-            data: {imdbId:string }
+            data: {
+                imdbId:string
+            }
         }
     '''
     imdbId = ox.web.imdb.guess(search_title, r['director'], timeout=-1)

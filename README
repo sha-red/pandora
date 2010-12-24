@@ -30,7 +30,7 @@ you need python, bazaar, pip and virtualenv and several other python modules:
   (make sure you have the python bindings installed).
 
   create a postgresql database and adjust settings in local_settings.py
-  and run python manage.py syncdb to populate the database
+  and run ./manage.py syncdb to populate the database
   you might want to load example configurations from fixutes.
 
 * RabbitMQ
@@ -50,10 +50,19 @@ you need python, bazaar, pip and virtualenv and several other python modules:
 
 Running developer environment:
   in one terminal:
-    python manage.py runserver
+    ./manage.py runserver
   and in another one:
-    python manage.py celeryd -Q default,encoding
+    ./manage.py celeryd -Q default,encoding
 
+Updating database:
+ right now database updates are not managed, each time you update to current bzr
+ you might have to update db tables too.
+ Use
+   ./manage.py sqldiff appname
+ to check if changes exist and
+   ./manage.py sqldiff appname | ./manage.py dbshell
+ to apply them.
+ This has to be done for all installed apps
 
 == DEPLOYMENT ==
 To run pan.do/ra in production, we use nginx, using apache2 is also possible.
@@ -64,4 +73,5 @@ To run pan.do/ra in production, we use nginx, using apache2 is also possible.
 * apache2 setup
     sudo apt-get install apache2-mpm-prefork
     sudo apt-get install libapache2-mod-xsendfile
+
 

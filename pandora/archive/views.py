@@ -59,15 +59,22 @@ def update(request):
             info
         call volume/files first and fill in requested info after that
 
-        param data
+        param data {
             volume: '',
             files: [
-                {oshash:, path:, mtime:, }
-            ]
+                {oshash:, path:, mtime:, },
+                ...
+            ],
             info: {oshash: object}
-
-        return {'status': {'code': int, 'text': string},
-                'data': {info: list, data: list, file: list}}
+        }
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+                info: list,
+                data: list,
+                file: list
+            }
+        }
     '''
     data = json.loads(request.POST['data'])
     user = request.user
@@ -121,8 +128,13 @@ def upload(request):
         frame: [] //multipart frames
         file: [] //multipart file
 
-        return {'status': {'code': int, 'text': string},
-                'data': {info: object, rename: object}}
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+                info: object,
+                rename: object
+             }
+        }
     '''
     user = request.user
     f = get_object_or_404_json(models.File, oshash=request.POST['oshash'])
@@ -219,11 +231,17 @@ actions.register(taskStatus)
 def editFile(request):
     '''
         change file / item link
-        param data
-            oshash hash of file
-            itemId new itemId
-        return {'status': {'code': int, 'text': string},
-                'data': {imdbId:string }}
+        param data {
+            oshash: hash of file
+            itemId: new itemId
+        }
+
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+                imdbId:string
+            }
+        }
     '''
     #FIXME: permissions, need to be checked
     data = json.loads(request.POST['data'])
