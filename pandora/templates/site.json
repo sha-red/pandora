@@ -58,8 +58,7 @@
         {"id": "history", "title": "History"},
         {"id": "lists", "title": "My Lists"},
         {"id": "public", "title": "Public Lists"},
-        {"id": "featured", "title": "Featured Lists"},
-        {"id": "admin", "title": "Admin"}
+        {"id": "featured", "title": "Featured Lists"}
     ],
     "sortKeys": [
         {"id": "title", "title": "Title", "operator": "", "align": "left", "width": 180, "removable": false},
@@ -121,17 +120,19 @@
             "findQuery": {"conditions": [], "operator": ""},
             "groupsQuery": {"conditions": [], "operator": "|"},
             "groupsSize": 176,
+			"item": "",
             "itemView": "timeline",
             "listQuery": {"conditions": [], "operator": ""},
             "listsSize": 256,
             "listView": "icons",
 			"section": "items",
-            "sections": ["history", "lists", "public", "featured", "admin"],
+            "sections": ["history", "lists", "public", "featured"],
             "showAnnotations": true,
             "showGroups": true,
             "showInfo": true,
             "showLists": true,
             "showMovies": true,
+			"sitePage": "home",
             "sort": [
                 {"key": "director", "operator": ""}
             ],
