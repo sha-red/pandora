@@ -40,6 +40,11 @@ var app = new Ox.App({
     });
 
     $main.appendTo(app.$body);
+    if(document.location.hash) {
+        var action = document.location.hash.substring(1);
+        //FIXME: how to select item in Ox.TextList?
+        //app.$ui.actionList
+    }
 });
 
 function constructList() {
@@ -83,12 +88,15 @@ function constructList() {
         ]
     }).bindEvent({
        select: function(event, data) {
-           var info = $('<div>');
+           var info = $('<div>'),
+               hash = '#';
            $.each(data.ids, function(v, k) {
                 console.log(k)
                 info.append($("<h2>").html(k));
                 info.append($('<pre>').html(app.docs[k].replace('/\n/<br>\n/g')));
+                hash += k + ','
             });
+            document.location.hash = hash.substring(0, hash.length-1);
             app.$ui.actionInfo.html(info);
        }
     });
