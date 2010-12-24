@@ -24,7 +24,13 @@ var app = new Ox.App({
     app.$ui.actionList = constructList();
     app.$ui.actionInfo = Ox.Container().css({padding: '8px'});
 
-    app.api.apidoc(function(results) { app.docs = results.data.actions; });
+    app.api.apidoc(function(results) {
+        app.docs = results.data.actions;
+
+        if(document.location.hash) {
+            app.$ui.actionList.triggerEvent('select', {ids: document.location.hash.substring(1).split(',')});
+        }
+    });
 
     var $main = new Ox.SplitPanel({
         elements: [
@@ -40,11 +46,6 @@ var app = new Ox.App({
     });
 
     $main.appendTo(app.$body);
-    if(document.location.hash) {
-        var action = document.location.hash.substring(1);
-        //FIXME: how to select item in Ox.TextList?
-        //app.$ui.actionList
-    }
 });
 
 function constructList() {
