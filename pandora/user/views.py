@@ -250,7 +250,7 @@ def requestToken(request):
                 user = q[0]
         if user:
             while True:
-                token = ox.to32(random.randint(0, 1000000000))
+                token = ox.to32(random.randint(32768, 1048575))
                 if models.UserProfile.objects.filter(reset_token=token).count() == 0:
                     break
             user_profile = user.get_profile()
