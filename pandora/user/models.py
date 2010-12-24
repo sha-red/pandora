@@ -12,7 +12,7 @@ from django.conf import settings
 from ox.utils import json
 
 class UserProfile(models.Model):
-    recover_key = models.TextField()
+    reset_token = models.TextField(blank=True, null=True, unique=True)
     user = models.ForeignKey(User, unique=True)
     
     files_updated = models.DateTimeField(default=datetime.now)

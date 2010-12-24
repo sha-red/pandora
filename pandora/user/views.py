@@ -1,7 +1,7 @@
-    # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-import uuid
-import hashlib
+import random
+random.seed()
 
 from django import forms
 from django.contrib.auth.models import User
@@ -14,6 +14,7 @@ from django.core.mail import send_mail, BadHeaderError
 
 from ox.django.shortcuts import render_to_json_response, json_response
 from ox.django.decorators import login_required_json
+import ox
 
 import models
 
@@ -136,6 +137,12 @@ def register(request):
                     'email': 'Email address already exits'
                 }
             })
+        elif not form.data['password']:
+            response = json_response({
+                'errors': {
+                    'password': 'Password can not be empty'
+                }
+            })
         else:
             first_user = models.User.objects.count() == 0
             user = models.User(username=form.data['username'], email=form.data['email'])
@@ -156,10 +163,64 @@ def register(request):
     return render_to_json_response(response)
 actions.register(register)
 
+def resetPassword(request):
+    '''
+        param data {
+            token: reset token
+            password: new password
+        }
+        
+        return {
+            status: {'code': int, 'text': string}
+            data: {
+                errors: {
+                    token: 'Invalid token'
+                }
+                user {
+                }
+            }
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    if 'token' in data and 'password' in data:
+        if not data['password']:
+            response = json_response({
+                'errors': {
+                    'password': 'Password can not be empty'
+                }
+            })
+        else:
+            qs = models.UserProfile.objects.filter(reset_token=data['token'])
+            if qs.count() == 1:
+                user = qs[0].user
+                user.set_password(data['password'])
+                user.save()
+                user_profile = user.get_profile()
+                user_profile.reset_token = None
+                user_profile.save()
+                user = authenticate(username=user.username, password=data['password'])
+                login(request, user)
+
+                user_json = models.get_user_json(user)
+                response = json_response({
+                    'user': user_json
+                }, text='password reset')
+            else:
+                response = json_response({
+                    'errors': {
+                        'token': 'Invalid token'
+                    }
+                })
+
+    else:
+        response = json_response(status=400, text='invalid data')
+    return render_to_json_response(response)
+actions.register(resetPassword)
+
 class RecoverForm(forms.Form):
     username_or_email = forms.TextInput()
 
-def api_recover(request):
+def requestToken(request):
     '''
         param data {
             username_or_email: username
@@ -171,6 +232,7 @@ def api_recover(request):
                 errors: {
                     username_or_email: 'Username or email address not found'
                 }
+                username: user
             }
         }
     '''
@@ -187,20 +249,26 @@ def api_recover(request):
             if q.count() > 0:
                 user = q[0]
         if user:
-            key = hashlib.sha1(str(uuid.uuid4())).hexdigest()
+            while True:
+                token = ox.to32(random.randint(0, 1000000000))
+                if models.UserProfile.objects.filter(reset_token=token).count() == 0:
+                    break
             user_profile = user.get_profile()
-            user_profile.recover_key = key
+            user_profile.reset_token = token
             user_profile.save()
 
-            template = loader.get_template('recover_email.txt')
+            template = loader.get_template('password_reset_email.txt')
             context = RequestContext(request, {
-                'recover_url': request.build_absolute_uri("/r/%s" % key),
+                'url': request.build_absolute_uri("/"),
+                'token': token,
                 'sitename': settings.SITENAME,
             })
             message = template.render(context)
-            subject = '%s account recovery' % settings.SITENAME
+            subject = '%s password reset' % settings.SITENAME
             user.email_user(subject, message)
-            response = json_response(text='recover email sent')
+            response = json_response({
+                'username': user.username
+            }, text='recover email sent')
         else:
             response = json_response({
                 'errors': {
@@ -210,7 +278,7 @@ def api_recover(request):
     else:
         response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)
-actions.register(api_recover, 'recover')
+actions.register(requestToken)
 
 def findUser(request):
     '''
@@ -232,25 +300,6 @@ def findUser(request):
     response['data']['users'] = [u.username for u in User.objects.filter(username__iexact=data['value'])]
     return render_to_json_response(response)
 actions.register(findUser)
-
-def recover(request, key):
-    '''
-        recover user and redirect to settings
-    '''
-    qs = models.UserProfile.objects.filter(recover_key=key)
-    if qs.count() == 1:
-        user = qs[0].user
-        user.set_password(key)
-        user.save()
-        user_profile = user.get_profile()
-        user_profile.recover_key = ''
-        user_profile.save()
-        user = authenticate(username=user.username, password=key)
-        login(request, user)
-        
-        #FIXME: set message to notify user to update password
-        return redirect('/#settings')
-    return redirect('/')
 
 class ContactForm(forms.Form):
     email = forms.EmailField()

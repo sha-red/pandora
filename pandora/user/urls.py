@@ -9,6 +9,5 @@ urlpatterns = patterns("user.views",
     (r'^login', 'login'),
     (r'^logout', 'logout'),
     (r'^register', 'register'),
-    (r'^recover', 'recover'),
 )
 
