@@ -21,6 +21,7 @@ from django.conf import settings
 from ox.django import fields
 import ox
 from ox import stripTags
+import ox.web.imdb
 from ox.normalize import canonicalTitle, canonicalName
 from firefogg import Firefogg
 
@@ -572,7 +573,8 @@ class Item(models.Model):
 
         s.color = int(sum(self.data.get('color', [])))
         s.cuts = len(self.data.get('cuts', []))
-        s.cutsperminute = s.cuts / (s.duration/60)
+        if s.duration:
+            s.cutsperminute = s.cuts / (s.duration/60)
         for key in ('title', 'language', 'country') + self.person_keys:
             setattr(s, '%s_desc'%key, getattr(s, key))
             if not getattr(s, key):
@@ -758,19 +760,20 @@ class Item(models.Model):
             frame = posters[poster]
             timeline = self.path('timeline.64.png')
             timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
-            cmd = [settings.ITEM_POSTER,
-                   '-t', self.get('title'),
-                   '-d', ', '.join(self.get('directors', ['Unknown Director'])),
-                   '-y', str(self.get('year', '')),
-                   '-f', frame,
-                   '-l', timeline,
-                   '-p', poster
-                  ]
-            if len(self.itemId) == 7:
-                cmd += ['-i', self.itemId]
-            cmd += ['-o', self.oxdbId]
-            p = subprocess.Popen(cmd)
-            p.wait()
+            if os.path.exists(timeline):
+                cmd = [settings.ITEM_POSTER,
+                       '-t', self.get('title'),
+                       '-d', ', '.join(self.get('directors', ['Unknown Director'])),
+                       '-y', str(self.get('year', '')),
+                       '-f', frame,
+                       '-l', timeline,
+                       '-p', poster
+                      ]
+                if len(self.itemId) == 7:
+                    cmd += ['-i', self.itemId]
+                cmd += ['-o', self.oxdbId]
+                p = subprocess.Popen(cmd)
+                p.wait()
         return posters.keys()
 
 class ItemFind(models.Model):

@@ -17,10 +17,9 @@ def update_poster(itemId):
     item.make_poster(True)
 
 @task(ignore_resulsts=True, queue='default')
-def update_imdb(imdbId):
-    item = models.Item.objects.get(itemId=imdbId)
+def update_imdb(itemId):
+    item = models.Item.objects.get(itemId=itemId)
     item.update_imdb()
-    update_poster(itemId)
 
 @task(queue="encoding")
 def update_streams(itemId):
