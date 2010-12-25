@@ -98,6 +98,9 @@ def api_logout(request):
     if request.user.is_authenticated():
         response = json_response(text='logged out')
         logout(request)
+    with open(os.path.join(settings.PROJECT_ROOT, 'templates', 'site.json')) as f:
+        site = json.load(f)
+    response['data']['user'] = site['user']
     return render_to_json_response(response)
 actions.register(api_logout, 'logout')
 
@@ -303,7 +306,7 @@ def findUser(request):
     data = json.loads(request.POST['data'])
     response = json_response(status=200, text='ok')
     if data['key'] == 'email':
-        response['data']['emails'] = [u.username for u in User.objects.filter(email__iexact=data['value'])]
+        response['data']['users'] = [u.email for u in User.objects.filter(email__iexact=data['value'])]
     else:
         response['data']['users'] = [u.username for u in User.objects.filter(username__iexact=data['value'])]
     return render_to_json_response(response)
