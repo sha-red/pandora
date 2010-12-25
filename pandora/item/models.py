@@ -25,7 +25,6 @@ from ox.normalize import canonicalTitle, canonicalName
 from firefogg import Firefogg
 
 import managers
-import load
 import utils
 import tasks
 from archive import extract
@@ -149,7 +148,6 @@ def get_item(info):
             item.save()
             tasks.update_imdb.delay(item.itemId)
             #item.update_imdb()
-            tasks.update_poster.delay(item.itemId)
     else:
         q = Item.objects.filter(find__key='title', find__value=info['title'])
         if q.count() > 1:

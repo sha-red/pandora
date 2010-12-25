@@ -4,7 +4,6 @@ from datetime import timedelta
 
 from celery.decorators import task, periodic_task
 
-import load
 import models
 
 
@@ -21,11 +20,7 @@ def update_poster(itemId):
 def update_imdb(imdbId):
     item = models.Item.objects.get(itemId=imdbId)
     item.update_imdb()
-
-@task(ignore_resulsts=True)
-def find_item(fileId):
-    f = models.File.objects.get(pk=fileId)
-    f.find_item()
+    update_poster(itemId)
 
 @task(queue="encoding")
 def update_streams(itemId):
