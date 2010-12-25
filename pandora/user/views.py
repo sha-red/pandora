@@ -33,7 +33,7 @@ def api_login(request):
         }
         
         return {
-            status: {'code': int, 'text': string}
+            status: {'code': 200, 'text': 'ok'}
             data: {
                 errors: {
                     username: 'Unknown Username',
@@ -87,6 +87,11 @@ def api_logout(request):
         
         return {
             status: {'code': int, 'text': string}
+            data: {
+                user: {
+                    default user
+                }
+            }
         }
     '''
     response = json_response(text='ok')
@@ -297,7 +302,10 @@ def findUser(request):
     #FIXME: support other operators and keys
     data = json.loads(request.POST['data'])
     response = json_response(status=200, text='ok')
-    response['data']['users'] = [u.username for u in User.objects.filter(username__iexact=data['value'])]
+    if data['key'] == 'email':
+        response['data']['emails'] = [u.username for u in User.objects.filter(email__iexact=data['value'])]
+    else:
+        response['data']['users'] = [u.username for u in User.objects.filter(username__iexact=data['value'])]
     return render_to_json_response(response)
 actions.register(findUser)
 
