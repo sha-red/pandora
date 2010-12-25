@@ -572,6 +572,9 @@ class Item(models.Model):
             s.size = 0
 
         s.color = int(sum(self.data.get('color', [])))
+        s.saturation = 0 #FIXME
+        s.brightness = 0 #FIXME
+        
         s.cuts = len(self.data.get('cuts', []))
         if s.duration:
             s.cutsperminute = s.cuts / (s.duration/60)
