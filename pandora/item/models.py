@@ -578,6 +578,8 @@ class Item(models.Model):
         s.cuts = len(self.data.get('cuts', []))
         if s.duration:
             s.cutsperminute = s.cuts / (s.duration/60)
+        else:
+            s.cutsperminute = 0
         for key in ('title', 'language', 'country') + self.person_keys:
             setattr(s, '%s_desc'%key, getattr(s, key))
             if not getattr(s, key):
