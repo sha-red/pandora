@@ -52,27 +52,317 @@ var pandora = new Ox.App({
 
 		Query.fromString(location.hash.substr(1));
 
-	    //url();
+	    URL.parse();
 	    window.onpopstate = function() {
-	        url();
+	        URL.update();
 	    };
 
-		app.$ui.appPanel = ui.appPanel().display();	    
+		app.$ui.appPanel = ui.appPanel();
+		app.$ui.appPanel.display();	    
 
         app.ui.sectionButtonsWidth = app.$ui.sectionButtons.width() + 8;
 
-        app.$ui.window.resize(function(foo) {
-            Ox.print('foo', foo)
-            app.$ui.list.size();
-            resizeGroups(app.$ui.rightPanel.width());
-            if (app.user.ui.listView == 'map') {
-                app.$ui.map.triggerResize();
+        app.$ui.window.resize(function() {
+            if (app.user.ui.item == '') {
+                app.$ui.list.size();
+                resizeGroups(app.$ui.rightPanel.width());
+                if (app.user.ui.listView == 'map') {
+                    app.$ui.map.triggerResize();
+                }
+            } else {
+                Ox.print('app.$ui.window.resize');
+                app.$ui.editor.options({
+					height: app.$ui.document.height() -
+					        20 - 24 - app.$ui.contentPanel.size(0) - 1 - 16,
+                    width: app.$ui.document.width() -
+                            app.$ui.mainPanel.size(0) - app.$ui.timelinePanel.size(1) - 2 // fixme: item, not timelinePanel
+                });
             }
         });
 
+        pandora.app = app; // remove later
+
 	}
 
+    function login(data) {
+        app.user = data.user;
+        app.$ui.appPanel.reload();
+    }
+
+    function logout(data) {
+        app.user = data.user;
+        app.$ui.appPanel.reload();
+    }
+
 	var ui = {
+	    accountCodeInput: function() {
+	        return new Ox.Input({
+                id: 'code',
+                label: 'Code',
+                labelWidth: 100,
+                validate: function(value, callback) {
+                    callback({
+                        message: 'Missing Code',
+                        valid: value.length > 0
+                    });
+                },
+                width: 368
+            });
+	    },
+	    accountDialog: function(action) {
+	        var buttonTitle = {
+                    login: 'Login',
+                    register: 'Register',
+                    reset: 'Reset Password',
+                    resetlogin: 'Reset Password and Login'
+                },            
+	            buttons = {
+    	            login: ['register', 'reset'],
+    	            register: ['login'],
+    	            reset: ['login'],
+    	            resetlogin: ['login']
+	            },
+    	        text = {
+                    login: '',
+                    register: '',
+                    reset: 'To reset your password, please enter your username or e-mail address.',
+                    resetlogin: 'To login to your account, please choose a new password, and enter the code that we have e-mailed you.'
+                },
+                title = {
+                    login: 'Login',
+                    register: 'Register',
+                    reset: 'Reset Password',
+                    resetlogin: 'Reset Password'
+                };
+	        var that = new Ox.Dialog({
+    	            buttons: [
+    	                $.map(buttons[action], function(v) {
+                            return button(v);
+                        }),
+                        [button('cancel'), button('submit')]
+                    ],
+                    content: app.$ui.accountForm = ui.accountForm(action),
+                    height: 200,
+                    id: 'accountDialog',
+                    minHeight: 200,
+                    minWidth: 400,
+                    title: title[action],
+                    width: 400
+    	        })
+    	        .bindEvent({
+    	            resize: function(event, data) {
+                        var width = data.width - 32;
+                        app.$ui.accountForm.items.forEach(function(item) {
+                            item.options({width: width})
+                        });
+                    }
+    	        });
+    	    function button(type) {
+    	        if (type == 'cancel') {
+    	            return new Ox.Button({
+                        id: 'cancel',
+                        title: 'Cancel'
+                    }).bindEvent('click', function() {
+                        that.close();
+                    })
+    	        } else if (type == 'submit') {
+    	            return new Ox.Button({
+                        disabled: true,
+                        id: 'submit',
+                        title: buttonTitle[action]
+                    }).bindEvent('click', function() {
+                        app.$ui.accountForm.submit()
+                    })
+    	        } else {
+    	            return new Ox.Button({
+    	                id: type,
+    	                title: title[type] + '...'
+    	            }).bindEvent('click', function() {
+        	            action = type;
+                        that.options({
+                            buttons: [
+                                $.map(buttons[type], function(v) {
+                                    return button(v);
+                                }),
+                                [button('cancel'), button('submit')]
+                            ],
+                            content: app.$ui.accountForm = ui.accountForm(type),
+                            title: title[type]
+                        });
+                    });
+    	        }
+    	    }
+	        return that;
+	    },
+	    accountEmailInput: function() {
+	        return new Ox.Input({
+                id: 'email',
+                label: 'E-Mail Address',
+                labelWidth: 100,
+                type: 'email',
+                validate: function(value, callback) {
+                    callback({
+                        message: 'Missing E-Mail Address',
+                        valid: value.length > 0
+                    });
+                },
+                width: 368
+            });
+	    },
+	    accountForm: function(action) {
+	        app.$ui.codeInput = ui.accountEmailInput();
+	        app.$ui.emailInput = ui.accountEmailInput();
+	        app.$ui.passwordInput = ui.accountPasswordInput();
+	        app.$ui.usernameInput = ui.accountUsernameInput();
+	        app.$ui.usernameOrEmailInput = ui.accountUsernameOrEmailInput();
+	        var items = {
+	                'login': [
+	                    app.$ui.usernameInput,
+	                    app.$ui.passwordInput
+	                ],
+	                'register': [
+                        app.$ui.usernameInput,
+                        app.$ui.passwordInput,
+                        app.$ui.emailInput
+	                ],
+	                'reset': [
+	                    app.$ui.usernameOrEmailInput
+	                ],
+	                'resetlogin': [
+	                    app.$ui.usernameInput,
+	                    app.$ui.passwordInput,
+	                    app.$ui.codeInput
+	                ]
+	            },
+	            that = new Ox.Form({
+                    error: 'Unknown username or wrong password',
+                    id: 'accountForm',
+                    items: $.map(items[action], function(v, i) {
+                        return {element: v};
+                    }),
+                    submit: function(data, callback) {
+                        pandora.api.login(data, function(result) {
+                            if (!result.data.errors) {
+                                app.$ui.accountDialog.close();
+                                login(result.data);
+                            } else {
+                                callback([{id: 'password', message: 'Incorrect Password'}]);
+                            }
+                        });
+                    }
+                })
+                .bindEvent({
+                    submit: function(event, data) {
+                
+                    },
+                    validate: function(event, data) {
+                        app.$ui.accountDialog[(data.valid ? 'enable' : 'disable') + 'Button']('submit');
+                    }
+                });
+            that.items = items[action];
+            return that;	        
+	    },
+        accountLogoutDialog: function() {
+            var that = new Ox.Dialog({
+                    buttons: [
+                        new Ox.Button({
+                            id: 'cancel',
+                            title: 'Cancel'
+                        }).bindEvent('click', function() {
+                            that.close();
+                            app.$ui.mainMenu.getItem('loginlogout').toggleTitle();
+                        }),
+                        new Ox.Button({
+                            id: 'submit',
+                            title: 'Logout'
+                        }).bindEvent('click', function() {
+                            that.close();
+                            pandora.api.logout({}, function(result) {
+                                logout(result.data);
+                            });
+                        })
+                    ],
+                    height: 160,
+                    title: 'Logout',
+                    width: 300
+                })
+                .append(
+                    new Ox.Element('div')
+                        .html('Are you sure you want to logout?')
+                )
+            return that;
+        },
+	    accountPasswordInput: function() {
+	        return new Ox.Input({
+	            autovalidate: /.+/,
+                id: 'password',
+                label: 'Password',
+                labelWidth: 100,
+                type: 'password',
+                validate: function(value, callback) {
+                    callback({
+                        message: 'Missing Password',
+                        valid: value.length > 0
+                    });
+                },
+                width: 368
+            });
+	    },
+	    accountUsernameInput: function() {
+	        return new Ox.Input({
+                autovalidate: function(value, blur, callback) {
+                    var length = value.length;
+                    value = $.map(value.toLowerCase().split(''), function(v, i) {
+                        if (new RegExp('[a-z0-9' + ((i == 0 || (i == length - 1 && blur)) ? '' : '\-_') + ']')(v)) {
+                            return v
+                        } else {
+                            return null;
+                        }
+                    }).join('');
+                    $.each(['--', '-_', '_-', '__'], function(i, v) {
+                        while (value.indexOf(v) > -1) {
+                            value = value.replace(new RegExp(v, 'g'), v[0]);
+                        }
+                    })
+                    callback(value);
+                },
+                id: 'username',
+                label: 'Username',
+                labelWidth: 100,
+                validate: function(value, callback) {
+                    !value.length ? callback({
+                        message: 'Missing Username',
+                        valid: false
+                    }) : pandora.api.findUser({
+                        key: 'username',
+                        value: value,
+                        operator: '='
+                    }, function(result) {
+                        Ox.print('result', result)
+                        var valid = result.data.users.length == 1;
+                        callback({
+                            message: 'Unknown Username',
+                            valid: valid
+                        });
+                    });
+                },
+                width: 368
+            });
+	    },
+        accountUsernameOrEmailInput: function() {
+            return new Ox.Input({
+                id: 'email',
+                label: 'Username or E-Mail Address',
+                labelWidth: 184,
+                validate: function(value, callback) {
+                    callback({
+                        message: 'Missing Username or E-Mail Address',
+                        valid: value.length > 0
+                    });
+                },
+                width: 368
+            });
+        },
 		annotations: function() {
 			var that = new Ox.Element(),
 				$bins = [];
@@ -116,8 +406,15 @@ var pandora = new Ox.App({
 			that.display = function() {
 				app.$ui.body.css({opacity: 0});
 			    that.appendTo(app.$ui.body);
-			    app.$ui.body.animate({opacity: 1});
+			    app.$ui.body.animate({opacity: 1}, 1000);
 				return that;
+			}
+			that.reload = function() {
+			    $.each($elements, function(i, $element) {
+			        $element.remove();
+			    });
+			    app.$ui.appPanel = ui.appPanel().appendTo(app.$ui.body);
+			    return that;
 			}
 			return that;
 		},
@@ -148,13 +445,13 @@ var pandora = new Ox.App({
 	                });
 	            });
 			} else if (mode == 'item') {
-				
+				var that = new Ox.Element('div');
 			}
 			return that;
 		},
 		contentPanel: function() {
 			var that = new Ox.SplitPanel({
-		        elements: [
+		        elements: app.user.ui.item == '' ? [
 		            {
 		                collapsible: true,
 		                element: app.$ui.browser = ui.browser('list')
@@ -171,6 +468,15 @@ var pandora = new Ox.App({
 		            {
 		                element: app.$ui.list = ui.list(app.user.ui.listView)
 		            }
+		        ] : [
+    	            {
+    	                collapsible: true,
+    	                element: app.$ui.browser = ui.browser('item'),
+    	                size: 80
+    	            },
+    	            {
+    	                element: app.$ui.item = ui.item(app.user.ui.item, app.user.ui.itemView)
+    	            }
 		        ],
 		        orientation: 'vertical'
 		    });
@@ -409,13 +715,108 @@ var pandora = new Ox.App({
 		        );
 		    return that;
 		},
-		item: function(id, view) {
+        item: function(id, view) { // fixme: params are not necessary
+            var that,
+                elements = [
+                ];
+            if (view == 'timeline') {
+                that = app.$ui.timelinePanel = new Ox.SplitPanel({
+					elements: [
+						{
+							element: new Ox.Element('div'),
+						},
+						{
+							collapsible: true,
+							element: app.$ui.annotations = ui.annotations(),
+							size: 256
+						}
+					],
+					orientation: 'horizontal'
+				});
+				getItem();
+            }
+            function getItem() {
+                pandora.api.getItem(id, function(result) {
+		            var video = result.data.item.stream,
+		                cuts = result.data.item.layers.cuts || {},
+		                subtitles = result.data.item.layers.subtitles || [{
+		                    'in': 5,
+		                    'out': 10,
+		                    'text': 'This subtitle is just a test...'
+		                }];
+		            video.height = 96;
+		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
+		            video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
+		            app.$ui.timelinePanel.replace(0, app.$ui.editor = new Ox.VideoEditor({
+		                cuts: cuts,
+		                duration: video.duration,
+		                find: '',
+		                frameURL: function(position) {
+		                    return '/' + id + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
+		                },
+						height: app.$ui.contentPanel.size(1),
+		                id: 'editor',
+		                largeTimeline: true,
+		                matches: [],
+		                points: [0, 0],
+		                position: 0,
+		                posterFrame: parseInt(video.duration / 2),
+		                subtitles: subtitles,
+		                videoHeight: video.height,
+		                videoId: id,
+		                videoWidth: video.width,
+		                videoSize: 'small',
+		                videoURL: video.url,
+		                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1 - 256 - 1
+		            }).bindEvent('resize', function(event, data) {
+						Ox.print('RESIZE:', data)
+						app.$ui.editor.options({
+							width: data
+						});
+					}));
+					app.$ui.rightPanel.bindEvent('resize', function(event, data) {
+	                    Ox.print('rightPanel resize', data, app.$ui.timelinePanel.size(1))
+	                    app.$ui.editor.options({
+	                        width: data - app.$ui.timelinePanel.size(1) - 1
+	                    });
+	                });
+		        });
+            }
+            that.display = function() {
+                app.$ui.contentPanel.replaceElements([
+                    {
+						collapsible: true,
+						element: app.$ui.browser = new Ox.Element('div').options({id: 'browser'}),
+						resizable: false,
+						size: 80
+					},
+					{
+					    element: app.$ui.timelinePanel = new Ox.SplitPanel({
+							elements: [
+								{
+									element: app.$ui.editor = new Ox.Element('div')
+								},
+								{
+									collapsible: true,
+									element: app.$ui.annotations = ui.annotations(),
+									size: 256
+								}
+							],
+							orientation: 'horizontal'
+						})
+					}
+	            ]);
+	            // getItem(); // fixme: can the asynchronicity be moved within the video editor?
+            }
+            return that;
+        },
+		item_: function(id, view) {
 			var $item;
 		    //location.hash = '!' + id;
+		    //app.user.ui.mode = 'item';
 		    app.$ui.mainMenu.enableItem('openmovie');
 		    app.$ui.mainMenu.checkItem('viewMenu_openmovie_' + view);
 		    //FIXME: there should be a menu function for this
-		    app.$ui.contentPanel.empty();
 		    if (view == 'timeline') {
 		        pandora.api.getItem(id, function(result) {
 		            item_debug = result.data.item;
@@ -429,84 +830,64 @@ var pandora = new Ox.App({
 		            video.height = 96;
 		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
 		            video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
-					$item = new Ox.SplitPanel({
-						elements: [
-							{
-								collapsible: true,
-								element: app.$ui.browser = new Ox.Element('div')
-									.options({id: 'browser'}),
-								resizable: false,
-								size: 80
-							},
-							{
-								element: app.$ui.timelinePanel = new Ox.SplitPanel({
-									elements: [
-										{
-											element: app.$ui.editor = new Ox.VideoEditor({
-								                cuts: cuts,
-								                duration: video.duration,
-								                find: '',
-								                frameURL: function(position) {
-								                    return '/' + id + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
-								                },
-												height: app.$ui.contentPanel.size(1),
-								                id: 'editor',
-								                largeTimeline: true,
-								                matches: [],
-								                points: [0, 0],
-								                position: 0,
-								                posterFrame: parseInt(video.duration / 2),
-								                subtitles: subtitles,
-								                videoHeight: video.height,
-								                videoId: id,
-								                videoWidth: video.width,
-								                videoSize: 'small',
-								                videoURL: video.url,
-								                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1 - 256 - 1
-								            })
-											.bindEvent('resize', function(event, data) {
-												Ox.print('RESIZE:', data)
-												app.$ui.editor.options({
-													width: data
-												});
-											}),
-											size: 'auto'
-										},
-										/*
-										{
-											collapsible: true,
-											element: app.$ui.annotations = new Ox.Map({
-				                                	places: ['Boston', 'Brussels', 'Barcelona', 'Berlin', 'Beirut', 'Bombay', 'Bangalore', 'Beijing']
-				                                })
-												.bindEvent('resize', function(event, data) {
-													app.$ui.editor.options({
-														width: app.$document.width() - app.$ui.mainPanel.size(0) - app.$ui.timelinePanel.size(1) - 2.
-													})
-												}),
-											resizable: true,
-											resize: [192, 256],
-											size: 256
-										}
-										*/
-										{
-											collapsible: true,
-											element: app.$ui.annotations = ui.annotations(),
-											size: 256
-										}
-									],
-									orientation: 'horizontal'
-								}),
-								size: 'auto'
-							}
-						],
-						orientation: 'vertical'
-					});
-					app.$ui.rightPanel.replace(1, $item);
+					//app.$ui.contentPanel.size(0, 80);
+		            app.$ui.contentPanel.replaceElements([
+						{
+							collapsible: true,
+							element: app.$ui.browser = new Ox.Element('div').options({id: 'browser'}),
+							resizable: false,
+							size: 80
+						},
+						{
+							element: app.$ui.timelinePanel = new Ox.SplitPanel({
+								elements: [
+									{
+										element: app.$ui.editor = new Ox.VideoEditor({
+							                cuts: cuts,
+							                duration: video.duration,
+							                find: '',
+							                frameURL: function(position) {
+							                    return '/' + id + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
+							                },
+											height: app.$ui.contentPanel.size(1),
+							                id: 'editor',
+							                largeTimeline: true,
+							                matches: [],
+							                points: [0, 0],
+							                position: 0,
+							                posterFrame: parseInt(video.duration / 2),
+							                subtitles: subtitles,
+							                videoHeight: video.height,
+							                videoId: id,
+							                videoWidth: video.width,
+							                videoSize: 'small',
+							                videoURL: video.url,
+							                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1 - 256 - 1
+							            })
+										.bindEvent('resize', function(event, data) {
+											Ox.print('RESIZE:', data)
+											app.$ui.editor.options({
+												width: data
+											});
+										}),
+										size: 'auto'
+									},
+									{
+										collapsible: true,
+										element: app.$ui.annotations = ui.annotations(),
+										size: 256
+									}
+								],
+								orientation: 'horizontal'
+							}),
+							size: 'auto'
+						}
+					]);
 		            app.$ui.rightPanel
 		                .bindEvent('resize', function(event, data) {
-		                    Ox.print('rightPanel resize', data, app.$ui.timelinePanel.size(1))
+		                    Ox.print('rightPanel resize', data, app.$ui.item.size(1))
 		                    app.$ui.editor.options({
-		                        width: data - app.$ui.timelinePanel.size(1) - 1
+		                        width: data - app.$ui.item.size(1) - 1
 		                    });
 		                });
 					///*
@@ -577,6 +958,7 @@ var pandora = new Ox.App({
 		list: function(view) {
 			var that, $map,
 		        keys = ['director', 'id', 'poster', 'title', 'year'];
+		    app.user.ui.mode = 'list';
 		    Ox.print('constructList', view);
 		    if (view == 'list') {
 		        that = new Ox.TextList({
@@ -752,7 +1134,7 @@ var pandora = new Ox.App({
 		        },
 		        open: function(event, data) {
 		            var id = data.ids[0];
-		            url(id);
+		            URL.set(id);
 		        },
 		        openpreview: function(event, data) {
 		            app.requests.preview && pandora.api.cancel(app.requests.preview);
@@ -963,11 +1345,14 @@ var pandora = new Ox.App({
 		            app.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (data.operator === '' ? 'ascending' : 'descending'));
 		        }
 		    });
-
+            that.display = function() {
+                
+            };
 		    return that;
 		},
 		mainMenu: function() {
-			var that = new Ox.MainMenu({
+			var isGuest = app.user.group == 'guest',
+			    that = new Ox.MainMenu({
 		            extras: [
 		                app.$ui.loadingIcon = new Ox.LoadingIcon({
 		                    size: 'medium'
@@ -978,21 +1363,27 @@ var pandora = new Ox.App({
 		                { id: app.config.site.id + 'Menu', title: app.config.site.name, items: [
 	                        { id: 'home', title: 'Home' },
 		                    {},
-		                    { id: 'about', title: 'About' },
-		                    { id: 'tour', title: 'Tour' },
-		                    { id: 'news', title: 'News' },
+		                    { id: 'about', title: 'About ' + app.config.site.name },
+		                    { id: 'news', title: app.config.site.name + ' News' },
+		                    { id: 'tour', title: 'Take a Tour' },
 		                    { id: 'faq', title: 'Frequently Asked Questions' },
 		                    { id: 'tos', title: 'Terms of Service' },
 		                    {},
-		                    { id: 'contact', title: 'Contact' }
+		                    { id: 'software', title: 'Software', items: [
+		                        { id: 'about', title: 'About' },
+		                        { id: 'download', title: 'Download' },
+		                        { id: 'report', title: 'Report a Bug' }
+		                    ] },
+		                    {},
+		                    { id: 'contact', title: 'Contact ' + app.config.site.name }
 		                ] },
 		                { id: 'userMenu', title: 'User', items: [
-		                    { id: 'username', title: 'User: not logged in', disabled: true },
+		                    { id: 'username', title: 'User: ' + (isGuest ? 'not logged in' : app.user.username), disabled: true },
 		                    {},
-		                    { id: 'preferences', title: 'Preferences...', disabled: true, keyboard: 'control ,' },
+		                    { id: 'preferences', title: 'Preferences...', disabled: isGuest, keyboard: 'control ,' },
 		                    {},
-		                    { id: 'register', title: 'Create an Account...' },
-		                    { id: 'loginlogout', title: ['Login...', 'Logout...'] }
+		                    { id: 'register', title: 'Register...', disabled: !isGuest },
+		                    { id: 'loginlogout', title: isGuest ? 'Login...' : 'Logout...' }
 		                ] },
 		                { id: 'listMenu', title: 'List', items: [
 		                    { id: 'history', title: 'History', items: [
@@ -1135,7 +1526,7 @@ var pandora = new Ox.App({
 		                        url(id);
 		                } else if (data.id == 'ordermovies') {
 		                    var id = data.checked[0].id;
-		                    app.$ui.list.sortList(user.ui.sort[0].key, id == 'ascending' ? '' : '-');
+		                    app.$ui.list.sortList(app.user.ui.sort[0].key, id == 'ascending' ? '' : '-');
 		                } else if (data.id == 'sortmovies') {
 		                    var id = data.checked[0].id,
 		                        operator = Ox.getObjectById(app.config.sortKeys, id).operator;
@@ -1174,128 +1565,14 @@ var pandora = new Ox.App({
 		                        ],
 		                        height: 498,
 		                        id: 'home',
-		                        title: app.options('name'),
+		                        title: app.config.site.name,
 		                        width: 800
 		                    }).open();
+		                } else if (data.id == 'register') {
+		                    app.$ui.accountDialog = ui.accountDialog('register').open();
 		                } else if (data.id == 'loginlogout') {
-		                    var $form = new Ox.Form({
-		                            error: 'Unknown username or wrong password',
-		                            id: 'login',
-		                            items: [
-		                                {
-		                                    element: new Ox.Input({
-		                                        autovalidate: function(value, blur, callback) {
-		                                            var length = value.length;
-		                                            value = $.map(value.toLowerCase().split(''), function(v, i) {
-		                                                if (new RegExp('[a-z0-9' + ((i == 0 || (i == length - 1 && blur)) ? '' : '\- ') + ']')(v)) {
-		                                                    return v
-		                                                } else {
-		                                                    return null;
-		                                                }
-		                                            }).join('');
-		                                            $.each(['--', '- ', ' -', '--'], function(i, v) {
-		                                                while (value.indexOf(v) > -1) {
-		                                                    value = value.replace(new RegExp(v, 'g'), v[0]);
-		                                                }
-		                                            })
-		                                            callback(value);
-		                                        },
-		                                        id: 'username',
-		                                        label: 'Username',
-		                                        labelWidth: 120,
-		                                        validate: function(value, callback) {
-		                                            pandora.api.findUser({
-		                                                key: 'username',
-		                                                value: value,
-		                                                operator: '='
-		                                            }, function(result) {
-		                                                Ox.print('result', result)
-		                                                var valid = result.data.users.length == 1;
-		                                                callback({
-		                                                    message: 'Unknown Username',
-		                                                    valid: valid
-		                                                });
-		                                            });
-		                                        },
-		                                        width: 300
-		                                    })
-		                                },
-		                                {
-		                                    element: new Ox.Input({
-		                                        id: 'password',
-		                                        label: 'Password',
-		                                        labelWidth: 120,
-		                                        type: 'password',
-		                                        validate: /.+/,
-		                                        width: 300
-		                                    })
-		                                }
-		                            ],
-		                            submit: function(data, callback) {
-		                                pandora.api.login(data, function(result) {
-		                                    if (result.status.code == 200) {
-		                                        $dialog.close();
-		                                        app.user = result.data.user;
-		                                        app.$ui.mainMenu.getItem('username').options({
-		                                            title: 'User: ' + app.user.name
-		                                        });
-		                                        app.$ui.mainMenu.getItem('preferences').options({
-		                                            disabled: false
-		                                        });
-		                                        app.$ui.mainMenu.getItem('register').options({
-		                                            disabled: true
-		                                        });
-		                                    } else {
-		                                        callback([{ id: 'password', message: 'Incorrect Password' }]);
-		                                    }
-		                                });
-		                            }
-		                        })
-		                        .bindEvent({
-		                            validate: function(event, data) {
-		                                $dialog[(data.valid ? 'enable' : 'disable') + 'Button']('signin');
-		                            }
-		                        }),
-		                        $dialog = new Ox.Dialog({
-		                            buttons: [
-		                                [
-		                                    {
-		                                        click: function() {
-
-		                                        },
-		                                        id: 'signup',
-		                                        title: 'Sign up...'
-		                                    },
-		                                    {
-		                                        click: function() {
-
-		                                        },
-		                                        id: 'reset',
-		                                        title: 'Reset Password...'
-		                                    }
-		                                ],
-		                                [
-		                                    {
-		                                        click: function() {
-		                                            $dialog.close();
-		                                            app.$ui.mainMenu.getItem('loginlogout').toggleTitle();
-		                                        },
-		                                        id: 'cancel',
-		                                        title: 'Cancel'
-		                                    },
-		                                    {
-		                                        click: $form.submit,
-		                                        disabled: true,
-		                                        id: 'signin',
-		                                        title: 'Sign in'
-		                                    }
-		                                ]
-		                            ],
-		                            id: 'login',
-		                            minWidth: 332,
-		                            title: 'Sign in',
-		                            width: 332
-		                        }).append($form).open();
+		                    app.$ui.accountDialog = (app.user.group == 'guest' ?
+		                        ui.accountDialog('login') : ui.accountLogoutDialog()).open();
 		                } else if (data.id == 'places') {
 		                    var $manage = new Ox.SplitPanel({
 		                            elements: [
@@ -1610,10 +1887,18 @@ var pandora = new Ox.App({
                 orientation: 'vertical'
             })
             .bindEvent('resize', function(event, data) {
-                resizeGroups(data);
-                app.$ui.list.size();
-                if (app.user.ui.listView == 'map') {
-                    app.$ui.map.triggerResize();
+                if (!app.user.ui.item) {
+                    resizeGroups(data);
+                    app.$ui.list.size();
+                    if (app.user.ui.listView == 'map') {
+                        app.$ui.map.triggerResize();
+                    }
+                } else {
+                    if (app.user.ui.itemView == 'timeline') {
+                        app.$ui.editor.options({
+    						width: data
+    					});
+    				}
                 }
             });
 			return that;
@@ -1634,11 +1919,11 @@ var pandora = new Ox.App({
 		},
 		sectionButtons: function() {
 		    var that = new Ox.ButtonGroup({
-                    buttons: items = [
-    					{id: 'site', title: app.config.site.name},
-                        {id: 'items', title: app.config.itemName.plural},
-                        {id: 'texts', title: 'Texts'},
-    					{id: 'admin', title: 'Admin'}
+                    buttons: [
+    					{id: 'site', selected: app.user.ui.section == 'site', title: app.config.site.name},
+                        {id: 'items', selected: app.user.ui.section == 'items', title: app.config.itemName.plural},
+                        {id: 'texts', selected: app.user.ui.section == 'texts', title: 'Texts'},
+    					{id: 'admin', selected: app.user.ui.section == 'admin', title: 'Admin'}
                     ],
                     id: 'sectionButtons',
                     selectable: true
@@ -1652,8 +1937,24 @@ var pandora = new Ox.App({
 			var that = new Ox.Element();
 			var $sections = [];
 		    $.each(app.user.ui.sections, function(i, id) {
+		        var menu = [];
+		        if (id == 'lists') {
+		            menu = [
+		                { id: 'new', title: 'New List...' },
+		                { id: 'newfromselection', title: 'New List from Selection...' },
+		                { id: 'newsmart', title: 'New Smart List...' },
+		                { id: 'newfromresults', title: 'New Smart List from Results...' },
+		                {},
+		                { id: 'addselection', title: 'Add Selection to List...' }
+		            ];
+		        } else if (id == 'public') {
+		            menu = [
+		                { id: 'browse', title: 'More Public Lists...' },
+		            ];
+		        }
 		        var $section = new Ox.CollapsePanel({
 		            id: id,
+		            menu: menu,
 		            size: 16,
 		            title: Ox.getObjectById(app.config.sections, id).title
 		        });
@@ -1681,11 +1982,11 @@ var pandora = new Ox.App({
         sectionSelect: function() {
 		    var that = new Ox.Select({
 		            id: 'sectionSelect',
-                    items: items = [
-    					{id: 'site', title: app.config.site.name},
-                        {id: 'items', title: app.config.itemName.plural},
-                        {id: 'texts', title: 'Texts'},
-    					{id: 'admin', title: 'Admin'}
+                    items: [
+    					{checked: app.user.ui.section == 'site', id: 'site', title: app.config.site.name},
+                        {checked: app.user.ui.section == 'items', id: 'items', title: app.config.itemName.plural},
+                        {checked: app.user.ui.section == 'texts', id: 'texts', title: 'Texts'},
+    					{checked: app.user.ui.section == 'admin', id: 'admin', title: 'Admin'}
                     ]
                 }).css({
 	                float: 'left',
@@ -1748,10 +2049,10 @@ var pandora = new Ox.App({
 			var that = new Ox.Select({
                     id: 'viewSelect',
                     items: $.map(app.config.listViews, function(view, i) {
-                        view.title = 'View ' + view.title
-                        return $.extend({
+                        return $.extend($.extend({}, view), {
                             checked: app.user.ui.listView == view.id,
-                        }, view);
+                            title: 'View ' + view.title
+                        });
                     }),
                     width: 144
                 })
@@ -1763,9 +2064,6 @@ var pandora = new Ox.App({
                     var id = data.selected[0].id;
                     app.user.ui.listView = id;
                     app.$ui.mainMenu.checkItem('viewMenu_movies_' + id);
-                    //$ui.list.$element.replaceWith(constructList(id));
-                    // Ox.print('change ... id', id, list = app.constructList(id), list.options(), list.options('id'))
-                    //$ui.contentPanel.replace('list', constructList(id));
                     app.$ui.contentPanel.replace(1, app.$ui.list = ui.list(id));
                 });
 			return that;
@@ -1931,6 +2229,78 @@ var pandora = new Ox.App({
 	    };
 
 	})();
+
+    var URL = (function() {
+
+        var old = {
+                user: {
+                    ui: {}
+                }
+            },
+            regexps = {
+    			'^(|about|faq|home|news|software|terms|tour)$': function(url) {
+			        app.user.ui.section = 'site';
+			        app.user.ui.sitePage = url;
+    			},
+    			'^(|find)$': function() {
+			        app.user.ui.section = 'items';
+			        app.user.ui.item = '';
+    			},
+    			'^(calendar|calendars|clips|icons|flow|map|maps|timelines)$': function() {
+			        app.user.ui.section = 'items';
+			        app.user.ui.item = '';
+			        app.user.ui.listView = url;
+    			},
+                '^[0-9A-Z]': function() {
+    				var split = url.split('/'),
+					    item = split[0],
+		        	    view = new RegExp(
+		        	        '^(calendar|clips|files|info|map|player|statistics|timeline)$'
+		        	    )(split[1]) || app.user.ui.itemView;
+    				app.user.ui.section = 'items';
+    				app.user.ui.item = item;
+    				app.user.ui.itemView = view;
+    			},
+    			'^texts$': function() {
+    			    app.user.ui.section = 'texts';
+    			},
+    			'^admin$': function() {
+    			    app.user.ui.section = 'admin';
+    			}
+            };
+
+        return {
+
+            set: function(url) {
+                history.pushState({}, '', '/' + url);
+                old.user.ui = $.extend({}, app.user.ui); // make a clone
+                URL.update();
+            },
+
+            parse: function() {
+                url = document.location.pathname.substr(1) + document.location.hash;
+                $.each(regexps, function(re, fn) {
+                    Ox.print(url, 're', re)
+                    re = new RegExp(re);
+        			if (re(url)) {
+        				fn(url);
+        				return false;
+        			}
+                });
+            },
+
+            update: function() {
+                URL.parse();
+                if (!old.user.ui.item && app.user.ui.item) {
+                    ui.item(app.user.ui.item, app.user.ui.itemView).display();
+                } else if (old.user.ui.item && !app.user.ui.item) {
+                    ui.list(app.user.ui.listView).display();
+                }
+            }
+
+        }
+
+    }());
 
 	var url = function(url) {
 		var currentURL = document.location.pathname.substr(1) + document.location.hash,
