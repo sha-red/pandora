@@ -17,11 +17,7 @@ from django.shortcuts import render_to_response, get_object_or_404, get_list_or_
 from django.template import RequestContext
 from django.conf import settings
 
-try:
-    import simplejson as json
-except ImportError:
-    from django.utils import simplejson as json
-
+from ox.utils import json
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 from ox.django.http import HttpFileResponse
@@ -84,7 +80,8 @@ def update(request):
     if 'files' in data:
         #update files info async, this takes to long otherwise
         #FIXME: how can client know if update is done? possibly with taksStatus?
-        t = tasks.update_files.delay(user.username, data['volume'], data['files'])
+        task_id = '_'.join(['update', user.username, data['volume']])
+        t = tasks.update_files.apply_async(args=[user.username, data['volume'], data['files']], task_id=task_id)
         response['data']['taskId'] = t.task_id
 
         user_profile = user.get_profile()
@@ -192,7 +189,8 @@ def firefogg_upload(request):
                     f.save()
                     #FIXME: this fails badly if rabbitmq goes down
                     try:
-                        t = item.tasks.update_streams.delay(f.item.itemId)
+                        taks_id = 'update_streams_%s' % f.item.itemId
+                        t = item.tasks.update_streams.apply_async(args=[f.item.itemId], task_id=task_id)
                         data['resultUrl'] = t.task_id
                     except:
                         pass
