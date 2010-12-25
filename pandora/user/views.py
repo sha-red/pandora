@@ -226,66 +226,68 @@ def resetPassword(request):
     return render_to_json_response(response)
 actions.register(resetPassword)
 
-class RecoverForm(forms.Form):
-    username_or_email = forms.TextInput()
-
 def requestToken(request):
     '''
         param data {
-            username_or_email: username
+            username: username,
+            email: email
         }
         
         return {
             status: {'code': int, 'text': string}
             data: {
                 errors: {
-                    username_or_email: 'Username or email address not found'
+                    username: 'Unknown Username'
+                    email: 'Unknown Email'
                 }
                 username: user
             }
         }
     '''
     data = json.loads(request.POST['data'])
-    form = RegisterForm(data, request.FILES)
-    if form.is_valid():
-        username = data['username_or_email']
-        user = None
-        q = models.User.objects.filter(username=username)
-        if q.count() > 0:
-            user = q[0]
-        else:
-            q = models.User.objects.filter(email=username)
-            if q.count() > 0:
-                user = q[0]
-        if user:
-            while True:
-                token = ox.to32(random.randint(32768, 1048575))
-                if models.UserProfile.objects.filter(reset_token=token).count() == 0:
-                    break
-            user_profile = user.get_profile()
-            user_profile.reset_token = token
-            user_profile.save()
+    user = None
+    if 'username' in data:
+        try:
+            user = models.User.objects.get(username=data['username'])
+        except models.User.DoesNotExist:
+            user = None
+    elif 'email' in data:
+        try:
+            user = models.User.objects.get(email=data['email'])
+        except models.User.DoesNotExist:
+            user = None
+    if user:
+        while True:
+            token = ox.to32(random.randint(32768, 1048575))
+            if models.UserProfile.objects.filter(reset_token=token).count() == 0:
+                break
+        user_profile = user.get_profile()
+        user_profile.reset_token = token
+        user_profile.save()
 
-            template = loader.get_template('password_reset_email.txt')
-            context = RequestContext(request, {
-                'url': request.build_absolute_uri("/"),
-                'token': token,
-                'sitename': settings.SITENAME,
-            })
-            message = template.render(context)
-            subject = '%s password reset' % settings.SITENAME
-            user.email_user(subject, message)
-            response = json_response({
-                'username': user.username
-            }, text='recover email sent')
-        else:
-            response = json_response({
-                'errors': {
-                    'username_or_email': 'Username or email address not found'
-                }
-            })
+        template = loader.get_template('password_reset_email.txt')
+        context = RequestContext(request, {
+            'url': request.build_absolute_uri("/"),
+            'token': token,
+            'sitename': settings.SITENAME,
+        })
+        message = template.render(context)
+        subject = '%s password reset' % settings.SITENAME
+        user.email_user(subject, message)
+        response = json_response({
+            'username': user.username
+        }, text='password reset email sent')
     else:
-        response = json_response(status=400, text='invalid data')
+        response = json_response({
+            'errors': {
+            }
+        })
+        if 'username' in data:
+            response['data']['errors']['username'] = 'Unknown Username'
+        elif 'email' in data:
+            response['data']['errors']['email'] = 'Unknown Email'
+        else:
+            response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)
 actions.register(requestToken)
 
