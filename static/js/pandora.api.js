@@ -89,7 +89,7 @@ function constructList() {
         ]
     }).bindEvent({
        select: function(event, data) {
-           var info = $('<div>'),
+           var info = $('<div>').addClass('OxSelectable'),
                hash = '#';
            $.each(data.ids, function(v, k) {
                 console.log(k)
