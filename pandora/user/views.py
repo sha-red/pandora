@@ -272,7 +272,7 @@ def requestToken(request):
             'sitename': settings.SITENAME,
         })
         message = template.render(context)
-        subject = '%s password reset' % settings.SITENAME
+        subject = '%s - Reset Password' % settings.SITENAME
         user.email_user(subject, message)
         response = json_response({
             'username': user.username
@@ -309,7 +309,7 @@ def findUser(request):
     data = json.loads(request.POST['data'])
     response = json_response(status=200, text='ok')
     if data['key'] == 'email':
-        response['data']['users'] = [u.email for u in User.objects.filter(email__iexact=data['value'])]
+        response['data']['users'] = [u.username for u in User.objects.filter(email__iexact=data['value'])]
     else:
         response['data']['users'] = [u.username for u in User.objects.filter(username__iexact=data['value'])]
     return render_to_json_response(response)
