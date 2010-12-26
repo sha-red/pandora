@@ -40,15 +40,18 @@ var pandora = new Ox.App({
 
 	function load() {
 
-	    Ox.Request.requests() && app.$ui.loadingIcon.start();
-	    Ox.Event.bind('', 'requestStart', function() {
-	        Ox.print('requestStart')
-	        app.$ui.loadingIcon.start();
-	    });
-	    Ox.Event.bind('', 'requestStop', function() {
-	        Ox.print('requestStop')
-	        app.$ui.loadingIcon.stop();
-	    });
+        $(function() {
+            var $body = $('body');
+    	    Ox.Request.requests() && app.$ui.loadingIcon.start();
+    	    $body.bind('requestStart', function() {
+    	        Ox.print('requestStart')
+    	        app.$ui.loadingIcon.start();
+    	    });
+    	    $body.bind('requestStop', function() {
+    	        Ox.print('requestStop')
+    	        app.$ui.loadingIcon.stop();
+    	    });
+        });
 
 		Query.fromString(location.hash.substr(1));
 
@@ -86,180 +89,308 @@ var pandora = new Ox.App({
 
     function login(data) {
         app.user = data.user;
+        //Ox.Event.unbindAll();
         app.$ui.appPanel.reload();
     }
 
     function logout(data) {
         app.user = data.user;
+        //Ox.Event.unbindAll();
         app.$ui.appPanel.reload();
     }
 
 	var ui = {
-	    accountCodeInput: function() {
-	        return new Ox.Input({
-                id: 'code',
-                label: 'Code',
-                labelWidth: 100,
-                validate: function(value, callback) {
-                    callback({
-                        message: 'Missing Code',
-                        valid: value.length > 0
-                    });
-                },
-                width: 368
-            });
-	    },
 	    accountDialog: function(action) {
-	        var buttonTitle = {
-                    login: 'Login',
-                    register: 'Register',
-                    reset: 'Reset Password',
-                    resetlogin: 'Reset Password and Login'
-                },            
-	            buttons = {
-    	            login: ['register', 'reset'],
-    	            register: ['login'],
-    	            reset: ['login'],
-    	            resetlogin: ['login']
-	            },
-    	        text = {
-                    login: '',
-                    register: '',
-                    reset: 'To reset your password, please enter your username or e-mail address.',
-                    resetlogin: 'To login to your account, please choose a new password, and enter the code that we have e-mailed you.'
-                },
-                title = {
-                    login: 'Login',
-                    register: 'Register',
-                    reset: 'Reset Password',
-                    resetlogin: 'Reset Password'
-                };
-	        var that = new Ox.Dialog({
-    	            buttons: [
-    	                $.map(buttons[action], function(v) {
-                            return button(v);
-                        }),
-                        [button('cancel'), button('submit')]
-                    ],
-                    content: app.$ui.accountForm = ui.accountForm(action),
-                    height: 200,
+	        var that = new Ox.Dialog($.extend({
+                    height: 256,
                     id: 'accountDialog',
-                    minHeight: 200,
-                    minWidth: 400,
-                    title: title[action],
-                    width: 400
-    	        })
+                    minHeight: 256,
+                    minWidth: 384,
+                    width: 384
+    	        }, ui.accountDialogOptions(action)))
     	        .bindEvent({
     	            resize: function(event, data) {
                         var width = data.width - 32;
                         app.$ui.accountForm.items.forEach(function(item) {
-                            item.options({width: width})
+                            item.options({width: width});
                         });
                     }
     	        });
-    	    function button(type) {
-    	        if (type == 'cancel') {
+	        return that;
+	    },
+	    accountDialogOptions: function(action, value) {
+	        Ox.print('ACTION', action)
+            app.$ui.accountForm && app.$ui.accountForm.remove();
+	        var buttons = {
+	                login: ['register', 'reset'],
+	                register: ['login'],
+	                reset: ['login'],
+	                resetAndLogin: []
+                },
+                buttonTitle = {
+                    login: 'Login',
+                    register: 'Register',
+                    reset: 'Reset Password',
+                    resetAndLogin: 'Reset Password and Login'
+                },
+                dialogText = {
+                    login: 'To login to your account, please enter your username and password.',
+                    register: 'To create a new account, please choose a username and password, and enter your e-mail address.',
+                    reset: 'To reset your password, please enter either your username or your e-mail address.',
+                    resetAndLogin: 'To login to your account, please choose a new password, and enter the code that we have just e-mailed to you.'
+                },
+                dialogTitle = {
+                    login: 'Login',
+                    register: 'Register',
+                    reset: 'Reset Password',
+                    resetAndLogin: 'Reset Password'
+                };
+            function button(type) {
+                if (type == 'cancel') {
     	            return new Ox.Button({
-                        id: 'cancel',
+                        id: 'cancel' + Ox.toTitleCase(action),
                         title: 'Cancel'
                     }).bindEvent('click', function() {
-                        that.close();
-                    })
+                        app.$ui.accountDialog.close();
+                    });
     	        } else if (type == 'submit') {
     	            return new Ox.Button({
                         disabled: true,
-                        id: 'submit',
+                        id: 'submit' + Ox.toTitleCase(action),
                         title: buttonTitle[action]
                     }).bindEvent('click', function() {
-                        app.$ui.accountForm.submit()
-                    })
+                        app.$ui.accountForm.submit();
+                    });
     	        } else {
     	            return new Ox.Button({
     	                id: type,
-    	                title: title[type] + '...'
+    	                title: buttonTitle[type] + '...'
     	            }).bindEvent('click', function() {
-        	            action = type;
-                        that.options({
-                            buttons: [
-                                $.map(buttons[type], function(v) {
-                                    return button(v);
-                                }),
-                                [button('cancel'), button('submit')]
-                            ],
-                            content: app.$ui.accountForm = ui.accountForm(type),
-                            title: title[type]
-                        });
+    	                Ox.print('CLICK EVENT', type)
+                        app.$ui.accountDialog.options(ui.accountDialogOptions(type));
                     });
     	        }
-    	    }
-	        return that;
-	    },
-	    accountEmailInput: function() {
-	        return new Ox.Input({
-                id: 'email',
-                label: 'E-Mail Address',
-                labelWidth: 100,
-                type: 'email',
-                validate: function(value, callback) {
-                    callback({
-                        message: 'Missing E-Mail Address',
-                        valid: value.length > 0
-                    });
-                },
-                width: 368
-            });
-	    },
-	    accountForm: function(action) {
-	        app.$ui.codeInput = ui.accountEmailInput();
-	        app.$ui.emailInput = ui.accountEmailInput();
-	        app.$ui.passwordInput = ui.accountPasswordInput();
-	        app.$ui.usernameInput = ui.accountUsernameInput();
-	        app.$ui.usernameOrEmailInput = ui.accountUsernameOrEmailInput();
-	        var items = {
-	                'login': [
-	                    app.$ui.usernameInput,
-	                    app.$ui.passwordInput
-	                ],
-	                'register': [
-                        app.$ui.usernameInput,
-                        app.$ui.passwordInput,
-                        app.$ui.emailInput
-	                ],
-	                'reset': [
-	                    app.$ui.usernameOrEmailInput
-	                ],
-	                'resetlogin': [
-	                    app.$ui.usernameInput,
-	                    app.$ui.passwordInput,
-	                    app.$ui.codeInput
-	                ]
-	            },
-	            that = new Ox.Form({
-                    error: 'Unknown username or wrong password',
-                    id: 'accountForm',
-                    items: $.map(items[action], function(v, i) {
-                        return {element: v};
+            }
+            return {
+                buttons: [
+    	            $.map(buttons[action], function(type) {
+                        return button(type);
                     }),
+                    [button('cancel'), button('submit')]
+                ],
+                content: new Ox.Element('div')
+                    .append(
+                        new Ox.Element('div')
+                            .addClass('OxText')
+                            .html(dialogText[action] + '<br/><br/>')
+                    )
+                    .append(
+                        app.$ui.accountForm = ui.accountForm(action, value)
+                    ),
+                keys: {
+    	            enter: 'submit' + Ox.toTitleCase(action),
+    	            escape: 'cancel' + Ox.toTitleCase(action)
+    	        },
+                title: dialogTitle[action]
+            };
+	    },
+	    accountForm: function(action, value) {
+	        if (app.$ui.accountForm) {
+	            app.$ui.accountForm.items.forEach(function(item) {
+	                if (item.options('id') == 'usernameOrEmail') {
+	                    Ox.print('REMOVING')
+	                    //Ox.Event.unbind('usernameOrEmailSelect')
+	                    //Ox.Event.unbind('usernameOrEmailSelectMenu')
+	                    //Ox.Event.unbind('usernameOrEmailInput')
+	                }
+	                Ox.print('REMOVING ITEM', item.options('id'));
+	                item.remove();
+	            });
+	        }
+	        var items = {
+	                'login': ['username', 'password'],
+	                'register': ['newUsername', 'password', 'email'],
+	                'reset': ['usernameOrEmail'],
+	                'resetAndLogin': ['oldUsername', 'newPassword', 'code']
+	            },
+	            $items = $.map(items[action], function(v) {
+                    return item(v, value);
+                }),
+	            that = new Ox.Form({
+                    id: 'accountForm' + Ox.toTitleCase(action),
+                    items: $items,
                     submit: function(data, callback) {
-                        pandora.api.login(data, function(result) {
-                            if (!result.data.errors) {
-                                app.$ui.accountDialog.close();
-                                login(result.data);
-                            } else {
-                                callback([{id: 'password', message: 'Incorrect Password'}]);
-                            }
-                        });
+                        if (action == 'login') {
+                            pandora.api.login(data, function(result) {
+                                if (!result.data.errors) {
+                                    app.$ui.accountDialog.close();
+                                    login(result.data);
+                                } else {
+                                    callback([{id: 'password', message: 'Incorrect password'}]);
+                                }
+                            });
+                        } else if (action == 'register') {
+                            pandora.api.register(data, function(result) {
+                                if (!result.data.errors) {
+                                    app.$ui.accountDialog.close();
+                                    login(result.data);
+                                    ui.accountWelcomeDialog().open();
+                                } else {
+                                    callback([{id: 'password', message: result.data.errors.toString()}]); // fixme
+                                }
+                            });
+                        } else if (action == 'reset') {
+                            var usernameOrEmail = data.usernameOrEmail;
+                            data = {};
+                            data[usernameOrEmail[0].id] = usernameOrEmail[1];
+                            pandora.api.requestToken(data, function(result) {
+                                if (!result.data.errors) {
+                                    app.$ui.accountDialog.options(ui.accountDialogOptions('resetAndLogin', result.data.username));
+                                } else {
+                                    callback([{id: 'usernameOrEmail', message: result.data.errors.username_or_email}])
+                                }
+                            });
+                        } else if (action == 'resetAndLogin') {
+                            pandora.api.resetPassword(data, function(result) {
+                                if (!result.data.errors) {
+                                    app.$ui.accountDialog.close();
+                                    login(result.data);
+                                } else {
+                                    callback([{id: 'code', message: 'Incorrect code'}]);
+                                }
+                            })
+                        }
                     }
-                })
-                .bindEvent({
+                }).bindEvent({
                     submit: function(event, data) {
                 
                     },
                     validate: function(event, data) {
-                        app.$ui.accountDialog[(data.valid ? 'enable' : 'disable') + 'Button']('submit');
+                        Ox.print('FORM VALIDATE', data)
+                        app.$ui.accountDialog[
+                            (data.valid ? 'enable' : 'disable') + 'Button'
+                        ]('submit' + Ox.toTitleCase(action));
                     }
                 });
-            that.items = items[action];
+            that.items = $items;
+            function item(type, value) {
+                if (type == 'code') {
+                    return new Ox.Input({
+                        autovalidate: autovalidateCode,
+                        id: 'code',
+                        label: 'Code',
+                        labelWidth: 120,
+                        validate: function(value, callback) {
+                            callback({
+                                message: 'Missing code',
+                                valid: !!value.length
+                            });
+                        },
+                        width: 352
+                    });
+                } else if (type == 'email') {
+                    return new Ox.Input({
+                        autovalidate: autovalidateEmail,
+                        id: 'email',
+                        label: 'E-Mail Address',
+                        labelWidth: 120,
+                        type: 'email',
+                        validate: validateUser('email'),
+                        width: 352
+                    });
+                } else if (type == 'newPassword') {
+                    return new Ox.Input({
+                        autovalidate: /.+/,
+                        id: 'password',
+                        label: 'New Password',
+                        labelWidth: 120,
+                        type: 'password',
+                        validate: function(value, callback) {
+                            callback({
+                                message: 'Missing password',
+                                valid: value.length > 0
+                            });
+                        },
+                        width: 352
+                    });
+                } else if (type == 'newUsername') {
+                    return new Ox.Input({
+                        autovalidate: autovalidateUsername,
+                        id: 'username',
+                        label: 'Username',
+                        labelWidth: 120,
+                        validate: validateUser('username'),
+                        width: 352
+                    });
+                } else if (type == 'oldUsername') {
+                    return new Ox.Input({
+                        disabled: true,
+                        id: 'username',
+                        label: 'Username',
+                        labelWidth: 120,
+                        value: value,
+                        width: 352
+                    });
+                } else if (type == 'password') {
+                    return new Ox.Input({
+        	            autovalidate: /.+/,
+                        id: 'password',
+                        label: 'Password',
+                        labelWidth: 120,
+                        type: 'password',
+                        validate: function(value, callback) {
+                            callback({
+                                message: 'Missing Password',
+                                valid: value.length > 0
+                            });
+                        },
+                        width: 352
+                    });
+                } else if (type == 'username') {
+                    return new Ox.Input({
+                        autovalidate: autovalidateUsername,
+                        id: 'username',
+                        label: 'Username',
+                        labelWidth: 120,
+                        validate: validateUser('username', true),
+                        width: 352
+                    });    
+                } else if (type == 'usernameOrEmail') {
+                    return new Ox.FormElementGroup({
+                        id: 'usernameOrEmail',
+                        elements: [
+                            app.$ui.usernameOrEmailSelect = new Ox.Select({
+                                    id: 'usernameOrEmailSelect',
+                                    items: [
+                                        {id: 'username', title: 'Username'},
+                                        {id: 'email', title: 'E-Mail Address'},
+                                    ],
+                                    overlap: 'right',
+                                    width: 120
+                                })
+                                .bindEvent({
+                                    change: function(event, data) {
+                                        var selected = data.selected[0].id;
+                                        app.$ui.usernameOrEmailInput.options({
+                                            autovalidate: selected == 'username' ? autovalidateUsername : autovalidateEmail,
+                                            validate: validateUser(selected, true),
+                                            value: ''
+                                        }).focus();
+                                    }
+                                }),
+                            app.$ui.usernameOrEmailInput = new Ox.Input({
+                                autovalidate: autovalidateUsername,
+                                id: 'usernameOrEmailInput',
+                                validate: validateUser('username', true),
+                                width: 232
+                            })
+                        ],
+                        separators: [
+                            {title: '', width: 0}
+                        ]
+                    });
+                }
+            }
             return that;	        
 	    },
         accountLogoutDialog: function() {
@@ -273,7 +404,7 @@ var pandora = new Ox.App({
                             app.$ui.mainMenu.getItem('loginlogout').toggleTitle();
                         }),
                         new Ox.Button({
-                            id: 'submit',
+                            id: 'logout',
                             title: 'Logout'
                         }).bindEvent('click', function() {
                             that.close();
@@ -282,86 +413,41 @@ var pandora = new Ox.App({
                             });
                         })
                     ],
+                    content: new Ox.Element('div').html('Are you sure you want to logout?'),
                     height: 160,
+                    keys: {enter: 'logout', escape: 'cancel'},
                     title: 'Logout',
                     width: 300
-                })
-                .append(
-                    new Ox.Element('div')
-                        .html('Are you sure you want to logout?')
-                )
+                });
             return that;
         },
-	    accountPasswordInput: function() {
-	        return new Ox.Input({
-	            autovalidate: /.+/,
-                id: 'password',
-                label: 'Password',
-                labelWidth: 100,
-                type: 'password',
-                validate: function(value, callback) {
-                    callback({
-                        message: 'Missing Password',
-                        valid: value.length > 0
-                    });
-                },
-                width: 368
-            });
-	    },
-	    accountUsernameInput: function() {
-	        return new Ox.Input({
-                autovalidate: function(value, blur, callback) {
-                    var length = value.length;
-                    value = $.map(value.toLowerCase().split(''), function(v, i) {
-                        if (new RegExp('[a-z0-9' + ((i == 0 || (i == length - 1 && blur)) ? '' : '\-_') + ']')(v)) {
-                            return v
-                        } else {
-                            return null;
-                        }
-                    }).join('');
-                    $.each(['--', '-_', '_-', '__'], function(i, v) {
-                        while (value.indexOf(v) > -1) {
-                            value = value.replace(new RegExp(v, 'g'), v[0]);
-                        }
-                    })
-                    callback(value);
-                },
-                id: 'username',
-                label: 'Username',
-                labelWidth: 100,
-                validate: function(value, callback) {
-                    !value.length ? callback({
-                        message: 'Missing Username',
-                        valid: false
-                    }) : pandora.api.findUser({
-                        key: 'username',
-                        value: value,
-                        operator: '='
-                    }, function(result) {
-                        Ox.print('result', result)
-                        var valid = result.data.users.length == 1;
-                        callback({
-                            message: 'Unknown Username',
-                            valid: valid
-                        });
-                    });
-                },
-                width: 368
-            });
-	    },
-        accountUsernameOrEmailInput: function() {
-            return new Ox.Input({
-                id: 'email',
-                label: 'Username or E-Mail Address',
-                labelWidth: 184,
-                validate: function(value, callback) {
-                    callback({
-                        message: 'Missing Username or E-Mail Address',
-                        valid: value.length > 0
-                    });
-                },
-                width: 368
-            });
+        accountWelcomeDialog: function() {
+            var that = new Ox.Dialog({
+                    buttons: [
+                        [
+                            new Ox.Button({
+                                id: 'preferences',
+                                title: 'Preferences...'
+                            }).bindEvent('click', function() {
+                                that.close();
+                            })
+                        ],
+                        [
+                            new Ox.Button({
+                                id: 'close',
+                                title: 'Close'
+                            }).bindEvent('click', function() {
+                                that.close();
+                            })
+                        ]
+                    ],
+                    content: new Ox.Element('div').html('Welcome, ' + app.user.username + '!<br/><br/>Your account has been created.'),
+                    height: 160,
+                    keys: {enter: 'close', escape: 'close'},
+                    title: 'Welcome to ' + app.config.site.name,
+                    width: 300
+                });
+            return that;
         },
 		annotations: function() {
 			var that = new Ox.Element(),
@@ -410,9 +496,7 @@ var pandora = new Ox.App({
 				return that;
 			}
 			that.reload = function() {
-			    $.each($elements, function(i, $element) {
-			        $element.remove();
-			    });
+			    app.$ui.appPanel.remove();
 			    app.$ui.appPanel = ui.appPanel().appendTo(app.$ui.body);
 			    return that;
 			}
@@ -498,7 +582,11 @@ var pandora = new Ox.App({
                             })
                             .bindEvent('change', function(event, data) {
                                 var key = data.selected[0].id;
-                                app.user.ui.findQuery.conditions[0].key = key
+                                if (!app.user.ui.findQuery.conditions.length) {
+                                    app.user.ui.findQuery.conditions = [{key: key, value: '', operator: ''}];
+                                } else {
+                                    app.user.ui.findQuery.conditions[0].key = key;
+                                }
                                 app.$ui.mainMenu.checkItem('findMenu_find_' + key);
                                 app.$ui.findInput.focus();
                             }),
@@ -1201,15 +1289,17 @@ var pandora = new Ox.App({
 		                        });
 		                    app.$ui.previewDialog = new Ox.Dialog({
 		                            buttons: [
-		                                {
+		                                new Ox.Button({
 		                                    title: 'Close',
+		                                }).bindEvent({
 		                                    click: function() {
 		                                        app.$ui.previewDialog.close();
 		                                        delete app.$ui.previewDialog;
 		                                        app.$ui.list.closePreview();
 		                                    }
-		                                }
+		                                })
 		                            ],
+		                            content: app.$ui.previewImage,
 		                            height: dialogHeight,
 		                            id: 'previewDialog',
 		                            minHeight: app.ui.previewRatio >= 1 ? 128 / app.ui.previewRatio + 48 : 176,
@@ -1218,7 +1308,6 @@ var pandora = new Ox.App({
 		                            title: title,
 		                            width: dialogWidth
 		                        })
-		                        .append(app.$ui.previewImage)
 		                        .bindEvent('resize', function(event, data) {
 		                            var dialogRatio = data.width / (data.height - 48),
 		                                height, width;
@@ -1541,13 +1630,14 @@ var pandora = new Ox.App({
 		                if (data.id == 'about') {
 		                    var $dialog = new Ox.Dialog({
 		                        buttons: [
-		                            {
+		                            new Ox.Button({
+		                                id: 'closeAbout',
+		                                title: 'Close'
+		                            }).bindEvent({
 		                                click: function() {
 		                                    $dialog.close();
-		                                },
-		                                id: 'close',
-		                                title: 'Close'
-		                            }
+		                                }
+		                            })
 		                        ],
 		                        id: 'about',
 		                        title: 'About'
@@ -1555,13 +1645,14 @@ var pandora = new Ox.App({
 		                } else if (data.id == 'home') {
 		                    var $dialog = new Ox.Dialog({
 		                        buttons: [
-		                            {
+		                            new Ox.Button({
+		                                id: 'closeHome',
+		                                title: 'Close'
+		                            }).bindEvent({
 		                                click: function() {
 		                                    $dialog.close();
-		                                },
-		                                id: 'close',
-		                                title: 'Close'
-		                            }
+		                                }
+		                            })
 		                        ],
 		                        height: 498,
 		                        id: 'home',
@@ -2070,6 +2161,37 @@ var pandora = new Ox.App({
 		}
 	}
 
+    function autovalidateCode(value, blur, callback) {
+        value = $.map(value.toUpperCase().split(''), function(v) {
+            return /[0-9A-Z]/(v) ? v : null;
+        }).join('');
+        callback(value);
+    }
+
+    function autovalidateEmail(value, blur, callback) {
+        value = $.map(value.toLowerCase().split(''), function(v, i) {
+            return /[0-9a-z\.\+\-_@]/(v) ? v : null;
+        }).join('');
+        callback(value);
+    }
+
+    function autovalidateUsername(value, blur, callback) {
+        var length = value.length;
+        value = $.map(value.toLowerCase().split(''), function(v, i) {
+            if (new RegExp('[0-9a-z' + ((i == 0 || (i == length - 1 && blur)) ? '' : '\-_') + ']')(v)) {
+                return v
+            } else {
+                return null;
+            }
+        }).join('');
+        $.each(['--', '-_', '_-', '__'], function(i, v) {
+            while (value.indexOf(v) > -1) {
+                value = value.replace(new RegExp(v, 'g'), v[0]);
+            }
+        })
+        callback(value);
+    }
+
 	function getGroupWidth(pos, panelWidth) {
 	    var width = {};
 	    width.list = Math.floor(panelWidth / 5) + (panelWidth % 5 > pos);
@@ -2087,6 +2209,31 @@ var pandora = new Ox.App({
         $.each(app.$ui.groups, function(i, list) {
             list.resizeColumn('name', widths[i].column);
         });
+    }
+
+    function validateUser(key, existing) {
+        existing = existing || false;
+        var string = key == 'username' ? 'username' : 'e-mail address';
+        return function(value, callback) {
+            var valid = key == 'username' ? !!value.length : Ox.isValidEmail(value);
+            valid ? pandora.api.findUser({
+                key: key,
+                value: value,
+                operator: '='
+            }, function(result) {
+                var valid = existing == !!result.data.users.length;
+                Ox.print(existing, result.data.users)
+                callback({
+                    message: existing ? 
+                        'Unknown ' + string :
+                        string[0].toUpperCase() + string.substr(1) + ' already exists',
+                    valid: valid
+                });
+            }) : callback({
+                message: (!value.length ? 'Missing' : 'Invalid') + ' ' + string,
+                valid: false
+            });
+        };
     }
 
 	var Query = (function() {
