@@ -96,6 +96,8 @@ class File(models.Model):
                     self.display_aspect_ratio = "%s:%s" % (self.width, self.height)
                 self.is_video = True
                 self.is_audio = False
+                if self.name.endswith('.jpg') or self.name.endswith('.png') or self.duration == 0.04:
+                    self.is_video = False
             else:
                 self.is_video = False
             if 'audio' in self.info and self.info['audio']:
