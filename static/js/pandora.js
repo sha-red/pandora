@@ -240,14 +240,15 @@ var pandora = new Ox.App({
                                 }
                             });
                         } else if (action == 'reset') {
-                            var usernameOrEmail = data.usernameOrEmail;
+                            var usernameOrEmail = data.usernameOrEmail,
+                                key = usernameOrEmail[0].id;
                             data = {};
-                            data[usernameOrEmail[0].id] = usernameOrEmail[1];
+                            data[key] = usernameOrEmail[1];
                             pandora.api.requestToken(data, function(result) {
                                 if (!result.data.errors) {
                                     app.$ui.accountDialog.options(ui.accountDialogOptions('resetAndLogin', result.data.username));
                                 } else {
-                                    callback([{id: 'usernameOrEmail', message: result.data.errors.username_or_email}])
+                                    callback([{id: 'usernameOrEmail', message: 'Unknown ' + (key == 'username' ? 'username' : 'e-mail address')}])
                                 }
                             });
                         } else if (action == 'resetAndLogin') {
@@ -1620,6 +1621,7 @@ var pandora = new Ox.App({
 		                    var id = data.checked[0].id,
 		                        operator = Ox.getObjectById(app.config.sortKeys, id).operator;
 		                    app.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator === '' ? 'ascending' : 'descending'));
+		                    app.$ui.sortSelect.selectItem(id);
 		                    app.$ui.list.sortList(id, operator);
 		                } else if (data.id == 'viewmovies') {
 		                    var view = data.checked[0].id;
@@ -1631,7 +1633,7 @@ var pandora = new Ox.App({
 		                    var $dialog = new Ox.Dialog({
 		                        buttons: [
 		                            new Ox.Button({
-		                                id: 'closeAbout',
+		                                id: 'close',
 		                                title: 'Close'
 		                            }).bindEvent({
 		                                click: function() {
@@ -1646,7 +1648,7 @@ var pandora = new Ox.App({
 		                    var $dialog = new Ox.Dialog({
 		                        buttons: [
 		                            new Ox.Button({
-		                                id: 'closeHome',
+		                                id: 'close',
 		                                title: 'Close'
 		                            }).bindEvent({
 		                                click: function() {
@@ -1656,6 +1658,7 @@ var pandora = new Ox.App({
 		                        ],
 		                        height: 498,
 		                        id: 'home',
+		                        keys: {enter: 'close', escape: 'close'},
 		                        title: app.config.site.name,
 		                        width: 800
 		                    }).open();
@@ -2085,6 +2088,32 @@ var pandora = new Ox.App({
 	            });
 	        return that;
 		},
+        sortSelect: function() {
+            var that = new Ox.Select({
+                    id: 'sortSelect',
+                    items: $.map(app.config.sortKeys, function(key) {
+                        Ox.print('????', app.user.ui.sort.key, key.id)
+                        return $.extend($.extend({}, key), {
+                            checked: app.user.ui.sort[0].key == key.id,
+                            title: 'Sort by ' + key.title
+                        });
+                    }),
+                    width: 144
+                })
+                .css({
+                    float: 'left',
+                    margin: '4px 0 0 4px'
+                })
+                .bindEvent('change', function(event, data) {
+                    var id = data.selected[0].id,
+                        operator = Ox.getObjectById(app.config.sortKeys, id).operator;
+                    app.user.ui.listView = id;
+                    app.$ui.mainMenu.checkItem('sortMenu_sortmovies_' + id);
+                    app.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator === '' ? 'ascending' : 'descending'));
+                    app.$ui.list.sortList(id, operator);
+                });
+            return that;
+        },
 		status: function(key, data) {
 			var that = Ox.toTitleCase(key) + ': ' + [
 		        Ox.formatNumber(data.items) + ' movie' + (data.items != 1 ? 's' : ''),
@@ -2129,6 +2158,9 @@ var pandora = new Ox.App({
 			            app.$ui.viewSelect = ui.viewSelect() 
 			        )
 			        .append(
+			            app.$ui.sortSelect = ui.sortSelect()
+			        )
+			        .append(
 			            app.$ui.findElement = ui.findElement() 
 			        );
 			that.toggle = function() {
@@ -2139,7 +2171,7 @@ var pandora = new Ox.App({
 		viewSelect: function() {
 			var that = new Ox.Select({
                     id: 'viewSelect',
-                    items: $.map(app.config.listViews, function(view, i) {
+                    items: $.map(app.config.listViews, function(view) {
                         return $.extend($.extend({}, view), {
                             checked: app.user.ui.listView == view.id,
                             title: 'View ' + view.title
@@ -2149,7 +2181,7 @@ var pandora = new Ox.App({
                 })
                 .css({
                     float: 'left',
-                    margin: '4px'
+                    margin: '4px 0 0 4px'
                 })
                 .bindEvent('change', function(event, data) {
                     var id = data.selected[0].id;
