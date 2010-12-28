@@ -100,6 +100,13 @@ def stream(video, target, profile, info):
         audioquality = 0
         audiobitrate = None
         audiochannels = 1
+    elif profile == '240p':
+        height = 240
+
+        audiorate = 44100
+        audioquality = 0
+        audiobitrate = None
+        audiochannels = 1
     else:
         height = 96
 
