@@ -26,37 +26,96 @@ import ox
 import models
 from api.actions import actions
 
-@login_required_json
-def addLayer(request):
+
+def findAnnotation(request):
     '''
-        param data
-            {key: value}
+        param data {
+            fixme
+        }
+
+        return {
+            'status': {'code': int, 'text': string}
+            'data': {
+                annotations = [{..}, {...}, ...]
+            }
+        }
+    '''
+    #FIXME: implement findItem like queries
+    data = json.loads(request.POST['data'])
+    response = json_response(status=200, text='ok')
+    qs = models.Annotations.objects.filter(item__itemId=data['item'])
+    response['data']['annotations'] = [a.json() for a in qs]
+    return render_to_json_response(response)
+actions.register(findAnnotation)
+
+@login_required_json
+def addAnnotation(request):
+    '''
+        param data {
+            item: itemId,
+            layer: layerId,
+            start: float,
+            end: float,
+            value: string
+        }
         return {'status': {'code': int, 'text': string},
-                'data': {}}
+                'data': {
+                    'annotation': {}s
+                }
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    for key in ('item', 'layer', 'start', 'end', 'value'):
+        if key not in data:
+            return render_to_json_response(json_response(status=400, text='invalid data'))
+
+    item = get_object_or_404_json(models.Item, itemId=data['item'])
+    layer = get_object_or_404_json(models.Layer, layerId=data['layer'])
+    
+    annotation = models.Annotation(
+        item=item,
+        layer=layer,
+        user=request.user,
+        start=float(data['start']), start=float(data['end']),
+        value=data['value']
+    )
+    annotation.save()
+    response = json_response()
+    response['data']['annotation'] = annotation.json()
+    return render_to_json_response(response)
+
+    response = {'status': {'code': 501, 'text': 'not implemented'}}
+    return render_to_json_response(response)
+actions.register(addAnnotation)
+
+@login_required_json
+def removeAnnotation(request):
+    '''
+        param data {
+            id:
+        }
+        return {'status': {'code': int, 'text': string},
+                'data': {
+                }
+        }
     '''
     response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
-actions.register(addLayer)
+actions.register(removeAnnotation)
 
 @login_required_json
-def removeLayer(request):
+def editAnnotation(request):
     '''
-        param data
-            {key: value}
+        param data {
+            id:,
+            start: float,
+            end: float,
+            value: string,
+        }
         return {'status': {'code': int, 'text': string},
-                'data': {}}
-    '''
-    response = {'status': {'code': 501, 'text': 'not implemented'}}
-    return render_to_json_response(response)
-actions.register(removeLayer)
-
-@login_required_json
-def editLayer(request):
-    '''
-        param data
-            {key: value}
-        return {'status': {'code': int, 'text': string},
-                'data': {}}
+                'data': {
+                }
+        }
     '''
     response = json_response({})
     data = json.loads(request.POST['data'])
@@ -69,5 +128,5 @@ def editLayer(request):
 
     response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
-actions.register(editLayer)
+actions.register(editAnnotation)
 

@@ -23,6 +23,8 @@ from ox.utils import json
 from ox import stripTags
 from ox.normalize import canonicalTitle, canonicalName
 
+import utils
+
 
 class Layer(models.Model):
     class Meta:
@@ -70,7 +72,7 @@ class Annotation(models.Model):
     start = models.FloatField(default=-1)
     stop = models.FloatField(default=-1)
 
-    type = models.CharField(blank=True, max_length=255)
+    layer = models.ForeignKey(Layer)
     value = models.TextField()
 
     def editable(self, user):
@@ -80,6 +82,23 @@ class Annotation(models.Model):
             if user.groups.filter(id__in=obj.groups.all()).count() > 0:
                 return True
         return False
+
+    def html(self):
+        if self.layer.type == 'string':
+            return utils.html_parser(self.value)
+        else:
+            return self.value
+
+    def json(self):
+        return {
+            'id': self.id,
+            'user': self.user.username,
+            'start': self.start,
+            'stop': self.start,
+            'value': self.value,
+            'value_html': self.html(),
+            'layer': self.layer.name
+        }
 
     def __unicode__(self):
         return "%s/%s-%s" %(self.item, self.start, self.stop)
