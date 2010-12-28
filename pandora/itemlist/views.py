@@ -25,9 +25,7 @@ import ox
 
 from api.actions import actions
 
-'''
-    List API
-'''
+
 @login_required_json
 def addListItem(request):
     '''
@@ -45,7 +43,7 @@ def addListItem(request):
         item = get_object_or_404_json(models.Item, pk=data['item'])
         if list.editable(request.user):
             list.add(item)
-            response = json_response(status=200, text='item removed')
+            response = json_response(status=200, text='item added')
         else:
             response = json_response(status=403, text='not allowed')
     elif 'query' in data:
@@ -98,7 +96,10 @@ def addList(request):
         list.save()
         response = json_response(status=200, text='created')
     else:
-        response = json_response(status=403, text='list name exists')
+        response = json_response(status=200, text='list already exists')
+        response['data']['errors'] = {
+            'name': 'List already exists'
+        }
     return render_to_json_response(response)
 actions.register(addList)
 
@@ -109,7 +110,8 @@ def editList(request):
             {key: value}
         keys: name, public
         return {'status': {'code': int, 'text': string},
-                'data': {}}
+                'data': {}
+        }
     '''
     data = json.loads(request.POST['data'])
     list = get_object_or_404_json(models.List, pk=data['list'])

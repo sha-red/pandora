@@ -30,6 +30,9 @@ class Preference(models.Model):
     key = models.CharField(blank=True, max_length=255)
     value = models.TextField(blank=True)
 
+    def __unicode__(self):
+        return u"%s/%s=%s" % (self.user, self.key, self.value)
+
 def get_user_json(user):
     json = {}
     for key in ('username', ):

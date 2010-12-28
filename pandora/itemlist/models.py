@@ -47,7 +47,7 @@ class List(models.Model):
         self.ListItem.objects.all().filter(item=item, list=self).delete()
 
     def __unicode__(self):
-        return u'%s (%s)' % (self.title, unicode(self.user))
+        return u'%s (%s)' % (self.title, self.user)
 
     def editable(self, user):
         #FIXME: make permissions work
@@ -62,5 +62,5 @@ class ListItem(models.Model):
     item = models.ForeignKey('item.Item')
 
     def __unicode__(self):
-        return u'%s in %s' % (unicode(self.item), unicode(self.list))
+        return u'%s in %s' % (self.item, self.list)
 
