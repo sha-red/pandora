@@ -76,7 +76,7 @@ def addAnnotation(request):
         item=item,
         layer=layer,
         user=request.user,
-        start=float(data['start']), start=float(data['end']),
+        start=float(data['start']), end=float(data['end']),
         value=data['value']
     )
     annotation.save()
