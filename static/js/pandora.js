@@ -18,9 +18,6 @@ var pandora = new Ox.App({
 			},
 			config: data.config,
 			requests: {},
-			templates: {
-				info: $('<div>').load('/static/html/itemInfo.html')
-			},
 			ui: {
 				infoRatio: 4 / 3,
 				sectionElement: 'buttons',
@@ -78,7 +75,7 @@ var pandora = new Ox.App({
 					height: app.$ui.document.height() -
 					        20 - 24 - app.$ui.contentPanel.size(0) - 1 - 16,
                     width: app.$ui.document.width() -
-                            app.$ui.mainPanel.size(0) - app.$ui.timelinePanel.size(1) - 2 // fixme: item, not timelinePanel
+                            app.$ui.mainPanel.size(0) - app.$ui.item.size(1) - 2
                 });
             }
         });
@@ -451,7 +448,9 @@ var pandora = new Ox.App({
             return that;
         },
 		annotations: function() {
-			var that = new Ox.Element(),
+			var that = new Ox.Element({
+			        id: 'annotations'
+			    }),
 				$bins = [];
 		    $.each(app.config.layers, function(i, layer) {
 		        var $bin = new Ox.CollapsePanel({
@@ -475,6 +474,7 @@ var pandora = new Ox.App({
 		    $.each($bins, function(i, bin) {
 		        that.append(bin);
 		    });
+		    //alert(JSON.stringify(that.id))
 			return that;
 		},
 		appPanel: function() {
@@ -564,7 +564,7 @@ var pandora = new Ox.App({
     	            }
 		        ],
 		        orientation: 'vertical'
-		    });
+		    })
 			return that;
 		},
 		findElement: function() {
@@ -805,73 +805,91 @@ var pandora = new Ox.App({
 		    return that;
 		},
         item: function(id, view) { // fixme: params are not necessary
-            var that,
-                elements = [
-                ];
-            if (view == 'timeline') {
-                that = app.$ui.timelinePanel = new Ox.SplitPanel({
-					elements: [
-						{
-							element: new Ox.Element('div'),
-						},
-						{
-							collapsible: true,
-							element: app.$ui.annotations = ui.annotations(),
-							size: 256
-						}
-					],
-					orientation: 'horizontal'
-				});
-				getItem();
-            }
+            var that = new Ox.Element('div');
+                elements = [];
+            getItem();
             function getItem() {
-                pandora.api.getItem(id, function(result) {
-		            var video = result.data.item.stream,
-		                cuts = result.data.item.layers.cuts || {},
-		                subtitles = result.data.item.layers.subtitles || [{
-		                    'in': 5,
-		                    'out': 10,
-		                    'text': 'This subtitle is just a test...'
-		                }];
-		            video.height = 96;
-		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
-		            video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
-		            app.$ui.timelinePanel.replace(0, app.$ui.editor = new Ox.VideoEditor({
-		                cuts: cuts,
-		                duration: video.duration,
-		                find: '',
-		                frameURL: function(position) {
-		                    return '/' + id + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
-		                },
-						height: app.$ui.contentPanel.size(1),
-		                id: 'editor',
-		                largeTimeline: true,
-		                matches: [],
-		                points: [0, 0],
-		                position: 0,
-		                posterFrame: parseInt(video.duration / 2),
-		                subtitles: subtitles,
-		                videoHeight: video.height,
-		                videoId: id,
-		                videoWidth: video.width,
-		                videoSize: 'small',
-		                videoURL: video.url,
-		                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1 - 256 - 1
-		            }).bindEvent('resize', function(event, data) {
-						Ox.print('RESIZE:', data)
-						app.$ui.editor.options({
-							width: data
-						});
-					}));
-					app.$ui.rightPanel.bindEvent('resize', function(event, data) {
-	                    Ox.print('rightPanel resize', data, app.$ui.timelinePanel.size(1))
-	                    app.$ui.editor.options({
-	                        width: data - app.$ui.timelinePanel.size(1) - 1
-	                    });
-	                });
+                pandora.api.getItem(app.user.ui.item, function(result) {
+                    if (app.user.ui.itemView == 'info') {
+				        Ox.print('result.data.item', result.data.item)
+                        $.get('/static/html/itemInfo.html', {}, function(template) {
+                            Ox.print(template);
+                            app.$ui.contentPanel.replace(1,
+                                app.$ui.item = new Ox.Element('div')
+                                .append($.tmpl(template, result.data.item))
+                            );
+                        });
+                    } else if (app.user.ui.itemView == 'timeline') {
+                        var video = result.data.item.stream,
+    		                cuts = result.data.item.layers.cuts || {},
+    		                subtitles = result.data.item.layers.subtitles || [{
+    		                    'in': 5,
+    		                    'out': 10,
+    		                    'text': 'This subtitle is just a test...'
+    		                }];
+    		            video.height = 96;
+    		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
+    		            video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
+    		            app.$ui.contentPanel.replace(1, app.$ui.item = new Ox.SplitPanel({
+        					elements: [
+        						{
+        							element: app.$ui.editor = new Ox.VideoEditor({
+                		                cuts: cuts,
+                		                duration: video.duration,
+                		                find: '',
+                		                frameURL: function(position) {
+                		                    return '/' + id + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
+                		                },
+                						height: app.$ui.contentPanel.size(1),
+                		                id: 'editor',
+                		                largeTimeline: true,
+                		                matches: [],
+                		                points: [0, 0],
+                		                position: 0,
+                		                posterFrame: parseInt(video.duration / 2),
+                		                subtitles: subtitles,
+                		                videoHeight: video.height,
+                		                videoId: id,
+                		                videoWidth: video.width,
+                		                videoSize: 'small',
+                		                videoURL: video.url,
+                		                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1 - 256 - 1
+                		            }).bindEvent('resize', function(event, data) {
+                						Ox.print('resize editor', data)
+                						app.$ui.editor.options({
+                							width: data
+                						});
+                						Ox.print('resize done')
+                					}),
+        						},
+        						{
+        							collapsible: true,
+        							element: app.$ui.annotations = ui.annotations(),
+        							resizable: true,
+        							resize: [256, 384],
+        							size: 256
+        						}
+        					],
+        					orientation: 'horizontal'
+    				    }).bindEvent('resize', function(event, data) {
+        				    Ox.print('resize item', data)
+        				    app.$ui.editor.options({
+        				        height: data
+        				    });
+        				}));
+    					/*
+    					app.$ui.rightPanel.bindEvent('resize', function(event, data) {
+    	                    Ox.print('... rightPanel resize', data, app.$ui.timelinePanel.size(1))
+    	                    app.$ui.editor.options({
+    	                        width: data - app.$ui.timelinePanel.size(1) - 1
+    	                    });
+    	                });
+    	                */    		            
+                    }
 		        });
             }
             that.display = function() {
+                //alert('display')
                 app.$ui.contentPanel.replaceElements([
                     {
 						collapsible: true,
@@ -880,25 +898,14 @@ var pandora = new Ox.App({
 						size: 80
 					},
 					{
-					    element: app.$ui.timelinePanel = new Ox.SplitPanel({
-							elements: [
-								{
-									element: app.$ui.editor = new Ox.Element('div')
-								},
-								{
-									collapsible: true,
-									element: app.$ui.annotations = ui.annotations(),
-									size: 256
-								}
-							],
-							orientation: 'horizontal'
-						})
+					    element: new Ox.Element('div')
 					}
 	            ]);
-	            // getItem(); // fixme: can the asynchronicity be moved within the video editor?
+	            getItem(); // fixme: can the asynchronicity be moved within the video editor?
             }
             return that;
         },
+        /*
 		item_: function(id, view) {
 			var $item;
 		    //location.hash = '!' + id;
@@ -979,14 +986,12 @@ var pandora = new Ox.App({
 		                        width: data - app.$ui.item.size(1) - 1
 		                    });
 		                });
-					///*
 		            app.$ui.window.resize(function() {
 		                app.$ui.editor.options({
 							height: app.$ui.document.height() - 20 - 24 - app.$ui.contentPanel.size(0) - 1 - 16,
 		                    width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - app.$ui.timelinePanel.size(1) - 2
 		                });
 		            });
-					//*/
 		        });
 		    } else if (view == 'info') {
 		        pandora.api.getItem(id, function(result) {
@@ -995,17 +1000,16 @@ var pandora = new Ox.App({
 		            var $item = new Ox.Container();
 		            $item.append(app.template.info.tmpl(item));
 		            app.$ui.rightPanel.replace(1, $item);
-		            /*
 		            app.$ui.rightPanel
 		                .bindEvent('resize', function(event, data) {
 		                    app.$ui.editor.options({
 		                        width: data - app.$ui.timelinePanel.size(1) - 1
 		                    });
 		                });
-		            */
 		        });
 		    }
 		},
+        */
 		leftPanel: function() {
 			var that = new Ox.SplitPanel({
                     elements: [
@@ -1959,7 +1963,7 @@ var pandora = new Ox.App({
                     }
                 ],
                 orientation: 'horizontal'
-            });
+            })
 			return that;
 		},
 		rightPanel: function() {
@@ -1981,6 +1985,7 @@ var pandora = new Ox.App({
                 orientation: 'vertical'
             })
             .bindEvent('resize', function(event, data) {
+                Ox.print('???? resize rightPanel', event, data)
                 if (!app.user.ui.item) {
                     resizeGroups(data);
                     app.$ui.list.size();
@@ -1990,7 +1995,7 @@ var pandora = new Ox.App({
                 } else {
                     if (app.user.ui.itemView == 'timeline') {
                         app.$ui.editor.options({
-    						width: data
+    						width: data - app.$ui.item.size(1) - 1
     					});
     				}
                 }
@@ -2156,24 +2161,29 @@ var pandora = new Ox.App({
 			        })
 			        .append(
 			            app.$ui.viewSelect = ui.viewSelect() 
-			        )
-			        .append(
-			            app.$ui.sortSelect = ui.sortSelect()
-			        )
-			        .append(
-			            app.$ui.findElement = ui.findElement() 
 			        );
-			that.toggle = function() {
-				
+			!app.user.ui.item && that.append(
+			    app.$ui.sortSelect = ui.sortSelect()
+			);
+			that.append(
+			    app.$ui.findElement = ui.findElement()
+			);
+			that.display = function() {
+				app.$ui.rightPanel.replace(0, app.$ui.toolbar = toolbar());
 			}
 			return that;
 		},
 		viewSelect: function() {
 			var that = new Ox.Select({
                     id: 'viewSelect',
-                    items: $.map(app.config.listViews, function(view) {
+                    items: !app.user.ui.item ? $.map(app.config.listViews, function(view) {
                         return $.extend($.extend({}, view), {
                             checked: app.user.ui.listView == view.id,
+                            title: 'View ' + view.title
+                        });
+                    }) : $.map(app.config.itemViews, function(view) {
+                        return $.extend($.extend({}, view), {
+                            checked: app.user.ui.itemView == view.id,
                             title: 'View ' + view.title
                         });
                     }),
@@ -2183,11 +2193,15 @@ var pandora = new Ox.App({
                     float: 'left',
                     margin: '4px 0 0 4px'
                 })
-                .bindEvent('change', function(event, data) {
+                .bindEvent('change', !app.user.ui.item ? function(event, data) {
                     var id = data.selected[0].id;
                     app.user.ui.listView = id;
                     app.$ui.mainMenu.checkItem('viewMenu_movies_' + id);
                     app.$ui.contentPanel.replace(1, app.$ui.list = ui.list(id));
+                } : function(event, data) {
+                    var id = data.selected[0].id;
+                    app.user.ui.itemView = id;
+                    app.$ui.contentPanel.replace(1, app.$ui.item = ui.item());
                 });
 			return that;
 		}
@@ -2471,6 +2485,8 @@ var pandora = new Ox.App({
             update: function() {
                 URL.parse();
                 if (!old.user.ui.item && app.user.ui.item) {
+                    //ui.toolbar.display();
+                    app.$ui.rightPanel.replace(0, app.$ui.toolbar = ui.toolbar());
                     ui.item(app.user.ui.item, app.user.ui.itemView).display();
                 } else if (old.user.ui.item && !app.user.ui.item) {
                     ui.list(app.user.ui.listView).display();
