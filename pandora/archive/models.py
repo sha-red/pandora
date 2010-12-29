@@ -102,8 +102,8 @@ class File(models.Model):
                 self.is_video = False
             if 'audio' in self.info and self.info['audio']:
                 self.audio_codec = self.info['audio'][0]['codec']
-                self.samplerate = self.info['audio'][0]['samplerate']
-                self.channels = self.info['audio'][0]['channels']
+                self.samplerate = self.info['audio'][0].get('samplerate', 0)
+                self.channels = self.info['audio'][0].get('channels', 0)
 
                 if not self.is_video:
                     self.is_audio = True
