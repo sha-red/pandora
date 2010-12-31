@@ -498,7 +498,7 @@ class Item(models.Model):
 
         #FIXME:
         #f.dialog = 'fixme'
-        save('dialog', '\n'.join([l.value for l in Annotation.objects.filter(type='subtitle', item=self).order_by('start')]))
+        save('dialog', '\n'.join([l.value for l in Annotation.objects.filter(layer__type='subtitle', item=self).order_by('start')]))
 
         #FIXME: collate filenames
         #f.filename = self.filename
