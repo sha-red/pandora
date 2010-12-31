@@ -392,3 +392,22 @@ def timeline_strip(item, cuts, info, prefix):
                 print 'writing', timeline_file
             timeline_image.save(timeline_file)
 
+def chop(response, video, start, end):
+    if end <= start:
+        return ''
+    t = end - start
+    cmd = [
+        'ffmpeg',
+        '-y',
+        '-i', video,
+        '-ss', '%.3f'%start,
+        '-t','%.3f'%t,
+        '-vcodec', 'copy',
+        '-acodec', 'copy',
+        '-f', 'webm',
+        '/dev/stdout'
+    ]
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=open('/dev/null', 'w'))
+    stdout, stderr = p.communicate()
+    return stdout
+
