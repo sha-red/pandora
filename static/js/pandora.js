@@ -738,6 +738,7 @@ var pandora = new Ox.App({
 		                            }), callback);
 		                        }
 		                    });
+		                    Ox.print('ZZZ')
 		                    $.each(app.ui.groups, function(i_, group_) {
 		                        if (i_ != i) {
 		                            Ox.print('setting groups request', i, i_)
@@ -838,7 +839,7 @@ var pandora = new Ox.App({
                 		                duration: video.duration,
                 		                find: '',
                 		                frameURL: function(position) {
-                		                    return '/' + id + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
+                		                    return '/' + app.user.ui.item + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
                 		                },
                 						height: app.$ui.contentPanel.size(1),
                 		                id: 'editor',
@@ -865,6 +866,7 @@ var pandora = new Ox.App({
         						{
         							collapsible: true,
         							element: app.$ui.annotations = ui.annotations(),
+        							    //.bindEvent('resize', function(event, data) { Ox.print('resize annotations', data); }),
         							resizable: true,
         							resize: [256, 384],
         							size: 256
