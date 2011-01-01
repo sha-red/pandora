@@ -392,10 +392,10 @@ def timeline_strip(item, cuts, info, prefix):
                 print 'writing', timeline_file
             timeline_image.save(timeline_file)
 
-def chop(response, video, start, end):
-    if end <= start:
-        return ''
+def chop(video, start, end):
     t = end - start
+    tmp = tempfile.mkdtemp()
+    choped_video = '%s/tmp.webm' % tmp
     cmd = [
         'ffmpeg',
         '-y',
@@ -405,9 +405,13 @@ def chop(response, video, start, end):
         '-vcodec', 'copy',
         '-acodec', 'copy',
         '-f', 'webm',
-        '/dev/stdout'
+        choped_video
     ]
-    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=open('/dev/null', 'w'))
-    stdout, stderr = p.communicate()
-    return stdout
-
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                              stdout=open('/dev/null', 'w'),
+                              stderr=open('/dev/null', 'w'))
+    p.wait()
+    f = open(choped_video, 'r')
+    os.unlink(choped_video)
+    os.rmdir(tmp)
+    return f

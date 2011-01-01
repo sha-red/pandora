@@ -425,13 +425,11 @@ def video(request, id, profile):
     path = stream.video.path
     content_type = path.endswith('.mp4') and 'video/mp4' or 'video/webm'
     #server side cutting
-    #FIXME: find way to not load video into ram,
-    #       this can easily get to much for the server
     t = request.GET.get('t', None)
-    if t:
+    if content_type == 'video/webm' and t:
         t = map(float, t.split(','))
-        if len(t) == 2:
-            response = HttpResponse(content_type=content_type)
+        if len(t) == 2 and t[1] > t[0] and stream.duration>=t[1]:
+            response = HttpResponse(extract.chop(path, t[0], t[1]), content_type=content_type)
             filename = "Clip of %s - %s-%s - %s %s.webm" % (
                 item.get('title'),
                 ox.formatDuration(t[0] * 1000),
@@ -440,7 +438,15 @@ def video(request, id, profile):
                 item.itemId
             )
             response['Content-Disposition'] = 'attachment; filename="%s"' % filename
-            response.write(extract.chop(response, path, t[0], t[1]))
+            return response
+        else:
+            filename = "%s - %s %s.webm" % (
+                item.get('title'),
+                settings.SITENAME,
+                item.itemId
+            )
+            response = HttpFileResponse(path, content_type=content_type)
+            response['Content-Disposition'] = 'attachment; filename="%s"' % filename
             return response
     return HttpFileResponse(path, content_type=content_type)
 
