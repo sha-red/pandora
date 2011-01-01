@@ -7,8 +7,7 @@ random.seed()
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404, redirect
-from django.template import RequestContext, loader, Context
+from django.template import RequestContext, loader
 from django.utils import simplejson as json
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
@@ -26,13 +25,14 @@ class LoginForm(forms.Form):
     username = forms.TextInput()
     password = forms.TextInput()
 
+
 def api_login(request):
     '''
         param data {
             username: 'username',
             password: 'password'
         }
-        
+
         return {
             status: {'code': 200, 'text': 'ok'}
             data: {
@@ -81,11 +81,12 @@ def api_login(request):
     return render_to_json_response(response)
 actions.register(api_login, 'login')
 
+
 def api_logout(request):
     '''
         param data {
         }
-        
+
         return {
             status: {'code': int, 'text': string}
             data: {
@@ -105,10 +106,12 @@ def api_logout(request):
     return render_to_json_response(response)
 actions.register(api_logout, 'logout')
 
+
 class RegisterForm(forms.Form):
     username = forms.TextInput()
     password = forms.TextInput()
     email = forms.TextInput()
+
 
 def register(request):
     '''
@@ -117,7 +120,7 @@ def register(request):
             password: 'password',
             email: 'emailaddress'
         }
-        
+
         return {
             status: {'code': int, 'text': string}
             data: {
@@ -172,13 +175,14 @@ def register(request):
     return render_to_json_response(response)
 actions.register(register)
 
+
 def resetPassword(request):
     '''
         param data {
             token: reset token
             password: new password
         }
-        
+
         return {
             status: {'code': int, 'text': string}
             data: {
@@ -226,13 +230,14 @@ def resetPassword(request):
     return render_to_json_response(response)
 actions.register(resetPassword)
 
+
 def requestToken(request):
     '''
         param data {
             username: username,
             email: email
         }
-        
+
         return {
             status: {'code': int, 'text': string}
             data: {
@@ -291,13 +296,14 @@ def requestToken(request):
     return render_to_json_response(response)
 actions.register(requestToken)
 
+
 def findUser(request):
     '''
         param data {
             key: "username",
             value: "foo", operator: "="
         }
-        
+
         return {
             'status': {'code': int, 'text': string}
             'data': {
@@ -315,10 +321,12 @@ def findUser(request):
     return render_to_json_response(response)
 actions.register(findUser)
 
+
 class ContactForm(forms.Form):
     email = forms.EmailField()
     subject = forms.TextInput()
     message = forms.TextInput()
+
 
 def contact(request):
     '''
@@ -326,7 +334,7 @@ def contact(request):
             'email': string,
             'message': string
         }
-        
+
         return {
             'status': {'code': int, 'text': string}
         }
@@ -352,6 +360,7 @@ def contact(request):
         response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)
 actions.register(contact)
+
 
 @login_required_json
 def preferences(request):
@@ -391,4 +400,3 @@ def preferences(request):
                     models.set_preference(request.user, key, data[key])
     return render_to_json_response(response)
 actions.register(preferences)
-

@@ -2,32 +2,19 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
 
-from datetime import datetime
-import os.path
-import math
-import random
-import re
-import subprocess
 import unicodedata
-from glob import glob
 
 from django.db import models
-from django.db.models import Q
-from django.contrib.auth.models import User
-from django.core.files.base import ContentFile
-from django.utils import simplejson as json
-from django.conf import settings
 
 from ox.django import fields
 import ox
-from ox import stripTags
-from ox.normalize import canonicalTitle, canonicalName
 
 
 def get_name_sort(name):
     person, created = Person.objects.get_or_create(name=name)
     name_sort = unicodedata.normalize('NFKD', person.name_sort)
     return name_sort
+
 
 class Person(models.Model):
     name = models.CharField(max_length=200)
@@ -67,4 +54,3 @@ class Person(models.Model):
 
     def json(self):
         return self.name
-

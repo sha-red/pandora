@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from datetime import timedelta
 import os
-import re
 
-from celery.decorators import task, periodic_task
+from celery.decorators import task
 
-from item.utils import oxid, parse_path
+from item.utils import parse_path
 from item.models import get_item
-import item.tasks
 
 import models
+
 
 @task(ignore_resulsts=True, queue='default')
 def update_files(user, volume, files):
@@ -33,9 +31,9 @@ def update_files(user, volume, files):
 
         same_folder = models.Instance.objects.filter(folder=folder, volume=volume)
         if same_folder.count() > 0:
-            item = same_folder[0].file.item
+            i = same_folder[0].file.item
         else:
-            item = None
+            i = None
 
         path = os.path.join(folder, name)
 
@@ -48,7 +46,7 @@ def update_files(user, volume, files):
                     setattr(instance, key, f[key])
                     updated=True
             if updated:
-		        instance.save()
+                instance.save()
         else:
             #look if oshash is known
             file_objects = models.File.objects.filter(oshash=oshash)
@@ -56,13 +54,13 @@ def update_files(user, volume, files):
                 file_object = file_objects[0]
             #new oshash, add to database
             else:
-                if not item:
+                if not i:
                     item_info = parse_path(folder)
-                    item = get_item(item_info)
+                    i = get_item(item_info)
                 file_object = models.File()
                 file_object.oshash = oshash
                 file_object.name = name
-                file_object.item = item
+                file_object.item = i
                 file_object.save()
             instance = models.Instance()
             instance.volume = volume
@@ -74,4 +72,3 @@ def update_files(user, volume, files):
     #remove deleted files
     #FIXME: can this have any bad consequences? i.e. on the selction of used item files.
     models.Instance.objects.filter(volume=volume).exclude(file__oshash__in=all_files).delete()
-

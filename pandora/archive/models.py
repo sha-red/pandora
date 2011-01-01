@@ -1,30 +1,22 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
-from datetime import datetime
+
 import os.path
-import random
 import re
 import time
 
 from django.db import models
-from django.db.models import Q
 from django.contrib.auth.models import User
-from django.core.files.base import ContentFile
-from django.utils import simplejson as json
 from django.conf import settings
 
 from ox.django import fields
 import ox
-from ox import stripTags
-from ox.normalize import canonicalTitle, canonicalName
-from firefogg import Firefogg
+from ox.normalize import canonicalTitle
 import chardet
 
 from item import utils
 from item.models import Item
-
-import extract
 
 
 class File(models.Model):
@@ -37,7 +29,7 @@ class File(models.Model):
     item = models.ForeignKey(Item, related_name='files')
 
     name = models.CharField(max_length=2048, default="") # canoncial path/file
-    sort_name = models.CharField(max_length=2048, default="") # sort path/file name
+    sort_name = models.CharField(max_length=2048, default="") # sort name
 
     part = models.CharField(default="", max_length=255)
     version = models.CharField(default="", max_length=255) # sort path/file name
@@ -146,13 +138,14 @@ class File(models.Model):
         return None
 
     def srt(self):
+
         def _detectEncoding(fp):
-            bomDict={ # bytepattern : name              
-                      (0x00, 0x00, 0xFE, 0xFF) : "utf_32_be",        
-                      (0xFF, 0xFE, 0x00, 0x00) : "utf_32_le",
-                      (0xFE, 0xFF, None, None) : "utf_16_be", 
-                      (0xFF, 0xFE, None, None) : "utf_16_le", 
-                      (0xEF, 0xBB, 0xBF, None) : "utf_8",
+            bomDict={ # bytepattern : name
+                      (0x00, 0x00, 0xFE, 0xFF): "utf_32_be",
+                      (0xFF, 0xFE, 0x00, 0x00): "utf_32_le",
+                      (0xFE, 0xFF, None, None): "utf_16_be",
+                      (0xFF, 0xFE, None, None): "utf_16_le",
+                      (0xEF, 0xBB, 0xBF, None): "utf_8",
                     }
 
             # go to beginning of file and get the first 4 bytes
@@ -162,15 +155,15 @@ class File(models.Model):
 
             # try bom detection using 4 bytes, 3 bytes, or 2 bytes
             bomDetection = bomDict.get((byte1, byte2, byte3, byte4))
-            if not bomDetection :
+            if not bomDetection:
                 bomDetection = bomDict.get((byte1, byte2, byte3, None))
-                if not bomDetection :
+                if not bomDetection:
                     bomDetection = bomDict.get((byte1, byte2, None, None))
 
             ## if BOM detected, we're done :-)
             fp.seek(oldFP)
-            if bomDetection :
-                  return bomDetection
+            if bomDetection:
+                return bomDetection
 
             encoding = 'latin-1'
             #more character detecting magick using http://chardet.feedparser.org/
@@ -221,7 +214,9 @@ class File(models.Model):
             return True
         return False
 
+
 class Volume(models.Model):
+
     class Meta:
         unique_together = ("user", "name")
 
@@ -234,7 +229,9 @@ class Volume(models.Model):
     def __unicode__(self):
         return u"%s's %s"% (self.user, self.name)
 
+
 class Instance(models.Model):
+
     class Meta:
         unique_together = ("name", "folder", "volume")
 
@@ -258,12 +255,15 @@ class Instance(models.Model):
     def itemId(self):
         return File.objects.get(oshash=self.oshash).itemId
 
+
 def frame_path(frame, name):
     ext = os.path.splitext(name)[-1]
     name = "%s%s" % (frame.position, ext)
     return frame.file.path(name)
 
+
 class Frame(models.Model):
+
     class Meta:
         unique_together = ("file", "position")
     created = models.DateTimeField(auto_now_add=True)
@@ -282,5 +282,3 @@ class Frame(models.Model):
 
     def __unicode__(self):
         return u'%s at %s' % (self.file, self.position)
-
-

@@ -5,11 +5,6 @@ from datetime import datetime
 
 from django.db import models
 from django.contrib.auth.models import User
-from django.conf import settings
-
-import ox
-from ox.django import fields
-from ox.utils import json
 
 
 class News(models.Model):
@@ -29,6 +24,7 @@ class News(models.Model):
     def get_absolute_url(self):
         return '/text/%s' % self.slug
 
+
 class Text(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -46,6 +42,7 @@ class Text(models.Model):
     def get_absolute_url(self):
         return '/text/%s' % self.slug
 
+
 class Image(models.Model):
     image = models.ImageField(upload_to='text/image')
     caption = models.CharField(max_length=255, default="")
@@ -53,10 +50,10 @@ class Image(models.Model):
     def get_absolute_url(self):
         return self.image.url
 
+
 class Attachment(models.Model):
     file = models.FileField(upload_to='text/attachment')
     caption = models.CharField(max_length=255, default="")
 
     def get_absolute_url(self):
         return self.file.url
-

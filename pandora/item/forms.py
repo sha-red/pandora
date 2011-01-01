@@ -1,8 +1,5 @@
 from ajax_filtered_fields.forms import AjaxManyToManyField, ForeignKeyByLetter
 from django.conf import settings
-from django import forms
-
-import models
 
 ajax_filtered_js = (
     settings.ADMIN_MEDIA_PREFIX + "js/SelectBox.js",

@@ -1,14 +1,9 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-import re
 from datetime import datetime
-from urllib2 import unquote
-from ox.utils import json
 
-from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, Manager
- 
+
 import models
 
 
@@ -20,6 +15,7 @@ def keyType(key):
     if key in ('rating', 'votes'):
         return "float"
     return "string"
+
 
 def parseCondition(condition):
     '''
@@ -33,13 +29,15 @@ def parseCondition(condition):
             operator: "!="
     }
     ...
-	'''
+    '''
     k = condition.get('key', 'all')
     k = {'id': 'itemId'}.get(k, k)
-    if not k: k = 'all'
+    if not k:
+        k = 'all'
     v = condition['value']
     op = condition.get('operator', None)
-    if not op: op = '~'
+    if not op:
+        op = '~'
     if op.startswith('!'):
         op = op[1:]
         exclude = True
@@ -66,16 +64,17 @@ def parseCondition(condition):
         k = str(k)
         if exclude:
             if in_find and not k.startswith('itemId'):
-                q = ~Q(**{'find__key':k, value_key:v})
+                q = ~Q(**{'find__key': k, value_key: v})
             else:
-                q = ~Q(**{k:v})
+                q = ~Q(**{k: v})
         else:
             if in_find and not k.startswith('itemId'):
-                q = Q(**{'find__key':k, value_key:v})
+                q = Q(**{'find__key': k, value_key: v})
             else:
-                q = Q(**{k:v})
+                q = Q(**{k: v})
         return q
     else: #number or date
+
         def parseDate(d):
             while len(d) < 3:
                 d.append(1)
@@ -90,11 +89,11 @@ def parseCondition(condition):
             if exclude: #!1960-1970
                 k1 = 'value__lt'
                 k2 = 'value__gte'
-                return Q(**{'find__key': k, k1:v1})|Q(**{'find__key': k, k2:v2})
+                return Q(**{'find__key': k, k1: v1})|Q(**{'find__key': k, k2: v2})
             else: #1960-1970
                 k1 = 'value__gte'
                 k2 = 'value__lt'
-                return Q(**{'find__key': k, k1:v1})&Q(**{'find__key': k, k2:v2})
+                return Q(**{'find__key': k, k1: v1})&Q(**{'find__key': k, k2: v2})
         else:
             if keyType(k) == "date":
                 v = parseDate(v.split('.'))
@@ -113,9 +112,10 @@ def parseCondition(condition):
             vk = str(vk)
 
             if exclude: #!1960
-                return ~Q(**{'find__key': k, vk:v})
+                return ~Q(**{'find__key': k, vk: v})
             else: #1960
-                return Q(**{'find__key': k, vk:v})
+                return Q(**{'find__key': k, vk: v})
+
 
 def parseConditions(conditions, operator):
     '''
@@ -135,16 +135,18 @@ def parseConditions(conditions, operator):
         }
     ],
     operator: "&"
-	'''
+    '''
     conn = []
     for condition in conditions:
         if 'conditions' in condition:
             q = parseConditions(condition['conditions'],
                              condition.get('operator', '&'))
-            if q: conn.append(q)
+            if q:
+                conn.append(q)
             pass
         else:
-            if condition.get('value', '') != '' or condition.get('operator', '') == '=':
+            if condition.get('value', '') != '' or \
+               condition.get('operator', '') == '=':
                 conn.append(parseCondition(condition))
     if conn:
         q = conn[0]
@@ -156,7 +158,9 @@ def parseConditions(conditions, operator):
         return q
     return None
 
+
 class ItemManager(Manager):
+
     def get_query_set(self):
         return super(ItemManager, self).get_query_set()
 
@@ -165,13 +169,14 @@ class ItemManager(Manager):
             l = l.split(":")
             only_public = True
             if not user.is_anonymous():
-                if len(l) == 1: l = [request.user.username] + l
-                if request.user.username == l[0]:
+                if len(l) == 1:
+                    l = [user.username] + l
+                if user.username == l[0]:
                     only_public = False
             if len(l) == 2:
                 lqs = models.List.objects.filter(name=l[1], user__username=l[0])
                 if only_public:
-                    lqs = qls.filter(public=True)
+                    lqs = lqs.filter(public=True)
                 if lqs.count() == 1:
                     qs = qs.filter(listitem__list__id=lqs[0].id)
         return qs
@@ -196,7 +201,7 @@ class ItemManager(Manager):
                 ],
                 operator: "&"
             }
-		'''
+        '''
 
         #join query with operator
         qs = self.get_query_set()
@@ -212,4 +217,3 @@ class ItemManager(Manager):
         l = data.get('list', 'all')
         qs = self.filter_list(qs, l, user)
         return qs
-

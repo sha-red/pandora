@@ -11,15 +11,18 @@ import models
 def cronjob(**kwargs):
     print "do some cleanup stuff once a day"
 
+
 @task(ignore_resulsts=True, queue='default')
 def update_poster(itemId):
     item = models.Item.objects.get(itemId=itemId)
     item.make_poster(True)
 
+
 @task(ignore_resulsts=True, queue='default')
 def update_imdb(itemId):
     item = models.Item.objects.get(itemId=itemId)
     item.update_imdb()
+
 
 @task(queue="encoding")
 def update_streams(itemId):

@@ -6,6 +6,7 @@ from django.contrib import admin
 from forms import FileAdminForm, InstanceAdminForm
 import models
 
+
 class FileAdmin(admin.ModelAdmin):
     search_fields = ['name', 'video_codec']
     list_display = ['available', 'is_main', '__unicode__', 'itemId']
@@ -18,9 +19,9 @@ class FileAdmin(admin.ModelAdmin):
 
 admin.site.register(models.File, FileAdmin)
 
+
 class InstanceAdmin(admin.ModelAdmin):
     search_fields = ['name', 'folder', 'volume__name']
     form = InstanceAdminForm
 
 admin.site.register(models.Instance, InstanceAdmin)
-

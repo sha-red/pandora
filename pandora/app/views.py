@@ -1,30 +1,31 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
+from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.conf import settings
 
 from ox.django.shortcuts import json_response, render_to_json_response, get_object_or_404_json
+from ox.utils import json
 
 import models
 
-from item.models import siteJson
-
 from api.actions import actions
 
+
 def intro(request):
-    context = RequestContext(request, {'settings':settings})
+    context = RequestContext(request, {'settings': settings})
     return render_to_response('intro.html', context)
 
+
 def index(request):
-    context = RequestContext(request, {'settings':settings})
-    if request.GET.get('_escaped_fragment_', None):
-        return html_snapshot(request)
+    context = RequestContext(request, {'settings': settings})
     return render_to_response('index.html', context)
 
+
 def timeline(request):
-    context = RequestContext(request, {'settings':settings})
+    context = RequestContext(request, {'settings': settings})
     return render_to_response('timeline.html', context)
+
 
 def getPage(request):
     data = json.loads(request.POST['data'])
@@ -34,6 +35,7 @@ def getPage(request):
     return render_to_json_response(response)
 actions.register(getPage)
 
+
 def site_json(request):
     '''
     return render_to_json_response(siteJson())
@@ -41,6 +43,7 @@ def site_json(request):
     siteSettings = {}
     for s in models.SiteSettings.objects.all():
         siteSettings[s.key] = s.value
-    context = RequestContext(request, {'settings':settings, 'siteSettings': siteSettings})
-    return render_to_response('site.json', context, mimetype="application/javascript")
-
+    context = RequestContext(request, {'settings': settings,
+                                       'siteSettings': siteSettings})
+    return render_to_response('site.json', context,
+                              mimetype="application/javascript")

@@ -1,27 +1,10 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
-import os.path
-import re
-from datetime import datetime
-from urllib2 import unquote
-import mimetypes
-
-from django import forms
-from django.core.paginator import Paginator
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.db.models import Q, Avg, Count, Sum
-from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404, redirect
-from django.template import RequestContext
-from django.conf import settings
 
 from ox.utils import json
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
-from ox.django.http import HttpFileResponse
-import ox
 
 import models
 from api.actions import actions
@@ -48,6 +31,7 @@ def findAnnotation(request):
     return render_to_json_response(response)
 actions.register(findAnnotation)
 
+
 @login_required_json
 def addAnnotation(request):
     '''
@@ -67,18 +51,18 @@ def addAnnotation(request):
     data = json.loads(request.POST['data'])
     for key in ('item', 'layer', 'start', 'end', 'value'):
         if key not in data:
-            return render_to_json_response(json_response(status=400, text='invalid data'))
+            return render_to_json_response(json_response(status=400,
+                                                         text='invalid data'))
 
     item = get_object_or_404_json(models.Item, itemId=data['item'])
     layer = get_object_or_404_json(models.Layer, layerId=data['layer'])
-    
+
     annotation = models.Annotation(
         item=item,
         layer=layer,
         user=request.user,
         start=float(data['start']), end=float(data['end']),
-        value=data['value']
-    )
+        value=data['value'])
     annotation.save()
     response = json_response()
     response['data']['annotation'] = annotation.json()
@@ -87,6 +71,7 @@ def addAnnotation(request):
     response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
 actions.register(addAnnotation)
+
 
 @login_required_json
 def removeAnnotation(request):
@@ -102,6 +87,7 @@ def removeAnnotation(request):
     response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
 actions.register(removeAnnotation)
+
 
 @login_required_json
 def editAnnotation(request):
@@ -129,4 +115,3 @@ def editAnnotation(request):
     response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
 actions.register(editAnnotation)
-

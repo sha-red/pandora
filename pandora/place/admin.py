@@ -9,5 +9,3 @@ import models
 class PlaceAdmin(admin.ModelAdmin):
     search_fields = ['name']
 admin.site.register(models.Place, PlaceAdmin)
-
-

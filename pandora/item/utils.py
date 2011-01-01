@@ -2,17 +2,15 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 #
-import errno
 from decimal import Decimal
 import os
-import sys
 import re
 import hashlib
 import unicodedata
 
 import ox
 import ox.iso
-from ox.normalize import normalizeName, normalizeTitle, canonicalTitle
+from ox.normalize import normalizeName, normalizeTitle
 
 
 def parse_decimal(string):
@@ -22,10 +20,12 @@ def parse_decimal(string):
     d = string.split('/')
     return Decimal(d[0]) / Decimal(d[1])
 
+
 def plural_key(term):
     return {
         'country': 'countries',
     }.get(term, term + 's')
+
 
 def oxid(title, directors, year='', seriesTitle='', episodeTitle='', season=0, episode=0):
     director = ', '.join(directors)
@@ -37,6 +37,7 @@ def oxid(title, directors, year='', seriesTitle='', episodeTitle='', season=0, e
         oxid_value = u"\n".join(["%02d" % episode, episodeTitle, director, year])
         oxid += hashlib.sha1(oxid_value.encode('utf-8')).hexdigest()[:20]
     return u"0x" + oxid
+
 
 def oxdb_id(title, directors=[], year='', season='', episode='', episode_title='', episode_directors=[], episode_year=''):
     # new id function, will replace oxid()
@@ -51,11 +52,13 @@ def oxdb_id(title, directors=[], year='', season='', episode='', episode_title='
                   get_hash('\n'.join([str(episode), episode_director, episode_title, str(episode_year)]))[:8]
     return u'0x' + oxdb_id
 
+
 def oxdb_directors(director):
     director = os.path.basename(os.path.dirname(director))
     if director.endswith('_'):
         director = "%s." % director[:-1]
     directors = [normalizeName(d) for d in director.split('; ')]
+
     def cleanup(director):
         director = director.strip()
         director = director.replace('Series', '')
@@ -64,6 +67,7 @@ def oxdb_directors(director):
         return director
     directors = filter(None, [cleanup(d) for d in directors])
     return directors
+
 
 def oxdb_title(_title, searchTitle = False):
     '''
@@ -83,7 +87,7 @@ def oxdb_title(_title, searchTitle = False):
         else:
             stitle = _title.split('.')[-2]
         if stitle.startswith('Episode '):
-            stitle = '' 
+            stitle = ''
         if searchTitle:
             title = '"%s" %s' % (title, stitle)
         else:
@@ -98,8 +102,10 @@ def oxdb_title(_title, searchTitle = False):
     title = normalizeTitle(title)
     return title
 
+
 def oxdb_year(data):
     return ox.findRe(data, '\.(\d{4})\.')
+
 
 def oxdb_series_title(path):
     seriesTitle = u''
@@ -111,12 +117,14 @@ def oxdb_series_title(path):
             seriesTitle = t.split(" (S")[0]
     return seriesTitle
 
+
 def oxdb_episode_title(path):
     episodeTitle = u''
     ep = re.compile('.Episode \d+?\.(.*?)\.[a-zA-Z]').findall(path)
     if ep:
         episodeTitle = ep[0]
     return episodeTitle
+
 
 def oxdb_season_episode(path):
     season = 0
@@ -137,6 +145,7 @@ def oxdb_season_episode(path):
             episode = int(se[0][1])
     return (season, episode)
 
+
 def oxdb_part(path):
     part = 1
     path = path.lower()
@@ -148,6 +157,7 @@ def oxdb_part(path):
         if p:
             part = p[0]
     return part
+
 
 def parse_path(path):
     '''
@@ -178,6 +188,7 @@ def parse_path(path):
                           episode_year='')
     return r
 
+
 def sort_title(title):
     #title
     title = re.sub(u'[\'!¿¡,\.;\-"\:\*\[\]]', '', title)
@@ -185,9 +196,8 @@ def sort_title(title):
     #title = title.replace(u'Æ', 'Ae')
     if isinstance(title, str):
         title = unicode(title)
-    title = unicodedata.normalize('NFKD',title)
+    title = unicodedata.normalize('NFKD', title)
 
     #pad numbered titles
     title = re.sub('(\d+)', lambda x: '%010d' % int(x.group(0)), title)
     return title.strip()
-

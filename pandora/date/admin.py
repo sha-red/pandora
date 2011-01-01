@@ -9,4 +9,3 @@ import models
 class DateAdmin(admin.ModelAdmin):
     search_fields = ['name']
 admin.site.register(models.Date, DateAdmin)
-

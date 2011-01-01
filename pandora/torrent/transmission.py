@@ -10,11 +10,13 @@ from django.conf import settings
 import ox.torrent
 import transmissionrpc
 
+
 def connect():
     return transmissionrpc.Client(settings.TRANSMISSON_HOST,
                                   port=settings.TRANSMISSON_PORT,
                                   user=settings.TRANSMISSON_USER,
                                   password=settings.TRANSMISSON_PASSWORD)
+
 
 def remove(info_hash):
     if settings.DEBUG:
@@ -24,10 +26,11 @@ def remove(info_hash):
             tc = connect()
             tc.remove(info_hash.lower())
         except:
-            if DEBUG:
+            if settings.DEBUG:
                 import traceback
                 traceback.print_exc()
-        
+
+
 def add(torrent_file):
     download_dir = os.path.dirname(torrent_file)
     with open(torrent_file) as f:
@@ -42,6 +45,7 @@ def add(torrent_file):
             import traceback
             traceback.print_exc()
 
+
 def is_seeding(info_hash):
     info_hash = info_hash.lower()
     try:
@@ -55,6 +59,7 @@ def is_seeding(info_hash):
     if torrents:
         return True
     return False
+
 
 def start_daemon():
     try:
@@ -71,4 +76,3 @@ def start_daemon():
             '-w', settings.MEDIA_ROOT,
         ])
         time.sleep(1)
-

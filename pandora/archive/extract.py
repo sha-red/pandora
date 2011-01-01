@@ -3,33 +3,31 @@
 from __future__ import division, with_statement
 
 import os
-from os.path import abspath, join, dirname, exists
+from os.path import exists
 
 import fractions
 import subprocess
-import sys
-import shutil
 import tempfile
 import time
-import re
 import math
 from glob import glob
 
 import numpy as np
 import Image
-import ox
-from ox.utils import json
 
 
 img_extension='jpg'
 
 FFMPEG2THEORA = 'ffmpeg2theora'
 
+
 class AspectRatio(fractions.Fraction):
+
     def __new__(cls, numerator, denominator=None):
         if not denominator:
             ratio = map(int, numerator.split(':'))
-            if len(ratio) == 1: ratio.append(1)
+            if len(ratio) == 1:
+                ratio.append(1)
             numerator = ratio[0]
             denominator = ratio[1]
             #if its close enough to the common aspect ratios rather use that
@@ -44,6 +42,7 @@ class AspectRatio(fractions.Fraction):
     @property
     def ratio(self):
         return "%d:%d" % (self.numerator, self.denominator)
+
 
 def stream(video, target, profile, info):
     if not os.path.exists(target):
@@ -118,8 +117,8 @@ def stream(video, target, profile, info):
     bpp = 0.17
     fps = AspectRatio(info['video'][0]['framerate'])
 
-    width  = int(dar * height)
-    width += width % 2 
+    width = int(dar * height)
+    width += width % 2
 
     bitrate = height*width*fps*bpp/1000
     aspect = dar.ratio
@@ -184,7 +183,7 @@ def stream(video, target, profile, info):
                 '-me_range', '16',
                 '-g', '250', #FIXME: should this be related to fps?
                 '-keyint_min', '25', #FIXME: should this be related to fps?
-                '-sc_threshold','40',
+                '-sc_threshold', '40',
                 '-i_qfactor', '0.71',
                 '-qmin', '10', '-qmax', '51',
                 '-qdiff', '4'
@@ -200,18 +199,19 @@ def stream(video, target, profile, info):
     if format == 'mp4':
         cmd += ["%s.mp4"%target]
     else:
-        cmd += ['-f','webm', target]
+        cmd += ['-f', 'webm', target]
 
     print cmd
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=open('/dev/null', 'w'), stderr=subprocess.STDOUT)
     p.communicate()
     if format == 'mp4':
-        cmd = ['qt-faststart',  "%s.mp4"%target, target]
+        cmd = ['qt-faststart', "%s.mp4"%target, target]
         print cmd
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=open('/dev/null', 'w'), stderr=subprocess.STDOUT)
         p.communicate()
         os.unlink("%s.mp4"%target)
     return True
+
 
 def run_command(cmd, timeout=10):
     #print cmd
@@ -225,6 +225,7 @@ def run_command(cmd, timeout=10):
         os.kill(p.pid, 9)
         killedpid, stat = os.waitpid(p.pid, os.WNOHANG)
     return p.returncode
+
 
 def frame(videoFile, frame, position, width=128, redo=False):
     '''
@@ -243,6 +244,7 @@ def frame(videoFile, frame, position, width=128, redo=False):
             cmd = ['oxframe', '-i', videoFile, '-o', frame, '-p', str(position), '-x', str(width)]
             run_command(cmd)
 
+
 def resize_image(image_source, image_output, width=None, size=None):
     if exists(image_source):
         source = Image.open(image_source).convert('RGB')
@@ -257,7 +259,7 @@ def resize_image(image_source, image_output, width=None, size=None):
                 height = size
                 width = int(height * (float(source_width) / source_height))
                 width = width - width % 2
-            
+
         else:
             height = int(width / (float(source_width) / source_height))
             height = height - height % 2
@@ -269,12 +271,13 @@ def resize_image(image_source, image_output, width=None, size=None):
         output = source.resize((width, height), resize_method)
         output.save(image_output)
 
+
 def timeline(video, prefix):
     cmd = ['oxtimeline', '-i', video, '-o', prefix]
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     p.wait()
 
-#stats based on timeline images
+
 def average_color(prefix):
     height = 64
     width = 1500
@@ -294,9 +297,11 @@ def average_color(prefix):
         color += p
     return list(map(float, color))
 
+
 def get_distance(rgb0, rgb1):
     dst = math.sqrt(pow(rgb0[0] - rgb1[0], 2) + pow(rgb0[0] - rgb1[0], 2) + pow(rgb0[0] - rgb1[0], 2))
     return dst / math.sqrt(3 * pow(255, 2))
+
 
 def cuts(prefix):
     cuts = []
@@ -324,6 +329,7 @@ def cuts(prefix):
                 cuts.append(frame / fps)
     return cuts
 
+
 def divide(num, by):
     # >>> divide(100, 3)
     # [33, 33, 34]
@@ -334,9 +340,10 @@ def divide(num, by):
         arr.append(div + (i > by - 1 - mod))
     return arr
 
+
 def timeline_strip(item, cuts, info, prefix):
     _debug = False
-    duration =  info['duration']
+    duration = info['duration']
     video_height = info['video'][0]['height']
     video_width = info['video'][0]['width']
     video_ratio = video_width / video_height
@@ -392,6 +399,7 @@ def timeline_strip(item, cuts, info, prefix):
                 print 'writing', timeline_file
             timeline_image.save(timeline_file)
 
+
 def chop(video, start, end):
     t = end - start
     tmp = tempfile.mkdtemp()
@@ -401,7 +409,7 @@ def chop(video, start, end):
         '-y',
         '-i', video,
         '-ss', '%.3f'%start,
-        '-t','%.3f'%t,
+        '-t', '%.3f'%t,
         '-vcodec', 'copy',
         '-acodec', 'copy',
         '-f', 'webm',

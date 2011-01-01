@@ -3,12 +3,11 @@
 from __future__ import division, with_statement
 
 from django.db import models
-from django.db.models import Q
-from django.conf import settings
 
 from ox.django import fields
 
 import managers
+
 
 class Date(models.Model):
     '''
@@ -41,4 +40,3 @@ class Date(models.Model):
             self.name_sort = self.name
         self.name_find = self.name + '||'.join(self.aliases)
         super(Date, self).save(*args, **kwargs)
-

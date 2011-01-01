@@ -4,26 +4,18 @@ from __future__ import division, with_statement
 
 from datetime import datetime
 import os.path
-import math
-import random
-import re
 import subprocess
-import unicodedata
 from glob import glob
 
 from django.db import models
-from django.db.models import Q
-from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.utils import simplejson as json
 from django.conf import settings
 
-from ox.django import fields
 import ox
-from ox import stripTags
+from ox.django import fields
+from ox.normalize import canonicalTitle
 import ox.web.imdb
-from ox.normalize import canonicalTitle, canonicalName
-from firefogg import Firefogg
 
 import managers
 import utils
@@ -31,23 +23,23 @@ import tasks
 from archive import extract
 
 from annotaion.models import Annotation, Layer
-from person.models import get_name_sort, Person
+from person.models import get_name_sort
 
 
 def siteJson():
-	r = {}
-	r['findKeys'] = [{"id": "all", "title": "All"}]
-	for p in Property.objects.all():
-		if p.find:
-		    title = p.title
-		    if not title:
-		        title = p.name.capitalize()
-		    f = {"id": p.name, "title": title}
-		    f['autocomplete'] = p.autocomplete
-		    r['findKeys'].append(f)
-		    
-	r['groups'] = [p.name for p in Property.objects.filter(group=True)]
-	r['layers'] = [l.json() for l in Layer.objects.all()]
+    r = {}
+    r['findKeys'] = [{"id": "all", "title": "All"}]
+    for p in Property.objects.all():
+        if p.find:
+            title = p.title
+            if not title:
+                title = p.name.capitalize()
+            f = {"id": p.name, "title": title}
+            f['autocomplete'] = p.autocomplete
+            r['findKeys'].append(f)
+
+    r['groups'] = [p.name for p in Property.objects.filter(group=True)]
+    r['layers'] = [l.json() for l in Layer.objects.all()]
 
     r['itemViews'] = [
         {"id": "info", "title": "Info"},
@@ -81,28 +73,28 @@ def siteJson():
         {"id": "public", "title": "Public Lists"},
         {"id": "featured", "title": "Featured Lists"}
     ]
-	r['sortKeys'] = []
-	for p in Property.objects.exclude(sort=''):
-	    title = p.title
-	    if not title:
-	        title = p.name.capitalize()
+    r['sortKeys'] = []
+    for p in Property.objects.exclude(sort=''):
+        title = p.title
+        if not title:
+            title = p.name.capitalize()
 
-		f = {
-			"id": p.name,
-			"title": title,
-			"operator": p.operator,
-			"align": p.align,
-			"width": p.width,
-		}
-		if not p.removable:
-			f['removable'] = False
-		r['sortKeys'].append(f)
-	r['sortKeys'].append([{"id": "id", "title": "ID", "operator": "", "align": "left", "width": 90}])
+        f = {
+            "id": p.name,
+            "title": title,
+            "operator": p.operator,
+            "align": p.align,
+            "width": p.width,
+        }
+        if not p.removable:
+            f['removable'] = False
+        r['sortKeys'].append(f)
+    r['sortKeys'].append([{"id": "id", "title": "ID", "operator": "", "align": "left", "width": 90}])
 
-	r['totals'] = [{"id": "items"}]
-	for p in Property.objects.filter(totals=True):
-	    f = {'id': p.name, 'admin': p.admin}
-	    r['totals'].append(f)
+    r['totals'] = [{"id": "items"}]
+    for p in Property.objects.filter(totals=True):
+        f = {'id': p.name, 'admin': p.admin}
+        r['totals'].append(f)
 
     #FIXME: defaults should also be populated from properties
     r["user"] = {
@@ -127,7 +119,8 @@ def siteJson():
         },
         "username": ""
     }
-	return r
+    return r
+
 
 def get_item(info):
     '''
@@ -176,28 +169,30 @@ def get_item(info):
                     item.save()
     return item
 
+
 class Property(models.Model):
+
     class Meta:
         ordering = ('position', )
         verbose_name_plural = "Properties"
-               
+
     name = models.CharField(null=True, max_length=255, unique=True)
     title = models.CharField(null=True, max_length=255, blank=True)
-	#text, string, string from list(fixme), event, place, person
+    #text, string, string from list(fixme), event, place, person
     type = models.CharField(null=True, max_length=255)
     array = models.BooleanField(default=False)
     position = models.IntegerField(default=0)
     width = models.IntegerField(default=180)
     align = models.CharField(null=True, max_length=255, default='left')
     operator = models.CharField(null=True, max_length=5, default='', blank=True)
-	default = models.BooleanField('Enabled by default', default=False)
-	removable = models.BooleanField(default=True)
+    default = models.BooleanField('Enabled by default', default=False)
+    removable = models.BooleanField(default=True)
 
-	#sort values: title, string, integer, float, date
+    #sort values: title, string, integer, float, date
     sort = models.CharField(null=True, max_length=255, blank=True)
-	find = models.BooleanField(default=False)
-	autocomplete = models.BooleanField(default=False)
-	group = models.BooleanField(default=False)
+    find = models.BooleanField(default=False)
+    autocomplete = models.BooleanField(default=False)
+    group = models.BooleanField(default=False)
 
     totals = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
@@ -207,19 +202,20 @@ class Property(models.Model):
             return self.title
         return self.name
 
-	def json(self):
-		j = {}
-		for key in ('type', 'sort', 'title', 'array', 'totals', 'admin'):
-			value = getattr(self, key)
-			if value:
-				j[key] = value
-		return j
+    def json(self):
+        j = {}
+        for key in ('type', 'sort', 'title', 'array', 'totals', 'admin'):
+            value = getattr(self, key)
+            if value:
+                j[key] = value
+        return j
 
     def save(self, *args, **kwargs):
         if not self.title:
             self.title = self.name.capitalize()
         super(Property, self).save(*args, **kwargs)
-    
+
+
 class Item(models.Model):
     person_keys = ('director', 'writer', 'producer', 'editor', 'cinematographer', 'actor', 'character')
     facet_keys = person_keys + ('country', 'language', 'genre', 'keyword')
@@ -228,7 +224,7 @@ class Item(models.Model):
     published = models.DateTimeField(default=datetime.now, editable=False)
 
     #only items that have data from files are available,
-    #this is indicated by setting available to True 
+    #this is indicated by setting available to True
     available = models.BooleanField(default=False, db_index=True)
     itemId = models.CharField(max_length=128, unique=True, blank=True)
     oxdbId = models.CharField(max_length=42, unique=True, blank=True)
@@ -258,9 +254,9 @@ class Item(models.Model):
 
     def edit(self, data):
         #FIXME: how to map the keys to the right place to write them to?
-		for key in data:
-			if key != 'id':
-				setattr(self.data, key, data[key])
+        for key in data:
+            if key != 'id':
+                setattr(self.data, key, data[key])
         self.oxdb.save()
         self.save()
 
@@ -339,11 +335,11 @@ class Item(models.Model):
     #FIXME: this should not be used
     _public_fields = {
         'itemId': 'id',
-        'title':   'title',
-        'year':    'year',
+        'title': 'title',
+        'year': 'year',
 
-        'runtime':    'runtime',
-        'release_date':    'release_date',
+        'runtime': 'runtime',
+        'release_date': 'release_date',
 
         'countries': 'country',
         'directors': 'director',
@@ -402,7 +398,7 @@ class Item(models.Model):
             s = self.streams.all()[0]
             if s.video and s.info:
                 stream['duration'] = s.info['duration']
-                if 'video' in s.info and s.info['video']: 
+                if 'video' in s.info and s.info['video']:
                     stream['aspectRatio'] = s.info['video'][0]['width'] / s.info['video'][0]['height']
                 if settings.XSENDFILE or settings.XACCELREDIRECT:
                     stream['baseUrl'] = '/%s' % self.itemId
@@ -414,7 +410,7 @@ class Item(models.Model):
     def get_layers(self):
         layers = {}
         layers['cuts'] = self.data.get('cuts', {})
-        
+
         layers['subtitles'] = {}
         #FIXME: subtitles should be stored in Annotation
         qs = self.files.filter(is_subtitle=True, is_main=True, available=True)
@@ -468,7 +464,9 @@ class Item(models.Model):
     '''
         Search related functions
     '''
+
     def update_find(self):
+
         def save(key, value):
             f, created = ItemFind.objects.get_or_create(item=self, key=key)
             if value not in ('', '||'):
@@ -478,7 +476,7 @@ class Item(models.Model):
                 f.delete()
 
         save('title', '\n'.join([self.get('title'), self.get('original_title', '')]))
-        
+
         #FIXME: filter us/int  title
         #f.title += ' '.join([t.title for t in self.alternative_titles()])
 
@@ -537,17 +535,17 @@ class Item(models.Model):
 
         for key in ('keywords', 'genres', 'cast', 'summary', 'trivia', 'connections'):
             setattr(s, key, len(self.get(key, '')))
-            
+
         s.itemId = self.itemId.replace('0x', 'xx')
         s.rating = self.get('rating', -1)
         s.votes = self.get('votes', -1)
 
         # data from related subtitles
         s.scenes = 0 #FIXME
-        s.dialog =  0 #FIXME
-        s.words =  0 #FIXME
-        s.wpm =    0 #FIXME
-        s.risk =   0 #FIXME
+        s.dialog = 0 #FIXME
+        s.words = 0 #FIXME
+        s.wpm = 0 #FIXME
+        s.risk = 0 #FIXME
         # data from related files
         videos = self.main_videos()
         if len(videos) > 0:
@@ -574,7 +572,7 @@ class Item(models.Model):
         s.color = int(sum(self.data.get('color', [])))
         s.saturation = 0 #FIXME
         s.brightness = 0 #FIXME
-        
+
         s.cuts = len(self.data.get('cuts', []))
         if s.duration:
             s.cutsperminute = s.cuts / (s.duration/60)
@@ -585,13 +583,13 @@ class Item(models.Model):
             if not getattr(s, key):
                 setattr(s, key, u'zzzzzzzzzzzzzzzzzzzzzzzzz')
         if not s.year:
-            s.year_desc = '';
-            s.year = '9999';
+            s.year_desc = ''
+            s.year = '9999'
         #FIXME: also deal with number based rows like genre, keywords etc
         s.save()
 
     def update_facets(self):
-        #FIXME: what to do with Unkown Director, Year, Country etc. 
+        #FIXME: what to do with Unkown Director, Year, Country etc.
         for key in self.facet_keys:
             if key == 'actor':
                 current_values = [i[0] for i in self.get('actor', [])]
@@ -616,7 +614,7 @@ class Item(models.Model):
             f, created = Facet.objects.get_or_create(key='year', value=year, value_sort=year, item=self)
         else:
             Facet.objects.filter(item=self, key='year').delete()
-    
+
     def path(self, name=''):
         h = self.itemId
         return os.path.join('items', h[:2], h[2:4], h[4:6], h[6:], name)
@@ -624,6 +622,7 @@ class Item(models.Model):
     '''
         Video related functions
     '''
+
     def frame(self, position, width=128):
         stream = self.streams.filter(profile=settings.VIDEO_PROFILE+'.webm')[0]
         path = os.path.join(settings.MEDIA_ROOT, self.path(), 'frames', "%d"%width, "%s.jpg"%position)
@@ -647,14 +646,14 @@ class Item(models.Model):
                     first.width == v.width and first.height == v.height:
                     return True
                 return False
-            videos = filter(check, videos) 
+            videos = filter(check, videos)
         return videos
 
     def update_streams(self):
         files = {}
         for f in self.main_videos():
             files[utils.sort_title(f.name)] = f.video.path
-        
+
         #FIXME: how to detect if something changed?
         if files:
             stream, created = Stream.objects.get_or_create(item=self, profile='%s.webm' % settings.VIDEO_PROFILE)
@@ -693,6 +692,7 @@ class Item(models.Model):
     '''
         Poster related functions
     '''
+
     def update_poster_urls(self):
         _current = {}
         for s in settings.POSTER_SERVICES:
@@ -781,12 +781,14 @@ class Item(models.Model):
                 p.wait()
         return posters.keys()
 
+
 class ItemFind(models.Model):
     """
         used to find items,
         item.update_find populates this table
         its used in manager.ItemManager
     """
+
     class Meta:
         unique_together = ("item", "key")
 
@@ -794,8 +796,9 @@ class ItemFind(models.Model):
     key = models.CharField(max_length=200, db_index=True)
     value = models.TextField(blank=True)
 
-#FIXME: make sort based on site.json
+
 class ItemSort(models.Model):
+    #FIXME: make sort based on site.json
     """
         used to sort items, all sort values are in here
     """
@@ -872,6 +875,7 @@ class ItemSort(models.Model):
         return tuple(fields)
     fields = classmethod(fields)
 
+
 class Facet(models.Model):
     item = models.ForeignKey('Item', related_name='facets')
     key = models.CharField(max_length=200, db_index=True)
@@ -883,7 +887,9 @@ class Facet(models.Model):
             self.value_sort = self.value
         super(Facet, self).save(*args, **kwargs)
 
+
 class Stream(models.Model):
+
     class Meta:
         unique_together = ("item", "profile")
 
@@ -899,7 +905,7 @@ class Stream(models.Model):
 
     def path(self):
         return self.item.path(self.profile)
-        
+
     def extract_derivatives(self):
         if settings.VIDEO_H264:
             profile = self.profile.replace('.webm', '.mp4')
@@ -945,7 +951,9 @@ class Stream(models.Model):
             self.info = ox.avinfo(self.video.path)
         super(Stream, self).save(*args, **kwargs)
 
+
 class PosterUrl(models.Model):
+
     class Meta:
         unique_together = ("item", "service", "url")
         ordering = ('-height', )
@@ -958,4 +966,3 @@ class PosterUrl(models.Model):
 
     def __unicode__(self):
         return u'%s %s %dx%d' % (unicode(self.item), self.service, self.width, self.height)
-

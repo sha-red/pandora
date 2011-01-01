@@ -2,29 +2,18 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 import os.path
-import re
 from datetime import datetime
-from urllib2 import unquote
-import mimetypes
 
 from django import forms
-from django.core.paginator import Paginator
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.db.models import Q, Avg, Count, Sum
-from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404, redirect
-from django.template import RequestContext
+from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 
 from ox.utils import json
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
-from ox.django.http import HttpFileResponse
 from ox.django.views import task_status
-import ox
 
-from item.utils import oxid, parse_path
+from item.utils import parse_path
 from item.models import get_item
 import item.tasks
 from api.actions import actions
@@ -46,6 +35,7 @@ def removeVolume(request):
         response = json_response(status=404, text='volume not found')
     return render_to_json_response(response)
 actions.register(removeVolume)
+
 
 @login_required_json
 def update(request):
@@ -111,11 +101,13 @@ def update(request):
     return render_to_json_response(response)
 actions.register(update)
 
+
 @login_required_json
 def encodingProfile(request):
     response = json_response({'profile': settings.VIDEO_PROFILE})
     return render_to_json_response(response)
 actions.register(encodingProfile)
+
 
 @login_required_json
 def upload(request):
@@ -157,10 +149,12 @@ def upload(request):
     return render_to_json_response(response)
 actions.register(upload)
 
+
 class VideoChunkForm(forms.Form):
     chunk = forms.FileField()
     chunkId = forms.IntegerField(required=False)
     done = forms.IntegerField(required=False)
+
 
 @login_required_json
 def firefogg_upload(request):
@@ -189,7 +183,7 @@ def firefogg_upload(request):
                     #FIXME: this fails badly if rabbitmq goes down
                     try:
                         t = item.tasks.update_streams.delay((f.item.itemId))
-                        data['resultUrl'] = t.task_id
+                        response['resultUrl'] = t.task_id
                     except:
                         pass
                     response['result'] = 1
@@ -213,6 +207,7 @@ def firefogg_upload(request):
     response = json_response(status=400, text='this request requires POST')
     return render_to_json_response(response)
 
+
 @login_required_json
 def taskStatus(request):
     #FIXME: should check if user has permissions to get status
@@ -222,6 +217,7 @@ def taskStatus(request):
     response = task_status(request, task_id)
     return render_to_json_response(response)
 actions.register(taskStatus)
+
 
 @login_required_json
 def editFile(request):
@@ -257,6 +253,7 @@ def editFile(request):
     return render_to_json_response(response)
 actions.register(editFile)
 
+
 def lookup_file(request, oshash):
     f = get_object_or_404(models.File, oshash=oshash)
     return redirect(f.item.get_absolute_url())
@@ -270,34 +267,34 @@ def fileInfo(request):
                 'data': {imdbId:string }}
     '''
     if 'data' in request.POST:
-		oshash = json.loads(request.POST['data'])
-	elif 'oshash' in request.GET:
-		oshash = request.GET['oshash']
+        oshash = json.loads(request.POST['data'])
+    elif 'oshash' in request.GET:
+        oshash = request.GET['oshash']
     f = models.ItemFile.objects.get(oshash=oshash)
     response = {'data': f.json()}
     return render_to_json_response(response)
 actions.register(fileInfo)
 
 def subtitles(request):
-	'''
-	param data
-		oshash string
-		language string
-		subtitle string
-	return
-		if no language is provided:
-			{data: {languages: array}}
-		if language is set:
-			{data: {subtitle: string}}
-		if subtitle is set:
-			saves subtitle for given language
-	'''
+    '''
+    param data
+        oshash string
+        language string
+        subtitle string
+    return
+        if no language is provided:
+            {data: {languages: array}}
+        if language is set:
+            {data: {subtitle: string}}
+        if subtitle is set:
+            saves subtitle for given language
+    '''
     if 'data' in request.POST:
-		data = json.loads(request.POST['data'])
-		oshash = data['oshash']
-		language = data.get('language', None)
-		srt = data.get('subtitle', None)
-	if srt:
+        data = json.loads(request.POST['data'])
+        oshash = data['oshash']
+        language = data.get('language', None)
+        srt = data.get('subtitle', None)
+    if srt:
         user = request.user
         sub = models.Subtitles.objects.get_or_create(user, oshash, language)
         sub.srt = srt
@@ -307,8 +304,8 @@ def subtitles(request):
         if language:
             q = models.Subtitles.objects.filter(item_file__oshash=oshash, language=language)
             if q.count() > 0:
-				response['data']['subtitle'] = q[0].srt
-				return render_to_json_response(response)
+                response['data']['subtitle'] = q[0].srt
+                return render_to_json_response(response)
         l = models.Subtitles.objects.filter(item_file__oshash=oshash).values('language')
         response['data']['languages'] = [f['language'] for f in l]
         return render_to_json_response(response)

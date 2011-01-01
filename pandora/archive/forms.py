@@ -1,4 +1,4 @@
-from ajax_filtered_fields.forms import AjaxManyToManyField, ForeignKeyByLetter
+from ajax_filtered_fields.forms import ForeignKeyByLetter
 from django.conf import settings
 from django import forms
 
@@ -10,6 +10,8 @@ ajax_filtered_js = (
     settings.STATIC_URL + 'js/jquery/jquery.js',
     settings.STATIC_URL + 'js/ajax_filtered_fields.js',
 )
+
+
 class FileAdminForm(forms.ModelForm):
     item = ForeignKeyByLetter(models.Item, field_name='itemId')
 
@@ -28,4 +30,3 @@ class InstanceAdminForm(forms.ModelForm):
 
     class Media:
         js = ajax_filtered_js
-

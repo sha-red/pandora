@@ -5,6 +5,7 @@ from django.contrib import admin
 
 import models
 
+
 class PageAdmin(admin.ModelAdmin):
     search_fields = ['name', 'body']
 
@@ -15,4 +16,3 @@ class SiteSettingsAdmin(admin.ModelAdmin):
     search_fields = ['key', 'value']
 
 admin.site.register(models.SiteSettings, SiteSettingsAdmin)
-

@@ -18,7 +18,7 @@ def autodiscover():
                 import_module('%s.views'%app)
             except:
                 if module_has_submodule(mod, 'views'):
-                    raise 
+                    raise
 
 
 def trim(docstring):
@@ -46,8 +46,11 @@ def trim(docstring):
     # Return a single string:
     return '\n'.join(trimmed)
 
+
 class ApiActions(dict):
+
     def __init__(self):
+
         def api(request):
             '''
                 returns list of all known api action
@@ -56,7 +59,8 @@ class ApiActions(dict):
             '''
             actions = self.keys()
             actions.sort()
-            return render_to_json_response(json_response({'actions': actions}))
+            response = json_response({'actions': actions})
+            return render_to_json_response(response)
         self['api'] = api
 
         def apidoc(request):

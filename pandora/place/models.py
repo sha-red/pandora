@@ -3,12 +3,12 @@
 from __future__ import division, with_statement
 
 from django.db import models
-from django.db.models import Q
-from django.conf import settings
 
+import ox
 from ox.django import fields
 
 import managers
+
 
 class Place(models.Model):
     '''
@@ -60,7 +60,6 @@ class Place(models.Model):
         self.lng_center = ox.location.center(self.lng_sw, self.lng_ne)
 
         #update area
-        self.area = location.area(self.lat_sw, self.lng_sw, self.lat_ne, self.lng_ne)
+        self.area = ox.location.area(self.lat_sw, self.lng_sw, self.lat_ne, self.lng_ne)
 
         super(Place, self).save(*args, **kwargs)
-

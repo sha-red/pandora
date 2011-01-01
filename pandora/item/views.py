@@ -2,19 +2,10 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 import os.path
-import re
-from datetime import datetime
-from urllib2 import unquote
-import mimetypes
 
-from django import forms
-from django.core.paginator import Paginator
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.db.models import Q, Avg, Count, Sum
+from django.db.models import Count, Sum
 from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404, redirect
-from django.template import RequestContext
+from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 
 from ox.utils import json
@@ -28,12 +19,12 @@ import models
 import utils
 import tasks
 
-from user.models import get_user_json
 
 from archive.models import File
 from archive import extract
 
 from api.actions import actions
+
 
 def _order_query(qs, sort, prefix='sort__'):
     order_by = []
@@ -44,7 +35,8 @@ def _order_query(qs, sort, prefix='sort__'):
             sort.append({'operator': '+', 'key': 'director'})
     for e in sort:
         operator = e['operator']
-        if operator != '-': operator = ''
+        if operator != '-':
+            operator = ''
         key = {'id': 'itemId'}.get(e['key'], e['key'])
         #FIXME: this should be a property of models.ItemSort!!!
         if operator=='-' and key in ('title', 'director', 'writer', 'producer', 'editor', 'cinematographer', 'language', 'country', 'year'):
@@ -82,7 +74,7 @@ def find(request):
             'sort': array,
             'range': array
         }
-        
+
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
             sort: array of key, operator dics
@@ -111,7 +103,7 @@ Groups
             'group': string,
             'range': array
         }
-        
+
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
             range:       result range, array [from, to]
@@ -134,7 +126,7 @@ Positions
             'query': query,
             'ids': []
         }
-        
+
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
             ids:  ids of items for which positions are required
@@ -143,7 +135,7 @@ Positions
     if settings.JSON_DEBUG:
         print json.dumps(data, indent=2)
     query = _parse_query(data, request.user)
-    
+
     response = json_response({})
     if 'group' in query:
         if 'sort' in query:
@@ -183,7 +175,7 @@ Positions
     elif 'ids' in query:
         #FIXME: this does not scale for larger results
         qs = _order_query(query['qs'], query['sort'])
-        
+
         response['data']['positions'] = {}
         ids = [j['itemId'] for j in qs.values('itemId')]
         response['data']['positions'] = _get_positions(ids, query['ids'])
@@ -371,7 +363,8 @@ def getImdbId(request):
             }
         }
     '''
-    imdbId = ox.web.imdb.guess(search_title, r['director'], timeout=-1)
+    data = json.loads(request.POST['data'])
+    imdbId = ox.web.imdb.getImdbId(data['title'], data['director'], timeout=-1)
     if imdbId:
         response = json_response({'imdbId': imdbId})
     else:
@@ -406,7 +399,8 @@ def poster(request, id, size=None):
         else:
             poster_path = item.poster.path
     else:
-        if not size: size='large'
+        if not size:
+            size='large'
         return redirect('http://0xdb.org/%s/poster.%s.jpg' % (item.itemId, size))
         poster_path = os.path.join(settings.STATIC_ROOT, 'png/posterDark.48.png')
     return HttpFileResponse(poster_path, content_type='image/jpeg')

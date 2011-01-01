@@ -5,6 +5,7 @@ from django.contrib import admin
 
 import models
 
+
 class ItemAdmin(admin.ModelAdmin):
     search_fields = ['itemId', 'data', 'external_data']
     list_display = ['available', 'itemId', '__unicode__']
@@ -12,8 +13,7 @@ class ItemAdmin(admin.ModelAdmin):
 
 admin.site.register(models.Item, ItemAdmin)
 
+
 class PropertyAdmin(admin.ModelAdmin):
     search_fields = ['name', 'title']
 admin.site.register(models.Property, PropertyAdmin)
-
-
