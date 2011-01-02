@@ -38,7 +38,7 @@ def _order_query(qs, sort, prefix='sort__'):
         elif sort[0]['key'] == 'year':
             sort.append({'operator': '+', 'key': 'director'})
             sort.append({'operator': '+', 'key': 'title'})
-        else:
+        elif not sort[0]['key'] in ('value', 'value_sort'):
             sort.append({'operator': '+', 'key': 'director'})
             sort.append({'operator': '-', 'key': 'year'})
             sort.append({'operator': '+', 'key': 'title'})
