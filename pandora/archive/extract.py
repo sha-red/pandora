@@ -403,7 +403,8 @@ def timeline_strip(item, cuts, info, prefix):
 def chop(video, start, end):
     t = end - start
     tmp = tempfile.mkdtemp()
-    choped_video = '%s/tmp.webm' % tmp
+    ext = os.path.splitext(video)[1]
+    choped_video = '%s/tmp%s' % (tmp, ext)
     cmd = [
         'ffmpeg',
         '-y',
@@ -412,7 +413,7 @@ def chop(video, start, end):
         '-t', '%.3f'%t,
         '-vcodec', 'copy',
         '-acodec', 'copy',
-        '-f', 'webm',
+        '-f', ext[1:],
         choped_video
     ]
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE,

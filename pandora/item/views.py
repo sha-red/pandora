@@ -29,10 +29,19 @@ from api.actions import actions
 def _order_query(qs, sort, prefix='sort__'):
     order_by = []
     if len(sort) == 1:
-        if sort[0]['key'] in ('title', 'director'):
+        if sort[0]['key'] == 'title':
             sort.append({'operator': '-', 'key': 'year'})
-        if sort[0]['key'] in ('year', ):
             sort.append({'operator': '+', 'key': 'director'})
+        elif sort[0]['key'] == 'director':
+            sort.append({'operator': '-', 'key': 'year'})
+            sort.append({'operator': '+', 'key': 'title'})
+        elif sort[0]['key'] == 'year':
+            sort.append({'operator': '+', 'key': 'director'})
+            sort.append({'operator': '+', 'key': 'title'})
+        else:
+            sort.append({'operator': '+', 'key': 'director'})
+            sort.append({'operator': '-', 'key': 'year'})
+            sort.append({'operator': '+', 'key': 'title'})
     for e in sort:
         operator = e['operator']
         if operator != '-':
@@ -420,24 +429,27 @@ def video(request, id, profile):
     content_type = path.endswith('.mp4') and 'video/mp4' or 'video/webm'
     #server side cutting
     t = request.GET.get('t', None)
-    if content_type == 'video/webm' and t:
+    if t:
         t = map(float, t.split(','))
-        if len(t) == 2 and t[1] > t[0] and stream.duration>=t[1]:
+        ext = os.path.splitext(profile)[1]
+        if len(t) == 2 and t[1] > t[0] and stream.info['duration']>=t[1]:
             response = HttpResponse(extract.chop(path, t[0], t[1]), content_type=content_type)
-            filename = "Clip of %s - %s-%s - %s %s.webm" % (
+            filename = "Clip of %s - %s-%s - %s %s%s" % (
                 item.get('title'),
                 ox.formatDuration(t[0] * 1000),
                 ox.formatDuration(t[1] * 1000),
                 settings.SITENAME,
-                item.itemId
+                item.itemId,
+                ext
             )
             response['Content-Disposition'] = 'attachment; filename="%s"' % filename
             return response
         else:
-            filename = "%s - %s %s.webm" % (
+            filename = "%s - %s %s%s" % (
                 item.get('title'),
                 settings.SITENAME,
-                item.itemId
+                item.itemId,
+                ext
             )
             response = HttpFileResponse(path, content_type=content_type)
             response['Content-Disposition'] = 'attachment; filename="%s"' % filename
