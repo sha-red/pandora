@@ -530,7 +530,35 @@ var pandora = new Ox.App({
 	                });
 	            });
 			} else if (mode == 'item') {
-				var that = new Ox.Element('div');
+		        var that = new Ox.IconList({
+		            id: 'list',
+		            item: function(data, sort, size) {
+		                var ratio = data.poster.width / data.poster.height;
+		                size = size || 64;
+		                return {
+		                    height: ratio <= 1 ? size : size / ratio,
+		                    id: data['id'],
+		                    info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
+		                    title: data.title + (data.director ? ' (' + data.director + ')' : ''),
+		                    url: data.poster.url.replace(/jpg/, size + '.jpg'),
+		                    width: ratio >= 1 ? size : size * ratio
+		                };
+		            },
+		            keys: ['director', 'id', 'poster', 'title', 'year'],
+		            max: 1,
+		            min: 1,
+		            orientation: 'horizontal',
+		            request: function(data, callback) {
+		                Ox.print('data, Query.toObject', data, Query.toObject())
+		                pandora.api.find($.extend(data, {
+		                    query: Query.toObject()
+		                }), callback);
+		            },
+		            selected: [app.user.ui.item],
+		            size: 64,
+		            sort: app.user.ui.sort,
+		            unique: 'id'
+		        });
 			}
 			return that;
 		},
@@ -557,7 +585,7 @@ var pandora = new Ox.App({
     	            {
     	                collapsible: true,
     	                element: app.$ui.browser = ui.browser('item'),
-    	                size: 80
+    	                size: 112 + ($.browser.mozilla ? 16 : 12) // fixme: should be app.ui.scrollbarSize
     	            },
     	            {
     	                element: app.$ui.item = ui.item(app.user.ui.item, app.user.ui.itemView)
@@ -895,9 +923,9 @@ var pandora = new Ox.App({
                 app.$ui.contentPanel.replaceElements([
                     {
 						collapsible: true,
-						element: app.$ui.browser = new Ox.Element('div').options({id: 'browser'}),
+						element: app.$ui.browser = ui.browser('item'),
 						resizable: false,
-						size: 80
+						size: 112 + ($.browser.mozilla ? 16 : 12)
 					},
 					{
 					    element: new Ox.Element('div')
@@ -1972,7 +2000,7 @@ var pandora = new Ox.App({
 			var that = new Ox.SplitPanel({
                 elements: [
                     {
-                        element: app.$ui.toolbar = ui.toolbar('list').css({ zIndex: 2 }), // fixme: remove later
+                        element: app.$ui.toolbar = ui.toolbar(),
                         size: 24
                     },
                     {
@@ -2163,7 +2191,10 @@ var pandora = new Ox.App({
 			        })
 			        .append(
 			            app.$ui.viewSelect = ui.viewSelect() 
-			        );
+			        )
+			        .css({
+			            zIndex: 2 // fixme: remove later
+			        });
 			!app.user.ui.item && that.append(
 			    app.$ui.sortSelect = ui.sortSelect()
 			);
@@ -2171,7 +2202,7 @@ var pandora = new Ox.App({
 			    app.$ui.findElement = ui.findElement()
 			);
 			that.display = function() {
-				app.$ui.rightPanel.replace(0, app.$ui.toolbar = toolbar());
+				app.$ui.rightPanel.replace(0, app.$ui.toolbar = ui.toolbar()); // fixme: remove later
 			}
 			return that;
 		},
