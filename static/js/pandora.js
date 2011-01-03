@@ -1093,7 +1093,6 @@ var pandora = new Ox.App({
 		list: function(view) {
 			var that, $map,
 		        keys = ['director', 'id', 'poster', 'title', 'year'];
-		    app.user.ui.mode = 'list';
 		    Ox.print('constructList', view);
 		    if (view == 'list') {
 		        that = new Ox.TextList({
@@ -2288,7 +2287,7 @@ var pandora = new Ox.App({
         callback(value);
     }
 
-    function getAlignment(key) {
+    function getAlignment(key) { // fixme: make static
         return ['person', 'string', 'text', 'title'].indexOf(
             Ox.getObjectById(app.config.sortKeys, key).type
         ) > -1 ? 'left' : 'right';
@@ -2301,7 +2300,7 @@ var pandora = new Ox.App({
 	    return width;
 	}
 
-    function getSortOperator(key) {
+    function getSortOperator(key) { // fixme: make static
         return ['person', 'string', 'text', 'title'].indexOf(
             Ox.getObjectById(app.config.sortKeys, key).type
         ) > -1 ? '' : '-';
@@ -2552,21 +2551,25 @@ var pandora = new Ox.App({
 
             update: function() {
                 URL.parse();
-                if (!old.user.ui.item) {
-                    if (!app.user.ui.item) {
-                        
+                if (app.user.ui.section == 'items') {
+                    if (!old.user.ui.item) {
+                        if (!app.user.ui.item) {
+
+                        } else {
+                            app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
+                            //app.$ui.rightPanel.replace(0, app.$ui.toolbar = ui.toolbar());
+                            //ui.item().display();
+                        }
                     } else {
-                        //ui.toolbar.display();
-                        app.$ui.rightPanel.replace(0, app.$ui.toolbar = ui.toolbar());
-                        ui.item().display();
-                    }
-                } else {
-                    if (!app.user.ui.item) {
-                        ui.list(app.user.ui.listView).display();
-                    } else {
-                        app.$ui.contentPanel.replace(1, ui.item());
+                        if (!app.user.ui.item) {
+                            app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
+                            //ui.list(app.user.ui.listView).display();
+                        } else {
+                            app.$ui.contentPanel.replace(1, ui.item());
+                        }
                     }
                 }
+                delete old.user.ui;
             }
 
         }
