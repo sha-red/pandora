@@ -21,12 +21,12 @@ import models
 from api.actions import actions
 
 
-class LoginForm(forms.Form):
+class SigninForm(forms.Form):
     username = forms.TextInput()
     password = forms.TextInput()
 
 
-def api_login(request):
+def signin(request):
     '''
         param data {
             username: 'username',
@@ -47,7 +47,7 @@ def api_login(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    form = LoginForm(data, request.FILES)
+    form = SigninForm(data, request.FILES)
     if form.is_valid():
         if models.User.objects.filter(username=form.data['username']).count() == 0:
             response = json_response({
@@ -79,10 +79,10 @@ def api_login(request):
     else:
         response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)
-actions.register(api_login, 'login')
+actions.register(signin)
 
 
-def api_logout(request):
+def signout(request):
     '''
         param data {
         }
@@ -104,16 +104,16 @@ def api_logout(request):
         site = json.load(f)
     response['data']['user'] = site['user']
     return render_to_json_response(response)
-actions.register(api_logout, 'logout')
+actions.register(signout)
 
 
-class RegisterForm(forms.Form):
+class SignupForm(forms.Form):
     username = forms.TextInput()
     password = forms.TextInput()
     email = forms.TextInput()
 
 
-def register(request):
+def signup(request):
     '''
         param data {
             username: 'username',
@@ -135,7 +135,7 @@ def register(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    form = RegisterForm(data, request.FILES)
+    form = SignupForm(data, request.FILES)
     if form.is_valid():
         if models.User.objects.filter(username=form.data['username']).count() > 0:
             response = json_response({
@@ -173,7 +173,7 @@ def register(request):
     else:
         response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)
-actions.register(register)
+actions.register(signup)
 
 
 def resetPassword(request):
