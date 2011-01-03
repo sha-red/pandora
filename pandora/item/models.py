@@ -630,7 +630,7 @@ class Item(models.Model):
                     setattr(s, name, value)
 
         #sort keys based on database, these will always be available
-        s.id = self.itemId.replace('0x', 'xx')
+        s.itemId = self.itemId.replace('0x', 'xx')
         s.modified = self.modified
         s.modified_desc = self.modified
         s.published = self.published
@@ -896,6 +896,7 @@ attrs = {
 }
 for key in site_config['sortKeys']:
     name = key['id']
+    name = {'id': 'itemId'}.get(name, name)
     field_type = key['type']
     if field_type in ('string', 'title', 'person'):
         attrs[name] = models.CharField(max_length=1000, db_index=True)
