@@ -19,22 +19,22 @@
         {"id": "dialog", "title": "Dialog"}
     ],
     "groups": [
-		{"id": "director", "title": "Director"},
-		{"id": "country", "title": "Country"},
-		{"id": "year", "title": "Year"},
-		{"id": "language", "title": "Language"},
-		{"id": "genre", "title": "Genre"},
-		{"id": "writer", "title": "Writer"},
-		{"id": "producer", "title": "Producer"},
-		{"id": "cinematographer", "title": "Cinematographer"},
-		{"id": "editor", "title": "Editor"},
-		{"id": "actor", "title": "Actor"},
-		{"id": "keyword", "title": "Keyword"}
-	],
-	"itemName": {
-		"singular": "Movie",
-		"plural": "Movies"
-	},
+        {"id": "director", "title": "Director"},
+        {"id": "country", "title": "Country"},
+        {"id": "year", "title": "Year"},
+        {"id": "language", "title": "Language"},
+        {"id": "genre", "title": "Genre"},
+        {"id": "writer", "title": "Writer"},
+        {"id": "producer", "title": "Producer"},
+        {"id": "cinematographer", "title": "Cinematographer"},
+        {"id": "editor", "title": "Editor"},
+        {"id": "actor", "title": "Actor"},
+        {"id": "keyword", "title": "Keyword"}
+    ],
+    "itemName": {
+        "singular": "Movie",
+        "plural": "Movies"
+    },
     "itemViews": [
         {"id": "info", "title": "Info"},
         {"id": "statistics", "title": "Statistics"},
@@ -44,10 +44,10 @@
         {"id": "calendar", "title": "Calendar"},
         {"id": "files", "title": "Files", "admin": true}
     ],
-	"layers": [
-		{"id": "privatenotes", "title": "Private Notes", "type": "text"},
-		{"id": "publicnotes", "title": "Public Notes", "type": "text"}
-	],
+    "layers": [
+        {"id": "privatenotes", "title": "Private Notes", "type": "text"},
+        {"id": "publicnotes", "title": "Public Notes", "type": "text"}
+    ],
     "listViews": [
         {"id": "list", "title": "as List"},
         {"id": "icons", "title": "as Icons"},
@@ -61,9 +61,9 @@
         {"id": "calendar", "title": "on Calendar"}
     ],
     "site": {
-    	"id": "{{settings.SITEID}}",
+        "id": "{{settings.SITEID}}",
         "name": "{{settings.SITENAME}}",
-		"sectionName": "{{settings.SITENAME}}",
+        "sectionName": "{{settings.SITENAME}}",
         "url": "{{settings.URL}}"
     },
     "sections": [
@@ -128,24 +128,25 @@
         "group": "guest",
         "preferences": {},
         "ui": {
+            "annotationsSize": 256,
             "columns": ["id", "title", "director", "country", "year", "language", "genre"],
             "findQuery": {"conditions": [], "operator": ""},
-			"groups": ["director", "country", "year", "language", "genre"],
+            "groups": ["director", "country", "year", "language", "genre"],
             "groupsQuery": {"conditions": [], "operator": "|"},
             "groupsSize": 176,
-			"item": "",
+            "item": "",
             "itemView": "timeline",
             "listQuery": {"conditions": [], "operator": ""},
             "listsSize": 256,
             "listView": "icons",
-			"section": "items",
+            "section": "items",
             "sections": ["history", "lists", "public", "featured"],
             "showAnnotations": true,
             "showGroups": true,
             "showInfo": true,
-            "showLists": true,
             "showMovies": true,
-			"sitePage": "home",
+            "showSidebar": true,
+            "sitePage": "home",
             "sort": [
                 {"key": "director", "operator": ""}
             ],
