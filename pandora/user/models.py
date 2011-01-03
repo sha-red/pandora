@@ -9,6 +9,7 @@ from django.conf import settings
 
 from ox.utils import json
 
+from app.models import site_config
 
 class UserProfile(models.Model):
     reset_token = models.TextField(blank=True, null=True, unique=True)
@@ -50,9 +51,7 @@ def get_user_json(user):
 
 
 def get_ui(user):
-    with open(os.path.join(settings.PROJECT_ROOT, 'templates', 'site.json')) as f:
-        site = json.load(f)
-    return site['user']['ui']
+    return site_config['user']['ui']
     '''
     return {
         "columns": ["id", "title", "director", "country", "year", "language", "genre"],

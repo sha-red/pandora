@@ -19,7 +19,7 @@ import ox
 import models
 
 from api.actions import actions
-
+from app.models import site_config
 
 class SigninForm(forms.Form):
     username = forms.TextInput()
@@ -100,9 +100,8 @@ def signout(request):
     if request.user.is_authenticated():
         response = json_response(text='logged out')
         logout(request)
-    with open(os.path.join(settings.PROJECT_ROOT, 'templates', 'site.json')) as f:
-        site = json.load(f)
-    response['data']['user'] = site['user']
+
+    response['data']['user'] = site_config['user']
     return render_to_json_response(response)
 actions.register(signout)
 
