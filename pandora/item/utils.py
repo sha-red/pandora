@@ -189,6 +189,11 @@ def parse_path(path):
     return r
 
 
+def sort_string(string):
+    string = string.replace(u'Þ', 'Th')
+    return unicodedata.normalize('NFKD', string)
+
+
 def sort_title(title):
     #title
     title = re.sub(u'[\'!¿¡,\.;\-"\:\*\[\]]', '', title)
@@ -196,9 +201,8 @@ def sort_title(title):
     #title = title.replace(u'Æ', 'Ae')
     if isinstance(title, str):
         title = unicode(title)
-    title = unicodedata.normalize('NFKD', title)
+    title = sort_string(title)
 
     #pad numbered titles
     title = re.sub('(\d+)', lambda x: '%010d' % int(x.group(0)), title)
     return title.strip()
-

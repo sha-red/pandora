@@ -282,7 +282,10 @@ class Item(models.Model):
                 data['releasedate'] = min(data.pop('release date'))
             if 'plot' in data:
                 data['summary'] = data.pop('plot')
-            data['actor'] = [c[0] for c in data['cast']]
+            if isinstance(data['cast'][0], basestring):
+                data['actor'] = [data['cast'][0]]
+            else:
+                data['actor'] = [c[0] for c in data['cast']]
             self.external_data = data
             self.save()
 
@@ -562,24 +565,23 @@ class Item(models.Model):
             if name not in base_keys:
                 if field_type == 'title':
                     value = utils.sort_title(canonicalTitle(self.get(name)))
-                    value = unicodedata.normalize('NFKD', value)
+                    value = utils.sort_string(value)
                     setattr(s, '%s_desc'%name, value)
                     if not value:
                         value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
                     setattr(s, name, value)
                 elif field_type == 'person':
                     value = sortNames(self.get(name, []))
-                    value = unicodedata.normalize('NFKD', value)[:255]
+                    value = utils.sort_string(value)[:955]
                     setattr(s, '%s_desc'%name, value)
                     if not value:
                         value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
                     setattr(s, name, value)
-                elif field_type == 'text':
-                    #FIXME: what use pural_key?
+                elif field_type == 'string':
                     value = self.get(name, u'')
                     if isinstance(value, list):
                         value = u','.join(value)
-                    value = unicodedata.normalize('NFKD', value)
+                    value = utils.sort_string(value)[:955]
                     setattr(s, '%s_desc'%name, value)
                     if not value:
                         value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
@@ -896,15 +898,12 @@ attrs = {
 for key in site_config['sortKeys']:
     name = key['id']
     field_type = key['type']
-    if field_type in ('string', 'title'):
+    if field_type in ('string', 'title', 'person'):
         attrs[name] = models.CharField(max_length=1000, db_index=True)
         attrs['%s_desc'%name] = models.CharField(max_length=1000, db_index=True)
     elif field_type == 'year':
         attrs[name] = models.CharField(max_length=4, db_index=True)
         attrs['%s_desc'%name] = models.CharField(max_length=4, db_index=True)
-    elif field_type in ('text', 'person'):
-        attrs[name] = models.TextField(blank=True, db_index=True)
-        attrs['%s_desc'%name] = models.TextField(blank=True, db_index=True)
     elif field_type in ('integer', 'words', 'length'):
         attrs[name] = models.BigIntegerField(blank=True, db_index=True)
         attrs['%s_desc'%name] = models.BigIntegerField(blank=True, db_index=True)
