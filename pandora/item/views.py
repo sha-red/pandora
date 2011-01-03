@@ -147,6 +147,7 @@ Positions
 
     response = json_response({})
     if 'group' in query:
+        '''
         if 'sort' in query:
             if len(query['sort']) == 1 and query['sort'][0]['key'] == 'items':
                 if query['group'] == "year":
@@ -169,6 +170,8 @@ Positions
                 query['sort'][i]['key'] = name_sort
             elif query['sort'][i]['key'] == 'items':
                 query['sort'][i]['key'] = items
+        print query['sort']
+        print '---------------------------------------------------------'
         qs = _order_query(qs, query['sort'], prefix='')
         if 'ids' in query:
             #FIXME: this does not scale for larger results
@@ -181,6 +184,40 @@ Positions
             response['data']['items'] = [{'name': i[name], 'items': i[items]} for i in qs]
         else:
             response['data']['items'] = qs.count()
+        '''
+        if 'sort' in query:
+            if len(query['sort']) == 1 and query['sort'][0]['key'] == 'items':
+                if query['group'] == "year":
+                    order_by = query['sort'][0]['operator'] == '-' and 'items' or '-items'
+                else:
+                    order_by = query['sort'][0]['operator'] == '-' and '-items' or 'items'
+                if query['group'] != "keyword":
+                    order_by = (order_by, 'value_sort')
+                else:
+                    order_by = (order_by,)
+            else:
+                order_by = query['sort'][0]['operator'] == '-' and '-value_sort' or 'value_sort'
+                order_by = (order_by, 'items')
+        else:
+            order_by = ('-value_sort', 'items')
+        response['data']['items'] = []
+        items = 'items'
+        item_qs = query['qs']
+        qs = models.Facet.objects.filter(key=query['group']).filter(item__id__in=item_qs)
+        qs = qs.values('value').annotate(items=Count('id')).order_by(*order_by)
+
+        if 'ids' in query:
+            #FIXME: this does not scale for larger results
+            response['data']['positions'] = {}
+            ids = [j['value'] for j in qs]
+            response['data']['positions'] = _get_positions(ids, query['ids'])
+
+        elif 'range' in data:
+            qs = qs[query['range'][0]:query['range'][1]]
+            response['data']['items'] = [{'name': i['value'], 'items': i[items]} for i in qs]
+        else:
+            response['data']['items'] = qs.count()
+
     elif 'ids' in query:
         #FIXME: this does not scale for larger results
         qs = _order_query(query['qs'], query['sort'])
@@ -221,6 +258,45 @@ Positions
     return render_to_json_response(response)
 
 actions.register(find)
+
+
+def autocomplete(request):
+    '''
+        param data
+            key
+            value
+            operator '', '^', '$'
+            range
+        return 
+    '''
+    data = json.loads(request.POST['data'])
+    if not 'range' in data:
+        data['range'] = [0, 10]
+
+    #FIXME: key and sort have to be defined in site.json
+    if data['key'] == 'title':
+        qs = models.Item.objects.filter(find__key='title', find__value__icontains=data['value'])
+        qs = qs.order_by('-sort__votes')
+        qs = qs[data['range'][0]:data['range'][1]]
+        response = json_response({})
+        response['data']['items'] = [i.get('title') for i in qs]    
+    else:
+        qs = models.Facet.objects.filter(key=data['key'])
+        op = data.get('operator', '')
+        if op == '':
+            qs = qs.filter(value__icontains=data['value'])
+        elif op == '^':
+            qs = qs.filter(value__istartswith=data['value'])
+        elif op == '$':
+            qs = qs.filter(value__iendswith=data['value'])
+        qs = qs.values('value').annotate(items=Count('id')).order_by('-items')
+        qs = qs[data['range'][0]:data['range'][1]]
+        response = json_response({})
+        response['data']['items'] = [i['value'] for i in qs]
+
+    print response
+    return render_to_json_response(response)
+actions.register(autocomplete)
 
 
 def getItem(request):

@@ -10,7 +10,7 @@ import models
 def keyType(key):
     if key in ('released', ):
         return "date"
-    if key in ('year', 'cast.length'):
+    if key in ('cast.length', ):
         return "int"
     if key in ('rating', 'votes'):
         return "float"
