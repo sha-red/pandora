@@ -219,7 +219,7 @@ var pandora = new Ox.App({
                     items: $items,
                     submit: function(data, callback) {
                         if (action == 'login') {
-                            pandora.api.login(data, function(result) {
+                            pandora.api.signin(data, function(result) {
                                 if (!result.data.errors) {
                                     app.$ui.accountDialog.close();
                                     login(result.data);
@@ -228,7 +228,7 @@ var pandora = new Ox.App({
                                 }
                             });
                         } else if (action == 'register') {
-                            pandora.api.register(data, function(result) {
+                            pandora.api.signup(data, function(result) {
                                 if (!result.data.errors) {
                                     app.$ui.accountDialog.close();
                                     login(result.data);
@@ -407,7 +407,7 @@ var pandora = new Ox.App({
                             title: 'Logout'
                         }).bindEvent('click', function() {
                             that.close();
-                            pandora.api.logout({}, function(result) {
+                            pandora.api.signout({}, function(result) {
                                 logout(result.data);
                             });
                         })
@@ -747,7 +747,8 @@ var pandora = new Ox.App({
             }
 			return that;
 		},
-        group: function(id) {
+        group: function(id, query) {
+            Ox.print('group', id, query)
             var i = app.user.ui.groups.indexOf(id),
                 panelWidth = app.$ui.document.width() - app.user.ui.listsSize - 1,
                 title = Ox.getObjectById(app.config.groups, id).title,
@@ -781,6 +782,9 @@ var pandora = new Ox.App({
                             query: Query.toObject(id)
                         }), callback);
                     },
+                    selected: query ? $.map(query.conditions, function(v) {
+                        return v.key;
+                    }) : [],
                     sort: [
                         {
                             key: id == 'year' ? 'name' : 'items',
@@ -798,29 +802,7 @@ var pandora = new Ox.App({
                             operator: '='
                         };
                     });
-                    query = Query.toObject();
-                    app.$ui.list.options({
-                        request: function(data, callback) {
-                            return pandora.api.find($.extend(data, {
-                                query: query
-                            }), callback);
-                        }
-                    });
-                    $.each(app.ui.groups, function(i_, group_) {
-                        if (i_ != i) {
-                            Ox.print('setting groups request', i, i_)
-                            app.$ui.groups[i_].options({
-                                request: function(data, callback) {
-                                    delete data.keys;
-                                    return pandora.api.find($.extend(data, {
-                                        group: group_.id,
-                                        query: Query.toObject(group_.id)
-                                    }), callback);
-                                }
-                            });
-                        }
-                    });
-                    history.pushState({}, '', Query.toString(query));
+                    reloadGroups();
                 });
             new Ox.Select({
                     items: $.map(app.config.groups, function(v) {
@@ -836,21 +818,37 @@ var pandora = new Ox.App({
                 })
                 .bindEvent('change', function(event, data) {
                     var id_ = data.selected[0].id,
-                        index = app.user.ui.groups.indexOf(id_);
-                    replaceGroup(i, id_);
-                    index > -1 && replaceGroup(index, id);
-                    function replaceGroup(i, id) {
-                        app.user.ui.groups[i] = id;
-                        if (i == 0 || i == 4) {
-                            app.$ui.browser.replace(i / 2, app.$ui.groups[i] = ui.group(id));
-                        } else {
-                            app.$ui.groupsInnerPanel.replace(i - 1, app.$ui.groups[i] = ui.group(id));
+                        i_ = app.user.ui.groups.indexOf(id_);
+                    i_ == -1 ? replaceGroup(i, id_) : swapGroups();
+                    function replaceGroup(i, id, query) {
+                        var isOuter = i % 4 == 0;
+                        if (i_ == -1) {
+                            if (app.ui.groups[i].query.conditions.length) {
+                                app.ui.groups[i].query.conditions = [];
+                                reloadGroups();
+                            }
+                            app.ui.groups[i] = getGroupObject(id);
                         }
-                        app.ui.groups[i] = getGroupObject(id);
+                        app.user.ui.groups[i] = id;
+                        app.$ui[isOuter ? 'browser' : 'groupsInnerPanel'].replace(
+                            isOuter ? i / 2 : i - 1,
+                            app.$ui.groups[i] = ui.group(id, query)
+                        );
+                    }
+                    function swapGroups() {
+                        var group = $.extend({}, app.ui.groups[i]),
+                            query = app.ui.groups[i].query;
+                            query_ = app.ui.groups[i_].query;
+                        app.ui.groups[i] = app.ui.groups[i_];
+                        app.ui.groups[i_] = group;
+                        app.user.ui.groups[i] = id_;
+                        app.user.ui.groups[i_] = id;
+                        replaceGroup(i, id_, query_);
+                        replaceGroup(i_, id, query);
                     }
                 })
                 .appendTo(that.$bar.$element);
-            app.ui.groups[i] = getGroupObject(id);
+            app.ui.groups[i] = getGroupObject(id);    
             function getGroupObject(id) {
                 var i = app.user.ui.groups.indexOf(id),
                     title = Ox.getObjectById(app.config.groups, id).title,
@@ -866,13 +864,38 @@ var pandora = new Ox.App({
                     title: title
                 };
             }
+            function reloadGroups() {
+                var query = Query.toObject();
+                app.$ui.list.options({
+                    request: function(data, callback) {
+                        return pandora.api.find($.extend(data, {
+                            query: query
+                        }), callback);
+                    }
+                });
+                $.each(app.ui.groups, function(i_, group_) {
+                    if (i_ != i) {
+                        Ox.print('setting groups request', i, i_)
+                        app.$ui.groups[i_].options({
+                            request: function(data, callback) {
+                                delete data.keys;
+                                return pandora.api.find($.extend(data, {
+                                    group: group_.id,
+                                    query: Query.toObject(group_.id)
+                                }), callback);
+                            }
+                        });
+                    }
+                });
+                history.pushState({}, '', Query.toString(query));
+            }
             return that;
         },
 		groups: function() {
 			var $groups = [];
 			app.ui.groups = [];
             app.user.ui.groups.forEach(function(id, i) {
-                $groups[i] = ui.group(id, i)
+                $groups[i] = ui.group(id);
             });
 		    return $groups;
 		},
@@ -1449,7 +1472,7 @@ var pandora = new Ox.App({
 		        }
 		    });
             that.display = function() {
-                
+                app.$ui.rightPanel.replace(1, app.$ui.contentPanel = ui.contentPanel());
             };
 		    return that;
 		},
@@ -2527,7 +2550,6 @@ var pandora = new Ox.App({
                     }
                 } else {
                     if (!app.user.ui.item) {
-                        alert('return')
                         ui.list(app.user.ui.listView).display();
                     } else {
                         app.$ui.contentPanel.replace(1, ui.item());
