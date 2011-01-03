@@ -133,10 +133,10 @@ def get_item(info):
             item = Item.objects.get(itemId=info['imdbId'])
         except Item.DoesNotExist:
             item = Item(itemId=info['imdbId'])
-            if 'title' in info and 'directors' in info:
+            if 'title' in info and 'director' in info:
                 item.external_data = {
                     'title': info['title'],
-                    'directors': info['directors'],
+                    'director': info['director'],
                     'year': info.get('year', '')
                 }
             #FIXME: this should be done async
@@ -155,7 +155,7 @@ def get_item(info):
                 item = Item()
                 item.data = {
                     'title': info['title'],
-                    'directors': info['directors'],
+                    'director': info['director'],
                     'year': info.get('year', '')
                 }
                 item.itemId = info['oxdbId']
@@ -353,15 +353,15 @@ class Item(models.Model):
         'runtime': 'runtime',
         'release_date': 'release_date',
 
-        'countries': 'country',
-        'directors': 'director',
-        'writers': 'writer',
-        'editors': 'editor',
-        'producers': 'producer',
+        'country': 'country',
+        'director': 'director',
+        'writer': 'writer',
+        'editor': 'editor',
+        'producer': 'producer',
         'cinematographer': 'cinematographer',
-        'languages': 'language',
+        'language': 'language',
         'genres': 'genre',
-        'keywords': 'keyword',
+        'keyword': 'keyword',
         'cast': 'cast',
         'series_title': 'series_title',
         'episode_title': 'episode_title',
@@ -464,12 +464,12 @@ class Item(models.Model):
     fields = classmethod(fields)
 
     def oxid(self):
-        return utils.oxid(self.get('title', ''), self.get('directors', []), str(self.get('year', '')),
+        return utils.oxid(self.get('title', ''), self.get('director', []), str(self.get('year', '')),
                           self.get('series title', ''), self.get('episode title', ''),
                           self.get('season', ''), self.get('episode', ''))
 
     def oxdb_id(self):
-        return utils.oxdb_id(self.get('title', ''), self.get('directors', []), str(self.get('year', '')),
+        return utils.oxdb_id(self.get('title', ''), self.get('director', []), str(self.get('year', '')),
                           self.get('season', ''), self.get('episode', ''),
                           self.get('episode_title', ''), self.get('episode_directors', ''), self.get('episode_year', ''))
 
@@ -852,7 +852,7 @@ class Item(models.Model):
             if os.path.exists(timeline):
                 cmd = [settings.ITEM_POSTER,
                        '-t', self.get('title'),
-                       '-d', ', '.join(self.get('directors', ['Unknown Director'])),
+                       '-d', ', '.join(self.get('director', ['Unknown Director'])),
                        '-y', str(self.get('year', '')),
                        '-f', frame,
                        '-l', timeline,

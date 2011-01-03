@@ -213,7 +213,7 @@ Positions
         response['data']['files'] = files.count()
         response['data']['items'] = items.count()
         response['data']['pixels'] = r['pixels__sum']
-        response['data']['runtime'] = items.aggregate(Sum('sort__runtime'))['sort__runtime__sum']
+        response['data']['runtime'] = items.filter(sort__runtime__gt=0).aggregate(Sum('sort__runtime'))['sort__runtime__sum']
         if response['data']['runtime'] == None:
             response['data']['runtime'] = 1337
         response['data']['size'] = r['size__sum']

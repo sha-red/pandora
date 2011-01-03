@@ -37,7 +37,9 @@ def parseCondition(condition):
     key_type = models.site_config['keys'].get(k, {'type':'string'}).get('type')
     key_type = {
         'title': 'string',
-        'person': 'string'
+        'person': 'string',
+        'text': 'string',
+        'year': 'string',
     }.get(key_type, key_type)
 
     if key_type == "string":
