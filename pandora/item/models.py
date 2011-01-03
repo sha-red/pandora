@@ -332,11 +332,10 @@ class Item(models.Model):
             l.items.remove(self)
             if l.items.filter(id=other.id) == 0:
                 l.items.add(other)
-        #FIXME: should this really happen for layers?
-        for l in self.layer.all():
-            l.items.remove(self)
-            if l.items.filter(id=other.id) == 0:
-                l.items.add(other)
+        #FIXME: should this really happen for annotations?
+        for a in self.annotations.all():
+            a.item = other
+
         if hasattr(self, 'files'):
             for f in self.files.all():
                 f.item = other
