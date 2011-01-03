@@ -7,16 +7,6 @@ from django.db.models import Q, Manager
 import models
 
 
-def keyType(key):
-    if key in ('released', ):
-        return "date"
-    if key in ('year', 'cast.length'):
-        return "int"
-    if key in ('rating', 'votes'):
-        return "float"
-    return "string"
-
-
 def parseCondition(condition):
     '''
     condition: {
@@ -37,29 +27,40 @@ def parseCondition(condition):
     v = condition['value']
     op = condition.get('operator', None)
     if not op:
-        op = '~'
+        op = ''
     if op.startswith('!'):
         op = op[1:]
         exclude = True
     else:
         exclude = False
-    if keyType(k) == "string":
+
+    key_type = models.site_config['keys'].get(k, 'string')
+    return {
+        'title': 'string',
+        'person': 'string'
+    }.get(key_type, key_type)
+
+    if key_type == "string":
         in_find=True
         value_key = 'find__value'
-        if op == '=':
-            if k in models.Item.facet_keys:
-                in_find=False
+        if k in models.Item.facet_keys:
+            in_find = False
+            if op == '=':
                 v = models.Item.objects.filter(facets__key=k, facets__value=v)
-                k = 'id__in'
-            else:
-                value_key = 'find__value__iexact'
+            elif op == '^':
+                v = models.Item.objects.filter(facets__key=k, facets__value__istartswith=v)
+            elif op == '$':
+                v = models.Item.objects.filter(facets__key=k, facets__value__iendswith=v)
+            k = 'id__in'
+        elif op == '=':
+            value_key = 'find__value__iexact'
         elif op == '^':
             v = v[1:]
             value_key = 'find__value__istartswith'
         elif op == '$':
             v = v[:-1]
             value_key = 'find__value__iendswith'
-        else: # elif op == '~':
+        else: # default
             value_key = 'find__value__icontains'
         k = str(k)
         if exclude:
@@ -82,7 +83,7 @@ def parseCondition(condition):
         if op == '-':
             v1 = v[1]
             v2 = v[2]
-            if keyType(k) == "date":
+            if key_type == "date":
                 v1 = parseDate(v1.split('.'))
                 v2 = parseDate(v2.split('.'))
 
@@ -95,7 +96,7 @@ def parseCondition(condition):
                 k2 = 'value__lt'
                 return Q(**{'find__key': k, k1: v1})&Q(**{'find__key': k, k2: v2})
         else:
-            if keyType(k) == "date":
+            if key_type == "date":
                 v = parseDate(v.split('.'))
             if op == '=':
                 vk = 'value__exact'
@@ -107,6 +108,8 @@ def parseCondition(condition):
                 vk = 'value__lt'
             elif op == '<=':
                 vk = 'value__lte'
+            elif op == '':
+                vk = 'value__exact'
 
             vk = 'find__%s' % vk
             vk = str(vk)

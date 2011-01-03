@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from django.db import models
+import os
 
+from django.db import models
+from django.conf import settings
+from ox.utils import json
 
 class Page(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -19,3 +22,10 @@ class SiteSettings(models.Model):
 
     def __unicode__(self):
         return self.key
+
+with open(os.path.join(settings.PROJECT_ROOT, 'templates', 'site.json')) as f:
+    site_config = json.load(f)
+    site_config['keys'] = {}
+    for key in site_config['sortKeys']:
+        site_config['keys'][key['id']] = key
+

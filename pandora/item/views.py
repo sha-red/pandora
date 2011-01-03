@@ -42,13 +42,14 @@ def _order_query(qs, sort, prefix='sort__'):
             sort.append({'operator': '+', 'key': 'director'})
             sort.append({'operator': '-', 'key': 'year'})
             sort.append({'operator': '+', 'key': 'title'})
+
+
     for e in sort:
         operator = e['operator']
         if operator != '-':
             operator = ''
         key = {'id': 'itemId'}.get(e['key'], e['key'])
-        #FIXME: this should be a property of models.ItemSort!!!
-        if operator=='-' and key in ('title', 'director', 'writer', 'producer', 'editor', 'cinematographer', 'language', 'country', 'year'):
+        if operator=='-' and '%s_desc'%key in models.ItemSort.descending_fields:
             key = '%s_desc' % key
         order = '%s%s%s' % (operator, prefix, key)
         order_by.append(order)
@@ -150,35 +151,33 @@ Positions
         if 'sort' in query:
             if len(query['sort']) == 1 and query['sort'][0]['key'] == 'items':
                 if query['group'] == "year":
-                    query['sort'].append({'key': 'name', 'operator':'-'})
+                    order_by = query['sort'][0]['operator'] == '-' and 'items' or '-items'
                 else:
-                    query['sort'].append({'key': 'name', 'operator':'+'})
+                    order_by = query['sort'][0]['operator'] == '-' and '-items' or 'items'
+                if query['group'] != "keyword":
+                    order_by = (order_by, 'value_sort')
+                else:
+                    order_by = (order_by,)
+            else:
+                order_by = query['sort'][0]['operator'] == '-' and '-value_sort' or 'value_sort'
+                order_by = (order_by, 'items')
         else:
-            query['sort'] = [{'key': 'name', 'operator':'+'}]
+            order_by = ('-value_sort', 'items')
         response['data']['items'] = []
         items = 'items'
         item_qs = query['qs']
         qs = models.Facet.objects.filter(key=query['group']).filter(item__id__in=item_qs)
-        qs = qs.values('value').annotate(items=Count('id')).order_by()
-        name = 'value'
-        name_sort = 'value_sort'
+        qs = qs.values('value').annotate(items=Count('id')).order_by(**order_by)
 
-        #replace normalized items/name sort with actual db value
-        for i in range(0, len(query['sort'])):
-            if query['sort'][i]['key'] == 'name':
-                query['sort'][i]['key'] = name_sort
-            elif query['sort'][i]['key'] == 'items':
-                query['sort'][i]['key'] = items
-        qs = _order_query(qs, query['sort'], prefix='')
         if 'ids' in query:
             #FIXME: this does not scale for larger results
             response['data']['positions'] = {}
-            ids = [j[name] for j in qs]
+            ids = [j['value'] for j in qs]
             response['data']['positions'] = _get_positions(ids, query['ids'])
 
         elif 'range' in data:
             qs = qs[query['range'][0]:query['range'][1]]
-            response['data']['items'] = [{'name': i[name], 'items': i[items]} for i in qs]
+            response['data']['items'] = [{'name': i['value'], 'items': i[items]} for i in qs]
         else:
             response['data']['items'] = qs.count()
     elif 'ids' in query:
@@ -222,7 +221,50 @@ Positions
 
 actions.register(find)
 
+def autocomplete(request):
+    '''
+        param data
+            key
+            value
+            operator '', '^', '$'
+            range
+        return 
+    '''
+    data = json.loads(request.POST['data'])
+    if not 'range' in data:
+        data['range'] = [0, 10]
+    op = data.get('operator', '')
 
+    if models.site_config['keys'][data['key']]['type'] == 'title':
+        qs = models.Item.objects.filter(available=True) #does this need more limiting? user etc
+        if data['value']:
+            if op == '':
+                qs = qs.filter(find__key=data['key'], find__value__icontains=data['value'])
+            elif op == '^':
+                qs = qs.filter(find__key=data['key'], find__value__istartswith=data['value'])
+            elif op == '$':
+                qs = qs.filter(find__key=data['key'], find__value__iendswith=data['value'])
+        qs = qs.order_by('-sort__%s'%models.site_config['keys'][data['key']]['autocompleteSortKey'])
+        qs = qs[data['range'][0]:data['range'][1]]
+        response = json_response({})
+        response['data']['items'] = [i.get(data['key']) for i in qs]    
+    else:
+        qs = models.Facet.objects.filter(key=data['key'])
+        if data['value']:
+            if op == '':
+                qs = qs.filter(value__icontains=data['value'])
+            elif op == '^':
+                qs = qs.filter(value__istartswith=data['value'])
+            elif op == '$':
+                qs = qs.filter(value__iendswith=data['value'])
+        qs = qs.values('value').annotate(items=Count('id')).order_by('-items')
+        qs = qs[data['range'][0]:data['range'][1]]
+        response = json_response({})
+        response['data']['items'] = [i['value'] for i in qs]
+    return render_to_json_response(response)
+actions.register(autocomplete)
+
+    
 def getItem(request):
     '''
         param data

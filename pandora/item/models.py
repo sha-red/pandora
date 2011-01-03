@@ -6,6 +6,7 @@ from datetime import datetime
 import os.path
 import subprocess
 from glob import glob
+import unicodedata
 
 from django.db import models
 from django.core.files.base import ContentFile
@@ -24,7 +25,7 @@ from archive import extract
 
 from annotaion.models import Annotation, Layer
 from person.models import get_name_sort
-
+from app.models import site_config
 
 def siteJson():
     r = {}
@@ -218,7 +219,6 @@ class Property(models.Model):
 
 class Item(models.Model):
     person_keys = ('director', 'writer', 'producer', 'editor', 'cinematographer', 'actor', 'character')
-    facet_keys = person_keys + ('country', 'language', 'genre', 'keyword')
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     published = models.DateTimeField(default=datetime.now, editable=False)
@@ -271,7 +271,19 @@ class Item(models.Model):
 
     def update_imdb(self):
         if len(self.itemId) == 7:
-            self.external_data = ox.web.imdb.Imdb(self.itemId)
+            data = ox.web.imdb.Imdb(self.itemId)
+            #FIXME: all this should be in ox.web.imdb.Imdb
+            for key in ('directors', 'writers', 'editors', 'producers', 'cinematographers', 'languages', 'genres', 'keywords'):
+                if key in data:
+                    data[key[:-1]] = data.pop(key)
+            if 'countries' in data:
+                data['country'] = data.pop('countries')
+            if 'release date' in data:
+                data['releasedate'] = min(data.pop('release date'))
+            if 'plot' in data:
+                data['summary'] = data.pop('plot')
+            data['actor'] = [c[0] for c in data['cast']]
+            self.external_data = data
             self.save()
 
     def __unicode__(self):
@@ -517,36 +529,113 @@ class Item(models.Model):
                 sort_value = ''
             return sort_value
 
-        #title
-        title = canonicalTitle(self.get('title'))
-        s.title = utils.sort_title(title)
+        base_keys = (
+            'id',
+            'aspectratio',
+            'duration',
+            'color',
+            'saturation',
+            'brightness',
+            'volume',
+            'clips',
+            'cuts',
+            'cutsperminute',
+            'words',
+            'wordsperminute',
+            'resolution',
+            'pixels',
+            'size',
+            'bitrate',
+            'files',
+            'filename',
+            'published',
+            'modified',
+            'popularity'
+        )
+        for key in site_config['sortKeys']:
+            name = key['id']
+            field_type = key['type']
+            if name not in base_keys:
+                if field_type == 'title':
+                    value = utils.sort_title(canonicalTitle(self.get(name)))
+                    value = unicodedata.normalize('NFKD', value)
+                    setattr(s, name, value)
+                    if not value:
+                        value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
+                    setattr(s, '%s_desc'%name, value)
+                elif field_type == 'person':
+                    value = sortNames(self.get(name, []))
+                    value = unicodedata.normalize('NFKD', value)
+                    setattr(s, name, value)
+                    if not value:
+                        value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
+                    setattr(s, '%s_desc'%name, value)
+                elif field_type == 'text':
+                    #FIXME: what use pural_key?
+                    value = self.get(name, '')
+                    if isinstance(value, list):
+                        value = ','.join(value)
+                    value = unicodedata.normalize('NFKD', value)
+                    setattr(s, name, value)
+                    if not value:
+                        value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
+                    setattr(s, '%s_desc'%name, value)
+                elif field_type == 'length':
+                    setattr(s, name, len(self.get(name, '')))
+                elif field_type == 'integer':
+                    max_int = 9223372036854775807L
+                    value = self.get(name, -max_int)
+                    if isinstance(value, list):
+                        value = len(value)
+                    setattr(s, name, value)
+                    if value == -max_int:
+                        value = max_int
+                    setattr(s, '%s_desc'%name, value)
+                elif field_type == 'float':
+                    max_float = 9223372036854775807L
+                    value = self.get(name, -max_float)
+                    if isinstance(value, list):
+                        value = sum(value)
+                    setattr(s, name, value)
+                    if value == -max_float:
+                        value = max_float
+                    setattr(s, '%s_desc'%name, value)
+                elif field_type == 'words':
+                    value = self.get(name, '')
+                    if isinstance(value, list):
+                        value = '\n'.join(value)
+                    if value:
+                        value = len(value.split(' '))
+                    else:
+                        value = 0
+                    setattr(s, name, value)
+                elif field_type == 'year':
+                    value = self.get(name, '')
+                    setattr(s, name, value)
+                    if not value:
+                        value = '9999'
+                    setattr(s, '%s_desc'%name, value)
+                elif field_type == 'date':
+                    value = self.get(name, None)
+                    if isinstance(value, basestring):
+                        value = datetime.strptime(value, '%Y-%m-%d')
+                    setattr(s, name, value)
+                    if not value:
+                        value = datetime.strptime('9999-12-12', '%Y-%m-%d')
+                    setattr(s, '%s_desc'%name, value)
 
-        s.country = ','.join(self.get('countries', []))
-        s.year = self.get('year', '')
-        s.year_desc = s.year
+        #sort keys based on database, these will always be available
+        s.id = self.itemId.replace('0x', 'xx')
+        s.modified = self.modified
+        s.modified_desc = self.modified
+        s.published = self.published
+        s.published_desc = self.published
 
-        for key in self.person_keys:
-            setattr(s, key, sortNames(self.get(utils.plural_key(key), [])))
-
-        for key in ('language', 'country'):
-            setattr(s, key, ','.join(self.get(utils.plural_key(key), [])))
-
-        s.runtime = self.get('runtime', 0)
-
-        for key in ('keywords', 'genres', 'cast', 'summary', 'trivia', 'connections'):
-            setattr(s, key, len(self.get(key, '')))
-
-        s.itemId = self.itemId.replace('0x', 'xx')
-        s.rating = self.get('rating', -1)
-        s.votes = self.get('votes', -1)
-
-        # data from related subtitles
-        s.scenes = 0 #FIXME
-        s.dialog = 0 #FIXME
-        s.words = 0 #FIXME
-        s.wpm = 0 #FIXME
-        s.risk = 0 #FIXME
-        # data from related files
+        # sort values based on data from videos
+        s.words = 0 #FIXME: get words from all layers or something
+        s.wordsperminute = 0
+        s.clips = 0  #FIXME: get clips from all layers or something
+        s.popularity = 0  #FIXME: get popularity from somewhere
         videos = self.main_videos()
         if len(videos) > 0:
             s.duration = sum([v.duration for v in videos])
@@ -557,8 +646,10 @@ class Item(models.Model):
                 s.bitrate = videos[0].info['bitrate']
             s.pixels = sum([v.pixels for v in videos])
             s.filename = ' '.join([v.name for v in videos])
+            s.filename_desc = ' '.join([v.name for v in videos])
             s.files = self.files.all().count()
             s.size = sum([v.size for v in videos]) #FIXME: only size of movies?
+            s.volume = 0
         else:
             s.duration = 0
             s.resolution = 0
@@ -568,6 +659,7 @@ class Item(models.Model):
             s.filename = 0
             s.files = 0
             s.size = 0
+            s.volume = 0
 
         s.color = int(sum(self.data.get('color', [])))
         s.saturation = 0 #FIXME
@@ -578,14 +670,6 @@ class Item(models.Model):
             s.cutsperminute = s.cuts / (s.duration/60)
         else:
             s.cutsperminute = 0
-        for key in ('title', 'language', 'country') + self.person_keys:
-            setattr(s, '%s_desc'%key, getattr(s, key))
-            if not getattr(s, key):
-                setattr(s, key, u'zzzzzzzzzzzzzzzzzzzzzzzzz')
-        if not s.year:
-            s.year_desc = ''
-            s.year = '9999'
-        #FIXME: also deal with number based rows like genre, keywords etc
         s.save()
 
     def update_facets(self):
@@ -781,6 +865,14 @@ class Item(models.Model):
                 p.wait()
         return posters.keys()
 
+Item.facet_keys = []
+Item.person_keys = []
+for key in site_config['findKeys']:
+    name = key['id']
+    if key.get('autocomplete', False) and not site_config['keys'].get(name, {'type': None})['type'] == 'title':
+        Item.facet_keys.append(name)
+    if name in site_config['keys'] and site_config['keys'][name]['type'] == 'person':
+        Item.person_keys.append(name)
 
 class ItemFind(models.Model):
     """
@@ -796,7 +888,40 @@ class ItemFind(models.Model):
     key = models.CharField(max_length=200, db_index=True)
     value = models.TextField(blank=True)
 
+attrs = {
+    '__module__': 'item.models',
+    'item': models.OneToOneField('Item', related_name='sort', primary_key=True),
+}
+for key in site_config['sortKeys']:
+    name = key['id']
+    field_type = key['type']
+    if field_type in ('string', 'title'):
+        attrs[name] = models.CharField(max_length=1000, db_index=True)
+        attrs['%s_desc'%name] = models.CharField(max_length=1000, db_index=True)
+    elif field_type == 'year':
+        attrs[name] = models.CharField(max_length=4, db_index=True)
+        attrs['%s_desc'%name] = models.CharField(max_length=4, db_index=True)
+    elif field_type in ('text', 'person'):
+        attrs[name] = models.TextField(blank=True, db_index=True)
+        attrs['%s_desc'%name] = models.TextField(blank=True, db_index=True)
+    elif field_type in ('integer', 'words', 'length'):
+        attrs[name] = models.BigIntegerField(blank=True, db_index=True)
+        attrs['%s_desc'%name] = models.BigIntegerField(blank=True, db_index=True)
+    elif field_type == 'float':
+        attrs[name] = models.FloatField(blank=True, db_index=True)
+        attrs['%s_desc'%name] = models.FloatField(blank=True, db_index=True)
+    elif field_type == 'date':
+        attrs[name] = models.DateTimeField(blank=True, db_index=True)
+        attrs['%s_desc'%name] = models.DateTimeField(blank=True, db_index=True)
+    else:
+        print field_type
+        print key
 
+ItemSort = type('ItemSort', (models.Model,), attrs)
+ItemSort.fields = filter(lambda x: not x.endswith('_desc'), [f.name for f in ItemSort._meta.fields])
+ItemSort.descending_fields = filter(lambda x: x.endswith('_desc'), [f.name for f in ItemSort._meta.fields])
+
+'''
 class ItemSort(models.Model):
     #FIXME: make sort based on site.json
     """
@@ -848,7 +973,6 @@ class ItemSort(models.Model):
     cuts = models.IntegerField(blank=True, db_index=True)
     cutsperminute = models.FloatField(blank=True, db_index=True)
 
-
     #required to move empty values to the bottom for both asc and desc sort
     title_desc = models.CharField(max_length=1000, db_index=True)
     director_desc = models.TextField(blank=True, db_index=True)
@@ -862,25 +986,18 @@ class ItemSort(models.Model):
 
     language_desc = models.TextField(blank=True, db_index=True)
 
-    _private_fields = ('id', 'item')
-    #return available sort fields
-    #FIXME: should return mapping name -> verbose_name
-    def fields(self):
-        fields = []
-        for f in self._meta.fields:
-            if f.name not in self._private_fields:
-                name = f.verbose_name
-                name = name[0].capitalize() + name[1:]
-                fields.append(name)
-        return tuple(fields)
-    fields = classmethod(fields)
-
+ItemSort.fields = filter(lambda x: not x.endswith('_desc'), [f.name for f in ItemSort._meta.fields])
+ItemSort.descending_fields = filter(lambda x: x.endswith('_desc'), [f.name for f in ItemSort._meta.fields])
+'''
 
 class Facet(models.Model):
+    class Meta:
+        unique_together = ("item", "key", "value")
+
     item = models.ForeignKey('Item', related_name='facets')
     key = models.CharField(max_length=200, db_index=True)
-    value = models.CharField(max_length=200)
-    value_sort = models.CharField(max_length=200)
+    value = models.CharField(max_length=200, db_index=True)
+    value_sort = models.CharField(max_length=200, db_index=True)
 
     def save(self, *args, **kwargs):
         if not self.value_sort:
