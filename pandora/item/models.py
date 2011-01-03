@@ -522,11 +522,11 @@ class Item(models.Model):
             s = ItemSort(item=self)
 
         def sortNames(values):
-            sort_value = ''
+            sort_value = u''
             if values:
-                sort_value = '; '.join([get_name_sort(name) for name in values])
+                sort_value = u'; '.join([get_name_sort(name) for name in values])
             if not sort_value:
-                sort_value = ''
+                sort_value = u''
             return sort_value
 
         base_keys = (
@@ -572,9 +572,9 @@ class Item(models.Model):
                     setattr(s, '%s_desc'%name, value)
                 elif field_type == 'text':
                     #FIXME: what use pural_key?
-                    value = self.get(name, '')
+                    value = self.get(name, u'')
                     if isinstance(value, list):
-                        value = ','.join(value)
+                        value = u','.join(value)
                     value = unicodedata.normalize('NFKD', value)
                     setattr(s, name, value)
                     if not value:
