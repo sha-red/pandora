@@ -451,6 +451,14 @@ var pandora = new Ox.App({
 		annotations: function() {
 			var that = new Ox.Element({
 			        id: 'annotations'
+			    })
+			    .bindEvent({
+			        resize: function(event, data) {
+			            app.user.ui.annotationsSize = data;
+			        },
+			        toggle: function(event, data) {
+			            app.user.ui.showAnnotations = !data.collapsed;
+			        }
 			    }),
 				$bins = [];
 		    $.each(app.config.layers, function(i, layer) {
@@ -590,6 +598,7 @@ var pandora = new Ox.App({
 		                URL.set(data.ids[0]);
 		            },
 		            toggle: function(event, data) {
+		                app.user.ui.showMovies = !data.collapsed;
 		                if (data.collapsed) {
 		                    if (app.user.ui.itemView == 'timeline') {
 		                        app.$ui.editor.gainFocus();
@@ -607,10 +616,10 @@ var pandora = new Ox.App({
 			var that = new Ox.SplitPanel({
 		        elements: app.user.ui.item == '' ? [
 		            {
+		                collapsed: !app.user.ui.showGroups,
 		                collapsible: true,
 		                element: app.$ui.browser = ui.browser()
 			                .bindEvent('resize', function(event, data) {
-			                    Ox.print('resizing groups...')
 			                    $.each(app.$ui.groups, function(i, list) {
 			                        list.size();
 			                    });
@@ -624,6 +633,7 @@ var pandora = new Ox.App({
 		            }
 		        ] : [
     	            {
+    	                collapsed: !app.user.ui.showMovies,
     	                collapsible: true,
     	                element: app.$ui.browser = ui.browser(),
     	                size: 112 + ($.browser.mozilla ? 16 : 12) // fixme: should be app.ui.scrollbarSize
@@ -953,8 +963,26 @@ var pandora = new Ox.App({
 		    return that;
 		},
         item: function() {
-            var that = new Ox.Element('div');
-                elements = [];
+            var that;
+            if (app.user.ui.itemView == 'info') {
+                that = new Ox.Element('div');
+            } else if (app.user.ui.itemView == 'timeline') {
+                that = new Ox.SplitPanel({
+                    elements: [
+                        {
+                            element: new Ox.Element('div'),
+                        },
+                        {
+                            collapsed: !app.user.ui.showAnnotations,
+							collapsible: true,
+							element: new Ox.Element('div'),
+							resizable: true,
+							resize: [256, 384],
+							size: app.user.ui.annotationsSize
+                        }
+                    ]
+                })
+            }
             getItem();
             function getItem() {
                 pandora.api.getItem(app.user.ui.item, function(result) {
@@ -978,54 +1006,42 @@ var pandora = new Ox.App({
     		            video.height = 96;
     		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
     		            video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
-    		            app.$ui.contentPanel.replace(1, app.$ui.item = new Ox.SplitPanel({
-        					elements: [
-        						{
-        							element: app.$ui.editor = new Ox.VideoEditor({
-                		                cuts: cuts,
-                		                duration: video.duration,
-                		                find: '',
-                		                frameURL: function(position) {
-                		                    return '/' + app.user.ui.item + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
-                		                },
-                						height: app.$ui.contentPanel.size(1),
-                		                id: 'editor',
-                		                largeTimeline: true,
-                		                matches: [],
-                		                points: [0, 0],
-                		                position: 0,
-                		                posterFrame: parseInt(video.duration / 2),
-                		                subtitles: subtitles,
-                		                videoHeight: video.height,
-                		                videoId: app.user.ui.item,
-                		                videoWidth: video.width,
-                		                videoSize: 'small',
-                		                videoURL: video.url,
-                		                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1 - 256 - 1
-                		            }).bindEvent('resize', function(event, data) {
-                						Ox.print('resize editor', data)
-                						app.$ui.editor.options({
-                							width: data
-                						});
-                						Ox.print('resize done')
-                					}),
-        						},
-        						{
-        							collapsible: true,
-        							element: app.$ui.annotations = ui.annotations(),
-        							    //.bindEvent('resize', function(event, data) { Ox.print('resize annotations', data); }),
-        							resizable: true,
-        							resize: [256, 384],
-        							size: 256
-        						}
-        					],
-        					orientation: 'horizontal'
-    				    }).bindEvent('resize', function(event, data) {
+                        that.replace(0, app.$ui.editor = new Ox.VideoEditor({
+    		                cuts: cuts,
+    		                duration: video.duration,
+    		                find: '',
+    		                frameURL: function(position) {
+    		                    return '/' + app.user.ui.item + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
+    		                },
+    						height: app.$ui.contentPanel.size(1),
+    		                id: 'editor',
+    		                largeTimeline: true,
+    		                matches: [],
+    		                points: [0, 0],
+    		                position: 0,
+    		                posterFrame: parseInt(video.duration / 2),
+    		                subtitles: subtitles,
+    		                videoHeight: video.height,
+    		                videoId: app.user.ui.item,
+    		                videoWidth: video.width,
+    		                videoSize: 'small',
+    		                videoURL: video.url,
+    		                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1 -
+    		                    (app.user.ui.showAnnotations * app.user.ui.annotationsSize) - 1
+    		            }).bindEvent('resize', function(event, data) {
+    						Ox.print('resize editor', data)
+    						app.$ui.editor.options({
+    							width: data
+    						});
+    						Ox.print('resize done')
+    					}));
+    					that.replace(1, app.$ui.annotations = ui.annotations());
+    		            that.bindEvent('resize', function(event, data) {
         				    Ox.print('resize item', data)
         				    app.$ui.editor.options({
         				        height: data
         				    });
-        				}));
+        				});
     					/*
     					app.$ui.rightPanel.bindEvent('resize', function(event, data) {
     	                    Ox.print('... rightPanel resize', data, app.$ui.timelinePanel.size(1))
@@ -2039,7 +2055,7 @@ var pandora = new Ox.App({
                 } else {
                     app.$ui.browser.scrollToSelection();
                     app.user.ui.itemView == 'timeline' && app.$ui.editor.options({
-    					width: data - app.$ui.item.size(1) - 1
+    					width: data - (app.user.ui.showAnnotations * app.user.ui.annotationsSize) - 1
     				});
                 }
             });
