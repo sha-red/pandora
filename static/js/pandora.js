@@ -771,7 +771,13 @@ var pandora = new Ox.App({
 			return that;
 		},
         group: function(id, query) {
-            Ox.print('group', id, query)
+            Ox.print('group', id, query);
+            /*
+            query && query.conditions.length && alert($.map(query.conditions, function(v) {
+                return v.value;
+            }));
+            */
+            //alert(id + ' ' + JSON.stringify(Query.toObject(id)))
             var i = app.user.ui.groups.indexOf(id),
                 panelWidth = app.$ui.document.width() - app.user.ui.listsSize - 1,
                 title = Ox.getObjectById(app.config.groups, id).title,
@@ -800,13 +806,14 @@ var pandora = new Ox.App({
                     request: function(data, callback) {
                         Ox.print('sending request', data)
                         delete data.keys;
+                        //alert(id + " Query.toObject " + JSON.stringify(Query.toObject(id)) + ' ' + JSON.stringify(data))
                         return pandora.api.find($.extend(data, {
                             group: id,
                             query: Query.toObject(id)
                         }), callback);
                     },
                     selected: query ? $.map(query.conditions, function(v) {
-                        return v.key;
+                        return v.value;
                     }) : [],
                     sort: [
                         {
@@ -825,7 +832,7 @@ var pandora = new Ox.App({
                             operator: '='
                         };
                     });
-                    reloadGroups();
+                    reloadGroups(i);
                 });
             new Ox.Select({
                     items: $.map(app.config.groups, function(v) {
@@ -842,36 +849,42 @@ var pandora = new Ox.App({
                 .bindEvent('change', function(event, data) {
                     var id_ = data.selected[0].id,
                         i_ = app.user.ui.groups.indexOf(id_);
-                    i_ == -1 ? replaceGroup(i, id_) : swapGroups();
-                    function replaceGroup(i, id, query) {
-                        var isOuter = i % 4 == 0;
-                        if (i_ == -1) {
-                            if (app.ui.groups[i].query.conditions.length) {
-                                app.ui.groups[i].query.conditions = [];
-                                reloadGroups();
-                            }
-                            app.ui.groups[i] = getGroupObject(id);
+                    if (i_ == -1) {
+                        // new group was not part of old group set
+                        if (app.ui.groups[i].query.conditions.length) {
+                            // if group with selection gets replaced, reload
+                            app.ui.groups[i].query.conditions = [];
+                            reloadGroups(i);
                         }
-                        app.user.ui.groups[i] = id;
-                        app.$ui[isOuter ? 'browser' : 'groupsInnerPanel'].replace(
-                            isOuter ? i / 2 : i - 1,
-                            app.$ui.groups[i] = ui.group(id, query)
-                        );
-                    }
-                    function swapGroups() {
-                        var group = $.extend({}, app.ui.groups[i]),
-                            query = app.ui.groups[i].query;
-                            query_ = app.ui.groups[i_].query;
+                        app.ui.groups[i] = getGroupObject(id_);
+                        app.user.ui.groups[i] = id_;
+                        replaceGroup(i, id_);
+                    } else {
+                        // swap two existing groups
+                        var group = $.extend({}, app.ui.groups[i]);
                         app.ui.groups[i] = app.ui.groups[i_];
                         app.ui.groups[i_] = group;
                         app.user.ui.groups[i] = id_;
                         app.user.ui.groups[i_] = id;
-                        replaceGroup(i, id_, query_);
-                        replaceGroup(i_, id, query);
+                        replaceGroup(i, id_, app.ui.groups[i].query);
+                        replaceGroup(i_, id, app.ui.groups[i_].query);
+                    }
+                    function replaceGroup(i, id, query) {
+                        // if query is passed, selected items will be derived from it
+                        var isOuter = i % 4 == 0;
+                        //foo = app.$ui.groups[i];
+                        app.$ui[isOuter ? 'browser' : 'groupsInnerPanel'].replace(
+                            isOuter ? i / 2 : i - 1,
+                            app.$ui.groups[i] = ui.group(id, query)
+                        );
+                        //foo.remove();
                     }
                 })
                 .appendTo(that.$bar.$element);
-            app.ui.groups[i] = getGroupObject(id);    
+            if (!query) {
+                // if query is set, group object has already been taken care of
+                app.ui.groups[i] = getGroupObject(id);
+            }
             function getGroupObject(id) {
                 var i = app.user.ui.groups.indexOf(id),
                     title = Ox.getObjectById(app.config.groups, id).title,
@@ -886,31 +899,6 @@ var pandora = new Ox.App({
                     size: width.list,
                     title: title
                 };
-            }
-            function reloadGroups() {
-                var query = Query.toObject();
-                app.$ui.list.options({
-                    request: function(data, callback) {
-                        return pandora.api.find($.extend(data, {
-                            query: query
-                        }), callback);
-                    }
-                });
-                $.each(app.ui.groups, function(i_, group_) {
-                    if (i_ != i) {
-                        Ox.print('setting groups request', i, i_)
-                        app.$ui.groups[i_].options({
-                            request: function(data, callback) {
-                                delete data.keys;
-                                return pandora.api.find($.extend(data, {
-                                    group: group_.id,
-                                    query: Query.toObject(group_.id)
-                                }), callback);
-                            }
-                        });
-                    }
-                });
-                history.pushState({}, '', Query.toString(query));
             }
             return that;
         },
@@ -2321,6 +2309,33 @@ var pandora = new Ox.App({
         return ['person', 'string', 'text', 'title'].indexOf(
             Ox.getObjectById(app.config.sortKeys, key).type
         ) > -1 ? '' : '-';
+    }
+
+    function reloadGroups(i) {
+        var query = Query.toObject();
+        app.$ui.list.options({
+            request: function(data, callback) {
+                return pandora.api.find($.extend(data, {
+                    query: query
+                }), callback);
+            }
+        });
+        $.each(app.ui.groups, function(i_, group_) {
+            if (i_ != i) {
+                Ox.print('setting groups request', i, i_)
+                app.$ui.groups[i_].options({
+                    request: function(data, callback) {
+                        delete data.keys;
+                        //alert(i_ + " Query.toObject " + JSON.stringify(Query.toObject(group_.id)))
+                        return pandora.api.find($.extend(data, {
+                            group: group_.id,
+                            query: Query.toObject(group_.id)
+                        }), callback);
+                    }
+                });
+            }
+        });
+        history.pushState({}, '', Query.toString(query));
     }
 
     function resizeGroups(width) {
