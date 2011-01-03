@@ -6,7 +6,8 @@ simplejson
 -e hg+https://django-ajax-filtered-fields.googlecode.com/hg/#egg=django-ajax-filtered-fields
 celery>2.1.1
 django-celery>2.1.1
-django_extensions
+#django_extensions
+-e git+https://github.com/django-extensions/django-extensions.git#djang_extensions
 -e bzr+http://firefogg.org/dev/python-firefogg/#egg=python-firefogg
 -e git+git://github.com/dcramer/django-devserver#egg=django_devserver
 transmissionrpc
