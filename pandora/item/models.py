@@ -492,17 +492,21 @@ class Item(models.Model):
         #FIXME: filter us/int  title
         #f.title += ' '.join([t.title for t in self.alternative_titles()])
 
-        save('year', self.get('year', ''))
-
         for key in self.facet_keys:
-            if key == 'actor':
-                values = [i[0] for i in self.get('actor', [])]
-            elif key == 'character':
-                values = [i[1] for i in self.get('actor', [])]
+            if key == 'character':
+                values = self.get('cast', '')
+                if values:
+                 if isinstance(values[0], basestring):
+                    values = [values[0], ]
+                 else:
+                    values = [i[1] for i in values]
             else:
-                values = self.get(utils.plural_key(key), [])
-            save(key, '|%s|'%'|'.join(values))
-        save('summary', self.get('plot', '') + self.get('plot_outline', ''))
+                values = self.get(key, '')
+            if isinstance(values, list):
+                save(key, '|%s|'%'|'.join(values))
+            else:
+                save(key, values)
+        save('summary', self.get('summary', '') + self.get('plot', '') + self.get('plot_outline', ''))
         save('trivia', ' '.join(self.get('trivia', [])))
         save('location', '|%s|'%'|'.join(self.get('filming_locations', [])))
 
@@ -559,27 +563,27 @@ class Item(models.Model):
                 if field_type == 'title':
                     value = utils.sort_title(canonicalTitle(self.get(name)))
                     value = unicodedata.normalize('NFKD', value)
-                    setattr(s, name, value)
+                    setattr(s, '%s_desc'%name, value)
                     if not value:
                         value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
-                    setattr(s, '%s_desc'%name, value)
+                    setattr(s, name, value)
                 elif field_type == 'person':
                     value = sortNames(self.get(name, []))
-                    value = unicodedata.normalize('NFKD', value)
-                    setattr(s, name, value)
+                    value = unicodedata.normalize('NFKD', value)[:255]
+                    setattr(s, '%s_desc'%name, value)
                     if not value:
                         value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
-                    setattr(s, '%s_desc'%name, value)
+                    setattr(s, name, value)
                 elif field_type == 'text':
                     #FIXME: what use pural_key?
                     value = self.get(name, u'')
                     if isinstance(value, list):
                         value = u','.join(value)
                     value = unicodedata.normalize('NFKD', value)
-                    setattr(s, name, value)
+                    setattr(s, '%s_desc'%name, value)
                     if not value:
                         value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
-                    setattr(s, '%s_desc'%name, value)
+                    setattr(s, name, value)
                 elif field_type == 'length':
                     setattr(s, name, len(self.get(name, '')))
                 elif field_type == 'integer':
@@ -611,18 +615,18 @@ class Item(models.Model):
                     setattr(s, name, value)
                 elif field_type == 'year':
                     value = self.get(name, '')
-                    setattr(s, name, value)
+                    setattr(s, '%s_desc'%name, value)
                     if not value:
                         value = '9999'
-                    setattr(s, '%s_desc'%name, value)
+                    setattr(s, name, value)
                 elif field_type == 'date':
                     value = self.get(name, None)
                     if isinstance(value, basestring):
                         value = datetime.strptime(value, '%Y-%m-%d')
-                    setattr(s, name, value)
+                    setattr(s, '%s_desc'%name, value)
                     if not value:
                         value = datetime.strptime('9999-12-12', '%Y-%m-%d')
-                    setattr(s, '%s_desc'%name, value)
+                    setattr(s, name, value)
 
         #sort keys based on database, these will always be available
         s.id = self.itemId.replace('0x', 'xx')
@@ -675,12 +679,9 @@ class Item(models.Model):
     def update_facets(self):
         #FIXME: what to do with Unkown Director, Year, Country etc.
         for key in self.facet_keys:
-            if key == 'actor':
-                current_values = [i[0] for i in self.get('actor', [])]
-            elif key == 'character':
-                current_values = [i[1] for i in self.get('actor', [])]
-            else:
-                current_values = self.get(utils.plural_key(key), [])
+            current_values = self.get(key, [])
+            if not isinstance(current_values, list):
+                current_values = [current_values]
             saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
             removed_values = filter(lambda x: x not in current_values, saved_values)
             if removed_values:
