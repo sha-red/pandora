@@ -541,12 +541,13 @@ var pandora = new Ox.App({
 	            })
 	            .bindEvent({
 	                resize: function(event, data) {
-    	                Ox.print('resizing groups...')
+    	                app.user.ui.groupsSize = data;
     	                $.each(app.$ui.groups, function(i, list) {
     	                    list.size();
     	                });
     	            },
     	            toggle: function(event, data) {
+    	                app.user.ui.showGroups = !data.collapsed;
     	                data.collapsed && app.$ui.list.gainFocus();
     	            }
 	            });
