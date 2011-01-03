@@ -539,11 +539,16 @@ var pandora = new Ox.App({
 	                id: 'browser',
 	                orientation: 'horizontal'
 	            })
-	            .bindEvent('resize', function(event, data) {
-	                Ox.print('resizing groups...')
-	                $.each(app.$ui.groups, function(i, list) {
-	                    list.size();
-	                });
+	            .bindEvent({
+	                resize: function(event, data) {
+    	                Ox.print('resizing groups...')
+    	                $.each(app.$ui.groups, function(i, list) {
+    	                    list.size();
+    	                });
+    	            },
+    	            toggle: function(event, data) {
+    	                data.collapsed && app.$ui.list.gainFocus();
+    	            }
 	            });
 			} else {
 		        var that = new Ox.IconList({
@@ -582,6 +587,13 @@ var pandora = new Ox.App({
 		            },
 		            select: function(event, data) {
 		                URL.set(data.ids[0]);
+		            },
+		            toggle: function(event, data) {
+		                if (data.collapsed) {
+		                    if (app.user.ui.itemView == 'timeline') {
+		                        app.$ui.editor.gainFocus();
+		                    }
+		                }
 		            }
 		        });
 			}
