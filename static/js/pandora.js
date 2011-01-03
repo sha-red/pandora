@@ -50,7 +50,7 @@ var pandora = new Ox.App({
     	    });
         });
 
-		Query.fromString(location.hash.substr(1));
+		//Query.fromString(location.hash.substr(1));
 
 	    URL.parse();
 	    window.onpopstate = function() {
@@ -71,7 +71,8 @@ var pandora = new Ox.App({
                 }
             } else {
                 Ox.print('app.$ui.window.resize');
-                app.$ui.editor.options({
+                app.$ui.browser.scrollToSelection();
+                app.user.ui.itemView == 'timeline' && app.$ui.editor.options({
 					height: app.$ui.document.height() -
 					        20 - 24 - app.$ui.contentPanel.size(0) - 1 - 16,
                     width: app.$ui.document.width() -
@@ -474,7 +475,6 @@ var pandora = new Ox.App({
 		    $.each($bins, function(i, bin) {
 		        that.append(bin);
 		    });
-		    //alert(JSON.stringify(that.id))
 			return that;
 		},
 		appPanel: function() {
@@ -503,10 +503,26 @@ var pandora = new Ox.App({
 			}
 			return that;
 		},
-		browser: function(mode) {
-			if (mode == 'list') {
+        backButton: function() {
+            var that = Ox.Button({
+                title: 'Back to Movies',
+                width: 96
+            }).css({
+                float: 'left',
+                margin: '4px'
+            })
+            .bindEvent({
+                click: function(event, data) {
+                    URL.set(Query.toString());
+                }
+            });
+            return that;
+        },
+		browser: function() {
+		    var that;
+			if (!app.user.ui.item) {
 				app.$ui.groups = ui.groups();
-				var that = new Ox.SplitPanel({
+				that = new Ox.SplitPanel({
 	                elements: [
 	                    {
 	                        element: app.$ui.groups[0],
@@ -529,8 +545,48 @@ var pandora = new Ox.App({
 	                    list.size();
 	                });
 	            });
-			} else if (mode == 'item') {
-				var that = new Ox.Element('div');
+			} else {
+		        var that = new Ox.IconList({
+		            centered: true,
+		            id: 'list',
+		            item: function(data, sort, size) {
+		                var ratio = data.poster.width / data.poster.height;
+		                size = size || 64;
+		                return {
+		                    height: ratio <= 1 ? size : size / ratio,
+		                    id: data['id'],
+		                    info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
+		                    title: data.title + (data.director ? ' (' + data.director + ')' : ''),
+		                    url: data.poster.url.replace(/jpg/, size + '.jpg'),
+		                    width: ratio >= 1 ? size : size * ratio
+		                };
+		            },
+		            keys: ['director', 'id', 'poster', 'title', 'year'],
+		            max: 1,
+		            min: 1,
+		            orientation: 'horizontal',
+		            request: function(data, callback) {
+		                Ox.print('data, Query.toObject', data, Query.toObject())
+		                pandora.api.find($.extend(data, {
+		                    query: Query.toObject()
+		                }), callback);
+		            },
+		            selected: [app.user.ui.item],
+		            size: 64,
+		            sort: app.user.ui.sort,
+		            unique: 'id'
+		        })
+		        .bindEvent({
+		            open: function(event, data) {
+		                that.scrollToSelection();
+		            },
+		            select: function(event, data) {
+		                URL.set(data.ids[0]);
+		            }
+		        });
+			}
+			that.update = function() {
+			    app.$ui.contentPanel.replace(0, app.$ui.browser = ui.browser());
 			}
 			return that;
 		},
@@ -539,7 +595,7 @@ var pandora = new Ox.App({
 		        elements: app.user.ui.item == '' ? [
 		            {
 		                collapsible: true,
-		                element: app.$ui.browser = ui.browser('list')
+		                element: app.$ui.browser = ui.browser()
 			                .bindEvent('resize', function(event, data) {
 			                    Ox.print('resizing groups...')
 			                    $.each(app.$ui.groups, function(i, list) {
@@ -556,8 +612,8 @@ var pandora = new Ox.App({
 		        ] : [
     	            {
     	                collapsible: true,
-    	                element: app.$ui.browser = ui.browser('item'),
-    	                size: 80
+    	                element: app.$ui.browser = ui.browser(),
+    	                size: 112 + ($.browser.mozilla ? 16 : 12) // fixme: should be app.ui.scrollbarSize
     	            },
     	            {
     	                element: app.$ui.item = ui.item(app.user.ui.item, app.user.ui.itemView)
@@ -589,43 +645,13 @@ var pandora = new Ox.App({
                                     app.user.ui.findQuery.conditions[0].key = key;
                                 }
                                 app.$ui.mainMenu.checkItem('findMenu_find_' + key);
-                                app.$ui.findInput.focus();
+                                app.$ui.findInput.options({
+                                    autocomplete: autocompleteFunction()
+                                }).focus();
+                                Ox.print(app.$ui.findInput.options('autocomplete').toString())
                             }),
                         app.$ui.findInput = new Ox.Input({
-                            autocomplete: function(value, callback) {
-                                var key = 'title';
-                                var findKey = Ox.getObjectById(app.config.findKeys, key);
-                                Ox.print('autocomplete', key, value);
-                                value === '' && Ox.print('Warning: autocomplete function should never be called with empty value');
-                                if ('autocomplete' in findKey && findKey.autocomplete) {
-                                    pandora.api.find({
-                                        keys: [key],
-                                        query: {
-                                            conditions: [
-                                                {
-                                                    key: key,
-                                                    value: value,
-                                                    operator: ''
-                                                }
-                                            ],
-                                            operator: ''
-                                        },
-                                        sort: [
-                                            {
-                                                key: key,
-                                                operator: ''
-                                            }
-                                        ],
-                                        range: [0, 10]
-                                    }, function(result) {
-                                        callback($.map(result.data.items, function(v) {
-                                            return v.title;
-                                        }));
-                                    });
-                                } else {
-                                    callback();                            
-                                }
-                            },
+                            autocomplete: autocompleteFunction(),
                             autocompleteSelect: true,
                             autocompleteSelectHighlight: true,
                             autocompleteSelectSubmit: true,
@@ -634,7 +660,8 @@ var pandora = new Ox.App({
                             width: 192
                         })
                         .bindEvent('submit', function(event, data) {
-                            var key = app.user.ui.findQuery.conditions[0].key,
+                            var key = app.user.ui.findQuery.conditions.length ?
+                                    app.user.ui.findQuery.conditions[0].key : '',
                                 query;
                             Ox.print('key', key);
                             app.user.ui.findQuery.conditions = [
@@ -672,97 +699,181 @@ var pandora = new Ox.App({
                     float: 'right',
                     margin: '4px'
                 });
+            function autocompleteFunction() {
+                return app.user.ui.findQuery.conditions.length ? function(value, callback) {
+                    var key = app.user.ui.findQuery.conditions[0].key,
+                        findKey = Ox.getObjectById(app.config.findKeys, key);
+                    Ox.print('autocomplete', key, value);
+                    value === '' && Ox.print('Warning: autocomplete function should never be called with empty value');
+                    if ('autocomplete' in findKey && findKey.autocomplete) {
+                        pandora.api.autocomplete({
+                            key: key,
+                            range: [0, 20],
+                            value: value
+                        }, function(result) {
+                            //alert(JSON.stringify(result))
+                            callback(result.data.items);
+                        });
+                        /*
+                        pandora.api.find({
+                            keys: [key],
+                            query: {
+                                conditions: [
+                                    {
+                                        key: key,
+                                        value: value,
+                                        operator: ''
+                                    }
+                                ],
+                                operator: ''
+                            },
+                            sort: [
+                                {
+                                    key: key,
+                                    operator: ''
+                                }
+                            ],
+                            range: [0, 10]
+                        }, function(result) {
+                            callback($.map(result.data.items, function(v) {
+                                return v[key];
+                            }));
+                        });
+                        */
+                    } else {
+                        callback();                            
+                    }
+                } : null;
+            }
 			return that;
 		},
+        group: function(id) {
+            var i = app.user.ui.groups.indexOf(id),
+                panelWidth = app.$ui.document.width() - app.user.ui.listsSize - 1,
+                title = Ox.getObjectById(app.config.groups, id).title,
+                width = getGroupWidth(i, panelWidth),
+                that = new Ox.TextList({
+                    columns: [
+                        {
+                            align: 'left',
+                            id: 'name',
+                            operator: id == 'year' ? '-' : '+',
+                            title: title,
+                            unique: true,
+                            visible: true,
+                            width: width.column
+                        },
+                        {
+                            align: 'right',
+                            id: 'items',
+                            operator: '-',
+                            title: '#',
+                            visible: true,
+                            width: 40
+                        }
+                    ],
+                    id: 'group_' + id,
+                    request: function(data, callback) {
+                        Ox.print('sending request', data)
+                        delete data.keys;
+                        return pandora.api.find($.extend(data, {
+                            group: id,
+                            query: Query.toObject(id)
+                        }), callback);
+                    },
+                    sort: [
+                        {
+                            key: id == 'year' ? 'name' : 'items',
+                            operator: '-'
+                        }
+                    ]
+                })
+                .bindEvent('select', function(event, data) {
+                    var group = app.ui.groups[i],
+                        query;
+                    app.ui.groups[i].query.conditions = $.map(data.ids, function(v) {
+                        return {
+                            key: id,
+                            value: v,
+                            operator: '='
+                        };
+                    });
+                    query = Query.toObject();
+                    app.$ui.list.options({
+                        request: function(data, callback) {
+                            return pandora.api.find($.extend(data, {
+                                query: query
+                            }), callback);
+                        }
+                    });
+                    $.each(app.ui.groups, function(i_, group_) {
+                        if (i_ != i) {
+                            Ox.print('setting groups request', i, i_)
+                            app.$ui.groups[i_].options({
+                                request: function(data, callback) {
+                                    delete data.keys;
+                                    return pandora.api.find($.extend(data, {
+                                        group: group_.id,
+                                        query: Query.toObject(group_.id)
+                                    }), callback);
+                                }
+                            });
+                        }
+                    });
+                    history.pushState({}, '', Query.toString(query));
+                });
+            new Ox.Select({
+                    items: $.map(app.config.groups, function(v) {
+                        return {
+                            checked: v.id == id,
+                            id: v.id,
+                            title: v.title
+                        }
+                    }),
+                    max: 1,
+                    min: 1,
+                    type: 'image'
+                })
+                .bindEvent('change', function(event, data) {
+                    var id_ = data.selected[0].id,
+                        index = app.user.ui.groups.indexOf(id_);
+                    replaceGroup(i, id_);
+                    index > -1 && replaceGroup(index, id);
+                    function replaceGroup(i, id) {
+                        app.user.ui.groups[i] = id;
+                        if (i == 0 || i == 4) {
+                            app.$ui.browser.replace(i / 2, app.$ui.groups[i] = ui.group(id));
+                        } else {
+                            app.$ui.groupsInnerPanel.replace(i - 1, app.$ui.groups[i] = ui.group(id));
+                        }
+                        app.ui.groups[i] = getGroupObject(id);
+                    }
+                })
+                .appendTo(that.$bar.$element);
+            app.ui.groups[i] = getGroupObject(id);
+            function getGroupObject(id) {
+                var i = app.user.ui.groups.indexOf(id),
+                    title = Ox.getObjectById(app.config.groups, id).title,
+                    width = getGroupWidth(i, panelWidth);
+                return {
+                    id: id,
+                    element: that,
+                    query: {
+                        conditions: [],
+    	                operator: '|'
+                    },
+                    size: width.list,
+                    title: title
+                };
+            }
+            return that;
+        },
 		groups: function() {
-			var $groups = [],
-				panelWidth = app.$ui.document.width() - app.user.ui.listsSize - 1;
-		    app.ui.groups = $.map(app.config.groups, function(id, i) {
-		        var title = Ox.getObjectById(app.config.sortKeys, id).title,
-		            width = getGroupWidth(i, panelWidth);
-		        return {
-		            id: id,
-		            element: $groups[i] = new Ox.TextList({
-		                    columns: [
-		                        {
-		                            align: 'left',
-		                            id: 'name',
-		                            operator: id == 'year' ? '-' : '+',
-		                            title: title,
-		                            unique: true,
-		                            visible: true,
-		                            width: width.column
-		                        },
-		                        {
-		                            align: 'right',
-		                            id: 'items',
-		                            operator: '-',
-		                            title: '#',
-		                            visible: true,
-		                            width: 40
-		                        }
-		                    ],
-		                    id: 'group_' + id,
-		                    request: function(data, callback) {
-		                        Ox.print('sending request', data)
-		                        delete data.keys;
-		                        return pandora.api.find($.extend(data, {
-		                            group: id,
-		                            query: Query.toObject(id)
-		                        }), callback);
-		                    },
-		                    sort: [
-		                        {
-		                            key: id == 'year' ? 'name' : 'items',
-		                            operator: '-'
-		                        }
-		                    ]
-		                })
-		                .bindEvent('select', function(event, data) {
-		                    Ox.print('-- select', i)
-		                    var group = app.ui.groups[i],
-		                        query;
-		                    app.ui.groups[i].query.conditions = $.map(data.ids, function(v) {
-		                        return {
-		                            key: group.id,
-		                            value: v,
-		                            operator: '='
-		                        };
-		                    });
-		                    query = Query.toObject();
-		                    Ox.print('-- data, query', data, query)
-		                    app.$ui.list.options({
-		                        request: function(data, callback) {
-		                            return pandora.api.find($.extend(data, {
-		                                query: query
-		                            }), callback);
-		                        }
-		                    });
-		                    Ox.print('ZZZ')
-		                    $.each(app.ui.groups, function(i_, group_) {
-		                        if (i_ != i) {
-		                            Ox.print('setting groups request', i, i_)
-		                            app.$ui.groups[i_].options({
-		                                request: function(data, callback) {
-		                                    delete data.keys;
-		                                    return pandora.api.find($.extend(data, {
-		                                        group: group_.id,
-		                                        query: Query.toObject(group_.id)
-		                                    }), callback);
-		                                }
-		                            });
-		                        }
-		                    });
-		                    history.pushState({}, '', '/#' + Query.toString(query));
-		                }),
-		            query: {
-		                conditions: [],
-		                operator: '|'
-		            },
-		            size: width.list,
-		            title: title
-		        };
-		    });
+			var $groups = [];
+			app.ui.groups = [];
+            app.user.ui.groups.forEach(function(id, i) {
+                $groups[i] = ui.group(id, i)
+            });
 		    return $groups;
 		},
 		groupsInnerPanel: function() {
@@ -805,7 +916,7 @@ var pandora = new Ox.App({
 		        );
 		    return that;
 		},
-        item: function(id, view) { // fixme: params are not necessary
+        item: function() {
             var that = new Ox.Element('div');
                 elements = [];
             getItem();
@@ -850,7 +961,7 @@ var pandora = new Ox.App({
                 		                posterFrame: parseInt(video.duration / 2),
                 		                subtitles: subtitles,
                 		                videoHeight: video.height,
-                		                videoId: id,
+                		                videoId: app.user.ui.item,
                 		                videoWidth: video.width,
                 		                videoSize: 'small',
                 		                videoURL: video.url,
@@ -891,13 +1002,12 @@ var pandora = new Ox.App({
 		        });
             }
             that.display = function() {
-                //alert('display')
                 app.$ui.contentPanel.replaceElements([
                     {
 						collapsible: true,
-						element: app.$ui.browser = new Ox.Element('div').options({id: 'browser'}),
+						element: app.$ui.browser = ui.browser(),
 						resizable: false,
-						size: 80
+						size: 112 + ($.browser.mozilla ? 16 : 12)
 					},
 					{
 					    element: new Ox.Element('div')
@@ -907,111 +1017,6 @@ var pandora = new Ox.App({
             }
             return that;
         },
-        /*
-		item_: function(id, view) {
-			var $item;
-		    //location.hash = '!' + id;
-		    //app.user.ui.mode = 'item';
-		    app.$ui.mainMenu.enableItem('openmovie');
-		    app.$ui.mainMenu.checkItem('viewMenu_openmovie_' + view);
-		    //FIXME: there should be a menu function for this
-		    if (view == 'timeline') {
-		        pandora.api.getItem(id, function(result) {
-		            item_debug = result.data.item;
-		            var video = result.data.item.stream,
-		                cuts = result.data.item.layers.cuts || {},
-		                subtitles = result.data.item.layers.subtitles || [{
-		                    'in': 5,
-		                    'out': 10,
-		                    'text': 'This subtitle is just a test...'
-		                }];
-		            video.height = 96;
-		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
-		            video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
-					//app.$ui.contentPanel.size(0, 80);
-		            app.$ui.contentPanel.replaceElements([
-						{
-							collapsible: true,
-							element: app.$ui.browser = new Ox.Element('div').options({id: 'browser'}),
-							resizable: false,
-							size: 80
-						},
-						{
-							element: app.$ui.timelinePanel = new Ox.SplitPanel({
-								elements: [
-									{
-										element: app.$ui.editor = new Ox.VideoEditor({
-							                cuts: cuts,
-							                duration: video.duration,
-							                find: '',
-							                frameURL: function(position) {
-							                    return '/' + id + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
-							                },
-											height: app.$ui.contentPanel.size(1),
-							                id: 'editor',
-							                largeTimeline: true,
-							                matches: [],
-							                points: [0, 0],
-							                position: 0,
-							                posterFrame: parseInt(video.duration / 2),
-							                subtitles: subtitles,
-							                videoHeight: video.height,
-							                videoId: id,
-							                videoWidth: video.width,
-							                videoSize: 'small',
-							                videoURL: video.url,
-							                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1 - 256 - 1
-							            })
-										.bindEvent('resize', function(event, data) {
-											Ox.print('RESIZE:', data)
-											app.$ui.editor.options({
-												width: data
-											});
-										}),
-										size: 'auto'
-									},
-									{
-										collapsible: true,
-										element: app.$ui.annotations = ui.annotations(),
-										size: 256
-									}
-								],
-								orientation: 'horizontal'
-							}),
-							size: 'auto'
-						}
-					]);
-		            app.$ui.rightPanel
-		                .bindEvent('resize', function(event, data) {
-		                    Ox.print('rightPanel resize', data, app.$ui.item.size(1))
-		                    app.$ui.editor.options({
-		                        width: data - app.$ui.item.size(1) - 1
-		                    });
-		                });
-		            app.$ui.window.resize(function() {
-		                app.$ui.editor.options({
-							height: app.$ui.document.height() - 20 - 24 - app.$ui.contentPanel.size(0) - 1 - 16,
-		                    width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - app.$ui.timelinePanel.size(1) - 2
-		                });
-		            });
-		        });
-		    } else if (view == 'info') {
-		        pandora.api.getItem(id, function(result) {
-		            item_debug = result.data.item;
-		            var item = result.data.item;
-		            var $item = new Ox.Container();
-		            $item.append(app.template.info.tmpl(item));
-		            app.$ui.rightPanel.replace(1, $item);
-		            app.$ui.rightPanel
-		                .bindEvent('resize', function(event, data) {
-		                    app.$ui.editor.options({
-		                        width: data - app.$ui.timelinePanel.size(1) - 1
-		                    });
-		                });
-		        });
-		    }
-		},
-        */
 		leftPanel: function() {
 			var that = new Ox.SplitPanel({
                     elements: [
@@ -1059,8 +1064,10 @@ var pandora = new Ox.App({
 		        that = new Ox.TextList({
 		            columns: $.map(app.config.sortKeys, function(key, i) {
 		                return $.extend({
-		                    visible: $.inArray(key.id, app.user.ui.columns) > -1,
-		                    unique: key.id == 'id'
+		                    align: getAlignment(key.id),
+		                    operator: getSortOperator(key.id),
+		                    unique: key.id == 'id',
+		                    visible: $.inArray(key.id, app.user.ui.columns) > -1
 		                }, key);
 		            }),
 		            columnsMovable: true,
@@ -1625,7 +1632,7 @@ var pandora = new Ox.App({
 		                    app.$ui.list.sortList(app.user.ui.sort[0].key, id == 'ascending' ? '' : '-');
 		                } else if (data.id == 'sortmovies') {
 		                    var id = data.checked[0].id,
-		                        operator = Ox.getObjectById(app.config.sortKeys, id).operator;
+		                        operator = getSortOperator(id);
 		                    app.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator === '' ? 'ascending' : 'descending'));
 		                    app.$ui.sortSelect.selectItem(id);
 		                    app.$ui.list.sortList(id, operator);
@@ -1972,7 +1979,7 @@ var pandora = new Ox.App({
 			var that = new Ox.SplitPanel({
                 elements: [
                     {
-                        element: app.$ui.toolbar = ui.toolbar('list').css({ zIndex: 2 }), // fixme: remove later
+                        element: app.$ui.toolbar = ui.toolbar(),
                         size: 24
                     },
                     {
@@ -1995,11 +2002,10 @@ var pandora = new Ox.App({
                         app.$ui.map.triggerResize();
                     }
                 } else {
-                    if (app.user.ui.itemView == 'timeline') {
-                        app.$ui.editor.options({
-    						width: data - app.$ui.item.size(1) - 1
-    					});
-    				}
+                    app.$ui.browser.scrollToSelection();
+                    app.user.ui.itemView == 'timeline' && app.$ui.editor.options({
+    					width: data - app.$ui.item.size(1) - 1
+    				});
                 }
             });
 			return that;
@@ -2113,11 +2119,12 @@ var pandora = new Ox.App({
                 })
                 .bindEvent('change', function(event, data) {
                     var id = data.selected[0].id,
-                        operator = Ox.getObjectById(app.config.sortKeys, id).operator;
-                    app.user.ui.listView = id;
+                        operator = getSortOperator(id);
+                    app.user.ui.sort[0].key = id;
                     app.$ui.mainMenu.checkItem('sortMenu_sortmovies_' + id);
                     app.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator === '' ? 'ascending' : 'descending'));
                     app.$ui.list.sortList(id, operator);
+                    URL.set(Query.toString());
                 });
             return that;
         },
@@ -2159,11 +2166,16 @@ var pandora = new Ox.App({
 		},
 		toolbar: function() {
 			var that = new Ox.Bar({
-			            size: 24
-			        })
-			        .append(
-			            app.$ui.viewSelect = ui.viewSelect() 
-			        );
+			        size: 24
+			    }).css({
+		            zIndex: 2 // fixme: remove later
+		        });
+		    app.user.ui.item && that.append(
+		        app.$ui.backButton = ui.backButton()
+		    );
+			that.append(
+			    app.$ui.viewSelect = ui.viewSelect() 
+			);
 			!app.user.ui.item && that.append(
 			    app.$ui.sortSelect = ui.sortSelect()
 			);
@@ -2171,7 +2183,7 @@ var pandora = new Ox.App({
 			    app.$ui.findElement = ui.findElement()
 			);
 			that.display = function() {
-				app.$ui.rightPanel.replace(0, app.$ui.toolbar = toolbar());
+				app.$ui.rightPanel.replace(0, app.$ui.toolbar = ui.toolbar()); // fixme: remove later
 			}
 			return that;
 		},
@@ -2186,10 +2198,10 @@ var pandora = new Ox.App({
                     }) : $.map(app.config.itemViews, function(view) {
                         return $.extend($.extend({}, view), {
                             checked: app.user.ui.itemView == view.id,
-                            title: 'View ' + view.title
+                            title: view.title
                         });
                     }),
-                    width: 144
+                    width: !app.user.ui.item ? 144 : 96
                 })
                 .css({
                     float: 'left',
@@ -2200,6 +2212,7 @@ var pandora = new Ox.App({
                     app.user.ui.listView = id;
                     app.$ui.mainMenu.checkItem('viewMenu_movies_' + id);
                     app.$ui.contentPanel.replace(1, app.$ui.list = ui.list(id));
+                    URL.set(Query.toString());
                 } : function(event, data) {
                     var id = data.selected[0].id;
                     app.user.ui.itemView = id;
@@ -2240,12 +2253,24 @@ var pandora = new Ox.App({
         callback(value);
     }
 
+    function getAlignment(key) {
+        return ['person', 'string', 'text', 'title'].indexOf(
+            Ox.getObjectById(app.config.sortKeys, key).type
+        ) > -1 ? 'left' : 'right';
+    }
+
 	function getGroupWidth(pos, panelWidth) {
 	    var width = {};
 	    width.list = Math.floor(panelWidth / 5) + (panelWidth % 5 > pos);
 	    width.column = width.list - 40 - ($.browser.mozilla ? 16 : 12);
 	    return width;
 	}
+
+    function getSortOperator(key) {
+        return ['person', 'string', 'text', 'title'].indexOf(
+            Ox.getObjectById(app.config.sortKeys, key).type
+        ) > -1 ? '' : '-';
+    }
 
     function resizeGroups(width) {
         var widths = $.map(app.ui.groups, function(v, i) {
@@ -2367,7 +2392,7 @@ var pandora = new Ox.App({
 	    return {
 
 	        fromString: function(str) {
-	            var query = Ox.unserialize(str),
+	            var query = Ox.unserialize(str.substr(1)),
 	                sort = [];
 	            if ('find' in query) {
 	                app.user.ui.findQuery = parseFind(query.find);
@@ -2378,7 +2403,7 @@ var pandora = new Ox.App({
 	                app.user.ui.sort = $.map(query.sort.split(','), function(v, i) {
 	                    var hasOperator = '+-'.indexOf(v[0]) > -1,
 	                        key = hasOperator ? query.sort.substr(1) : query.sort,
-	                        operator = hasOperator ? v[0].replace('+', '') : Ox.getObjectById(app.config.sortKeys, key).operator;
+	                        operator = hasOperator ? v[0].replace('+', '') : getSortOperator(key);
 	                    return {
 	                        key: key,
 	                        operator: operator
@@ -2414,7 +2439,7 @@ var pandora = new Ox.App({
 
 	        toString: function() {
 	            Ox.print('tS', app.user.ui.find)
-	            return Ox.serialize({
+	            return '?' + Ox.serialize({
 	                find: constructFind(Query.toObject()),
 	                sort: app.user.ui.sort[0].operator + app.user.ui.sort[0].key,
 	                view: app.user.ui.listView
@@ -2433,6 +2458,11 @@ var pandora = new Ox.App({
                 }
             },
             regexps = {
+                '^\\?': function(url) {
+                    Query.fromString(url);
+                    app.user.ui.section = 'items';
+                    app.user.ui.item = '';
+                },
     			'^(|about|faq|home|news|software|terms|tour)$': function(url) {
 			        app.user.ui.section = 'site';
 			        app.user.ui.sitePage = url;
@@ -2473,7 +2503,8 @@ var pandora = new Ox.App({
             },
 
             parse: function() {
-                url = document.location.pathname.substr(1) + document.location.hash;
+                url = document.location.pathname.substr(1) +
+                        document.location.search + document.location.hash;
                 $.each(regexps, function(re, fn) {
                     Ox.print(url, 're', re)
                     re = new RegExp(re);
@@ -2486,12 +2517,21 @@ var pandora = new Ox.App({
 
             update: function() {
                 URL.parse();
-                if (!old.user.ui.item && app.user.ui.item) {
-                    //ui.toolbar.display();
-                    app.$ui.rightPanel.replace(0, app.$ui.toolbar = ui.toolbar());
-                    ui.item(app.user.ui.item, app.user.ui.itemView).display();
-                } else if (old.user.ui.item && !app.user.ui.item) {
-                    ui.list(app.user.ui.listView).display();
+                if (!old.user.ui.item) {
+                    if (!app.user.ui.item) {
+                        
+                    } else {
+                        //ui.toolbar.display();
+                        app.$ui.rightPanel.replace(0, app.$ui.toolbar = ui.toolbar());
+                        ui.item().display();
+                    }
+                } else {
+                    if (!app.user.ui.item) {
+                        alert('return')
+                        ui.list(app.user.ui.listView).display();
+                    } else {
+                        app.$ui.contentPanel.replace(1, ui.item());
+                    }
                 }
             }
 

@@ -167,7 +167,7 @@ Positions
         items = 'items'
         item_qs = query['qs']
         qs = models.Facet.objects.filter(key=query['group']).filter(item__id__in=item_qs)
-        qs = qs.values('value').annotate(items=Count('id')).order_by(**order_by)
+        qs = qs.values('value').annotate(items=Count('id')).order_by(*order_by)
 
         if 'ids' in query:
             #FIXME: this does not scale for larger results
@@ -264,7 +264,6 @@ def autocomplete(request):
     return render_to_json_response(response)
 actions.register(autocomplete)
 
-    
 def getItem(request):
     '''
         param data
