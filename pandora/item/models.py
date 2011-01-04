@@ -279,7 +279,9 @@ class Item(models.Model):
             if 'countries' in data:
                 data['country'] = data.pop('countries')
             if 'release date' in data:
-                data['releasedate'] = min(data.pop('release date'))
+                data['releasedate'] = data.pop('release date')
+                if isinstance(data['releasedate'], list):
+                    data['releasedate'] = min(data['releasedate'])
             if 'plot' in data:
                 data['summary'] = data.pop('plot')
             if isinstance(data['cast'][0], basestring):
@@ -353,7 +355,7 @@ class Item(models.Model):
         'year': 'year',
 
         'runtime': 'runtime',
-        'release_date': 'release_date',
+        'releasedate': 'releasedate',
 
         'country': 'country',
         'director': 'director',
@@ -362,7 +364,7 @@ class Item(models.Model):
         'producer': 'producer',
         'cinematographer': 'cinematographer',
         'language': 'language',
-        'genres': 'genre',
+        'genre': 'genre',
         'keyword': 'keyword',
         'cast': 'cast',
         'series_title': 'series_title',
