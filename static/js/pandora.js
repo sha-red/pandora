@@ -1674,7 +1674,9 @@ var pandora = new Ox.App({
 		                        operator = getSortOperator(id);
 		                    app.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator === '' ? 'ascending' : 'descending'));
 		                    app.$ui.sortSelect.selectItem(id);
+                            //alert(id + ' ' + operator)
 		                    app.$ui.list.sortList(id, operator);
+		                    URL.set(Query.toString());
 		                } else if (data.id == 'viewmovies') {
 		                    var view = data.checked[0].id;
 		                    url('#view=' + view);
@@ -2159,9 +2161,15 @@ var pandora = new Ox.App({
                 .bindEvent('change', function(event, data) {
                     var id = data.selected[0].id,
                         operator = getSortOperator(id);
-                    app.user.ui.sort[0].key = id;
+                    /*
+                    app.user.ui.sort[0] = {
+                        key: id,
+                        operator: operator
+                    };
+                    */
                     app.$ui.mainMenu.checkItem('sortMenu_sortmovies_' + id);
                     app.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator === '' ? 'ascending' : 'descending'));
+                    //alert(id + ' ' + operator)
                     app.$ui.list.sortList(id, operator);
                     URL.set(Query.toString());
                 });
