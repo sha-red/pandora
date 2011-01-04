@@ -38,7 +38,9 @@ if settings.DEBUG:
         (r'^tests/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.TESTS_ROOT}),
     )
+
 urlpatterns += patterns('',
+    (r'^.*?embed$', 'app.views.embed'),
     (r'^[A-Z0-9].*$', 'app.views.index'),
     (r'^$', 'app.views.index'),
 )
