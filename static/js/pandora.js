@@ -779,7 +779,7 @@ var pandora = new Ox.App({
             */
             //alert(id + ' ' + JSON.stringify(Query.toObject(id)))
             var i = app.user.ui.groups.indexOf(id),
-                panelWidth = app.$ui.document.width() - app.user.ui.listsSize - 1,
+                panelWidth = app.$ui.document.width() - (app.user.ui.showSidebar * app.user.ui.sidebarSize) - 1,
                 title = Ox.getObjectById(app.config.groups, id).title,
                 width = getGroupWidth(i, panelWidth),
                 that = new Ox.TextList({
@@ -1074,24 +1074,30 @@ var pandora = new Ox.App({
                             element: app.$ui.info = ui.info().options({
                                 id: 'infoPanel'
                             }),
-                            size: app.user.ui.listsSize / app.ui.infoRatio + 16
+                            size: app.user.ui.sidebarSize / app.ui.infoRatio + 16
                         }
                     ],
                     id: 'leftPanel',
                     orientation: 'vertical'
                 })
-                .bindEvent('resize', function(event, data) {
-                    if (data < app.ui.sectionButtonsWidth && app.$ui.sectionButtons) {
-                        app.$ui.sectionButtons.remove();
-                        delete app.$ui.sectionButtons;
-                        app.$ui.sectionbar.append(app.$ui.sectionSelect = ui.sectionSelect());
-                    } else if (data >= app.ui.sectionButtonsWidth && app.$ui.sectionSelect) {
-                        app.$ui.sectionSelect.remove();
-                        delete app.$ui.sectionSelect;
-                        app.$ui.sectionbar.append(app.$ui.sectionButtons = ui.sectionButtons());
+                .bindEvent({
+                    resize: function(event, data) {
+                        app.user.ui.sidebarSize = data;
+                        if (data < app.ui.sectionButtonsWidth && app.$ui.sectionButtons) {
+                            app.$ui.sectionButtons.remove();
+                            delete app.$ui.sectionButtons;
+                            app.$ui.sectionbar.append(app.$ui.sectionSelect = ui.sectionSelect());
+                        } else if (data >= app.ui.sectionButtonsWidth && app.$ui.sectionSelect) {
+                            app.$ui.sectionSelect.remove();
+                            delete app.$ui.sectionSelect;
+                            app.$ui.sectionbar.append(app.$ui.sectionButtons = ui.sectionButtons());
+                        }
+                        Ox.print('resize', data, data / app.ui.infoRatio + 16);
+                        app.$ui.leftPanel.size('infoPanel', Math.round(data / app.ui.infoRatio) + 16);
+                    },
+                    toggle: function(event, data) {
+                        app.user.ui.showSidebar = !data.collapsed;
                     }
-                    Ox.print('resize', data, data / app.ui.infoRatio + 16);
-                    app.$ui.leftPanel.size('infoPanel', Math.round(data / app.ui.infoRatio) + 16);
                 });
 			return that;
 		},
@@ -2006,7 +2012,7 @@ var pandora = new Ox.App({
                         element: app.$ui.leftPanel = ui.leftPanel(),
                         resizable: true,
                         resize: [128, 256, 384, 512],
-                        size: app.user.ui.listsSize
+                        size: app.user.ui.sidebarSize
                     },
                     {
                         element: app.$ui.rightPanel = ui.rightPanel()
