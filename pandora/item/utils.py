@@ -39,12 +39,12 @@ def oxid(title, directors, year='', seriesTitle='', episodeTitle='', season=0, e
     return u"0x" + oxid
 
 
-def oxdb_id(title, directors=[], year='', season='', episode='', episode_title='', episode_directors=[], episode_year=''):
+def oxdb_id(title, director=[], year='', season='', episode='', episode_title='', episode_director=[], episode_year=''):
     # new id function, will replace oxid()
     def get_hash(string):
         return hashlib.sha1(string.encode('utf-8')).hexdigest().upper()
-    director = ', '.join(directors)
-    episode_director = ', '.join(episode_directors)
+    director = ', '.join(director)
+    episode_director = ', '.join(episode_director)
     if not episode:
         oxdb_id = get_hash(director)[:8] + get_hash('\n'.join([title, str(year)]))[:8]
     else:

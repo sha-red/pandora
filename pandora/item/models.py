@@ -273,7 +273,9 @@ class Item(models.Model):
         if len(self.itemId) == 7:
             data = ox.web.imdb.Imdb(self.itemId)
             #FIXME: all this should be in ox.web.imdb.Imdb
-            for key in ('directors', 'writers', 'editors', 'producers', 'cinematographers', 'languages', 'genres', 'keywords'):
+            for key in ('directors', 'writers', 'editors', 'producers',
+                        'cinematographers', 'languages', 'genres', 'keywords',
+                        'episode_directors'):
                 if key in data:
                     data[key[:-1]] = data.pop(key)
             if 'countries' in data:
@@ -469,13 +471,13 @@ class Item(models.Model):
 
     def oxid(self):
         return utils.oxid(self.get('title', ''), self.get('director', []), str(self.get('year', '')),
-                          self.get('series title', ''), self.get('episode title', ''),
+                          self.get('series_title', ''), self.get('episode_title', ''),
                           self.get('season', ''), self.get('episode', ''))
 
     def oxdb_id(self):
         return utils.oxdb_id(self.get('title', ''), self.get('director', []), str(self.get('year', '')),
                           self.get('season', ''), self.get('episode', ''),
-                          self.get('episode_title', ''), self.get('episode_directors', ''), self.get('episode_year', ''))
+                          self.get('episode_title', ''), self.get('episode_director', []), self.get('episode_year', ''))
 
     '''
         Search related functions

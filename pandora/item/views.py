@@ -200,6 +200,7 @@ Positions
                     r[p] = m.get(p, '')
             return r
         qs = qs[query['range'][0]:query['range'][1]]
+        #response['data']['items'] = [only_p(m.get_json()) for m in qs]
         response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]
     else: # otherwise stats
         items = query['qs']
