@@ -137,7 +137,6 @@
             "item": "",
             "itemView": "timeline",
             "listQuery": {"conditions": [], "operator": ""},
-            "listsSize": 256,
             "listView": "icons",
             "section": "items",
             "sections": ["history", "lists", "public", "featured"],
@@ -146,6 +145,7 @@
             "showInfo": true,
             "showMovies": true,
             "showSidebar": true,
+            "sidebarSize": 256,
             "sitePage": "home",
             "sort": [
                 {"key": "director", "operator": ""}
