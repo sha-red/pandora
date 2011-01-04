@@ -40,7 +40,7 @@ def render_icon(frame, timeline, icon):
     timeline_image = Image.open(timeline)
     timeline_image = timeline_image.resize((icon_width, 64), Image.ANTIALIAS)
     icon_image.paste(timeline_image, (0, icon_height - 64))
-    mask_image = Image.open(ox.path.join(static_root, 'png', 'icon.mask.png'))
+    mask_image = Image.open(os.path.join(static_root, 'png', 'icon.mask.png'))
     mask_image = mask_image.resize((icon_width, icon_height))
     icon_image.putalpha(mask_image)
     icon_image.save(icon)
@@ -54,7 +54,7 @@ def main():
     if options.icon == None:
         parser.print_help()
         sys.exit()
-    render_icon(opt.frame, opt.timeline, opt.icon)
+    render_icon(options.frame, options.timeline, options.icon)
 
 if __name__ == "__main__":
     main()

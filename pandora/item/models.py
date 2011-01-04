@@ -236,6 +236,9 @@ class Item(models.Model):
     poster_height = models.IntegerField(default=0)
     poster_width = models.IntegerField(default=0)
     poster_frame = models.FloatField(default=-1)
+
+    icon = models.ImageField(default=None, blank=True, upload_to=lambda i, x: i.path("icon.jpg"))
+
     #stream related fields
     stream_aspect = models.FloatField(default=4/3)
 
@@ -870,6 +873,30 @@ class Item(models.Model):
                 p = subprocess.Popen(cmd)
                 p.wait()
         return posters.keys()
+
+    def make_icon(self):
+        #FIXME: should take middle or selected frame or som
+        frames = []
+        for f in self.main_videos():
+            for ff in f.frames.all():
+                frames.append(ff.frame.path)
+        if frames:
+            icon = self.path('icon.jpg')
+            self.icon.name = icon
+            frame = frames[int(len(frames)/2)]
+            timeline = self.path('timeline.64.png')
+            timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
+            if os.path.exists(timeline):
+                cmd = [settings.ITEM_ICON,
+                       '-f', frame,
+                       '-l', timeline,
+                       '-i', self.icon.path
+                      ]
+                p = subprocess.Popen(cmd)
+                p.wait()
+            self.save()
+            return icon
+        return None
 
 Item.facet_keys = []
 Item.person_keys = []

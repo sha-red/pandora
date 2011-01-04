@@ -11,5 +11,7 @@ urlpatterns = patterns("item.views",
     (r'^(?P<id>[A-Z0-9].*)/poster\.(?P<size>\d+)\.jpg$', 'poster'),
     (r'^(?P<id>[A-Z0-9].*)/poster\.(?P<size>large)\.jpg$', 'poster'),
     (r'^(?P<id>[A-Z0-9].*)/poster\.jpg$', 'poster'),
+    (r'^(?P<id>[A-Z0-9].*)/icon\.(?P<size>\d+)\.jpg$', 'icon'),
+    (r'^(?P<id>[A-Z0-9].*)/icon\.jpg$', 'icon'),
     (r'^(?P<id>[A-Z0-9].*)/timelines/(?P<timeline>.+)\.(?P<size>\d+)\.(?P<position>\d+)\.png$', 'timeline'),
 )

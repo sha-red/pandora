@@ -57,6 +57,7 @@ def _order_query(qs, sort, prefix='sort__'):
         qs = qs.order_by(*order_by)
     return qs
 
+
 def _parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
@@ -68,6 +69,7 @@ def _parse_query(data, user):
     #group by only allows sorting by name or number of itmes
     return query
 
+
 def _get_positions(ids, get_ids):
     positions = {}
     for i in get_ids:
@@ -76,6 +78,7 @@ def _get_positions(ids, get_ids):
         except:
             pass
     return positions
+
 
 def find(request):
     '''
@@ -222,6 +225,7 @@ Positions
 
 actions.register(find)
 
+
 def autocomplete(request):
     '''
         param data
@@ -265,6 +269,7 @@ def autocomplete(request):
     return render_to_json_response(response)
 actions.register(autocomplete)
 
+
 def getItem(request):
     '''
         param data
@@ -282,6 +287,7 @@ def getItem(request):
     response['data'] = {'item': info}
     return render_to_json_response(response)
 actions.register(getItem)
+
 
 @login_required_json
 def editItem(request):
@@ -434,27 +440,42 @@ def frame(request, id, position, size):
         raise Http404
     return HttpFileResponse(frame, content_type='image/jpeg')
 
+
+def image_to_response(item, image, size=None):
+    if size:
+        size = int(size)
+        path = image.path.replace('.jpg', '.%d.jpg'%size)
+        if not os.path.exists(path):
+            image_size = max(image.width, image.height)
+            if size > image_size:
+                return redirect('/%s/icon.jpg' % item.itemId)
+            extract.resize_image(image.path, path, size=size)
+    else:
+        path = image.path
+    return HttpFileResponse(path, content_type='image/jpeg')
+
+
 def poster(request, id, size=None):
     item = get_object_or_404(models.Item, itemId=id)
     if size == 'large':
         size = None
     if item.poster:
-        if size:
-            size = int(size)
-            poster_path = item.poster.path.replace('.jpg', '.%d.jpg'%size)
-            if not os.path.exists(poster_path):
-                poster_size = max(item.poster.width, item.poster.height)
-                if size > poster_size:
-                    return redirect('/%s/poster.jpg' % item.itemId)
-                extract.resize_image(item.poster.path, poster_path, size=size)
-        else:
-            poster_path = item.poster.path
+        return image_to_response(item, item.poster, size)
     else:
         if not size:
             size='large'
         return redirect('http://0xdb.org/%s/poster.%s.jpg' % (item.itemId, size))
         poster_path = os.path.join(settings.STATIC_ROOT, 'png/posterDark.48.png')
     return HttpFileResponse(poster_path, content_type='image/jpeg')
+
+
+def icon(request, id, size=None):
+    item = get_object_or_404(models.Item, itemId=id)
+    if item.icon:
+        return image_to_response(item, item.icon, size)
+    else:
+        raise Http404
+
 
 def timeline(request, id, timeline, size, position):
     item = get_object_or_404(models.Item, itemId=id)
@@ -463,6 +484,7 @@ def timeline(request, id, timeline, size, position):
     else:
         timeline = '%s.%s.%04d.png' %(item.timeline_prefix, size, int(position))
     return HttpFileResponse(timeline, content_type='image/png')
+
 
 def video(request, id, profile):
     item = get_object_or_404(models.Item, itemId=id)
@@ -497,4 +519,3 @@ def video(request, id, profile):
             response['Content-Disposition'] = 'attachment; filename="%s"' % filename
             return response
     return HttpFileResponse(path, content_type=content_type)
-
