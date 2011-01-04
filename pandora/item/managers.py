@@ -53,6 +53,8 @@ def parseCondition(condition):
                 v = models.Item.objects.filter(facets__key=k, facets__value__istartswith=v)
             elif op == '$':
                 v = models.Item.objects.filter(facets__key=k, facets__value__iendswith=v)
+            else:
+                v = models.Item.objects.filter(facets__key=k, facets__value__icontains=v)
             k = 'id__in'
         elif op == '=':
             value_key = 'find__value__iexact'
