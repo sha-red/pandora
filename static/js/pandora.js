@@ -1118,6 +1118,11 @@ var pandora = new Ox.App({
 		            columnsMovable: true,
 		            columnsRemovable: true,
 		            columnsResizable: true,
+                    format: {
+                        releasedate: {type: 'date', args: ['%a, %b %e, %Y']},
+                        runtime: {type: 'duration', args: [0, 'medium']},
+                        votes: {type: 'percent', args: [403824, 2]}
+                    },
 		            id: 'list',
 		            request: function(data, callback) {
 		                Ox.print('data, Query.toObject', data, Query.toObject())
