@@ -13,7 +13,3 @@ class ItemAdmin(admin.ModelAdmin):
 
 admin.site.register(models.Item, ItemAdmin)
 
-
-class PropertyAdmin(admin.ModelAdmin):
-    search_fields = ['name', 'title']
-admin.site.register(models.Property, PropertyAdmin)
