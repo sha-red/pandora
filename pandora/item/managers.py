@@ -40,6 +40,7 @@ def parseCondition(condition):
         'person': 'string',
         'text': 'string',
         'year': 'string',
+        'length': 'string',
     }.get(key_type, key_type)
 
     if key_type == "string":

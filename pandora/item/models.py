@@ -27,101 +27,6 @@ from annotaion.models import Annotation, Layer
 from person.models import get_name_sort
 from app.models import site_config
 
-def siteJson():
-    r = {}
-    r['findKeys'] = [{"id": "all", "title": "All"}]
-    for p in Property.objects.all():
-        if p.find:
-            title = p.title
-            if not title:
-                title = p.name.capitalize()
-            f = {"id": p.name, "title": title}
-            f['autocomplete'] = p.autocomplete
-            r['findKeys'].append(f)
-
-    r['groups'] = [p.name for p in Property.objects.filter(group=True)]
-    r['layers'] = [l.json() for l in Layer.objects.all()]
-
-    r['itemViews'] = [
-        {"id": "info", "title": "Info"},
-        {"id": "statistics", "title": "Statistics"},
-        {"id": "clips", "title": "Clips"},
-        {"id": "timeline", "title": "Timeline"},
-        {"id": "map", "title": "Map"},
-        {"id": "calendar", "title": "Calendar"},
-        {"id": "files", "title": "Files", "admin": True}
-    ]
-    r['listViews'] = [
-        {"id": "list", "title": "as List"},
-        {"id": "icons", "title": "as Icons"},
-        {"id": "info", "title": "with Info"},
-        {"id": "clips", "title": "with Clips"},
-        {"id": "timelines", "title": "with Timelines"},
-        {"id": "maps", "title": "with Maps"},
-        {"id": "calendars", "title": "with Calendars"},
-        {"id": "clip", "title": "as Clips"},
-        {"id": "map", "title": "on Map"},
-        {"id": "calendar", "title": "on Calendar"}
-    ]
-    r['site'] = {
-        "name": settings.SITENAME,
-        "id": settings.SITEID,
-        "url": settings.URL
-    }
-    r['sections'] = [
-        {"id": "history", "title": "History"},
-        {"id": "lists", "title": "My Lists"},
-        {"id": "public", "title": "Public Lists"},
-        {"id": "featured", "title": "Featured Lists"}
-    ]
-    r['sortKeys'] = []
-    for p in Property.objects.exclude(sort=''):
-        title = p.title
-        if not title:
-            title = p.name.capitalize()
-
-        f = {
-            "id": p.name,
-            "title": title,
-            "operator": p.operator,
-            "align": p.align,
-            "width": p.width,
-        }
-        if not p.removable:
-            f['removable'] = False
-        r['sortKeys'].append(f)
-    r['sortKeys'].append([{"id": "id", "title": "ID", "operator": "", "align": "left", "width": 90}])
-
-    r['totals'] = [{"id": "items"}]
-    for p in Property.objects.filter(totals=True):
-        f = {'id': p.name, 'admin': p.admin}
-        r['totals'].append(f)
-
-    #FIXME: defaults should also be populated from properties
-    r["user"] = {
-        "group": "guest",
-        "preferences": {},
-        "ui": {
-            "columns": ["id"] + [p.name for p in Property.objects.filter(default=True)],
-            "findQuery": {"conditions": [], "operator": ""},
-            "groupsQuery": {"conditions": [], "operator": "|"},
-            "groupsSize": 128,
-            "itemView": "timeline",
-            "listQuery": {"conditions": [], "operator": ""},
-            "listsSize": 192,
-            "listView": "icons",
-            "sections": ["history", "lists", "public", "featured"],
-            "showGroups": True,
-            "showInfo": True,
-            "showLists": True,
-            "showMovies": True,
-            "sort": settings.DEFAULT_SORT,
-            "theme": settings.DEFAULT_THEME
-        },
-        "username": ""
-    }
-    return r
-
 
 def get_item(info):
     '''
@@ -171,54 +76,7 @@ def get_item(info):
     return item
 
 
-class Property(models.Model):
-
-    class Meta:
-        ordering = ('position', )
-        verbose_name_plural = "Properties"
-
-    name = models.CharField(null=True, max_length=255, unique=True)
-    title = models.CharField(null=True, max_length=255, blank=True)
-    #text, string, string from list(fixme), event, place, person
-    type = models.CharField(null=True, max_length=255)
-    array = models.BooleanField(default=False)
-    position = models.IntegerField(default=0)
-    width = models.IntegerField(default=180)
-    align = models.CharField(null=True, max_length=255, default='left')
-    operator = models.CharField(null=True, max_length=5, default='', blank=True)
-    default = models.BooleanField('Enabled by default', default=False)
-    removable = models.BooleanField(default=True)
-
-    #sort values: title, string, integer, float, date
-    sort = models.CharField(null=True, max_length=255, blank=True)
-    find = models.BooleanField(default=False)
-    autocomplete = models.BooleanField(default=False)
-    group = models.BooleanField(default=False)
-
-    totals = models.BooleanField(default=False)
-    admin = models.BooleanField(default=False)
-
-    def __unicode__(self):
-        if self.title:
-            return self.title
-        return self.name
-
-    def json(self):
-        j = {}
-        for key in ('type', 'sort', 'title', 'array', 'totals', 'admin'):
-            value = getattr(self, key)
-            if value:
-                j[key] = value
-        return j
-
-    def save(self, *args, **kwargs):
-        if not self.title:
-            self.title = self.name.capitalize()
-        super(Property, self).save(*args, **kwargs)
-
-
 class Item(models.Model):
-    person_keys = ('director', 'writer', 'producer', 'editor', 'cinematographer', 'actor', 'character')
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     published = models.DateTimeField(default=datetime.now, editable=False)
@@ -441,41 +299,32 @@ class Item(models.Model):
 
     def get_json(self, fields=None):
         item = {}
-        for key in self._public_fields:
-            pub_key = self._public_fields.get(key, key)
-            if not fields or pub_key in fields:
-                if hasattr(self, key):
-                    value = getattr(self, key)
-                else:
-                    value = self.get(key)
-                if callable(value):
-                    item[pub_key] = value()
-                else:
-                    item[pub_key] = value
+        item.update(self.external_data)
+        item.update(self.data)
+        for key in site_config['keys'].keys():
+            if key not in item:
+                value = self.get(key)
+                #also get values from sort table, i.e. numberof values
+                if not value and  self.sort and hasattr(self.sort, key):
+                    if hasattr(self.sort, '%s_desc'%key):
+                        if getattr(self.sort, key) == getattr(self.sort, '%s_desc'%key):
+                            value = getattr(self.sort, key)
+                    else:
+                        value = getattr(self.sort, key)
+                if value:
+                    item[key] = value
+
+        #format datetime values
+        for key in item:
+            if isinstance(item[key], datetime):
+                item[key] = item[key].strftime('%Y-%m-%dT%H:%M:%SZ')
+
         if not fields:
             item['stream'] = self.get_stream()
         item['poster'] = self.get_poster()
         item['posters'] = self.get_posters()
-        if fields:
-            for f in fields:
-                if f.endswith('.length') and f[:-7] in ('cast', 'genre', 'trivia'):
-                    item[f] = getattr(self.sort, f[:-7])
         return item
 
-    def fields(self):
-        fields = {}
-        for f in self._meta.fields:
-            if f.name in self._public_fields:
-                fields[f.name] = {}
-                fields[f.name]['order'] = 'desc'
-                fields[f.name]['type'] = type(f)
-        return fields
-    fields = classmethod(fields)
-
-    def oxid(self):
-        return utils.oxid(self.get('title', ''), self.get('director', []), str(self.get('year', '')),
-                          self.get('series_title', ''), self.get('episode_title', ''),
-                          self.get('season', ''), self.get('episode', ''))
 
     def oxdb_id(self):
         return utils.oxdb_id(self.get('title', ''), self.get('director', []), str(self.get('year', '')),
@@ -496,10 +345,8 @@ class Item(models.Model):
             else:
                 f.delete()
 
+        #FIXME: use site_config
         save('title', '\n'.join([self.get('title'), self.get('original_title', '')]))
-
-        #FIXME: filter us/int  title
-        #f.title += ' '.join([t.title for t in self.alternative_titles()])
 
         for key in self.facet_keys:
             if key == 'character':
@@ -515,6 +362,7 @@ class Item(models.Model):
                 save(key, '|%s|'%'|'.join(values))
             else:
                 save(key, values)
+
         save('summary', self.get('summary', '') + self.get('plot', '') + self.get('plot_outline', ''))
         save('trivia', ' '.join(self.get('trivia', [])))
         save('location', '|%s|'%'|'.join(self.get('filming_locations', [])))
@@ -567,24 +415,27 @@ class Item(models.Model):
         )
         for key in site_config['sortKeys']:
             name = key['id']
+            source = key.get('key', name)
             field_type = key['type']
+            max_int = 9223372036854775807L
+
             if name not in base_keys:
                 if field_type == 'title':
-                    value = utils.sort_title(canonicalTitle(self.get(name)))
+                    value = utils.sort_title(canonicalTitle(self.get(source)))
                     value = utils.sort_string(value)
                     setattr(s, '%s_desc'%name, value)
                     if not value:
                         value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
                     setattr(s, name, value)
                 elif field_type == 'person':
-                    value = sortNames(self.get(name, []))
+                    value = sortNames(self.get(source, []))
                     value = utils.sort_string(value)[:955]
                     setattr(s, '%s_desc'%name, value)
                     if not value:
                         value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
                     setattr(s, name, value)
                 elif field_type == 'string':
-                    value = self.get(name, u'')
+                    value = self.get(source, u'')
                     if isinstance(value, list):
                         value = u','.join(value)
                     value = utils.sort_string(value)[:955]
@@ -593,19 +444,27 @@ class Item(models.Model):
                         value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
                     setattr(s, name, value)
                 elif field_type == 'length':
-                    setattr(s, name, len(self.get(name, '')))
-                elif field_type == 'integer':
-                    max_int = 9223372036854775807L
-                    value = self.get(name, -max_int)
-                    if isinstance(value, list):
+                    #can be length of strings or length of arrays, i.e. keywords
+                    value = self.get(source, None)
+                    if not value:
+                        value = -max_int
+                    else:
                         value = len(value)
-                    setattr(s, name, value)
+                    setattr(s, '%s_desc'%name, value)
                     if value == -max_int:
                         value = max_int
+                    setattr(s, name, value)
+                elif field_type == 'integer':
+                    value = self.get(source, -max_int)
+                    if isinstance(value, list):
+                        value = len(value)
                     setattr(s, '%s_desc'%name, value)
+                    if value == -max_int:
+                        value = max_int
+                    setattr(s, name, value)
                 elif field_type == 'float':
                     max_float = 9223372036854775807L
-                    value = self.get(name, -max_float)
+                    value = self.get(source, -max_float)
                     if isinstance(value, list):
                         value = sum(value)
                     setattr(s, name, value)
@@ -613,7 +472,7 @@ class Item(models.Model):
                         value = max_float
                     setattr(s, '%s_desc'%name, value)
                 elif field_type == 'words':
-                    value = self.get(name, '')
+                    value = self.get(source, '')
                     if isinstance(value, list):
                         value = '\n'.join(value)
                     if value:
@@ -622,13 +481,13 @@ class Item(models.Model):
                         value = 0
                     setattr(s, name, value)
                 elif field_type == 'year':
-                    value = self.get(name, '')
+                    value = self.get(source, '')
                     setattr(s, '%s_desc'%name, value)
                     if not value:
                         value = '9999'
                     setattr(s, name, value)
                 elif field_type == 'date':
-                    value = self.get(name, None)
+                    value = self.get(source, None)
                     if isinstance(value, basestring):
                         value = datetime.strptime(value, '%Y-%m-%d')
                     setattr(s, '%s_desc'%name, value)
@@ -683,6 +542,7 @@ class Item(models.Model):
         else:
             s.cutsperminute = 0
         s.save()
+
 
     def update_facets(self):
         #FIXME: what to do with Unkown Director, Year, Country etc.
@@ -921,6 +781,10 @@ class ItemFind(models.Model):
     key = models.CharField(max_length=200, db_index=True)
     value = models.TextField(blank=True)
 
+'''
+ItemSort
+table constructed based on info in site_config['sortKeys']
+'''
 attrs = {
     '__module__': 'item.models',
     'item': models.OneToOneField('Item', related_name='sort', primary_key=True),
@@ -952,76 +816,14 @@ ItemSort = type('ItemSort', (models.Model,), attrs)
 ItemSort.fields = filter(lambda x: not x.endswith('_desc'), [f.name for f in ItemSort._meta.fields])
 ItemSort.descending_fields = filter(lambda x: x.endswith('_desc'), [f.name for f in ItemSort._meta.fields])
 
-'''
-class ItemSort(models.Model):
-    #FIXME: make sort based on site.json
-    """
-        used to sort items, all sort values are in here
-    """
-    item = models.OneToOneField('Item', related_name='sort', primary_key=True)
-
-    title = models.CharField(max_length=1000, db_index=True)
-    director = models.TextField(blank=True, db_index=True)
-    country = models.TextField(blank=True, db_index=True)
-    year = models.CharField(max_length=4, db_index=True)
-
-    producer = models.TextField(blank=True, db_index=True)
-    writer = models.TextField(blank=True, db_index=True)
-    editor = models.TextField(blank=True, db_index=True)
-    cinematographer = models.TextField(blank=True, db_index=True)
-
-    language = models.TextField(blank=True, db_index=True)
-    runtime = models.IntegerField(blank=True, null=True, db_index=True)
-
-    keywords = models.IntegerField(blank=True, db_index=True)
-    genre = models.TextField(blank=True, db_index=True)
-    cast = models.IntegerField(blank=True, db_index=True)
-    summary = models.IntegerField(blank=True, db_index=True)
-    trivia = models.IntegerField(blank=True, db_index=True)
-    connections = models.IntegerField(blank=True, db_index=True)
-
-    rating = models.FloatField(blank=True, db_index=True)
-    votes = models.IntegerField(blank=True, db_index=True)
-    scenes = models.IntegerField(blank=True, db_index=True)
-    dialog = models.IntegerField(null=True, blank=True, db_index=True)
-    words = models.IntegerField(null=True, blank=True, db_index=True)
-    wpm = models.IntegerField('Words per Minute', null=True, blank=True, db_index=True)
-    risk = models.IntegerField(null=True, blank=True, db_index=True)
-
-    itemId = models.CharField('ID', max_length=128, blank=True, db_index=True)
-
-    duration = models.FloatField(default=-1, db_index=True)
-    resolution = models.BigIntegerField(blank=True, db_index=True)
-    aspectratio = models.IntegerField('Aspect Ratio', blank=True, db_index=True)
-    bitrate = models.IntegerField(blank=True, db_index=True)
-    pixels = models.BigIntegerField(blank=True, db_index=True)
-    filename = models.CharField(max_length=1024, blank=True, db_index=True)
-    files = models.IntegerField(blank=True, db_index=True)
-    size = models.BigIntegerField(blank=True, db_index=True)
-    color = models.IntegerField(blank=True, db_index=True)
-    saturation = models.IntegerField(blank=True, db_index=True)
-    brightness = models.IntegerField(blank=True, db_index=True)
-    cuts = models.IntegerField(blank=True, db_index=True)
-    cutsperminute = models.FloatField(blank=True, db_index=True)
-
-    #required to move empty values to the bottom for both asc and desc sort
-    title_desc = models.CharField(max_length=1000, db_index=True)
-    director_desc = models.TextField(blank=True, db_index=True)
-    country_desc = models.TextField(blank=True, db_index=True)
-    year_desc = models.CharField(max_length=4, db_index=True)
-
-    producer_desc = models.TextField(blank=True, db_index=True)
-    writer_desc = models.TextField(blank=True, db_index=True)
-    editor_desc = models.TextField(blank=True, db_index=True)
-    cinematographer_desc = models.TextField(blank=True, db_index=True)
-
-    language_desc = models.TextField(blank=True, db_index=True)
-
-ItemSort.fields = filter(lambda x: not x.endswith('_desc'), [f.name for f in ItemSort._meta.fields])
-ItemSort.descending_fields = filter(lambda x: x.endswith('_desc'), [f.name for f in ItemSort._meta.fields])
-'''
 
 class Facet(models.Model):
+    '''
+        used for keys that can have multiple values like people, languages etc.
+        does not perform to well if total number of items goes above 10k
+        this happens for keywords in 0xdb right now
+    '''
+    
     class Meta:
         unique_together = ("item", "key", "value")
 
@@ -1032,7 +834,7 @@ class Facet(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.value_sort:
-            self.value_sort = self.value
+            self.value_sort = utils.sort_string(self.value)
         super(Facet, self).save(*args, **kwargs)
 
 
