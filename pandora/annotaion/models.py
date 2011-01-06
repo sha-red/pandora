@@ -51,7 +51,7 @@ class Annotation(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User)
-    item = models.ForeignKey('item.Item')
+    item = models.ForeignKey('item.Item', related_name='annotations')
 
     #seconds
     start = models.FloatField(default=-1)

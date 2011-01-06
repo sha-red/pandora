@@ -68,7 +68,7 @@
     },
     "sections": [
         {"id": "history", "title": "History"},
-        {"id": "lists", "title": "My Lists"},
+        {"id": "my", "title": "My Lists"},
         {"id": "public", "title": "Public Lists"},
         {"id": "featured", "title": "Featured Lists"}
     ],
@@ -83,7 +83,7 @@
         {"id": "producer", "title": "Producer", "width": 180, "type": "person"},
         {"id": "cinematographer", "title": "Cinematographer", "width": 180, "type": "person"},
         {"id": "editor", "title": "Editor", "width": 180, "type": "person"},
-        {"id": "numberofactors", "title": "Number of Actors", "width": 60, "key": "actor", "type": "length"},
+        {"id": "actor", "title": "Number of Actors", "width": 60, "type": "person"},
         {"id": "genre", "title": "Genre", "width": 120, "type": "string"},
         {"id": "numberofkeywords", "title": "Number of Keywords", "width": 60, "key": "keyword", "type": "length"},
         {"id": "wordsinsummary", "title": "Words in Summary", "width": 60, "key": "summary", "type": "words"},
@@ -126,6 +126,24 @@
     ],
     "user": {
         "group": "guest",
+        "lists": {
+            "history": [
+                {"id": "all_movies", "title": "All Movies", "query": {}}
+            ],
+            "my": [
+                {"id": "favorites", "title": "Favorites", "public": true, "items": []},
+                {"id": "most_popular", "title": "Most Popular", "query": {}},
+                {"id": "recently_viewed", "title": "Recently Viewed", "query": {}},
+                {"id": "1960s", "title": "1960s", "query": {"conditions": [{"key": "year", "value": "196", "operator": "^"}], "operator": ""}}
+            ],
+            "public": [
+                {"id": "rlx_watchme", "title": "rlx: watchme", "public": true, "items": [0, 1, 2, 3, 4]}
+            ],
+            "featured": [
+                {"id": "situationist_film", "title": "Situationist Film", "query": {}},
+                {"id": "timelines", "title": "Timelines", "items": [0, 1, 2, 3, 4, 5, 6, 7, 8]}
+            ]
+        },
         "preferences": {},
         "ui": {
             "annotationsSize": 256,
@@ -139,7 +157,7 @@
             "listQuery": {"conditions": [], "operator": ""},
             "listView": "icons",
             "section": "items",
-            "sections": ["history", "lists", "public", "featured"],
+            "sections": ["history", "my", "public", "featured"],
             "showAnnotations": true,
             "showGroups": true,
             "showInfo": true,
