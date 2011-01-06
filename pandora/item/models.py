@@ -519,8 +519,8 @@ class Item(models.Model):
             if 'bitrate' in videos[0].info:
                 s.bitrate = videos[0].info['bitrate']
             s.pixels = sum([v.pixels for v in videos])
-            s.filename = ' '.join([v.name for v in videos])
-            s.filename_desc = ' '.join([v.name for v in videos])
+            s.filename = ' '.join([v.name for v in videos])[:955]
+            s.filename_desc = ' '.join([v.name for v in videos])[:955]
             s.files = self.files.all().count()
             s.size = sum([v.size for v in videos]) #FIXME: only size of movies?
             s.volume = 0
