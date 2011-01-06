@@ -17,6 +17,7 @@ class List(models.Model):
     user = models.ForeignKey(User)
     name = models.CharField(max_length=255)
     public = models.BooleanField(default=False)
+    featured = models.BooleanField(default=False)
     
     query = DictField(default={})
 

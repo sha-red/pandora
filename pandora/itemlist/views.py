@@ -103,7 +103,10 @@ def editList(request):
     if list.editable(request.user):
         for key in data:
             if key in ('name', 'public', 'query'):
-                setattr(list, key, data['key'])
+                if key in data:
+                    setattr(list, key, data[key])
+        if user.has_perm('Ox.admin') and 'featured' in data:
+            list.featured = data['featured']
     else:
         response = json_response(status=403, text='not allowed')
     return render_to_json_response(response)
