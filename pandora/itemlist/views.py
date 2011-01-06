@@ -102,7 +102,7 @@ def editList(request):
     list = get_object_or_404_json(models.List, pk=data['list'])
     if list.editable(request.user):
         for key in data:
-            if key in ('name', 'public'):
+            if key in ('name', 'public', 'query'):
                 setattr(list, key, data['key'])
     else:
         response = json_response(status=403, text='not allowed')

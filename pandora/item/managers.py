@@ -186,7 +186,14 @@ class ItemManager(Manager):
                 if only_public:
                     lqs = lqs.filter(public=True)
                 if lqs.count() == 1:
-                    qs = qs.filter(listitem__list__id=lqs[0].id)
+                    if lqs[0].query:
+                        data = lqs[0].query
+                        conditions = parseConditions(data['query']['conditions'],
+                                                     data['query'].get('operator', '&'))
+                        if conditions:
+                            qs = qs.filter(conditions)
+                    else:
+                        qs = qs.filter(id__in=lqs[0].items.all())
         return qs
 
     def find(self, data, user):
