@@ -5,6 +5,7 @@ from __future__ import division, with_statement
 from django.db import models
 from django.contrib.auth.models import User
 
+from ox.django.fields import DictField
 
 class List(models.Model):
 
@@ -16,6 +17,9 @@ class List(models.Model):
     user = models.ForeignKey(User)
     name = models.CharField(max_length=255)
     public = models.BooleanField(default=False)
+    
+    query = DictField(default={})
+
     items = models.ManyToManyField('item.Item', related_name='lists',
                                                 through='ListItem')
 

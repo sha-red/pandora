@@ -83,7 +83,7 @@
         {"id": "producer", "title": "Producer", "width": 180, "type": "person"},
         {"id": "cinematographer", "title": "Cinematographer", "width": 180, "type": "person"},
         {"id": "editor", "title": "Editor", "width": 180, "type": "person"},
-        {"id": "actor", "title": "Number of Actors", "width": 60, "type": "person"},
+        {"id": "numberofactors", "title": "Number of Actors", "width": 60, "key": "actor", "type": "length"},
         {"id": "genre", "title": "Genre", "width": 120, "type": "string"},
         {"id": "numberofkeywords", "title": "Number of Keywords", "width": 60, "key": "keyword", "type": "length"},
         {"id": "wordsinsummary", "title": "Words in Summary", "width": 60, "key": "summary", "type": "words"},

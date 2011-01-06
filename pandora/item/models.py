@@ -164,7 +164,6 @@ class Item(models.Model):
         return '/%s' % self.itemId
 
     def save(self, *args, **kwargs):
-        self.json = self.get_json()
         self.oxdbId = self.oxdb_id()
 
         if self.poster:
@@ -173,10 +172,11 @@ class Item(models.Model):
         else:
             self.poster_height = 128
             self.poster_width = 80
-        super(Item, self).save(*args, **kwargs)
         self.update_find()
         self.update_sort()
         self.update_facets()
+        self.json = self.get_json()
+        super(Item, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         self.delete_poster()
@@ -298,7 +298,9 @@ class Item(models.Model):
         return layers
 
     def get_json(self, fields=None):
-        item = {}
+        item = {
+            'id': self.itemId
+        }
         item.update(self.external_data)
         item.update(self.data)
         for key in site_config['keys'].keys():
@@ -490,10 +492,10 @@ class Item(models.Model):
                     value = self.get(source, None)
                     if isinstance(value, basestring):
                         value = datetime.strptime(value, '%Y-%m-%d')
-                    setattr(s, '%s_desc'%name, value)
+                    setattr(s, name, value)
                     if not value:
                         value = datetime.strptime('9999-12-12', '%Y-%m-%d')
-                    setattr(s, name, value)
+                    setattr(s, '%s_desc'%name, value)
 
         #sort keys based on database, these will always be available
         s.itemId = self.itemId.replace('0x', 'xx')
