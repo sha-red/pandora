@@ -147,10 +147,11 @@ class Item(models.Model):
                     data['releasedate'] = min(data['releasedate'])
             if 'plot' in data:
                 data['summary'] = data.pop('plot')
-            if isinstance(data['cast'][0], basestring):
-                data['actor'] = [data['cast'][0]]
-            else:
-                data['actor'] = [c[0] for c in data['cast']]
+            if 'cast' in data:
+                if isinstance(data['cast'][0], basestring):
+                    data['actor'] = [data['cast'][0]]
+                else:
+                    data['actor'] = [c[0] for c in data['cast']]
             self.external_data = data
             self.save()
 
