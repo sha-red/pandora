@@ -2103,6 +2103,7 @@ var pandora = new Ox.App({
 		sections: function() {
 			var that = new Ox.Element();
 			var $sections = [];
+			app.$ui.sectionLists = [];
 		    $.each(app.user.ui.sections, function(i, id) {
 		        var menu = [];
 		        if (id == 'my') {
@@ -2129,7 +2130,7 @@ var pandora = new Ox.App({
 	            $section.$content.css({
 	                height: app.user.lists[id].length * 16 + 'px'
 	            });
-	            var $list = new Ox.TextList({
+	            app.$ui.sectionLists[i] = new Ox.TextList({
 	                columns: [
                         {
                             align: 'left',
@@ -2198,21 +2199,14 @@ var pandora = new Ox.App({
 	                width: app.user.ui.sidebarSize + 'px',
 	                height: app.user.lists[id].length * 16 + 'px'
 	            })
+	            .bindEvent('select', function(event, data) {
+	                app.$ui.sectionLists.forEach(function($list, i_) {
+	                    if (i != i_) {
+	                        $list.options('selected', []);
+	                    }
+	                });
+	            })
 	            .appendTo($section.$content);
-		        /*
-		        } else {
-		            $section.$content.append(
-    		            $('<div>').css({ height: '20px' }).append(
-    		                $('<div>').css({ float: 'left', width: '16px', height: '16px', margin: '1px'}).append(
-    		                    $('<img>').attr({ src: 'static/oxjs/build/png/ox.ui.modern/iconFind.png' }).css({ width: '16px', height: '16px', border: 0, background: 'rgb(64, 64, 64)', WebkitBorderRadius: '2px' })
-    		                )
-    		            ).append(
-    		                $('<div>').css({ float: 'left', width: '122px', height: '14px', margin: '2px' }).html('Foo')
-    		            ).append(
-    		                $('<div>').css({ float: 'left', width: '40px', height: '14px', margin: '2px', textAlign: 'right' }).html('23')
-    		            )
-    		        );
-		        } */
 		    });
 		    $.each($sections, function(i, $section) {
 		        that.append($section);
