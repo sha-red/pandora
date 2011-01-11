@@ -49,10 +49,14 @@ def findList(request):
             },
             sort: [{key: 'name', operator: '+'}],
             range: [0, 100]
+            keys: []
         }
 
         possible query keys:
             name, user, featured, subscribed
+
+        possible keys:
+            name, user, featured, subscribed, query
 
         }
         return {status: {code: int, text: string},
@@ -69,10 +73,13 @@ def findList(request):
     #order
     qs = _order_query(query['qs'], query['sort'])
     #range
-    qs = qs[query['range'][0]:query['range'][1]]
-
     response = json_response()
-    response['data']['lists'] = [l.json(request.user) for l in qs]
+    if 'keys' in data:
+        qs = qs[query['range'][0]:query['range'][1]]
+
+        response['data']['items'] = [l.json(data['keys'], request.user) for l in qs]
+    else:
+        response['data']['items'] = qs.count()
     return render_to_json_response(response)
 actions.register(findList)
 

@@ -63,15 +63,16 @@ class List(models.Model):
             return True
         return False
 
-    def json(self, user=None):
-        return {
-            'user': self.user.username,
-            'name': self.name,
-            'public': self.public,
-            'featured': self.featured,
-            'query': self.query,
-            'items': self.get_number_of_items(user)
-        }
+    def json(self, keys, user=None):
+        response = {}
+        for key in keys:
+            if key == 'items':
+                response[key] = self.get_number_of_items(user)
+            elif key == 'user':
+                response[key] = self.user.username
+            else:
+                response[key] = getattr(self, key)
+        return response
 
 class ListItem(models.Model):
     created = models.DateTimeField(auto_now_add=True)
