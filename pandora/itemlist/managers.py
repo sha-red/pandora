@@ -134,4 +134,5 @@ class ListManager(Manager):
         if conditions:
             qs = qs.filter(conditions)
 
+        qs = qs.filter(Q(status='public') | Q(status='featured') | Q(user=user))
         return qs

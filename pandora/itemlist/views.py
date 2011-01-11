@@ -33,7 +33,7 @@ def _parse_query(data, user):
     query['qs'] = models.List.objects.find(data, user)
     return query
 
-def findList(request):
+def findLists(request):
     '''
         FIXME: support key: subscribed
         param data {
@@ -81,7 +81,7 @@ def findList(request):
     else:
         response['data']['items'] = qs.count()
     return render_to_json_response(response)
-actions.register(findList)
+actions.register(findLists)
 
 @login_required_json
 def addListItem(request):
@@ -189,9 +189,17 @@ def editList(request):
     list = get_object_or_404_json(models.List, pk=data['list'])
     if list.editable(request.user):
         for key in data:
-            if key in ('name', 'public', 'query'):
+            if key in ('name', 'status', 'query'):
                 if key in data:
-                    setattr(list, key, data[key])
+                    if key == 'query' and not data['query']:
+                        setattr(list, key, {"static":True})
+                    elif key == 'status':
+                        value = data[key]
+                        if value not in list._status:
+                            value = list._status[0]
+                        setattr(list, key, value)
+                    else:
+                        setattr(list, key, data[key])
         if user.has_perm('Ox.admin') and 'featured' in data:
             list.featured = data['featured']
     else:
