@@ -24,7 +24,7 @@ class Timeline(models.Model):
 
     def editable(self, user):
         #FIXME: make permissions work
-        if self.user == user or user.has_perm('Ox.admin'):
+        if self.user == user or user.is_staff:
             return True
         return False
 

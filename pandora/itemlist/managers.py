@@ -7,7 +7,7 @@ from django.db.models import Q, Manager
 import models
 
 
-def parseCondition(condition):
+def parseCondition(condition, user):
     '''
     condition: {
             value: "war"
@@ -35,10 +35,9 @@ def parseCondition(condition):
         exclude = False
     if k == 'subscribed':
         print "FXIME, subscribed needs work"
-        k = 'public'
-        v = True
-
-    if isinstance(v, bool): #featured and public flag
+        key = 'subscribed_users__username'
+        v = user.username
+    elif isinstance(v, bool): #featured and public flag
         key = k
     else:
         if op == '=':
@@ -58,7 +57,7 @@ def parseCondition(condition):
         q = Q(**{key: v})
     return q
 
-def parseConditions(conditions, operator):
+def parseConditions(conditions, operator, user):
     '''
     conditions: [
         {
@@ -81,14 +80,14 @@ def parseConditions(conditions, operator):
     for condition in conditions:
         if 'conditions' in condition:
             q = parseConditions(condition['conditions'],
-                             condition.get('operator', '&'))
+                             condition.get('operator', '&'), user)
             if q:
                 conn.append(q)
             pass
         else:
             if condition.get('value', '') != '' or \
                condition.get('operator', '') == '=':
-                conn.append(parseCondition(condition))
+                conn.append(parseCondition(condition, user))
     if conn:
         q = conn[0]
         for c in conn[1:]:
@@ -129,8 +128,9 @@ class ListManager(Manager):
 
         #join query with operator
         qs = self.get_query_set()
-        conditions = parseConditions(data['query']['conditions'],
-                                     data['query'].get('operator', '&'))
+        conditions = parseConditions(data['query'].get('conditions', []),
+                                     data['query'].get('operator', '&'),
+                                     user)
         if conditions:
             qs = qs.filter(conditions)
 

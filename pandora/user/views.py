@@ -408,7 +408,12 @@ def setUI(request):
         param data {
             key.subkey: value
         }
-        return
+        you can set nested keys
+            api.setUI({"lists.my.listView": "icons"})
+
+        return {
+            'status': {'code': int, 'text': string}
+        }
     '''
     data = json.loads(request.POST['data'])
     keys = data.keys()[0].split('.')

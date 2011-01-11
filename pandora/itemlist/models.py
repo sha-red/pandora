@@ -19,7 +19,7 @@ class List(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, related_name='lists')
     name = models.CharField(max_length=255)
     status = models.CharField(max_length=20, default='private')
     _status = ['private', 'public', 'featured']
@@ -27,6 +27,8 @@ class List(models.Model):
 
     items = models.ManyToManyField('item.Item', related_name='lists',
                                                 through='ListItem')
+
+    subscribed_users = models.ManyToManyField(User, related_name='subscribed_lists')
 
     objects = managers.ListManager()
 
@@ -53,22 +55,29 @@ class List(models.Model):
     def __unicode__(self):
         return u'%s (%s)' % (self.name, self.user)
 
+    def get_id(self):
+        return '%s:%s' % (self.user.username, self.name)
+
     def editable(self, user):
         #FIXME: make permissions work
-        if self.user == user or user.has_perm('Ox.admin'):
+        if self.user == user or user.is_staff:
             return True
         return False
 
-    def json(self, keys, user=None):
+    def json(self, keys=['id', 'name', 'user', 'query', 'status'], user=None):
         response = {}
         for key in keys:
             if key == 'items':
                 response[key] = self.get_number_of_items(user)
+            elif key == 'id':
+                response[key] = self.get_id()
             elif key == 'user':
                 response[key] = self.user.username
             elif key == 'query':
                 if not self.query.get('static', False):
                     response[key] = self.query
+            elif key == 'ui':
+                response[key] = site_conf['uiDefaults']['list']
             else:
                 response[key] = getattr(self, key)
         return response
@@ -81,3 +90,4 @@ class ListItem(models.Model):
 
     def __unicode__(self):
         return u'%s in %s' % (self.item, self.list)
+

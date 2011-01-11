@@ -124,6 +124,16 @@
         {"id": "size", "admin": true},
         {"id": "pixels"}
     ],
+    "uiDefaults": {
+        "list": {
+            "columns": ["id", "title", "director", "country", "year", "language", "runtime", "genre"],
+            "listView": "icons",
+            "selected": [],
+            "sort": [
+                {"key": "director", "operator": ""}
+            ]
+        }
+    },
     "user": {
         "group": "guest",
         "lists": {
@@ -131,13 +141,14 @@
                 {"id": "all_movies", "title": "All Movies", "query": {}}
             ],
             "my": [
+                {"user": "foo", "name": "Favorites", "featured": false, "public": true},
                 {"id": "favorites", "title": "Favorites", "public": true, "items": []},
                 {"id": "most_popular", "title": "Most Popular", "query": {}},
                 {"id": "recently_viewed", "title": "Recently Viewed", "query": {}},
                 {"id": "1960s", "title": "1960s", "query": {"conditions": [{"key": "year", "value": "196", "operator": "^"}], "operator": ""}}
             ],
             "public": [
-                {"id": "rlx_watchme", "title": "rlx: watchme", "public": true, "items": [0, 1, 2, 3, 4]}
+                {"id": "rlx:watchme", "title": "rlx: watchme", "public": true, "items": [0, 1, 2, 3, 4]}
             ],
             "featured": [
                 {"id": "situationist_film", "title": "Situationist Film", "query": {}},
@@ -147,17 +158,26 @@
         "preferences": {},
         "ui": {
             "annotationsSize": 256,
-            "columns": ["id", "title", "director", "country", "year", "language", "runtime", "genre"],
             "findQuery": {"conditions": [], "operator": ""},
             "groups": ["director", "country", "year", "language", "genre"],
             "groupsQuery": {"conditions": [], "operator": "|"},
             "groupsSize": 176,
             "item": "",
             "itemView": "timeline",
+            "list": "",
             "listQuery": {"conditions": [], "operator": ""},
-            "listView": "icons",
+            "lists": {
+                "": {
+                    "columns": ["id", "title", "director", "country", "year", "language", "runtime", "genre"],
+                    "listView": "icons",
+                    "selected": [],
+                    "sort": [
+                        {"key": "director", "operator": ""}
+                    ]
+                }
+            },
             "section": "items",
-            "sections": ["history", "my", "public", "featured"],
+            "sections": ["my", "public", "featured"],
             "showAnnotations": true,
             "showGroups": true,
             "showInfo": true,
@@ -165,9 +185,6 @@
             "showSidebar": true,
             "sidebarSize": 256,
             "sitePage": "home",
-            "sort": [
-                {"key": "director", "operator": ""}
-            ],
             "theme": "classic"
         },
         "username": ""

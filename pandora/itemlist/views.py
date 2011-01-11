@@ -160,7 +160,7 @@ def addList(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    if models.List.filter(name=data['name'], user=request.user).count() == 0:
+    if models.List.objects.filter(name=data['name'], user=request.user).count() == 0:
         list = models.List(name = data['name'], user=request.user)
         list.save()
         response = json_response(status=200, text='created')
@@ -186,8 +186,10 @@ def editList(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    list = get_object_or_404_json(models.List, pk=data['list'])
+    username, listname = data['id'].split(':')
+    list = get_object_or_404_json(models.List, user__username=username, name=listname)
     if list.editable(request.user):
+        response = json_response()
         for key in data:
             if key in ('name', 'status', 'query'):
                 if key in data:
@@ -200,7 +202,7 @@ def editList(request):
                         setattr(list, key, value)
                     else:
                         setattr(list, key, data[key])
-        if user.has_perm('Ox.admin') and 'featured' in data:
+        if request.user.is_staff and 'featured' in data:
             list.featured = data['featured']
     else:
         response = json_response(status=403, text='not allowed')
@@ -223,7 +225,7 @@ def removeList(request):
     '''
     data = json.loads(request.POST['data'])
     user = request.user.username
-    if user.has_perm('Ox.admin') and 'user' in data:
+    if user.is_staff and 'user' in data:
         user = data.get('user')
     list = get_object_or_404_json(models.List, name=data['name'], user__username=user)
     if list.editable(request.user):
@@ -232,3 +234,49 @@ def removeList(request):
         response = json_response(status=403, text='not allowed')
     return render_to_json_response(response)
 actions.register(removeList)
+
+
+@login_required_json
+def subscribeToList(request):
+    '''
+        param data {
+            id: listId,
+            user: username(only admins)
+        }
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+            }
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    username, listname = data['id'].split(':')
+    list = get_object_or_404_json(models.List, user__username=username, name=listname)
+    user = request.user
+    if list.subscribed_users.filter(username=user.username).count() == 0:
+        list.subscribed_users.add(user)
+    response = json_response()
+    return render_to_json_response(response)
+actions.register(subscribeToList)
+
+@login_required_json
+def unsubscribeFromList(request):
+    '''
+        param data {
+            id: listId,
+            user: username(only admins)
+        }
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+            }
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    username, listname = data['id'].split(':')
+    list = get_object_or_404_json(models.List, user__username=username, name=listname)
+    user = request.user
+    list.subscribed_users.remove(user)
+    response = json_response()
+    return render_to_json_response(response)
+actions.register(unsubscribeFromList)
