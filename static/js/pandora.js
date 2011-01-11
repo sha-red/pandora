@@ -1131,11 +1131,6 @@ var pandora = new Ox.App({
 		            columnsRemovable: true,
 		            columnsResizable: true,
 		            columnsVisible: true,
-                    format: {
-                        releasedate: {type: 'date', args: ['%a, %b %e, %Y']},
-                        runtime: {type: 'duration', args: [0, 'medium']},
-                        votes: {type: 'percent', args: [403824, 2]}
-                    },
 		            id: 'list',
 		            request: function(data, callback) {
 		                Ox.print('data, Query.toObject', data, Query.toObject())
@@ -2108,6 +2103,7 @@ var pandora = new Ox.App({
 		sections: function() {
 			var that = new Ox.Element();
 			var $sections = [];
+			app.$ui.sectionLists = [];
 		    $.each(app.user.ui.sections, function(i, id) {
 		        var menu = [];
 		        if (id == 'my') {
@@ -2134,7 +2130,7 @@ var pandora = new Ox.App({
 	            $section.$content.css({
 	                height: app.user.lists[id].length * 16 + 'px'
 	            });
-	            var $list = new Ox.TextList({
+	            app.$ui.sectionLists[i] = new Ox.TextList({
 	                columns: [
                         {
                             align: 'left',
@@ -2153,13 +2149,25 @@ var pandora = new Ox.App({
                         },
 	                    {
 	                        align: 'left',
-	                        id: 'icon',
+	                        format: function(value) {
+	                            return $('<img>').attr({
+                                    src: 'static/oxjs/build/png/ox.ui.modern/symbol' +
+                                    (value ? 'Find' : 'None') + '.png'
+                                });
+	                        },
+	                        id: 'query',
 	                        operator: '+',
 	                        visible: true,
 	                        width: 16
 	                    },
 	                    {
 	                        align: 'left',
+	                        format: function(value) {
+	                            return $('<img>').attr({
+                                    src: 'static/oxjs/build/png/ox.ui.modern/symbol' +
+                                    (value ? 'Publish' : 'None') + '.png'
+                                });
+	                        },
 	                        id: 'public',
 	                        operator: '+',
 	                        visible: true,
@@ -2174,19 +2182,8 @@ var pandora = new Ox.App({
 	                    } else {
 	                        callback({data: {items: $.map(app.user.lists[id], function(v, i) {
 	                            return $.extend(v, {
-	                                edit: $('<img>').attr({
-	                                    src: 'static/oxjs/build/png/ox.ui.modern/symbolNone.png'
-	                                }).mouseover(function() { $(this).attr({
-	                                    src: 'static/oxjs/build/png/ox.ui.modern/symbolEdit.png'
-	                                })}).mouseout(function() { $(this).attr({
-	                                    src: 'static/oxjs/build/png/ox.ui.modern/symbolNone.png'
-	                                })}),
-	                                icon: $('<img>').attr({
-	                                    src: 'static/oxjs/build/png/ox.ui.modern/symbol' + (v.items ? 'None' : 'Find') + '.png'
-	                                }),
-	                                public: $('<img>').attr({
-	                                    src: 'static/oxjs/build/png/ox.ui.modern/symbol' + (v.items && v.public ? 'Publish' : 'None') + '.png'
-	                                }),
+	                                query: v.query,
+	                                public: v.public,
 	                                items: v.items ? v.items.length.toString() : (v.title == '1960s' || v.title == 'All Movies' ? '?' : '100')
 	                            });
 	                        })}});
@@ -2202,21 +2199,14 @@ var pandora = new Ox.App({
 	                width: app.user.ui.sidebarSize + 'px',
 	                height: app.user.lists[id].length * 16 + 'px'
 	            })
+	            .bindEvent('select', function(event, data) {
+	                app.$ui.sectionLists.forEach(function($list, i_) {
+	                    if (i != i_) {
+	                        $list.options('selected', []);
+	                    }
+	                });
+	            })
 	            .appendTo($section.$content);
-		        /*
-		        } else {
-		            $section.$content.append(
-    		            $('<div>').css({ height: '20px' }).append(
-    		                $('<div>').css({ float: 'left', width: '16px', height: '16px', margin: '1px'}).append(
-    		                    $('<img>').attr({ src: 'static/oxjs/build/png/ox.ui.modern/iconFind.png' }).css({ width: '16px', height: '16px', border: 0, background: 'rgb(64, 64, 64)', WebkitBorderRadius: '2px' })
-    		                )
-    		            ).append(
-    		                $('<div>').css({ float: 'left', width: '122px', height: '14px', margin: '2px' }).html('Foo')
-    		            ).append(
-    		                $('<div>').css({ float: 'left', width: '40px', height: '14px', margin: '2px', textAlign: 'right' }).html('23')
-    		            )
-    		        );
-		        } */
 		    });
 		    $.each($sections, function(i, $section) {
 		        that.append($section);
