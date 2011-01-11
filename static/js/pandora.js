@@ -587,7 +587,7 @@ var pandora = new Ox.App({
 		            },
 		            selected: [app.user.ui.item],
 		            size: 64,
-		            sort: app.user.ui.sort,
+		            sort: app.user.ui.lists[app.user.ui.list].sort,
 		            unique: 'id'
 		        })
 		        .bindEvent({
@@ -629,7 +629,7 @@ var pandora = new Ox.App({
 		                size: app.user.ui.groupsSize
 		            },
 		            {
-		                element: app.$ui.list = ui.list(app.user.ui.listView)
+		                element: app.$ui.list = ui.list(app.user.ui.lists[app.user.ui.list].listView)
 		            }
 		        ] : [
     	            {
@@ -1100,7 +1100,7 @@ var pandora = new Ox.App({
                         app.$ui.leftPanel.find('.OxItem').css({
                             width: data + 'px'
                         });
-                        app.$ui.leftPanel.find('.OxCell.OxColumnTitle').css({
+                        app.$ui.leftPanel.find('.OxCell.OxColumnName').css({
                             width: (data - 80) + 'px'
                         });
                         //*/
@@ -1124,7 +1124,7 @@ var pandora = new Ox.App({
 		                    align: getAlignment(key.id),
 		                    operator: getSortOperator(key.id),
 		                    unique: key.id == 'id',
-		                    visible: $.inArray(key.id, app.user.ui.columns) > -1
+		                    visible: $.inArray(key.id, app.user.ui.lists[app.user.ui.list].columns) > -1
 		                }, key);
 		            }),
 		            columnsMovable: true,
@@ -1138,7 +1138,7 @@ var pandora = new Ox.App({
 		                    query: Query.toObject()
 		                }), callback);
 		            },
-		            sort: app.user.ui.sort
+		            sort: app.user.ui.lists[app.user.ui.list].sort
 		        })
 		        .bindEvent({
 		            resize: function(event, data) {
@@ -1168,7 +1168,7 @@ var pandora = new Ox.App({
 		                }), callback);
 		            },
 		            size: 128,
-		            sort: app.user.ui.sort,
+		            sort: app.user.ui.lists[app.user.ui.list].sort,
 		            unique: 'id'
 		        });
 			} else if (view == 'map') {
@@ -1583,8 +1583,9 @@ var pandora = new Ox.App({
 		                { id: 'viewMenu', title: 'View', items: [
 		                    { id: 'movies', title: 'View Movies', items: [
 		                        { group: 'viewmovies', min: 0, max: 1, items: $.map(app.config.listViews, function(view, i) {
+		                            //alert(JSON.stringify([app.user.ui.list, app.user.ui.lists]))
 		                            return $.extend({
-		                                checked: app.user.ui.listView == view.id,
+		                                checked: app.user.ui.lists[app.user.ui.list].listView == view.id,
 		                            }, view);
 		                        }) },
 		                    ]},
@@ -1615,14 +1616,14 @@ var pandora = new Ox.App({
 		                    { id: 'sortmovies', title: 'Sort Movies by', items: [
 		                        { group: 'sortmovies', min: 1, max: 1, items: $.map(app.config.sortKeys, function(key, i) {
 		                            return $.extend({
-		                                checked: app.user.ui.sort[0].key == key.id,
+		                                checked: app.user.ui.lists[app.user.ui.list].sort[0].key == key.id,
 		                            }, key);
 		                        }) }
 		                    ] },
 		                    { id: 'ordermovies', title: 'Order Movies', items: [
 		                        { group: 'ordermovies', min: 1, max: 1, items: [
-		                            { id: 'ascending', title: 'Ascending', checked: app.user.ui.sort[0].operator === '' },
-		                            { id: 'descending', title: 'Descending', checked: app.user.ui.sort[0].operator == '-' }
+		                            { id: 'ascending', title: 'Ascending', checked: app.user.ui.lists[app.user.ui.list].sort[0].operator === '' },
+		                            { id: 'descending', title: 'Descending', checked: app.user.ui.lists[app.user.ui.list].sort[0].operator == '-' }
 		                        ]}
 		                    ] },
 		                    { id: 'advancedsort', title: 'Advanced Sort...', keyboard: 'shift control s' },
@@ -1687,7 +1688,7 @@ var pandora = new Ox.App({
 		                        url(id);
 		                } else if (data.id == 'ordermovies') {
 		                    var id = data.checked[0].id;
-		                    app.$ui.list.sortList(app.user.ui.sort[0].key, id == 'ascending' ? '' : '-');
+		                    app.$ui.list.sortList(app.user.ui.lists[app.user.ui.list].sort[0].key, id == 'ascending' ? '' : '-');
 		                } else if (data.id == 'sortmovies') {
 		                    var id = data.checked[0].id,
 		                        operator = getSortOperator(id);
@@ -2058,7 +2059,7 @@ var pandora = new Ox.App({
                 if (!app.user.ui.item) {
                     resizeGroups(data);
                     app.$ui.list.size();
-                    if (app.user.ui.listView == 'map') {
+                    if (app.user.ui.lists[app.user.ui.list].listView == 'map') {
                         app.$ui.map.triggerResize();
                     }
                 } else {
@@ -2127,16 +2128,22 @@ var pandora = new Ox.App({
 		            title: Ox.getObjectById(app.config.sections, id).title
 		        });
 		        $sections.push($section);
-	            $section.$content.css({
-	                height: app.user.lists[id].length * 16 + 'px'
-	            });
 	            app.$ui.sectionLists[i] = new Ox.TextList({
 	                columns: [
+	                    {
+	                        id: 'id',
+	                        visible: false,
+	                        unique: true
+	                    },
+	                    {
+	                        id: 'position',
+	                        visible: false,
+	                    },
                         {
                             align: 'left',
-                            id: 'title',
+                            editable: id == 'my',
+                            id: 'name',
                             operator: '+',
-                            unique: true,
                             visible: true,
                             width: 184
                         },
@@ -2163,12 +2170,13 @@ var pandora = new Ox.App({
 	                    {
 	                        align: 'left',
 	                        format: function(value) {
+	                            var symbols = {private: 'None', public: 'Publish', featured: 'Star'};
 	                            return $('<img>').attr({
                                     src: 'static/oxjs/build/png/ox.ui.modern/symbol' +
-                                    (value ? 'Publish' : 'None') + '.png'
+                                    symbols[value] + '.png'
                                 });
 	                        },
-	                        id: 'public',
+	                        id: 'status',
 	                        operator: '+',
 	                        visible: true,
 	                        width: 16
@@ -2177,34 +2185,61 @@ var pandora = new Ox.App({
 	                max: 1,
 	                min: 0,
 	                request: function(data, callback) {
-	                    if ($.isEmptyObject(data)) {
-	                        callback({data: {items: app.user.lists[id].length}});
-	                    } else {
-	                        callback({data: {items: $.map(app.user.lists[id], function(v, i) {
-	                            return $.extend(v, {
-	                                query: v.query,
-	                                public: v.public,
-	                                items: v.items ? v.items.length.toString() : (v.title == '1960s' || v.title == 'All Movies' ? '?' : '100')
-	                            });
-	                        })}});
+	                    var query;
+	                    if (id == 'my') {
+	                        query = {conditions: [
+	                            {key: 'user', value: app.user.username, operator: '='},
+	                            {key: 'status', value: 'featured', operator: '!'}
+	                        ], operator: ''};
+	                    } else if (id == 'public') {
+	                        query = {conditions: [{key: 'subscribed', value: true, operator: '='}], operator: ''};
+	                    } else if (id == 'featured') {
+	                        query = {conditions: [{key: 'status', value: 'featured', operator: '='}], operator: '&'};
 	                    }
+	                    return pandora.api.findLists($.extend(data, {
+                            query: query
+                        }), callback);
                     },
                     sort: [
-                        {key: 'title', operator: '+'}
-                    ]
+                        {key: 'position', operator: '+'}
+                    ],
+                    sortable: id == 'my' || id == 'public' || app.user.group == 'admin'
 	            })
 	            .css({
 	                left: 0,
 	                top: 0,
 	                width: app.user.ui.sidebarSize + 'px',
-	                height: app.user.lists[id].length * 16 + 'px'
 	            })
-	            .bindEvent('select', function(event, data) {
-	                app.$ui.sectionLists.forEach(function($list, i_) {
-	                    if (i != i_) {
-	                        $list.options('selected', []);
-	                    }
-	                });
+	            .bind({
+	                dragenter: function(e) {
+	                    Ox.print('DRAGENTER', e)
+	                }
+	            })
+	            .bindEvent({
+	                load: function(event, data) {
+	                    $section.$content.css({
+        	                height: data.items * 16 + 'px'
+        	            });
+        	            app.$ui.sectionLists[i].css({
+        	                height: data.items * 16 + 'px'
+        	            });
+	                },
+	                select: function(event, data) {
+    	                app.$ui.sectionLists.forEach(function($list, i_) {
+    	                    i != i_ && $list.options('selected', []);
+    	                });
+    	            },
+    	            sort: function(event, data) {
+    	                /*
+    	                data.ids.forEach(function(id, pos) {
+    	                    app.user.ui.lists[id].position = pos;
+    	                });
+    	                */
+	                    pandora.api.sortLists({
+	                        section: id,
+	                        ids: data.ids
+	                    });
+    	            }
 	            })
 	            .appendTo($section.$content);
 		    });
@@ -2235,9 +2270,9 @@ var pandora = new Ox.App({
             var that = new Ox.Select({
                     id: 'sortSelect',
                     items: $.map(app.config.sortKeys, function(key) {
-                        Ox.print('????', app.user.ui.sort.key, key.id)
+                        //Ox.print('????', app.user.ui.lists[app.user.ui.list].sort.key, key.id)
                         return $.extend($.extend({}, key), {
-                            checked: app.user.ui.sort[0].key == key.id,
+                            checked: app.user.ui.lists[app.user.ui.list].sort[0].key == key.id,
                             title: 'Sort by ' + key.title
                         });
                     }),
@@ -2251,7 +2286,7 @@ var pandora = new Ox.App({
                     var id = data.selected[0].id,
                         operator = getSortOperator(id);
                     /*
-                    app.user.ui.sort[0] = {
+                    app.user.ui.lists[app.user.ui.list].sort[0] = {
                         key: id,
                         operator: operator
                     };
@@ -2328,7 +2363,7 @@ var pandora = new Ox.App({
                     id: 'viewSelect',
                     items: !app.user.ui.item ? $.map(app.config.listViews, function(view) {
                         return $.extend($.extend({}, view), {
-                            checked: app.user.ui.listView == view.id,
+                            checked: app.user.ui.lists[app.user.ui.list].listView == view.id,
                             title: 'View ' + view.title
                         });
                     }) : $.map(app.config.itemViews, function(view) {
@@ -2345,7 +2380,7 @@ var pandora = new Ox.App({
                 })
                 .bindEvent('change', !app.user.ui.item ? function(event, data) {
                     var id = data.selected[0].id;
-                    app.user.ui.listView = id;
+                    app.user.ui.lists[app.user.ui.list].listView = id;
                     app.$ui.mainMenu.checkItem('viewMenu_movies_' + id);
                     app.$ui.contentPanel.replace(1, app.$ui.list = ui.list(id));
                     URL.set(Query.toString());
@@ -2563,7 +2598,7 @@ var pandora = new Ox.App({
 	            }
 	            if ('sort' in query) {
 	                sort = query.sort.split(',')
-	                app.user.ui.sort = $.map(query.sort.split(','), function(v, i) {
+	                app.user.ui.lists[app.user.ui.list].sort = $.map(query.sort.split(','), function(v, i) {
 	                    var hasOperator = '+-'.indexOf(v[0]) > -1,
 	                        key = hasOperator ? query.sort.substr(1) : query.sort,
 	                        operator = hasOperator ? v[0].replace('+', '') : getSortOperator(key);
@@ -2574,7 +2609,7 @@ var pandora = new Ox.App({
 	                });
 	            }
 	            if ('view' in query) {
-	                app.user.ui.listView = query.view;
+	                app.user.ui.lists[app.user.ui.list].listView = query.view;
 	            }
 	        },
 
@@ -2604,8 +2639,9 @@ var pandora = new Ox.App({
 	            Ox.print('tS', app.user.ui.find)
 	            return '?' + Ox.serialize({
 	                find: constructFind(Query.toObject()),
-	                sort: app.user.ui.sort[0].operator + app.user.ui.sort[0].key,
-	                view: app.user.ui.listView
+	                sort: app.user.ui.lists[app.user.ui.list].sort[0].operator +
+	                        app.user.ui.lists[app.user.ui.list].sort[0].key,
+	                view: app.user.ui.lists[app.user.ui.list].listView
 	            });
 	        }
 
@@ -2637,7 +2673,7 @@ var pandora = new Ox.App({
     			'^(calendar|calendars|clips|icons|flow|map|maps|timelines)$': function() {
 			        app.user.ui.section = 'items';
 			        app.user.ui.item = '';
-			        app.user.ui.listView = url;
+			        app.user.ui.lists[app.user.ui.list].listView = url;
     			},
                 '^[0-9A-Z]': function() {
     				var split = url.split('/'),
