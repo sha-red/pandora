@@ -41,8 +41,10 @@ class UserProfile(models.Model):
             ids = [l.get_id() for l in lists]
             in_list = filter(lambda l: l in ui['lists'], ids)
             for l in lists:
-                print l
-                pos, created = Position.objects.get_or_create(list=l, user=self.user, section=section)
+                if section == 'featured':
+                    pos, created = Position.objects.get_or_create(list=l, section=section)
+                else:
+                    pos, created = Position.objects.get_or_create(list=l, user=self.user, section=section)
                 if created:
                     pos.position = len(in_list)
                     pos.save()

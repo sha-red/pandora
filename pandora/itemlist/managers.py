@@ -21,7 +21,10 @@ def parseCondition(condition, user):
     ...
     '''
     k = condition.get('key', 'name')
-    k = {'user': 'user__username'}.get(k, k)
+    k = {
+        'user': 'user__username',
+        'position': 'position__position',
+    }.get(k, k)
     if not k:
         k = 'name'
     v = condition['value']

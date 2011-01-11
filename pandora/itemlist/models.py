@@ -7,7 +7,6 @@ from django.contrib.auth.models import User
 
 from ox.django.fields import DictField
 
-from item.models import Item
 
 import managers
 
@@ -39,6 +38,7 @@ class List(models.Model):
         if self.query.get('static', False):
             return self.items.count()
         else:
+            from item.models import Item
             return Item.objects.find({'query': self.query}, user).count()
 
     def add(self, item):
@@ -56,7 +56,7 @@ class List(models.Model):
         return self.get_id()
 
     def get_id(self):
-        return u'%s:%s' % (self.user.username, self.name)
+        return u'%s.%s' % (self.user.username, self.name)
 
     def editable(self, user):
         #FIXME: make permissions work
@@ -99,4 +99,7 @@ class Position(models.Model):
     user = models.ForeignKey(User)
     section = models.CharField(max_length='255')
     position = models.IntegerField(default=0)
+
+    def __unicode__(self):
+        return u'%s/%s/%s' % (self.section, self.position, self.list)
 

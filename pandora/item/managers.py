@@ -4,8 +4,8 @@ from datetime import datetime
 
 from django.db.models import Q, Manager
 
+from itemlist.models import List
 import models
-
 
 def parseCondition(condition):
     '''
@@ -41,8 +41,10 @@ def parseCondition(condition):
         'text': 'string',
         'year': 'string',
         'length': 'string',
+        'list': 'list'
     }.get(key_type, key_type)
-
+    if k == 'list':
+        key_type = 'list'
     if key_type == "string":
         in_find=True
         value_key = 'find__value'
@@ -78,6 +80,19 @@ def parseCondition(condition):
                 q = Q(**{'find__key': k, value_key: v})
             else:
                 q = Q(**{k: v})
+        return q
+    elif key_type == 'list':
+        l = v.split(".")
+        lqs = List.objects.filter(name=l[1], user__username=l[0])
+        if lqs.count() == 1:
+            if lqs[0].query.get('static', False) == False:
+                data = lqs[0].query
+                q = parseConditions(data['conditions'],
+                                    data.get('operator', '&'))
+            else:
+                q = Q(id__in=lqs[0].items.all())
+        else:
+            q = Q(itemId=False)
         return q
     else: #number or date
 
@@ -184,7 +199,7 @@ class ItemManager(Manager):
             if len(l) == 2:
                 lqs = models.List.objects.filter(name=l[1], user__username=l[0])
                 if only_public:
-                    lqs = lqs.filter(public=True)
+                    lqs = lqs.filter(Q(status='public')|Q(status='featured'))
                 if lqs.count() == 1:
                     if lqs[0].query:
                         data = lqs[0].query
