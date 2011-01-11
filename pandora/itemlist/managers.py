@@ -33,7 +33,7 @@ def parseCondition(condition):
         exclude = True
     else:
         exclude = False
-    if key == 'subscribed':
+    if k == 'subscribed':
         print "FXIME, subscribed needs work"
         k = 'public'
         v = True
