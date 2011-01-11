@@ -10,6 +10,72 @@ import models
 from api.actions import actions
 
 
+def _order_query(qs, sort):
+    order_by = []
+    for e in sort:
+        operator = e['operator']
+        if operator != '-':
+            operator = ''
+        key = e['key']
+        order = '%s%s' % (operator, key)
+        order_by.append(order)
+    if order_by:
+        qs = qs.order_by(*order_by)
+    return qs
+
+def _parse_query(data, user):
+    query = {}
+    query['range'] = [0, 100]
+    query['sort'] = [{'key':'user', 'operator':'+'}, {'key':'name', 'operator':'+'}]
+    for key in ('sort', 'keys', 'group', 'list', 'range', 'ids'):
+        if key in data:
+            query[key] = data[key]
+    query['qs'] = models.List.objects.find(data, user)
+    return query
+
+def findList(request):
+    '''
+        FIXME: support key: subscribed
+        param data {
+            query: {
+                conditions: [
+                    {
+                        key: 'user',
+                        value: 'something',
+                        operator: '='
+                    }
+                ]
+                operator: ","
+            },
+            sort: [{key: 'name', operator: '+'}],
+            range: [0, 100]
+        }
+
+        possible query keys:
+            name, user, featured, subscribed
+
+        }
+        return {status: {code: int, text: string},
+                data: {
+                    lists: [
+                        {name:, user:, featured:, public...}
+                    ]
+                }
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    query = _parse_query(data, request.user)
+
+    #order
+    qs = _order_query(query['qs'], query['sort'])
+    #range
+    qs = qs[query['range'][0]:query['range'][1]]
+
+    response = json_response()
+    response['data']['lists'] = [l.json(request.user) for l in qs]
+    return render_to_json_response(response)
+actions.register(findList)
+
 @login_required_json
 def addListItem(request):
     '''
@@ -18,8 +84,11 @@ def addListItem(request):
              item: itemId,
              quert: ...
            }
-        return {'status': {'code': int, 'text': string},
-                'data': {}}
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+            }
+        }
     '''
     data = json.loads(request.POST['data'])
     list = get_object_or_404_json(models.List, pk=data['list'])
@@ -47,8 +116,11 @@ def removeListItem(request):
              item: itemId,
              quert: ...
            }
-        return {'status': {'code': int, 'text': string},
-                'data': {}}
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+            }
+        }
     '''
     data = json.loads(request.POST['data'])
     list = get_object_or_404_json(models.List, pk=data['list'])
@@ -73,14 +145,19 @@ def addList(request):
     '''
         param data
             {name: value}
-        return {'status': {'code': int, 'text': string},
-                'data': {}}
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+                list:
+            }
+        }
     '''
     data = json.loads(request.POST['data'])
     if models.List.filter(name=data['name'], user=request.user).count() == 0:
         list = models.List(name = data['name'], user=request.user)
         list.save()
         response = json_response(status=200, text='created')
+        response['data']['list'] = list.json()
     else:
         response = json_response(status=200, text='list already exists')
         response['data']['errors'] = {'name': 'List already exists'}
@@ -91,11 +168,14 @@ actions.register(addList)
 @login_required_json
 def editList(request):
     '''
-        param data
-            {key: value}
-        keys: name, public
-        return {'status': {'code': int, 'text': string},
-                'data': {}
+        param data {
+            key: value
+        }
+        keys: name, public, query, featured (if admin)
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+            }
         }
     '''
     data = json.loads(request.POST['data'])
@@ -116,13 +196,21 @@ actions.register(editList)
 @login_required_json
 def removeList(request):
     '''
-        param data
-            {key: value}
-        return {'status': {'code': int, 'text': string},
-                'data': {}}
+        param data {
+            name: value,
+            user: username(only admins)
+        }
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+            }
+        }
     '''
     data = json.loads(request.POST['data'])
-    list = get_object_or_404_json(models.List, pk=data['list'])
+    user = request.user.username
+    if user.has_perm('Ox.admin') and 'user' in data:
+        user = data.get('user')
+    list = get_object_or_404_json(models.List, name=data['name'], user__username=user)
     if list.editable(request.user):
         list.delete()
     else:

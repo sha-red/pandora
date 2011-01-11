@@ -8,8 +8,11 @@ from django.db import models
 from django.conf import settings
 
 from ox.utils import json
+from ox.django.fields import DictField
 
 from app.models import site_config
+from itemlist.models import List
+
 
 class UserProfile(models.Model):
     reset_token = models.TextField(blank=True, null=True, unique=True)
@@ -17,7 +20,7 @@ class UserProfile(models.Model):
 
     files_updated = models.DateTimeField(default=datetime.now)
     newsletter = models.BooleanField(default=True)
-
+    ui = DictField(default={})
 
 def user_post_save(sender, instance, **kwargs):
     profile, new = UserProfile.objects.get_or_create(user=instance)

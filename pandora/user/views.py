@@ -162,6 +162,14 @@ def signup(request):
             user.is_superuser = first_user
             user.is_staff = first_user
             user.save()
+            #create default user lists:
+            for l in settings.DEFAULT_LISTS:
+                list = models.List(name=l['name'], user=user)
+                for key in ('query', 'public', 'featured'):
+                    if key in l:
+                        setattr(list, key, l[key])
+                list.save()
+
             user = authenticate(username=form.data['username'],
                                 password=form.data['password'])
             login(request, user)
@@ -399,3 +407,20 @@ def preferences(request):
                     models.set_preference(request.user, key, data[key])
     return render_to_json_response(response)
 actions.register(preferences)
+
+
+@login_required_json
+def setUI(request):
+    '''
+    '''
+    data = json.loads(request.POST['data'])
+    keys = data.keys()[0].split('.')
+    value = data.values()[0]
+    ui = user.profile.ui
+    while keys:
+        key = keys.pop(0)
+
+    response = json_response()
+    return render_to_json_response(response)
+actions.register(preferences)
+

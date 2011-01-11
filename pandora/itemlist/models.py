@@ -7,6 +7,11 @@ from django.contrib.auth.models import User
 
 from ox.django.fields import DictField
 
+from item.models import Item
+
+import managers
+
+
 class List(models.Model):
 
     class Meta:
@@ -18,11 +23,25 @@ class List(models.Model):
     name = models.CharField(max_length=255)
     public = models.BooleanField(default=False)
     featured = models.BooleanField(default=False)
-    
     query = DictField(default={})
 
     items = models.ManyToManyField('item.Item', related_name='lists',
                                                 through='ListItem')
+
+    objects = managers.ListManager()
+
+    def save(self, *args, **kwargs):
+        if self.query:
+            self.smart = True
+        else:
+            self.smart = False
+        super(List, self).save(*args, **kwargs)
+
+    def get_number_of_items(self, user=None):
+        if not self.query:
+            return self.items.count()
+        else:
+            return Item.objects.find({'query': self.query}, user).count()
 
     def add(self, item):
         q = self.items.filter(id=item.id)
@@ -36,7 +55,7 @@ class List(models.Model):
         self.ListItem.objects.all().filter(item=item, list=self).delete()
 
     def __unicode__(self):
-        return u'%s (%s)' % (self.title, self.user)
+        return u'%s (%s)' % (self.name, self.user)
 
     def editable(self, user):
         #FIXME: make permissions work
@@ -44,6 +63,15 @@ class List(models.Model):
             return True
         return False
 
+    def json(self, user=None):
+        return {
+            'user': self.user.username,
+            'name': self.name,
+            'public': self.public,
+            'featured': self.featured,
+            'query': self.query,
+            'items': self.get_number_of_items(user)
+        }
 
 class ListItem(models.Model):
     created = models.DateTimeField(auto_now_add=True)

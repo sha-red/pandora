@@ -182,6 +182,13 @@ POSTER_PRECEDENCE = (
     'other'
 )
 
+DEFAULT_LISTS = [
+    {"name": "Favorites"},
+    {"name": "1960s", "query": {
+                "conditions": [{"key": "year", "value": "196", "operator": "^"}],
+                "operator": ""}
+    }
+]
 #0xdb.org
 #POSTER_SERVICES=['http://data.0xdb.org/poster/']
 
