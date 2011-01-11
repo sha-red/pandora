@@ -369,58 +369,61 @@ def contact(request):
 actions.register(contact)
 
 
-@login_required_json
-def preferences(request):
-    '''
-        param data
-            string
-            array
-            object
+def getPositionById(list, key):
+    for i in range(0, len(list)):
+        if list[i]['id'] == key:
+            return i
+    return -1
 
-        return
-        if data is empy or {}
-        if data is string:
-            return preference with name
-        if data is array:
-            return preferences with names
-        if data is object:
-            set key values in dict as preferences
+
+@login_required_json
+def setPreferences(request):
     '''
+        param data {
+            key.subkey: value
+        }
+        return
+    '''
+    data = json.loads(request.POST['data'])
+    keys = data.keys()[0].split('.')
+    value = data.values()[0]
+    profile = request.user.get_profile()
+    p = profile.preferences
+    while len(keys)>1:
+        key = keys.pop(0)
+        if isinstance(p, list):
+            p = p[getPositionById(p, key)]
+        else:
+            p = p[key]
+    p[keys[0]] = value
+    profile.save()
     response = json_response()
-    if 'data' not in request.POST:
-        response['data']['preferences'] = models.get_preferences(request.user)
-    else:
-        data = json.loads(request.POST['data'])
-        if isinstance(data, basestring):
-            response['data']['preferences'] = {}
-            response['data']['preferences'][data] = models.get_preference(request.user, data)
-        elif isinstance(data, list):
-            response['data']['preferences'] = {}
-            for preference in data:
-                response['preferences'][preference] = models.get_preference(request.user, preference)
-        elif isinstance(data, dict):
-            if not data:
-                response['data']['preferences'] = models.get_preferences(request.user)
-            else:
-                del response['data']
-                for key in data:
-                    models.set_preference(request.user, key, data[key])
     return render_to_json_response(response)
-actions.register(preferences)
+actions.register(setPreferences)
 
 
 @login_required_json
 def setUI(request):
     '''
+        param data {
+            key.subkey: value
+        }
+        return
     '''
     data = json.loads(request.POST['data'])
     keys = data.keys()[0].split('.')
     value = data.values()[0]
-    ui = user.profile.ui
-    while keys:
+    profile = request.user.get_profile()
+    p = profile.ui
+    while len(keys)>1:
         key = keys.pop(0)
-
+        if isinstance(p, list):
+            p = p[getPositionById(p, key)]
+        else:
+            p = p[key]
+    p[keys[0]] = value
+    profile.save()
     response = json_response()
     return render_to_json_response(response)
-actions.register(preferences)
+actions.register(setUI)
 

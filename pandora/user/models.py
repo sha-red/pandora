@@ -21,22 +21,12 @@ class UserProfile(models.Model):
     files_updated = models.DateTimeField(default=datetime.now)
     newsletter = models.BooleanField(default=True)
     ui = DictField(default={})
+    preferences = DictField(default={})
 
 def user_post_save(sender, instance, **kwargs):
     profile, new = UserProfile.objects.get_or_create(user=instance)
 
 models.signals.post_save.connect(user_post_save, sender=User)
-
-
-class Preference(models.Model):
-    user = models.ForeignKey(User, related_name='preferences')
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    key = models.CharField(blank=True, max_length=255)
-    value = models.TextField(blank=True)
-
-    def __unicode__(self):
-        return u"%s/%s=%s" % (self.user, self.key, self.value)
 
 
 def get_user_json(user):
@@ -77,9 +67,7 @@ def get_ui(user):
 
 
 def get_preferences(user):
-    prefs = {}
-    for p in Preference.objects.filter(user=user):
-        prefs[p.key] = json.loads(p.value)
+    prefs = user.get_profile().preferences
     prefs['email'] = user.email
     return prefs
 
