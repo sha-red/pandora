@@ -35,8 +35,8 @@ def parseCondition(condition):
         exclude = False
     if key == 'subscribed':
         print "FXIME, subscribed needs work"
-        key = 'public'
-        value = True
+        k = 'public'
+        v = True
 
     if isinstance(v, bool): #featured and public flag
         key = k
