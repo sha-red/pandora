@@ -11,7 +11,7 @@ from ox.utils import json
 from ox.django.fields import DictField
 
 from app.models import site_config
-from itemlist.models import List
+from itemlist.models import List, Position
 
 
 class UserProfile(models.Model):
@@ -35,12 +35,32 @@ class UserProfile(models.Model):
         if not 'lists' in ui:
             ui['lists'] = {}
             ui['lists'][''] = site_config['uiDefaults']['list']
-        ids = [l.get_id() for l in self.user.lists.all()]
-        ids += [l.get_id() for l in self.user.subscribed_lists.all()]
-        ids += [l.get_id() for l in List.objects.filter(status='featured').exclude(user=self.user)]
-        for l in ids:
-            if l not in ui['lists']:
-                ui['lists'][l] = ui['lists']['']
+
+        def add(lists, section):
+            print lists, section
+            ids = [l.get_id() for l in lists]
+            in_list = filter(lambda l: l in ui['lists'], ids)
+            for l in lists:
+                print l
+                pos, created = Position.objects.get_or_create(list=l, user=self.user, section=section)
+                if created:
+                    pos.position = len(in_list)
+                    pos.save()
+                id = l.get_id()
+                if id not in in_list:
+                    ui['lists'][id] = {}
+                    ui['lists'][id].update(ui['lists'][''])
+                    in_list.append(id)
+                ui['lists'][id]['position'] = pos.position
+            return ids
+
+        ids = ['']
+        ids += add(self.user.lists.exclude(status="featured"), 'my')
+        ids += add(self.user.subscribed_lists.all(), 'public')
+        ids += add(List.objects.filter(status='featured'), 'featured')
+        for i in ui['lists'].keys():
+            if i not in ids:
+                del ui['lists'][i]
         return ui
 
 def user_post_save(sender, instance, **kwargs):

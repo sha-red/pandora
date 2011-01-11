@@ -53,10 +53,10 @@ class List(models.Model):
         self.ListItem.objects.all().filter(item=item, list=self).delete()
 
     def __unicode__(self):
-        return u'%s (%s)' % (self.name, self.user)
+        return self.get_id()
 
     def get_id(self):
-        return '%s:%s' % (self.user.username, self.name)
+        return u'%s:%s' % (self.user.username, self.name)
 
     def editable(self, user):
         #FIXME: make permissions work
@@ -76,8 +76,6 @@ class List(models.Model):
             elif key == 'query':
                 if not self.query.get('static', False):
                     response[key] = self.query
-            elif key == 'ui':
-                response[key] = site_conf['uiDefaults']['list']
             else:
                 response[key] = getattr(self, key)
         return response
@@ -90,4 +88,15 @@ class ListItem(models.Model):
 
     def __unicode__(self):
         return u'%s in %s' % (self.item, self.list)
+
+
+class Position(models.Model):
+
+    class Meta:
+        unique_together = ("user", "list", "section")
+
+    list = models.ForeignKey(List, related_name='position')
+    user = models.ForeignKey(User)
+    section = models.CharField(max_length='255')
+    position = models.IntegerField(default=0)
 

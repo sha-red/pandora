@@ -10,6 +10,10 @@ import models
 from api.actions import actions
 
 
+def get_list_or_404_json(id):
+    username, listname = id.split(':')
+    return get_object_or_404_json(models.List, user__username=username, name=listname)
+
 def _order_query(qs, sort):
     order_by = []
     for e in sort:
@@ -26,7 +30,8 @@ def _order_query(qs, sort):
 def _parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
-    query['sort'] = [{'key':'user', 'operator':'+'}, {'key':'name', 'operator':'+'}]
+    #query['sort'] = [{'key':'user', 'operator':'+'}, {'key':'name', 'operator':'+'}]
+    query['sort'] = [{'key':'position__section', 'operator':'+'}, {'key':'position__position', 'operator':'+'}]
     for key in ('sort', 'keys', 'group', 'list', 'range', 'ids'):
         if key in data:
             query[key] = data[key]
@@ -186,8 +191,7 @@ def editList(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    username, listname = data['id'].split(':')
-    list = get_object_or_404_json(models.List, user__username=username, name=listname)
+    list = get_list_or_404_json(data['id'])
     if list.editable(request.user):
         response = json_response()
         for key in data:
@@ -250,8 +254,7 @@ def subscribeToList(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    username, listname = data['id'].split(':')
-    list = get_object_or_404_json(models.List, user__username=username, name=listname)
+    list = get_list_or_404_json(data['id'])
     user = request.user
     if list.subscribed_users.filter(username=user.username).count() == 0:
         list.subscribed_users.add(user)
@@ -273,10 +276,40 @@ def unsubscribeFromList(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    username, listname = data['id'].split(':')
-    list = get_object_or_404_json(models.List, user__username=username, name=listname)
+    list = get_list_or_404_json(data['id'])
     user = request.user
     list.subscribed_users.remove(user)
     response = json_response()
     return render_to_json_response(response)
 actions.register(unsubscribeFromList)
+
+
+@login_required_json
+def sortLists(request):
+    '''
+        param data {
+            section: 'my',
+            ids: [1,2,4,3]
+        }
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+            }
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    position = 0
+    section = data['section']
+    #FIXME: featured list needs fixing here
+    user = request.user
+    for i in data['ids']:
+        list = get_list_or_404_json(i)
+        pos, created = models.Position.objects.get_or_create(list=list, user=request.user, section=data['section'])
+        pos.position = position
+        pos.save()
+        position += 1
+        
+    response = json_response()
+    return render_to_json_response(response)
+actions.register(sortLists)
+
