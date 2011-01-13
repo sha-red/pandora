@@ -86,9 +86,8 @@ def findLists(request):
 
     if is_section_request:
         qs = query['qs']
-        if not is_featured:
-            if not request.user.is_anonymous():
-                qs = qs.filter(position__in=models.Position.objects.filter(user=request.user))
+        if not is_featured and not request.user.is_anonymous():
+            qs = qs.filter(position__in=models.Position.objects.filter(user=request.user))
         qs = qs.order_by('position__position')
     else:
         qs = _order_query(query['qs'], query['sort'])
