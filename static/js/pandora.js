@@ -2110,9 +2110,9 @@ var pandora = new Ox.App({
 		        if (id == 'my') {
 		            menu = [
 		                { id: 'new', title: 'New List...' },
-		                { id: 'newfromselection', title: 'New List from Selection...' },
+		                { id: 'newfromselection', title: 'New List from Current Selection...', disabled: true },
 		                { id: 'newsmart', title: 'New Smart List...' },
-		                { id: 'newfromresults', title: 'New Smart List from Results...' },
+		                { id: 'newfromresults', title: 'New Smart List from Current Results...', disabled: true },
 		                {},
 		                { id: 'addselection', title: 'Add Selection to List...' }
 		            ];
@@ -2132,19 +2132,26 @@ var pandora = new Ox.App({
 	                columns: [
 	                    {
 	                        id: 'id',
-	                        visible: false,
-	                        unique: true
-	                    },
-	                    {
-	                        id: 'position',
-	                        visible: false,
+	                        format: function(value) {
+	                            return value.split('.').join(': ');
+	                        },
+	                        operator: '+',
+	                        unique: true,
+	                        visible: id == 'public',
+	                        width: 184
 	                    },
                         {
                             align: 'left',
-                            editable: id == 'my',
+                            editable: id == 'my' ? true : (id == 'featured' ? function(data) {
+                                Ox.print('########', data, app.user.username)
+                                return data.id && data.id.split(': ')[0] == app.user.username;
+                            } : false),
                             id: 'name',
+                            input: {
+                                autovalidate: autovalidateListname
+                            },
                             operator: '+',
-                            visible: true,
+                            visible: id != 'public',
                             width: 184
                         },
                         {
@@ -2159,7 +2166,7 @@ var pandora = new Ox.App({
 	                        format: function(value) {
 	                            return $('<img>').attr({
                                     src: 'static/oxjs/build/png/ox.ui.modern/symbol' +
-                                    (value ? 'Find' : 'None') + '.png'
+                                        (value ? 'Find' : 'None') + '.png'
                                 });
 	                        },
 	                        id: 'query',
@@ -2169,11 +2176,12 @@ var pandora = new Ox.App({
 	                    },
 	                    {
 	                        align: 'left',
+	                        clickable: id == 'my',
 	                        format: function(value) {
 	                            var symbols = {private: 'None', public: 'Publish', featured: 'Star'};
 	                            return $('<img>').attr({
                                     src: 'static/oxjs/build/png/ox.ui.modern/symbol' +
-                                    symbols[value] + '.png'
+                                        symbols[value] + '.png'
                                 });
 	                        },
 	                        id: 'status',
@@ -2184,6 +2192,7 @@ var pandora = new Ox.App({
 	                ],
 	                max: 1,
 	                min: 0,
+	                pageLength: 1000,
 	                request: function(data, callback) {
 	                    var query;
 	                    if (id == 'my') {
@@ -2216,6 +2225,19 @@ var pandora = new Ox.App({
 	                }
 	            })
 	            .bindEvent({
+	                click: function(event, data) {
+	                    var list = app.$ui.sectionLists[i];
+	                    if (data.key == 'query') {
+	                        
+	                    } else if (data.key == 'status') {
+	                        pandora.api.editList({
+	                            id: data.id,
+	                            status: list.value(data.id, data.key) == 'private' ? 'public' : 'private'
+	                        }, function(result) {
+	                            list.value(result.data.id, 'status', result.data.status);
+	                        });
+	                    }
+	                },
 	                load: function(event, data) {
 	                    $section.$content.css({
         	                height: data.items * 16 + 'px'
@@ -2224,22 +2246,38 @@ var pandora = new Ox.App({
         	                height: data.items * 16 + 'px'
         	            });
 	                },
-	                select: function(event, data) {
-    	                app.$ui.sectionLists.forEach(function($list, i_) {
-    	                    i != i_ && $list.options('selected', []);
-    	                });
-    	            },
-    	            sort: function(event, data) {
+    	            move: function(event, data) {
     	                /*
     	                data.ids.forEach(function(id, pos) {
     	                    app.user.ui.lists[id].position = pos;
     	                });
     	                */
+    	                // fixme: only one of the below
+    	                // (and then Ox.List can send less event data)
+    	                pandora.api.editList({
+    	                    id: data.id,
+    	                    position: data.position
+    	                });
+    	                /*
 	                    pandora.api.sortLists({
 	                        section: id,
 	                        ids: data.ids
 	                    });
-    	            }
+	                    */
+    	            },
+	                select: function(event, data) {
+    	                app.$ui.sectionLists.forEach(function($list, i_) {
+    	                    i != i_ && $list.options('selected', []);
+    	                });
+    	            },
+    	            submit: function(event, data) {
+    	                data_ = {id: data.id};
+    	                data_[data.key] = data.value;
+	                    pandora.api.editList(data_, function(result) {
+	                        app.$ui.sectionLists[i].value(data.id, 'name', result.data.name);
+	                        app.$ui.sectionLists[i].value(data.id, 'id', result.data.id);
+	                    });
+	                }
 	            })
 	            .appendTo($section.$content);
 		    });
@@ -2404,6 +2442,24 @@ var pandora = new Ox.App({
         value = $.map(value.toLowerCase().split(''), function(v, i) {
             return /[0-9a-z\.\+\-_@]/(v) ? v : null;
         }).join('');
+        callback(value);
+    }
+
+    function autovalidateListname(value, blur, callback) {
+        var length = value.length;
+        value = $.map(value.split(''), function(v, i) {
+            if (new RegExp('[0-9a-z\\(\\)' + ((i == 0 || (i == length - 1 && blur)) ? '' : ' \-') + ']', 'i')(v)) {
+                return v
+            } else {
+                return null;
+            }
+        }).join('');
+        $.each(['  ', ' -', '- ', '--', '\\(\\(', '\\)\\(', '\\)\\)'], function(i, v) {
+            Ox.print(v, v[0], v[0] == '\\')
+            while (value.indexOf(v) > -1) {
+                value = value.replace(new RegExp(v, 'g'), v[0] + (v[0] == '\\' ? v[1] : ''));
+            }
+        })
         callback(value);
     }
 

@@ -32,6 +32,7 @@ def _parse_query(data, user):
     query['range'] = [0, 100]
     #query['sort'] = [{'key':'user', 'operator':'+'}, {'key':'name', 'operator':'+'}]
     query['sort'] = [{'key':'position__position', 'operator':'+'}]
+    query['sort'] = [{'key':'name', 'operator':'+'}]
     for key in ('keys', 'group', 'list', 'range', 'ids'):
         if key in data:
             query[key] = data[key]
@@ -76,7 +77,11 @@ def findLists(request):
     query = _parse_query(data, request.user)
 
     #order
-    qs = _order_query(query['qs'], query['sort'])
+    #FIXME: having to use distinct here seams wrong
+    qs = _order_query(query['qs'].distinct(), query['sort'])
+    #qs = query['qs'].distinct().order_by('position__position')
+    #qs = query['qs']
+
     #range
     response = json_response()
     if 'keys' in data:
@@ -186,10 +191,12 @@ actions.register(addList)
 def editList(request):
     '''
         param data {
-            key: value
-            position: int
+            id: listId,
+            key: value,
         }
-        keys: name, public, query, featured (if admin)
+        keys: name, status, query, position
+        if you change status you have to provide position of list
+
         return {
             status: {'code': int, 'text': string},
             data: {
@@ -210,6 +217,13 @@ def editList(request):
                         if value not in list._status:
                             value = list._status[0]
                         setattr(list, key, value)
+                    elif key == 'name':
+                        name = data['name']
+                        num = 1
+                        while models.List.objects.filter(name=name, user=list.user).exclude(id=list.id).count()>0:
+                            num += 1
+                            name = data['name'] + ' (%d)' % num
+                        setattr(list, key, name)
                     else:
                         setattr(list, key, data[key])
 
@@ -221,6 +235,7 @@ def editList(request):
                 pos.section = 'my'
             pos.save()
         list.save()
+        response['data'] = list.json(user=request.user)
     else:
         response = json_response(status=403, text='not allowed')
     return render_to_json_response(response)
