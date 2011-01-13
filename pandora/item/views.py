@@ -70,16 +70,6 @@ def _parse_query(data, user):
     return query
 
 
-def _get_positions(ids, get_ids):
-    positions = {}
-    for i in get_ids:
-        try:
-            positions[i] = ids.index(i)
-        except:
-            pass
-    return positions
-
-
 def find(request):
     '''
         param data {
@@ -184,7 +174,7 @@ Positions
             #FIXME: this does not scale for larger results
             response['data']['positions'] = {}
             ids = [j['value'] for j in qs]
-            response['data']['positions'] = _get_positions(ids, query['ids'])
+            response['data']['positions'] = utils.get_positions(ids, query['ids'])
 
         elif 'range' in data:
             qs = qs[query['range'][0]:query['range'][1]]

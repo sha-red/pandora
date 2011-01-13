@@ -25,6 +25,7 @@ class List(models.Model):
     query = DictField(default={"static": True})
     type= models.CharField(max_length=255, default='static')
 
+    #is through table still required?
     items = models.ManyToManyField('item.Item', related_name='lists',
                                                 through='ListItem')
 

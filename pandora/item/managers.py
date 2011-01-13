@@ -87,12 +87,13 @@ def parseCondition(condition):
         if len(l) == 2:
             lqs = List.objects.filter(name=l[1], user__username=l[0])
             if lqs.count() == 1:
-                if lqs[0].query.get('static', False) == False:
-                    data = lqs[0].query
-                    q = parseConditions(data['conditions'],
+                l = lqs[0]
+                if l.query.get('static', False) == False:
+                    data = l.query
+                    q = parseConditions(data.get('conditions', []),
                                         data.get('operator', '&'))
                 else:
-                    q = Q(id__in=lqs[0].items.all())
+                    q = Q(id__in=l.items.all())
         return q
     else: #number or date
 
@@ -237,7 +238,7 @@ class ItemManager(Manager):
         qs = self.get_query_set()
         #only include items that have hard metadata
         qs = qs.filter(available=True)
-        conditions = parseConditions(data['query']['conditions'],
+        conditions = parseConditions(data['query'].get('conditions', []),
                                      data['query'].get('operator', '&'))
         if conditions:
             qs = qs.filter(conditions)

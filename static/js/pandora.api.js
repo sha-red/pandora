@@ -68,14 +68,14 @@ function constructList() {
             if(!data.keys) {
                 app.api.api(function(results) {
                     var items = [];
-                    $.each(results.data.actions, function(i, k) {items.push({'name':  k})});
+                    $.each(results.data.actions, function(i, k) {items.push({'name':  i})});
                     var result = {'data': {'items': items.length}};
                     callback(result);
                 });
             } else {
                 app.api.api(function(results) {
                     var items = [];
-                    $.each(results.data.actions, function(i, k) {items.push({'name':  k})});
+                    $.each(results.data.actions, function(i, k) {items.push({'name':  i})});
                     var result = {'data': {'items': items}};
                     callback(result);
                 });

@@ -206,3 +206,16 @@ def sort_title(title):
     #pad numbered titles
     title = re.sub('(\d+)', lambda x: '%010d' % int(x.group(0)), title)
     return title.strip()
+
+def get_positions(ids, pos):
+    '''
+    >>> get_positions([1,2,3,4], [2,4])
+    {2: 1, 4: 3}
+    '''
+    positions = {}
+    for i in pos:
+        try:
+            positions[i] = ids.index(i)
+        except:                         
+            pass                                    
+    return positions
