@@ -8,7 +8,7 @@ var pandora = new Ox.App({
     init: 'hello',
 }).launch(function(data) {
 
-    Ox.print('data', data);
+    //Ox.print('data', data);
 
 	var app = {
 			$ui: {
@@ -38,14 +38,15 @@ var pandora = new Ox.App({
 	function load() {
 
         $(function() {
+            // fixme: use jquert ajaxStart?
             var $body = $('body');
     	    Ox.Request.requests() && app.$ui.loadingIcon.start();
     	    $body.bind('requestStart', function() {
-    	        Ox.print('requestStart')
+    	        //Ox.print('requestStart')
     	        app.$ui.loadingIcon.start();
     	    });
     	    $body.bind('requestStop', function() {
-    	        Ox.print('requestStop')
+    	        //Ox.print('requestStop')
     	        app.$ui.loadingIcon.stop();
     	    });
         });
@@ -70,7 +71,7 @@ var pandora = new Ox.App({
                     app.$ui.map.triggerResize();
                 }
             } else {
-                Ox.print('app.$ui.window.resize');
+                //Ox.print('app.$ui.window.resize');
                 app.$ui.browser.scrollToSelection();
                 app.user.ui.itemView == 'timeline' && app.$ui.editor.options({
 					height: app.$ui.document.height() -
@@ -117,7 +118,7 @@ var pandora = new Ox.App({
 	        return that;
 	    },
 	    accountDialogOptions: function(action, value) {
-	        Ox.print('ACTION', action)
+	        //Ox.print('ACTION', action)
             app.$ui.accountForm && app.$ui.accountForm.remove();
 	        var buttons = {
 	                login: ['register', 'reset'],
@@ -164,7 +165,7 @@ var pandora = new Ox.App({
     	                id: type,
     	                title: buttonTitle[type] + '...'
     	            }).bindEvent('click', function() {
-    	                Ox.print('CLICK EVENT', type)
+    	                //Ox.print('CLICK EVENT', type)
                         app.$ui.accountDialog.options(ui.accountDialogOptions(type));
                     });
     	        }
@@ -196,12 +197,12 @@ var pandora = new Ox.App({
 	        if (app.$ui.accountForm) {
 	            app.$ui.accountForm.items.forEach(function(item) {
 	                if (item.options('id') == 'usernameOrEmail') {
-	                    Ox.print('REMOVING')
+	                    //Ox.print('REMOVING')
 	                    //Ox.Event.unbind('usernameOrEmailSelect')
 	                    //Ox.Event.unbind('usernameOrEmailSelectMenu')
 	                    //Ox.Event.unbind('usernameOrEmailInput')
 	                }
-	                Ox.print('REMOVING ITEM', item.options('id'));
+	                //Ox.print('REMOVING ITEM', item.options('id'));
 	                item.remove();
 	            });
 	        }
@@ -265,7 +266,7 @@ var pandora = new Ox.App({
                 
                     },
                     validate: function(event, data) {
-                        Ox.print('FORM VALIDATE', data)
+                        //Ox.print('FORM VALIDATE', data)
                         app.$ui.accountDialog[
                             (data.valid ? 'enable' : 'disable') + 'Button'
                         ]('submit' + Ox.toTitleCase(action));
@@ -580,7 +581,7 @@ var pandora = new Ox.App({
 		            min: 1,
 		            orientation: 'horizontal',
 		            request: function(data, callback) {
-		                Ox.print('data, Query.toObject', data, Query.toObject())
+		                //Ox.print('data, Query.toObject', data, Query.toObject())
 		                pandora.api.find($.extend(data, {
 		                    query: Query.toObject()
 		                }), callback);
@@ -671,7 +672,7 @@ var pandora = new Ox.App({
                                 app.$ui.findInput.options({
                                     autocomplete: autocompleteFunction()
                                 }).focus();
-                                Ox.print(app.$ui.findInput.options('autocomplete').toString())
+                                //Ox.print(app.$ui.findInput.options('autocomplete').toString())
                             }),
                         app.$ui.findInput = new Ox.Input({
                             autocomplete: autocompleteFunction(),
@@ -686,7 +687,7 @@ var pandora = new Ox.App({
                             var key = app.user.ui.findQuery.conditions.length ?
                                     app.user.ui.findQuery.conditions[0].key : '',
                                 query;
-                            Ox.print('key', key);
+                            //Ox.print('key', key);
                             app.user.ui.findQuery.conditions = [
                                 {
                                     key: key == 'all' ? '' : key,
@@ -726,7 +727,7 @@ var pandora = new Ox.App({
                 return app.user.ui.findQuery.conditions.length ? function(value, callback) {
                     var key = app.user.ui.findQuery.conditions[0].key,
                         findKey = Ox.getObjectById(app.config.findKeys, key);
-                    Ox.print('autocomplete', key, value);
+                    //Ox.print('autocomplete', key, value);
                     value === '' && Ox.print('Warning: autocomplete function should never be called with empty value');
                     if ('autocomplete' in findKey && findKey.autocomplete) {
                         pandora.api.autocomplete({
@@ -771,7 +772,7 @@ var pandora = new Ox.App({
 			return that;
 		},
         group: function(id, query) {
-            Ox.print('group', id, query);
+            //Ox.print('group', id, query);
             /*
             query && query.conditions.length && alert($.map(query.conditions, function(v) {
                 return v.value;
@@ -805,7 +806,7 @@ var pandora = new Ox.App({
                     columnsVisible: true,
                     id: 'group_' + id,
                     request: function(data, callback) {
-                        Ox.print('sending request', data)
+                        //Ox.print('sending request', data)
                         delete data.keys;
                         //alert(id + " Query.toObject " + JSON.stringify(Query.toObject(id)) + ' ' + JSON.stringify(data))
                         return pandora.api.find($.extend(data, {
@@ -976,9 +977,9 @@ var pandora = new Ox.App({
             function getItem() {
                 pandora.api.getItem(app.user.ui.item, function(result) {
                     if (app.user.ui.itemView == 'info') {
-				        Ox.print('result.data.item', result.data.item)
+				        //Ox.print('result.data.item', result.data.item)
                         $.get('/static/html/itemInfo.html', {}, function(template) {
-                            Ox.print(template);
+                            //Ox.print(template);
                             app.$ui.contentPanel.replace(1,
                                 app.$ui.item = new Ox.Element('div')
                                 .append($.tmpl(template, result.data.item))
@@ -1018,15 +1019,15 @@ var pandora = new Ox.App({
     		                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1 -
     		                    (app.user.ui.showAnnotations * app.user.ui.annotationsSize) - 1
     		            }).bindEvent('resize', function(event, data) {
-    						Ox.print('resize editor', data)
+    						//Ox.print('resize editor', data)
     						app.$ui.editor.options({
     							width: data
     						});
-    						Ox.print('resize done')
+    						//Ox.print('resize done')
     					}));
     					that.replace(1, app.$ui.annotations = ui.annotations());
     		            that.bindEvent('resize', function(event, data) {
-        				    Ox.print('resize item', data)
+        				    //Ox.print('resize item', data)
         				    app.$ui.editor.options({
         				        height: data
         				    });
@@ -1107,7 +1108,7 @@ var pandora = new Ox.App({
                             width: (data - 88) + 'px'
                         });
                         //*/
-                        Ox.print('resize', data, data / app.ui.infoRatio + 16);
+                        //Ox.print('resize', data, data / app.ui.infoRatio + 16);
                         app.$ui.leftPanel.size('infoPanel', Math.round(data / app.ui.infoRatio) + 16);
                     },
                     toggle: function(event, data) {
@@ -1119,7 +1120,7 @@ var pandora = new Ox.App({
 		list: function(view) {
 			var that, $map,
 		        keys = ['director', 'id', 'poster', 'title', 'year'];
-		    Ox.print('constructList', view);
+		    //Ox.print('constructList', view);
 		    if (view == 'list') {
 		        that = new Ox.TextList({
 		            columns: $.map(app.config.sortKeys, function(key, i) {
@@ -1136,7 +1137,7 @@ var pandora = new Ox.App({
 		            columnsVisible: true,
 		            id: 'list',
 		            request: function(data, callback) {
-		                Ox.print('data, Query.toObject', data, Query.toObject())
+		                //Ox.print('data, Query.toObject', data, Query.toObject())
 		                pandora.api.find($.extend(data, {
 		                    query: Query.toObject()
 		                }), callback);
@@ -1165,7 +1166,7 @@ var pandora = new Ox.App({
 		            },
 		            keys: keys,
 		            request: function(data, callback) {
-		                Ox.print('data, Query.toObject', data, Query.toObject())
+		                //Ox.print('data, Query.toObject', data, Query.toObject())
 		                pandora.api.find($.extend(data, {
 		                    query: Query.toObject()
 		                }), callback);
@@ -1346,7 +1347,7 @@ var pandora = new Ox.App({
 		                                });
 		                        });
 		                    });
-		                    Ox.print(app.$ui.document.height(), dialogWidth, 'x', dialogHeight, dialogWidth / (dialogHeight - 48), item.poster.width, 'x', item.poster.height, item.poster.width / item.poster.height)
+		                    //Ox.print(app.$ui.document.height(), dialogWidth, 'x', dialogHeight, dialogWidth / (dialogHeight - 48), item.poster.width, 'x', item.poster.height, item.poster.width / item.poster.height)
 		                } else {
 		                    app.$ui.previewImage = $('<img>')
 		                        .attr({
@@ -1421,7 +1422,7 @@ var pandora = new Ox.App({
 		                    })
 		                    .one('load', function() {
 		                        if (data.ids[0] != app.ui.selectedMovies[0]) {
-		                            Ox.print('cancel after load...')
+		                            //Ox.print('cancel after load...')
 		                            return;
 		                        }
 		                        var image = $still[0],
@@ -2058,7 +2059,7 @@ var pandora = new Ox.App({
                 orientation: 'vertical'
             })
             .bindEvent('resize', function(event, data) {
-                Ox.print('???? resize rightPanel', event, data)
+                //Ox.print('???? resize rightPanel', event, data)
                 if (!app.user.ui.item) {
                     resizeGroups(data);
                     app.$ui.list.size();
@@ -2179,7 +2180,7 @@ var pandora = new Ox.App({
 	                        align: 'left',
 	                        clickable: function(data) {
 	                            //alert(JSON.stringify([data.user, data.type]))
-	                            Ox.print('$$$$$$$$', data.user, data.type)
+	                            //Ox.print('$$$$$$$$', data.user, data.type)
                                 return data.user == app.user.username && data.type == 'smart';
                             },
 	                        format: function(value) {
@@ -2249,7 +2250,7 @@ var pandora = new Ox.App({
 	            })
 	            .bind({
 	                dragenter: function(e) {
-	                    Ox.print('DRAGENTER', e)
+	                    //Ox.print('DRAGENTER', e)
 	                }
 	            })
 	            .bindEvent({
@@ -2496,7 +2497,7 @@ var pandora = new Ox.App({
             }
         }).join('');
         $.each(['  ', ' -', '- ', '--', '\\(\\(', '\\)\\(', '\\)\\)'], function(i, v) {
-            Ox.print(v, v[0], v[0] == '\\')
+            //Ox.print(v, v[0], v[0] == '\\')
             while (value.indexOf(v) > -1) {
                 value = value.replace(new RegExp(v, 'g'), v[0] + (v[0] == '\\' ? v[1] : ''));
             }
@@ -2551,7 +2552,7 @@ var pandora = new Ox.App({
         });
         $.each(app.ui.groups, function(i_, group_) {
             if (i_ != i) {
-                Ox.print('setting groups request', i, i_)
+                //Ox.print('setting groups request', i, i_)
                 app.$ui.groups[i_].options({
                     request: function(data, callback) {
                         delete data.keys;
@@ -2571,7 +2572,7 @@ var pandora = new Ox.App({
         var widths = $.map(app.ui.groups, function(v, i) {
             return getGroupWidth(i, width);
         });
-        Ox.print('widths', widths);
+        //Ox.print('widths', widths);
         app.$ui.browser.size(0, widths[0].list).size(2, widths[4].list);
         app.$ui.groupsInnerPanel.size(0, widths[1].list).size(2, widths[3].list);
         $.each(app.$ui.groups, function(i, list) {
@@ -2590,7 +2591,7 @@ var pandora = new Ox.App({
                 operator: '='
             }, function(result) {
                 var valid = existing == !!result.data.users.length;
-                Ox.print(existing, result.data.users)
+                //Ox.print(existing, result.data.users)
                 callback({
                     message: existing ? 
                         'Unknown ' + string :
@@ -2607,7 +2608,7 @@ var pandora = new Ox.App({
 	var Query = (function() {
 
 	    function constructFind(query) {
-	        Ox.print('cF', query)
+	        //Ox.print('cF', query)
 	        return /*encodeURI(*/$.map(query.conditions, function(v, i) {
 	            if (!Ox.isUndefined(v.conditions)) {
 	                return '[' + constructFind(v) + ']';
@@ -2645,12 +2646,12 @@ var pandora = new Ox.App({
 	        } else if (str.indexOf('|') > -1) {
 	            find.operator = '|';
 	        }
-	        Ox.print('pF', str, find.operator)
+	        //Ox.print('pF', str, find.operator)
 	        find.conditions = $.map(find.operator === '' ? [str] : str.split(find.operator == '&' ? ',' : '|'), function(v, i) {
-	            Ox.print('v', v)
+	            //Ox.print('v', v)
 	            var ret, kv;
 	            if (v[0] == '[') {
-	                Ox.print('recursion', subconditions)
+	                //Ox.print('recursion', subconditions)
 	                ret = parseFind(subconditions[parseInt(v.substr(1, v.length - 2))]);
 	            } else {
 	                kv = ((v.indexOf(':') > - 1 ? '' : ':') + v).split(':');
@@ -2691,7 +2692,7 @@ var pandora = new Ox.App({
 	                sort = [];
 	            if ('find' in query) {
 	                app.user.ui.findQuery = parseFind(query.find);
-	                Ox.print('user.ui.findQuery', app.user.ui.findQuery)
+	                //Ox.print('user.ui.findQuery', app.user.ui.findQuery)
 	            }
 	            if ('sort' in query) {
 	                sort = query.sort.split(',')
@@ -2711,7 +2712,7 @@ var pandora = new Ox.App({
 	        },
 
 	        toObject: function(groupId) {
-	            Ox.print('tO', app.user.ui.findQuery.conditions)
+	            //Ox.print('tO', app.user.ui.findQuery.conditions)
 	            // the inner $.merge() creates a clone
 	            var conditions = $.merge(
 	                    $.merge([], app.user.ui.listQuery.conditions),
@@ -2725,7 +2726,7 @@ var pandora = new Ox.App({
                     }
                 }) : []);
 	            operator = conditions.length < 2 ? '' : ','; // fixme: should be &
-	            Ox.print('>>', groupId, app.user.ui.find, conditions);
+	            //Ox.print('>>', groupId, app.user.ui.find, conditions);
 	            return {
 	                conditions: conditions,
 	                operator: operator
@@ -2733,7 +2734,7 @@ var pandora = new Ox.App({
 	        },
 
 	        toString: function() {
-	            Ox.print('tS', app.user.ui.find)
+	            //Ox.print('tS', app.user.ui.find)
 	            return '?' + Ox.serialize({
 	                find: constructFind(Query.toObject()),
 	                sort: app.user.ui.lists[app.user.ui.list].sort[0].operator +
@@ -2802,7 +2803,7 @@ var pandora = new Ox.App({
                 url = document.location.pathname.substr(1) +
                         document.location.search + document.location.hash;
                 $.each(regexps, function(re, fn) {
-                    Ox.print(url, 're', re)
+                    //Ox.print(url, 're', re)
                     re = new RegExp(re);
         			if (re(url)) {
         				fn(url);
@@ -2858,7 +2859,7 @@ var pandora = new Ox.App({
 	        } else {
 	            //FIXME: this is a workaround since open gets called twice
 	            //       due to a bug with double click
-	            Ox.print('ignore double call of app.url, double click need to be fixed');
+	            //Ox.print('ignore double call of app.url, double click need to be fixed');
 	            return;
 	        }
 	    }
