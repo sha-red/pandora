@@ -82,17 +82,17 @@ def parseCondition(condition):
                 q = Q(**{k: v})
         return q
     elif key_type == 'list':
+        q = Q(itemId=False)
         l = v.split(".")
-        lqs = List.objects.filter(name=l[1], user__username=l[0])
-        if lqs.count() == 1:
-            if lqs[0].query.get('static', False) == False:
-                data = lqs[0].query
-                q = parseConditions(data['conditions'],
-                                    data.get('operator', '&'))
-            else:
-                q = Q(id__in=lqs[0].items.all())
-        else:
-            q = Q(itemId=False)
+        if len(l) == 2:
+            lqs = List.objects.filter(name=l[1], user__username=l[0])
+            if lqs.count() == 1:
+                if lqs[0].query.get('static', False) == False:
+                    data = lqs[0].query
+                    q = parseConditions(data['conditions'],
+                                        data.get('operator', '&'))
+                else:
+                    q = Q(id__in=lqs[0].items.all())
         return q
     else: #number or date
 

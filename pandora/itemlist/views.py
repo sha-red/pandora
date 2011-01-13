@@ -178,17 +178,19 @@ def addList(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    if models.List.objects.filter(name=data['name'], user=request.user).count() == 0:
-        list = models.List(name = data['name'], user=request.user)
-        list.save()
-        pos, created = models.Position.objects.get_or_create(list=list, user=request.user, section='my')
-        pos.position = data['position']
-        pos.save()
-        response = json_response(status=200, text='created')
-        response['data']['list'] = list.json()
-    else:
-        response = json_response(status=200, text='list already exists')
-        response['data']['errors'] = {'name': 'List already exists'}
+    name = data['name']
+    num = 1
+    while models.List.objects.filter(name=name, user=request.user).count()>0:
+        num += 1
+        name = data['name'] + ' (%d)' % num
+    list = models.List(name = name, user=request.user)
+    list.save()
+    pos, created = models.Position.objects.get_or_create(list=list,
+                                     user=request.user, section='my')
+    pos.position = data['position']
+    pos.save()
+    response = json_response(status=200, text='created')
+    response['data'] = list.json()
     return render_to_json_response(response)
 actions.register(addList, cache=False)
 
@@ -263,8 +265,7 @@ actions.register(editList, cache=False)
 def removeList(request):
     '''
         param data {
-            name: value,
-            user: username(only admins)
+            id: listId,
         }
         return {
             status: {'code': int, 'text': string},
@@ -273,10 +274,8 @@ def removeList(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    user = request.user.username
-    if user.is_staff and 'user' in data:
-        user = data.get('user')
-    list = get_object_or_404_json(models.List, name=data['name'], user__username=user)
+    list = get_list_or_404_json(data['id'])
+    response = json_response()
     if list.editable(request.user):
         list.delete()
     else:
