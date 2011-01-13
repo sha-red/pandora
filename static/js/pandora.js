@@ -1094,27 +1094,19 @@ var pandora = new Ox.App({
                             delete app.$ui.sectionSelect;
                             app.$ui.sectionbar.append(app.$ui.sectionButtons = ui.sectionButtons());
                         }
-                        ///*
-                        Ox.print('data', data);
-                        app.$ui.leftPanel.find('.OxTextList').css({
-                            width: data + 'px'
+                        app.$ui.sectionLists.forEach(function($list) {
+                            $list.css({width: data + 'px'});
+                            $list.resizeColumn('name', data - 88);
                         });
-                        app.$ui.leftPanel.find('.OxTextList .OxContent').css({
-                            width: data + 'px'
-                        });
-                        app.$ui.leftPanel.find('.OxItem').css({
-                            width: data + 'px'
-                        });
-                        app.$ui.leftPanel.find('.OxCell.OxColumnName').css({
-                            width: (data - 96) + 'px'
-                        });
-                        Ox.print(app.$ui.leftPanel.find('.OxCell.OxColumnName').css('width'))
-                        //*/
-                        //Ox.print('resize', data, data / app.ui.infoRatio + 16);
                         app.$ui.leftPanel.size('infoPanel', Math.round(data / app.ui.infoRatio) + 16);
                     },
                     toggle: function(event, data) {
                         app.user.ui.showSidebar = !data.collapsed;
+                        if (data.collapsed) {
+                            app.$ui.sectionLists.forEach(function($list) {
+                                $list.loseFocus();
+                            });
+                        }
                     }
                 });
 			return that;
@@ -2144,6 +2136,7 @@ var pandora = new Ox.App({
     		                        type: data.id == 'new' ? 'static' : 'smart'
     		                    }, function(result) {
     		                        id = result.data.id;
+    		                        URL.set('?find=list:' + id)
             	                    Ox.Request.emptyCache(); // fixme: remove
     		                        $list.reloadList()
     		                            .bindEvent({load: load});
@@ -2153,9 +2146,12 @@ var pandora = new Ox.App({
     		                    $list.gainFocus()
     		                        .options({selected: [id]})
     		                        .editCell(id, 'name');
-    		                    Ox.print('load', id, $list.options('selected'))
                                 $list.unbindEvent({load: load}) // fixme: need bindEventOnce
     		                }
+    		            },
+    		            toggle: function(event, data) {
+    		                Ox.print('toggle')
+    		                data.collapsed && app.$ui.sectionLists[i].loseFocus();
     		            }
     		        });
 		        $sections.push($section);
@@ -2358,7 +2354,7 @@ var pandora = new Ox.App({
     	                data_ = {id: data.id};
     	                data_[data.key] = data.value;
 	                    pandora.api.editList(data_, function(result) {
-	                        if (result.data.name != data_.name) {
+	                        if (result.data.id != data.id) {
 	                            app.$ui.sectionLists[i].value(data.id, 'name', result.data.name);
     	                        app.$ui.sectionLists[i].value(data.id, 'id', result.data.id);
     	                        URL.set('?find=list:' + result.data.id);
