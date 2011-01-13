@@ -34,7 +34,7 @@ def removeVolume(request):
     except models.Volume.DoesNotExist:
         response = json_response(status=404, text='volume not found')
     return render_to_json_response(response)
-actions.register(removeVolume)
+actions.register(removeVolume, cache=False)
 
 
 @login_required_json
@@ -99,7 +99,7 @@ def update(request):
     response['data']['file'] = [f.file.oshash for f in files.filter(file__is_subtitle=True)]
 
     return render_to_json_response(response)
-actions.register(update)
+actions.register(update, cache=False)
 
 
 @login_required_json
@@ -147,7 +147,7 @@ def upload(request):
         else:
             response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
-actions.register(upload)
+actions.register(upload, cache=False)
 
 
 class VideoChunkForm(forms.Form):
@@ -216,7 +216,7 @@ def taskStatus(request):
     task_id = data['task_id']
     response = task_status(request, task_id)
     return render_to_json_response(response)
-actions.register(taskStatus)
+actions.register(taskStatus, cache=False)
 
 
 @login_required_json
@@ -251,7 +251,7 @@ def editFile(request):
         #FIXME: other things might need updating here
         response = json_response(text='updated')
     return render_to_json_response(response)
-actions.register(editFile)
+actions.register(editFile, cache=False)
 
 
 def lookup_file(request, oshash):

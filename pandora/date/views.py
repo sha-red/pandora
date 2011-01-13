@@ -20,7 +20,7 @@ def addDate(request):
     else:
         response = json_response(status=403, text='place name exists')
     return render_to_json_response(response)
-actions.register(addDate)
+actions.register(addDate, cache=False)
 
 
 @login_required_json
@@ -51,14 +51,14 @@ def editDate(request):
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
-actions.register(editDate)
+actions.register(editDate, cache=False)
 
 
 @login_required_json
 def removeDate(request):
     response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
-actions.register(removeDate)
+actions.register(removeDate, cache=False)
 
 
 def findDate(request):

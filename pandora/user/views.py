@@ -79,7 +79,7 @@ def signin(request):
     else:
         response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)
-actions.register(signin)
+actions.register(signin, cache=False)
 
 
 def signout(request):
@@ -103,7 +103,7 @@ def signout(request):
 
     response['data']['user'] = site_config['user']
     return render_to_json_response(response)
-actions.register(signout)
+actions.register(signout, cache=False)
 
 
 class SignupForm(forms.Form):
@@ -180,7 +180,7 @@ def signup(request):
     else:
         response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)
-actions.register(signup)
+actions.register(signup, cache=False)
 
 
 def resetPassword(request):
@@ -235,7 +235,7 @@ def resetPassword(request):
     else:
         response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)
-actions.register(resetPassword)
+actions.register(resetPassword, cache=False)
 
 
 def requestToken(request):
@@ -301,7 +301,7 @@ def requestToken(request):
         else:
             response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)
-actions.register(requestToken)
+actions.register(requestToken, cache=False)
 
 
 def findUser(request):
@@ -366,7 +366,7 @@ def contact(request):
     else:
         response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)
-actions.register(contact)
+actions.register(contact, cache=False)
 
 
 def getPositionById(list, key):
@@ -399,7 +399,7 @@ def setPreferences(request):
     profile.save()
     response = json_response()
     return render_to_json_response(response)
-actions.register(setPreferences)
+actions.register(setPreferences, cache=False)
 
 
 @login_required_json
@@ -430,5 +430,5 @@ def setUI(request):
     profile.save()
     response = json_response()
     return render_to_json_response(response)
-actions.register(setUI)
+actions.register(setUI, cache=False)
 

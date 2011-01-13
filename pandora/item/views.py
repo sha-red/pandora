@@ -207,7 +207,7 @@ Positions
         response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]
     else: # otherwise stats
         items = query['qs']
-        files = File.objects.all().filter(item__in=items)
+        files = File.objects.all().filter(item__in=items).exclude(size__gt=0)
         r = files.aggregate(
             Sum('duration'),
             Sum('pixels'),
@@ -217,7 +217,7 @@ Positions
         response['data']['files'] = files.count()
         response['data']['items'] = items.count()
         response['data']['pixels'] = r['pixels__sum']
-        response['data']['runtime'] = items.filter(sort__runtime__gt=0).aggregate(Sum('sort__runtime'))['sort__runtime__sum']
+        response['data']['runtime'] = items.filter(sort__runtime_desc__gt=0).aggregate(Sum('sort__runtime_desc'))['sort__runtime_desc__sum']
         if response['data']['runtime'] == None:
             response['data']['runtime'] = 1337
         response['data']['size'] = r['size__sum']
@@ -309,7 +309,7 @@ def editItem(request):
     else:
         response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
-actions.register(editItem)
+actions.register(editItem, cache=False)
 
 @login_required_json
 def removeItem(request):
@@ -327,7 +327,7 @@ def removeItem(request):
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
-actions.register(removeItem)
+actions.register(removeItem, cache=False)
 
 '''
     Poster API
@@ -372,7 +372,7 @@ def setPosterFrame(request): #parse path and return info
     else:
         response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
-actions.register(setPosterFrame)
+actions.register(setPosterFrame, cache=False)
 
 def setPoster(request): #parse path and return info
     '''
@@ -404,7 +404,7 @@ def setPoster(request): #parse path and return info
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
-actions.register(setPoster)
+actions.register(setPoster, cache=False)
 
 def getImdbId(request):
     '''

@@ -23,6 +23,7 @@ class List(models.Model):
     status = models.CharField(max_length=20, default='private')
     _status = ['private', 'public', 'featured']
     query = DictField(default={"static": True})
+    type= models.CharField(max_length=255, default='static')
 
     items = models.ManyToManyField('item.Item', related_name='lists',
                                                 through='ListItem')
@@ -32,6 +33,10 @@ class List(models.Model):
     objects = managers.ListManager()
 
     def save(self, *args, **kwargs):
+        if self.query.get('static', False):
+            self.type = 'static'
+        else:
+            self.type = 'smart'
         super(List, self).save(*args, **kwargs)
 
     def get_number_of_items(self, user=None):
@@ -64,7 +69,7 @@ class List(models.Model):
             return True
         return False
 
-    def json(self, keys=['id', 'name', 'user', 'query', 'status'], user=None):
+    def json(self, keys=['id', 'name', 'user', 'type', 'query', 'status'], user=None):
         response = {}
         for key in keys:
             if key == 'items':

@@ -39,7 +39,7 @@ def editNews(request):
     item = get_object_or_404_json(models.Text, pk=itemId)
     response['data']['page'] = item.html()
     return render_to_json_response(response)
-actions.register(editNews)
+actions.register(editNews, cache=False)
 
 
 def findNews(request):
@@ -78,7 +78,7 @@ def editText(request):
     item = get_object_or_404_json(models.Text, pk=itemId)
     response['data']['page'] = item.html()
     return render_to_json_response(response)
-actions.register(editText)
+actions.register(editText, cache=False)
 
 
 def findText(request):

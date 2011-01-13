@@ -37,7 +37,7 @@ def addClip(request):
     else:
         response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
-actions.register(addClip)
+actions.register(addClip, cache=False)
 
 
 @login_required_json
@@ -65,7 +65,7 @@ def removeClip(request):
     else:
         response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
-actions.register(removeClip)
+actions.register(removeClip, cache=False)
 
 
 def getTimeline(request):
@@ -123,7 +123,7 @@ def addTimeline(request):
             'name': 'List already exists'
         }
     return render_to_json_response(response)
-actions.register(addTimeline)
+actions.register(addTimeline, cache=False)
 
 
 @login_required_json
@@ -145,7 +145,7 @@ def editTimeline(request):
     else:
         response = json_response(status=403, text='not allowed')
     return render_to_json_response(response)
-actions.register(editTimeline)
+actions.register(editTimeline, cache=False)
 
 
 @login_required_json
@@ -163,4 +163,4 @@ def removeTimeline(request):
     else:
         response = json_response(status=403, text='not allowed')
     return render_to_json_response(response)
-actions.register(removeTimeline)
+actions.register(removeTimeline, cache=False)

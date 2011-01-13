@@ -70,7 +70,7 @@ def addAnnotation(request):
 
     response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
-actions.register(addAnnotation)
+actions.register(addAnnotation, cache=False)
 
 
 @login_required_json
@@ -86,7 +86,7 @@ def removeAnnotation(request):
     '''
     response = {'status': {'code': 501, 'text': 'not implemented'}}
     return render_to_json_response(response)
-actions.register(removeAnnotation)
+actions.register(removeAnnotation, cache=False)
 
 
 @login_required_json
@@ -114,4 +114,4 @@ def editAnnotation(request):
 
     response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
-actions.register(editAnnotation)
+actions.register(editAnnotation, cache=False)

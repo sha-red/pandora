@@ -36,7 +36,7 @@ def addPlace(request):
     else:
         response = json_response(status=403, text='place name exists')
     return render_to_json_response(response)
-actions.register(addPlace)
+actions.register(addPlace, cache=False)
 
 
 @login_required_json
@@ -67,14 +67,14 @@ def editPlace(request):
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
-actions.register(editPlace)
+actions.register(editPlace, cache=False)
 
 
 @login_required_json
 def removePlace(request):
     response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
-actions.register(removePlace)
+actions.register(removePlace, cache=False)
 
 
 def findPlace(request):

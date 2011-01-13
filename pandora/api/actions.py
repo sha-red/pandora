@@ -48,7 +48,7 @@ def trim(docstring):
 
 
 class ApiActions(dict):
-
+    properties = {}
     def __init__(self):
 
         def api(request):
@@ -57,11 +57,14 @@ class ApiActions(dict):
                 return {'status': {'code': int, 'text': string},
                         'data': {actions: ['api', 'hello', ...]}}
             '''
-            actions = self.keys()
-            actions.sort()
+            _actions = self.keys()
+            _actions.sort()
+            actions = {}
+            for a in _actions:
+                actions[a] = self.properties[a]
             response = json_response({'actions': actions})
             return render_to_json_response(response)
-        self['api'] = api
+        self.register(api)
 
         def apidoc(request):
             '''
@@ -74,15 +77,16 @@ class ApiActions(dict):
                 docs[f] = self.doc(f)
             return render_to_json_response(json_response({'actions': docs}))
 
-        self['apidoc'] = apidoc
+        self.register(apidoc)
 
     def doc(self, f):
         return trim(self[f].__doc__)
 
-    def register(self, method, action=None):
+    def register(self, method, action=None, cache=True):
         if not action:
             action = method.func_name
         self[action] = method
+        self.properties[action] = {'cache': cache}
 
     def unregister(self, action):
         if action in self:

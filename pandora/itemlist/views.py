@@ -122,7 +122,7 @@ def addListItem(request):
     else:
         response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
-actions.register(addListItem)
+actions.register(addListItem, cache=False)
 
 
 @login_required_json
@@ -154,7 +154,7 @@ def removeListItem(request):
     else:
         response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
-actions.register(removeListItem)
+actions.register(removeListItem, cache=False)
 
 
 @login_required_json
@@ -184,7 +184,7 @@ def addList(request):
         response = json_response(status=200, text='list already exists')
         response['data']['errors'] = {'name': 'List already exists'}
     return render_to_json_response(response)
-actions.register(addList)
+actions.register(addList, cache=False)
 
 
 @login_required_json
@@ -208,10 +208,18 @@ def editList(request):
     if list.editable(request.user):
         response = json_response()
         for key in data:
-            if key in ('name', 'status', 'query'):
+            if key in ('name', 'status', 'query', 'type'):
                 if key in data:
                     if key == 'query' and not data['query']:
                         setattr(list, key, {"static":True})
+                    elif key == 'type':
+                        if data[key] == 'static':
+                            list.query = {"static":True}
+                            list.type = 'static'
+                        else:
+                            list.type = 'dynamic'
+                            if list.query.get('static', False):
+                                 list.query = {}
                     elif key == 'status':
                         value = data[key]
                         if value not in list._status:
@@ -239,7 +247,7 @@ def editList(request):
     else:
         response = json_response(status=403, text='not allowed')
     return render_to_json_response(response)
-actions.register(editList)
+actions.register(editList, cache=False)
 
 
 @login_required_json
@@ -265,7 +273,7 @@ def removeList(request):
     else:
         response = json_response(status=403, text='not allowed')
     return render_to_json_response(response)
-actions.register(removeList)
+actions.register(removeList, cache=False)
 
 
 @login_required_json
@@ -291,7 +299,7 @@ def subscribeToList(request):
         pos.save()
     response = json_response()
     return render_to_json_response(response)
-actions.register(subscribeToList)
+actions.register(subscribeToList, cache=False)
 
 @login_required_json
 def unsubscribeFromList(request):
@@ -313,7 +321,7 @@ def unsubscribeFromList(request):
     models.Position.objects.filter(list=list, user=request.user, section='public').delete()
     response = json_response()
     return render_to_json_response(response)
-actions.register(unsubscribeFromList)
+actions.register(unsubscribeFromList, cache=False)
 
 
 @login_required_json
@@ -359,5 +367,5 @@ def sortLists(request):
 
         response = json_response()
     return render_to_json_response(response)
-actions.register(sortLists)
+actions.register(sortLists, cache=False)
 
