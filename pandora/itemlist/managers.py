@@ -37,7 +37,6 @@ def parseCondition(condition, user):
     else:
         exclude = False
     if k == 'subscribed':
-        print "FXIME, subscribed needs work"
         key = 'subscribed_users__username'
         v = user.username
     elif isinstance(v, bool): #featured and public flag

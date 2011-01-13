@@ -30,10 +30,10 @@ def _order_query(qs, sort):
 def _parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
-    #query['sort'] = [{'key':'user', 'operator':'+'}, {'key':'name', 'operator':'+'}]
-    query['sort'] = [{'key':'position__position', 'operator':'+'}]
+    query['sort'] = [{'key':'user', 'operator':'+'}, {'key':'name', 'operator':'+'}]
+    #query['sort'] = [{'key':'position__position', 'operator':'+'}]
     query['sort'] = [{'key':'name', 'operator':'+'}]
-    for key in ('keys', 'group', 'list', 'range', 'ids'):
+    for key in ('keys', 'group', 'list', 'range', 'ids', 'sort'):
         if key in data:
             query[key] = data[key]
     query['qs'] = models.List.objects.find(data, user)
@@ -77,10 +77,16 @@ def findLists(request):
     query = _parse_query(data, request.user)
 
     #order
-    #FIXME: having to use distinct here seams wrong
-    qs = _order_query(query['qs'].distinct(), query['sort'])
-    #qs = query['qs'].distinct().order_by('position__position')
-    #qs = query['qs']
+    is_section_request = query['sort'] == [{u'operator': u'+', u'key': u'position'}]
+    is_featured = len(filter(lambda x: x['key'] == 'status' and x['value'] == 'featured' and x['operator'] == '=', data['query'].get('conditions', []))) > 0 
+
+    if is_section_request:
+        qs = query['qs']
+        if not is_featured:
+            qs = qs.filter(position__in=models.Position.objects.filter(user=request.user))
+        qs = qs.order_by('position__position')
+    else:
+        qs = _order_query(query['qs'], query['sort'])
 
     #range
     response = json_response()
@@ -225,6 +231,9 @@ def editList(request):
                         if value not in list._status:
                             value = list._status[0]
                         setattr(list, key, value)
+                        if value == 'private':
+                            for user in list.subscribed_users.all():
+                                list.subscribed_users.remove(user)
                     elif key == 'name':
                         name = data['name']
                         num = 1

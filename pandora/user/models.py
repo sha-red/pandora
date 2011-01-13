@@ -37,9 +37,7 @@ class UserProfile(models.Model):
             ui['lists'][''] = site_config['uiDefaults']['list']
 
         def add(lists, section):
-            print lists, section
-            ids = [l.get_id() for l in lists]
-            in_list = filter(lambda l: l in ui['lists'], ids)
+            ids = []
             for l in lists:
                 if section == 'featured':
                     pos, created = Position.objects.get_or_create(list=l, section=section)
@@ -49,11 +47,10 @@ class UserProfile(models.Model):
                     pos.position = len(in_list)
                     pos.save()
                 id = l.get_id()
-                if id not in in_list:
+                if id not in ui['lists']:
                     ui['lists'][id] = {}
                     ui['lists'][id].update(ui['lists'][''])
-                    in_list.append(id)
-                ui['lists'][id]['position'] = pos.position
+                ids.append(id)
             return ids
 
         ids = ['']
