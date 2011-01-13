@@ -143,6 +143,14 @@ Positions
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
             ids:  ids of items for which positions are required
+        return {
+            status: {...},
+            data: {
+                positions: {
+                    id: position
+                }
+            }
+        }
     '''
     data = json.loads(request.POST['data'])
     if settings.JSON_DEBUG:
