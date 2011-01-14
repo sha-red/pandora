@@ -179,9 +179,14 @@
             "section": "items",
             "sections": ["my", "public", "featured"],
             "showAnnotations": true,
-            "showGroups": true,
+            "showGroups": false,
             "showInfo": true,
             "showMovies": true,
+            "showSection": {
+                "my": true,
+                "public": true,
+                "featured": true
+            },
             "showSidebar": true,
             "sidebarSize": 256,
             "sitePage": "home",
