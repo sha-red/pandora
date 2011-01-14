@@ -207,8 +207,9 @@ def addList(request):
             value = data[key]
             if value not in list._status:
                 value = list._status[0]
+            if not user.request.is_staff and value == 'featured':
+                value = 'private'
             setattr(list, key, value)
-
     list.save()
 
     pos, created = models.Position.objects.get_or_create(list=list,
@@ -259,10 +260,25 @@ def editList(request):
                 value = data[key]
                 if value not in list._status:
                     value = list._status[0]
-                setattr(list, key, value)
                 if value == 'private':
                     for user in list.subscribed_users.all():
                         list.subscribed_users.remove(user)
+                    qs = models.Position.objects.filter(user=request.user, section='section', list=list)
+                    if qs.count() > 1:
+                        pos = qs[0]
+                        pos.section = 'my'
+                        pos.save()
+                elif value == 'featured':
+                    if not request.user.is_staff:
+                        value = list.status
+                    else:
+                        pos, created = models.Position.objects.get_or_create(list=list, user=request.user,
+                                                                             section='featured')
+                        if created:
+                            qs = models.Position.objects.filter(user=request.user, section='featured')
+                            pos.position = qs.aggregate(Max('position'))['position__max'] + 1
+                            pos.save()
+                list.status = value
             elif key == 'name':
                 name = data['name'].strip()
                 if not name:
@@ -271,7 +287,7 @@ def editList(request):
                 while models.List.objects.filter(name=name, user=list.user).exclude(id=list.id).count()>0:
                     num += 1
                     name = data['name'] + ' (%d)' % num
-                setattr(list, key, name)
+                list.name = name
 
         if 'position' in data:
             pos, created = models.Position.objects.get_or_create(list=list, user=request.user)
