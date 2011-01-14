@@ -5,7 +5,7 @@ import sys
 from django.conf import settings
 
 from ox.django.shortcuts import render_to_json_response, json_response
-
+from ox.utils import json
 
 def autodiscover():
     #register api actions from all installed apps
@@ -53,31 +53,40 @@ class ApiActions(dict):
 
         def api(request):
             '''
-                returns list of all known api action
-                return {'status': {'code': int, 'text': string},
-                        'data': {actions: ['api', 'hello', ...]}}
+                returns list of all known api actions
+                param data {
+                    docs: bool
+                }
+                if docs is true, action properties contain docstrings
+                return {
+                    status: {'code': int, 'text': string},
+                    data: {
+                        actions: {
+                            'api': {
+                                cache: true,
+                                doc: 'recursion'
+                            },
+                            'hello': {
+                                cache: true,
+                                ..
+                            }
+                            ...
+                        }
+                    }
+                }
             '''
+            data = json.loads(request.POST['data'])
+            docs = data.get('docs', False)
             _actions = self.keys()
             _actions.sort()
             actions = {}
             for a in _actions:
                 actions[a] = self.properties[a]
+                if docs:
+                    actions[a]['doc'] = self.doc(a)
             response = json_response({'actions': actions})
             return render_to_json_response(response)
         self.register(api)
-
-        def apidoc(request):
-            '''
-                returns array of actions with documentation
-            '''
-            actions = self.keys()
-            actions.sort()
-            docs = {}
-            for f in actions:
-                docs[f] = self.doc(f)
-            return render_to_json_response(json_response({'actions': docs}))
-
-        self.register(apidoc)
 
     def doc(self, f):
         return trim(self[f].__doc__)
