@@ -352,16 +352,18 @@ def subscribeToList(request):
     data = json.loads(request.POST['data'])
     list = get_list_or_404_json(data['id'])
     user = request.user
-    if list.subscribed_users.filter(username=user.username).count() == 0:
+    if list.status == 'public' and \
+       list.subscribed_users.filter(username=user.username).count() == 0:
         list.subscribed_users.add(user)
-        pos, created = models.Position.objects.get_or_create(list=list, user=request.user, section='public')
+        pos, created = models.Position.objects.get_or_create(list=list, user=user, section='public')
         if created:
-            qs = models.Position.objects.filter(user=request.user, section='public')
+            qs = models.Position.objects.filter(user=user, section='public')
             pos.position = qs.aggregate(Max('position'))['position__max'] + 1
             pos.save()
     response = json_response()
     return render_to_json_response(response)
 actions.register(subscribeToList, cache=False)
+
 
 @login_required_json
 def unsubscribeFromList(request):
@@ -380,7 +382,7 @@ def unsubscribeFromList(request):
     list = get_list_or_404_json(data['id'])
     user = request.user
     list.subscribed_users.remove(user)
-    models.Position.objects.filter(list=list, user=request.user, section='public').delete()
+    models.Position.objects.filter(list=list, user=user, section='public').delete()
     response = json_response()
     return render_to_json_response(response)
 actions.register(unsubscribeFromList, cache=False)
@@ -416,8 +418,9 @@ def sortLists(request):
                     pos = qs[0]
                 else:
                     pos = models.Position(list=list, user=user, section=section)
-                pos.position = position
-                pos.save()
+                if pos.position != position:
+                    pos.position = position
+                    pos.save()
                 position += 1
                 models.Position.objects.filter(section=section, list=list).exclude(id=pos.id).delete()
         else:
@@ -425,8 +428,9 @@ def sortLists(request):
                 list = get_list_or_404_json(i)
                 pos, created = models.Position.objects.get_or_create(list=list,
                                             user=request.user, section=section)
-                pos.position = position
-                pos.save()
+                if pos.position != position:
+                    pos.position = position
+                    pos.save()
                 position += 1
 
         response = json_response()

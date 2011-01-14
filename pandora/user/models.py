@@ -5,6 +5,7 @@ from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Max
 from django.conf import settings
 
 from ox.utils import json
@@ -39,12 +40,14 @@ class UserProfile(models.Model):
         def add(lists, section):
             ids = []
             for l in lists:
+                qs = Position.objects.filter(section=section)
                 if section == 'featured':
                     pos, created = Position.objects.get_or_create(list=l, section=section)
                 else:
                     pos, created = Position.objects.get_or_create(list=l, user=self.user, section=section)
+                    qs = qs.filter(user=self.user)
                 if created:
-                    pos.position = len(in_list)
+                    pos.position = qs.aggregate(Max('position'))['position__max'] + 1
                     pos.save()
                 id = l.get_id()
                 if id not in ui['lists']:
