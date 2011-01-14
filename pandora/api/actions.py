@@ -75,7 +75,7 @@ class ApiActions(dict):
                     }
                 }
             '''
-            data = json.loads(request.POST['data'])
+            data = json.loads(request.POST.get('data', '{}'))
             docs = data.get('docs', False)
             _actions = self.keys()
             _actions.sort()
