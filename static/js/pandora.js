@@ -1699,8 +1699,8 @@ var pandora = new Ox.App({
                     select: function(event, data) {
                         // fixme: duplicated
                         if (data.ids.length) {
-                            app.$ui.sectionList.forEach(function($list, i) {
-        	                    i != 2 && $list.options('selected', []);
+                            app.$ui.sectionList.forEach(function($list, i_) {
+        	                    i != i && $list.options('selected', []);
         	                });
         	                URL.set('?find=list:' + data.ids[0]);
                         } else {
