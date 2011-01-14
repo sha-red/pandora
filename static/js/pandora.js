@@ -35,27 +35,6 @@ var pandora = new Ox.App({
         $.browser.safari && Ox.theme('modern');
     }
 
-    // fixme: remove
-    app.uiDefaults = {
-        "list": {
-            "columns": ["id", "title", "director", "country", "year", "language", "runtime", "genre"],
-            "listView": "icons",
-            "selected": [],
-            "sort": [
-                {"key": "director", "operator": ""}
-            ]
-        }
-    }
-    // fixme: remove
-    app.user.ui.showSection = {
-        "my": true,
-        "public": true,
-        "featured": true
-    }
-
-    // $.each(pandora.afterLaunch, function(i, f) { f(); });
-    
-
 	function load() {
 
         $(function() {
@@ -2623,7 +2602,7 @@ var pandora = new Ox.App({
     		                        type: data.id == 'new' ? 'static' : 'smart'
     		                    }, function(result) {
     		                        id = result.data.id;
-    		                        app.user.ui.lists[id] = app.uiDefaults.list;
+    		                        app.user.ui.lists[id] = app.config.uiDefaults.list;
     		                        URL.set('?find=list:' + id)
             	                    Ox.Request.emptyCache(); // fixme: remove
     		                        $list.reloadList().bindEvent({load: load});
@@ -3031,7 +3010,7 @@ var pandora = new Ox.App({
                 $list.resizeColumn(i == 1 ? 'id' : 'name', width - 88);
             }
             if (!app.user.ui.showSection[id]) {
-                //app.$ui.section[i].update();
+                app.$ui.section[i].update();
             }
         });
     }

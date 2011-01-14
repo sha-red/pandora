@@ -238,7 +238,8 @@ def autocomplete(request):
         data['range'] = [0, 10]
     op = data.get('operator', '')
 
-    if models.site_config['keys'][data['key']]['type'] == 'title':
+    site_config = models.site_config()
+    if site_config['keys'][data['key']]['type'] == 'title':
         qs = models.Item.objects.filter(available=True) #does this need more limiting? user etc
         if data['value']:
             if op == '':
@@ -247,7 +248,7 @@ def autocomplete(request):
                 qs = qs.filter(find__key=data['key'], find__value__istartswith=data['value'])
             elif op == '$':
                 qs = qs.filter(find__key=data['key'], find__value__iendswith=data['value'])
-        qs = qs.order_by('-sort__%s'%models.site_config['keys'][data['key']]['autocompleteSortKey'])
+        qs = qs.order_by('-sort__%s'%site_config['keys'][data['key']]['autocompleteSortKey'])
         qs = qs[data['range'][0]:data['range'][1]]
         response = json_response({})
         response['data']['items'] = [i.get(data['key']) for i in qs]    

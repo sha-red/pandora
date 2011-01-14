@@ -34,7 +34,7 @@ def parseCondition(condition):
     else:
         exclude = False
 
-    key_type = models.site_config['keys'].get(k, {'type':'string'}).get('type')
+    key_type = models.site_config()['keys'].get(k, {'type':'string'}).get('type')
     key_type = {
         'title': 'string',
         'person': 'string',

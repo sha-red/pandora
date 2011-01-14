@@ -304,7 +304,7 @@ class Item(models.Model):
         }
         item.update(self.external_data)
         item.update(self.data)
-        for key in site_config['keys'].keys():
+        for key in site_config()['keys'].keys():
             if key not in item:
                 value = self.get(key)
                 #also get values from sort table, i.e. numberof values
@@ -416,7 +416,7 @@ class Item(models.Model):
             'modified',
             'popularity'
         )
-        for key in site_config['sortKeys']:
+        for key in site_config()['sortKeys']:
             name = key['id']
             source = key.get('key', name)
             field_type = key['type']
@@ -763,11 +763,12 @@ class Item(models.Model):
 
 Item.facet_keys = []
 Item.person_keys = []
-for key in site_config['findKeys']:
+config = site_config()
+for key in config['findKeys']:
     name = key['id']
-    if key.get('autocomplete', False) and not site_config['keys'].get(name, {'type': None})['type'] == 'title':
+    if key.get('autocomplete', False) and not config['keys'].get(name, {'type': None})['type'] == 'title':
         Item.facet_keys.append(name)
-    if name in site_config['keys'] and site_config['keys'][name]['type'] == 'person':
+    if name in config['keys'] and config['keys'][name]['type'] == 'person':
         Item.person_keys.append(name)
 
 class ItemFind(models.Model):
@@ -792,7 +793,7 @@ attrs = {
     '__module__': 'item.models',
     'item': models.OneToOneField('Item', related_name='sort', primary_key=True),
 }
-for key in site_config['sortKeys']:
+for key in config['sortKeys']:
     name = key['id']
     name = {'id': 'itemId'}.get(name, name)
     field_type = key['type']

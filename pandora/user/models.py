@@ -31,11 +31,12 @@ class UserProfile(models.Model):
 
     def get_ui(self):
         ui = {}
-        ui.update(site_config['user']['ui'])
+        config = site_config()
+        ui.update(config['user']['ui'])
         ui.update(self.ui)
         if not 'lists' in ui:
             ui['lists'] = {}
-            ui['lists'][''] = site_config['uiDefaults']['list']
+            ui['lists'][''] = config['uiDefaults']['list']
 
         def add(lists, section):
             ids = []

@@ -23,9 +23,10 @@ class SiteSettings(models.Model):
     def __unicode__(self):
         return self.key
 
-with open(os.path.join(settings.PROJECT_ROOT, 'templates', 'site.json')) as f:
-    site_config = json.load(f)
-    site_config['keys'] = {}
-    for key in site_config['sortKeys']:
-        site_config['keys'][key['id']] = key
-
+def site_config():
+    with open(os.path.join(settings.PROJECT_ROOT, 'templates', 'site.json')) as f:
+        site_config = json.load(f)
+        site_config['keys'] = {}
+        for key in site_config['sortKeys']:
+            site_config['keys'][key['id']] = key
+    return site_config
