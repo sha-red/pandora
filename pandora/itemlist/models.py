@@ -72,7 +72,7 @@ class List(models.Model):
             return True
         return False
 
-    def json(self, keys=['id', 'name', 'user', 'type', 'query', 'status'], user=None):
+    def json(self, keys=['id', 'name', 'user', 'type', 'query', 'status', 'subscribed'], user=None):
         response = {}
         for key in keys:
             if key == 'items':

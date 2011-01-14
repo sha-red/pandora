@@ -10,7 +10,7 @@ from ox.django.shortcuts import render_to_json_response, get_object_or_404_json,
 import models
 from api.actions import actions
 from item import utils
-
+from item.models import Item
 
 def get_list_or_404_json(id):
     username, listname = id.split('.')
@@ -111,11 +111,11 @@ actions.register(findLists)
 @login_required_json
 def addListItem(request):
     '''
-        param data
-            {list: listId,
-             item: itemId,
-             query: ...
-           }
+        param data {
+            list: listId,
+            item: itemId,
+            query: ...
+        }
         return {
             status: {'code': int, 'text': string},
             data: {
@@ -125,7 +125,7 @@ def addListItem(request):
     data = json.loads(request.POST['data'])
     list = get_list_or_404_json(data['list'])
     if 'item' in data:
-        item = get_object_or_404_json(models.Item, itemId=data['item'])
+        item = get_object_or_404_json(Item, itemId=data['item'])
         if list.editable(request.user):
             list.add(item)
             response = json_response(status=200, text='item added')
@@ -142,11 +142,11 @@ actions.register(addListItem, cache=False)
 @login_required_json
 def removeListItem(request):
     '''
-        param data
-            {list: listId,
+        param data {
+             list: listId,
              item: itemId,
              quert: ...
-           }
+        }
         return {
             status: {'code': int, 'text': string},
             data: {
@@ -156,7 +156,7 @@ def removeListItem(request):
     data = json.loads(request.POST['data'])
     list = get_list_or_404_json(data['list'])
     if 'item' in data:
-        item = get_object_or_404_json(models.Item, itemId=data['item'])
+        item = get_object_or_404_json(Item, itemId=data['item'])
         if list.editable(request.user):
             list.remove(item)
             response = json_response(status=200, text='item removed')

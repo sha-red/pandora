@@ -187,7 +187,7 @@ Positions
 
         response['data']['positions'] = {}
         ids = [j['itemId'] for j in qs.values('itemId')]
-        response['data']['positions'] = _get_positions(ids, query['ids'])
+        response['data']['positions'] = utils.get_positions(ids, query['ids'])
 
     elif 'keys' in query:
         response['data']['items'] = []

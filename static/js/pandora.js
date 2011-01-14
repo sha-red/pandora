@@ -1601,7 +1601,7 @@ var pandora = new Ox.App({
                         {
                             id: 'name',
                             operator: '+',
-                            title: 'Name',
+                            title: 'List',
                             visible: true,
                             width: Math.ceil(columnWidth)
                         },
@@ -1614,6 +1614,9 @@ var pandora = new Ox.App({
                             width: 40
                         },
                         {
+                            clickable: function(data) {
+                                return data.type == 'smart';
+                            },
                             format: function(value) {
                                 return $('<img>')
                                     .attr({
@@ -1678,18 +1681,21 @@ var pandora = new Ox.App({
                 })
                 .bindEvent({
                     click: function(event, data) {
-                        if (id == 'public') {
+                        if (data.key == 'type') {
+                            alert('...');
+                        } else if (data.key == 'subscribed') {
                             var subscribed = that.value(data.id, 'subscribed');
                             pandora.api[subscribed ? 'unsubscribeFromList' : 'subscribeToList']({
                                 id: data.id,
                             }, function(result) {
                                 that.value(data.id, 'subscribed', !subscribed);
                             });
-                        } else if (id == 'featured') {
+                        } else if (data.key == 'status') {
                             pandora.api.editList({
                                 id: data.id,
                                 status: that.value(data.id, 'status') == 'featured' ? 'public' : 'featured'
                             }, function(result) {
+                                Ox.print('result', result)
                                 if (result.data.user == app.user.username || result.data.subscribed) {
                                     Ox.Request.emptyCache(); // fixme: remove
                                     app.$ui.sectionList[
@@ -2388,7 +2394,7 @@ var pandora = new Ox.App({
                         clickable: function(data) {
                             //alert(JSON.stringify([data.user, data.type]))
                             //Ox.print('$$$$$$$$', data.user, data.type)
-                            return data.user == app.user.username && data.type == 'smart';
+                            return data.type == 'smart';
                         },
                         format: function(value) {
                             return $('<img>')
@@ -2579,14 +2585,14 @@ var pandora = new Ox.App({
         },
 		sections: function() {
 			var that = new Ox.Element()
-			    .css({overflowY: 'auto'})
+			    .css({overflowX: 'hidden', overflowY: 'auto'})
 			    .bindEvent({
 			        resize: function(event, data) {
                         resizeSections();
     	            }
 			    });
 			var counter = 0;
-			var $sections = [];
+			//var $sections = [];
 			app.$ui.section = [];
 			app.$ui.sectionList = [];
 		    $.each(app.user.ui.sections, function(i, id) {
@@ -2648,6 +2654,7 @@ var pandora = new Ox.App({
 		                    } else {
 		                        app.$ui.publicListsBrowser.replaceWith(app.$ui.sectionList[1] = ui.sectionList('public'));
 		                    }
+		                    resizeSections();
 		                }
 		            })];
 		        } else if (id == 'featured' && app.user.group == 'admin') {
@@ -2667,6 +2674,7 @@ var pandora = new Ox.App({
 		                    } else {
 		                        app.$ui.featuredListsBrowser.replaceWith(app.$ui.sectionList[2] = ui.sectionList('featured'));
 		                    }
+		                    resizeSections();
 		                }
 		            })];
 		        }
@@ -2708,14 +2716,14 @@ var pandora = new Ox.App({
     		                resizeSections();
     		            }
     		        });
-		        $sections.push(app.$ui.section[i]);
+		        //$sections.push(app.$ui.section[i]);
 	            app.$ui.sectionList[i] = ui.sectionList(id)
                     .bindEvent({init: init})
 	                .appendTo(app.$ui.section[i].$content);
 	            function init(event, data) {
     	            Ox.print('init', i, counter)
 	                if (++counter == 3) {
-                        $.each($sections, function(i, $section) {
+                        $.each(app.$ui.section, function(i, $section) {
             		        that.append($section);
             		    });
             		    resizeSections();
@@ -2943,17 +2951,20 @@ var pandora = new Ox.App({
                 height += show * 40;
             }
         });
-        Ox.print('getSectionsHeight', height)
         return height;
     }
 
     function getSectionsWidth() {
         var width = app.user.ui.sidebarSize;
         // fixme: don't use height(), look up in splitpanels
-        Ox.print('>', app.$ui.leftPanel.height() - 24 - 1 - app.$ui.info.height())
+        //var a = getSectionsHeight(), b = app.$ui.leftPanel.height() - 24 - 1 - app.$ui.info.height()
+        Ox.print(getSectionsHeight(), '>', app.$ui.leftPanel.height() - 24 - 1 - app.$ui.info.height())
+        //Ox.print(a, '>', b);
         if (getSectionsHeight() > app.$ui.leftPanel.height() - 24 - 1 - app.$ui.info.height()) {
+        //if (a > b) {
             width -= app.ui.scrollbarSize;
         }
+        Ox.print('width', width)
         return width;
     }
 
@@ -3006,16 +3017,21 @@ var pandora = new Ox.App({
         var width = getSectionsWidth();
         Ox.print('sectionsWidth', width)
         app.$ui.sectionList.forEach(function($list, i) {
-            var id = i == 1 ? 'id' : 'name';
+            var id = ['my', 'public', 'featured'][i], // fixme: find a better way
+                height;
+            app.$ui.section[i].css({width: width + 'px'});
             $list.css({width: width + 'px'});
             if (
-                i == 1 && app.ui.showPublicListsBrowser ||
-                i == 2 && app.ui.showFeaturedListsBrowser
+                (i == 1 && app.ui.showPublicListsBrowser) ||
+                (i == 2 && app.ui.showFeaturedListsBrowser)
             ) {
                 $list.resizeColumn('user', Math.floor((width - 88) / 2))
                     .resizeColumn('name', Math.floor((width - 88) / 2));
             } else {
-                $list.resizeColumn(id, width - 88);
+                $list.resizeColumn(i == 1 ? 'id' : 'name', width - 88);
+            }
+            if (!app.user.ui.showSection[id]) {
+                //app.$ui.section[i].update();
             }
         });
     }
