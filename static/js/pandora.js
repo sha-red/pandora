@@ -36,6 +36,17 @@ var pandora = new Ox.App({
     }
 
     // fixme: remove
+    app.uiDefaults = {
+        "list": {
+            "columns": ["id", "title", "director", "country", "year", "language", "runtime", "genre"],
+            "listView": "icons",
+            "selected": [],
+            "sort": [
+                {"key": "director", "operator": ""}
+            ]
+        }
+    }
+    // fixme: remove
     app.user.ui.showSection = {
         "my": true,
         "public": true,
@@ -1653,7 +1664,7 @@ var pandora = new Ox.App({
                             {key: 'status', value: 'public', operator: '='}
                         ], operator: '&'} : {conditions: [
                             {key: 'status', value: 'public', operator: '='},
-                            {key: 'status', value: 'public', operator: '='}
+                            {key: 'status', value: 'featured', operator: '='}
                         ], operator: '|'};
                         return pandora.api.findLists($.extend(data, {
                             query: query
@@ -2418,9 +2429,12 @@ var pandora = new Ox.App({
                         query = {conditions: [
                             {key: 'user', value: app.user.username, operator: '='},
                             {key: 'status', value: 'featured', operator: '!'}
-                        ], operator: ''};
+                        ], operator: '&'};
                     } else if (id == 'public') {
-                        query = {conditions: [{key: 'subscribed', value: true, operator: '='}], operator: ''};
+                        query = {conditions: [
+                            {key: 'subscribed', value: true, operator: '='},
+                            {key: 'status', value: 'featured', operator: '!'},
+                        ], operator: '&'};
                     } else if (id == 'featured') {
                         query = {conditions: [{key: 'status', value: 'featured', operator: '='}], operator: '&'};
                     }
@@ -2485,6 +2499,7 @@ var pandora = new Ox.App({
                         pandora.api.removeList({
                             id: data.ids[0]
                         }, function(result) {
+                            delete app.user.ui.lists[data.ids[0]]; // fixme: how to delete a ui preference?
     	                    Ox.Request.emptyCache(); // fixme: remove
                             $list.reloadList();
                         });
@@ -2586,7 +2601,8 @@ var pandora = new Ox.App({
                     })
                     .bindEvent({
                         click: function(event, data) {
-		                    var id;
+		                    var $list = app.$ui.sectionList[i],
+		                        id;
 		                    if (data.id == 'new' || data.id == 'newsmart') {
     		                    pandora.api.addList({
     		                        name: 'Untitled',
@@ -2594,6 +2610,7 @@ var pandora = new Ox.App({
     		                        type: data.id == 'new' ? 'static' : 'smart'
     		                    }, function(result) {
     		                        id = result.data.id;
+    		                        app.user.ui.lists[id] = app.uiDefaults.list;
     		                        URL.set('?find=list:' + id)
             	                    Ox.Request.emptyCache(); // fixme: remove
     		                        $list.reloadList().bindEvent({load: load});

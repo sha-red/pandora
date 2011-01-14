@@ -288,6 +288,21 @@ def editList(request):
                             qs = models.Position.objects.filter(user=request.user, section='featured')
                             pos.position = qs.aggregate(Max('position'))['position__max'] + 1
                             pos.save()
+                        models.Position.objects.filter(list=list).exclude(id=pos.id).delete()
+                else:
+                        models.Position.objects.filter(list=list).delete()
+                        pos, created = models.Position.objects.get_or_create(list=list, user=list.user,
+                                                                             section='my')
+                        qs = models.Position.objects.filter(user=list.user, section='my')
+                        pos.position = qs.aggregate(Max('position'))['position__max'] + 1
+                        pos.save()
+                        for u in list.subscribed_users.all():
+                            pos, created = models.Position.objects.get_or_create(list=list, user=u,
+                                                                                 section='public')
+                            qs = models.Position.objects.filter(user=u, section='public')
+                            pos.position = qs.aggregate(Max('position'))['position__max'] + 1
+                            pos.save()
+
                 list.status = value
             elif key == 'name':
                 name = data['name'].strip()
