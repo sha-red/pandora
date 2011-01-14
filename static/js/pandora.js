@@ -1670,7 +1670,8 @@ var pandora = new Ox.App({
                             query: query
                         }), callback);
                     },
-                    selected: app.user.ui.list ? [app.user.ui.list] : [],
+                    // fixme: select if previously selected
+                    // selected: app.user.ui.list ? [app.user.ui.list] : [],
                     sort: [
                         {key: 'name', operator: '+'}
                     ]
@@ -1689,10 +1690,12 @@ var pandora = new Ox.App({
                                 id: data.id,
                                 status: that.value(data.id, 'status') == 'featured' ? 'public' : 'featured'
                             }, function(result) {
-                                Ox.Request.emptyCache(); // fixme: remove
-                                app.$ui.sectionList[
-                                    result.data.user == app.user.username ? 0 : 1
-                                ].reloadList();
+                                if (result.data.user == app.user.username || result.data.subscribed) {
+                                    Ox.Request.emptyCache(); // fixme: remove
+                                    app.$ui.sectionList[
+                                        result.data.user == app.user.username ? 0 : 1
+                                    ].reloadList();
+                                }
                                 that.value(data.id, 'status', result.data.status);
                             });
                         }
@@ -1709,9 +1712,10 @@ var pandora = new Ox.App({
                     },
                     select: function(event, data) {
                         // fixme: duplicated
+                        Ox.print("HELLO")
                         if (data.ids.length) {
                             app.$ui.sectionList.forEach(function($list, i_) {
-        	                    i != i && $list.options('selected', []);
+        	                    i != i_ && $list.options('selected', []);
         	                });
         	                URL.set('?find=list:' + data.ids[0]);
                         } else {
@@ -2515,10 +2519,13 @@ var pandora = new Ox.App({
                             id: data.ids[0],
                             status: 'public'
                         }, function(result) {
-    	                    Ox.Request.emptyCache(); // fixme: remove
-                            app.$ui.sectionList[
-                                result.data.user == app.user.username ? 0 : 1
-                            ].reloadList();
+                            // fixme: duplicated
+                            if (result.data.user == app.user.username || result.data.subscribed) {
+                                Ox.Request.emptyCache(); // fixme: remove
+                                app.$ui.sectionList[
+                                    result.data.user == app.user.username ? 0 : 1
+                                ].reloadList();
+                            }
                             $list.reloadList();
                         });
                     }
@@ -2634,6 +2641,7 @@ var pandora = new Ox.App({
 		            })
 		            .bindEvent({
 		                change: function(event, data) {
+		                    Ox.Request.emptyCache(); // fixme: remove
 		                    app.ui.showPublicListsBrowser = !app.ui.showPublicListsBrowser;
 		                    if (app.ui.showPublicListsBrowser) {
     		                    app.$ui.sectionList[1].replaceWith(app.$ui.publicListsBrowser = ui.listsBrowser('public'));
@@ -2652,6 +2660,7 @@ var pandora = new Ox.App({
 		            })
 		            .bindEvent({
 		                change: function(event, data) {
+		                    Ox.Request.emptyCache(); // fixme: remove
 		                    app.ui.showFeaturedListsBrowser = !app.ui.showFeaturedListsBrowser;
 		                    if (app.ui.showFeaturedListsBrowser) {
     		                    app.$ui.sectionList[2].replaceWith(app.$ui.featuredListsBrowser = ui.listsBrowser('featured'));
@@ -2659,7 +2668,8 @@ var pandora = new Ox.App({
 		                        app.$ui.featuredListsBrowser.replaceWith(app.$ui.sectionList[2] = ui.sectionList('featured'));
 		                    }
 		                }
-		            })];		        }
+		            })];
+		        }
 		        app.$ui.section[i] = new Ox.CollapsePanel({
     		            id: id,
     		            extras: extras,
@@ -2940,6 +2950,7 @@ var pandora = new Ox.App({
     function getSectionsWidth() {
         var width = app.user.ui.sidebarSize;
         // fixme: don't use height(), look up in splitpanels
+        Ox.print('>', app.$ui.leftPanel.height() - 24 - 1 - app.$ui.info.height())
         if (getSectionsHeight() > app.$ui.leftPanel.height() - 24 - 1 - app.$ui.info.height()) {
             width -= app.ui.scrollbarSize;
         }
