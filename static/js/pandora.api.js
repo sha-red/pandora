@@ -24,8 +24,8 @@ var app = new Ox.App({
     app.$ui.actionList = constructList();
     app.$ui.actionInfo = Ox.Container().css({padding: '8px'});
 
-    app.api.apidoc(function(results) {
-        app.docs = results.data.actions;
+    app.api.api({docs: true}, function(results) {
+        app.actions = results.data.actions;
 
         if(document.location.hash) {
             app.$ui.actionList.triggerEvent('select', {ids: document.location.hash.substring(1).split(',')});
@@ -94,7 +94,7 @@ function constructList() {
            $.each(data.ids, function(v, k) {
                 console.log(k)
                 info.append($("<h2>").html(k));
-                info.append($('<pre>').html(app.docs[k].replace('/\n/<br>\n/g')));
+                info.append($('<pre>').html(app.actions[k]['doc'].replace('/\n/<br>\n/g')));
                 hash += k + ','
             });
             document.location.hash = hash.substring(0, hash.length-1);
