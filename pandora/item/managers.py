@@ -180,7 +180,7 @@ def parseConditions(conditions, operator):
             else:
                 q = q & c
         return q
-    return None
+    return Q() 
 
 
 class ItemManager(Manager):
@@ -206,8 +206,7 @@ class ItemManager(Manager):
                         data = lqs[0].query
                         conditions = parseConditions(data['query']['conditions'],
                                                      data['query'].get('operator', '&'))
-                        if conditions:
-                            qs = qs.filter(conditions)
+                        qs = qs.filter(conditions)
                     else:
                         qs = qs.filter(id__in=lqs[0].items.all())
         return qs
@@ -240,8 +239,7 @@ class ItemManager(Manager):
         qs = qs.filter(available=True)
         conditions = parseConditions(data['query'].get('conditions', []),
                                      data['query'].get('operator', '&'))
-        if conditions:
-            qs = qs.filter(conditions)
+        qs = qs.filter(conditions)
 
         #FIXME: lists are part of query now
         # filter list, works for own or public lists
