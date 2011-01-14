@@ -24,6 +24,8 @@ class List(models.Model):
     _status = ['private', 'public', 'featured']
     query = DictField(default={"static": True})
     type= models.CharField(max_length=255, default='static')
+    
+    icon = models.ImageField(default=None, blank=True, upload_to=lambda i, x: i.path("icon.jpg"))
 
     #is through table still required?
     items = models.ManyToManyField('item.Item', related_name='lists',
@@ -82,9 +84,30 @@ class List(models.Model):
             elif key == 'query':
                 if not self.query.get('static', False):
                     response[key] = self.query
+            elif key == 'subscribed':
+                if user and not user.is_anonymous():
+                    response[key] = self.subscribed_users.filter(id=user.id).exists()
             else:
                 response[key] = getattr(self, key)
         return response
+
+    def path(self, name=''):
+        h = self.get_id()
+        return os.path.join('lists', h[:2], h[2:4], h[4:6], h[6:], name)
+
+    def make_icon(self):
+        frames = []
+        iself.icon.name = self.path('icon.png')
+        icon = self.icon.path
+        if frames:
+            cmd = [
+                'scripts/list_icon',
+                '-f', ','.join(frames),
+                '-o', icon
+            ]
+            p = subprocess.Popen(cmd)
+            p.wait()
+
 
 class ListItem(models.Model):
     created = models.DateTimeField(auto_now_add=True)

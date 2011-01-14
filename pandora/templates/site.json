@@ -179,7 +179,7 @@
             "section": "items",
             "sections": ["my", "public", "featured"],
             "showAnnotations": true,
-            "showGroups": false,
+            "showGroups": true,
             "showInfo": true,
             "showMovies": true,
             "showSection": {

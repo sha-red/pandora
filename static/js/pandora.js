@@ -20,9 +20,11 @@ var pandora = new Ox.App({
 			requests: {},
 			ui: {
 				infoRatio: 16 / 9,
+				scrollbarSize: $.browser.mozilla ? 16 : 12,
 				sectionElement: 'buttons',
 				sectionLength: {},
-		        selectedMovies: []
+		        selectedMovies: [],
+		        showAllPublicLists: false
 			},
 			user: data.user
 		};
@@ -45,7 +47,7 @@ var pandora = new Ox.App({
 	function load() {
 
         $(function() {
-            // fixme: use jquert ajaxStart?
+            // fixme: use jquery ajaxStart?
             var $body = $('body');
     	    Ox.Request.requests() && app.$ui.loadingIcon.start();
     	    $body.bind('requestStart', function() {
@@ -645,7 +647,7 @@ var pandora = new Ox.App({
     	                collapsed: !app.user.ui.showMovies,
     	                collapsible: true,
     	                element: app.$ui.browser = ui.browser(),
-    	                size: 112 + ($.browser.mozilla ? 16 : 12) // fixme: should be app.ui.scrollbarSize
+    	                size: 112 + app.ui.scrollbarSize
     	            },
     	            {
     	                element: app.$ui.item = ui.item(app.user.ui.item, app.user.ui.itemView)
@@ -822,6 +824,7 @@ var pandora = new Ox.App({
                             query: Query.toObject(id)
                         }), callback);
                     },
+                    scrollbarVisible: true,
                     selected: query ? $.map(query.conditions, function(v) {
                         return v.value;
                     }) : [],
@@ -962,6 +965,7 @@ var pandora = new Ox.App({
 		        .bindEvent({
 		            toggle: function(event, data) {
 		                app.user.ui.showInfo = !data.collapsed;
+		                resizeSections();
 		            }
 		        });
 		    return that;
@@ -1063,7 +1067,7 @@ var pandora = new Ox.App({
 						collapsible: true,
 						element: app.$ui.browser = ui.browser(),
 						resizable: false,
-						size: 112 + ($.browser.mozilla ? 16 : 12)
+						size: 112 + app.ui.scrollbarSize
 					},
 					{
 					    element: new Ox.Element('div')
@@ -1149,6 +1153,7 @@ var pandora = new Ox.App({
 		                    query: Query.toObject()
 		                }), callback);
 		            },
+		            scrollbarVisible: true,
 		            sort: app.user.ui.lists[app.user.ui.list].sort
 		        })
 		        .bindEvent({
@@ -2049,7 +2054,37 @@ var pandora = new Ox.App({
             })
 			return that;
 		},
-        publicListsDialog: function() {
+        publicLists: function() {
+            var that = new Ox.SplitPanel({
+                elements: [
+                    {
+                        element: ui.publicListsBar(),
+                        size: 24
+                    },
+                    {
+                        element: app.$ui.sectionList[1] = ui.publicListsList()
+                    }
+                ],
+                orientation: 'vertical'
+            });
+            return that;
+        },
+        publicListsBar: function() {
+            var that = new Ox.Bar({
+                    size: 24
+                });
+            app.$ui.findListInput = new Ox.Input({
+                    placeholder: 'Find User',
+                    width: 184 - app.ui.scrollbarSize
+                })
+                .css({
+                    margin: '4px',
+                    align: 'right'
+                })
+                .appendTo(that);
+            return that;
+        },
+        publicListsDialog: function() { // fixme: unused
             var that = new Ox.Dialog({
                 buttons: [
                     new Ox.Button({
@@ -2061,7 +2096,21 @@ var pandora = new Ox.App({
                         }
                     })
                 ],
-                content: new Ox.TextList({
+                content: ui.publicListsList(),
+                height: 320,
+                keys: {enter: 'close', escape: 'close'},
+                padding: 0,
+                title: 'Public Lists',
+                width: 420
+            })
+            .css({
+                position: 'absolute'
+            });
+            return that;
+        },
+        publicListsList: function() {
+            var columnWidth = (app.user.ui.sidebarSize - app.ui.scrollbarSize - 88) / 2,
+                that = new Ox.TextList({
                     columns: [
                         {
                             format: function() {
@@ -2074,6 +2123,7 @@ var pandora = new Ox.App({
                             title: $('<img>').attr({
                                 src: 'static/oxjs/build/png/ox.ui/icon16.png'
                             }),
+                            unique: true,
                             visible: true,
                             width: 16
                         },
@@ -2082,14 +2132,14 @@ var pandora = new Ox.App({
                             operator: '+',
                             title: 'User',
                             visible: true,
-                            width: 160
+                            width: Math.floor(columnWidth)
                         },
                         {
                             id: 'name',
                             operator: '+',
                             title: 'Name',
                             visible: true,
-                            width: 160
+                            width: Math.ceil(columnWidth)
                         },
                         {
                             align: 'right',
@@ -2100,70 +2150,89 @@ var pandora = new Ox.App({
                             width: 40
                         },
                         {
-	                        format: function(value) {
-	                            return $('<img>')
-	                                .attr({
+                            format: function(value) {
+                                return $('<img>')
+                                    .attr({
                                         src: 'static/oxjs/build/png/ox.ui.' + Ox.theme() +
                                         '/symbolFind.png'
                                     })
                                     .css({
                                         opacity: value == 'static' ? 0.1 : 1
                                     });
-	                        },
-	                        id: 'type',
-	                        operator: '+',
-	                        title: $('<img>').attr({
+                            },
+                            id: 'type',
+                            operator: '+',
+                            title: $('<img>').attr({
                                 src: 'static/oxjs/build/png/ox.ui.' +
                                 Ox.theme() + '/symbolFind.png'
                             }),
-	                        visible: true,
-	                        width: 16
-	                    },
+                            visible: true,
+                            width: 16
+                        },
                         {
                             clickable: true,
-	                        format: function(value) {
-	                            return $('<img>')
-	                                .attr({
+                            format: function(value) {
+                                return $('<img>')
+                                    .attr({
                                         src: 'static/oxjs/build/png/ox.ui.' +
                                         Ox.theme() + '/symbolCheck.png'
                                     })
                                     .css({
-                                        opacity: value == 'static' ? 0.1 : 1
+                                        opacity: value ? 1 : 0.1
                                     });
-	                        },
-	                        id: 'status',
-	                        operator: '+',
-	                        title: $('<img>').attr({
+                            },
+                            id: 'subscribed',
+                            operator: '+',
+                            title: $('<img>').attr({
                                 src: 'static/oxjs/build/png/ox.ui.' +
                                 Ox.theme() + '/symbolCheck.png'
                             }),
-	                        visible: true,
-	                        width: 16
-	                    },
+                            visible: true,
+                            width: 16
+                        },
                     ],
                     columnsVisible: true,
+                    pageLength: 1000,
                     request: function(data, callback) {
-	                    var query = {conditions: [
-                            //{key: 'user', value: app.user.username, operator: '!'},
+                        var query = {conditions: [
+                            {key: 'user', value: app.user.username, operator: '!'},
                             {key: 'status', value: 'public', operator: '='}
                         ], operator: ''};
-	                    return pandora.api.findLists($.extend(data, {
+                        return pandora.api.findLists($.extend(data, {
                             query: query
                         }), callback);
                     },
+                    selected: app.user.ui.list ? [app.user.ui.list] : [],
                     sort: [
                         {key: 'name', operator: '+'}
                     ]
-                }),
-                height: 320,
-                keys: {enter: 'close', escape: 'close'},
-                padding: 0,
-                title: 'Public Lists',
-                width: 420
-            })
-            .css({
-                position: 'absolute'
-            });
+                })
+                .bindEvent({
+                    click: function(event, data) {
+                        alert('click')
+                    },
+                    init: function(event, data) {
+                        app.ui.sectionLength.public = data.items;
+                        app.$ui.section[1].$content.css({
+        	                height: 40 + data.items * 16 + 'px'
+        	            });
+        	            app.$ui.sectionList[1].css({
+        	                height: 16 + data.items * 16 + 'px'
+        	            });
+        	            resizeSections();
+                    },
+                    select: function(event, data) {
+                        // fixme: duplicated
+                        if (data.ids.length) {
+                            app.$ui.sectionList.forEach(function($list, i) {
+        	                    i != 1 && $list.options('selected', []);
+        	                });
+        	                URL.set('?find=list:' + data.ids[0]);
+                        } else {
+                            URL.set('');
+                        }
+                    }
+                });
             return that;
         },
 		rightPanel: function() {
@@ -2232,8 +2301,7 @@ var pandora = new Ox.App({
 	        return that;
 		},
         sectionList: function(id, i) {
-            var width = app.user.ui.sidebarWidth, //getSectionsWidth(),
-                that = new Ox.TextList({
+            var that = new Ox.TextList({
                 columns: [
                     {
                         format: function() {
@@ -2254,7 +2322,7 @@ var pandora = new Ox.App({
                         operator: '+',
                         unique: true,
                         visible: id == 'public',
-                        width: width - 88
+                        width: app.user.ui.sidebarWidth - 88
                     },
                     {
                         editable: function(data) {
@@ -2267,7 +2335,7 @@ var pandora = new Ox.App({
                         },
                         operator: '+',
                         visible: id != 'public',
-                        width: width - 88
+                        width: app.user.ui.sidebarWidth - 88
                     },
                     {
                         align: 'right',
@@ -2343,7 +2411,7 @@ var pandora = new Ox.App({
             .css({
                 left: 0,
                 top: 0,
-                width: width + 'px',
+                width: app.user.ui.sidebarWidth + 'px',
             })
             .bind({
                 dragenter: function(e) {
@@ -2396,13 +2464,14 @@ var pandora = new Ox.App({
                     });
                 },
                 init: function(event, data) {
-                    app.ui.sectionLength[id] = data.items;
+                    app.ui.sectionLength[id] = data.items; // fixme: why by id, not by i?
                     app.$ui.section[i].$content.css({
     	                height: data.items * 16 + 'px'
     	            });
     	            app.$ui.sectionList[i].css({
     	                height: data.items * 16 + 'px'
     	            });
+    	            resizeSections();
                 },
 	            move: function(event, data) {
 	                /*
@@ -2420,8 +2489,10 @@ var pandora = new Ox.App({
                         app.$ui.sectionList.forEach(function($list, i_) {
     	                    i != i_ && $list.options('selected', []);
     	                });
+                        app.user.ui.list = data.ids[0];
     	                URL.set('?find=list:' + data.ids[0]);
                     } else {
+                        app.user.ui.list = '';
                         URL.set('');
                     }
 	            },
@@ -2476,7 +2547,7 @@ var pandora = new Ox.App({
     		        .bindEvent({
     		            click: function(event, data) {
     		                var $list = app.$ui.sectionList[i],
-    		                    id;
+    		                    hasFocus, id;
     		                if (data.id == 'new' || data.id == 'newsmart') {
     		                    pandora.api.addList({
     		                        name: 'Untitled',
@@ -2495,13 +2566,17 @@ var pandora = new Ox.App({
             		                }
     		                    });
     		                } else if (data.id == 'browse') {
-    		                    app.$ui.publicListsDialog = ui.publicListsDialog().open();
+    		                    //hasFocus = app.$ui.app.$ui.sectionList[1].hasFocus();
+    		                    app.$ui.sectionList[1].replaceWith(app.$ui.publicLists = ui.publicLists());
+    		                    //hasFocus && app.$ui.publicLists.gainFocus();
+    		                    //app.$ui.publicListsDialog = ui.publicListsDialog().open();
+    		                    app.ui.showAllPublicLists = true;
     		                }
     		            },
     		            toggle: function(event, data) {
-    		                Ox.print('toggle')
     		                data.collapsed && app.$ui.sectionList[i].loseFocus();
     		                app.user.ui.showSection[id] = !data.collapsed;
+    		                resizeSections();
     		            }
     		        });
 		        $sections.push(app.$ui.section[i]);
@@ -2725,16 +2800,15 @@ var pandora = new Ox.App({
 	function getGroupWidth(pos, panelWidth) { // fixme: don't pass panelWidth
 	    var width = {};
 	    width.list = Math.floor(panelWidth / 5) + (panelWidth % 5 > pos);
-	    width.column = width.list - 40 - ($.browser.mozilla ? 16 : 12);
+	    width.column = width.list - 40 - app.ui.scrollbarSize;
 	    return width;
 	}
 
     function getSectionsWidth() {
         var width = app.user.ui.sidebarSize;
-        Ox.print(getSectionsHeight(), '>', app.$ui.leftPanel.height() - 24 - 1 - app.$ui.info.height(), getSectionsHeight() > app.$ui.leftPanel.height() - 24 - 1 - app.$ui.info.height())
         // fixme: don't use height(), look up in splitpanels
         if (getSectionsHeight() > app.$ui.leftPanel.height() - 24 - 1 - app.$ui.info.height()) {
-            width -= $.browser.mozilla ? 16 : 12;
+            width -= app.ui.scrollbarSize;
         }
         return width;
     }
@@ -2742,7 +2816,11 @@ var pandora = new Ox.App({
     function getSectionsHeight() {
         var height = 48;
         $.each(app.user.ui.showSection, function(id, show) {
+            Ox.print('*', id, app.ui.sectionLength[id])
             height += show * app.ui.sectionLength[id] * 16;
+            if (id == 'public' && app.ui.showAllPublicLists) {
+                height += show * 40
+            }
         });
         Ox.print('getSectionsHeight', height)
         return height;
@@ -2795,9 +2873,16 @@ var pandora = new Ox.App({
 
     function resizeSections() {
         var width = getSectionsWidth();
-        app.$ui.sectionList.forEach(function($list) {
+        Ox.print('sectionsWidth', width)
+        app.$ui.sectionList.forEach(function($list, i) {
+            var id = i == 1 ? 'id' : 'name';
             $list.css({width: width + 'px'});
-            $list.resizeColumn('name', width - 88);
+            if (i == 1 && app.ui.showAllPublicLists) {
+                $list.resizeColumn('user', Math.floor((width - 88) / 2))
+                    .resizeColumn('name', Math.floor((width - 88) / 2));
+            } else {
+                $list.resizeColumn(id, width - 88);
+            }
         });
     }
 

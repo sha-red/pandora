@@ -85,8 +85,8 @@ def parseCondition(condition):
         q = Q(itemId=False)
         l = v.split(".")
         if len(l) == 2:
-            lqs = List.objects.filter(name=l[1], user__username=l[0])
-            if lqs.count() == 1:
+            lqs = list(List.objects.filter(name=l[1], user__username=l[0]))
+            if len(lqs) == 1:
                 l = lqs[0]
                 if l.query.get('static', False) == False:
                     data = l.query

@@ -22,7 +22,9 @@ def _order_query(qs, sort):
         operator = e['operator']
         if operator != '-':
             operator = ''
-        key = e['key']
+        key = {
+            'subscribed': 'subscribed_users'
+        }.get(e['key'], e['key'])
         order = '%s%s' % (operator, key)
         order_by.append(order)
     if order_by:
@@ -183,13 +185,16 @@ def addList(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    name = data['name']
+    name = data['name'].strip()
+    if not name:
+        name = "Untitled"
     num = 1
-    while models.List.objects.filter(name=name, user=request.user).count()>0:
+    created = False
+    while not created:
+        list, created = models.List.objects.get_or_create(name=name, user=request.user)
         num += 1
         name = data['name'] + ' (%d)' % num
-    list = models.List(name = name, user=request.user)
-    list.save()
+
     for key in data:
         if key == 'query' and not data['query']:
             setattr(list, key, {"static":True})
@@ -207,14 +212,19 @@ def addList(request):
             value = data[key]
             if value not in list._status:
                 value = list._status[0]
-            if not user.request.is_staff and value == 'featured':
+            if not request.user.is_staff and value == 'featured':
                 value = 'private'
             setattr(list, key, value)
     list.save()
 
-    pos, created = models.Position.objects.get_or_create(list=list,
-                                     user=request.user, section='my')
-    qs = models.Position.objects.filter(user=request.user, section='my')
+    if list.status == 'featured':
+        pos, created = models.Position.objects.get_or_create(list=list,
+                                         user=request.user, section='featured')
+        qs = models.Position.objects.filter(section='featured')
+    else:
+        pos, created = models.Position.objects.get_or_create(list=list,
+                                         user=request.user, section='my')
+        qs = models.Position.objects.filter(user=request.user, section='my')
     pos.position = qs.aggregate(Max('position'))['position__max'] + 1
     pos.save()
     response = json_response(status=200, text='created')
@@ -332,7 +342,6 @@ def subscribeToList(request):
     '''
         param data {
             id: listId,
-            user: username(only admins)
         }
         return {
             status: {'code': int, 'text': string},
@@ -346,8 +355,10 @@ def subscribeToList(request):
     if list.subscribed_users.filter(username=user.username).count() == 0:
         list.subscribed_users.add(user)
         pos, created = models.Position.objects.get_or_create(list=list, user=request.user, section='public')
-        pos.position = data['position']
-        pos.save()
+        if created:
+            qs = models.Position.objects.filter(user=request.user, section='public')
+            pos.position = qs.aggregate(Max('position'))['position__max'] + 1
+            pos.save()
     response = json_response()
     return render_to_json_response(response)
 actions.register(subscribeToList, cache=False)
@@ -382,6 +393,8 @@ def sortLists(request):
             section: 'my',
             ids: [1,2,4,3]
         }
+        known sections: 'my', 'public', 'featured'
+        featured can only be edited by admins
         return {
             status: {'code': int, 'text': string},
             data: {
@@ -411,7 +424,7 @@ def sortLists(request):
             for i in data['ids']:
                 list = get_list_or_404_json(i)
                 pos, created = models.Position.objects.get_or_create(list=list,
-                                     user=request.user, section=section)
+                                            user=request.user, section=section)
                 pos.position = position
                 pos.save()
                 position += 1
@@ -419,4 +432,3 @@ def sortLists(request):
         response = json_response()
     return render_to_json_response(response)
 actions.register(sortLists, cache=False)
-
