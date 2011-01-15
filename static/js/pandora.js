@@ -826,17 +826,22 @@ var pandora = new Ox.App({
                         }
                     ]
                 })
-                .bindEvent('select', function(event, data) {
-                    var group = app.ui.groups[i],
-                        query;
-                    app.ui.groups[i].query.conditions = $.map(data.ids, function(v) {
-                        return {
-                            key: id,
-                            value: v,
-                            operator: '='
-                        };
-                    });
-                    reloadGroups(i);
+                .bindEvent({
+                    paste: function(event, data) {
+                        app.$ui.list.triggerEvent('paste', data);
+                    },
+                    select: function(event, data) {
+                        var group = app.ui.groups[i],
+                            query;
+                        app.ui.groups[i].query.conditions = $.map(data.ids, function(v) {
+                            return {
+                                key: id,
+                                value: v,
+                                operator: '='
+                            };
+                        });
+                        reloadGroups(i);
+                    }
                 });
             new Ox.Select({
                     items: $.map(app.config.groups, function(v) {
@@ -1119,7 +1124,7 @@ var pandora = new Ox.App({
                 });
 			return that;
 		},
-		list: function(view) {
+		list: function(view) { // fixme: remove view argument
 			var that, $map,
 		        keys = ['director', 'id', 'poster', 'title', 'year'];
 		    //Ox.print('constructList', view);
@@ -1291,6 +1296,20 @@ var pandora = new Ox.App({
 		            app.$ui.previewDialog.close();
 		            delete app.$ui.previewDialog;
 		        },
+		        copy: function(event, data) {
+		            Ox.Clipboard.copy({
+		                items: data.ids,
+		                text: $.map(data.ids, function(id) {
+		                    return app.$ui.list.value(id, 'title');
+		                }).join('\n')
+		            });
+		        },
+		        'delete': function(event, data) {
+		            getListData().editable && pandora.api.removeListItems({
+	                    list: app.user.ui.list,
+	                    items: data.ids
+	                }, reloadList);
+		        },
 		        init: function(event, data) {
 		            app.$ui.total.html(ui.status('total', data));
 		            data = [];
@@ -1408,6 +1427,12 @@ var pandora = new Ox.App({
 		                }
 		            });
 		        },
+                paste: function(event, data) {
+                    data.items && getListData().editable && pandora.api.addListItems({
+                        list: app.user.ui.list,
+                        items: data.items
+                    }, reloadList);
+                },
 		        select: function(event, data) {
 		            var $still, $timeline;
 		            app.ui.selectedMovies = data.ids;
@@ -1515,7 +1540,7 @@ var pandora = new Ox.App({
 		            app.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (data.operator === '' ? 'ascending' : 'descending'));
 		        }
 		    });
-            that.display = function() {
+            that.display = function() { // fixme: used?
                 app.$ui.rightPanel.replace(1, app.$ui.contentPanel = ui.contentPanel());
             };
 		    return that;
@@ -1695,13 +1720,16 @@ var pandora = new Ox.App({
         	            });
         	            resizeSections();
                     },
+                    paste: function(event, data) {
+                        app.$ui.list.triggerEvent('paste', data);
+                    },
                     select: function(event, data) {
                         // fixme: duplicated
-                        Ox.print("HELLO")
                         if (data.ids.length) {
                             app.$ui.sectionList.forEach(function($list, i_) {
         	                    i != i_ && $list.options('selected', []);
         	                });
+        	                app.user.ui.list = data.ids[0];
         	                URL.set('?find=list:' + data.ids[0]);
                         } else {
                             URL.set('');
@@ -2212,6 +2240,8 @@ var pandora = new Ox.App({
 		                        }).css({
 		                            overflow: 'hidden'
 		                        }).append($manage).open();
+		                } else if (data.id == 'query') {
+		                    alert(JSON.stringify(Query.toObject()));
 		                }
 		            }
 		        });
@@ -2352,7 +2382,6 @@ var pandora = new Ox.App({
                     {
                         editable: function(data) {
                             return data.user == app.user.username;
-                            // return data.id && data.id.split(': ')[0] == app.user.username;
                         },
                         id: 'name',
                         input: {
@@ -2536,13 +2565,18 @@ var pandora = new Ox.App({
                         ids: data.ids
                     });
 	            },
+	            paste: function(event, data) {
+                    app.$ui.list.triggerEvent('paste', data);
+                },
                 select: function(event, data) {
+                    var $list = app.$ui.sectionList[i];
                     if (data.ids.length) {
+                        var listId = data.ids[0];
                         app.$ui.sectionList.forEach(function($list, i_) {
     	                    i != i_ && $list.options('selected', []);
     	                });
-                        app.user.ui.list = data.ids[0];
-    	                URL.set('?find=list:' + data.ids[0]);
+                        app.user.ui.list = listId;
+    	                URL.set('?find=list:' + listId);
                     } else {
                         app.user.ui.list = '';
                         URL.set('');
@@ -2576,7 +2610,7 @@ var pandora = new Ox.App({
 			app.$ui.sectionList = [];
 		    $.each(app.user.ui.sections, function(i, id) {
 		        var extras;
-		        if (id == 'my') {
+		        if (id == 'my' && app.user.group != 'guest') {
 		            extras = [new Ox.Select({
                         items: [
     		                { id: 'new', title: 'New List...' },
@@ -2616,7 +2650,7 @@ var pandora = new Ox.App({
     		                }
                         }
                     })];
-		        } else if (id == 'public') {
+		        } else if (id == 'public' && app.user.group != 'guest') {
 		            extras = [new Ox.Button({
 		                selectable: true,
 		                style: 'symbol',
@@ -2875,7 +2909,7 @@ var pandora = new Ox.App({
     function autovalidateListname(value, blur, callback) {
         var length = value.length;
         value = $.map(value.split(''), function(v, i) {
-            if (new RegExp('[0-9a-z\\(\\)' + ((i == 0 || (i == length - 1 && blur)) ? '' : ' \-') + ']', 'i')(v)) {
+            if (new RegExp('[0-9' + Ox.regexp.letters + '\\(\\)' + ((i == 0 || (i == length - 1 && blur)) ? '' : ' \-') + ']', 'i')(v)) {
                 return v
             } else {
                 return null;
@@ -2913,6 +2947,16 @@ var pandora = new Ox.App({
         ) > -1 ? 'left' : 'right';
     }
 
+    function getListData() {
+        var data = {};
+        if (app.user.ui.list) {
+            var section = app.$ui.sectionList[0].options('selected')[0] == app.user.ui.list ? 0 : 2;
+            data = app.$ui.sectionList[section].value(app.user.ui.list);
+        }
+        data.editable = data.user == app.user.username && data.type == 'static';
+        return data;
+    }
+
 	function getGroupWidth(pos, panelWidth) { // fixme: don't pass panelWidth
 	    var width = {};
 	    width.list = Math.floor(panelWidth / 5) + (panelWidth % 5 > pos);
@@ -2936,11 +2980,7 @@ var pandora = new Ox.App({
     function getSectionsWidth() {
         var width = app.user.ui.sidebarSize;
         // fixme: don't use height(), look up in splitpanels
-        //var a = getSectionsHeight(), b = app.$ui.leftPanel.height() - 24 - 1 - app.$ui.info.height()
-        Ox.print(getSectionsHeight(), '>', app.$ui.leftPanel.height() - 24 - 1 - app.$ui.info.height())
-        //Ox.print(a, '>', b);
         if (getSectionsHeight() > app.$ui.leftPanel.height() - 24 - 1 - app.$ui.info.height()) {
-        //if (a > b) {
             width -= app.ui.scrollbarSize;
         }
         Ox.print('width', width)
@@ -2992,8 +3032,31 @@ var pandora = new Ox.App({
         });
     }
 
+    function reloadList() {
+        Ox.print('reloadList')
+        var listData = getListData();
+        Ox.Request.emptyCache(); // fixme: remove
+        app.$ui.groups.forEach(function($group) {
+            $group.reloadList();
+        });
+        app.$ui.list.bindEvent({
+                init: function(event, data) {
+                    app.$ui.sectionList[listData.status == 'featured' ? 2 : 0]
+                        .value(listData.id, 'items', data.items);
+                },
+                load: load
+            })
+            .reloadList();
+        function load(event, data) {
+            app.$ui.list.gainFocus().options({selected: [data.items]});
+            app.$ui.list.unbindEvent({load: load}); // fixme: need bindEventOnce
+        }
+    }
+
     function resizeSections() {
-        var width = getSectionsWidth();
+        var width = getSectionsWidth(),
+            columnWidth = {user: parseInt((width - 88) * 0.4)};
+            columnWidth.name = (width - 88) - columnWidth.user;
         Ox.print('sectionsWidth', width)
         app.$ui.sectionList.forEach(function($list, i) {
             var id = ['my', 'public', 'featured'][i], // fixme: find a better way
@@ -3004,8 +3067,8 @@ var pandora = new Ox.App({
                 (i == 1 && app.ui.showPublicListsBrowser) ||
                 (i == 2 && app.ui.showFeaturedListsBrowser)
             ) {
-                $list.resizeColumn('user', Math.floor((width - 88) / 2))
-                    .resizeColumn('name', Math.floor((width - 88) / 2));
+                $list.resizeColumn('user', columnWidth.user)
+                    .resizeColumn('name', columnWidth.name);
             } else {
                 $list.resizeColumn(i == 1 ? 'id' : 'name', width - 88);
             }
@@ -3274,7 +3337,7 @@ var pandora = new Ox.App({
 
     }());
 
-	var url = function(url) {
+	var url = function(url) { // fixme: unused
 		var currentURL = document.location.pathname.substr(1) + document.location.hash,
 			match = false;
 			regexps = {

@@ -109,11 +109,11 @@ def findLists(request):
 actions.register(findLists)
 
 @login_required_json
-def addListItem(request):
+def addListItems(request):
     '''
         param data {
             list: listId,
-            item: itemId,
+            items: [itemId],
             query: ...
         }
         return {
@@ -124,11 +124,11 @@ def addListItem(request):
     '''
     data = json.loads(request.POST['data'])
     list = get_list_or_404_json(data['list'])
-    if 'item' in data:
-        item = get_object_or_404_json(Item, itemId=data['item'])
+    if 'items' in data:
         if list.editable(request.user):
-            list.add(item)
-            response = json_response(status=200, text='item added')
+            for item in Item.objects.filter(itemId__in=data['items']):
+                list.add(item)
+            response = json_response(status=200, text='items added')
         else:
             response = json_response(status=403, text='not allowed')
     elif 'query' in data:
@@ -136,15 +136,15 @@ def addListItem(request):
     else:
         response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
-actions.register(addListItem, cache=False)
+actions.register(addListItems, cache=False)
 
 
 @login_required_json
-def removeListItem(request):
+def removeListItems(request):
     '''
         param data {
              list: listId,
-             item: itemId,
+             items: [itemId],
              quert: ...
         }
         return {
@@ -155,11 +155,11 @@ def removeListItem(request):
     '''
     data = json.loads(request.POST['data'])
     list = get_list_or_404_json(data['list'])
-    if 'item' in data:
-        item = get_object_or_404_json(Item, itemId=data['item'])
+    if 'items' in data:
         if list.editable(request.user):
-            list.remove(item)
-            response = json_response(status=200, text='item removed')
+            for item in list.items.filter(itemId__in=data['items']):
+                list.remove(item)
+            response = json_response(status=200, text='items removed')
         else:
             response = json_response(status=403, text='not allowed')
     elif 'query' in data:
@@ -168,7 +168,7 @@ def removeListItem(request):
     else:
         response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
-actions.register(removeListItem, cache=False)
+actions.register(removeListItems, cache=False)
 
 
 @login_required_json
