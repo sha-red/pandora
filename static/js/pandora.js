@@ -704,37 +704,46 @@ var pandora = new Ox.App({
                                 id: 'input',
                                 width: 192
                             })
-                            .bindEvent('submit', function(event, data) {
-                                var key = app.user.ui.findQuery.conditions.length ?
-                                        app.user.ui.findQuery.conditions[0].key : '',
-                                    query;
-                                app.user.ui.findQuery.conditions = [
-                                    {
-                                        key: key == 'all' ? '' : key,
-                                        value: data.value,
-                                        operator: ''
+                            .bindEvent({
+                                submit: function(event, data) {
+                                    var key = app.user.ui.findQuery.conditions.length ?
+                                            app.user.ui.findQuery.conditions[0].key : '',
+                                        query;
+                                    if (that.value()[0].id == 'all') { // fixme: ambiguous?
+                                        app.$ui.sectionList.forEach(function($list) {
+                                            $list.options({selected: []});
+                                        }); // fixme: doesn't cover complex lists
+                                        app.user.ui.list = '';
+                                        app.user.ui.listQuery = {conditions: [], operator: ''};
                                     }
-                                ];
-                                $.each(app.ui.groups, function(i, group) {
-                                    group.query.conditions = [];
-                                    app.$ui.groups[i].options({
+                                    app.user.ui.findQuery.conditions = [
+                                        {
+                                            key: key == 'all' ? '' : key,
+                                            value: data.value,
+                                            operator: ''
+                                        }
+                                    ];
+                                    $.each(app.ui.groups, function(i, group) {
+                                        group.query.conditions = [];
+                                        app.$ui.groups[i].options({
+                                            request: function(data, callback) {
+                                                delete data.keys;
+                                                return pandora.api.find($.extend(data, {
+                                                    group: group.id,
+                                                    query: Query.toObject(group.id)
+                                                }), callback);
+                                            }
+                                        });
+                                    });
+                                    app.$ui.list.options({
                                         request: function(data, callback) {
-                                            delete data.keys;
                                             return pandora.api.find($.extend(data, {
-                                                group: group.id,
-                                                query: Query.toObject(group.id)
+                                                query: query = Query.toObject()
                                             }), callback);
                                         }
                                     });
-                                });
-                                app.$ui.list.options({
-                                    request: function(data, callback) {
-                                        return pandora.api.find($.extend(data, {
-                                            query: query = Query.toObject()
-                                        }), callback);
-                                    }
-                                });
-                                history.pushState({}, '', '/' + Query.toString(query));
+                                    history.pushState({}, '', '/' + Query.toString(query));
+                                }
                             })
                     ]),
                     id: 'findElement'
