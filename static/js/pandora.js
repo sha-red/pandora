@@ -877,7 +877,7 @@ var pandora = new Ox.App({
                         }
                         app.ui.groups[i] = getGroupObject(id_);
                         app.user.ui.groups[i] = id_;
-                        setUI({groups: app.user.ui.groups});
+                        UI.set({groups: app.user.ui.groups});
                         replaceGroup(i, id_);
                     } else {
                         // swap two existing groups
@@ -886,7 +886,7 @@ var pandora = new Ox.App({
                         app.ui.groups[i_] = group;
                         app.user.ui.groups[i] = id_;
                         app.user.ui.groups[i_] = id;
-                        setUI({groups: app.user.ui.groups});
+                        UI.set({groups: app.user.ui.groups});
                         replaceGroup(i, id_, app.ui.groups[i].query);
                         replaceGroup(i_, id, app.ui.groups[i_].query);
                     }
@@ -3392,6 +3392,7 @@ var pandora = new Ox.App({
                     if (!old.user.ui.item) {
                         if (!app.user.ui.item) {
                             app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
+                            //app.$ui.contentPanel.replace(1, ui.list());
                         } else {
                             app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
                             //app.$ui.rightPanel.replace(0, app.$ui.toolbar = ui.toolbar());
