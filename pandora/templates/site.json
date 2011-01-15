@@ -124,16 +124,6 @@
         {"id": "size", "admin": true},
         {"id": "pixels"}
     ],
-    "uiDefaults": {
-        "list": {
-            "columns": ["id", "title", "director", "country", "year", "language", "runtime", "genre"],
-            "listView": "icons",
-            "selected": [],
-            "sort": [
-                {"key": "director", "operator": ""}
-            ]
-        }
-    },
     "user": {
         "group": "guest",
         "lists": {
@@ -169,6 +159,7 @@
             "lists": {
                 "": {
                     "columns": ["id", "title", "director", "country", "year", "language", "runtime", "genre"],
+                    "columnWidth": {},
                     "listView": "icons",
                     "selected": [],
                     "sort": [

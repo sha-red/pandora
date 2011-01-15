@@ -33,7 +33,7 @@ var pandora = new Ox.App({
     pandora.app = app; // remove later
 
     if (app.user.group == 'guest') {
-        app.user = data.config.user;
+        app.user = $.extend({}, app.config.user);
         $.browser.safari && Ox.theme('modern');
     }
 
@@ -1138,18 +1138,31 @@ var pandora = new Ox.App({
 			return that;
 		},
 		list: function(view) { // fixme: remove view argument
-			var that, $map,
-		        keys = ['director', 'id', 'poster', 'title', 'year'];
+			var that, $map;
 		    //Ox.print('constructList', view);
 		    if (view == 'list') {
+		        /*
+		        keys = Ox.unique($.merge(
+		            $.map(app.user.ui.lists[app.user.ui.list].columns, function(id) {
+		                return Ox.getObjectById(app.config.sortKeys, id);
+		            }),
+		            app.config.sortKeys
+		        ));
+		        Ox.print('$$$$', keys)
+		        */
 		        that = new Ox.TextList({
 		            columns: $.map(app.config.sortKeys, function(key, i) {
-		                return $.extend({
+		                var position = app.user.ui.lists[app.user.ui.list].columns.indexOf(key.id);
+		                Ox.print(position, '++++', key.id, app.user.ui.lists[app.user.ui.list].columnWidth[key.id], key.width, '||:', app.user.ui.lists[app.user.ui.list].columnWidth[key.id] || key.width)
+		                return $.extend($.extend({}, key), {
 		                    align: getAlignment(key.id),
+		                    defaultWidth: key.width,
 		                    operator: getSortOperator(key.id),
+		                    position: position,
 		                    unique: key.id == 'id',
-		                    visible: $.inArray(key.id, app.user.ui.lists[app.user.ui.list].columns) > -1
-		                }, key);
+		                    visible: position > -1,
+		                    width: app.user.ui.lists[app.user.ui.list].columnWidth[key.id] || key.width
+		                });
 		            }),
 		            columnsMovable: true,
 		            columnsRemovable: true,
@@ -1166,8 +1179,26 @@ var pandora = new Ox.App({
 		            sort: app.user.ui.lists[app.user.ui.list].sort
 		        })
 		        .bindEvent({
-		            resize: function(event, data) {
+		            columnchange: function(event, data) {
+		                var columnWidth = {}
+		                UI.set(['lists', app.user.ui.list, 'columns'].join('|'), data.ids);
+		                /*
+		                data.ids.forEach(function(id) {
+		                    columnWidth[id] = 
+		                        app.user.ui.lists[app.user.ui.list].columnWidth[id] ||
+		                        Ox.getObjectById(app.config.sortKeys, id).width
+		                });
+		                UI.set(['lists', app.user.ui.list, 'columnWidth'].join('|'), columnWidth);
+		                */
+		            },
+		            columnresize: function(event, data) {
+		                UI.set(['lists', app.user.ui.list, 'columnWidth', data.id].join('|'), data.width);
+		            },
+		            resize: function(event, data) { // this is the resize event of the split panel
 		                that.size();
+		            },
+		            sort: function(event, data) {
+		                UI.set(['lists', app.user.ui.list, 'sort'].join('|'), [data]);
 		            }
 		        });
 		    } else if (view == 'icons') {
@@ -1185,7 +1216,7 @@ var pandora = new Ox.App({
 		                    width: ratio >= 1 ? size : size * ratio
 		                };
 		            },
-		            keys: keys,
+		            keys: ['director', 'id', 'poster', 'title', 'year'],
 		            request: function(data, callback) {
 		                //Ox.print('data, Query.toObject', data, Query.toObject())
 		                pandora.api.find($.extend(data, {
@@ -1745,6 +1776,7 @@ var pandora = new Ox.App({
         	                UI.set({list: data.ids[0]});
         	                URL.set('?find=list:' + data.ids[0]);
                         } else {
+                            UI.set({list: ''});
                             URL.set('');
                         }
                     }
@@ -1755,6 +1787,7 @@ var pandora = new Ox.App({
 			var isGuest = app.user.group == 'guest',
 			    that = new Ox.MainMenu({
 		            extras: [
+		                $('<div>').html('beta').css({marginRight: '4px'}),
 		                app.$ui.loadingIcon = new Ox.LoadingIcon({
 		                    size: 'medium'
 		                })
@@ -1904,7 +1937,8 @@ var pandora = new Ox.App({
 		                    { id: 'help', title: app.config.site.name + ' Help', keyboard: 'shift ?' }
 		                ] },
 		                { id: 'debugMenu', title: 'Debug', items: [
-		                    { id: 'query', title: 'Show Query' }
+		                    { id: 'query', title: 'Show Query' },
+		                    { id: 'resetui', title: 'Reset UI Settings'}
 		                ] },
 		                { id: 'testMenu', title: 'Test', items: [
 		                    { group: 'foogroup', items: [
@@ -2254,7 +2288,31 @@ var pandora = new Ox.App({
 		                            overflow: 'hidden'
 		                        }).append($manage).open();
 		                } else if (data.id == 'query') {
-		                    alert(JSON.stringify(Query.toObject()));
+		                    var $dialog = new Ox.Dialog({
+		                        buttons: [
+		                            new Ox.Button({
+		                                id: 'close',
+		                                title: 'Close'
+		                            }).bindEvent({
+		                                click: function() {
+		                                    $dialog.close();
+		                                }
+		                            })
+		                        ],
+		                        content: new Ox.Element()
+		                            .html([
+		                                'Query: ' + JSON.stringify(Query.toObject()),
+		                                'findQuery: ' + JSON.stringify(app.user.ui.findQuery),
+		                                'listQuery: ' + JSON.stringify(app.user.ui.listQuery)
+		                            ].join('<br/><br/>')),
+		                        height: 200,
+		                        keys: {enter: 'close', escape: 'close'},
+		                        width: 400
+		                    }).open();
+		                } else if (data.id == 'resetui') {
+		                    pandora.api.resetUI({}, function() {
+    		                    app.$ui.appPanel.reload();
+		                    });
 		                }
 		            }
 		        });
@@ -2652,7 +2710,7 @@ var pandora = new Ox.App({
     		                        type: data.id == 'new' ? 'static' : 'smart'
     		                    }, function(result) {
     		                        id = result.data.id;
-    		                        UI.set(['lists', id].join('|'), app.config.uiDefaults.list);
+    		                        UI.set(['lists', id].join('|'), app.config.user.ui.lists['']);
     		                        URL.set('?find=list:' + id)
             	                    Ox.Request.emptyCache(); // fixme: remove
     		                        $list.reloadList().bindEvent({load: load});
@@ -3215,10 +3273,21 @@ var pandora = new Ox.App({
 	    return {
 
 	        fromString: function(str) {
-	            var query = Ox.unserialize(str.substr(1)),
+	            var list = '',
+	                query = Ox.unserialize(str.substr(1)),
 	                sort = [];
 	            if ('find' in query) {
+	                app.user.ui.listQuery = {conditions: [], operator: ''}; // fixme: hackish
 	                app.user.ui.findQuery = parseFind(query.find);
+	                if (app.user.ui.listsQuery) {
+	                    list = app.user.ui.listsQuery.conditions[0].value;
+	                    UI.set({
+	                        list: list
+	                    });
+	                    !app.user.ui.lists[list] && UI.set(
+	                        'lists.' + list, app.config.user.ui.list
+	                    );
+	                }
 	                //Ox.print('user.ui.findQuery', app.user.ui.findQuery)
 	            }
 	            if ('sort' in query) {
@@ -3340,7 +3409,7 @@ var pandora = new Ox.App({
                     });
                     UI.set(['lists', app.user.ui.list, 'listView'].join('|'), url);
     			},
-                '^[0-9A-Z]': function() {
+                '^[0-9A-Z]': function(url) {
     				var split = url.split('/'),
 					    item = split[0],
 		        	    view = new RegExp(
@@ -3380,6 +3449,7 @@ var pandora = new Ox.App({
                     //Ox.print(url, 're', re)
                     re = new RegExp(re);
         			if (re(url)) {
+        			    Ox.print('URL re ' + re)
         				fn(url);
         				return false;
         			}

@@ -403,6 +403,24 @@ actions.register(setPreferences, cache=False)
 
 
 @login_required_json
+def resetUI(request):
+    '''
+        reset user ui settings to defaults
+        param data {
+        }
+
+        return {
+            'status': {'code': int, 'text': string}
+        }
+    '''
+    profile = request.user.get_profile()
+    profile.ui = {}
+    profile.save()
+    response = json_response()
+    return render_to_json_response(response)
+actions.register(resetUI, cache=False)
+
+@login_required_json
 def setUI(request):
     '''
         param data {
