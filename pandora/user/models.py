@@ -33,7 +33,17 @@ class UserProfile(models.Model):
         ui = {}
         config = site_config()
         ui.update(config['user']['ui'])
-        ui.update(self.ui)
+        def updateUI(ui, new):
+            '''
+                only update set keys in dicts
+            '''
+            for key in new:
+                if isinstance(new[key], dict) and key in ui:
+                    ui[key] = updateUI(ui[key], new[key])
+                else:
+                    ui[key] = new[key]
+            return ui
+        ui = updateUI(ui, self.ui)
         if not 'lists' in ui:
             ui['lists'] = {}
             ui['lists'][''] = config['uiDefaults']['list']

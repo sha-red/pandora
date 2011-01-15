@@ -409,14 +409,14 @@ def setUI(request):
             key.subkey: value
         }
         you can set nested keys
-            api.setUI({"lists.my.listView": "icons"})
+            api.setUI({"lists|my|ListView": "icons"})
 
         return {
             'status': {'code': int, 'text': string}
         }
     '''
     data = json.loads(request.POST['data'])
-    keys = data.keys()[0].split('.')
+    keys = data.keys()[0].split('|')
     value = data.values()[0]
     profile = request.user.get_profile()
     p = profile.ui
@@ -425,6 +425,8 @@ def setUI(request):
         if isinstance(p, list):
             p = p[getPositionById(p, key)]
         else:
+            if key not in p:
+                p[key] = {}
             p = p[key]
     p[keys[0]] = value
     profile.save()

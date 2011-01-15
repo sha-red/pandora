@@ -239,8 +239,13 @@ def autocomplete(request):
     op = data.get('operator', '')
 
     site_config = models.site_config()
+    order_by = site_config['_findKeys'].get(data['key'], {}).get('autocompleteSortKey', False)
+    if order_by:
+        order_by = '-sort__%s_desc' % order_by
+    else:
+        order_by = '-items'
     if site_config['keys'][data['key']]['type'] == 'title':
-        qs = models.Item.objects.filter(available=True) #does this need more limiting? user etc
+        qs = _parse_query({'query': data.get('query', {})}, request.user)['qs']
         if data['value']:
             if op == '':
                 qs = qs.filter(find__key=data['key'], find__value__icontains=data['value'])
@@ -248,7 +253,7 @@ def autocomplete(request):
                 qs = qs.filter(find__key=data['key'], find__value__istartswith=data['value'])
             elif op == '$':
                 qs = qs.filter(find__key=data['key'], find__value__iendswith=data['value'])
-        qs = qs.order_by('-sort__%s'%site_config['keys'][data['key']]['autocompleteSortKey'])
+        qs = qs.order_by(order_by)
         qs = qs[data['range'][0]:data['range'][1]]
         response = json_response({})
         response['data']['items'] = [i.get(data['key']) for i in qs]    
@@ -261,7 +266,8 @@ def autocomplete(request):
                 qs = qs.filter(value__istartswith=data['value'])
             elif op == '$':
                 qs = qs.filter(value__iendswith=data['value'])
-        qs = qs.values('value').annotate(items=Count('id')).order_by('-items')
+        qs = qs.values('value').annotate(items=Count('id'))
+        qs = qs.order_by(order_by)
         qs = qs[data['range'][0]:data['range'][1]]
         response = json_response({})
         response['data']['items'] = [i['value'] for i in qs]

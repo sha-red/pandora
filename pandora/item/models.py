@@ -343,7 +343,7 @@ class Item(models.Model):
         def save(key, value):
             f, created = ItemFind.objects.get_or_create(item=self, key=key)
             if value not in ('', '||'):
-                f.value = value
+                f.value = value.strip()
                 f.save()
             else:
                 f.delete()
@@ -785,6 +785,8 @@ class ItemFind(models.Model):
     key = models.CharField(max_length=200, db_index=True)
     value = models.TextField(blank=True)
 
+    def __unicode__(self):
+        return u"%s=%s" % (self.key, self.value)
 '''
 ItemSort
 table constructed based on info in site_config['sortKeys']

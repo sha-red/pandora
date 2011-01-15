@@ -1,7 +1,7 @@
 {
     "findKeys": [
         {"id": "all", "title": "All"},
-        {"id": "title", "title": "Title", "autocomplete": true},
+        {"id": "title", "title": "Title", "autocomplete": true, "autocompleteSortKey": "votes"},
         {"id": "director", "title": "Director", "autocomplete": true},
         {"id": "country", "title": "Country", "autocomplete": true},
         {"id": "year", "title": "Year", "autocomplete": true},
@@ -73,7 +73,7 @@
         {"id": "featured", "title": "Featured Lists"}
     ],
     "sortKeys": [
-        {"id": "title", "title": "Title", "width": 180, "removable": false, "type": "title", "autocompleteSortKey": "votes"},
+        {"id": "title", "title": "Title", "width": 180, "removable": false, "type": "title"},
         {"id": "director", "title": "Director", "width": 180, "removable": false, "type": "person"},
         {"id": "country", "title": "Country", "width": 120, "type": "string"},
         {"id": "year", "title": "Year", "width": 60, "type": "year"},

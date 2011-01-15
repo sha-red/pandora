@@ -29,4 +29,7 @@ def site_config():
         site_config['keys'] = {}
         for key in site_config['sortKeys']:
             site_config['keys'][key['id']] = key
+        site_config['_findKeys'] = {}
+        for key in site_config['findKeys']:
+            site_config['_findKeys'][key['id']] = key
     return site_config
