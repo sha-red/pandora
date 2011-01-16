@@ -34,7 +34,6 @@ var pandora = new Ox.App({
 
     if (app.user.group == 'guest') {
         app.user = $.extend({}, app.config.user);
-        $.browser.safari && Ox.theme('modern');
     }
 
 	function load() {
@@ -650,6 +649,12 @@ var pandora = new Ox.App({
 			return that;
 		},
 		findElement: function() {
+			var findKey = '',
+			    findValue = '';
+			if (app.user.ui.findQuery.conditions.length == 1) {
+			    findKey = app.user.ui.findQuery.conditions[0].key;
+			    findValue = app.user.ui.findQuery.conditions[0].value;
+			}
 			var that = new Ox.FormElementGroup({
                     elements: $.merge(app.user.ui.list ? [
                             app.$ui.findListSelect = new Ox.Select({
@@ -674,6 +679,7 @@ var pandora = new Ox.App({
                                     items: $.map(app.config.findKeys, function(key, i) {
                                         return {
                                             id: key.id,
+                                            checked: key.id == findKey,
                                             title: 'Find: ' + key.title
                                         };
                                     }),
@@ -683,7 +689,7 @@ var pandora = new Ox.App({
                                 .bindEvent({
                                     change: function(event, data) {
                                         var key = data.selected[0].id;
-                                        if (!app.user.ui.findQuery.conditions.length) {
+                                        if (!app.user.ui.findQuery.conditions.length) { // fixme: can this case happen at all?
                                             app.user.ui.findQuery.conditions = [{key: key, value: '', operator: ''}];
                                         } else {
                                             app.user.ui.findQuery.conditions[0].key = key;
@@ -702,47 +708,26 @@ var pandora = new Ox.App({
                                 autocompleteSelectSubmit: true,
                                 clear: true,
                                 id: 'input',
+                                value: findValue,
                                 width: 192
                             })
                             .bindEvent({
                                 submit: function(event, data) {
                                     var key = app.user.ui.findQuery.conditions.length ?
-                                            app.user.ui.findQuery.conditions[0].key : '',
-                                        query;
-                                    if (that.value()[0].id == 'all') { // fixme: ambiguous?
+                                            app.user.ui.findQuery.conditions[0].key : '';
+                                    if (app.user.ui.list && that.value()[0].id == 'all') {
                                         app.$ui.sectionList.forEach(function($list) {
                                             $list.options({selected: []});
-                                        }); // fixme: doesn't cover complex lists
-                                        app.user.ui.list = '';
+                                        });
+                                        UI.set({list: ''});
                                         app.user.ui.listQuery = {conditions: [], operator: ''};
                                     }
-                                    app.user.ui.findQuery.conditions = [
-                                        {
-                                            key: key == 'all' ? '' : key,
-                                            value: data.value,
-                                            operator: ''
-                                        }
-                                    ];
-                                    $.each(app.ui.groups, function(i, group) {
-                                        group.query.conditions = [];
-                                        app.$ui.groups[i].options({
-                                            request: function(data, callback) {
-                                                delete data.keys;
-                                                return pandora.api.find($.extend(data, {
-                                                    group: group.id,
-                                                    query: Query.toObject(group.id)
-                                                }), callback);
-                                            }
-                                        });
-                                    });
-                                    app.$ui.list.options({
-                                        request: function(data, callback) {
-                                            return pandora.api.find($.extend(data, {
-                                                query: query = Query.toObject()
-                                            }), callback);
-                                        }
-                                    });
-                                    history.pushState({}, '', '/' + Query.toString(query));
+                                    app.user.ui.findQuery.conditions = [{
+                                        key: key == 'all' ? '' : key,
+                                        value: data.value,
+                                        operator: ''
+                                    }];
+                                    URL.set(Query.toString());
                                 }
                             })
                     ]),
@@ -754,17 +739,15 @@ var pandora = new Ox.App({
                 });
             function autocompleteFunction() {
                 return app.user.ui.findQuery.conditions.length ? function(value, callback) {
-                    var key = that.value()[app.user.ui.list ? 1 : 0].id,
+                    var elementValue = that.value(),
+                        key = elementValue[app.user.ui.list ? 1 : 0].id,
                         findKey = Ox.getObjectById(app.config.findKeys, key);
                     Ox.print('!!!!', key, findKey, 'autocomplete' in findKey && findKey.autocomplete)
                     value === '' && Ox.print('Warning: autocomplete function should never be called with empty value');
                     if ('autocomplete' in findKey && findKey.autocomplete) {
                         pandora.api.autocomplete({
                             key: key,
-                            query: that.value()[0].id == 'list' ? {
-                                conditions: $.merge($.merge([], app.user.ui.listQuery.conditions), app.user.ui.findQuery.conditions),
-                                operator: '&'
-                            } : app.user.ui.findQuery,
+                            query: elementValue[0].id == 'list' ? app.user.ui.listQuery : {conditions: [], operator: ''},
                             range: [0, 20],
                             sort: [{
                                 key: 'votes',
@@ -2443,7 +2426,7 @@ var pandora = new Ox.App({
                     },
                     {
                         format: function(value) {
-                            return value.split('.').join(': ');
+                            return value.split('/').join(': ');
                         },
                         id: 'id',
                         operator: '+',
@@ -2649,10 +2632,10 @@ var pandora = new Ox.App({
                         app.$ui.sectionList.forEach(function($list, i_) {
     	                    i != i_ && $list.options('selected', []);
     	                });
-                        UI.set({list: listId});
+                        //UI.set({list: listId});
     	                URL.set('?find=list:' + listId);
                     } else {
-                        UI.set({list: ''});
+                        //UI.set({list: ''});
                         URL.set('');
                     }
 	            },
@@ -3279,15 +3262,13 @@ var pandora = new Ox.App({
 	            if ('find' in query) {
 	                app.user.ui.listQuery = {conditions: [], operator: ''}; // fixme: hackish
 	                app.user.ui.findQuery = parseFind(query.find);
-	                if (app.user.ui.listsQuery) {
-	                    list = app.user.ui.listsQuery.conditions[0].value;
-	                    UI.set({
-	                        list: list
-	                    });
+	                if (app.user.ui.listQuery.conditions.length) {
+	                    list = app.user.ui.listQuery.conditions[0].value;
 	                    !app.user.ui.lists[list] && UI.set(
-	                        'lists.' + list, app.config.user.ui.list
+	                        ['lists', list].join('|'), app.config.user.ui.lists['']
 	                    );
 	                }
+	                UI.set({list: list});
 	                //Ox.print('user.ui.findQuery', app.user.ui.findQuery)
 	            }
 	            if ('sort' in query) {
@@ -3398,7 +3379,6 @@ var pandora = new Ox.App({
                     Query.fromString('?find='); // fixme: silly hack
                     UI.set({
                         section: 'items',
-                        list: '',
                         item: ''
                     });
     			},

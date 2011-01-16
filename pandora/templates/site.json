@@ -148,6 +148,7 @@
         "preferences": {},
         "ui": {
             "annotationsSize": 256,
+            "findKey": "",
             "findQuery": {"conditions": [], "operator": ""},
             "groups": ["director", "country", "year", "language", "genre"],
             "groupsQuery": {"conditions": [], "operator": "|"},

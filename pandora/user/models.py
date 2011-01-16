@@ -61,9 +61,11 @@ class UserProfile(models.Model):
                     pos.position = qs.aggregate(Max('position'))['position__max'] + 1
                     pos.save()
                 id = l.get_id()
+                '''
                 if id not in ui['lists']:
                     ui['lists'][id] = {}
                     ui['lists'][id].update(ui['lists'][''])
+                '''
                 ids.append(id)
             return ids
 
