@@ -491,6 +491,12 @@ def timeline(request, id, timeline, size, position):
     return HttpFileResponse(timeline, content_type='image/png')
 
 
+def timeline_overview(request, id, size):
+    item = get_object_or_404(models.Item, itemId=id)
+    timeline = '%s.%s.png' %(item.timeline_prefix, size)
+    return HttpFileResponse(timeline, content_type='image/png')
+
+
 def video(request, id, profile):
     item = get_object_or_404(models.Item, itemId=id)
     stream = get_object_or_404(item.streams, profile=profile)

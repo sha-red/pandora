@@ -190,6 +190,8 @@ DEFAULT_LISTS = [
     }
 ]
 #0xdb.org
+USE_IMDB = True
+
 #POSTER_SERVICES=['http://data.0xdb.org/poster/']
 
 #copy scripts and adjust to customize

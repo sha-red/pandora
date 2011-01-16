@@ -19,9 +19,9 @@ def update_poster(itemId):
 
 
 @task(ignore_resulsts=True, queue='default')
-def update_imdb(itemId):
+def update_external(itemId):
     item = models.Item.objects.get(itemId=itemId)
-    item.update_imdb()
+    item.update_external()
 
 
 @task(queue="encoding")

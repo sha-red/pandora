@@ -24,7 +24,8 @@ class List(models.Model):
     _status = ['private', 'public', 'featured']
     query = DictField(default={"static": True})
     type= models.CharField(max_length=255, default='static')
-    
+    description = models.TextField(default='')
+
     icon = models.ImageField(default=None, blank=True, upload_to=lambda i, x: i.path("icon.jpg"))
 
     #is through table still required?

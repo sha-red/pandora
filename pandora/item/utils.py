@@ -184,7 +184,7 @@ def parse_path(path):
     r['oxdbId'] = oxdb_id(r['title'], r['directors'], r.get('year', ''),
                           r.get('season', ''), r.get('episode', ''),
                           episode_title=r['episode_title'],
-                          episode_directors=[],
+                          episode_director=[],
                           episode_year='')
     return r
 

@@ -33,46 +33,54 @@ def get_item(info):
         info dict with:
             imdbId, title, director, episode_title, season, series
     '''
-    if 'imdbId' in info and info['imdbId']:
-        try:
-            item = Item.objects.get(itemId=info['imdbId'])
-        except Item.DoesNotExist:
-            item = Item(itemId=info['imdbId'])
-            if 'title' in info and 'director' in info:
-                item.external_data = {
-                    'title': info['title'],
-                    'director': info['director'],
-                    'year': info.get('year', '')
-                }
-            #FIXME: this should be done async
-            item.save()
-            tasks.update_imdb.delay(item.itemId)
-            #item.update_imdb()
-    else:
-        q = Item.objects.filter(find__key='title', find__value=info['title'])
-        if q.count() > 1:
-            print "FIXME: check more than title here!!?"
-            item = q[0]
-        else:
+    if settings.USE_IMDB:
+        if 'imdbId' in info and info['imdbId']:
             try:
-                item = Item.objects.get(itemId=info['oxdbId'])
+                item = Item.objects.get(itemId=info['imdbId'])
             except Item.DoesNotExist:
-                item = Item()
-                item.data = {
-                    'title': info['title'],
-                    'director': info['director'],
-                    'year': info.get('year', '')
-                }
-                item.itemId = info['oxdbId']
-
-                for key in ('episode_title', 'series_title', 'season', 'episode'):
-                    if key in info and info[key]:
-                        item.data[key] = info[key]
+                item = Item(itemId=info['imdbId'])
+                if 'title' in info and 'director' in info:
+                    item.external_data = {
+                        'title': info['title'],
+                        'director': info['director'],
+                        'year': info.get('year', '')
+                    }
+                #FIXME: this should be done async
+                item.save()
+                tasks.update_external.delay(item.itemId)
+                #item.update_external()
+        else:
+            q = Item.objects.filter(find__key='title', find__value=info['title'])
+            if q.count() > 1:
+                print "FIXME: check more than title here!!?"
+                item = q[0]
+            else:
                 try:
-                    existing_item = Item.objects.get(oxdbId=item.oxdb_id())
-                    item = existing_item
+                    item = Item.objects.get(itemId=info['oxdbId'])
                 except Item.DoesNotExist:
-                    item.save()
+                    item = Item()
+                    item.data = {
+                        'title': info['title'],
+                        'director': info['director'],
+                        'year': info.get('year', '')
+                    }
+                    item.itemId = info['oxdbId']
+
+                    for key in ('episode_title', 'series_title', 'season', 'episode'):
+                        if key in info and info[key]:
+                            item.data[key] = info[key]
+                    try:
+                        existing_item = Item.objects.get(oxdbId=item.oxdb_id())
+                        item = existing_item
+                    except Item.DoesNotExist:
+                        item.save()
+    else:
+        try:
+            item = Item.objects.get(itemId=info['itemId'])
+        except Item.DoesNotExist:
+            item = Item(itemId=info['itemId'])
+            item.save()
+
     return item
 
 
@@ -130,7 +138,7 @@ class Item(models.Model):
                     _reviews[settings.REVIEW_WHITELIST[url]] = r[0]
         return _reviews
 
-    def update_imdb(self):
+    def update_external(self):
         if len(self.itemId) == 7:
             data = ox.web.imdb.Imdb(self.itemId)
             #FIXME: all this should be in ox.web.imdb.Imdb
@@ -343,7 +351,9 @@ class Item(models.Model):
         def save(key, value):
             f, created = ItemFind.objects.get_or_create(item=self, key=key)
             if value not in ('', '||'):
-                f.value = value.strip()
+                if isinstance(value, basestring):
+                    value = value.strip()
+                f.value = value
                 f.save()
             else:
                 f.delete()
@@ -730,7 +740,7 @@ class Item(models.Model):
                        '-l', timeline,
                        '-p', poster
                       ]
-                if len(self.itemId) == 7:
+                if settings.USE_IMDB and len(self.itemId) == 7:
                     cmd += ['-i', self.itemId]
                 cmd += ['-o', self.oxdbId]
                 p = subprocess.Popen(cmd)
