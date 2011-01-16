@@ -83,7 +83,7 @@ def parseCondition(condition):
         return q
     elif key_type == 'list':
         q = Q(itemId=False)
-        l = v.split(".")
+        l = v.split("/")
         if len(l) == 2:
             lqs = list(List.objects.filter(name=l[1], user__username=l[0]))
             if len(lqs) == 1:

@@ -13,7 +13,7 @@ from item import utils
 from item.models import Item
 
 def get_list_or_404_json(id):
-    username, listname = id.split('.')
+    username, listname = id.split('/')
     return get_object_or_404_json(models.List, user__username=username, name=listname)
 
 def _order_query(qs, sort):
