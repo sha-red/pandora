@@ -36,6 +36,13 @@ def parseCondition(condition, user):
         exclude = True
     else:
         exclude = False
+    if k == 'id':
+        v = v.split('/')
+        if len(v) == 2:
+            q = Q(user__username=v[0], name=v[1])
+        else:
+            q = Q(id__in=[])
+        return q
     if k == 'subscribed':
         key = 'subscribed_users__username'
         v = user.username

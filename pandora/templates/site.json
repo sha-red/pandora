@@ -39,13 +39,14 @@
         {"id": "info", "title": "Info"},
         {"id": "statistics", "title": "Statistics"},
         {"id": "clips", "title": "Clips"},
+        {"id": "player", "title": "Player"},
         {"id": "timeline", "title": "Timeline"},
         {"id": "map", "title": "Map"},
         {"id": "calendar", "title": "Calendar"},
         {"id": "files", "title": "Files", "admin": true}
     ],
     "layers": [
-        {"id": "privatenotes", "title": "Private Notes", "type": "text"},
+        {"id": "privatenotes", "title": "Private Notes", "type": "text", "private": true},
         {"id": "publicnotes", "title": "Public Notes", "type": "text"}
     ],
     "listViews": [
@@ -171,6 +172,7 @@
             "section": "items",
             "sections": ["my", "public", "featured"],
             "showAnnotations": true,
+            "showControls": true,
             "showGroups": true,
             "showInfo": true,
             "showMovies": true,
@@ -182,7 +184,8 @@
             "showSidebar": true,
             "sidebarSize": 256,
             "sitePage": "home",
-            "theme": "modern"
+            "theme": "modern",
+            "videoSize": "fit"
         },
         "username": ""
     }

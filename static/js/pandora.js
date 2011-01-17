@@ -14,7 +14,7 @@ var pandora = new Ox.App({
 			$ui: {
 				body: $('body'),
 				document: $(document),
-				window: $(window)
+				window: $(window).resize(resizeWindow)
 			},
 			config: data.config,
 			requests: {},
@@ -38,50 +38,23 @@ var pandora = new Ox.App({
 
 	function load() {
 
-        $(function() {
-            // fixme: use jquery ajaxStart?
-            var $body = $('body');
-    	    Ox.Request.requests() && app.$ui.loadingIcon.start();
-    	    $body.bind('requestStart', function() {
-    	        //Ox.print('requestStart')
-    	        app.$ui.loadingIcon && app.$ui.loadingIcon.start();
-    	    });
-    	    $body.bind('requestStop', function() {
-    	        //Ox.print('requestStop')
-    	        app.$ui.loadingIcon && app.$ui.loadingIcon.stop();
-    	    });
-        });
-
-		//Query.fromString(location.hash.substr(1));
-
 	    URL.parse();
 	    window.onpopstate = function() {
 	        URL.update();
 	    };
 
 		app.$ui.appPanel = ui.appPanel();
-		app.$ui.appPanel.display();	    
 
-        app.ui.sectionButtonsWidth = app.$ui.sectionButtons.width() + 8;
+        $(function() {
 
-        app.$ui.window.resize(function() {
-            resizeSections();
-            if (app.user.ui.item == '') {
-                app.$ui.list.size();
-                resizeGroups(app.$ui.rightPanel.width());
-                if (app.user.ui.listView == 'map') {
-                    app.$ui.map.triggerResize();
-                }
-            } else {
-                //Ox.print('app.$ui.window.resize');
-                app.$ui.browser.scrollToSelection();
-                app.user.ui.itemView == 'timeline' && app.$ui.editor.options({
-					height: app.$ui.document.height() -
-					        20 - 24 - app.$ui.contentPanel.size(0) - 1 - 16,
-                    width: app.$ui.document.width() -
-                            app.$ui.mainPanel.size(0) - app.$ui.item.size(1) - 2
-                });
-            }
+    		app.$ui.appPanel.display();	    
+
+    	    Ox.Request.requests() && app.$ui.loadingIcon.start();
+    	    app.$ui.body.ajaxStart(app.$ui.loadingIcon.start);
+    	    app.$ui.body.ajaxStop(app.$ui.loadingIcon.stop);
+
+            app.ui.sectionButtonsWidth = app.$ui.sectionButtons.width() + 8;
+
         });
 
 	}
@@ -963,6 +936,8 @@ var pandora = new Ox.App({
             var that;
             if (app.user.ui.itemView == 'info') {
                 that = new Ox.Element('div');
+            } else if (app.user.ui.itemView == 'player') {
+                that = new Ox.Element('div');
             } else if (app.user.ui.itemView == 'timeline') {
                 that = new Ox.SplitPanel({
                     elements: [
@@ -992,6 +967,36 @@ var pandora = new Ox.App({
                                 .append($.tmpl(template, result.data.item))
                             );
                         });
+                    } else if (app.user.ui.itemView == 'player') {
+                        var video = result.data.item.stream,
+                            subtitles = result.data.item.layers.subtitles;
+                        video.height = 96;
+    		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
+    		            video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
+                        app.$ui.contentPanel.replace(1, app.$ui.player = new Ox.VideoPanelPlayer({
+                            annotationsSize: app.user.ui.annotationsSize,
+                            duration: video.duration,
+                            height: app.$ui.contentPanel.size(1),
+                            showAnnotations: app.user.ui.showAnnotations,
+                            showControls: app.user.ui.showControls,
+    		                videoHeight: video.height,
+    		                videoId: app.user.ui.item,
+    		                videoWidth: video.width,
+    		                videoSize: app.user.ui.videoSize,
+    		                videoURL: video.url,
+    		                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1
+                        }).bindEvent({
+                            change: function(event, data) {
+                                // showAnnotations, showControls, videoSize
+                                UI.set(data);
+                            }
+                        }))/*.bindEvent({
+                            resize: function(event, data) {
+        						app.$ui.player.options({
+        						    height: data
+        						});
+                            }
+                        })*/;
                     } else if (app.user.ui.itemView == 'timeline') {
                         var video = result.data.item.stream,
     		                cuts = result.data.item.layers.cuts || {},
@@ -1318,7 +1323,18 @@ var pandora = new Ox.App({
 		            });
 		    }
 
-		    ['list', 'icons'].indexOf(view) > -1 && that.bindEvent({
+		    ['list', 'icons'].indexOf(view) > -1 && that.bind({
+		        dragstart: function(e) {
+		            app.$ui.sectionList.forEach(function($list, i) {
+		                $list.addClass('OxDrop');
+		            });
+		        },
+		        dragend: function(e) {
+		            app.$ui.sectionList.forEach(function($list, i) {
+		                $list.removeClass('OxDrop');
+		            });
+		        },
+		    }).bindEvent({
 		        closepreview: function(event, data) {
 		            app.$ui.previewDialog.close();
 		            delete app.$ui.previewDialog;
@@ -1346,8 +1362,9 @@ var pandora = new Ox.App({
 		            app.$ui.selected.html(ui.status('selected', data));
 		        },
 		        open: function(event, data) {
-		            var id = data.ids[0];
-		            URL.set(id);
+		            var id = data.ids[0],
+		                title = that.value(id, 'title');
+		            URL.set(title, id);
 		        },
 		        openpreview: function(event, data) {
 		            app.requests.preview && pandora.api.cancel(app.requests.preview);
@@ -1770,7 +1787,7 @@ var pandora = new Ox.App({
 			var isGuest = app.user.group == 'guest',
 			    that = new Ox.MainMenu({
 		            extras: [
-		                $('<div>').html('beta').css({marginRight: '4px'}),
+		                $('<div>').html('beta').css({marginRight: '8px', color: 'rgb(128, 128, 128)'}),
 		                app.$ui.loadingIcon = new Ox.LoadingIcon({
 		                    size: 'medium'
 		                })
@@ -2372,6 +2389,9 @@ var pandora = new Ox.App({
                     }
                 } else {
                     app.$ui.browser.scrollToSelection();
+                    app.user.ui.itemView == 'player' && app.$ui.player.options({
+    					width: data
+    				});
                     app.user.ui.itemView == 'timeline' && app.$ui.editor.options({
     					width: data - (app.user.ui.showAnnotations * app.user.ui.annotationsSize) - 1
     				});
@@ -2455,8 +2475,6 @@ var pandora = new Ox.App({
                     },
                     {
                         clickable: function(data) {
-                            //alert(JSON.stringify([data.user, data.type]))
-                            //Ox.print('$$$$$$$$', data.user, data.type)
                             return data.type == 'smart';
                         },
                         format: function(value) {
@@ -2628,14 +2646,11 @@ var pandora = new Ox.App({
                 select: function(event, data) {
                     var $list = app.$ui.sectionList[i];
                     if (data.ids.length) {
-                        var listId = data.ids[0];
                         app.$ui.sectionList.forEach(function($list, i_) {
     	                    i != i_ && $list.options('selected', []);
     	                });
-                        //UI.set({list: listId});
-    	                URL.set('?find=list:' + listId);
+    	                URL.set('?find=list:' + data.ids[0]);
                     } else {
-                        //UI.set({list: ''});
                         URL.set('');
                     }
 	            },
@@ -2798,10 +2813,10 @@ var pandora = new Ox.App({
             		        that.append($section);
             		    });
             		    resizeSections();
+            		    //selectList(); fixme: doesn't work
                     }
                     app.$ui.sectionList[i].unbindEvent({init: init}); // fixme: need bindEventOnce
 	            }
-	            app.$ui.sectionList[i]
 		    });
 			that.toggle = function() {
 				
@@ -3084,18 +3099,6 @@ var pandora = new Ox.App({
         history.pushState({}, '', Query.toString(query));
     }
 
-    function resizeGroups(width) {
-        var widths = $.map(app.ui.groups, function(v, i) {
-            return getGroupWidth(i, width);
-        });
-        //Ox.print('widths', widths);
-        app.$ui.browser.size(0, widths[0].list).size(2, widths[4].list);
-        app.$ui.groupsInnerPanel.size(0, widths[1].list).size(2, widths[3].list);
-        $.each(app.$ui.groups, function(i, list) {
-            list.resizeColumn('name', widths[i].column);
-        });
-    }
-
     function reloadList() {
         Ox.print('reloadList')
         var listData = getListData();
@@ -3115,6 +3118,43 @@ var pandora = new Ox.App({
             app.$ui.list.gainFocus().options({selected: [data.items]});
             app.$ui.list.unbindEvent({load: load}); // fixme: need bindEventOnce
         }
+    }
+
+    function resizeGroups(width) {
+        var widths = $.map(app.ui.groups, function(v, i) {
+            return getGroupWidth(i, width);
+        });
+        //Ox.print('widths', widths);
+        app.$ui.browser.size(0, widths[0].list).size(2, widths[4].list);
+        app.$ui.groupsInnerPanel.size(0, widths[1].list).size(2, widths[3].list);
+        $.each(app.$ui.groups, function(i, list) {
+            list.resizeColumn('name', widths[i].column);
+        });
+    }
+
+    function resizeWindow() {
+        resizeSections();
+        if (app.user.ui.item == '') {
+            app.$ui.list.size();
+            resizeGroups(app.$ui.rightPanel.width());
+            if (app.user.ui.listView == 'map') {
+                app.$ui.map.triggerResize();
+            }
+        } else {
+            //Ox.print('app.$ui.window.resize');
+            app.$ui.browser.scrollToSelection();
+            app.user.ui.itemView == 'player' && app.$ui.player.options({
+                // fixme: duplicated
+				height: app.$ui.contentPanel.size(1),
+                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1
+            });
+            app.user.ui.itemView == 'timeline' && app.$ui.editor.options({
+                // fixme: duplicated
+				height: app.$ui.contentPanel.size(1),
+                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1 -
+		            (app.user.ui.showAnnotations * app.user.ui.annotationsSize) - 1 
+            });
+        }        
     }
 
     function resizeSections() {
@@ -3140,6 +3180,38 @@ var pandora = new Ox.App({
                 app.$ui.section[i].update();
             }
         });
+    }
+
+    function selectList() {
+        if (app.user.ui.list) {
+	        pandora.api.findLists({
+	            keys: ['status', 'user'],
+	            query: {
+	                conditions: [{key: 'id', value: app.user.ui.list, operator: '='}],
+	                operator: ''
+	            },
+	            range: [0, 1]
+	        }, function(result) {
+	            var list, section = -1;
+	            if (result.data.items.length) {
+	                list = result.data.items[0]
+	                if (list.user == app.user.username) {
+	                    section = list.status == 'featured' ? 2 : 0
+	                } else {
+	                    section = 1;
+	                }
+	            }
+	            if (section > -1) {
+	                app.$ui.sectionList[section]
+	                    .options('selected', [app.user.ui.list])
+	                    .gainFocus();
+	            } else {
+	                app.user.ui.list = '';
+	                //app.user.ui.listQuery.conditions = []; // fixme: Query should read from ui.list, and not need ui.listQuery to be reset
+	                //URL.set(Query.toString());
+	            }
+	        })
+	    }
     }
 
     function validateUser(key, existing) {
@@ -3415,8 +3487,11 @@ var pandora = new Ox.App({
 
         return {
 
-            set: function(url) {
-                history.pushState({}, '', '/' + url);
+            set: function(title, url) {
+                if (arguments.length == 1) { // fixme: remove later
+                    url = title;
+                }
+                history.pushState({}, app.config.site.name + (title ? ' - ' + title : ''), '/' + url);
                 old.user.ui = $.extend({}, app.user.ui); // make a clone
                 URL.update();
             },
