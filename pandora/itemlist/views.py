@@ -215,6 +215,8 @@ def addList(request):
             if not request.user.is_staff and value == 'featured':
                 value = 'private'
             setattr(list, key, value)
+        elif key == 'description':
+            list.description = data['description']
     list.save()
 
     if list.status == 'featured':
@@ -313,6 +315,8 @@ def editList(request):
                     num += 1
                     name = data['name'] + ' (%d)' % num
                 list.name = name
+            elif key == 'description':
+                list.description = data['description']
 
         if 'position' in data:
             pos, created = models.Position.objects.get_or_create(list=list, user=request.user)

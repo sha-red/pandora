@@ -652,6 +652,7 @@ class Item(models.Model):
             stream.extract_derivatives()
             self.make_local_posters()
             self.make_poster()
+            self.make_icon()
             self.available = True
             self.save()
 

@@ -10,7 +10,7 @@ import models
 from api.actions import actions
 
 
-def findAnnotation(request):
+def findAnnotations(request):
     '''
         param data {
             fixme
@@ -29,7 +29,7 @@ def findAnnotation(request):
     qs = models.Annotations.objects.filter(item__itemId=data['item'])
     response['data']['annotations'] = [a.json() for a in qs]
     return render_to_json_response(response)
-actions.register(findAnnotation)
+actions.register(findAnnotations)
 
 
 @login_required_json

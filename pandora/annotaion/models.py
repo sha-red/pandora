@@ -13,20 +13,23 @@ class Layer(models.Model):
     class Meta:
         ordering = ('position', )
 
+    enabled = models.BooleanField(default=True)
+
     name = models.CharField(null=True, max_length=255, unique=True)
     title = models.CharField(null=True, max_length=255)
-    #text, string, string from list(fixme), event, place, person
+    #text, string, string from list(fixme), date, place, person, pingback,
+    #What about: smart layers? for date, place, person
     type = models.CharField(null=True, max_length=255)
+
+    #can this be changed per user?
     position = models.IntegerField(default=0)
 
-    overlapping = models.BooleanField(default=True)
-    enabled = models.BooleanField(default=True)
-
-    enabled = models.BooleanField(default=True)
+    overlap = models.BooleanField(default=True)
+    overlay = models.BooleanField(default=True)
     public = models.BooleanField(default=True)   #false=users only see there own bins
-    subtitle = models.BooleanField(default=True) #bis can be displayed as subtitle, only one bin
 
-    find = models.BooleanField(default=True)
+    #find/sort integration
+    find = models.BooleanField(default=True) #true part of find all
     #words / item duration(wpm), total words, cuts per minute, cuts, number of annotations, number of annotations/duration
     sort = models.CharField(null=True, max_length=255)
 
@@ -55,7 +58,7 @@ class Annotation(models.Model):
 
     #seconds
     start = models.FloatField(default=-1)
-    stop = models.FloatField(default=-1)
+    end = models.FloatField(default=-1)
 
     layer = models.ForeignKey(Layer)
     value = models.TextField()
@@ -74,16 +77,19 @@ class Annotation(models.Model):
         else:
             return self.value
 
+    def get_id(self):
+        return ox.to32(self.id)
+
     def json(self):
         return {
-            'id': self.id,
+            'id': self.get_id(),
             'user': self.user.username,
             'start': self.start,
-            'stop': self.start,
+            'end': self.end,
             'value': self.value,
             'value_html': self.html(),
             'layer': self.layer.name
         }
 
     def __unicode__(self):
-        return "%s/%s-%s" %(self.item, self.start, self.stop)
+        return u"%s/%s-%s" %(self.item, self.start, self.end)
