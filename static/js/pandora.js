@@ -979,6 +979,7 @@ var pandora = new Ox.App({
                             height: app.$ui.contentPanel.size(1),
                             showAnnotations: app.user.ui.showAnnotations,
                             showControls: app.user.ui.showControls,
+                            subtitles: subtitles,
     		                videoHeight: video.height,
     		                videoId: app.user.ui.item,
     		                videoWidth: video.width,
@@ -989,7 +990,9 @@ var pandora = new Ox.App({
                             change: function(event, data) {
                                 // showAnnotations, showControls, videoSize
                                 UI.set(data);
-                            }
+                            },
+                            enterfullscreen: enterFullscreen,
+                            exitfullscreen: exitFullscreen
                         }))/*.bindEvent({
                             resize: function(event, data) {
         						app.$ui.player.options({
@@ -1053,6 +1056,7 @@ var pandora = new Ox.App({
     	                });
     	                */    		            
                     }
+                    app.$ui.total.html(result.data.item.title + ' (' + result.data.item.director.join(', ') + ')')
 		        });
             }
             that.display = function() {
@@ -3017,6 +3021,30 @@ var pandora = new Ox.App({
             }
         })
         callback(value);
+    }
+
+    function enterFullscreen() {
+        app.$ui.appPanel.size(0, 0);
+        app.user.ui.showSidebar && app.$ui.mainPanel.size(0, 0);
+        app.$ui.rightPanel.size(0, 0).size(2, 0);
+        !app.user.ui.showMovies && app.$ui.contentPanel.css({
+            top: (-112 - app.ui.scrollbarSize) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
+        });
+        app.user.ui.showMovies && app.$ui.contentPanel.size(0, 0);
+        app.$ui.player.options({
+            height: app.$document.height() - 2,
+            width: app.$document.width() - 2
+        })
+    }
+
+    function exitFullscreen() {
+        app.$ui.appPanel.size(0, 20);
+        app.user.ui.showSidebar && app.$ui.mainPanel.size(0, app.user.ui.sidebarSize);
+        app.$ui.rightPanel.size(0, 24).size(2, 16);
+        !app.user.ui.showMovies && app.$ui.contentPanel.css({
+            top: 24 + (-112 - app.ui.scrollbarSize) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
+        });
+        app.user.ui.showMovies && app.$ui.contentPanel.size(0, 112 + app.ui.scrollbarSize);
     }
 
     function getAlignment(key) { // fixme: make static
