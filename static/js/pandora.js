@@ -3560,16 +3560,16 @@ var pandora = new Ox.App({
                             //ui.item().display();
                         }
                     } else {
+                        if (['player', 'timeline'].indexOf(old.user.ui.itemView) > -1) {
+                            UI.set(
+                                'videoPosition|' + old.user.ui.item,
+                                app.$ui[old.user.ui.itemView == 'player' ? 'player' : 'editor'].options('position')
+                            );
+                        }
                         if (!app.user.ui.item) {
                             app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
                             //ui.list(app.user.ui.listView).display();
                         } else {
-                            if (['player', 'timeline'].indexOf(old.user.ui.itemView) > -1) {
-                                UI.set(
-                                    'videoPosition|' + old.user.ui.item,
-                                    app.$ui[old.user.ui.itemView == 'player' ? 'player' : 'editor'].options('position')
-                                );
-                            }
                             app.$ui.contentPanel.replace(1, ui.item());
                         }
                     }
