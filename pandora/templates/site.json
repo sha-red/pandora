@@ -185,6 +185,7 @@
             "sidebarSize": 256,
             "sitePage": "home",
             "theme": "modern",
+            "videoPosition": {},
             "videoSize": "fit"
         },
         "username": ""

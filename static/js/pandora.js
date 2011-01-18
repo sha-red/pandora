@@ -32,6 +32,10 @@ var pandora = new Ox.App({
 
     pandora.app = app; // remove later
 
+    if ($.browser.mozilla) {
+        app.config.user.ui.theme = 'classic'
+    }
+
     if (app.user.group == 'guest') {
         app.user = $.extend({}, app.config.user);
     }
@@ -43,6 +47,7 @@ var pandora = new Ox.App({
 	        URL.update();
 	    };
 
+        Ox.theme(app.user.ui.theme);
 		app.$ui.appPanel = ui.appPanel();
 
         $(function() {
@@ -61,13 +66,13 @@ var pandora = new Ox.App({
 
     function login(data) {
         app.user = data.user;
-        //Ox.Event.unbindAll();
+        Ox.theme(app.user.ui.theme);
         app.$ui.appPanel.reload();
     }
 
     function logout(data) {
         app.user = data.user;
-        //Ox.Event.unbindAll();
+        Ox.theme(app.config.user.ui.theme);
         app.$ui.appPanel.reload();
     }
 
@@ -977,6 +982,7 @@ var pandora = new Ox.App({
                             annotationsSize: app.user.ui.annotationsSize,
                             duration: video.duration,
                             height: app.$ui.contentPanel.size(1),
+                            position: app.user.ui.videoPosition[app.user.ui.item] || 0,
                             showAnnotations: app.user.ui.showAnnotations,
                             showControls: app.user.ui.showControls,
                             subtitles: subtitles,
@@ -1023,7 +1029,7 @@ var pandora = new Ox.App({
     		                largeTimeline: true,
     		                matches: [],
     		                points: [0, 0],
-    		                position: 0,
+                            position: app.user.ui.videoPosition[app.user.ui.item] || 0,
     		                posterFrame: parseInt(video.duration / 2),
     		                subtitles: subtitles,
     		                videoHeight: video.height,
@@ -1059,6 +1065,7 @@ var pandora = new Ox.App({
                     app.$ui.total.html(result.data.item.title + ' (' + result.data.item.director.join(', ') + ')')
 		        });
             }
+            /*
             that.display = function() {
                 app.$ui.contentPanel.replaceElements([
                     {
@@ -1073,6 +1080,7 @@ var pandora = new Ox.App({
 	            ]);
 	            getItem(); // fixme: can the asynchronicity be moved within the video editor?
             }
+            */
             return that;
         },
 		leftPanel: function() {
@@ -2960,14 +2968,13 @@ var pandora = new Ox.App({
                     change: !app.user.ui.item ? function(event, data) {
                         var id = data.selected[0].id;
                         app.$ui.mainMenu.checkItem('viewMenu_movies_' + id);
-                        //app.$ui.contentPanel.replace(1, app.$ui.list = ui.list(id));
                         UI.set(['lists', app.user.ui.list, 'listView'].join('|'), id);
                         URL.set(Query.toString());
                     } : function(event, data) {
                         var id = data.selected[0].id;
-                        UI.set({itemView: id});
-                        // fixme: URL.set() here
-                        app.$ui.contentPanel.replace(1, app.$ui.item = ui.item());
+                        //UI.set({itemView: id});
+                        URL.set(app.user.ui.item + '/' + id);
+                        // app.$ui.contentPanel.replace(1, app.$ui.item = ui.item());
                     }
                 });
 			return that;
@@ -3494,7 +3501,8 @@ var pandora = new Ox.App({
 					    item = split[0],
 		        	    view = new RegExp(
 		        	        '^(calendar|clips|files|info|map|player|statistics|timeline)$'
-		        	    )(split[1]) || app.user.ui.itemView;
+		        	    )(split[1]);
+		        	view = view ? view[0] : app.user.ui.itemView;
                     UI.set({
                         section: 'items',
                         item: item,
@@ -3556,6 +3564,12 @@ var pandora = new Ox.App({
                             app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
                             //ui.list(app.user.ui.listView).display();
                         } else {
+                            if (['player', 'timeline'].indexOf(old.user.ui.itemView) > -1) {
+                                UI.set(
+                                    'videoPosition|' + app.user.ui.item,
+                                    app.$ui[old.user.ui.itemView == 'player' ? 'player' : 'editor'].options('position')
+                                );
+                            }
                             app.$ui.contentPanel.replace(1, ui.item());
                         }
                     }
