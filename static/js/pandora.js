@@ -989,13 +989,15 @@ var pandora = new Ox.App({
     		                videoHeight: video.height,
     		                videoId: app.user.ui.item,
     		                videoWidth: video.width,
-    		                videoSize: app.user.ui.videoSize,
+    		                videoSize: app.user.ui.videoScreen,
     		                videoURL: video.url,
     		                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1
                         }).bindEvent({
                             change: function(event, data) {
-                                // showAnnotations, showControls, videoSize
-                                UI.set(data);
+                                // showAnnotations, showControls, videoScreen
+                                UI.set('videoSize' in data ? {
+                                    videoScreen: data.videoSize
+                                } : data);
                             },
                             enterfullscreen: enterFullscreen,
                             exitfullscreen: exitFullscreen
@@ -1035,16 +1037,19 @@ var pandora = new Ox.App({
     		                videoHeight: video.height,
     		                videoId: app.user.ui.item,
     		                videoWidth: video.width,
-    		                videoSize: 'small',
+    		                videoSize: app.user.ui.videoSize,
     		                videoURL: video.url,
     		                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1 -
     		                    (app.user.ui.showAnnotations * app.user.ui.annotationsSize) - 1
-    		            }).bindEvent('resize', function(event, data) {
-    						//Ox.print('resize editor', data)
-    						app.$ui.editor.options({
-    							width: data
-    						});
-    						//Ox.print('resize done')
+    		            }).bindEvent({
+    		                resize: function(event, data) {
+    						    app.$ui.editor.options({
+    							    width: data
+    						    });
+    						},
+    						togglesize: function(event, data) {
+    						    UI.set({videoSize: data.size});
+    						}
     					}));
     					that.replace(1, app.$ui.annotations = ui.annotations());
     		            that.bindEvent('resize', function(event, data) {

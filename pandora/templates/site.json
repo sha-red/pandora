@@ -186,7 +186,8 @@
             "sitePage": "home",
             "theme": "modern",
             "videoPosition": {},
-            "videoSize": "fit"
+            "videoScreen": "fit",
+            "videoSize": "small"
         },
         "username": ""
     }
