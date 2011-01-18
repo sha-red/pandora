@@ -3566,7 +3566,7 @@ var pandora = new Ox.App({
                         } else {
                             if (['player', 'timeline'].indexOf(old.user.ui.itemView) > -1) {
                                 UI.set(
-                                    'videoPosition|' + app.user.ui.item,
+                                    'videoPosition|' + old.user.ui.item,
                                     app.$ui[old.user.ui.itemView == 'player' ? 'player' : 'editor'].options('position')
                                 );
                             }
