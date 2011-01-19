@@ -7,6 +7,7 @@ from datetime import datetime
 from django import forms
 from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
+from django.db.models import Count, Sum
 
 from ox.utils import json
 from ox.django.decorators import login_required_json
@@ -15,6 +16,7 @@ from ox.django.views import task_status
 
 from item.utils import parse_path
 from item.models import get_item
+from item.views import _parse_query
 import item.tasks
 from api.actions import actions
 
@@ -258,56 +260,187 @@ def lookup_file(request, oshash):
     f = get_object_or_404(models.File, oshash=oshash)
     return redirect(f.item.get_absolute_url())
 
-"""
-def fileInfo(request):
-    '''
-        param data
-            oshash string
-        return {'status': {'code': int, 'text': string},
-                'data': {imdbId:string }}
-    '''
-    if 'data' in request.POST:
-        oshash = json.loads(request.POST['data'])
-    elif 'oshash' in request.GET:
-        oshash = request.GET['oshash']
-    f = models.ItemFile.objects.get(oshash=oshash)
-    response = {'data': f.json()}
-    return render_to_json_response(response)
-actions.register(fileInfo)
 
-def subtitles(request):
+def _order_query(qs, sort, prefix=''):
+    order_by = []
+    if len(sort) == 1:
+        sort.append({'operator': '+', 'key': 'name'})
+        sort.append({'operator': '-', 'key': 'created'})
     '''
-    param data
-        oshash string
-        language string
-        subtitle string
-    return
-        if no language is provided:
-            {data: {languages: array}}
-        if language is set:
-            {data: {subtitle: string}}
-        if subtitle is set:
-            saves subtitle for given language
+        if sort[0]['key'] == 'title':
+            sort.append({'operator': '-', 'key': 'year'})
+            sort.append({'operator': '+', 'key': 'director'})
+        elif sort[0]['key'] == 'director':
+            sort.append({'operator': '-', 'key': 'year'})
+            sort.append({'operator': '+', 'key': 'title'})
+        elif sort[0]['key'] == 'year':
+            sort.append({'operator': '+', 'key': 'director'})
+            sort.append({'operator': '+', 'key': 'title'})
+        elif not sort[0]['key'] in ('value', 'value_sort'):
+            sort.append({'operator': '+', 'key': 'director'})
+            sort.append({'operator': '-', 'key': 'year'})
+            sort.append({'operator': '+', 'key': 'title'})
+
     '''
-    if 'data' in request.POST:
-        data = json.loads(request.POST['data'])
-        oshash = data['oshash']
-        language = data.get('language', None)
-        srt = data.get('subtitle', None)
-    if srt:
-        user = request.user
-        sub = models.Subtitles.objects.get_or_create(user, oshash, language)
-        sub.srt = srt
-        sub.save()
-    else:
-        response = json_response({})
-        if language:
-            q = models.Subtitles.objects.filter(item_file__oshash=oshash, language=language)
-            if q.count() > 0:
-                response['data']['subtitle'] = q[0].srt
-                return render_to_json_response(response)
-        l = models.Subtitles.objects.filter(item_file__oshash=oshash).values('language')
-        response['data']['languages'] = [f['language'] for f in l]
-        return render_to_json_response(response)
-actions.register(subtitles)
-"""
+
+    for e in sort:
+        operator = e['operator']
+        if operator != '-':
+            operator = ''
+        key = {'id': 'item__itemId', 'name': 'sort_name'}.get(e['key'], e['key'])
+        #if operator=='-' and '%s_desc'%key in models.ItemSort.descending_fields:
+        #    key = '%s_desc' % key
+        order = '%s%s%s' % (operator, prefix, key)
+        order_by.append(order)
+    if order_by:
+        qs = qs.order_by(*order_by)
+    return qs
+
+
+def findFiles(request):
+    '''
+        param data {
+            'query': query,
+            'sort': array,
+            'range': array
+        }
+
+            query: query object, more on query syntax at
+                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
+            sort: array of key, operator dics
+                [
+                    {
+                        key: "year",
+                        operator: "-"
+                    },
+                    {
+                        key: "director",
+                        operator: ""
+                    }
+                ]
+            range:       result range, array [from, to]
+            keys:  array of keys to return
+            group:    group elements by, country, genre, director...
+
+        with keys, items is list of dicts with requested properties:
+          return {'status': {'code': int, 'text': string},
+                'data': {items: array}}
+
+Groups
+        param data {
+            'query': query,
+            'key': string,
+            'group': string,
+            'range': array
+        }
+
+            query: query object, more on query syntax at
+                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
+            range:       result range, array [from, to]
+            keys:  array of keys to return
+            group:    group elements by, country, genre, director...
+
+        possible values for keys: name, items
+
+        with keys
+        items contains list of {'name': string, 'items': int}:
+        return {'status': {'code': int, 'text': string},
+            'data': {items: array}}
+
+        without keys: return number of items in given query
+          return {'status': {'code': int, 'text': string},
+                'data': {items: int}}
+
+Positions
+        param data {
+            'query': query,
+            'ids': []
+        }
+
+            query: query object, more on query syntax at
+                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
+            ids:  ids of items for which positions are required
+        return {
+            status: {...},
+            data: {
+                positions: {
+                    id: position
+                }
+            }
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    if settings.JSON_DEBUG:
+        print json.dumps(data, indent=2)
+    query = _parse_query(data, request.user)
+
+    response = json_response({})
+    if 'group' in query:
+        if 'sort' in query:
+            if len(query['sort']) == 1 and query['sort'][0]['key'] == 'items':
+                if query['group'] == "year":
+                    order_by = query['sort'][0]['operator'] == '-' and 'items' or '-items'
+                else:
+                    order_by = query['sort'][0]['operator'] == '-' and '-items' or 'items'
+                if query['group'] != "keyword":
+                    order_by = (order_by, 'value_sort')
+                else:
+                    order_by = (order_by,)
+            else:
+                order_by = query['sort'][0]['operator'] == '-' and '-value_sort' or 'value_sort'
+                order_by = (order_by, 'items')
+        else:
+            order_by = ('-value_sort', 'items')
+        response['data']['items'] = []
+        items = 'items'
+        item_qs = query['qs']
+        qs = models.Facet.objects.filter(key=query['group']).filter(item__id__in=item_qs)
+        qs = qs.values('value').annotate(items=Count('id')).order_by(*order_by)
+
+        if 'ids' in query:
+            #FIXME: this does not scale for larger results
+            response['data']['positions'] = {}
+            ids = [j['value'] for j in qs]
+            response['data']['positions'] = utils.get_positions(ids, query['ids'])
+
+        elif 'range' in data:
+            qs = qs[query['range'][0]:query['range'][1]]
+            response['data']['items'] = [{'name': i['value'], 'items': i[items]} for i in qs]
+        else:
+            response['data']['items'] = qs.count()
+    elif 'ids' in query:
+        #FIXME: this does not scale for larger results
+        qs = _order_query(query['qs'], query['sort'])
+
+        response['data']['positions'] = {}
+        ids = [j['itemId'] for j in qs.values('itemId')]
+        response['data']['positions'] = utils.get_positions(ids, query['ids'])
+
+    elif 'keys' in query:
+        response['data']['items'] = []
+        qs = models.File.objects.filter(item__in=query['qs'])
+        qs = _order_query(qs, query['sort'])
+        keys = query['keys']
+        qs = qs[query['range'][0]:query['range'][1]]
+        response['data']['items'] = [f.json(keys) for f in qs]
+    else: # otherwise stats
+        items = query['qs']
+        files = models.File.objects.filter(item__in=query['qs'])
+        #files = models.File.objects.all().filter(item__in=items).exclude(size__gt=0)
+        r = files.aggregate(
+            Sum('duration'),
+            Sum('pixels'),
+            Sum('size')
+        )
+        response['data']['duration'] = r['duration__sum']
+        response['data']['files'] = files.count()
+        response['data']['items'] = items.count()
+        response['data']['pixels'] = r['pixels__sum']
+        response['data']['runtime'] = items.filter(sort__runtime_desc__gt=0).aggregate(Sum('sort__runtime_desc'))['sort__runtime_desc__sum']
+        if response['data']['runtime'] == None:
+            response['data']['runtime'] = 0
+        response['data']['size'] = r['size__sum']
+    return render_to_json_response(response)
+
+actions.register(findFiles)
+

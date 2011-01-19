@@ -214,6 +214,26 @@ class File(models.Model):
             return True
         return False
 
+    def json(self, keys=None, user=None):
+        data = {
+            'available': self.available,
+            'duration': self.duration,
+            'framerate': self.framerate,
+            'height': self.height,
+            'width': self.width,
+            'oshash': self.oshash,
+            'samplerate': self.samplerate,
+            'video_codec': self.video_codec,
+            'audio_codec': self.audio_codec,
+            'name': self.name,
+            'size': self.size,
+            'info': self.info
+        }
+        if keys:
+            for k in data.keys():
+                if k not in keys:
+                    del data[k]
+        return data
 
 class Volume(models.Model):
 
