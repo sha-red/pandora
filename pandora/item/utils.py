@@ -170,7 +170,7 @@ def parse_path(path):
     search_title = oxdb_title(path, True)
     r = {}
     r['title'] = oxdb_title(path)
-    r['directors'] = oxdb_directors(path)
+    r['director'] = oxdb_directors(path)
     year = ox.findRe(path, '\((\d{4})\)')
     if year:
         r['year'] = year
