@@ -240,9 +240,12 @@ class ItemManager(Manager):
         conditions = parseConditions(data['query'].get('conditions', []),
                                      data['query'].get('operator', '&'))
         qs = qs.filter(conditions)
-
-        #FIXME: lists are part of query now
-        # filter list, works for own or public lists
-        l = data.get('list', 'all')
-        qs = self.filter_list(qs, l, user)
+        
+        #anonymous can only see public items
+        if user.is_anonymous():
+            qs = qs.filter(public=True)
+        #users can see public items, there own items and items of there groups
+        elif not user.is_staff:
+            qs = qs.filter(Q(public=True)|Q(user=user)|Q(groups__in=user.groups.all()))
+        #admins can see all available items
         return qs

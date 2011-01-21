@@ -12,6 +12,7 @@ from django.db import models
 from django.core.files.base import ContentFile
 from django.utils import simplejson as json
 from django.conf import settings
+from django.contrib.auth.models import User, Group
 
 import ox
 from ox.django import fields
@@ -89,9 +90,14 @@ class Item(models.Model):
     modified = models.DateTimeField(auto_now=True)
     published = models.DateTimeField(default=datetime.now, editable=False)
 
+    user = models.ForeignKey(User, related_name='items')
+    groups = models.ManyToManyField(Group, related_name='items')
+
     #only items that have data from files are available,
     #this is indicated by setting available to True
     available = models.BooleanField(default=False, db_index=True)
+    public = models.BooleanField(default=False, db_index=True)
+
     itemId = models.CharField(max_length=128, unique=True, blank=True)
     oxdbId = models.CharField(max_length=42, unique=True, blank=True)
     external_data = fields.DictField(default={}, editable=False)
@@ -118,15 +124,27 @@ class Item(models.Model):
         return default
 
     def editable(self, user):
-        #FIXME: make permissions work
+        if user.is_staff or \
+           self.user == user or \
+           self.groups.filter(id__in=user.groups.all()).count() > 0:
+            return True
         return False
 
     def edit(self, data):
         #FIXME: how to map the keys to the right place to write them to?
+        if 'id' in data:
+            #FIXME: check if id is valid and exists and move/merge items accordingly
+            del data['id']
+        if 'id' in data:
+            groups = data.pop('groups')
+            self.groups.exclude(name__in=groups).delete()
+            for g in groups:
+                group, created = Group.objects.get_or_create(name=g) 
+                self.groups.add(group)
         for key in data:
             if key != 'id':
                 setattr(self.data, key, data[key])
-        self.oxdb.save()
+        self.data.save()
         self.save()
 
     def reviews(self):

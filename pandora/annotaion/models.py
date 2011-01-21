@@ -65,9 +65,9 @@ class Annotation(models.Model):
 
     def editable(self, user):
         if user.is_authenticated():
-            if self.user == user or user.has_perm('0x.admin'):
-                return True
-            if user.groups.filter(id__in=self.groups.all()).count() > 0:
+            if user.is_staff or \
+               self.user == user or \
+               user.groups.filter(id__in=self.groups.all()).count() > 0:
                 return True
         return False
 

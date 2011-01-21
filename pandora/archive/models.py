@@ -117,12 +117,6 @@ class File(models.Model):
 
         super(File, self).save(*args, **kwargs)
 
-    def json(self):
-        r = {}
-        for k in self:
-            r[k] = unicode(self[k])
-        return r
-
     #upload and data handling
     video = models.FileField(null=True, blank=True, upload_to=lambda f, x: f.path('%s.webm'%settings.VIDEO_PROFILE))
     data = models.FileField(null=True, blank=True, upload_to=lambda f, x: f.path('data.bin'))
@@ -227,13 +221,15 @@ class File(models.Model):
             'audio_codec': self.audio_codec,
             'name': self.name,
             'size': self.size,
-            'info': self.info
+            'info': self.info,
+            'instances': self.instances.count()
         }
         if keys:
             for k in data.keys():
                 if k not in keys:
                     del data[k]
         return data
+
 
 class Volume(models.Model):
 

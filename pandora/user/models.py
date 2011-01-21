@@ -89,11 +89,8 @@ def get_user_json(user):
     result = {}
     for key in ('username', ):
         result[key] = getattr(user, key)
-    result['group'] = 'user'
-    if user.is_staff:
-        result['group'] = 'admin'
-    elif user.has_perm('0x.vip'): #FIXME: permissions
-        result['group'] = 'vip'
+    result['admin'] = user.is_staff
+    result['groups'] = [g.name for g in user.groups.all()]
     result['preferences'] = profile.get_preferences()
     result['ui'] = profile.get_ui()
     return result

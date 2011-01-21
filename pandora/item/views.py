@@ -62,7 +62,7 @@ def _parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
     query['sort'] = [{'key':'title', 'operator':'+'}]
-    for key in ('sort', 'keys', 'group', 'list', 'range', 'ids'):
+    for key in ('sort', 'keys', 'group', 'range', 'ids'):
         if key in data:
             query[key] = data[key]
     query['qs'] = models.Item.objects.find(data, user)
