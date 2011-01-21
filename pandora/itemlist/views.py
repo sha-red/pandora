@@ -225,8 +225,8 @@ def addList(request):
         qs = models.Position.objects.filter(section='featured')
     else:
         pos, created = models.Position.objects.get_or_create(list=list,
-                                         user=request.user, section='my')
-        qs = models.Position.objects.filter(user=request.user, section='my')
+                                         user=request.user, section='personal')
+        qs = models.Position.objects.filter(user=request.user, section='personal')
     pos.position = qs.aggregate(Max('position'))['position__max'] + 1
     pos.save()
     response = json_response(status=200, text='created')
@@ -278,7 +278,7 @@ def editList(request):
                     qs = models.Position.objects.filter(user=request.user, section='section', list=list)
                     if qs.count() > 1:
                         pos = qs[0]
-                        pos.section = 'my'
+                        pos.section = 'personal'
                         pos.save()
                 elif value == 'featured':
                     if not request.user.is_staff:
@@ -293,9 +293,10 @@ def editList(request):
                         models.Position.objects.filter(list=list).exclude(id=pos.id).delete()
                 else:
                         models.Position.objects.filter(list=list).delete()
-                        pos, created = models.Position.objects.get_or_create(list=list, user=list.user,
-                                                                             section='my')
-                        qs = models.Position.objects.filter(user=list.user, section='my')
+                        pos, created = models.Position.objects.get_or_create(list=list,
+                                                      user=list.user,section='personal')
+                        qs = models.Position.objects.filter(user=list.user,
+                                                            section='personal')
                         pos.position = qs.aggregate(Max('position'))['position__max'] + 1
                         pos.save()
                         for u in list.subscribed_users.all():
@@ -323,7 +324,7 @@ def editList(request):
             pos.position = data['position']
             pos.section = 'featured'
             if list.status == 'private':
-                pos.section = 'my'
+                pos.section = 'personal'
             pos.save()
         list.save()
         response['data'] = list.json(user=request.user)
@@ -411,10 +412,10 @@ actions.register(unsubscribeFromList, cache=False)
 def sortLists(request):
     '''
         param data {
-            section: 'my',
+            section: 'personal',
             ids: [1,2,4,3]
         }
-        known sections: 'my', 'public', 'featured'
+        known sections: 'personal', 'public', 'featured'
         featured can only be edited by admins
         return {
             status: {'code': int, 'text': string},
@@ -425,27 +426,29 @@ def sortLists(request):
     data = json.loads(request.POST['data'])
     position = 0
     section = data['section']
+    #ids = list(set(data['ids']))
+    ids = data['ids']
     if section == 'featured' and not request.user.is_staff:
         response = json_response(status=403, text='not allowed')
     else:
         user = request.user
         if section == 'featured':
-            for i in data['ids']:
-                list = get_list_or_404_json(i)
-                qs = models.Position.objects.filter(section=section, list=list)
+            for i in ids:
+                l = get_list_or_404_json(i)
+                qs = models.Position.objects.filter(section=section, list=l)
                 if qs.count() > 0:
                     pos = qs[0]
                 else:
-                    pos = models.Position(list=list, user=user, section=section)
+                    pos = models.Position(list=l, user=user, section=section)
                 if pos.position != position:
                     pos.position = position
                     pos.save()
                 position += 1
-                models.Position.objects.filter(section=section, list=list).exclude(id=pos.id).delete()
+                models.Position.objects.filter(section=section, list=l).exclude(id=pos.id).delete()
         else:
-            for i in data['ids']:
-                list = get_list_or_404_json(i)
-                pos, created = models.Position.objects.get_or_create(list=list,
+            for i in ids:
+                l = get_list_or_404_json(i)
+                pos, created = models.Position.objects.get_or_create(list=l,
                                             user=request.user, section=section)
                 if pos.position != position:
                     pos.position = position
