@@ -736,7 +736,7 @@ class Item(models.Model):
     def local_posters(self):
         part = 1
         posters = {}
-        self.poster_frame >= 0:
+        if self.poster_frame >= 0:
             frame = self.get_poster_frame_path()
             path = self.path('poster.pandora.%s.%s.jpg'%(part, self.poster_frame))
             path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, path))
