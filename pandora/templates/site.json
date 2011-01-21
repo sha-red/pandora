@@ -72,7 +72,7 @@
         {"id": "news", "title": "News"},
         {"id": "tour", "title": "Take a Tour"},
         {"id": "faq", "title": "Frequently Asked Questions"},
-        {"id": "tos", "title": "Terms of Service"}
+        {"id": "terms", "title": "Terms of Service"}
     ],
     "sortKeys": [
         {"id": "title", "title": "Title", "width": 180, "removable": false, "type": "title"},
@@ -127,7 +127,7 @@
         {"id": "pixels"}
     ],
     "user": {
-        "group": "guest",
+        "level": "guest",
         "lists": {
             "history": [
                 {"id": "all_movies", "title": "All Movies", "query": {}}
