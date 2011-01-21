@@ -789,7 +789,6 @@ class Item(models.Model):
         if frame:
             icon = self.path('icon.jpg')
             self.icon.name = icon
-            frame = frames[int(len(frames)/2)]
             timeline = self.path('timeline.64.png')
             timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
             if os.path.exists(timeline):

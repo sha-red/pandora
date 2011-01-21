@@ -6,6 +6,7 @@ from django.db import models
 from django.conf import settings
 from ox.utils import json
 
+
 class Page(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)

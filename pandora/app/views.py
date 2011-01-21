@@ -5,6 +5,8 @@ from django.template import RequestContext
 from django.conf import settings
 
 from ox.django.shortcuts import json_response, render_to_json_response, get_object_or_404_json
+from ox.django.decorators import login_required_json
+
 from ox.utils import json
 
 import models
@@ -33,10 +35,49 @@ def timeline(request):
 
 
 def getPage(request):
+    '''
+        param data {
+            name: pagename
+        }
+        return {
+            status: ...
+            data: {
+                name:
+                body:
+            }
+        }
+    '''
     data = json.loads(request.POST['data'])
-    name = data['page']
-    page = get_object_or_404_json(models.Archive, name=name)
+    name = data['name']
+    page = get_object_or_404_json(models.Page, name=name)
     response = json_response({'name': page.name, 'body': page.body})
+    return render_to_json_response(response)
+actions.register(getPage)
+
+
+@login_required_json
+def editPage(request):
+    '''
+        param data {
+            name: pagename
+            body: text
+        }
+        return {
+            status: ...
+            data: {
+                name:
+                body:
+            }
+        }
+    '''
+    if not request.user.is_staff:
+        response = json_response(status=403, text='permission denied')
+        return render_to_json_response(response)
+    data = json.loads(request.POST['data'])
+    page, created = models.Page.objects.get_or_create(name=data['name'])
+    page.body = data['body']
+    page.save()
+    response = json_response({'name': page.name, 'page': page.body})
     return render_to_json_response(response)
 actions.register(getPage)
 
