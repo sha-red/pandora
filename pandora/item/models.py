@@ -736,12 +736,18 @@ class Item(models.Model):
     def local_posters(self):
         part = 1
         posters = {}
-        for f in self.main_videos():
-            for frame in f.frames.all():
-                path = self.path('poster.pandora.%s.%s.jpg'%(part, frame.position))
-                path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, path))
-                posters[path] = frame.frame.path
-            part += 1
+        self.poster_frame >= 0:
+            frame = self.get_poster_frame_path()
+            path = self.path('poster.pandora.%s.%s.jpg'%(part, self.poster_frame))
+            path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, path))
+            posters[path] = frame
+        else:
+            for f in self.main_videos():
+                for frame in f.frames.all():
+                    path = self.path('poster.pandora.%s.%s.jpg'%(part, frame.position))
+                    path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, path))
+                    posters[path] = frame.frame.path
+                part += 1
         return posters
 
     def make_local_posters(self):
@@ -766,13 +772,20 @@ class Item(models.Model):
                 p.wait()
         return posters.keys()
 
-    def make_icon(self):
-        #FIXME: should take middle or selected frame or som
+    def get_poster_frame_path(self):
+        if self.poster_frame >= 0:
+            size = int(settings.VIDEO_PROFILE[:-1])
+            return self.frame(self.poster_frame, size)
+
         frames = []
         for f in self.main_videos():
             for ff in f.frames.all():
                 frames.append(ff.frame.path)
-        if frames:
+            return frames[int(len(frames)/2)]
+
+    def make_icon(self):
+        frame = self.get_poster_frame_path()
+        if frame:
             icon = self.path('icon.jpg')
             self.icon.name = icon
             frame = frames[int(len(frames)/2)]

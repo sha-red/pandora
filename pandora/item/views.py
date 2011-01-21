@@ -373,6 +373,7 @@ def setPosterFrame(request): #parse path and return info
         #FIXME: some things need to be updated after changing this
         item.poster_frame = data['position']
         item.save()
+        tasks.update_poster.delay(item.itemId)
         response = json_response()
     else:
         response = json_response(status=403, text='permissino denied')

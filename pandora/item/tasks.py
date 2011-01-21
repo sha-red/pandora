@@ -16,6 +16,7 @@ def cronjob(**kwargs):
 def update_poster(itemId):
     item = models.Item.objects.get(itemId=itemId)
     item.make_poster(True)
+    item.make_icon()
 
 
 @task(ignore_resulsts=True, queue='default')
