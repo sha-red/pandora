@@ -67,11 +67,12 @@
         "sectionName": "{{settings.SITENAME}}",
         "url": "{{settings.URL}}"
     },
-    "sections": [
-        {"id": "history", "title": "History"},
-        {"id": "my", "title": "My Lists"},
-        {"id": "public", "title": "Public Lists"},
-        {"id": "featured", "title": "Featured Lists"}
+    "sitePages": [
+        {"id": "about", "title": "About"},
+        {"id": "news", "title": "News"},
+        {"id": "tour", "title": "Take a Tour"},
+        {"id": "faq", "title": "Frequently Asked Questions"},
+        {"id": "tos", "title": "Terms of Service"}
     ],
     "sortKeys": [
         {"id": "title", "title": "Title", "width": 180, "removable": false, "type": "title"},
@@ -131,14 +132,14 @@
             "history": [
                 {"id": "all_movies", "title": "All Movies", "query": {}}
             ],
-            "my": [
+            "personal": [
                 {"user": "foo", "name": "Favorites", "featured": false, "public": true},
                 {"id": "favorites", "title": "Favorites", "public": true, "items": []},
                 {"id": "most_popular", "title": "Most Popular", "query": {}},
                 {"id": "recently_viewed", "title": "Recently Viewed", "query": {}},
                 {"id": "1960s", "title": "1960s", "query": {"conditions": [{"key": "year", "value": "196", "operator": "^"}], "operator": ""}}
             ],
-            "public": [
+            "favorite": [
                 {"id": "rlx:watchme", "title": "rlx: watchme", "public": true, "items": [0, 1, 2, 3, 4]}
             ],
             "featured": [
@@ -170,16 +171,22 @@
                 }
             },
             "section": "items",
-            "sections": ["my", "public", "featured"],
             "showAnnotations": true,
             "showControls": true,
             "showGroups": true,
             "showInfo": true,
             "showMovies": true,
-            "showSection": {
-                "my": true,
-                "public": true,
-                "featured": true
+            "showFolder": {
+                "site": {
+                    "site": true,
+                    "user": true,
+                    "admin": true
+                },
+                "items": {
+                    "personal": true,
+                    "favorite": true,
+                    "featured": true
+                }
             },
             "showSidebar": true,
             "sidebarSize": 256,

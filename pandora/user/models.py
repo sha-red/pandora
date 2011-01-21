@@ -53,7 +53,13 @@ class UserProfile(models.Model):
             for l in lists:
                 qs = Position.objects.filter(section=section)
                 if section == 'featured':
-                    pos, created = Position.objects.get_or_create(list=l, section=section)
+                    try:
+                        pos = Position.objects.get(list=l, section=section)
+                        created = False
+                    except Position.DoesNotExist:
+                        pos = Position(list=l, section=section, user=self.user)
+                        pos.save()
+                        created = True 
                 else:
                     pos, created = Position.objects.get_or_create(list=l, user=self.user, section=section)
                     qs = qs.filter(user=self.user)
@@ -70,8 +76,8 @@ class UserProfile(models.Model):
             return ids
 
         ids = ['']
-        ids += add(self.user.lists.exclude(status="featured"), 'my')
-        ids += add(self.user.subscribed_lists.all(), 'public')
+        ids += add(self.user.lists.exclude(status="featured"), 'personal')
+        ids += add(self.user.subscribed_lists.filter(status='public'), 'public')
         ids += add(List.objects.filter(status='featured'), 'featured')
         for i in ui['lists'].keys():
             if i not in ids:
