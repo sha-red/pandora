@@ -292,6 +292,7 @@ class Item(models.Model):
         if local_posters:
             posters['local'] = []
             for p in local_posters:
+                #FIXME: media_url is no longer public
                 url = p.replace(settings.MEDIA_ROOT, settings.MEDIA_URL)
                 width = 640
                 height = 1024
