@@ -48,7 +48,10 @@ def getPage(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    name = data['name']
+    if isinstance(data, basestring):
+        name = data
+    else:
+        name = data['name']
     page = get_object_or_404_json(models.Page, name=name)
     response = json_response({'name': page.name, 'body': page.body})
     return render_to_json_response(response)
