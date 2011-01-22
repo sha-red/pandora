@@ -4,8 +4,7 @@
 
 var app = new Ox.App({
     apiURL: '/api/',
-    config: '/site.json',
-    init: 'hello',
+    init: 'init',
 }).launch(function(data) {
     Ox.print('data', data)
     app.config = data.config;

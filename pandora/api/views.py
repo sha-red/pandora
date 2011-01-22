@@ -2,11 +2,14 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 
+import os
+
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.conf import settings
 
 from ox.django.shortcuts import render_to_json_response, json_response
+from ox.utils import json
 
 from pandora.user.models import get_user_json
 
@@ -42,7 +45,7 @@ def api(request):
     return response
 
 
-def hello(request):
+def init(request):
     '''
         return {'status': {'code': int, 'text': string},
                 'data': {user: object}}
@@ -55,8 +58,14 @@ def hello(request):
         response['data']['user'] = {'name': 'Guest',
                                     'group': 'guest',
                                     'preferences': {}}
+    with open(os.path.join(settings.PROJECT_ROOT, 'templates', 'site.json')) as f:
+        response['data']['config'] = json.load(f)
+        response['data']['config']['site']['id'] = settings.SITEID
+        response['data']['config']['site']['name'] = settings.SITENAME
+        response['data']['config']['site']['sectionName'] = settings.SITENAME
+        response['data']['config']['site']['url'] = settings.URL
     return render_to_json_response(response)
-actions.register(hello)
+actions.register(init)
 
 
 def error(request):
