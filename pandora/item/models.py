@@ -6,7 +6,6 @@ from datetime import datetime
 import os.path
 import subprocess
 from glob import glob
-import unicodedata
 
 from django.db import models
 from django.core.files.base import ContentFile
@@ -24,7 +23,7 @@ import utils
 import tasks
 from archive import extract
 
-from annotaion.models import Annotation, Layer
+from annotaion.models import Annotation
 from person.models import get_name_sort
 from app.models import site_config
 
@@ -103,13 +102,15 @@ class Item(models.Model):
     external_data = fields.DictField(default={}, editable=False)
     data = fields.DictField(default={}, editable=False)
     json = fields.DictField(default={}, editable=False)
-    poster = models.ImageField(default=None, blank=True, upload_to=lambda i, x: i.path("poster.jpg"))
+    poster = models.ImageField(default=None, blank=True,
+                               upload_to=lambda i, x: i.path("poster.jpg"))
     poster_url = models.TextField(blank=True)
     poster_height = models.IntegerField(default=0)
     poster_width = models.IntegerField(default=0)
     poster_frame = models.FloatField(default=-1)
 
-    icon = models.ImageField(default=None, blank=True, upload_to=lambda i, x: i.path("icon.jpg"))
+    icon = models.ImageField(default=None, blank=True,
+                             upload_to=lambda i, x: i.path("icon.jpg"))
 
     #stream related fields
     stream_aspect = models.FloatField(default=4/3)

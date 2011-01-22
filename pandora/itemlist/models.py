@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
+import os
+import subprocess
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -26,7 +28,8 @@ class List(models.Model):
     type= models.CharField(max_length=255, default='static')
     description = models.TextField(default='')
 
-    icon = models.ImageField(default=None, blank=True, upload_to=lambda i, x: i.path("icon.jpg"))
+    icon = models.ImageField(default=None, blank=True,
+                             upload_to=lambda i, x: i.path("icon.jpg"))
 
     #is through table still required?
     items = models.ManyToManyField('item.Item', related_name='lists',
@@ -73,7 +76,9 @@ class List(models.Model):
             return True
         return False
 
-    def json(self, keys=['id', 'name', 'user', 'type', 'query', 'status', 'subscribed'], user=None):
+    def json(self, keys=None, user=None):
+        if not keys:
+             keys=['id', 'name', 'user', 'type', 'query', 'status', 'subscribed']
         response = {}
         for key in keys:
             if key == 'items':
@@ -98,7 +103,7 @@ class List(models.Model):
 
     def make_icon(self):
         frames = []
-        iself.icon.name = self.path('icon.png')
+        self.icon.name = self.path('icon.png')
         icon = self.icon.path
         if frames:
             cmd = [

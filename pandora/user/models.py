@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-import os
 from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Max
-from django.conf import settings
 
-from ox.utils import json
 from ox.django.fields import DictField
 
 from app.models import site_config

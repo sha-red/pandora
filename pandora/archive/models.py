@@ -78,24 +78,28 @@ class File(models.Model):
                 setattr(self, key, self.info.get(key, 0))
 
             if 'video' in self.info and self.info['video']:
-                self.video_codec = self.info['video'][0]['codec']
-                self.width = self.info['video'][0]['width']
-                self.height = self.info['video'][0]['height']
-                self.framerate = self.info['video'][0]['framerate']
-                if 'display_aspect_ratio' in self.info['video'][0]:
-                    self.display_aspect_ratio = self.info['video'][0]['display_aspect_ratio']
+                video = self.info['video'][0]
+                self.video_codec = video['codec']
+                self.width = video['width']
+                self.height = video['height']
+                self.framerate = video['framerate']
+                if 'display_aspect_ratio' in video:
+                    self.display_aspect_ratio = video['display_aspect_ratio']
                 else:
                     self.display_aspect_ratio = "%s:%s" % (self.width, self.height)
                 self.is_video = True
                 self.is_audio = False
-                if self.name.endswith('.jpg') or self.name.endswith('.png') or self.duration == 0.04:
+                if self.name.endswith('.jpg') or \
+                   self.name.endswith('.png') or \
+                   self.duration == 0.04:
                     self.is_video = False
             else:
                 self.is_video = False
             if 'audio' in self.info and self.info['audio']:
-                self.audio_codec = self.info['audio'][0]['codec']
-                self.samplerate = self.info['audio'][0].get('samplerate', 0)
-                self.channels = self.info['audio'][0].get('channels', 0)
+                audio = self.info['audio'][0]
+                self.audio_codec = audio['codec']
+                self.samplerate = audio.get('samplerate', 0)
+                self.channels = audio.get('channels', 0)
 
                 if not self.is_video:
                     self.is_audio = True
@@ -118,8 +122,10 @@ class File(models.Model):
         super(File, self).save(*args, **kwargs)
 
     #upload and data handling
-    video = models.FileField(null=True, blank=True, upload_to=lambda f, x: f.path('%s.webm'%settings.VIDEO_PROFILE))
-    data = models.FileField(null=True, blank=True, upload_to=lambda f, x: f.path('data.bin'))
+    video = models.FileField(null=True, blank=True,
+                        upload_to=lambda f, x: f.path('%s.webm'%settings.VIDEO_PROFILE))
+    data = models.FileField(null=True, blank=True,
+                        upload_to=lambda f, x: f.path('data.bin'))
 
     def path(self, name):
         h = self.oshash
@@ -297,4 +303,4 @@ class Frame(models.Model):
     '''
 
     def __unicode__(self):
-        return u'%s at %s' % (self.file, self.position)
+        return u'%s/%s' % (self.file, self.position)

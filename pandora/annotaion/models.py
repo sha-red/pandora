@@ -7,7 +7,6 @@ from django.contrib.auth.models import User
 
 import utils
 
-
 class Layer(models.Model):
 
     class Meta:
