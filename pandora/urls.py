@@ -42,6 +42,7 @@ if settings.DEBUG:
 urlpatterns += patterns('',
     (r'^.*?embed$', 'app.views.embed'),
     (r'^[A-Z0-9].*$', 'app.views.index'),
+    (r'^[a-z0-9].+$', 'app.views.index'),
     (r'^$', 'app.views.index'),
 )
 
