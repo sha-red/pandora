@@ -66,11 +66,18 @@ function constructList() {
         columnsRemovable: false,
         id: 'actionList',
         request: function(data, callback) {
+            function _sort(a, b) {
+                if(a.name > b.name)
+                    return 1;
+                else if(a.name == b.name)
+                    return 0;
+                return -1;
+            }
             if(!data.keys) {
                 app.api.api(function(results) {
                     var items = [];
                     $.each(results.data.actions, function(i, k) {items.push({'name':  i})});
-                    items = items.sort(function(a, b) { return a.name > b.name; });
+                    items.sort(_sort);
                     var result = {'data': {'items': items.length}};
                     callback(result);
                 });
@@ -78,7 +85,7 @@ function constructList() {
                 app.api.api(function(results) {
                     var items = [];
                     $.each(results.data.actions, function(i, k) {items.push({'name':  i})});
-                    items = items.sort(function(a, b) { return a.name > b.name; });
+                    items.sort(_sort);
                     var result = {'data': {'items': items}};
                     callback(result);
                 });
