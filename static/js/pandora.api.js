@@ -32,6 +32,7 @@ var app = new Ox.App({
         }
     });
 
+    app.$ui.actionList.$body.css({overflowX: 'hidden', overflowY: 'auto'});
     var $main = new Ox.SplitPanel({
         elements: [
             {
@@ -69,6 +70,7 @@ function constructList() {
                 app.api.api(function(results) {
                     var items = [];
                     $.each(results.data.actions, function(i, k) {items.push({'name':  i})});
+                    items = items.sort(function(a, b) { return a.name > b.name; });
                     var result = {'data': {'items': items.length}};
                     callback(result);
                 });
@@ -76,6 +78,7 @@ function constructList() {
                 app.api.api(function(results) {
                     var items = [];
                     $.each(results.data.actions, function(i, k) {items.push({'name':  i})});
+                    items = items.sort(function(a, b) { return a.name > b.name; });
                     var result = {'data': {'items': items}};
                     callback(result);
                 });
