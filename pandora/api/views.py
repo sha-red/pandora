@@ -52,18 +52,18 @@ def init(request):
     '''
     #data = json.loads(request.POST['data'])
     response = json_response({})
-    if request.user.is_authenticated():
-        response['data']['user'] = get_user_json(request.user)
-    else:
-        response['data']['user'] = {'name': 'Guest',
-                                    'group': 'guest',
-                                    'preferences': {}}
     with open(settings.SITE_CONFIG) as f:
         response['data']['config'] = json.load(f)
         response['data']['config']['site']['id'] = settings.SITEID
         response['data']['config']['site']['name'] = settings.SITENAME
         response['data']['config']['site']['sectionName'] = settings.SITENAME
         response['data']['config']['site']['url'] = settings.URL
+
+    if request.user.is_authenticated():
+        response['data']['user'] = get_user_json(request.user)
+    else:
+        response['data']['user'] = response['data']['config']['user']
+
     return render_to_json_response(response)
 actions.register(init)
 

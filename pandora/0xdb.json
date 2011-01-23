@@ -52,7 +52,7 @@
             "title": "Country",
             "type": ["string"],
             "find": {"autocomplete": true},
-            "sort": {"type": "string", "width": 180},
+            "sort": {"type": "string", "width": 120},
             "group": true
         },
         {
@@ -60,7 +60,7 @@
             "title": "Year",
             "type": "year",
             "find": {"autocomplete": true},
-            "sort": {"type": "year", "width": 180},
+            "sort": {"type": "year", "width": 60},
             "group": true
         },
         {
@@ -68,8 +68,15 @@
             "title": "Language",
             "type": ["string"],
             "find": {"autocomplete": true},
-            "sort": {"type": "string", "width": 180},
+            "sort": {"type": "string", "width": 120},
             "group": true
+        },
+        {
+            "id": "runtime", 
+            "title": "Runtime", 
+            "type": "integer",
+            "sort": {"type": "integer", "width": 60},
+            "format": {"type": "duration", "args": [0, "medium"]}
         },
         {
             "id": "writer",
@@ -80,8 +87,7 @@
             "group": true
         },
         {
-            "id":
-            "producer",
+            "id": "producer",
             "type": ["string"],
             "title": "Producer",
             "find": {"autocomplete": true},
@@ -112,6 +118,13 @@
             "group": true
         },
         {
+            "id": "numberofactors",
+            "title": "Number of Actors",
+            "sort": {"type": "integer", "width": 60},
+            "value": {"key": "actor", "type": "length"},
+            "type": "integer"
+        },
+        {
             "id": "character", 
             "title": "Character", 
             "type": ["string"],
@@ -124,18 +137,11 @@
             "find": {"autocomplete": true}
         },
         {
-            "id": "numberofactors",
-            "title": "Number of Actors",
-            "sort": {"type": "integer", "width": 60},
-            "value": {"key": "actor", "type": "length"},
-            "type": "integer"
-        },
-        {
             "id": "genre", 
             "title": "Genre", 
             "type": ["string"],
             "find": {"autocomplete": true},
-            "sort": {"type": "string", "width": 180},
+            "sort": {"type": "string", "width": 120},
             "group": true
         },
         {
@@ -153,22 +159,8 @@
             "value": {"key": "keyword", "type": "length"}
         },
         {
-            "id": "runtime", 
-            "title": "Runtime", 
-            "type": "integer",
-            "sort": {"type": "integer", "width": 60},
-            "format": {"type": "duration", "args": [0, "medium"]}
-        },
-        {
             "id": "summary",
             "title": "Summary",
-            "type": "text",
-            "group": false,
-            "find": {}
-        },
-        {
-            "id": "dialog",
-            "title": "Dialog",
             "type": "text",
             "group": false,
             "find": {}
@@ -234,6 +226,13 @@
             "title": "ID",
             "sort": {"type": "string", "width": 90},
             "type": "string"
+        },
+        {
+            "id": "dialog",
+            "title": "Dialog",
+            "type": "text",
+            "group": false,
+            "find": {}
         },
         {
             "id": "aspectratio",
@@ -348,6 +347,18 @@
         {
             "id": "modified",
             "title": "Date Modified",
+            "sort": {"type": "date", "width": 90},
+            "type": "date"
+        },
+        {
+            "id": "accessed",
+            "title": "Date Accessed",
+            "sort": {"type": "date", "width": 90},
+            "type": "date"
+        },
+        {
+            "id": "viewed",
+            "title": "Date Viewed",
             "sort": {"type": "date", "width": 90},
             "type": "date"
         },

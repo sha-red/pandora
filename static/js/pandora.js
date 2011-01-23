@@ -4,7 +4,6 @@
 
 var pandora = new Ox.App({
     apiURL: '/api/',
-    config: '/site.json',
     init: 'init',
 }).launch(function(data) {
 
@@ -14,11 +13,22 @@ var pandora = new Ox.App({
 			$ui: {
 				body: $('body'),
 				document: $(document),
-				window: $(window).resize(resizeWindow)
+				window: $(window)
+				    .resize(resizeWindow)
+				    .unload(unloadWindow)
 			},
 			config: data.config,
 			requests: {},
 			ui: {
+			    findKeys: $.map(data.config.itemKeys, function(key, i) {
+			        return 'find' in key ? $.extend({
+                        id: key.id,
+			            title: key.title
+			        }, key.find) : null;
+			    }),
+				infoRatio: 16 / 9,
+				scrollbarSize: $.browser.mozilla ? 16 : 12,
+				sectionElement: 'buttons',
 			    sectionFolders: {
 			        site: $.merge([
                         {id: 'site', title: 'Site', items: $.merge([
@@ -43,10 +53,13 @@ var pandora = new Ox.App({
                         {id: 'featured', title: 'Featured Lists', showBrowser: false}
 			        ],
 			    },
-				infoRatio: 16 / 9,
-				scrollbarSize: $.browser.mozilla ? 16 : 12,
-				sectionElement: 'buttons',
-		        selectedMovies: []
+		        selectedMovies: [],
+			    sortKeys: $.map(data.config.itemKeys, function(key, i) {
+			        return 'sort' in key ? $.extend({
+                        id: key.id,
+			            title: key.title
+			        }, key.sort) : null;
+			    })
 			},
 			user: data.user
 		};
@@ -675,7 +688,7 @@ var pandora = new Ox.App({
                         ] : [], [
                             app.$ui.findSelect = new Ox.Select({
                                     id: 'select',
-                                    items: $.map(app.config.findKeys, function(key, i) {
+                                    items: $.map(app.ui.findKeys, function(key, i) {
                                         return {
                                             id: key.id,
                                             checked: key.id == findKey,
@@ -740,7 +753,7 @@ var pandora = new Ox.App({
                 return app.user.ui.findQuery.conditions.length ? function(value, callback) {
                     var elementValue = that.value(),
                         key = elementValue[app.user.ui.list ? 1 : 0].id,
-                        findKey = Ox.getObjectById(app.config.findKeys, key);
+                        findKey = Ox.getObjectById(app.ui.findKeys, key);
                     Ox.print('!!!!', key, findKey, 'autocomplete' in findKey && findKey.autocomplete)
                     value === '' && Ox.print('Warning: autocomplete function should never be called with empty value');
                     if ('autocomplete' in findKey && findKey.autocomplete) {
@@ -1141,11 +1154,15 @@ var pandora = new Ox.App({
                                         $dialog.close();
                                     })
                                 ],
-                                content: new Ox.Element('div').html('...'),
+                                content: new Ox.Filter({
+                                    keys: $.map(app.config.sortKeys, function(key) {
+                                        return {id: key.id, title: key.title, type: 'string'}
+                                    })
+                                }),
                                 height: 200,
                                 keys: {enter: 'save', escape: 'cancel'},
                                 title: 'Advanced Find',
-                                width: 640
+                                width: 616 + app.ui.scrollbarSize
                             }).open();
                         } else if (data.key == 'status') {
                             pandora.api.editList({
@@ -1850,7 +1867,7 @@ var pandora = new Ox.App({
 		        Ox.print('$$$$', keys)
 		        */
 		        that = new Ox.TextList({
-		            columns: $.map(app.config.sortKeys, function(key, i) {
+		            columns: $.map(app.ui.sortKeys, function(key, i) {
 		                var position = app.user.ui.lists[app.user.ui.list].columns.indexOf(key.id);
 		                Ox.print(position, '++++', key.id, app.user.ui.lists[app.user.ui.list].columnWidth[key.id], key.width, '||:', app.user.ui.lists[app.user.ui.list].columnWidth[key.id] || key.width)
 		                return $.extend($.extend({}, key), {
@@ -1885,7 +1902,7 @@ var pandora = new Ox.App({
 		                data.ids.forEach(function(id) {
 		                    columnWidth[id] = 
 		                        app.user.ui.lists[app.user.ui.list].columnWidth[id] ||
-		                        Ox.getObjectById(app.config.sortKeys, id).width
+		                        Ox.getObjectById(app.ui.sortKeys, id).width
 		                });
 		                UI.set(['lists', app.user.ui.list, 'columnWidth'].join('|'), columnWidth);
 		                */
@@ -1910,7 +1927,7 @@ var pandora = new Ox.App({
 		                    height: ratio <= 1 ? size : size / ratio,
 		                    id: data['id'],
 		                    info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
-		                    title: data.title + (data.director ? ' (' + data.director + ')' : ''),
+		                    title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
 		                    url: data.poster.url.replace(/jpg/, size + '.jpg'),
 		                    width: ratio >= 1 ? size : size * ratio
 		                };
@@ -2403,7 +2420,7 @@ var pandora = new Ox.App({
 		                ]},
 		                { id: 'sortMenu', title: 'Sort', items: [
 		                    { id: 'sortmovies', title: 'Sort Movies by', items: [
-		                        { group: 'sortmovies', min: 1, max: 1, items: $.map(app.config.sortKeys, function(key, i) {
+		                        { group: 'sortmovies', min: 1, max: 1, items: $.map(app.ui.sortKeys, function(key, i) {
 		                            return $.extend({
 		                                checked: app.user.ui.lists[app.user.ui.list].sort[0].key == key.id,
 		                            }, key);
@@ -2421,11 +2438,11 @@ var pandora = new Ox.App({
 		                ] },
 		                { id: 'findMenu', title: 'Find', items: [
 		                    { id: 'find', title: 'Find', items: [
-		                        { group: 'find', min: 1, max: 1, items: $.map(app.config.findKeys, function(key, i) {
+		                        { group: 'find', min: 1, max: 1, items: $.map(app.ui.findKeys, function(key, i) {
 		                            return $.extend({
 		                                checked: app.user.ui.findQuery.conditions.length && 
-		                                        (app.user.ui.findQuery.conditions[0].key == key.id ||
-		                                        (app.user.ui.findQuery.conditions[0].key === '' && key.id == 'all')),
+		                                    (app.user.ui.findQuery.conditions[0].key == key.id ||
+		                                    (app.user.ui.findQuery.conditions[0].key === '' && key.id == 'all')),
 		                            }, key)
 		                        }) }
 		                    ] },
@@ -2989,7 +3006,7 @@ var pandora = new Ox.App({
         sortSelect: function() {
             var that = new Ox.Select({
                     id: 'sortSelect',
-                    items: $.map(app.config.sortKeys, function(key) {
+                    items: $.map(app.ui.sortKeys, function(key) {
                         //Ox.print('????', app.user.ui.lists[app.user.ui.list].sort.key, key.id)
                         return $.extend($.extend({}, key), {
                             checked: app.user.ui.lists[app.user.ui.list].sort[0].key == key.id,
@@ -3191,7 +3208,7 @@ var pandora = new Ox.App({
 
     function getAlignment(key) { // fixme: make static
         return ['person', 'string', 'text', 'title'].indexOf(
-            Ox.getObjectById(app.config.sortKeys, key).type
+            Ox.getObjectById(app.ui.sortKeys, key).type
         ) > -1 ? 'left' : 'right';
     }
 
@@ -3245,7 +3262,7 @@ var pandora = new Ox.App({
 
     function getSortOperator(key) { // fixme: make static
         return ['person', 'string', 'text', 'title'].indexOf(
-            Ox.getObjectById(app.config.sortKeys, key).type
+            Ox.getObjectById(app.ui.sortKeys, key).type
         ) > -1 ? '' : '-';
     }
 
@@ -3364,6 +3381,10 @@ var pandora = new Ox.App({
         }        
     }
 
+    function saveVideoPosition() {
+        //alert(JSON.stringify(['videoPosition|' + old.user.ui.item, app.$ui[old.user.ui.itemView == 'player' ? 'player' : 'editor'].options('position')]));
+    }
+
     function selectList() {
         if (app.user.ui.list) {
 	        pandora.api.findLists({
@@ -3390,6 +3411,19 @@ var pandora = new Ox.App({
 	            }
 	        })
 	    }
+    }
+
+    function unloadWindow() {
+        // fixme: ajax request has to have async set to false for this to work
+        app.user.ui.section == 'items' &&
+            ['player', 'timeline'].indexOf(app.user.ui.itemView) > -1 &&
+            app.user.ui.item &&
+            UI.set(
+                'videoPosition|' + app.user.ui.item,
+                app.$ui[
+                    app.user.ui.itemView == 'player' ? 'player' : 'editor'
+                ].options('position')
+            );
     }
 
     function validateUser(key, existing) {
@@ -3600,6 +3634,7 @@ var pandora = new Ox.App({
                     }
                 });
                 pandora.api.setUI(obj);
+                //alert('set ' + JSON.stringify(obj))
             }
         }
     }());
@@ -3700,40 +3735,23 @@ var pandora = new Ox.App({
 
             update: function() {
                 URL.parse();
-                if (app.user.ui.section == 'site') {
-                    if (old.user.ui.section == 'site') {
-                        app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
-                    } else {
-                        app.$ui.appPanel.replace(1, app.$ui.mainPanel = ui.mainPanel());
-                    }
-                } else if (app.user.ui.section == 'items') {
-                    if (old.user.ui.section == 'site') {
-                        app.$ui.appPanel.replace(1, app.$ui.mainPanel = ui.mainPanel());
-                    } else {
-                        if (!old.user.ui.item) {
-                            if (!app.user.ui.item) {
-                                app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
-                                //app.$ui.contentPanel.replace(1, ui.list());
-                            } else {
-                                app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
-                                //app.$ui.rightPanel.replace(0, app.$ui.toolbar = ui.toolbar());
-                                //ui.item().display();
-                            }
-                        } else {
-                            if (['player', 'timeline'].indexOf(old.user.ui.itemView) > -1) {
-                                UI.set(
-                                    'videoPosition|' + old.user.ui.item,
-                                    app.$ui[old.user.ui.itemView == 'player' ? 'player' : 'editor'].options('position')
-                                );
-                            }
-                            if (!app.user.ui.item) {
-                                app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
-                                //ui.list(app.user.ui.listView).display();
-                            } else {
-                                app.$ui.contentPanel.replace(1, ui.item());
-                            }
-                        }
-                    }
+                if (app.user.ui.section != old.user.ui.section) {
+                    app.$ui.appPanel.replace(1, app.$ui.mainPanel = ui.mainPanel());
+                } else if (!app.user.ui.item || !old.user.ui.item) {
+                    app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
+                } else {
+                    app.$ui.contentPanel.replace(1, ui.item());
+                }
+                if (
+                    old.user.ui.item &&
+                    ['player', 'timeline'].indexOf(old.user.ui.itemView) > -1
+                ) {
+                    UI.set(
+                        'videoPosition|' + old.user.ui.item,
+                        app.$ui[
+                            old.user.ui.itemView == 'player' ? 'player' : 'editor'
+                        ].options('position')
+                    );
                 }
                 delete old.user.ui;
             }
