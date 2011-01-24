@@ -57,6 +57,23 @@ def _order_query(qs, sort, prefix='sort__'):
         qs = qs.order_by(*order_by)
     return qs
 
+def _order_by_group(query):
+    if 'sort' in query:
+        if len(query['sort']) == 1 and query['sort'][0]['key'] == 'items':
+            if query['group'] == "year":
+                order_by = query['sort'][0]['operator'] == '-' and 'items' or '-items'
+            else:
+                order_by = query['sort'][0]['operator'] == '-' and '-items' or 'items'
+            if query['group'] != "keyword":
+                order_by = (order_by, 'value_sort')
+            else:
+                order_by = (order_by,)
+        else:
+            order_by = query['sort'][0]['operator'] == '-' and '-value_sort' or 'value_sort'
+            order_by = (order_by, 'items')
+    else:
+        order_by = ('-value_sort', 'items')
+    return order_by
 
 def _parse_query(data, user):
     query = {}
@@ -149,46 +166,27 @@ Positions
 
     response = json_response({})
     if 'group' in query:
-        if 'sort' in query:
-            if len(query['sort']) == 1 and query['sort'][0]['key'] == 'items':
-                if query['group'] == "year":
-                    order_by = query['sort'][0]['operator'] == '-' and 'items' or '-items'
-                else:
-                    order_by = query['sort'][0]['operator'] == '-' and '-items' or 'items'
-                if query['group'] != "keyword":
-                    order_by = (order_by, 'value_sort')
-                else:
-                    order_by = (order_by,)
-            else:
-                order_by = query['sort'][0]['operator'] == '-' and '-value_sort' or 'value_sort'
-                order_by = (order_by, 'items')
-        else:
-            order_by = ('-value_sort', 'items')
         response['data']['items'] = []
         items = 'items'
         item_qs = query['qs']
+        order_by = _order_by_group(query)
         qs = models.Facet.objects.filter(key=query['group']).filter(item__id__in=item_qs)
         qs = qs.values('value').annotate(items=Count('id')).order_by(*order_by)
 
         if 'ids' in query:
-            #FIXME: this does not scale for larger results
             response['data']['positions'] = {}
             ids = [j['value'] for j in qs]
             response['data']['positions'] = utils.get_positions(ids, query['ids'])
-
         elif 'range' in data:
             qs = qs[query['range'][0]:query['range'][1]]
             response['data']['items'] = [{'name': i['value'], 'items': i[items]} for i in qs]
         else:
             response['data']['items'] = qs.count()
     elif 'ids' in query:
-        #FIXME: this does not scale for larger results
         qs = _order_query(query['qs'], query['sort'])
-
         response['data']['positions'] = {}
         ids = [j['itemId'] for j in qs.values('itemId')]
         response['data']['positions'] = utils.get_positions(ids, query['ids'])
-
     elif 'keys' in query:
         response['data']['items'] = []
         qs = _order_query(query['qs'], query['sort'])
@@ -201,11 +199,11 @@ Positions
                     r[p] = m.get(p, '')
             return r
         qs = qs[query['range'][0]:query['range'][1]]
-        #response['data']['items'] = [only_p(m.get_json()) for m in qs]
+        #response['data']['items'] = [m.get_json(_p) for m in qs]
         response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]
     else: # otherwise stats
         items = query['qs']
-        files = File.objects.all().filter(item__in=items).exclude(size__gt=0)
+        files = File.objects.all().filter(item__in=items).filter(size__gt=0)
         r = files.aggregate(
             Sum('duration'),
             Sum('pixels'),
@@ -215,12 +213,13 @@ Positions
         response['data']['files'] = files.count()
         response['data']['items'] = items.count()
         response['data']['pixels'] = r['pixels__sum']
-        response['data']['runtime'] = items.filter(sort__runtime_desc__gt=0).aggregate(Sum('sort__runtime_desc'))['sort__runtime_desc__sum']
-        if response['data']['runtime'] == None:
-            response['data']['runtime'] = 1337
+        response['data']['runtime'] = items.filter(sort__runtime_desc__gt=0).aggregate(
+                                      Sum('sort__runtime_desc'))['sort__runtime_desc__sum']
         response['data']['size'] = r['size__sum']
+        for key in ('runtime', 'duration', 'pixels', 'size'):
+            if response['data'][key] == None:
+                response['data'][key] = 0 
     return render_to_json_response(response)
-
 actions.register(find)
 
 
@@ -287,11 +286,13 @@ def getItem(request):
     response = json_response({})
     itemId = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Item, itemId=itemId)
-    #FIXME: check permissions
-    info = item.get_json()
-    info['stream'] = item.get_stream()
-    info['layers'] = item.get_layers()
-    response['data'] = {'item': info}
+    if item.access(request.user):
+        info = item.get_json()
+        info['stream'] = item.get_stream()
+        info['layers'] = item.get_layers()
+        response['data']['item'] = info
+    else:
+        response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 actions.register(getItem)
 

@@ -23,7 +23,7 @@ import utils
 import tasks
 from archive import extract
 
-from annotaion.models import Annotation
+from annotaion.models import Annotation, Layer
 from person.models import get_name_sort
 from app.models import site_config
 
@@ -123,6 +123,21 @@ class Item(models.Model):
         if self.external_data and key in self.external_data:
             return self.external_data[key]
         return default
+
+    def access(self, user):
+        if user.is_authenticated():
+            access, created = Access.objects.get_or_create(item=self, user=user)
+        else:
+            access, created = Access.objects.get_or_create(item=self, user=None)
+        access.save()
+
+        if self.public and self.available:
+            return True
+        elif user.is_staff or \
+           self.user == user or \
+           self.groups.filter(id__in=user.groups.all()).count() > 0:
+            return True
+        return False
 
     def editable(self, user):
         if user.is_staff or \
@@ -319,11 +334,15 @@ class Item(models.Model):
         layers = {}
         layers['cuts'] = self.data.get('cuts', {})
 
-        layers['subtitles'] = {}
-        #FIXME: subtitles should be stored in Annotation
+        layers['subtitles'] = [] 
+        #FIXME: should subtitles be stored in Annotation?
         qs = self.files.filter(is_subtitle=True, is_main=True, available=True)
         if qs.count()>0:
             layers['subtitles'] = qs[0].srt()
+        for l in Layer.objects.all():
+            ll = layers.setdefault(l.name, [])
+            for a in Annotation.objects.filter(layer=l, item=self).order_by('start'):
+                ll.append(a.json())
         return layers
 
     def get_json(self, fields=None):
@@ -351,8 +370,6 @@ class Item(models.Model):
             if isinstance(i[key], datetime):
                 i[key] = i[key].strftime('%Y-%m-%dT%H:%M:%SZ')
 
-        if not fields:
-            i['stream'] = self.get_stream()
         i['poster'] = self.get_poster()
         i['posters'] = self.get_posters()
         return i
@@ -851,11 +868,11 @@ for key in filter(lambda k: 'sort' in k, config['itemKeys']):
     name = {'id': 'itemId'}.get(name, name)
     sort_type = key['sort'].get('type', key['type'])
     model = {
-        'char': (models.CharField, dict(max_length=1000, db_index=True)),
-        'year': (models.CharField, dict(max_length=4, db_index=True)),
-        'integer': (models.BigIntegerField, dict(blank=True, db_index=True)),
-        'float': (models.FloatField, dict(blank=True, db_index=True)),
-        'date': (models.DateTimeField, dict(blank=True, db_index=True))
+        'char': (models.CharField, dict(null=True, max_length=1000, db_index=True)),
+        'year': (models.CharField, dict(null=True, max_length=4, db_index=True)),
+        'integer': (models.BigIntegerField, dict(null=True, blank=True, db_index=True)),
+        'float': (models.FloatField, dict(null=True, blank=True, db_index=True)),
+        'date': (models.DateTimeField, dict(null=True, blank=True, db_index=True))
     }[{
         'string': 'char',
         'title': 'char',
@@ -874,6 +891,19 @@ ItemSort.fields = filter(lambda x: not x.endswith('_desc'),
 ItemSort.descending_fields = filter(lambda x: x.endswith('_desc'),
                                     [f.name for f in ItemSort._meta.fields])
 
+
+class Access(models.Model):
+    class Meta:
+        unique_together = ("item", "user")
+
+    access = models.DateTimeField(auto_now=True)
+    item = models.ForeignKey(Item, related_name='accessed')
+    user = models.ForeignKey(User, null=True, related_name='accessed_items')
+    
+    def __unicode__(self):
+        if self.user:
+            return u"%s/%s/%s" % (self.user, self.item, self.access)
+        return u"%s/%s" % (self.item, self.access)
 
 class Facet(models.Model):
     '''
