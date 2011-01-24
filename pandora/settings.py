@@ -139,6 +139,7 @@ AUTH_PROFILE_MODULE = 'user.UserProfile'
 #Video encoding settings
 #available profiles: 96p, 270p, 360p, 480p, 720p, 1080p
 
+SITE_CONFIG = join(PROJECT_ROOT, '0xdb.json')
 DEFAULT_SORT = [{"key": "director", "operator": ""}]
 DEFAULT_THEME = "classic"
 

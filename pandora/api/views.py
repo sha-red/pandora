@@ -58,7 +58,7 @@ def init(request):
         response['data']['user'] = {'name': 'Guest',
                                     'group': 'guest',
                                     'preferences': {}}
-    with open(os.path.join(settings.PROJECT_ROOT, 'templates', 'site.json')) as f:
+    with open(settings.SITE_CONFIG) as f:
         response['data']['config'] = json.load(f)
         response['data']['config']['site']['id'] = settings.SITEID
         response['data']['config']['site']['name'] = settings.SITENAME

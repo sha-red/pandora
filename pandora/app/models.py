@@ -25,10 +25,10 @@ class SiteSettings(models.Model):
         return self.key
 
 def site_config():
-    with open(os.path.join(settings.PROJECT_ROOT, 'templates', 'site.json')) as f:
+    with open(settings.SITE_CONFIG) as f:
         site_config = json.load(f)
         site_config['keys'] = {}
-        for key in site_config['sortKeys']:
+        for key in site_config['itemKeys']:
             site_config['keys'][key['id']] = key
         site_config['_findKeys'] = {}
         for key in site_config['findKeys']:

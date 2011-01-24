@@ -35,6 +35,8 @@ def parseCondition(condition):
         exclude = False
 
     key_type = models.site_config()['keys'].get(k, {'type':'string'}).get('type')
+    if isinstance(key_type, list):
+        key_type = key_type[0]
     key_type = {
         'title': 'string',
         'person': 'string',
@@ -71,12 +73,16 @@ def parseCondition(condition):
             value_key = 'find__value__icontains'
         k = str(k)
         if exclude:
-            if in_find and not k.startswith('itemId'):
+            if k == 'all':
+                q = ~Q(**{value_key: v})
+            elif in_find and not k.startswith('itemId'):
                 q = ~Q(**{'find__key': k, value_key: v})
             else:
                 q = ~Q(**{k: v})
         else:
-            if in_find and not k.startswith('itemId'):
+            if k == 'all':
+                q = Q(**{value_key: v})
+            elif in_find and not k.startswith('itemId'):
                 q = Q(**{'find__key': k, value_key: v})
             else:
                 q = Q(**{k: v})
@@ -239,7 +245,7 @@ class ItemManager(Manager):
         qs = qs.filter(available=True)
         conditions = parseConditions(data['query'].get('conditions', []),
                                      data['query'].get('operator', '&'))
-        qs = qs.filter(conditions)
+        qs = qs.filter(conditions).distinct()
         
         #anonymous can only see public items
         if user.is_anonymous():

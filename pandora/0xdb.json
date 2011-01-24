@@ -31,6 +31,333 @@
         {"id": "actor", "title": "Actor"},
         {"id": "keyword", "title": "Keyword"}
     ],
+    "itemKeys": [
+        {  
+            "id": "title",
+            "title": "Title",
+            "type": "string",
+            "find": {"autocomplete": true, "autocompleteSortKey": "votes"},
+            "sort": {"removable": false, "type": "title", "width": 180}
+        },
+        {
+            "id": "director",
+            "title": "Director",
+            "type": ["string"],
+            "find": {"autocomplete": true},
+            "sort": {"removable": false, "type": "person", "width": 180},
+            "group": true
+        },
+        {
+            "id": "country",
+            "title": "Country",
+            "type": ["string"],
+            "find": {"autocomplete": true},
+            "sort": {"type": "string", "width": 180},
+            "group": true
+        },
+        {
+            "id": "year",
+            "title": "Year",
+            "type": "year",
+            "find": {"autocomplete": true},
+            "sort": {"type": "year", "width": 180},
+            "group": true
+        },
+        {
+            "id": "language",
+            "title": "Language",
+            "type": ["string"],
+            "find": {"autocomplete": true},
+            "sort": {"type": "string", "width": 180},
+            "group": true
+        },
+        {
+            "id": "writer",
+            "title": "Writer",
+            "type": ["string"],
+            "find": {"autocomplete": true},
+            "sort": {"type": "person", "width": 180},
+            "group": true
+        },
+        {
+            "id":
+            "producer",
+            "type": ["string"],
+            "title": "Producer",
+            "find": {"autocomplete": true},
+            "sort": {"type": "person", "width": 180},
+            "group": true
+        },
+        {
+            "id": "cinematographer",
+            "title": "Cinematographer",
+            "type": ["string"],
+            "find": {"autocomplete": true},
+            "sort": {"type": "person", "width": 180},
+            "group": true
+        },
+        {
+            "id": "editor",
+            "title": "Editor",
+            "type": ["string"],
+            "find": {"autocomplete": true},
+            "sort": {"type": "person", "width": 180},
+            "group": true
+        },
+        {
+            "id": "actor",
+            "title": "Actor", 
+            "type": ["string"],
+            "find": {"autocomplete": true},
+            "group": true
+        },
+        {
+            "id": "character", 
+            "title": "Character", 
+            "type": ["string"],
+            "find": {"autocomplete": true}
+        },
+        {
+            "id": "name",
+            "title": "Name", 
+            "type": ["string"],
+            "find": {"autocomplete": true}
+        },
+        {
+            "id": "numberofactors",
+            "title": "Number of Actors",
+            "sort": {"type": "integer", "width": 60},
+            "value": {"key": "actor", "type": "length"},
+            "type": "integer"
+        },
+        {
+            "id": "genre", 
+            "title": "Genre", 
+            "type": ["string"],
+            "find": {"autocomplete": true},
+            "sort": {"type": "string", "width": 180},
+            "group": true
+        },
+        {
+            "id": "keyword", 
+            "title": "Keyword", 
+            "type": ["string"],
+            "find": {"autocomplete": true},
+            "group": true
+        },
+        {
+            "id": "numberofkeywords", 
+            "title": "Number of Keyword", 
+            "type": "integer",
+            "sort": {"type": "integer", "width": 60},
+            "value": {"key": "keyword", "type": "length"}
+        },
+        {
+            "id": "runtime", 
+            "title": "Runtime", 
+            "type": "integer",
+            "sort": {"type": "integer", "width": 60},
+            "format": {"type": "duration", "args": [0, "medium"]}
+        },
+        {
+            "id": "summary",
+            "title": "Summary",
+            "type": "text",
+            "group": false,
+            "find": {}
+        },
+        {
+            "id": "dialog",
+            "title": "Dialog",
+            "type": "text",
+            "group": false,
+            "find": {}
+        },
+        {
+            "id": "wordsinsummary",
+            "title": "Words in Summary",
+            "sort": {"type": "integer", "width": 60},
+            "type": "integer",
+            "value": {"key": "summary", "type": "words"}
+        },
+        {
+            "id": "wordsintrivia",
+            "title": "Words in Trivia",
+            "type": "integer",
+            "sort": {"type": "integer", "width": 60},
+            "value": {"key": "trivia", "type": "words"}
+        },
+        {
+            "id": "releasedate",
+            "title": "Release Date",
+            "sort": {"type": "date", "width": 120},
+            "type": "date",
+            "format": {"type": "date", "args": ["%a, %b %e, %Y"]}
+        },
+        {
+            "id": "budget",
+            "title": "Budget",
+            "sort": {"type": "integer", "width": 90},
+            "type": "integer",
+            "format": {"type": "currency", "args": ["$", 0]}
+        },
+        {
+            "id": "gross",
+            "title": "Gross",
+            "sort": {"type": "integer", "width": 90},
+            "type": "integer",
+            "format": {"type": "currency", "args": ["$", 0]}
+        },
+        {
+            "id": "profit",
+            "title": "Profit",
+            "sort": {"type": "integer", "width": 90},
+            "type": "integer",
+            "format": {"type": "currency", "args": ["$", 0]}
+        },
+        {
+            "id": "rating",
+            "title": "Rating",
+            "sort": {"type": "float", "width": 60},
+            "type": "float",
+            "format": {"type": "percent", "args": [10, 2]}
+        },
+        {
+            "id": "votes",
+            "title": "Votes",
+            "sort": {"type": "integer", "width": 60},
+            "type": "integer",
+            "format": {"type": "percent", "args": [403824, 2]}
+        },
+        {
+            "id": "id",
+            "title": "ID",
+            "sort": {"type": "string", "width": 90},
+            "type": "string"
+        },
+        {
+            "id": "aspectratio",
+            "title": "Aspect Ratio",
+            "sort": {"type": "float", "width": 90},
+            "type": "float"
+        },
+        {
+            "id": "duration",
+            "title": "Duration",
+            "sort": {"type": "float", "width": 90},
+            "type": "float"
+        },
+        {
+            "id": "color",
+            "title": "Color",
+            "sort": {"type": "float", "width": 90},
+            "type": "float"
+        },
+        {
+            "id": "saturation",
+            "title": "Saturation",
+            "sort": {"type": "float", "width": 60},
+            "type": "float"
+        },
+        {
+            "id": "brightness",
+            "title": "Brightness",
+            "sort": {"type": "float", "width": 60},
+            "type": "float"
+        },
+        {
+            "id": "volume",
+            "title": "Volume",
+            "sort": {"type": "float", "width": 60},
+            "type": "float"
+        },
+        {
+            "id": "clips",
+            "title": "Clips",
+            "sort": {"type": "integer", "width": 60},
+            "type": "integer"
+        },
+        {
+            "id": "cuts",
+            "title": "Cuts",
+            "sort": {"type": "integer", "width": 60},
+            "type": "integer"
+        },
+        {
+            "id": "cutsperminute",
+            "title": "Cuts per Minute",
+            "sort": {"type": "float", "width": 60},
+            "type": "float"
+        },
+        {
+            "id": "words",
+            "title": "Words",
+            "sort": {"type": "integer", "width": 60},
+            "type": "integer"
+        },
+        {
+            "id": "wordsperminute",
+            "title": "Words per Minute",
+            "sort": {"type": "float", "width": 60},
+            "type": "float"
+        },
+        {
+            "id": "resolution",
+            "title": "Resolution",
+            "sort": {"type": "integer", "width": 90},
+            "type": "integer"
+        },
+        {
+            "id": "pixels",
+            "title": "Pixels",
+            "type": "integer",
+            "group": false,
+            "sort": {"type": "integer", "width": 60},
+            "auto": true
+        },
+        {
+            "id": "size",
+            "title": "Size",
+            "sort": {"type": "integer", "width": 60},
+            "type": "integer"
+        },
+        {
+            "id": "bitrate",
+            "title": "Bitrate",
+            "sort": {"type": "integer", "width": 60},
+            "type": "integer"
+        },
+        {
+            "id": "files",
+            "title": "Files",
+            "sort": {"type": "integer", "width": 60},
+            "type": "integer"
+        },
+        {
+            "id": "filename",
+            "title": "Filename",
+            "sort": {"type": "string", "width": 180},
+            "type": "string"
+        },
+        {
+            "id": "published",
+            "title": "Date Published",
+            "sort": {"type": "date", "width": 90},
+            "type": "date"
+        },
+        {
+            "id": "modified",
+            "title": "Date Modified",
+            "sort": {"type": "date", "width": 90},
+            "type": "date"
+        },
+        {
+            "id": "popularity",
+            "title": "Popularity",
+            "sort": {"type": "float", "width": 60},
+            "type": "float"
+        }
+    ],
     "itemName": {
         "singular": "Movie",
         "plural": "Movies"

@@ -327,13 +327,14 @@ class Item(models.Model):
         return layers
 
     def get_json(self, fields=None):
-        item = {
+        i = {
             'id': self.itemId
         }
-        item.update(self.external_data)
-        item.update(self.data)
-        for key in site_config()['keys'].keys():
-            if key not in item:
+        i.update(self.external_data)
+        i.update(self.data)
+        for k in site_config()['itemKeys']:
+            key = k['id']
+            if key not in i:
                 value = self.get(key)
                 #also get values from sort table, i.e. numberof values
                 if not value and  self.sort and hasattr(self.sort, key):
@@ -343,18 +344,18 @@ class Item(models.Model):
                     else:
                         value = getattr(self.sort, key)
                 if value:
-                    item[key] = value
+                    i[key] = value
 
         #format datetime values
-        for key in item:
-            if isinstance(item[key], datetime):
-                item[key] = item[key].strftime('%Y-%m-%dT%H:%M:%SZ')
+        for key in i:
+            if isinstance(i[key], datetime):
+                i[key] = i[key].strftime('%Y-%m-%dT%H:%M:%SZ')
 
         if not fields:
-            item['stream'] = self.get_stream()
-        item['poster'] = self.get_poster()
-        item['posters'] = self.get_posters()
-        return item
+            i['stream'] = self.get_stream()
+        i['poster'] = self.get_poster()
+        i['posters'] = self.get_posters()
+        return i
 
 
     def oxdb_id(self):
@@ -370,7 +371,7 @@ class Item(models.Model):
 
         def save(key, value):
             f, created = ItemFind.objects.get_or_create(item=self, key=key)
-            if value not in ('', '||'):
+            if value not in (''):
                 if isinstance(value, basestring):
                     value = value.strip()
                 f.value = value
@@ -392,22 +393,16 @@ class Item(models.Model):
             else:
                 values = self.get(key, '')
             if isinstance(values, list):
-                save(key, '|%s|'%'|'.join(values))
+                save(key, '\n'.join(values))
             else:
                 save(key, values)
 
-        save('summary', self.get('summary', '') + self.get('plot', '') + self.get('plot_outline', ''))
+        save('summary', self.get('summary', ''))
         save('trivia', ' '.join(self.get('trivia', [])))
-        save('location', '|%s|'%'|'.join(self.get('filming_locations', [])))
 
         #FIXME:
-        #f.dialog = 'fixme'
-        save('dialog', '\n'.join([l.value for l in Annotation.objects.filter(layer__type='subtitle', item=self).order_by('start')]))
-
-        #FIXME: collate filenames
-        #f.filename = self.filename
-        all_find = ' '.join([f.value for f in ItemFind.objects.filter(item=self).exclude(key='all')])
-        save('all', all_find)
+        qs = Annotation.objects.filter(layer__type='subtitle', item=self).order_by('start')
+        save('dialog', '\n'.join([l.value for l in qs]))
 
     def update_sort(self):
         try:
@@ -446,28 +441,32 @@ class Item(models.Model):
             'modified',
             'popularity'
         )
-        for key in site_config()['sortKeys']:
+        max_int = 9223372036854775807L
+
+        for key in filter(lambda k: 'sort' in k, config['itemKeys']):
             name = key['id']
-            source = key.get('key', name)
-            field_type = key['type']
-            max_int = 9223372036854775807L
+            source = name
+            sort_type = key['sort'].get('type', key['type'])
+            if 'value' in key:
+                source = key['value']['key']
+                sort_type = key['value'].get('type', sort_type) 
 
             if name not in base_keys:
-                if field_type == 'title':
+                if sort_type == 'title':
                     value = utils.sort_title(canonicalTitle(self.get(source)))
                     value = utils.sort_string(value)
                     setattr(s, '%s_desc'%name, value)
                     if not value:
                         value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
                     setattr(s, name, value)
-                elif field_type == 'person':
+                elif sort_type == 'person':
                     value = sortNames(self.get(source, []))
                     value = utils.sort_string(value)[:955]
                     setattr(s, '%s_desc'%name, value)
                     if not value:
                         value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
                     setattr(s, name, value)
-                elif field_type == 'string':
+                elif sort_type == 'string':
                     value = self.get(source, u'')
                     if isinstance(value, list):
                         value = u','.join(value)
@@ -476,7 +475,7 @@ class Item(models.Model):
                     if not value:
                         value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
                     setattr(s, name, value)
-                elif field_type == 'length':
+                elif sort_type == 'length':
                     #can be length of strings or length of arrays, i.e. keywords
                     value = self.get(source, None)
                     if not value:
@@ -487,7 +486,7 @@ class Item(models.Model):
                     if value == -max_int:
                         value = max_int
                     setattr(s, name, value)
-                elif field_type == 'integer':
+                elif sort_type == 'integer':
                     value = self.get(source, -max_int)
                     if isinstance(value, list):
                         value = len(value)
@@ -495,7 +494,7 @@ class Item(models.Model):
                     if value == -max_int:
                         value = max_int
                     setattr(s, name, value)
-                elif field_type == 'float':
+                elif sort_type == 'float':
                     max_float = 9223372036854775807L
                     value = self.get(source, -max_float)
                     if isinstance(value, list):
@@ -504,7 +503,7 @@ class Item(models.Model):
                     if value == -max_float:
                         value = max_float
                     setattr(s, '%s_desc'%name, value)
-                elif field_type == 'words':
+                elif sort_type == 'words':
                     value = self.get(source, '')
                     if isinstance(value, list):
                         value = '\n'.join(value)
@@ -513,13 +512,13 @@ class Item(models.Model):
                     else:
                         value = 0
                     setattr(s, name, value)
-                elif field_type == 'year':
+                elif sort_type == 'year':
                     value = self.get(source, '')
                     setattr(s, '%s_desc'%name, value)
                     if not value:
                         value = '9999'
                     setattr(s, name, value)
-                elif field_type == 'date':
+                elif sort_type == 'date':
                     value = self.get(source, None)
                     if isinstance(value, basestring):
                         value = datetime.strptime(value, '%Y-%m-%d')
@@ -597,7 +596,8 @@ class Item(models.Model):
                     f.save()
         year = self.get('year', None)
         if year:
-            f, created = Facet.objects.get_or_create(key='year', value=year, value_sort=year, item=self)
+            f, created = Facet.objects.get_or_create(key='year', value=year,
+                                                     value_sort=year, item=self)
         else:
             Facet.objects.filter(item=self, key='year').delete()
 
@@ -611,7 +611,8 @@ class Item(models.Model):
 
     def frame(self, position, width=128):
         stream = self.streams.filter(profile=settings.VIDEO_PROFILE+'.webm')[0]
-        path = os.path.join(settings.MEDIA_ROOT, self.path(), 'frames', "%d"%width, "%s.jpg"%position)
+        path = os.path.join(settings.MEDIA_ROOT, self.path(),
+                            'frames', "%d"%width, "%s.jpg"%position)
         if not os.path.exists(path):
             extract.frame(stream.video.path, path, position, width)
         return path
@@ -621,7 +622,8 @@ class Item(models.Model):
         return os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline')
 
     def main_videos(self):
-        #FIXME: needs to check if more than one user has main files and only take from "higher" user
+        #FIXME: needs to check if more than one user has main files and only
+        #       take from "higher" user
         videos = self.files.filter(is_main=True, is_video=True, available=True)
         if videos.count()>0:
             first = videos[0]
@@ -642,7 +644,8 @@ class Item(models.Model):
 
         #FIXME: how to detect if something changed?
         if files:
-            stream, created = Stream.objects.get_or_create(item=self, profile='%s.webm' % settings.VIDEO_PROFILE)
+            stream, created = Stream.objects.get_or_create(item=self,
+                                     profile='%s.webm' % settings.VIDEO_PROFILE)
             stream.video.name = stream.path()
             cmd = []
             if os.path.exists(stream.video.path):
@@ -655,7 +658,8 @@ class Item(models.Model):
                     cmd.append(files[f])
                 cmd = [ 'mkvmerge', '-o', stream.video.path ] + cmd[1:]
                 #print cmd
-                p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 #p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
                 p.wait()
             else:
@@ -663,8 +667,9 @@ class Item(models.Model):
             stream.save()
 
             if 'video' in stream.info:
+                v = stream.info['video'][0]
                 extract.timeline(stream.video.path, self.timeline_prefix)
-                self.stream_aspect = stream.info['video'][0]['width']/stream.info['video'][0]['height']
+                self.stream_aspect = v['width']/v['height']
                 self.data['cuts'] = extract.cuts(self.timeline_prefix)
                 self.data['color'] = extract.average_color(self.timeline_prefix)
                 #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
@@ -804,15 +809,18 @@ class Item(models.Model):
             return icon
         return None
 
-Item.facet_keys = []
-Item.person_keys = []
+
 config = site_config()
-for key in config['findKeys']:
-    name = key['id']
-    if key.get('autocomplete', False) and not config['keys'].get(name, {'type': None})['type'] == 'title':
-        Item.facet_keys.append(name)
-    if name in config['keys'] and config['keys'][name]['type'] == 'person':
-        Item.person_keys.append(name)
+
+Item.facet_keys = []
+for key in filter(lambda k: 'find' in k, config['itemKeys']):
+    if 'autocomplete' in key['find'] and not 'autokompleteSortKey' in key['find']:
+        Item.facet_keys.append(key['id'])
+
+Item.person_keys = []
+for key in filter(lambda k: 'sort' in k, config['itemKeys']):
+    if key['sort'].get('type', '') == 'person':
+        Item.person_keys.append(key['id'])
 
 class ItemFind(models.Model):
     """
@@ -832,38 +840,39 @@ class ItemFind(models.Model):
         return u"%s=%s" % (self.key, self.value)
 '''
 ItemSort
-table constructed based on info in site_config['sortKeys']
+table constructed based on info in site_config['itemKeys']
 '''
 attrs = {
     '__module__': 'item.models',
     'item': models.OneToOneField('Item', related_name='sort', primary_key=True),
 }
-for key in config['sortKeys']:
+for key in filter(lambda k: 'sort' in k, config['itemKeys']):
     name = key['id']
     name = {'id': 'itemId'}.get(name, name)
-    field_type = key['type']
-    if field_type in ('string', 'title', 'person'):
-        attrs[name] = models.CharField(max_length=1000, db_index=True)
-        attrs['%s_desc'%name] = models.CharField(max_length=1000, db_index=True)
-    elif field_type == 'year':
-        attrs[name] = models.CharField(max_length=4, db_index=True)
-        attrs['%s_desc'%name] = models.CharField(max_length=4, db_index=True)
-    elif field_type in ('integer', 'words', 'length'):
-        attrs[name] = models.BigIntegerField(blank=True, db_index=True)
-        attrs['%s_desc'%name] = models.BigIntegerField(blank=True, db_index=True)
-    elif field_type == 'float':
-        attrs[name] = models.FloatField(blank=True, db_index=True)
-        attrs['%s_desc'%name] = models.FloatField(blank=True, db_index=True)
-    elif field_type == 'date':
-        attrs[name] = models.DateTimeField(blank=True, db_index=True)
-        attrs['%s_desc'%name] = models.DateTimeField(blank=True, db_index=True)
-    else:
-        print field_type
-        print key
+    sort_type = key['sort'].get('type', key['type'])
+    model = {
+        'char': (models.CharField, dict(max_length=1000, db_index=True)),
+        'year': (models.CharField, dict(max_length=4, db_index=True)),
+        'integer': (models.BigIntegerField, dict(blank=True, db_index=True)),
+        'float': (models.FloatField, dict(blank=True, db_index=True)),
+        'date': (models.DateTimeField, dict(blank=True, db_index=True))
+    }[{
+        'string': 'char',
+        'title': 'char',
+        'person': 'char',
+        'year': 'year',
+        'words': 'integer',
+        'length': 'integer',
+        'date': 'date',
+    }.get(sort_type, sort_type)]
+    attrs[name] = model[0](**model[1])
+    attrs['%s_desc'%name] = model[0](**model[1])
 
 ItemSort = type('ItemSort', (models.Model,), attrs)
-ItemSort.fields = filter(lambda x: not x.endswith('_desc'), [f.name for f in ItemSort._meta.fields])
-ItemSort.descending_fields = filter(lambda x: x.endswith('_desc'), [f.name for f in ItemSort._meta.fields])
+ItemSort.fields = filter(lambda x: not x.endswith('_desc'),
+                         [f.name for f in ItemSort._meta.fields])
+ItemSort.descending_fields = filter(lambda x: x.endswith('_desc'),
+                                    [f.name for f in ItemSort._meta.fields])
 
 
 class Facet(models.Model):

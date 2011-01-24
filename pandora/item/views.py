@@ -239,12 +239,14 @@ def autocomplete(request):
     op = data.get('operator', '')
 
     site_config = models.site_config()
-    order_by = site_config['_findKeys'].get(data['key'], {}).get('autocompleteSortKey', False)
+    key = site_config['keys'][data['key']]
+    order_by = key.get('find', {}).get('autocompleteSortKey', False)
     if order_by:
         order_by = '-sort__%s_desc' % order_by
     else:
         order_by = '-items'
-    if site_config['keys'][data['key']]['type'] == 'title':
+    sort_type = key.get('sort', {}).get('type', 'string')
+    if sort_type == 'title':
         qs = _parse_query({'query': data.get('query', {})}, request.user)['qs']
         if data['value']:
             if op == '':
