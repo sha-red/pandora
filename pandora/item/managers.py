@@ -6,7 +6,7 @@ from django.db.models import Q, Manager
 
 from itemlist.models import List
 import models
-
+from ox.django.query import QuerySet
 
 def parseCondition(condition):
     '''
@@ -193,7 +193,8 @@ def parseConditions(conditions, operator):
 class ItemManager(Manager):
 
     def get_query_set(self):
-        return super(ItemManager, self).get_query_set()
+        #return super(ItemManager, self).get_query_set()
+        return QuerySet(self.model)
 
     def filter_list(self, qs, l, user):
         if l != "all":

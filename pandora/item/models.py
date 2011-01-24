@@ -357,11 +357,7 @@ class Item(models.Model):
                 value = self.get(key)
                 #also get values from sort table, i.e. numberof values
                 if not value and  self.sort and hasattr(self.sort, key):
-                    if hasattr(self.sort, '%s_desc'%key):
-                        if getattr(self.sort, key) == getattr(self.sort, '%s_desc'%key):
-                            value = getattr(self.sort, key)
-                    else:
-                        value = getattr(self.sort, key)
+                    value = getattr(self.sort, key)
                 if value:
                     i[key] = value
 
@@ -388,7 +384,7 @@ class Item(models.Model):
 
         def save(key, value):
             f, created = ItemFind.objects.get_or_create(item=self, key=key)
-            if value not in (''):
+            if value not in ('', ):
                 if isinstance(value, basestring):
                     value = value.strip()
                 f.value = value
@@ -460,6 +456,11 @@ class Item(models.Model):
         )
         max_int = 9223372036854775807L
 
+        def set_value(s, name, value):
+            if not value:
+                value = None
+            setattr(s, name, value)
+
         for key in filter(lambda k: 'sort' in k, config['itemKeys']):
             name = key['id']
             source = name
@@ -472,84 +473,43 @@ class Item(models.Model):
                 if sort_type == 'title':
                     value = utils.sort_title(canonicalTitle(self.get(source)))
                     value = utils.sort_string(value)
-                    setattr(s, '%s_desc'%name, value)
-                    if not value:
-                        value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
-                    setattr(s, name, value)
+                    set_value(s, name, value)
                 elif sort_type == 'person':
                     value = sortNames(self.get(source, []))
                     value = utils.sort_string(value)[:955]
-                    setattr(s, '%s_desc'%name, value)
-                    if not value:
-                        value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
-                    setattr(s, name, value)
+                    set_value(s, name, value)
                 elif sort_type == 'string':
                     value = self.get(source, u'')
                     if isinstance(value, list):
                         value = u','.join(value)
                     value = utils.sort_string(value)[:955]
-                    setattr(s, '%s_desc'%name, value)
-                    if not value:
-                        value = 'zzzzzzzzzzzzzzzzzzzzzzzzz'
-                    setattr(s, name, value)
-                elif sort_type == 'length':
+                    set_value(s, name, value)
+                elif sort_type in ('length', 'integer', 'float'):
                     #can be length of strings or length of arrays, i.e. keywords
                     value = self.get(source, None)
-                    if not value:
-                        value = -max_int
-                    else:
-                        value = len(value)
-                    setattr(s, '%s_desc'%name, value)
-                    if value == -max_int:
-                        value = max_int
-                    setattr(s, name, value)
-                elif sort_type == 'integer':
-                    value = self.get(source, -max_int)
                     if isinstance(value, list):
                         value = len(value)
-                    setattr(s, '%s_desc'%name, value)
-                    if value == -max_int:
-                        value = max_int
-                    setattr(s, name, value)
-                elif sort_type == 'float':
-                    max_float = 9223372036854775807L
-                    value = self.get(source, -max_float)
-                    if isinstance(value, list):
-                        value = sum(value)
-                    setattr(s, name, value)
-                    if value == -max_float:
-                        value = max_float
-                    setattr(s, '%s_desc'%name, value)
+                    set_value(s, name, value)
                 elif sort_type == 'words':
-                    value = self.get(source, '')
+                    value = self.get(source, None)
                     if isinstance(value, list):
                         value = '\n'.join(value)
                     if value:
                         value = len(value.split(' '))
-                    else:
-                        value = 0
-                    setattr(s, name, value)
+                    set_value(s, name, value)
                 elif sort_type == 'year':
-                    value = self.get(source, '')
-                    setattr(s, '%s_desc'%name, value)
-                    if not value:
-                        value = '9999'
-                    setattr(s, name, value)
+                    value = self.get(source, None)
+                    set_value(s, name, value)
                 elif sort_type == 'date':
                     value = self.get(source, None)
                     if isinstance(value, basestring):
                         value = datetime.strptime(value, '%Y-%m-%d')
-                    setattr(s, name, value)
-                    if not value:
-                        value = datetime.strptime('9999-12-12', '%Y-%m-%d')
-                    setattr(s, '%s_desc'%name, value)
+                    set_value(s, name, value)
 
         #sort keys based on database, these will always be available
         s.itemId = self.itemId.replace('0x', 'xx')
         s.modified = self.modified
-        s.modified_desc = self.modified
         s.published = self.published
-        s.published_desc = self.published
 
         # sort values based on data from videos
         s.words = 0 #FIXME: get words from all layers or something
@@ -566,30 +526,29 @@ class Item(models.Model):
                 s.bitrate = videos[0].info['bitrate']
             s.pixels = sum([v.pixels for v in videos])
             s.filename = ' '.join([v.name for v in videos])[:955]
-            s.filename_desc = ' '.join([v.name for v in videos])[:955]
             s.files = self.files.all().count()
             s.size = sum([v.size for v in videos]) #FIXME: only size of movies?
             s.volume = 0
         else:
-            s.duration = 0
-            s.resolution = 0
-            s.aspectratio = 0
-            s.bitrate = 0
-            s.pixels = 0
-            s.filename = 0
-            s.files = 0
-            s.size = 0
-            s.volume = 0
+            s.duration = None
+            s.resolution = None
+            s.aspectratio = None
+            s.bitrate = None
+            s.pixels = None
+            s.filename = None
+            s.files = None
+            s.size = None
+            s.volume = None
 
         s.color = int(sum(self.data.get('color', [])))
-        s.saturation = 0 #FIXME
-        s.brightness = 0 #FIXME
+        s.saturation = None #FIXME
+        s.brightness = None #FIXME
 
         s.cuts = len(self.data.get('cuts', []))
         if s.duration:
             s.cutsperminute = s.cuts / (s.duration/60)
         else:
-            s.cutsperminute = 0
+            s.cutsperminute = None 
         s.save()
 
 
@@ -883,13 +842,9 @@ for key in filter(lambda k: 'sort' in k, config['itemKeys']):
         'date': 'date',
     }.get(sort_type, sort_type)]
     attrs[name] = model[0](**model[1])
-    attrs['%s_desc'%name] = model[0](**model[1])
 
 ItemSort = type('ItemSort', (models.Model,), attrs)
-ItemSort.fields = filter(lambda x: not x.endswith('_desc'),
-                         [f.name for f in ItemSort._meta.fields])
-ItemSort.descending_fields = filter(lambda x: x.endswith('_desc'),
-                                    [f.name for f in ItemSort._meta.fields])
+ItemSort.fields = [f.name for f in ItemSort._meta.fields]
 
 
 class Access(models.Model):

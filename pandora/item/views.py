@@ -49,12 +49,10 @@ def _order_query(qs, sort, prefix='sort__'):
         if operator != '-':
             operator = ''
         key = {'id': 'itemId'}.get(e['key'], e['key'])
-        if operator=='-' and '%s_desc'%key in models.ItemSort.descending_fields:
-            key = '%s_desc' % key
         order = '%s%s%s' % (operator, prefix, key)
         order_by.append(order)
     if order_by:
-        qs = qs.order_by(*order_by)
+        qs = qs.order_by(*order_by, nulls_last=True)
     return qs
 
 def _order_by_group(query):
@@ -213,8 +211,7 @@ Positions
         response['data']['files'] = files.count()
         response['data']['items'] = items.count()
         response['data']['pixels'] = r['pixels__sum']
-        response['data']['runtime'] = items.filter(sort__runtime_desc__gt=0).aggregate(
-                                      Sum('sort__runtime_desc'))['sort__runtime_desc__sum']
+        response['data']['runtime'] = items.aggregate(Sum('sort__runtime'))['sort__runtime__sum']
         response['data']['size'] = r['size__sum']
         for key in ('runtime', 'duration', 'pixels', 'size'):
             if response['data'][key] == None:
@@ -241,7 +238,7 @@ def autocomplete(request):
     key = site_config['keys'][data['key']]
     order_by = key.get('find', {}).get('autocompleteSortKey', False)
     if order_by:
-        order_by = '-sort__%s_desc' % order_by
+        order_by = '-sort__%s' % order_by
     else:
         order_by = '-items'
     sort_type = key.get('sort', {}).get('type', 'string')
