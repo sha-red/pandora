@@ -51,9 +51,9 @@ def _order_query(qs, sort, prefix='sort__'):
         key = {
             'id': 'itemId',
             'accessed': 'accessed__access',
-            'viewed': 'accessed__access'
+            'viewed': 'accessed__access',
         }.get(e['key'], e['key'])
-        if key not in ('accessed__access', ):
+        if key not in ('accessed__access', 'accessed__accessed'):
             key = "%s%s" % (prefix, key)
         order = '%s%s' % (operator, key)
         order_by.append(order)
@@ -198,10 +198,13 @@ Positions
         def only_p_sums(m):
             r = {}
             for p in _p:
-                if p in ('accessed', 'viewed'):
-                    r[p] = getattr(m, 'viewed')
+                if p == 'viewed' and request.user.is_authenticated():
+                    value = m.accessed.filter(user=request.user).annotate(v=Max('access'))
+                    r[p] = value.exists() and value[0].v or None
+                elif p  == 'accessed':
+                    r[p] = m.a
                 elif p == 'popularity':
-                    r[p] = getattr(m, p)
+                    r[p] = m.sort.popularity
                 else:
                     r[p] = m.json.get(p, '')
                 if isinstance(r[p], datetime):
@@ -214,18 +217,13 @@ Positions
                 for p in _p:
                     r[p] = m.get(p, '')
             return r
-        if 'viewed' in _p and request.user.is_authenticated():
-            qs = qs.filter(accessed__user=request.user)
         qs = qs[query['range'][0]:query['range'][1]]
         #response['data']['items'] = [m.get_json(_p) for m in qs]
         if 'popularity' in _p:
             qs = qs.annotate(popularity=Sum('accessed__accessed'))
-            response['data']['items'] = [only_p_sums(m) for m in qs]
-        elif 'viewed' in _p and request.user.is_authenticated():
-            qs = qs.annotate(viewed=Max('accessed__access'))
-            response['data']['items'] = [only_p_sums(m) for m in qs]
-        elif 'accessed' in _p:
-            qs = qs.annotate(viewed=Max('accessed__access'))
+        if 'accessed' in _p:
+            qs = qs.annotate(a=Max('accessed__access'))
+        if 'viewed' in _p or 'popularity' in _p or 'accessed' in _p:
             response['data']['items'] = [only_p_sums(m) for m in qs]
         else:
             response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]

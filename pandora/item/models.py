@@ -8,6 +8,7 @@ import subprocess
 from glob import glob
 
 from django.db import models
+from django.db.models import Sum
 from django.core.files.base import ContentFile
 from django.utils import simplejson as json
 from django.conf import settings
@@ -544,6 +545,7 @@ class Item(models.Model):
             s.cutsperminute = s.cuts / (s.duration/60)
         else:
             s.cutsperminute = None 
+        s.popularity = self.accessed.aggregate(Sum('accessed'))['accessed__sum']
         s.save()
 
 

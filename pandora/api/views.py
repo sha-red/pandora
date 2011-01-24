@@ -7,7 +7,7 @@ import os
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.conf import settings
-from django.db.models import Max
+from django.db.models import Max, Sum
 
 from ox.django.shortcuts import render_to_json_response, json_response
 from ox.utils import json
@@ -65,7 +65,12 @@ def init(request):
         #populate max values for percent requests
         for key in filter(lambda k: 'format' in k, config['itemKeys']):
             if key['format']['type'] == 'percent' and key['format']['args'][0] == 'auto':
-                value = ItemSort.objects.aggregate(Max('votes'))['votes__max']
+                name = key['id']
+                if name == 'popularity':
+                    name = 'item__accessed__accessed'
+                    value = ItemSort.objects.aggregate(Sum(name))['%s__sum'%name]
+                else:
+                    value = ItemSort.objects.aggregate(Max(name))['%s__max'%name]
                 key['format']['args'][0] = value
 
         response['data']['config'] = config
