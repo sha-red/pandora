@@ -814,7 +814,7 @@ config = site_config()
 
 Item.facet_keys = []
 for key in filter(lambda k: 'find' in k, config['itemKeys']):
-    if 'autocomplete' in key['find'] and not 'autokompleteSortKey' in key['find']:
+    if 'autocomplete' in key['find'] and not 'autocompleteSortKey' in key['find']:
         Item.facet_keys.append(key['id'])
 
 Item.person_keys = []
