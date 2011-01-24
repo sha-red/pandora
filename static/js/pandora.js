@@ -9,6 +9,10 @@ var pandora = new Ox.App({
 
     //Ox.print('data', data);
 
+    // fixme: never set ui.videoPosition to 0 ... set to null a.k.a. delete
+    // fixme: sort=-director doesn't work
+    // fixme: don't reload full right panel on sortSelect
+
 	var app = {
 			$ui: {
 				body: $('body'),
@@ -21,10 +25,7 @@ var pandora = new Ox.App({
 			requests: {},
 			ui: {
 			    findKeys: $.map(data.config.itemKeys, function(key, i) {
-			        return 'find' in key ? $.extend({
-                        id: key.id,
-			            title: key.title
-			        }, key.find) : null;
+			        return key.find ? key : null;
 			    }),
 				infoRatio: 16 / 9,
 				scrollbarSize: $.browser.mozilla ? 16 : 12,
@@ -55,10 +56,7 @@ var pandora = new Ox.App({
 			    },
 		        selectedMovies: [],
 			    sortKeys: $.map(data.config.itemKeys, function(key, i) {
-			        return 'sort' in key ? $.extend({
-                        id: key.id,
-			            title: key.title
-			        }, key.sort) : null;
+			        return key.columnWidth ? key : null;
 			    })
 			},
 			user: data.user
@@ -660,6 +658,62 @@ var pandora = new Ox.App({
 		    })
 			return that;
 		},
+        filter: function() {
+            var that = new Ox.Filter({
+                findKeys: $.map(app.config.itemKeys, function(key) {
+                    return {
+                        autocomplete: key.autocomplete,
+                        autocompleteSortKey: key.autocompleteSortKey,
+                        format: key.format,
+                        id: key.id,
+                        title: key.title,
+                        type: key.type
+                    };
+                }),
+                sortKeys: app.ui.sortKeys,
+                viewKeys: app.config.listViews
+            });
+            return that;
+        },
+        filterDialog: function() {
+            var that = new Ox.Dialog({
+                buttons: [
+                    new Ox.Button({
+                            id: 'debug',
+                            title: 'Debug',
+                        })
+                        .bindEvent({
+                            click: function() {
+                                alert(JSON.stringify(app.$ui.filter.options('query')));
+                            }
+                        }),
+                    new Ox.Button({
+                            id: 'cancel',
+                            title: 'Cancel'
+                        })
+                        .bindEvent({
+                            click: function() {
+                                app.$ui.filterDialog.close();
+                            }
+                        }),
+                    new Ox.Button({
+                            id: 'save',
+                            title: 'Save'
+                        })
+                        .bindEvent({
+                            click: function() {
+                                app.$ui.filterDialog.close();
+                            }
+                        })
+                ],
+                content: app.$ui.filter = new ui.filter(),
+                height: 264,
+                keys: {enter: 'save', escape: 'cancel'},
+                title: 'Advanced Find',
+                width: 616 + app.ui.scrollbarSize
+            });
+            return that;
+        },
 		findElement: function() {
 			var findKey = '',
 			    findValue = '';
@@ -688,29 +742,35 @@ var pandora = new Ox.App({
                         ] : [], [
                             app.$ui.findSelect = new Ox.Select({
                                     id: 'select',
-                                    items: $.map(app.ui.findKeys, function(key, i) {
+                                    items: $.merge($.map(app.ui.findKeys, function(key, i) {
                                         return {
                                             id: key.id,
                                             checked: key.id == findKey,
                                             title: 'Find: ' + key.title
                                         };
-                                    }),
+                                    }), [{}, {
+                                        id: 'advanced',
+                                        title: 'Find: Advanced'
+                                    }]),
                                     overlap: 'right',
                                     width: 112
                                 })
                                 .bindEvent({
                                     change: function(event, data) {
                                         var key = data.selected[0].id;
-                                        if (!app.user.ui.findQuery.conditions.length) { // fixme: can this case happen at all?
-                                            app.user.ui.findQuery.conditions = [{key: key, value: '', operator: ''}];
+                                        if (key == 'advanced') {
+                                            app.$ui.filterDialog = ui.filterDialog().open();
                                         } else {
-                                            app.user.ui.findQuery.conditions[0].key = key;
+                                            if (!app.user.ui.findQuery.conditions.length) { // fixme: can this case happen at all?
+                                                app.user.ui.findQuery.conditions = [{key: key, value: '', operator: ''}];
+                                            } else {
+                                                app.user.ui.findQuery.conditions[0].key = key;
+                                            }
+                                            app.$ui.mainMenu.checkItem('findMenu_find_' + key);
+                                            app.$ui.findInput.options({
+                                                autocomplete: autocompleteFunction()
+                                            }).focus();
                                         }
-                                        app.$ui.mainMenu.checkItem('findMenu_find_' + key);
-                                        app.$ui.findInput.options({
-                                            autocomplete: autocompleteFunction()
-                                        }).focus();
-                                        //Ox.print(app.$ui.findInput.options('autocomplete').toString())
                                     }
                                 }),
                             app.$ui.findInput = new Ox.Input({
@@ -1139,31 +1199,7 @@ var pandora = new Ox.App({
                     click: function(event, data) {
                         var $list = app.$ui.folderList[id];
                         if (data.key == 'type') {
-                            var $dialog = new Ox.Dialog({
-                                buttons: [
-                                    new Ox.Button({
-                                        id: 'cancel',
-                                        title: 'Cancel'
-                                    }).bindEvent('click', function() {
-                                        $dialog.close();
-                                    }),
-                                    new Ox.Button({
-                                        id: 'save',
-                                        title: 'Save'
-                                    }).bindEvent('click', function() {
-                                        $dialog.close();
-                                    })
-                                ],
-                                content: new Ox.Filter({
-                                    keys: $.map(app.config.sortKeys, function(key) {
-                                        return {id: key.id, title: key.title, type: 'string'}
-                                    })
-                                }),
-                                height: 200,
-                                keys: {enter: 'save', escape: 'cancel'},
-                                title: 'Advanced Find',
-                                width: 616 + app.ui.scrollbarSize
-                            }).open();
+                            app.$ui.filterDialog = ui.filterDialog().open();
                         } else if (data.key == 'status') {
                             pandora.api.editList({
                                 id: data.id,
@@ -1869,16 +1905,22 @@ var pandora = new Ox.App({
 		        that = new Ox.TextList({
 		            columns: $.map(app.ui.sortKeys, function(key, i) {
 		                var position = app.user.ui.lists[app.user.ui.list].columns.indexOf(key.id);
-		                Ox.print(position, '++++', key.id, app.user.ui.lists[app.user.ui.list].columnWidth[key.id], key.width, '||:', app.user.ui.lists[app.user.ui.list].columnWidth[key.id] || key.width)
-		                return $.extend($.extend({}, key), {
-		                    align: getAlignment(key.id),
-		                    defaultWidth: key.width,
+		                return {
+		                    align: ['string', 'text'].indexOf(
+		                        Ox.isArray(key.type) ? key.type[0]: key.type
+		                    ) > -1 ? 'left' : 'right',
+		                    defaultWidth: key.columnWidth,
+		                    format: key.format,
+		                    id: key.id,
 		                    operator: getSortOperator(key.id),
 		                    position: position,
+		                    removable: !key.columnRequired,
+		                    title: key.title,
+		                    type: key.type,
 		                    unique: key.id == 'id',
 		                    visible: position > -1,
-		                    width: app.user.ui.lists[app.user.ui.list].columnWidth[key.id] || key.width
-		                });
+		                    width: app.user.ui.lists[app.user.ui.list].columnWidth[key.id] || key.columnWidth
+		                };
 		            }),
 		            columnsMovable: true,
 		            columnsRemovable: true,
@@ -3206,12 +3248,6 @@ var pandora = new Ox.App({
         app.user.ui.showMovies && app.$ui.contentPanel.size(0, 112 + app.ui.scrollbarSize);
     }
 
-    function getAlignment(key) { // fixme: make static
-        return ['person', 'string', 'text', 'title'].indexOf(
-            Ox.getObjectById(app.ui.sortKeys, key).type
-        ) > -1 ? 'left' : 'right';
-    }
-
     function getListData() {
         var data = {};
         if (app.user.ui.list) {
@@ -3261,9 +3297,10 @@ var pandora = new Ox.App({
 	}
 
     function getSortOperator(key) { // fixme: make static
-        return ['person', 'string', 'text', 'title'].indexOf(
-            Ox.getObjectById(app.ui.sortKeys, key).type
-        ) > -1 ? '' : '-';
+        var type = Ox.getObjectById(app.config.itemKeys, key).type;
+        return ['hue', 'string', 'text'].indexOf(
+            Ox.isArray(type) ? type[0] : type
+        ) > -1 ? '+' : '-';
     }
 
     function reloadGroups(i) {
@@ -3560,7 +3597,7 @@ var pandora = new Ox.App({
 	                UI.set(['lists', app.user.ui.list, 'sort'].join('|'), $.map(query.sort.split(','), function(v, i) {
 	                    var hasOperator = '+-'.indexOf(v[0]) > -1,
 	                        key = hasOperator ? query.sort.substr(1) : query.sort,
-	                        operator = hasOperator ? v[0].replace('+', '') : getSortOperator(key);
+	                        operator = hasOperator ? v[0]/*.replace('+', '')*/ : getSortOperator(key);
 	                    return {
 	                        key: key,
 	                        operator: operator
@@ -3596,10 +3633,12 @@ var pandora = new Ox.App({
 
 	        toString: function() {
 	            //Ox.print('tS', app.user.ui.find)
+	            var sort = app.user.ui.lists[app.user.ui.list].sort[0];
+	                key = sort.key,
+	                operator = sort.operator;
 	            return '?' + Ox.serialize({
 	                find: constructFind(Query.toObject()),
-	                sort: app.user.ui.lists[app.user.ui.list].sort[0].operator +
-	                        app.user.ui.lists[app.user.ui.list].sort[0].key,
+	                sort: (operator == getSortOperator(key) ? '' : operator) + key,
 	                view: app.user.ui.lists[app.user.ui.list].listView
 	            });
 	        }
@@ -3612,28 +3651,27 @@ var pandora = new Ox.App({
         return {
             set: function(obj) {
                 if (arguments.length == 2) {
+                    // translate (key, value) to {key: value}
                     var obj_ = {};
                     obj_[arguments[0]] = arguments[1];
                     obj = obj_;
                 }
                 $.each(obj, function(key, val) {
                     Ox.print('key', key, 'val', val)
-                    keys = key.split('|');
-                    if (keys.length == 1) {
-                        app.user.ui[keys[0]] = val;
-                    } else if (keys.length == 2) {
-                        app.user.ui[keys[0]][keys[1]] = val;
-                    } else if (keys.length == 3) {
-                        app.user.ui[keys[0]][keys[1]][keys[2]] = val;
-                    } else if (keys.length == 4) {
-                        app.user.ui[keys[0]][keys[1]][keys[2]][keys[3]] = val;
-                    } else if (keys.length == 5) {
-                        app.user.ui[keys[0]][keys[1]][keys[2]][keys[3]][keys[4]] = val;
-                    } else if (keys.length == 6) {
-                        app.user.ui[keys[0]][keys[1]][keys[2]][keys[3]][keys[4]][keys[5]] = val;
+                    var i = 0,
+                        keys = key.split('|'),
+                        old = app.user.ui;
+                    while (i < keys.length - 1) {
+                        old = old[keys[i]];
+                        i++;
+                    }
+                    if (old[keys[i]] !== val) {
+                        old[keys[i]] = val;
+                    } else {
+                        delete obj[key];
                     }
                 });
-                pandora.api.setUI(obj);
+                Ox.length(obj) && pandora.api.setUI(obj);
                 //alert('set ' + JSON.stringify(obj))
             }
         }
