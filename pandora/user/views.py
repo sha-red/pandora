@@ -19,6 +19,7 @@ import models
 
 from api.actions import actions
 from app.models import site_config
+from item.models import Access, Item
 
 class SigninForm(forms.Form):
     username = forms.TextInput()
@@ -419,7 +420,6 @@ def resetUI(request):
     return render_to_json_response(response)
 actions.register(resetUI, cache=False)
 
-@login_required_json
 def setUI(request):
     '''
         param data {
@@ -433,20 +433,31 @@ def setUI(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    keys = data.keys()[0].split('|')
-    value = data.values()[0]
-    profile = request.user.get_profile()
-    p = profile.ui
-    while len(keys)>1:
-        key = keys.pop(0)
-        if isinstance(p, list):
-            p = p[getPositionById(p, key)]
+    if request.user.is_authenticated():
+        for key in data:
+            keys = key.split('|')
+            value = data[key]
+            profile = request.user.get_profile()
+            p = profile.ui
+            while len(keys)>1:
+                key = keys.pop(0)
+                if isinstance(p, list):
+                    p = p[getPositionById(p, key)]
+                else:
+                    if key not in p:
+                        p[key] = {}
+                    p = p[key]
+            p[keys[0]] = value
+        profile.save()
+
+    if data.get('item', False):
+        item = Item.objects.get(itemId=data['item'])
+        if request.user.is_authenticated():
+            access, created = Access.objects.get_or_create(item=item, user=request.user)
         else:
-            if key not in p:
-                p[key] = {}
-            p = p[key]
-    p[keys[0]] = value
-    profile.save()
+            access, created = Access.objects.get_or_create(item=item, user=None)
+        access.save()
+
     response = json_response()
     return render_to_json_response(response)
 actions.register(setUI, cache=False)

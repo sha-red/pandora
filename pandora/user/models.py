@@ -92,10 +92,12 @@ def get_user_json(user):
     result = {}
     for key in ('username', ):
         result[key] = getattr(user, key)
-    if user.is_staff:
+    if user.is_superuser:
         result['level'] = 'admin'
+    elif user.is_staff:
+        result['level'] = 'staff'
     else:
-        result['level'] = 'user'
+        result['level'] = 'member'
     result['groups'] = [g.name for g in user.groups.all()]
     result['preferences'] = profile.get_preferences()
     result['ui'] = profile.get_ui()
