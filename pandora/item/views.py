@@ -20,7 +20,6 @@ import models
 import utils
 import tasks
 
-
 from archive.models import File
 from archive import extract
 
@@ -267,12 +266,12 @@ def autocomplete(request):
 
     site_config = models.site_config()
     key = site_config['keys'][data['key']]
-    order_by = key.get('find', {}).get('autocompleteSortKey', False)
+    order_by = key.get('autocompleteSortKey', False)
     if order_by:
         order_by = '-sort__%s' % order_by
     else:
         order_by = '-items'
-    sort_type = key.get('sort', {}).get('type', 'string')
+    sort_type = key.get('sort', key.get('type', 'string'))
     if sort_type == 'title':
         qs = _parse_query({'query': data.get('query', {})}, request.user)['qs']
         if data['value']:
