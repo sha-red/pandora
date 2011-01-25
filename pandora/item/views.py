@@ -281,7 +281,7 @@ def autocomplete(request):
                 qs = qs.filter(find__key=data['key'], find__value__istartswith=data['value'])
             elif op == '$':
                 qs = qs.filter(find__key=data['key'], find__value__iendswith=data['value'])
-        qs = qs.order_by(order_by)
+        qs = qs.order_by(order_by, nulls_last=True)
         qs = qs[data['range'][0]:data['range'][1]]
         response = json_response({})
         response['data']['items'] = [i.get(data['key']) for i in qs]    
