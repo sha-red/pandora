@@ -14,7 +14,7 @@ from glob import glob
 
 import numpy as np
 import Image
-
+import ox
 
 img_extension='jpg'
 
@@ -295,7 +295,8 @@ def average_color(prefix):
     for i in range(0, len(pixels)):
         p = np.sum(pixels[i], axis=0) / frames
         color += p
-    return list(map(float, color))
+    color = list(map(float, color))
+    return ox.image.getHSL(color)
 
 
 def get_distance(rgb0, rgb1):
