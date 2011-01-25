@@ -7,11 +7,13 @@ import os
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.conf import settings
+from django.db.models import Max
 
 from ox.django.shortcuts import render_to_json_response, json_response
 from ox.utils import json
 
-from pandora.user.models import get_user_json
+from user.models import get_user_json
+from item.models import ItemSort
 
 from actions import actions
 
@@ -53,12 +55,20 @@ def init(request):
     #data = json.loads(request.POST['data'])
     response = json_response({})
     with open(settings.SITE_CONFIG) as f:
-        response['data']['config'] = json.load(f)
-        response['data']['config']['site']['id'] = settings.SITEID
-        response['data']['config']['site']['name'] = settings.SITENAME
-        response['data']['config']['site']['sectionName'] = settings.SITENAME
-        response['data']['config']['site']['url'] = settings.URL
+        config = json.load(f)
 
+        config['site']['id'] = settings.SITEID
+        config['site']['name'] = settings.SITENAME
+        config['site']['sectionName'] = settings.SITENAME
+        config['site']['url'] = settings.URL
+
+        #populate max values for percent requests
+        for key in filter(lambda k: 'format' in k, config['itemKeys']):
+            if key['format']['type'] == 'percent' and key['format']['args'][0] == 'auto':
+                value = ItemSort.objects.aggregate(Max('votes'))['votes__max']
+                key['format']['args'][0] = value
+
+        response['data']['config'] = config
     if request.user.is_authenticated():
         response['data']['user'] = get_user_json(request.user)
     else:
