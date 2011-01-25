@@ -2,8 +2,9 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 import os.path
+from datetime import datetime
 
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Max
 from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
@@ -48,8 +49,14 @@ def _order_query(qs, sort, prefix='sort__'):
         operator = e['operator']
         if operator != '-':
             operator = ''
-        key = {'id': 'itemId'}.get(e['key'], e['key'])
-        order = '%s%s%s' % (operator, prefix, key)
+        key = {
+            'id': 'itemId',
+            'accessed': 'accessed__access',
+            'viewed': 'accessed__access'
+        }.get(e['key'], e['key'])
+        if key not in ('accessed__access', ):
+            key = "%s%s" % (prefix, key)
+        order = '%s%s' % (operator, key)
         order_by.append(order)
     if order_by:
         qs = qs.order_by(*order_by, nulls_last=True)
@@ -189,6 +196,18 @@ Positions
         response['data']['items'] = []
         qs = _order_query(query['qs'], query['sort'])
         _p = query['keys']
+        def only_p_sums(m):
+            r = {}
+            for p in _p:
+                if p in ('accessed', 'viewed'):
+                    r[p] = getattr(m, 'viewed')
+                elif p == 'popularity':
+                    r[p] = getattr(m, p)
+                else:
+                    r[p] = m.json.get(p, '')
+                if isinstance(r[p], datetime):
+                    r[p] = r[p].strftime('%Y-%m-%dT%H:%M:%SZ')
+            return r
         def only_p(m):
             r = {}
             if m:
@@ -196,9 +215,21 @@ Positions
                 for p in _p:
                     r[p] = m.get(p, '')
             return r
+        if 'viewed' in _p and request.user.is_authenticated():
+            qs = qs.filter(accessed__user=request.user)
         qs = qs[query['range'][0]:query['range'][1]]
         #response['data']['items'] = [m.get_json(_p) for m in qs]
-        response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]
+        if 'popularity' in _p:
+            qs = qs.annotate(popularity=Sum('accessed__accessed'))
+            response['data']['items'] = [only_p_sums(m) for m in qs]
+        elif 'viewed' in _p and request.user.is_authenticated():
+            qs = qs.annotate(viewed=Max('accessed__access'))
+            response['data']['items'] = [only_p_sums(m) for m in qs]
+        elif 'accessed' in _p:
+            qs = qs.annotate(viewed=Max('accessed__access'))
+            response['data']['items'] = [only_p_sums(m) for m in qs]
+        else:
+            response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]
     else: # otherwise stats
         items = query['qs']
         files = File.objects.all().filter(item__in=items).filter(size__gt=0)

@@ -125,18 +125,12 @@ class Item(models.Model):
         return default
 
     def access(self, user):
-        if user.is_authenticated():
-            access, created = Access.objects.get_or_create(item=self, user=user)
-        else:
-            access, created = Access.objects.get_or_create(item=self, user=None)
-        access.save()
-
         if self.public and self.available:
             return True
-        elif user.is_staff or \
-           self.user == user or \
-           self.groups.filter(id__in=user.groups.all()).count() > 0:
-            return True
+        elif user.is_authenticated() and \
+             (user.is_staff or self.user == user or \
+              self.groups.filter(id__in=user.groups.all()).count() > 0):
+                return True
         return False
 
     def editable(self, user):
@@ -431,13 +425,18 @@ class Item(models.Model):
                 sort_value = u''
             return sort_value
 
+        def set_value(s, name, value):
+            if not value:
+                value = None
+            setattr(s, name, value)
+
         base_keys = (
             'id',
             'aspectratio',
             'duration',
-            'color',
+            'hue',
             'saturation',
-            'brightness',
+            'lightness',
             'volume',
             'clips',
             'cuts',
@@ -448,24 +447,19 @@ class Item(models.Model):
             'pixels',
             'size',
             'bitrate',
-            'files',
-            'filename',
+            'numberoffiles',
             'published',
             'modified',
-            'popularity'
+            'popularity',
         )
-        max_int = 9223372036854775807L
 
-        def set_value(s, name, value):
-            if not value:
-                value = None
-            setattr(s, name, value)
-
-        for key in filter(lambda k: 'sort' in k, config['itemKeys']):
+        for key in filter(lambda k: 'columnWidth' in k, config['itemKeys']):
             name = key['id']
             source = name
-            sort_type = key['sort'].get('type', key['type'])
+            sort_type = key.get('sort', key['type'])
             if 'value' in key:
+                if 'layer' in key['value']:
+                   continue 
                 source = key['value']['key']
                 sort_type = key['value'].get('type', sort_type) 
 
@@ -525,8 +519,7 @@ class Item(models.Model):
             if 'bitrate' in videos[0].info:
                 s.bitrate = videos[0].info['bitrate']
             s.pixels = sum([v.pixels for v in videos])
-            s.filename = ' '.join([v.name for v in videos])[:955]
-            s.files = self.files.all().count()
+            s.numberoffiles = self.files.all().count()
             s.size = sum([v.size for v in videos]) #FIXME: only size of movies?
             s.volume = 0
         else:
@@ -540,10 +533,12 @@ class Item(models.Model):
             s.size = None
             s.volume = None
 
-        s.color = int(sum(self.data.get('color', [])))
-        s.saturation = None #FIXME
-        s.brightness = None #FIXME
-
+        if 'color' in self.data:
+            s.hue, s.saturation, s.brightness = self.data['color']
+        else:
+            s.hue = None
+            s.saturation = None
+            s.brighness = None
         s.cuts = len(self.data.get('cuts', []))
         if s.duration:
             s.cutsperminute = s.cuts / (s.duration/60)
@@ -559,7 +554,7 @@ class Item(models.Model):
             if not isinstance(current_values, list):
                 current_values = [current_values]
             saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
-            removed_values = filter(lambda x: x not in current_values, saved_values)
+            removed_values = filter(lambda i: i not in current_values, saved_values)
             if removed_values:
                 Facet.objects.filter(item=self, key=key, value__in=removed_values).delete()
             for value in current_values:
@@ -570,12 +565,6 @@ class Item(models.Model):
                     f = Facet(key=key, value=value, value_sort=value_sort)
                     f.item = self
                     f.save()
-        year = self.get('year', None)
-        if year:
-            f, created = Facet.objects.get_or_create(key='year', value=year,
-                                                     value_sort=year, item=self)
-        else:
-            Facet.objects.filter(item=self, key='year').delete()
 
     def path(self, name=''):
         h = self.itemId
@@ -789,13 +778,13 @@ class Item(models.Model):
 config = site_config()
 
 Item.facet_keys = []
-for key in filter(lambda k: 'find' in k, config['itemKeys']):
-    if 'autocomplete' in key['find'] and not 'autocompleteSortKey' in key['find']:
+for key in config['itemKeys']:
+    if 'autocomplete' in key and not 'autocompleteSortKey' in key:
         Item.facet_keys.append(key['id'])
 
 Item.person_keys = []
-for key in filter(lambda k: 'sort' in k, config['itemKeys']):
-    if key['sort'].get('type', '') == 'person':
+for key in config['itemKeys']:
+    if 'sort' in key and key['sort'] == 'person':
         Item.person_keys.append(key['id'])
 
 class ItemFind(models.Model):
@@ -822,10 +811,12 @@ attrs = {
     '__module__': 'item.models',
     'item': models.OneToOneField('Item', related_name='sort', primary_key=True),
 }
-for key in filter(lambda k: 'sort' in k, config['itemKeys']):
+for key in filter(lambda k: 'columnWidth' in k, config['itemKeys']):
     name = key['id']
     name = {'id': 'itemId'}.get(name, name)
-    sort_type = key['sort'].get('type', key['type'])
+    sort_type = key.get('sort', key['type'])
+    if isinstance(sort_type, list):
+        sort_type = sort_type[0]
     model = {
         'char': (models.CharField, dict(null=True, max_length=1000, db_index=True)),
         'year': (models.CharField, dict(null=True, max_length=4, db_index=True)),
@@ -840,6 +831,7 @@ for key in filter(lambda k: 'sort' in k, config['itemKeys']):
         'words': 'integer',
         'length': 'integer',
         'date': 'date',
+        'hue': 'float',
     }.get(sort_type, sort_type)]
     attrs[name] = model[0](**model[1])
 
@@ -854,7 +846,14 @@ class Access(models.Model):
     access = models.DateTimeField(auto_now=True)
     item = models.ForeignKey(Item, related_name='accessed')
     user = models.ForeignKey(User, null=True, related_name='accessed_items')
-    
+    accessed = models.IntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        if not self.accessed:
+            self.accessed = 0
+        self.accessed += 1
+        super(Access, self).save(*args, **kwargs)
+
     def __unicode__(self):
         if self.user:
             return u"%s/%s/%s" % (self.user, self.item, self.access)
