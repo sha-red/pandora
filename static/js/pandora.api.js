@@ -1,19 +1,17 @@
 /***
     Pandora API
 ***/
-
 var app = new Ox.App({
     apiURL: '/api/',
     init: 'init',
 }).launch(function(data) {
-    Ox.print('data', data)
     app.config = data.config;
     app.user = data.user;
     if (app.user.group == 'guest') {
         app.user = data.config.user;
         $.browser.safari && Ox.theme('modern');
     }
-
+    app.config.default_info = '<div class="OxSelectable"><h2>Overview</h2>use this api in the browser with Ox.app or use <a href="http://code.0x2620.org/pandora_client">pandora_client</a> to use it in python</div>';
     app.$body = $('body');
     app.$document = $(document);
     app.$window = $(window);
@@ -21,7 +19,7 @@ var app = new Ox.App({
 
     app.$ui = {};
     app.$ui.actionList = constructList();
-    app.$ui.actionInfo = Ox.Container().css({padding: '8px'});
+    app.$ui.actionInfo = Ox.Container().css({padding: '16px'}).html(app.config.default_info);
 
     app.api.api({docs: true}, function(results) {
         app.actions = results.data.actions;
@@ -31,11 +29,26 @@ var app = new Ox.App({
         }
     });
 
-    app.$ui.actionList.$body.css({overflowX: 'hidden', overflowY: 'auto'});
+    var $left = new Ox.SplitPanel({
+        elements: [
+            {
+                element: new Ox.Element().html(app.config.site.name + ' API').css({
+                    'background-color': '#ddd',
+                    'font-weight': 'bold',
+                    'padding': '8px'
+                }),
+                size: 24
+            },
+            {
+                element: app.$ui.actionList
+            }
+        ],
+        orientation: 'vertical'
+    });
     var $main = new Ox.SplitPanel({
         elements: [
             {
-                element: app.$ui.actionList,
+                element: $left,
                 size: 160
             },
             {
@@ -90,6 +103,7 @@ function constructList() {
                 });
             }
         },
+        scrollbarVisible: true,
         sort: [
             {
                 key: "name",
@@ -100,12 +114,16 @@ function constructList() {
        select: function(event, data) {
            var info = $('<div>').addClass('OxSelectable'),
                hash = '#';
-           $.each(data.ids, function(v, k) {
+           if(data.ids.length)
+              $.each(data.ids, function(v, k) {
                 console.log(k)
                 info.append($("<h2>").html(k));
                 info.append($('<pre>').html(app.actions[k]['doc'].replace('/\n/<br>\n/g')));
                 hash += k + ','
-            });
+              });
+            else
+              info.html(app.config.default_info);
+
             document.location.hash = hash.substring(0, hash.length-1);
             app.$ui.actionInfo.html(info);
        }
