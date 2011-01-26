@@ -119,10 +119,12 @@ function constructList() {
            if(data.ids.length)
               $.each(data.ids, function(v, k) {
                 info.append($("<h2>").html(k));
-                info.append($('<pre>').html(app.actions[k].doc.replace('/\n/<br>\n/g')));
-                
-                var $code = $('<pre>').html(app.actions[k].code.replace('/\n/<br>\n/g'))
-                                      .hide();
+                var $doc =$('<pre>')
+                           .html(app.actions[k].doc.replace('/\n/<br>\n/g'))
+                           .appendTo(info);
+                var $code = $('<code class=" python">')
+                             .html(app.actions[k].code.replace('/\n/<br>\n/g'))
+                             .hide();
                 var $button = new Ox.Button({
                   title: [
                     {id: "one", title: "expand"},
@@ -133,8 +135,10 @@ function constructList() {
                 .addClass("margin")
                 .click(function() { $code.toggle()})
                 .appendTo(info)
-               $('<span>').html(' View Python Source').appendTo(info)
-               $code.appendTo(info) 
+                $('<span>').html(' View Python Source').appendTo(info)
+                $('<pre>').append($code).appendTo(info) 
+                hljs.highlightBlock($code[0], '    ');
+
                 hash += k + ','
               });
             else
