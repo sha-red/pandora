@@ -32,10 +32,12 @@ var app = new Ox.App({
     var $left = new Ox.SplitPanel({
         elements: [
             {
-                element: new Ox.Element().html(app.config.site.name + ' API').css({
+                element: new Ox.Element().append(new Ox.Element()
+                .html(app.config.site.name + ' API').css({
+                    'padding': '4px',
+                })).css({
                     'background-color': '#ddd',
                     'font-weight': 'bold',
-                    'padding': '8px'
                 }),
                 size: 24
             },
