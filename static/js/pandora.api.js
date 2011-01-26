@@ -123,7 +123,7 @@ function constructList() {
                            .html(app.actions[k].doc.replace('/\n/<br>\n/g'))
                            .appendTo(info);
                 var $code = $('<code class=" python">')
-                             .html(app.actions[k].code.replace('/\n/<br>\n/g'))
+                             .html(app.actions[k].code[1].replace('/\n/<br>\n/g'))
                              .hide();
                 var $button = new Ox.Button({
                   title: [
@@ -135,7 +135,8 @@ function constructList() {
                 .addClass("margin")
                 .click(function() { $code.toggle()})
                 .appendTo(info)
-                $('<span>').html(' View Python Source').appendTo(info)
+                var f = app.actions[k].code[0];
+                $('<span>').html(' View Source ('+f+')').appendTo(info)
                 $('<pre>').append($code).appendTo(info) 
                 hljs.highlightBlock($code[0], '    ');
 
