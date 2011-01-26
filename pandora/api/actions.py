@@ -99,8 +99,9 @@ class ApiActions(dict):
         f = self[name]
         if name != 'api' and hasattr(f, 'func_closure') and f.func_closure:
             f = f.func_closure[0].cell_contents 
-        filename = f.func_code.co_filename[len(settings.PROJECT_ROOT)+1:]
-        return filename, trim(inspect.getsource(f))
+        info = f.func_code.co_filename[len(settings.PROJECT_ROOT)+1:]
+        info = u'%s:%s' % (info, f.func_code.co_firstlineno)
+        return info, trim(inspect.getsource(f))
 
     def register(self, method, action=None, cache=True):
         if not action:
