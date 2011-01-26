@@ -21,7 +21,7 @@ var app = new Ox.App({
     app.$ui.actionList = constructList();
     app.$ui.actionInfo = Ox.Container().css({padding: '16px'}).html(app.config.default_info);
 
-    app.api.api({docs: true}, function(results) {
+    app.api.api({docs: true, code: true}, function(results) {
         app.actions = results.data.actions;
 
         if(document.location.hash) {
@@ -118,9 +118,23 @@ function constructList() {
                hash = '#';
            if(data.ids.length)
               $.each(data.ids, function(v, k) {
-                console.log(k)
                 info.append($("<h2>").html(k));
-                info.append($('<pre>').html(app.actions[k]['doc'].replace('/\n/<br>\n/g')));
+                info.append($('<pre>').html(app.actions[k].doc.replace('/\n/<br>\n/g')));
+                
+                var $code = $('<pre>').html(app.actions[k].code.replace('/\n/<br>\n/g'))
+                                      .hide();
+                var $button = new Ox.Button({
+                  title: [
+                    {id: "one", title: "expand"},
+                    {id: "two", title: "collapse"},
+                  ],
+                  type: "image"
+                })
+                .addClass("margin")
+                .click(function() { $code.toggle()})
+                .appendTo(info)
+               $('<span>').html(' View Python Source').appendTo(info)
+               $code.appendTo(info) 
                 hash += k + ','
               });
             else

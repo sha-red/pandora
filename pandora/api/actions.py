@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 import sys
+import inspect
 
 from django.conf import settings
 
 from ox.django.shortcuts import render_to_json_response, json_response
 from ox.utils import json
+
 
 def autodiscover():
     #register api actions from all installed apps
@@ -19,7 +21,6 @@ def autodiscover():
             except:
                 if module_has_submodule(mod, 'views'):
                     raise
-
 
 def trim(docstring):
     if not docstring:
@@ -77,6 +78,7 @@ class ApiActions(dict):
             '''
             data = json.loads(request.POST.get('data', '{}'))
             docs = data.get('docs', False)
+            code = data.get('code', False)
             _actions = self.keys()
             _actions.sort()
             actions = {}
@@ -84,12 +86,20 @@ class ApiActions(dict):
                 actions[a] = self.properties[a]
                 if docs:
                     actions[a]['doc'] = self.doc(a)
+                if code:
+                    actions[a]['code'] = self.code(a)
             response = json_response({'actions': actions})
             return render_to_json_response(response)
         self.register(api)
 
     def doc(self, f):
         return trim(self[f].__doc__)
+
+    def code(self, name):
+        f = self[name]
+        if name != 'api' and hasattr(f, 'func_closure') and f.func_closure:
+            f = f.func_closure[0].cell_contents 
+        return trim(inspect.getsource(f))
 
     def register(self, method, action=None, cache=True):
         if not action:
@@ -102,3 +112,4 @@ class ApiActions(dict):
             del self[action]
 
 actions = ApiActions()
+

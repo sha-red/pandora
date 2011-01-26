@@ -24,7 +24,7 @@ import utils
 import tasks
 from archive import extract
 
-from annotaion.models import Annotation, Layer
+from annotation.models import Annotation, Layer
 from person.models import get_name_sort
 from app.models import site_config
 

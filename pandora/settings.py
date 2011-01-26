@@ -119,7 +119,7 @@ INSTALLED_APPS = (
 #    'south',
     'djcelery',
 
-    'annotaion',
+    'annotation',
     'app',
     'archive',
     'date',
