@@ -1762,11 +1762,11 @@ var pandora = new Ox.App({
                         })*/;
                     } else if (app.user.ui.itemView == 'timeline') {
                         var video = result.data.item.stream,
-    		                cuts = result.data.item.layers.cuts || {},
+    		                cuts = result.data.item.cuts || {},
     		                subtitles = result.data.item.layers.subtitles || [{
     		                    'in': 5,
     		                    'out': 10,
-    		                    'text': 'This subtitle is just a test...'
+    		                    'value': 'This subtitle is just a test...'
     		                }];
                             video.height = video.profiles[0]
     		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;

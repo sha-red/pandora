@@ -339,8 +339,6 @@ class Item(models.Model):
 
     def get_layers(self):
         layers = {}
-        layers['cuts'] = self.data.get('cuts', {})
-
         layers['subtitles'] = [] 
         #FIXME: should subtitles be stored in Annotation?
         qs = self.files.filter(is_subtitle=True, is_main=True, available=True)

@@ -195,7 +195,7 @@ class File(models.Model):
 
         srts = re.compile('(\d\d:\d\d:\d\d[,.]\d\d\d)\s*-->\s*(\d\d:\d\d:\d\d[,.]\d\d\d)\s*(.+?)\n\n', re.DOTALL)
         for s in srts.findall(data):
-            _s = {'in': parseTime(s[0]), 'out': parseTime(s[1]), 'text': s[2].strip()}
+            _s = {'in': parseTime(s[0]), 'out': parseTime(s[1]), 'value': s[2].strip()}
             srt.append(_s)
         return srt
 
