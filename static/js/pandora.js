@@ -667,7 +667,9 @@ var pandora = new Ox.App({
                         format: key.format,
                         id: key.id,
                         title: key.title,
-                        type: key.type
+                        type: key.type == 'layer' ? Ox.getObjectById(
+                            app.config.layers, key.id
+                        ).type : key.type
                     };
                 }),
                 sortKeys: app.ui.sortKeys,
