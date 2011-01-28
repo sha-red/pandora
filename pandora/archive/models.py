@@ -77,7 +77,8 @@ class File(models.Model):
             for key in ('duration', 'size'):
                 setattr(self, key, self.info.get(key, 0))
 
-            if 'video' in self.info and self.info['video']:
+            if 'video' in self.info and self.info['video'] and \
+               'width' in self.info['video'][0]:
                 video = self.info['video'][0]
                 self.video_codec = video['codec']
                 self.width = video['width']

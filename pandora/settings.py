@@ -132,6 +132,7 @@ INSTALLED_APPS = (
     'timeline',
     'user',
     'api',
+    'urlalias',
 )
 
 AUTH_PROFILE_MODULE = 'user.UserProfile'

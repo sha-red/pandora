@@ -6,6 +6,8 @@ from datetime import datetime
 import os.path
 import subprocess
 from glob import glob
+import uuid
+import unicodedata
 
 from django.db import models
 from django.db.models import Sum
@@ -76,12 +78,15 @@ def get_item(info):
                     except Item.DoesNotExist:
                         item.save()
     else:
-        try:
-            item = Item.objects.get(itemId=info['itemId'])
-        except Item.DoesNotExist:
-            item = Item(itemId=info['itemId'])
+        qs = Item.objects.filter(find__key='title', find__value=info['title'])
+        if qs.count() == 1:
+            item = qs[0]
+        else:
+            item = Item()
+            item.data = {
+                'title': info['title']
+            }
             item.save()
-
     return item
 
 
@@ -195,13 +200,20 @@ class Item(models.Model):
     def __unicode__(self):
         year = self.get('year')
         if year:
-            return u'%s (%s)' % (self.get('title'), self.get('year'))
-        return self.get('title')
+            return u'%s (%s)' % (self.get('title', 'Untitled'), self.get('year'))
+        return self.get('title', u'Untitled')
 
     def get_absolute_url(self):
         return '/%s' % self.itemId
 
     def save(self, *args, **kwargs):
+        if not self.id:
+            if not self.itemId:
+                self.itemId = str(uuid.uuid1())
+            super(Item, self).save(*args, **kwargs)
+            if not settings.USE_IMDB:
+                self.itemId = ox.to32(self.id)    
+ 
         self.oxdbId = self.oxdb_id()
 
         if self.poster:
@@ -367,6 +379,8 @@ class Item(models.Model):
 
 
     def oxdb_id(self):
+        if not settings.USE_IMDB:
+            return self.itemId
         return utils.oxdb_id(self.get('title', ''), self.get('director', []), str(self.get('year', '')),
                           self.get('season', ''), self.get('episode', ''),
                           self.get('episode_title', ''), self.get('episode_director', []), self.get('episode_year', ''))
@@ -388,7 +402,8 @@ class Item(models.Model):
                 f.delete()
 
         #FIXME: use site_config
-        save('title', '\n'.join([self.get('title'), self.get('original_title', '')]))
+        save('title', u'\n'.join([self.get('title', 'Untitled'),
+                                 self.get('original_title', '')]))
 
         for key in self.facet_keys:
             if key == 'character':
@@ -466,7 +481,7 @@ class Item(models.Model):
 
             if name not in base_keys:
                 if sort_type == 'title':
-                    value = utils.sort_title(canonicalTitle(self.get(source)))
+                    value = utils.sort_title(canonicalTitle(self.get(source, u'Untitled')))
                     value = utils.sort_string(value)
                     set_value(s, name, value)
                 elif sort_type == 'person':
@@ -577,7 +592,11 @@ class Item(models.Model):
     '''
 
     def frame(self, position, width=128):
-        stream = self.streams.filter(profile=settings.VIDEO_PROFILE+'.webm')[0]
+        stream = self.streams.filter(profile=settings.VIDEO_PROFILE+'.webm')
+        if stream.count()>0:
+            stream = stream[0]
+        else:
+            return None
         path = os.path.join(settings.MEDIA_ROOT, self.path(),
                             'frames', "%d"%width, "%s.jpg"%position)
         if not os.path.exists(path):
@@ -739,9 +758,12 @@ class Item(models.Model):
                        '-l', timeline,
                        '-p', poster
                       ]
-                if settings.USE_IMDB and len(self.itemId) == 7:
+                if settings.USE_IMDB:
+                    if len(self.itemId) == 7:
+                        cmd += ['-i', self.itemId]
+                    cmd += ['-o', self.oxdbId]
+                else:
                     cmd += ['-i', self.itemId]
-                cmd += ['-o', self.oxdbId]
                 p = subprocess.Popen(cmd)
                 p.wait()
         return posters.keys()
