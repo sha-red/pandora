@@ -52,7 +52,10 @@ def getPage(request):
         name = data
     else:
         name = data['name']
-    page = get_object_or_404_json(models.Page, name=name)
+    page, created = models.Page.objects.get_or_create(name=name)
+    if created:
+        page.body = 'Insert text here'
+        page.save()
     response = json_response({'name': page.name, 'body': page.body})
     return render_to_json_response(response)
 actions.register(getPage)

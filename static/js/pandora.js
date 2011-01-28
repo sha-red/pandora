@@ -527,7 +527,7 @@ var pandora = new Ox.App({
 		},
         backButton: function() {
             var that = Ox.Button({
-                title: 'Back to Movies',
+                title: 'Back to ' + app.config.itemName.plural,
                 width: 96
             }).css({
                 float: 'left',
@@ -725,7 +725,7 @@ var pandora = new Ox.App({
                     elements: $.merge(app.user.ui.list ? [
                             app.$ui.findListSelect = new Ox.Select({
                                     items: [
-                                        {id: 'all', title: 'Find: All Movies'},
+                                        {id: 'all', title: 'Find: All ' + app.config.itemName.plural},
                                         {id: 'list', title: 'Find: This List'}
                                     ],
                                     overlap: 'right',
@@ -1725,7 +1725,7 @@ var pandora = new Ox.App({
                     } else if (app.user.ui.itemView == 'player') {
                         var video = result.data.item.stream,
                             subtitles = result.data.item.layers.subtitles;
-                        video.height = 96;
+                            video.height = video.profiles[0]
     		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
     		            video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
                         app.$ui.contentPanel.replace(1, app.$ui.player = new Ox.VideoPanelPlayer({
@@ -1766,7 +1766,7 @@ var pandora = new Ox.App({
     		                    'out': 10,
     		                    'text': 'This subtitle is just a test...'
     		                }];
-    		            video.height = 96;
+                            video.height = video.profiles[0]
     		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
     		            video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
                         that.replace(0, app.$ui.editor = new Ox.VideoEditor({
@@ -2260,7 +2260,7 @@ var pandora = new Ox.App({
 		            if (data.ids.length == 1) {
 		                $still = $('<img>')
 		                    .attr({
-		                        src: 'http://0xdb.org/' + data.ids[0] + '/still.jpg'
+		                        src: '/' + data.ids[0] + '/icon.jpg'
 		                    })
 		                    .one('load', function() {
 		                        if (data.ids[0] != app.ui.selectedMovies[0]) {
@@ -2397,7 +2397,7 @@ var pandora = new Ox.App({
 		                ] },
 		                { id: 'listMenu', title: 'List', items: [
 		                    { id: 'history', title: 'History', items: [
-		                        { id: 'allmovies', title: 'All Movies' }
+		                        { id: 'allmovies', title: 'All ' + app.config.itemName.plural }
 		                    ] },
 		                    { id: 'lists', title: 'View List', items: [
 		                        { id: 'favorites', title: 'Favorites' }
@@ -2412,7 +2412,7 @@ var pandora = new Ox.App({
 		                    { id: 'newsmartlist', title: 'New Smart List...', keyboard: 'alt control n' },
 		                    { id: 'newsmartlistfromresults', title: 'New Smart List from Results...', keyboard: 'shift alt control n' },
 		                    {},
-		                    { id: 'addmovietolist', title: ['Add Selected Movie to List...', 'Add Selected Movies to List...'], disabled: true },
+		                    { id: 'addmovietolist', title: ['Add Selected ' + app.config.itemName.singular + ' to List...', 'Add Selected ' + app.config.itemName.plural + ' to List...'], disabled: true },
 		                    {},
 		                    { id: 'setposterframe', title: 'Set Poster Frame', disabled: true }
 		                ]},
@@ -2430,7 +2430,7 @@ var pandora = new Ox.App({
 		                    { id: 'invertselection', title: 'Invert Selection', disabled: true, keyboard: 'alt control a' }
 		                ] },
 		                { id: 'viewMenu', title: 'View', items: [
-		                    { id: 'movies', title: 'View Movies', items: [
+		                    { id: 'movies', title: 'View ' + app.config.itemName.plural, items: [
 		                        { group: 'viewmovies', min: 0, max: 1, items: $.map(app.config.listViews, function(view, i) {
 		                            return $.extend({
 		                                checked: app.user.ui.lists[app.user.ui.list].listView == view.id,
@@ -2447,7 +2447,7 @@ var pandora = new Ox.App({
 		                        { id: 'video', title: 'Video' }
 		                    ] },
 		                    {},
-		                    { id: 'openmovie', title: ['Open Movie', 'Open Movies'], disabled: true, items: [
+		                    { id: 'openmovie', title: ['Open ' + app.config.itemName.singular, 'Open ' + app.config.itemName.plural], disabled: true, items: [
 		                        { group: 'movieview', min: 0, max: 1, items: $.map(app.config.itemViews, function(view, i) {
 		                            return $.extend({
 		                                checked: app.user.ui.itemView == view.id,
@@ -2458,17 +2458,17 @@ var pandora = new Ox.App({
 		                    { id: 'lists', title: 'Hide Lists', keyboard: 'shift l' },
 		                    { id: 'info', title: 'Hide Info', keyboard: 'shift i' },
 		                    { id: 'groups', title: 'Hide Groups', keyboard: 'shift g' },
-		                    { id: 'movies', title: 'Hide Movies', disabled: true, keyboard: 'shift m' }
+		                    { id: 'movies', title: 'Hide ' + app.config.itemName.plural, disabled: true, keyboard: 'shift m' }
 		                ]},
 		                { id: 'sortMenu', title: 'Sort', items: [
-		                    { id: 'sortmovies', title: 'Sort Movies by', items: [
+		                    { id: 'sortmovies', title: 'Sort ' + app.config.itemName.plural + ' by', items: [
 		                        { group: 'sortmovies', min: 1, max: 1, items: $.map(app.ui.sortKeys, function(key, i) {
 		                            return $.extend({
 		                                checked: app.user.ui.lists[app.user.ui.list].sort[0].key == key.id,
 		                            }, key);
 		                        }) }
 		                    ] },
-		                    { id: 'ordermovies', title: 'Order Movies', items: [
+		                    { id: 'ordermovies', title: 'Order ' + app.config.itemName.plural, items: [
 		                        { group: 'ordermovies', min: 1, max: 1, items: [
 		                            { id: 'ascending', title: 'Ascending', checked: app.user.ui.lists[app.user.ui.list].sort[0].operator === '' },
 		                            { id: 'descending', title: 'Descending', checked: app.user.ui.lists[app.user.ui.list].sort[0].operator == '-' }
@@ -2945,6 +2945,9 @@ var pandora = new Ox.App({
 			                
 			            }
 			        });
+                    pandora.api.getPage(app.user.ui.sitePage, function(result) {
+                        that.html(result.data.body).css({'overflow-y':'auto'});                        
+                    });
 			} else if (app.user.ui.section == 'items') {
 			    that = new Ox.SplitPanel({
                     elements: [
@@ -3692,7 +3695,7 @@ var pandora = new Ox.App({
                         item: ''
                     });
                 },
-    			'^(|about|archives|faq|help|home|news|preferences|software|terms|tour)$': function(url) {
+    			'^(|about|archives|faq|help|license|home|news|preferences|software|terms|tour)$': function(url) {
                     UI.set({
                         section: 'site',
                         sitePage: url || 'home'
@@ -3775,6 +3778,8 @@ var pandora = new Ox.App({
                 URL.parse();
                 if (app.user.ui.section != old.user.ui.section) {
                     app.$ui.appPanel.replace(1, app.$ui.mainPanel = ui.mainPanel());
+                } else if (app.user.ui.sitePage != old.user.ui.sitePage) {
+                    app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
                 } else if (!app.user.ui.item || !old.user.ui.item) {
                     app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
                 } else {

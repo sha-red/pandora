@@ -6,6 +6,7 @@ from celery.decorators import task
 
 from item.utils import parse_path
 from item.models import get_item
+from django.conf import settings
 
 import models
 
@@ -55,7 +56,10 @@ def update_files(user, volume, files):
             #new oshash, add to database
             else:
                 if not i:
-                    item_info = parse_path(folder)
+                    if settings.USE_IMDB:
+                        item_info = parse_path(folder)
+                    else:
+                        item_info = parse_path(path)
                     i = get_item(item_info)
                 file_object = models.File()
                 file_object.oshash = oshash
