@@ -378,25 +378,29 @@
             "id": "published",
             "title": "Date Published",
             "type": "date",
-            "columnWidth": 90
+            "columnWidth": 90,
+            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]}
         },
         {
             "id": "modified",
             "title": "Date Modified",
             "type": "date",
-            "columnWidth": 90
+            "columnWidth": 90,
+            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]}
         },
         {
             "id": "accessed",
             "title": "Date Accessed",
             "type": "date",
-            "columnWidth": 90
+            "columnWidth": 90,
+            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]}
         },
         {
             "id": "viewed",
             "title": "Date Viewed",
             "type": "date",
-            "columnWidth": 90
+            "columnWidth": 90,
+            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]}
         },
         {
             "id": "popularity",
