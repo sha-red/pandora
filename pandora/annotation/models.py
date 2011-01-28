@@ -4,6 +4,7 @@ from __future__ import division, with_statement
 
 from django.db import models
 from django.contrib.auth.models import User
+import ox
 
 import utils
 
@@ -83,11 +84,12 @@ class Annotation(models.Model):
         return {
             'id': self.get_id(),
             'user': self.user.username,
-            'start': self.start,
-            'end': self.end,
+            'in': self.start,
+            'out': self.end,
             'value': self.value,
             'value_html': self.html(),
-            'layer': self.layer.name
+            'created': self.created.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            'modified': self.modified.strftime('%Y-%m-%dT%H:%M:%SZ')
         }
 
     def __unicode__(self):
