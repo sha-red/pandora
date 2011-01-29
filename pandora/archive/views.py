@@ -14,7 +14,7 @@ from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 from ox.django.views import task_status
 
-from item.utils import parse_path
+from item import utils
 from item.models import get_item
 from item.views import _parse_query
 import item.tasks
@@ -244,7 +244,7 @@ def editFile(request):
     if f.item.id != data['itemId']:
         if len(data['itemId']) != 7:
             folder = f.instances.all()[0].folder
-            item_info = parse_path(folder)
+            item_info = utils.parse_path(folder)
             item = get_item(item_info)
         else:
             item = get_item({'imdbId': data['itemId']})
@@ -419,27 +419,14 @@ Positions
     elif 'keys' in query:
         response['data']['items'] = []
         qs = models.File.objects.filter(item__in=query['qs'])
-        qs = _order_query(qs, query['sort'])
+        #qs = _order_query(qs, query['sort'])
         keys = query['keys']
         qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [f.json(keys) for f in qs]
     else: # otherwise stats
         items = query['qs']
         files = models.File.objects.filter(item__in=query['qs'])
-        #files = models.File.objects.all().filter(item__in=items).exclude(size__gt=0)
-        r = files.aggregate(
-            Sum('duration'),
-            Sum('pixels'),
-            Sum('size')
-        )
-        response['data']['duration'] = r['duration__sum']
-        response['data']['files'] = files.count()
-        response['data']['items'] = items.count()
-        response['data']['pixels'] = r['pixels__sum']
-        response['data']['runtime'] = items.filter(sort__runtime_desc__gt=0).aggregate(Sum('sort__runtime_desc'))['sort__runtime_desc__sum']
-        if response['data']['runtime'] == None:
-            response['data']['runtime'] = 0
-        response['data']['size'] = r['size__sum']
+        response['data']['items'] = files.count()
     return render_to_json_response(response)
 
 actions.register(findFiles)

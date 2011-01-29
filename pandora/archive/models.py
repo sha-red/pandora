@@ -229,7 +229,8 @@ class File(models.Model):
             'name': self.name,
             'size': self.size,
             'info': self.info,
-            'instances': self.instances.count()
+            'instances': self.instances.count(),
+            'is_main': self.is_main
         }
         if keys:
             for k in data.keys():
