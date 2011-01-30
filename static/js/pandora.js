@@ -636,6 +636,99 @@
 		    })
 			return that;
 		},
+        files: function() {
+             var that = new Ox.TextList({
+                columns: [
+                    {
+                        align: "left",
+                        id: "name",
+                        operator: "+",
+                        title: "Name",
+                        unique: true,
+                        visible: true,
+                        width: 400
+                    },
+                    {
+                        align: "left",
+                        id: "oshash",
+                        operator: "+",
+                        title: "oshash",
+                        visible: true,
+                        width: 120
+                    },
+                    {
+                        align: "left",
+                        id: "instances",
+                        operator: "+",
+                        title: "Instances",
+                        visible: true,
+                        width: 60
+                    },
+                    {
+                        align: "left",
+                        id: "width",
+                        operator: "+",
+                        title: "Width",
+                        visible: true,
+                        width: 60
+                    },
+                    {
+                        align: "left",
+                        id: "height",
+                        operator: "+",
+                        title: "Height",
+                        visible: true,
+                        width: 60
+                    },
+                    {
+                        align: "left",
+                        id: "duration",
+                        operator: "+",
+                        title: "Duration",
+                        visible: true,
+                        width: 80,
+                        format: {type: "duration", args: [0, "medium"]}
+                    },
+                    {
+                        align: "left",
+                        id: "size",
+                        operator: "+",
+                        title: "Size",
+                        visible: true,
+                        width: 80,
+                        format: {type: "value", args: ["B"]}
+                    },
+                    {
+                        align: "left",
+                        id: "is_main",
+                        operator: "+",
+                        title: "Main",
+                        visible: true,
+                        width: 140
+                    }
+                ],
+                columnsMovable: true,
+                columnsRemovable: true,
+                columnsResizable: true,
+                columnsVisible: true,
+                id: 'files',
+                request: function(data, callback) {
+                    //Ox.print('data, Query.toObject', data, Query.toObject())
+                    pandora.api.findFiles($.extend(data, {
+                        query: {
+                            conditions: [{
+                                key: 'id',
+                                value: app.user.ui.item,
+                                operator: '='
+                            }]
+                        }
+                    }), callback);
+                },
+                scrollbarVisible: true,
+                sort: [{key: 'name', operator:'+'}]
+            });
+            return that;
+        },
         filter: function() {
             var that = new Ox.Filter({
                 findKeys: $.map(app.config.itemKeys, function(key) {
@@ -1800,98 +1893,7 @@
     	                });
     	                */    		            
                     } else if (app.user.ui.itemView == 'files') {
-                        app.$ui.contentPanel.replace(1,
-                            app.$ui.item = new Ox.TextList({
-                                columns: [
-                                    {
-                                        align: "left",
-                                        id: "name",
-                                        operator: "+",
-                                        title: "Name",
-                                        unique: true,
-                                        visible: true,
-                                        width: 400
-                                    },
-                                    {
-                                        align: "left",
-                                        id: "oshash",
-                                        operator: "+",
-                                        title: "oshash",
-                                        visible: true,
-                                        width: 120
-                                    },
-                                    {
-                                        align: "left",
-                                        id: "instances",
-                                        operator: "+",
-                                        title: "Instances",
-                                        visible: true,
-                                        width: 60
-                                    },
-                                    {
-                                        align: "left",
-                                        id: "width",
-                                        operator: "+",
-                                        title: "Width",
-                                        visible: true,
-                                        width: 60
-                                    },
-                                    {
-                                        align: "left",
-                                        id: "height",
-                                        operator: "+",
-                                        title: "Height",
-                                        visible: true,
-                                        width: 60
-                                    },
-                                    {
-                                        align: "left",
-                                        id: "duration",
-                                        operator: "+",
-                                        title: "Duration",
-                                        visible: true,
-                                        width: 80,
-                                        format: {type: "duration", args: [0, "medium"]}
-                                    },
-                                    {
-                                        align: "left",
-                                        id: "size",
-                                        operator: "+",
-                                        title: "Size",
-                                        visible: true,
-                                        width: 80,
-                                        format: {type: "value", args: ["B"]}
-                                    },
-                                    {
-                                        align: "left",
-                                        id: "is_main",
-                                        operator: "+",
-                                        title: "Main",
-                                        visible: true,
-                                        width: 140
-                                    }
-                                ],
-                                columnsMovable: true,
-                                columnsRemovable: true,
-                                columnsResizable: true,
-                                columnsVisible: true,
-                                id: 'files',
-                                request: function(data, callback) {
-                                    //Ox.print('data, Query.toObject', data, Query.toObject())
-                                    pandora.api.findFiles($.extend(data, {
-                                        query: {
-                                            conditions: [{
-                                                key: 'id',
-                                                value: result.data.item.id,
-                                                operator: '='
-                                            }]
-                                        }
-                                    }), callback);
-                                },
-                                scrollbarVisible: true,
-                                sort: [{key: 'name', operator:'+'}]
-                            })
-                        );
+                        app.$ui.contentPanel.replace(1, app.$ui.files = ui.files());
                     }
                     app.$ui.total.html(result.data.item.title + ' (' + result.data.item.director.join(', ') + ')')
 		        });
