@@ -2,36 +2,34 @@
     Pandora
 ***/
 
-var pandora = new Ox.App({
-    apiURL: '/api/',
-    init: 'init',
-}).launch(function(data) {
+// fixme: never set ui.videoPosition to 0 ... set to null a.k.a. delete
+// fixme: sort=-director doesn't work
+// fixme: don't reload full right panel on sortSelect
 
-    //Ox.print('data', data);
+(function() {
 
-    // fixme: never set ui.videoPosition to 0 ... set to null a.k.a. delete
-    // fixme: sort=-director doesn't work
-    // fixme: don't reload full right panel on sortSelect
+    window.pandora = new Ox.App({url: '/api/'}).launch(function(data) {
 
-	var app = {
-			$ui: {
-				body: $('body'),
-				document: $(document),
-				window: $(window)
-				    .resize(resizeWindow)
-				    .unload(unloadWindow)
-			},
-			config: data.config,
-			requests: {},
-			ui: {
-			    findKeys: $.map(data.config.itemKeys, function(key, i) {
-			        return key.find ? key : null;
-			    }),
-				infoRatio: 16 / 9,
-				scrollbarSize: $.browser.mozilla ? 16 : 12,
-				sectionElement: 'buttons',
-			    sectionFolders: {
-			        site: $.merge([
+        Ox.print('Ox.App launch', data);
+
+        $.extend(app, {
+    		$ui: {
+    			body: $('body'),
+    			document: $(document),
+    			window: $(window)
+    			    .resize(resizeWindow)
+    			    .unload(unloadWindow)
+    		},
+            config: data.config,
+            ui: {
+    		    findKeys: $.map(data.config.itemKeys, function(key, i) {
+    		        return key.find ? key : null;
+    		    }),
+    			infoRatio: 16 / 9,
+    			scrollbarSize: $.browser.mozilla ? 16 : 12,
+    			sectionElement: 'buttons',
+    		    sectionFolders: {
+    		        site: $.merge([
                         {id: 'site', title: 'Site', items: $.merge([
                             {id: 'home', title: 'Home'}
                         ], $.merge(data.config.sitePages, [
@@ -48,31 +46,23 @@ var pandora = new Ox.App({
                             {id: 'users', title: 'Users'}
                         ]}
                     ] : []),
-			        items: [
+    		        items: [
                         {id: 'personal', title: 'Personal Lists'},
                         {id: 'favorite', title: 'Favorite Lists', showBrowser: false},
                         {id: 'featured', title: 'Featured Lists', showBrowser: false}
-			        ],
-			    },
-		        selectedMovies: [],
-			    sortKeys: $.map(data.config.itemKeys, function(key, i) {
-			        return key.columnWidth ? key : null;
-			    })
-			},
-			user: data.user
-		};
+    		        ],
+    		    },
+    	        selectedMovies: [],
+    		    sortKeys: $.map(data.config.itemKeys, function(key, i) {
+    		        return key.columnWidth ? key : null;
+    		    })
+    		},
+    		user: data.user.level == 'guest' ? $.extend({}, data.config.user) : data.user
+        });
 
-    pandora.app = app; // remove later
-
-    if ($.browser.mozilla) {
-        app.config.user.ui.theme = 'classic'
-    }
-
-    if (app.user.level == 'guest') {
-        app.user = $.extend({}, app.config.user);
-    }
-
-	function load() {
+        if (data.user.level == 'guest' && $.browser.mozilla) {
+            app.user.ui.theme = 'classic'
+        }
 
 	    URL.parse();
 	    window.onpopstate = function() {
@@ -80,33 +70,21 @@ var pandora = new Ox.App({
 	    };
 
         Ox.theme(app.user.ui.theme);
-		app.$ui.appPanel = ui.appPanel();
+		app.$ui.appPanel = ui.appPanel().display();	    
 
-        $(function() {
+    	Ox.Request.requests() && app.$ui.loadingIcon.start();
+    	app.$ui.body.ajaxStart(app.$ui.loadingIcon.start);
+    	app.$ui.body.ajaxStop(app.$ui.loadingIcon.stop);
 
-    		app.$ui.appPanel.display();	    
+        app.ui.sectionButtonsWidth = app.$ui.sectionButtons.width() + 8;
 
-    	    Ox.Request.requests() && app.$ui.loadingIcon.start();
-    	    app.$ui.body.ajaxStart(app.$ui.loadingIcon.start);
-    	    app.$ui.body.ajaxStop(app.$ui.loadingIcon.stop);
+        window.pandora.app = app;
 
-            app.ui.sectionButtonsWidth = app.$ui.sectionButtons.width() + 8;
+    });
 
-        });
-
-	}
-
-    function login(data) {
-        app.user = data.user;
-        Ox.theme(app.user.ui.theme);
-        app.$ui.appPanel.reload();
-    }
-
-    function logout(data) {
-        app.user = data.user;
-        Ox.theme(app.config.user.ui.theme);
-        app.$ui.appPanel.reload();
-    }
+	var app = {
+		requests: {}
+	};
 
 	var ui = {
 	    accountDialog: function(action) {
@@ -744,13 +722,16 @@ var pandora = new Ox.App({
                         ] : [], [
                             app.$ui.findSelect = new Ox.Select({
                                     id: 'select',
-                                    items: $.merge($.map(app.ui.findKeys, function(key, i) {
+                                    items: $.merge($.merge([{
+                                        id: 'all',
+                                        title: 'Find: All'
+                                    }], $.map(app.ui.findKeys, function(key, i) {
                                         return {
                                             id: key.id,
                                             checked: key.id == findKey,
                                             title: 'Find: ' + key.title
                                         };
-                                    }), [{}, {
+                                    })), [{}, {
                                         id: 'advanced',
                                         title: 'Find: Advanced'
                                     }]),
@@ -994,7 +975,7 @@ var pandora = new Ox.App({
                             }, function(result) {
                                 Ox.print('result', result)
                                 if (result.data.user == app.user.username || result.data.subscribed) {
-                                    Ox.Request.emptyCache(); // fixme: remove
+                                    Ox.Request.clearCache(); // fixme: remove
                                     app.$ui.folderList[
                                         result.data.user == app.user.username ? 'personal' : 'favorite'
                                     ].reloadList();
@@ -1223,14 +1204,14 @@ var pandora = new Ox.App({
                                 // fixme: is this the best way to delete a ui preference?
                                 delete app.user.ui.lists[data.ids[0]];
                                 UI.set({lists: app.user.ui.lists});
-        	                    Ox.Request.emptyCache(); // fixme: remove
+        	                    Ox.Request.clearCache(); // fixme: remove
                                 $list.reloadList();
                             });
                         } else if (id == 'favorite') {
                             pandora.api.unsubscribeFromList({
                                 id: data.ids[0]
                             }, function(result) {
-        	                    Ox.Request.emptyCache(); // fixme: remove
+        	                    Ox.Request.clearCache(); // fixme: remove
                                 $list.reloadList();
                             });
                         } else if (id == 'featured' && app.user.level == 'admin') {
@@ -1240,7 +1221,7 @@ var pandora = new Ox.App({
                             }, function(result) {
                                 // fixme: duplicated
                                 if (result.data.user == app.user.username || result.data.subscribed) {
-                                    Ox.Request.emptyCache(); // fixme: remove
+                                    Ox.Request.clearCache(); // fixme: remove
                                     app.$ui.folderList[
                                         result.data.user == app.user.username ? 'personal' : 'favorite'
                                     ].reloadList();
@@ -1371,7 +1352,7 @@ var pandora = new Ox.App({
         		                        id = result.data.id;
         		                        UI.set(['lists', id].join('|'), app.config.user.ui.lists['']); // fixme: necessary?
         		                        URL.set('?find=list:' + id)
-                	                    Ox.Request.emptyCache(); // fixme: remove
+                	                    Ox.Request.clearCache(); // fixme: remove
         		                        $list.reloadList().bindEvent({load: load});
         		                        function load(event, data) {
                 		                    $list.gainFocus()
@@ -1393,7 +1374,7 @@ var pandora = new Ox.App({
     		            })
     		            .bindEvent({
     		                change: function(event, data) {
-    		                    Ox.Request.emptyCache(); // fixme: remove
+    		                    Ox.Request.clearCache(); // fixme: remove
     		                    app.ui.sectionFolders.items[i].showBrowser = !app.ui.sectionFolders.items[i].showBrowser;
     		                    if (app.ui.sectionFolders.items[i].showBrowser) {
         		                    app.$ui.folderList.favorite.replaceWith(
@@ -1417,7 +1398,7 @@ var pandora = new Ox.App({
     		            })
     		            .bindEvent({
     		                change: function(event, data) {
-    		                    Ox.Request.emptyCache(); // fixme: remove
+    		                    Ox.Request.clearCache(); // fixme: remove
     		                    app.ui.sectionFolders.items[i].showBrowser = !app.ui.sectionFolders.items[i].showBrowser;
     		                    if (app.ui.sectionFolders.items[i].showBrowser) {
         		                    app.$ui.folderList.featured.replaceWith(
@@ -1450,7 +1431,7 @@ var pandora = new Ox.App({
         		                    }, function(result) {
         		                        id = result.data.id;
         		                        URL.set('?find=list:' + id)
-                	                    Ox.Request.emptyCache(); // fixme: remove
+                	                    Ox.Request.clearCache(); // fixme: remove
         		                        $list.reloadList().bindEvent({load: load});
         		                        function load(event, data) {
                 		                    $list.gainFocus()
@@ -3308,6 +3289,18 @@ var pandora = new Ox.App({
         ) > -1 ? '+' : '-';
     }
 
+    function login(data) {
+        app.user = data.user;
+        Ox.theme(app.user.ui.theme);
+        app.$ui.appPanel.reload();
+    }
+
+    function logout(data) {
+        app.user = data.user;
+        Ox.theme(app.config.user.ui.theme);
+        app.$ui.appPanel.reload();
+    }
+
     function reloadGroups(i) {
         var query = Query.toObject();
         app.$ui.list.options({
@@ -3337,7 +3330,7 @@ var pandora = new Ox.App({
     function reloadList() {
         Ox.print('reloadList')
         var listData = getListData();
-        Ox.Request.emptyCache(); // fixme: remove
+        Ox.Request.clearCache(); // fixme: remove
         app.$ui.groups.forEach(function($group) {
             $group.reloadList();
         });
@@ -3843,6 +3836,4 @@ var pandora = new Ox.App({
 		}
 	}
 
-	load();
-
-});
+})();
