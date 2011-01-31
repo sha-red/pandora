@@ -912,6 +912,29 @@
             }
 			return that;
 		},
+        flipbook: function(item) {
+            var that = new Ox.Flipbook({
+                }).bindEvent('click', function(event, data) {
+                    alert(data.position);
+                });
+                pandora.api.getItem(item, function(result) {
+                    var duration = result.data.item.duration,
+                        posterFrame = result.data.item.posterFrame || parseInt(duration/2),
+                        steps = 24,
+                        framePrefix = '/' + item + '/frame/' + that.width() + '/',
+                        frames = {};
+                    Ox.range(0, duration, duration/steps).forEach(function(position) {
+                        position = parseInt(position);
+                        frames[position] = framePrefix + position + '.jpg';
+                    });
+                    that.options({
+                        frames: frames,
+                        icon: framePrefix + posterFrame + '.jpg',
+                        duration: duration
+                    });
+                });
+            return that;
+        },
         folderBrowser: function(id) {
             var that = new Ox.SplitPanel({
                 elements: [
@@ -1738,7 +1761,7 @@
 		info: function() {
 			var that = new Ox.Element()
 		        .append(
-		            app.$ui.infoStill = new Ox.Element('img')
+		            app.$ui.infoStill = new Ox.Element('div')
 		                .css({
 		                    position: 'absolute',
 		                    left: 0,
@@ -1761,6 +1784,26 @@
 		                resizeFolders();
 		            }
 		        });
+            if(app.user.ui.item) {
+                pandora.api.getItem(app.user.ui.item, function(result) {
+                    app.ui.infoRatio = result.data.item.stream.aspectRatio;
+                    var width = that.width() || 256,
+                        height = width / app.ui.infoRatio + 16;
+                    app.$ui.infoStill.remove();
+                    app.$ui.infoStill = ui.flipbook(app.user.ui.item)
+                                          .appendTo(that.$element);
+                    app.$ui.infoStill.css({
+                        'height': (height-16) + 'px'
+                    });
+                    that.css({
+                        height: height  + 'px'
+                    });
+                    resizeFolders();
+                    !app.user.ui.showInfo && app.$ui.leftPanel.css({bottom: -height});
+                    app.$ui.leftPanel.size(2, height );
+                });
+                app.$ui.infoTimeline.attr('src', '/'+app.user.ui.item+'/timeline.16.png')
+            }
 		    return that;
 		},
         item: function() {
@@ -2336,71 +2379,24 @@
 		                app.$ui.mainMenu.disableItem('openmovie');            
 		            }
 		            if (data.ids.length == 1) {
-		                $still = $('<img>')
-		                    .attr({
-		                        src: '/' + data.ids[0] + '/icon.jpg'
-		                    })
-		                    .one('load', function() {
-		                        if (data.ids[0] != app.ui.selectedMovies[0]) {
-		                            //Ox.print('cancel after load...')
-		                            return;
-		                        }
-		                        var image = $still[0],
-		                            imageWidth = image.width,
-		                            imageHeight = image.height,
-		                            width = app.$ui.info.width(),
-		                            height = imageHeight * width / imageWidth;
-		                        app.ui.infoRatio = width / height;
-                                !app.user.ui.showInfo && app.$ui.leftPanel.css({bottom: -height - 16});
-		                        app.$ui.leftPanel.size(2, height + 16);
-		                        $still.css({
-		                                position: 'absolute',
-		                                left: 0,
-		                                top: 0,
-		                                //width: width + 'px',
-		                                //height: height + 'px',
-		                                width: '100%',
-		                                opacity: 0
-		                            })
-		                            .appendTo(app.$ui.info.$element)
-		                            .animate({
-		                                opacity: 1
-		                            });
-		                        app.$ui.infoStill.animate({
-		                            opacity: 0
-		                        }, 250);
-		                        app.$ui.info.animate({
-		                            height: (height + 16) + 'px'
-		                        }, 250, function() {
-		                            app.$ui.infoStill.remove();
-		                            app.$ui.infoStill = $still;
-		                            resizeFolders();
-		                        });
-		                    });
-		                /*
-		                $timeline = $('<img>')
-		                    .attr({
-		                        src: 'http://0xdb.org/' + data.ids[0] + '/timeline/timeline.png'
-		                    })
-		                    .one('load', function() {
-		                        $timeline.css({
-		                                position: 'absolute',
-		                                left: 0,
-		                                bottom: '16px',
-		                                opacity: 0
-		                            })
-		                            .appendTo($ui.info.$element)
-		                            .animate({
-		                                opacity: 1
-		                            });
-		                        $ui.infoTimeline.animate({
-		                            opacity: 0
-		                        }, 250, function() {
-		                            $ui.infoTimeline.remove();
-		                            $ui.infoTimeline = $timeline;
-		                        });
-		                    });
-		                */
+                        pandora.api.getItem(data.ids[0], function(result) {
+                            app.ui.infoRatio = result.data.item.stream.aspectRatio;
+                            var height = app.$ui.info.width() / app.ui.infoRatio + 16;
+                            app.$ui.infoStill.remove();
+                            app.$ui.infoStill = ui.flipbook(data.ids[0])
+                                                  .appendTo(app.$ui.info.$element);
+                            app.$ui.infoStill.css({
+                               'height': (height - 16) + 'px'
+                            });
+                            !app.user.ui.showInfo && app.$ui.leftPanel.css({bottom: -height});
+                            app.$ui.leftPanel.size(2, height);
+                            app.$ui.info.animate({
+                                height: height + 'px'
+                            }, 250, function() {
+                                resizeFolders();
+                            });
+                        });
+                        app.$ui.infoTimeline.attr('src', '/'+data.ids[0]+'/timeline.16.png')
 		            }
 		            pandora.api.find({
 		                query: {
@@ -3872,8 +3868,10 @@
                     app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
                 } else if (!app.user.ui.item || !old.user.ui.item) {
                     app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
+                    app.$ui.leftPanel.replace(2, app.$ui.info = ui.info());
                 } else {
                     app.$ui.contentPanel.replace(1, ui.item());
+                    app.$ui.leftPanel.replace(2, app.$ui.info = ui.info());
                 }
                 if (
                     old.user.ui.item &&
