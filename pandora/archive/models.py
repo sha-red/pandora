@@ -29,9 +29,11 @@ class File(models.Model):
     item = models.ForeignKey(Item, related_name='files')
 
     name = models.CharField(max_length=2048, default="") # canoncial path/file
+    folder = models.CharField(max_length=2048, default="") # canoncial path/file
     sort_name = models.CharField(max_length=2048, default="") # sort name
 
-    part = models.CharField(default="", max_length=255)
+    type = models.CharField(default="", max_length=255)
+    part = models.IntegerField(null=True)
     version = models.CharField(default="", max_length=255) # sort path/file name
     language = models.CharField(default="", max_length=8)
 
@@ -39,7 +41,7 @@ class File(models.Model):
     episode = models.IntegerField(default=-1)
 
     size = models.BigIntegerField(default=0)
-    duration = models.BigIntegerField(default=0)
+    duration = models.BigIntegerField(null=True)
 
     info = fields.DictField(default={})
 
@@ -72,7 +74,7 @@ class File(models.Model):
 
     def save(self, *args, **kwargs):
         if self.name and not self.sort_name:
-            self.sort_name = canonicalTitle(self.name)
+            self.sort_name = utils.sort_string(canonicalTitle(self.name))
         if self.info:
             for key in ('duration', 'size'):
                 setattr(self, key, self.info.get(key, 0))
@@ -110,6 +112,11 @@ class File(models.Model):
             if self.framerate:
                 self.pixels = int(self.width * self.height * float(utils.parse_decimal(self.framerate)) * self.duration)
 
+        else:
+            self.is_video = os.path.splitext(self.name)[-1] in ('.avi', '.mkv', '.dv', '.ogv', '.mpeg', '.mov')
+            self.is_audio = os.path.splitext(self.name)[-1] in ('.mp3', '.wav', '.ogg', '.flac')
+            self.is_subtitle= os.path.splitext(self.name)[-1] in ('.srt', '.sub', '.idx')
+
         if not self.is_audio and not self.is_video and self.name.endswith('.srt'):
             self.is_subtitle = True
 
@@ -120,6 +127,11 @@ class File(models.Model):
             self.is_extra = False
             self.is_main = True
 
+        self.part = self.get_part()
+        self.type = self.get_type()
+        self.folder = self.get_folder()
+        if self.type not in ('audio', 'video'):
+            self.duration = None
         super(File, self).save(*args, **kwargs)
 
     #upload and data handling
@@ -216,12 +228,19 @@ class File(models.Model):
         return False
 
     def json(self, keys=None, user=None):
+        resolution = (self.width, self.height)
+        if resolution == (0, 0):
+            resolution = None
+        duration = self.duration
+        if self.get_type() != 'video':
+            duration = None
         data = {
             'available': self.available,
-            'duration': self.duration,
+            'duration': duration,
             'framerate': self.framerate,
             'height': self.height,
             'width': self.width,
+            'resolution': resolution,
             'oshash': self.oshash,
             'samplerate': self.samplerate,
             'video_codec': self.video_codec,
@@ -229,8 +248,12 @@ class File(models.Model):
             'name': self.name,
             'size': self.size,
             'info': self.info,
-            'instances': self.instances.count(),
-            'is_main': self.is_main
+            'users': list(set([i.volume.user.username for i in self.instances.all()])),
+            'instances': [i.json() for i in self.instances.all()],
+            'folder': self.get_folder(),
+            'type': self.get_type(),
+            'is_main': self.is_main,
+            'part': self.get_part()
         }
         if keys:
             for k in data.keys():
@@ -238,6 +261,25 @@ class File(models.Model):
                     del data[k]
         return data
 
+    def get_part(self):
+        if self.is_extra:
+            return None
+        files = list(self.item.files.filter(type=self.type, is_main=self.is_main).order_by('sort_name'))
+        return files.index(self) + 1
+
+    def get_type(self):
+        if self.is_video:
+            return 'video'
+        if self.is_audio:
+            return 'audio'
+        if self.is_subtitle or os.path.splitext(self.name)[-1] in ('.sub', '.idx'):
+            return 'subtitle'
+        return 'unknown'
+
+    def get_folder(self):
+        if self.instances.count() > 0:
+            return self.instances.all()[0].folder
+        return ''
 
 class Volume(models.Model):
 
@@ -279,6 +321,13 @@ class Instance(models.Model):
     def itemId(self):
         return File.objects.get(oshash=self.oshash).itemId
 
+    def json(self):
+        return {
+            'user': self.volume.user.username,
+            'volume': self.volume.name,
+            'folder': self.folder,
+            'name': self.name
+        }
 
 def frame_path(frame, name):
     ext = os.path.splitext(name)[-1]

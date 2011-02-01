@@ -264,7 +264,7 @@ def lookup_file(request, oshash):
 def _order_query(qs, sort, prefix=''):
     order_by = []
     if len(sort) == 1:
-        sort.append({'operator': '+', 'key': 'name'})
+        sort.append({'operator': '+', 'key': 'sort_name'})
         sort.append({'operator': '-', 'key': 'created'})
     '''
         if sort[0]['key'] == 'title':
@@ -287,7 +287,12 @@ def _order_query(qs, sort, prefix=''):
         operator = e['operator']
         if operator != '-':
             operator = ''
-        key = {'id': 'item__itemId', 'name': 'sort_name'}.get(e['key'], e['key'])
+        key = {
+            'id': 'item__itemId',
+            'users': 'instances__volume__user__username',
+            'resolution': 'width',
+            'name': 'sort_name'
+        }.get(e['key'], e['key'])
         #if operator=='-' and '%s_desc'%key in models.ItemSort.descending_fields:
         #    key = '%s_desc' % key
         order = '%s%s%s' % (operator, prefix, key)
@@ -419,7 +424,7 @@ Positions
     elif 'keys' in query:
         response['data']['items'] = []
         qs = models.File.objects.filter(item__in=query['qs'])
-        #qs = _order_query(qs, query['sort'])
+        qs = _order_query(qs, query['sort'])
         keys = query['keys']
         qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [f.json(keys) for f in qs]

@@ -194,6 +194,8 @@ def parse_path(path):
 
 def sort_string(string):
     string = string.replace(u'Þ', 'Th')
+    #pad numbered titles
+    string = re.sub('(\d+)', lambda x: '%010d' % int(x.group(0)), string)
     return unicodedata.normalize('NFKD', string)
 
 
@@ -206,8 +208,6 @@ def sort_title(title):
         title = unicode(title)
     title = sort_string(title)
 
-    #pad numbered titles
-    title = re.sub('(\d+)', lambda x: '%010d' % int(x.group(0)), title)
     return title.strip()
 
 def get_positions(ids, pos):
