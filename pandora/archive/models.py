@@ -73,6 +73,8 @@ class File(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        self.name= self.get_name()
+        self.folder = self.get_folder()
         if self.name and not self.sort_name:
             self.sort_name = utils.sort_string(canonicalTitle(self.name))
         if self.info:
@@ -129,7 +131,7 @@ class File(models.Model):
 
         self.part = self.get_part()
         self.type = self.get_type()
-        self.folder = self.get_folder()
+
         if self.type not in ('audio', 'video'):
             self.duration = None
         super(File, self).save(*args, **kwargs)
@@ -279,6 +281,11 @@ class File(models.Model):
     def get_folder(self):
         if self.instances.count() > 0:
             return self.instances.all()[0].folder
+        return ''
+
+    def get_name(self):
+        if self.instances.count() > 0:
+            return self.instances.all()[0].name
         return ''
 
 class Volume(models.Model):
