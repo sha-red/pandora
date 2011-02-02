@@ -12,6 +12,7 @@ from django.conf import settings
 import ox
 import ox.iso
 from ox.normalize import normalizeName, normalizeTitle
+import ox.web.imdb
 
 
 def parse_decimal(string):
@@ -28,8 +29,8 @@ def plural_key(term):
     }.get(term, term + 's')
 
 
-def oxid(title, directors, year='', seriesTitle='', episodeTitle='', season=0, episode=0):
-    director = ', '.join(directors)
+def oxid(title, director, year='', seriesTitle='', episodeTitle='', season=0, episode=0):
+    director = ', '.join(director)
     oxid_value = u"\n".join([title, director, year])
     oxid = hashlib.sha1(oxid_value.encode('utf-8')).hexdigest()
     if seriesTitle:
@@ -54,11 +55,11 @@ def oxdb_id(title, director=[], year='', season='', episode='', episode_title=''
     return u'0x' + oxdb_id
 
 
-def oxdb_directors(director):
+def parse_director(director):
     director = os.path.basename(os.path.dirname(director))
     if director.endswith('_'):
         director = "%s." % director[:-1]
-    directors = [normalizeName(d) for d in director.split('; ')]
+    director = [normalizeName(d) for d in director.split('; ')]
 
     def cleanup(director):
         director = director.strip()
@@ -66,11 +67,11 @@ def oxdb_directors(director):
         director = director.replace('Unknown Director', '')
         director = director.replace('Various Directors', '')
         return director
-    directors = filter(None, [cleanup(d) for d in directors])
-    return directors
+    director = filter(None, [cleanup(d) for d in director])
+    return director
 
 
-def oxdb_title(_title, searchTitle = False):
+def parse_title(_title, searchTitle = False):
     '''
       normalize filename to get item title
     '''
@@ -104,22 +105,18 @@ def oxdb_title(_title, searchTitle = False):
     return title
 
 
-def oxdb_year(data):
-    return ox.findRe(data, '\.(\d{4})\.')
-
-
-def oxdb_series_title(path):
+def parse_series_title(path):
     seriesTitle = u''
     if path.startswith('Series'):
         seriesTitle = os.path.basename(path)
     else:
-        t = oxdb_title(path)
+        t = parse_title(path)
         if " (S" in t:
             seriesTitle = t.split(" (S")[0]
     return seriesTitle
 
 
-def oxdb_episode_title(path):
+def parse_episode_title(path):
     episodeTitle = u''
     ep = re.compile('.Episode \d+?\.(.*?)\.[a-zA-Z]').findall(path)
     if ep:
@@ -127,7 +124,7 @@ def oxdb_episode_title(path):
     return episodeTitle
 
 
-def oxdb_season_episode(path):
+def parse_season_episode(path):
     season = 0
     episode = 0
     path = os.path.basename(path)
@@ -168,23 +165,23 @@ def parse_path(path):
             G/Godard, Jean-Luc/Histoire(s) du cinema_ Toutes les histoires (1988)
     '''
     r = {}
-    r['title'] = oxdb_title(path)
-    if not settings.USE_IMDB:
-        return r
-    import ox.web.imdb
-    search_title = oxdb_title(path, True)
-    r['directors'] = oxdb_directors(path)
+    r['title'] = parse_title(path)
     year = ox.findRe(path, '\((\d{4})\)')
     if year:
         r['year'] = year
+    if not settings.USE_IMDB:
+        return r
+
+    search_title = parse_title(path, True)
+    r['director'] = parse_director(path)
 
     #FIXME: only include it its actually a series
-    r['episode_title'] = oxdb_episode_title(path)
-    r['season'], r['episode'] = oxdb_season_episode(path)
-    r['series_title'] = oxdb_series_title(path)
+    r['episode_title'] = parse_episode_title(path)
+    r['season'], r['episode'] = parse_season_episode(path)
+    r['series_title'] = parse_series_title(path)
 
-    r['imdbId'] = ox.web.imdb.guess(search_title, ', '.join(r['directors']), timeout=-1)
-    r['oxdbId'] = oxdb_id(r['title'], r['directors'], r.get('year', ''),
+    r['imdbId'] = ox.web.imdb.guess(search_title, ', '.join(r['director']), timeout=-1)
+    r['oxdbId'] = oxdb_id(r['title'], r['director'], r.get('year', ''),
                           r.get('season', ''), r.get('episode', ''),
                           episode_title=r['episode_title'],
                           episode_director=[],

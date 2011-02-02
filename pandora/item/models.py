@@ -48,10 +48,8 @@ def get_item(info):
                         'director': info['director'],
                         'year': info.get('year', '')
                     }
-                #FIXME: this should be done async
                 item.save()
                 tasks.update_external.delay(item.itemId)
-                #item.update_external()
         else:
             q = Item.objects.filter(find__key='title', find__value=info['title'])
             if q.count() > 1:
