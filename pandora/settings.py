@@ -193,6 +193,8 @@ DEFAULT_LISTS = [
 ]
 #0xdb.org
 USE_IMDB = True
+#this should idealy go away, one folder per item
+USE_FOLDER = True
 
 #POSTER_SERVICES=['http://data.0xdb.org/poster/']
 
