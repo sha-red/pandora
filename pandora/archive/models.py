@@ -17,6 +17,7 @@ import chardet
 
 from item import utils
 from item.models import Item
+from person.models import get_name_sort
 
 
 class File(models.Model):
@@ -264,10 +265,12 @@ class File(models.Model):
         return data
 
     def get_part(self):
-        if self.is_extra:
-            return None
-        files = list(self.item.files.filter(type=self.type, is_main=self.is_main).order_by('sort_name'))
-        return files.index(self) + 1
+        if not self.is_extra:
+            files = list(self.item.files.filter(type=self.type,
+                                                is_main=self.is_main).order_by('sort_name'))
+            if self in files:
+                return files.index(self) + 1
+        return None
 
     def get_type(self):
         if self.is_video:
@@ -279,14 +282,32 @@ class File(models.Model):
         return 'unknown'
 
     def get_folder(self):
-        if self.instances.count() > 0:
-            return self.instances.all()[0].folder
+        name = os.path.splitext(self.get_name())[0]
+        if self.item:
+            if settings.USE_IMDB:
+                director = self.item.get('director', ['Unknown Director'])
+                director = map(get_name_sort, director)
+                director = '; '.join(director)
+                director = re.sub(r'[:\\/]', '_', director)
+                name = os.path.join(director, name)
+            year = self.item.get('year', None)
+            if year:
+                name += u' (%s)' % year
+            name = os.path.join(name[0].upper(), name)
+            return name
         return ''
 
     def get_name(self):
+        if self.item:
+            name = self.item.get('title', 'Untitled')
+            name = re.sub(r'[:\\/]', '_', name)
+        if not name:
+            name = 'Untitled'
         if self.instances.count() > 0:
-            return self.instances.all()[0].name
-        return ''
+            ext = os.path.splitext(self.instances.all()[0].name)[-1]
+        else:
+            ext = '.unknown'
+        return name + ext
 
 class Volume(models.Model):
 
