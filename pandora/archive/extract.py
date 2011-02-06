@@ -196,10 +196,13 @@ def stream(video, target, profile, info):
           + audio_settings \
           + video_settings
 
-    if format == 'mp4':
-        cmd += ["%s.mp4"%target]
-    else:
+    if format == 'webm':
         cmd += ['-f', 'webm', target]
+    if format == 'mp4':
+        #mp4 needs postprocessing(qt-faststart), write to temp file
+        cmd += ["%s.mp4"%target]
+    else :
+        cmd += [target]
 
     print cmd
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=open('/dev/null', 'w'), stderr=subprocess.STDOUT)

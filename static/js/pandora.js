@@ -1734,10 +1734,11 @@
                     });
                 } else if (app.user.ui.itemView == 'player') {
                     var video = result.data.item.stream,
-                        subtitles = result.data.item.layers.subtitles;
+                        subtitles = result.data.item.layers.subtitles,
+                        format = Ox.supportedVideoFormat(video.formats);
                         video.height = video.profiles[0]
 		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
-		            video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
+		            video.url = video.baseUrl + '/' + video.height + 'p.' + format;
                     app.$ui.contentPanel.replace(1, app.$ui.player = new Ox.VideoPanelPlayer({
                         annotationsSize: app.user.ui.annotationsSize,
                         duration: video.duration,
@@ -1775,10 +1776,11 @@
 		                    'in': 5,
 		                    'out': 10,
 		                    'value': 'This subtitle is just a test...'
-		                }];
-                        video.height = video.profiles[0]
+		                }],
+                        format = Ox.supportedVideoFormat(video.formats);
+                    video.height = video.profiles[0];
 		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
-		            video.url = video.baseUrl + '/' + video.height + 'p.' + ($.support.video.webm ? 'webm' : 'mp4');
+		            video.url = video.baseUrl + '/' + video.height + 'p.' + format;
                     app.$ui.contentPanel.replace(1, app.$ui.editor = new Ox.VideoEditor({
                         annotationsSize: app.user.ui.annotationsSize,
 		                cuts: cuts,

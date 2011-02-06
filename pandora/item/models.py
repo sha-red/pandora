@@ -333,6 +333,7 @@ class Item(models.Model):
                 else:
                     stream['baseUrl'] = os.path.dirname(s.video.url)
                 stream['profiles'] = list(set(map(lambda s: int(os.path.splitext(s['profile'])[0][:-1]), self.streams.all().values('profile'))))
+                stream['formats'] = list(set(map(lambda s: os.path.splitext(s['profile'])[1][1:], self.streams.all().values('profile'))))
         return stream
 
     def get_layers(self):
@@ -588,7 +589,7 @@ class Item(models.Model):
     '''
 
     def frame(self, position, width=128):
-        stream = self.streams.filter(profile=settings.VIDEO_PROFILE+'.webm')
+        stream = self.streams.filter(profile=settings.VIDEO_PROFILE)
         if stream.count()>0:
             stream = stream[0]
         else:
@@ -627,7 +628,7 @@ class Item(models.Model):
         #FIXME: how to detect if something changed?
         if files:
             stream, created = Stream.objects.get_or_create(item=self,
-                                     profile='%s.webm' % settings.VIDEO_PROFILE)
+                                     profile=settings.VIDEO_PROFILE)
             stream.video.name = stream.path()
             cmd = []
             if os.path.exists(stream.video.path):
@@ -766,7 +767,7 @@ class Item(models.Model):
 
     def get_poster_frame_path(self):
         if self.poster_frame >= 0:
-            size = int(settings.VIDEO_PROFILE[:-1])
+            size = int(settings.VIDEO_PROFILE.split('.')[0][:-1])
             return self.frame(self.poster_frame, size)
 
         frames = []
@@ -919,33 +920,13 @@ class Stream(models.Model):
         return self.item.path(self.profile)
 
     def extract_derivatives(self):
-        if settings.VIDEO_H264:
-            profile = self.profile.replace('.webm', '.mp4')
+        for profile in settings.VIDEO_DERIVATIVES:
             derivative, created = Stream.objects.get_or_create(profile=profile, item=self.item)
             if created:
                 derivative.source = self
                 derivative.video.name = self.video.name.replace(self.profile, profile)
                 derivative.encode()
                 derivative.save()
-
-        for p in settings.VIDEO_DERIVATIVES:
-            profile = p + '.webm'
-            target = self.video.path.replace(self.profile, profile)
-            derivative, created = Stream.objects.get_or_create(profile=profile, item=self.item)
-            if created:
-                derivative.source = self
-                derivative.video.name = self.video.name.replace(self.profile, profile)
-                derivative.encode()
-                derivative.save()
-
-            if settings.VIDEO_H264:
-                profile = p + '.mp4'
-                derivative, created = Stream.objects.get_or_create(profile=profile, item=self.item)
-                if created:
-                    derivative.source = self
-                    derivative.video.name = self.video.name.replace(self.profile, profile)
-                    derivative.encode()
-                    derivative.save()
         return True
 
     def encode(self):

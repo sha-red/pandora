@@ -161,8 +161,6 @@ class VideoChunkForm(forms.Form):
 @login_required_json
 def firefogg_upload(request):
     profile = request.GET['profile']
-    if profile.endswith('.webm'):
-        profile = os.path.splitext(profile)[0]
     oshash = request.GET['oshash']
     #handle video upload
     if request.method == 'POST':

@@ -139,7 +139,7 @@ class File(models.Model):
 
     #upload and data handling
     video = models.FileField(null=True, blank=True,
-                        upload_to=lambda f, x: f.path('%s.webm'%settings.VIDEO_PROFILE))
+                        upload_to=lambda f, x: f.path(settings.VIDEO_PROFILE))
     data = models.FileField(null=True, blank=True,
                         upload_to=lambda f, x: f.path('data.bin'))
 
@@ -221,7 +221,7 @@ class File(models.Model):
     def save_chunk(self, chunk, chunk_id=-1):
         if not self.available:
             if not self.video:
-                self.video.save('%s.webm'%settings.VIDEO_PROFILE, chunk)
+                self.video.save(settings.VIDEO_PROFILE, chunk)
             else:
                 f = open(self.video.path, 'a')
                 #FIXME: should check that chunk_id/offset is right

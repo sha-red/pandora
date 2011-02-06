@@ -144,15 +144,23 @@ SITE_CONFIG = join(PROJECT_ROOT, '0xdb.json')
 DEFAULT_SORT = [{"key": "director", "operator": ""}]
 DEFAULT_THEME = "classic"
 
-VIDEO_PROFILE = '96p'
+VIDEO_PROFILE = '96p.webm'
 VIDEO_DERIVATIVES = []
 VIDEO_H264 = False
 
 #Pad.ma
-#VIDEO_PROFILE = '480p'
-#VIDEO_DERIVATIVES = ['96p', '270p', '360p']
-#VIDEO_H264 = False
-
+'''
+VIDEO_PROFILE = '480p.webm'
+VIDEO_DERIVATIVES = [
+    '96p.webm',
+    '240p.webm',
+    '360p.webm'
+    '96p.mp4',
+    '240p.mp4',
+    '360p.mp4',
+    '480p.mp4',
+]
+'''
 
 TRANSMISSON_HOST = 'localhost'
 TRANSMISSON_PORT = 9091
