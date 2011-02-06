@@ -138,7 +138,7 @@ INSTALLED_APPS = (
 AUTH_PROFILE_MODULE = 'user.UserProfile'
 
 #Video encoding settings
-#available profiles: 96p, 270p, 360p, 480p, 720p, 1080p
+#available profiles: 96p, 240p, 360p, 480p, 720p, 1080p
 
 SITE_CONFIG = join(PROJECT_ROOT, '0xdb.json')
 DEFAULT_SORT = [{"key": "director", "operator": ""}]
@@ -146,7 +146,14 @@ DEFAULT_THEME = "classic"
 
 VIDEO_PROFILE = '96p.webm'
 VIDEO_DERIVATIVES = []
-VIDEO_H264 = False
+
+#0xdb
+'''
+VIDEO_PROFILE = '96p.webm'
+VIDEO_DERIVATIVES = [
+    '96p.mp4'
+]
+'''
 
 #Pad.ma
 '''
