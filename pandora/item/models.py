@@ -726,6 +726,10 @@ class Item(models.Model):
     def local_posters(self):
         part = 1
         posters = {}
+        timeline = self.path('timeline.64.png')
+        timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
+        if not os.path.exists(timeline):
+            return posters
         if self.poster_frame >= 0:
             frame = self.get_poster_frame_path()
             path = self.path('poster.pandora.%s.%s.jpg'%(part, self.poster_frame))
@@ -742,11 +746,11 @@ class Item(models.Model):
 
     def make_local_posters(self):
         posters = self.local_posters()
-        for poster in posters:
-            frame = posters[poster]
-            timeline = self.path('timeline.64.png')
-            timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
-            if os.path.exists(timeline):
+        timeline = self.path('timeline.64.png')
+        timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
+        if os.path.exists(timeline):
+            for poster in posters:
+                frame = posters[poster]
                 cmd = [settings.ITEM_POSTER,
                        '-t', self.get('title'),
                        '-d', ', '.join(self.get('director', ['Unknown Director'])),
