@@ -7,6 +7,8 @@ from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 
 import models
+from item.models import Item
+
 from api.actions import actions
 
 
@@ -38,8 +40,8 @@ def addAnnotation(request):
         param data {
             item: itemId,
             layer: layerId,
-            start: float,
-            end: float,
+            in: float,
+            out: float,
             value: string
         }
         return {'status': {'code': int, 'text': string},
@@ -49,19 +51,19 @@ def addAnnotation(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    for key in ('item', 'layer', 'start', 'end', 'value'):
+    for key in ('item', 'layer', 'in', 'out', 'value'):
         if key not in data:
             return render_to_json_response(json_response(status=400,
                                                          text='invalid data'))
 
-    item = get_object_or_404_json(models.Item, itemId=data['item'])
-    layer = get_object_or_404_json(models.Layer, layerId=data['layer'])
+    item = get_object_or_404_json(Item, itemId=data['item'])
+    layer = get_object_or_404_json(models.Layer, name=data['layer'])
 
     annotation = models.Annotation(
         item=item,
         layer=layer,
         user=request.user,
-        start=float(data['start']), end=float(data['end']),
+        start=float(data['in']), end=float(data['out']),
         value=data['value'])
     annotation.save()
     response = json_response()
@@ -94,8 +96,8 @@ def editAnnotation(request):
     '''
         param data {
             id:,
-            start: float,
-            end: float,
+            in: float,
+            out: float,
             value: string,
         }
         return {'status': {'code': int, 'text': string},
@@ -105,9 +107,12 @@ def editAnnotation(request):
     '''
     response = json_response({})
     data = json.loads(request.POST['data'])
-    layer = get_object_or_404_json(models.Layer, pk=data['id'])
-    if layer.editable(request.user):
-        response = json_response(status=501, text='not implemented')
+    a = get_object_or_404_json(models.Annotation, pk=data['id'])
+    if a.editable(request.user):
+        a.value = data['value']
+        a.start = data['in']
+        a.end = data['out']
+        a.save()
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)

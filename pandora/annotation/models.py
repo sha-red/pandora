@@ -87,7 +87,6 @@ class Annotation(models.Model):
             'in': self.start,
             'out': self.end,
             'value': self.value,
-            'value_html': self.html(),
             'created': self.created.strftime('%Y-%m-%dT%H:%M:%SZ'),
             'modified': self.modified.strftime('%Y-%m-%dT%H:%M:%SZ')
         }

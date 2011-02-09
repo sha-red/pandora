@@ -206,9 +206,12 @@ class File(models.Model):
                 return srt
 
         srts = re.compile('(\d\d:\d\d:\d\d[,.]\d\d\d)\s*-->\s*(\d\d:\d\d:\d\d[,.]\d\d\d)\s*(.+?)\n\n', re.DOTALL)
+        i = 0
         for s in srts.findall(data):
-            _s = {'in': parseTime(s[0]), 'out': parseTime(s[1]), 'value': s[2].strip()}
+            _s = {'id': str(i),
+                  'in': parseTime(s[0]), 'out': parseTime(s[1]), 'value': s[2].strip()}
             srt.append(_s)
+            i += 1
         return srt
 
     def editable(self, user):
