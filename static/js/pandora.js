@@ -5,6 +5,7 @@
 // fixme: never set ui.videoPosition to 0 ... set to null a.k.a. delete
 // fixme: sort=-director doesn't work
 // fixme: don't reload full right panel on sortSelect
+// fixme: clear items cache after login/logout
 
 (function() {
 
@@ -1443,6 +1444,7 @@
         		            title: folder.title
         		        })
         		        .bindEvent({
+        		            // fixme: duplicated
         		            click: function(event, data) {
         		                var $list = app.$ui.folderList[i],
         		                    hasFocus, id;
@@ -1761,26 +1763,34 @@
                             } : data);
                         },
                         enterfullscreen: enterFullscreen,
-                        exitfullscreen: exitFullscreen
-                    }))/*.bindEvent({
+                        exitfullscreen: exitFullscreen,
                         resize: function(event, data) {
-    						app.$ui.player.options({
-    						    height: data
-    						});
+                            app.$ui.player.options({
+                                height: data
+                            });
                         }
-                    })*/;
+                    }));
                 } else if (app.user.ui.itemView == 'timeline') {
-                    var video = result.data.item.stream,
+                    var layers = [],
+                        video = result.data.item.stream,
 		                cuts = result.data.item.cuts || {},
-		                subtitles = result.data.item.layers.subtitles || [{
-		                    'in': 5,
-		                    'out': 10,
-		                    'value': 'This subtitle is just a test...'
-		                }],
-                        format = Ox.supportedVideoFormat(video.formats);
+                        format = Ox.supportedVideoFormat(video.formats),
+		                subtitles = result.data.item.layers.subtitles;
                     video.height = video.profiles[0];
 		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
 		            video.url = video.baseUrl + '/' + video.height + 'p.' + format;
+                    $.each(app.config.layers, function(i, layer) {
+                        layers[i] = $.extend({}, layer);
+                        if (result.data.item.layers[layer.id])
+                            layers[i]['items'] = result.data.item.layers[layer.id];
+                        else
+                            layers[i]['items'] = [{
+                                               'in': 5,
+                                               'out': 10,
+                                               'value': 'This annotation is just a test...'
+                            }];
+
+                    });
                     app.$ui.contentPanel.replace(1, app.$ui.editor = new Ox.VideoEditor({
                         annotationsSize: app.user.ui.annotationsSize,
 		                cuts: cuts,
@@ -1792,7 +1802,7 @@
 						height: app.$ui.contentPanel.size(1),
 		                id: 'editor',
 		                largeTimeline: true,
-		                layers: app.config.layers,
+		                layers: layers,
 		                matches: [],
 		                points: [0, 0],
                         position: app.user.ui.videoPosition[app.user.ui.item] || 0,
@@ -1806,16 +1816,19 @@
 		                videoURL: video.url,
 		                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1
 		            }).bindEvent({
-		                /*
-		                resize: function(event, data) {
-						    app.$ui.editor.options({
-							    width: data
-						    });
-						},
-						*/
+                        resize: function(event, data) {
+                            app.$ui.editor.options({
+                                height: data
+                            });
+                        },
 						togglesize: function(event, data) {
 						    UI.set({videoSize: data.size});
-						}
+						},
+                        updateAnnotation: function(event, data) {
+                            //fixme: check that edit was successfull
+                            Ox.print('updateAnnotation', data);
+                            pandora.api.editAnnotation(data);
+                        }
 					}));
 		            that.bindEvent('resize', function(event, data) {
     				    //Ox.print('resize item', data)
@@ -3367,7 +3380,7 @@
 
     function resizeWindow() {
         resizeFolders();
-        if (app.user.ui.item == '') {
+        if (!app.user.ui.item) {
             app.$ui.list.size();
             resizeGroups(app.$ui.rightPanel.width());
             if (app.user.ui.listView == 'map') {
