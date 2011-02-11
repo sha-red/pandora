@@ -14,6 +14,15 @@ jQuery.support.video = function() {
     } else {
         video.support = false;
     }
+    video.supportedFormat = function(formats) {
+        var format;
+        formats.forEach(function(f) {
+            if(!format && video[f]) {
+                format = f
+            }
+        });
+        return format;
+    }
     return video;
 }();
 

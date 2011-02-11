@@ -1737,7 +1737,7 @@
                 } else if (app.user.ui.itemView == 'player') {
                     var video = result.data.item.stream,
                         subtitles = result.data.item.layers.subtitles,
-                        format = Ox.supportedVideoFormat(video.formats);
+                        format = $.support.video.supportedFormat(video.formats);
                         video.height = video.profiles[0]
 		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
 		            video.url = video.baseUrl + '/' + video.height + 'p.' + format;
@@ -1774,7 +1774,7 @@
                     var layers = [],
                         video = result.data.item.stream,
 		                cuts = result.data.item.cuts || {},
-                        format = Ox.supportedVideoFormat(video.formats),
+                        format = $.support.video.supportedFormat(video.formats);
 		                subtitles = result.data.item.layers.subtitles;
                     video.height = video.profiles[0];
 		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
