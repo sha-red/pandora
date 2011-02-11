@@ -314,7 +314,7 @@ def getItem(request):
     if item.access(request.user):
         info = item.get_json()
         info['stream'] = item.get_stream()
-        info['layers'] = item.get_layers()
+        info['layers'] = item.get_layers(request.user)
         response['data']['item'] = info
     else:
         response = json_response(status=403, text='permission denied')

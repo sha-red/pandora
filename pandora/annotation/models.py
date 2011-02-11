@@ -8,6 +8,21 @@ import ox
 
 import utils
 
+
+def load_layers(layers):
+    for l in layers:
+        create_or_update_layer(l)
+
+def create_or_update_layer(data):
+    layer, created = Layer.objects.get_or_create(name=data['id'])
+    for key in ('title', 'type', 'overlap', 'overlay', 'private'):
+        if key in data and getattr(layer, key) != data[key]:
+            setattr(layer, key, data[key])
+            created = True
+    if created:
+        layer.save()
+    return layer
+
 class Layer(models.Model):
 
     class Meta:
@@ -26,7 +41,7 @@ class Layer(models.Model):
 
     overlap = models.BooleanField(default=True)
     overlay = models.BooleanField(default=True)
-    public = models.BooleanField(default=True)   #false=users only see there own bins
+    private = models.BooleanField(default=False)   #false=users only see there own bins
 
     #find/sort integration
     find = models.BooleanField(default=True) #true part of find all
@@ -42,7 +57,13 @@ class Layer(models.Model):
         return p
 
     def json(self):
-        return {'id': self.name, 'title': self.title, 'type': self.type}
+        return {
+            'id': self.name,
+            'overlap': self.overlap,
+            'private': self.private,
+            'title': self.title,
+            'type': self.type
+        }
 
     def __unicode__(self):
         return self.title

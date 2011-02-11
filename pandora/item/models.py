@@ -336,7 +336,7 @@ class Item(models.Model):
                 stream['formats'] = list(set(map(lambda s: os.path.splitext(s['profile'])[1][1:], self.streams.all().values('profile'))))
         return stream
 
-    def get_layers(self):
+    def get_layers(self, user=None):
         layers = {}
         layers['subtitles'] = [] 
         #FIXME: should subtitles be stored in Annotation?
@@ -345,7 +345,12 @@ class Item(models.Model):
             layers['subtitles'] = qs[0].srt()
         for l in Layer.objects.all():
             ll = layers.setdefault(l.name, [])
-            for a in Annotation.objects.filter(layer=l, item=self).order_by('start'):
+            qs = Annotation.objects.filter(layer=l, item=self)
+            if l.private:
+                if user.is_anonymous():
+                    user = None
+                qs = qs.filter(user=user)
+            for a in qs.order_by('start'):
                 ll.append(a.json())
         return layers
 
@@ -862,7 +867,6 @@ for key in filter(lambda k: 'columnWidth' in k, config['itemKeys']):
 
 ItemSort = type('ItemSort', (models.Model,), attrs)
 ItemSort.fields = [f.name for f in ItemSort._meta.fields]
-
 
 class Access(models.Model):
     class Meta:

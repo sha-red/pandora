@@ -6,10 +6,12 @@ from ox.utils import json
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 
-import models
-from item.models import Item
 
+from app.models import site_config
+from item.models import Item
 from api.actions import actions
+
+import models
 
 
 def findAnnotations(request):
@@ -55,6 +57,9 @@ def addAnnotation(request):
         if key not in data:
             return render_to_json_response(json_response(status=400,
                                                          text='invalid data'))
+
+    #FIXME: this should be only called starting up server
+    models.load_layers(site_config()['layers'])
 
     item = get_object_or_404_json(Item, itemId=data['item'])
     layer = get_object_or_404_json(models.Layer, name=data['layer'])
