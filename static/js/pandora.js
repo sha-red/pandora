@@ -1824,6 +1824,20 @@
 						togglesize: function(event, data) {
 						    UI.set({videoSize: data.size});
 						},
+                        addAnnotation: function(event, data) {
+                            Ox.print('addAnnotation', data);
+                            data.item = app.user.ui.item;
+                            data.value = 'Click to change text';
+                            pandora.api.addAnnotation(data, function(result) {
+                                app.$ui.editor.addAnnotation(data.layer, result.data.annotation);
+                            });
+                        },
+                        removeAnnotations: function(event, data) {
+                            pandora.api.removeAnnotations(data, function(result) {
+                                //fixme: check for errors
+                                app.$ui.editor.removeAnnotations(data.layer, data.ids);
+                            });
+                        },
                         updateAnnotation: function(event, data) {
                             //fixme: check that edit was successfull
                             Ox.print('updateAnnotation', data);

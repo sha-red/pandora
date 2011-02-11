@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 
+import ox
 from ox.utils import json
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
@@ -81,19 +82,30 @@ actions.register(addAnnotation, cache=False)
 
 
 @login_required_json
-def removeAnnotation(request):
+def removeAnnotations(request):
     '''
         param data {
-            id:
+            ids: []
         }
         return {'status': {'code': int, 'text': string},
                 'data': {
                 }
         }
     '''
-    response = {'status': {'code': 501, 'text': 'not implemented'}}
+    response = json_response({})
+    data = json.loads(request.POST['data'])
+    ids = map(ox.from32, data['ids'])
+    failed = []
+    for a in models.Annotation.objects.filter(id__in=ids):
+        if a.editable(request.user):
+            a.delete()
+        else:
+            failed.append(a.get_id)
+    if failed:
+        response = json_response(status=403, text='permission denied')
+        response['data']['ids'] = failed
     return render_to_json_response(response)
-actions.register(removeAnnotation, cache=False)
+actions.register(removeAnnotations, cache=False)
 
 
 @login_required_json
@@ -112,7 +124,7 @@ def editAnnotation(request):
     '''
     response = json_response({})
     data = json.loads(request.POST['data'])
-    a = get_object_or_404_json(models.Annotation, pk=data['id'])
+    a = get_object_or_404_json(models.Annotation, pk=ox.from32(data['id']))
     if a.editable(request.user):
         a.value = data['value']
         a.start = data['in']
