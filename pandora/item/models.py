@@ -383,6 +383,8 @@ class Item(models.Model):
     def oxdb_id(self):
         if not settings.USE_IMDB:
             return self.itemId
+        if not self.get('title', None) and not self.get('director', None):
+            return None
         return utils.oxdb_id(self.get('title', ''), self.get('director', []), str(self.get('year', '')),
                           self.get('season', ''), self.get('episode', ''),
                           self.get('episode_title', ''), self.get('episode_director', []), self.get('episode_year', ''))
