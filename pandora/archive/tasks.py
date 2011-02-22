@@ -37,7 +37,7 @@ def get_or_create_file(volume, f):
     return file
 
 def update_or_create_instance(volume, f):
-    instance = models.Instance.objects.filter(file__oshash=f['oshash'], volume=f['volume'])
+    instance = models.Instance.objects.filter(file__oshash=f['oshash'], volume=volume)
     if instance.count()>0:
         instance = instance[0]
         updated = False
