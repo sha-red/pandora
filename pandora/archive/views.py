@@ -126,7 +126,6 @@ def upload(request):
              }
         }
     '''
-    user = request.user
     f = get_object_or_404_json(models.File, oshash=request.POST['oshash'])
     if 'frame' in request.FILES:
         if f.frames.count() == 0:
@@ -134,8 +133,7 @@ def upload(request):
                 name = frame.name
                 #float required?
                 position = float(os.path.splitext(name)[0])
-                fr = models.Frame(file=f, position=position)
-                fr.save()
+                fr, created = models.Frame.objects.get_or_create(file=f, position=position)
                 fr.frame.save(name, frame)
             response = json_response({})
         else:

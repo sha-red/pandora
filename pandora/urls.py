@@ -39,6 +39,10 @@ if settings.DEBUG:
     )
 
 urlpatterns += patterns('',
+    (r'^(V[a-z0-9]*)$', 'urlalias.views.padma_video'),
+    (r'^(V[a-z0-9]*/.*)$', 'urlalias.views.padma_video'),
+)
+urlpatterns += patterns('',
     (r'^.*?embed$', 'app.views.embed'),
     (r'^[A-Z0-9].*$', 'app.views.index'),
     (r'^[a-z0-9].+$', 'app.views.index'),
