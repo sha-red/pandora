@@ -13,7 +13,7 @@ import models
 _INSTANCE_KEYS = ('mtime', 'name', 'folder')
 
 
-def get_or_create_item(volume, f):
+def get_or_create_item(volume, f, user):
     in_same_folder = models.Instance.objects.filter(folder=f['folder'], volume=volume)
     if in_same_folder.count() > 0:
         i = in_same_folder[0].file.item
@@ -22,17 +22,17 @@ def get_or_create_item(volume, f):
             item_info = parse_path(f['folder'])
         else:
             item_info = parse_path(f['path'])
-        i = get_item(item_info)
+        i = get_item(item_info, user)
     return i
 
-def get_or_create_file(volume, f):
+def get_or_create_file(volume, f, user):
     try:
         file = models.File.objects.get(oshash=f['oshash'])
     except models.File.DoesNotExist:
         file = models.File()
         file.oshash = f['oshash']
         file.name = f['name']
-        file.item = get_or_create_item(volume, f)
+        file.item = get_or_create_item(volume, f, user)
         file.save()
     return file
 
@@ -50,7 +50,7 @@ def update_or_create_instance(volume, f):
     else:
         instance = models.Instance()
         instance.volume = volume
-        instance.file = get_or_create_file(volume, f) 
+        instance.file = get_or_create_file(volume, f, volume.user) 
         for key in _INSTANCE_KEYS:
             setattr(instance, key, f[key])
         instance.save()

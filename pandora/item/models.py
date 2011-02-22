@@ -31,7 +31,7 @@ from person.models import get_name_sort
 from app.models import site_config
 
 
-def get_item(info):
+def get_item(info, user=None):
     '''
         info dict with:
             imdbId, title, director, episode_title, season, series
@@ -48,6 +48,7 @@ def get_item(info):
                         'director': info['director'],
                         'year': info.get('year', '')
                     }
+                item.user = user
                 item.save()
                 tasks.update_external.delay(item.itemId)
         else:
@@ -84,6 +85,7 @@ def get_item(info):
             item.data = {
                 'title': info['title']
             }
+            item.user = user
             item.save()
     return item
 
@@ -93,7 +95,7 @@ class Item(models.Model):
     modified = models.DateTimeField(auto_now=True)
     published = models.DateTimeField(default=datetime.now, editable=False)
 
-    user = models.ForeignKey(User, related_name='items')
+    user = models.ForeignKey(User, null=True, related_name='items')
     groups = models.ManyToManyField(Group, related_name='items')
 
     #only items that have data from files are available,

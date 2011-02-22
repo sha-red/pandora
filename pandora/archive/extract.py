@@ -15,6 +15,7 @@ from glob import glob
 import numpy as np
 import Image
 import ox
+import ox.image
 
 img_extension='jpg'
 
