@@ -79,7 +79,7 @@ def _order_by_group(query):
         order_by = ('-value_sort', 'items')
     return order_by
 
-def _parse_query(data, user):
+def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
     query['sort'] = [{'key':'title', 'operator':'+'}]
@@ -166,7 +166,7 @@ Positions
     data = json.loads(request.POST['data'])
     if settings.JSON_DEBUG:
         print json.dumps(data, indent=2)
-    query = _parse_query(data, request.user)
+    query = parse_query(data, request.user)
 
     response = json_response({})
     if 'group' in query:
@@ -271,7 +271,7 @@ def autocomplete(request):
         order_by = '-items'
     sort_type = key.get('sort', key.get('type', 'string'))
     if sort_type == 'title':
-        qs = _parse_query({'query': data.get('query', {})}, request.user)['qs']
+        qs = parse_query({'query': data.get('query', {})}, request.user)['qs']
         if data['value']:
             if op == '':
                 qs = qs.filter(find__key=data['key'], find__value__icontains=data['value'])

@@ -16,7 +16,7 @@ from ox.django.views import task_status
 
 from item import utils
 from item.models import get_item
-from item.views import _parse_query
+from item.views import parse_query
 import item.tasks
 from api.actions import actions
 
@@ -375,7 +375,7 @@ Positions
     data = json.loads(request.POST['data'])
     if settings.JSON_DEBUG:
         print json.dumps(data, indent=2)
-    query = _parse_query(data, request.user)
+    query = parse_query(data, request.user)
 
     response = json_response({})
     if 'group' in query:
