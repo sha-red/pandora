@@ -434,10 +434,10 @@ def setUI(request):
     '''
     data = json.loads(request.POST['data'])
     if request.user.is_authenticated():
+        profile = request.user.get_profile()
         for key in data:
             keys = key.split('|')
             value = data[key]
-            profile = request.user.get_profile()
             p = profile.ui
             while len(keys)>1:
                 key = keys.pop(0)
