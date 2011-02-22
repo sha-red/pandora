@@ -43,7 +43,6 @@ def _order_query(qs, sort, prefix='sort__'):
             sort.append({'operator': '-', 'key': 'year'})
             sort.append({'operator': '+', 'key': 'title'})
 
-
     for e in sort:
         operator = e['operator']
         if operator != '-':
