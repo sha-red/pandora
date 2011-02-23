@@ -127,6 +127,7 @@ def upload(request):
              }
         }
     '''
+    response = json_response({})
     f = get_object_or_404_json(models.File, oshash=request.POST['oshash'])
     if 'frame' in request.FILES:
         if f.frames.count() == 0:
@@ -136,7 +137,6 @@ def upload(request):
                 position = float(os.path.splitext(name)[0])
                 fr, created = models.Frame.objects.get_or_create(file=f, position=position)
                 fr.frame.save(name, frame)
-            response = json_response({})
         else:
             response = json_response(status=403, text='permissino denied')
     if 'file' in request.FILES:
