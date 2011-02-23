@@ -330,6 +330,8 @@ class Item(models.Model):
                 stream['duration'] = s.info['duration']
                 if 'video' in s.info and s.info['video']:
                     stream['aspectRatio'] = s.info['video'][0]['width'] / s.info['video'][0]['height']
+                else:
+                    stream['aspectRatio'] = 4/3
                 if settings.XSENDFILE or settings.XACCELREDIRECT:
                     stream['baseUrl'] = '/%s' % self.itemId
                 else:
@@ -607,6 +609,8 @@ class Item(models.Model):
                             'frames', "%d"%width, "%s.jpg"%position)
         if not os.path.exists(path):
             extract.frame(stream.video.path, path, position, width)
+        if not os.path.exists(path):
+            path = os.path.join(settings.STATIC_ROOT, 'png/frame.broken.png')
         return path
 
     @property
