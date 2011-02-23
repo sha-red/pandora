@@ -50,7 +50,7 @@ do_start()
 	start-stop-daemon --start --quiet --pidfile $PIDFILE -c $DAEMON_USER \
 	                                  --exec $DAEMON --test > /dev/null \
 		|| return 1
-  start-stop-daemon --start --quiet --pidfile $PIDFILE -c $DAEMON_USER \
+    start-stop-daemon --start --quiet --pidfile $PIDFILE -c $DAEMON_USER --startas $DAEMON \
            --make-pidfile --background --exec $DAEMON -- $DAEMON_ARGS \
 		|| return 2
 }
