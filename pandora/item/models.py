@@ -96,7 +96,7 @@ class Item(models.Model):
     published = models.DateTimeField(default=datetime.now, editable=False)
 
     user = models.ForeignKey(User, null=True, related_name='items')
-    groups = models.ManyToManyField(Group, related_name='items')
+    groups = models.ManyToManyField(Group, blank=True, related_name='items')
 
     #only items that have data from files are available,
     #this is indicated by setting available to True
@@ -627,6 +627,18 @@ class Item(models.Model):
                     return True
                 return False
             videos = filter(check, videos)
+        else:
+            audio = self.files.filter(is_main=True, is_audio=True, available=True)
+            if audio.count()>0:
+                first = audio[0]
+                user = first.instances.all()[0].volume.user
+                #only take videos from same user and with same width/height
+                def check(v):
+                    if v.instances.filter(volume__user=user).count()>0:
+                        return True
+                    return False
+                videos = filter(check, audio)
+ 
         return videos
 
     def update_streams(self):
@@ -658,9 +670,9 @@ class Item(models.Model):
                 os.symlink(files.values()[0], stream.video.path)
             stream.save()
 
-            if 'video' in stream.info:
+            extract.timeline(stream.video.path, self.timeline_prefix)
+            if 'video' in stream.info and stream.info['video']:
                 v = stream.info['video'][0]
-                extract.timeline(stream.video.path, self.timeline_prefix)
                 self.stream_aspect = v['width']/v['height']
                 self.data['cuts'] = extract.cuts(self.timeline_prefix)
                 self.data['color'] = extract.average_color(self.timeline_prefix)
@@ -787,7 +799,8 @@ class Item(models.Model):
         for f in self.main_videos():
             for ff in f.frames.all():
                 frames.append(ff.frame.path)
-            return frames[int(len(frames)/2)]
+            if frames:
+                return frames[int(len(frames)/2)]
 
     def make_icon(self):
         frame = self.get_poster_frame_path()

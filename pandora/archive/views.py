@@ -98,6 +98,7 @@ def update(request):
     response['data']['info'] = [f.file.oshash for f in files.filter(file__info='{}')]
     #needs some flag to find those that are actually used main is to generic
     response['data']['data'] = [f.file.oshash for f in files.filter(file__is_video=True, file__is_main=True)]
+    response['data']['data'] += [f.file.oshash for f in files.filter(file__is_audio=True, file__is_main=True)]
     response['data']['file'] = [f.file.oshash for f in files.filter(file__is_subtitle=True)]
 
     return render_to_json_response(response)

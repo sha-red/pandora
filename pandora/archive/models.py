@@ -101,6 +101,9 @@ class File(models.Model):
                     self.is_video = False
             else:
                 self.is_video = False
+                self.display_aspect_ratio = "4:3"
+                self.width = '320'
+                self.height = '240'
             if 'audio' in self.info and self.info['audio']:
                 audio = self.info['audio'][0]
                 self.audio_codec = audio['codec']
