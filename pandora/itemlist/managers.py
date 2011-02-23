@@ -60,6 +60,7 @@ def parseCondition(condition, user):
         else: # default
             key = '%s__icontains'%k
 
+    key = str(key)
     if exclude:
         q = ~Q(**{key: v})
     else:
