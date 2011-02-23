@@ -331,7 +331,7 @@ class Item(models.Model):
                 if 'video' in s.info and s.info['video']:
                     stream['aspectRatio'] = s.info['video'][0]['width'] / s.info['video'][0]['height']
                 else:
-                    stream['aspectRatio'] = 4/3
+                    stream['aspectRatio'] = 128/80
                 if settings.XSENDFILE or settings.XACCELREDIRECT:
                     stream['baseUrl'] = '/%s' % self.itemId
                 else:
