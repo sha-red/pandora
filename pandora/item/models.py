@@ -680,7 +680,7 @@ class Item(models.Model):
     def update_poster_urls(self):
         _current = {}
         for s in settings.POSTER_SERVICES:
-            url = '%s?itemId=%s'%(s, self.itemId)
+            url = '%s?id=%s'%(s, self.itemId)
             try:
                 data = json.loads(ox.net.readUrlUnicode(url))
             except:
