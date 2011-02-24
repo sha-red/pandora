@@ -17,7 +17,7 @@ class Place(models.Model):
     '''
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, null=True, related_name='items')
+    user = models.ForeignKey(User, null=True, related_name='places')
 
     name = fields.TupleField(default=[])
     name_sort = models.CharField(max_length=200)
