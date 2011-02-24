@@ -32,7 +32,7 @@ def addPlace(request):
     '''
     data = json.loads(request.POST['data'])
     exists = False
-    names = data['name']
+    names = data.pop('name')
     if isinstance(names, basestring):
         names = [names]
     for name in names:
@@ -41,6 +41,7 @@ def addPlace(request):
     if not exists:
         place = models.Place()
         place.user = request.user
+        place.name = tuple(names)
         for key in data:
             setattr(place, key, data[key])
         place.save()
@@ -193,9 +194,5 @@ Positions
         response['data']['positions'] = utils.get_positions(ids, query['ids'])
     else:
         response['data']['items'] = qs.count()
-    response['data']['items'] = []
-    #FIXME: add coordinates to limit search
-    for p in models.Place.objects.find(data['query']):
-        response['data']['items'].append(p.json())
     return render_to_json_response(response)
 actions.register(findPlaces)

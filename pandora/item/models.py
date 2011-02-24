@@ -375,6 +375,7 @@ class Item(models.Model):
                     i[key] = value
 
         #format datetime values
+#       #FIXME: do this in render_tojson
         for key in i:
             if isinstance(i[key], datetime):
                 i[key] = i[key].strftime('%Y-%m-%dT%H:%M:%SZ')
