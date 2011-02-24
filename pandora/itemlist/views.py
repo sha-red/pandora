@@ -31,7 +31,7 @@ def _order_query(qs, sort):
         qs = qs.order_by(*order_by)
     return qs
 
-def _parse_query(data, user):
+def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
     query['sort'] = [{'key':'user', 'operator':'+'}, {'key':'name', 'operator':'+'}]
@@ -69,14 +69,14 @@ def findLists(request):
         }
         return {status: {code: int, text: string},
                 data: {
-                    lists: [
+                    items: [
                         {name:, user:, featured:, public...}
                     ]
                 }
         }
     '''
     data = json.loads(request.POST['data'])
-    query = _parse_query(data, request.user)
+    query = parse_query(data, request.user)
 
     #order
     is_section_request = query['sort'] == [{u'operator': u'+', u'key': u'position'}]
