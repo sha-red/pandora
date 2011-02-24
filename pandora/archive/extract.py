@@ -186,7 +186,7 @@ def stream(video, target, profile, info):
         video_settings = ['-vn']
 
     ffmpeg = FFMPEG2THEORA.replace('2theora', '')
-    cmd = [ffmpeg, '-y', '-threads', '2', '-i', video] \
+    cmd = [ffmpeg, '-y', '-i', video] \
           + audio_settings \
           + video_settings
 
