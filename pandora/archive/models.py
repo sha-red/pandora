@@ -126,8 +126,11 @@ class File(models.Model):
         if not self.is_audio and not self.is_video and self.name.endswith('.srt'):
             self.is_subtitle = True
 
-        if self.name and self.name.startswith('Extras/'):
+        if self.name and self.name.lower().startswith('extras/'):
             self.is_extra = True
+            self.is_main = False
+        elif self.name and self.name.lower().startswith('versions/'):
+            self.is_version = True
             self.is_main = False
         else:
             self.is_extra = False

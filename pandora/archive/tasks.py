@@ -64,7 +64,7 @@ def update_files(user, volume, files):
     for f in files:
         folder = f['path'].split('/')
         name = folder.pop()
-        if folder and folder[-1] in ('Extras', 'Versions', 'DVDs'):
+        if folder and folder[-1].lower() in ('extras', 'versions', 'dvds'):
             name = '/'.join([folder.pop(), name])
         f['folder'] = '/'.join(folder)
         f['name'] = name
