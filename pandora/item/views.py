@@ -334,7 +334,7 @@ def editItem(request):
     data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Item, itemId=data['id'])
     if item.editable(request.user):
-        response = json_response(status=501, text='not implemented')
+        response = json_response(status=200, text='ok')
         item.edit(data)
     else:
         response = json_response(status=403, text='permissino denied')

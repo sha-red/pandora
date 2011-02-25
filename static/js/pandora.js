@@ -1727,13 +1727,58 @@
             pandora.api.getItem(app.user.ui.item, function(result) {
                 if (app.user.ui.itemView == 'info') {
 			        //Ox.print('result.data.item', result.data.item)
-                    $.get('/static/html/itemInfo.html', {}, function(template) {
-                        //Ox.print(template);
-                        app.$ui.contentPanel.replace(1,
-                            app.$ui.item = new Ox.Element('div')
-                            .append($.tmpl(template, result.data.item))
-                        );
-                    });
+                    if (app.user.level == 'admin') {
+                        var $form,
+                            $edit = new Ox.Element()
+                            .append($form = new Ox.FormElementGroup({
+                                elements: Ox.map(app.config.itemKeys, function(key) {
+                                    return new Ox.Input({
+                                        id: key.id,
+                                        label: key.title,
+                                        labelWidth: 100,
+                                        value: result.data.item[key.id],
+                                        type: 'text',
+                                        width: 500 
+                                    });
+                                }),
+                                separators: [
+                                    {title: '', width: 0}
+                                ]
+                            }))
+                            .append(new Ox.Button({
+                                title: 'Save',
+                                type: 'text'
+                            }).bindEvent({
+                                click: function(event, data) {
+                                    var values = $form.value();
+                                    var changed = {};
+                                    Ox.map(app.config.itemKeys, function(key, i) {
+                                        if(values[i] && values[i] != ''+result.data.item[key.id]) {
+                                            if(Ox.isArray(key.type) && key.type[0] == 'string')
+                                                changed[key.id] = values[i].split(', ');
+                                            else
+                                                changed[key.id] = values[i];
+                                        }
+                                    });
+                                    if(changed) {
+                                        pandora.api.editItem(Ox.extend(changed, {id: app.user.ui.item}), function(result) {
+                                            //fixme just reload parts that need reloading
+                                            window.location.reload();
+                                        });    
+                                    }
+                                }
+                            }));
+                        app.$ui.contentPanel.replace(1, app.$ui.item = $edit);
+                    } else {
+                        $.get('/static/html/itemInfo.html', {}, function(template) {
+                            //Ox.print(template);
+                            app.$ui.contentPanel.replace(1,
+                                app.$ui.item = new Ox.Element('div')
+                                .append($.tmpl(template, result.data.item))
+                            );
+                        });
+                    }
+
                 } else if (app.user.ui.itemView == 'player') {
                     var video = result.data.item.stream,
                         subtitles = result.data.item.layers.subtitles,
@@ -1865,7 +1910,8 @@
                         })
                     );
                 }
-                app.$ui.total.html(result.data.item.title + ' (' + result.data.item.director.join(', ') + ')')
+                var director = result.data.item.director?' ('+result.data.item.director.join(', ')+')':'';
+                app.$ui.total.html(result.data.item.title + director);
 	        });
             return that;
         },

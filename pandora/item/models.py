@@ -151,7 +151,7 @@ class Item(models.Model):
         if 'id' in data:
             #FIXME: check if id is valid and exists and move/merge items accordingly
             del data['id']
-        if 'id' in data:
+        if 'groups' in data:
             groups = data.pop('groups')
             self.groups.exclude(name__in=groups).delete()
             for g in groups:
@@ -159,8 +159,7 @@ class Item(models.Model):
                 self.groups.add(group)
         for key in data:
             if key != 'id':
-                setattr(self.data, key, data[key])
-        self.data.save()
+                self.data[key] = data[key]
         self.save()
 
     def reviews(self):
