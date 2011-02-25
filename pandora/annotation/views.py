@@ -49,7 +49,8 @@ def addAnnotation(request):
         }
         return {'status': {'code': int, 'text': string},
                 'data': {
-                    'annotation': {}s
+                    id: 123,
+                    ...
                 }
         }
     '''
@@ -72,8 +73,7 @@ def addAnnotation(request):
         start=float(data['in']), end=float(data['out']),
         value=data['value'])
     annotation.save()
-    response = json_response()
-    response['data']['annotation'] = annotation.json()
+    response = json_response(annotation.json())
     return render_to_json_response(response)
 
     response = {'status': {'code': 501, 'text': 'not implemented'}}
@@ -119,6 +119,8 @@ def editAnnotation(request):
         }
         return {'status': {'code': int, 'text': string},
                 'data': {
+                    id:
+                    ...
                 }
         }
     '''
@@ -130,10 +132,8 @@ def editAnnotation(request):
         a.start = data['in']
         a.end = data['out']
         a.save()
+        response['data'] = a.json()
     else:
         response = json_response(status=403, text='permission denied')
-    return render_to_json_response(response)
-
-    response = json_response(status=501, text='not implemented')
     return render_to_json_response(response)
 actions.register(editAnnotation, cache=False)

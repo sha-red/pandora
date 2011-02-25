@@ -1825,16 +1825,7 @@
 		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
 		            video.url = video.baseUrl + '/' + video.height + 'p.' + format;
                     $.each(app.config.layers, function(i, layer) {
-                        layers[i] = $.extend({}, layer);
-                        if (result.data.item.layers[layer.id])
-                            layers[i]['items'] = result.data.item.layers[layer.id];
-                        else
-                            layers[i]['items'] = [{
-                                               'in': 5,
-                                               'out': 10,
-                                               'value': 'This annotation is just a test...'
-                            }];
-
+                        layers[i] = $.extend({}, layer, {items: result.data.item.layers[layer.id]});
                     });
                     app.$ui.contentPanel.replace(1, app.$ui.editor = new Ox.VideoEditor({
                         annotationsSize: app.user.ui.annotationsSize,
@@ -1872,9 +1863,9 @@
                         addAnnotation: function(event, data) {
                             Ox.print('addAnnotation', data);
                             data.item = app.user.ui.item;
-                            data.value = 'Click to change text';
+                            data.value = 'Click to edit';
                             pandora.api.addAnnotation(data, function(result) {
-                                app.$ui.editor.addAnnotation(data.layer, result.data.annotation);
+                                app.$ui.editor.addAnnotation(data.layer, result.data);
                             });
                         },
                         removeAnnotations: function(event, data) {
