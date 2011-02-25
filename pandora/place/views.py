@@ -21,6 +21,7 @@ def addPlace(request):
         param data {
             name: "",
             geoname: "",
+            countryCode: '',
             south: float,
             west: float,
             north: float,
@@ -45,7 +46,7 @@ def addPlace(request):
         for key in data:
             setattr(place, key, data[key])
         place.save()
-        response = json_response(status=200, text='created')
+        response = json_response(place.json())
     else:
         response = json_response(status=403, text='place name exists')
     return render_to_json_response(response)
@@ -72,14 +73,17 @@ def editPlace(request):
         for name in names:
             if models.Place.objects.filter(name_find__icontains=u'|%s|'%name).exclude(id=place.id).count() != 0:
                 conflict = True
+        if 'geoname' in data:
+            if models.Place.objects.filter(geoname=data['geoname']).exclude(id=place.id).count() != 0:
+                conflict = True
         if not conflict:
             for key in data:
                 if key != 'id':
                     setattr(place, key, data[key])
             place.save()
-            response = json_response(status=200, text='updated')
+            response = json_response(place.json())
         else:
-            response = json_response(status=403, text='place name/alias conflict')
+            response = json_response(status=403, text='place name/geoname conflict')
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
@@ -108,12 +112,29 @@ actions.register(removePlace, cache=False)
 def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
-    query['sort'] = [{'key':'user', 'operator':'+'}, {'key':'name', 'operator':'+'}]
-    for key in ('keys', 'group', 'list', 'range', 'ids', 'sort'):
+    query['sort'] = [{'key':'name', 'operator':'+'}]
+    query['area'] = {'south': -180.0, 'west': -180.0, 'north': 180.0, 'east': 180.0}
+    for key in ('area', 'keys', 'group', 'list', 'range', 'ids', 'sort', 'query'):
         if key in data:
             query[key] = data[key]
-    query['qs'] = models.Place.objects.all()
+    query['qs'] = models.Place.objects.find(query, user)
     return query
+
+def order_query(qs, sort):
+    order_by = []
+    for e in sort:
+        operator = e['operator']
+        if operator != '-':
+            operator = ''
+        key = {
+            'name': 'name_sort',
+            'geoname': 'geoname_sort',
+        }.get(e['key'], e['key'])
+        order = '%s%s' % (operator, key)
+        order_by.append(order)
+    if order_by:
+        qs = qs.order_by(*order_by, nulls_last=True)
+    return qs
 
 def findPlaces(request):
     '''
@@ -185,7 +206,7 @@ Positions
     response = json_response()
 
     query = parse_query(data, request.user)
-    qs = query['qs']
+    qs = order_query(query['qs'], query['sort'])
     if 'keys' in data:
         qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [p.json(request.user) for p in qs]
