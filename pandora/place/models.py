@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
-from datetime import datetime
 from django.db import models
 
 import ox
@@ -62,9 +61,6 @@ class Place(models.Model):
                     'south', 'west', 'north', 'east',
                     'lat', 'lng', 'size'):
             j[key] = getattr(self, key)
-
-            if isinstance(j[key], datetime):
-                j[key] = j[key].strftime('%Y-%m-%dT%H:%M:%SZ')
         return j
 
     def save(self, *args, **kwargs):

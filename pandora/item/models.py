@@ -225,8 +225,18 @@ class Item(models.Model):
         self.update_find()
         self.update_sort()
         self.update_facets()
+        update_poster = False
+        if not settings.USE_IMDB:
+            if self.poster_frame == -1 and self.sort.duration:
+                self.poster_frame = self.sort.duration/2
+                update_poster = True
+            if not self.get('runtime', None) and self.sort.duration:
+                self.data['runtime'] = self.sort.duration
+                self.update_sort()
         self.json = self.get_json()
         super(Item, self).save(*args, **kwargs)
+        if update_poster:
+            tasks.update_poster.delay(self.itemId)
 
     def delete(self, *args, **kwargs):
         self.delete_poster()
@@ -257,40 +267,6 @@ class Item(models.Model):
                 f.save()
         self.delete()
         other.save()
-
-    '''
-        JSON cache related functions
-    '''
-    #FIXME: this should not be used
-    _public_fields = {
-        'itemId': 'id',
-        'title': 'title',
-        'year': 'year',
-
-        'runtime': 'runtime',
-        'releasedate': 'releasedate',
-
-        'country': 'country',
-        'director': 'director',
-        'writer': 'writer',
-        'editor': 'editor',
-        'producer': 'producer',
-        'cinematographer': 'cinematographer',
-        'language': 'language',
-        'genre': 'genre',
-        'keyword': 'keyword',
-        'cast': 'cast',
-        'series_title': 'series_title',
-        'episode_title': 'episode_title',
-        'season': 'season',
-        'episode': 'episode',
-        'reviews': 'reviews',
-        'trivia': 'trivia',
-        'rating': 'rating',
-        'votes': 'votes',
-        'alternative_titles': 'alternative_titles',
-        'connections_json': 'connections',
-    }
 
     def get_poster(self):
         poster = {}
@@ -373,12 +349,6 @@ class Item(models.Model):
                     value = getattr(self.sort, key)
                 if value:
                     i[key] = value
-
-        #format datetime values
-#       #FIXME: do this in render_tojson
-        for key in i:
-            if isinstance(i[key], datetime):
-                i[key] = i[key].strftime('%Y-%m-%dT%H:%M:%SZ')
 
         i['poster'] = self.get_poster()
         i['posters'] = self.get_posters()

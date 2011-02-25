@@ -108,8 +108,8 @@ class Annotation(models.Model):
             'in': self.start,
             'out': self.end,
             'value': self.value,
-            'created': self.created.strftime('%Y-%m-%dT%H:%M:%SZ'),
-            'modified': self.modified.strftime('%Y-%m-%dT%H:%M:%SZ')
+            'created': self.created,
+            'modified': self.modified
         }
 
     def __unicode__(self):

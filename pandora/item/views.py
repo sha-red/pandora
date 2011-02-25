@@ -206,8 +206,6 @@ Positions
                     r[p] = m.sort.popularity
                 else:
                     r[p] = m.json.get(p, '')
-                if isinstance(r[p], datetime):
-                    r[p] = r[p].strftime('%Y-%m-%dT%H:%M:%SZ')
             return r
         def only_p(m):
             r = {}
