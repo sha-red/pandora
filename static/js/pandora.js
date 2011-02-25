@@ -823,7 +823,8 @@
         flipbook: function(item) {
             var that = new Ox.Flipbook({
                 }).bindEvent('click', function(event, data) {
-                    alert(data.position);
+                    UI.set('videoPosition|' + item, data.position);
+                    URL.set(item + '/timeline');
                 });
                 pandora.api.getItem(item, function(result) {
                     var duration = result.data.item.duration,
