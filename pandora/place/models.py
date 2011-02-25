@@ -24,6 +24,7 @@ class Place(models.Model):
 
     geoname = models.CharField(max_length=1024, unique=True)
     geoname_sort = models.CharField(max_length=1024, unique=True)
+    countryCode = models.CharField(max_length=16, default='')
 
     wikipediaId = models.CharField(max_length=1000, blank=True)
 
@@ -57,7 +58,7 @@ class Place(models.Model):
             'user': self.user.username,
         }
         for key in ('created', 'modified',
-                    'name', 'geoname',
+                    'name', 'geoname', 'countryCode',
                     'south', 'west', 'north', 'east',
                     'lat', 'lng', 'size'):
             j[key] = getattr(self, key)

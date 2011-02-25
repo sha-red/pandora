@@ -571,16 +571,16 @@
 		                    width: ratio >= 1 ? size : size * ratio
 		                };
 		            },
-		            keys: ['director', 'id', 'poster', 'title', 'year'],
-		            max: 1,
-		            min: 1,
-		            orientation: 'horizontal',
-		            request: function(data, callback) {
+		            items: function(data, callback) {
 		                //Ox.print('data, Query.toObject', data, Query.toObject())
 		                pandora.api.find($.extend(data, {
 		                    query: Query.toObject()
 		                }), callback);
 		            },
+		            keys: ['director', 'id', 'poster', 'title', 'year'],
+		            max: 1,
+		            min: 1,
+		            orientation: 'horizontal',
 		            selected: [app.user.ui.item],
 		            size: 64,
 		            sort: app.user.ui.lists[app.user.ui.list].sort,
@@ -962,8 +962,7 @@
                         },
                     ],
                     columnsVisible: true,
-                    pageLength: 1000,
-                    request: function(data, callback) {
+                    items: function(data, callback) {
                         var query = id == 'favorite' ? {conditions: [
                             {key: 'user', value: app.user.username, operator: '!'},
                             {key: 'status', value: 'public', operator: '='}
@@ -975,6 +974,7 @@
                             query: query
                         }), callback);
                     },
+                    pageLength: 1000,
                     // fixme: select if previously selected
                     // selected: app.user.ui.list ? [app.user.ui.list] : [],
                     sort: [
@@ -1062,9 +1062,7 @@
                             width: app.user.ui.sidebarSize - 16
                         }
 		            ],
-		            max: 1,
-		            min: 1,
-		            request: function(data, callback) {
+		            items: function(data, callback) {
 		                var result = {data: {}};
 		                if (!data.range) {
 		                    result.data.items = Ox.getObjectById(app.ui.sectionFolders.site, id).items.length;
@@ -1073,6 +1071,8 @@
 		                }
 		                callback(result);
 		            },
+		            max: 1,
+		            min: 1,
 		            sort: [{key: '', operator: ''}]
                 })
                 .bindEvent({
@@ -1165,10 +1165,7 @@
                             width: 16
                         }
                     ],
-                    max: 1,
-                    min: 0,
-                    pageLength: 1000,
-                    request: function(data, callback) {
+                    items: function(data, callback) {
                         var query;
                         if (id == 'personal') {
                             query = {conditions: [
@@ -1187,6 +1184,9 @@
                             query: query
                         }), callback);
                     },
+                    max: 1,
+                    min: 0,
+                    pageLength: 1000,
                     sort: [
                         {key: 'position', operator: '+'}
                     ],
@@ -1535,7 +1535,7 @@
                     ],
                     columnsVisible: true,
                     id: 'group_' + id,
-                    request: function(data, callback) {
+                    items: function(data, callback) {
                         //Ox.print('sending request', data)
                         delete data.keys;
                         //alert(id + " Query.toObject " + JSON.stringify(Query.toObject(id)) + ' ' + JSON.stringify(data))
@@ -1995,7 +1995,7 @@
 		            columnsResizable: true,
 		            columnsVisible: true,
 		            id: 'list',
-		            request: function(data, callback) {
+		            items: function(data, callback) {
 		                //Ox.print('data, Query.toObject', data, Query.toObject())
 		                pandora.api.find($.extend(data, {
 		                    query: Query.toObject()
@@ -2042,13 +2042,13 @@
 		                    width: ratio >= 1 ? size : size * ratio
 		                };
 		            },
-		            keys: ['director', 'id', 'poster', 'title', 'year'],
-		            request: function(data, callback) {
+		            items: function(data, callback) {
 		                //Ox.print('data, Query.toObject', data, Query.toObject())
 		                pandora.api.find($.extend(data, {
 		                    query: Query.toObject()
 		                }), callback);
 		            },
+		            keys: ['director', 'id', 'poster', 'title', 'year'],
 		            size: 128,
 		            sort: app.user.ui.lists[app.user.ui.list].sort,
 		            unique: 'id'
@@ -2150,7 +2150,7 @@
 					orientation: 'horizontal'
 				})
 				.bindEvent('resize', function() {
-				    app.$ui.map.triggerResize();
+				    app.$ui.map.resize();
 				});
 		    } else {
 		        $list = new Ox.Element('<div>')
@@ -2611,6 +2611,8 @@
 		                    app.$ui.accountDialog = (app.user.level == 'guest' ?
 		                        ui.accountDialog('login') : ui.accountLogoutDialog()).open();
 		                } else if (data.id == 'places') {
+		                    app.$ui.placesDialog = ui.placesDialog().open();
+		                    /*
 		                    var $manage = new Ox.SplitPanel({
 		                            elements: [
 		                                {
@@ -2727,7 +2729,7 @@
 															.bindEvent({
 																submit: function(event, data) {
 																	app.$ui.map.find(data.value, function(location) {
-																		/*
+																		
 																		app.$ui.placeNameInput.options({
 																			disabled: false,
 																			value: location.name
@@ -2745,7 +2747,7 @@
 																		app.$ui.addPlaceButton.options({
 																			disabled: false
 																		});
-																		*/
+
 																	});
 																}
 															})
@@ -2882,6 +2884,7 @@
 		                        }).css({
 		                            overflow: 'hidden'
 		                        }).append($manage).open();
+		                    */
 		                } else if (data.id == 'query') {
 		                    var $dialog = new Ox.Dialog({
 		                        buttons: [
@@ -2931,6 +2934,73 @@
                 orientation: 'horizontal'
             })
 			return that;
+		},
+		placesDialog: function() {
+		    var height = Math.round(document.height * 0.8),
+		        width = Math.round(document.width * 0.8),
+		        that = new Ox.Dialog({
+    		        buttons: [
+        		        new Ox.Button({
+                            id: 'done',
+                            title: 'Done'
+                        }).bindEvent({
+                            click: function() {
+                                that.close();
+                            }
+                        })
+    		        ],
+    		        content: app.$ui.placesElement = new Ox.ListMap({
+    		                height: height - 48,
+    		                places: function(data, callback) {
+    		                    return pandora.api.findPlaces($.extend(data, {
+                                    query: {conditions: [], operator: ''}
+                                }), callback);
+    		                },
+    		                width: width
+        		        })
+        		        .bindEvent({
+        		            addplace: function(event, data) {
+        		                Ox.print('ADDPLACE', data)
+        		                pandora.api.addPlace(data.place, function(result) {
+        		                    var id = result.data.id;
+        		                    Ox.print("ID", result.data.id, result)
+                                    Ox.Request.clearCache(); // fixme: remove
+                                    Ox.print('AAAAA')
+                                    app.$ui.placesElement
+                                        .reloadList()
+                                        .bindEvent({loadlist: load});
+                                    Ox.print('BBBBB')
+                                    function load(event, data) {
+                                        Ox.print('LOAD')
+                                        app.$ui.placesElement
+                                            .focusList()
+                                            .options({selected: [id]})
+                                            .unbindEvent({loadlist: load}); // fixme: need bindEventOnce
+                                    }
+                                });
+        		            },
+        		            removeplace: function(event, data) {
+        		                pandora.api.removePlace(data.id, function(result) {
+        		                    // fixme: duplicated
+                                    Ox.Request.clearCache(); // fixme: remove
+                                    app.$ui.placesElement
+                                        .reloadList()
+                                        .bindEvent({loadlist: load});
+                                    function load(event, data) {
+                                        app.$ui.placesElement
+                                            .focusList()
+                                            .unbindEvent({loadlist: load}); // fixme: need bindEventOnce
+                                    }
+        		                });
+        		            }
+        		        }),
+    		        height: height,
+                    keys: {enter: 'done', escape: 'done'},
+                    padding: 0,
+                    title: 'Manage Places',
+    		        width: width
+    		    });
+		    return that;
 		},
         publicListsDialog: function() { // fixme: unused
             var that = new Ox.Dialog({
@@ -2994,7 +3064,7 @@
                             resizeGroups(data);
                             app.$ui.list.size();
                             if (app.user.ui.lists[app.user.ui.list].listView == 'map') {
-                                app.$ui.map.triggerResize();
+                                app.$ui.map.resize();
                             }
                         } else {
                             app.$ui.browser.scrollToSelection();
@@ -3342,7 +3412,7 @@
     function reloadGroups(i) {
         var query = Query.toObject();
         app.$ui.list.options({
-            request: function(data, callback) {
+            items: function(data, callback) {
                 return pandora.api.find($.extend(data, {
                     query: query
                 }), callback);
@@ -3352,7 +3422,7 @@
             if (i_ != i) {
                 //Ox.print('setting groups request', i, i_)
                 app.$ui.groups[i_].options({
-                    request: function(data, callback) {
+                    items: function(data, callback) {
                         delete data.keys;
                         return pandora.api.find($.extend(data, {
                             group: group_.id,
@@ -3435,7 +3505,7 @@
             app.$ui.list.size();
             resizeGroups(app.$ui.rightPanel.width());
             if (app.user.ui.listView == 'map') {
-                app.$ui.map.triggerResize();
+                app.$ui.map.resize();
             }
         } else {
             //Ox.print('app.$ui.window.resize');

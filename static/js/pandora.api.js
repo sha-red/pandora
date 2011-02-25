@@ -79,7 +79,7 @@ function constructList() {
         columnsMovable: false,
         columnsRemovable: false,
         id: 'actionList',
-        request: function(data, callback) {
+        items: function(data, callback) {
             function _sort(a, b) {
                 if(a.name > b.name)
                     return 1;
