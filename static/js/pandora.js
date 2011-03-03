@@ -444,10 +444,10 @@
 			    })
 			    .bindEvent({
 			        resize: function(event, data) {
-			            app.user.ui.annotationsSize = data.width;
+			            app.user.ui.annotationsSize = data;
 			        },
 			        resizeend: function(event, data) {
-			            UI.set({annotationsSize: data.width});
+			            UI.set({annotationsSize: data});
 			        },
 			        toggle: function(event, data) {
 			            UI.set({showAnnotations: !data.collapsed});
@@ -524,21 +524,31 @@
 			if (!app.user.ui.item) {
 				app.$ui.groups = ui.groups();
 				that = new Ox.SplitPanel({
-	                elements: Ox.map(app.$ui.groups, function(group) {
-	                    return {element: group};
-	                }),
+	                elements: [
+	                    {
+	                        element: app.$ui.groups[0],
+	                        size: app.ui.groups[0].size
+	                    },
+	                    {
+	                        element: app.$ui.groupsInnerPanel = ui.groupsInnerPanel()
+	                    },
+	                    {
+	                        element: app.$ui.groups[4],
+	                        size: app.ui.groups[4].size
+	                    },
+	                ],
 	                id: 'browser',
 	                orientation: 'horizontal'
 	            })
 	            .bindEvent({
 	                resize: function(event, data) {
-    	                app.user.ui.groupsSize = data.height;
+    	                app.user.ui.groupsSize = data;
     	                $.each(app.$ui.groups, function(i, list) {
     	                    list.size();
     	                });
     	            },
     	            resizeend: function(event, data){
-    	                UI.set({groupsSize: data.height});
+    	                UI.set({groupsSize: data});
     	            },
     	            toggle: function(event, data) {
     	                UI.set({showGroups: !data.collapsed});
@@ -594,7 +604,7 @@
 		        });
 			}
 			that.update = function() {
-			    app.$ui.contentPanel.replaceElement(0, app.$ui.browser = ui.browser());
+			    app.$ui.contentPanel.replace(0, app.$ui.browser = ui.browser());
 			}
 			return that;
 		},
@@ -813,8 +823,7 @@
         flipbook: function(item) {
             var that = new Ox.Flipbook({
                 }).bindEvent('click', function(event, data) {
-                    UI.set('videoPosition|' + item, data.position);
-                    URL.set(item + '/timeline');
+                    alert(data.position);
                 });
                 pandora.api.getItem(item, function(result) {
                     var duration = result.data.item.duration,
@@ -872,13 +881,13 @@
                         {
                             format: function() {
                                 return $('<img>').attr({
-                                    src: '/static/oxjs/build/png/ox.ui/icon16.png'
+                                    src: 'static/oxjs/build/png/ox.ui/icon16.png'
                                 });
                             },
                             id: 'id',
                             operator: '+',
                             title: $('<img>').attr({
-                                src: '/static/oxjs/build/png/ox.ui/icon16.png'
+                                src: 'static/oxjs/build/png/ox.ui/icon16.png'
                             }),
                             unique: true,
                             visible: true,
@@ -1037,7 +1046,7 @@
     		            {
                             format: function() {
                                 return $('<img>').attr({
-                                    src: '/static/oxjs/build/png/ox.ui/icon16.png'
+                                    src: 'static/oxjs/build/png/ox.ui/icon16.png'
                                 });
                             },
                             id: 'id',
@@ -1081,7 +1090,7 @@
                         {
                             format: function() {
                                 return $('<img>').attr({
-                                    src: '/static/oxjs/build/png/ox.ui/icon16.png'
+                                    src: 'static/oxjs/build/png/ox.ui/icon16.png'
                                 });
                             },
                             id: 'user',
@@ -1602,8 +1611,10 @@
                     }
                     function replaceGroup(i, id, query) {
                         // if query is passed, selected items will be derived from it
-                        app.$ui['browser'].replaceElement(
-                            i, app.$ui.groups[i] = ui.group(id, query)
+                        var isOuter = i % 4 == 0;
+                        app.$ui[isOuter ? 'browser' : 'groupsInnerPanel'].replace(
+                            isOuter ? i / 2 : i - 1,
+                            app.$ui.groups[i] = ui.group(id, query)
                         );
                     }
                 })
@@ -1636,6 +1647,25 @@
                 $groups[i] = ui.group(id);
             });
 		    return $groups;
+		},
+		groupsInnerPanel: function() {
+			var that = new Ox.SplitPanel({
+                elements: [
+                    {
+                        element: app.$ui.groups[1],
+                        size: app.ui.groups[1].size
+                    },
+                    {
+                        element: app.$ui.groups[2],
+                    },
+                    {
+                        element: app.$ui.groups[3],
+                        size: app.ui.groups[3].size
+                    }
+                ],
+                orientation: 'horizontal'
+            });
+			return that;
 		},
 		info: function() {
 			var that = new Ox.Element()
@@ -1738,11 +1768,11 @@
                                     }
                                 }
                             }));
-                        app.$ui.contentPanel.replaceElement(1, app.$ui.item = $edit);
+                        app.$ui.contentPanel.replace(1, app.$ui.item = $edit);
                     } else {
                         $.get('/static/html/itemInfo.html', {}, function(template) {
                             //Ox.print(template);
-                            app.$ui.contentPanel.replaceElement(1,
+                            app.$ui.contentPanel.replace(1,
                                 app.$ui.item = new Ox.Element('div')
                                 .append($.tmpl(template, result.data.item))
                             );
@@ -1756,7 +1786,7 @@
                         video.height = video.profiles[0]
 		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
 		            video.url = video.baseUrl + '/' + video.height + 'p.' + format;
-                    app.$ui.contentPanel.replaceElement(1, app.$ui.player = new Ox.VideoPanelPlayer({
+                    app.$ui.contentPanel.replace(1, app.$ui.player = new Ox.VideoPanelPlayer({
                         annotationsSize: app.user.ui.annotationsSize,
                         duration: video.duration,
                         height: app.$ui.contentPanel.size(1),
@@ -1781,7 +1811,7 @@
                         exitfullscreen: exitFullscreen,
                         resize: function(event, data) {
                             app.$ui.player.options({
-                                height: data.height
+                                height: data
                             });
                         }
                     }));
@@ -1797,7 +1827,7 @@
                     $.each(app.config.layers, function(i, layer) {
                         layers[i] = $.extend({}, layer, {items: result.data.item.layers[layer.id]});
                     });
-                    app.$ui.contentPanel.replaceElement(1, app.$ui.editor = new Ox.VideoEditor({
+                    app.$ui.contentPanel.replace(1, app.$ui.editor = new Ox.VideoEditor({
                         annotationsSize: app.user.ui.annotationsSize,
 		                cuts: cuts,
 		                duration: video.duration,
@@ -1824,7 +1854,7 @@
 		            }).bindEvent({
                         resize: function(event, data) {
                             app.$ui.editor.options({
-                                height: data.height
+                                height: data
                             });
                         },
 						togglesize: function(event, data) {
@@ -1853,7 +1883,7 @@
 		            that.bindEvent('resize', function(event, data) {
     				    //Ox.print('resize item', data)
     				    app.$ui.editor.options({
-    				        height: data.height
+    				        height: data
     				    });
     				});
 					/*
@@ -1865,7 +1895,7 @@
 	                });
 	                */    		            
                 } else if (app.user.ui.itemView == 'files') {
-                    app.$ui.contentPanel.replaceElement(1,
+                    app.$ui.contentPanel.replace(1,
                         app.$ui.item = new Ox.FilesView({
                             id: result.data.item.id
                         })
@@ -1899,12 +1929,12 @@
                 .bindEvent({
                     resize: function(event, data) {
                         var infoSize = Math.round(data / app.ui.infoRatio) + 16;
-                        app.user.ui.sidebarSize = data.width;
-                        if (data.width < app.ui.sectionButtonsWidth && app.$ui.sectionButtons) {
+                        app.user.ui.sidebarSize = data;
+                        if (data < app.ui.sectionButtonsWidth && app.$ui.sectionButtons) {
                             app.$ui.sectionButtons.remove();
                             delete app.$ui.sectionButtons;
                             app.$ui.sectionbar.append(app.$ui.sectionSelect = ui.sectionSelect());
-                        } else if (data.width >= app.ui.sectionButtonsWidth && app.$ui.sectionSelect) {
+                        } else if (data >= app.ui.sectionButtonsWidth && app.$ui.sectionSelect) {
                             app.$ui.sectionSelect.remove();
                             delete app.$ui.sectionSelect;
                             app.$ui.sectionbar.append(app.$ui.sectionButtons = ui.sectionButtons());
@@ -1914,7 +1944,7 @@
                         resizeFolders();
                     },
                     resizeend: function(event, data) {
-                        UI.set({sidebarSize: data.width});
+                        UI.set({sidebarSize: data});
                     },
                     toggle: function(event, data) {
                         UI.set({showSidebar: !data.collapsed});
@@ -2346,7 +2376,7 @@
 		        }
 		    });
             that.display = function() { // fixme: used?
-                app.$ui.rightPanel.replaceElement(1, app.$ui.contentPanel = ui.contentPanel());
+                app.$ui.rightPanel.replace(1, app.$ui.contentPanel = ui.contentPanel());
             };
 		    return that;
 		},
@@ -3039,10 +3069,10 @@
                         } else {
                             app.$ui.browser.scrollToSelection();
                             app.user.ui.itemView == 'player' && app.$ui.player.options({
-            					width: data.width
+            					width: data
             				});
                             app.user.ui.itemView == 'timeline' && app.$ui.editor.options({
-            					width: data.width
+            					width: data
             				});
                         }
                     }
@@ -3198,7 +3228,7 @@
 			    app.$ui.findElement = ui.findElement()
 			);
 			that.display = function() {
-				app.$ui.rightPanel.replaceElement(0, app.$ui.toolbar = ui.toolbar()); // fixme: remove later
+				app.$ui.rightPanel.replace(0, app.$ui.toolbar = ui.toolbar()); // fixme: remove later
 			}
 			return that;
 		},
@@ -3232,7 +3262,7 @@
                         var id = data.selected[0].id;
                         //UI.set({itemView: id});
                         URL.set(app.user.ui.item + '/' + id);
-                        // app.$ui.contentPanel.replaceElement(1, app.$ui.item = ui.item());
+                        // app.$ui.contentPanel.replace(1, app.$ui.item = ui.item());
                     }
                 });
 			return that;
@@ -3346,12 +3376,10 @@
     function getFoldersWidth() {
         var width = app.user.ui.sidebarSize;
         // fixme: don't use height(), look up in splitpanels
-        /*
         Ox.print(getFoldersHeight(), '>', app.$ui.leftPanel.height() - 24 - 1 - app.$ui.info.height())
         if (getFoldersHeight() > app.$ui.leftPanel.height() - 24 - 1 - app.$ui.info.height()) {
             width -= app.ui.scrollbarSize;
         }
-        */
         return width;
     }
 
@@ -3433,8 +3461,8 @@
             return getGroupWidth(i, width);
         });
         //Ox.print('widths', widths);
-        //app.$ui.browser.size(0, widths[0].list).size(2, widths[4].list);
-        //app.$ui.groupsInnerPanel.size(0, widths[1].list).size(2, widths[3].list);
+        app.$ui.browser.size(0, widths[0].list).size(2, widths[4].list);
+        app.$ui.groupsInnerPanel.size(0, widths[1].list).size(2, widths[3].list);
         $.each(app.$ui.groups, function(i, list) {
             list.resizeColumn('name', widths[i].column);
         });
@@ -3851,15 +3879,15 @@
             update: function() {
                 URL.parse();
                 if (app.user.ui.section != old.user.ui.section) {
-                    app.$ui.appPanel.replaceElement(1, app.$ui.mainPanel = ui.mainPanel());
+                    app.$ui.appPanel.replace(1, app.$ui.mainPanel = ui.mainPanel());
                 } else if (app.user.ui.sitePage != old.user.ui.sitePage) {
-                    app.$ui.mainPanel.replaceElement(1, app.$ui.rightPanel = ui.rightPanel());
+                    app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
                 } else if (!app.user.ui.item || !old.user.ui.item) {
-                    app.$ui.mainPanel.replaceElement(1, app.$ui.rightPanel = ui.rightPanel());
-                    app.$ui.leftPanel.replaceElement(2, app.$ui.info = ui.info());
+                    app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
+                    app.$ui.leftPanel.replace(2, app.$ui.info = ui.info());
                 } else {
-                    app.$ui.contentPanel.replaceElement(1, ui.item());
-                    app.$ui.leftPanel.replaceElement(2, app.$ui.info = ui.info());
+                    app.$ui.contentPanel.replace(1, ui.item());
+                    app.$ui.leftPanel.replace(2, app.$ui.info = ui.info());
                 }
                 if (
                     old.user.ui.item &&
@@ -3913,7 +3941,7 @@
 		});
 		if (!match) {
 			Query.fromString(location.hash.substr(1));
-	        app.$ui.rightPanel.replaceElement(1, ui.contentPanel());
+	        app.$ui.rightPanel.replace(1, ui.contentPanel());
 		}
 	}
 
