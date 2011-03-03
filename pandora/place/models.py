@@ -27,6 +27,7 @@ class Place(models.Model):
     countryCode = models.CharField(max_length=16, default='')
 
     wikipediaId = models.CharField(max_length=1000, blank=True)
+    type= models.CharField(max_length=1000, blank=True)
 
     south = models.FloatField(default=0)
     west = models.FloatField(default=0)
@@ -35,6 +36,9 @@ class Place(models.Model):
     lat = models.FloatField(default=0)
     lng = models.FloatField(default=0)
     size = models.FloatField(default=0)
+    size = models.FloatField(default=0)
+
+    matches = models.IntegerField(default=0)
 
     objects = managers.PlaceManager()
 
@@ -60,7 +64,7 @@ class Place(models.Model):
         for key in ('created', 'modified',
                     'name', 'geoname', 'countryCode',
                     'south', 'west', 'north', 'east',
-                    'lat', 'lng', 'size'):
+                    'lat', 'lng', 'size', 'matches', 'type'):
             j[key] = getattr(self, key)
         return j
 
