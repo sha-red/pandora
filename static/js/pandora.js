@@ -813,7 +813,8 @@
         flipbook: function(item) {
             var that = new Ox.Flipbook({
                 }).bindEvent('click', function(event, data) {
-                    alert(data.position);
+                    UI.set('videoPosition|' + item, data.position);
+                    URL.set(item + '/timeline');
                 });
                 pandora.api.getItem(item, function(result) {
                     var duration = result.data.item.duration,
@@ -871,13 +872,13 @@
                         {
                             format: function() {
                                 return $('<img>').attr({
-                                    src: 'static/oxjs/build/png/ox.ui/icon16.png'
+                                    src: '/static/oxjs/build/png/ox.ui/icon16.png'
                                 });
                             },
                             id: 'id',
                             operator: '+',
                             title: $('<img>').attr({
-                                src: 'static/oxjs/build/png/ox.ui/icon16.png'
+                                src: '/static/oxjs/build/png/ox.ui/icon16.png'
                             }),
                             unique: true,
                             visible: true,
@@ -1036,7 +1037,7 @@
     		            {
                             format: function() {
                                 return $('<img>').attr({
-                                    src: 'static/oxjs/build/png/ox.ui/icon16.png'
+                                    src: '/static/oxjs/build/png/ox.ui/icon16.png'
                                 });
                             },
                             id: 'id',
@@ -1080,7 +1081,7 @@
                         {
                             format: function() {
                                 return $('<img>').attr({
-                                    src: 'static/oxjs/build/png/ox.ui/icon16.png'
+                                    src: '/static/oxjs/build/png/ox.ui/icon16.png'
                                 });
                             },
                             id: 'user',
