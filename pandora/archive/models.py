@@ -346,7 +346,7 @@ class Instance(models.Model):
     mtime = models.IntegerField(default=lambda: int(time.time()), editable=False)
 
     name = models.CharField(max_length=2048)
-    folder = models.CharField(max_length=255)
+    folder = models.CharField(max_length=2048)
 
     file = models.ForeignKey(File, related_name='instances')
     volume = models.ForeignKey(Volume, related_name='files')
