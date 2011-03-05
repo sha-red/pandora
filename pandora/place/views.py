@@ -20,6 +20,7 @@ def addPlace(request):
     '''
         param data {
             name: "",
+            aliases: [],
             geoname: "",
             countryCode: '',
             south: float,
@@ -34,17 +35,19 @@ def addPlace(request):
     data = json.loads(request.POST['data'])
     exists = False
     names = data.pop('name')
-    if isinstance(names, basestring):
-        names = [names]
-    for name in names:
+    for name in [names] + data.get('aliases', []):
         if models.Place.objects.filter(name_find__icontains=u'|%s|'%name).count() != 0:
             exists = True
     if not exists:
         place = models.Place()
         place.user = request.user
-        place.name = tuple(names)
+        place.name = names
+        place.aliases = tuple(data.pop('aliases', []))
         for key in data:
-            setattr(place, key, data[key])
+            value = data[key]
+            if isinstance(value, list):
+                value = tuple(value)
+            setattr(place, key, value)
         place.save()
         response = json_response(place.json())
     else:
@@ -70,7 +73,7 @@ def editPlace(request):
         names = [names]
     if place.editable(request.user):
         conflict = False
-        for name in names:
+        for name in names + data.get('aliases', []):
             if models.Place.objects.filter(name_find__icontains=u'|%s|'%name).exclude(id=place.id).count() != 0:
                 conflict = True
         if 'geoname' in data:
@@ -79,7 +82,10 @@ def editPlace(request):
         if not conflict:
             for key in data:
                 if key != 'id':
-                    setattr(place, key, data[key])
+                    value = data[key]
+                    if isinstance(value, list):
+                        value = tuple(value)
+                    setattr(place, key, value)
             place.save()
             response = json_response(place.json())
         else:

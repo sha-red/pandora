@@ -18,7 +18,8 @@ class Place(models.Model):
     modified = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, null=True, related_name='places')
 
-    name = fields.TupleField(default=[])
+    name = models.CharField(max_length=1024)
+    aliases = fields.TupleField(default=[])
     name_sort = models.CharField(max_length=200)
     name_find = models.TextField(default='', editable=False)
 
@@ -62,7 +63,7 @@ class Place(models.Model):
             'user': self.user.username,
         }
         for key in ('created', 'modified',
-                    'name', 'geoname', 'countryCode',
+                    'name', 'aliases', 'geoname', 'countryCode',
                     'south', 'west', 'north', 'east',
                     'lat', 'lng', 'size', 'matches', 'type'):
             j[key] = getattr(self, key)
@@ -70,10 +71,9 @@ class Place(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.name_sort:
-            self.name_sort = ', '.join(self.name)
+            self.name_sort = self.name #', '.join(self.name)
         self.geoname_sort = ', '.join(reversed(self.geoname.split(', ')))
-
-        self.name_find = '|%s|'%'|'.join(self.name)
+        self.name_find = '|%s|'%'|'.join([self.name]+list(self.aliases))
 
         #update center
         #self.lat = ox.location.center(self.south, self.north)
