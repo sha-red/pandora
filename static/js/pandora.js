@@ -27,7 +27,6 @@
     		        return key.find ? key : null;
     		    }),
     			infoRatio: 16 / 9,
-    			scrollbarSize: $.browser.mozilla ? 16 : 12,
     			sectionElement: 'buttons',
     		    sectionFolders: {
     		        site: $.merge([
@@ -464,7 +463,7 @@
 		        $bin.$content.append(
 		            $('<div>').css({ height: '20px' }).append(
 		                $('<div>').css({ float: 'left', width: '16px', height: '16px', margin: '1px'}).append(
-		                    $('<img>').attr({ src: 'static/oxjs/build/png/ox.ui.modern/iconFind.png' }).css({ width: '16px', height: '16px', border: 0, background: 'rgb(64, 64, 64)', WebkitBorderRadius: '2px' })
+		                    $('<img>').attr({ src: Ox.UI.getImagePath('iconFind.svg') }).css({ width: '16px', height: '16px', border: 0, background: 'rgb(64, 64, 64)', WebkitBorderRadius: '2px' })
 		                )
 		            ).append(
 		                $('<div>').css({ float: 'left', width: '122px', height: '14px', margin: '2px' }).html('Foo')
@@ -604,7 +603,7 @@
 		        });
 			}
 			that.update = function() {
-			    app.$ui.contentPanel.replace(0, app.$ui.browser = ui.browser());
+			    app.$ui.contentPanel.replaceElement(0, app.$ui.browser = ui.browser());
 			}
 			return that;
 		},
@@ -627,7 +626,7 @@
     	                collapsed: !app.user.ui.showMovies,
     	                collapsible: true,
     	                element: app.$ui.browser = ui.browser(),
-    	                size: 112 + app.ui.scrollbarSize
+    	                size: 112 + Ox.UI.SCROLLBAR_SIZE
     	            },
     	            {
     	                element: app.$ui.item = ui.item(app.user.ui.item, app.user.ui.itemView)
@@ -691,7 +690,7 @@
                 height: 264,
                 keys: {enter: 'save', escape: 'cancel'},
                 title: 'Advanced Find',
-                width: 616 + app.ui.scrollbarSize
+                width: 616 + Ox.UI.SCROLLBAR_SIZE
             });
             return that;
         },
@@ -864,7 +863,7 @@
                 });
             app.$ui.findListInput = new Ox.Input({
                     placeholder: 'Find User',
-                    width: 184 - app.ui.scrollbarSize
+                    width: 184 - Ox.UI.SCROLLBAR_SIZE
                 })
                 .css({
                     margin: '4px',
@@ -874,21 +873,28 @@
             return that;
         },
         folderBrowserList: function(id) {
-            var columnWidth = (app.user.ui.sidebarSize - app.ui.scrollbarSize - 88) / 2,
+            var columnWidth = (app.user.ui.sidebarSize - Ox.UI.SCROLLBAR_SIZE - 88) / 2,
                 i = Ox.getPositionById(app.ui.sectionFolders[app.user.ui.section], id),
                 that = new Ox.TextList({
                     columns: [
                         {
                             format: function() {
-                                return $('<img>').attr({
-                                    src: 'static/oxjs/build/png/ox.ui/icon16.png'
-                                });
+                                return $('<img>')
+                                    .attr({
+                                        src: 'static/oxjs/build/png/ox.ui/icon16.png'
+                                    });
                             },
                             id: 'id',
                             operator: '+',
-                            title: $('<img>').attr({
-                                src: 'static/oxjs/build/png/ox.ui/icon16.png'
-                            }),
+                            title: $('<img>')
+                                .attr({
+                                    src: 'static/oxjs/build/png/ox.ui/icon16.png'
+                                })
+                                .css({
+                                    width: '10px',
+                                    height: '10px',
+                                    padding: '3px 2px 1px 2px',
+                                }),
                             unique: true,
                             visible: true,
                             width: 16
@@ -922,19 +928,26 @@
                             format: function(value) {
                                 return $('<img>')
                                     .attr({
-                                        src: 'static/oxjs/build/png/ox.ui.' + Ox.theme() +
-                                        '/symbolFind.png'
+                                        src: Ox.UI.getImagePath('symbolFind.svg')
                                     })
                                     .css({
+                                        width: '10px',
+                                        height: '10px',
+                                        padding: '3px 2px 1px 2px', // fixme: strange
                                         opacity: value == 'static' ? 0.1 : 1
                                     });
                             },
                             id: 'type',
                             operator: '+',
-                            title: $('<img>').attr({
-                                src: 'static/oxjs/build/png/ox.ui.' +
-                                Ox.theme() + '/symbolFind.png'
-                            }),
+                            title: $('<img>')
+                                .attr({
+                                    src: Ox.UI.getImagePath('symbolFind.svg')
+                                })
+                                .css({
+                                    width: '10px',
+                                    height: '10px',
+                                    padding: '3px 2px 1px 2px',
+                                }),
                             visible: true,
                             width: 16
                         },
@@ -943,20 +956,31 @@
                             format: function(value) {
                                 return $('<img>')
                                     .attr({
-                                        src: 'static/oxjs/build/png/ox.ui.' + Ox.theme() +
-                                        '/symbol' + (id == 'favorite' ? 'Check' : 'Star') + '.png'
+                                        src: Ox.UI.getImagePath(
+                                            'symbol' + (id == 'favorite' ? 'Check' : 'Star') + '.svg'
+                                        )
                                     })
                                     .css({
+                                        width: '10px',
+                                        height: '10px',
+                                        padding: '3px 2px 1px 2px',
                                         opacity: id == 'favorite' ? (value ? 1 : 0.1) :
                                         (value == 'featured' ? 1 : 0.1)
                                     });
                             },
                             id: id == 'favorite' ? 'subscribed' : 'status',
                             operator: '+',
-                            title: $('<img>').attr({
-                                src: 'static/oxjs/build/png/ox.ui.' + Ox.theme() +
-                                '/symbol' + (id == 'favorite' ? 'Check' : 'Star') + '.png'
-                            }),
+                            title: $('<img>')
+                                .attr({
+                                    src: Ox.UI.getImagePath(
+                                        'symbol' + (id == 'favorite' ? 'Check' : 'Star') + '.svg'
+                                    )
+                                })
+                                .css({
+                                    width: '10px',
+                                    height: '10px',
+                                    padding: '3px 2px 1px 2px'
+                                }),
                             visible: true,
                             width: 16
                         },
@@ -1045,9 +1069,10 @@
 		            columns: [
     		            {
                             format: function() {
-                                return $('<img>').attr({
-                                    src: 'static/oxjs/build/png/ox.ui/icon16.png'
-                                });
+                                return $('<img>')
+                                    .attr({
+                                        src: 'static/oxjs/build/png/ox.ui/icon16.png'
+                                    })
                             },
                             id: 'id',
                             operator: '+',
@@ -1134,10 +1159,12 @@
                             format: function(value) {
                                 return $('<img>')
                                     .attr({
-                                        src: 'static/oxjs/build/png/ox.ui.' + Ox.theme() +
-                                        '/symbolFind.png'
+                                        src: Ox.UI.getImagePath('symbolFind.svg')
                                     })
                                     .css({
+                                        width: '10px',
+                                        height: '10px',
+                                        padding: '3px 2px 1px 2px',
                                         opacity: value == 'static' ? 0.1 : 1
                                     });
                             },
@@ -1152,10 +1179,14 @@
                                 //var symbols = {private: 'Publish', public: 'Publish', featured: 'Star'};
                                 return $('<img>')
                                     .attr({
-                                        src: 'static/oxjs/build/png/ox.ui.' + Ox.theme() + '/symbol'
-                                        + (value == 'featured' ? 'Star' : 'Publish') + '.png'
+                                        src: Ox.UI.getImagePath(
+                                            'symbol' + (value == 'featured' ? 'Star' : 'Publish') + '.svg'
+                                        )
                                     })
                                     .css({
+                                        width: '10px',
+                                        height: '10px',
+                                        padding: '3px 2px 1px 2px',
                                         opacity: value == 'private' ? 0.1 : 1
                                     })
                             },
@@ -1612,7 +1643,7 @@
                     function replaceGroup(i, id, query) {
                         // if query is passed, selected items will be derived from it
                         var isOuter = i % 4 == 0;
-                        app.$ui[isOuter ? 'browser' : 'groupsInnerPanel'].replace(
+                        app.$ui[isOuter ? 'browser' : 'groupsInnerPanel'].replaceElement(
                             isOuter ? i / 2 : i - 1,
                             app.$ui.groups[i] = ui.group(id, query)
                         );
@@ -1768,11 +1799,11 @@
                                     }
                                 }
                             }));
-                        app.$ui.contentPanel.replace(1, app.$ui.item = $edit);
+                        app.$ui.contentPanel.replaceElement(1, app.$ui.item = $edit);
                     } else {
                         $.get('/static/html/itemInfo.html', {}, function(template) {
                             //Ox.print(template);
-                            app.$ui.contentPanel.replace(1,
+                            app.$ui.contentPanel.replaceElement(1,
                                 app.$ui.item = new Ox.Element('div')
                                 .append($.tmpl(template, result.data.item))
                             );
@@ -1786,7 +1817,7 @@
                         video.height = video.profiles[0]
 		            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
 		            video.url = video.baseUrl + '/' + video.height + 'p.' + format;
-                    app.$ui.contentPanel.replace(1, app.$ui.player = new Ox.VideoPanelPlayer({
+                    app.$ui.contentPanel.replaceElement(1, app.$ui.player = new Ox.VideoPanelPlayer({
                         annotationsSize: app.user.ui.annotationsSize,
                         duration: video.duration,
                         height: app.$ui.contentPanel.size(1),
@@ -1827,7 +1858,7 @@
                     $.each(app.config.layers, function(i, layer) {
                         layers[i] = $.extend({}, layer, {items: result.data.item.layers[layer.id]});
                     });
-                    app.$ui.contentPanel.replace(1, app.$ui.editor = new Ox.VideoEditor({
+                    app.$ui.contentPanel.replaceElement(1, app.$ui.editor = new Ox.VideoEditor({
                         annotationsSize: app.user.ui.annotationsSize,
 		                cuts: cuts,
 		                duration: video.duration,
@@ -1895,7 +1926,7 @@
 	                });
 	                */    		            
                 } else if (app.user.ui.itemView == 'files') {
-                    app.$ui.contentPanel.replace(1,
+                    app.$ui.contentPanel.replaceElement(1,
                         app.$ui.item = new Ox.FilesView({
                             id: result.data.item.id
                         })
@@ -2376,7 +2407,7 @@
 		        }
 		    });
             that.display = function() { // fixme: used?
-                app.$ui.rightPanel.replace(1, app.$ui.contentPanel = ui.contentPanel());
+                app.$ui.rightPanel.replaceElement(1, app.$ui.contentPanel = ui.contentPanel());
             };
 		    return that;
 		},
@@ -3228,7 +3259,7 @@
 			    app.$ui.findElement = ui.findElement()
 			);
 			that.display = function() {
-				app.$ui.rightPanel.replace(0, app.$ui.toolbar = ui.toolbar()); // fixme: remove later
+				app.$ui.rightPanel.replaceElement(0, app.$ui.toolbar = ui.toolbar()); // fixme: remove later
 			}
 			return that;
 		},
@@ -3262,7 +3293,7 @@
                         var id = data.selected[0].id;
                         //UI.set({itemView: id});
                         URL.set(app.user.ui.item + '/' + id);
-                        // app.$ui.contentPanel.replace(1, app.$ui.item = ui.item());
+                        // app.$ui.contentPanel.replaceElement(1, app.$ui.item = ui.item());
                     }
                 });
 			return that;
@@ -3323,7 +3354,7 @@
         app.user.ui.showSidebar && app.$ui.mainPanel.size(0, 0);
         app.$ui.rightPanel.size(0, 0).size(2, 0);
         !app.user.ui.showMovies && app.$ui.contentPanel.css({
-            top: (-112 - app.ui.scrollbarSize) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
+            top: (-112 - Ox.UI.SCROLLBAR_SIZE) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
         });
         app.user.ui.showMovies && app.$ui.contentPanel.size(0, 0);
         app.$ui.player.options({
@@ -3337,9 +3368,9 @@
         app.user.ui.showSidebar && app.$ui.mainPanel.size(0, app.user.ui.sidebarSize);
         app.$ui.rightPanel.size(0, 24).size(2, 16);
         !app.user.ui.showMovies && app.$ui.contentPanel.css({
-            top: 24 + (-112 - app.ui.scrollbarSize) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
+            top: 24 + (-112 - Ox.UI.SCROLLBAR_SIZE) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
         });
-        app.user.ui.showMovies && app.$ui.contentPanel.size(0, 112 + app.ui.scrollbarSize);
+        app.user.ui.showMovies && app.$ui.contentPanel.size(0, 112 + Ox.UI.SCROLLBAR_SIZE);
     }
 
     function getListData() {
@@ -3378,7 +3409,7 @@
         // fixme: don't use height(), look up in splitpanels
         Ox.print(getFoldersHeight(), '>', app.$ui.leftPanel.height() - 24 - 1 - app.$ui.info.height())
         if (getFoldersHeight() > app.$ui.leftPanel.height() - 24 - 1 - app.$ui.info.height()) {
-            width -= app.ui.scrollbarSize;
+            width -= Ox.UI.SCROLLBAR_SIZE;
         }
         return width;
     }
@@ -3386,7 +3417,7 @@
 	function getGroupWidth(pos, panelWidth) { // fixme: don't pass panelWidth
 	    var width = {};
 	    width.list = Math.floor(panelWidth / 5) + (panelWidth % 5 > pos);
-	    width.column = width.list - 40 - app.ui.scrollbarSize;
+	    width.column = width.list - 40 - Ox.UI.SCROLLBAR_SIZE;
 	    return width;
 	}
 
@@ -3879,15 +3910,15 @@
             update: function() {
                 URL.parse();
                 if (app.user.ui.section != old.user.ui.section) {
-                    app.$ui.appPanel.replace(1, app.$ui.mainPanel = ui.mainPanel());
+                    app.$ui.appPanel.replaceElement(1, app.$ui.mainPanel = ui.mainPanel());
                 } else if (app.user.ui.sitePage != old.user.ui.sitePage) {
-                    app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
+                    app.$ui.mainPanel.replaceElement(1, app.$ui.rightPanel = ui.rightPanel());
                 } else if (!app.user.ui.item || !old.user.ui.item) {
-                    app.$ui.mainPanel.replace(1, app.$ui.rightPanel = ui.rightPanel());
-                    app.$ui.leftPanel.replace(2, app.$ui.info = ui.info());
+                    app.$ui.mainPanel.replaceElement(1, app.$ui.rightPanel = ui.rightPanel());
+                    app.$ui.leftPanel.replaceElement(2, app.$ui.info = ui.info());
                 } else {
-                    app.$ui.contentPanel.replace(1, ui.item());
-                    app.$ui.leftPanel.replace(2, app.$ui.info = ui.info());
+                    app.$ui.contentPanel.replaceElement(1, ui.item());
+                    app.$ui.leftPanel.replaceElement(2, app.$ui.info = ui.info());
                 }
                 if (
                     old.user.ui.item &&
@@ -3941,7 +3972,7 @@
 		});
 		if (!match) {
 			Query.fromString(location.hash.substr(1));
-	        app.$ui.rightPanel.replace(1, ui.contentPanel());
+	        app.$ui.rightPanel.replaceElement(1, ui.contentPanel());
 		}
 	}
 
