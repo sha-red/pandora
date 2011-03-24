@@ -39,7 +39,6 @@ EOF
 
 cd /srv/pandora/pandora
 sudo -u pandora python manage.py syncdb --noinput 
-sudo -u pandora python manage.py loaddata fixtures/0xdb_properties.json
 echo "UPDATE django_site SET domain = 'pandora.local', name = 'pandora.local' WHERE 1=1;" | sudo -u pandora python manage.py dbshell
 
 mkdir /srv/pandora/data
