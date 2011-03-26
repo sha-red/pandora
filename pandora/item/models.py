@@ -913,7 +913,7 @@ class Stream(models.Model):
     info = fields.DictField(default={})
 
     def __unicode__(self):
-        return u"%s/%s" % (self.item, self.profile)
+        return u"%s/%s" % (self.item.itemId, self.profile)
 
     def path(self):
         return self.item.path(self.profile)

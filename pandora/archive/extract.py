@@ -192,7 +192,7 @@ def stream(video, target, profile, info):
 
     if format == 'webm':
         cmd += ['-f', 'webm', target]
-    if format == 'mp4':
+    elif format == 'mp4':
         #mp4 needs postprocessing(qt-faststart), write to temp file
         cmd += ["%s.mp4"%target]
     else :

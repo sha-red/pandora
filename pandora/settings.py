@@ -162,10 +162,8 @@ VIDEO_PROFILE = '480p.webm'
 VIDEO_DERIVATIVES = [
     '96p.webm',
     '240p.webm',
-    '360p.webm'
     '96p.mp4',
     '240p.mp4',
-    '360p.mp4',
     '480p.mp4',
 ]
 '''
