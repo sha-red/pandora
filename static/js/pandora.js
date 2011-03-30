@@ -3318,7 +3318,7 @@
     function autovalidateListname(value, blur, callback) {
         var length = value.length;
         value = $.map(value.split(''), function(v, i) {
-            if (new RegExp('[0-9' + Ox.regexp.letters + '\\(\\)' + ((i == 0 || (i == length - 1 && blur)) ? '' : ' \-') + ']', 'i')(v)) {
+            if (new RegExp('[0-9' + Ox.regexp.letters + '\\(\\)' + ((i == 0 || (i == length - 1 && blur)) ? '' : ' \-') + ']', 'i').test(v)) {
                 return v
             } else {
                 return null;
@@ -3336,7 +3336,7 @@
     function autovalidateUsername(value, blur, callback) {
         var length = value.length;
         value = $.map(value.toLowerCase().split(''), function(v, i) {
-            if (new RegExp('[0-9a-z' + ((i == 0 || (i == length - 1 && blur)) ? '' : '\-_') + ']')(v)) {
+            if (new RegExp('[0-9a-z' + ((i == 0 || (i == length - 1 && blur)) ? '' : '\-_') + ']').test(v)) {
                 return v
             } else {
                 return null;
@@ -3839,7 +3839,7 @@
     				var split = url.split('/'),
     				    section = new RegExp(
     				        '^ˆ(statistics|users)$'
-    				    )(split[1]);
+    				    ).exec(split[1]);
     				section = section ? section[0] : 'users';
     				UI.set({
     				    section: 'site',
@@ -3867,7 +3867,7 @@
 		        	        '^(' + $.map(app.config.itemViews, function(v) {
 		        	            return v.id
 		        	        }).join('|') + ')$'
-		        	    )(split[1]);
+		        	    ).exec(split[1]);
 		        	view = view ? view[0] : app.user.ui.itemView;
                     UI.set({
                         section: 'items',
@@ -3900,7 +3900,7 @@
                 $.each(regexps, function(re, fn) {
                     //Ox.print(url, 're', re)
                     re = new RegExp(re);
-        			if (re(url)) {
+        			if (re.test(url)) {
         			    Ox.print('URL re ' + re)
         				fn(url);
         				return false;
@@ -3965,7 +3965,7 @@
 	    }
 		$.each(regexps, function(re, fn) {
 			re = new RegExp(re);
-			if (re(url)) {
+			if (re.test(url)) {
 				fn();
 				match = true;
 				return false;
