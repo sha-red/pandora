@@ -193,6 +193,7 @@ class Item(models.Model):
                     data['actor'] = [data['cast'][0]]
                 else:
                     data['actor'] = [c[0] for c in data['cast']]
+                data['actor'] = list(set(data['actor']))
             self.external_data = data
             self.save()
 
