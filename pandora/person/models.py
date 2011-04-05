@@ -15,9 +15,8 @@ def get_name_sort(name):
     name_sort = unicodedata.normalize('NFKD', person.name_sort)
     return name_sort
 
-
 class Person(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     name_sort = models.CharField(max_length=200)
 
     #FIXME: how to deal with aliases
