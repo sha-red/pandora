@@ -296,7 +296,7 @@ class File(models.Model):
             if settings.USE_IMDB:
                 director = self.item.get('director', ['Unknown Director'])
                 director = map(get_name_sort, director)
-                director = '; '.join(director)
+                director = u'; '.join(director)
                 director = re.sub(r'[:\\/]', '_', director)
                 name = os.path.join(director, name)
             year = self.item.get('year', None)
@@ -304,7 +304,7 @@ class File(models.Model):
                 name += u' (%s)' % year
             name = os.path.join(name[0].upper(), name)
             return name
-        return ''
+        return u''
 
     def get_name(self):
         if self.item:
