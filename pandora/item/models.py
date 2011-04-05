@@ -631,6 +631,9 @@ class Item(models.Model):
             elif not os.path.exists(os.path.dirname(stream.video.path)):
                 os.makedirs(os.path.dirname(stream.video.path))
             if len(files.values()) > 1:
+                if len(files.values()) > 4:
+                    print "FIXME: to many files for this item, not merging entire tv shows"
+                    return
                 for f in sorted(files):
                     cmd.append('+')
                     cmd.append(files[f])
@@ -724,6 +727,9 @@ class Item(models.Model):
         timeline = self.path('timeline.64.png')
         timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
         if not os.path.exists(timeline):
+            path = self.path('poster.pandora.jpg')
+            path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, path))
+            posters[path] = False
             return posters
         if self.poster_frame >= 0:
             frame = self.get_poster_frame_path()
@@ -743,25 +749,30 @@ class Item(models.Model):
         posters = self.local_posters()
         timeline = self.path('timeline.64.png')
         timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
-        if os.path.exists(timeline):
-            for poster in posters:
-                frame = posters[poster]
-                cmd = [settings.ITEM_POSTER,
-                       '-t', self.get('title'),
-                       '-d', ', '.join(self.get('director', ['Unknown Director'])),
-                       '-y', str(self.get('year', '')),
-                       '-f', frame,
-                       '-l', timeline,
-                       '-p', poster
-                      ]
-                if settings.USE_IMDB:
-                    if len(self.itemId) == 7:
-                        cmd += ['-i', self.itemId]
-                    cmd += ['-o', self.oxdbId]
-                else:
+        if not os.path.exists(os.path.join(settings.MEDIA_ROOT,self.path())):
+            os.makedirs(os.path.join(settings.MEDIA_ROOT,self.path()))
+        for poster in posters:
+            frame = posters[poster]
+            cmd = [settings.ITEM_POSTER,
+                   '-t', self.get('title'),
+                   '-d', ', '.join(self.get('director', ['Unknown Director'])),
+                   '-y', str(self.get('year', '')),
+                   '-p', poster
+                  ]
+            if frame:
+                cmd += [
+                   '-f', frame,
+                   '-l', timeline,
+                ]
+            if settings.USE_IMDB:
+                if len(self.itemId) == 7:
                     cmd += ['-i', self.itemId]
-                p = subprocess.Popen(cmd)
-                p.wait()
+                cmd += ['-o', self.oxdbId]
+            else:
+                cmd += ['-i', self.itemId]
+            print cmd
+            p = subprocess.Popen(cmd)
+            p.wait()
         return posters.keys()
 
     def get_poster_frame_path(self):

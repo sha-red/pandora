@@ -51,10 +51,10 @@ def render_poster(title, director, year, series, oxdb_id, imdb_id, frame, timeli
     }
 
     # frame
+    frame_width = poster_width
+    frame_ratio = 4 / 3
+    frame_height = int(round(frame_width / frame_ratio))
     if frame:
-        frame_width = poster_width
-        frame_ratio = 4 / 3
-        frame_height = int(round(frame_width / frame_ratio))
         frame_image = Image.open(frame)
         frame_image_ratio = frame_image.size[0] / frame_image.size[1]
         if frame_ratio < frame_image_ratio:
@@ -70,9 +70,10 @@ def render_poster(title, director, year, series, oxdb_id, imdb_id, frame, timeli
     # timeline
     timeline_width = poster_width
     timeline_height = 64
-    timeline_image = Image.open(timeline)
-    timeline_image = timeline_image.resize((timeline_width, timeline_height), Image.ANTIALIAS)
-    poster_image.paste(timeline_image, (0, frame_height))
+    if timeline:
+        timeline_image = Image.open(timeline)
+        timeline_image = timeline_image.resize((timeline_width, timeline_height), Image.ANTIALIAS)
+        poster_image.paste(timeline_image, (0, frame_height))
 
     # text
     text_width = poster_width
