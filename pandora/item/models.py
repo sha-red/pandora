@@ -755,8 +755,8 @@ class Item(models.Model):
         for poster in posters:
             frame = posters[poster]
             cmd = [settings.ITEM_POSTER,
-                   '-t', self.get('title'),
-                   '-d', ', '.join(self.get('director', ['Unknown Director'])),
+                   '-t', self.get('title').encode('utf-8'),
+                   '-d', u', '.join(self.get('director', ['Unknown Director'])).encode('utf-8'),
                    '-y', str(self.get('year', '')),
                    '-p', poster
                   ]
@@ -771,7 +771,6 @@ class Item(models.Model):
                 cmd += ['-o', self.oxdbId]
             else:
                 cmd += ['-i', self.itemId]
-            print cmd
             p = subprocess.Popen(cmd)
             p.wait()
         return posters.keys()
