@@ -104,7 +104,7 @@ class Item(models.Model):
     public = models.BooleanField(default=False, db_index=True)
 
     itemId = models.CharField(max_length=128, unique=True, blank=True)
-    oxdbId = models.CharField(max_length=42, unique=True, blank=True)
+    oxdbId = models.CharField(max_length=42, unique=True, blank=True, null=True)
     external_data = fields.DictField(default={}, editable=False)
     data = fields.DictField(default={}, editable=False)
     json = fields.DictField(default={}, editable=False)
@@ -179,7 +179,7 @@ class Item(models.Model):
                         'cinematographers', 'languages', 'genres', 'keywords',
                         'episode_directors'):
                 if key in data:
-                    data[key[:-1]] = data.pop(key)
+                    data[key[:-1]] = list(set(data.pop(key)))
             if 'countries' in data:
                 data['country'] = data.pop('countries')
             if 'release date' in data:
@@ -893,6 +893,9 @@ class Facet(models.Model):
     key = models.CharField(max_length=200, db_index=True)
     value = models.CharField(max_length=200, db_index=True)
     value_sort = models.CharField(max_length=200, db_index=True)
+
+    def __unicode__(self):
+        return u"%s=%s" % (self.key, self.value)
 
     def save(self, *args, **kwargs):
         if not self.value_sort:
