@@ -179,7 +179,7 @@ class Item(models.Model):
                         'cinematographers', 'languages', 'genres', 'keywords',
                         'episode_directors'):
                 if key in data:
-                    data[key[:-1]] = list(set(data.pop(key)))
+                    data[key[:-1]] = data.pop(key)
             if 'countries' in data:
                 data['country'] = data.pop('countries')
             if 'release date' in data:
@@ -193,7 +193,7 @@ class Item(models.Model):
                     data['actor'] = [data['cast'][0]]
                 else:
                     data['actor'] = [c[0] for c in data['cast']]
-                data['actor'] = list(set(data['actor']))
+                data['actor'] = data['actor']
             self.external_data = data
             self.save()
 
@@ -250,6 +250,8 @@ class Item(models.Model):
         '''
             move all related tables to other and delete self
         '''
+        #FIXME: stream path is wrong after this, should this be dealt with in save?
+        #       its more that streams have to be generated again after merging
         for stream in self.streams.all():
             stream.item = other
             stream.save()
@@ -549,6 +551,7 @@ class Item(models.Model):
             current_values = self.get(key, [])
             if not isinstance(current_values, list):
                 current_values = [current_values]
+            current_values = list(set(current_values))
             saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
             removed_values = filter(lambda i: i not in current_values, saved_values)
             if removed_values:
