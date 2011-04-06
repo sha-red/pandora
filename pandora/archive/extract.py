@@ -47,11 +47,8 @@ class AspectRatio(fractions.Fraction):
 
 def stream(video, target, profile, info):
     if not os.path.exists(target):
-        fdir = os.path.dirname(target)
-        if not os.path.exists(fdir):
-            os.makedirs(fdir)
+        ox.makedirs(os.path.dirname(target))
 
-    dar = AspectRatio(info['video'][0]['display_aspect_ratio'])
     '''
         WebM look into
             lag
@@ -109,36 +106,27 @@ def stream(video, target, profile, info):
         audiochannels = 1
 
     bpp = 0.17
-    fps = AspectRatio(info['video'][0]['framerate'])
+    
+    if info['video'] and 'display_aspect_ratio' in info['video'][0]:
+        fps = AspectRatio(info['video'][0]['framerate'])
 
-    width = int(dar * height)
-    width += width % 2
+        dar = AspectRatio(info['video'][0]['display_aspect_ratio'])
+        width = int(dar * height)
+        width += width % 2
 
-    bitrate = height*width*fps*bpp/1000
-    aspect = dar.ratio
-    #use 1:1 pixel aspect ratio if dar is close to that
-    if abs(width/height - dar) < 0.02:
-        aspect = '%s:%s' % (width, height)
+        bitrate = height*width*fps*bpp/1000
+        aspect = dar.ratio
+        #use 1:1 pixel aspect ratio if dar is close to that
+        if abs(width/height - dar) < 0.02:
+            aspect = '%s:%s' % (width, height)
 
-    if info['audio']:
-        audio_settings = ['-ar', str(audiorate), '-aq', str(audioquality)]
-        if audiochannels and 'channels' in info['audio'][0] and info['audio'][0]['channels'] > audiochannels:
-            audio_settings += ['-ac', str(audiochannels)]
-        if audiobitrate:
-            audio_settings += ['-ab', audiobitrate]
-        if format == 'mp4':
-            audio_settings += ['-acodec', 'libfaac']
-        else:
-            audio_settings += ['-acodec', 'libvorbis']
-    else:
-        audio_settings = ['-an']
-
-    if info['video']:
         video_settings = [
             '-vb', '%dk'%bitrate, '-g', '%d' % int(fps*2),
             '-s', '%dx%d'%(width, height),
             '-aspect', aspect,
+            #'-vf', 'yadif',
         ]
+
         if format == 'mp4':
             #quicktime does not support bpyramid
             '''
@@ -185,6 +173,19 @@ def stream(video, target, profile, info):
     else:
         video_settings = ['-vn']
 
+    if info['audio']:
+        audio_settings = ['-ar', str(audiorate), '-aq', str(audioquality)]
+        if audiochannels and 'channels' in info['audio'][0] and info['audio'][0]['channels'] > audiochannels:
+            audio_settings += ['-ac', str(audiochannels)]
+        if audiobitrate:
+            audio_settings += ['-ab', audiobitrate]
+        if format == 'mp4':
+            audio_settings += ['-acodec', 'libfaac']
+        else:
+            audio_settings += ['-acodec', 'libvorbis']
+    else:
+        audio_settings = ['-an']
+
     ffmpeg = FFMPEG2THEORA.replace('2theora', '')
     cmd = [ffmpeg, '-y', '-i', video] \
           + audio_settings \
@@ -199,12 +200,16 @@ def stream(video, target, profile, info):
         cmd += [target]
 
     print cmd
-    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=open('/dev/null', 'w'), stderr=subprocess.STDOUT)
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                              stdout=open('/dev/null', 'w'),
+                              stderr=subprocess.STDOUT)
     p.communicate()
     if format == 'mp4':
         cmd = ['qt-faststart', "%s.mp4"%target, target]
         print cmd
-        p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=open('/dev/null', 'w'), stderr=subprocess.STDOUT)
+        p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                                  stdout=open('/dev/null', 'w'),
+                                  stderr=subprocess.STDOUT)
         p.communicate()
         os.unlink("%s.mp4"%target)
     return True
@@ -212,7 +217,8 @@ def stream(video, target, profile, info):
 
 def run_command(cmd, timeout=10):
     #print cmd
-    p = subprocess.Popen(cmd, stdout=open('/dev/null', 'w'), stderr=subprocess.STDOUT)
+    p = subprocess.Popen(cmd, stdout=open('/dev/null', 'w'),
+                              stderr=subprocess.STDOUT)
     while timeout > 0:
         time.sleep(0.2)
         timeout -= 0.2
@@ -236,8 +242,7 @@ def frame(videoFile, frame, position, width=128, redo=False):
     if exists(videoFile):
         frameFolder = os.path.dirname(frame)
         if redo or not exists(frame):
-            if not exists(frameFolder):
-                os.makedirs(frameFolder)
+            ox.makedirs(frameFolder)
             cmd = ['oxframe', '-i', videoFile, '-o', frame, '-p', str(position), '-x', str(width)]
             run_command(cmd)
 

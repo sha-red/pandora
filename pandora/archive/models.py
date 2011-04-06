@@ -74,10 +74,26 @@ class File(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.name= self.get_name()
+        instance = self.get_instance()
+        if instance:
+            if instance.name.lower().startswith('extras/'):
+                self.is_extra = True
+                self.is_main = False
+            elif instance.name.lower().startswith('versions/'):
+                self.is_version = True
+                self.is_main = False
+            else:
+                self.is_extra = False
+                self.is_main = True
+        else:
+            self.is_main = False
+            self.is_extra = False
+            self.is_version = False
+        
+        self.name = self.get_name()
         self.folder = self.get_folder()
-        if self.name and not self.sort_name:
-            self.sort_name = utils.sort_string(canonicalTitle(self.name))
+        self.sort_name = utils.sort_string(canonicalTitle(self.name))
+
         if self.info:
             for key in ('duration', 'size'):
                 setattr(self, key, self.info.get(key, 0))
@@ -125,16 +141,6 @@ class File(models.Model):
 
         if not self.is_audio and not self.is_video and self.name.endswith('.srt'):
             self.is_subtitle = True
-
-        if self.name and self.name.lower().startswith('extras/'):
-            self.is_extra = True
-            self.is_main = False
-        elif self.name and self.name.lower().startswith('versions/'):
-            self.is_version = True
-            self.is_main = False
-        else:
-            self.is_extra = False
-            self.is_main = True
 
         self.part = self.get_part()
         self.type = self.get_type()
@@ -290,6 +296,11 @@ class File(models.Model):
             return 'subtitle'
         return 'unknown'
 
+    def get_instance(self):
+        if self.instances.all().count() > 0:
+            return self.instances.all()[0]
+        return None
+
     def get_folder(self):
         name = os.path.splitext(self.get_name())[0]
         if self.item:
@@ -307,6 +318,8 @@ class File(models.Model):
         return u''
 
     def get_name(self):
+        if self.is_extra:
+            return self.get_instance().name
         if self.item:
             name = self.item.get('title', 'Untitled')
             name = re.sub(r'[:\\/]', '_', name)

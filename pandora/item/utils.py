@@ -102,6 +102,8 @@ def parse_title(_title, searchTitle = False):
     if year and title.endswith(year):
         title = title[:-len(year)].strip()
     title = normalizeTitle(title)
+    if searchTitle and year:
+        title = u"%s %s" % (title, year)
     return title
 
 
@@ -180,7 +182,9 @@ def parse_path(path):
     r['season'], r['episode'] = parse_season_episode(path)
     r['series_title'] = parse_series_title(path)
 
-    r['imdbId'] = ox.web.imdb.guess(search_title, ', '.join(r['director']), timeout=-1)
+    #FIXME: use oxdata/id/?title=title&director=director&year=year
+    #r['imdbId'] = ox.web.imdb.guess(search_title, ', '.join(r['director']), timeout=-1)
+    r['imdbId'] = ox.web.imdb.guess(search_title, timeout=-1)
     r['oxdbId'] = oxdb_id(r['title'], r['director'], r.get('year', ''),
                           r.get('season', ''), r.get('episode', ''),
                           episode_title=r['episode_title'],

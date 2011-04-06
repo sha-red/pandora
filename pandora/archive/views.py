@@ -66,6 +66,7 @@ def update(request):
     '''
     data = json.loads(request.POST['data'])
     user = request.user
+    upload_only = data.get('upload', False)
 
     response = json_response({'info': [], 'data': [], 'file': []})
     volume = None
@@ -91,15 +92,18 @@ def update(request):
                             del info[key]
                     instance.file.info = info
                     instance.file.save()
-
-    files = models.Instance.objects.filter(volume__user=user, file__available=False)
-    if volume:
-        files = files.filter(volume=volume)
-    response['data']['info'] = [f.file.oshash for f in files.filter(file__info='{}')]
-    #needs some flag to find those that are actually used main is to generic
-    response['data']['data'] = [f.file.oshash for f in files.filter(file__is_video=True, file__is_main=True)]
-    response['data']['data'] += [f.file.oshash for f in files.filter(file__is_audio=True, file__is_main=True)]
-    response['data']['file'] = [f.file.oshash for f in files.filter(file__is_subtitle=True)]
+    if not upload_only:
+        files = models.Instance.objects.filter(volume__user=user, file__available=False)
+        if volume:
+            files = files.filter(volume=volume)
+        response['data']['info'] = [f.file.oshash for f in files.filter(file__info='{}')]
+        #needs some flag to find those that are actually used main is to generic
+        response['data']['data'] = [f.file.oshash for f in files.filter(file__is_video=True,
+                                                                        file__is_main=True)]
+        response['data']['data'] += [f.file.oshash for f in files.filter(file__is_audio=True,
+                                                                         file__is_main=True)]
+        response['data']['file'] = [f.file.oshash for f in files.filter(file__is_subtitle=True,
+                                                                        name__endswith='.srt')]
 
     return render_to_json_response(response)
 actions.register(update, cache=False)

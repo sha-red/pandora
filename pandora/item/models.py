@@ -550,7 +550,7 @@ class Item(models.Model):
         for key in self.facet_keys:
             current_values = self.get(key, [])
             if not isinstance(current_values, list):
-                current_values = [current_values]
+                current_values = [unicode(current_values)]
             current_values = list(set(current_values))
             saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
             removed_values = filter(lambda i: i not in current_values, saved_values)
@@ -632,8 +632,7 @@ class Item(models.Model):
             cmd = []
             if os.path.exists(stream.video.path):
                 os.unlink(stream.video.path)
-            elif not os.path.exists(os.path.dirname(stream.video.path)):
-                os.makedirs(os.path.dirname(stream.video.path))
+            ox.makedirs(os.path.dirname(stream.video.path))
             if len(files.values()) > 1:
                 if len(files.values()) > 4:
                     print "FIXME: to many files for this item, not merging entire tv shows"
@@ -753,8 +752,7 @@ class Item(models.Model):
         posters = self.local_posters()
         timeline = self.path('timeline.64.png')
         timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
-        if not os.path.exists(os.path.join(settings.MEDIA_ROOT,self.path())):
-            os.makedirs(os.path.join(settings.MEDIA_ROOT,self.path()))
+        ox.makedirs(os.path.join(settings.MEDIA_ROOT,self.path()))
         for poster in posters:
             frame = posters[poster]
             cmd = [settings.ITEM_POSTER,

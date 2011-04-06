@@ -47,6 +47,7 @@ def update_or_create_instance(volume, f):
                 updated=True
         if updated:
             instance.save()
+            instance.file.save()
     else:
         instance = models.Instance()
         instance.volume = volume
@@ -54,6 +55,7 @@ def update_or_create_instance(volume, f):
         for key in _INSTANCE_KEYS:
             setattr(instance, key, f[key])
         instance.save()
+        instance.file.save()
     return instance
 
 @task(ignore_resulsts=True, queue='default')
