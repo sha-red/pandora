@@ -10,6 +10,7 @@ jQuery.support.video = function() {
             video.webm = false;
         }
         video.h264 = !!(v.canPlayType && v.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"').replace(/no/, ''));
+        video.mp4 = video.h264;
         video.ogg = !!(v.canPlayType && v.canPlayType('video/ogg; codecs="theora, vorbis"').replace(/no/, ''));
         video.ogv = video.ogg;
     } else {
