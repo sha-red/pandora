@@ -297,6 +297,7 @@ class File(models.Model):
         return 'unknown'
 
     def get_instance(self):
+        #FIXME: what about other instances?
         if self.instances.all().count() > 0:
             return self.instances.all()[0]
         return None
@@ -318,7 +319,8 @@ class File(models.Model):
         return u''
 
     def get_name(self):
-        if self.is_extra:
+        instance = self.get_instance()
+        if instance:
             return self.get_instance().name
         if self.item:
             name = self.item.get('title', 'Untitled')
