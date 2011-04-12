@@ -87,6 +87,11 @@ STATIC_URL = '/static/'
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '/admin/media/'
 
+
+#max upload size,
+#needs to be in line with setting in nginx/apache
+FILE_UPLOAD_MAX_MEMORY_SIZE=32*1024*1024
+
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',

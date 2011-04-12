@@ -303,7 +303,11 @@ class File(models.Model):
         return None
 
     def get_folder(self):
+        instance = self.get_instance()
+        if instance:
+            return instance.folder
         name = os.path.splitext(self.get_name())[0]
+        name = name.replace('. ', '||').split('.')[0].replace('||', '. ')
         if self.item:
             if settings.USE_IMDB:
                 director = self.item.get('director', ['Unknown Director'])
@@ -321,16 +325,13 @@ class File(models.Model):
     def get_name(self):
         instance = self.get_instance()
         if instance:
-            return self.get_instance().name
+            return instance.name
         if self.item:
             name = self.item.get('title', 'Untitled')
             name = re.sub(r'[:\\/]', '_', name)
         if not name:
             name = 'Untitled'
-        if self.instances.count() > 0:
-            ext = os.path.splitext(self.instances.all()[0].name)[-1]
-        else:
-            ext = '.unknown'
+        ext = '.unknown'
         return name + ext
 
 class Volume(models.Model):
