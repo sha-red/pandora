@@ -25,18 +25,22 @@ def get_or_create_item(volume, f, user):
         i = get_item(item_info, user)
     return i
 
-def get_or_create_file(volume, f, user):
+def get_or_create_file(volume, f, user, item=None):
     try:
         file = models.File.objects.get(oshash=f['oshash'])
     except models.File.DoesNotExist:
         file = models.File()
         file.oshash = f['oshash']
         file.name = f['name']
-        file.item = get_or_create_item(volume, f, user)
+        if item:
+            file.item = item
+        else:
+            file.item = get_or_create_item(volume, f, user)
         file.save()
     return file
 
 def update_or_create_instance(volume, f):
+    #instance with oshash exists
     instance = models.Instance.objects.filter(file__oshash=f['oshash'], volume=volume)
     if instance.count()>0:
         instance = instance[0]
@@ -49,9 +53,17 @@ def update_or_create_instance(volume, f):
             instance.save()
             instance.file.save()
     else:
+        instance = models.Instance.objects.filter(name=f['name'], folder=f['folder'], volume=volume)
+        if instance.count()>0:
+            #same path, other oshash, keep path/item mapping, remove instance
+            item = instance[0].item
+            instance.delete()
+        else: #new instance
+            item = None
+
         instance = models.Instance()
         instance.volume = volume
-        instance.file = get_or_create_file(volume, f, volume.user) 
+        instance.file = get_or_create_file(volume, f, volume.user, item) 
         for key in _INSTANCE_KEYS:
             setattr(instance, key, f[key])
         instance.save()
@@ -72,7 +84,7 @@ def update_files(user, volume, files):
         f['name'] = name
         all_files.append(f['oshash'])
         update_or_create_instance(volume, f)
-
+    
     #remove deleted files
     #FIXME: can this have any bad consequences? i.e. on the selction of used item files.
     models.Instance.objects.filter(volume=volume).exclude(file__oshash__in=all_files).delete()
