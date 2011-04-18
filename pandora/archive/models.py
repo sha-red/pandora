@@ -9,6 +9,7 @@ import time
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.db.models.signals import pre_delete
 
 from ox.django import fields
 import ox
@@ -334,6 +335,14 @@ class File(models.Model):
         ext = '.unknown'
         return name + ext
 
+def delete_file(sender, **kwargs):
+    f = kwargs['instance']
+    if f.video:
+        f.video.delete()
+    if f.data:
+        f.data.delete()
+pre_delete.connect(delete_file, sender=File)
+
 class Volume(models.Model):
 
     class Meta:
@@ -347,7 +356,6 @@ class Volume(models.Model):
 
     def __unicode__(self):
         return u"%s's %s"% (self.user, self.name)
-
 
 class Instance(models.Model):
 
@@ -408,3 +416,9 @@ class Frame(models.Model):
 
     def __unicode__(self):
         return u'%s/%s' % (self.file, self.position)
+
+def delete_frame(sender, **kwargs):
+    f = kwargs['instance']
+    if f.frame:
+        f.frame.delete()
+pre_delete.connect(delete_frame, sender=Frame)

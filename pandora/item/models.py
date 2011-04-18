@@ -6,6 +6,7 @@ from datetime import datetime
 import os.path
 import subprocess
 from glob import glob
+import shutil
 import uuid
 import unicodedata
 
@@ -15,6 +16,7 @@ from django.core.files.base import ContentFile
 from django.utils import simplejson as json
 from django.conf import settings
 from django.contrib.auth.models import User, Group
+from django.db.models.signals import pre_delete
 
 import ox
 from ox.django import fields
@@ -238,12 +240,11 @@ class Item(models.Model):
         if update_poster:
             tasks.update_poster.delay(self.itemId)
 
+    def delete_files(self):
+        shutil.rmtree(self.path(''))
+
     def delete(self, *args, **kwargs):
-        self.delete_poster()
-        for f in glob("%s*"%self.timeline_prefix):
-            os.unlink(f)
-        for f in glob("%sstrip*"%self.timeline_prefix[:-8]):
-            os.unlink(f)
+        self.delete_files()
         super(Item, self).delete(*args, **kwargs)
 
     def merge_with(self, other):
@@ -594,7 +595,7 @@ class Item(models.Model):
     def main_videos(self):
         #FIXME: needs to check if more than one user has main files and only
         #       take from "higher" user
-        videos = self.files.filter(is_main=True, is_video=True, available=True)
+        videos = self.files.filter(is_main=True, is_video=True, available=True).order_by('part')
         if videos.count()>0:
             first = videos[0]
             user = first.instances.all()[0].volume.user
@@ -807,6 +808,10 @@ class Item(models.Model):
             return icon
         return None
 
+def delete_item(sender, **kwargs):
+    i = kwargs['instance']
+    i.delete_files()
+pre_delete.connect(delete_item, sender=Item)
 
 config = site_config()
 
