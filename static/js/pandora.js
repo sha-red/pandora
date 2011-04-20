@@ -107,7 +107,7 @@
 	    },
 	    accountDialogOptions: function(action, value) {
 	        //Ox.print('ACTION', action)
-            app.$ui.accountForm && app.$ui.accountForm.remove();
+            app.$ui.accountForm && app.$ui.accountForm.removeElement();
 	        var buttons = {
 	                login: ['register', 'reset'],
 	                register: ['login'],
@@ -191,7 +191,7 @@
 	                    //Ox.Event.unbind('usernameOrEmailInput')
 	                }
 	                //Ox.print('REMOVING ITEM', item.options('id'));
-	                item.remove();
+	                item.removeElement();
 	            });
 	        }
 	        var items = {
@@ -491,13 +491,14 @@
 			        orientation: 'vertical'
 			    });
 			that.display = function() {
+			    // fixme: move animation into Ox.App
 				app.$ui.body.css({opacity: 0});
 			    that.appendTo(app.$ui.body);
 			    app.$ui.body.animate({opacity: 1}, 1000);
 				return that;
 			}
 			that.reload = function() {
-			    app.$ui.appPanel.remove();
+			    app.$ui.appPanel.removeElement();
 			    app.$ui.appPanel = ui.appPanel().appendTo(app.$ui.body);
 			    return that;
 			}
@@ -1409,13 +1410,13 @@
         		                        UI.set(['lists', id].join('|'), app.config.user.ui.lists['']); // fixme: necessary?
         		                        URL.set('?find=list:' + id)
                 	                    Ox.Request.clearCache(); // fixme: remove
-        		                        $list.reloadList().bindEvent({load: load});
-        		                        function load(event, data) {
-                		                    $list.gainFocus()
-                		                        .options({selected: [id]})
-                		                        .editCell(id, 'name');
-                                            $list.unbindEvent({load: load}) // fixme: need bindEventOnce
-                		                }
+        		                        $list.reloadList().bindEventOnce({
+        		                            load: function(event, data) {
+                    		                    $list.gainFocus()
+                    		                        .options({selected: [id]})
+                    		                        .editCell(id, 'name');
+                    		                }
+        		                        });
         		                    });
         		                }
                             }
@@ -1489,13 +1490,13 @@
         		                        id = result.data.id;
         		                        URL.set('?find=list:' + id)
                 	                    Ox.Request.clearCache(); // fixme: remove
-        		                        $list.reloadList().bindEvent({load: load});
-        		                        function load(event, data) {
-                		                    $list.gainFocus()
-                		                        .options({selected: [id]})
-                		                        .editCell(id, 'name');
-                                            $list.unbindEvent({load: load}) // fixme: need bindEventOnce
-                		                }
+        		                        $list.reloadList().bindEventOnce({
+        		                            load: function(event, data) {
+        		                                $list.gainFocus()
+                    		                        .options({selected: [id]})
+                    		                        .editCell(id, 'name');
+        		                            }
+        		                        });
         		                    });
         		                } else if (data.id == 'browse') {
         		                    alert('??')
@@ -1513,19 +1514,19 @@
         		        });
     		        //$sections.push(app.$ui.section[i]);
     	            app.$ui.folderList[folder.id] = ui.folderList(folder.id)
-                        .bindEvent({init: init})
+                        .bindEventOnce({
+                            init: function(event, data) {
+                                Ox.print('init', i, counter)
+            	                if (++counter == 3) {
+                                    app.$ui.folder.forEach(function($folder) {
+                        		        that.append($folder);
+                        		    });
+                        		    resizeFolders();
+                        		    selectList(); //fixme: doesn't work
+                                }
+                            }
+                        })
     	                .appendTo(app.$ui.folder[i].$content);
-    	            function init(event, data) {
-        	            Ox.print('init', i, counter)
-    	                if (++counter == 3) {
-                            app.$ui.folder.forEach(function($folder) {
-                		        that.append($folder);
-                		    });
-                		    resizeFolders();
-                		    selectList(); //fixme: doesn't work
-                        }
-                        app.$ui.folderList[folder.id].unbindEvent({init: init}); // fixme: need bindEventOnce
-    	            }
     		    });
 			}
 			that.toggle = function() {
@@ -1730,7 +1731,7 @@
                     app.ui.infoRatio = result.data.item.stream.aspectRatio;
                     var width = that.width() || 256,
                         height = width / app.ui.infoRatio + 16;
-                    app.$ui.infoStill.remove();
+                    app.$ui.infoStill.removeElement();
                     app.$ui.infoStill = ui.flipbook(app.user.ui.item)
                                           .appendTo(that.$element);
                     app.$ui.infoStill.css({
@@ -1963,11 +1964,11 @@
                         var infoSize = Math.round(data / app.ui.infoRatio) + 16;
                         app.user.ui.sidebarSize = data;
                         if (data < app.ui.sectionButtonsWidth && app.$ui.sectionButtons) {
-                            app.$ui.sectionButtons.remove();
+                            app.$ui.sectionButtons.removeElement();
                             delete app.$ui.sectionButtons;
                             app.$ui.sectionbar.append(app.$ui.sectionSelect = ui.sectionSelect());
                         } else if (data >= app.ui.sectionButtonsWidth && app.$ui.sectionSelect) {
-                            app.$ui.sectionSelect.remove();
+                            app.$ui.sectionSelect.removeElement();
                             delete app.$ui.sectionSelect;
                             app.$ui.sectionbar.append(app.$ui.sectionButtons = ui.sectionButtons());
                         }
@@ -2361,7 +2362,7 @@
                         pandora.api.getItem(data.ids[0], function(result) {
                             app.ui.infoRatio = result.data.item.stream.aspectRatio;
                             var height = app.$ui.info.width() / app.ui.infoRatio + 16;
-                            app.$ui.infoStill.remove();
+                            app.$ui.infoStill.removeElement();
                             app.$ui.infoStill = ui.flipbook(data.ids[0])
                                                   .appendTo(app.$ui.info.$element);
                             app.$ui.infoStill.css({
@@ -3000,15 +3001,13 @@
                                     Ox.print('AAAAA')
                                     app.$ui.placesElement
                                         .reloadList()
-                                        .bindEvent({loadlist: load});
-                                    Ox.print('BBBBB')
-                                    function load(event, data) {
-                                        Ox.print('LOAD')
-                                        app.$ui.placesElement
-                                            .focusList()
-                                            .options({selected: [id]})
-                                            .unbindEvent({loadlist: load}); // fixme: need bindEventOnce
-                                    }
+                                        .bindEventOnce({
+                                            loadlist: function() {
+                                                app.$ui.placesElement
+                                                    .focusList()
+                                                    .options({selected: [id]});
+                                            }
+                                        });
                                 });
         		            },
         		            removeplace: function(event, data) {
@@ -3017,12 +3016,12 @@
                                     Ox.Request.clearCache(); // fixme: remove
                                     app.$ui.placesElement
                                         .reloadList()
-                                        .bindEvent({loadlist: load});
-                                    function load(event, data) {
-                                        app.$ui.placesElement
-                                            .focusList()
-                                            .unbindEvent({loadlist: load}); // fixme: need bindEventOnce
-                                    }
+                                        .bindEventOnce({
+                                            loadlist: function(event, data) {
+                                                app.$ui.placesElement
+                                                    .focusList();
+                                            }
+                                        });
         		                });
         		            }
         		        }),
@@ -3478,14 +3477,14 @@
                 init: function(event, data) {
                     app.$ui.folderList[listData.status]
                         .value(listData.id, 'items', data.items);
-                },
-                load: load
+                }
+            })
+            .bindEventOnce({
+                load: function(event, data) {
+                    app.$ui.list.gainFocus().options({selected: [data.items]});
+                }
             })
             .reloadList();
-        function load(event, data) {
-            app.$ui.list.gainFocus().options({selected: [data.items]});
-            app.$ui.list.unbindEvent({load: load}); // fixme: need bindEventOnce
-        }
     }
 
     function resizeGroups(width) {
@@ -3808,7 +3807,7 @@
                         delete obj[key];
                     }
                 });
-                Ox.length(obj) && pandora.api.setUI(obj);
+                Ox.len(obj) && pandora.api.setUI(obj);
                 //alert('set ' + JSON.stringify(obj))
             }
         }
