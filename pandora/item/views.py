@@ -528,7 +528,7 @@ def video(request, id, profile):
     path = stream.video.path
     content_type = path.endswith('.mp4') and 'video/mp4' or 'video/webm'
     #server side cutting
-    t = request.GET.get('t', None)
+    t = request.GET.get('t')
     if t:
         t = map(float, t.split(','))
         ext = os.path.splitext(profile)[1]

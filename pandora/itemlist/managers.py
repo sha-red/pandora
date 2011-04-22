@@ -28,7 +28,7 @@ def parseCondition(condition, user):
     if not k:
         k = 'name'
     v = condition['value']
-    op = condition.get('operator', None)
+    op = condition.get('operator')
     if not op:
         op = ''
     if op.startswith('!'):

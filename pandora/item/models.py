@@ -232,7 +232,7 @@ class Item(models.Model):
             if self.poster_frame == -1 and self.sort.duration:
                 self.poster_frame = self.sort.duration/2
                 update_poster = True
-            if not self.get('runtime', None) and self.sort.duration:
+            if not self.get('runtime') and self.sort.duration:
                 self.data['runtime'] = self.sort.duration
                 self.update_sort()
         self.json = self.get_json()
@@ -361,7 +361,7 @@ class Item(models.Model):
     def oxdb_id(self):
         if not settings.USE_IMDB:
             return self.itemId
-        if not self.get('title', None) and not self.get('director', None):
+        if not self.get('title') and not self.get('director'):
             return None
         return utils.oxdb_id(self.get('title', ''), self.get('director', []), str(self.get('year', '')),
                           self.get('season', ''), self.get('episode', ''),
@@ -478,22 +478,22 @@ class Item(models.Model):
                     set_value(s, name, value)
                 elif sort_type in ('length', 'integer', 'float'):
                     #can be length of strings or length of arrays, i.e. keywords
-                    value = self.get(source, None)
+                    value = self.get(source)
                     if isinstance(value, list):
                         value = len(value)
                     set_value(s, name, value)
                 elif sort_type == 'words':
-                    value = self.get(source, None)
+                    value = self.get(source)
                     if isinstance(value, list):
                         value = '\n'.join(value)
                     if value:
                         value = len(value.split(' '))
                     set_value(s, name, value)
                 elif sort_type == 'year':
-                    value = self.get(source, None)
+                    value = self.get(source)
                     set_value(s, name, value)
                 elif sort_type == 'date':
-                    value = self.get(source, None)
+                    value = self.get(source)
                     if isinstance(value, basestring):
                         value = datetime.strptime(value, '%Y-%m-%d')
                     set_value(s, name, value)

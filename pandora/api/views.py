@@ -37,7 +37,7 @@ def api(request):
     #FIXME: possible to do this in f
     #data = json.loads(request.POST['data'])
 
-    f = actions.get(function, None)
+    f = actions.get(function)
     if f:
         response = f(request)
     else:

@@ -316,7 +316,7 @@ class File(models.Model):
                 director = u'; '.join(director)
                 director = re.sub(r'[:\\/]', '_', director)
                 name = os.path.join(director, name)
-            year = self.item.get('year', None)
+            year = self.item.get('year')
             if year:
                 name += u' (%s)' % year
             name = os.path.join(name[0].upper(), name)
