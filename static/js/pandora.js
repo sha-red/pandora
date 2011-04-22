@@ -7,7 +7,7 @@
 // fixme: don't reload full right panel on sortSelect
 // fixme: clear items cache after login/logout
 
-(function() {
+Ox.UI(function() {
 
     window.pandora = new Ox.App({url: '/api/'}).launch(function(data) {
 
@@ -3808,7 +3808,7 @@
                         delete obj[key];
                     }
                 });
-                Ox.length(obj) && pandora.api.setUI(obj);
+                Ox.len(obj) && pandora.api.setUI(obj);
                 //alert('set ' + JSON.stringify(obj))
             }
         }
@@ -3977,4 +3977,4 @@
 		}
 	}
 
-})();
+});
