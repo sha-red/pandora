@@ -85,6 +85,8 @@ Ox.load('UI', {
 
             app.ui.sectionButtonsWidth = app.$ui.sectionButtons.width() + 8;
 
+            Ox.UI.hideLoadingScreen();
+
             window.pandora.app = app;
 
         }
@@ -892,14 +894,14 @@ Ox.load('UI', {
                             format: function() {
                                 return $('<img>')
                                     .attr({
-                                        src: '/static/oxjs/build/png/ox.ui/icon16.png'
+                                        src: '/static/oxjs/build/png/Ox.UI/icon16.png'
                                     });
                             },
                             id: 'id',
                             operator: '+',
                             title: $('<img>')
                                 .attr({
-                                    src: '/static/oxjs/build/png/ox.ui/icon16.png'
+                                    src: '/static/oxjs/build/png/Ox.UI/icon16.png'
                                 })
                                 .css({
                                     width: '10px',
@@ -1082,7 +1084,7 @@ Ox.load('UI', {
                             format: function() {
                                 return $('<img>')
                                     .attr({
-                                        src: '/static/oxjs/build/png/ox.ui/icon16.png'
+                                        src: '/static/oxjs/build/png/Ox.UI/icon16.png'
                                     })
                             },
                             id: 'id',
@@ -1126,7 +1128,7 @@ Ox.load('UI', {
                         {
                             format: function() {
                                 return $('<img>').attr({
-                                    src: '/static/oxjs/build/png/ox.ui/icon16.png'
+                                    src: '/static/oxjs/build/png/Ox.UI/icon16.png'
                                 });
                             },
                             id: 'user',
