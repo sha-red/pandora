@@ -6,79 +6,88 @@
 // fixme: sort=-director doesn't work
 // fixme: don't reload full right panel on sortSelect
 // fixme: clear items cache after login/logout
+// fixme: rename config to site (site/user is better than config/user)
 
-Ox.UI(function() {
+Ox.load('UI', {
+    hideScreen: false,
+    showScreen: true,
+    theme: 'modern'
+}, function() {
 
-    window.pandora = new Ox.App({url: '/api/'}).launch(function(data) {
+    window.pandora = new Ox.App({url: '/api/'}).bindEvent({
 
-        Ox.print('Ox.App launch', data);
+        load: function(event, data) {
 
-        $.extend(app, {
-    		$ui: {
-    			body: $('body'),
-    			document: $(document),
-    			window: $(window)
-    			    .resize(resizeWindow)
-    			    .unload(unloadWindow)
-    		},
-            config: data.config,
-            ui: {
-    		    findKeys: $.map(data.config.itemKeys, function(key, i) {
-    		        return key.find ? key : null;
-    		    }),
-    			infoRatio: 16 / 9,
-    			sectionElement: 'buttons',
-    		    sectionFolders: {
-    		        site: $.merge([
-                        {id: 'site', title: 'Site', items: $.merge([
-                            {id: 'home', title: 'Home'}
-                        ], $.merge(data.config.sitePages, [
-                            {id: 'software', title: 'Software'},
-                            {id: 'help', title: 'Help'}
-                        ]))},
-                        {id: 'user', title: 'User', items: [
-                            {id: 'preferences', title: 'Preferences'},
-                            {id: 'archives', title: 'Archives'}
-                        ]}
-                    ], data.user.level == 'admin' ? [
-                        {id: 'admin', title: 'Admin', items: [
-                            {id: 'statistics', title: 'Statistics'},
-                            {id: 'users', title: 'Users'}
-                        ]}
-                    ] : []),
-    		        items: [
-                        {id: 'personal', title: 'Personal Lists'},
-                        {id: 'favorite', title: 'Favorite Lists', showBrowser: false},
-                        {id: 'featured', title: 'Featured Lists', showBrowser: false}
-    		        ],
-    		    },
-    	        selectedMovies: [],
-    		    sortKeys: $.map(data.config.itemKeys, function(key, i) {
-    		        return key.columnWidth ? key : null;
-    		    })
-    		},
-    		user: data.user.level == 'guest' ? $.extend({}, data.config.user) : data.user
-        });
+            Ox.print('Ox.App load', data);
 
-        if (data.user.level == 'guest' && $.browser.mozilla) {
-            app.user.ui.theme = 'classic'
+            $.extend(app, {
+        		$ui: {
+        			body: $('body'),
+        			document: $(document),
+        			window: $(window)
+        			    .resize(resizeWindow)
+        			    .unload(unloadWindow)
+        		},
+                config: data.config,
+                ui: {
+        		    findKeys: $.map(data.config.itemKeys, function(key, i) {
+        		        return key.find ? key : null;
+        		    }),
+        			infoRatio: 16 / 9,
+        			sectionElement: 'buttons',
+        		    sectionFolders: {
+        		        site: $.merge([
+                            {id: 'site', title: 'Site', items: $.merge([
+                                {id: 'home', title: 'Home'}
+                            ], $.merge(data.config.sitePages, [
+                                {id: 'software', title: 'Software'},
+                                {id: 'help', title: 'Help'}
+                            ]))},
+                            {id: 'user', title: 'User', items: [
+                                {id: 'preferences', title: 'Preferences'},
+                                {id: 'archives', title: 'Archives'}
+                            ]}
+                        ], data.user.level == 'admin' ? [
+                            {id: 'admin', title: 'Admin', items: [
+                                {id: 'statistics', title: 'Statistics'},
+                                {id: 'users', title: 'Users'}
+                            ]}
+                        ] : []),
+        		        items: [
+                            {id: 'personal', title: 'Personal Lists'},
+                            {id: 'favorite', title: 'Favorite Lists', showBrowser: false},
+                            {id: 'featured', title: 'Featured Lists', showBrowser: false}
+        		        ],
+        		    },
+        	        selectedMovies: [],
+        		    sortKeys: $.map(data.config.itemKeys, function(key, i) {
+        		        return key.columnWidth ? key : null;
+        		    })
+        		},
+        		user: data.user.level == 'guest' ? $.extend({}, data.config.user) : data.user
+            });
+
+            if (data.user.level == 'guest' && $.browser.mozilla) {
+                app.user.ui.theme = 'classic'
+            }
+
+    	    URL.parse();
+    	    window.onpopstate = function() {
+    	        URL.update();
+    	    };
+
+            Ox.Theme(app.user.ui.theme);
+    		app.$ui.appPanel = ui.appPanel().display();	    
+
+        	Ox.Request.requests() && app.$ui.loadingIcon.start();
+        	app.$ui.body.ajaxStart(app.$ui.loadingIcon.start);
+        	app.$ui.body.ajaxStop(app.$ui.loadingIcon.stop);
+
+            app.ui.sectionButtonsWidth = app.$ui.sectionButtons.width() + 8;
+
+            window.pandora.app = app;
+
         }
-
-	    URL.parse();
-	    window.onpopstate = function() {
-	        URL.update();
-	    };
-
-        Ox.theme(app.user.ui.theme);
-		app.$ui.appPanel = ui.appPanel().display();	    
-
-    	Ox.Request.requests() && app.$ui.loadingIcon.start();
-    	app.$ui.body.ajaxStart(app.$ui.loadingIcon.start);
-    	app.$ui.body.ajaxStop(app.$ui.loadingIcon.stop);
-
-        app.ui.sectionButtonsWidth = app.$ui.sectionButtons.width() + 8;
-
-        window.pandora.app = app;
 
     });
 
@@ -3430,13 +3439,13 @@ Ox.UI(function() {
 
     function login(data) {
         app.user = data.user;
-        Ox.theme(app.user.ui.theme);
+        Ox.Theme(app.user.ui.theme);
         app.$ui.appPanel.reload();
     }
 
     function logout(data) {
         app.user = data.user;
-        Ox.theme(app.config.user.ui.theme);
+        Ox.Theme(app.config.user.ui.theme);
         app.$ui.appPanel.reload();
     }
 
