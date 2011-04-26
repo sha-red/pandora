@@ -1,21 +1,24 @@
 /***
     Pandora API
 ***/
+Ox.load('UI', {
+    hideScreen: false,
+    showScreen: true,
+    theme: 'classic'
+}, function() {
+
 var app = new Ox.App({
     apiURL: '/api/',
     init: 'init',
-}).launch(function(data) {
+}).bindEvent('load', function(event, data) {
     app.config = data.config;
     app.user = data.user;
-    if (app.user.group == 'guest') {
-        app.user = data.config.user;
-        $.browser.safari && Ox.theme('modern');
-    }
     app.config.default_info = '<div class="OxSelectable"><h2>Overview</h2>use this api in the browser with Ox.app or use <a href="http://code.0x2620.org/pandora_client">pandora_client</a> to use it in python</div>';
     app.$body = $('body');
     app.$document = $(document);
     app.$window = $(window);
     //app.$body.html('');
+    Ox.UI.hideLoadingScreen();
 
     app.$ui = {};
     app.$ui.actionList = constructList();
@@ -150,3 +153,5 @@ function constructList() {
        }
     });
 }
+});
+
