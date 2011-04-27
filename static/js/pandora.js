@@ -9,7 +9,9 @@
 // fixme: rename config to site (site/user is better than config/user)
 
 Ox.load('UI', {
+    debug: true,
     hideScreen: false,
+    loadImages: true,
     showScreen: true,
     theme: 'modern'
 }, function() {
@@ -19,6 +21,8 @@ Ox.load('UI', {
         load: function(event, data) {
 
             Ox.print('Ox.App load', data);
+
+            Ox.UI.hideLoadingScreen();
 
             $.extend(app, {
         		$ui: {
@@ -84,8 +88,6 @@ Ox.load('UI', {
         	app.$ui.body.ajaxStop(app.$ui.loadingIcon.stop);
 
             app.ui.sectionButtonsWidth = app.$ui.sectionButtons.width() + 8;
-
-            Ox.UI.hideLoadingScreen();
 
             window.pandora.app = app;
 
