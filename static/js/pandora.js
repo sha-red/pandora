@@ -178,9 +178,9 @@ Ox.load('UI', {
                     }),
                     [button('cancel'), button('submit')]
                 ],
-                content: new Ox.Element('div')
+                content: new Ox.Element()
                     .append(
-                        new Ox.Element('div')
+                        new Ox.Element()
                             .addClass('OxText')
                             .html(dialogText[action] + '<br/><br/>')
                     )
@@ -414,7 +414,7 @@ Ox.load('UI', {
                             });
                         })
                     ],
-                    content: new Ox.Element('div').html('Are you sure you want to logout?'),
+                    content: new Ox.Element().html('Are you sure you want to logout?'),
                     height: 160,
                     keys: {enter: 'logout', escape: 'cancel'},
                     title: 'Logout',
@@ -442,7 +442,7 @@ Ox.load('UI', {
                             })
                         ]
                     ],
-                    content: new Ox.Element('div').html('Welcome, ' + app.user.username + '!<br/><br/>Your account has been created.'),
+                    content: new Ox.Element().html('Welcome, ' + app.user.username + '!<br/><br/>Your account has been created.'),
                     height: 160,
                     keys: {enter: 'close', escape: 'close'},
                     title: 'Welcome to ' + app.config.site.name,
@@ -1393,7 +1393,7 @@ Ox.load('UI', {
 			    //resizeFolders();
 			} else if (app.user.ui.section == 'items') {
     		    $.each(app.ui.sectionFolders.items, function(i, folder) {
-    		        var extras;
+    		        var extras = [];
     		        if (folder.id == 'personal' && app.user.level != 'guest') {
     		            extras = [new Ox.Select({
                             items: [
@@ -1716,7 +1716,7 @@ Ox.load('UI', {
 		info: function() {
 			var that = new Ox.Element()
 		        .append(
-		            app.$ui.infoStill = new Ox.Element('div')
+		            app.$ui.infoStill = new Ox.Element()
 		                .css({
 		                    position: 'absolute',
 		                    left: 0,
@@ -1725,7 +1725,7 @@ Ox.load('UI', {
 		                })
 		        )
 		        .append(
-		            app.$ui.infoTimeline = new Ox.Element('img')
+		            app.$ui.infoTimeline = new Ox.Element('<img>')
 		                .css({
 		                    position: 'absolute',
 		                    left: 0,
@@ -1764,11 +1764,11 @@ Ox.load('UI', {
         item: function() {
             var that;
             if (app.user.ui.itemView == 'info' || app.user.ui.itemView == 'files') {
-                that = new Ox.Element('div');
+                that = new Ox.Element();
             } else if (app.user.ui.itemView == 'player') {
-                that = new Ox.Element('div');
+                that = new Ox.Element();
             } else if (app.user.ui.itemView == 'timeline') {
-                that = new Ox.Element('div');
+                that = new Ox.Element();
             }
             pandora.api.getItem(app.user.ui.item, function(result) {
                 if (app.user.ui.itemView == 'info') {
@@ -1819,7 +1819,7 @@ Ox.load('UI', {
                         $.get('/static/html/itemInfo.html', {}, function(template) {
                             //Ox.print(template);
                             app.$ui.contentPanel.replaceElement(1,
-                                app.$ui.item = new Ox.Element('div')
+                                app.$ui.item = new Ox.Element()
                                 .append($.tmpl(template, result.data.item))
                             );
                         });
@@ -2199,7 +2199,7 @@ Ox.load('UI', {
 				    app.$ui.map.resize();
 				});
 		    } else {
-		        $list = new Ox.Element('<div>')
+		        $list = new Ox.Element()
 		            .css({
 		                width: '100px',
 		                height: '100px',
@@ -2727,7 +2727,7 @@ Ox.load('UI', {
 		                                                size: 44
 		                                            },
 		                                            {
-		                                                element: new Ox.Element('div')
+		                                                element: new Ox.Element()
 		                                            },
 		                                            {
 		                                                element: new Ox.Toolbar({
@@ -3242,13 +3242,13 @@ Ox.load('UI', {
 		                    fontSize: '9px'
 		                })
 		                .append(
-		                    app.$ui.total = new Ox.Element('span')
+		                    app.$ui.total = new Ox.Element('<span>')
 		                )
 		                .append(
-		                    new Ox.Element('span').html(' &mdash; ')
+		                    new Ox.Element('<span>').html(' &mdash; ')
 		                )
 		                .append(
-		                    app.$ui.selected = new Ox.Element('span')
+		                    app.$ui.selected = new Ox.Element('<span>')
 		                )
 		        );
 		    return that;
