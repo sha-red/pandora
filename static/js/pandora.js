@@ -896,14 +896,14 @@ Ox.load('UI', {
                             format: function() {
                                 return $('<img>')
                                     .attr({
-                                        src: '/static/oxjs/build/png/Ox.UI/icon16.png'
+                                        src: Ox.UI.PATH + 'png/icon16.png'
                                     });
                             },
                             id: 'id',
                             operator: '+',
                             title: $('<img>')
                                 .attr({
-                                    src: '/static/oxjs/build/png/Ox.UI/icon16.png'
+                                    src: Ox.UI.PATH + 'png/icon16.png'
                                 })
                                 .css({
                                     width: '10px',
@@ -1086,7 +1086,7 @@ Ox.load('UI', {
                             format: function() {
                                 return $('<img>')
                                     .attr({
-                                        src: '/static/oxjs/build/png/Ox.UI/icon16.png'
+                                        src: Ox.UI.PATH + 'png/icon16.png'
                                     })
                             },
                             id: 'id',
@@ -1130,7 +1130,7 @@ Ox.load('UI', {
                         {
                             format: function() {
                                 return $('<img>').attr({
-                                    src: '/static/oxjs/build/png/Ox.UI/icon16.png'
+                                    src: Ox.UI.PATH + 'png/icon16.png'
                                 });
                             },
                             id: 'user',
