@@ -1878,24 +1878,33 @@ Ox.load('UI', {
 		                cuts: cuts,
 		                duration: video.duration,
 		                find: '',
-		                frameURL: function(position) {
+		                getFrameURL: function(position) {
 		                    return '/' + app.user.ui.item + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
 		                },
+		                getLargeTimelineImageURL: function(i) {
+                            return '/' + app.user.ui.item + '/timelines/timeline.64.' + i + '.png';
+                        },
+                        getSmallTimelineImageURL: function(i) {
+                            return '/' + app.user.ui.item + '/timelines/timeline.16.' + i + '.png';
+                        },
 						height: app.$ui.contentPanel.size(1),
 		                id: 'editor',
-		                largeTimeline: true,
+		                'in': 0,
 		                layers: layers,
-		                matches: [],
-		                points: [0, 0],
+		                out: 0,
                         position: app.user.ui.videoPosition[app.user.ui.item] || 0,
 		                posterFrame: parseInt(video.duration / 2),
                         showAnnotations: app.user.ui.showAnnotations,
-		                subtitles: subtitles,
+		                showLargeTimeline: true,
+		                // fixme: layers have value, subtitles has text?
+		                subtitles: subtitles.map(function(subtitle) {
+		                    return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
+		                }),
 		                videoHeight: video.height,
 		                videoId: app.user.ui.item,
 		                videoWidth: video.width,
 		                videoSize: app.user.ui.videoSize,
-		                videoURL: video.url,
+		                video: video.url,
 		                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1
 		            }).bindEvent({
                         resize: function(event, data) {
