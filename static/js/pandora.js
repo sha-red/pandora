@@ -16,6 +16,8 @@ Ox.load('UI', {
     theme: 'modern'
 }, function() {
 
+Ox.load('Geo', function() {
+
     window.pandora = new Ox.App({url: '/api/'}).bindEvent({
 
         load: function(event, data) {
@@ -3997,5 +3999,7 @@ Ox.load('UI', {
 	        app.$ui.rightPanel.replaceElement(1, ui.contentPanel());
 		}
 	}
+
+});
 
 });
