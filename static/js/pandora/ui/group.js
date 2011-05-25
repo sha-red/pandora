@@ -67,7 +67,7 @@ pandora.ui.group = function(id, query) {
                         operator: '='
                     };
                 });
-                reloadGroups(i);
+                pandora.reloadGroups(i);
             }
         });
     new Ox.Select({
@@ -90,7 +90,7 @@ pandora.ui.group = function(id, query) {
                 if (app.ui.groups[i].query.conditions.length) {
                     // if group with selection gets replaced, reload
                     app.ui.groups[i].query.conditions = [];
-                    reloadGroups(i);
+                    pandora.reloadGroups(i);
                 }
                 app.ui.groups[i] = getGroupObject(id_);
                 app.user.ui.groups[i] = id_;
