@@ -241,9 +241,12 @@ class Item(models.Model):
             tasks.update_poster.delay(self.itemId)
 
     def delete_files(self):
-        shutil.rmtree(self.path(''))
+        path = os.path.join(settings.MEDIA_ROOT, self.path())
+        if os.path.exists(path):
+            shutil.rmtree(path)
 
     def delete(self, *args, **kwargs):
+        self.streams.all().delete()
         self.delete_files()
         super(Item, self).delete(*args, **kwargs)
 
@@ -251,15 +254,10 @@ class Item(models.Model):
         '''
             move all related tables to other and delete self
         '''
-        #FIXME: stream path is wrong after this, should this be dealt with in save?
-        #       its more that streams have to be generated again after merging
-        for stream in self.streams.all():
-            stream.item = other
-            stream.save()
         for l in self.lists.all():
-            l.items.remove(self)
+            l.remove(self)
             if l.items.filter(id=other.id) == 0:
-                l.items.add(other)
+                l.add(other)
         #FIXME: should this really happen for annotations?
         for a in self.annotations.all():
             a.item = other
@@ -270,6 +268,7 @@ class Item(models.Model):
                 f.save()
         self.delete()
         other.save()
+        #FIXME: update poster, stills and streams after this
 
     def get_poster(self):
         poster = {}
