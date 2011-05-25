@@ -34,7 +34,7 @@ pandora.ui.rightPanel = function() {
             resize: function(event, data) {
                 //Ox.print('???? resize rightPanel', event, data)
                 if (!app.user.ui.item) {
-                    resizeGroups(data);
+                    pandora.resizeGroups(data);
                     app.$ui.list.size();
                     if (app.user.ui.lists[app.user.ui.list].listView == 'map') {
                         app.$ui.map.resize();

@@ -136,7 +136,7 @@ Ox.load('Geo', function() {
         pandora.resizeFolders();
         if (!app.user.ui.item) {
             app.$ui.list.size();
-            resizeGroups(app.$ui.rightPanel.width());
+            pandora.resizeGroups(app.$ui.rightPanel.width());
             if (app.user.ui.listView == 'map') {
                 app.$ui.map.resize();
             }
