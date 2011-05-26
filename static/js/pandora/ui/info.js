@@ -16,7 +16,7 @@ pandora.ui.info = function() {
                     position: 'absolute',
                     left: 0,
                     bottom: 0,
-                    height: '16px',
+                    height: '16px'
                 })
         )
         .bindEvent({
@@ -27,7 +27,7 @@ pandora.ui.info = function() {
         });
     if(app.user.ui.item) {
         pandora.api.getItem(app.user.ui.item, function(result) {
-            app.ui.infoRatio = result.data.item.stream.aspectRatio;
+            app.ui.infoRatio = result.data.stream.aspectRatio;
             var width = that.width() || 256,
                 height = width / app.ui.infoRatio + 16;
             app.$ui.infoStill.removeElement();
@@ -43,7 +43,7 @@ pandora.ui.info = function() {
             !app.user.ui.showInfo && app.$ui.leftPanel.css({bottom: -height});
             app.$ui.leftPanel.size(2, height );
         });
-        app.$ui.infoTimeline.attr('src', '/'+app.user.ui.item+'/timeline.16.png')
+        app.$ui.infoTimeline.attr('src', '/'+app.user.ui.item+'/timeline.16.png');
     }
     return that;
 };

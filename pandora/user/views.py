@@ -11,7 +11,7 @@ from django.utils import simplejson as json
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
 
-from ox.django.shortcuts import render_to_json_response, json_response
+from ox.django.shortcuts import render_to_json_response, json_response, get_object_or_404_json
 from ox.django.decorators import login_required_json
 import ox
 
@@ -451,7 +451,7 @@ def setUI(request):
         profile.save()
 
     if data.get('item', False):
-        item = Item.objects.get(itemId=data['item'])
+        item = get_object_or_404_json(Item, itemId=data['item'])
         if request.user.is_authenticated():
             access, created = Access.objects.get_or_create(item=item, user=request.user)
         else:

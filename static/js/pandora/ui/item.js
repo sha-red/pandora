@@ -1,16 +1,17 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.item = function() {
-    var that;
-    if (app.user.ui.itemView == 'info' || app.user.ui.itemView == 'files') {
-        that = new Ox.Element();
-    } else if (app.user.ui.itemView == 'player') {
-        that = new Ox.Element();
-    } else if (app.user.ui.itemView == 'timeline') {
-        that = new Ox.Element();
-    }
+    var that = new Ox.Element();
     pandora.api.getItem(app.user.ui.item, function(result) {
-        if (app.user.ui.itemView == 'info') {
-            //Ox.print('result.data.item', result.data.item)
+        if (result.status.code != 200) {
+            app.$ui.contentPanel.replaceElement(1,
+                Ox.Element().html(
+                    'The '+app.config.itemName.singular+' you are looking for does not exist.'));
+        } else if (app.user.ui.itemView == 'calendar') {
+            app.$ui.contentPanel.replaceElement(1, Ox.Element().html('Calendar'));
+        } else if (app.user.ui.itemView == 'clips') {
+            app.$ui.contentPanel.replaceElement(1, Ox.Element().html('Clips'));
+        } else if (app.user.ui.itemView == 'info') {
+            //Ox.print('result.data', result.data)
             if (app.user.level == 'admin') {
                 var $form,
                     $edit = new Ox.Element()
@@ -20,7 +21,7 @@ pandora.ui.item = function() {
                                 id: key.id,
                                 label: key.title,
                                 labelWidth: 100,
-                                value: result.data.item[key.id],
+                                value: result.data[key.id],
                                 type: 'text',
                                 width: 500 
                             });
@@ -37,11 +38,12 @@ pandora.ui.item = function() {
                             var values = $form.value();
                             var changed = {};
                             Ox.map(app.config.itemKeys, function(key, i) {
-                                if(values[i] && values[i] != ''+result.data.item[key.id]) {
-                                    if(Ox.isArray(key.type) && key.type[0] == 'string')
+                                if(values[i] && values[i] != ''+result.data[key.id]) {
+                                    if(Ox.isArray(key.type) && key.type[0] == 'string') {
                                         changed[key.id] = values[i].split(', ');
-                                    else
+                                    } else {
                                         changed[key.id] = values[i];
+                                    }
                                 }
                             });
                             if(changed) {
@@ -58,16 +60,17 @@ pandora.ui.item = function() {
                     //Ox.print(template);
                     app.$ui.contentPanel.replaceElement(1,
                         app.$ui.item = new Ox.Element()
-                        .append($.tmpl(template, result.data.item))
+                        .append($.tmpl(template, result.data))
                     );
                 });
             }
 
+        } else if (app.user.ui.itemView == 'map') {
+            app.$ui.contentPanel.replaceElement(1, Ox.Element().html('Map'));
         } else if (app.user.ui.itemView == 'player') {
-            var video = result.data.item.stream,
-                subtitles = result.data.item.layers.subtitles,
+            var video = result.data.stream,
                 format = $.support.video.supportedFormat(video.formats);
-                video.height = video.profiles[0]
+                video.height = video.profiles[0];
             video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
             video.url = video.baseUrl + '/' + video.height + 'p.' + format;
             app.$ui.contentPanel.replaceElement(1, app.$ui.player = new Ox.VideoPanelPlayer({
@@ -77,7 +80,9 @@ pandora.ui.item = function() {
                 position: app.user.ui.videoPosition[app.user.ui.item] || 0,
                 showAnnotations: app.user.ui.showAnnotations,
                 showControls: app.user.ui.showControls,
-                subtitles: subtitles,
+                subtitles: result.data.layers.subtitles.map(function(subtitle) {
+                    return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
+                }),
                 videoHeight: video.height,
                 videoId: app.user.ui.item,
                 videoWidth: video.width,
@@ -99,17 +104,21 @@ pandora.ui.item = function() {
                     });
                 }
             }));
+        } else if (app.user.ui.itemView == 'statistics') {
+            app.$ui.contentPanel.replaceElement(1, Ox.Element().html('Statistics'));
         } else if (app.user.ui.itemView == 'timeline') {
             var layers = [],
-                video = result.data.item.stream,
-                cuts = result.data.item.cuts || {},
-                format = $.support.video.supportedFormat(video.formats);
-                subtitles = result.data.item.layers.subtitles;
+                video = result.data.stream,
+                cuts = result.data.cuts || {},
+                format = $.support.video.supportedFormat(video.formats),
+                streams = {};
             video.height = video.profiles[0];
             video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
-            video.url = video.baseUrl + '/' + video.height + 'p.' + format;
+            video.profiles.forEach(function(profile) {
+                streams[profile] = video.baseUrl + '/' + profile + 'p.' + format;
+            });
             $.each(app.config.layers, function(i, layer) {
-                layers[i] = $.extend({}, layer, {items: result.data.item.layers[layer.id]});
+                layers[i] = $.extend({}, layer, {items: result.data.layers[layer.id]});
             });
             app.$ui.contentPanel.replaceElement(1, app.$ui.editor = new Ox.VideoEditor({
                 annotationsSize: app.user.ui.annotationsSize,
@@ -117,7 +126,7 @@ pandora.ui.item = function() {
                 duration: video.duration,
                 find: '',
                 getFrameURL: function(position) {
-                    return '/' + app.user.ui.item + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg'
+                    return '/' + app.user.ui.item + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg';
                 },
                 getLargeTimelineImageURL: function(i) {
                     return '/' + app.user.ui.item + '/timelines/timeline.64.' + i + '.png';
@@ -135,14 +144,14 @@ pandora.ui.item = function() {
                 showAnnotations: app.user.ui.showAnnotations,
                 showLargeTimeline: true,
                 // fixme: layers have value, subtitles has text?
-                subtitles: subtitles.map(function(subtitle) {
+                subtitles: result.data.layers.subtitles.map(function(subtitle) {
                     return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
                 }),
                 videoHeight: video.height,
                 videoId: app.user.ui.item,
                 videoWidth: video.width,
                 videoSize: app.user.ui.videoSize,
-                video: video.url,
+                video: streams,
                 width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1
             }).bindEvent({
                 resize: function(event, data) {
@@ -190,12 +199,12 @@ pandora.ui.item = function() {
         } else if (app.user.ui.itemView == 'files') {
             app.$ui.contentPanel.replaceElement(1,
                 app.$ui.item = new Ox.FilesView({
-                    id: result.data.item.id
+                    id: result.data.id
                 })
             );
         }
-        var director = result.data.item.director?' ('+result.data.item.director.join(', ')+')':'';
-        app.$ui.total.html(result.data.item.title + director);
+        var director = result.data.director?' ('+result.data.director.join(', ')+')':'';
+        app.$ui.total.html(result.data.title + director);
     });
     return that;
 };
