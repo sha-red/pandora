@@ -12,13 +12,26 @@ from api.actions import actions
 
 @login_required_json
 def addEvent(request):
+    '''
+        param data
+            {
+                'name': '',
+                'start': ''
+                'end': ''
+            }
+            required keys: name, start, end
+    '''
     data = json.loads(request.POST['data'])
+    #FIXME: check for alternativeNames too!
     if models.Event.filter(name=data['name']).count() == 0:
-        place = models.Event(name = data['name'])
-        place.save()
+        event = models.Event(name = data['name'])
+        for key in ('start', 'end', 'alternativeNames'):
+            if key in data and data[key]:
+                setattr(event, key, data[key])
+        event.save()
         response = json_response(status=200, text='created')
     else:
-        response = json_response(status=403, text='place name exists')
+        response = json_response(status=403, text='event name exists')
     return render_to_json_response(response)
 actions.register(addEvent, cache=False)
 
@@ -28,26 +41,28 @@ def editEvent(request):
     '''
         param data
             {
-                'id': dateid,
-                'date': dict
+                'id': event id,
+                'name': ''
+                ...
             }
-            date contains key/value pairs with place propterties
+            update provides keys of event with id
     '''
     data = json.loads(request.POST['data'])
-    Event = get_object_or_404_json(models.Event, pk=data['id'])
-    if Event.editable(request.user):
+    event = get_object_or_404_json(models.Event, pk=data['id'])
+    if event.editable(request.user):
         conflict = False
-        names = [data['date']['name']] + data['date']['aliases']
+        names = [data.get('name', event.name)] + data.get('alternativeNames', [])
         for name in names: #FIXME: also check aliases!
-            if models.Event.filter(name=data['name']).exclude(id=Event.id).count() != 0:
+            if models.Event.filter(name=data['name']).exclude(id=event.id).count() != 0:
                 conflict = True
         if not conflict:
-            for key in data['date']:
-                setattr(Event, key, data['date'][key])
-            Event.save()
+            for key in ('start', 'end', 'alternativeNames'):
+                if key in data:
+                    setattr(event, key, data[key])
+            event.save()
             response = json_response(status=200, text='updated')
         else:
-            response = json_response(status=403, text='Event name/alias conflict')
+            response = json_response(status=403, text='Event name conflict')
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
@@ -56,7 +71,20 @@ actions.register(editEvent, cache=False)
 
 @login_required_json
 def removeEvent(request):
-    response = json_response(status=501, text='not implemented')
+    '''
+        param data {
+            id: event id
+        }
+        remove Event with given id
+
+    '''
+    data = json.loads(request.POST['data'])
+    event = get_object_or_404_json(models.Event, pk=data['id'])
+    if event.editable(request.user):
+        event.delete()
+        response = json_response(status=200, text='removed')
+    else:
+        response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 actions.register(removeEvent, cache=False)
 
