@@ -5,6 +5,7 @@ from __future__ import division, with_statement
 from django.db import models
 from django.contrib.auth.models import User, Group
 
+import ox
 from ox.django import fields
 
 import managers
@@ -46,11 +47,16 @@ class Event(models.Model):
         self.name_find = self.name + '||'.join(self.alternativeNames)
         super(Event, self).save(*args, **kwargs)
 
-    def json(self):
-        return {
-            'name': self.name,
-            'alternativeNames': self.alternativeNames,
-            'start': self.start,
-            'end': self.end,
-            'type': self.type
+    def get_id(self):
+        return ox.to32(self.id)
+
+    def json(self, user=None):
+        j = {
+            'id': self.get_id(),
+            'user': self.user.username,
         }
+        for key in ('created', 'modified',
+                    'name', 'alternativeNames', 'start', 'end',
+                    'type'):
+            j[key] = getattr(self, key)
+        return j

@@ -89,7 +89,7 @@ def removeEvent(request):
 actions.register(removeEvent, cache=False)
 
 
-def findEvent(request):
+def findEvents(request):
     '''
         param data
             {'query': query, 'sort': array, 'range': array}
@@ -128,4 +128,4 @@ Positions
     for p in models.Event.objects.find(data['query']):
         response['data']['events'].append(p.json())
     return render_to_json_response(response)
-actions.register(findEvent)
+actions.register(findEvents)

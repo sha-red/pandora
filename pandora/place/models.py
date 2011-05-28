@@ -19,7 +19,7 @@ class Place(models.Model):
     user = models.ForeignKey(User, null=True, related_name='places')
 
     name = models.CharField(max_length=1024)
-    aliases = fields.TupleField(default=[])
+    alternativeNames = fields.TupleField(default=[])
     name_sort = models.CharField(max_length=200)
     name_find = models.TextField(default='', editable=False)
 
@@ -36,7 +36,7 @@ class Place(models.Model):
     east = models.FloatField(default=0)
     lat = models.FloatField(default=0)
     lng = models.FloatField(default=0)
-    size = models.FloatField(default=0)
+    area = models.FloatField(default=0)
 
     matches = models.IntegerField(default=0)
 
@@ -62,9 +62,9 @@ class Place(models.Model):
             'user': self.user.username,
         }
         for key in ('created', 'modified',
-                    'name', 'aliases', 'geoname', 'countryCode',
+                    'name', 'alternativeNames', 'geoname', 'countryCode',
                     'south', 'west', 'north', 'east',
-                    'lat', 'lng', 'size', 'matches', 'type'):
+                    'lat', 'lng', 'area', 'matches', 'type'):
             j[key] = getattr(self, key)
         return j
 
@@ -72,13 +72,13 @@ class Place(models.Model):
         if not self.name_sort:
             self.name_sort = self.name #', '.join(self.name)
         self.geoname_sort = ', '.join(reversed(self.geoname.split(', ')))
-        self.name_find = '|%s|'%'|'.join([self.name]+list(self.aliases))
+        self.name_find = '|%s|'%'|'.join([self.name]+list(self.alternativeNames))
 
         #update center
         #self.lat = ox.location.center(self.south, self.north)
         #self.lng = ox.location.center(self.east, self.west)
 
         #update area
-        #self.size = ox.location.area(self.south, self.west, self.north, self.east)
+        #self.area= ox.location.area(self.south, self.west, self.north, self.east)
 
         super(Place, self).save(*args, **kwargs)

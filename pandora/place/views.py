@@ -2,6 +2,8 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 
+from django.db.models import Max, Min
+
 import ox
 from ox.utils import json
 
@@ -29,7 +31,7 @@ def addPlace(request):
             east: float,
             lat: float,
             lng: float,
-            size: float,
+            area: float,
         }
     '''
     data = json.loads(request.POST['data'])
@@ -221,5 +223,15 @@ Positions
         response['data']['positions'] = utils.get_positions(ids, query['ids'])
     else:
         response['data']['items'] = qs.count()
+        '''
+        r = qs.aggregate(
+            Min('south'),
+            Min('west'),
+            Max('north'),
+            Max('east'),
+        )
+        print r
+        '''
+        response['data']['area'] = {'south': -180.0, 'west': -180.0, 'north': 180.0, 'east': 180.0}
     return render_to_json_response(response)
 actions.register(findPlaces)
