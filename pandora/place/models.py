@@ -37,7 +37,6 @@ class Place(models.Model):
     lat = models.FloatField(default=0)
     lng = models.FloatField(default=0)
     size = models.FloatField(default=0)
-    size = models.FloatField(default=0)
 
     matches = models.IntegerField(default=0)
 

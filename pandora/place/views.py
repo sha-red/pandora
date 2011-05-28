@@ -194,7 +194,7 @@ def findPlaces(request):
                     }
                 ]
             range:       result range, array [from, to]
-            area: [south, west, north, east] only return places in that square
+            area: {south:, west:, north:, east:} only return places in that square
 
         with keys, items is list of dicts with requested properties:
           return {'status': {'code': int, 'text': string},
