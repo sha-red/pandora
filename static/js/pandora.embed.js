@@ -1,7 +1,7 @@
 /***
     Pandora embed
 ***/
-
+Ox.load('UI', function() {
 var pandora = new Ox.App({
     apiURL: '/api/',
 }).launch(function(data) {
@@ -56,6 +56,7 @@ var pandora = new Ox.App({
         }
     };
     var item = document.location.pathname.split('/')[1];
-    ui.info= new app.info(item)
-      .appendTo(document.body);
+    ui.info = new app.info(item)
+                     .appendTo(document.body);
+});
 });
