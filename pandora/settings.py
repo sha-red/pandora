@@ -124,7 +124,7 @@ INSTALLED_APPS = (
     'annotation',
     'app',
     'archive',
-    'date',
+    'event',
     'item',
     'itemlist',
     'person',
