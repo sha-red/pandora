@@ -60,7 +60,7 @@ pandora.getGroupWidth = function(pos, panelWidth) { // fixme: don't pass panelWi
 }
 
 pandora.getSortOperator = function(key) { // fixme: make static
-    var type = Ox.getObjectById(app.config.itemKeys, key).type;
+    var type = Ox.getObjectById(app.site.itemKeys, key).type;
     return ['hue', 'string', 'text'].indexOf(
         Ox.isArray(type) ? type[0] : type
     ) > -1 ? '+' : '-';
@@ -74,7 +74,7 @@ pandora.login = function(data) {
 
 pandora.logout = function(data) {
     app.user = data.user;
-    Ox.Theme(app.config.user.ui.theme);
+    Ox.Theme(app.site.user.ui.theme);
     app.$ui.appPanel.reload();
 }
 

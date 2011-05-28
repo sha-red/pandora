@@ -5,7 +5,7 @@ pandora.ui.item = function() {
         if (result.status.code != 200) {
             app.$ui.contentPanel.replaceElement(1,
                 Ox.Element().html(
-                    'The '+app.config.itemName.singular+' you are looking for does not exist.'));
+                    'The '+app.site.itemName.singular+' you are looking for does not exist.'));
         } else if (app.user.ui.itemView == 'calendar') {
             app.$ui.contentPanel.replaceElement(1, Ox.Element().html('Calendar'));
         } else if (app.user.ui.itemView == 'clips') {
@@ -16,7 +16,7 @@ pandora.ui.item = function() {
                 var $form,
                     $edit = new Ox.Element()
                     .append($form = new Ox.FormElementGroup({
-                        elements: Ox.map(app.config.itemKeys, function(key) {
+                        elements: Ox.map(app.site.itemKeys, function(key) {
                             return new Ox.Input({
                                 id: key.id,
                                 label: key.title,
@@ -37,7 +37,7 @@ pandora.ui.item = function() {
                         click: function(event, data) {
                             var values = $form.value();
                             var changed = {};
-                            Ox.map(app.config.itemKeys, function(key, i) {
+                            Ox.map(app.site.itemKeys, function(key, i) {
                                 if(values[i] && values[i] != ''+result.data[key.id]) {
                                     if(Ox.isArray(key.type) && key.type[0] == 'string') {
                                         changed[key.id] = values[i].split(', ');
@@ -117,7 +117,7 @@ pandora.ui.item = function() {
             video.profiles.forEach(function(profile) {
                 streams[profile] = video.baseUrl + '/' + profile + 'p.' + format;
             });
-            $.each(app.config.layers, function(i, layer) {
+            $.each(app.site.layers, function(i, layer) {
                 layers[i] = $.extend({}, layer, {items: result.data.layers[layer.id]});
             });
             app.$ui.contentPanel.replaceElement(1, app.$ui.editor = new Ox.VideoEditor({

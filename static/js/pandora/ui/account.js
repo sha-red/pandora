@@ -348,7 +348,7 @@ pandora.ui.accountWelcomeDialog = function() {
             content: new Ox.Element().html('Welcome, ' + app.user.username + '!<br/><br/>Your account has been created.'),
             height: 160,
             keys: {enter: 'close', escape: 'close'},
-            title: 'Welcome to ' + app.config.site.name,
+            title: 'Welcome to ' + app.site.site.name,
             width: 300
         });
     return that;

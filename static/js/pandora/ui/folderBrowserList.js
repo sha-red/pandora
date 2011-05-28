@@ -534,7 +534,7 @@ pandora.ui.folders = function() {
                                 type: data.id == 'new' ? 'static' : 'smart'
                             }, function(result) {
                                 id = result.data.id;
-                                pandora.UI.set(['lists', id].join('|'), app.config.user.ui.lists['']); // fixme: necessary?
+                                pandora.UI.set(['lists', id].join('|'), app.site.user.ui.lists['']); // fixme: necessary?
                                 pandora.URL.set('?find=list:' + id)
                                 Ox.Request.clearCache(); // fixme: remove
                                 $list.reloadList().bindEventOnce({

@@ -15,7 +15,7 @@ pandora.ui.annotations = function() {
             }
         }),
         $bins = [];
-    $.each(app.config.layers, function(i, layer) {
+    $.each(app.site.layers, function(i, layer) {
         var $bin = new Ox.CollapsePanel({
             id: layer.id,
             size: 16,

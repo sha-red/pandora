@@ -6,9 +6,9 @@ pandora.ui.list = function(view) { // fixme: remove view argument
         /*
         keys = Ox.unique($.merge(
             $.map(app.user.ui.lists[app.user.ui.list].columns, function(id) {
-                return Ox.getObjectById(app.config.sortKeys, id);
+                return Ox.getObjectById(app.site.sortKeys, id);
             }),
-            app.config.sortKeys
+            app.site.sortKeys
         ));
         Ox.print('$$$$', keys)
         */
@@ -236,7 +236,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
         init: function(event, data) {
             app.$ui.total.html(pandora.ui.status('total', data));
             data = [];
-            $.each(app.config.totals, function(i, v) {
+            $.each(app.site.totals, function(i, v) {
                 data[v.id] = 0;
             });
             app.$ui.selected.html(pandora.ui.status('selected', data));

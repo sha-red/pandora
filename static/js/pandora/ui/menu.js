@@ -10,11 +10,11 @@ pandora.ui.mainMenu = function() {
             ],
             id: 'mainMenu',
             menus: [
-                { id: app.config.site.id + 'Menu', title: app.config.site.name, items: [
+                { id: app.site.site.id + 'Menu', title: app.site.site.name, items: [
                     { id: 'home', title: 'Home' },
                     {},
-                    { id: 'about', title: 'About ' + app.config.site.name },
-                    { id: 'news', title: app.config.site.name + ' News' },
+                    { id: 'about', title: 'About ' + app.site.site.name },
+                    { id: 'news', title: app.site.site.name + ' News' },
                     { id: 'tour', title: 'Take a Tour' },
                     { id: 'faq', title: 'Frequently Asked Questions' },
                     { id: 'terms', title: 'Terms of Service' },
@@ -25,7 +25,7 @@ pandora.ui.mainMenu = function() {
                         { id: 'report', title: 'Report a Bug' }
                     ] },
                     {},
-                    { id: 'contact', title: 'Contact ' + app.config.site.name }
+                    { id: 'contact', title: 'Contact ' + app.site.site.name }
                 ] },
                 { id: 'userMenu', title: 'User', items: [
                     { id: 'username', title: 'User: ' + (isGuest ? 'not logged in' : app.user.username), disabled: true },
@@ -37,7 +37,7 @@ pandora.ui.mainMenu = function() {
                 ] },
                 { id: 'listMenu', title: 'List', items: [
                     { id: 'history', title: 'History', items: [
-                        { id: 'allmovies', title: 'All ' + app.config.itemName.plural }
+                        { id: 'allmovies', title: 'All ' + app.site.itemName.plural }
                     ] },
                     { id: 'lists', title: 'View List', items: [
                         { id: 'favorites', title: 'Favorites' }
@@ -52,7 +52,7 @@ pandora.ui.mainMenu = function() {
                     { id: 'newsmartlist', title: 'New Smart List...', keyboard: 'alt control n' },
                     { id: 'newsmartlistfromresults', title: 'New Smart List from Results...', keyboard: 'shift alt control n' },
                     {},
-                    { id: 'addmovietolist', title: ['Add Selected ' + app.config.itemName.singular + ' to List...', 'Add Selected ' + app.config.itemName.plural + ' to List...'], disabled: true },
+                    { id: 'addmovietolist', title: ['Add Selected ' + app.site.itemName.singular + ' to List...', 'Add Selected ' + app.site.itemName.plural + ' to List...'], disabled: true },
                     {},
                     { id: 'setposterframe', title: 'Set Poster Frame', disabled: true }
                 ]},
@@ -70,8 +70,8 @@ pandora.ui.mainMenu = function() {
                     { id: 'invertselection', title: 'Invert Selection', disabled: true, keyboard: 'alt control a' }
                 ] },
                 { id: 'viewMenu', title: 'View', items: [
-                    { id: 'movies', title: 'View ' + app.config.itemName.plural, items: [
-                        { group: 'viewmovies', min: 0, max: 1, items: $.map(app.config.listViews, function(view, i) {
+                    { id: 'movies', title: 'View ' + app.site.itemName.plural, items: [
+                        { group: 'viewmovies', min: 0, max: 1, items: $.map(app.site.listViews, function(view, i) {
                             return $.extend({
                                 checked: app.user.ui.lists[app.user.ui.list].listView == view.id,
                             }, view);
@@ -87,8 +87,8 @@ pandora.ui.mainMenu = function() {
                         { id: 'video', title: 'Video' }
                     ] },
                     {},
-                    { id: 'openmovie', title: ['Open ' + app.config.itemName.singular, 'Open ' + app.config.itemName.plural], disabled: true, items: [
-                        { group: 'movieview', min: 0, max: 1, items: $.map(app.config.itemViews, function(view, i) {
+                    { id: 'openmovie', title: ['Open ' + app.site.itemName.singular, 'Open ' + app.site.itemName.plural], disabled: true, items: [
+                        { group: 'movieview', min: 0, max: 1, items: $.map(app.site.itemViews, function(view, i) {
                             return $.extend({
                                 checked: app.user.ui.itemView == view.id,
                             }, view);
@@ -98,17 +98,17 @@ pandora.ui.mainMenu = function() {
                     { id: 'lists', title: 'Hide Lists', keyboard: 'shift l' },
                     { id: 'info', title: 'Hide Info', keyboard: 'shift i' },
                     { id: 'groups', title: 'Hide Groups', keyboard: 'shift g' },
-                    { id: 'movies', title: 'Hide ' + app.config.itemName.plural, disabled: true, keyboard: 'shift m' }
+                    { id: 'movies', title: 'Hide ' + app.site.itemName.plural, disabled: true, keyboard: 'shift m' }
                 ]},
                 { id: 'sortMenu', title: 'Sort', items: [
-                    { id: 'sortmovies', title: 'Sort ' + app.config.itemName.plural + ' by', items: [
+                    { id: 'sortmovies', title: 'Sort ' + app.site.itemName.plural + ' by', items: [
                         { group: 'sortmovies', min: 1, max: 1, items: $.map(app.ui.sortKeys, function(key, i) {
                             return $.extend({
                                 checked: app.user.ui.lists[app.user.ui.list].sort[0].key == key.id,
                             }, key);
                         }) }
                     ] },
-                    { id: 'ordermovies', title: 'Order ' + app.config.itemName.plural, items: [
+                    { id: 'ordermovies', title: 'Order ' + app.site.itemName.plural, items: [
                         { group: 'ordermovies', min: 1, max: 1, items: [
                             { id: 'ascending', title: 'Ascending', checked: app.user.ui.lists[app.user.ui.list].sort[0].operator === '' },
                             { id: 'descending', title: 'Descending', checked: app.user.ui.lists[app.user.ui.list].sort[0].operator == '-' }
@@ -149,7 +149,7 @@ pandora.ui.mainMenu = function() {
                     { id: 'report', title: 'Report a Bug' },
                 ] },
                 { id: 'helpMenu', title: 'Help', items: [
-                    { id: 'help', title: app.config.site.name + ' Help', keyboard: 'shift ?' }
+                    { id: 'help', title: app.site.site.name + ' Help', keyboard: 'shift ?' }
                 ] },
                 { id: 'debugMenu', title: 'Debug', items: [
                     { id: 'query', title: 'Show pandora.Query' },
@@ -221,7 +221,7 @@ pandora.ui.mainMenu = function() {
                         height: 498,
                         id: 'home',
                         keys: {enter: 'close', escape: 'close'},
-                        title: app.config.site.name,
+                        title: app.site.site.name,
                         width: 800
                     }).open();
                 } else if (data.id == 'register') {

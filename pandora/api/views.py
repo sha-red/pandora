@@ -73,11 +73,11 @@ def init(request):
                     value = ItemSort.objects.aggregate(Max(name))['%s__max'%name]
                 key['format']['args'][0] = value
 
-        response['data']['config'] = config
+        response['data']['site'] = config
     if request.user.is_authenticated():
         response['data']['user'] = get_user_json(request.user)
     else:
-        response['data']['user'] = response['data']['config']['user']
+        response['data']['user'] = response['data']['site']['user']
 
     return render_to_json_response(response)
 actions.register(init)

@@ -2,12 +2,12 @@
 pandora.ui.viewSelect = function() {
     var that = new Ox.Select({
             id: 'viewSelect',
-            items: !app.user.ui.item ? $.map(app.config.listViews, function(view) {
+            items: !app.user.ui.item ? $.map(app.site.listViews, function(view) {
                 return $.extend($.extend({}, view), {
                     checked: app.user.ui.lists[app.user.ui.list].listView == view.id,
                     title: 'View ' + view.title
                 });
-            }) : $.map(app.config.itemViews, function(view) {
+            }) : $.map(app.site.itemViews, function(view) {
                 return $.extend($.extend({}, view), {
                     checked: app.user.ui.itemView == view.id,
                     title: 'View: ' + view.title

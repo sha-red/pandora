@@ -10,7 +10,7 @@ pandora.ui.findElement = function() {
             elements: $.merge(app.user.ui.list ? [
                     app.$ui.findListSelect = new Ox.Select({
                             items: [
-                                {id: 'all', title: 'Find: All ' + app.config.itemName.plural},
+                                {id: 'all', title: 'Find: All ' + app.site.itemName.plural},
                                 {id: 'list', title: 'Find: This List'}
                             ],
                             overlap: 'right',

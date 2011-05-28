@@ -9,7 +9,7 @@ pandora.ui.group = function(id, query) {
     //alert(id + ' ' + JSON.stringify(pandora.Query.toObject(id)))
     var i = app.user.ui.groups.indexOf(id),
         panelWidth = app.$ui.document.width() - (app.user.ui.showSidebar * app.user.ui.sidebarSize) - 1,
-        title = Ox.getObjectById(app.config.groups, id).title,
+        title = Ox.getObjectById(app.site.groups, id).title,
         width = pandora.getGroupWidth(i, panelWidth),
         that = new Ox.TextList({
             columns: [
@@ -71,7 +71,7 @@ pandora.ui.group = function(id, query) {
             }
         });
     new Ox.Select({
-            items: $.map(app.config.groups, function(v) {
+            items: $.map(app.site.groups, function(v) {
                 return {
                     checked: v.id == id,
                     id: v.id,
@@ -123,7 +123,7 @@ pandora.ui.group = function(id, query) {
     }
     function getGroupObject(id) {
         var i = app.user.ui.groups.indexOf(id),
-            title = Ox.getObjectById(app.config.groups, id).title,
+            title = Ox.getObjectById(app.site.groups, id).title,
             width = pandora.getGroupWidth(i, panelWidth);
         return {
             id: id,

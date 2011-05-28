@@ -4,8 +4,8 @@ pandora.ui.sectionSelect = function() {
     var that = new Ox.Select({
             id: 'sectionSelect',
             items: [
-                {checked: app.user.ui.section == 'site', id: 'site', title: app.config.site.name},
-                {checked: app.user.ui.section == 'items', id: 'items', title: app.config.itemName.plural},
+                {checked: app.user.ui.section == 'site', id: 'site', title: app.site.site.name},
+                {checked: app.user.ui.section == 'items', id: 'items', title: app.site.itemName.plural},
                 {checked: app.user.ui.section == 'texts', id: 'texts', title: 'Texts'},
                 {checked: app.user.ui.section == 'admin', id: 'admin', title: 'Admin'}
             ]

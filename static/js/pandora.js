@@ -7,7 +7,6 @@
 // fixme: sort=-director doesn't work
 // fixme: don't reload full right panel on sortSelect
 // fixme: clear items cache after login/logout
-// fixme: rename config to site (site/user is better than config/user)
 // fixme: replace global app object with pandora.app or move to pandora itself
 Ox.load('UI', {
     debug: true,
@@ -36,9 +35,9 @@ Ox.load('Geo', function() {
                             .resize(resizeWindow)
                             .unload(unloadWindow)
                     },
-                    config: data.config,
+                    site: data.site,
                     ui: {
-                        findKeys: $.map(data.config.itemKeys, function(key, i) {
+                        findKeys: $.map(data.site.itemKeys, function(key, i) {
                             return key.find ? key : null;
                         }),
                         infoRatio: 16 / 9,
@@ -47,7 +46,7 @@ Ox.load('Geo', function() {
                             site: $.merge([
                                 {id: 'site', title: 'Site', items: $.merge([
                                     {id: 'home', title: 'Home'}
-                                ], $.merge(data.config.sitePages, [
+                                ], $.merge(data.site.sitePages, [
                                     {id: 'software', title: 'Software'},
                                     {id: 'help', title: 'Help'}
                                 ]))},
@@ -65,14 +64,14 @@ Ox.load('Geo', function() {
                                 {id: 'personal', title: 'Personal Lists'},
                                 {id: 'favorite', title: 'Favorite Lists', showBrowser: false},
                                 {id: 'featured', title: 'Featured Lists', showBrowser: false}
-                            ],
+                            ]
                         },
                         selectedMovies: [],
-                        sortKeys: $.map(data.config.itemKeys, function(key, i) {
+                        sortKeys: $.map(data.site.itemKeys, function(key, i) {
                             return key.columnWidth ? key : null;
                         })
                     },
-                    user: data.user.level == 'guest' ? $.extend({}, data.config.user) : data.user
+                    user: data.user.level == 'guest' ? $.extend({}, data.site.user) : data.user
                 });
 
                 if (data.user.level == 'guest' && $.browser.mozilla) {

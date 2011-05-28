@@ -2,8 +2,8 @@
 pandora.ui.sectionButtons = function() {
     var that = new Ox.ButtonGroup({
             buttons: [
-                {id: 'site', selected: app.user.ui.section == 'site', title: app.config.site.name},
-                {id: 'items', selected: app.user.ui.section == 'items', title: app.config.itemName.plural},
+                {id: 'site', selected: app.user.ui.section == 'site', title: app.site.site.name},
+                {id: 'items', selected: app.user.ui.section == 'items', title: app.site.itemName.plural},
                 {id: 'texts', selected: app.user.ui.section == 'texts', title: 'Texts'},
                 {id: 'admin', selected: app.user.ui.section == 'admin', title: 'Admin'}
             ],
@@ -20,6 +20,10 @@ pandora.ui.sectionButtons = function() {
                     pandora.URL.set(app.user.ui.sitePage);
                 } else if (section == 'items') {
                     pandora.URL.set(pandora.Query.toString());
+                } else if (section == 'texts') {
+                    pandora.URL.set('texts');
+                } else if (section == 'admin') {
+                    pandora.URL.set('admin');
                 }
             }
         });

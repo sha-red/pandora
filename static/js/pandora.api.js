@@ -11,9 +11,9 @@ var app = new Ox.App({
     apiURL: '/api/',
     init: 'init',
 }).bindEvent('load', function(event, data) {
-    app.config = data.config;
+    app.site.= data.config;
     app.user = data.user;
-    app.config.default_info = '<div class="OxSelectable"><h2>Overview</h2>use this api in the browser with Ox.app or use <a href="http://code.0x2620.org/pandora_client">pandora_client</a> to use it in python</div>';
+    app.site.default_info = '<div class="OxSelectable"><h2>Overview</h2>use this api in the browser with Ox.app or use <a href="http://code.0x2620.org/pandora_client">pandora_client</a> to use it in python</div>';
     app.$body = $('body');
     app.$document = $(document);
     app.$window = $(window);
@@ -22,7 +22,7 @@ var app = new Ox.App({
 
     app.$ui = {};
     app.$ui.actionList = constructList();
-    app.$ui.actionInfo = Ox.Container().css({padding: '16px'}).html(app.config.default_info);
+    app.$ui.actionInfo = Ox.Container().css({padding: '16px'}).html(app.site.default_info);
 
     app.api.api({docs: true, code: true}, function(results) {
         app.actions = results.data.actions;
@@ -36,7 +36,7 @@ var app = new Ox.App({
         elements: [
             {
                 element: new Ox.Element().append(new Ox.Element()
-                .html(app.config.site.name + ' API').css({
+                .html(app.site.site.name + ' API').css({
                     'padding': '4px',
                 })).css({
                     'background-color': '#ddd',
@@ -146,7 +146,7 @@ function constructList() {
                 hash += k + ','
               });
             else
-              info.html(app.config.default_info);
+              info.html(app.site.default_info);
 
             document.location.hash = hash.substring(0, hash.length-1);
             app.$ui.actionInfo.html(info);

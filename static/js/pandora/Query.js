@@ -98,7 +98,7 @@ pandora.Query = (function() {
                 if (app.user.ui.listQuery.conditions.length) {
                     list = app.user.ui.listQuery.conditions[0].value;
                     !app.user.ui.lists[list] && pandora.UI.set(
-                        ['lists', list].join('|'), app.config.user.ui.lists['']
+                        ['lists', list].join('|'), app.site.user.ui.lists['']
                     );
                 }
                 pandora.UI.set({list: list});

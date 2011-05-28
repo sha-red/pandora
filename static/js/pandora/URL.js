@@ -29,7 +29,7 @@ pandora.URL = (function() {
                 pandora.UI.set({
                     section: 'site',
                     sitePage: url
-                })
+                });
             },
             '^(find)$': function() {
                 pandora.Query.fromString('?find='); // fixme: silly hack
@@ -50,7 +50,7 @@ pandora.URL = (function() {
                     item = split[0],
                     view = new RegExp(
                         '^(' + $.map(app.config.itemViews, function(v) {
-                            return v.id
+                            return v.id;
                         }).join('|') + ')$'
                     ).exec(split[1]);
                 view = view ? view[0] : app.user.ui.itemView;
