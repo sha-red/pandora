@@ -22,7 +22,7 @@ def addPlace(request):
     '''
         param data {
             name: "",
-            aliases: [],
+            alternativeNames: [],
             geoname: "",
             countryCode: '',
             south: float,
@@ -37,14 +37,14 @@ def addPlace(request):
     data = json.loads(request.POST['data'])
     exists = False
     names = data.pop('name')
-    for name in [names] + data.get('aliases', []):
+    for name in [names] + data.get('alternativeNames', []):
         if models.Place.objects.filter(name_find__icontains=u'|%s|'%name).count() != 0:
             exists = True
     if not exists:
         place = models.Place()
         place.user = request.user
         place.name = names
-        place.aliases = tuple(data.pop('aliases', []))
+        place.alternativeNames = tuple(data.pop('alternativeNames', []))
         for key in data:
             value = data[key]
             if isinstance(value, list):
@@ -75,7 +75,7 @@ def editPlace(request):
         names = [names]
     if place.editable(request.user):
         conflict = False
-        for name in names + data.get('aliases', []):
+        for name in names + data.get('alternativeNames', []):
             if models.Place.objects.filter(name_find__icontains=u'|%s|'%name).exclude(id=place.id).count() != 0:
                 conflict = True
         if 'geoname' in data:
@@ -223,15 +223,11 @@ Positions
         response['data']['positions'] = utils.get_positions(ids, query['ids'])
     else:
         response['data']['items'] = qs.count()
-        '''
-        r = qs.aggregate(
-            Min('south'),
-            Min('west'),
-            Max('north'),
-            Max('east'),
+        response['data']['area'] = qs.aggregate(
+            south=Min('south'),
+            west=Min('west'),
+            north=Max('north'),
+            east=Max('east'),
         )
-        print r
-        '''
-        response['data']['area'] = {'south': -180.0, 'west': -180.0, 'north': 180.0, 'east': 180.0}
     return render_to_json_response(response)
 actions.register(findPlaces)

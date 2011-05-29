@@ -40,6 +40,16 @@ def parseCondition(condition, user):
         return q
     if isinstance(v, bool): #featured and public flag
         key = k
+    elif key in ('lat', 'lng', 'area', 'south', 'west', 'north', 'east', 'matches'):
+        if op == '>':
+            key = '%s__gt'%k
+        elif op == '>=':
+            key = '%s__gte'%k
+        elif op == '<':
+            key = '%s__lt'%k
+        elif op == '<=':
+            key = '%s__lte'%k
+        #default is exact match
     else:
         if op == '=':
             key = '%s__iexact'%k
