@@ -32,8 +32,12 @@ def parseCondition(condition, user):
     else:
         exclude = False
     if op == '-':
-        return parseCondition({'key': k, 'value': v[0], 'operator': '>='}, user) \
-                & parseCondition({'key': k, 'value': v[1], 'operator': '<'}, user)
+        q = parseCondition({'key': k, 'value': v[0], 'operator': '>='}) \
+            & parseCondition({'key': k, 'value': v[1], 'operator': '<'})
+        if exclude:
+            return ~q
+        else:
+            return q
     if k == 'id':
         v = v.split('/')
         if len(v) == 2:
@@ -55,7 +59,7 @@ def parseCondition(condition, user):
         else: #default is exact match
             key = k
     else:
-        if op == '=':
+        if op == '=' or op == '^$':
             key = '%s__iexact'%k
         elif op == '^':
             v = v[1:]

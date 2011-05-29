@@ -35,6 +35,14 @@ def parseCondition(condition):
     else:
         exclude = False
 
+    if op == '-':
+        q = parseCondition({'key': k, 'value': v[0], 'operator': '>='}) \
+            & parseCondition({'key': k, 'value': v[1], 'operator': '<'})
+        if exclude:
+            return ~q
+        else:
+            return q
+
     key_type = models.site_config()['keys'].get(k, {'type':'string'}).get('type')
     if isinstance(key_type, list):
         key_type = key_type[0]
@@ -53,7 +61,7 @@ def parseCondition(condition):
         value_key = 'find__value'
         if k in models.Item.facet_keys:
             in_find = False
-            if op == '=':
+            if op == '=' or op == '^$':
                 v = models.Item.objects.filter(facets__key=k, facets__value=v)
             elif op == '^':
                 v = models.Item.objects.filter(facets__key=k, facets__value__istartswith=v)
@@ -62,7 +70,7 @@ def parseCondition(condition):
             else:
                 v = models.Item.objects.filter(facets__key=k, facets__value__icontains=v)
             k = 'id__in'
-        elif op == '=':
+        elif op == '=' or op == '^$':
             value_key = 'find__value__iexact'
         elif op == '^':
             v = v[1:]
@@ -108,44 +116,29 @@ def parseCondition(condition):
             while len(d) < 3:
                 d.append(1)
             return datetime(*[int(i) for i in d])
-        if op == '-':
-            v1 = v[1]
-            v2 = v[2]
-            if key_type == "date":
-                v1 = parseDate(v1.split('.'))
-                v2 = parseDate(v2.split('.'))
 
-            if exclude: #!1960-1970
-                k1 = 'value__lt'
-                k2 = 'value__gte'
-                return Q(**{'find__key': k, k1: v1})|Q(**{'find__key': k, k2: v2})
-            else: #1960-1970
-                k1 = 'value__gte'
-                k2 = 'value__lt'
-                return Q(**{'find__key': k, k1: v1})&Q(**{'find__key': k, k2: v2})
-        else:
-            if key_type == "date":
-                v = parseDate(v.split('.'))
-            if op == '=':
-                vk = 'value__exact'
-            elif op == '>':
-                vk = 'value__gt'
-            elif op == '>=':
-                vk = 'value__gte'
-            elif op == '<':
-                vk = 'value__lt'
-            elif op == '<=':
-                vk = 'value__lte'
-            elif op == '':
-                vk = 'value__exact'
+        if key_type == "date":
+            v = parseDate(v.split('.'))
+        if op == '=' or op == '^$':
+            vk = 'value__exact'
+        elif op == '>':
+            vk = 'value__gt'
+        elif op == '>=':
+            vk = 'value__gte'
+        elif op == '<':
+            vk = 'value__lt'
+        elif op == '<=':
+            vk = 'value__lte'
+        elif op == '':
+            vk = 'value__exact'
 
-            vk = 'find__%s' % vk
-            vk = str(vk)
+        vk = 'find__%s' % vk
+        vk = str(vk)
 
-            if exclude: #!1960
-                return ~Q(**{'find__key': k, vk: v})
-            else: #1960
-                return Q(**{'find__key': k, vk: v})
+        if exclude: #!1960
+            return ~Q(**{'find__key': k, vk: v})
+        else: #1960
+            return Q(**{'find__key': k, vk: v})
 
 
 def parseConditions(conditions, operator):
