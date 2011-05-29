@@ -31,6 +31,9 @@ def parseCondition(condition, user):
         exclude = True
     else:
         exclude = False
+    if op == '-':
+        return parseCondition({'key': k, 'value': v[0], 'operator': '>='}, user) \
+                & parseCondition({'key': k, 'value': v[1], 'operator': '<'}, user)
     if k == 'id':
         v = v.split('/')
         if len(v) == 2:
@@ -40,7 +43,7 @@ def parseCondition(condition, user):
         return q
     if isinstance(v, bool): #featured and public flag
         key = k
-    elif key in ('lat', 'lng', 'area', 'south', 'west', 'north', 'east', 'matches'):
+    elif k in ('lat', 'lng', 'area', 'south', 'west', 'north', 'east', 'matches'):
         if op == '>':
             key = '%s__gt'%k
         elif op == '>=':
@@ -49,7 +52,8 @@ def parseCondition(condition, user):
             key = '%s__lt'%k
         elif op == '<=':
             key = '%s__lte'%k
-        #default is exact match
+        else: #default is exact match
+            key = k
     else:
         if op == '=':
             key = '%s__iexact'%k

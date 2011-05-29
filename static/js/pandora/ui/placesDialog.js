@@ -16,9 +16,9 @@ pandora.ui.placesDialog = function() {
             content: app.$ui.placesElement = new Ox.ListMap({
                     height: height - 48,
                     places: function(data, callback) {
-                        return pandora.api.findPlaces($.extend(data, {
+                        return pandora.api.findPlaces($.extend({
                             query: {conditions: [], operator: ''}
-                        }), callback);
+                        }, data), callback);
                     },
                     addPlace: function(data, callback) {
                         Ox.print('ADDPLACE', data);
@@ -34,7 +34,10 @@ pandora.ui.placesDialog = function() {
                     },
                     removePlace: function(data, callback) {
                         Ox.print('REMOVEPLACE', data);
-                        pandora.api.removePlace(data.id, callback);
+                        pandora.api.removePlace(data.place, function(result) {
+                            Ox.Request.clearCache(); // fixme: remove
+                            callback(result);
+                        });
                     },
                     width: width
                 }),
