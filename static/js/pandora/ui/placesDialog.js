@@ -22,7 +22,11 @@ pandora.ui.placesDialog = function() {
                     },
                     addPlace: function(data, callback) {
                         Ox.print('ADDPLACE', data);
-                        pandora.api.addPlace(data.place, callback);
+                        pandora.api.addPlace(data.place, function(result) {
+                            Ox.Request.clearCache(); // fixme: remove
+                            callback(result);
+                        });
+
                     },
                     editPlace: function(data, callback) {
                         Ox.print('EDITPLACE', data);
