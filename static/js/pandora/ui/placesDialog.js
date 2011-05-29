@@ -20,41 +20,19 @@ pandora.ui.placesDialog = function() {
                             query: {conditions: [], operator: ''}
                         }), callback);
                     },
-                    width: width
-                })
-                .bindEvent({
-                    addplace: function(event, data) {
-                        Ox.print('ADDPLACE', data)
-                        pandora.api.addPlace(data.place, function(result) {
-                            var id = result.data.id;
-                            Ox.print("ID", result.data.id, result)
-                            Ox.Request.clearCache(); // fixme: remove
-                            Ox.print('AAAAA')
-                            app.$ui.placesElement
-                                .reloadList()
-                                .bindEventOnce({
-                                    loadlist: function() {
-                                        app.$ui.placesElement
-                                            .focusList()
-                                            .options({selected: [id]});
-                                    }
-                                });
-                        });
+                    addPlace: function(data, callback) {
+                        Ox.print('ADDPLACE', data);
+                        pandora.api.addPlace(data.place, callback);
                     },
-                    removeplace: function(event, data) {
-                        pandora.api.removePlace(data.id, function(result) {
-                            // fixme: duplicated
-                            Ox.Request.clearCache(); // fixme: remove
-                            app.$ui.placesElement
-                                .reloadList()
-                                .bindEventOnce({
-                                    loadlist: function(event, data) {
-                                        app.$ui.placesElement
-                                            .focusList();
-                                    }
-                                });
-                        });
-                    }
+                    editPlace: function(data, callback) {
+                        Ox.print('EDITPLACE', data);
+                        pandora.api.editPlace(data.place, callback);
+                    },
+                    removePlace: function(data, callback) {
+                        Ox.print('REMOVEPLACE', data);
+                        pandora.api.removePlace(data.id, callback);
+                    },
+                    width: width
                 }),
             height: height,
             keys: {enter: 'done', escape: 'done'},
