@@ -49,7 +49,7 @@ pandora.URL = (function() {
                 var split = url.split('/'),
                     item = split[0],
                     view = new RegExp(
-                        '^(' + $.map(app.config.itemViews, function(v) {
+                        '^(' + $.map(app.site.itemViews, function(v) {
                             return v.id;
                         }).join('|') + ')$'
                     ).exec(split[1]);
@@ -73,7 +73,7 @@ pandora.URL = (function() {
             if (arguments.length == 1) { // fixme: remove later
                 url = title;
             }
-            history.pushState({}, app.config.site.name + (title ? ' - ' + title : ''), '/' + url);
+            history.pushState({}, app.site.site.name + (title ? ' - ' + title : ''), '/' + url);
             old.user.ui = $.extend({}, app.user.ui); // make a clone
             this.update();
         },
