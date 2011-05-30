@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from django.db.models import Q, Manager
 from ox.django.query import QuerySet
+import ox
 
 def parseCondition(condition, user):
     '''
@@ -39,15 +40,10 @@ def parseCondition(condition, user):
         else:
             return q
     if k == 'id':
-        v = v.split('/')
-        if len(v) == 2:
-            q = Q(user__username=v[0], name=v[1])
-        else:
-            q = Q(id__in=[])
-        return q
+        v = ox.from32(v)
     if isinstance(v, bool): #featured and public flag
         key = k
-    elif k in ('lat', 'lng', 'area', 'south', 'west', 'north', 'east', 'matches'):
+    elif k in ('lat', 'lng', 'area', 'south', 'west', 'north', 'east', 'matches', 'id'):
         if op == '>':
             key = '%s__gt'%k
         elif op == '>=':
