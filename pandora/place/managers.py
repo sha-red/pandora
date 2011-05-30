@@ -32,8 +32,8 @@ def parseCondition(condition, user):
     else:
         exclude = False
     if op == '-':
-        q = parseCondition({'key': k, 'value': v[0], 'operator': '>='}) \
-            & parseCondition({'key': k, 'value': v[1], 'operator': '<'})
+        q = parseCondition({'key': k, 'value': v[0], 'operator': '>='}, user) \
+            & parseCondition({'key': k, 'value': v[1], 'operator': '<'}, user)
         if exclude:
             return ~q
         else:
