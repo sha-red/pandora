@@ -27,16 +27,14 @@ pandora.ui.findElement = function() {
                 ] : [], [
                     app.$ui.findSelect = new Ox.Select({
                             id: 'select',
-                            items: $.merge($.merge([{
-                                id: 'all',
-                                title: 'Find: All'
-                            }], $.map(app.ui.findKeys, function(key, i) {
+                            items: $.merge($.map(app.ui.findKeys,
+                            function(key, i) {
                                 return {
                                     id: key.id,
                                     checked: key.id == findKey,
                                     title: 'Find: ' + key.title
                                 };
-                            })), [{}, {
+                            }), [{}, {
                                 id: 'advanced',
                                 title: 'Find: Advanced'
                             }]),
