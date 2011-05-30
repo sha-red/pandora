@@ -32,6 +32,7 @@ def addPlace(request):
             lat: float,
             lng: float,
             area: float,
+            type: ""
         }
     '''
     data = json.loads(request.POST['data'])
