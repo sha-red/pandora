@@ -130,8 +130,8 @@ function constructList() {
                              .hide();
                 var $button = new Ox.Button({
                   title: [
-                    {id: "one", title: "expand"},
-                    {id: "two", title: "collapse"},
+                    {id: "one", title: "right"},
+                    {id: "two", title: "down"},
                   ],
                   type: "image"
                 })
