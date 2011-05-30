@@ -9,7 +9,6 @@ from django.contrib.auth.models import User, Group
 
 import managers
 
-
 class Place(models.Model):
     '''
         Places are named locations, they should have geographical information attached to them.
@@ -68,6 +67,11 @@ class Place(models.Model):
                     'lat', 'lng', 'area', 'matches', 'type'):
             j[key] = getattr(self, key)
         return j
+
+    def update_matches(self):
+        import random
+        self.matches = random.randInt(0, 100)
+        self.save()
 
     def save(self, *args, **kwargs):
         if not self.name_sort:
