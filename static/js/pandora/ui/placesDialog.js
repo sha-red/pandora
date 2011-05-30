@@ -20,21 +20,21 @@ pandora.ui.placesDialog = function() {
                             query: {conditions: [], operator: ''}
                         }, data), callback);
                     },
-                    addPlace: function(data, callback) {
-                        Ox.print('ADDPLACE', data);
-                        pandora.api.addPlace(data.place, function(result) {
+                    addPlace: function(place, callback) {
+                        Ox.print('ADDPLACE', place);
+                        pandora.api.addPlace(place, function(result) {
                             Ox.Request.clearCache(); // fixme: remove
                             callback(result);
                         });
 
                     },
-                    editPlace: function(data, callback) {
-                        Ox.print('EDITPLACE', data);
-                        pandora.api.editPlace(data.place, callback);
+                    editPlace: function(place, callback) {
+                        Ox.print('EDITPLACE', place);
+                        pandora.api.editPlace(place, callback);
                     },
-                    removePlace: function(data, callback) {
-                        Ox.print('REMOVEPLACE', data);
-                        pandora.api.removePlace(data.place, function(result) {
+                    removePlace: function(place, callback) {
+                        Ox.print('REMOVEPLACE', place);
+                        pandora.api.removePlace(place, function(result) {
                             Ox.Request.clearCache(); // fixme: remove
                             callback(result);
                         });
