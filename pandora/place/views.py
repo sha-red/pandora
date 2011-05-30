@@ -214,6 +214,7 @@ Positions
             ids:  ids of places for which positions are required
     '''
     data = json.loads(request.POST['data'])
+    print data
     response = json_response()
 
     query = parse_query(data, request.user)

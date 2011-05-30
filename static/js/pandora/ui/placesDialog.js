@@ -39,6 +39,7 @@ pandora.ui.placesDialog = function() {
                             callback(result);
                         });
                     },
+                    showTypes: true,
                     width: width
                 }),
             height: height,
