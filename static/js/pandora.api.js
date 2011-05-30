@@ -11,7 +11,7 @@ var app = new Ox.App({
     apiURL: '/api/',
     init: 'init',
 }).bindEvent('load', function(event, data) {
-    app.site.= data.config;
+    app.site = data.site;
     app.user = data.user;
     app.site.default_info = '<div class="OxSelectable"><h2>Overview</h2>use this api in the browser with Ox.app or use <a href="http://code.0x2620.org/pandora_client">pandora_client</a> to use it in python</div>';
     app.$body = $('body');
