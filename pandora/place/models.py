@@ -49,7 +49,7 @@ class Place(models.Model):
         return self.name
 
     def editable(self, user):
-        if user.is_staff or self.user == user:
+        if user and user.is_staff or self.user == user:
             return True
         return False
 
@@ -60,6 +60,7 @@ class Place(models.Model):
         j = {
             'id': self.get_id(),
             'user': self.user.username,
+            'editable': self.editable(user)
         }
         for key in ('created', 'modified',
                     'name', 'alternativeNames', 'geoname', 'countryCode',
