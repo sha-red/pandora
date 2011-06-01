@@ -6,8 +6,10 @@ from django.db import models
 import ox
 from ox.django import fields
 from django.contrib.auth.models import User, Group
+from django.db.models import Q
 
 import managers
+from annotation.models import Annotation
 
 class Place(models.Model):
     '''
@@ -69,8 +71,10 @@ class Place(models.Model):
         return j
 
     def update_matches(self):
-        import random
-        self.matches = random.randInt(0, 100)
+        q = Q(value__icontains=self.name)
+        for name in self.alternativeNames:
+            q = q|Q(value__icontains=name)
+        self.matches = Annotation.objects.filter(q).count()
         self.save()
 
     def save(self, *args, **kwargs):

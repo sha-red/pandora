@@ -43,7 +43,7 @@ class File(models.Model):
     episode = models.IntegerField(default=-1)
 
     size = models.BigIntegerField(default=0)
-    duration = models.BigIntegerField(null=True)
+    duration = models.FloatField(null=True)
 
     info = fields.DictField(default={})
 
@@ -143,8 +143,8 @@ class File(models.Model):
         if not self.is_audio and not self.is_video and self.name.endswith('.srt'):
             self.is_subtitle = True
 
-        self.part = self.get_part()
         self.type = self.get_type()
+        self.part = self.get_part()
 
         if self.type not in ('audio', 'video'):
             self.duration = None
@@ -166,7 +166,7 @@ class File(models.Model):
             return self.data.read()
         return None
 
-    def srt(self):
+    def srt(self, offset=0):
 
         def _detectEncoding(fp):
             bomDict={ # bytepattern : name
@@ -203,7 +203,7 @@ class File(models.Model):
             return encoding
 
         def parseTime(t):
-            return ox.time2ms(t.replace(',', '.')) / 1000
+            return offset + ox.time2ms(t.replace(',', '.')) / 1000
 
         srt = []
 

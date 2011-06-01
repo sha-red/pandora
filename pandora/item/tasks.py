@@ -3,6 +3,7 @@
 from datetime import timedelta
 
 from celery.decorators import task, periodic_task
+from django.db.models import Q
 
 import models
 
@@ -34,3 +35,24 @@ def update_streams(itemId):
     if item.files.filter(is_main=True, is_video=True, available=False).count() == 0:
         item.update_streams()
     return True
+
+def load_subtitles(itemId):
+    item = models.Item.objects.get(itemId=itemId)
+    layer = models.Layer.objects.get(name='subtitles')
+    models.Annotation.objects.filter(layer=layer,item=item).delete()
+    offset = 0
+    for f in item.files.filter(is_main=True, is_subtitle=True, available=True).order_by('part'):
+            user = f.instances.all()[0].volume.user
+            for data in f.srt(offset):
+                annotation = models.Annotation(
+                    item=f.item,
+                    layer=layer,
+                    start=data['in'],
+                    end=data['out'],
+                    value=data['value'],
+                    user=user
+                )
+                annotation.save()
+            duration = item.files.filter(Q(is_audio=True)|Q(is_video=True)) \
+                                 .filter(is_main=True, available=True, part=f.part)[0].duration
+            offset += duration
