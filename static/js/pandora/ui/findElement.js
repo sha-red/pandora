@@ -98,7 +98,7 @@ pandora.ui.findElement = function() {
     function autocompleteFunction() {
         return app.user.ui.findQuery.conditions.length ? function(value, callback) {
             var elementValue = that.value(),
-                key = elementValue[app.user.ui.list ? 1 : 0].id,
+                key = elementValue[app.user.ui.list ? 1 : 0],
                 findKey = Ox.getObjectById(app.ui.findKeys, key);
             Ox.print('!!!!', key, findKey, 'autocomplete' in findKey && findKey.autocomplete)
             value === '' && Ox.print('Warning: autocomplete function should never be called with empty value');

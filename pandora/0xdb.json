@@ -16,6 +16,7 @@
         {
             "id": "all",
             "title": "All",
+            "type": "string",
             "find": true
         },
         {

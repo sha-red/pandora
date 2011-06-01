@@ -25,7 +25,7 @@ pandora.ui.contentPanel = function() {
             }
         ],
         orientation: 'vertical'
-    })
+    });
     return that;
 };
 

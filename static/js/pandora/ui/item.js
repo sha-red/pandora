@@ -109,7 +109,7 @@ pandora.ui.item = function() {
         } else if (app.user.ui.itemView == 'timeline') {
             var layers = [],
                 video = result.data.stream,
-                cuts = result.data.cuts || {},
+                cuts = result.data.cuts || [],
                 format = $.support.video.supportedFormat(video.formats),
                 streams = {};
             video.height = video.profiles[0];
