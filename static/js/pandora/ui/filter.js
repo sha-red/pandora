@@ -1,8 +1,8 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.filter = function() {
     var that = new Ox.Filter({
-        findKeys: $.map(app.site.itemKeys, function(key) {
-            return {
+        findKeys: Ox.map(app.site.itemKeys, function(key) {
+            return key.id == 'all' ? null : {
                 autocomplete: key.autocomplete,
                 autocompleteSortKey: key.autocompleteSortKey,
                 format: key.format,

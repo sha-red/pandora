@@ -71,10 +71,15 @@ class Place(models.Model):
         return j
 
     def update_matches(self):
+        """
+        import random
+        self.matches = random.randint(0, 100)
+        """
         q = Q(value__icontains=self.name)
         for name in self.alternativeNames:
             q = q|Q(value__icontains=name)
         self.matches = Annotation.objects.filter(q).count()
+
         self.save()
 
     def save(self, *args, **kwargs):
