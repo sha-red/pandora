@@ -19,7 +19,7 @@ import chardet
 from item import utils
 from item.models import Item
 from person.models import get_name_sort
-
+from annotation.models import Annotation, Layer
 
 class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)

@@ -88,3 +88,16 @@ def update_files(user, volume, files):
     #remove deleted files
     #FIXME: can this have any bad consequences? i.e. on the selction of used item files.
     models.Instance.objects.filter(volume=volume).exclude(file__oshash__in=all_files).delete()
+
+def import_subtitles(id):
+    f = models.File.objects.get(pk=id)
+    layer = models.Layer.objects.get(name='subtitles')
+    for data in f.srt():
+        annotation = models.Annotation(
+            item=f.item,
+            layer=layer,
+            start=data['in'],
+            end=data['out'],
+            value=data['value']
+        )
+        annotation.save()

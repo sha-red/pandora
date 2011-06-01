@@ -101,8 +101,8 @@ class Annotation(models.Model):
     def get_id(self):
         return ox.to32(self.id)
 
-    def json(self):
-        return {
+    def json(self, layer=False):
+        j = {
             'id': self.get_id(),
             'user': self.user.username,
             'in': self.start,
@@ -111,6 +111,9 @@ class Annotation(models.Model):
             'created': self.created,
             'modified': self.modified
         }
+        if layer:
+            j['layer'] = self.layer.name
+        return j
 
     def __unicode__(self):
         return u"%s/%s-%s" %(self.item, self.start, self.end)
