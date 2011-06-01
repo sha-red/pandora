@@ -144,6 +144,7 @@ class File(models.Model):
             self.is_subtitle = True
 
         self.type = self.get_type()
+        self.language = self.get_language()
         self.part = self.get_part()
 
         if self.type not in ('audio', 'video'):
@@ -282,7 +283,7 @@ class File(models.Model):
 
     def get_part(self):
         if not self.is_extra:
-            files = list(self.item.files.filter(type=self.type,
+            files = list(self.item.files.filter(type=self.type, language=self.language,
                                                 is_main=self.is_main).order_by('sort_name'))
             if self in files:
                 return files.index(self) + 1
@@ -334,6 +335,12 @@ class File(models.Model):
             name = 'Untitled'
         ext = '.unknown'
         return name + ext
+
+    def get_language(self):
+        language = self.name.split('.')
+        if len(language) >= 3 and len(language[-2]) == 2:
+            return language[-2]
+        return ''
 
 def delete_file(sender, **kwargs):
     f = kwargs['instance']
