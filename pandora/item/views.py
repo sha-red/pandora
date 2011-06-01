@@ -14,6 +14,7 @@ from ox.utils import json
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 from ox.django.http import HttpFileResponse
+from django.db.models import Q
 import ox
 
 import models
@@ -22,6 +23,7 @@ import tasks
 
 from archive.models import File
 from archive import extract
+from annotation.models import Annotation
 
 from api.actions import actions
 
@@ -82,13 +84,17 @@ def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
     query['sort'] = [{'key':'title', 'operator':'+'}]
-    for key in ('sort', 'keys', 'group', 'range', 'ids'):
+    for key in ('sort', 'keys', 'group', 'range', 'position', 'positions'):
         if key in data:
             query[key] = data[key]
     query['qs'] = models.Item.objects.find(data, user)
+    if 'annotations' in data:
+        query['annotations'] = data['annotations']
+        #FIXME: annotations need manager find(data, user)
+        query['aqs'] = Annotation.objects.filter(Q(layer__private=False)|Q(user=user))
+
     #group by only allows sorting by name or number of itmes
     return query
-
 
 def find(request):
     '''
@@ -147,12 +153,13 @@ Groups
 Positions
         param data {
             'query': query,
-            'ids': []
+            'positions': [],
+            'sort': array
         }
 
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            ids:  ids of items for which positions are required
+            positions: ids of items for which positions are required
         return {
             status: {...},
             data: {
@@ -176,20 +183,31 @@ Positions
         qs = models.Facet.objects.filter(key=query['group']).filter(item__id__in=item_qs)
         qs = qs.values('value').annotate(items=Count('id')).order_by(*order_by)
 
-        if 'ids' in query:
+        if 'positions' in query:
             response['data']['positions'] = {}
             ids = [j['value'] for j in qs]
-            response['data']['positions'] = utils.get_positions(ids, query['ids'])
+            response['data']['positions'] = utils.get_positions(ids, query['positions'])
         elif 'range' in data:
             qs = qs[query['range'][0]:query['range'][1]]
             response['data']['items'] = [{'name': i['value'], 'items': i[items]} for i in qs]
         else:
             response['data']['items'] = qs.count()
-    elif 'ids' in query:
+    elif 'position' in query:
         qs = _order_query(query['qs'], query['sort'])
-        response['data']['positions'] = {}
         ids = [j['itemId'] for j in qs.values('itemId')]
-        response['data']['positions'] = utils.get_positions(ids, query['ids'])
+        data['conditions'] = data['conditions'] + {
+            'value': query['position'],
+            'key': query['sort'][0]['key'],
+            'operator': '^'
+        }
+        query = parse_query(data, request.user)
+        qs = _order_query(query['qs'], query['sort'])
+        if qs.count() > 0:
+            response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
+    elif 'positions' in query:
+        qs = _order_query(query['qs'], query['sort'])
+        ids = [j['itemId'] for j in qs.values('itemId')]
+        response['data']['positions'] = utils.get_positions(ids, query['positions'])
     elif 'keys' in query:
         response['data']['items'] = []
         qs = _order_query(query['qs'], query['sort'])
@@ -206,6 +224,10 @@ Positions
                     r[p] = m.sort.popularity
                 else:
                     r[p] = m.json.get(p, '')
+            if 'annotations' in query:
+                n = query['annotations']
+                r['annotations'] = [a.json(layer=True)
+                                    for a in query['aqs'].filter(itemID=m.id)[:n]]
             return r
         def only_p(m):
             r = {}
@@ -213,6 +235,10 @@ Positions
                 m = json.loads(m)
                 for p in _p:
                     r[p] = m.get(p, '')
+            if 'annotations' in query:
+                n = query['annotations']
+                r['annotations'] = [a.json(layer=True)
+                                    for a in query['aqs'].filter(item__itemId=m['id'])[:n]]
             return r
         qs = qs[query['range'][0]:query['range'][1]]
         #response['data']['items'] = [m.get_json(_p) for m in qs]
@@ -224,6 +250,7 @@ Positions
             response['data']['items'] = [only_p_sums(m) for m in qs]
         else:
             response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]
+
     else: # otherwise stats
         items = query['qs']
         files = File.objects.filter(item__in=items).filter(size__gt=0)

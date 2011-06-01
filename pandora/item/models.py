@@ -320,11 +320,6 @@ class Item(models.Model):
 
     def get_layers(self, user=None):
         layers = {}
-        layers['subtitles'] = [] 
-        #FIXME: should subtitles be stored in Annotation?
-        qs = self.files.filter(is_subtitle=True, is_main=True, available=True)
-        if qs.count()>0:
-            layers['subtitles'] = qs[0].srt()
         for l in Layer.objects.all():
             ll = layers.setdefault(l.name, [])
             qs = Annotation.objects.filter(layer=l, item=self)

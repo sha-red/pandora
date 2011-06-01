@@ -238,8 +238,8 @@ class ItemManager(Manager):
         qs = self.get_query_set()
         #only include items that have hard metadata
         qs = qs.filter(available=True)
-        conditions = parseConditions(data['query'].get('conditions', []),
-                                     data['query'].get('operator', '&'))
+        conditions = parseConditions(data.get('query', {}).get('conditions', []),
+                                     data.get('query', {}).get('operator', '&'))
         qs = qs.filter(conditions).distinct()
         
         #anonymous can only see public items

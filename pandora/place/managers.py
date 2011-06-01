@@ -146,19 +146,8 @@ class PlaceManager(Manager):
         #join query with operator
         qs = self.get_query_set()
         
-        south=data['area']['south']
-        west=data['area']['west']
-        north=data['area']['north']
-        east=data['area']['east']
-        qs = qs.filter(Q(
-            Q(Q(south__gt=south)|Q(south__lt=north)|Q(west__gt=west)|Q(west__lt=east)) &
-            Q(Q(south__gt=south)|Q(south__lt=north)|Q(west__lt=east)|Q(east__gt=east)) &
-            Q(Q(north__gt=south)|Q(north__lt=north)|Q(west__gt=west)|Q(west__lt=east)) &
-            Q(Q(north__gt=south)|Q(north__lt=north)|Q(east__gt=west)|Q(east__lt=east))
-        ))
-        
-        conditions = parseConditions(data['query'].get('conditions', []),
-                                     data['query'].get('operator', '&'),
+        conditions = parseConditions(data.get('query', {}).get('conditions', []),
+                                     data.get('query', {}).get('operator', '&'),
                                      user)
         if conditions:
             qs = qs.filter(conditions)

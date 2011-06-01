@@ -360,12 +360,12 @@ Groups
 Positions
         param data {
             'query': query,
-            'ids': []
+            'positions': []
         }
 
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            ids:  ids of items for which positions are required
+            positions:  ids of items for which positions are required
         return {
             status: {...},
             data: {
@@ -403,24 +403,24 @@ Positions
         qs = models.Facet.objects.filter(key=query['group']).filter(item__id__in=item_qs)
         qs = qs.values('value').annotate(items=Count('id')).order_by(*order_by)
 
-        if 'ids' in query:
+        if 'positions' in query:
             #FIXME: this does not scale for larger results
             response['data']['positions'] = {}
             ids = [j['value'] for j in qs]
-            response['data']['positions'] = utils.get_positions(ids, query['ids'])
+            response['data']['positions'] = utils.get_positions(ids, query['positions'])
 
         elif 'range' in data:
             qs = qs[query['range'][0]:query['range'][1]]
             response['data']['items'] = [{'name': i['value'], 'items': i[items]} for i in qs]
         else:
             response['data']['items'] = qs.count()
-    elif 'ids' in query:
+    elif 'positions' in query:
         #FIXME: this does not scale for larger results
         qs = _order_query(query['qs'], query['sort'])
 
         response['data']['positions'] = {}
         ids = [j['itemId'] for j in qs.values('itemId')]
-        response['data']['positions'] = utils.get_positions(ids, query['ids'])
+        response['data']['positions'] = utils.get_positions(ids, query['positions'])
 
     elif 'keys' in query:
         response['data']['items'] = []

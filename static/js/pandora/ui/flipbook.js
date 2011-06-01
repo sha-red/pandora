@@ -6,8 +6,8 @@ pandora.ui.flipbook = function(item) {
             pandora.URL.set(item + '/timeline');
         });
         pandora.api.getItem(item, function(result) {
-            var duration = result.data.item.duration,
-                posterFrame = result.data.item.posterFrame || parseInt(duration/2),
+            var duration = result.data.duration,
+                posterFrame = result.data.posterFrame || parseInt(duration/2),
                 steps = 24,
                 framePrefix = '/' + item + '/frame/' + that.width() + '/',
                 frames = {};

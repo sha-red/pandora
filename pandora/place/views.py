@@ -124,8 +124,7 @@ def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
     query['sort'] = [{'key':'name', 'operator':'+'}]
-    query['area'] = {'south': -180.0, 'west': -180.0, 'north': 180.0, 'east': 180.0}
-    for key in ('area', 'keys', 'group', 'list', 'range', 'ids', 'sort', 'query'):
+    for key in ('keys', 'group', 'list', 'range', 'position', 'positions', 'sort', 'query'):
         if key in data:
             query[key] = data[key]
     query['qs'] = models.Place.objects.find(query, user)
@@ -183,7 +182,7 @@ def findPlaces(request):
                 }
         }
         param data
-            {'query': query, 'sort': array, 'range': array, 'area': array}
+            {'query': query, 'sort': array, 'range': array}
 
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
@@ -199,7 +198,6 @@ def findPlaces(request):
                     }
                 ]
             range:       result range, array [from, to]
-            area: {south:, west:, north:, east:} only return places in that square
 
         with keys, items is list of dicts with requested properties:
           return {'status': {'code': int, 'text': string},
@@ -207,11 +205,11 @@ def findPlaces(request):
 
 Positions
         param data
-            {'query': query, 'ids': []}
+            {'query': query, 'positions': []}
 
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            ids:  ids of places for which positions are required
+            positions:  ids of places for which positions are required
     '''
     data = json.loads(request.POST['data'])
     print data
@@ -222,9 +220,20 @@ Positions
     if 'keys' in data:
         qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [p.json(request.user) for p in qs]
-    elif 'ids' in data:
+    elif 'position' in query:
         ids = [i.get_id() for i in qs]
-        response['data']['positions'] = utils.get_positions(ids, query['ids'])
+        data['conditions'] = data['conditions'] + {
+            'value': query['position'],
+            'key': query['sort'][0]['key'],
+            'operator': '^'
+        }
+        query = parse_query(data, request.user)
+        qs = order_query(query['qs'], query['sort'])
+        if qs.count() > 0:
+            response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
+    elif 'positions' in data:
+        ids = [i.get_id() for i in qs]
+        response['data']['positions'] = utils.get_positions(ids, query['positions'])
     else:
         response['data']['items'] = qs.count()
         response['data']['area'] = qs.aggregate(

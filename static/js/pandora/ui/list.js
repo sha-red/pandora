@@ -369,7 +369,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
             }
             if (data.ids.length == 1) {
                 pandora.api.getItem(data.ids[0], function(result) {
-                    app.ui.infoRatio = result.data.item.stream.aspectRatio;
+                    app.ui.infoRatio = result.data.stream.aspectRatio;
                     var height = app.$ui.info.width() / app.ui.infoRatio + 16;
                     if(app.$ui.infoStill) app.$ui.infoStill.removeElement();
                     app.$ui.infoStill = pandora.ui.flipbook(data.ids[0])
