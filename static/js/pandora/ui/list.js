@@ -99,100 +99,63 @@ pandora.ui.list = function(view) { // fixme: remove view argument
         that = new Ox.SplitPanel({
             elements: [
                 {
-                    element: new Ox.SplitPanel({
-                        elements: [
-                            {
-                                element: new Ox.Toolbar({
-                                        orientation: 'horizontal',
-                                        size: 24
-                                    })
-                                    .append(
-                                        app.$ui.findMapInput = new Ox.Input({
-                                            clear: true,
-                                            id: 'findMapInput',
-                                            placeholder: 'Find on Map',
-                                            width: 192
-                                        })
-                                        .css({
-                                            float: 'right',
-                                            margin: '4px'
-                                        })
-                                        .bindEvent({
-                                            submit: function(event, data) {
-                                                app.$ui.map.find(data.value, function(data) {
-                                                    app.$ui.mapStatusbar.html(data.geoname + ' ' + JSON.stringify(data.points))
-                                                });
-                                            }
-                                        })
-                                    ),
-                                size: 24
-                            },
-                            {
-                                element: app.$ui.map = new Ox.Map({
-                                        places: [
-                                            {
-                                                geoname: 'Beirut, Lebanon',
-                                                name: 'Beirut',
-                                                points: {
-                                                    'center': [33.8886284, 35.4954794],
-                                                    'northeast': [33.8978909, 35.5114868],
-                                                    'southwest': [33.8793659, 35.479472]
-                                                }
-                                            },
-                                            {
-                                                geoname: 'Berlin, Germany',
-                                                name: 'Berlin',
-                                                points: {
-                                                    'center': [52.506701, 13.4246065],
-                                                    'northeast': [52.675323, 13.760909],
-                                                    'southwest': [52.338079, 13.088304]
-                                                }
-                                            },
-                                            {
-                                                geoname: 'Mumbai, Maharashtra, India',
-                                                name: 'Bombay',
-                                                points: {
-                                                    'center': [19.07871865, 72.8778187],
-                                                    'northeast': [19.2695223, 72.9806562],
-                                                    'southwest': [18.887915, 72.7749812]
-                                                }
-                                            }
-                                        ]
-                                    })
-                                    .bindEvent({                                
-                                        select: function(event, data) {
-                                            app.$ui.mapStatusbar.html(data.geoname + ' ' + JSON.stringify(data.points))
-                                        }
-                                    }),
-                                id: 'map',
-                                size: 'auto'
-                            },
-                            {
-                                element: app.$ui.mapStatusbar = new Ox.Toolbar({
-                                        orientation: 'horizontal',
-                                        size: 16
-                                    })
-                                    .css({
-                                        fontSize: '9px',
-                                        padding: '2px 4px 0 0',
-                                        textAlign: 'right'
-                                    }),
-                                size: 16
-                            }
-                        ],
-                        orientation: 'vertical'
-                    }),
+                    element: app.$ui.map = Ox.Map({
+                        height: window.innerHeight - app.user.ui.showGroups * app.user.ui.groupsSize - 61,
+                        places: function(data, callback) {
+                            return pandora.api.findPlaces($.extend({
+                                query: {conditions: [], operator: ''}
+                            }, data), callback);
+                        },
+                        showTypes: true,
+                        toolbar: true,
+                        width: window.innerWidth - app.user.ui.showSidebar * app.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE,
+                    })
                 },
                 {
                     element: new Ox.Element(),
                     id: 'place',
-                    size: 128 + 16 + 12
+                    size: 144 + Ox.UI.SCROLLBAR_SIZE
                 }
             ],
             orientation: 'horizontal'
         })
         .bindEvent('resize', function() {
-            app.$ui.map.resize();
+            app.$ui.map.resizeMap();
+        });
+    } else if (view == 'calendar') {
+        that = new Ox.SplitPanel({
+            elements: [
+                {
+                    element: app.$ui.calendar = Ox.Calendar({
+                        date: new Date(0),
+                        events: [
+                            {name: 'Thirty Years\' War', start: '1618', end: '1648', type: 'other'},
+                            {name: 'American Civil War', start: '1861-04-12', end: '1865-04-09', type: 'other'},
+                            {name: 'Franco-Prussian War', start: '1870-07-19', end: '1871-05-10', type: 'other'},
+                            {name: 'World War One', start: '1914-07-28', end: '1918-11-11', type: 'other'},
+                            {name: 'World War Two', start: '1939-09-01', end: '1945-09-02', type: 'other'},
+                            {name: 'Algerian War', start: '1954-11-01', end: '1962-03-19', type: 'other'},
+                            {name: 'Vietnam War', start: '1955-11-01', end: '1975-04-30', type: 'other'},
+                            {name: 'Six-Day War', start: '1967-06-05', end: '1967-06-11', type: 'other'},
+                            {name: 'Iran-Iraq War', start: '1980-09-22', end: '1988-08-20', type: 'other'},
+                            {name: 'Gulf War', start: '1990-08-02', end: '1991-02-28', type: 'other'}
+                        ],
+                        height: window.innerHeight - app.user.ui.showGroups * app.user.ui.groupsSize - 61,
+                        range: [-5000, 5000],
+                        width: window.innerWidth - app.user.ui.showSidebar * app.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE,
+                        zoom: 4
+                    })
+                },
+                {
+                    element: new Ox.Element(),
+                    id: 'place',
+                    size: 144 + Ox.UI.SCROLLBAR_SIZE
+                }
+            ],
+            orientation: 'horizontal'
+        })
+        .bindEvent('resize', function() {
+
         });
     } else {
         $list = new Ox.Element('<div>')
