@@ -134,6 +134,8 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                             {name: 'Franco-Prussian War', start: '1870-07-19', end: '1871-05-10', type: 'other'},
                             {name: 'World War One', start: '1914-07-28', end: '1918-11-11', type: 'other'},
                             {name: 'World War Two', start: '1939-09-01', end: '1945-09-02', type: 'other'},
+                            {name: 'Cold War', start: '1947', end: '1991', type: 'other'},
+                            {name: 'Korean War', start: '1950-06-25', end: '1953-07-27', type: 'other'},
                             {name: 'Algerian War', start: '1954-11-01', end: '1962-03-19', type: 'other'},
                             {name: 'Vietnam War', start: '1955-11-01', end: '1975-04-30', type: 'other'},
                             {name: 'Six-Day War', start: '1967-06-05', end: '1967-06-11', type: 'other'},
