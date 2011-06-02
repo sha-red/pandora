@@ -43,7 +43,7 @@ pandora.ui.placesDialog = function() {
                     width: width
                 }),
             height: height,
-            keys: {enter: 'done', escape: 'done'},
+            //keys: {enter: 'done', escape: 'done'},
             padding: 0,
             title: 'Manage Places',
             width: width
