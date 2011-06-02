@@ -1,7 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.placesDialog = function() {
-    var height = Math.round(document.height * 0.8),
-        width = Math.round(document.width * 0.8),
+    var height = Math.round(window.innerHeight * 0.9),
+        width = Math.round(window.innerWidth * 0.9),
         that = new Ox.Dialog({
             buttons: [
                 new Ox.Button({
