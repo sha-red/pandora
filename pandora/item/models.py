@@ -400,8 +400,8 @@ class Item(models.Model):
         save('trivia', ' '.join(self.get('trivia', [])))
 
         #FIXME:
-        qs = Annotation.objects.filter(layer__type='subtitle', item=self).order_by('start')
-        save('dialog', '\n'.join([l.value for l in qs]))
+        qs = Annotation.objects.filter(layer__name='subtitles', item=self).order_by('start')
+        save('subtitles', '\n'.join([l.value for l in qs]))
 
     def update_sort(self):
         try:

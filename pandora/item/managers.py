@@ -52,10 +52,12 @@ def parseCondition(condition):
         'text': 'string',
         'year': 'string',
         'length': 'string',
-        'list': 'list'
+        'list': 'list',
+        'layer': 'string'
     }.get(key_type, key_type)
     if k == 'list':
         key_type = 'list'
+
     if key_type == "string":
         in_find=True
         value_key = 'find__value'

@@ -41,7 +41,16 @@ def load_subtitles(itemId):
     layer = models.Layer.objects.get(name='subtitles')
     models.Annotation.objects.filter(layer=layer,item=item).delete()
     offset = 0
-    for f in item.files.filter(is_main=True, is_subtitle=True, available=True).order_by('part'):
+    language = ''
+    languages = [f.language for f in item.files.filter(is_main=True, is_subtitle=True,
+                                                       available=True)]
+    if languages:
+        if 'en' in languages:
+            language = 'en'
+        else:
+            language = languages[0] 
+    for f in item.files.filter(is_main=True, is_subtitle=True,
+                               available=True, language=language).order_by('part'):
             user = f.instances.all()[0].volume.user
             for data in f.srt(offset):
                 annotation = models.Annotation(
@@ -54,5 +63,12 @@ def load_subtitles(itemId):
                 )
                 annotation.save()
             duration = item.files.filter(Q(is_audio=True)|Q(is_video=True)) \
-                                 .filter(is_main=True, available=True, part=f.part)[0].duration
+                                 .filter(is_main=True, available=True, part=f.part)
+            if duration:
+                duration = duration[0].duration
+            else:
+                models.Annotation.objects.filter(layer=layer,item=item).delete()
+                break
             offset += duration
+    item.update_find()
+

@@ -7,6 +7,7 @@ import re
 import time
 
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.db.models.signals import pre_delete
@@ -138,10 +139,12 @@ class File(models.Model):
         else:
             self.is_video = os.path.splitext(self.name)[-1] in ('.avi', '.mkv', '.dv', '.ogv', '.mpeg', '.mov')
             self.is_audio = os.path.splitext(self.name)[-1] in ('.mp3', '.wav', '.ogg', '.flac')
-            self.is_subtitle= os.path.splitext(self.name)[-1] in ('.srt', '.sub', '.idx')
+            self.is_subtitle = os.path.splitext(self.name)[-1] in ('.srt', )
 
         if not self.is_audio and not self.is_video and self.name.endswith('.srt'):
             self.is_subtitle = True
+        else:
+            self.is_subtitle = False
 
         self.type = self.get_type()
         self.language = self.get_language()
@@ -282,6 +285,15 @@ class File(models.Model):
         return data
 
     def get_part(self):
+        #FIXME: this breaks for sub/idx/srt
+        if os.path.splitext(self.name)[-1] in ('.sub', '.idx', '.srt'):
+            name = os.path.splitext(self.name)[0]
+            if self.language:
+                name = name[-(len(self.language)+1)]
+            qs = self.item.files.filter(Q(is_video=True)|Q(is_audio=True),
+                                        is_main=True, name__startswith=name)
+            if qs.count()>0:
+                return qs[0].part
         if not self.is_extra:
             files = list(self.item.files.filter(type=self.type, language=self.language,
                                                 is_main=self.is_main).order_by('sort_name'))
