@@ -464,6 +464,36 @@ def setPoster(request): #parse path and return info
     return render_to_json_response(response)
 actions.register(setPoster, cache=False)
 
+def lookup(request):
+    '''
+        param data {
+            title: string,
+            director: [string],
+            year: string,
+            id: string
+        }
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+                title: string,
+                director: [string],
+                year: string,
+                id: string
+            }
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    if 'id' in data:
+        i = models.Item.objects.get(itemId=data['id'])
+        r = {'id': i.itemId}
+        for key in ('title', 'director', 'year'):
+            r[key] = i.get(key)
+        response = json_response(r)
+    else:
+        response = json_response(status=404, text='not found')
+    return render_to_json_response(response)
+actions.register(lookup)
+
 def getImdbId(request):
     '''
         param data {
