@@ -21,7 +21,7 @@ pandora.ui.info = function() {
         )
         .bindEvent({
             toggle: function(event, data) {
-                UI.set({showInfo: !data.collapsed});
+                pandora.UI.set({showInfo: !data.collapsed});
                 pandora.resizeFolders();
             }
         });

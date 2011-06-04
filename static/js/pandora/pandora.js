@@ -124,13 +124,14 @@ pandora.reloadList = function() {
     });
     app.$ui.list.bindEvent({
             init: function(event, data) {
-                app.$ui.folderList[listData.status]
-                    .value(listData.id, 'items', data.items);
+                var folder = listData.status == 'private' ? 'personal' : listData.status;
+                app.$ui.folderList[folder].value(listData.id, 'items', data.items);
             }
         })
         .bindEventOnce({
             load: function(event, data) {
-                app.$ui.list.gainFocus().options({selected: [data.items]});
+                app.$ui.list.gainFocus();
+                if (data) app.$ui.list.options({selected: [data.items]});
             }
         })
         .reloadList();

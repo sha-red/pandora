@@ -193,10 +193,10 @@ pandora.ui.list = function(view) { // fixme: remove view argument
             });
         },
         'delete': function(event, data) {
-            getListData().editable && pandora.api.removeListItems({
+            pandora.getListData().editable && pandora.api.removeListItems({
                 list: app.user.ui.list,
                 items: data.ids
-            }, reloadList);
+            }, pandora.reloadList);
         },
         init: function(event, data) {
             app.$ui.total.html(pandora.ui.status('total', data));
@@ -317,10 +317,10 @@ pandora.ui.list = function(view) { // fixme: remove view argument
             });
         },
         paste: function(event, data) {
-            data.items && getListData().editable && pandora.api.addListItems({
+            data.items && pandora.getListData().editable && pandora.api.addListItems({
                 list: app.user.ui.list,
                 items: data.items
-            }, reloadList);
+            }, pandora.reloadList);
         },
         select: function(event, data) {
             var $still, $timeline;
