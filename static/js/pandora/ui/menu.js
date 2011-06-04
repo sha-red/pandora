@@ -233,7 +233,7 @@ pandora.ui.mainMenu = function() {
                             })
                             .bind({
                                 click: function() {
-                                    $screen.find('div').add('#screen > input').animate({opacity: 0}, 250);
+                                    $screen.find('div').add('#screen > input').remove();
                                     $logo.animate({
                                         width: window.innerWidth + 'px'
                                     }, 500)
@@ -258,7 +258,8 @@ pandora.ui.mainMenu = function() {
                             .click(function(e) {
                                 e.stopPropagation();
                             })
-                            .appendTo($screen),
+                            .appendTo($screen)
+                            .focusInput(),
                         $findButton = Ox.Button({
                                 title: 'Find',
                                 width: 74
@@ -286,7 +287,7 @@ pandora.ui.mainMenu = function() {
                                 margin: 'auto',
                                 opacity: 0
                             })
-                            .appendTo($screen);
+                            .appendTo($screen),
                         $signupButton = Ox.Button({
                                 title: 'Sign Up',
                                 width: 74
@@ -300,7 +301,7 @@ pandora.ui.mainMenu = function() {
                                 margin: 'auto',
                                 opacity: 0
                             })
-                            .appendTo($screen);
+                            .appendTo($screen),
                         $signinButton = Ox.Button({
                                 title: 'Sign In',
                                 width: 74
@@ -314,9 +315,9 @@ pandora.ui.mainMenu = function() {
                                 margin: 'auto',
                                 opacity: 0
                             })
-                            .appendTo($screen);
+                            .appendTo($screen),
                         $aboutButton = Ox.Button({
-                                title: 'About',
+                                title: 'About ' + pandora.app.site.site.name,
                                 width: 156
                             })
                             .css({
@@ -328,7 +329,22 @@ pandora.ui.mainMenu = function() {
                                 margin: 'auto',
                                 opacity: 0
                             })
-                            .appendTo($screen);
+                            .appendTo($screen),
+                        $text = $('<div>')
+                            .html('A Movie Database. \u2620 2007-2011 0x2620. All Open Source.')
+                            .css({
+                                position: 'absolute',
+                                left: 0,
+                                top: '176px',
+                                right: 0,
+                                bottom: 0,
+                                width: '360px',
+                                height: '16px',
+                                margin: 'auto',
+                                opacity: 0,
+                                textAlign: 'center'                               
+                            })
+                            .appendTo($screen)
                     $screen.animate({opacity: 1}, 500, function() {
                         $screen.find('div').add('#screen > input').animate({opacity: 1}, 250)
                     });
