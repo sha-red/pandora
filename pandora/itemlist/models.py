@@ -22,8 +22,8 @@ class List(models.Model):
     modified = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, related_name='lists')
     name = models.CharField(max_length=255)
-    status = models.CharField(max_length=20, default='personal')
-    _status = ['personal', 'public', 'featured']
+    status = models.CharField(max_length=20, default='private')
+    _status = ['private', 'public', 'featured']
     query = DictField(default={"static": True})
     type= models.CharField(max_length=255, default='static')
     description = models.TextField(default='')
