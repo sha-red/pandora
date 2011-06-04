@@ -218,8 +218,39 @@ pandora.ui.mainMenu = function() {
                                 zIndex: 1000
                             })
                             .appendTo(Ox.UI.$body),
+                        $reflectionImage = $('<img>')
+                            .attr({
+                                src: '/static/png/logo256.png'
+                            })
+                            .css({
+                                position: 'absolute',
+                                left: 0,
+                                top: '160px',
+                                right: 0,
+                                bottom: 0,
+                                width: '320px',
+                                margin: 'auto',
+                                opacity: 0,
+                                MozTransform: 'scaleY(-1)',
+                                WebkitTransform: 'scaleY(-1)'
+                            })
+                            .appendTo($screen),
+                        $reflectionGradient = $('<div>')
+                            .css({
+                                position: 'absolute',
+                                left: 0,
+                                top: '160px',
+                                right: 0,
+                                bottom: 0,
+                                width: '320px',
+                                height: '160px',
+                                margin: 'auto',
+                                backgroundImage: '-webkit-linear-gradient(top, rgba(32, 32, 32, 0.8), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))'
+                            })
+                            .appendTo($screen),
                         $logo = $('<img>')
                             .attr({
+                                id: 'logo',
                                 src: '/static/png/logo256.png'
                             })
                             .css({
@@ -233,7 +264,7 @@ pandora.ui.mainMenu = function() {
                             })
                             .bind({
                                 click: function() {
-                                    $screen.find('div').add('#screen > input').remove();
+                                    $screen.find(':not(#logo)').remove();
                                     $logo.animate({
                                         width: window.innerWidth + 'px'
                                     }, 500)
@@ -242,7 +273,7 @@ pandora.ui.mainMenu = function() {
                                     });
                                 }
                             })
-                            .appendTo($screen),
+                            .appendTo($screen),                            
                         $input = Ox.Input({
                                 width: 156
                             })
@@ -346,7 +377,7 @@ pandora.ui.mainMenu = function() {
                             })
                             .appendTo($screen)
                     $screen.animate({opacity: 1}, 500, function() {
-                        $screen.find('div').add('#screen > input').animate({opacity: 1}, 250)
+                        $screen.find(':not(#logo)').animate({opacity: 1}, 250)
                     });
                     $logo.animate({width: '320px'}, 500);
                         
