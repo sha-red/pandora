@@ -2,16 +2,20 @@
 pandora.ui.rightPanel = function() {
     var that;
     if (app.user.ui.section == 'site') {
-        that = new Ox.Element()
-            .html(app.user.ui.sitePage)
-            .bindEvent({
-                resize: function(event, data) {
-                    
-                }
-            });
+        if (app.user.ui.sitePage == 'home') {
+            that = pandora.ui.homePage()
+                .bindEvent({
+                    resize: function(data) {
+                        that.resize();
+                    }
+                });
+        } else {
+            that = new Ox.Element()
+                .css({padding: '8px'});
             pandora.api.getPage(app.user.ui.sitePage, function(result) {
-                that.html(result.data.body).css({'overflow-y':'auto'});                        
+                that.html(result.data.body).css({overflowY: 'auto'});                        
             });
+        }
     } else if (app.user.ui.section == 'items') {
         that = new Ox.SplitPanel({
             elements: [
