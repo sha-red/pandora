@@ -10,6 +10,8 @@ from django.db.models import Q
 
 import managers
 from annotation.models import Annotation
+from item.models import Item
+
 
 class Place(models.Model):
     '''
@@ -40,6 +42,7 @@ class Place(models.Model):
     area = models.FloatField(default=0)
 
     matches = models.IntegerField(default=0)
+    items = models.ManyToManyField(Item, blank=True, related_name='places')
 
     objects = managers.PlaceManager()
 
@@ -77,7 +80,13 @@ class Place(models.Model):
         return Annotation.objects.filter(q)
 
     def update_matches(self):
-        self.matches = self.get_matches().count()
+        matches = self.get_matches()
+        self.matches = matches.count()
+        ids = list(set([a.item.id for a in matches]))
+        for i in self.items.exclude(id__in=ids):
+            self.items.remove(i)
+        for i in Item.objects.filter(id__in=ids).exclude(id__in=self.items.all()):
+            self.items.add(i)
         self.save()
 
     def save(self, *args, **kwargs):

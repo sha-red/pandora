@@ -96,6 +96,9 @@ def findEvents(request):
 
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
+            itemQuery: {
+                //see find request
+            },
             sort: array of key, operator dics
                 [
                     {
@@ -109,6 +112,8 @@ def findEvents(request):
                 ]
             range:       result range, array [from, to]
 
+        itemQuery can be used to limit the resuts to matches in those items.
+        
         with keys, items is list of dicts with requested properties:
           return {'status': {'code': int, 'text': string},
                 'data': {items: array}}

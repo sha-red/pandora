@@ -10,6 +10,7 @@ import ox
 from ox.django import fields
 
 from annotation.models import Annotation
+from item.models import Item
 import managers
 
 
@@ -47,7 +48,9 @@ class Event(models.Model):
     durationTime = models.BigIntegerField(default=0)
 
     type = models.CharField(default='', max_length=255)
+
     matches = models.IntegerField(default=0)
+    items = models.ManyToManyField(Item, blank=True, related_name='events')
     
     def get_matches(self):
         q = Q(value__icontains=" " + self.name)|Q(value__startswith=self.name)
@@ -56,7 +59,13 @@ class Event(models.Model):
         return Annotation.objects.filter(q)
 
     def update_matches(self):
-        self.matches = self.get_matches().count()
+        matches = self.get_matches()
+        self.matches = matches.count()
+        ids = list(set([a.item.id for a in matches]))
+        for i in self.items.exclude(id__in=ids):
+            self.items.remove(i)
+        for i in Item.objects.filter(id__in=ids).exclude(id__in=self.items.all()):
+            self.items.add(i)
         self.save()
 
     def save(self, *args, **kwargs):
