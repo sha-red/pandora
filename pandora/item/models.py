@@ -318,16 +318,20 @@ class Item(models.Model):
         if settings.URL not in index:
             index.append(settings.URL)
 
-        posters = [
-            {
+        posters = []
+        
+        poster = self.path('poster.local.jpg')
+        poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
+        if os.path.exists(poster):
+            posters.append({
                 'url': '/%s/poster.pandora.jpg' % self.itemId,
                 'width': 640,
                 'height': 1024,
                 'source': settings.URL,
                 'selected': url == None,
                 'index': index.index(settings.URL)
-            }
-        ]
+            })
+
         got = {}
         for p in self.poster_urls.all().order_by('-height'):
             if p.service not in got:
@@ -342,6 +346,26 @@ class Item(models.Model):
                 })
         posters.sort(key=lambda a: a['index'])
         return posters
+
+    def get_frames(self):
+        frames = []
+        frames = self.poster_frames()
+        if frames:
+            pos = self.poster_frame
+            if pos < 0:
+                pos = 0
+            p = 0
+            for f in frames:
+                frames.append({
+                    'index': p,
+                    'position': f['position'],
+                    'selected': p == pos,
+                    'url': '/%s/frame/poster/%d.jpg' %(self.itemId, p),
+                    'height': f['height'],
+                    'width': f['width'] 
+                })
+                p += 1
+        return frames
 
     def get_stream(self):
         stream = {}
@@ -394,26 +418,10 @@ class Item(models.Model):
 
         if not keys or 'poster' in keys:
             i['poster'] = self.get_poster()
-        if not keys or 'posters' in keys:
+        if keys and 'posters' in keys:
             i['posters'] = self.get_posters()
-        if not keys or 'frames' in keys:
-            i['frames'] = []
-            frames = self.poster_frames()
-            if frames:
-                pos = self.poster_frame
-                if pos < 0:
-                    pos = 0
-                p = 0
-                for f in frames:
-                    i['frames'].append({
-                        'index': p,
-                        'position': f['position'],
-                        'selected': p == pos,
-                        'url': '/%s/frame/poster/%d.jpg' %(self.itemId, p),
-                        'height': f['height'],
-                        'width': f['width'] 
-                    })
-                    p += 1
+        if keys and 'frames' in keys:
+            i['frames'] = self.get_frames()
         if keys:
             info = {}
             for key in keys:
