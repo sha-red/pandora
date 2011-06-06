@@ -16,6 +16,8 @@ Ox.load('UI', {
     theme: 'modern'
 }, function() {
 
+// fixme: use Ox.extend()
+
 Ox.load('Geo', function() {
 
     window.pandora = new Ox.App({url: '/api/'}).bindEvent({
@@ -72,8 +74,16 @@ Ox.load('Geo', function() {
                     sortKeys: $.map(data.site.itemKeys, function(key, i) {
                         return key.columnWidth ? key : null;
                     })
-                
                 });
+                pandora.site.itemViews.push(
+                    {id: 'files', title: 'Files', admin: 'true'}
+                );
+                pandora.site.media.importPosterFrames && pandora.site.itemViews.push(
+                    {id: 'frames', title: 'Frames', admin: 'true'}
+                );
+                pandora.site.media.importMoviePosters && pandora.site.itemViews.push(
+                    {id: 'posters', title: 'Posters', admin: 'true'}
+                );
                 $.extend(pandora.user, {
                     infoRatio: 16 / 9,
                     sectionElement: 'buttons',

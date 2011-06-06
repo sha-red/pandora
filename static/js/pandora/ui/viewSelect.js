@@ -2,12 +2,14 @@
 pandora.ui.viewSelect = function() {
     var that = Ox.Select({
             id: 'viewSelect',
-            items: !pandora.user.ui.item ? $.map(pandora.site.listViews, function(view) {
+            items: !pandora.user.ui.item ? pandora.site.listViews.map(function(view) {
                 return $.extend($.extend({}, view), {
                     checked: pandora.user.ui.lists[pandora.user.ui.list].listView == view.id,
                     title: 'View ' + view.title
                 });
-            }) : $.map(pandora.site.itemViews, function(view) {
+            }) : pandora.site.itemViews.filter(function(view) {
+                return !view.admin || pandora.user.level == 'admin';
+            }).map(function(view) {
                 return $.extend($.extend({}, view), {
                     checked: pandora.user.ui.itemView == view.id,
                     title: 'View: ' + view.title

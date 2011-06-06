@@ -40,6 +40,5 @@
   "js/pandora/ui/appPanel.js", 
   "js/pandora/ui/flipbook.js", 
   "js/pandora/ui/editor.js",
-  "js/pandora/ui/postersDialog.js",
-  "js/pandora/ui/framesDialog.js"
+  "js/pandora/ui/mediaView.js"
 ]
