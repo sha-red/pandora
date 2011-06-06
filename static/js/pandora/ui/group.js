@@ -71,7 +71,7 @@ pandora.ui.group = function(id, query) {
             }
         });
     new Ox.Select({
-            items: $.map(pandora.user.queryGroups, function(v) {
+            items: $.map(pandora.site.groups, function(v) {
                 return {
                     checked: v.id == id,
                     id: v.id,
