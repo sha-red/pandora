@@ -207,6 +207,181 @@ pandora.ui.mainMenu = function() {
                         title: 'About'
                     }).open();
                 } else if (data.id == 'home') {
+                    var $screen = $('<div>')
+                            .attr({id: 'screen'})
+                            .css({
+                                position: 'absolute',
+                                width: '100%',
+                                height: '100%',
+                                background: 'rgb(32, 32, 32)',
+                                opacity: 0,
+                                zIndex: 1000
+                            })
+                            .appendTo(Ox.UI.$body),
+                        $reflectionImage = $('<img>')
+                            .attr({
+                                src: '/static/png/logo256.png'
+                            })
+                            .css({
+                                position: 'absolute',
+                                left: 0,
+                                top: '160px',
+                                right: 0,
+                                bottom: 0,
+                                width: '320px',
+                                margin: 'auto',
+                                opacity: 0,
+                                MozTransform: 'scaleY(-1)',
+                                WebkitTransform: 'scaleY(-1)'
+                            })
+                            .appendTo($screen),
+                        $reflectionGradient = $('<div>')
+                            .css({
+                                position: 'absolute',
+                                left: 0,
+                                top: '160px',
+                                right: 0,
+                                bottom: 0,
+                                width: '320px',
+                                height: '160px',
+                                margin: 'auto',
+                                backgroundImage: '-webkit-linear-gradient(top, rgba(32, 32, 32, 0.8), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))'
+                            })
+                            .appendTo($screen),
+                        $logo = $('<img>')
+                            .attr({
+                                id: 'logo',
+                                src: '/static/png/logo256.png'
+                            })
+                            .css({
+                                position: 'absolute',
+                                left: 0,
+                                top: 0,
+                                right: 0,
+                                bottom: '160px',
+                                width: window.innerWidth + 'px',
+                                margin: 'auto'
+                            })
+                            .bind({
+                                click: function() {
+                                    $screen.find(':not(#logo)').remove();
+                                    $logo.animate({
+                                        width: window.innerWidth + 'px'
+                                    }, 500)
+                                    $screen.animate({opacity: 0}, 500, function() {
+                                        $screen.remove();
+                                    });
+                                }
+                            })
+                            .appendTo($screen),                            
+                        $input = Ox.Input({
+                                width: 156
+                            })
+                            .css({
+                                position: 'absolute',
+                                left: 0,
+                                top: '48px',
+                                right: '164px',
+                                bottom: 0,
+                                margin: 'auto',
+                                opacity: 0
+                            })
+                            .click(function(e) {
+                                e.stopPropagation();
+                            })
+                            .appendTo($screen)
+                            .focusInput(),
+                        $findButton = Ox.Button({
+                                title: 'Find',
+                                width: 74
+                            })
+                            .css({
+                                position: 'absolute',
+                                left: '82px',
+                                top: '48px',
+                                right: 0,
+                                bottom: 0,
+                                margin: 'auto',
+                                opacity: 0
+                            })
+                            .appendTo($screen),
+                        $browseButton = Ox.Button({
+                                title: 'Browse',
+                                width: 74
+                            })
+                            .css({
+                                position: 'absolute',
+                                left: '246px',
+                                top: '48px',
+                                right: 0,
+                                bottom: 0,
+                                margin: 'auto',
+                                opacity: 0
+                            })
+                            .appendTo($screen),
+                        $signupButton = Ox.Button({
+                                title: 'Sign Up',
+                                width: 74
+                            })
+                            .css({
+                                position: 'absolute',
+                                left: 0,
+                                top: '112px',
+                                right: '246px',
+                                bottom: 0,
+                                margin: 'auto',
+                                opacity: 0
+                            })
+                            .appendTo($screen),
+                        $signinButton = Ox.Button({
+                                title: 'Sign In',
+                                width: 74
+                            })
+                            .css({
+                                position: 'absolute',
+                                left: 0,
+                                top: '112px',
+                                right: '82px',
+                                bottom: 0,
+                                margin: 'auto',
+                                opacity: 0
+                            })
+                            .appendTo($screen),
+                        $aboutButton = Ox.Button({
+                                title: 'About ' + pandora.site.site.name,
+                                width: 156
+                            })
+                            .css({
+                                position: 'absolute',
+                                left: '164px',
+                                top: '112px',
+                                right: 0,
+                                bottom: 0,
+                                margin: 'auto',
+                                opacity: 0
+                            })
+                            .appendTo($screen),
+                        $text = $('<div>')
+                            .html('A Movie Database. \u2620 2007-2011 0x2620. All Open Source.')
+                            .css({
+                                position: 'absolute',
+                                left: 0,
+                                top: '176px',
+                                right: 0,
+                                bottom: 0,
+                                width: '360px',
+                                height: '16px',
+                                margin: 'auto',
+                                opacity: 0,
+                                textAlign: 'center'                               
+                            })
+                            .appendTo($screen)
+                    $screen.animate({opacity: 1}, 500, function() {
+                        $screen.find(':not(#logo)').animate({opacity: 1}, 250)
+                    });
+                    $logo.animate({width: '320px'}, 500);
+                        
+                    /*
                     var $dialog = new Ox.Dialog({
                         buttons: [
                             new Ox.Button({
@@ -224,6 +399,7 @@ pandora.ui.mainMenu = function() {
                         title: pandora.site.site.name,
                         width: 800
                     }).open();
+                    */
                 } else if (data.id == 'register') {
                     pandora.$ui.accountDialog = pandora.ui.accountDialog('register').open();
                 } else if (data.id == 'loginlogout') {
