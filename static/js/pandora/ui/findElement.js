@@ -2,15 +2,15 @@
 pandora.ui.findElement = function() {
     var findKey = '',
         findValue = '';
-    if (app.user.ui.findQuery.conditions.length == 1) {
-        findKey = app.user.ui.findQuery.conditions[0].key;
-        findValue = app.user.ui.findQuery.conditions[0].value;
+    if (pandora.user.ui.findQuery.conditions.length == 1) {
+        findKey = pandora.user.ui.findQuery.conditions[0].key;
+        findValue = pandora.user.ui.findQuery.conditions[0].value;
     }
     var that = new Ox.FormElementGroup({
-            elements: $.merge(app.user.ui.list ? [
-                    app.$ui.findListSelect = new Ox.Select({
+            elements: $.merge(pandora.user.ui.list ? [
+                    pandora.$ui.findListSelect = new Ox.Select({
                             items: [
-                                {id: 'all', title: 'Find: All ' + app.site.itemName.plural},
+                                {id: 'all', title: 'Find: All ' + pandora.site.itemName.plural},
                                 {id: 'list', title: 'Find: This List'}
                             ],
                             overlap: 'right',
@@ -19,15 +19,15 @@ pandora.ui.findElement = function() {
                         .bindEvent({
                             change: function(event, data) {
                                 var key = data.selected[0].id;
-                                app.$ui.findInput.options({
+                                pandora.$ui.findInput.options({
                                     autocomplete: autocompleteFunction()
                                 }).focus();
                             }
                         }),
                 ] : [], [
-                    app.$ui.findSelect = new Ox.Select({
+                    pandora.$ui.findSelect = new Ox.Select({
                             id: 'select',
-                            items: $.merge($.map(app.ui.findKeys,
+                            items: $.merge($.map(pandora.site.findKeys,
                             function(key, i) {
                                 return {
                                     id: key.id,
@@ -45,21 +45,21 @@ pandora.ui.findElement = function() {
                             change: function(event, data) {
                                 var key = data.selected[0].id;
                                 if (key == 'advanced') {
-                                    app.$ui.filterDialog = pandora.ui.filterDialog().open();
+                                    pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                                 } else {
-                                    if (!app.user.ui.findQuery.conditions.length) { // fixme: can this case happen at all?
-                                        app.user.ui.findQuery.conditions = [{key: key, value: '', operator: ''}];
+                                    if (!pandora.user.ui.findQuery.conditions.length) { // fixme: can this case happen at all?
+                                        pandora.user.ui.findQuery.conditions = [{key: key, value: '', operator: ''}];
                                     } else {
-                                        app.user.ui.findQuery.conditions[0].key = key;
+                                        pandora.user.ui.findQuery.conditions[0].key = key;
                                     }
-                                    app.$ui.mainMenu.checkItem('findMenu_find_' + key);
-                                    app.$ui.findInput.options({
+                                    pandora.$ui.mainMenu.checkItem('findMenu_find_' + key);
+                                    pandora.$ui.findInput.options({
                                         autocomplete: autocompleteFunction()
                                     }).focus();
                                 }
                             }
                         }),
-                    app.$ui.findInput = new Ox.Input({
+                    pandora.$ui.findInput = new Ox.Input({
                         autocomplete: autocompleteFunction(),
                         autocompleteSelect: true,
                         autocompleteSelectHighlight: true,
@@ -71,16 +71,16 @@ pandora.ui.findElement = function() {
                     })
                     .bindEvent({
                         submit: function(event, data) {
-                            var key = app.user.ui.findQuery.conditions.length ?
-                                    app.user.ui.findQuery.conditions[0].key : '';
-                            if (app.user.ui.list && that.value()[0].id == 'all') {
-                                $.each(app.$ui.folderList, function(k, $list) {
+                            var key = pandora.user.ui.findQuery.conditions.length ?
+                                    pandora.user.ui.findQuery.conditions[0].key : '';
+                            if (pandora.user.ui.list && that.value()[0].id == 'all') {
+                                $.each(pandora.$ui.folderList, function(k, $list) {
                                     $list.options({selected: []});
                                 });
                                 pandora.UI.set({list: ''});
-                                app.user.ui.listQuery = {conditions: [], operator: ''};
+                                pandora.user.ui.listQuery = {conditions: [], operator: ''};
                             }
-                            app.user.ui.findQuery.conditions = [{
+                            pandora.user.ui.findQuery.conditions = [{
                                 key: key == 'all' ? '' : key,
                                 value: data.value,
                                 operator: ''
@@ -96,16 +96,16 @@ pandora.ui.findElement = function() {
             margin: '4px'
         });
     function autocompleteFunction() {
-        return app.user.ui.findQuery.conditions.length ? function(value, callback) {
+        return pandora.user.ui.findQuery.conditions.length ? function(value, callback) {
             var elementValue = that.value(),
-                key = elementValue[app.user.ui.list ? 1 : 0],
-                findKey = Ox.getObjectById(app.ui.findKeys, key);
+                key = elementValue[pandora.user.ui.list ? 1 : 0],
+                findKey = Ox.getObjectById(pandora.site.findKeys, key);
             Ox.print('!!!!', key, findKey, 'autocomplete' in findKey && findKey.autocomplete)
             value === '' && Ox.print('Warning: autocomplete function should never be called with empty value');
             if ('autocomplete' in findKey && findKey.autocomplete) {
                 pandora.api.autocomplete({
                     key: key,
-                    query: elementValue[0].id == 'list' ? app.user.ui.listQuery : {conditions: [], operator: ''},
+                    query: elementValue[0].id == 'list' ? pandora.user.ui.listQuery : {conditions: [], operator: ''},
                     range: [0, 20],
                     sort: [{
                         key: 'votes',

@@ -1,20 +1,20 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.mainMenu = function() {
-    var isGuest = app.user.level == 'guest',
+    var isGuest = pandora.user.level == 'guest',
         that = new Ox.MainMenu({
             extras: [
                 $('<div>').html('beta').css({marginRight: '8px', color: 'rgb(128, 128, 128)'}),
-                app.$ui.loadingIcon = new Ox.LoadingIcon({
+                pandora.$ui.loadingIcon = new Ox.LoadingIcon({
                     size: 'medium'
                 })
             ],
             id: 'mainMenu',
             menus: [
-                { id: app.site.site.id + 'Menu', title: app.site.site.name, items: [
+                { id: pandora.site.site.id + 'Menu', title: pandora.site.site.name, items: [
                     { id: 'home', title: 'Home' },
                     {},
-                    { id: 'about', title: 'About ' + app.site.site.name },
-                    { id: 'news', title: app.site.site.name + ' News' },
+                    { id: 'about', title: 'About ' + pandora.site.site.name },
+                    { id: 'news', title: pandora.site.site.name + ' News' },
                     { id: 'tour', title: 'Take a Tour' },
                     { id: 'faq', title: 'Frequently Asked Questions' },
                     { id: 'terms', title: 'Terms of Service' },
@@ -25,10 +25,10 @@ pandora.ui.mainMenu = function() {
                         { id: 'report', title: 'Report a Bug' }
                     ] },
                     {},
-                    { id: 'contact', title: 'Contact ' + app.site.site.name }
+                    { id: 'contact', title: 'Contact ' + pandora.site.site.name }
                 ] },
                 { id: 'userMenu', title: 'User', items: [
-                    { id: 'username', title: 'User: ' + (isGuest ? 'not logged in' : app.user.username), disabled: true },
+                    { id: 'username', title: 'User: ' + (isGuest ? 'not logged in' : pandora.user.username), disabled: true },
                     {},
                     { id: 'preferences', title: 'Preferences...', disabled: isGuest, keyboard: 'control ,' },
                     {},
@@ -37,7 +37,7 @@ pandora.ui.mainMenu = function() {
                 ] },
                 { id: 'listMenu', title: 'List', items: [
                     { id: 'history', title: 'History', items: [
-                        { id: 'allmovies', title: 'All ' + app.site.itemName.plural }
+                        { id: 'allmovies', title: 'All ' + pandora.site.itemName.plural }
                     ] },
                     { id: 'lists', title: 'View List', items: [
                         { id: 'favorites', title: 'Favorites' }
@@ -52,7 +52,7 @@ pandora.ui.mainMenu = function() {
                     { id: 'newsmartlist', title: 'New Smart List...', keyboard: 'alt control n' },
                     { id: 'newsmartlistfromresults', title: 'New Smart List from Results...', keyboard: 'shift alt control n' },
                     {},
-                    { id: 'addmovietolist', title: ['Add Selected ' + app.site.itemName.singular + ' to List...', 'Add Selected ' + app.site.itemName.plural + ' to List...'], disabled: true },
+                    { id: 'addmovietolist', title: ['Add Selected ' + pandora.site.itemName.singular + ' to List...', 'Add Selected ' + pandora.site.itemName.plural + ' to List...'], disabled: true },
                     {},
                     { id: 'setposterframe', title: 'Set Poster Frame', disabled: true }
                 ]},
@@ -70,10 +70,10 @@ pandora.ui.mainMenu = function() {
                     { id: 'invertselection', title: 'Invert Selection', disabled: true, keyboard: 'alt control a' }
                 ] },
                 { id: 'viewMenu', title: 'View', items: [
-                    { id: 'movies', title: 'View ' + app.site.itemName.plural, items: [
-                        { group: 'viewmovies', min: 0, max: 1, items: $.map(app.site.listViews, function(view, i) {
+                    { id: 'movies', title: 'View ' + pandora.site.itemName.plural, items: [
+                        { group: 'viewmovies', min: 0, max: 1, items: $.map(pandora.site.listViews, function(view, i) {
                             return $.extend({
-                                checked: app.user.ui.lists[app.user.ui.list].listView == view.id,
+                                checked: pandora.user.ui.lists[pandora.user.ui.list].listView == view.id,
                             }, view);
                         }) },
                     ]},
@@ -87,10 +87,10 @@ pandora.ui.mainMenu = function() {
                         { id: 'video', title: 'Video' }
                     ] },
                     {},
-                    { id: 'openmovie', title: ['Open ' + app.site.itemName.singular, 'Open ' + app.site.itemName.plural], disabled: true, items: [
-                        { group: 'movieview', min: 0, max: 1, items: $.map(app.site.itemViews, function(view, i) {
+                    { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], disabled: true, items: [
+                        { group: 'movieview', min: 0, max: 1, items: $.map(pandora.site.itemViews, function(view, i) {
                             return $.extend({
-                                checked: app.user.ui.itemView == view.id,
+                                checked: pandora.user.ui.itemView == view.id,
                             }, view);
                         }) },
                     ]},
@@ -98,20 +98,20 @@ pandora.ui.mainMenu = function() {
                     { id: 'lists', title: 'Hide Lists', keyboard: 'shift l' },
                     { id: 'info', title: 'Hide Info', keyboard: 'shift i' },
                     { id: 'groups', title: 'Hide Groups', keyboard: 'shift g' },
-                    { id: 'movies', title: 'Hide ' + app.site.itemName.plural, disabled: true, keyboard: 'shift m' }
+                    { id: 'movies', title: 'Hide ' + pandora.site.itemName.plural, disabled: true, keyboard: 'shift m' }
                 ]},
                 { id: 'sortMenu', title: 'Sort', items: [
-                    { id: 'sortmovies', title: 'Sort ' + app.site.itemName.plural + ' by', items: [
-                        { group: 'sortmovies', min: 1, max: 1, items: $.map(app.ui.sortKeys, function(key, i) {
+                    { id: 'sortmovies', title: 'Sort ' + pandora.site.itemName.plural + ' by', items: [
+                        { group: 'sortmovies', min: 1, max: 1, items: $.map(pandora.site.sortKeys, function(key, i) {
                             return $.extend({
-                                checked: app.user.ui.lists[app.user.ui.list].sort[0].key == key.id,
+                                checked: pandora.user.ui.lists[pandora.user.ui.list].sort[0].key == key.id,
                             }, key);
                         }) }
                     ] },
-                    { id: 'ordermovies', title: 'Order ' + app.site.itemName.plural, items: [
+                    { id: 'ordermovies', title: 'Order ' + pandora.site.itemName.plural, items: [
                         { group: 'ordermovies', min: 1, max: 1, items: [
-                            { id: 'ascending', title: 'Ascending', checked: app.user.ui.lists[app.user.ui.list].sort[0].operator === '' },
-                            { id: 'descending', title: 'Descending', checked: app.user.ui.lists[app.user.ui.list].sort[0].operator == '-' }
+                            { id: 'ascending', title: 'Ascending', checked: pandora.user.ui.lists[pandora.user.ui.list].sort[0].operator === '' },
+                            { id: 'descending', title: 'Descending', checked: pandora.user.ui.lists[pandora.user.ui.list].sort[0].operator == '-' }
                         ]}
                     ] },
                     { id: 'advancedsort', title: 'Advanced Sort...', keyboard: 'shift control s' },
@@ -120,11 +120,11 @@ pandora.ui.mainMenu = function() {
                 ] },
                 { id: 'findMenu', title: 'Find', items: [
                     { id: 'find', title: 'Find', items: [
-                        { group: 'find', min: 1, max: 1, items: $.map(app.ui.findKeys, function(key, i) {
+                        { group: 'find', min: 1, max: 1, items: $.map(pandora.site.findKeys, function(key, i) {
                             return $.extend({
-                                checked: app.user.ui.findQuery.conditions.length && 
-                                    (app.user.ui.findQuery.conditions[0].key == key.id ||
-                                    (app.user.ui.findQuery.conditions[0].key === '' && key.id == 'all')),
+                                checked: pandora.user.ui.findQuery.conditions.length && 
+                                    (pandora.user.ui.findQuery.conditions[0].key == key.id ||
+                                    (pandora.user.ui.findQuery.conditions[0].key === '' && key.id == 'all')),
                             }, key)
                         }) }
                     ] },
@@ -149,7 +149,7 @@ pandora.ui.mainMenu = function() {
                     { id: 'report', title: 'Report a Bug' },
                 ] },
                 { id: 'helpMenu', title: 'Help', items: [
-                    { id: 'help', title: app.site.site.name + ' Help', keyboard: 'shift ?' }
+                    { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'shift ?' }
                 ] },
                 { id: 'debugMenu', title: 'Debug', items: [
                     { id: 'query', title: 'Show pandora.Query' },
@@ -167,7 +167,7 @@ pandora.ui.mainMenu = function() {
             change: function(event, data) {
                 if (data.id == 'find') {
                     var id = data.checked[0].id;
-                    app.$ui.findSelect.selectItem(id);
+                    pandora.$ui.findSelect.selectItem(id);
                 } else if (data.id == 'movieview') {
                     var view = data.checked[0].id;
                     var id = document.location.pathname.split('/')[1];
@@ -177,13 +177,13 @@ pandora.ui.mainMenu = function() {
                         url(id);
                 } else if (data.id == 'ordermovies') {
                     var id = data.checked[0].id;
-                    app.$ui.list.sortList(app.user.ui.lists[app.user.ui.list].sort[0].key, id == 'ascending' ? '' : '-');
+                    pandora.$ui.list.sortList(pandora.user.ui.lists[pandora.user.ui.list].sort[0].key, id == 'ascending' ? '' : '-');
                 } else if (data.id == 'sortmovies') {
                     var id = data.checked[0].id,
                         operator = pandora.getSortOperator(id);
-                    app.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator === '' ? 'ascending' : 'descending'));
-                    app.$ui.sortSelect.selectItem(id);
-                    app.$ui.list.sortList(id, operator);
+                    pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator === '' ? 'ascending' : 'descending'));
+                    pandora.$ui.sortSelect.selectItem(id);
+                    pandora.$ui.list.sortList(id, operator);
                     pandora.URL.set(pandora.Query.toString());
                 } else if (data.id == 'viewmovies') {
                     var view = data.checked[0].id;
@@ -221,16 +221,16 @@ pandora.ui.mainMenu = function() {
                         height: 498,
                         id: 'home',
                         keys: {enter: 'close', escape: 'close'},
-                        title: app.site.site.name,
+                        title: pandora.site.site.name,
                         width: 800
                     }).open();
                 } else if (data.id == 'register') {
-                    app.$ui.accountDialog = pandora.ui.accountDialog('register').open();
+                    pandora.$ui.accountDialog = pandora.ui.accountDialog('register').open();
                 } else if (data.id == 'loginlogout') {
-                    app.$ui.accountDialog = (app.user.level == 'guest' ?
+                    pandora.$ui.accountDialog = (pandora.user.level == 'guest' ?
                         pandora.ui.accountDialog('login') : pandora.ui.accountLogoutDialog()).open();
                 } else if (data.id == 'places') {
-                    app.$ui.placesDialog = pandora.ui.placesDialog().open();
+                    pandora.$ui.placesDialog = pandora.ui.placesDialog().open();
                     /*
                     var $manage = new Ox.SplitPanel({
                             elements: [
@@ -243,9 +243,9 @@ pandora.ui.mainMenu = function() {
                                                     orientation: 'horizontal',
                                                     size: 44
                                                 }).append(
-                                                    app.$ui.findPlacesElement = new Ox.FormElementGroup({
+                                                    pandora.$ui.findPlacesElement = new Ox.FormElementGroup({
                                                         elements: [
-                                                            app.$ui.findPlacesSelect = new Ox.Select({
+                                                            pandora.$ui.findPlacesSelect = new Ox.Select({
                                                                     id: 'findPlacesSelect',
                                                                     items: [
                                                                         { id: 'name', title: 'Find: Name' },
@@ -257,13 +257,13 @@ pandora.ui.mainMenu = function() {
                                                                 })
                                                                 .bindEvent({
                                                                     change: function(event, data) {
-                                                                        app.$ui.findPlacesSelect.loseFocus();
-                                                                        app.$ui.findPlacesInput.options({
+                                                                        pandora.$ui.findPlacesSelect.loseFocus();
+                                                                        pandora.$ui.findPlacesInput.options({
                                                                             placeholder: data.selected[0].title
                                                                         });
                                                                     }
                                                                 }),
-                                                            app.$ui.findPlacesInput = new Ox.Input({
+                                                            pandora.$ui.findPlacesInput = new Ox.Input({
                                                                 clear: true,
                                                                 id: 'findPlacesInput',
                                                                 placeholder: 'Find: Name',
@@ -277,7 +277,7 @@ pandora.ui.mainMenu = function() {
                                                         margin: '4px'
                                                     })
                                                 ).append(
-                                                    app.$ui.sortPlacesSelect = new Ox.Select({
+                                                    pandora.$ui.sortPlacesSelect = new Ox.Select({
                                                         id: 'sortPlacesSelect',
                                                         items: [
                                                             { id: 'name', title: 'Sort by Name', checked: true },
@@ -322,7 +322,7 @@ pandora.ui.mainMenu = function() {
                                                     orientation: 'horizontal',
                                                     size: 24
                                                 }).append(
-                                                    app.$ui.labelsButton = new Ox.Button({
+                                                    pandora.$ui.labelsButton = new Ox.Button({
                                                             id: 'labelsButton',
                                                             title: [
                                                                 {id: 'show', title: 'Show Labels'},
@@ -335,7 +335,7 @@ pandora.ui.mainMenu = function() {
                                                             margin: '4px'
                                                         })
                                                 ).append(
-                                                    app.$ui.findMapInput = new Ox.Input({
+                                                    pandora.$ui.findMapInput = new Ox.Input({
                                                         clear: true,
                                                         id: 'findMapInput',
                                                         placeholder: 'Find on Map',
@@ -347,23 +347,23 @@ pandora.ui.mainMenu = function() {
                                                     })
                                                     .bindEvent({
                                                         submit: function(event, data) {
-                                                            app.$ui.map.find(data.value, function(location) {
+                                                            pandora.$ui.map.find(data.value, function(location) {
                                                                 
-                                                                app.$ui.placeNameInput.options({
+                                                                pandora.$ui.placeNameInput.options({
                                                                     disabled: false,
                                                                     value: location.name
                                                                 });
-                                                                app.$ui.placeAliasesInput.options({
+                                                                pandora.$ui.placeAliasesInput.options({
                                                                     disabled: false
                                                                 });
-                                                                app.$ui.placeGeonameLabel.options({
+                                                                pandora.$ui.placeGeonameLabel.options({
                                                                     disabled: false,
                                                                     title: location.names.join(', ')
                                                                 });
-                                                                app.$ui.removePlaceButton.options({
+                                                                pandora.$ui.removePlaceButton.options({
                                                                     disabled: false
                                                                 });
-                                                                app.$ui.addPlaceButton.options({
+                                                                pandora.$ui.addPlaceButton.options({
                                                                     disabled: false
                                                                 });
 
@@ -374,7 +374,7 @@ pandora.ui.mainMenu = function() {
                                                 size: 24
                                             },
                                             {
-                                                element: app.$ui.map = new Ox.Map({
+                                                element: pandora.$ui.map = new Ox.Map({
                                                         places: ['Boston', 'Brussels', 'Barcelona', 'Berlin', 'Beirut', 'Bombay', 'Bangalore', 'Beijing']
                                                     })
                                                     .css({
@@ -385,33 +385,33 @@ pandora.ui.mainMenu = function() {
                                                     })
                                                     .bindEvent({
                                                         select: function(event, location) {
-                                                            app.$ui.placeNameInput.options({
+                                                            pandora.$ui.placeNameInput.options({
                                                                 disabled: false,
                                                                 value: location.name
                                                             });
-                                                            app.$ui.placeAliasesInput.options({
+                                                            pandora.$ui.placeAliasesInput.options({
                                                                 disabled: false
                                                             });
-                                                            app.$ui.placeGeonameLabel.options({
+                                                            pandora.$ui.placeGeonameLabel.options({
                                                                 disabled: false,
                                                                 title: location.names.join(', ')
                                                             });
-                                                            app.$ui.removePlaceButton.options({
+                                                            pandora.$ui.removePlaceButton.options({
                                                                 disabled: false
                                                             });
-                                                            app.$ui.addPlaceButton.options({
+                                                            pandora.$ui.addPlaceButton.options({
                                                                 disabled: false
                                                             });
                                                         }
                                                     })
                                             },
                                             {
-                                                element: app.$ui.bottomBar = new Ox.Toolbar({
+                                                element: pandora.$ui.bottomBar = new Ox.Toolbar({
                                                     orientation: 'horizontal',
                                                     size: 24
                                                 })
                                                 .append(
-                                                    app.$ui.placeNameInput = new Ox.Input({
+                                                    pandora.$ui.placeNameInput = new Ox.Input({
                                                         disabled: true,
                                                         id: 'placeName',
                                                         placeholder: 'Name',
@@ -423,7 +423,7 @@ pandora.ui.mainMenu = function() {
                                                     })
                                                 )
                                                 .append(
-                                                    app.$ui.placeAliasesInput = new Ox.Input({
+                                                    pandora.$ui.placeAliasesInput = new Ox.Input({
                                                         disabled: true,
                                                         id: 'aliases',
                                                         placeholder: 'Aliases',
@@ -435,11 +435,11 @@ pandora.ui.mainMenu = function() {
                                                     })
                                                 )
                                                 .append(
-                                                    app.$ui.placeGeonameLabel = new Ox.Label({
+                                                    pandora.$ui.placeGeonameLabel = new Ox.Label({
                                                         disabled: true,
                                                         id: 'placeGeoname',
                                                         title: 'Geoname',
-                                                        width: parseInt(app.$ui.document.width() * 0.8) - 256 - 256 - 32 - 24
+                                                        width: parseInt(pandora.$ui.document.width() * 0.8) - 256 - 256 - 32 - 24
                                                     })
                                                     .css({
                                                         float: 'left',
@@ -447,7 +447,7 @@ pandora.ui.mainMenu = function() {
                                                     })
                                                 )
                                                 .append(
-                                                    app.$ui.addPlaceButton = new Ox.Button({
+                                                    pandora.$ui.addPlaceButton = new Ox.Button({
                                                         disabled: true,
                                                         id: 'addPlaceButton',
                                                         title: 'add',
@@ -459,7 +459,7 @@ pandora.ui.mainMenu = function() {
                                                     })
                                                 )
                                                 .append(
-                                                    app.$ui.removePlaceButton = new Ox.Button({
+                                                    pandora.$ui.removePlaceButton = new Ox.Button({
                                                         disabled: true,
                                                         id: 'removePlaceButton',
                                                         title: 'remove',
@@ -493,13 +493,13 @@ pandora.ui.mainMenu = function() {
                                     value: 'Close'
                                 }
                             ],
-                            height: parseInt(app.$ui.document.height() * 0.8),
+                            height: parseInt(pandora.$ui.document.height() * 0.8),
                             id: 'places',
                             minHeight: 400,
                             minWidth: 600,
                             padding: 0,
                             title: 'Manage Places',
-                            width: parseInt(app.$ui.document.width() * 0.8)
+                            width: parseInt(pandora.$ui.document.width() * 0.8)
                         }).css({
                             overflow: 'hidden'
                         }).append($manage).open();
@@ -519,8 +519,8 @@ pandora.ui.mainMenu = function() {
                         content: new Ox.Element()
                             .html([
                                 'Query: ' + JSON.stringify(pandora.Query.toObject()),
-                                'findQuery: ' + JSON.stringify(app.user.ui.findQuery),
-                                'listQuery: ' + JSON.stringify(app.user.ui.listQuery)
+                                'findQuery: ' + JSON.stringify(pandora.user.ui.findQuery),
+                                'listQuery: ' + JSON.stringify(pandora.user.ui.listQuery)
                             ].join('<br/><br/>')),
                         height: 200,
                         keys: {enter: 'close', escape: 'close'},
@@ -528,7 +528,7 @@ pandora.ui.mainMenu = function() {
                     }).open();
                 } else if (data.id == 'resetui') {
                     pandora.api.resetUI({}, function() {
-                        app.$ui.appPanel.reload();
+                        pandora.$ui.appPanel.reload();
                     });
                 }
             }

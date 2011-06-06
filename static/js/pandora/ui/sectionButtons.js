@@ -2,10 +2,10 @@
 pandora.ui.sectionButtons = function() {
     var that = new Ox.ButtonGroup({
             buttons: [
-                {id: 'site', selected: app.user.ui.section == 'site', title: app.site.site.name},
-                {id: 'items', selected: app.user.ui.section == 'items', title: app.site.itemName.plural},
-                {id: 'texts', selected: app.user.ui.section == 'texts', title: 'Texts'},
-                {id: 'admin', selected: app.user.ui.section == 'admin', title: 'Admin'}
+                {id: 'site', selected: pandora.user.ui.section == 'site', title: pandora.site.site.name},
+                {id: 'items', selected: pandora.user.ui.section == 'items', title: pandora.site.itemName.plural},
+                {id: 'texts', selected: pandora.user.ui.section == 'texts', title: 'Texts'},
+                {id: 'admin', selected: pandora.user.ui.section == 'admin', title: 'Admin'}
             ],
             id: 'sectionButtons',
             selectable: true
@@ -17,7 +17,7 @@ pandora.ui.sectionButtons = function() {
             change: function(event, data) {
                 var section = data.selected[0];
                 if (section == 'site') {
-                    pandora.URL.set(app.user.ui.sitePage);
+                    pandora.URL.set(pandora.user.ui.sitePage);
                 } else if (section == 'items') {
                     pandora.URL.set(pandora.Query.toString());
                 } else if (section == 'texts') {

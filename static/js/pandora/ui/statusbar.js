@@ -13,13 +13,13 @@ pandora.ui.statusbar = function() {
                     fontSize: '9px'
                 })
                 .append(
-                    app.$ui.total = new Ox.Element('span')
+                    pandora.$ui.total = new Ox.Element('span')
                 )
                 .append(
                     new Ox.Element('span').html(' &mdash; ')
                 )
                 .append(
-                    app.$ui.selected = new Ox.Element('span')
+                    pandora.$ui.selected = new Ox.Element('span')
                 )
         );
     return that;

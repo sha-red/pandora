@@ -7,7 +7,7 @@
 // fixme: sort=-director doesn't work
 // fixme: don't reload full right panel on sortSelect
 // fixme: clear items cache after login/logout
-// fixme: replace global app object with pandora.app or move to pandora itself
+
 Ox.load('UI', {
     debug: true,
     hideScreen: false,
@@ -21,13 +21,16 @@ Ox.load('Geo', function() {
     window.pandora = new Ox.App({url: '/api/'}).bindEvent({
 
         load: function(event, data) {
-            pandora.ui = {};
+            $.extend(pandora, {
+                requests: {},
+                ui: {}
+            });
             loadResources('/static/json/pandora.json', function() {
                 Ox.print('Ox.App load', data);
 
                 Ox.UI.hideLoadingScreen();
 
-                $.extend(app, {
+                $.extend(pandora, {
                     $ui: {
                         body: $('body'),
                         document: $(document),
@@ -36,46 +39,49 @@ Ox.load('Geo', function() {
                             .unload(unloadWindow)
                     },
                     site: data.site,
-                    ui: {
-                        findKeys: $.map(data.site.itemKeys, function(key, i) {
-                            return key.find ? key : null;
-                        }),
-                        infoRatio: 16 / 9,
-                        sectionElement: 'buttons',
-                        sectionFolders: {
-                            site: $.merge([
-                                {id: 'site', title: 'Site', items: $.merge([
-                                    {id: 'home', title: 'Home'}
-                                ], $.merge(data.site.sitePages, [
-                                    {id: 'software', title: 'Software'},
-                                    {id: 'help', title: 'Help'}
-                                ]))},
-                                {id: 'user', title: 'User', items: [
-                                    {id: 'preferences', title: 'Preferences'},
-                                    {id: 'archives', title: 'Archives'}
-                                ]}
-                            ], data.user.level == 'admin' ? [
-                                {id: 'admin', title: 'Admin', items: [
-                                    {id: 'statistics', title: 'Statistics'},
-                                    {id: 'users', title: 'Users'}
-                                ]}
-                            ] : []),
-                            items: [
-                                {id: 'personal', title: 'Personal Lists'},
-                                {id: 'favorite', title: 'Favorite Lists', showBrowser: false},
-                                {id: 'featured', title: 'Featured Lists', showBrowser: false}
-                            ]
-                        },
-                        selectedMovies: [],
-                        sortKeys: $.map(data.site.itemKeys, function(key, i) {
-                            return key.columnWidth ? key : null;
-                        })
-                    },
                     user: data.user.level == 'guest' ? $.extend({}, data.site.user) : data.user
+                });
+                $.extend(pandora.site, {
+                    findKeys: $.map(data.site.itemKeys, function(key, i) {
+                        return key.find ? key : null;
+                    }),
+                    sectionFolders: {
+                        site: $.merge([
+                            {id: 'site', title: 'Site', items: $.merge([
+                                {id: 'home', title: 'Home'}
+                            ], $.merge(data.site.sitePages, [
+                                {id: 'software', title: 'Software'},
+                                {id: 'help', title: 'Help'}
+                            ]))},
+                            {id: 'user', title: 'User', items: [
+                                {id: 'preferences', title: 'Preferences'},
+                                {id: 'archives', title: 'Archives'}
+                            ]}
+                        ], data.user.level == 'admin' ? [
+                            {id: 'admin', title: 'Admin', items: [
+                                {id: 'statistics', title: 'Statistics'},
+                                {id: 'users', title: 'Users'}
+                            ]}
+                        ] : []),
+                        items: [
+                            {id: 'personal', title: 'Personal Lists'},
+                            {id: 'favorite', title: 'Favorite Lists', showBrowser: false},
+                            {id: 'featured', title: 'Featured Lists', showBrowser: false}
+                        ]
+                    },
+                    sortKeys: $.map(data.site.itemKeys, function(key, i) {
+                        return key.columnWidth ? key : null;
+                    })
+                
+                });
+                $.extend(pandora.user, {
+                    infoRatio: 16 / 9,
+                    sectionElement: 'buttons',
+                    selectedMovies: []
                 });
 
                 if (data.user.level == 'guest' && $.browser.mozilla) {
-                    app.user.ui.theme = 'classic';
+                    pandora.user.ui.theme = 'classic';
                 }
 
                 pandora.URL.parse();
@@ -83,23 +89,18 @@ Ox.load('Geo', function() {
                     pandora.URL.update();
                 };
 
-                Ox.Theme(app.user.ui.theme);
-                app.$ui.appPanel = pandora.ui.appPanel().display();        
+                Ox.Theme(pandora.user.ui.theme);
+                pandora.$ui.appPanel = pandora.ui.appPanel().display();        
 
-                Ox.Request.requests() && app.$ui.loadingIcon.start();
-                app.$ui.body.ajaxStart(app.$ui.loadingIcon.start);
-                app.$ui.body.ajaxStop(app.$ui.loadingIcon.stop);
+                Ox.Request.requests() && pandora.$ui.loadingIcon.start();
+                pandora.$ui.body.ajaxStart(pandora.$ui.loadingIcon.start);
+                pandora.$ui.body.ajaxStop(pandora.$ui.loadingIcon.stop);
 
-                app.ui.sectionButtonsWidth = app.$ui.sectionButtons.width() + 8;
+                pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
 
-                window.pandora.app = app;
             }, '/static/');
         }
     });
-
-    app = {
-        requests: {}
-    };
 
     function loadResources(json, callback, prefix) {
         prefix = prefix || '';
@@ -133,37 +134,37 @@ Ox.load('Geo', function() {
 
     function resizeWindow() {
         pandora.resizeFolders();
-        if (!app.user.ui.item) {
-            app.$ui.list.size();
-            pandora.resizeGroups(app.$ui.rightPanel.width());
-            if (app.user.ui.listView == 'map') {
-                app.$ui.map.resize();
+        if (!pandora.user.ui.item) {
+            pandora.$ui.list.size();
+            pandora.resizeGroups(pandora.$ui.rightPanel.width());
+            if (pandora.user.ui.listView == 'map') {
+                pandora.$ui.map.resize();
             }
         } else {
-            //Ox.print('app.$ui.window.resize');
-            app.$ui.browser.scrollToSelection();
-            app.user.ui.itemView == 'player' && app.$ui.player.options({
+            //Ox.print('pandora.$ui.window.resize');
+            pandora.$ui.browser.scrollToSelection();
+            pandora.user.ui.itemView == 'player' && pandora.$ui.player.options({
                 // fixme: duplicated
-                height: app.$ui.contentPanel.size(1),
-                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1
+                height: pandora.$ui.contentPanel.size(1),
+                width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             });
-            app.user.ui.itemView == 'timeline' && app.$ui.editor.options({
+            pandora.user.ui.itemView == 'timeline' && pandora.$ui.editor.options({
                 // fixme: duplicated
-                height: app.$ui.contentPanel.size(1),
-                width: app.$ui.document.width() - app.$ui.mainPanel.size(0) - 1
+                height: pandora.$ui.contentPanel.size(1),
+                width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             });
         }        
     }
 
     function unloadWindow() {
         // fixme: ajax request has to have async set to false for this to work
-        app.user.ui.section == 'items' &&
-            ['player', 'timeline'].indexOf(app.user.ui.itemView) > -1 &&
-            app.user.ui.item &&
+        pandora.user.ui.section == 'items' &&
+            ['player', 'timeline'].indexOf(pandora.user.ui.itemView) > -1 &&
+            pandora.user.ui.item &&
             pandora.UI.set(
-                'videoPosition|' + app.user.ui.item,
-                app.$ui[
-                    app.user.ui.itemView == 'player' ? 'player' : 'editor'
+                'videoPosition|' + pandora.user.ui.item,
+                pandora.$ui[
+                    pandora.user.ui.itemView == 'player' ? 'player' : 'editor'
                 ].options('position')
             );
     }

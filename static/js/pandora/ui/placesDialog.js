@@ -13,7 +13,7 @@ pandora.ui.placesDialog = function() {
                     }
                 })
             ],
-            content: app.$ui.placesElement = new Ox.ListMap({
+            content: pandora.$ui.placesElement = new Ox.ListMap({
                     height: height - 48,
                     places: function(data, callback) {
                         return pandora.api.findPlaces($.extend({

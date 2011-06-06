@@ -1,8 +1,8 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.folderList = function(id) {
-    var i = Ox.getPositionById(app.ui.sectionFolders[app.user.ui.section], id),
+    var i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id),
         that;
-    if (app.user.ui.section == 'site') {
+    if (pandora.user.ui.section == 'site') {
         that = new Ox.TextList({
             columns: [
                 {
@@ -22,15 +22,15 @@ pandora.ui.folderList = function(id) {
                     id: 'title',
                     operator: '+',
                     visible: true,
-                    width: app.user.ui.sidebarSize - 16
+                    width: pandora.user.ui.sidebarSize - 16
                 }
             ],
             items: function(data, callback) {
                 var result = {data: {}};
                 if (!data.range) {
-                    result.data.items = Ox.getObjectById(app.ui.sectionFolders.site, id).items.length;
+                    result.data.items = Ox.getObjectById(pandora.site.sectionFolders.site, id).items.length;
                 } else {
-                    result.data.items = Ox.getObjectById(app.ui.sectionFolders.site, id).items;
+                    result.data.items = Ox.getObjectById(pandora.site.sectionFolders.site, id).items;
                 }
                 callback(result);
             },
@@ -41,13 +41,13 @@ pandora.ui.folderList = function(id) {
         .bindEvent({
             select: function(event, data) {
                 // fixme: duplicated
-                $.each(app.$ui.folderList, function(id_, $list) {
+                $.each(pandora.$ui.folderList, function(id_, $list) {
                     id != id_ && $list.options('selected', []);
                 })
                 pandora.URL.set((id == 'admin' ? 'admin/' : '' ) + data.ids[0]);
             },
         });
-    } else if (app.user.ui.section == 'items') {
+    } else if (pandora.user.ui.section == 'items') {
         that = new Ox.TextList({
             columns: [
                 {
@@ -69,11 +69,11 @@ pandora.ui.folderList = function(id) {
                     operator: '+',
                     unique: true,
                     visible: id == 'favorite',
-                    width: app.user.ui.sidebarWidth - 88
+                    width: pandora.user.ui.sidebarWidth - 88
                 },
                 {
                     editable: function(data) {
-                        return data.user == app.user.username;
+                        return data.user == pandora.user.username;
                     },
                     id: 'name',
                     input: {
@@ -81,7 +81,7 @@ pandora.ui.folderList = function(id) {
                     },
                     operator: '+',
                     visible: id != 'favorite',
-                    width: app.user.ui.sidebarWidth - 88
+                    width: pandora.user.ui.sidebarWidth - 88
                 },
                 {
                     align: 'right',
@@ -138,7 +138,7 @@ pandora.ui.folderList = function(id) {
                 var query;
                 if (id == 'personal') {
                     query = {conditions: [
-                        {key: 'user', value: app.user.username, operator: '='},
+                        {key: 'user', value: pandora.user.username, operator: '='},
                         {key: 'status', value: 'featured', operator: '!'}
                     ], operator: '&'};
                 } else if (id == 'favorite') {
@@ -159,12 +159,12 @@ pandora.ui.folderList = function(id) {
             sort: [
                 {key: 'position', operator: '+'}
             ],
-            sortable: id == 'personal' || id == 'favorite' || app.user.level == 'admin'
+            sortable: id == 'personal' || id == 'favorite' || pandora.user.level == 'admin'
         })
         .css({
             left: 0,
             top: 0,
-            width: app.user.ui.sidebarWidth + 'px',
+            width: pandora.user.ui.sidebarWidth + 'px',
         })
         .bind({
             dragenter: function(e) {
@@ -173,9 +173,9 @@ pandora.ui.folderList = function(id) {
         })
         .bindEvent({
             click: function(event, data) {
-                var $list = app.$ui.folderList[id];
+                var $list = pandora.$ui.folderList[id];
                 if (data.key == 'type') {
-                    app.$ui.filterDialog = ui.filterDialog().open();
+                    pandora.$ui.filterDialog = ui.filterDialog().open();
                 } else if (data.key == 'status') {
                     pandora.api.editList({
                         id: data.id,
@@ -186,8 +186,8 @@ pandora.ui.folderList = function(id) {
                 }
             },
             'delete': function(event, data) {
-                var $list = app.$ui.folderList[id];
-                app.user.ui.listQuery.conditions = [];
+                var $list = pandora.$ui.folderList[id];
+                pandora.user.ui.listQuery.conditions = [];
                 pandora.URL.set(pandora.Query.toString());
                 $list.options({selected: []});
                 if (id == 'personal') {
@@ -195,8 +195,8 @@ pandora.ui.folderList = function(id) {
                         id: data.ids[0]
                     }, function(result) {
                         // fixme: is this the best way to delete a ui preference?
-                        delete app.user.ui.lists[data.ids[0]];
-                        pandora.UI.set({lists: app.user.ui.lists});
+                        delete pandora.user.ui.lists[data.ids[0]];
+                        pandora.UI.set({lists: pandora.user.ui.lists});
                         Ox.Request.clearCache(); // fixme: remove
                         $list.reloadList();
                     });
@@ -207,16 +207,16 @@ pandora.ui.folderList = function(id) {
                         Ox.Request.clearCache(); // fixme: remove
                         $list.reloadList();
                     });
-                } else if (id == 'featured' && app.user.level == 'admin') {
+                } else if (id == 'featured' && pandora.user.level == 'admin') {
                     pandora.api.editList({
                         id: data.ids[0],
                         status: 'public'
                     }, function(result) {
                         // fixme: duplicated
-                        if (result.data.user == app.user.username || result.data.subscribed) {
+                        if (result.data.user == pandora.user.username || result.data.subscribed) {
                             Ox.Request.clearCache(); // fixme: remove
-                            app.$ui.folderList[
-                                result.data.user == app.user.username ? 'personal' : 'favorite'
+                            pandora.$ui.folderList[
+                                result.data.user == pandora.user.username ? 'personal' : 'favorite'
                             ].reloadList();
                         }
                         $list.reloadList();
@@ -224,11 +224,11 @@ pandora.ui.folderList = function(id) {
                 }
             },
             init: function(event, data) {
-                app.ui.sectionFolders[app.user.ui.section][i].items = data.items;
-                app.$ui.folder[i].$content.css({
+                pandora.site.sectionFolders[pandora.user.ui.section][i].items = data.items;
+                pandora.$ui.folder[i].$content.css({
                     height: data.items * 16 + 'px'
                 });
-                app.$ui.folderList[id].css({
+                pandora.$ui.folderList[id].css({
                     height: data.items * 16 + 'px'
                 });
                 pandora.resizeFolders();
@@ -236,7 +236,7 @@ pandora.ui.folderList = function(id) {
             move: function(event, data) {
                 /*
                 data.ids.forEach(function(id, pos) {
-                    app.user.ui.lists[id].position = pos;
+                    pandora.user.ui.lists[id].position = pos;
                 });
                 */
                 pandora.api.sortLists({
@@ -245,11 +245,11 @@ pandora.ui.folderList = function(id) {
                 });
             },
             paste: function(event, data) {
-                app.$ui.list.triggerEvent('paste', data);
+                pandora.$ui.list.triggerEvent('paste', data);
             },
             select: function(event, data) {
                 if (data.ids.length) {
-                    $.each(app.$ui.folderList, function(id_, $list) {
+                    $.each(pandora.$ui.folderList, function(id_, $list) {
                         id != id_ && $list.options('selected', []);
                     })
                     pandora.URL.set('?find=list:' + data.ids[0]);
@@ -262,8 +262,8 @@ pandora.ui.folderList = function(id) {
                 data_[data.key] = data.value;
                 pandora.api.editList(data_, function(result) {
                     if (result.data.id != data.id) {
-                        app.$ui.folderList[id].value(data.id, 'name', result.data.name);
-                        app.$ui.folderList[id].value(data.id, 'id', result.data.id);
+                        pandora.$ui.folderList[id].value(data.id, 'name', result.data.name);
+                        pandora.$ui.folderList[id].value(data.id, 'id', result.data.id);
                         pandora.URL.set('?find=list:' + result.data.id);
                     }
                 });

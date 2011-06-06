@@ -9,15 +9,15 @@ pandora.ui.folders = function() {
         });
     var counter = 0;
     //var $sections = [];
-    app.$ui.folder = [];
-    app.$ui.folderBrowser = {};
-    app.$ui.folderList = {};
-    if (app.user.ui.section == 'site') {
-        $.each(app.ui.sectionFolders.site, function(i, folder) {
-            var height = (Ox.getObjectById(app.ui.sectionFolders.site, folder.id).items.length * 16);
-            app.$ui.folder[i] = new Ox.CollapsePanel({
+    pandora.$ui.folder = [];
+    pandora.$ui.folderBrowser = {};
+    pandora.$ui.folderList = {};
+    if (pandora.user.ui.section == 'site') {
+        $.each(pandora.site.sectionFolders.site, function(i, folder) {
+            var height = (Ox.getObjectById(pandora.site.sectionFolders.site, folder.id).items.length * 16);
+            pandora.$ui.folder[i] = new Ox.CollapsePanel({
                     id: folder.id,
-                    collapsed: !app.user.ui.showFolder.site[folder.id],
+                    collapsed: !pandora.user.ui.showFolder.site[folder.id],
                     size: 16,
                     title: folder.title
                 })
@@ -26,25 +26,25 @@ pandora.ui.folders = function() {
                         
                     }
                 });
-            //alert(JSON.stringify(Ox.getObjectById(app.ui.sectionFolders.site, folder.id)))
-            app.$ui.folder[i].$content.css({
+            //alert(JSON.stringify(Ox.getObjectById(pandora.site.sectionFolders.site, folder.id)))
+            pandora.$ui.folder[i].$content.css({
                 height: height + 'px'
             })
                 //.appendTo(that);
-            app.$ui.folderList[folder.id] = pandora.ui.folderList(folder.id)
+            pandora.$ui.folderList[folder.id] = pandora.ui.folderList(folder.id)
                 .css({
                     height: height + 'px'
                 })
-                .appendTo(app.$ui.folder[i].$content);
-            app.$ui.folder.forEach(function($folder) {
+                .appendTo(pandora.$ui.folder[i].$content);
+            pandora.$ui.folder.forEach(function($folder) {
                 that.append($folder);
             });
         });
         //pandora.resizeFolders();
-    } else if (app.user.ui.section == 'items') {
-        $.each(app.ui.sectionFolders.items, function(i, folder) {
+    } else if (pandora.user.ui.section == 'items') {
+        $.each(pandora.site.sectionFolders.items, function(i, folder) {
             var extras = [];
-            if (folder.id == 'personal' && app.user.level != 'guest') {
+            if (folder.id == 'personal' && pandora.user.level != 'guest') {
                 extras = [new Ox.Select({
                     items: [
                         { id: 'new', title: 'New List...' },
@@ -61,7 +61,7 @@ pandora.ui.folders = function() {
                 })
                 .bindEvent({
                     click: function(event, data) {
-                        var $list = app.$ui.folderList[folder.id],
+                        var $list = pandora.$ui.folderList[folder.id],
                             id;
                         if (data.id == 'new' || data.id == 'newsmart') {
                             pandora.api.addList({
@@ -70,7 +70,7 @@ pandora.ui.folders = function() {
                                 type: data.id == 'new' ? 'static' : 'smart'
                             }, function(result) {
                                 id = result.data.id;
-                                pandora.UI.set(['lists', id].join('|'), app.site.user.ui.lists['']); // fixme: necessary?
+                                pandora.UI.set(['lists', id].join('|'), pandora.site.user.ui.lists['']); // fixme: necessary?
                                 pandora.URL.set('?find=list:' + id)
                                 Ox.Request.clearCache(); // fixme: remove
                                 $list.reloadList().bindEventOnce({
@@ -84,7 +84,7 @@ pandora.ui.folders = function() {
                         }
                     }
                 })];
-            } else if (folder.id == 'favorite' && app.user.level != 'guest') {
+            } else if (folder.id == 'favorite' && pandora.user.level != 'guest') {
                 extras = [new Ox.Button({
                     selectable: true,
                     style: 'symbol',
@@ -95,20 +95,20 @@ pandora.ui.folders = function() {
                 .bindEvent({
                     change: function(event, data) {
                         Ox.Request.clearCache(); // fixme: remove
-                        app.ui.sectionFolders.items[i].showBrowser = !app.ui.sectionFolders.items[i].showBrowser;
-                        if (app.ui.sectionFolders.items[i].showBrowser) {
-                            app.$ui.folderList.favorite.replaceWith(
-                                app.$ui.folderBrowser.favorite = pandora.ui.folderBrowser('favorite')
+                        pandora.site.sectionFolders.items[i].showBrowser = !pandora.site.sectionFolders.items[i].showBrowser;
+                        if (pandora.site.sectionFolders.items[i].showBrowser) {
+                            pandora.$ui.folderList.favorite.replaceWith(
+                                pandora.$ui.folderBrowser.favorite = pandora.ui.folderBrowser('favorite')
                             );
                         } else {
-                            app.$ui.folderBrowser.favorite.replaceWith(
-                                app.$ui.folderList.favorite = pandora.ui.folderList('favorite')
+                            pandora.$ui.folderBrowser.favorite.replaceWith(
+                                pandora.$ui.folderList.favorite = pandora.ui.folderList('favorite')
                             );
                         }
                         pandora.resizeFolders();
                     }
                 })];
-            } else if (folder.id == 'featured' && app.user.level == 'admin') {
+            } else if (folder.id == 'featured' && pandora.user.level == 'admin') {
                 extras = [new Ox.Button({
                     selectable: true,
                     style: 'symbol',
@@ -119,22 +119,22 @@ pandora.ui.folders = function() {
                 .bindEvent({
                     change: function(event, data) {
                         Ox.Request.clearCache(); // fixme: remove
-                        app.ui.sectionFolders.items[i].showBrowser = !app.ui.sectionFolders.items[i].showBrowser;
-                        if (app.ui.sectionFolders.items[i].showBrowser) {
-                            app.$ui.folderList.featured.replaceWith(
-                                app.$ui.folderBrowser.featured = pandora.ui.folderBrowser('featured'));
+                        pandora.site.sectionFolders.items[i].showBrowser = !pandora.site.sectionFolders.items[i].showBrowser;
+                        if (pandora.site.sectionFolders.items[i].showBrowser) {
+                            pandora.$ui.folderList.featured.replaceWith(
+                                pandora.$ui.folderBrowser.featured = pandora.ui.folderBrowser('featured'));
                         } else {
-                            app.$ui.folderBrowser.featured.replaceWith(
-                                app.$ui.folderList.featured = pandora.ui.folderList('featured')
+                            pandora.$ui.folderBrowser.featured.replaceWith(
+                                pandora.$ui.folderList.featured = pandora.ui.folderList('featured')
                             );
                         }
                         pandora.resizeFolders();
                     }
                 })];
             }
-            app.$ui.folder[i] = new Ox.CollapsePanel({
+            pandora.$ui.folder[i] = new Ox.CollapsePanel({
                     id: folder.id,
-                    collapsed: !app.user.ui.showFolder.items[folder.id],
+                    collapsed: !pandora.user.ui.showFolder.items[folder.id],
                     extras: extras,
                     size: 16,
                     title: folder.title
@@ -142,7 +142,7 @@ pandora.ui.folders = function() {
                 .bindEvent({
                     // fixme: duplicated
                     click: function(event, data) {
-                        var $list = app.$ui.folderList[i],
+                        var $list = pandora.$ui.folderList[i],
                             hasFocus, id;
                         if (data.id == 'new' || data.id == 'newsmart') {
                             pandora.api.addList({
@@ -164,24 +164,24 @@ pandora.ui.folders = function() {
                         } else if (data.id == 'browse') {
                             alert('??')
                             /*
-                            app.$ui.sectionList[1].replaceWith(app.$ui.publicLists = pandora.ui.publicLists());
-                            app.ui.showAllPublicLists = true;
+                            pandora.$ui.sectionList[1].replaceWith(pandora.$ui.publicLists = pandora.ui.publicLists());
+                            pandora.site.showAllPublicLists = true;
                             */
                         }
                     },
                     toggle: function(event, data) {
-                        data.collapsed && app.$ui.folderList[folder.id].loseFocus();
+                        data.collapsed && pandora.$ui.folderList[folder.id].loseFocus();
                         pandora.UI.set('showFolder|items|' + folder.id, !data.collapsed);
                         pandora.resizeFolders();
                     }
                 });
-            //$sections.push(app.$ui.section[i]);
-            app.$ui.folderList[folder.id] = pandora.ui.folderList(folder.id)
+            //$sections.push(pandora.$ui.section[i]);
+            pandora.$ui.folderList[folder.id] = pandora.ui.folderList(folder.id)
                 .bindEventOnce({
                     init: function(event, data) {
                         Ox.print('init', i, counter)
                         if (++counter == 3) {
-                            app.$ui.folder.forEach(function($folder) {
+                            pandora.$ui.folder.forEach(function($folder) {
                                 that.append($folder);
                             });
                             pandora.resizeFolders();
@@ -189,7 +189,7 @@ pandora.ui.folders = function() {
                         }
                     }
                 })
-                .appendTo(app.$ui.folder[i].$content);
+                .appendTo(pandora.$ui.folder[i].$content);
         });
     }
     that.toggle = function() {

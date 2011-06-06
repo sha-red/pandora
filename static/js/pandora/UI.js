@@ -12,7 +12,7 @@ pandora.UI = (function() {
                 Ox.print('key', key, 'val', val);
                 var i = 0,
                     keys = key.split('|'),
-                    old = app.user.ui;
+                    old = pandora.user.ui;
                 while (i < keys.length - 1) {
                     old = old[keys[i]];
                     i++;

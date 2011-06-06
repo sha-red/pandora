@@ -8,7 +8,7 @@ pandora.ui.filterDialog = function() {
                 })
                 .bindEvent({
                     click: function() {
-                        alert(JSON.stringify(app.$ui.filter.options('query')));
+                        alert(JSON.stringify(pandora.$ui.filter.options('query')));
                     }
                 }),
             new Ox.Button({
@@ -17,7 +17,7 @@ pandora.ui.filterDialog = function() {
                 })
                 .bindEvent({
                     click: function() {
-                        app.$ui.filterDialog.close();
+                        pandora.$ui.filterDialog.close();
                     }
                 }),
             new Ox.Button({
@@ -26,11 +26,11 @@ pandora.ui.filterDialog = function() {
                 })
                 .bindEvent({
                     click: function() {
-                        app.$ui.filterDialog.close();
+                        pandora.$ui.filterDialog.close();
                     }
                 })
         ],
-        content: app.$ui.filter = new pandora.ui.filter(),
+        content: pandora.$ui.filter = new pandora.ui.filter(),
         height: 264,
         keys: {enter: 'save', escape: 'cancel'},
         title: 'Advanced Find',

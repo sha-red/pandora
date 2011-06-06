@@ -1,7 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.filter = function() {
     var that = new Ox.Filter({
-        findKeys: Ox.map(app.site.itemKeys, function(key) {
+        findKeys: Ox.map(pandora.site.itemKeys, function(key) {
             return key.id == 'all' ? null : {
                 autocomplete: key.autocomplete,
                 autocompleteSortKey: key.autocompleteSortKey,
@@ -9,12 +9,12 @@ pandora.ui.filter = function() {
                 id: key.id,
                 title: key.title,
                 type: key.type == 'layer' ? Ox.getObjectById(
-                    app.site.layers, key.id
+                    pandora.site.layers, key.id
                 ).type : key.type
             };
         }),
-        sortKeys: app.ui.sortKeys,
-        viewKeys: app.site.listViews
+        sortKeys: pandora.site.sortKeys,
+        viewKeys: pandora.site.listViews
     });
     return that;
 };

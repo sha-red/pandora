@@ -5,7 +5,7 @@ pandora.ui.annotations = function() {
         })
         .bindEvent({
             resize: function(event, data) {
-                app.user.ui.annotationsSize = data;
+                pandora.user.ui.annotationsSize = data;
             },
             resizeend: function(event, data) {
                 pandora.UI.set({annotationsSize: data});
@@ -15,7 +15,7 @@ pandora.ui.annotations = function() {
             }
         }),
         $bins = [];
-    $.each(app.site.layers, function(i, layer) {
+    $.each(pandora.site.layers, function(i, layer) {
         var $bin = new Ox.CollapsePanel({
             id: layer.id,
             size: 16,

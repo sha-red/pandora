@@ -4,14 +4,14 @@ pandora.ui.mainPanel = function() {
         elements: [
             {
                 collapsible: true,
-                collapsed: !app.user.ui.showSidebar,
-                element: app.$ui.leftPanel = pandora.ui.leftPanel(),
+                collapsed: !pandora.user.ui.showSidebar,
+                element: pandora.$ui.leftPanel = pandora.ui.leftPanel(),
                 resizable: true,
                 resize: [192, 256, 320, 384],
-                size: app.user.ui.sidebarSize
+                size: pandora.user.ui.sidebarSize
             },
             {
-                element: app.$ui.rightPanel = pandora.ui.rightPanel()
+                element: pandora.$ui.rightPanel = pandora.ui.rightPanel()
             }
         ],
         orientation: 'horizontal'

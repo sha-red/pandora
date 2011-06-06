@@ -7,9 +7,9 @@ pandora.ui.group = function(id, query) {
     }));
     */
     //alert(id + ' ' + JSON.stringify(pandora.Query.toObject(id)))
-    var i = app.user.ui.groups.indexOf(id),
-        panelWidth = app.$ui.document.width() - (app.user.ui.showSidebar * app.user.ui.sidebarSize) - 1,
-        title = Ox.getObjectById(app.site.groups, id).title,
+    var i = pandora.user.ui.groups.indexOf(id),
+        panelWidth = pandora.$ui.document.width() - (pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize) - 1,
+        title = Ox.getObjectById(pandora.site.groups, id).title,
         width = pandora.getGroupWidth(i, panelWidth),
         that = new Ox.TextList({
             columns: [
@@ -55,12 +55,12 @@ pandora.ui.group = function(id, query) {
         })
         .bindEvent({
             paste: function(event, data) {
-                app.$ui.list.triggerEvent('paste', data);
+                pandora.$ui.list.triggerEvent('paste', data);
             },
             select: function(event, data) {
-                var group = app.ui.groups[i],
+                var group = pandora.user.queryGroups[i],
                     query;
-                app.ui.groups[i].query.conditions = $.map(data.ids, function(v) {
+                pandora.user.queryGroups[i].query.conditions = $.map(data.ids, function(v) {
                     return {
                         key: id,
                         value: v,
@@ -71,7 +71,7 @@ pandora.ui.group = function(id, query) {
             }
         });
     new Ox.Select({
-            items: $.map(app.site.groups, function(v) {
+            items: $.map(pandora.user.queryGroups, function(v) {
                 return {
                     checked: v.id == id,
                     id: v.id,
@@ -84,46 +84,46 @@ pandora.ui.group = function(id, query) {
         })
         .bindEvent('change', function(event, data) {
             var id_ = data.selected[0].id,
-                i_ = app.user.ui.groups.indexOf(id_);
+                i_ = pandora.user.ui.groups.indexOf(id_);
             if (i_ == -1) {
                 // new group was not part of old group set
-                if (app.ui.groups[i].query.conditions.length) {
+                if (pandora.user.queryGroups[i].query.conditions.length) {
                     // if group with selection gets replaced, reload
-                    app.ui.groups[i].query.conditions = [];
+                    pandora.user.queryGroups[i].query.conditions = [];
                     pandora.reloadGroups(i);
                 }
-                app.ui.groups[i] = getGroupObject(id_);
-                app.user.ui.groups[i] = id_;
-                pandora.UI.set({groups: app.user.ui.groups});
+                pandora.user.queryGroups[i] = getGroupObject(id_);
+                pandora.user.ui.groups[i] = id_;
+                pandora.UI.set({groups: pandora.user.ui.groups});
                 replaceGroup(i, id_);
             } else {
                 // swap two existing groups
-                var group = $.extend({}, app.ui.groups[i]);
-                app.ui.groups[i] = app.ui.groups[i_];
-                app.ui.groups[i_] = group;
-                app.user.ui.groups[i] = id_;
-                app.user.ui.groups[i_] = id;
-                pandora.UI.set({groups: app.user.ui.groups});
-                replaceGroup(i, id_, app.ui.groups[i].query);
-                replaceGroup(i_, id, app.ui.groups[i_].query);
+                var group = $.extend({}, pandora.user.queryGroups[i]);
+                pandora.user.queryGroups[i] = pandora.user.queryGroups[i_];
+                pandora.user.queryGroups[i_] = group;
+                pandora.user.ui.groups[i] = id_;
+                pandora.user.ui.groups[i_] = id;
+                pandora.UI.set({groups: pandora.user.ui.groups});
+                replaceGroup(i, id_, pandora.user.queryGroups[i].query);
+                replaceGroup(i_, id, pandora.user.queryGroups[i_].query);
             }
             function replaceGroup(i, id, query) {
                 // if query is passed, selected items will be derived from it
                 var isOuter = i % 4 == 0;
-                app.$ui[isOuter ? 'browser' : 'groupsInnerPanel'].replaceElement(
+                pandora.$ui[isOuter ? 'browser' : 'groupsInnerPanel'].replaceElement(
                     isOuter ? i / 2 : i - 1,
-                    app.$ui.groups[i] = pandora.ui.group(id, query)
+                    pandora.$ui.groups[i] = pandora.ui.group(id, query)
                 );
             }
         })
         .appendTo(that.$bar.$element);
     if (!query) {
         // if query is set, group object has already been taken care of
-        app.ui.groups[i] = getGroupObject(id);
+        pandora.user.queryGroups[i] = getGroupObject(id);
     }
     function getGroupObject(id) {
-        var i = app.user.ui.groups.indexOf(id),
-            title = Ox.getObjectById(app.site.groups, id).title,
+        var i = pandora.user.ui.groups.indexOf(id),
+            title = Ox.getObjectById(pandora.site.groups, id).title,
             width = pandora.getGroupWidth(i, panelWidth);
         return {
             id: id,
@@ -141,8 +141,8 @@ pandora.ui.group = function(id, query) {
 
 pandora.ui.groups = function() {
     var $groups = [];
-    app.ui.groups = [];
-    app.user.ui.groups.forEach(function(id, i) {
+    pandora.user.queryGroups = [];
+    pandora.user.ui.groups.forEach(function(id, i) {
         $groups[i] = pandora.ui.group(id);
     });
     return $groups;
@@ -152,15 +152,15 @@ pandora.ui.groupsInnerPanel = function() {
     var that = new Ox.SplitPanel({
         elements: [
             {
-                element: app.$ui.groups[1],
-                size: app.ui.groups[1].size
+                element: pandora.$ui.groups[1],
+                size: pandora.user.queryGroups[1].size
             },
             {
-                element: app.$ui.groups[2],
+                element: pandora.$ui.groups[2],
             },
             {
-                element: app.$ui.groups[3],
-                size: app.ui.groups[3].size
+                element: pandora.$ui.groups[3],
+                size: pandora.user.queryGroups[3].size
             }
         ],
         orientation: 'horizontal'

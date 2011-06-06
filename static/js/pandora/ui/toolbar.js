@@ -5,20 +5,20 @@ pandora.ui.toolbar = function() {
         }).css({
             zIndex: 2 // fixme: remove later
         });
-    app.user.ui.item && that.append(
-        app.$ui.backButton = pandora.ui.backButton()
+    pandora.user.ui.item && that.append(
+        pandora.$ui.backButton = pandora.ui.backButton()
     );
     that.append(
-        app.$ui.viewSelect = pandora.ui.viewSelect() 
+        pandora.$ui.viewSelect = pandora.ui.viewSelect() 
     );
-    !app.user.ui.item && that.append(
-        app.$ui.sortSelect = pandora.ui.sortSelect()
+    !pandora.user.ui.item && that.append(
+        pandora.$ui.sortSelect = pandora.ui.sortSelect()
     );
     that.append(
-        app.$ui.findElement = pandora.ui.findElement()
+        pandora.$ui.findElement = pandora.ui.findElement()
     );
     that.display = function() {
-        app.$ui.rightPanel.replaceElement(0, app.$ui.toolbar = pandora.ui.toolbar()); // fixme: remove later
+        pandora.$ui.rightPanel.replaceElement(0, pandora.$ui.toolbar = pandora.ui.toolbar()); // fixme: remove later
     }
     return that;
 };

@@ -3,17 +3,17 @@ pandora.ui.leftPanel = function() {
     var that = new Ox.SplitPanel({
             elements: [
                 {
-                    element: app.$ui.sectionbar = pandora.ui.sectionbar('buttons'),
+                    element: pandora.$ui.sectionbar = pandora.ui.sectionbar('buttons'),
                     size: 24
                 },
                 {
-                    element: app.$ui.folders = pandora.ui.folders()
+                    element: pandora.$ui.folders = pandora.ui.folders()
                 },
                 {
-                    collapsed: !app.user.ui.showInfo,
+                    collapsed: !pandora.user.ui.showInfo,
                     collapsible: true,
-                    element: app.$ui.info = pandora.ui.info(),
-                    size: app.user.ui.sidebarSize / app.ui.infoRatio + 16
+                    element: pandora.$ui.info = pandora.ui.info(),
+                    size: pandora.user.ui.sidebarSize / pandora.user.infoRatio + 16
                 }
             ],
             id: 'leftPanel',
@@ -21,19 +21,19 @@ pandora.ui.leftPanel = function() {
         })
         .bindEvent({
             resize: function(event, data) {
-                var infoSize = Math.round(data / app.ui.infoRatio) + 16;
-                app.user.ui.sidebarSize = data;
-                if (data < app.ui.sectionButtonsWidth && app.$ui.sectionButtons) {
-                    app.$ui.sectionButtons.removeElement();
-                    delete app.$ui.sectionButtons;
-                    app.$ui.sectionbar.append(app.$ui.sectionSelect = pandora.ui.sectionSelect());
-                } else if (data >= app.ui.sectionButtonsWidth && app.$ui.sectionSelect) {
-                    app.$ui.sectionSelect.removeElement();
-                    delete app.$ui.sectionSelect;
-                    app.$ui.sectionbar.append(app.$ui.sectionButtons = pandora.ui.sectionButtons());
+                var infoSize = Math.round(data / pandora.user.infoRatio) + 16;
+                pandora.user.ui.sidebarSize = data;
+                if (data < pandora.site.sectionButtonsWidth && pandora.$ui.sectionButtons) {
+                    pandora.$ui.sectionButtons.removeElement();
+                    delete pandora.$ui.sectionButtons;
+                    pandora.$ui.sectionbar.append(pandora.$ui.sectionSelect = pandora.ui.sectionSelect());
+                } else if (data >= pandora.site.sectionButtonsWidth && pandora.$ui.sectionSelect) {
+                    pandora.$ui.sectionSelect.removeElement();
+                    delete pandora.$ui.sectionSelect;
+                    pandora.$ui.sectionbar.append(pandora.$ui.sectionButtons = pandora.ui.sectionButtons());
                 }
-                !app.user.ui.showInfo && app.$ui.leftPanel.css({bottom: -infoSize});
-                app.$ui.leftPanel.size(2, infoSize);
+                !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -infoSize});
+                pandora.$ui.leftPanel.size(2, infoSize);
                 pandora.resizeFolders();
             },
             resizeend: function(event, data) {
@@ -42,7 +42,7 @@ pandora.ui.leftPanel = function() {
             toggle: function(event, data) {
                 pandora.UI.set({showSidebar: !data.collapsed});
                 if (data.collapsed) {
-                    $.each(app.$ui.folderList, function(k, $list) {
+                    $.each(pandora.$ui.folderList, function(k, $list) {
                         $list.loseFocus();
                     });
                 }

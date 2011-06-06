@@ -1,20 +1,20 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.browser = function() {
     var that;
-    if (!app.user.ui.item) {
-        app.$ui.groups = pandora.ui.groups();
+    if (!pandora.user.ui.item) {
+        pandora.$ui.groups = pandora.ui.groups();
         that = new Ox.SplitPanel({
             elements: [
                 {
-                    element: app.$ui.groups[0],
-                    size: app.ui.groups[0].size
+                    element: pandora.$ui.groups[0],
+                    size: pandora.user.queryGroups[0].size
                 },
                 {
-                    element: app.$ui.groupsInnerPanel = pandora.ui.groupsInnerPanel()
+                    element: pandora.$ui.groupsInnerPanel = pandora.ui.groupsInnerPanel()
                 },
                 {
-                    element: app.$ui.groups[4],
-                    size: app.ui.groups[4].size
+                    element: pandora.$ui.groups[4],
+                    size: pandora.user.queryGroups[4].size
                 },
             ],
             id: 'browser',
@@ -22,8 +22,8 @@ pandora.ui.browser = function() {
         })
         .bindEvent({
             resize: function(event, data) {
-                app.user.ui.groupsSize = data;
-                $.each(app.$ui.groups, function(i, list) {
+                pandora.user.ui.groupsSize = data;
+                $.each(pandora.$ui.groups, function(i, list) {
                     list.size();
                 });
             },
@@ -32,7 +32,7 @@ pandora.ui.browser = function() {
             },
             toggle: function(event, data) {
                 pandora.UI.set({showGroups: !data.collapsed});
-                data.collapsed && app.$ui.list.gainFocus();
+                data.collapsed && pandora.$ui.list.gainFocus();
             }
         });
     } else {
@@ -61,9 +61,9 @@ pandora.ui.browser = function() {
             max: 1,
             min: 1,
             orientation: 'horizontal',
-            selected: [app.user.ui.item],
+            selected: [pandora.user.ui.item],
             size: 64,
-            sort: app.user.ui.lists[app.user.ui.list].sort,
+            sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
             unique: 'id'
         })
         .bindEvent({
@@ -76,15 +76,15 @@ pandora.ui.browser = function() {
             toggle: function(event, data) {
                 pandora.UI.set({showMovies: !data.collapsed});
                 if (data.collapsed) {
-                    if (app.user.ui.itemView == 'timeline') {
-                        app.$ui.editor.gainFocus();
+                    if (pandora.user.ui.itemView == 'timeline') {
+                        pandora.$ui.editor.gainFocus();
                     }
                 }
             }
         });
     }
     that.update = function() {
-        app.$ui.contentPanel.replaceElement(0, app.$ui.browser = pandora.ui.browser());
+        pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
     }
     return that;
 };

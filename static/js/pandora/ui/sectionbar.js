@@ -5,8 +5,8 @@ pandora.ui.sectionbar = function(mode) {
         })
         .append(
             mode == 'buttons' ?
-            app.$ui.sectionButtons = pandora.ui.sectionButtons() :
-            app.$ui.sectionSelect = pandora.ui.sectionSelect()
+            pandora.$ui.sectionButtons = pandora.ui.sectionButtons() :
+            pandora.$ui.sectionSelect = pandora.ui.sectionSelect()
         );
     that.toggle = function() {
         

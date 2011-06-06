@@ -51,7 +51,7 @@ pandora.Query = (function() {
             } else {
                 kv = ((v.indexOf(':') > - 1 ? '' : ':') + v).split(':');
                 if (kv[0] == 'list') { // fixme: this is just a hack
-                    app.user.ui.listQuery = {conditions: [$.extend({
+                    pandora.user.ui.listQuery = {conditions: [$.extend({
                         key: kv[0]
                     }, parseValue(kv[1]))], operator: ''};
                 } else {
@@ -93,20 +93,20 @@ pandora.Query = (function() {
                 query = Ox.unserialize(str.substr(1)),
                 sort = [];
             if ('find' in query) {
-                app.user.ui.listQuery = {conditions: [], operator: ''}; // fixme: hackish
-                app.user.ui.findQuery = parseFind(query.find);
-                if (app.user.ui.listQuery.conditions.length) {
-                    list = app.user.ui.listQuery.conditions[0].value;
-                    !app.user.ui.lists[list] && pandora.UI.set(
-                        ['lists', list].join('|'), app.site.user.ui.lists['']
+                pandora.user.ui.listQuery = {conditions: [], operator: ''}; // fixme: hackish
+                pandora.user.ui.findQuery = parseFind(query.find);
+                if (pandora.user.ui.listQuery.conditions.length) {
+                    list = pandora.user.ui.listQuery.conditions[0].value;
+                    !pandora.user.ui.lists[list] && pandora.UI.set(
+                        ['lists', list].join('|'), pandora.site.user.ui.lists['']
                     );
                 }
                 pandora.UI.set({list: list});
-                //Ox.print('user.ui.findQuery', app.user.ui.findQuery)
+                //Ox.print('user.ui.findQuery', pandora.user.ui.findQuery)
             }
             if ('sort' in query) {
                 sort = query.sort.split(',');
-                pandora.UI.set(['lists', app.user.ui.list, 'sort'].join('|'), $.map(query.sort.split(','), function(v, i) {
+                pandora.UI.set(['lists', pandora.user.ui.list, 'sort'].join('|'), $.map(query.sort.split(','), function(v, i) {
                     var hasOperator = '+-'.indexOf(v[0]) > -1,
                         key = hasOperator ? query.sort.substr(1) : query.sort,
                         operator = hasOperator ? v[0]/*.replace('+', '')*/ : pandora.getSortOperator(key);
@@ -117,26 +117,26 @@ pandora.Query = (function() {
                 }));
             }
             if ('view' in query) {
-                pandora.UI.set(['lists', app.user.ui.list, 'listView'].join('|'), query.view);
+                pandora.UI.set(['lists', pandora.user.ui.list, 'listView'].join('|'), query.view);
             }
         },
 
         toObject: function(groupId) {
-            //Ox.print('tO', app.user.ui.findQuery.conditions)
+            //Ox.print('tO', pandora.user.ui.findQuery.conditions)
             // the inner $.merge() creates a clone
             var conditions = $.merge(
-                    $.merge([], app.user.ui.listQuery.conditions),
-                    app.user.ui.findQuery.conditions
+                    $.merge([], pandora.user.ui.listQuery.conditions),
+                    pandora.user.ui.findQuery.conditions
                 ),
                 operator;
-            $.merge(conditions, app.ui.groups ? $.map(app.ui.groups, function(v, i) {
+            $.merge(conditions, pandora.user.queryGroups ? $.map(pandora.user.queryGroups, function(v, i) {
                 if (v.id != groupId && v.query.conditions.length) {
                     return v.query.conditions.length == 1 ?
                         v.query.conditions : v.query;
                 }
             }) : []);
             operator = conditions.length < 2 ? '' : ','; // fixme: should be &
-            //Ox.print('>>', groupId, app.user.ui.find, conditions);
+            //Ox.print('>>', groupId, pandora.user.ui.find, conditions);
             return {
                 conditions: conditions,
                 operator: operator
@@ -144,14 +144,14 @@ pandora.Query = (function() {
         },
 
         toString: function() {
-            //Ox.print('tS', app.user.ui.find)
-            var sort = app.user.ui.lists[app.user.ui.list].sort[0],
+            //Ox.print('tS', pandora.user.ui.find)
+            var sort = pandora.user.ui.lists[pandora.user.ui.list].sort[0],
                 key = sort.key,
                 operator = sort.operator;
             return '?' + Ox.serialize({
                 find: constructFind(pandora.Query.toObject()),
                 sort: (operator == pandora.getSortOperator(key) ? '' : operator) + key,
-                view: app.user.ui.lists[app.user.ui.list].listView
+                view: pandora.user.ui.lists[pandora.user.ui.list].listView
             });
         }
 

@@ -3,7 +3,7 @@ pandora.ui.folderBrowserBar = function(id) {
     var that = new Ox.Bar({
             size: 24
         });
-    app.$ui.findListInput = new Ox.Input({
+    pandora.$ui.findListInput = new Ox.Input({
             placeholder: 'Find User',
             width: 184 - Ox.UI.SCROLLBAR_SIZE
         })

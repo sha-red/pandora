@@ -11,7 +11,7 @@ pandora.ui.accountDialog = function(action) {
         .bindEvent({
             resize: function(event, data) {
                 var width = data.width - 32;
-                app.$ui.accountForm.items.forEach(function(item) {
+                pandora.$ui.accountForm.items.forEach(function(item) {
                     item.options({width: width});
                 });
             }
@@ -21,7 +21,7 @@ pandora.ui.accountDialog = function(action) {
 
 pandora.ui.accountDialogOptions = function(action, value) {
     //Ox.print('ACTION', action)
-    app.$ui.accountForm && app.$ui.accountForm.removeElement();
+    pandora.$ui.accountForm && pandora.$ui.accountForm.removeElement();
     var buttons = {
             login: ['register', 'reset'],
             register: ['login'],
@@ -52,7 +52,7 @@ pandora.ui.accountDialogOptions = function(action, value) {
                 id: 'cancel' + Ox.toTitleCase(action),
                 title: 'Cancel'
             }).bindEvent('click', function() {
-                app.$ui.accountDialog.close();
+                pandora.$ui.accountDialog.close();
             });
         } else if (type == 'submit') {
             return new Ox.Button({
@@ -60,7 +60,7 @@ pandora.ui.accountDialogOptions = function(action, value) {
                 id: 'submit' + Ox.toTitleCase(action),
                 title: buttonTitle[action]
             }).bindEvent('click', function() {
-                app.$ui.accountForm.submit();
+                pandora.$ui.accountForm.submit();
             });
         } else {
             return new Ox.Button({
@@ -68,7 +68,7 @@ pandora.ui.accountDialogOptions = function(action, value) {
                 title: buttonTitle[type] + '...'
             }).bindEvent('click', function() {
                 //Ox.print('CLICK EVENT', type)
-                app.$ui.accountDialog.options(ui.accountDialogOptions(type));
+                pandora.$ui.accountDialog.options(ui.accountDialogOptions(type));
             });
         }
     }
@@ -86,7 +86,7 @@ pandora.ui.accountDialogOptions = function(action, value) {
                     .html(dialogText[action] + '<br/><br/>')
             )
             .append(
-                app.$ui.accountForm = pandora.ui.accountForm(action, value)
+                pandora.$ui.accountForm = pandora.ui.accountForm(action, value)
             ),
         keys: {
             enter: 'submit' + Ox.toTitleCase(action),
@@ -97,8 +97,8 @@ pandora.ui.accountDialogOptions = function(action, value) {
 };
 
 pandora.ui.accountForm = function(action, value) {
-    if (app.$ui.accountForm) {
-        app.$ui.accountForm.items.forEach(function(item) {
+    if (pandora.$ui.accountForm) {
+        pandora.$ui.accountForm.items.forEach(function(item) {
             if (item.options('id') == 'usernameOrEmail') {
                 //Ox.print('REMOVING')
                 //Ox.Event.unbind('usernameOrEmailSelect')
@@ -125,7 +125,7 @@ pandora.ui.accountForm = function(action, value) {
                 if (action == 'login') {
                     pandora.api.signin(data, function(result) {
                         if (!result.data.errors) {
-                            app.$ui.accountDialog.close();
+                            pandora.$ui.accountDialog.close();
                             pandora.login(result.data);
                         } else {
                             callback([{id: 'password', message: 'Incorrect password'}]);
@@ -134,7 +134,7 @@ pandora.ui.accountForm = function(action, value) {
                 } else if (action == 'register') {
                     pandora.api.signup(data, function(result) {
                         if (!result.data.errors) {
-                            app.$ui.accountDialog.close();
+                            pandora.$ui.accountDialog.close();
                             pandora.login(result.data);
                             pandora.ui.accountWelcomeDialog().open();
                         } else {
@@ -148,7 +148,7 @@ pandora.ui.accountForm = function(action, value) {
                     data[key] = usernameOrEmail[1];
                     pandora.api.requestToken(data, function(result) {
                         if (!result.data.errors) {
-                            app.$ui.accountDialog.options(ui.accountDialogOptions('resetAndLogin', result.data.username));
+                            pandora.$ui.accountDialog.options(ui.accountDialogOptions('resetAndLogin', result.data.username));
                         } else {
                             callback([{id: 'usernameOrEmail', message: 'Unknown ' + (key == 'username' ? 'username' : 'e-mail address')}])
                         }
@@ -156,7 +156,7 @@ pandora.ui.accountForm = function(action, value) {
                 } else if (action == 'resetAndLogin') {
                     pandora.api.resetPassword(data, function(result) {
                         if (!result.data.errors) {
-                            app.$ui.accountDialog.close();
+                            pandora.$ui.accountDialog.close();
                             pandora.login(result.data);
                         } else {
                             callback([{id: 'code', message: 'Incorrect code'}]);
@@ -170,7 +170,7 @@ pandora.ui.accountForm = function(action, value) {
             },
             validate: function(event, data) {
                 //Ox.print('FORM VALIDATE', data)
-                app.$ui.accountDialog[
+                pandora.$ui.accountDialog[
                     (data.valid ? 'enable' : 'disable') + 'Button'
                 ]('submit' + Ox.toTitleCase(action));
             }
@@ -262,7 +262,7 @@ pandora.ui.accountForm = function(action, value) {
             return new Ox.FormElementGroup({
                 id: 'usernameOrEmail',
                 elements: [
-                    app.$ui.usernameOrEmailSelect = new Ox.Select({
+                    pandora.$ui.usernameOrEmailSelect = new Ox.Select({
                             id: 'usernameOrEmailSelect',
                             items: [
                                 {id: 'username', title: 'Username'},
@@ -274,14 +274,14 @@ pandora.ui.accountForm = function(action, value) {
                         .bindEvent({
                             change: function(event, data) {
                                 var selected = data.selected[0].id;
-                                app.$ui.usernameOrEmailInput.options({
+                                pandora.$ui.usernameOrEmailInput.options({
                                     autovalidate: selected == 'username' ? pandora.autovalidateUsername : autovalidateEmail,
                                     validate: validateUser(selected, true),
                                     value: ''
                                 }).focus();
                             }
                         }),
-                    app.$ui.usernameOrEmailInput = new Ox.Input({
+                    pandora.$ui.usernameOrEmailInput = new Ox.Input({
                         autovalidate: pandora.autovalidateUsername,
                         id: 'usernameOrEmailInput',
                         validate: pandora.validateUser('username', true),
@@ -305,7 +305,7 @@ pandora.ui.accountLogoutDialog = function() {
                     title: 'Cancel'
                 }).bindEvent('click', function() {
                     that.close();
-                    app.$ui.mainMenu.getItem('loginlogout').toggleTitle();
+                    pandora.$ui.mainMenu.getItem('loginlogout').toggleTitle();
                 }),
                 new Ox.Button({
                     id: 'logout',
@@ -345,10 +345,10 @@ pandora.ui.accountWelcomeDialog = function() {
                     })
                 ]
             ],
-            content: new Ox.Element().html('Welcome, ' + app.user.username + '!<br/><br/>Your account has been created.'),
+            content: new Ox.Element().html('Welcome, ' + pandora.user.username + '!<br/><br/>Your account has been created.'),
             height: 160,
             keys: {enter: 'close', escape: 'close'},
-            title: 'Welcome to ' + app.site.site.name,
+            title: 'Welcome to ' + pandora.site.site.name,
             width: 300
         });
     return that;

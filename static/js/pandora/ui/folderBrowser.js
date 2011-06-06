@@ -7,7 +7,7 @@ pandora.ui.folderBrowser = function(id) {
                 size: 24
             },
             {
-                element: app.$ui.folderList[id] = pandora.ui.folderBrowserList(id)
+                element: pandora.$ui.folderList[id] = pandora.ui.folderBrowserList(id)
             }
         ],
         orientation: 'vertical'
