@@ -161,6 +161,8 @@ class Item(models.Model):
         return False
 
     def editable(self, user):
+        if user.is_anonymous():
+            return False
         if user.is_staff or \
            self.user == user or \
            self.groups.filter(id__in=user.groups.all()).count() > 0:
@@ -303,18 +305,18 @@ class Item(models.Model):
 
     def get_posters(self):
         url = self.prefered_poster_url()
-        precedence = []
+        index = []
         services = [p['service']
                     for p in self.poster_urls.values("service")
                                              .annotate(Count("id")).order_by()]
         for service in settings.POSTER_PRECEDENCE:
             if service in services:
-                precedence.append(service)
+                index.append(service)
         for service in services:
-            if service not in precedence:
-                precedence.append(service)
-        if settings.URL not in precedence:
-            precedence.append(settings.URL)
+            if service not in index:
+                index.append(service)
+        if settings.URL not in index:
+            index.append(settings.URL)
 
         posters = [
             {
@@ -323,7 +325,7 @@ class Item(models.Model):
                 'height': 1024,
                 'source': settings.URL,
                 'selected': url == None,
-                'precedence': precedence.index(settings.URL)
+                'index': index.index(settings.URL)
             }
         ]
         got = {}
@@ -336,9 +338,9 @@ class Item(models.Model):
                     'height': p.height,
                     'source': p.service,
                     'selected': p.url == url,
-                    'precedence': precedence.index(p.service)
+                    'index': index.index(p.service)
                 })
-        posters.sort(key=lambda a: a['precedence'])
+        posters.sort(key=lambda a: a['index'])
         return posters
 
     def get_stream(self):
@@ -404,7 +406,7 @@ class Item(models.Model):
                 p = 0
                 for f in frames:
                     i['frames'].append({
-                        'id': p,
+                        'index': p,
                         'position': f['position'],
                         'selected': p == pos,
                         'url': '/%s/frame/poster/%d.jpg' %(self.itemId, p),
@@ -810,8 +812,12 @@ class Item(models.Model):
         if self.poster:
             path = self.poster.path
             self.poster.delete()
-            for f in glob(path.replace('.jpg', '*.jpg')):
-                os.unlink(f)
+        else:
+            poster= self.path('poster.jpg')
+            path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
+        posters = glob(path.replace('.jpg', '*.jpg'))
+        for f in filter(lambda p: not p.endswith('poster.local.jpg'), posters):
+            os.unlink(f)
 
     def prefered_poster_url(self):
         self.update_poster_urls()
@@ -826,21 +832,15 @@ class Item(models.Model):
         return None
 
     def make_poster(self, force=False):
-        posters = glob(os.path.abspath(os.path.join(settings.MEDIA_ROOT,
-                                  self.path('poster.*.jpg'))))
-        for f in filter(lambda p: not p.endswith('poster.local.jpg'), posters):
-            os.unlink(f)
         if not self.poster or force:
             url = self.prefered_poster_url()
             if url:
                 data = ox.net.readUrl(url)
-                if force:
-                    self.delete_poster()
+                self.delete_poster()
                 self.poster.save('poster.jpg', ContentFile(data))
                 self.save()
             else:
-                if force:
-                    self.delete_poster()
+                self.delete_poster()
                 poster = self.make_local_poster()
                 with open(poster) as f:
                     self.poster.save('poster.jpg', ContentFile(f.read()))
@@ -896,10 +896,11 @@ class Item(models.Model):
     def get_poster_frame_path(self):
         frames =  self.poster_frames()
         if self.poster_frame >= 0:
-            if frames:
+            if frames and len(frames) > int(self.poster_frame):
                 return frames[int(self.poster_frame)]['path']
-            size = int(settings.VIDEO_PROFILE.split('.')[0][:-1])
-            return self.frame(self.poster_frame, size)
+            else:
+                size = int(settings.VIDEO_PROFILE.split('.')[0][:-1])
+                return self.frame(self.poster_frame, size)
 
         if frames:
             return frames[int(len(frames)/2)]['path']

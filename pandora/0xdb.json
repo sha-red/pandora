@@ -408,8 +408,7 @@
         {"id": "player", "title": "Player"},
         {"id": "timeline", "title": "Timeline"},
         {"id": "map", "title": "Map"},
-        {"id": "calendar", "title": "Calendar"},
-        {"id": "files", "title": "Files", "admin": true}
+        {"id": "calendar", "title": "Calendar"}
     ],
     "layers": [
         {
@@ -448,6 +447,10 @@
         {"id": "map", "title": "on Map"},
         {"id": "calendar", "title": "on Calendar"}
     ],
+    "media": {
+        "importMoviePosters": true,
+        "importPosterFrames": true
+    },
     "site": {
         "id": "{{settings.SITEID}}",
         "name": "{{settings.SITENAME}}",
