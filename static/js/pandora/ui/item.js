@@ -344,7 +344,11 @@ pandora.ui.item = function() {
             );
         } else if (pandora.user.ui.itemView == 'frames' || pandora.user.ui.itemView == 'posters') {
             pandora.$ui.contentPanel.replaceElement(1,
-                pandora.$ui.item = pandora.ui.mediaView()
+                pandora.$ui.item = pandora.ui.mediaView().bindEvent({
+                    resize: function() {
+                        pandora.$ui.item.resize();
+                    }
+                })
             );
         }
         var director = result.data.director?' ('+result.data.director.join(', ')+')':'';

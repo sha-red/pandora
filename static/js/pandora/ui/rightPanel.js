@@ -51,6 +51,8 @@ pandora.ui.rightPanel = function() {
                     pandora.user.ui.itemView == 'timeline' && pandora.$ui.editor.options({
                         width: data
                     });
+                    pandora.user.ui.itemView == 'frames' && pandora.$ui.item.resize();
+                    pandora.user.ui.itemView == 'posters' && pandora.$ui.item.resize();
                 }
             }
         });
