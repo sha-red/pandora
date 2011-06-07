@@ -105,9 +105,12 @@ pandora.ui.item = function() {
             } else {
                 $.get('/static/html/itemInfo.html', {}, function(template) {
                     //Ox.print(template);
+                    var posterRatio = result.data.poster.width / result.data.poster.height;
+                    result.data.posterWidth = posterRatio > 1 ? 256 : Math.round(256 * posterRatio);
+                    result.data.posterHeight = posterRatio < 1 ? 256 : Math.round(256 / posterRatio);
+                    result.data.posterLeft = Math.floor((256 - result.data.posterWidth) / 2);
                     pandora.$ui.contentPanel.replaceElement(1,
-                        pandora.$ui.item = Ox.Element()
-                        .append($.tmpl(template, result.data))
+                        pandora.$ui.item = Ox.Element().append($.tmpl(template, result.data))
                     );
                 });
             }
