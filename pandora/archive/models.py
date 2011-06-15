@@ -230,6 +230,8 @@ class File(models.Model):
         for s in srts.findall(data):
             _s = {'id': str(i),
                   'in': parseTime(s[0]), 'out': parseTime(s[1]), 'value': s[2].strip()}
+            if srt and srt[-1]['out'] > _s['in']:
+                srt[-1]['out'] = _s['in']
             srt.append(_s)
             i += 1
         return srt
