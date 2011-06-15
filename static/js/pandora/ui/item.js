@@ -178,8 +178,10 @@ pandora.ui.item = function() {
                 },
                 updateAnnotation: function(event, data) {
                     //fixme: check that edit was successfull
-                    Ox.print('updateAnnotation', data);
-                    pandora.api.editAnnotation(data);
+                    pandora.api.editAnnotation(data, function(result) {
+                        Ox.print('done updateAnnotation', result);
+                        
+                    });
                 }
             }));
             that.bindEvent('resize', function(event, data) {
