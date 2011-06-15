@@ -221,6 +221,37 @@ def taskStatus(request):
     return render_to_json_response(response)
 actions.register(taskStatus, cache=False)
 
+@login_required_json
+def moveFiles(request):
+    '''
+        change file / item link
+        param data {
+            ids: hashes of files
+            itemId: new itemId
+        }
+
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+            }
+        }
+    '''
+    #FIXME: permissions, need to be checked
+    data = json.loads(request.POST['data'])
+    for f in models.File.objects.filter(oshash__in=data['ids']):
+        if f.item.id != data['itemId']:
+            if len(data['itemId']) != 7:
+                folder = f.instances.all()[0].folder
+                item_info = utils.parse_path(folder)
+                item = get_item(item_info)
+            else:
+                item = get_item({'imdbId': data['itemId']})
+            f.item = item
+            f.save()
+            #FIXME: other things might need updating here
+    response = json_response(text='updated')
+    return render_to_json_response(response)
+actions.register(moveFiles, cache=False)
 
 @login_required_json
 def editFile(request):
