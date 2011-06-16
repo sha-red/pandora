@@ -7,19 +7,19 @@ pandora.ui.statusbar = function() {
             textAlign: 'center'
         })
         .append(
-            new Ox.Element()
+            Ox.Element()
                 .css({
                     marginTop: '2px',
                     fontSize: '9px'
                 })
                 .append(
-                    pandora.$ui.total = new Ox.Element('span')
+                    pandora.$ui.total = Ox.Element('<span>')
                 )
                 .append(
-                    new Ox.Element('span').html(' &mdash; ')
+                    Ox.Element('<span>').html(' &mdash; ')
                 )
                 .append(
-                    pandora.$ui.selected = new Ox.Element('span')
+                    pandora.$ui.selected = Ox.Element('<span>')
                 )
         );
     return that;
