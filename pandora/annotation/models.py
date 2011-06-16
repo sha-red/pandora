@@ -101,7 +101,7 @@ class Annotation(models.Model):
     def get_id(self):
         return ox.to32(self.id)
 
-    def json(self, layer=False):
+    def json(self, layer=False, keys=None):
         j = {
             'id': self.get_id(),
             'user': self.user.username,
@@ -113,6 +113,16 @@ class Annotation(models.Model):
         }
         if layer:
             j['layer'] = self.layer.name
+        if keys:
+            _j = {}
+            for key in keys:
+                if key in j:
+                    _j[key] = j[key]
+            j = _j
+            if 'aspectRatio' in keys:
+                j['aspectRatio'] = self.item.stream_aspect
+            if 'item' in keys:
+                j['item'] = self.item.itemId
         return j
 
     def __unicode__(self):

@@ -9,7 +9,38 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'calendar') {
             pandora.$ui.contentPanel.replaceElement(1, Ox.Element().html('Calendar'));
         } else if (pandora.user.ui.itemView == 'clips') {
-            pandora.$ui.contentPanel.replaceElement(1, Ox.Element().html('Clips'));
+            pandora.$ui.contentPanel.replaceElement(1, new Ox.IconList({
+                item: function(data, sort, size) {
+                    size = size || 128;
+                    var ratio = result.data.stream.aspectRatio,
+                        width = ratio>1?size:size*ratio,
+                        height = ratio>1?size/ratio:size,
+                        url = '/' + pandora.user.ui.item + '/frame/' + size + '/' + data['in'] + '.jpg';
+                    return {
+                        height: height,
+                        id: data['id'],
+                        info: Ox.formatDuration(data['in'], 'short') +' - '+ Ox.formatDuration(data['out'], 'short'),
+                        title: data.value,
+                        url: url,
+                        width: width 
+                    };
+                },
+                items: function(data, callback) {
+                    pandora.api.findAnnotations($.extend(data, {
+                        itemQuery: {
+                            conditions:[{
+                                key: 'id',
+                                value: pandora.user.ui.item,
+                                operator: '='
+                            }]
+                        }
+                    }), callback);
+                },
+                keys: ['id', 'value', 'in', 'out'],
+                size: 128,
+                sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
+                unique: 'id'
+            }));
         } else if (pandora.user.ui.itemView == 'info') {
             //Ox.print('result.data', result.data)
             if (pandora.user.level == 'admin') {

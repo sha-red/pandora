@@ -12,13 +12,34 @@ from app.models import site_config
 from item.models import Item
 from api.actions import actions
 
+from item import utils
+from item.models import Item
+
 import models
 
+
+def parse_query(data, user):
+    query = {}
+    query['range'] = [0, 100]
+    query['sort'] = [{'key':'in', 'operator':'+'}]
+    for key in ('value', 'layer', 'in', 'out'):
+        if key in data:
+            query[key] = data[key]
+    query['qs'] = models.Annotation.objects.all()
+    if 'itemQuery' in data:
+        item_query = Item.objects.find({'query': data['itemQuery']}, user)
+        query['qs'] = query['qs'].filter(item__in=item_query)
+    return query
+
+def order_query(qs, sort):
+    qs = qs.order_by('start')
+    return qs
 
 def findAnnotations(request):
     '''
         param data {
-            fixme
+            query: ...
+            itemQuery: ...
         }
 
         return {
@@ -28,11 +49,30 @@ def findAnnotations(request):
             }
         }
     '''
-    #FIXME: implement findItem like queries
     data = json.loads(request.POST['data'])
-    response = json_response(status=200, text='ok')
-    qs = models.Annotations.objects.filter(item__itemId=data['item'])
-    response['data']['annotations'] = [a.json() for a in qs]
+    response = json_response()
+
+    query = parse_query(data, request.user)
+    qs = order_query(query['qs'], query['sort'])
+    if 'keys' in data:
+        qs = qs[query['range'][0]:query['range'][1]]
+        response['data']['items'] = [p.json(keys=data['keys']) for p in qs]
+    elif 'position' in query:
+        ids = [i.get_id() for i in qs]
+        data['conditions'] = data['conditions'] + {
+            'value': data['position'],
+            'key': query['sort'][0]['key'],
+            'operator': '^'
+        }
+        query = parse_query(data, request.user)
+        qs = order_query(query['qs'], query['sort'])
+        if qs.count() > 0:
+            response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
+    elif 'positions' in data:
+        ids = [i.get_id() for i in qs]
+        response['data']['positions'] = utils.get_positions(ids, data['positions'])
+    else:
+        response['data']['items'] = qs.count()
     return render_to_json_response(response)
 actions.register(findAnnotations)
 

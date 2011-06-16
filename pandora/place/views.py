@@ -124,7 +124,7 @@ def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
     query['sort'] = [{'key':'name', 'operator':'+'}]
-    for key in ('keys', 'group', 'list', 'range', 'position', 'positions', 'sort', 'query'):
+    for key in ('keys', 'group', 'list', 'range', 'sort', 'query'):
         if key in data:
             query[key] = data[key]
     query['qs'] = models.Place.objects.find(query, user)
@@ -231,7 +231,7 @@ Positions
     elif 'position' in query:
         ids = [i.get_id() for i in qs]
         data['conditions'] = data['conditions'] + {
-            'value': query['position'],
+            'value': data['position'],
             'key': query['sort'][0]['key'],
             'operator': '^'
         }
@@ -241,7 +241,7 @@ Positions
             response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
     elif 'positions' in data:
         ids = [i.get_id() for i in qs]
-        response['data']['positions'] = utils.get_positions(ids, query['positions'])
+        response['data']['positions'] = utils.get_positions(ids, data['positions'])
     else:
         response['data']['items'] = qs.count()
         response['data']['area'] = qs.aggregate(

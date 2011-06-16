@@ -94,7 +94,34 @@ pandora.ui.list = function(view) { // fixme: remove view argument
             size: 128,
             sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
             unique: 'id'
-        })
+        });
+    } else if (view == 'clip') {
+        that = new Ox.IconList({
+            item: function(data, sort, size) {
+                size = size || 128;
+                var ratio = data.aspectRatio,
+                    width = size,
+                    height = size/ratio,
+                    url = '/' + data.item + '/frame/' + size + '/'+data['in'] + '.jpg';
+                return {
+                    height: height,
+                    id: data['id'],
+                    info: Ox.formatDuration(data['in'], 'short') +' - '+ Ox.formatDuration(data['out'], 'short'),
+                    title: data.value,
+                    url: url,
+                    width: width
+                };
+            },
+            items: function(data, callback) {
+                pandora.api.findAnnotations($.extend(data, {
+                    itemQuery: pandora.Query.toObject()
+                }), callback);
+            },
+            keys: ['id', 'value', 'in', 'out', 'aspectRatio', 'item'],
+            size: 128,
+            sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
+            unique: 'id'
+        });
     } else if (view == 'map') {
         that = new Ox.SplitPanel({
             elements: [
@@ -178,7 +205,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
             pandora.$ui.folderList.forEach(function($list, i) {
                 $list.removeClass('OxDrop');
             });
-        },
+        }
     }).bindEvent({
         closepreview: function(event, data) {
             pandora.$ui.previewDialog.close();
