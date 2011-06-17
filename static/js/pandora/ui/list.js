@@ -113,8 +113,17 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                 };
             },
             items: function(data, callback) {
+                var itemQuery = pandora.Query.toObject(),
+                    query = {conditions:[]};
+                //fixme: can this be in pandora.Query? dont just check for subtitles
+                itemQuery.conditions.forEach(function(q) {
+                    if(q.key == 'subtitles') {
+                        query.conditions.push({key: 'value', value: q.value, operator: q.operator});
+                    }
+                });
                 pandora.api.findAnnotations($.extend(data, {
-                    itemQuery: pandora.Query.toObject()
+                    query: query,
+                    itemQuery: itemQuery
                 }), callback);
             },
             keys: ['id', 'value', 'in', 'out', 'aspectRatio', 'item'],

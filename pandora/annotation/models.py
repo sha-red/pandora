@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 import ox
 
 import utils
+import managers
 
 
 def load_layers(layers):
@@ -70,6 +71,7 @@ class Layer(models.Model):
 
 
 class Annotation(models.Model):
+    objects = managers.AnnotationManager()
 
     #FIXME: here having a item,start index would be good
     created = models.DateTimeField(auto_now_add=True)

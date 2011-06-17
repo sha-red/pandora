@@ -22,10 +22,10 @@ def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
     query['sort'] = [{'key':'in', 'operator':'+'}]
-    for key in ('value', 'layer', 'in', 'out'):
+    for key in ('keys', 'group', 'range', 'sort', 'query'):
         if key in data:
             query[key] = data[key]
-    query['qs'] = models.Annotation.objects.all()
+    query['qs'] = models.Annotation.objects.find(query, user)
     if 'itemQuery' in data:
         item_query = Item.objects.find({'query': data['itemQuery']}, user)
         query['qs'] = query['qs'].filter(item__in=item_query)
