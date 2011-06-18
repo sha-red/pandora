@@ -138,9 +138,12 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                     element: pandora.$ui.map = Ox.Map({
                         height: window.innerHeight - pandora.user.ui.showGroups * pandora.user.ui.groupsSize - 61,
                         places: function(data, callback) {
-                            return pandora.api.findPlaces($.extend({
-                                query: {conditions: [], operator: ''}
-                            }, data), callback);
+                            var itemQuery = pandora.Query.toObject(),
+                                query = {conditions:[]};
+                            return pandora.api.findPlaces($.extend(data, {
+                                itemQuery: itemQuery,
+                                query: query
+                            }), callback);
                         },
                         showTypes: true,
                         toolbar: true,

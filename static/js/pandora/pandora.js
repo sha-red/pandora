@@ -92,8 +92,8 @@ pandora.reloadGroups = function(i) {
             }
         });
     } else if (view == 'map') {
-        pandora.$ui.list.options({
-            items: function(data, callback) {
+        pandora.$ui.map.options({
+            places: function(data, callback) {
                 return pandora.api.findPlaces($.extend(data, {
                     itemQuery: query
                 }), callback);
