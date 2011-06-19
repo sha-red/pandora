@@ -97,7 +97,39 @@ pandora.ui.item = function() {
             }
 
         } else if (pandora.user.ui.itemView == 'map') {
-            pandora.$ui.contentPanel.replaceElement(1, Ox.Element().html('Map'));
+            pandora.$ui.contentPanel.replaceElement(1, new Ox.SplitPanel({
+                elements: [
+                    {
+                        element: pandora.$ui.map = Ox.Map({
+                            height: window.innerHeight - pandora.user.ui.showGroups * pandora.user.ui.groupsSize - 61,
+                            places: function(data, callback) {
+                                var itemQuery = {conditions: [{
+                                        key: 'id',
+                                        value: pandora.user.ui.item,
+                                        operator: '='
+                                    }]},
+                                    query = {conditions:[]};
+                                return pandora.api.findPlaces($.extend(data, {
+                                    itemQuery: itemQuery,
+                                    query: query
+                                }), callback);
+                            },
+                            showTypes: true,
+                            toolbar: true,
+                            width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE
+                        })
+                    },
+                    {
+                        element: new Ox.Element(),
+                        id: 'place',
+                        size: 144 + Ox.UI.SCROLLBAR_SIZE
+                    }
+                ],
+                orientation: 'horizontal'
+            })
+            .bindEvent('resize', function() {
+                pandora.$ui.map.resizeMap();
+            }));
         } else if (pandora.user.ui.itemView == 'player') {
             var video = result.data.stream,
                 format = $.support.video.supportedFormat(video.formats);
