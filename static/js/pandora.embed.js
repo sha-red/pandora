@@ -1,16 +1,22 @@
 /***
     Pandora embed
 ***/
-Ox.load('UI', function() {
-var pandora = new Ox.App({
+Ox.load('UI', {
+    debug: true,
+    hideScreen: false,
+    loadImages: true,
+    showScreen: true,
+    theme: 'modern'
+}, function() {
+window.pandora = new Ox.App({url: '/api/'}).bindEvent({
     apiURL: '/api/',
-}).launch(function(data) {
-    var ui = {};
-    var app = {
+}).bindEvent('load', function(data) {
+    $.extend(pandora, {
+        ui: {},
 		info: function(item) {
-			var that = new Ox.Element()
+			var that = Ox.Element()
 		        .append(
-		            ui.infoTimeline = new Ox.Element('img')
+		            ui.infoTimeline = Ox.Element('<img>')
 		                .css({
 		                    position: 'absolute',
 		                    left: 0,
@@ -30,8 +36,52 @@ var pandora = new Ox.App({
 		        )
 		    return that;
 		},
+		clip: function(item, inPoint, outPoint) {
+		    Ox.print('!@#!@#!@#', inPoint, outPoint);
+		    var that = Ox.Element();
+            pandora.api.getItem(item, function(result) {
+                var video = result.data.stream,
+                    format = $.support.video.supportedFormat(video.formats);
+                    video.height = video.profiles[0];
+                video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
+                video.url = video.baseUrl + '/' + video.height + 'p.' + format;
+		        that.append(pandora.player = Ox.VideoPlayer({
+                        controlsBottom: ['playInToOut', 'space', 'position'],
+                        enableFind: false,
+                        enableFullscreen: true,
+                        enableVolume: true,
+                        externalControls: false,
+                        height: 192,
+                        paused: true,
+                        showMarkers: true,
+                        showMilliseconds: 2,
+                        width: 360,
+                        'in': inPoint,
+                        out: outPoint,
+                        position: inPoint,
+                        poster: '/' + item + '/frame/' + '128' + '/' + inPoint +'.jpg',
+                        title: result.data.title,
+                        video: video.url
+                    })
+                    .bindEvent({
+                        position: function(data) {
+                            if(data.position<inPoint || data.position>outPoint) {
+                                if(!pandora.player.options('paused'))
+                                    pandora.player.togglePaused();
+                                pandora.player.options({
+                                    position: inPoint,
+                                });
+                            }
+                        }
+                    })
+
+                );
+                Ox.UI.hideLoadingScreen();
+            });
+		    return that;
+		}, 
         flipbook: function(item) {
-            var that = new Ox.Flipbook({
+            var that = Ox.Flipbook({
                 }).bindEvent('click', function(event, data) {
                     var item_url = document.location.origin + '/' + item;
                     window.top.location.href = item_url + '/timeline#t=' + data.position;
@@ -54,9 +104,29 @@ var pandora = new Ox.App({
                 });
             return that;
         }
-    };
+    });
     var item = document.location.pathname.split('/')[1];
-    ui.info = new app.info(item)
-                     .appendTo(document.body);
+    function getArgument(key, result) {
+        var args = Ox.map(document.location.hash.substr(1).split('&'), function(a) {
+            a = a.split('=');
+            var key = a[0],
+                value = a[1];
+            return {
+                'key': key,
+                'value': value
+            }
+        });
+        $.each(args, function(i, a) {
+            Ox.print(i, a);
+            if (a.key == key) {
+                result = a.value;
+                return false;
+             }
+        });
+        return result;
+    }
+    var t = getArgument('t', '0,10').split(',')
+    pandora.ui.info = pandora.clip(item, parseInt(t[0]), parseInt(t[1]))
+                             .appendTo(document.body);
 });
 });
