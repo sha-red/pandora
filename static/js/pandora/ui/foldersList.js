@@ -3,7 +3,7 @@ pandora.ui.folderList = function(id) {
     var i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id),
         that;
     if (pandora.user.ui.section == 'site') {
-        that = new Ox.TextList({
+        that = Ox.TextList({
             columns: [
                 {
                     format: function() {
@@ -48,7 +48,7 @@ pandora.ui.folderList = function(id) {
             },
         });
     } else if (pandora.user.ui.section == 'items') {
-        that = new Ox.TextList({
+        that = Ox.TextList({
             columns: [
                 {
                     format: function() {

@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.viewSelect = function() {
-    var that = new Ox.Select({
+    var that = Ox.Select({
             id: 'viewSelect',
             items: !pandora.user.ui.item ? $.map(pandora.site.listViews, function(view) {
                 return $.extend($.extend({}, view), {

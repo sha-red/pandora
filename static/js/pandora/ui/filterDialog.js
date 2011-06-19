@@ -1,8 +1,8 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.filterDialog = function() {
-    var that = new Ox.Dialog({
+    var that = Ox.Dialog({
         buttons: [
-            new Ox.Button({
+            Ox.Button({
                     id: 'debug',
                     title: 'Debug',
                 })
@@ -11,7 +11,7 @@ pandora.ui.filterDialog = function() {
                         alert(JSON.stringify(pandora.$ui.filter.options('query')));
                     }
                 }),
-            new Ox.Button({
+            Ox.Button({
                     id: 'cancel',
                     title: 'Cancel'
                 })
@@ -20,7 +20,7 @@ pandora.ui.filterDialog = function() {
                         pandora.$ui.filterDialog.close();
                     }
                 }),
-            new Ox.Button({
+            Ox.Button({
                     id: 'save',
                     title: 'Save'
                 })

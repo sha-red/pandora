@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.item = function() {
-    var that = new Ox.Element();
+    var that = Ox.Element();
     pandora.api.getItem(pandora.user.ui.item, function(result) {
         if (result.status.code != 200) {
             pandora.$ui.contentPanel.replaceElement(1,
@@ -9,7 +9,7 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'calendar') {
             pandora.$ui.contentPanel.replaceElement(1, Ox.Element().html('Calendar'));
         } else if (pandora.user.ui.itemView == 'clips') {
-            pandora.$ui.contentPanel.replaceElement(1, new Ox.IconList({
+            pandora.$ui.contentPanel.replaceElement(1, Ox.IconList({
                 item: function(data, sort, size) {
                     size = size || 128;
                     var ratio = result.data.stream.aspectRatio,
@@ -45,10 +45,10 @@ pandora.ui.item = function() {
             //Ox.print('result.data', result.data)
             if (pandora.user.level == 'admin') {
                 var $form,
-                    $edit = new Ox.Element()
-                    .append($form = new Ox.FormElementGroup({
+                    $edit = Ox.Element()
+                    .append($form = Ox.FormElementGroup({
                         elements: Ox.map(pandora.site.itemKeys, function(key) {
-                            return new Ox.Input({
+                            return Ox.Input({
                                 id: key.id,
                                 label: key.title,
                                 labelWidth: 100,
@@ -61,7 +61,7 @@ pandora.ui.item = function() {
                             {title: '', width: 0}
                         ]
                     }))
-                    .append(new Ox.Button({
+                    .append(Ox.Button({
                         title: 'Save',
                         type: 'text'
                     }).bindEvent({
@@ -90,14 +90,14 @@ pandora.ui.item = function() {
                 $.get('/static/html/itemInfo.html', {}, function(template) {
                     //Ox.print(template);
                     pandora.$ui.contentPanel.replaceElement(1,
-                        pandora.$ui.item = new Ox.Element()
+                        pandora.$ui.item = Ox.Element()
                         .append($.tmpl(template, result.data))
                     );
                 });
             }
 
         } else if (pandora.user.ui.itemView == 'map') {
-            pandora.$ui.contentPanel.replaceElement(1, new Ox.SplitPanel({
+            pandora.$ui.contentPanel.replaceElement(1, Ox.SplitPanel({
                 elements: [
                     {
                         element: pandora.$ui.map = Ox.Map({
@@ -120,7 +120,7 @@ pandora.ui.item = function() {
                         })
                     },
                     {
-                        element: new Ox.Element(),
+                        element: Ox.Element(),
                         id: 'place',
                         size: 144 + Ox.UI.SCROLLBAR_SIZE
                     }
@@ -136,7 +136,7 @@ pandora.ui.item = function() {
                 video.height = video.profiles[0];
             video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
             video.url = video.baseUrl + '/' + video.height + 'p.' + format;
-            pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.player = new Ox.VideoPanelPlayer({
+            pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.player = Ox.VideoPanelPlayer({
                 annotationsSize: pandora.user.ui.annotationsSize,
                 duration: video.duration,
                 height: pandora.$ui.contentPanel.size(1),
@@ -183,7 +183,7 @@ pandora.ui.item = function() {
             $.each(pandora.site.layers, function(i, layer) {
                 layers[i] = $.extend({}, layer, {items: result.data.layers[layer.id]});
             });
-            pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.editor = new Ox.VideoEditor({
+            pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.editor = Ox.VideoEditor({
                 annotationsSize: pandora.user.ui.annotationsSize,
                 cuts: cuts,
                 duration: video.duration,
@@ -263,7 +263,7 @@ pandora.ui.item = function() {
             */                        
         } else if (pandora.user.ui.itemView == 'files') {
             pandora.$ui.contentPanel.replaceElement(1,
-                pandora.$ui.item = new Ox.FilesView({
+                pandora.$ui.item = Ox.FilesView({
                     id: result.data.id
                 })
             );

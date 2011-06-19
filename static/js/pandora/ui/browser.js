@@ -3,7 +3,7 @@ pandora.ui.browser = function() {
     var that;
     if (!pandora.user.ui.item) {
         pandora.$ui.groups = pandora.ui.groups();
-        that = new Ox.SplitPanel({
+        that = Ox.SplitPanel({
             elements: [
                 {
                     element: pandora.$ui.groups[0],
@@ -36,7 +36,7 @@ pandora.ui.browser = function() {
             }
         });
     } else {
-        var that = new Ox.IconList({
+        var that = Ox.IconList({
             centered: true,
             id: 'list',
             item: function(data, sort, size) {

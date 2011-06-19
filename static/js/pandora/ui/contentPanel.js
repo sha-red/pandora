@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.contentPanel = function() {
-    var that = new Ox.SplitPanel({
+    var that = Ox.SplitPanel({
         elements: pandora.user.ui.item == '' ? [
             {
                 collapsed: !pandora.user.ui.showGroups,

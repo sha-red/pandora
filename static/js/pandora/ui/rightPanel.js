@@ -10,14 +10,14 @@ pandora.ui.rightPanel = function() {
                     }
                 });
         } else {
-            that = new Ox.Element()
+            that = Ox.Element()
                 .css({padding: '8px'});
             pandora.api.getPage(pandora.user.ui.sitePage, function(result) {
                 that.html(result.data.body).css({overflowY: 'auto'});                        
             });
         }
     } else if (pandora.user.ui.section == 'items') {
-        that = new Ox.SplitPanel({
+        that = Ox.SplitPanel({
             elements: [
                 {
                     element: pandora.$ui.toolbar = pandora.ui.toolbar(),

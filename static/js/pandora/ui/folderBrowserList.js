@@ -2,7 +2,7 @@
 pandora.ui.folderBrowserList = function(id) {
     var columnWidth = (pandora.user.ui.sidebarSize - Ox.UI.SCROLLBAR_SIZE - 88) / 2,
         i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id),
-        that = new Ox.TextList({
+        that = Ox.TextList({
             columns: [
                 {
                     format: function() {
@@ -193,7 +193,7 @@ pandora.ui.folderList = function(id) {
     var i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id),
         that;
     if (pandora.user.ui.section == 'site') {
-        that = new Ox.TextList({
+        that = Ox.TextList({
             columns: [
                 {
                     format: function() {
@@ -238,7 +238,7 @@ pandora.ui.folderList = function(id) {
             },
         });
     } else if (pandora.user.ui.section == 'items') {
-        that = new Ox.TextList({
+        that = Ox.TextList({
             columns: [
                 {
                     format: function() {
@@ -464,7 +464,7 @@ pandora.ui.folderList = function(id) {
 };
 
 pandora.ui.folders = function() {
-    var that = new Ox.Element()
+    var that = Ox.Element()
         .css({overflowX: 'hidden', overflowY: 'auto'})
         .bindEvent({
             resize: function(event, data) {
@@ -479,7 +479,7 @@ pandora.ui.folders = function() {
     if (pandora.user.ui.section == 'site') {
         $.each(pandora.site.sectionFolders.site, function(i, folder) {
             var height = (Ox.getObjectById(pandora.site.sectionFolders.site, folder.id).items.length * 16);
-            pandora.$ui.folder[i] = new Ox.CollapsePanel({
+            pandora.$ui.folder[i] = Ox.CollapsePanel({
                     id: folder.id,
                     collapsed: !pandora.user.ui.showFolder.site[folder.id],
                     size: 16,
@@ -509,7 +509,7 @@ pandora.ui.folders = function() {
         $.each(pandora.site.sectionFolders.items, function(i, folder) {
             var extras = [];
             if (folder.id == 'personal' && pandora.user.level != 'guest') {
-                extras = [new Ox.Select({
+                extras = [Ox.Select({
                     items: [
                         { id: 'new', title: 'New List...' },
                         { id: 'newfromselection', title: 'New List from Current Selection...', disabled: true },
@@ -549,7 +549,7 @@ pandora.ui.folders = function() {
                     }
                 })];
             } else if (folder.id == 'favorite' && pandora.user.level != 'guest') {
-                extras = [new Ox.Button({
+                extras = [Ox.Button({
                     selectable: true,
                     style: 'symbol',
                     title: 'Edit',
@@ -573,7 +573,7 @@ pandora.ui.folders = function() {
                     }
                 })];
             } else if (folder.id == 'featured' && pandora.user.level == 'admin') {
-                extras = [new Ox.Button({
+                extras = [Ox.Button({
                     selectable: true,
                     style: 'symbol',
                     title: 'Edit',
@@ -596,7 +596,7 @@ pandora.ui.folders = function() {
                     }
                 })];
             }
-            pandora.$ui.folder[i] = new Ox.CollapsePanel({
+            pandora.$ui.folder[i] = Ox.CollapsePanel({
                     id: folder.id,
                     collapsed: !pandora.user.ui.showFolder.items[folder.id],
                     extras: extras,

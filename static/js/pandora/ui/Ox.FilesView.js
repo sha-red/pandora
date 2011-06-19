@@ -3,7 +3,7 @@
 Ox.FilesView = function(options, self) {
 
     var self = self || {},
-        that = new Ox.Element({}, self)
+        that = Ox.Element({}, self)
             .defaults({
                 id: ''
             })
@@ -11,11 +11,11 @@ Ox.FilesView = function(options, self) {
 
     self.selected = [];
 
-    self.$toolbar = new Ox.Bar({
+    self.$toolbar = Ox.Bar({
         size: 24
     });
 
-    self.$orderButton = new Ox.Button({
+    self.$orderButton = Ox.Button({
             title: 'Change Order of Users...'
         })
         .css({
@@ -24,7 +24,7 @@ Ox.FilesView = function(options, self) {
         })
         .appendTo(self.$toolbar);
 
-    self.$moveButton = new Ox.Button({
+    self.$moveButton = Ox.Button({
             disabled: 'true',
             title: 'Move Selected Files...'
         })
@@ -34,7 +34,7 @@ Ox.FilesView = function(options, self) {
         })
         .appendTo(self.$toolbar);
 
-    self.$filesList = new Ox.TextList({
+    self.$filesList = Ox.TextList({
             columns: [
                 {
                     align: 'left',

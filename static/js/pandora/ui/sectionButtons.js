@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.sectionButtons = function() {
-    var that = new Ox.ButtonGroup({
+    var that = Ox.ButtonGroup({
             buttons: [
                 {id: 'site', selected: pandora.user.ui.section == 'site', title: pandora.site.site.name},
                 {id: 'items', selected: pandora.user.ui.section == 'items', title: pandora.site.itemName.plural},

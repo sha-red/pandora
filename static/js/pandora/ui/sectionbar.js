@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.sectionbar = function(mode) {
-    var that = new Ox.Bar({
+    var that = Ox.Bar({
             size: 24
         })
         .append(

@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.annotations = function() {
-    var that = new Ox.Element({
+    var that = Ox.Element({
             id: 'annotations'
         })
         .bindEvent({
@@ -16,7 +16,7 @@ pandora.ui.annotations = function() {
         }),
         $bins = [];
     $.each(pandora.site.layers, function(i, layer) {
-        var $bin = new Ox.CollapsePanel({
+        var $bin = Ox.CollapsePanel({
             id: layer.id,
             size: 16,
             title: layer.title

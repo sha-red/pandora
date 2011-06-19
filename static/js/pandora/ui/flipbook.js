@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.flipbook = function(item) {
-    var that = new Ox.Flipbook({
+    var that = Ox.Flipbook({
         }).bindEvent('click', function(event, data) {
             pandora.UI.set('videoPosition|' + item, data.position);
             pandora.URL.set(item + '/timeline');

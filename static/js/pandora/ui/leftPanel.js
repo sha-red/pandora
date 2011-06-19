@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.leftPanel = function() {
-    var that = new Ox.SplitPanel({
+    var that = Ox.SplitPanel({
             elements: [
                 {
                     element: pandora.$ui.sectionbar = pandora.ui.sectionbar('buttons'),

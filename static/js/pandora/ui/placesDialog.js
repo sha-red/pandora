@@ -2,9 +2,9 @@
 pandora.ui.placesDialog = function() {
     var height = Math.round(window.innerHeight * 0.9),
         width = Math.round(window.innerWidth * 0.9),
-        that = new Ox.Dialog({
+        that = Ox.Dialog({
             buttons: [
-                new Ox.Button({
+                Ox.Button({
                     id: 'done',
                     title: 'Done'
                 }).bindEvent({
@@ -13,7 +13,7 @@ pandora.ui.placesDialog = function() {
                     }
                 })
             ],
-            content: pandora.$ui.placesElement = new Ox.ListMap({
+            content: pandora.$ui.placesElement = Ox.ListMap({
                     height: height - 48,
                     places: function(data, callback) {
                         return pandora.api.findPlaces($.extend({

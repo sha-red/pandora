@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.sortSelect = function() {
-    var that = new Ox.Select({
+    var that = Ox.Select({
             id: 'sortSelect',
             items: $.map(pandora.site.sortKeys, function(key) {
                 //Ox.print('????', pandora.user.ui.lists[pandora.user.ui.list].sort.key, key.id)

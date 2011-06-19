@@ -11,7 +11,7 @@ pandora.ui.group = function(id, query) {
         panelWidth = pandora.$ui.document.width() - (pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize) - 1,
         title = Ox.getObjectById(pandora.site.groups, id).title,
         width = pandora.getGroupWidth(i, panelWidth),
-        that = new Ox.TextList({
+        that = Ox.TextList({
             columns: [
                 {
                     align: 'left',
@@ -70,7 +70,7 @@ pandora.ui.group = function(id, query) {
                 pandora.reloadGroups(i);
             }
         });
-    new Ox.Select({
+    Ox.Select({
             items: $.map(pandora.site.groups, function(v) {
                 return {
                     checked: v.id == id,
@@ -149,7 +149,7 @@ pandora.ui.groups = function() {
 };
 
 pandora.ui.groupsInnerPanel = function() {
-    var that = new Ox.SplitPanel({
+    var that = Ox.SplitPanel({
         elements: [
             {
                 element: pandora.$ui.groups[1],

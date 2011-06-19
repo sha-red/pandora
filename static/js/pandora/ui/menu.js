@@ -1,10 +1,10 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.mainMenu = function() {
     var isGuest = pandora.user.level == 'guest',
-        that = new Ox.MainMenu({
+        that = Ox.MainMenu({
             extras: [
                 $('<div>').html('beta').css({marginRight: '8px', color: 'rgb(128, 128, 128)'}),
-                pandora.$ui.loadingIcon = new Ox.LoadingIcon({
+                pandora.$ui.loadingIcon = Ox.LoadingIcon({
                     size: 'medium'
                 })
             ],
@@ -192,9 +192,9 @@ pandora.ui.mainMenu = function() {
             },
             click: function(event, data) {
                 if (data.id == 'about') {
-                    var $dialog = new Ox.Dialog({
+                    var $dialog = Ox.Dialog({
                         buttons: [
-                            new Ox.Button({
+                            Ox.Button({
                                 id: 'close',
                                 title: 'Close'
                             }).bindEvent({
@@ -382,9 +382,9 @@ pandora.ui.mainMenu = function() {
                     $logo.animate({width: '320px'}, 500);
                         
                     /*
-                    var $dialog = new Ox.Dialog({
+                    var $dialog = Ox.Dialog({
                         buttons: [
-                            new Ox.Button({
+                            Ox.Button({
                                 id: 'close',
                                 title: 'Close'
                             }).bindEvent({
@@ -408,20 +408,20 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'places') {
                     pandora.$ui.placesDialog = pandora.ui.placesDialog().open();
                     /*
-                    var $manage = new Ox.SplitPanel({
+                    var $manage = Ox.SplitPanel({
                             elements: [
                                 {
                                     collapsible: true,
-                                    element: new Ox.SplitPanel({
+                                    element: Ox.SplitPanel({
                                         elements: [
                                             {
-                                                element: new Ox.Toolbar({
+                                                element: Ox.Toolbar({
                                                     orientation: 'horizontal',
                                                     size: 44
                                                 }).append(
-                                                    pandora.$ui.findPlacesElement = new Ox.FormElementGroup({
+                                                    pandora.$ui.findPlacesElement = Ox.FormElementGroup({
                                                         elements: [
-                                                            pandora.$ui.findPlacesSelect = new Ox.Select({
+                                                            pandora.$ui.findPlacesSelect = Ox.Select({
                                                                     id: 'findPlacesSelect',
                                                                     items: [
                                                                         { id: 'name', title: 'Find: Name' },
@@ -439,7 +439,7 @@ pandora.ui.mainMenu = function() {
                                                                         });
                                                                     }
                                                                 }),
-                                                            pandora.$ui.findPlacesInput = new Ox.Input({
+                                                            pandora.$ui.findPlacesInput = Ox.Input({
                                                                 clear: true,
                                                                 id: 'findPlacesInput',
                                                                 placeholder: 'Find: Name',
@@ -453,7 +453,7 @@ pandora.ui.mainMenu = function() {
                                                         margin: '4px'
                                                     })
                                                 ).append(
-                                                    pandora.$ui.sortPlacesSelect = new Ox.Select({
+                                                    pandora.$ui.sortPlacesSelect = Ox.Select({
                                                         id: 'sortPlacesSelect',
                                                         items: [
                                                             { id: 'name', title: 'Sort by Name', checked: true },
@@ -476,10 +476,10 @@ pandora.ui.mainMenu = function() {
                                                 size: 44
                                             },
                                             {
-                                                element: new Ox.Element('div')
+                                                element: Ox.Element('div')
                                             },
                                             {
-                                                element: new Ox.Toolbar({
+                                                element: Ox.Toolbar({
                                                     orientation: 'horizontal',
                                                     size: 16
                                                 }),
@@ -491,14 +491,14 @@ pandora.ui.mainMenu = function() {
                                     size: 256
                                 },
                                 {
-                                    element: new Ox.SplitPanel({
+                                    element: Ox.SplitPanel({
                                         elements: [
                                             {
-                                                element: new Ox.Toolbar({
+                                                element: Ox.Toolbar({
                                                     orientation: 'horizontal',
                                                     size: 24
                                                 }).append(
-                                                    pandora.$ui.labelsButton = new Ox.Button({
+                                                    pandora.$ui.labelsButton = Ox.Button({
                                                             id: 'labelsButton',
                                                             title: [
                                                                 {id: 'show', title: 'Show Labels'},
@@ -511,7 +511,7 @@ pandora.ui.mainMenu = function() {
                                                             margin: '4px'
                                                         })
                                                 ).append(
-                                                    pandora.$ui.findMapInput = new Ox.Input({
+                                                    pandora.$ui.findMapInput = Ox.Input({
                                                         clear: true,
                                                         id: 'findMapInput',
                                                         placeholder: 'Find on Map',
@@ -550,7 +550,7 @@ pandora.ui.mainMenu = function() {
                                                 size: 24
                                             },
                                             {
-                                                element: pandora.$ui.map = new Ox.Map({
+                                                element: pandora.$ui.map = Ox.Map({
                                                         places: ['Boston', 'Brussels', 'Barcelona', 'Berlin', 'Beirut', 'Bombay', 'Bangalore', 'Beijing']
                                                     })
                                                     .css({
@@ -582,12 +582,12 @@ pandora.ui.mainMenu = function() {
                                                     })
                                             },
                                             {
-                                                element: pandora.$ui.bottomBar = new Ox.Toolbar({
+                                                element: pandora.$ui.bottomBar = Ox.Toolbar({
                                                     orientation: 'horizontal',
                                                     size: 24
                                                 })
                                                 .append(
-                                                    pandora.$ui.placeNameInput = new Ox.Input({
+                                                    pandora.$ui.placeNameInput = Ox.Input({
                                                         disabled: true,
                                                         id: 'placeName',
                                                         placeholder: 'Name',
@@ -599,7 +599,7 @@ pandora.ui.mainMenu = function() {
                                                     })
                                                 )
                                                 .append(
-                                                    pandora.$ui.placeAliasesInput = new Ox.Input({
+                                                    pandora.$ui.placeAliasesInput = Ox.Input({
                                                         disabled: true,
                                                         id: 'aliases',
                                                         placeholder: 'Aliases',
@@ -611,7 +611,7 @@ pandora.ui.mainMenu = function() {
                                                     })
                                                 )
                                                 .append(
-                                                    pandora.$ui.placeGeonameLabel = new Ox.Label({
+                                                    pandora.$ui.placeGeonameLabel = Ox.Label({
                                                         disabled: true,
                                                         id: 'placeGeoname',
                                                         title: 'Geoname',
@@ -623,7 +623,7 @@ pandora.ui.mainMenu = function() {
                                                     })
                                                 )
                                                 .append(
-                                                    pandora.$ui.addPlaceButton = new Ox.Button({
+                                                    pandora.$ui.addPlaceButton = Ox.Button({
                                                         disabled: true,
                                                         id: 'addPlaceButton',
                                                         title: 'add',
@@ -635,7 +635,7 @@ pandora.ui.mainMenu = function() {
                                                     })
                                                 )
                                                 .append(
-                                                    pandora.$ui.removePlaceButton = new Ox.Button({
+                                                    pandora.$ui.removePlaceButton = Ox.Button({
                                                         disabled: true,
                                                         id: 'removePlaceButton',
                                                         title: 'remove',
@@ -658,7 +658,7 @@ pandora.ui.mainMenu = function() {
                             top: '24px',
                             bottom: '24px',
                         }),
-                        $dialog = new Ox.Dialog({
+                        $dialog = Ox.Dialog({
                             buttons: [
                                 {
                                     click: function() {
@@ -681,9 +681,9 @@ pandora.ui.mainMenu = function() {
                         }).append($manage).open();
                     */
                 } else if (data.id == 'query') {
-                    var $dialog = new Ox.Dialog({
+                    var $dialog = Ox.Dialog({
                         buttons: [
-                            new Ox.Button({
+                            Ox.Button({
                                 id: 'close',
                                 title: 'Close'
                             }).bindEvent({
@@ -692,7 +692,7 @@ pandora.ui.mainMenu = function() {
                                 }
                             })
                         ],
-                        content: new Ox.Element()
+                        content: Ox.Element()
                             .html([
                                 'Query: ' + JSON.stringify(pandora.Query.toObject()),
                                 'findQuery: ' + JSON.stringify(pandora.user.ui.findQuery),

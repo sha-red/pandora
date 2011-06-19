@@ -1,8 +1,8 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.publicListsDialog = function() { // fixme: unused
-    var that = new Ox.Dialog({
+    var that = Ox.Dialog({
         buttons: [
-            new Ox.Button({
+            Ox.Button({
                 id: 'done',
                 title: 'Done'
             }).bindEvent({

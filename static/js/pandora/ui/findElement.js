@@ -6,9 +6,9 @@ pandora.ui.findElement = function() {
         findKey = pandora.user.ui.findQuery.conditions[0].key;
         findValue = pandora.user.ui.findQuery.conditions[0].value;
     }
-    var that = new Ox.FormElementGroup({
+    var that = Ox.FormElementGroup({
             elements: $.merge(pandora.user.ui.list ? [
-                    pandora.$ui.findListSelect = new Ox.Select({
+                    pandora.$ui.findListSelect = Ox.Select({
                             items: [
                                 {id: 'all', title: 'Find: All ' + pandora.site.itemName.plural},
                                 {id: 'list', title: 'Find: This List'}
@@ -25,7 +25,7 @@ pandora.ui.findElement = function() {
                             }
                         }),
                 ] : [], [
-                    pandora.$ui.findSelect = new Ox.Select({
+                    pandora.$ui.findSelect = Ox.Select({
                             id: 'select',
                             items: $.merge($.map(pandora.site.findKeys,
                             function(key, i) {
@@ -59,7 +59,7 @@ pandora.ui.findElement = function() {
                                 }
                             }
                         }),
-                    pandora.$ui.findInput = new Ox.Input({
+                    pandora.$ui.findInput = Ox.Input({
                         autocomplete: autocompleteFunction(),
                         autocompleteSelect: true,
                         autocompleteSelectHighlight: true,

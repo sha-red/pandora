@@ -1,8 +1,8 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
 pandora.ui.info = function() {
-    var that = new Ox.Element()
+    var that = Ox.Element()
         .append(
-            pandora.$ui.infoStill = new Ox.Element()
+            pandora.$ui.infoStill = Ox.Element()
                 .css({
                     position: 'absolute',
                     left: 0,
@@ -11,7 +11,7 @@ pandora.ui.info = function() {
                 })
         )
         .append(
-            pandora.$ui.infoTimeline = new Ox.Element('<img>')
+            pandora.$ui.infoTimeline = Ox.Element('<img>')
                 .css({
                     position: 'absolute',
                     left: 0,

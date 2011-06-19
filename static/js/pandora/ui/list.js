@@ -12,7 +12,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
         ));
         Ox.print('$$$$', keys)
         */
-        that = new Ox.TextList({
+        that = Ox.TextList({
             columns: $.map(pandora.site.sortKeys, function(key, i) {
                 var position = pandora.user.ui.lists[pandora.user.ui.list].columns.indexOf(key.id);
                 return {
@@ -70,7 +70,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
             }
         });
     } else if (view == 'icons') {
-        that = new Ox.IconList({
+        that = Ox.IconList({
             id: 'list',
             item: function(data, sort, size) {
                 var ratio = data.poster.width / data.poster.height;
@@ -96,7 +96,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
             unique: 'id'
         });
     } else if (view == 'clip') {
-        that = new Ox.IconList({
+        that = Ox.IconList({
             item: function(data, sort, size) {
                 size = size || 128;
                 var ratio = data.aspectRatio,
@@ -132,7 +132,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
             unique: 'id'
         });
     } else if (view == 'map') {
-        that = new Ox.SplitPanel({
+        that = Ox.SplitPanel({
             elements: [
                 {
                     element: pandora.$ui.map = Ox.Map({
@@ -151,7 +151,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                     })
                 },
                 {
-                    element: new Ox.Element(),
+                    element: Ox.Element(),
                     id: 'place',
                     size: 144 + Ox.UI.SCROLLBAR_SIZE
                 }
@@ -162,7 +162,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
             pandora.$ui.map.resizeMap();
         });
     } else if (view == 'calendar') {
-        that = new Ox.SplitPanel({
+        that = Ox.SplitPanel({
             elements: [
                 {
                     element: pandora.$ui.calendar = Ox.Calendar({
@@ -188,7 +188,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                     })
                 },
                 {
-                    element: new Ox.Element(),
+                    element: Ox.Element(),
                     id: 'place',
                     size: 144 + Ox.UI.SCROLLBAR_SIZE
                 }
@@ -199,7 +199,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
 
         });
     } else {
-        $list = new Ox.Element('<div>')
+        $list = Ox.Element('<div>')
             .css({
                 width: '100px',
                 height: '100px',
@@ -313,9 +313,9 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                             bottom: 0,
                             margin: 'auto',
                         });
-                    pandora.$ui.previewDialog = new Ox.Dialog({
+                    pandora.$ui.previewDialog = Ox.Dialog({
                             buttons: [
-                                new Ox.Button({
+                                Ox.Button({
                                     title: 'Close',
                                 }).bindEvent({
                                     click: function() {
