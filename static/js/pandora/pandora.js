@@ -130,8 +130,8 @@ pandora.reloadGroups = function(i) {
             });
         }
     });
-    history.pushState({}, '', pandora.Query.toString(query));
-}
+    history.pushState({}, '', pandora.Query.toString());
+};
 
 pandora.getListData = function() {
     var data = {};
@@ -142,7 +142,7 @@ pandora.getListData = function() {
     }
     data.editable = data.user == pandora.user.username && data.type == 'static';
     return data;
-}
+};
 
 pandora.reloadList = function() {
     Ox.print('reloadList')
