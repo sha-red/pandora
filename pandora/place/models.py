@@ -43,6 +43,7 @@ class Place(models.Model):
 
     matches = models.IntegerField(default=0)
     items = models.ManyToManyField(Item, blank=True, related_name='places')
+    annotations = models.ManyToManyField(Annotation, blank=True, related_name='places')
 
     objects = managers.PlaceManager()
 
@@ -74,14 +75,18 @@ class Place(models.Model):
         return j
 
     def get_matches(self):
-        q = Q(value__icontains=" " + self.name)|Q(value__startswith=self.name)
+        q = Q(value__contains=" " + self.name)|Q(value__startswith=self.name)
         for name in self.alternativeNames:
-            q = q|Q(value__icontains=" " + name)|Q(value__startswith=name)
+            q = q|Q(value__contains=" " + name)|Q(value__startswith=name)
         return Annotation.objects.filter(q)
 
     def update_matches(self):
         matches = self.get_matches()
         self.matches = matches.count()
+        for i in self.annotations.exclude(id__in=matches):
+            self.annotations.remove(i)
+        for i in matches.exclude(id__in=self.annotations.all()):
+            self.annotations.add(i)
         ids = list(set([a.item.id for a in matches]))
         for i in self.items.exclude(id__in=ids):
             self.items.remove(i)

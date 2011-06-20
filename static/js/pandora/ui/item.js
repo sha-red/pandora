@@ -117,10 +117,54 @@ pandora.ui.item = function() {
                             showTypes: true,
                             toolbar: true,
                             width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE
+                        }).bindEvent({
+                            selectplace: function(event, place) {
+                                if(place) {
+                                    pandora.$ui.clips.options({
+                                        items: function(data, callback) {
+                                            return pandora.api.findAnnotations($.extend(data, {
+                                                query: {
+                                                    conditions:[{key: 'place', value: place.id, operator:'='}]
+                                                },
+                                                itemQuery: {conditions: [{
+                                                        key: 'id',
+                                                        value: pandora.user.ui.item,
+                                                        operator: '='
+                                                 }]}
+                                            }), callback);
+                                        }
+                                    });
+                                } else {
+                                    pandora.$ui.clips.options({
+                                        items: []
+                                    });
+                                }
+                            }
                         })
                     },
                     {
-                        element: Ox.Element(),
+                        element: pandora.$ui.clips = Ox.IconList({
+                            item: function(data, sort, size) {
+                                size = size || 128;
+                                var ratio = data.aspectRatio,
+                                    width = size,
+                                    height = size/ratio,
+                                    url = '/' + data.item + '/frame/' + size + '/'+data['in'] + '.jpg';
+                                return {
+                                    height: height,
+                                    id: data['id'],
+                                    info: Ox.formatDuration(data['in'], 'short') +' - '+ Ox.formatDuration(data['out'], 'short'),
+                                    title: data.value,
+                                    url: url,
+                                    width: width
+                                };
+                            },
+                            items: [],
+                            keys: ['id', 'value', 'in', 'out', 'aspectRatio', 'item'],
+                            size: 128,
+                            sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
+                            unique: 'id'
+                        }),
                         id: 'place',
                         size: 144 + Ox.UI.SCROLLBAR_SIZE
                     }
