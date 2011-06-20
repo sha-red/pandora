@@ -1,4 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=js
+
+
 pandora.URL = (function() {
 
     var old = {
@@ -117,10 +119,9 @@ pandora.URL = (function() {
                     ].options('position')
                 );
             }
-            delete old.user.ui;
+            //delete old.user.ui;
         }
 
-    }
+    };
 
 }());
-

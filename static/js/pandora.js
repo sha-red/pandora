@@ -85,7 +85,7 @@ Ox.load('Geo', function() {
                 }
 
                 pandora.URL.parse();
-                window.onpopstate = function() {
+                window.onpopstate = function(event) {
                     pandora.URL.update();
                 };
 
