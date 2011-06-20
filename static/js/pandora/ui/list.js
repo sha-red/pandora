@@ -130,6 +130,14 @@ pandora.ui.list = function(view) { // fixme: remove view argument
             size: 128,
             sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
             unique: 'id'
+        }).bindEvent({
+            open: function(event, data) {
+                var id = data.ids[0],
+                    item = that.value(id, 'item'),
+                    position = that.value(id, 'in');
+                pandora.UI.set('videoPosition|' + item, position);
+                pandora.URL.set(item + '/timeline');
+            }
         });
     } else if (view == 'map') {
         that = Ox.SplitPanel({
@@ -191,6 +199,14 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                         size: 128,
                         sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
                         unique: 'id'
+                    }).bindEvent({
+                        open: function(event, data) {
+                            var id = data.ids[0],
+                                item = pandora.$ui.clips.value(id, 'item'),
+                                position = pandora.$ui.clips.value(id, 'in');
+                            pandora.UI.set('videoPosition|' + item, position);
+                            pandora.URL.set(item + '/timeline');
+                        }
                     }),
                     id: 'place',
                     size: 144 + Ox.UI.SCROLLBAR_SIZE

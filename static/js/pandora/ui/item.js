@@ -9,7 +9,7 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'calendar') {
             pandora.$ui.contentPanel.replaceElement(1, Ox.Element().html('Calendar'));
         } else if (pandora.user.ui.itemView == 'clips') {
-            pandora.$ui.contentPanel.replaceElement(1, Ox.IconList({
+            pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.clips = Ox.IconList({
                 item: function(data, sort, size) {
                     size = size || 128;
                     var ratio = result.data.stream.aspectRatio,
@@ -40,6 +40,14 @@ pandora.ui.item = function() {
                 size: 128,
                 sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
                 unique: 'id'
+            }).bindEvent({
+                open: function(event, data) {
+                    var id = data.ids[0],
+                        item = pandora.user.ui.item,
+                        position = pandora.$ui.clips.value(id, 'in');
+                    pandora.UI.set('videoPosition|' + item, position);
+                    pandora.URL.set(item + '/timeline');
+                }
             }));
         } else if (pandora.user.ui.itemView == 'info') {
             //Ox.print('result.data', result.data)
@@ -164,6 +172,14 @@ pandora.ui.item = function() {
                             size: 128,
                             sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
                             unique: 'id'
+                        }).bindEvent({
+                            open: function(event, data) {
+                                var id = data.ids[0],
+                                    item = pandora.user.ui.item,
+                                    position = pandora.$ui.clips.value(id, 'in');
+                                pandora.UI.set('videoPosition|' + item, position);
+                                pandora.URL.set(item + '/timeline');
+                            }
                         }),
                         id: 'place',
                         size: 144 + Ox.UI.SCROLLBAR_SIZE
