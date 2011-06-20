@@ -451,7 +451,7 @@ Positions
         qs = _order_query(qs, query['sort'])
 
         response['data']['positions'] = {}
-        ids = [j['itemId'] for j in qs.values('itemId')]
+        ids = [j['oshash'] for j in qs.values('oshash')]
         response['data']['positions'] = utils.get_positions(ids, query['positions'])
 
     elif 'keys' in query:
