@@ -150,12 +150,12 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                         width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE,
                     }).bindEvent({
                         selectplace: function(event, place) {
-                            if(place) {
+                            if(place && place.id[0] != '_') {
                                 pandora.$ui.clips.options({
                                     items: function(data, callback) {
                                         return pandora.api.findAnnotations($.extend(data, {
                                             query: {
-                                                conditions:[{key: 'place', value: place.name, operator:'='}]
+                                                conditions:[{key: 'place', value: place.id, operator:'='}]
                                             },
                                             itemQuery: pandora.Query.toObject()
                                         }), callback);
