@@ -447,7 +447,8 @@ Positions
             response['data']['items'] = qs.count()
     elif 'positions' in query:
         #FIXME: this does not scale for larger results
-        qs = _order_query(query['qs'], query['sort'])
+        qs = models.File.objects.filter(item__in=query['qs'])
+        qs = _order_query(qs, query['sort'])
 
         response['data']['positions'] = {}
         ids = [j['itemId'] for j in qs.values('itemId')]
