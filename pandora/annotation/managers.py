@@ -20,7 +20,7 @@ def parseCondition(condition, user):
     k = condition.get('key', 'name')
     k = {
         'user': 'user__username',
-        'place': 'places__id',
+        'place': 'places__name',
     }.get(k, k)
     if not k:
         k = 'name'

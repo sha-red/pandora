@@ -155,7 +155,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                                     items: function(data, callback) {
                                         return pandora.api.findAnnotations($.extend(data, {
                                             query: {
-                                                conditions:[{key: 'place', value: place.id, operator:'='}]
+                                                conditions:[{key: 'place', value: place.name, operator:'='}]
                                             },
                                             itemQuery: pandora.Query.toObject()
                                         }), callback);
