@@ -56,7 +56,7 @@ def update_or_create_instance(volume, f):
         instance = models.Instance.objects.filter(name=f['name'], folder=f['folder'], volume=volume)
         if instance.count()>0:
             #same path, other oshash, keep path/item mapping, remove instance
-            item = instance[0].item
+            item = instance[0].file.item
             instance.delete()
         else: #new instance
             item = None
