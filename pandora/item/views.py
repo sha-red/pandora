@@ -553,7 +553,9 @@ def poster(request, id, size=None):
         if not size:
             size='large'
         poster_path = os.path.join(settings.STATIC_ROOT, 'png/posterDark.48.png')
-    return HttpFileResponse(poster_path, content_type='image/jpeg')
+    response = HttpFileResponse(poster_path, content_type='image/jpeg')
+    response['Cache-Control'] = 'no-cache'
+    return response
 
 
 def icon(request, id, size=None):

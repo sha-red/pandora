@@ -3,6 +3,7 @@
 -e bzr+http://code.0x2620.org/python-ox/#egg=python-ox
 -e bzr+http://code.0x2620.org/oxtimeline/#egg=oxtimeline
 simplejson
+chardet
 -e hg+https://django-ajax-filtered-fields.googlecode.com/hg/#egg=django-ajax-filtered-fields
 celery>2.1.1
 django-celery>2.1.1

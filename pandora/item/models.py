@@ -100,9 +100,8 @@ class Item(models.Model):
     user = models.ForeignKey(User, null=True, related_name='items')
     groups = models.ManyToManyField(Group, blank=True, related_name='items')
 
-    #only items that have data from files are available,
-    #this is indicated by setting available to True
-    available = models.BooleanField(default=False, db_index=True)
+    #while metadata is updated, files are set to rendered=False
+    rendered = models.BooleanField(default=False, db_index=True)
     public = models.BooleanField(default=False, db_index=True)
 
     itemId = models.CharField(max_length=128, unique=True, blank=True)
@@ -133,7 +132,7 @@ class Item(models.Model):
         return default
 
     def access(self, user):
-        if self.public and self.available:
+        if self.public:
             return True
         elif user.is_authenticated() and \
              (user.is_staff or self.user == user or \
@@ -333,7 +332,8 @@ class Item(models.Model):
 
     def get_json(self, fields=None):
         i = {
-            'id': self.itemId
+            'id': self.itemId,
+            'rendered': self.rendered
         }
         i.update(self.external_data)
         i.update(self.data)
@@ -526,7 +526,7 @@ class Item(models.Model):
             s.volume = None
 
         if 'color' in self.data:
-            s.hue, s.saturation, s.brightness = self.data['color']
+            s.hue, s.saturation, s.lightness = self.data['color']
         else:
             s.hue = None
             s.saturation = None
@@ -657,7 +657,7 @@ class Item(models.Model):
             self.make_local_posters()
             self.make_poster()
             self.make_icon()
-            self.available = True
+            self.rendered = True
             self.save()
 
     '''

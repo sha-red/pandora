@@ -48,7 +48,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
         })
         .bindEvent({
             columnchange: function(event, data) {
-                var columnWidth = {}
+                var columnWidth = {};
                 pandora.UI.set(['lists', pandora.user.ui.list, 'columns'].join('|'), data.ids);
                 /*
                 data.ids.forEach(function(id) {
@@ -95,6 +95,16 @@ pandora.ui.list = function(view) { // fixme: remove view argument
             sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
             unique: 'id'
         });
+    } else if (view == 'info') {
+        that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
+    } else if (view == 'clips') {
+        that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
+    } else if (view == 'timelines') {
+        that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
+    } else if (view == 'maps') {
+        that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
+    } else if (view == 'calendars') {
+        that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
     } else if (view == 'clip') {
         that = Ox.IconList({
             item: function(data, sort, size) {

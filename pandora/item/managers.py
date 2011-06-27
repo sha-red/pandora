@@ -239,7 +239,6 @@ class ItemManager(Manager):
         #join query with operator
         qs = self.get_query_set()
         #only include items that have hard metadata
-        qs = qs.filter(available=True)
         conditions = parseConditions(data.get('query', {}).get('conditions', []),
                                      data.get('query', {}).get('operator', '&'))
         qs = qs.filter(conditions).distinct()

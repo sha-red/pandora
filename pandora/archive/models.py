@@ -20,13 +20,14 @@ import chardet
 from item import utils
 from item.models import Item
 from person.models import get_name_sort
-from annotation.models import Annotation, Layer
+
 
 class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
     verified = models.BooleanField(default=False)
+    auto = models.BooleanField(default=True)
 
     oshash = models.CharField(max_length=16, unique=True)
     item = models.ForeignKey(Item, related_name='files')
@@ -75,7 +76,7 @@ class File(models.Model):
     def __unicode__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
+    def set_state(self):
         instance = self.get_instance()
         if instance:
             if instance.name.lower().startswith('extras/'):
@@ -152,6 +153,10 @@ class File(models.Model):
 
         if self.type not in ('audio', 'video'):
             self.duration = None
+
+    def save(self, *args, **kwargs):
+        if self.auto:
+            self.set_state()
         super(File, self).save(*args, **kwargs)
 
     #upload and data handling
@@ -268,7 +273,7 @@ class File(models.Model):
             'height': self.height,
             'width': self.width,
             'resolution': resolution,
-            'oshash': self.oshash,
+            'id': self.oshash,
             'samplerate': self.samplerate,
             'video_codec': self.video_codec,
             'audio_codec': self.audio_codec,

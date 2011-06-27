@@ -6,6 +6,14 @@ pandora.ui.item = function() {
             pandora.$ui.contentPanel.replaceElement(1,
                 Ox.Element().html(
                     'The '+pandora.site.itemName.singular+' you are looking for does not exist.'));
+        } else if (!result.data.rendered &&
+                   ['clips', 'map',
+                    'player', 'timeline'].indexOf(pandora.user.ui.itemView)>-1) {
+            pandora.$ui.contentPanel.replaceElement(1,
+                Ox.Element().css({margin: '16px'}).html(
+                    'We are sorry, "' + result.data.title +
+                    '" does not have a '+pandora.user.ui.itemView +
+                    ' view right now.'));
         } else if (pandora.user.ui.itemView == 'calendar') {
             pandora.$ui.contentPanel.replaceElement(1, Ox.Element().html('Calendar'));
         } else if (pandora.user.ui.itemView == 'clips') {
@@ -55,7 +63,7 @@ pandora.ui.item = function() {
                 var $form,
                     $edit = Ox.Element()
                     .append($form = Ox.FormElementGroup({
-                        elements: Ox.map(pandora.site.itemKeys, function(key) {
+                        elements: Ox.map(pandora.site.sortKeys, function(key) {
                             return Ox.Input({
                                 id: key.id,
                                 label: key.title,
@@ -228,7 +236,14 @@ pandora.ui.item = function() {
                 }
             }));
         } else if (pandora.user.ui.itemView == 'statistics') {
-            pandora.$ui.contentPanel.replaceElement(1, Ox.Element().html('Statistics'));
+            var stats = Ox.Container();
+            Ox.TreeList({
+                data: result.data,
+                width: 256
+            }).appendTo(stats);
+
+            pandora.$ui.contentPanel.replaceElement(1, stats);
+
         } else if (pandora.user.ui.itemView == 'timeline') {
             var layers = [],
                 video = result.data.stream,

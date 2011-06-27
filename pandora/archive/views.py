@@ -119,7 +119,7 @@ actions.register(encodingProfile)
 @login_required_json
 def upload(request):
     '''
-        oshash: string
+        id: string
         frame: [] //multipart frames
         file: [] //multipart file
 
@@ -132,7 +132,7 @@ def upload(request):
         }
     '''
     response = json_response({})
-    f = get_object_or_404_json(models.File, oshash=request.POST['oshash'])
+    f = get_object_or_404_json(models.File, oshash=request.POST['id'])
     if 'frame' in request.FILES:
         if f.frames.count() == 0:
             for frame in request.FILES.getlist('frame'):
@@ -164,7 +164,7 @@ class VideoChunkForm(forms.Form):
 @login_required_json
 def firefogg_upload(request):
     profile = request.GET['profile']
-    oshash = request.GET['oshash']
+    oshash = request.GET['id']
     #handle video upload
     if request.method == 'POST':
         #post next chunk
@@ -203,7 +203,7 @@ def firefogg_upload(request):
                 f.save()
                 response = {
                     #is it possible to no hardcode url here?
-                    'uploadUrl': request.build_absolute_uri('/api/upload/?oshash=%s&profile=%s' % (f.oshash, profile)),
+                    'uploadUrl': request.build_absolute_uri('/api/upload/?id=%s&profile=%s' % (f.oshash, profile)),
                     'result': 1
                 }
                 return render_to_json_response(response)
@@ -220,6 +220,7 @@ def taskStatus(request):
     response = task_status(request, task_id)
     return render_to_json_response(response)
 actions.register(taskStatus, cache=False)
+
 
 @login_required_json
 def moveFiles(request):
@@ -253,37 +254,34 @@ def moveFiles(request):
     return render_to_json_response(response)
 actions.register(moveFiles, cache=False)
 
+
 @login_required_json
 def editFile(request):
     '''
         change file / item link
         param data {
-            oshash: hash of file
-            itemId: new itemId
+            id: hash of file
+            part:
+            id_extra: boolean
         }
 
         return {
             status: {'code': int, 'text': string},
             data: {
-                imdbId:string
             }
         }
     '''
     #FIXME: permissions, need to be checked
     data = json.loads(request.POST['data'])
-    f = get_object_or_404_json(models.File, oshash=data['oshash'])
+    f = get_object_or_404_json(models.File, oshash=data['id'])
     response = json_response()
-    if f.item.id != data['itemId']:
-        if len(data['itemId']) != 7:
-            folder = f.instances.all()[0].folder
-            item_info = utils.parse_path(folder)
-            item = get_item(item_info)
-        else:
-            item = get_item({'imdbId': data['itemId']})
-        f.item = item
+    if data.keys() != ('id', ):
+        for key in data:
+            if key in ('is_extra', 'is_subtitle', 'is_video', 'is_version',
+                       'part', 'language'):
+                setattr(f, key, data[key])
+        f.auto = False
         f.save()
-        #FIXME: other things might need updating here
-        response = json_response(text='updated')
     return render_to_json_response(response)
 actions.register(editFile, cache=False)
 

@@ -105,9 +105,9 @@ Ox.FilesView = function(options, self) {
                 },
                 {
                     align: 'left',
-                    id: 'oshash',
+                    id: 'id',
                     operator: '+',
-                    title: 'Hash',
+                    title: 'ID',
                     unique: true,
                     visible: false,
                     width: 120
