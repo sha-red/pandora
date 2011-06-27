@@ -3,6 +3,7 @@
 from __future__ import division
 import os.path
 from datetime import datetime
+import mimetypes
 
 from django.db.models import Count, Sum, Max
 from django.http import HttpResponse, Http404
@@ -581,16 +582,20 @@ def timeline_overview(request, id, size):
     return HttpFileResponse(timeline, content_type='image/png')
 
 
-def video(request, id, profile):
+def video(request, id, profile, oshash=None):
     item = get_object_or_404(models.Item, itemId=id)
-    stream = get_object_or_404(item.streams, profile=profile)
-    path = stream.video.path
-    content_type = path.endswith('.mp4') and 'video/mp4' or 'video/webm'
+    if oshash:
+        stream = get_object_or_404(item.files, oshash=oshash)
+        path = stream.video.path
+    else:
+        stream = get_object_or_404(item.streams, profile=profile)
+        path = stream.video.path
     #server side cutting
     t = request.GET.get('t')
     if t:
         t = map(float, t.split(','))
         ext = os.path.splitext(profile)[1]
+        content_type = mimetypes.guess_type(path)[0]
         if len(t) == 2 and t[1] > t[0] and stream.info['duration']>=t[1]:
             response = HttpResponse(extract.chop(path, t[0], t[1]), content_type=content_type)
             filename = "Clip of %s - %s-%s - %s %s%s" % (
@@ -613,4 +618,4 @@ def video(request, id, profile):
             response = HttpFileResponse(path, content_type=content_type)
             response['Content-Disposition'] = 'attachment; filename="%s"' % filename
             return response
-    return HttpFileResponse(path, content_type=content_type)
+    return HttpFileResponse(path)

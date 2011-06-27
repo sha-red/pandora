@@ -589,7 +589,7 @@ class Item(models.Model):
     def main_videos(self):
         #FIXME: needs to check if more than one user has main files and only
         #       take from "higher" user
-        videos = self.files.filter(is_main=True, is_video=True, available=True).order_by('part')
+        videos = self.files.filter(is_main=True, is_video=True, available=True, instances__gt=0).order_by('part')
         if videos.count()>0:
             first = videos[0]
             user = first.instances.all()[0].volume.user
