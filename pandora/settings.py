@@ -172,6 +172,8 @@ DEFAULT_THEME = "classic"
 VIDEO_PROFILE = '96p.webm'
 VIDEO_DERIVATIVES = []
 
+TRACKER_URL="http://url2torrent.net:6970/announce"
+
 #0xdb
 '''
 VIDEO_PROFILE = '96p.webm'

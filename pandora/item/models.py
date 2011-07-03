@@ -9,6 +9,7 @@ from glob import glob
 import shutil
 import uuid
 import unicodedata
+from urllib import quote
 
 from django.db import models
 from django.db.models import Sum
@@ -17,6 +18,7 @@ from django.utils import simplejson as json
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.db.models.signals import pre_delete
+from django.contrib.sites.models import Site
 
 import ox
 from ox.django import fields
@@ -118,6 +120,9 @@ class Item(models.Model):
 
     icon = models.ImageField(default=None, blank=True,
                              upload_to=lambda i, x: i.path("icon.jpg"))
+
+    torrent = models.FileField(default=None, blank=True,
+                               upload_to=lambda i, x: i.path('torrent.torrent'))
 
     #stream related fields
     stream_aspect = models.FloatField(default=4/3)
@@ -613,6 +618,58 @@ class Item(models.Model):
                 videos = filter(check, audio)
  
         return videos
+
+    def make_torrent(self):
+        base = self.path('torrent')
+        base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, base))
+        if os.path.exists(base):
+            shutil.rmtree(base)
+        os.makedirs(base)
+
+        base = self.path('torrent/%s' % self.get('title'))
+        base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, base))
+        size = 0
+        duration = 0.0
+        if len(self.main_videos()) == 1:
+            url =  "%s/torrent/%s.webm" % (self.get_absolute_url(),
+                                           quote(self.get('title').encode('utf-8')))
+            video = "%s.webm" % base
+            v = self.main_videos()[0]
+            os.symlink(v.video.path, video)
+            info = ox.avinfo(video)
+            size = info.get('size', 0)
+            duration = info.get('duration', 0.0)
+        else:
+            url =  "%s/torrent/" % self.get_absolute_url()
+            part = 1
+            os.makedirs(base)
+            for v in self.main_videos():
+                video = "%s/%s.Part %d.webm" % (base, self.get('title'), part)
+                part += 1
+                os.symlink(v.video.path, video)
+                info = ox.avinfo(video)
+                size += info.get('size', 0)
+                duration += info.get('duration', 0.0)
+            video = base
+
+        torrent = '%s.torrent' % base
+        url = "http://%s%s" % (Site.objects.get_current().domain, url)
+        meta = {
+            'target': torrent,
+            'url-list': url,
+        }
+        if duration:
+            meta['playtime'] = ox.formatDuration(duration*1000)[:-4]
+
+        #slightly bigger torrent file but better for streaming
+        piece_size_pow2 = 15 #1 mbps -> 32KB pieces
+        if size / duration >= 1000000:
+            piece_size_pow2 = 16 #2 mbps -> 64KB pieces
+        meta['piece_size_pow2'] = piece_size_pow2
+
+        ox.torrent.createTorrent(video, settings.TRACKER_URL, meta)
+        self.torrent.name = self.path('torrent/%s.torrent' % self.get('title'))
+        self.save()
 
     def update_streams(self):
         files = {}

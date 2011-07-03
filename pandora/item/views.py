@@ -581,8 +581,24 @@ def timeline_overview(request, id, size):
     timeline = '%s.%s.png' %(item.timeline_prefix, size)
     return HttpFileResponse(timeline, content_type='image/png')
 
+def torrent(request, id, filename=None):
+    item = get_object_or_404(models.Item, itemId=id)
+    if not item.torrent:
+        raise Http404
+    if not filename or filename.endswith('.torrent'):
+        response = HttpFileResponse(item.torrent.path,
+                                    content_type='application/x-bittorrent')
+        filename = "%s.torrent" % item.get('title')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+        return response
+    while filename.startswith('/'):
+        filename = filename[1:]
+    filename = filename.replace('/../', '/')
+    filename = item.path('torrent/%s' % filename)
+    filename = os.path.abspath(os.path.join(settings.MEDIA_ROOT, filename))
+    return HttpFileResponse(filename)
 
-def video(request, id, profile, oshash=None):
+def video(request, id, profile, oshash=None, format=None):
     item = get_object_or_404(models.Item, itemId=id)
     if oshash:
         stream = get_object_or_404(item.files, oshash=oshash)
