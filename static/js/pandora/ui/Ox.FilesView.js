@@ -287,16 +287,19 @@ Ox.FilesView = function(options, self) {
         .css({margin: '0 4px 4px 4px'})
         .bindEvent({
             click: function() {
-                var itemId = self.$idInput.value();
-                Ox.Request.clearCache(); // fixme: remove
-                pandora.api.moveFiles({
+                var data = {
                     ids: self.selected,
-                    itemId: itemId
-                }, function() {
+                    itemId: self.$idInput.value()
+                };
+                ['title', 'director', 'year'].forEach(function(key) {
+                    data[key] = self['$' + key + 'Input'].value();
+                });
+                Ox.Request.clearCache(); // fixme: remove
+                pandora.api.moveFiles(data, function(result) {
                     if(self.$checkbox.value()) {
-                        pandora.URL.set(itemId);
+                        pandora.URL.set(result.data.itemId);
                     } else {
-                        Ox.print('moved', self.selected, itemId);
+                        Ox.print('moved', self.selected, result.data.itemId);
                         self.$filesList.reloadList();
                         self.$instancesList.reloadList();
                     }

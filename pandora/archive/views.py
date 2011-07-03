@@ -185,7 +185,7 @@ def firefogg_upload(request):
                     f.save()
                     #FIXME: this fails badly if rabbitmq goes down
                     try:
-                        t = item.tasks.update_streams.delay((f.item.itemId))
+                        t = item.tasks.update_streams.delay(f.item.itemId)
                         response['resultUrl'] = t.task_id
                     except:
                         pass
@@ -237,20 +237,28 @@ def moveFiles(request):
             }
         }
     '''
-    #FIXME: permissions, need to be checked
     data = json.loads(request.POST['data'])
+    if models.Item.objects.filter(itemId=data['itemId']).count() == 1:
+        item = models.Item.objects.get(itemId=data['itemId'])
+    else:
+        if len(data['itemId']) != 7:
+            del data['itemId']
+            item = get_item(data)
+        else:
+            item = get_item({'imdbId': data['itemId']})
+    changed = []
     for f in models.File.objects.filter(oshash__in=data['ids']):
-        if f.item.id != data['itemId']:
-            if len(data['itemId']) != 7:
-                folder = f.instances.all()[0].folder
-                item_info = utils.parse_path(folder)
-                item = get_item(item_info)
-            else:
-                item = get_item({'imdbId': data['itemId']})
+        if f.item.id != data['itemId'] and f.editable(request.user):
+            if f.item.itemId not in changed:
+                changed.append(f.item.itemId)
+            if item.itemId not in changed:
+                changed.append(item.itemId)
             f.item = item
             f.save()
-            #FIXME: other things might need updating here
+    for itemId in changed:
+        item.tasks.update_streams.delay(itemId)
     response = json_response(text='updated')
+    response['data']['itemId'] = item.itemId
     return render_to_json_response(response)
 actions.register(moveFiles, cache=False)
 
