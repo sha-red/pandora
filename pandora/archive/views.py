@@ -227,7 +227,7 @@ def moveFiles(request):
     '''
         change file / item link
         param data {
-            ids: hashes of files
+            ids: ids of files
             itemId: new itemId
         }
 

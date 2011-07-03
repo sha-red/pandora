@@ -123,6 +123,7 @@ class Item(models.Model):
 
     torrent = models.FileField(default=None, blank=True,
                                upload_to=lambda i, x: i.path('torrent.torrent'))
+    stream_info = fields.DictField(default={}, editable=False)
 
     #stream related fields
     stream_aspect = models.FloatField(default=4/3)
@@ -671,15 +672,14 @@ class Item(models.Model):
         self.torrent.name = self.path('torrent/%s.torrent' % self.get('title'))
         self.save()
 
-    def update_streams(self):
+    def update_streams(self, force=False):
         files = {}
         for f in self.main_videos():
             files[utils.sort_title(f.name)] = f.video.path
-
-        #FIXME: how to detect if something changed?
-        if files:
+        if force or self.stream_info != files:
+            self.stream_info = files
             stream, created = Stream.objects.get_or_create(item=self,
-                                     profile=settings.VIDEO_PROFILE)
+                                                           profile=settings.VIDEO_PROFILE)
             stream.video.name = stream.path()
             cmd = []
             if os.path.exists(stream.video.path):
