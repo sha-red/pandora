@@ -56,10 +56,24 @@ def get_item(info, user=None):
                 item.save()
                 tasks.update_external.delay(item.itemId)
         else:
-            q = Item.objects.filter(find__key='title', find__value=info['title'])
-            if q.count() > 1:
-                print "FIXME: check more than title here!!?"
+            q = Item.objects.all()
+            for key in ('title', 'director', 'year'):
+                if key in info and info[key]:
+                    q = q.filter(find__key=key, find__value=info[key])
+            if q.count() >= 1:
                 item = q[0]
+            elif not 'oxdbId' in info:
+                item = Item()
+                item.data = {
+                    'title': info['title'],
+                    'director': info['director'],
+                    'year': info.get('year', '')
+                }
+                for key in ('episode_title', 'series_title', 'season', 'episode'):
+                    if key in info and info[key]:
+                        item.data[key] = info[key]
+                item.oxdbId = item.oxdb_id()
+                item.save()
             else:
                 try:
                     item = Item.objects.get(itemId=info['oxdbId'])
@@ -219,9 +233,14 @@ class Item(models.Model):
                 self.itemId = str(uuid.uuid1())
             super(Item, self).save(*args, **kwargs)
             if not settings.USE_IMDB:
-                self.itemId = ox.to32(self.id)    
+                self.itemId = ox.to32(self.id)
  
         self.oxdbId = self.oxdb_id()
+        
+        #id changed, what about existing item with new id?
+        if settings.USE_IMDB and len(self.itemId) != 7 and self.oxdbId != self.itemId:
+            self.itemId = self.oxdbId
+            #FIXME: move files to new id here
 
         if self.poster:
             self.poster_height = self.poster.height
@@ -714,7 +733,7 @@ class Item(models.Model):
             self.make_local_posters()
             self.make_poster()
             self.make_icon()
-            self.rendered = True
+            self.rendered = files != {} 
             self.save()
 
     '''
