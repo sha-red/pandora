@@ -448,6 +448,7 @@ def setPoster(request): #parse path and return info
     '''
     data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Item, itemId=data['id'])
+    response = json_response()
     if item.editable(request.user):
         valid_urls = [p.url for p in item.poster_urls.all()]
         if data['url'] in valid_urls:
@@ -457,6 +458,11 @@ def setPoster(request): #parse path and return info
             item.save()
             tasks.update_poster.delay(item.itemId)
             response = json_response()
+            response['data']['poster'] = item.get_poster()
+        elif data['url'].endswith('/poster.pandora.jpg'):
+            item.poster_url = ''
+            item.save()
+            tasks.update_poster.delay(item.itemId)
             response['data']['poster'] = item.get_poster()
         else:
             response = json_response(status=403, text='invalid poster url')
@@ -529,6 +535,16 @@ def frame(request, id, position, size):
         raise Http404
     return HttpFileResponse(frame, content_type='image/jpeg')
 
+def poster_frame(request, id, position):
+    item = get_object_or_404(models.Item, itemId=id)
+    position = int(position)
+    frames = item.poster_frames()
+    print frames, position
+    if frames and len(frames) > position:
+        frame = frames[position]
+        return HttpFileResponse(frame, content_type='image/jpeg')
+    raise Http404
+
 
 def image_to_response(item, image, size=None):
     if size:
@@ -543,6 +559,11 @@ def image_to_response(item, image, size=None):
         path = image.path
     return HttpFileResponse(path, content_type='image/jpeg')
 
+def poster_local(request, id):
+    item = get_object_or_404(models.Item, itemId=id)
+    poster = item.path('poster.local.jpg')
+    poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
+    return HttpFileResponse(poster, content_type='image/jpeg')
 
 def poster(request, id, size=None):
     item = get_object_or_404(models.Item, itemId=id)

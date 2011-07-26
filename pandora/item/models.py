@@ -308,20 +308,17 @@ class Item(models.Model):
         return poster
 
     def get_posters(self):
-        posters = {}
+        posters = {
+            'local': [{
+                'url': '/%s/poster.pandora.jpg' % self.itemId,
+                'width': 640,
+                'height': 1024,
+            }]
+        }
         for p in self.poster_urls.all():
             if p.service not in posters:
                 posters[p.service] = []
             posters[p.service].append({'url': p.url, 'width': p.width, 'height': p.height})
-        local_posters = self.local_posters().keys()
-        if local_posters:
-            posters['local'] = []
-            for p in local_posters:
-                #FIXME: media_url is no longer public
-                url = p.replace(settings.MEDIA_ROOT, settings.MEDIA_URL)
-                width = 640
-                height = 1024
-                posters['local'].append({'url': url, 'width': width, 'height': height})
         return posters
 
     def get_stream(self):
@@ -374,6 +371,8 @@ class Item(models.Model):
 
         i['poster'] = self.get_poster()
         i['posters'] = self.get_posters()
+        i['posterFrames'] = ['/%s/frame/poster/%d.jpg' %(self.itemId, p)
+                             for p in range(0, len(self.poster_frames()))]
         return i
 
 
@@ -730,7 +729,7 @@ class Item(models.Model):
                 #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
 
             stream.extract_derivatives()
-            self.make_local_posters()
+            self.make_local_poster()
             self.make_poster()
             self.make_icon()
             self.rendered = files != {} 
@@ -790,74 +789,56 @@ class Item(models.Model):
             else:
                 if force:
                     self.delete_poster()
-                local_posters = self.make_local_posters()
-                if local_posters:
-                    with open(local_posters[0]) as f:
-                        self.poster.save('poster.jpg', ContentFile(f.read()))
+                poster = self.make_local_poster()
+                with open(poster) as f:
+                    self.poster.save('poster.jpg', ContentFile(f.read()))
 
-    def local_posters(self):
-        part = 1
-        posters = {}
+    def make_local_poster(self):
+        poster = self.path('poster.local.jpg')
+        poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
+
+        frame = self.get_poster_frame_path()
         timeline = self.path('timeline.64.png')
         timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
-        if not os.path.exists(timeline):
-            path = self.path('poster.pandora.jpg')
-            path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, path))
-            posters[path] = False
-            return posters
-        if self.poster_frame >= 0:
-            frame = self.get_poster_frame_path()
-            path = self.path('poster.pandora.%s.%s.jpg'%(part, self.poster_frame))
-            path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, path))
-            posters[path] = frame
-        else:
-            for f in self.main_videos():
-                for frame in f.frames.all():
-                    path = self.path('poster.pandora.%s.%s.jpg'%(part, frame.position))
-                    path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, path))
-                    posters[path] = frame.frame.path
-                part += 1
-        return posters
 
-    def make_local_posters(self):
-        posters = self.local_posters()
-        timeline = self.path('timeline.64.png')
-        timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
-        ox.makedirs(os.path.join(settings.MEDIA_ROOT,self.path()))
-        for poster in posters:
-            frame = posters[poster]
-            cmd = [settings.ITEM_POSTER,
-                   '-t', self.get('title').encode('utf-8'),
-                   '-d', u', '.join(self.get('director', ['Unknown Director'])).encode('utf-8'),
-                   '-y', str(self.get('year', '')),
-                   '-p', poster
-                  ]
-            if frame:
-                cmd += [
-                   '-f', frame,
-                   '-l', timeline,
-                ]
-            if settings.USE_IMDB:
-                if len(self.itemId) == 7:
-                    cmd += ['-i', self.itemId]
-                cmd += ['-o', self.oxdbId]
-            else:
+        director = u', '.join(self.get('director', ['Unknown Director']))
+        cmd = [settings.ITEM_POSTER,
+               '-t', self.get('title').encode('utf-8'),
+               '-d', director.encode('utf-8'),
+               '-y', str(self.get('year', '')),
+               '-p', poster
+              ]
+        if frame:
+            cmd += [
+               '-f', frame,
+               '-l', timeline,
+            ]
+        if settings.USE_IMDB:
+            if len(self.itemId) == 7:
                 cmd += ['-i', self.itemId]
-            p = subprocess.Popen(cmd)
-            p.wait()
-        return posters.keys()
+            cmd += ['-o', self.oxdbId]
+        else:
+            cmd += ['-i', self.itemId]
+        ox.makedirs(os.path.join(settings.MEDIA_ROOT,self.path()))
+        p = subprocess.Popen(cmd)
+        p.wait()
+        return poster
+
+    def poster_frames(self):
+        frames = []
+        for f in self.main_videos():
+            for ff in f.frames.all():
+                frames.append(ff.frame.path)
+        return frames
 
     def get_poster_frame_path(self):
         if self.poster_frame >= 0:
             size = int(settings.VIDEO_PROFILE.split('.')[0][:-1])
             return self.frame(self.poster_frame, size)
 
-        frames = []
-        for f in self.main_videos():
-            for ff in f.frames.all():
-                frames.append(ff.frame.path)
-            if frames:
-                return frames[int(len(frames)/2)]
+        frames = self.poster_frames()
+        if frames:
+            return frames[int(len(frames)/2)]
 
     def make_icon(self):
         frame = self.get_poster_frame_path()
