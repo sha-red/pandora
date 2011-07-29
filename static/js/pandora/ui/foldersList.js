@@ -1,4 +1,4 @@
-// vim: et:ts=4:sw=4:sts=4:ft=js
+// vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.folderList = function(id) {
     var i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id),
         that;

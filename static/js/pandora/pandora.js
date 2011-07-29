@@ -1,4 +1,4 @@
-// vim: et:ts=4:sw=4:sts=4:ft=js
+// vim: et:ts=4:sw=4:sts=4:ft=javascript
 
 pandora.enterFullscreen = function() {
     pandora.$ui.appPanel.size(0, 0);

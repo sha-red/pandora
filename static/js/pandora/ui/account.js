@@ -1,4 +1,4 @@
-// vim: et:ts=4:sw=4:sts=4:ft=js
+// vim: et:ts=4:sw=4:sts=4:ft=javascript
 
 pandora.ui.accountDialog = function(action) {
     var that = Ox.Dialog($.extend({

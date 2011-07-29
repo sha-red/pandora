@@ -1,4 +1,5 @@
-// vim: et:ts=4:sw=4:sts=4:ft=js
+// vim: et:ts=4:sw=4:sts=4:ft=javascript
+
 pandora.ui.list = function(view) { // fixme: remove view argument
     var that, $map;
     //Ox.print('constructList', view);

@@ -1,4 +1,4 @@
-// vim: et:ts=4:sw=4:sts=4:ft=js
+// vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.autovalidateCode = function(value, blur, callback) {
     value = $.map(value.toUpperCase().split(''), function(v) {
         return /[0-9A-Z]/(v) ? v : null;

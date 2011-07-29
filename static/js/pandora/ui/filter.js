@@ -1,4 +1,4 @@
-// vim: et:ts=4:sw=4:sts=4:ft=js
+// vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.filter = function() {
     var that = Ox.Filter({
         findKeys: Ox.map(pandora.site.itemKeys, function(key) {

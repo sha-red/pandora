@@ -1,4 +1,4 @@
-// vim: et:ts=4:sw=4:sts=4:ft=js
+// vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.item = function() {
     var that = Ox.Element();
     pandora.api.getItem(pandora.user.ui.item, function(result) {

@@ -1,4 +1,4 @@
-// vim: et:ts=4:sw=4:sts=4:ft=js
+// vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.folderBrowserList = function(id) {
     var columnWidth = (pandora.user.ui.sidebarSize - Ox.UI.SCROLLBAR_SIZE - 88) / 2,
         i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id),
