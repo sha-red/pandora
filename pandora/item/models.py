@@ -12,7 +12,7 @@ import unicodedata
 from urllib import quote
 
 from django.db import models
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from django.core.files.base import ContentFile
 from django.utils import simplejson as json
 from django.conf import settings
@@ -303,13 +303,26 @@ class Item(models.Model):
 
     def get_posters(self):
         url = self.prefered_poster_url()
+        precedence = []
+        services = [p['service']
+                    for p in self.poster_urls.values("service")
+                                             .annotate(Count("id")).order_by()]
+        for service in settings.POSTER_PRECEDENCE:
+            if service in services:
+                precedence.append(service)
+        for service in services:
+            if service not in precedence:
+                precedence.append(service)
+        precedence.append(settings.URL)
+
         posters = [
             {
                 'url': '/%s/poster.pandora.jpg' % self.itemId,
                 'width': 640,
                 'height': 1024,
                 'source': settings.URL,
-                'selected': url == None
+                'selected': url == None,
+                'precedence': precedence.index(settings.URL)
             }
         ]
         got = {}
@@ -321,7 +334,8 @@ class Item(models.Model):
                     'width': p.width,
                     'height': p.height,
                     'source': p.service,
-                    'selected': p.url == url
+                    'selected': p.url == url,
+                    'precedence': precedence.index(p.service)
                 })
         return posters
 
