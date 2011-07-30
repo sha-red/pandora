@@ -362,7 +362,7 @@ class Item(models.Model):
                 ll.append(a.json())
         return layers
 
-    def get_json(self, fields=None):
+    def get_json(self, keys=None):
         i = {
             'id': self.itemId,
             'rendered': self.rendered
@@ -371,21 +371,28 @@ class Item(models.Model):
         i.update(self.data)
         for k in site_config()['itemKeys']:
             key = k['id']
-            if key not in i:
-                value = self.get(key)
-                #also get values from sort table, i.e. numberof values
-                if not value and  self.sort and hasattr(self.sort, key):
-                    value = getattr(self.sort, key)
-                if value:
-                    i[key] = value
+            if not keys or key in keys:
+                if key not in i:
+                    value = self.get(key)
+                    #also get values from sort table, i.e. numberof values
+                    if not value and  self.sort and hasattr(self.sort, key):
+                        value = getattr(self.sort, key)
+                    if value:
+                        i[key] = value
 
-        if not fields or 'poster' in fields:
+        if not keys or 'poster' in keys:
             i['poster'] = self.get_poster()
-        if not fields or 'posters' in fields:
+        if not keys or 'posters' in keys:
             i['posters'] = self.get_posters()
-        if not fields or 'frames' in fields:
+        if not keys or 'frames' in keys:
             i['frames'] = ['/%s/frame/poster/%d.jpg' %(self.itemId, p)
                            for p in range(0, len(self.poster_frames()))]
+        if keys:
+            info = {}
+            for key in keys:
+                if key in i:
+                    info[key] = i[key]
+            return info
         return i
 
 

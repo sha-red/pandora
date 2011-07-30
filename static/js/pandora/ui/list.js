@@ -439,7 +439,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                 pandora.$ui.mainMenu.disableItem('openmovie');            
             }
             if (data.ids.length == 1) {
-                pandora.api.getItem(data.ids[0], function(result) {
+                pandora.api.get({id: data.ids[0], keys:['stream']}, function(result) {
                     pandora.user.infoRatio = result.data.stream.aspectRatio;
                     var height = pandora.$ui.info.width() / pandora.user.infoRatio + 16;
                     if(pandora.$ui.infoStill) pandora.$ui.infoStill.removeElement();

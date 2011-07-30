@@ -5,7 +5,7 @@ pandora.ui.flipbook = function(item) {
             pandora.UI.set('videoPosition|' + item, data.position);
             pandora.URL.set(item + '/timeline');
         });
-        pandora.api.getItem(item, function(result) {
+        pandora.api.get({id: item, keys: ['duration', 'posterFrame']}, function(result) {
             var duration = result.data.duration,
                 posterFrame = result.data.posterFrame || parseInt(duration/2),
                 steps = 24,

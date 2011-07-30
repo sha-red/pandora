@@ -343,9 +343,7 @@ def get(request):
             info['stream'] = item.get_stream()
         if 'layers' in data['keys']:
             info['layers'] = item.get_layers(request.user)
-        response['data'] = {} 
-        for key in data['keys']:
-            response['data'][key] = info[key]
+        response['data'] = info
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
