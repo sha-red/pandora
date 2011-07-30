@@ -326,6 +326,31 @@ def autocomplete(request):
 actions.register(autocomplete)
 
 
+def get(request):
+    '''
+        param data {
+            id: string
+            keys: array
+        }
+        return item array
+    '''
+    response = json_response({})
+    data = json.loads(request.POST['data'])
+    item = get_object_or_404_json(models.Item, itemId=data['id'])
+    if item.access(request.user):
+        info = item.get_json(data['keys'])
+        if 'stream' in data['keys']:
+            info['stream'] = item.get_stream()
+        if 'layers' in data['keys']:
+            info['layers'] = item.get_layers(request.user)
+        response['data'] = {} 
+        for key in data['keys']:
+            response['data'][key] = info[key]
+    else:
+        response = json_response(status=403, text='permission denied')
+    return render_to_json_response(response)
+actions.register(get)
+
 def getItem(request):
     '''
         param data
@@ -450,7 +475,7 @@ def setPoster(request): #parse path and return info
     item = get_object_or_404_json(models.Item, itemId=data['id'])
     response = json_response()
     if item.editable(request.user):
-        valid_urls = [p.url for p in item.poster_urls.all()]
+        valid_urls = [p['url'] for p in item.get_posters()]
         if data['url'] in valid_urls:
             item.poster_url = data['url']
             if item.poster:
@@ -458,11 +483,6 @@ def setPoster(request): #parse path and return info
             item.save()
             tasks.update_poster.delay(item.itemId)
             response = json_response()
-            response['data']['poster'] = item.get_poster()
-        elif data['url'].endswith('/poster.pandora.jpg'):
-            item.poster_url = ''
-            item.save()
-            tasks.update_poster.delay(item.itemId)
             response['data']['poster'] = item.get_poster()
         else:
             response = json_response(status=403, text='invalid poster url')

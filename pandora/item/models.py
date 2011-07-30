@@ -308,17 +308,27 @@ class Item(models.Model):
         return poster
 
     def get_posters(self):
-        posters = {
-            'local': [{
+        url = self.prefered_poster_url()
+        posters = [
+            {
                 'url': '/%s/poster.pandora.jpg' % self.itemId,
                 'width': 640,
                 'height': 1024,
-            }]
-        }
-        for p in self.poster_urls.all():
-            if p.service not in posters:
-                posters[p.service] = []
-            posters[p.service].append({'url': p.url, 'width': p.width, 'height': p.height})
+                'service': settings.URL,
+                'selected': url == None
+            }
+        ]
+        got = {}
+        for p in self.poster_urls.all().order_by('-height'):
+            if p.service not in got:
+                got[p.service] = 1
+                posters.append({
+                    'url': p.url,
+                    'width': p.width,
+                    'height': p.height,
+                    'service': p.service,
+                    'selected': p.url == url
+                })
         return posters
 
     def get_stream(self):
@@ -369,10 +379,13 @@ class Item(models.Model):
                 if value:
                     i[key] = value
 
-        i['poster'] = self.get_poster()
-        i['posters'] = self.get_posters()
-        i['posterFrames'] = ['/%s/frame/poster/%d.jpg' %(self.itemId, p)
-                             for p in range(0, len(self.poster_frames()))]
+        if not fields or 'poster' in fields:
+            i['poster'] = self.get_poster()
+        if not fields or 'posters' in fields:
+            i['posters'] = self.get_posters()
+        if not fields or 'frames' in fields:
+            i['frames'] = ['/%s/frame/poster/%d.jpg' %(self.itemId, p)
+                           for p in range(0, len(self.poster_frames()))]
         return i
 
 
