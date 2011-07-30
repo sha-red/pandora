@@ -127,7 +127,7 @@ class Item(models.Model):
     json = fields.DictField(default={}, editable=False)
     poster = models.ImageField(default=None, blank=True,
                                upload_to=lambda i, x: i.path("poster.jpg"))
-    poster_url = models.TextField(blank=True)
+    poster_source = models.TextField(blank=True)
     poster_height = models.IntegerField(default=0)
     poster_width = models.IntegerField(default=0)
     poster_frame = models.FloatField(default=-1)
@@ -299,12 +299,6 @@ class Item(models.Model):
         poster['width'] = self.poster_width
         poster['height'] = self.poster_height
         poster['url'] = '/%s/poster.jpg' % self.itemId
-        '''
-        if self.poster:
-            poster['url'] = self.poster.url
-        else:
-            poster['url'] = self.poster_url
-        '''
         return poster
 
     def get_posters(self):
@@ -789,12 +783,15 @@ class Item(models.Model):
                 os.unlink(f)
 
     def prefered_poster_url(self):
-        if self.poster_url:
-            return self.poster_url
         self.update_poster_urls()
-        for service in settings.POSTER_PRECEDENCE:
+        service = self.poster_source
+        if service and service != settings.URL:
             for u in self.poster_urls.filter(service=service).order_by('-height'):
                 return u.url
+        if not service:
+            for service in settings.POSTER_PRECEDENCE:
+                for u in self.poster_urls.filter(service=service).order_by('-height'):
+                    return u.url
         return None
 
     def make_poster(self, force=False):

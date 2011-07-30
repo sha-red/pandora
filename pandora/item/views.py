@@ -460,7 +460,7 @@ def setPoster(request): #parse path and return info
     '''
         param data {
             id: itemId,
-            url: string
+            source: string
         }
         return {
             status: {'code': int, 'text': string},
@@ -473,9 +473,9 @@ def setPoster(request): #parse path and return info
     item = get_object_or_404_json(models.Item, itemId=data['id'])
     response = json_response()
     if item.editable(request.user):
-        valid_urls = [p['url'] for p in item.get_posters()]
-        if data['url'] in valid_urls:
-            item.poster_url = data['url']
+        valid_sources = [p['source'] for p in item.get_posters()]
+        if data['source'] in valid_sources:
+            item.poster_source = data['source']
             if item.poster:
                 item.poster.delete()
             item.save()
