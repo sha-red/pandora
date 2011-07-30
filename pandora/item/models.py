@@ -314,7 +314,7 @@ class Item(models.Model):
                 'url': '/%s/poster.pandora.jpg' % self.itemId,
                 'width': 640,
                 'height': 1024,
-                'service': settings.URL,
+                'source': settings.URL,
                 'selected': url == None
             }
         ]
@@ -326,7 +326,7 @@ class Item(models.Model):
                     'url': p.url,
                     'width': p.width,
                     'height': p.height,
-                    'service': p.service,
+                    'source': p.service,
                     'selected': p.url == url
                 })
         return posters
