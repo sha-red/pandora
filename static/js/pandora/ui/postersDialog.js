@@ -95,7 +95,7 @@ pandora.ui.postersDialog = function(id) {
                                 })
                         );
                         pandora.api.setPoster({
-                            id: pandora.user.ui.item,
+                            id: id,
                             source: source
                         });
                     }

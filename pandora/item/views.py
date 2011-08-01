@@ -479,7 +479,7 @@ def setPoster(request): #parse path and return info
             if item.poster:
                 item.poster.delete()
             item.save()
-            tasks.update_poster.delay(item.itemId)
+            tasks.update_poster(item.itemId)
             response = json_response()
             response['data']['poster'] = item.get_poster()
         else:

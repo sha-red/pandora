@@ -439,6 +439,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                 pandora.$ui.mainMenu.disableItem('openmovie');            
             }
             if (data.ids.length == 1) {
+                pandora.user.ui.listItem = data.ids[0];
                 pandora.api.get({id: data.ids[0], keys:['stream']}, function(result) {
                     pandora.user.infoRatio = result.data.stream.aspectRatio;
                     var height = pandora.$ui.info.width() / pandora.user.infoRatio + 16;
