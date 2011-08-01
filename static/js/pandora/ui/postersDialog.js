@@ -59,13 +59,13 @@ pandora.ui.postersDialog = function(id) {
                         }
                     },
                     items: posters,
-                    keys: ['source', 'width', 'height', 'url'],
+                    keys: ['precedence', 'source', 'width', 'height', 'url'],
                     max: 1,
                     min: 1,
                     orientation: 'vertical',
                     selected: selected,
                     size: 128,
-                    sort: [{key: 'source', operator: '+'}],
+                    sort: [{key: 'precedence', operator: '+'}],
                     unique: 'source'
                 })
                 .css({background: 'rgb(16, 16, 16)'})

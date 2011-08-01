@@ -313,7 +313,8 @@ class Item(models.Model):
         for service in services:
             if service not in precedence:
                 precedence.append(service)
-        precedence.append(settings.URL)
+        if settings.URL not in precedence:
+            precedence.append(settings.URL)
 
         posters = [
             {
@@ -337,6 +338,7 @@ class Item(models.Model):
                     'selected': p.url == url,
                     'precedence': precedence.index(p.service)
                 })
+        posters.sort(key=lambda a: a['precedence'])
         return posters
 
     def get_stream(self):
