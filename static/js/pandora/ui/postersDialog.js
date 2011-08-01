@@ -94,11 +94,14 @@ pandora.ui.postersDialog = function(id) {
                                     margin: 'auto'
                                 })
                         );
+                        pandora.api.setPoster({
+                            id: pandora.user.ui.item,
+                            source: source
+                        });
                     }
                 });
 
         $panel.replaceElement(0, $list);
-
     });
 
     return that;

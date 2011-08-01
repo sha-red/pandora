@@ -811,6 +811,10 @@ class Item(models.Model):
         return None
 
     def make_poster(self, force=False):
+        posters = glob(os.path.abspath(os.path.join(settings.MEDIA_ROOT,
+                                  self.path('poster.*.jpg'))))
+        for f in filter(posters, lambda p: not p.endswith('poster.local.jpg')):
+            os.unlink(f)
         if not self.poster or force:
             url = self.prefered_poster_url()
             if url:

@@ -406,8 +406,7 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.accountDialog = (pandora.user.level == 'guest' ?
                         pandora.ui.accountDialog('login') : pandora.ui.accountLogoutDialog()).open();
                 } else if (data.id == 'posters') {
-                    var id = '0133093';
-                    pandora.$ui.postersDialog = pandora.ui.postersDialog(id).open();
+                    pandora.$ui.postersDialog = pandora.ui.postersDialog(pandora.user.ui.item).open();
                 } else if (data.id == 'places') {
                     pandora.$ui.placesDialog = pandora.ui.placesDialog().open();
                     /*
