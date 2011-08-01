@@ -393,22 +393,25 @@ def editItem(request):
 actions.register(editItem, cache=False)
 
 @login_required_json
-def removeItem(request):
+def remove(request):
     '''
-        param data
-            string id
+        param data {
+            id: string
+        }
 
         return {'status': {'code': int, 'text': string}}
     '''
     response = json_response({})
-    itemId = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Item, itemId=itemId)
+    data = json.loads(request.POST['data'])
+    item = get_object_or_404_json(models.Item, itemId=data['id'])
     if item.editable(request.user):
-        response = json_response(status=501, text='not implemented')
+        #FIXME: is this cascading enough or do we end up with orphan files etc.
+        item.delete()
+        response = json_response(status=200, text='removed')
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
-actions.register(removeItem, cache=False)
+actions.register(remove, cache=False)
 
 '''
     Poster API
