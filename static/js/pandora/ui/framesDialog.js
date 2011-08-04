@@ -47,7 +47,6 @@ pandora.ui.framesDialog = function(id) {
             })[0]['position']],
             $list = Ox.IconList({
                     item: function(data, sort, size) {
-                        console.log(data)
                         var ratio = data.width / data.height;
                         size = size || 128;
                         return {
