@@ -349,13 +349,13 @@ class Item(models.Model):
 
     def get_frames(self):
         frames = []
-        frames = self.poster_frames()
-        if frames:
+        pframes = self.poster_frames()
+        if pframes:
             pos = self.poster_frame
             if pos < 0:
                 pos = 0
             p = 0
-            for f in frames:
+            for f in pframes:
                 frames.append({
                     'index': p,
                     'position': f['position'],
