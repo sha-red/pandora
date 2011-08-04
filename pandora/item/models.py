@@ -395,8 +395,23 @@ class Item(models.Model):
         if not keys or 'posters' in keys:
             i['posters'] = self.get_posters()
         if not keys or 'frames' in keys:
-            i['frames'] = ['/%s/frame/poster/%d.jpg' %(self.itemId, p)
-                           for p in range(0, len(self.poster_frames()))]
+            i['frames'] = []
+            frames = self.poster_frames()
+            if frames:
+                pos = self.poster_frame
+                if pos < 0:
+                    pos = 0
+                p = 0
+                for f in frames:
+                    i['frames'].append({
+                        'id': p,
+                        'position': f['position'],
+                        'selected': p == pos,
+                        'url': '/%s/frame/poster/%d.jpg' %(self.itemId, p),
+                        'height': f['height'],
+                        'width': f['width'] 
+                    })
+                    p += 1
         if keys:
             info = {}
             for key in keys:
@@ -863,17 +878,26 @@ class Item(models.Model):
 
     def poster_frames(self):
         frames = []
+        offset = 0
         for f in self.main_videos():
             for ff in f.frames.all():
-                frames.append(ff.frame.path)
+                frames.append({
+                    'position': offset + ff.position,
+                    'path': ff.frame.path,
+                    'width': ff.frame.width,
+                    'height': ff.frame.height
+                })
+            offset += f.duration
         return frames
 
     def get_poster_frame_path(self):
+        frames =  self.poster_frames()
         if self.poster_frame >= 0:
+            if frames:
+                return frames[int(self.poster_frame)]['path']
             size = int(settings.VIDEO_PROFILE.split('.')[0][:-1])
             return self.frame(self.poster_frame, size)
 
-        frames = self.poster_frames()
         if frames:
             return frames[int(len(frames)/2)]
 

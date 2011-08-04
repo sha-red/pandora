@@ -560,9 +560,8 @@ def poster_frame(request, id, position):
     item = get_object_or_404(models.Item, itemId=id)
     position = int(position)
     frames = item.poster_frames()
-    print frames, position
     if frames and len(frames) > position:
-        frame = frames[position]
+        frame = frames[position]['path']
         return HttpFileResponse(frame, content_type='image/jpeg')
     raise Http404
 
