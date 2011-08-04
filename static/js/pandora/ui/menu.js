@@ -134,7 +134,7 @@ pandora.ui.mainMenu = function() {
                     { id: 'titles', title: 'Manage Titles...' },
                     { id: 'names', title: 'Manage Names...' },
                     {},
-                    { id: 'posters', title: 'Manage Stills...' },
+                    { id: 'stills', title: 'Manage Stills...' },
                     { id: 'posters', title: 'Manage Posters...' },
                     {},
                     { id: 'places', title: 'Manage Places...' },
@@ -405,6 +405,9 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'loginlogout') {
                     pandora.$ui.accountDialog = (pandora.user.level == 'guest' ?
                         pandora.ui.accountDialog('login') : pandora.ui.accountLogoutDialog()).open();
+                } else if (data.id == 'stills') {
+                    var id = pandora.user.ui.item || pandora.user.ui.listItem;
+                    pandora.$ui.postersDialog = pandora.ui.framesDialog(id).open();
                 } else if (data.id == 'posters') {
                     var id = pandora.user.ui.item || pandora.user.ui.listItem;
                     pandora.$ui.postersDialog = pandora.ui.postersDialog(id).open();

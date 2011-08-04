@@ -106,4 +106,4 @@ pandora.ui.postersDialog = function(id) {
 
     return that;
 
-}
+};
