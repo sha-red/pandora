@@ -863,6 +863,9 @@ class Item(models.Model):
         if frame:
             cmd += [
                '-f', frame,
+            ]
+        if os.path.exists(timeline):
+            cmd += [
                '-l', timeline,
             ]
         if settings.USE_IMDB:
