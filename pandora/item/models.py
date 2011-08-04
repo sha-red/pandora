@@ -353,7 +353,7 @@ class Item(models.Model):
         if pframes:
             pos = self.poster_frame
             if pos < 0:
-                pos = 0
+                pos = int(len(pframes) / 2)
             p = 0
             for f in pframes:
                 frames.append({
