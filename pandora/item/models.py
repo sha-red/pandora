@@ -899,7 +899,7 @@ class Item(models.Model):
             return self.frame(self.poster_frame, size)
 
         if frames:
-            return frames[int(len(frames)/2)]
+            return frames[int(len(frames)/2)]['path']
 
     def make_icon(self):
         frame = self.get_poster_frame_path()
