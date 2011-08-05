@@ -335,10 +335,10 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                 var documentHeight = pandora.$ui.document.height(),
                     item = result.data.items[0],
                     title = item.title + (item.director ? ' (' + item.director + ')' : ''),
-                    dialogHeight = documentHeight - 100,
+                    dialogHeight = documentHeight - 48,
                     dialogWidth;
                 pandora.site.previewRatio = item.poster.width / item.poster.height,
-                dialogWidth = parseInt((dialogHeight - 48) * pandora.site.previewRatio);
+                dialogWidth = Math.round((dialogHeight - 48) * pandora.site.previewRatio);
                 if ('previewDialog' in pandora.$ui) {
                     pandora.$ui.previewDialog.options({
                         title: title
@@ -355,7 +355,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                                     pandora.$ui.previewImage
                                         .css({
                                             width: dialogWidth + 'px',
-                                            height: (dialogHeight - 48 - 2) + 'px', // fixme: why -2 ?
+                                            height: (dialogHeight - 48) + 'px', // fixme: why -2 ?
                                             opacity: 0
                                         })
                                         .animate({
@@ -373,7 +373,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                         .css({
                             position: 'absolute',
                             width: dialogWidth + 'px',
-                            height: (dialogHeight - 48 - 2) + 'px', // fixme: why -2 ?
+                            height: (dialogHeight - 48) + 'px', // fixme: why -2 ?
                             left: 0,
                             top: 0,
                             right: 0,
@@ -393,10 +393,11 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                                 })
                             ],
                             content: pandora.$ui.previewImage,
+                            focus: false,
                             height: dialogHeight,
                             id: 'previewDialog',
-                            minHeight: pandora.site.previewRatio >= 1 ? 128 / pandora.site.previewRatio + 48 : 176,
-                            minWidth: pandora.site.previewRatio >= 1 ? 128 : 176 * pandora.site.previewRatio,
+                            minHeight: pandora.site.previewRatio >= 1 ? Math.round(128 / pandora.site.previewRatio) + 48 : 176,
+                            minWidth: pandora.site.previewRatio >= 1 ? 128 : Math.round(176 * pandora.site.previewRatio),
                             padding: 0,
                             title: title,
                             width: dialogWidth
@@ -406,10 +407,10 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                                 height, width;
                             if (dialogRatio < pandora.site.previewRatio) {
                                 width = data.width;
-                                height = width / pandora.site.previewRatio;
+                                height = Math.round(width / pandora.site.previewRatio);
                             } else {
-                                height = (data.height - 48 - 2);
-                                width = height * pandora.site.previewRatio;
+                                height = (data.height - 48);
+                                width = Math.round(height * pandora.site.previewRatio);
                             }
                             pandora.$ui.previewImage.css({
                                 width: width + 'px',

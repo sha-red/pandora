@@ -1,79 +1,85 @@
 <div id="itemInfo">
-    <div style="align: center; width: 256px; margin: 8px; float: left">
-        <img class="icon" style="height: 256px" src="/${id}/poster.jpg">
+    <div style="position: absolute; left: 8px; top: 8px; width: 256px">
+        <div style="width: 256px; height: ${posterHeight}px">
+            <img class="icon" style="position: absolute; left: ${posterLeft}px; width: ${posterWidth}px; height: ${posterHeight}px" src="/${id}/poster.jpg"/>
+        </div>
+        <div style="display: block; position: absolute; top: ${posterHeight}px; width: 256px; height: 128px; overflow-y: hidden">
+            <img class="icon" style="position: absolute; left: ${posterLeft}px; width: ${posterWidth}px; height: ${posterHeight}px; -moz-transform: scaleY(-1); -webkit-transform: scaleY(-1)" src="/${id}/poster.jpg"/>
+            <div style="display: block; position: absolute; width: 256px; height: 128px; background: -moz-linear-gradient(top, rgba(16, 16, 16, 0.75), rgba(16, 16, 16, 1)); background: -webkit-linear-gradient(top, rgba(16, 16, 16, 0.75), rgba(16, 16, 16, 1))"></div>
+        </div>
     </div>
-	<div style="width: 512px; float: left">
-		<div id="movieTitle" class="movieData textLarge textLeft" style="margin-top: 0px; margin-bottom: 2px">
+	<div style="position: absolute; width: 512px; left: 272px; top: 8px">
+		<div id="movieTitle" class="movieData textLarge textLeft" style="margin-top: 0px; margin-bottom: 2px; font-size: 13px; font-weight: bold">
 			${title}
 		</div>
-		<div id="movieDirector" class="movieData textLarge textLeft" style="margin-bottom: 4px">
+		<div id="movieDirector" class="movieData textLarge textLeft" style="margin-bottom: 4px; font-size: 13px; font-weight: bold">
 			${director}
 		</div>
 		<div id="movieInfo" class="movieData textMedium textJustify" style="margin-bottom: 4px">
 			<span id="movieCountry">
-				<span class="textBold">Country:</span> ${country} 
+				<span style="font-weight: bold">Country:</span> ${country} 
 			</span>
 			<span id="movieYear">
-				<span class="textBold">Year:</span> ${year}
+				<span style="font-weight: bold">Year:</span> ${year}
 			</span>
 			<span id="movieLanguage">
-				<span class="textBold">Language:</span> ${language} 
+				<span style="font-weight: bold">Language:</span> ${language} 
 			</span>
 			<span id="movieRuntime">
-				<span class="textBold">Runtime:</span> ${runtime} 
+				<span style="font-weight: bold">Runtime:</span> ${runtime} 
 			</span>
 		</div>
 		<div id="movieAltTitles" class="movieData textMedium textJustify" style="margin-bottom: 4px">
-			<span class="textBold">Alternative Title(s):</span> {alternative_titles} 
+			<span style="font-weight: bold">Alternative Title(s):</span> ${alternative_titles} 
 		</div>
 		<div id="movieWriter" class="movieData textMedium textJustify" style="margin-bottom: 4px">
-			<span class="textBold">Writer:</span> ${writer}
+			<span style="font-weight: bold">Writer:</span> ${writer}
 		</div>
 		<div id="movieProducer" class="movieData textMedium textJustify" style="margin-bottom: 4px">
-			<span class="textBold">Producer:</span> ${producer}
+			<span style="font-weight: bold">Producer:</span> ${producer}
 		</div>
 		<div id="movieCast" class="movieData textMedium textJustify" style="margin-bottom: 4px">
-			<span class="textBold">Cast:</span> ${cast}
+			<span style="font-weight: bold">Cast:</span> ${cast}
 		</div>
 		<div id="movieGenre" class="movieData textMedium textJustify" style="margin-bottom: 4px">
-			<span class="textBold">Genre:</span> ${genre}
+			<span style="font-weight: bold">Genre:</span> ${genre}
 		</div>
 		<div id="movieKeywords" class="movieData textMedium textJustify" style="margin-bottom: 4px">
-			<span class="textBold">Keywords:</span> ${keyword}
+			<span style="font-weight: bold">Keywords:</span> ${keyword}
 		</div>
 		<div id="movieSummary" class="movieData textMedium textJustify" style="margin-bottom: 4px">
-			<span class="textBold">Summary:</span> FIXME
+			<span style="font-weight: bold">Summary:</span> FIXME
 		</div>
 		<div id="movieTrivia" class="movieData textMedium">
 			FIXTRIVA
 		</div>
 		<div id="movieBusiness" class="movieData textMedium textJustify" style="margin-bottom: 4px">
 			<div id="movieDate" style="margin-bottom: 4px;">
-				<span class="textBold">Release Date:</span> ${release_date} 
+				<span style="font-weight: bold">Release Date:</span> ${release_date} 
 			</div>
 			<span id="movieBudget">
-				<span class="textBold">Budget:</span> ${budget} 
+				<span style="font-weight: bold">Budget:</span> ${budget} 
 			</span>
 			<span id="movieGross">
-				<span class="textBold">Gross:</span> ${gross} 
+				<span style="font-weight: bold">Gross:</span> ${gross} 
 			</span>
 			<span id="movieLoss">
-				<span class="textBold">Profit:</span> ${profit}  
+				<span style="font-weight: bold">Profit:</span> ${profit}  
 			</span>
 		</div>
 		<div id="moviePoll" class="movieData textMedium textJustify" style="margin-bottom: 4px">
 			<span id="movieRating">
-				<span class="textBold">Rating:</span> ${rating} 
+				<span style="font-weight: bold">Rating:</span> ${rating} 
 			</span>
 			<span id="movieVotes">
-				<span class="textBold">Votes:</span> ${votes} 
+				<span style="font-weight: bold">Votes:</span> ${votes} 
 			</span>
 		</div>
 		<div id="movieConnections">
 		    FIXME: movie connections
 		</div>
 		<div id="movieReviews" class="movieData textMedium textJustify" style="margin-bottom: 4px">
-			<span class="textBold">Reviews:</span> ${reviewsHtml}
+			<span style="font-weight: bold">Reviews:</span> ${reviewsHtml}
 		</div>
 	</div>
 </div>
