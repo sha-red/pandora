@@ -153,6 +153,7 @@ Ox.load('Geo', function() {
         } else {
             //Ox.print('pandora.$ui.window.resize');
             pandora.$ui.browser.scrollToSelection();
+            pandora.user.ui.itemView == 'info' && pandora.$ui.item.resize();
             pandora.user.ui.itemView == 'player' && pandora.$ui.player.options({
                 // fixme: duplicated
                 height: pandora.$ui.contentPanel.size(1),
@@ -163,8 +164,8 @@ Ox.load('Geo', function() {
                 height: pandora.$ui.contentPanel.size(1),
                 width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             });
-            pandora.user.ui.itemView == 'frames' && pandora.$ui.item.resize();
-            pandora.user.ui.itemView == 'posters' && pandora.$ui.item.resize();
+            //pandora.user.ui.itemView == 'frames' && pandora.$ui.item.resize();
+            //pandora.user.ui.itemView == 'posters' && pandora.$ui.item.resize();
         }
     }
 

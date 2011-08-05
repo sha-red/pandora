@@ -59,7 +59,7 @@ pandora.ui.item = function() {
             }));
         } else if (pandora.user.ui.itemView == 'info') {
             //Ox.print('result.data', result.data)
-            if (pandora.user.level == 'admin') {
+            if (pandora.user.level == 'admin' && false) {
                 var $form,
                     $edit = Ox.Element()
                     .append($form = Ox.FormElementGroup({
@@ -103,6 +103,15 @@ pandora.ui.item = function() {
                     }));
                 pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.item = $edit);
             } else {
+                pandora.$ui.contentPanel.replaceElement(1,
+                    pandora.$ui.item = pandora.ui.infoView(result.data)
+                        .bindEvent({
+                            resize: function() {
+                                pandora.$ui.item.resize();
+                            }
+                        })
+                );
+                /*
                 $.get('/static/html/itemInfo.html', {}, function(template) {
                     //Ox.print(template);
                     var posterRatio = result.data.poster.width / result.data.poster.height;
@@ -113,6 +122,7 @@ pandora.ui.item = function() {
                         pandora.$ui.item = Ox.Element().append($.tmpl(template, result.data))
                     );
                 });
+                */
             }
 
         } else if (pandora.user.ui.itemView == 'map') {

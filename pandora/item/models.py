@@ -439,6 +439,8 @@ class Item(models.Model):
 
         if 'reviews' in i:
             i['reviews'] = self.reviews()
+        if 'cast' in i and isinstance(i['cast'][0], list):
+            i['cast'] = map(lambda x: {'actor': x[0], 'character': x[1]}, i['cast'])
 
         if not keys or 'poster' in keys:
             i['poster'] = self.get_poster()
