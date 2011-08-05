@@ -4,6 +4,7 @@ from __future__ import division, with_statement
 
 from datetime import datetime
 import os.path
+import re
 import subprocess
 from glob import glob
 import shutil
@@ -187,11 +188,14 @@ class Item(models.Model):
 
     def reviews(self):
         reviews = self.get('reviews', [])
-        _reviews = {}
+        _reviews = []
         for r in reviews:
             for url in settings.REVIEW_WHITELIST:
                 if url in r[0]:
-                    _reviews[settings.REVIEW_WHITELIST[url]] = r[0]
+                    _reviews.append({
+                        'source': settings.REVIEW_WHITELIST[url],
+                        'url': r[0]
+                    })
         return _reviews
 
     def update_external(self):
@@ -217,6 +221,23 @@ class Item(models.Model):
                 else:
                     data['actor'] = [c[0] for c in data['cast']]
                 data['actor'] = data['actor']
+                data['cast'] = map(lambda x: {'actor': x[0], 'character': x[1]}, data['cast'])
+            if 'trivia' in data:
+                def fix_links(t):
+                    def fix_names(m):
+                        return '<a href="/?find=name:%s">%s</a>' % (
+                            quote(m.group(2).encode('utf-8')), m.group(2)
+                        )
+                    t = re.sub('<a href="(/name/.*?/)">(.*?)</a>', fix_names, t)
+                    def fix_titles(m):
+                        return '<a href="/?find=title:%s">%s</a>' % (
+                            quote(m.group(2).encode('utf-8')), m.group(2)
+                        )
+                    t = re.sub('<a href="(/title/.*?/)">(.*?)</a>', fix_titles, t)
+                    return t
+                data['trivia'] = [fix_links(t) for t in data['trivia']]
+
+            #filter reviews
             self.external_data = data
             self.save()
 
@@ -416,6 +437,9 @@ class Item(models.Model):
                     if value:
                         i[key] = value
 
+        if 'reviews' in i:
+            i['reviews'] = self.reviews()
+
         if not keys or 'poster' in keys:
             i['poster'] = self.get_poster()
         if keys and 'posters' in keys:
@@ -467,7 +491,7 @@ class Item(models.Model):
                  if isinstance(values[0], basestring):
                     values = [values[0], ]
                  else:
-                    values = [i[1] for i in values]
+                    values = [i['character'] for i in values]
             else:
                 values = self.get(key, '')
             if isinstance(values, list):

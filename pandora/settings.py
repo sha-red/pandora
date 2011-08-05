@@ -202,7 +202,7 @@ TRANSMISSON_PASSWORD = 'transmission'
 
 #Movie related settings
 REVIEW_WHITELIST = {
-    u'filmcritic.com': u'Filmcritic',
+    u'.filmcritic.com': u'Filmcritic',
     u'metacritic.com': u'Metacritic',
     u'nytimes.com': u'New York Times',
     u'rottentomatoes.com': u'Rotten Tomatoes',
