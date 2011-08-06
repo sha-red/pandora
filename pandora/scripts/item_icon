@@ -24,9 +24,9 @@ def render_icon(frame, timeline, icon):
     icon_height = 512
     icon_image = Image.new('RGBA', (icon_width, icon_height), (0, 0, 0, 0))
     frame_width = icon_width
-    frame_ratio = 8 / 7
+    frame_ratio = 4 / 3
     frame_height = int(round(frame_width / frame_ratio))
-    frame_image = Image.open(frame) if frame else Image.new('RGB', (512, 448), (0, 0, 0))
+    frame_image = Image.open(frame) if frame else Image.new('RGB', (512, 384), (0, 0, 0))
     frame_image_ratio = frame_image.size[0] / frame_image.size[1]
     if frame_ratio < frame_image_ratio:
         frame_image = frame_image.resize((int(frame_height * frame_image_ratio), frame_height), Image.ANTIALIAS)
@@ -37,16 +37,13 @@ def render_icon(frame, timeline, icon):
         top = int((frame_image.size[1] - frame_height) / 2)
         frame_image = frame_image.crop((0, top, frame_width, top + frame_height))
     mask_image = Image.open(os.path.join(static_root, 'png', 'icon.mask.png'))
-    icon_image.paste(frame_image, (0, 0), mask=mask_image)
+    icon_image.paste(frame_image, (0, 0))
     timeline_image = Image.open(timeline) if timeline else Image.new('RGB', (512, 128), (0, 0, 0))
     timeline_image = timeline_image.resize((icon_width, 128), Image.ANTIALIAS)
-    timeline_mask_image = Image.new('L', (512, 128))
-    timeline_mask_image.paste(mask.image.crop((0, 0, 511, 63)), (0, 0))
-    timeline_mask_image.paste(mask.image.crop((0, 448, 511, 511)), (0, 64))
-    icon_image.paste(timeline_image, (0, icon_height - 128), mask=timeline_mask_image)
-    #mask_image = Image.open(os.path.join(static_root, 'png', 'icon.mask.png'))
-    #mask_image = mask_image.resize((icon_width, icon_height))
-    #icon_image.putalpha(mask_image)
+    icon_image.paste(timeline_image, (0, icon_height - 128))
+    # we're using jpegs with border-radius
+    # mask_image = Image.open(os.path.join(static_root, 'png', 'icon.mask.png'))
+    # icon_image.putalpha(mask_image)
     icon_image.save(icon)
 
 def main():
