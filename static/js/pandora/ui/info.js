@@ -25,8 +25,11 @@ pandora.ui.info = function() {
                 pandora.resizeFolders();
             }
         });
-    if(pandora.user.ui.item) {
-        pandora.api.getItem(pandora.user.ui.item, function(result) {
+    if (pandora.user.ui.item) {
+        pandora.api.get({
+            id: pandora.user.ui.item,
+            keys: ['stream']
+        }, function(result) {
             pandora.user.infoRatio = result.data.stream.aspectRatio;
             var width = that.width() || 256,
                 height = width / pandora.user.infoRatio + 16;
@@ -41,9 +44,11 @@ pandora.ui.info = function() {
             });
             pandora.resizeFolders();
             !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -height});
-            pandora.$ui.leftPanel.size(2, height );
+            pandora.$ui.leftPanel.size(2, height);
         });
-        pandora.$ui.infoTimeline.attr('src', '/'+pandora.user.ui.item+'/timeline.16.png');
+        pandora.$ui.infoTimeline.attr({
+            src: '/' + pandora.user.ui.item + '/timeline16p.png'
+        });
     }
     return that;
 };

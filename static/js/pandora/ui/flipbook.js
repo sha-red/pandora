@@ -9,7 +9,7 @@ pandora.ui.flipbook = function(item) {
             var duration = result.data.duration,
                 posterFrame = result.data.posterFrame || parseInt(duration/2),
                 steps = 24,
-                framePrefix = '/' + item + '/frame/' + that.width() + '/',
+                framePrefix = '/' + item + '/frame' + that.height() + 'p',
                 frames = {};
             Ox.range(0, duration, duration/steps).forEach(function(position) {
                 position = parseInt(position);

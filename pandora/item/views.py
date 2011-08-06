@@ -573,8 +573,9 @@ def image_to_response(item, image, size=None):
         if not os.path.exists(path):
             image_size = max(image.width, image.height)
             if size > image_size:
-                return redirect('/%s/icon.jpg' % item.itemId)
-            extract.resize_image(image.path, path, size=size)
+                path = image.path
+            else:
+                extract.resize_image(image.path, path, size=size)
     else:
         path = image.path
     return HttpFileResponse(path, content_type='image/jpeg')
@@ -587,17 +588,13 @@ def poster_local(request, id):
 
 def poster(request, id, size=None):
     item = get_object_or_404(models.Item, itemId=id)
-    if size == 'large':
-        size = None
     if item.poster:
         return image_to_response(item, item.poster, size)
     else:
-        if not size:
-            size='large'
         poster_path = os.path.join(settings.STATIC_ROOT, 'png/posterDark.48.png')
-    response = HttpFileResponse(poster_path, content_type='image/jpeg')
-    response['Cache-Control'] = 'no-cache'
-    return response
+        response = HttpFileResponse(poster_path, content_type='image/jpeg')
+        response['Cache-Control'] = 'no-cache'
+        return response
 
 
 def icon(request, id, size=None):
@@ -608,12 +605,9 @@ def icon(request, id, size=None):
         raise Http404
 
 
-def timeline(request, id, timeline, size, position):
+def timeline(request, id, size, position):
     item = get_object_or_404(models.Item, itemId=id)
-    if timeline == 'strip':
-        timeline = '%s.%s.%04d.png' %(item.timeline_prefix[:-8] + 'strip', size, int(position))
-    else:
-        timeline = '%s.%s.%04d.png' %(item.timeline_prefix, size, int(position))
+    timeline = '%s.%s.%04d.png' %(item.timeline_prefix, size, int(position))
     return HttpFileResponse(timeline, content_type='image/png')
 
 
@@ -639,13 +633,14 @@ def torrent(request, id, filename=None):
     filename = os.path.abspath(os.path.join(settings.MEDIA_ROOT, filename))
     return HttpFileResponse(filename)
 
-def video(request, id, profile, oshash=None, format=None):
+def video(request, id, profile, index=None, format=None):
+    print id, profile, index, format
     item = get_object_or_404(models.Item, itemId=id)
-    if oshash:
-        stream = get_object_or_404(item.files, oshash=oshash)
+    if index:
+        stream = item.streams.filter(profile=profile)[index]
         path = stream.video.path
     else:
-        stream = get_object_or_404(item.streams, profile=profile)
+        stream = get_object_or_404(item.streams, profile="%s.%s" % (profile, format))
         path = stream.video.path
     #server side cutting
     t = request.GET.get('t')

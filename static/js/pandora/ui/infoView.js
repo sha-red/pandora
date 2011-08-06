@@ -36,7 +36,7 @@ pandora.ui.infoView = function(data) {
             .appendTo($info),
         $poster = Ox.Element('<img>')
             .attr({
-                src: '/' + data.id + '/poster.jpg?' + uid
+                src: '/' + data.id + '/poster512.jpg?' + uid
             })
             .css({
                 position: 'absolute',
@@ -63,7 +63,7 @@ pandora.ui.infoView = function(data) {
             .appendTo($data.$element),
         $reflectionPoster = $('<img>')
             .attr({
-                src: '/' + data.id + '/poster.jpg?' + uid
+                src: '/' + data.id + '/poster512.jpg?' + uid
             })
             .css({
                 position: 'absolute',
@@ -407,7 +407,7 @@ pandora.ui.infoView = function(data) {
                         position: selectedImage.index // fixme: api slightly inconsistent
                     }), function() {
                         $browserImages.each(function() {
-                            $(this).attr({src: '/' + data.id + '/poster.64.jpg?' + Ox.uid()});
+                            $(this).attr({src: '/' + data.id + '/poster64.jpg?' + Ox.uid()});
                         });
                     });
                 }
@@ -457,7 +457,7 @@ pandora.ui.infoView = function(data) {
         $text.animate({
             left: margin + (posterSize == 256 ? 256 : posterWidth) + margin + 'px',
         }, 250);
-        pandora.api.setUI({infoIconSize: pandora.user.ui.infoIconSize = posterSize});
+        pandora.UI.set({infoIconSize: posterSize});
     }
 
     that.resize = function() {

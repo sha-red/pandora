@@ -71,16 +71,16 @@ pandora.ui.mainMenu = function() {
                 ] },
                 { id: 'viewMenu', title: 'View', items: [
                     { id: 'movies', title: 'View ' + pandora.site.itemName.plural, items: [
-                        { group: 'viewmovies', min: 0, max: 1, items: $.map(pandora.site.listViews, function(view, i) {
+                        { group: 'viewmovies', min: 1, max: 1, items: $.map(pandora.site.listViews, function(view, i) {
                             return $.extend({
                                 checked: pandora.user.ui.lists[pandora.user.ui.list].listView == view.id,
                             }, view);
                         }) },
                     ]},
                     { id: 'icons', title: 'Icons', items: [
-                        { id: 'poster', title: 'Poster' },
-                        { id: 'still', title: 'Still' },
-                        { id: 'timeline', title: 'Timeline' }
+                        { group: 'viewicons', min: 1, max: 1, items: ['posters', 'frames'].map(function(icons) {
+                            return {id: icons, title: Ox.toTitleCase(icons), checked: pandora.user.ui.icons == icons};
+                        }) }
                     ] },
                     { id: 'info', title: 'Info', items: [
                         { id: 'poster', title: 'Poster' },
@@ -88,7 +88,7 @@ pandora.ui.mainMenu = function() {
                     ] },
                     {},
                     { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], disabled: true, items: [
-                        { group: 'movieview', min: 0, max: 1, items: $.map(pandora.site.itemViews, function(view, i) {
+                        { group: 'movieview', min: 1, max: 1, items: $.map(pandora.site.itemViews, function(view, i) {
                             return $.extend({
                                 checked: pandora.user.ui.itemView == view.id,
                             }, view);
@@ -168,6 +168,13 @@ pandora.ui.mainMenu = function() {
                 if (data.id == 'find') {
                     var id = data.checked[0].id;
                     pandora.$ui.findSelect.selectItem(id);
+                } else if (data.id == 'icons') {
+                    var $list = !pandora.user.ui.item ? pandora.$ui.list : pandora.$ui.browser;
+                    /*
+                    list.options({
+                        item:
+                    });
+                    */
                 } else if (data.id == 'movieview') {
                     var view = data.checked[0].id;
                     var id = document.location.pathname.split('/')[1];

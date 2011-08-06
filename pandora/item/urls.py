@@ -5,17 +5,26 @@ from django.conf.urls.defaults import *
 
 
 urlpatterns = patterns("item.views",
-    (r'^(?P<id>[A-Z0-9].*)/frame/(?P<size>\d+)/(?P<position>[0-9\.,]+).jpg$', 'frame'),
-    (r'^(?P<id>[A-Z0-9].*)/frame/poster/(?P<position>\d+).jpg$', 'poster_frame'),
-    (r'^(?P<id>[A-Z0-9].*)/(?P<oshash>[a-f0-9]+)/(?P<profile>.*\.(?P<format>webm|ogv|mp4))$', 'video'),
-    (r'^(?P<id>[A-Z0-9][A-Za-z0-9]+)/torrent/(?P<filename>.*?)$', 'torrent'),
-    (r'^(?P<id>[A-Z0-9].*)/(?P<profile>.*\.(?P<format>webm|ogv|mp4))$', 'video'),
-    (r'^(?P<id>[A-Z0-9].*)/poster\.(?P<size>\d+)\.jpg$', 'poster'),
-    (r'^(?P<id>[A-Z0-9].*)/poster\.(?P<size>large)\.jpg$', 'poster'),
-    (r'^(?P<id>[A-Z0-9].*)/poster\.pandora\.jpg$', 'poster_local'),
-    (r'^(?P<id>[A-Z0-9].*)/poster\.jpg$', 'poster'),
-    (r'^(?P<id>[A-Z0-9].*)/icon\.(?P<size>\d+)\.jpg$', 'icon'),
-    (r'^(?P<id>[A-Z0-9].*)/icon\.jpg$', 'icon'),
-    (r'^(?P<id>[A-Z0-9].*)/timelines/(?P<timeline>.+)\.(?P<size>\d+)\.(?P<position>\d+)\.png$', 'timeline'),
-    (r'^(?P<id>[A-Z0-9].*)/timeline\.(?P<size>\d+)\.png$', 'timeline_overview'),
+    #frames
+    (r'^(?P<id>[A-Z0-9].+)/frame(?P<size>\d+)p(?P<position>[\d\.]+)\.jpg$', 'frame'),
+
+    #timelines
+    (r'^(?P<id>[A-Z0-9].+)/timeline(?P<size>\d+)p(?P<position>\d+)\.png$', 'timeline'),
+    (r'^(?P<id>[A-Z0-9].+)/timeline(?P<size>\d+)p\.png$', 'timeline_overview'),
+
+    #video
+    (r'^(?P<id>[A-Z0-9].+)/(?P<profile>\d+p)(?P<index>\d*)\.(?P<format>webm|ogv|mp4)$', 'video'),
+
+    #torrent
+    (r'^(?P<id>[A-Z0-9][A-Za-z0-9]+)/torrent/(?P<filename>.+?)$', 'torrent'),
+
+    #icon
+    (r'^(?P<id>[A-Z0-9].+)/icon(?P<size>\d*)\.jpg$', 'icon'),
+
+    #poster
+    (r'^(?P<id>[A-Z0-9].+)/poster(?P<size>\d+)\.jpg$', 'poster'),
+    (r'^(?P<id>[A-Z0-9].+)/poster\.jpg$', 'poster_local'),
+    (r'^(?P<id>[A-Z0-9].+)/frameposter(?P<position>\d+).jpg$', 'poster_frame'),
+
+    
 )

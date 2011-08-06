@@ -24,13 +24,13 @@ pandora.ui.item = function() {
                 item: function(data, sort, size) {
                     size = size || 128;
                     var ratio = result.data.stream.aspectRatio,
-                        width = ratio>1?size:size*ratio,
-                        height = ratio>1?size/ratio:size,
-                        url = '/' + pandora.user.ui.item + '/frame/' + size + '/' + data['in'] + '.jpg';
+                        width = ratio > 1 ? size : Math.round(size * ratio),
+                        height = ratio > 1 ? Math.round(size / ratio) : size,
+                        url = '/' + pandora.user.ui.item + '/frame' + size + 'p' + data['in'] + '.jpg';
                     return {
                         height: height,
                         id: data['id'],
-                        info: Ox.formatDuration(data['in'], 'short') +' - '+ Ox.formatDuration(data['out'], 'short'),
+                        info: Ox.formatDuration(data['in'], 'short') + ' - ' + Ox.formatDuration(data['out'], 'short'),
                         title: data.value,
                         url: url,
                         width: width 
@@ -227,9 +227,7 @@ pandora.ui.item = function() {
                 position: pandora.user.ui.videoPosition[pandora.user.ui.item] || 0,
                 showAnnotations: pandora.user.ui.showAnnotations,
                 showControls: pandora.user.ui.showControls,
-                subtitles: result.data.layers.subtitles.map(function(subtitle) {
-                    return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
-                }),
+                subtitles: result.data.layers.subtitles,
                 videoHeight: video.height,
                 videoId: pandora.user.ui.item,
                 videoWidth: video.width,
@@ -280,13 +278,13 @@ pandora.ui.item = function() {
                 duration: video.duration,
                 find: '',
                 getFrameURL: function(position) {
-                    return '/' + pandora.user.ui.item + '/frame/' + video.width.toString() + '/' + position.toString() + '.jpg';
+                    return '/' + pandora.user.ui.item + '/frame' + video.height.toString() + 'p' + position.toString() + '.jpg';
                 },
                 getLargeTimelineImageURL: function(i) {
-                    return '/' + pandora.user.ui.item + '/timelines/timeline.64.' + i + '.png';
+                    return '/' + pandora.user.ui.item + '/timeline64p' + i + '.png';
                 },
                 getSmallTimelineImageURL: function(i) {
-                    return '/' + pandora.user.ui.item + '/timelines/timeline.16.' + i + '.png';
+                    return '/' + pandora.user.ui.item + '/timeline16p' + i + '.png';
                 },
                 height: pandora.$ui.contentPanel.size(1),
                 id: 'editor',

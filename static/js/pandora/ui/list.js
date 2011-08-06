@@ -75,14 +75,17 @@ pandora.ui.list = function(view) { // fixme: remove view argument
             defaultRatio: 5/8,
             id: 'list',
             item: function(data, sort, size) {
-                var ratio = data.poster.width / data.poster.height;
+                var icons = pandora.user.ui.icons,
+                    ratio = icons == 'posters' ? data.poster.width / data.poster.height : 1;
                 size = size || 128;
                 return {
                     height: ratio <= 1 ? size : size / ratio,
-                    id: data['id'],
+                    id: data.id,
                     info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
                     title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
-                    url: data.poster.url.replace(/jpg/, size + '.jpg'),
+                    url: icons == 'posters' 
+                        ? '/' + data.id + '/poster' + size + '.jpg'
+                        : '/' + data.id + '/icon' + size + '.jpg',
                     width: ratio >= 1 ? size : size * ratio
                 };
             },
@@ -113,13 +116,13 @@ pandora.ui.list = function(view) { // fixme: remove view argument
             item: function(data, sort, size) {
                 size = size || 128;
                 var ratio = data.aspectRatio,
-                    width = size,
-                    height = size/ratio,
-                    url = '/' + data.item + '/frame/' + size + '/'+data['in'] + '.jpg';
+                    width = ratio > 1 ? size : Math.round(size * ratio),
+                    height = ratio > 1 ? Math.round(size / ratio) : size,
+                    url = '/' + data.item + '/frame' + height + 'p' + data['in'] + '.jpg';
                 return {
                     height: height,
                     id: data['id'],
-                    info: Ox.formatDuration(data['in'], 'short') +' - '+ Ox.formatDuration(data['out'], 'short'),
+                    info: Ox.formatDuration(data['in'], 'short') + ' - ' + Ox.formatDuration(data['out'], 'short'),
                     title: data.value,
                     url: url,
                     width: width
@@ -130,7 +133,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                     query = {conditions:[]};
                 //fixme: can this be in pandora.Query? dont just check for subtitles
                 itemQuery.conditions.forEach(function(q) {
-                    if(q.key == 'subtitles') {
+                    if (q.key == 'subtitles') {
                         query.conditions.push({key: 'value', value: q.value, operator: q.operator});
                     }
                 });
@@ -463,7 +466,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                         pandora.resizeFolders();
                     });
                 });
-                pandora.$ui.infoTimeline.attr('src', '/'+data.ids[0]+'/timeline.16.png')
+                pandora.$ui.infoTimeline.attr('src', '/' + data.ids[0] + '/timeline16p.png')
             }
             pandora.api.find({
                 query: {

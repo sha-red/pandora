@@ -48,7 +48,7 @@ pandora.ui.browser = function() {
                     id: data['id'],
                     info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
                     title: data.title + (data.director ? ' (' + data.director + ')' : ''),
-                    url: data.poster.url.replace(/jpg/, size + '.jpg'),
+                    url: '/' + data['id'] + '/poster' + size + '.jpg',
                     width: ratio >= 1 ? size : size * ratio
                 };
             },

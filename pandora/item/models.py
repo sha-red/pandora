@@ -343,7 +343,7 @@ class Item(models.Model):
         poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
         if os.path.exists(poster):
             posters.append({
-                'url': '/%s/poster.pandora.jpg' % self.itemId,
+                'url': '/%s/poster.jpg' % self.itemId,
                 'width': 640,
                 'height': 1024,
                 'source': settings.URL,
@@ -379,7 +379,7 @@ class Item(models.Model):
                     'index': p,
                     'position': f['position'],
                     'selected': p == pos,
-                    'url': '/%s/frame/poster/%d.jpg' %(self.itemId, p),
+                    'url': '/%s/frameposter%d.jpg' %(self.itemId, p),
                     'height': f['height'],
                     'width': f['width'] 
                 })
