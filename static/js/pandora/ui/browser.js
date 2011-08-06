@@ -38,6 +38,7 @@ pandora.ui.browser = function() {
     } else {
         var that = Ox.IconList({
             centered: true,
+            defaultRatio: 5/8,
             id: 'list',
             item: function(data, sort, size) {
                 var ratio = data.poster.width / data.poster.height;

@@ -72,6 +72,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
         });
     } else if (view == 'icons') {
         that = Ox.IconList({
+            defaultRatio: 5/8,
             id: 'list',
             item: function(data, sort, size) {
                 var ratio = data.poster.width / data.poster.height;
@@ -108,6 +109,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
         that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
     } else if (view == 'clip') {
         that = Ox.IconList({
+            fixedRatio: 4/3,
             item: function(data, sort, size) {
                 size = size || 128;
                 var ratio = data.aspectRatio,
@@ -190,16 +192,19 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                 },
                 {
                     element: pandora.$ui.clips = Ox.IconList({
+                        fixedRatio: 4/3,
                         item: function(data, sort, size) {
+                            Ox.print('RATIO', data.aspectRatio);
                             size = size || 128;
-                            var ratio = data.aspectRatio,
-                                width = size,
-                                height = size/ratio,
-                                url = '/' + data.item + '/frame/' + size + '/'+data['in'] + '.jpg';
+                            var fixedRatio = 4/3,
+                                width = data.aspectRatio < fixedRatio ? size : size * data.aspectRatio / fixedRatio,
+                                height = width / data.aspectRatio,
+                                url = '/' + data.item + '/frame/' + width + '/' + data['in'] + '.jpg';
                             return {
                                 height: height,
-                                id: data['id'],
-                                info: Ox.formatDuration(data['in'], 'short') +' - '+ Ox.formatDuration(data['out'], 'short'),
+                                id: data.id,
+                                info: Ox.formatDuration(data['in'], 'short') + ' - '
+                                    + Ox.formatDuration(data['out'], 'short'),
                                 title: data.value,
                                 url: url,
                                 width: width
