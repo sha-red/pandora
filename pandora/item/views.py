@@ -339,9 +339,9 @@ def get(request):
     item = get_object_or_404_json(models.Item, itemId=data['id'])
     if item.access(request.user):
         info = item.get_json(data['keys'])
-        if 'stream' in data['keys']:
+        if not data['keys'] or 'stream' in data['keys']:
             info['stream'] = item.get_stream()
-        if 'layers' in data['keys']:
+        if not data['keys'] or 'layers' in data['keys']:
             info['layers'] = item.get_layers(request.user)
         response['data'] = info
     else:

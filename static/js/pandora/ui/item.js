@@ -1,7 +1,10 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.item = function() {
     var that = Ox.Element();
-    pandora.api.getItem(pandora.user.ui.item, function(result) {
+    pandora.api.get({
+        id: pandora.user.ui.item,
+        keys: []
+    }, pandora.user.level == 'admin' && pandora.user.ui.itemView == 'info' ? 0 : -1, function(result) {
         if (result.status.code != 200) {
             pandora.$ui.contentPanel.replaceElement(1,
                 Ox.Element().html(

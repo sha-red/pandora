@@ -444,6 +444,8 @@ class Item(models.Model):
 
         if not keys or 'poster' in keys:
             i['poster'] = self.get_poster()
+
+        #only needed by admins
         if keys and 'posters' in keys:
             i['posters'] = self.get_posters()
         if keys and 'frames' in keys:

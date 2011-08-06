@@ -15,6 +15,7 @@ pandora.ui.infoView = function(data) {
         posterLeft = posterSize == 256 ? Math.floor((posterSize - posterWidth) / 2) : 0,
         editPoster = false,
         that = Ox.Element(),
+        uid = Ox.uid(),
         $list,
         $info = $('<div>')
             .css({
@@ -35,7 +36,7 @@ pandora.ui.infoView = function(data) {
             .appendTo($info),
         $poster = Ox.Element('<img>')
             .attr({
-                src: '/' + data.id + '/poster.jpg'
+                src: '/' + data.id + '/poster.jpg?' + uid
             })
             .css({
                 position: 'absolute',
@@ -62,7 +63,7 @@ pandora.ui.infoView = function(data) {
             .appendTo($data.$element),
         $reflectionPoster = $('<img>')
             .attr({
-                src: '/' + data.id + '/poster.jpg'
+                src: '/' + data.id + '/poster.jpg?' + uid
             })
             .css({
                 position: 'absolute',
@@ -90,7 +91,8 @@ pandora.ui.infoView = function(data) {
                 top: margin + 'px',
                 right: margin + 'px'
             })
-            .appendTo($data.$element);
+            .appendTo($data.$element),
+        $browserImages = [];
 
     var match = /(\(S\d{2}(E\d{2})?\))/.exec(data.title);
     if (match) {
@@ -106,8 +108,10 @@ pandora.ui.infoView = function(data) {
             WebkitUserSelect: 'text'
         })
         .html(
-            data.title + (data.original_title ? ' '
-            + formatLight('(' + data.original_title + ')') : '')
+            data.title + (
+                data.original_title && data.original_title != data.title
+                ? ' ' + formatLight('(' + data.original_title + ')') : ''
+            )
         )
         .appendTo($text);
 
@@ -327,7 +331,7 @@ pandora.ui.infoView = function(data) {
         pandora.api.get({
             id: data.id,
             keys: [icon]
-        }, function(result) {
+        }, 0, function(result) {
             Ox.print('RESULT', result.data)
             var images = result.data[icon];
             selectedImage = images.filter(function(image) {
@@ -373,31 +377,37 @@ pandora.ui.infoView = function(data) {
                     selectedImage = images.filter(function(image) {
                         return image.index == index;
                     })[0];
-                    //renderPreview(selectedImage);
+                    var imageRatio = selectedImage.width / selectedImage.height,
+                        src = selectedImage.url;
+                    if ($browserImages.length == 0) {
+                        $browserImages = pandora.$ui.browser.find('img[src*="/' + data.id + '/poster"]');
+                    }
+                    $browserImages.each(function() {
+                        var $this = $(this),
+                            size = Math.max($this.width(), $this.height());
+                        $this.attr({src: src});
+                        icon == 'posters' && $this.css(imageRatio < 1 ? {
+                            width: Math.round(size * imageRatio) + 'px',
+                            height: size + 'px'
+                        } : {
+                            width: size + 'px',
+                            height: Math.round(size / imageRatio) + 'px'
+                        });
+                    });
+                    $poster.attr({src: src});
+                    $reflectionPoster.attr({src: src});
+                    posterRatio = imageRatio;
+                    posterSize = posterSize == 256 ? 512 : 256;
+                    togglePosterSize();
                     pandora.api[icon == 'posters' ? 'setPoster' : 'setPosterFrame'](Ox.extend({
                         id: data.id
                     }, icon == 'posters' ? {
                         source: selectedImage.source
                     } : {
                         position: selectedImage.index // fixme: api slightly inconsistent
-                    }), function(result) {
-                        var imageRatio = selectedImage.width / selectedImage.height;
-                        $('img[src*="/' + data.id + '/poster"]').each(function() {
-                            var $this = $(this),
-                                size = Math.max($this.width(), $this.height()),
-                                src = $this.attr('src').split('?')[0] + '?' + Ox.uid();
-                            $('<img>')
-                                .attr({src: src})
-                                .load(function() {
-                                    $this.attr({src: src});
-                                    icon == 'posters' && $this.css(imageRatio < 1 ? {
-                                        width: Math.round(size * imageRatio) + 'px',
-                                        height: size + 'px'
-                                    } : {
-                                        width: size + 'px',
-                                        height: Math.round(size / imageRatio) + 'px'
-                                    });
-                                });
+                    }), function() {
+                        $browserImages.each(function() {
+                            $(this).attr({src: '/' + data.id + '/poster.64.jpg?' + Ox.uid()});
                         });
                     });
                 }
