@@ -230,7 +230,7 @@ def run_command(cmd, timeout=10):
     return p.returncode
 
 
-def frame(videoFile, frame, position, width=128, redo=False):
+def frame(videoFile, frame, position, height=128, redo=False):
     '''
         params:
             videoFile input
@@ -243,7 +243,7 @@ def frame(videoFile, frame, position, width=128, redo=False):
         frameFolder = os.path.dirname(frame)
         if redo or not exists(frame):
             ox.makedirs(frameFolder)
-            cmd = ['oxframe', '-i', videoFile, '-o', frame, '-p', str(position), '-x', str(width)]
+            cmd = ['oxframe', '-i', videoFile, '-o', frame, '-p', str(position), '-y', str(height)]
             run_command(cmd)
 
 

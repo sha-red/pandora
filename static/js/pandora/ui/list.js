@@ -118,7 +118,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                 var ratio = data.aspectRatio,
                     width = ratio > 1 ? size : Math.round(size * ratio),
                     height = ratio > 1 ? Math.round(size / ratio) : size,
-                    url = '/' + data.item + '/frame' + height + 'p' + data['in'] + '.jpg';
+                    url = '/' + data.item + '/' + height + 'p' + data['in'] + '.jpg';
                 return {
                     height: height,
                     id: data['id'],

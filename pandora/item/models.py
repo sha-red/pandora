@@ -676,16 +676,17 @@ class Item(models.Model):
         Video related functions
     '''
 
-    def frame(self, position, width=128):
+    def frame(self, position, height=128):
         stream = self.streams.filter(profile=settings.VIDEO_PROFILE)
         if stream.count()>0:
             stream = stream[0]
         else:
             return None
+        height = min(height, stream.height())
         path = os.path.join(settings.MEDIA_ROOT, self.path(),
-                            'frames', "%d"%width, "%s.jpg"%position)
+                            'frames', "%dp"%height, "%s.jpg"%position)
         if not os.path.exists(path):
-            extract.frame(stream.video.path, path, position, width)
+            extract.frame(stream.video.path, path, position, height)
         if not os.path.exists(path):
             path = os.path.join(settings.STATIC_ROOT, 'png/frame.broken.png')
         return path
@@ -1090,6 +1091,9 @@ class Stream(models.Model):
 
     def path(self):
         return self.item.path(self.profile)
+
+    def height(self):
+        return int(self.profile.split('p')[0])
 
     def extract_derivatives(self):
         for profile in settings.VIDEO_DERIVATIVES:

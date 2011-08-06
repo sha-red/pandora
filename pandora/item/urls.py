@@ -6,7 +6,7 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns("item.views",
     #frames
-    (r'^(?P<id>[A-Z0-9].+)/frame(?P<size>\d+)p(?P<position>[\d\.]+)\.jpg$', 'frame'),
+    (r'^(?P<id>[A-Z0-9].+)/(?P<size>\d+)p(?P<position>[\d\.]+)\.jpg$', 'frame'),
 
     #timelines
     (r'^(?P<id>[A-Z0-9].+)/timeline(?P<size>\d+)p(?P<position>\d+)\.png$', 'timeline'),

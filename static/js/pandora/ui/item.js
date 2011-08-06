@@ -26,7 +26,7 @@ pandora.ui.item = function() {
                     var ratio = result.data.stream.aspectRatio,
                         width = ratio > 1 ? size : Math.round(size * ratio),
                         height = ratio > 1 ? Math.round(size / ratio) : size,
-                        url = '/' + pandora.user.ui.item + '/frame' + size + 'p' + data['in'] + '.jpg';
+                        url = '/' + pandora.user.ui.item + '/' + size + 'p' + data['in'] + '.jpg';
                     return {
                         height: height,
                         id: data['id'],
@@ -278,7 +278,7 @@ pandora.ui.item = function() {
                 duration: video.duration,
                 find: '',
                 getFrameURL: function(position) {
-                    return '/' + pandora.user.ui.item + '/frame' + video.height.toString() + 'p' + position.toString() + '.jpg';
+                    return '/' + pandora.user.ui.item + '/' + video.height.toString() + 'p' + position.toString() + '.jpg';
                 },
                 getLargeTimelineImageURL: function(i) {
                     return '/' + pandora.user.ui.item + '/timeline64p' + i + '.png';
