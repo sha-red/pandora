@@ -217,10 +217,8 @@ class Item(models.Model):
                 data['summary'] = data.pop('plot')
             if 'cast' in data:
                 if isinstance(data['cast'][0], basestring):
-                    data['actor'] = [data['cast'][0]]
-                else:
-                    data['actor'] = [c[0] for c in data['cast']]
-                data['actor'] = data['actor']
+                    data['cast'] = [data['cast']]
+                data['actor'] = [c[0] for c in data['cast']]
                 data['cast'] = map(lambda x: {'actor': x[0], 'character': x[1]}, data['cast'])
             if 'trivia' in data:
                 def fix_links(t):
@@ -439,6 +437,8 @@ class Item(models.Model):
 
         if 'reviews' in i:
             i['reviews'] = self.reviews()
+        if 'cast' in i and isinstance(i['cast'][0], basestring):
+            i['cast'] = [i['cast']]
         if 'cast' in i and isinstance(i['cast'][0], list):
             i['cast'] = map(lambda x: {'actor': x[0], 'character': x[1]}, i['cast'])
 
