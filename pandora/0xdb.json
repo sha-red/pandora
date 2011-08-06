@@ -502,6 +502,7 @@
             "groupsQuery": {"conditions": [], "operator": "|"},
             "groupsSize": 176,
             "icons": "posters",
+            "infoIconSize": 256,
             "item": "",
             "itemView": "timeline",
             "list": "",

@@ -2,10 +2,11 @@ pandora.ui.infoView = function(data) {
 
     var listWidth = 144 + Ox.UI.SCROLLBAR_SIZE,
         margin = 8,
+        posterSize = pandora.user.ui.infoIconSize,
         posterRatio = data.poster.width / data.poster.height,
-        posterWidth = posterRatio > 1 ? 256 : Math.round(256 * posterRatio),
-        posterHeight = posterRatio < 1 ? 256 : Math.round(256 / posterRatio),
-        posterLeft = Math.floor((256 - posterWidth) / 2),
+        posterWidth = posterRatio > 1 ? posterSize : Math.round(posterSize * posterRatio),
+        posterHeight = posterRatio < 1 ? posterSize : Math.round(posterSize / posterRatio),
+        posterLeft = Math.floor((posterSize - posterWidth) / 2),
         editPoster = false,
         that = Ox.Element(),
         $list,
@@ -26,7 +27,7 @@ pandora.ui.infoView = function(data) {
                 height: pandora.$ui.contentPanel.size(1) + 'px'
             })
             .appendTo($info),
-        $poster = $('<img>')
+        $poster = Ox.Element('<img>')
             .attr({
                 src: '/' + data.id + '/poster.jpg'
             })
@@ -36,7 +37,10 @@ pandora.ui.infoView = function(data) {
                 top: margin + 'px',
                 width: posterWidth + 'px',
                 height: posterHeight + 'px',
-                cursor: pandora.user.level == 'admin' ? 'pointer' : 'default'
+                cursor: 'pointer'
+            })
+            .bindEvent({
+                singleclick: togglePosterSize
             })
             .appendTo($data.$element),
         $reflection = $('<div>')
@@ -45,8 +49,8 @@ pandora.ui.infoView = function(data) {
                 position: 'absolute',
                 left: margin + 'px',
                 top: margin + posterHeight + 'px',
-                width: '256px',
-                height: '128px',
+                width: posterSize + 'px',
+                height: posterSize / 2 + 'px',
                 overflow: 'hidden'
             })
             .appendTo($data.$element),
@@ -68,8 +72,8 @@ pandora.ui.infoView = function(data) {
                 display: 'block',
                 position: 'absolute',
                 left: margin + 'px',
-                width: '256px',
-                height: '128px'
+                width: posterSize + 'px',
+                height: posterSize / 2 + 'px'
             })
             .css('background', '-moz-linear-gradient(top, rgba(16, 16, 16, 0.75), rgba(16, 16, 16, 1))')
             .css('background', '-webkit-linear-gradient(top, rgba(16, 16, 16, 0.75), rgba(16, 16, 16, 1))')
@@ -77,7 +81,7 @@ pandora.ui.infoView = function(data) {
         $text = $('<div>')
             .css({
                 position: 'absolute',
-                left: margin + 256 + margin + 'px',
+                left: margin + posterSize + margin + 'px',
                 top: margin + 'px',
                 right: margin + 'px'
             })
@@ -351,8 +355,9 @@ pandora.ui.infoView = function(data) {
     if (pandora.user.level == 'admin') {
         var icon = 'posters',
             selectedImage = {};
-        $poster.bind({
-            click: function() {
+
+        $poster.bindEvent({
+            doubleclick: function() {
                 if (!editPoster) {
                     $info.animate({
                         left: 0
@@ -456,6 +461,36 @@ pandora.ui.infoView = function(data) {
         return (Ox.isArray(value) ? value : [value]).map(function(value) {
             return key ? '<a href="/?find=' + key + ':' + value + '">' + value + '</a>' : value;
         }).join(', ');
+    }
+
+    function togglePosterSize() {
+        posterSize = posterSize == 256 ? 512 : 256;
+        posterWidth = posterRatio > 1 ? posterSize : Math.round(posterSize * posterRatio);
+        posterHeight = posterRatio < 1 ? posterSize : Math.round(posterSize / posterRatio);
+        posterLeft = Math.floor((posterSize - posterWidth) / 2);
+        $poster.animate({
+            left: margin + posterLeft + 'px',
+            width: posterWidth + 'px',
+            height: posterHeight + 'px'     
+        }, 250);
+        $reflection.animate({
+            top: margin + posterHeight + 'px',
+            width: posterSize + 'px',
+            height: posterSize / 2 + 'px'
+        }, 250);
+        $reflectionPoster.animate({
+            left: posterLeft + 'px',
+            width: posterWidth + 'px',
+            height: posterHeight + 'px',
+        }, 250);
+        $reflectionGradient.animate({
+            width: posterSize + 'px',
+            height: posterSize / 2 + 'px'
+        }, 250);
+        $text.animate({
+            left: margin + posterSize + margin + 'px',
+        }, 250);
+        pandora.api.setUI({infoIconSize: pandora.user.ui.infoIconSize = posterSize});
     }
 
     that.resize = function() {
