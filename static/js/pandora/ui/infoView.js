@@ -1,12 +1,18 @@
 pandora.ui.infoView = function(data) {
 
-    var listWidth = 144 + Ox.UI.SCROLLBAR_SIZE,
-        margin = 8,
+    var css = {
+            marginTop: '4px',
+            textAlign: 'justify',
+            MozUserSelect: 'text',
+            WebkitUserSelect: 'text'
+        },
+        listWidth = 144 + Ox.UI.SCROLLBAR_SIZE,
+        margin = 16,
         posterSize = pandora.user.ui.infoIconSize,
         posterRatio = data.poster.width / data.poster.height,
         posterWidth = posterRatio > 1 ? posterSize : Math.round(posterSize * posterRatio),
         posterHeight = posterRatio < 1 ? posterSize : Math.round(posterSize / posterRatio),
-        posterLeft = Math.floor((posterSize - posterWidth) / 2),
+        posterLeft = posterSize == 256 ? Math.floor((posterSize - posterWidth) / 2) : 0,
         editPoster = false,
         that = Ox.Element(),
         $list,
@@ -71,7 +77,6 @@ pandora.ui.infoView = function(data) {
             .css({
                 display: 'block',
                 position: 'absolute',
-                left: margin + 'px',
                 width: posterSize + 'px',
                 height: posterSize / 2 + 'px'
             })
@@ -81,49 +86,55 @@ pandora.ui.infoView = function(data) {
         $text = $('<div>')
             .css({
                 position: 'absolute',
-                left: margin + posterSize + margin + 'px',
+                left: margin + (posterSize == 256 ? 256 : posterWidth) + margin + 'px',
                 top: margin + 'px',
                 right: margin + 'px'
             })
             .appendTo($data.$element);
-    Ox.print('DATA', data);
-    ['title', 'director'].forEach(function(key) {
-        $('<div>')
-            .css({
-                marginTop: key == 'title' ? '-2px' : '2px',
-                fontWeight: 'bold',
-                fontSize: '13px',
-                MozUserSelect: 'text',
-                WebkitUserSelect: 'text'
-            })
-            .html(
-                key == 'title'
-                ? data.title + (
-                    data.original_title
-                    ? ' <span style="color: rgb(128, 128, 128)">(' + data.original_title + ')</span>'
-                    : ''
-                )
-                : formatValue(data.director, 'name')
-            )
-            .appendTo($text);
-    });
+
+    var match = /(\(S\d{2}(E\d{2})?\))/.exec(data.title);
+    if (match) {
+        data.title = data.title.replace(match[0], formatLight(match[0]));
+    }
+
+    $('<div>')
+        .css({
+            marginTop: '-2px',
+            fontWeight: 'bold',
+            fontSize: '13px',
+            MozUserSelect: 'text',
+            WebkitUserSelect: 'text'
+        })
+        .html(
+            data.title + (data.original_title ? ' '
+            + formatLight('(' + data.original_title + ')') : '')
+        )
+        .appendTo($text);
+
+    $('<div>')
+        .css({
+            marginTop: '2px',
+            fontWeight: 'bold',
+            fontSize: '13px',
+            MozUserSelect: 'text',
+            WebkitUserSelect: 'text'
+        })
+        .html(formatValue(data.director, 'name'))
+        .appendTo($text);
 
     if (data.country || data.year || data.language || data.runtime || pandora.user.level == 'admin') {
         var $div = $('<div>')
-            .css({
-                marginTop: '4px',
-                textAlign: 'justify'
-            })
+            .css(css)
             .appendTo($text);
         var html = [];
         ['country', 'year', 'language', 'runtime'].forEach(function(key) {
             if (data[key] || (['country', 'year'].indexOf(key) > -1 && pandora.user.level == 'admin')) {
-                var value = data[key] || '<span style="color: rgb(128, 128, 128)">unknown</span>';
+                var value = data[key] || formatLight('unknown');
                 html.push(
                     formatKey(key)
                     + (key == 'runtime'
                     ? Math.round(value / 60) + ' min'
-                    : formatValue(value, key == 'runtime' ? null : key))
+                    : formatValue(value, key == 'runtime' || !data[key] ? null : key))
                 );
             }
         });
@@ -132,34 +143,21 @@ pandora.ui.infoView = function(data) {
 
     // fixme: should be camelCase!
     data.alternative_titles && $('<div>')
-        .css({
-            marginTop: '4px',
-            textAlign: 'justify',
-            MozUserSelect: 'text',
-            WebkitUserSelect: 'text'
-        })
+        .css(css)
         .html(
             formatKey('Alternative Titles') + data.alternative_titles.map(function(value) {
-                return value[0] + (
-                    value[1]
-                    ? ' <span style="color: rgb(128, 128, 128)">(' + value[1] + ')</span>'
-                    : ''
-                );
+                return value[0] + (value[1] ? ' '
+                    + formatLight('(' + value[1] + ')') : '');
             }).join(', ')
         )
         .appendTo($text);
 
-    if (data.writer || data.producer || data.cinematographer || data.editor) {
+    if (data.creator || data.writer || data.producer || data.cinematographer || data.editor) {
         $div = $('<div>')
-            .css({
-                marginTop: '4px',
-                textAlign: 'justify',
-                MozUserSelect: 'text',
-                WebkitUserSelect: 'text'
-            })
+            .css(css)
             .appendTo($text);
         html = [];
-        ['writer', 'producer', 'cinematographer', 'editor'].forEach(function(key) {
+        ['creator', 'writer', 'producer', 'cinematographer', 'editor'].forEach(function(key) {
             data[key] && html.push(
                 formatKey(key) + formatValue(data[key], 'name')
             );
@@ -168,32 +166,21 @@ pandora.ui.infoView = function(data) {
     }
 
     data.cast && $('<div>')
-        .css({
-            marginTop: '4px',                
-            textAlign: 'justify',
-            MozUserSelect: 'text',
-            WebkitUserSelect: 'text'
-        })
+        .css(css)
         .html(
             formatKey('cast') + data.cast.map(function(value) {
                 value.character = value.character.replace('(uncredited)', '').trim();
-                return formatValue(value.actor, 'name') + (
-                    value.character
-                    ? ' <span style="color: rgb(128, 128, 128)">(' + formatValue(value.character) + ')</span>'
-                    : ''
-                );
+                return formatValue(value.actor, 'name')
+                    + (value.character ? ' '
+                    + formatLight('(' + formatValue(value.character) + ')')
+                    : '');
             }).join(', ')
         )
         .appendTo($text);
 
     if (data.genre || data.keyword) {
         $div = $('<div>')
-            .css({
-                marginTop: '4px',
-                textAlign: 'justify',
-                MozUserSelect: 'text',
-                WebkitUserSelect: 'text'
-            })
+            .css(css)
             .appendTo($text);
         html = [];
         ['genre', 'keyword'].forEach(function(key) {
@@ -206,12 +193,7 @@ pandora.ui.infoView = function(data) {
     }
 
     data.summary && $('<div>')
-        .css({
-            marginTop: '4px',
-            textAlign: 'justify',
-            MozUserSelect: 'text',
-            WebkitUserSelect: 'text'
-        })
+        .css(css)
         .html(
             formatKey('summary') + data.summary
         )
@@ -249,24 +231,14 @@ pandora.ui.infoView = function(data) {
     });
 
     data.filming_locations && $('<div>')
-        .css({
-            marginTop: '4px',
-            textAlign: 'justify',
-            MozUserSelect: 'text',
-            WebkitUserSelect: 'text'
-        })
+        .css(css)
         .html(
             formatKey('Filming Locations') + data.filming_locations.join('; ')
         )
         .appendTo($text);
 
     data.releasedate && $('<div>')
-        .css({
-            marginTop: '4px',
-            textAlign: 'justify',
-            MozUserSelect: 'text',
-            WebkitUserSelect: 'text'
-        })
+        .css(css)
         .html(
             formatKey('Release Date') + Ox.formatDate(data.releasedate, '%A, %B %e, %Y')
         )
@@ -274,12 +246,7 @@ pandora.ui.infoView = function(data) {
 
     if (data.budget || data.gross || data.profit) {
         $div = $('<div>')
-            .css({
-                marginTop: '4px',
-                textAlign: 'justify',
-                MozUserSelect: 'text',
-                WebkitUserSelect: 'text'
-            })
+            .css(css)
             .appendTo($text);
         html = [];
         ['budget', 'gross', 'profit'].forEach(function(key) {
@@ -292,12 +259,7 @@ pandora.ui.infoView = function(data) {
 
     if (data.rating || data.votes) {
         $div = $('<div>')
-            .css({
-                marginTop: '4px',
-                textAlign: 'justify',
-                MozUserSelect: 'text',
-                WebkitUserSelect: 'text'
-            })
+            .css(css)
             .appendTo($text);
         html = [];
         ['rating', 'votes'].forEach(function(key) {
@@ -310,12 +272,7 @@ pandora.ui.infoView = function(data) {
 
     if (data.connections) {
         $div = $('<div>')
-            .css({
-                marginTop: '4px',
-                textAlign: 'justify',
-                MozUserSelect: 'text',
-                WebkitUserSelect: 'text'
-            })
+            .css(css)
             .appendTo($text);
         html = [];
         [
@@ -336,12 +293,7 @@ pandora.ui.infoView = function(data) {
 
     ['reviews', 'links'].forEach(function(key) {
         data[key] && $('<div>')
-            .css({
-                marginTop: '4px',
-                textAlign: 'justify',
-                MozUserSelect: 'text',
-                WebkitUserSelect: 'text'
-            })
+            .css(css)
             .html(
                 formatKey(key) + data[key].map(function(value) {
                     return '<a href="' + value.url + '">' + value.source + '</a>'
@@ -457,6 +409,10 @@ pandora.ui.infoView = function(data) {
         return '<span style="font-weight: bold">' + Ox.toTitleCase(key) + ':</span> ';
     }
 
+    function formatLight(str) {
+        return '<span style="color: rgb(128, 128, 128)">' + str + '</span>';
+    }
+
     function formatValue(value, key) {
         return (Ox.isArray(value) ? value : [value]).map(function(value) {
             return key ? '<a href="/?find=' + key + ':' + value + '">' + value + '</a>' : value;
@@ -467,7 +423,7 @@ pandora.ui.infoView = function(data) {
         posterSize = posterSize == 256 ? 512 : 256;
         posterWidth = posterRatio > 1 ? posterSize : Math.round(posterSize * posterRatio);
         posterHeight = posterRatio < 1 ? posterSize : Math.round(posterSize / posterRatio);
-        posterLeft = Math.floor((posterSize - posterWidth) / 2);
+        posterLeft = posterSize == 256 ? Math.floor((posterSize - posterWidth) / 2) : 0,
         $poster.animate({
             left: margin + posterLeft + 'px',
             width: posterWidth + 'px',
@@ -488,7 +444,7 @@ pandora.ui.infoView = function(data) {
             height: posterSize / 2 + 'px'
         }, 250);
         $text.animate({
-            left: margin + posterSize + margin + 'px',
+            left: margin + (posterSize == 256 ? 256 : posterWidth) + margin + 'px',
         }, 250);
         pandora.api.setUI({infoIconSize: pandora.user.ui.infoIconSize = posterSize});
     }
