@@ -23,7 +23,7 @@ window.pandora = new Ox.App({url: '/api/'}).bindEvent({
 		                    bottom: 0,
 		                    height: '16px',
 		                })
-                        .attr('src', '/' + item + '/timeline.16.png')
+                        .attr('src', '/' + item + '/timeline16p.png')
 		        )
 		        .append(
 		            ui.infoStill = new app.flipbook(item)
@@ -59,7 +59,7 @@ window.pandora = new Ox.App({url: '/api/'}).bindEvent({
                         'in': inPoint,
                         out: outPoint,
                         position: inPoint,
-                        poster: '/' + item + '/frame/' + '128' + '/' + inPoint +'.jpg',
+                        poster: '/' + item + '/' + '128p' + inPoint +'.jpg',
                         title: result.data.title,
                         video: video.url
                     })
@@ -90,7 +90,7 @@ window.pandora = new Ox.App({url: '/api/'}).bindEvent({
                     var duration = result.data.item.duration,
                         posterFrame = result.data.item.posterFrame || parseInt(duration/2),
                         steps = 24,
-                        framePrefix = '/' + item + '/frame/' + that.width() + '/',
+                        framePrefix = '/' + item + '/' + that.height() + 'p',
                         frames = {};
                     Ox.range(0, duration, duration/steps).forEach(function(position) {
                         position = parseInt(position);
