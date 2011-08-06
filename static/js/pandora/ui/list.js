@@ -202,7 +202,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                             var fixedRatio = 4/3,
                                 width = data.aspectRatio < fixedRatio ? size : size * data.aspectRatio / fixedRatio,
                                 height = width / data.aspectRatio,
-                                url = '/' + data.item + '/frame/' + width + '/' + data['in'] + '.jpg';
+                                url = '/' + data.item + '/' + width + '/' + data['in'] + '.jpg';
                             return {
                                 height: height,
                                 id: data.id,

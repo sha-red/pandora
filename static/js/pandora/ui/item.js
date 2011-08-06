@@ -181,7 +181,7 @@ pandora.ui.item = function() {
                                 var ratio = data.aspectRatio,
                                     width = size,
                                     height = size/ratio,
-                                    url = '/' + data.item + '/frame/' + size + '/'+data['in'] + '.jpg';
+                                    url = '/' + data.item + '/' + size + '/'+data['in'] + '.jpg';
                                 return {
                                     height: height,
                                     id: data['id'],
