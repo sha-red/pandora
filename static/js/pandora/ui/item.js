@@ -252,7 +252,7 @@ pandora.ui.item = function() {
             var stats = Ox.Container();
             Ox.TreeList({
                 data: result.data,
-                width: 256
+                width: pandora.$ui.mainPanel.size(1) - Ox.UI.SCROLLBAR_SIZE
             }).appendTo(stats);
 
             pandora.$ui.contentPanel.replaceElement(1, stats);

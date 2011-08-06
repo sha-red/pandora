@@ -92,24 +92,40 @@ pandora.ui.infoView = function(data) {
                 MozUserSelect: 'text',
                 WebkitUserSelect: 'text'
             })
-            .html(formatValue(data[key], key == 'director' ? 'director' : null))
+            .html(
+                key == 'title'
+                ? data.title + (
+                    data.original_title
+                    ? ' <span style="color: rgb(128, 128, 128)">(' + data.original_title + ')</span>'
+                    : ''
+                )
+                : formatValue(data.director, 'name')
+            )
             .appendTo($text);
     });
-    var $div = $('<div>')
-        .css({
-            marginTop: '4px',
-            textAlign: 'justify'
-        })
-        .appendTo($text);
-    ['country', 'year', 'language', 'runtime'].forEach(function(key) {
-        data[key] && $('<span>')
-            .html(
-                formatKey(key)
-                + (key == 'runtime' ? Math.round(data[key] / 60) + ' min' : formatValue(data[key], key == 'runtime' ? null : key))
-                + '&nbsp; '
-            )
-            .appendTo($div);
-    });
+
+    if (data.country || data.year || data.language || data.runtime || pandora.user.level == 'admin') {
+        var $div = $('<div>')
+            .css({
+                marginTop: '4px',
+                textAlign: 'justify'
+            })
+            .appendTo($text);
+        var html = [];
+        ['country', 'year', 'language', 'runtime'].forEach(function(key) {
+            if (data[key] || (['country', 'year'].indexOf(key) > -1 && pandora.user.level == 'admin')) {
+                var value = data[key] || '<span style="color: rgb(128, 128, 128)">unknown</span>';
+                html.push(
+                    formatKey(key)
+                    + (key == 'runtime'
+                    ? Math.round(value / 60) + ' min'
+                    : formatValue(value, key == 'runtime' ? null : key))
+                );
+            }
+        });
+        $div.html(html.join('; '));
+    }
+
     // fixme: should be camelCase!
     data.alternative_titles && $('<div>')
         .css({
@@ -128,42 +144,62 @@ pandora.ui.infoView = function(data) {
             }).join(', ')
         )
         .appendTo($text);
-    $div = $('<div>')
+
+    if (data.writer || data.producer || data.cinematographer || data.editor) {
+        $div = $('<div>')
+            .css({
+                marginTop: '4px',
+                textAlign: 'justify',
+                MozUserSelect: 'text',
+                WebkitUserSelect: 'text'
+            })
+            .appendTo($text);
+        html = [];
+        ['writer', 'producer', 'cinematographer', 'editor'].forEach(function(key) {
+            data[key] && html.push(
+                formatKey(key) + formatValue(data[key], 'name')
+            );
+        });
+        $div.html(html.join('; '));
+    }
+
+    data.cast && $('<div>')
         .css({
-            marginTop: '4px',
+            marginTop: '4px',                
             textAlign: 'justify',
             MozUserSelect: 'text',
             WebkitUserSelect: 'text'
         })
+        .html(
+            formatKey('cast') + data.cast.map(function(value) {
+                value.character = value.character.replace('(uncredited)', '').trim();
+                return formatValue(value.actor, 'name') + (
+                    value.character
+                    ? ' <span style="color: rgb(128, 128, 128)">(' + formatValue(value.character) + ')</span>'
+                    : ''
+                );
+            }).join(', ')
+        )
         .appendTo($text);
 
-    ['writer', 'producer', 'cinematographer', 'editor'].forEach(function(key) {
-        data[key] && $('<span>')
-            .html(
-                formatKey(key) + formatValue(data[key], 'name') + '&nbsp; '
-            )
-            .appendTo($div);
-    });
-
-    ['cast', 'genre', 'keyword'].forEach(function(key) {
-        data[key] && $('<div>')
+    if (data.genre || data.keyword) {
+        $div = $('<div>')
             .css({
-                marginTop: '4px',                
-                textAlign: 'justify'
+                marginTop: '4px',
+                textAlign: 'justify',
+                MozUserSelect: 'text',
+                WebkitUserSelect: 'text'
             })
-            .html(
-                formatKey(key == 'keyword' ? 'keywords' : key)
-                + (key == 'cast' ? data[key].map(function(value) {
-                    value.character = value.character.replace('(uncredited)', '').trim();
-                    return formatValue(value.actor, 'name') + (
-                        value.character
-                        ? ' <span style="color: rgb(128, 128, 128)">(' + formatValue(value.character, 'name') + ')</span>'
-                        : ''
-                    );
-                }).join(', ') : formatValue(data[key], key == 'cast' ? 'name' : key))
-            )
             .appendTo($text);
-    });
+        html = [];
+        ['genre', 'keyword'].forEach(function(key) {
+            data[key] && html.push(
+                formatKey(key == 'keyword' ? 'keywords' : key)
+                + formatValue(data[key], key)
+            );
+        });
+        $div.html(html.join('; '));
+    }
 
     data.summary && $('<div>')
         .css({
@@ -185,22 +221,16 @@ pandora.ui.infoView = function(data) {
             .append(
                 $('<div>')
                     .css({
-                        //display: 'inline',
                         display: 'table-cell',
-                        //float: 'left',
                         width: '12px',
-                        marginTop: '4px',
-                        paddingBottom: '4px'
+                        paddingTop: '4px'
                     })
                     .html('<span style="font-weight: bold">&bull;</span>')
             )
             .append(
                 $('<div>')
                     .css({
-                        //clear: 'both',
                         display: 'table-cell',
-                        //float: 'left',
-                        //width: '100px',
                         paddingTop: '4px',
                         textAlign: 'justify',
                         MozUserSelect: 'text',
@@ -247,13 +277,13 @@ pandora.ui.infoView = function(data) {
                 WebkitUserSelect: 'text'
             })
             .appendTo($text);
+        html = [];
         ['budget', 'gross', 'profit'].forEach(function(key) {
-            data[key] && $('<span>')
-                .html(
-                    formatKey(key) + data[key] + '&nbsp; '
-                )
-                .appendTo($div);
+            data[key] && html.push(
+                formatKey(key) + Ox.formatCurrency(data[key], '$')
+            );
         });
+        $div.html(html.join('; '));
     }
 
     if (data.rating || data.votes) {
@@ -265,13 +295,13 @@ pandora.ui.infoView = function(data) {
                 WebkitUserSelect: 'text'
             })
             .appendTo($text);
+        html = [];
         ['rating', 'votes'].forEach(function(key) {
-            data[key] && $('<span>')
-                .html(
-                    formatKey(key) + Ox.formatNumber(data[key]) + '&nbsp; '
-                )
-                .appendTo($div);
+            data[key] && html.push(
+                formatKey(key) + Ox.formatNumber(data[key])
+            );
         });
+        $div.html(html.join('; '));
     }
 
     if (data.connections) {
@@ -283,28 +313,38 @@ pandora.ui.infoView = function(data) {
                 WebkitUserSelect: 'text'
             })
             .appendTo($text);
-        Ox.forEach(data.connections, function(movies, key) {
-            $('<span>')
-                .html(
-                    formatKey(key) + formatValue(movies) + '&nbsp; '
-                )
-                .appendTo($div);
+        html = [];
+        [
+            'Edited from', 'Edited into',
+            'Features', 'Featured in',
+            'Follows', 'Followed by',
+            'References', 'Referenced in',
+            'Remake of', 'Remade as',
+            'Spin off from', 'Spin off',
+            'Spoofs', 'Spoofed in'
+        ].forEach(function(key) {
+            data.connections[key] && html.push(
+                formatKey(key) + formatValue(data.connections[key])
+            );
         });
+        $div.html(html.join('; '));
     }
 
-    data.reviews && $('<div>')
-        .css({
-            marginTop: '4px',
-            textAlign: 'justify',
-            MozUserSelect: 'text',
-            WebkitUserSelect: 'text'
-        })
-        .html(
-            formatKey('reviews') + data.reviews.map(function(review) {
-                return '<a href="' + review.url + '">' + review.source + '</a>'
-            }).join(', ')
-        )
-        .appendTo($text);
+    ['reviews', 'links'].forEach(function(key) {
+        data[key] && $('<div>')
+            .css({
+                marginTop: '4px',
+                textAlign: 'justify',
+                MozUserSelect: 'text',
+                WebkitUserSelect: 'text'
+            })
+            .html(
+                formatKey(key) + data[key].map(function(value) {
+                    return '<a href="' + value.url + '">' + value.source + '</a>'
+                }).join(', ')
+            )
+            .appendTo($text);
+    });
     
     $('<div>').css({height: '8px'}).appendTo($text);
 

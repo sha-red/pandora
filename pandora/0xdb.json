@@ -501,6 +501,7 @@
             "groups": ["director", "country", "year", "language", "genre"],
             "groupsQuery": {"conditions": [], "operator": "|"},
             "groupsSize": 176,
+            "icons": "posters",
             "item": "",
             "itemView": "timeline",
             "list": "",
