@@ -490,9 +490,10 @@ class Item(models.Model):
             if key == 'character':
                 values = self.get('cast', '')
                 if values:
-                 if isinstance(values[0], basestring):
-                    values = [values[0], ]
-                 else:
+                    if isinstance(values[0], basestring):
+                        values = [values]
+                    if isinstance(values[0], list):
+                        values = map(lambda x: {'actor': x[0], 'character': x[1]}, values)
                     values = [i['character'] for i in values]
             else:
                 values = self.get(key, '')
