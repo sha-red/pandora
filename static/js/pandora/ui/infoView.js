@@ -51,8 +51,8 @@ pandora.ui.infoView = function(data) {
             })
             .appendTo($data.$element),
         $reflection = $('<div>')
+            .addClass('OxReflection')
             .css({
-                display: 'block',
                 position: 'absolute',
                 left: margin + 'px',
                 top: margin + posterHeight + 'px',
@@ -69,20 +69,15 @@ pandora.ui.infoView = function(data) {
                 position: 'absolute',
                 left: posterLeft + 'px',
                 width: posterWidth + 'px',
-                height: posterHeight + 'px',
-                MozTransform: 'scaleY(-1)',
-                WebkitTransform: 'scaleY(-1)'
+                height: posterHeight + 'px'
             })
             .appendTo($reflection),
         $reflectionGradient = $('<div>')
             .css({
-                display: 'block',
                 position: 'absolute',
                 width: posterSize + 'px',
                 height: posterSize / 2 + 'px'
             })
-            .css('background', '-moz-linear-gradient(top, rgba(16, 16, 16, 0.75), rgba(16, 16, 16, 1))')
-            .css('background', '-webkit-linear-gradient(top, rgba(16, 16, 16, 0.75), rgba(16, 16, 16, 1))')
             .appendTo($reflection),
         $text = $('<div>')
             .css({
@@ -90,6 +85,15 @@ pandora.ui.infoView = function(data) {
                 left: margin + (posterSize == 256 ? 256 : posterWidth) + margin + 'px',
                 top: margin + 'px',
                 right: margin + 'px'
+            })
+            .bind({
+                click: function(e) {
+                    var $target = $(e.target);
+                    if ($target.is('.OxLink')) {
+                        Ox.print('LINK', $target.data('link'));
+                        pandora.URL.set($target.data('link'));
+                    }
+                }
             })
             .appendTo($data.$element),
         $browserImages = [];
@@ -426,7 +430,10 @@ pandora.ui.infoView = function(data) {
 
     function formatValue(value, key) {
         return (Ox.isArray(value) ? value : [value]).map(function(value) {
-            return key ? '<a href="/?find=' + key + ':' + value + '">' + value + '</a>' : value;
+            return key ?
+                '<span class="OxLink" data-link="?find=' + key + ':' + value + '">' + value + '</span>'
+                : value;
+            //return key ? '<a href="/?find=' + key + ':' + value + '">' + value + '</a>' : value;
         }).join(', ');
     }
 
