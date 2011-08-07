@@ -3,12 +3,11 @@
 
 pandora.URL = (function() {
 
-    var old = {
-            user: {
-                ui: {}
-            }
-        },
-        regexps = {
+    var regexps = {
+            '^\\?url=': function(url) {
+                Ox.print('URL', url)
+                document.location = decodeURIComponent(url.substr(5));
+            },
             '^\\?': function(url) {
                 pandora.Query.fromString(url);
                 pandora.UI.set({
@@ -33,7 +32,7 @@ pandora.URL = (function() {
                     sitePage: url
                 });
             },
-            '^(find)$': function() {
+            '^find$': function() {
                 pandora.Query.fromString('?find='); // fixme: silly hack
                 pandora.UI.set({
                     section: 'items',
@@ -46,6 +45,11 @@ pandora.URL = (function() {
                     item: ''
                 });
                 pandora.UI.set(['lists', pandora.user.ui.list, 'listView'].join('|'), url);
+            },
+            '^texts$': function() {
+                pandora.UI.set({
+                    section: 'texts'
+                });
             },
             '^[0-9A-Z]': function(url) {
                 var split = url.split('/'),
@@ -61,11 +65,6 @@ pandora.URL = (function() {
                     item: item,
                     itemView: view
                 });
-            },
-            '^texts$': function() {
-                pandora.UI.set({
-                    section: 'texts'
-                });
             }
         };
 
@@ -75,8 +74,11 @@ pandora.URL = (function() {
             if (arguments.length == 1) { // fixme: remove later
                 url = title;
             }
-            history.pushState({}, pandora.site.site.name + (title ? ' - ' + title : ''), '/' + url);
-            old.user.ui = $.extend({}, pandora.user.ui); // make a clone
+            if (url[0] != '/') {
+                url = '/' + url;
+            }
+            history.pushState({}, pandora.site.site.name + (title ? ' - ' + title : ''), url);
+            oldUserUI = Ox.clone(pandora.user.ui);
             this.update();
         },
 
@@ -97,29 +99,29 @@ pandora.URL = (function() {
 
         update: function() {
             this.parse();
-            if (pandora.user.ui.section != old.user.ui.section) {
+            if (pandora.user.ui.section != oldUserUI.section) {
                 pandora.$ui.appPanel.replaceElement(1, pandora.$ui.mainPanel = pandora.ui.mainPanel());
-            } else if (pandora.user.ui.sitePage != old.user.ui.sitePage) {
+            } else if (pandora.user.ui.sitePage != oldUserUI.sitePage) {
                 pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
-            } else if (!pandora.user.ui.item || !old.user.ui.item) {
+            } else if (!pandora.user.ui.item || !oldUserUI.item) {
                 pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
                 pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
             } else {
                 pandora.$ui.contentPanel.replaceElement(1, pandora.ui.item());
                 pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
             }
+            // fixme: should be 'editor', not 'timeline'
             if (
-                old.user.ui.item &&
-                ['player', 'timeline'].indexOf(old.user.ui.itemView) > -1
+                oldUserUI.item &&
+                ['player', 'timeline'].indexOf(oldUserUI.itemView) > -1
             ) {
                 pandora.UI.set(
-                    'videoPosition|' + old.user.ui.item,
+                    'videoPosition|' + oldUserUI.item,
                     pandora.$ui[
-                        old.user.ui.itemView == 'player' ? 'player' : 'editor'
+                        oldUserUI.itemView == 'player' ? 'player' : 'editor'
                     ].options('position')
                 );
             }
-            //delete old.user.ui;
         }
 
     };

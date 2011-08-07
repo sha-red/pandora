@@ -89,9 +89,9 @@ pandora.ui.infoView = function(data) {
             .bind({
                 click: function(e) {
                     var $target = $(e.target);
-                    if ($target.is('.OxLink')) {
-                        Ox.print('LINK', $target.data('link'));
-                        pandora.URL.set($target.data('link'));
+                    if ($target.is('a')) {
+                        pandora.URL.set($target.attr('href'));
+                        return false;
                     }
                 }
             })
@@ -304,7 +304,7 @@ pandora.ui.infoView = function(data) {
             .css(css)
             .html(
                 formatKey(key) + data[key].map(function(value) {
-                    return '<a href="' + value.url + '">' + value.source + '</a>'
+                    return '<a href="/?url=' + encodeURIComponent(value.url) + '">' + value.source + '</a>'
                 }).join(', ')
             )
             .appendTo($text);
@@ -431,7 +431,7 @@ pandora.ui.infoView = function(data) {
     function formatValue(value, key) {
         return (Ox.isArray(value) ? value : [value]).map(function(value) {
             return key ?
-                '<span class="OxLink" data-link="?find=' + key + ':' + value + '">' + value + '</span>'
+                '<a href="/?find=' + key + ':' + value + '">' + value + '</a>'
                 : value;
             //return key ? '<a href="/?find=' + key + ':' + value + '">' + value + '</a>' : value;
         }).join(', ');
