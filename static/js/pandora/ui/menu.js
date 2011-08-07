@@ -186,13 +186,16 @@ pandora.ui.mainMenu = function() {
                     var $list;
                     pandora.UI.set({icons: value});
                     if (pandora.user.ui.item) {
+                        if (pandora.user.ui.itemView == 'info') {
+                            pandora.$ui.item.reload();
+                        }
                         $list = pandora.$ui.browser;
                     } else if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'icons') {
                         $list = pandora.$ui.list
                     }
                     $list && $list.options({
                         defaultRatio: value == 'posters' ? 5/8 : 1
-                    }).reloadList();
+                    }).reloadList(true);
                 } else if (data.id == 'viewmovies') {
                     url('#view=' + value);
                 }
