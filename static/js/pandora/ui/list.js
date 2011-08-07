@@ -111,19 +111,15 @@ pandora.ui.list = function(view) { // fixme: remove view argument
     } else if (view == 'calendars') {
         that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
     } else if (view == 'clip') {
+        var fixedRatio = 16/9;
         that = Ox.IconList({
-            fixedRatio: 4/3,
+            fixedRatio: fixedRatio,
             item: function(data, sort, size) {
                 size = size || 128;
                 var ratio = data.aspectRatio,
-                    width = ratio > 1 ? size : Math.round(size * ratio),
-                    height = ratio > 1 ? Math.round(size / ratio) : size,
+                    width = ratio > fixedRatio ? size : Math.round(size * ratio / fixedRatio),
+                    height = Math.round(width / ratio),
                     url = '/' + data.item + '/' + height + 'p' + data['in'] + '.jpg';
-                // fixme: ugly
-                if (height > 96) {
-                    width = Math.round(width * 96 / height);
-                    height = 96;
-                }
                 return {
                     height: height,
                     id: data['id'],
