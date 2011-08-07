@@ -701,7 +701,7 @@ class Item(models.Model):
         height = min(height, stream.height())
         path = os.path.join(settings.MEDIA_ROOT, self.path(),
                             'frames', "%dp"%height, "%s.jpg"%position)
-        if not os.path.exists(path):
+        if not os.path.exists(path) and stream.video:
             extract.frame(stream.video.path, path, position, height)
         if not os.path.exists(path):
             path = os.path.join(settings.STATIC_ROOT, 'png/frame.broken.png')
