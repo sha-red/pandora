@@ -183,13 +183,16 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.list.sortList(value, operator);
                     pandora.URL.set(pandora.Query.toString());
                 } else if (data.id == 'viewicons') {
-                    pandora.UI.set({icons: value})
-                    var $list = !pandora.user.ui.item ? pandora.$ui.list : pandora.$ui.browser;
-                    /*
-                    list.options({
-                        item:
-                    });
-                    */
+                    var $list;
+                    pandora.UI.set({icons: value});
+                    if (pandora.user.ui.item) {
+                        $list = pandora.$ui.browser;
+                    } else if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'icons') {
+                        $list = pandora.$ui.list
+                    }
+                    $list && $list.options({
+                        defaultRatio: value == 'posters' ? 5/8 : 1
+                    }).reloadList();
                 } else if (data.id == 'viewmovies') {
                     url('#view=' + value);
                 }

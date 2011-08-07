@@ -38,17 +38,20 @@ pandora.ui.browser = function() {
     } else {
         var that = Ox.IconList({
             centered: true,
-            defaultRatio: 5/8,
+            defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
             id: 'list',
             item: function(data, sort, size) {
-                var ratio = data.poster.width / data.poster.height;
+                var icons = pandora.user.ui.icons,
+                    ratio = icons == 'posters' ? data.poster.width / data.poster.height : 1;
                 size = size || 64;
                 return {
                     height: ratio <= 1 ? size : size / ratio,
-                    id: data['id'],
+                    id: data.id,
                     info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
                     title: data.title + (data.director ? ' (' + data.director + ')' : ''),
-                    url: '/' + data['id'] + '/poster' + size + '.jpg',
+                    url: icons == 'posters' 
+                        ? '/' + data.id + '/poster' + size + '.jpg'
+                        : '/' + data.id + '/icon' + size + '.jpg',
                     width: ratio >= 1 ? size : size * ratio
                 };
             },

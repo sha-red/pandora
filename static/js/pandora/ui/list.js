@@ -72,7 +72,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
         });
     } else if (view == 'icons') {
         that = Ox.IconList({
-            defaultRatio: 5/8,
+            defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
             id: 'list',
             item: function(data, sort, size) {
                 var icons = pandora.user.ui.icons,

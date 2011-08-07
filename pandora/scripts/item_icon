@@ -11,9 +11,7 @@ activate_this = os.path.join(root_dir, 'bin', 'activate_this.py')
 execfile(activate_this, dict(__file__=activate_this))
 
 import Image
-import ImageDraw
 from optparse import OptionParser
-from ox.image import drawText, wrapText
 import sys
 
 
