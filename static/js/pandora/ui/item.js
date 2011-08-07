@@ -20,13 +20,15 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'calendar') {
             pandora.$ui.contentPanel.replaceElement(1, Ox.Element().html('Calendar'));
         } else if (pandora.user.ui.itemView == 'clips') {
+            var ratio = result.data.stream.aspectRatio;
+            Ox.print('RATIO', ratio)
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.clips = Ox.IconList({
+                fixedRatio: ratio,
                 item: function(data, sort, size) {
                     size = size || 128;
-                    var ratio = result.data.stream.aspectRatio,
-                        width = ratio > 1 ? size : Math.round(size * ratio),
+                    var width = ratio > 1 ? size : Math.round(size * ratio),
                         height = ratio > 1 ? Math.round(size / ratio) : size,
-                        url = '/' + pandora.user.ui.item + '/' + size + 'p' + data['in'] + '.jpg';
+                        url = '/' + pandora.user.ui.item + '/' + height + 'p' + data['in'] + '.jpg';
                     return {
                         height: height,
                         id: data['id'],
