@@ -455,7 +455,6 @@ pandora.ui.infoView = function(data) {
                 .appendTo($info);
         });
         
-        return ;
     }
 
     function toggleIconSize() {
@@ -498,7 +497,7 @@ pandora.ui.infoView = function(data) {
         iconRatio = pandora.user.ui.icons == 'posters'
             ? data.poster.width / data.poster.height : 1,
         toggleIconSize();
-        edit && $list.replaceWith($list = renderList());
+        pandora.user.level == 'admin' && $list.replaceWith($list = renderList());
     };
 
     that.resize = function() {
