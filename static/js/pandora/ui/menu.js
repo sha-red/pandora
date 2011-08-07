@@ -165,36 +165,33 @@ pandora.ui.mainMenu = function() {
         })
         .bindEvent({
             change: function(event, data) {
+                var value = data.checked[0].id;
                 if (data.id == 'find') {
-                    var id = data.checked[0].id;
-                    pandora.$ui.findSelect.selectItem(id);
-                } else if (data.id == 'icons') {
+                    pandora.$ui.findSelect.selectItem(value);
+                } else if (data.id == 'movieview') {
+                    var id = document.location.pathname.split('/')[1];
+                    if (value == 'info')
+                        url(id + '/info');
+                    else
+                        url(id);
+                } else if (data.id == 'ordermovies') {
+                    pandora.$ui.list.sortList(pandora.user.ui.lists[pandora.user.ui.list].sort[0].key, value == 'ascending' ? '' : '-');
+                } else if (data.id == 'sortmovies') {
+                    var operator = pandora.getSortOperator(value);
+                    pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator === '' ? 'ascending' : 'descending'));
+                    pandora.$ui.sortSelect.selectItem(value);
+                    pandora.$ui.list.sortList(value, operator);
+                    pandora.URL.set(pandora.Query.toString());
+                } else if (data.id == 'viewicons') {
+                    pandora.UI.set({icons: value})
                     var $list = !pandora.user.ui.item ? pandora.$ui.list : pandora.$ui.browser;
                     /*
                     list.options({
                         item:
                     });
                     */
-                } else if (data.id == 'movieview') {
-                    var view = data.checked[0].id;
-                    var id = document.location.pathname.split('/')[1];
-                    if (view == 'info')
-                        url(id + '/info');
-                    else
-                        url(id);
-                } else if (data.id == 'ordermovies') {
-                    var id = data.checked[0].id;
-                    pandora.$ui.list.sortList(pandora.user.ui.lists[pandora.user.ui.list].sort[0].key, id == 'ascending' ? '' : '-');
-                } else if (data.id == 'sortmovies') {
-                    var id = data.checked[0].id,
-                        operator = pandora.getSortOperator(id);
-                    pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator === '' ? 'ascending' : 'descending'));
-                    pandora.$ui.sortSelect.selectItem(id);
-                    pandora.$ui.list.sortList(id, operator);
-                    pandora.URL.set(pandora.Query.toString());
                 } else if (data.id == 'viewmovies') {
-                    var view = data.checked[0].id;
-                    url('#view=' + view);
+                    url('#view=' + value);
                 }
             },
             click: function(event, data) {

@@ -20,13 +20,13 @@ import sys
 static_root = os.path.join(os.path.dirname(__file__), '..', '..', 'static')
 
 def render_icon(frame, timeline, icon):
-    icon_width = 512
-    icon_height = 512
+    icon_width = 1024
+    icon_height = 1024
     icon_image = Image.new('RGBA', (icon_width, icon_height), (0, 0, 0, 0))
     frame_width = icon_width
-    frame_ratio = 4 / 3
+    frame_ratio = 1
     frame_height = int(round(frame_width / frame_ratio))
-    frame_image = Image.open(frame) if frame else Image.new('RGB', (512, 384), (0, 0, 0))
+    frame_image = Image.open(frame) if frame else Image.new('RGB', (1024, 768), (0, 0, 0))
     frame_image_ratio = frame_image.size[0] / frame_image.size[1]
     if frame_ratio < frame_image_ratio:
         frame_image = frame_image.resize((int(frame_height * frame_image_ratio), frame_height), Image.ANTIALIAS)
@@ -36,13 +36,20 @@ def render_icon(frame, timeline, icon):
         frame_image = frame_image.resize((frame_width, int(frame_width / frame_image_ratio)), Image.ANTIALIAS)
         top = int((frame_image.size[1] - frame_height) / 2)
         frame_image = frame_image.crop((0, top, frame_width, top + frame_height))
-    mask_image = Image.open(os.path.join(static_root, 'png', 'icon.mask.png'))
     icon_image.paste(frame_image, (0, 0))
-    timeline_image = Image.open(timeline) if timeline else Image.new('RGB', (512, 128), (0, 0, 0))
-    timeline_image = timeline_image.resize((icon_width, 128), Image.ANTIALIAS)
-    icon_image.paste(timeline_image, (0, icon_height - 128))
+    timeline_left = 64
+    timeline_top = 832
+    timeline_width = 896
+    timeline_height = 128
+    timeline_image = Image.new('RGB', (timeline_width + 8, timeline_height + 8), (255, 255, 255))
+    mask_image = Image.open(os.path.join(static_root, 'png', 'iconTimelineOuterMask.png'))
+    icon_image.paste(timeline_image, (timeline_left - 4, timeline_top - 4), mask=mask_image)
+    timeline_image = Image.open(timeline) if timeline else Image.new('RGB', (timeline_width, timeline_height), (0, 0, 0))
+    timeline_image = timeline_image.resize((timeline_width, timeline_height), Image.ANTIALIAS)
+    mask_image = Image.open(os.path.join(static_root, 'png', 'iconTimelineInnerMask.png'))
+    icon_image.paste(timeline_image, (timeline_left, timeline_top), mask=mask_image)
     # we're using jpegs with border-radius
-    # mask_image = Image.open(os.path.join(static_root, 'png', 'icon.mask.png'))
+    # mask_image = Image.open(os.path.join(static_root, 'png', 'iconMask.png'))
     # icon_image.putalpha(mask_image)
     icon_image.save(icon)
 

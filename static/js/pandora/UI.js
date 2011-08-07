@@ -1,13 +1,8 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.UI = (function() {
     return {
-        set: function(obj) {
-            if (arguments.length == 2) {
-                // translate (key, value) to {key: value}
-                var obj_ = {};
-                obj_[arguments[0]] = arguments[1];
-                obj = obj_;
-            }
+        set: function(/*{key: val} or key, val*/) {
+            var obj = Ox.makeObject(arguments);
             $.each(obj, function(key, val) {
                 Ox.print('key', key, 'val', val);
                 var i = 0,
@@ -24,7 +19,6 @@ pandora.UI = (function() {
                 }
             });
             Ox.len(obj) && pandora.api.setUI(obj);
-            //alert('set ' + JSON.stringify(obj))
         }
     }
 }());
