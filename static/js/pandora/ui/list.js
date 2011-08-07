@@ -157,6 +157,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
             }
         });
     } else if (view == 'map') {
+        var fixedRatio = 16/9;
         that = Ox.SplitPanel({
             elements: [
                 {
@@ -196,12 +197,11 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                 },
                 {
                     element: pandora.$ui.clips = Ox.IconList({
-                        fixedRatio: 4/3,
+                        fixedRatio: fixedRatio,
                         item: function(data, sort, size) {
                             Ox.print('RATIO', data.aspectRatio);
                             size = size || 128;
-                            var fixedRatio = 4/3,
-                                width = data.aspectRatio < fixedRatio ? size : size * data.aspectRatio / fixedRatio,
+                            var width = data.aspectRatio < fixedRatio ? size : size * data.aspectRatio / fixedRatio,
                                 height = width / data.aspectRatio,
                                 url = '/' + data.item + '/' + width + '/' + data['in'] + '.jpg';
                             return {
