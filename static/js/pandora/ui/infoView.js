@@ -382,7 +382,7 @@ pandora.ui.infoView = function(data) {
                         position: selectedImage.index // fixme: api slightly inconsistent
                     }), function(result) {
                         var imageRatio = selectedImage.width / selectedImage.height;
-                        $('img[src*="/' + item + '/poster"]').each(function() {
+                        $('img[src*="/' + data.id + '/poster"]').each(function() {
                             var $this = $(this),
                                 size = Math.max($this.width(), $this.height()),
                                 src = $this.attr('src').split('?')[0] + '?' + Ox.uid();
