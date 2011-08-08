@@ -1,53 +1,36 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
-pandora.ui.info = function() {
+pandora.ui.info = function(id) {
+    id = id || pandora.user.ui.item;
+    Ox.print('ID', id)
     var that = Ox.Element()
-        .append(
-            pandora.$ui.infoStill = Ox.Element()
-                .css({
-                    position: 'absolute',
-                    left: 0,
-                    top: 0,
-                    height: '96px'
-                })
-        )
-        .append(
-            pandora.$ui.infoTimeline = Ox.Element('<img>')
-                .css({
-                    position: 'absolute',
-                    left: 0,
-                    bottom: 0,
-                    height: '16px'
-                })
-        )
         .bindEvent({
             toggle: function(event, data) {
                 pandora.UI.set({showInfo: !data.collapsed});
                 pandora.resizeFolders();
             }
         });
-    if (pandora.user.ui.item) {
-        pandora.api.get({
-            id: pandora.user.ui.item,
-            keys: ['stream']
-        }, function(result) {
-            pandora.user.infoRatio = result.data.stream.aspectRatio;
-            var width = that.width() || 256,
-                height = width / pandora.user.infoRatio + 16;
-            pandora.$ui.infoStill.removeElement();
-            pandora.$ui.infoStill = pandora.ui.flipbook(pandora.user.ui.item)
-                                  .appendTo(that.$element);
-            pandora.$ui.infoStill.css({
-                'height': (height-16) + 'px'
-            });
-            that.css({
-                height: height  + 'px'
-            });
-            pandora.resizeFolders();
-            !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -height});
-            pandora.$ui.leftPanel.size(2, height);
+    if (id) {
+        pandora.api.get({id: id, keys:['stream']}, function(result) {
+            var video = result.data.stream;
+                height = Math.round(pandora.user.ui.sidebarSize / video.aspectRatio) + 16;
+            pandora.$ui.videoPreview && pandora.$ui.videoPreview.removeElement();
+            pandora.$ui.videoPreview = pandora.ui.videoPreview({
+                id: id,
+                video: video
+            }).appendTo(pandora.$ui.info);
+            pandora.user.infoRatio = video.aspectRatio;
+            resize(height);
         });
-        pandora.$ui.infoTimeline.attr({
-            src: '/' + pandora.user.ui.item + '/timeline16p.png'
+    } else if (pandora.$ui.leftPanel) {
+        resize(32);
+    }
+    function resize(height) {
+        !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -height});
+        pandora.$ui.leftPanel.size(2, height);
+        that.animate({
+            height: height + 'px'
+        }, 250, function() {
+            pandora.resizeFolders();
         });
     }
     return that;

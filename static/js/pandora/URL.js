@@ -104,11 +104,11 @@ pandora.URL = (function() {
             } else if (pandora.user.ui.sitePage != oldUserUI.sitePage) {
                 pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
             } else if (!pandora.user.ui.item || !oldUserUI.item) {
+                pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
                 pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
-                pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
             } else {
-                pandora.$ui.contentPanel.replaceElement(1, pandora.ui.item());
                 pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
+                pandora.$ui.contentPanel.replaceElement(1, pandora.ui.item());
             }
             // fixme: should be 'editor', not 'timeline'
             if (

@@ -21,6 +21,7 @@ pandora.ui.leftPanel = function() {
         })
         .bindEvent({
             resize: function(event, data) {
+                Ox.print('LEFT PANEL RESIZE')
                 var infoSize = Math.round(data / pandora.user.infoRatio) + 16;
                 pandora.user.ui.sidebarSize = data;
                 if (data < pandora.site.sectionButtonsWidth && pandora.$ui.sectionButtons) {
@@ -34,6 +35,10 @@ pandora.ui.leftPanel = function() {
                 }
                 !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -infoSize});
                 pandora.$ui.leftPanel.size(2, infoSize);
+                pandora.$ui.videoPreview && pandora.$ui.videoPreview.options({
+                    frameHeight: infoSize - 16,
+                    frameWidth: data
+                });
                 pandora.resizeFolders();
             },
             resizeend: function(event, data) {

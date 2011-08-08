@@ -38,7 +38,7 @@
   "js/pandora/ui/backButton.js", 
   "js/pandora/ui/leftPanel.js", 
   "js/pandora/ui/appPanel.js", 
-  "js/pandora/ui/flipbook.js", 
+  "js/pandora/ui/videoPreview.js", 
   "js/pandora/ui/editor.js",
   "js/pandora/ui/infoView.js",
   "js/pandora/ui/mediaView.js"

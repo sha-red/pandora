@@ -343,7 +343,6 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                     operator: '|'
                 }
             }, function(result) {
-                Ox.print('-- preview item', result.data.items[0])
                 var item = result.data.items[0],
                     title = item.title + ' (' + item.director + ')'
                     ratio = item.poster.width / item.poster.height,
@@ -419,27 +418,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                 pandora.$ui.mainMenu.disableItem('copy');
                 pandora.$ui.mainMenu.disableItem('openmovie');            
             }
-            if (data.ids.length == 1) {
-                pandora.user.ui.listItem = data.ids[0];
-                pandora.api.get({id: data.ids[0], keys:['stream']}, function(result) {
-                    pandora.user.infoRatio = result.data.stream.aspectRatio;
-                    var height = pandora.$ui.info.width() / pandora.user.infoRatio + 16;
-                    if(pandora.$ui.infoStill) pandora.$ui.infoStill.removeElement();
-                    pandora.$ui.infoStill = pandora.ui.flipbook(data.ids[0])
-                                                  .appendTo(pandora.$ui.info.$element);
-                    pandora.$ui.infoStill.css({
-                       'height': (height - 16) + 'px'
-                    });
-                    !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -height});
-                    pandora.$ui.leftPanel.size(2, height);
-                    pandora.$ui.info.animate({
-                        height: height + 'px'
-                    }, 250, function() {
-                        pandora.resizeFolders();
-                    });
-                });
-                pandora.$ui.infoTimeline.attr('src', '/' + data.ids[0] + '/timeline16p.png')
-            }
+            pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info(data.ids[0]));
             pandora.api.find({
                 query: {
                     conditions: $.map(data.ids, function(id, i) {
