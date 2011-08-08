@@ -410,7 +410,7 @@ class Item(models.Model):
             ll = layers.setdefault(l.name, [])
             qs = Annotation.objects.filter(layer=l, item=self)
             if l.private:
-                if user.is_anonymous():
+                if user and user.is_anonymous():
                     user = None
                 qs = qs.filter(user=user)
             for a in qs.order_by('start'):

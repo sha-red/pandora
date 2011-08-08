@@ -45,7 +45,7 @@ def load_subtitles(itemId):
     languages = [f.language for f in item.files.filter(is_main=True, is_subtitle=True,
                                                        available=True)]
     if languages:
-        if 'en' in languages:
+        if 'en' in languages or '' in languages:
             language = 'en'
         else:
             language = languages[0] 
