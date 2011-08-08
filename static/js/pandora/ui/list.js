@@ -1,7 +1,8 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
 pandora.ui.list = function(view) { // fixme: remove view argument
-    var that, $map;
+    var that, $map,
+        preview = false;
     //Ox.print('constructList', view);
     if (view == 'list') {
         /*
@@ -297,7 +298,8 @@ pandora.ui.list = function(view) { // fixme: remove view argument
     }).bindEvent({
         closepreview: function(event, data) {
             pandora.$ui.previewDialog.close();
-            delete pandora.$ui.previewDialog;
+            preview = false;
+            //delete pandora.$ui.previewDialog;
         },
         copy: function(event, data) {
             Ox.Clipboard.copy({
@@ -341,94 +343,63 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                     operator: '|'
                 }
             }, function(result) {
-                var documentHeight = pandora.$ui.document.height(),
-                    item = result.data.items[0],
-                    title = item.title + (item.director ? ' (' + item.director + ')' : ''),
-                    dialogHeight = documentHeight - 48,
-                    dialogWidth;
-                pandora.site.previewRatio = item.poster.width / item.poster.height,
-                dialogWidth = Math.round((dialogHeight - 48) * pandora.site.previewRatio);
-                if ('previewDialog' in pandora.$ui) {
-                    pandora.$ui.previewDialog.options({
-                        title: title
-                    });
-                    pandora.$ui.previewImage.animate({
-                        opacity: 0
-                    }, 100, function() {
-                        pandora.$ui.previewDialog.size(dialogWidth, dialogHeight, function() {
-                            pandora.$ui.previewImage
-                                .attr({
-                                    src: item.poster.url
-                                })
-                                .one('load', function() {
-                                    pandora.$ui.previewImage
-                                        .css({
-                                            width: dialogWidth + 'px',
-                                            height: (dialogHeight - 48) + 'px', // fixme: why -2 ?
-                                            opacity: 0
-                                        })
-                                        .animate({
-                                            opacity: 1
-                                        }, 100);
-                                });
-                        });
-                    });
-                    //Ox.print(pandora.$ui.document.height(), dialogWidth, 'x', dialogHeight, dialogWidth / (dialogHeight - 48), item.poster.width, 'x', item.poster.height, item.poster.width / item.poster.height)
-                } else {
-                    pandora.$ui.previewImage = $('<img>')
-                        .attr({
-                            src: item.poster.url
-                        })
-                        .css({
-                            position: 'absolute',
-                            width: dialogWidth + 'px',
-                            height: (dialogHeight - 48) + 'px', // fixme: why -2 ?
-                            left: 0,
-                            top: 0,
-                            right: 0,
-                            bottom: 0,
-                            margin: 'auto',
-                        });
-                    pandora.$ui.previewDialog = Ox.Dialog({
-                            buttons: [
-                                Ox.Button({
-                                    title: 'Close',
-                                }).bindEvent({
-                                    click: function() {
-                                        pandora.$ui.previewDialog.close();
-                                        delete pandora.$ui.previewDialog;
-                                        pandora.$ui.list.closePreview();
-                                    }
-                                })
-                            ],
-                            content: pandora.$ui.previewImage,
-                            focus: false,
-                            height: dialogHeight,
-                            id: 'previewDialog',
-                            minHeight: pandora.site.previewRatio >= 1 ? Math.round(128 / pandora.site.previewRatio) + 48 : 176,
-                            minWidth: pandora.site.previewRatio >= 1 ? 128 : Math.round(176 * pandora.site.previewRatio),
-                            padding: 0,
-                            title: title,
-                            width: dialogWidth
-                        })
-                        .bindEvent('resize', function(event, data) {
-                            var dialogRatio = data.width / (data.height - 48),
-                                height, width;
-                            if (dialogRatio < pandora.site.previewRatio) {
-                                width = data.width;
-                                height = Math.round(width / pandora.site.previewRatio);
-                            } else {
-                                height = (data.height - 48);
-                                width = Math.round(height * pandora.site.previewRatio);
-                            }
-                            pandora.$ui.previewImage.css({
-                                width: width + 'px',
-                                height: height + 'px', // fixme: why -2 ?
+                Ox.print('-- preview item', result.data.items[0])
+                var item = result.data.items[0],
+                    title = item.title + ' (' + item.director + ')'
+                    ratio = item.poster.width / item.poster.height,
+                    windowWidth = window.innerWidth * 0.8,
+                    windowHeight = window.innerHeight * 0.8,
+                    windowRatio = windowWidth / windowHeight,
+                    width = Math.round(ratio > windowRatio ? windowWidth : windowHeight * ratio),
+                    height = Math.round(ratio < windowRatio ? windowHeight : windowWidth / ratio);
+                pandora.$ui.previewImage = $('<img>')
+                    .attr({src: item.poster.url.replace('.jpg', '128.jpg')})
+                    .css({width: width + 'px', height: height + 'px'})
+                $('<img>').load(function() {
+                        pandora.$ui.previewImage.attr({src: $(this).attr('src')});
+                    })
+                    .attr({src: item.poster.url.replace('.jpg', '1024.jpg')});
+                if (!preview) {
+                    if (!pandora.$ui.previewDialog) {
+                        pandora.$ui.previewDialog = Ox.Dialog({
+                                closeButton: true,
+                                content: pandora.$ui.previewImage,
+                                fixedRatio: true,
+                                focus: false,
+                                height: height,
+                                maximizeButton: true,
+                                title: title,
+                                width: width
                             })
+                            .bindEvent({
+                                close: function() {
+                                    that.closePreview();
+                                    preview = false;
+                                },
+                                resize: function(event) {
+                                    pandora.$ui.previewImage.css({
+                                        width: event.width + 'px',
+                                        height: event.height + 'px'
+                                    });
+                                }
+                            })
+                            .open();
+                    } else {
+                            pandora.$ui.previewDialog.options({
+                                content: pandora.$ui.previewImage,
+                                height: height,
+                                title: title,
+                                width: width
+                            })
+                            .open();
+                    }
+                    preview = true;
+                } else {
+                    pandora.$ui.previewDialog.options({
+                            content: pandora.$ui.previewImage,
+                            title: title,
                         })
-                        .open();
-                    //pandora.$ui.previewImage = $image;
-                    //Ox.print(pandora.$document.height(), dialogWidth, 'x', dialogHeight, dialogWidth / (dialogHeight - 48), item.poster.width, 'x', item.poster.height, item.poster.width / item.poster.height)
+                        .setSize(width, height);
                 }
             });
         },
