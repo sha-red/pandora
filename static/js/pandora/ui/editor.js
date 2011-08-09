@@ -25,7 +25,7 @@ pandora.ui.annotations = function() {
         $bin.$content.append(
             $('<div>').css({ height: '20px' }).append(
                 $('<div>').css({ float: 'left', width: '16px', height: '16px', margin: '1px'}).append(
-                    $('<img>').attr({ src: Ox.UI.getImagePath('iconFind.svg') }).css({ width: '16px', height: '16px', border: 0, background: 'rgb(64, 64, 64)', WebkitBorderRadius: '2px' })
+                    $('<img>').attr({ src: Ox.UI.getImageURL('iconFind') }).css({ width: '16px', height: '16px', border: 0, background: 'rgb(64, 64, 64)', WebkitBorderRadius: '2px' })
                 )
             ).append(
                 $('<div>').css({ float: 'left', width: '122px', height: '14px', margin: '2px' }).html('Foo')

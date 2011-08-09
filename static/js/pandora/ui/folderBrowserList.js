@@ -55,7 +55,7 @@ pandora.ui.folderBrowserList = function(id) {
                     format: function(value) {
                         return $('<img>')
                             .attr({
-                                src: Ox.UI.getImagePath('symbolFind.svg')
+                                src: Ox.UI.getImageURL('symbolFind')
                             })
                             .css({
                                 width: '10px',
@@ -68,7 +68,7 @@ pandora.ui.folderBrowserList = function(id) {
                     operator: '+',
                     title: $('<img>')
                         .attr({
-                            src: Ox.UI.getImagePath('symbolFind.svg')
+                            src: Ox.UI.getImageURL('symbolFind')
                         })
                         .css({
                             width: '10px',
@@ -83,8 +83,8 @@ pandora.ui.folderBrowserList = function(id) {
                     format: function(value) {
                         return $('<img>')
                             .attr({
-                                src: Ox.UI.getImagePath(
-                                    'symbol' + (id == 'favorite' ? 'Check' : 'Star') + '.svg'
+                                src: Ox.UI.getImageURL(
+                                    'symbol' + (id == 'favorite' ? 'Check' : 'Star')
                                 )
                             })
                             .css({
@@ -99,8 +99,8 @@ pandora.ui.folderBrowserList = function(id) {
                     operator: '+',
                     title: $('<img>')
                         .attr({
-                            src: Ox.UI.getImagePath(
-                                'symbol' + (id == 'favorite' ? 'Check' : 'Star') + '.svg'
+                            src: Ox.UI.getImageURL(
+                                'symbol' + (id == 'favorite' ? 'Check' : 'Star')
                             )
                         })
                         .css({
@@ -287,7 +287,7 @@ pandora.ui.folderList = function(id) {
                     format: function(value) {
                         return $('<img>')
                             .attr({
-                                src: Ox.UI.getImagePath('symbolFind.svg')
+                                src: Ox.UI.getImageURL('symbolFind')
                             })
                             .css({
                                 width: '10px',
@@ -307,8 +307,8 @@ pandora.ui.folderList = function(id) {
                         //var symbols = {private: 'Publish', public: 'Publish', featured: 'Star'};
                         return $('<img>')
                             .attr({
-                                src: Ox.UI.getImagePath(
-                                    'symbol' + (value == 'featured' ? 'Star' : 'Publish') + '.svg'
+                                src: Ox.UI.getImageURL(
+                                    'symbol' + (value == 'featured' ? 'Star' : 'Publish')
                                 )
                             })
                             .css({
