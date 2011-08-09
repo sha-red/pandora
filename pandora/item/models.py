@@ -499,12 +499,19 @@ class Item(models.Model):
                     if isinstance(values[0], list):
                         values = map(lambda x: {'actor': x[0], 'character': x[1]}, values)
                     values = [i['character'] for i in values]
+            elif key == 'name':
+                values = []
+                for k in map(lambda x: x['id'],
+                               filter(lambda x: x.get('sort') == 'person',
+                                      config['itemKeys'])):
+                    values += self.get(k, [])
             else:
                 values = self.get(key, '')
             if isinstance(values, list):
                 save(key, '\n'.join(values))
             else:
                 save(key, values)
+
 
         save('summary', self.get('summary', ''))
         save('trivia', ' '.join(self.get('trivia', [])))
@@ -654,6 +661,13 @@ class Item(models.Model):
         #FIXME: what to do with Unkown Director, Year, Country etc.
         for key in self.facet_keys:
             current_values = self.get(key, [])
+            #FIXME: is there a better way to build name collection?
+            if key == 'name':
+                current_values = []
+                for k in map(lambda x: x['id'],
+                               filter(lambda x: x.get('sort') == 'person',
+                                      config['itemKeys'])):
+                    current_values += self.get(k, [])
             if not isinstance(current_values, list):
                 current_values = [unicode(current_values)]
             current_values = list(set(current_values))
