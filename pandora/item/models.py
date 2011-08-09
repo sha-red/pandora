@@ -437,6 +437,8 @@ class Item(models.Model):
 
         if 'reviews' in i:
             i['reviews'] = self.reviews()
+            if not i['reviews']:
+                del i['reviews']
         if 'cast' in i and isinstance(i['cast'][0], basestring):
             i['cast'] = [i['cast']]
         if 'cast' in i and isinstance(i['cast'][0], list):
