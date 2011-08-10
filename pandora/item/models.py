@@ -961,22 +961,21 @@ class Item(models.Model):
 
     def make_icon(self):
         frame = self.get_poster_frame_path()
+        icon = self.path('icon.jpg')
+        self.icon.name = icon
+        timeline = self.path('timeline.64.png')
+        timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
+        cmd = [settings.ITEM_ICON,
+           '-i', self.icon.path
+        ]
+        if os.path.exists(timeline):
+           cmd += ['-l', timeline]
         if frame:
-            icon = self.path('icon.jpg')
-            self.icon.name = icon
-            timeline = self.path('timeline.64.png')
-            timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
-            if os.path.exists(timeline):
-                cmd = [settings.ITEM_ICON,
-                       '-f', frame,
-                       '-l', timeline,
-                       '-i', self.icon.path
-                      ]
-                p = subprocess.Popen(cmd)
-                p.wait()
-            self.save()
-            return icon
-        return None
+           cmd += ['-f', frame]
+        p = subprocess.Popen(cmd)
+        p.wait()
+        self.save()
+        return icon
 
 def delete_item(sender, **kwargs):
     i = kwargs['instance']
