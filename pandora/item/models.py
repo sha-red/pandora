@@ -975,6 +975,10 @@ class Item(models.Model):
         p = subprocess.Popen(cmd)
         p.wait()
         self.save()
+        icons = os.path.abspath(os.path.join(settings.MEDIA_ROOT, icon))
+        icons = glob(icons.replace('.jpg', '*.jpg'))
+        for f in filter(lambda p: not p.endswith('/icon.jpg'), icons):
+            os.unlink(f)
         return icon
 
 def delete_item(sender, **kwargs):
