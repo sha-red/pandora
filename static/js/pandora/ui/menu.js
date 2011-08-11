@@ -153,7 +153,8 @@ pandora.ui.mainMenu = function() {
                 ] },
                 { id: 'debugMenu', title: 'Debug', items: [
                     { id: 'query', title: 'Show pandora.Query' },
-                    { id: 'resetui', title: 'Reset UI Settings'}
+                    { id: 'resetui', title: 'Reset UI Settings'},
+                    { id: 'clearcache', title: 'Clear cache'}
                 ] },
                 { id: 'testMenu', title: 'Test', items: [
                     { group: 'foogroup', items: [
@@ -722,6 +723,8 @@ pandora.ui.mainMenu = function() {
                     pandora.api.resetUI({}, function() {
                         pandora.$ui.appPanel.reload();
                     });
+                } else if (data.id == 'clearcache') {
+                    Ox.Request.clearCache();
                 }
             }
         });
