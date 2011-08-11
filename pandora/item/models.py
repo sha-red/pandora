@@ -821,7 +821,7 @@ class Item(models.Model):
                 os.symlink(files.values()[0], stream.video.path)
             stream.save()
 
-            extract.timeline(stream.video.path, self.timeline_prefix)
+            self.make_timeline()
             if 'video' in stream.info and stream.info['video']:
                 v = stream.info['video'][0]
                 self.stream_aspect = v['width']/v['height']
@@ -884,6 +884,11 @@ class Item(models.Model):
                 for u in self.poster_urls.filter(service=service).order_by('-height'):
                     return u.url
         return None
+
+    def make_timeline(self):
+        stream = self.streams.filter(profile=settings.VIDEO_PROFILE)
+        if stream.count() > 0 and stream[0].video:
+            extract.timeline(stream[0].video.path, self.timeline_prefix)
 
     def make_poster(self, force=False):
         if not self.poster or force:
@@ -948,7 +953,7 @@ class Item(models.Model):
         return frames
 
     def get_poster_frame_path(self):
-        frames =  self.poster_frames()
+        frames = self.poster_frames()
         if self.poster_frame >= 0:
             if frames and len(frames) > int(self.poster_frame):
                 return frames[int(self.poster_frame)]['path']
