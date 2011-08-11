@@ -16,7 +16,7 @@ urlpatterns = patterns("item.views",
     (r'^(?P<id>[A-Z0-9].+)/(?P<profile>\d+p)(?P<index>\d*)\.(?P<format>webm|ogv|mp4)$', 'video'),
 
     #torrent
-    (r'^(?P<id>[A-Z0-9][A-Za-z0-9]+)/torrent/(?P<filename>.+?)$', 'torrent'),
+    (r'^(?P<id>[A-Z0-9][A-Za-z0-9]+)/torrent/(?P<filename>.*?)$', 'torrent'),
 
     #icon
     (r'^(?P<id>[A-Z0-9].+)/icon(?P<size>\d*)\.jpg$', 'icon'),

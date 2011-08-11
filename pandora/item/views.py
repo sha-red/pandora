@@ -624,14 +624,17 @@ def torrent(request, id, filename=None):
         response = HttpFileResponse(item.torrent.path,
                                     content_type='application/x-bittorrent')
         filename = "%s.torrent" % item.get('title')
-        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+        response['Content-Disposition'] = 'attachment; filename="%s"' % filename.encode('utf-8')
         return response
     while filename.startswith('/'):
         filename = filename[1:]
     filename = filename.replace('/../', '/')
     filename = item.path('torrent/%s' % filename)
     filename = os.path.abspath(os.path.join(settings.MEDIA_ROOT, filename))
-    return HttpFileResponse(filename)
+    response = HttpFileResponse(filename)
+    response['Content-Disposition'] = 'attachment; filename="%s"' % \
+                                      os.path.basename(filename.encode('utf-8'))
+    return response
 
 def video(request, id, profile, index=None, format=None):
     print id, profile, index, format
