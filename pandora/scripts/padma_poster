@@ -30,11 +30,12 @@ def render_poster(id, title, frame, timeline, poster):
     # timeline
     timeline_height = 64
     timeline_lines = 16
-    timeline_image = Image.open(timeline)
-    timeline_image = timeline_image.resize((10240, timeline_height), Image.ANTIALIAS)
-    for i in range(timeline_lines):
-        line_image = timeline_image.crop((i * poster_width, 0, (i + 1) * poster_width, 64))
-        poster_image.paste(line_image, (0, i * timeline_height))
+    if timeline:
+        timeline_image = Image.open(timeline)
+        timeline_image = timeline_image.resize((10240, timeline_height), Image.ANTIALIAS)
+        for i in range(timeline_lines):
+            line_image = timeline_image.crop((i * poster_width, 0, (i + 1) * poster_width, 64))
+            poster_image.paste(line_image, (0, i * timeline_height))
 
     # id
     text = 'Pad.ma/' + id
