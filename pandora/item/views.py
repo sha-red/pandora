@@ -548,9 +548,15 @@ actions.register(getImdbId)
 '''
     media delivery
 '''
-def frame(request, id, position, size):
+def frame(request, id, size, position=None):
     item = get_object_or_404(models.Item, itemId=id)
-    position = float(position.replace(',', '.'))
+    if not position:
+        if item.poster_frame == -1 and item.sort.duration:
+            position = item.sort.duration/2
+        else:
+            position = item.poster_frame
+    else:
+        position = float(position.replace(',', '.'))
     frame = item.frame(position, int(size))
     if not frame:
         raise Http404

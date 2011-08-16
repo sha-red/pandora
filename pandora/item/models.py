@@ -400,7 +400,7 @@ class Item(models.Model):
                     stream['baseUrl'] = '/%s' % self.itemId
                 else:
                     stream['baseUrl'] = os.path.dirname(s.video.url)
-                stream['profiles'] = sorted(list(set(map(lambda s: int(os.path.splitext(s['profile'])[0][:-1]), self.streams.all().values('profile')))))
+                stream['resolutions'] = sorted(list(set(map(lambda s: int(os.path.splitext(s['profile'])[0][:-1]), self.streams.all().values('profile')))))
                 stream['formats'] = list(set(map(lambda s: os.path.splitext(s['profile'])[1][1:], self.streams.all().values('profile'))))
         return stream
 
