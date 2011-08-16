@@ -89,6 +89,9 @@ Ox.load('Geo', function() {
                     sectionElement: 'buttons',
                     selectedMovies: []
                 });
+                // fixme: this should not happen
+                !pandora.user.ui.lists[pandora.user.ui.list]
+                    && pandora.user.ui.lists[pandora.user.ui.list] = pandora.user.ui.lists[''];
 
                 if (data.user.level == 'guest' && $.browser.mozilla) {
                     pandora.user.ui.theme = 'classic';

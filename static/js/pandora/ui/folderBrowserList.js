@@ -441,7 +441,7 @@ pandora.ui.folderList = function(id) {
                 if (data.ids.length) {
                     $.each(pandora.$ui.folderList, function(id_, $list) {
                         id != id_ && $list.options('selected', []);
-                    })
+                    });
                     pandora.URL.set('?find=list:' + data.ids[0]);
                 } else {
                     pandora.URL.set('?find=');

@@ -39,7 +39,7 @@ pandora.URL = (function() {
                     item: ''
                 });
             },
-            '^(calendar|calendars|clips|icons|flow|map|maps|timelines)$': function() {
+            '^(calendar|calendars|clips|icons|flow|map|maps|timelines)$': function(url) {
                 pandora.UI.set({
                     section: 'items',
                     item: ''
