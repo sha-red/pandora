@@ -25,6 +25,7 @@ import ox
 from ox.django import fields
 from ox.normalize import canonicalTitle
 import ox.web.imdb
+import ox.image
 
 import managers
 import utils
@@ -951,6 +952,13 @@ class Item(models.Model):
                 })
             offset += f.duration
         return frames
+
+    def select_frame(self):
+        frames = self.poster_frames()
+        if frames:
+            heat = [ox.image.getImageHeat(f['path']) for f in frames] 
+            self.poster_frame = heat.index(max(heat))
+            self.save()
 
     def get_poster_frame_path(self):
         frames = self.poster_frames()
