@@ -122,6 +122,7 @@ def stream(video, target, profile, info):
 
         video_settings = [
             '-vb', '%dk'%bitrate, '-g', '%d' % int(fps*2),
+            '-keyint_min', '%d' % int(fps),
             '-s', '%dx%d'%(width, height),
             '-aspect', aspect,
             #'-vf', 'yadif',
@@ -163,8 +164,6 @@ def stream(video, target, profile, info):
                 '-flags2', '+mixed_refs',
                 '-coder', '0',
                 '-me_range', '16',
-                '-g', '250', #FIXME: should this be related to fps?
-                '-keyint_min', '25', #FIXME: should this be related to fps?
                 '-sc_threshold', '40',
                 '-i_qfactor', '0.71',
                 '-qmin', '10', '-qmax', '51',
