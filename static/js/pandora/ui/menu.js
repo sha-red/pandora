@@ -74,7 +74,7 @@ pandora.ui.mainMenu = function() {
                         { group: 'viewmovies', min: 1, max: 1, items: $.map(pandora.site.listViews, function(view, i) {
                             return Ox.extend({
                                 checked: pandora.user.ui.lists[pandora.user.ui.list]
-                                    ? pandora.user.ui.lists[pandora.user.ui.list].listView == view.id : false,
+                                    && pandora.user.ui.lists[pandora.user.ui.list].listView == view.id,
                             }, view);
                         }) },
                     ]},
@@ -106,14 +106,14 @@ pandora.ui.mainMenu = function() {
                         { group: 'sortmovies', min: 1, max: 1, items: $.map(pandora.site.sortKeys, function(key, i) {
                             return Ox.extend({
                                 checked: pandora.user.ui.lists[pandora.user.ui.list]
-                                    ? pandora.user.ui.lists[pandora.user.ui.list].sort[0].key == key.id : false,
+                                    && pandora.user.ui.lists[pandora.user.ui.list].sort[0].key == key.id
                             }, key);
                         }) }
                     ] },
                     { id: 'ordermovies', title: 'Order ' + pandora.site.itemName.plural, items: [
                         { group: 'ordermovies', min: 1, max: 1, items: [
-                            { id: 'ascending', title: 'Ascending', checked: pandora.user.ui.lists[pandora.user.ui.list].sort[0].operator === '' },
-                            { id: 'descending', title: 'Descending', checked: pandora.user.ui.lists[pandora.user.ui.list].sort[0].operator == '-' }
+                            { id: 'ascending', title: 'Ascending', checked: pandora.user.ui.lists[pandora.user.ui.list] && pandora.user.ui.lists[pandora.user.ui.list].sort[0].operator === '' },
+                            { id: 'descending', title: 'Descending', checked: pandora.user.ui.lists[pandora.user.ui.list] && pandora.user.ui.lists[pandora.user.ui.list].sort[0].operator == '-' }
                         ]}
                     ] },
                     { id: 'advancedsort', title: 'Advanced Sort...', keyboard: 'shift control s' },
@@ -178,7 +178,7 @@ pandora.ui.mainMenu = function() {
                     else
                         url(id);
                 } else if (data.id == 'ordermovies') {
-                    pandora.$ui.list.sortList(pandora.user.ui.lists[pandora.user.ui.list].sort[0].key, value == 'ascending' ? '' : '-');
+                    pandora.$ui.list.sortList(pandora.user.ui.lists[pandora.user.ui.list] && pandora.user.ui.lists[pandora.user.ui.list].sort[0].key, value == 'ascending' ? '' : '-');
                 } else if (data.id == 'sortmovies') {
                     var operator = pandora.getSortOperator(value);
                     pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator === '' ? 'ascending' : 'descending'));
@@ -193,7 +193,7 @@ pandora.ui.mainMenu = function() {
                             pandora.$ui.item.reload();
                         }
                         $list = pandora.$ui.browser;
-                    } else if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'icons') {
+                    } else if (pandora.user.ui.lists[pandora.user.ui.list] && pandora.user.ui.lists[pandora.user.ui.list].listView == 'icons') {
                         $list = pandora.$ui.list
                     }
                     $list && $list.options({
