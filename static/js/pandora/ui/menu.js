@@ -72,8 +72,9 @@ pandora.ui.mainMenu = function() {
                 { id: 'viewMenu', title: 'View', items: [
                     { id: 'movies', title: 'View ' + pandora.site.itemName.plural, items: [
                         { group: 'viewmovies', min: 1, max: 1, items: $.map(pandora.site.listViews, function(view, i) {
-                            return $.extend({
-                                checked: pandora.user.ui.lists[pandora.user.ui.list].listView == view.id,
+                            return Ox.extend({
+                                checked: pandora.user.ui.lists[pandora.user.ui.list]
+                                    ? pandora.user.ui.lists[pandora.user.ui.list].listView == view.id : false,
                             }, view);
                         }) },
                     ]},
@@ -89,7 +90,7 @@ pandora.ui.mainMenu = function() {
                     {},
                     { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], disabled: true, items: [
                         { group: 'movieview', min: 1, max: 1, items: $.map(pandora.site.itemViews, function(view, i) {
-                            return $.extend({
+                            return Ox.extend({
                                 checked: pandora.user.ui.itemView == view.id,
                             }, view);
                         }) },
@@ -103,8 +104,9 @@ pandora.ui.mainMenu = function() {
                 { id: 'sortMenu', title: 'Sort', items: [
                     { id: 'sortmovies', title: 'Sort ' + pandora.site.itemName.plural + ' by', items: [
                         { group: 'sortmovies', min: 1, max: 1, items: $.map(pandora.site.sortKeys, function(key, i) {
-                            return $.extend({
-                                checked: pandora.user.ui.lists[pandora.user.ui.list].sort[0].key == key.id,
+                            return Ox.extend({
+                                checked: pandora.user.ui.lists[pandora.user.ui.list]
+                                    ? pandora.user.ui.lists[pandora.user.ui.list].sort[0].key == key.id : false,
                             }, key);
                         }) }
                     ] },
@@ -121,7 +123,7 @@ pandora.ui.mainMenu = function() {
                 { id: 'findMenu', title: 'Find', items: [
                     { id: 'find', title: 'Find', items: [
                         { group: 'find', min: 1, max: 1, items: $.map(pandora.site.findKeys, function(key, i) {
-                            return $.extend({
+                            return Ox.extend({
                                 checked: pandora.user.ui.findQuery.conditions.length && 
                                     (pandora.user.ui.findQuery.conditions[0].key == key.id ||
                                     (pandora.user.ui.findQuery.conditions[0].key === '' && key.id == 'all')),
