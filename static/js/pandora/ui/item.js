@@ -219,7 +219,7 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'player') {
             var video = result.data.stream,
                 format = $.support.video.supportedFormat(video.formats);
-                video.height = video.profiles[0];
+                video.height = video.resolutions[0];
             video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
             video.url = video.baseUrl + '/' + video.height + 'p.' + format;
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.player = Ox.VideoPanelPlayer({
@@ -266,9 +266,9 @@ pandora.ui.item = function() {
                 cuts = result.data.cuts || [],
                 format = $.support.video.supportedFormat(video.formats),
                 streams = {};
-            video.height = video.profiles[0];
+            video.height = video.resolutions[0];
             video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
-            video.profiles.forEach(function(profile) {
+            video.resolutions.forEach(function(profile) {
                 streams[profile] = video.baseUrl + '/' + profile + 'p.' + format;
             });
             $.each(pandora.site.layers, function(i, layer) {
