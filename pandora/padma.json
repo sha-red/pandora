@@ -306,7 +306,6 @@
         {"id": "timeline", "title": "Timeline"},
         {"id": "map", "title": "Map"},
         {"id": "calendar", "title": "Calendar"},
-        {"id": "files", "title": "Files", "admin": true}
     ],
     "layers": [
         {

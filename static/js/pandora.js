@@ -78,12 +78,6 @@ Ox.load('Geo', function() {
                 pandora.site.itemViews.push(
                     {id: 'files', title: 'Files', admin: 'true'}
                 );
-                pandora.site.media.importPosterFrames && pandora.site.itemViews.push(
-                    {id: 'frames', title: 'Frames', admin: 'true'}
-                );
-                pandora.site.media.importMoviePosters && pandora.site.itemViews.push(
-                    {id: 'posters', title: 'Posters', admin: 'true'}
-                );
                 $.extend(pandora.user, {
                     infoRatio: 16 / 9,
                     sectionElement: 'buttons',

@@ -246,20 +246,21 @@ def moveFiles(request):
             i = get_item(data)
         else:
             i = get_item({'imdbId': data['itemId']})
-    changed = []
+    changed = [i.itemId]
     for f in models.File.objects.filter(oshash__in=data['ids']):
         if f.item.id != i.itemId and f.editable(request.user):
             if f.item.itemId not in changed:
                 changed.append(f.item.itemId)
-            if i.itemId not in changed:
-                changed.append(i.itemId)
             f.item = i 
             f.save()
     for itemId in changed:
         c = models.Item.objects.get(itemId=itemId)
-        c.rendered = False
-        c.save()
-        item.tasks.update_streams.delay(itemId)
+        if c.files.count() == 0:
+            c.delete()
+        else:
+            c.rendered = False
+            c.save()
+            item.tasks.update_streams.delay(itemId)
     response = json_response(text='updated')
     response['data']['itemId'] = i.itemId
     return render_to_json_response(response)

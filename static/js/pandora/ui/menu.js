@@ -18,19 +18,15 @@ pandora.ui.mainMenu = function() {
                     { id: 'tour', title: 'Take a Tour' },
                     { id: 'faq', title: 'Frequently Asked Questions' },
                     { id: 'terms', title: 'Terms of Service' },
+                    { id: 'contact', title: 'Contact ' + pandora.site.site.name },
                     {},
-                    { id: 'software', title: 'Software', items: [
-                        { id: 'about', title: 'About' },
-                        { id: 'download', title: 'Download' },
-                        { id: 'report', title: 'Report a Bug' }
-                    ] },
-                    {},
-                    { id: 'contact', title: 'Contact ' + pandora.site.site.name }
+                    { id: 'software', title: 'Software' }
                 ] },
                 { id: 'userMenu', title: 'User', items: [
                     { id: 'username', title: 'User: ' + (isGuest ? 'not logged in' : pandora.user.username), disabled: true },
                     {},
                     { id: 'preferences', title: 'Preferences...', disabled: isGuest, keyboard: 'control ,' },
+                    { id: 'archives', title: 'Archives...', disabled: isGuest },
                     {},
                     { id: 'register', title: 'Register...', disabled: !isGuest },
                     { id: 'loginlogout', title: isGuest ? 'Login...' : 'Logout...' }
@@ -82,10 +78,6 @@ pandora.ui.mainMenu = function() {
                             return {id: icons, title: Ox.toTitleCase(icons), checked: pandora.user.ui.icons == icons};
                         }) }
                     ] },
-                    { id: 'info', title: 'Info', items: [
-                        { id: 'poster', title: 'Poster' },
-                        { id: 'video', title: 'Video' }
-                    ] },
                     {},
                     { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], disabled: true, items: [
                         { group: 'movieview', min: 1, max: 1, items: $.map(pandora.site.itemViews, function(view, i) {
@@ -134,19 +126,11 @@ pandora.ui.mainMenu = function() {
                     { id: 'titles', title: 'Manage Titles...' },
                     { id: 'names', title: 'Manage Names...' },
                     {},
-                    { id: 'stills', title: 'Manage Stills...' },
-                    { id: 'posters', title: 'Manage Posters...' },
-                    {},
                     { id: 'places', title: 'Manage Places...' },
                     { id: 'events', title: 'Manage Events...' },
                     {},
                     { id: 'users', title: 'Manage Users...' },
                     { id: 'lists', title: 'Manage Lists...' },
-                ] },
-                { id: 'codeMenu', title: 'Code', items: [
-                    { id: 'download', title: 'Download' },
-                    { id: 'contribute', title: 'Contribute' },
-                    { id: 'report', title: 'Report a Bug' },
                 ] },
                 { id: 'helpMenu', title: 'Help', items: [
                     { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'shift ?' }
@@ -155,12 +139,6 @@ pandora.ui.mainMenu = function() {
                     { id: 'query', title: 'Show pandora.Query' },
                     { id: 'resetui', title: 'Reset UI Settings'},
                     { id: 'clearcache', title: 'Clear cache'}
-                ] },
-                { id: 'testMenu', title: 'Test', items: [
-                    { group: 'foogroup', items: [
-                        { id: 'item1', title: 'Item 1' },
-                        { id: 'item2', title: 'Item 2' }
-                    ] }
                 ] }
             ]
         })
