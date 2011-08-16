@@ -550,14 +550,24 @@ actions.register(getImdbId)
 '''
 def frame(request, id, size, position=None):
     item = get_object_or_404(models.Item, itemId=id)
+    frame = None
     if not position:
-        if item.poster_frame == -1 and item.sort.duration:
+        frames = item.poster_frames()
+        if frames:
+            position = item.poster_frame
+            if position == -1:
+                position = int(len(frames)/2)
+            position = frames[int(position)]['position']
+        elif item.poster_frame == -1 and item.sort.duration:
             position = item.sort.duration/2
         else:
             position = item.poster_frame
     else:
         position = float(position.replace(',', '.'))
-    frame = item.frame(position, int(size))
+
+    if not frame:
+        frame = item.frame(position, int(size))
+
     if not frame:
         raise Http404
     return HttpFileResponse(frame, content_type='image/jpeg')
