@@ -233,7 +233,7 @@ Positions
         def only_p(m):
             r = {}
             if m:
-                m = json.loads(m)
+                m = json.loads(m, object_hook=ox.django.fields.from_json)
                 for p in _p:
                     r[p] = m.get(p, '')
             if 'annotations' in query:
