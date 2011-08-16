@@ -21,9 +21,18 @@ pandora.ui.videoPreview = function(data) {
         })
         .bindEvent({
             click: function(event) {
-                pandora.URL.set(
-                    '/' + data.id + '/timeline/' + Ox.formatDuration(event.position, 2)
-                );
+                if (pandora.user.ui.item) {
+                    pandora.$ui[
+                        pandora.user.ui.itemView == 'player' ? 'player' : 'editor'
+                    ].options({
+                        position: event.position
+                    });
+                } else {
+                    pandora.UI.set('videoPosition|' + data.id, event.position);
+                    pandora.URL.set(
+                        '/' + data.id + '/timeline' //'/' + Ox.formatDuration(event.position, 2)
+                    );
+                }
             }
         });
     function getResolution() {
