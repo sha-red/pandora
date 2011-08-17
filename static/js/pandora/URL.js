@@ -104,9 +104,11 @@ pandora.URL = (function() {
             } else if (pandora.user.ui.sitePage != oldUserUI.sitePage) {
                 pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
             } else if (!pandora.user.ui.item || !oldUserUI.item) {
+                // list to list, list to item, item to list
                 pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
                 pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
             } else {
+                // item to items
                 pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
                 pandora.$ui.contentPanel.replaceElement(1, pandora.ui.item());
             }
@@ -115,11 +117,12 @@ pandora.URL = (function() {
                 oldUserUI.item &&
                 ['player', 'timeline'].indexOf(oldUserUI.itemView) > -1
             ) {
-                pandora.UI.set(
+                var $item = pandora.$ui[
+                    oldUserUI.itemView == 'player' ? 'player' : 'editor'
+                ];
+                $item && pandora.UI.set(
                     'videoPosition|' + oldUserUI.item,
-                    pandora.$ui[
-                        oldUserUI.itemView == 'player' ? 'player' : 'editor'
-                    ].options('position')
+                    $item.options('position')
                 );
             }
         }

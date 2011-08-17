@@ -162,8 +162,6 @@ Ox.load('Geo', function() {
                 height: pandora.$ui.contentPanel.size(1),
                 width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             });
-            //pandora.user.ui.itemView == 'frames' && pandora.$ui.item.resize();
-            //pandora.user.ui.itemView == 'posters' && pandora.$ui.item.resize();
         }
     }
 

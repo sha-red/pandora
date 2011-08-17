@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+
 pandora.ui.rightPanel = function() {
     var that;
     if (pandora.user.ui.section == 'site') {
@@ -10,8 +11,7 @@ pandora.ui.rightPanel = function() {
                     }
                 });
         } else {
-            that = Ox.Element()
-                .css({padding: '8px'});
+            that = Ox.Element().css({padding: '8px'});
             pandora.api.getPage(pandora.user.ui.sitePage, function(result) {
                 that.html(result.data.body).css({overflowY: 'auto'});                        
             });
@@ -36,7 +36,6 @@ pandora.ui.rightPanel = function() {
         })
         .bindEvent({
             resize: function(event, data) {
-                //Ox.print('???? resize rightPanel', event, data)
                 if (!pandora.user.ui.item) {
                     pandora.resizeGroups(data);
                     pandora.$ui.list.size();

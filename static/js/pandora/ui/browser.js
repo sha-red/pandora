@@ -56,7 +56,6 @@ pandora.ui.browser = function() {
                 };
             },
             items: function(data, callback) {
-                //Ox.print('data, pandora.Query.toObject', data, pandora.Query.toObject())
                 pandora.api.find($.extend(data, {
                     query: pandora.Query.toObject()
                 }), callback);
@@ -75,6 +74,7 @@ pandora.ui.browser = function() {
                 that.scrollToSelection();
             },
             select: function(event, data) {
+                pandora.UI.set('lists|' + pandora.user.ui.list + '|selected', data.ids);
                 pandora.URL.set(data.ids[0]);
             },
             toggle: function(event, data) {

@@ -1,8 +1,9 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
-pandora.ui.list = function(view) { // fixme: remove view argument
+pandora.ui.list = function() { // fixme: remove view argument
     var that, $map,
-        preview = false;
+        view = pandora.user.ui.lists[pandora.user.ui.list].listView,
+        preview = false
     //Ox.print('constructList', view);
     if (view == 'list') {
         /*
@@ -72,6 +73,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
             }
         });
     } else if (view == 'icons') {
+        //alert(JSON.stringify(pandora.user.ui.lists[pandora.user.ui.list].selected))
         that = Ox.IconList({
             defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
             id: 'list',
@@ -97,6 +99,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
                 }), callback);
             },
             keys: ['director', 'id', 'poster', 'title', 'year'],
+            selected: pandora.user.ui.lists[pandora.user.ui.list].selected,
             size: 128,
             sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
             unique: 'id'
@@ -410,7 +413,7 @@ pandora.ui.list = function(view) { // fixme: remove view argument
         },
         select: function(event, data) {
             var $still, $timeline;
-            pandora.user.selectedMovies = data.ids;
+            pandora.user.ui.lists[pandora.user.ui.list].selected = data.ids;
             if (data.ids.length) {
                 pandora.$ui.mainMenu.enableItem('copy');
                 pandora.$ui.mainMenu.enableItem('openmovie');

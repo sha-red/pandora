@@ -14,6 +14,7 @@ pandora.ui.infoView = function(data) {
         iconWidth = iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio),
         iconHeight = iconRatio < 1 ? iconSize : Math.round(iconSize / iconRatio),
         iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
+        borderRadius = pandora.user.ui.icons == 'posters' ? 0 : iconSize / 8,
         edit = false,
         that = Ox.Element(),
         uid = Ox.uid(),
@@ -47,6 +48,7 @@ pandora.ui.infoView = function(data) {
                 top: margin + 'px',
                 width: iconWidth + 'px',
                 height: iconHeight + 'px',
+                borderRadius: borderRadius + 'px',
                 cursor: 'pointer'
             })
             .bindEvent({
@@ -74,7 +76,8 @@ pandora.ui.infoView = function(data) {
                 position: 'absolute',
                 left: iconLeft + 'px',
                 width: iconWidth + 'px',
-                height: iconHeight + 'px'
+                height: iconHeight + 'px',
+                borderRadius: borderRadius + 'px'
             })
             .appendTo($reflection),
         $reflectionGradient = $('<div>')
@@ -462,10 +465,12 @@ pandora.ui.infoView = function(data) {
         iconWidth = iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio);
         iconHeight = iconRatio < 1 ? iconSize : Math.round(iconSize / iconRatio);
         iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
+        borderRadius = pandora.user.ui.icons == 'posters' ? 0 : iconSize / 8;
         $icon.animate({
             left: margin + iconLeft + 'px',
             width: iconWidth + 'px',
-            height: iconHeight + 'px'     
+            height: iconHeight + 'px',
+            borderRadius: borderRadius + 'px'   
         }, 250);
         $reflection.animate({
             top: margin + iconHeight + 'px',
@@ -476,6 +481,7 @@ pandora.ui.infoView = function(data) {
             left: iconLeft + 'px',
             width: iconWidth + 'px',
             height: iconHeight + 'px',
+            borderRadius: borderRadius + 'px'
         }, 250);
         $reflectionGradient.animate({
             width: iconSize + 'px',
@@ -495,7 +501,7 @@ pandora.ui.infoView = function(data) {
         $reflectionIcon.attr({src: src});
         iconSize = iconSize == 256 ? 512 : 256;
         iconRatio = pandora.user.ui.icons == 'posters'
-            ? data.poster.width / data.poster.height : 1,
+            ? data.poster.width / data.poster.height : 1;
         toggleIconSize();
         pandora.user.level == 'admin' && $list.replaceWith($list = renderList());
     };

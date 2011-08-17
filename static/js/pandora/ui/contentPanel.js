@@ -11,7 +11,7 @@ pandora.ui.contentPanel = function() {
                 size: pandora.user.ui.groupsSize
             },
             {
-                element: pandora.$ui.list = pandora.ui.list(pandora.user.ui.lists[pandora.user.ui.list].listView)
+                element: pandora.$ui.list = pandora.ui.list()
             }
         ] : [
             {
@@ -21,7 +21,7 @@ pandora.ui.contentPanel = function() {
                 size: 112 + Ox.UI.SCROLLBAR_SIZE
             },
             {
-                element: pandora.$ui.item = pandora.ui.item(pandora.user.ui.item, pandora.user.ui.itemView)
+                element: pandora.$ui.item = pandora.ui.item()
             }
         ],
         orientation: 'vertical'

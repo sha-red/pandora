@@ -504,7 +504,7 @@
             "icons": "posters",
             "infoIconSize": 256,
             "item": "",
-            "itemView": "timeline",
+            "itemView": "info",
             "list": "",
             "listQuery": {"conditions": [], "operator": ""},
             "lists": {
