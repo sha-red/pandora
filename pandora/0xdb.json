@@ -541,8 +541,10 @@
             "sitePage": "home",
             "theme": "modern",
             "videoPosition": {},
-            "videoScreen": "fit",
-            "videoSize": "small"
+            "videoScale": "fit",
+            "videoMuted": false,
+            "videoSize": "small",
+            "videoVolume": 1
         },
         "username": ""
     },
