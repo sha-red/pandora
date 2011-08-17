@@ -184,7 +184,7 @@ pandora.ui.item = function() {
                                 size = size || 128;
                                 var ratio = data.aspectRatio,
                                     width = size,
-                                    height = parseInt(size/ratio),
+                                    height = Math.round(size / ratio),
                                     url = '/' + data.item + '/' + height + 'p' + data['in'] + '.jpg';
                                 return {
                                     height: height,
@@ -227,8 +227,8 @@ pandora.ui.item = function() {
                 streams = {};
             video.height = video.resolutions[0];
             video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
-            video.resolutions.forEach(function(profile) {
-                streams[profile] = video.baseUrl + '/' + profile + 'p.' + format;
+            video.resolutions.forEach(function(resolution) {
+                streams[resolution] = video.baseUrl + '/' + resolution + 'p.' + format;
             });
             $.each(pandora.site.layers, function(i, layer) {
                 layers[i] = $.extend({}, layer, {items: result.data.layers[layer.id]});
@@ -246,9 +246,9 @@ pandora.ui.item = function() {
                 scaleToFill: pandora.user.ui.videoScale == 'fill',
                 showAnnotations: pandora.user.ui.showAnnotations,
                 showControls: pandora.user.ui.showControls,
-                subtitles: result.data.layers.subtitles.map(function(subtitle) {
+                subtitles: result.data.layers.subtitles ? result.data.layers.subtitles.map(function(subtitle) {
                     return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
-                }),
+                }) : [],
                 timeline: '/' + pandora.user.ui.item + '/timeline16p.png',
                 video: streams,
                 videoHeight: video.height,
@@ -294,7 +294,7 @@ pandora.ui.item = function() {
             video.height = video.resolutions[0];
             video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
             video.resolutions.forEach(function(profile) {
-                streams[profile] = video.baseUrl + '/' + profile + 'p.' + format;
+                streams[resolution] = video.baseUrl + '/' + resolution + 'p.' + format;
             });
             $.each(pandora.site.layers, function(i, layer) {
                 layers[i] = $.extend({}, layer, {items: result.data.layers[layer.id]});
@@ -323,9 +323,9 @@ pandora.ui.item = function() {
                 showAnnotations: pandora.user.ui.showAnnotations,
                 showLargeTimeline: true,
                 // fixme: layers have value, subtitles has text?
-                subtitles: result.data.layers.subtitles.map(function(subtitle) {
+                subtitles: result.data.layers.subtitles ? result.data.layers.subtitles.map(function(subtitle) {
                     return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
-                }),
+                }) : [],
                 video: streams,
                 videoHeight: video.height,
                 //videoId: pandora.user.ui.item,
