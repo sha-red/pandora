@@ -131,6 +131,7 @@ pandora.ui.item = function() {
             }
 
         } else if (pandora.user.ui.itemView == 'map') {
+            var video = result.data.stream;
             pandora.$ui.contentPanel.replaceElement(1, Ox.SplitPanel({
                 elements: [
                     {
@@ -178,12 +179,13 @@ pandora.ui.item = function() {
                     },
                     {
                         element: pandora.$ui.clips = Ox.IconList({
+                            fixedRatio: video.aspectRatio,
                             item: function(data, sort, size) {
                                 size = size || 128;
                                 var ratio = data.aspectRatio,
                                     width = size,
-                                    height = size/ratio,
-                                    url = '/' + data.item + '/' + size + '/'+data['in'] + '.jpg';
+                                    height = parseInt(size/ratio),
+                                    url = '/' + data.item + '/' + height + 'p' + data['in'] + '.jpg';
                                 return {
                                     height: height,
                                     id: data['id'],

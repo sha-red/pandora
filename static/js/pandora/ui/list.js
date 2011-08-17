@@ -208,8 +208,8 @@ pandora.ui.list = function() { // fixme: remove view argument
                             Ox.print('RATIO', data.aspectRatio);
                             size = size || 128;
                             var width = data.aspectRatio < fixedRatio ? size : size * data.aspectRatio / fixedRatio,
-                                height = width / data.aspectRatio,
-                                url = '/' + data.item + '/' + width + '/' + data['in'] + '.jpg';
+                                height = parseInt(width / data.aspectRatio),
+                                url = '/' + data.item + '/' + height + 'p' + data['in'] + '.jpg';
                             return {
                                 height: height,
                                 id: data.id,
