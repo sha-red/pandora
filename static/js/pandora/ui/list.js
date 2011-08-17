@@ -47,6 +47,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                 }), callback);
             },
             scrollbarVisible: true,
+            selected: pandora.user.ui.lists[pandora.user.ui.list].selected,
             sort: pandora.user.ui.lists[pandora.user.ui.list].sort
         })
         .bindEvent({
@@ -413,7 +414,8 @@ pandora.ui.list = function() { // fixme: remove view argument
         },
         select: function(event, data) {
             var $still, $timeline;
-            pandora.user.ui.lists[pandora.user.ui.list].selected = data.ids;
+            pandora.UI.set(['lists', pandora.user.ui.list, 'selected'].join('|'), data.ids);
+            //pandora.user.ui.lists[pandora.user.ui.list].selected = data.ids;
             if (data.ids.length) {
                 pandora.$ui.mainMenu.enableItem('copy');
                 pandora.$ui.mainMenu.enableItem('openmovie');
@@ -438,6 +440,7 @@ pandora.ui.list = function() { // fixme: remove view argument
             });
         },
         sort: function(event, data) {
+            Ox.print('--SORT--', pandora.user.ui.sort[0].key)
             /* some magic has already set user.ui.sort
             Ox.print(':', user.ui.sort[0])
             if (data.key != user.ui.sort[0].key) {

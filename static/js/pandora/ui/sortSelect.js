@@ -17,18 +17,17 @@ pandora.ui.sortSelect = function() {
         })
         .bindEvent({
             change: function(event, data) {
-                var id = data.selected[0].id,
-                    operator = pandora.getSortOperator(id);
-                /*
-                pandora.user.ui.lists[pandora.user.ui.list].sort[0] = {
-                    key: id,
-                    operator: operator
-                };
-                */
-                pandora.$ui.mainMenu.checkItem('sortMenu_sortmovies_' + id);
+                var key = data.selected[0].id,
+                    operator = pandora.getSortOperator(key);
+                pandora.$ui.mainMenu.checkItem('sortMenu_sortmovies_' + key);
                 pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator === '' ? 'ascending' : 'descending'));
-                pandora.$ui.list.sortList(id, operator);
-                pandora.URL.set(pandora.Query.toString());
+                pandora.$ui.list.options({
+                    sort: [{key: key, operator: operator}]
+                });
+                // fixme: why does this not work??
+                //pandora.UI.set(['lists', pandora.user.ui.list, 'sort'].join('|'), [{key: key, operator: operator}]);
+                pandora.user.ui.lists[pandora.user.ui.list].sort[0] = {key: key, operator: operator};
+                pandora.URL.push(pandora.Query.toString());
             }
         });
     return that;

@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+
 pandora.ui.toolbar = function() {
     var that = Ox.Bar({
             size: 24

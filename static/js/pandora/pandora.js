@@ -130,7 +130,7 @@ pandora.reloadGroups = function(i) {
             });
         }
     });
-    history.pushState({}, '', pandora.Query.toString());
+    pandora.URL.push(pandora.Query.toString());
 };
 
 pandora.getListData = function() {

@@ -26,7 +26,8 @@ pandora.ui.viewSelect = function() {
                 var id = data.selected[0].id;
                 pandora.$ui.mainMenu.checkItem('viewMenu_movies_' + id);
                 pandora.UI.set(['lists', pandora.user.ui.list, 'listView'].join('|'), id);
-                pandora.URL.set(pandora.Query.toString());
+                pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
+                pandora.URL.push(pandora.Query.toString());
             } : function(event, data) {
                 var id = data.selected[0].id;
                 //pandora.UI.set({itemView: id});
