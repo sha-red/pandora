@@ -308,15 +308,18 @@ pandora.ui.item = function() {
                 video: streams,
                 width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             }).bindEvent({
-                resize: function(event, data) {
+                resize: function(data) {
                     pandora.$ui.editor.options({
                         height: data
                     });
                 },
-                togglesize: function(event, data) {
+                resizeend: function(data) {
+                    pandora.UI.set({annotationsSize: data});
+                },
+                togglesize: function(data) {
                     pandora.UI.set({videoSize: data.size});
                 },
-                addAnnotation: function(event, data) {
+                addAnnotation: function(data) {
                     Ox.print('addAnnotation', data);
                     data.item = pandora.user.ui.item;
                     data.value = 'Click to edit';
@@ -324,13 +327,16 @@ pandora.ui.item = function() {
                         pandora.$ui.editor.addAnnotation(data.layer, result.data);
                     });
                 },
-                removeAnnotations: function(event, data) {
+                removeAnnotations: function(data) {
                     pandora.api.removeAnnotations(data, function(result) {
                         //fixme: check for errors
                         pandora.$ui.editor.removeAnnotations(data.layer, data.ids);
                     });
                 },
-                updateAnnotation: function(event, data) {
+                toggleAnnotations: function(data) {
+                    pandora.UI.set('showAnnotations', data.visible);
+                },
+                updateAnnotation: function(data) {
                     //fixme: check that edit was successfull
                     pandora.api.editAnnotation(data, function(result) {
                         Ox.print('done updateAnnotation', result);

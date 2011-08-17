@@ -1,16 +1,21 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+
+// fixme: this should be deleted!!
+
 pandora.ui.annotations = function() {
     var that = Ox.Element({
             id: 'annotations'
         })
         .bindEvent({
-            resize: function(event, data) {
+            resize: function(data) {
                 pandora.user.ui.annotationsSize = data;
             },
-            resizeend: function(event, data) {
+            resizeend: function(data) {
+                //alert('resizeend', JSON.stringify(data))
                 pandora.UI.set({annotationsSize: data});
             },
-            toggle: function(event, data) {
+            toggle: function(data) {
+                //alert('toggle', JSON.stringify(data))
                 pandora.UI.set({showAnnotations: !data.collapsed});
             }
         }),
