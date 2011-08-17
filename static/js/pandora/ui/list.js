@@ -76,6 +76,7 @@ pandora.ui.list = function() { // fixme: remove view argument
     } else if (view == 'icons') {
         //alert(JSON.stringify(pandora.user.ui.lists[pandora.user.ui.list].selected))
         that = Ox.IconList({
+            borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 16,
             defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
             id: 'list',
             item: function(data, sort, size) {

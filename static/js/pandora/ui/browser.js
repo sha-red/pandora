@@ -37,6 +37,7 @@ pandora.ui.browser = function() {
         });
     } else {
         var that = Ox.IconList({
+            borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 8,
             centered: true,
             defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
             id: 'list',

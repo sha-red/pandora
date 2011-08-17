@@ -173,6 +173,7 @@ pandora.ui.mainMenu = function() {
                         $list = pandora.$ui.list
                     }
                     $list && $list.options({
+                        borderRadius: value == 'posters' ? 0 : pandora.user.ui.item ? 8 : 16,
                         defaultRatio: value == 'posters' ? 5/8 : 1
                     }).reloadList(true);
                 } else if (data.id == 'viewmovies') {
