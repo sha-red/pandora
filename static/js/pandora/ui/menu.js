@@ -688,14 +688,16 @@ pandora.ui.mainMenu = function() {
                             })
                         ],
                         content: Ox.Element()
+                            .css({padding: '16px'})
                             .html([
                                 'Query: ' + JSON.stringify(pandora.Query.toObject()),
                                 'findQuery: ' + JSON.stringify(pandora.user.ui.findQuery),
                                 'listQuery: ' + JSON.stringify(pandora.user.ui.listQuery)
                             ].join('<br/><br/>')),
-                        height: 200,
+                        height: 192,
                         keys: {enter: 'close', escape: 'close'},
-                        width: 400
+                        title: 'Query',
+                        width: 384
                     }).open();
                 } else if (data.id == 'resetui') {
                     pandora.api.resetUI({}, function() {
