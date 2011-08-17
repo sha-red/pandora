@@ -61,7 +61,10 @@ def get_item(info, user=None):
             q = Item.objects.all()
             for key in ('title', 'director', 'year'):
                 if key in info and info[key]:
-                    q = q.filter(find__key=key, find__value=info[key])
+                    if isinstance(info[key], list):
+                        q = q.filter(find__key=key, find__value='\n'.join(info[key]))
+                    else:
+                        q = q.filter(find__key=key, find__value=info[key])
             if q.count() >= 1:
                 item = q[0]
             elif not 'oxdbId' in info:

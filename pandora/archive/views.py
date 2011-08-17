@@ -243,6 +243,11 @@ def moveFiles(request):
     else:
         if len(data['itemId']) != 7:
             del data['itemId']
+            if 'director' in data and isinstance(data['director'], basestring):
+                if data['director'] == '':
+                    data['director'] = []
+                else:
+                    data['director'] = data['director'].split(', ')
             i = get_item(data)
         else:
             i = get_item({'imdbId': data['itemId']})
