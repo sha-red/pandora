@@ -108,6 +108,7 @@ pandora.URL = (function() {
 
         update: function() {
             var oldUserUI = Ox.clone(pandora.user.ui);
+            Ox.Request.cancel();
             this.parse();
             if (pandora.user.ui.section != oldUserUI.section) {
                 pandora.$ui.appPanel.replaceElement(1, pandora.$ui.mainPanel = pandora.ui.mainPanel());
