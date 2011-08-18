@@ -8,8 +8,8 @@ pandora.ui.videoPreview = function(data) {
             getFrame: function(position) {
                 var width = pandora.user.ui.sidebarSize,
                     height = Math.round(width / pandora.user.infoRatio),
-                    resolution = Ox.filter(data.video.resolutions, function(resolution, i) {
-                        return resolution >= height || i == data.video.resolutions.length - 1;
+                    resolution = Ox.filter(pandora.site.resolutions, function(resolution, i) {
+                        return resolution >= height || i == pandora.site.resolutions.length - 1;
                     })[0];
                 return '/' + data.id + '/' + resolution + 'p' + (
                     Ox.isUndefined(position) ? '' : position
