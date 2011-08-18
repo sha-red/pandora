@@ -494,12 +494,12 @@ class Stream(models.Model):
             for f in settings.VIDEO_FORMATS:
                 derivative, created = Stream.objects.get_or_create(file=self.file,
                                                   resolution=resolution, format=f)
-            if created:
-                derivative.source = self
-                name = derivative.name()
-                derivative.video.name = os.path.join(os.path.dirname(self.video.name), name)
-                derivative.encode()
-                derivative.save()
+                if created:
+                    derivative.source = self
+                    name = derivative.name()
+                    derivative.video.name = os.path.join(os.path.dirname(self.video.name), name)
+                    derivative.encode()
+                    derivative.save()
         return True
 
     def encode(self):
