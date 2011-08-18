@@ -106,9 +106,9 @@ pandora.Query = (function() {
             }
             if ('sort' in query) {
                 sort = query.sort.split(',');
-                pandora.UI.set(['lists', pandora.user.ui.list, 'sort'].join('|'), $.map(query.sort.split(','), function(v, i) {
+                pandora.UI.set(['lists', pandora.user.ui.list, 'sort'].join('|'), query.sort.split(',').map(function(v) {
                     var hasOperator = '+-'.indexOf(v[0]) > -1,
-                        key = hasOperator ? query.sort.substr(1) : query.sort,
+                        key = hasOperator ? v.substr(1) : v,
                         operator = hasOperator ? v[0]/*.replace('+', '')*/ : pandora.getSortOperator(key);
                     return {
                         key: key,

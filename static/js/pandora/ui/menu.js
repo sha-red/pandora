@@ -102,7 +102,7 @@ pandora.ui.mainMenu = function() {
                     ] },
                     { id: 'ordermovies', title: 'Order ' + pandora.site.itemName.plural, items: [
                         { group: 'ordermovies', min: 1, max: 1, items: [
-                            { id: 'ascending', title: 'Ascending', checked: pandora.user.ui.lists[pandora.user.ui.list].sort[0].operator === '' },
+                            { id: 'ascending', title: 'Ascending', checked: pandora.user.ui.lists[pandora.user.ui.list].sort[0].operator == '+' },
                             { id: 'descending', title: 'Descending', checked: pandora.user.ui.lists[pandora.user.ui.list].sort[0].operator == '-' }
                         ]}
                     ] },
@@ -112,12 +112,13 @@ pandora.ui.mainMenu = function() {
                 ] },
                 { id: 'findMenu', title: 'Find', items: [
                     { id: 'find', title: 'Find', items: [
-                        { group: 'find', min: 1, max: 1, items: $.map(pandora.site.findKeys, function(key, i) {
+                        { group: 'find', min: 1, max: 1, items: pandora.site.findKeys.map(function(key, i) {
                             return Ox.extend({
-                                checked: pandora.user.ui.findQuery.conditions.length && 
-                                    (pandora.user.ui.findQuery.conditions[0].key == key.id ||
-                                    (pandora.user.ui.findQuery.conditions[0].key === '' && key.id == 'all')),
-                            }, key)
+                                checked: pandora.user.ui.findQuery.conditions.length ? ( 
+                                    pandora.user.ui.findQuery.conditions[0].key == key.id ||
+                                    (pandora.user.ui.findQuery.conditions[0].key === '' && key.id == 'all')
+                                ) : key.id == 'all',
+                            }, key);
                         }) }
                     ] },
                     { id: 'advancedfind', title: 'Advanced Find...', keyboard: 'shift control f' }
@@ -154,13 +155,25 @@ pandora.ui.mainMenu = function() {
                     else
                         url(id);
                 } else if (data.id == 'ordermovies') {
-                    pandora.$ui.list.sortList(pandora.user.ui.lists[pandora.user.ui.list].sort[0].key, value == 'ascending' ? '' : '-');
+                    var key = pandora.user.ui.lists[pandora.user.ui.list].sort[0].key,
+                        operator = value == 'ascending' ? '+' : '-';
+                    pandora.$ui.list.options({
+                        sort: [{key: key, operator: operator}]
+                    });
+                    pandora.UI.set(['lists', pandora.user.ui.list, 'sort'].join('|'), [{key: key, operator: operator}]);
+                    //pandora.user.ui.lists[pandora.user.ui.list].sort[0] = {key: key, operator: operator};
+                    pandora.URL.push(pandora.Query.toString());
                 } else if (data.id == 'sortmovies') {
                     var operator = pandora.getSortOperator(value);
-                    pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator === '' ? 'ascending' : 'descending'));
+                    pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator == '+' ? 'ascending' : 'descending'));
                     pandora.$ui.sortSelect.selectItem(value);
-                    pandora.$ui.list.sortList(value, operator);
-                    pandora.URL.set(pandora.Query.toString());
+                    pandora.$ui.list.options({
+                        sort: [{key: value, operator: operator}]
+                    });
+                    pandora.UI.set(['lists', pandora.user.ui.list, 'sort'].join('|'), [{key: value, operator: operator}]);
+                    //pandora.user.ui.lists[pandora.user.ui.list].sort[0] = {key: key, operator: operator};
+                    pandora.URL.push(pandora.Query.toString());
+
                 } else if (data.id == 'viewicons') {
                     var $list;
                     pandora.UI.set({icons: value});

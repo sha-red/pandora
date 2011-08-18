@@ -51,7 +51,7 @@ pandora.ui.list = function() { // fixme: remove view argument
             sort: pandora.user.ui.lists[pandora.user.ui.list].sort
         })
         .bindEvent({
-            columnchange: function(event, data) {
+            columnchange: function(data) {
                 var columnWidth = {};
                 pandora.UI.set(['lists', pandora.user.ui.list, 'columns'].join('|'), data.ids);
                 /*
@@ -63,14 +63,19 @@ pandora.ui.list = function() { // fixme: remove view argument
                 pandora.UI.set(['lists', pandora.user.ui.list, 'columnWidth'].join('|'), columnWidth);
                 */
             },
-            columnresize: function(event, data) {
+            columnresize: function(data) {
                 pandora.UI.set(['lists', pandora.user.ui.list, 'columnWidth', data.id].join('|'), data.width);
             },
-            resize: function(event, data) { // this is the resize event of the split panel
+            resize: function(data) { // this is the resize event of the split panel
                 that.size();
             },
-            sort: function(event, data) {
-                pandora.UI.set(['lists', pandora.user.ui.list, 'sort'].join('|'), [data]);
+            sort: function(data) {
+                Ox.print('---- SORT ----', data)
+                pandora.$ui.mainMenu.checkItem('sortMenu_sortmovies_' + data.key);
+                pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (data.operator == '+' ? 'ascending' : 'descending'));
+                pandora.$ui.sortSelect.selectItem(data.key);
+                pandora.UI.set(['lists', pandora.user.ui.list, 'sort'].join('|'), [{key: data.key, operator: data.operator}]);
+                pandora.URL.push(pandora.Query.toString());
             }
         });
     } else if (view == 'icons') {
@@ -154,12 +159,16 @@ pandora.ui.list = function() { // fixme: remove view argument
             sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
             unique: 'id'
         }).bindEvent({
-            open: function(event, data) {
+            open: function(data) {
                 var id = data.ids[0],
                     item = that.value(id, 'item'),
                     position = that.value(id, 'in');
                 pandora.UI.set('videoPosition|' + item, position);
                 pandora.URL.set(item + '/timeline');
+            },
+            select: function(data) {
+                // fixme: clips ids should be 'itemId/annotationId'
+                pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info('1135952'));
             }
         });
     } else if (view == 'map') {
@@ -208,8 +217,8 @@ pandora.ui.list = function() { // fixme: remove view argument
                             Ox.print('RATIO', data.aspectRatio);
                             size = size || 128;
                             var width = data.aspectRatio < fixedRatio ? size : size * data.aspectRatio / fixedRatio,
-                                height = parseInt(width / data.aspectRatio),
-                                url = '/' + data.item + '/' + height + 'p' + data['in'] + '.jpg';
+                                height = width / data.aspectRatio,
+                                url = '/' + data.item + '/' + width + '/' + data['in'] + '.jpg';
                             return {
                                 height: height,
                                 id: data.id,
@@ -226,7 +235,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                         sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
                         unique: 'id'
                     }).bindEvent({
-                        open: function(event, data) {
+                        open: function(data) {
                             var id = data.ids[0],
                                 item = pandora.$ui.clips.value(id, 'item'),
                                 position = pandora.$ui.clips.value(id, 'in');
@@ -301,12 +310,12 @@ pandora.ui.list = function() { // fixme: remove view argument
             });
         }
     }).bindEvent({
-        closepreview: function(event, data) {
+        closepreview: function(data) {
             pandora.$ui.previewDialog.close();
             preview = false;
             //delete pandora.$ui.previewDialog;
         },
-        copy: function(event, data) {
+        copy: function(data) {
             Ox.Clipboard.copy({
                 items: data.ids,
                 text: $.map(data.ids, function(id) {
@@ -314,13 +323,13 @@ pandora.ui.list = function() { // fixme: remove view argument
                 }).join('\n')
             });
         },
-        'delete': function(event, data) {
+        'delete': function(data) {
             pandora.getListData().editable && pandora.api.removeListItems({
                 list: pandora.user.ui.list,
                 items: data.ids
             }, pandora.reloadList);
         },
-        init: function(event, data) {
+        init: function(data) {
             pandora.$ui.total.html(pandora.ui.status('total', data));
             data = [];
             $.each(pandora.site.totals, function(i, v) {
@@ -328,12 +337,12 @@ pandora.ui.list = function() { // fixme: remove view argument
             });
             pandora.$ui.selected.html(pandora.ui.status('selected', data));
         },
-        open: function(event, data) {
+        open: function(data) {
             var id = data.ids[0],
                 title = that.value(id, 'title');
             pandora.URL.set(title, id);
         },
-        openpreview: function(event, data) {
+        openpreview: function(data) {
             pandora.requests.preview && pandora.api.cancel(pandora.requests.preview);
             pandora.requests.preview = pandora.api.find({
                 keys: ['director', 'id', 'poster', 'title'],
@@ -407,13 +416,13 @@ pandora.ui.list = function() { // fixme: remove view argument
                 }
             });
         },
-        paste: function(event, data) {
+        paste: function(data) {
             data.items && pandora.getListData().editable && pandora.api.addListItems({
                 list: pandora.user.ui.list,
                 items: data.items
             }, pandora.reloadList);
         },
-        select: function(event, data) {
+        select: function(data) {
             var $still, $timeline;
             pandora.UI.set(['lists', pandora.user.ui.list, 'selected'].join('|'), data.ids);
             //pandora.user.ui.lists[pandora.user.ui.list].selected = data.ids;
@@ -439,21 +448,6 @@ pandora.ui.list = function() { // fixme: remove view argument
             }, function(result) {
                 pandora.$ui.selected.html(pandora.ui.status('selected', result.data));
             });
-        },
-        sort: function(event, data) {
-            Ox.print('--SORT--', pandora.user.ui.sort[0].key)
-            /* some magic has already set user.ui.sort
-            Ox.print(':', user.ui.sort[0])
-            if (data.key != user.ui.sort[0].key) {
-                pandora.$ui.mainMenu.checkItem('sort_sortmovies_' + data.key);
-            }
-            if (data.operator != user.ui.sort[0].operator) {
-                pandora.$ui.mainMenu.checkItem('sort_ordermovies_' + data.operator === '' ? 'ascending' : 'descending');
-            }
-            user.ui.sort[0] = data;
-            */
-            pandora.$ui.mainMenu.checkItem('sortMenu_sortmovies_' + data.key);
-            pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (data.operator === '' ? 'ascending' : 'descending'));
         }
     });
     that.display = function() { // fixme: used?

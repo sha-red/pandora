@@ -13,7 +13,7 @@ pandora.ui.leftPanel = function() {
                     collapsed: !pandora.user.ui.showInfo,
                     collapsible: true,
                     element: pandora.$ui.info = pandora.ui.info(),
-                    size: pandora.user.ui.sidebarSize / pandora.user.infoRatio + 16
+                    size: Math.round(pandora.user.ui.sidebarSize / pandora.user.infoRatio)
                 }
             ],
             id: 'leftPanel',
@@ -22,7 +22,7 @@ pandora.ui.leftPanel = function() {
         .bindEvent({
             resize: function(event, data) {
                 Ox.print('LEFT PANEL RESIZE')
-                var infoSize = Math.round(data / pandora.user.infoRatio) + 16;
+                var infoSize = Math.round(data / pandora.user.infoRatio);
                 pandora.user.ui.sidebarSize = data;
                 if (data < pandora.site.sectionButtonsWidth && pandora.$ui.sectionButtons) {
                     pandora.$ui.sectionButtons.removeElement();
