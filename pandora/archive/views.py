@@ -198,8 +198,7 @@ def firefogg_upload(request):
             #404 if oshash is not know, files must be registered via update api first
             f = get_object_or_404(models.File, oshash=oshash)
             if f.editable(request.user):
-                if f.video:
-                    f.video.delete()
+                f.streams.all().delete()
                 f.available = False
                 f.save()
                 response = {
