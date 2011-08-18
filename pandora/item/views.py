@@ -662,7 +662,10 @@ def video(request, id, resolution, format, index=None):
     if index > len(videos):
         raise Http404
 
-    f = videos[index]
+    stream = videos[index].streams.filter(resolution=resolution, format=format)
+    if stream.count() == 0:
+        raise Http404
+    stream = stream[0]
     path = stream.video.path
 
     #server side cutting
