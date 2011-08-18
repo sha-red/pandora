@@ -28,6 +28,15 @@ class SiteSettings(models.Model):
 def site_config():
     with open(settings.SITE_CONFIG) as f:
         site_config = json.load(f)
+
+        site_config['site']['id'] = settings.SITEID
+        site_config['site']['name'] = settings.SITENAME
+        site_config['site']['sectionName'] = settings.SITENAME
+        site_config['site']['url'] = settings.URL
+
+        site_config['formats'] = settings.VIDEO_FORMATS
+        site_config['resolutions'] = settings.VIDEO_RESOLUTIONS
+
         site_config['keys'] = {}
         for key in site_config['itemKeys']:
             site_config['keys'][key['id']] = key

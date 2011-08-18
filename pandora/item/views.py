@@ -652,21 +652,25 @@ def torrent(request, id, filename=None):
                                       os.path.basename(filename.encode('utf-8'))
     return response
 
-def video(request, id, profile, index=None, format=None):
+def video(request, id, resolution, format, index=None):
     item = get_object_or_404(models.Item, itemId=id)
     if index:
         index = int(index) - 1
-        path = item.main_videos()[index].video.path
-        #stream = item.streams.filter(profile=profile)[index]
-        #path = stream.video.path
     else:
-        stream = get_object_or_404(item.streams, profile="%s.%s" % (profile, format))
-        path = stream.video.path
+        index = 0
+    videos = item.main_videos()
+    if index > len(videos):
+        raise Http404
+
+    f = videos[index]
+    path = stream.video.path
+
     #server side cutting
+    #FIXME: this needs to join segments if needed
     t = request.GET.get('t')
     if t:
         t = map(float, t.split(','))
-        ext = os.path.splitext(profile)[1]
+        ext = '.%s' % format
         content_type = mimetypes.guess_type(path)[0]
         if len(t) == 2 and t[1] > t[0] and stream.info['duration']>=t[1]:
             response = HttpResponse(extract.chop(path, t[0], t[1]), content_type=content_type)

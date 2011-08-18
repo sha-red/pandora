@@ -392,8 +392,9 @@ class Item(models.Model):
 
     def get_stream(self):
         stream = {}
-        if self.streams.all().count():
-            s = self.streams.all()[0]
+        videos = self.main_videos()
+        for video in videos:
+            s = video.streams.all()[0]
             if s.video and s.info:
                 stream['duration'] = s.info['duration']
                 if 'video' in s.info and s.info['video']:
@@ -404,8 +405,6 @@ class Item(models.Model):
                     stream['baseUrl'] = '/%s' % self.itemId
                 else:
                     stream['baseUrl'] = os.path.dirname(s.video.url)
-                stream['resolutions'] = sorted(list(set(map(lambda s: int(os.path.splitext(s['profile'])[0][:-1]), self.streams.all().values('profile')))))
-                stream['formats'] = list(set(map(lambda s: os.path.splitext(s['profile'])[1][1:], self.streams.all().values('profile'))))
         return stream
 
     def get_layers(self, user=None):
@@ -450,6 +449,11 @@ class Item(models.Model):
 
         if not keys or 'poster' in keys:
             i['poster'] = self.get_poster()
+
+        videos = self.main_videos()
+        i['duration'] = sum([v.duration for v in videos])
+        i['durations'] = [v.duration for v in videos]
+        i['apsectRatio'] = i.get('aspectratio')
 
         #only needed by admins
         if keys and 'posters' in keys:
@@ -561,6 +565,7 @@ class Item(models.Model):
             'size',
             'bitrate',
             'numberoffiles',
+            'parts',
             'published',
             'modified',
             'popularity',
@@ -627,12 +632,13 @@ class Item(models.Model):
         if len(videos) > 0:
             s.duration = sum([v.duration for v in videos])
             s.resolution = videos[0].width * videos[0].height
-            s.aspectratio = int(1000 * utils.parse_decimal(v.display_aspect_ratio))
+            s.aspectratio = float(utils.parse_decimal(v.display_aspect_ratio))
             #FIXME: should be average over all files
             if 'bitrate' in videos[0].info:
                 s.bitrate = videos[0].info['bitrate']
             s.pixels = sum([v.pixels for v in videos])
             s.numberoffiles = self.files.all().count()
+            s.parts = len(videos)
             s.size = sum([v.size for v in videos]) #FIXME: only size of movies?
             s.volume = 0
         else:
@@ -645,6 +651,7 @@ class Item(models.Model):
             s.files = None
             s.size = None
             s.volume = None
+            s.parts = 0
 
         if 'color' in self.data:
             s.hue, s.saturation, s.lightness = self.data['color']
@@ -695,24 +702,34 @@ class Item(models.Model):
     '''
         Video related functions
     '''
-
     def frame(self, position, height=128):
-        stream = self.streams.filter(profile=settings.VIDEO_PROFILE)
-        if stream.count()>0:
-            stream = stream[0]
-        else:
-            return None
-        height = min(height, stream.height())
-        path = os.path.join(settings.MEDIA_ROOT, self.path(),
-                            'frames', "%dp"%height, "%s.jpg"%position)
-        if not os.path.exists(path) and stream.video:
-            extract.frame(stream.video.path, path, position, height)
-        if not os.path.exists(path):
-            path = os.path.join(settings.STATIC_ROOT, 'png/frame.broken.png')
-        return path
+        offset = 0
+        videos = self.main_videos()
+        for video in videos:
+            if video.duration + offset < position:
+                offset += video.duration
+            else:
+                position = position - offset
+                stream = video.streams.filter(resolution=settings.VIDEO_RESOLUTIONS[0],
+                                              format=settings.VIDEO_FORMATS[0])
+                if stream.count()>0:
+                    stream = stream[0]
+                else:
+                    return None
+                height = min(height, stream.resolution)
+                path = os.path.join(settings.MEDIA_ROOT, stream.path(),
+                                    'frames', "%dp"%height, "%s.jpg"%position)
+                if not os.path.exists(path) and stream.video:
+                    extract.frame(stream.video.path, path, position, height)
+                if not os.path.exists(path):
+                    return None
+                return path
 
     @property
     def timeline_prefix(self):
+        videos = self.main_videos()
+        if len(videos) == 1:
+            return os.path.join(settings.MEDIA_ROOT, videos[0].path('timeline'))
         return os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline')
 
     def main_videos(self):
@@ -890,9 +907,7 @@ class Item(models.Model):
         return None
 
     def make_timeline(self):
-        stream = self.streams.filter(profile=settings.VIDEO_PROFILE)
-        if stream.count() > 0 and stream[0].video:
-            extract.timeline(stream[0].video.path, self.timeline_prefix)
+        print "FIXME, needs to build timeline from parts"
 
     def make_poster(self, force=False):
         if not self.poster or force:
@@ -1107,53 +1122,6 @@ class Facet(models.Model):
         if not self.value_sort:
             self.value_sort = utils.sort_string(self.value)
         super(Facet, self).save(*args, **kwargs)
-
-
-class Stream(models.Model):
-
-    class Meta:
-        unique_together = ("item", "profile")
-
-    item = models.ForeignKey(Item, related_name='streams')
-    profile = models.CharField(max_length=255, default='96p.webm')
-    video = models.FileField(default=None, blank=True, upload_to=lambda f, x: f.path())
-    source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True)
-    available = models.BooleanField(default=False)
-    info = fields.DictField(default={})
-
-    def __unicode__(self):
-        return u"%s/%s" % (self.item.itemId, self.profile)
-
-    def path(self):
-        return self.item.path(self.profile)
-
-    def height(self):
-        return int(self.profile.split('p')[0])
-
-    def extract_derivatives(self):
-        for profile in settings.VIDEO_DERIVATIVES:
-            derivative, created = Stream.objects.get_or_create(profile=profile, item=self.item)
-            if created:
-                derivative.source = self
-                derivative.video.name = self.video.name.replace(self.profile, profile)
-                derivative.encode()
-                derivative.save()
-        return True
-
-    def encode(self):
-        if self.source:
-            video = self.source.video.path
-            target = self.video.path
-            profile = self.profile
-            info = ox.avinfo(video)
-            if extract.stream(video, target, profile, info):
-                self.available=True
-                self.save()
-
-    def save(self, *args, **kwargs):
-        if self.video and not self.info:
-            self.info = ox.avinfo(self.video.path)
-        super(Stream, self).save(*args, **kwargs)
 
 
 class PosterUrl(models.Model):

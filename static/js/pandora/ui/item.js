@@ -223,11 +223,11 @@ pandora.ui.item = function() {
             var layers = [],
                 video = result.data.stream,
                 cuts = result.data.cuts || [],
-                format = $.support.video.supportedFormat(video.formats),
+                format = $.support.video.supportedFormat(pandora.site.formats),
                 streams = {};
-            video.height = video.resolutions[0];
+            video.height = pandora.site.resolutions[0];
             video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
-            video.resolutions.forEach(function(resolution) {
+            pandora.site.resolutions.forEach(function(resolution) {
                 streams[resolution] = video.baseUrl + '/' + resolution + 'p.' + format;
             });
             $.each(pandora.site.layers, function(i, layer) {
@@ -289,11 +289,11 @@ pandora.ui.item = function() {
             var layers = [],
                 video = result.data.stream,
                 cuts = result.data.cuts || [],
-                format = $.support.video.supportedFormat(video.formats),
+                format = $.support.video.supportedFormat(pandora.site.formats),
                 streams = {};
-            video.height = video.resolutions[0];
+            video.height = pandora.site.resolutions[0];
             video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
-            video.resolutions.forEach(function(resolution) {
+            pandora.site.resolutions.forEach(function(resolution) {
                 streams[resolution] = video.baseUrl + '/' + resolution + 'p.' + format;
             });
             $.each(pandora.site.layers, function(i, layer) {

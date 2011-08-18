@@ -111,7 +111,8 @@ actions.register(update, cache=False)
 
 @login_required_json
 def encodingProfile(request):
-    response = json_response({'profile': settings.VIDEO_PROFILE})
+    profile = "%sp.%s" % (settings.VIDEO_RESOLUTIONS[0], settings.VIDEO_FORMATS[0])
+    response = json_response({'profile': profile})
     return render_to_json_response(response)
 actions.register(encodingProfile)
 
@@ -178,7 +179,7 @@ def firefogg_upload(request):
                     'result': 1,
                     'resultUrl': request.build_absolute_uri('/')
                 }
-                if not f.save_chunk(c, chunk_id):
+                if not f.save_chunk(c, chunk_id, form.cleaned_data['done']):
                     response['result'] = -1
                 elif form.cleaned_data['done']:
                     f.available = True

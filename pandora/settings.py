@@ -174,24 +174,19 @@ VIDEO_DERIVATIVES = []
 
 TRACKER_URL="http://url2torrent.net:6970/announce"
 
+VIDEO_FORMATS=['webm']
+VIDEO_RESOLUTIONS=[96]
+
 #0xdb
 '''
-VIDEO_PROFILE = '96p.webm'
-VIDEO_DERIVATIVES = [
-    '96p.mp4'
-]
+VIDEO_FORMATS=['webm', 'mp4']
+VIDEO_RESOLUTIONS=[96]
 '''
 
 #Pad.ma
 '''
-VIDEO_PROFILE = '480p.webm'
-VIDEO_DERIVATIVES = [
-    '96p.webm',
-    '240p.webm',
-    '96p.mp4',
-    '240p.mp4',
-    '480p.mp4',
-]
+VIDEO_FORMATS=['webm', 'mp4']
+VIDEO_RESOLUTIONS=[480, 240, 96]
 '''
 
 TRANSMISSON_HOST = 'localhost'
