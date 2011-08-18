@@ -529,7 +529,7 @@ class Stream(models.Model):
 
     def json(self):
         if settings.XSENDFILE or settings.XACCELREDIRECT:
-            base_url = '/%s' % self.itemId
+            base_url = '/%s' % self.file.itemId
         else:
             base_url = os.path.dirname(self.video.url)
         return {
