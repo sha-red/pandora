@@ -468,7 +468,7 @@ class Stream(models.Model):
     resolution = models.IntegerField(default=96)
     format = models.CharField(max_length=255, default='webm')
 
-    video = models.FileField(default=None, blank=True, upload_to=lambda f, x: f.path())
+    video = models.FileField(default=None, blank=True, upload_to=lambda f, x: f.path(x))
     source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True)
     available = models.BooleanField(default=False)
     info = fields.DictField(default={})
