@@ -112,7 +112,38 @@ pandora.ui.list = function() { // fixme: remove view argument
             unique: 'id'
         });
     } else if (view == 'info') {
-        that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
+        that = Ox.IconList({
+            borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 16,
+            defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
+            id: 'list',
+            item: function(data, sort, size) {
+                var icons = pandora.user.ui.icons,
+                    ratio = icons == 'posters' ? data.poster.width / data.poster.height : 1;
+                size = size || 128;
+                return {
+                    height: ratio <= 1 ? size : size / ratio,
+                    id: data.id,
+                    info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
+                    title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
+                    url: icons == 'posters' 
+                        ? '/' + data.id + '/poster' + size + '.jpg'
+                        : '/' + data.id + '/icon' + size + '.jpg',
+                    width: ratio >= 1 ? size : size * ratio
+                };
+            },
+            items: function(data, callback) {
+                //Ox.print('data, pandora.Query.toObject', data, pandora.Query.toObject())
+                pandora.api.find($.extend(data, {
+                    query: pandora.Query.toObject()
+                }), callback);
+            },
+            keys: ['director', 'id', 'poster', 'title', 'year'],
+            orientation: 'vertical',
+            selected: pandora.user.ui.lists[pandora.user.ui.list].selected,
+            size: 128,
+            sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
+            unique: 'id'
+        });
     } else if (view == 'clips') {
         that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
     } else if (view == 'timelines') {
@@ -218,7 +249,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                             size = size || 128;
                             var width = data.aspectRatio < fixedRatio ? size : size * data.aspectRatio / fixedRatio,
                                 height = width / data.aspectRatio,
-                                url = '/' + data.item + '/' + width + '/' + data['in'] + '.jpg';
+                                url = '/' + data.item + '/' + height + 'p' + data['in'] + '.jpg';
                             return {
                                 height: height,
                                 id: data.id,
@@ -300,12 +331,12 @@ pandora.ui.list = function() { // fixme: remove view argument
 
     ['list', 'icons'].indexOf(view) > -1 && that.bind({
         dragstart: function(e) {
-            pandora.$ui.folderList.forEach(function($list, i) {
+            Ox.forEach(pandora.$ui.folderList, function($list, i) {
                 $list.addClass('OxDrop');
             });
         },
         dragend: function(e) {
-            pandora.$ui.folderList.forEach(function($list, i) {
+            Ox.forEach(pandora.$ui.folderList, function($list, i) {
                 $list.removeClass('OxDrop');
             });
         }

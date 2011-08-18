@@ -293,7 +293,7 @@ pandora.ui.item = function() {
                 streams = {};
             video.height = video.resolutions[0];
             video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
-            video.resolutions.forEach(function(profile) {
+            video.resolutions.forEach(function(resolution) {
                 streams[resolution] = video.baseUrl + '/' + resolution + 'p.' + format;
             });
             $.each(pandora.site.layers, function(i, layer) {

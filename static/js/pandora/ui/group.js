@@ -34,13 +34,16 @@ pandora.ui.group = function(id, query) {
             columnsVisible: true,
             id: 'group_' + id,
             items: function(data, callback) {
-                //Ox.print('sending request', data)
-                delete data.keys;
-                //alert(id + " pandora.Query.toObject " + JSON.stringify(pandora.Query.toObject(id)) + ' ' + JSON.stringify(data))
-                return pandora.api.find($.extend(data, {
-                    group: id,
-                    query: pandora.Query.toObject(id)
-                }), callback);
+                //if (pandora.user.ui.showGroups) {
+                    delete data.keys;
+                    //alert(id + " pandora.Query.toObject " + JSON.stringify(pandora.Query.toObject(id)) + ' ' + JSON.stringify(data))
+                    return pandora.api.find($.extend(data, {
+                        group: id,
+                        query: pandora.Query.toObject(id)
+                    }), callback);
+                //} else {
+                //    callback({data: {items: data.keys ? [] : 0}});
+                //}
             },
             scrollbarVisible: true,
             selected: query ? $.map(query.conditions, function(v) {
