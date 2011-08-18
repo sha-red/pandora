@@ -472,7 +472,9 @@ class Stream(models.Model):
     source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True)
     available = models.BooleanField(default=False)
     info = fields.DictField(default={})
-    
+    duration = models.FloatField(default=0)
+    aspect_ratio = models.FloatField(default=0)
+
     @property
     def timeline_prefix(self):
         return os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline')
@@ -518,7 +520,23 @@ class Stream(models.Model):
     def save(self, *args, **kwargs):
         if self.video and not self.info:
             self.info = ox.avinfo(self.video.path)
+        self.duration = self.info.get('duration', 0)
+        if 'video' in self.info and self.info['video']:
+            self.aspect_ratio = self.info['video'][0]['width'] / self.info['video'][0]['height']
+        else:
+            self.aspect_ratio = 128/80
         super(Stream, self).save(*args, **kwargs)
+
+    def json(self):
+        if settings.XSENDFILE or settings.XACCELREDIRECT:
+            base_url = '/%s' % self.itemId
+        else:
+            base_url = os.path.dirname(self.video.url)
+        return {
+            'duration': self.duration,
+            'aspectRatio': self.aspect_ratio,
+            'baseUrl': base_url
+        }
 
 def delete_stream(sender, **kwargs):
     f = kwargs['instance']

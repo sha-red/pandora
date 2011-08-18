@@ -295,7 +295,6 @@ class Item(models.Model):
             shutil.rmtree(path)
 
     def delete(self, *args, **kwargs):
-        self.streams.all().delete()
         self.delete_files()
         super(Item, self).delete(*args, **kwargs)
 
@@ -391,21 +390,8 @@ class Item(models.Model):
         return frames
 
     def get_stream(self):
-        stream = {}
-        videos = self.main_videos()
-        for video in videos:
-            s = video.streams.all()[0]
-            if s.video and s.info:
-                stream['duration'] = s.info['duration']
-                if 'video' in s.info and s.info['video']:
-                    stream['aspectRatio'] = s.info['video'][0]['width'] / s.info['video'][0]['height']
-                else:
-                    stream['aspectRatio'] = 128/80
-                if settings.XSENDFILE or settings.XACCELREDIRECT:
-                    stream['baseUrl'] = '/%s' % self.itemId
-                else:
-                    stream['baseUrl'] = os.path.dirname(s.video.url)
-        return stream
+        for s in self.streams():
+            return s.json()
 
     def get_layers(self, user=None):
         layers = {}
@@ -450,9 +436,8 @@ class Item(models.Model):
         if not keys or 'poster' in keys:
             i['poster'] = self.get_poster()
 
-        videos = self.main_videos()
-        i['duration'] = sum([v.duration for v in videos])
-        i['durations'] = [v.duration for v in videos]
+        i['durations'] = [s.duration for s in self.streams()]
+        i['duration'] = sum(i['durations'])
         i['apsectRatio'] = i.get('aspectratio')
 
         #only needed by admins
@@ -704,18 +689,12 @@ class Item(models.Model):
     '''
     def frame(self, position, height=128):
         offset = 0
-        videos = self.main_videos()
-        for video in videos:
-            if video.duration + offset < position:
-                offset += video.duration
+        streams = self.streams()
+        for stream in streams:
+            if stream.duration + offset < position:
+                offset += stream.duration
             else:
                 position = position - offset
-                stream = video.streams.filter(resolution=settings.VIDEO_RESOLUTIONS[0],
-                                              format=settings.VIDEO_FORMATS[0])
-                if stream.count()>0:
-                    stream = stream[0]
-                else:
-                    return None
                 height = min(height, stream.resolution)
                 path = os.path.join(settings.MEDIA_ROOT, stream.path(),
                                     'frames', "%dp"%height, "%s.jpg"%position)
@@ -811,6 +790,9 @@ class Item(models.Model):
         ox.torrent.createTorrent(video, settings.TRACKER_URL, meta)
         self.torrent.name = self.path('torrent/%s.torrent' % self.get('title'))
         self.save()
+
+    def streams(self):
+        return [video.streams.filter(source=None)[0] for video in self.main_videos()]
 
     def update_streams(self, force=False):
         files = {}
