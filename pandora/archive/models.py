@@ -21,6 +21,9 @@ from item import utils
 from item.models import Item
 from person.models import get_name_sort
 
+import extract
+
+
 
 class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -160,10 +163,8 @@ class File(models.Model):
         super(File, self).save(*args, **kwargs)
 
     #upload and data handling
-    video = models.FileField(null=True, blank=True,
-                        upload_to=lambda f, x: f.path(settings.VIDEO_PROFILE))
     data = models.FileField(null=True, blank=True,
-                        upload_to=lambda f, x: f.path('data.bin'))
+                            upload_to=lambda f, x: f.path('data.bin'))
 
     def path(self, name):
         h = self.oshash
@@ -245,15 +246,22 @@ class File(models.Model):
         #FIXME: check that user has instance of this file
         return True
 
-    def save_chunk(self, chunk, chunk_id=-1):
+    def save_chunk(self, chunk, chunk_id=-1, done=False):
         if not self.available:
-            if not self.video:
-                self.video.save(settings.VIDEO_PROFILE, chunk)
+            stream, created = Stream.objects.get_or_create(
+                        file=self,
+                        resolution=settings.VIDEO_RESOLUTIONS[0],
+                        format=settings.VIDEO_FORMATS[0])
+            if created:
+                stream.video.save(stream.name(), chunk)
             else:
-                f = open(self.video.path, 'a')
+                f = open(stream.video.path, 'a')
                 #FIXME: should check that chunk_id/offset is right
                 f.write(chunk.read())
                 f.close()
+            if done:
+                stream.available = True
+                stream.save()
             return True
         return False
 
@@ -365,8 +373,7 @@ class File(models.Model):
 
 def delete_file(sender, **kwargs):
     f = kwargs['instance']
-    if f.video:
-        f.video.delete()
+    #FIXME: delete streams here
     if f.data:
         f.data.delete()
 pre_delete.connect(delete_file, sender=File)
@@ -450,3 +457,71 @@ def delete_frame(sender, **kwargs):
     if f.frame:
         f.frame.delete()
 pre_delete.connect(delete_frame, sender=Frame)
+
+
+class Stream(models.Model):
+
+    class Meta:
+        unique_together = ("file", "resolution", "format")
+
+    file = models.ForeignKey(File, related_name='streams')
+    resolution = models.IntegerField(default=96)
+    format = models.CharField(max_length=255, default='webm')
+
+    video = models.FileField(default=None, blank=True, upload_to=lambda f, x: f.path())
+    source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True)
+    available = models.BooleanField(default=False)
+    info = fields.DictField(default={})
+    
+    @property
+    def timeline_prefix(self):
+        return os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline')
+
+    def name(self):
+        return u"%sp.%s" % (self.resolution, self.format)
+        
+    def __unicode__(self):
+        return u"%s/%s" % (self.file, self.name())
+
+    def path(self, name=''):
+        return self.file.path(name)
+
+    def extract_derivatives(self):
+        self.make_timeline()
+        for resolution in settings.VIDEO_RESOLUTIONS:
+            for f in settings.VIDEO_FORMATS:
+                derivative, created = Stream.objects.get_or_create(file=self.file,
+                                                  resolution=resolution, format=f)
+            if created:
+                derivative.source = self
+                name = derivative.name()
+                derivative.video.name = os.path.join(os.path.dirname(self.video.name), name)
+                derivative.encode()
+                derivative.save()
+        return True
+
+    def encode(self):
+        if self.source:
+            video = self.source.video.path
+            target = self.video.path
+            info = ox.avinfo(video)
+            if extract.stream(video, target, self.name(), info):
+                self.available = True
+            else:
+                self.available = False
+            self.save()
+
+    def make_timeline(self):
+        if self.available and not self.source:
+            extract.timeline(self.video.path, self.timeline_prefix)
+
+    def save(self, *args, **kwargs):
+        if self.video and not self.info:
+            self.info = ox.avinfo(self.video.path)
+        super(Stream, self).save(*args, **kwargs)
+
+def delete_stream(sender, **kwargs):
+    f = kwargs['instance']
+    if f.video:
+        f.video.delete()
+pre_delete.connect(delete_stream, sender=Stream)

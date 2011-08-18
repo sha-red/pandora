@@ -14,6 +14,7 @@ from ox.utils import json
 
 from user.models import get_user_json
 from item.models import ItemSort
+from app.models import site_config
 
 from actions import actions
 
@@ -54,26 +55,21 @@ def init(request):
     '''
     #data = json.loads(request.POST['data'])
     response = json_response({})
-    with open(settings.SITE_CONFIG) as f:
-        config = json.load(f)
+    config = site_config()
+    del config['keys'] #is this needed?
 
-        config['site']['id'] = settings.SITEID
-        config['site']['name'] = settings.SITENAME
-        config['site']['sectionName'] = settings.SITENAME
-        config['site']['url'] = settings.URL
+    #populate max values for percent requests
+    for key in filter(lambda k: 'format' in k, config['itemKeys']):
+        if key['format']['type'] == 'percent' and key['format']['args'][0] == 'auto':
+            name = key['id']
+            if name == 'popularity':
+                name = 'item__accessed__accessed'
+                value = ItemSort.objects.aggregate(Sum(name))['%s__sum'%name]
+            else:
+                value = ItemSort.objects.aggregate(Max(name))['%s__max'%name]
+            key['format']['args'][0] = value
 
-        #populate max values for percent requests
-        for key in filter(lambda k: 'format' in k, config['itemKeys']):
-            if key['format']['type'] == 'percent' and key['format']['args'][0] == 'auto':
-                name = key['id']
-                if name == 'popularity':
-                    name = 'item__accessed__accessed'
-                    value = ItemSort.objects.aggregate(Sum(name))['%s__sum'%name]
-                else:
-                    value = ItemSort.objects.aggregate(Max(name))['%s__max'%name]
-                key['format']['args'][0] = value
-
-        response['data']['site'] = config
+    response['data']['site'] = config
     if request.user.is_authenticated():
         response['data']['user'] = get_user_json(request.user)
     else:

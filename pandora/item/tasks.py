@@ -32,8 +32,12 @@ def update_streams(itemId):
         create stream, extract timeline and create derivatives
     '''
     item = models.Item.objects.get(itemId=itemId)
-    if item.files.filter(is_main=True, is_video=True, available=False).count() == 0:
-        item.update_streams()
+    videos = item.main_videos()
+    for video in videos:
+        for f in video.streams.filter(source=None):
+            f.extract_derivatives()
+    #if item.files.filter(is_main=True, is_video=True, available=False).count() == 0:
+    #    item.update_streams()
     return True
 
 def load_subtitles(itemId):
