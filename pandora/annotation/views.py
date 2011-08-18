@@ -166,7 +166,8 @@ def editAnnotation(request):
     '''
     response = json_response({})
     data = json.loads(request.POST['data'])
-    a = get_object_or_404_json(models.Annotation, pk=ox.from32(data['id']))
+    itemId, annotationId = data['id'].split('/')
+    a = get_object_or_404_json(models.Annotation, pk=ox.from32(annotationId))
     if a.editable(request.user):
         a.value = data['value']
         a.start = data['in']

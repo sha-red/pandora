@@ -40,7 +40,9 @@ def parseCondition(condition, user):
             return ~q
         else:
             return q
-    if k in ('id', 'places__id'):
+    if k == 'id':
+        v = ox.from32(v.split('/')[-1])
+    elif k in ('places__id', ):
         v = ox.from32(v)
     if isinstance(v, bool): #featured and public flag
         key = k

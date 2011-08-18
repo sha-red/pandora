@@ -101,7 +101,7 @@ class Annotation(models.Model):
             return self.value
 
     def get_id(self):
-        return ox.to32(self.id)
+        return '%s/%s' % (self.item.itemId, ox.to32(self.id))
 
     def json(self, layer=False, keys=None):
         j = {
