@@ -186,6 +186,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                 }), callback);
             },
             keys: ['id', 'value', 'in', 'out', 'aspectRatio', 'item'],
+            max: 1,
             size: 128,
             sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
             unique: 'id'
@@ -197,9 +198,58 @@ pandora.ui.list = function() { // fixme: remove view argument
                 pandora.UI.set('videoPosition|' + item, position);
                 pandora.URL.set(item + '/timeline');
             },
+            openpreview: function(data) {
+                var $video = $('.OxItem.OxSelected > .OxIcon > .OxVideoPlayer');
+                $video && $video.trigger('click');
+                that.closePreview();
+            },
             select: function(data) {
-                // fixme: clips ids should be 'itemId/annotationId'
-                pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info('1135952'));
+                if (data.ids.length) {
+                    var id = data.ids[0],
+                        item = id.split('/')[0], width, height,
+                        $img = $('.OxItem.OxSelected > .OxIcon > img'),
+                        $video = $('.OxItem.OxSelected > .OxIcon > .OxVideoPlayer');
+                    pandora.UI.set(['lists', pandora.user.ui.list, 'selected'].join('|'), item);
+                    pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info(data.ids[0].split('/')[0]));
+                    if ($img.length) {
+                        width = parseInt($img.css('width'));
+                        height = parseInt($img.css('height'));
+                        pandora.api.findAnnotations({
+                            query: {
+                                conditions:[{key: 'id', value: id, operator: '='}]
+                            },
+                            keys: ['in', 'out']
+                        }, function(result) {
+                            var $player = Ox.VideoPlayer({
+                                    height: height,
+                                    'in': result.data.items[0]['in'],
+                                    out: result.data.items[0].out,
+                                    paused: true,
+                                    playInToOut: true,
+                                    poster: '/' + item + '/' + height + 'p' + result.data.items[0]['in'] + '.jpg',
+                                    width: width,
+                                    video: '/' + item + '/96p.webm'
+                                })
+                                .addClass('OxTarget')
+                                .bind({
+                                    click: function() {
+                                        $player.$element.is('.OxSelectedVideo') && $player.togglePaused();
+                                    }
+                                });
+                            $img.replaceWith($player.$element);
+                            $('.OxSelectedVideo').removeClass('OxSelectedVideo');
+                            $player.$element.addClass('OxSelectedVideo');
+                        });
+                    } else if ($video.length) {
+                        // item select fires before video click
+                        // so we have to make sure that selecting
+                        // doesn't click through to play
+                        setTimeout(function() {
+                            $('.OxSelectedVideo').removeClass('OxSelectedVideo');
+                            $video.addClass('OxSelectedVideo');
+                        }, 25);
+                    }
+                }
             }
         });
     } else if (view == 'map') {
