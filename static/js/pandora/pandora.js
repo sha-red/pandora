@@ -144,6 +144,21 @@ pandora.getListData = function() {
     return data;
 };
 
+pandora.getVideoPartAndPosition = function(durations, position) {
+    var duration = 0, ret;
+    Ox.forEach(durations, function(d, i) {
+        if (duration + d > position) {
+            ret = {
+                part: i,
+                position: position - duration
+            }
+            return false;
+        }
+        duration += d;
+    });
+    return ret;
+};
+
 pandora.reloadList = function() {
     Ox.print('reloadList')
     var listData = pandora.getListData();
