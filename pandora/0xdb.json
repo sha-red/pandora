@@ -347,6 +347,13 @@
             "format": {"type": "unit", "args": ["kbps"]}
         },
         {
+            "id": "parts",
+            "title": "Parts",
+            "type": "integer",
+            "columnWidth": 60,
+            "rightsLevel": 1
+        },
+        {
             "id": "numberoffiles",
             "title": "Number of Files",
             "type": "integer",

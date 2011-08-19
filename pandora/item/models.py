@@ -792,49 +792,16 @@ class Item(models.Model):
         return [video.streams.filter(source=None)[0] for video in self.main_videos()]
 
     def update_streams(self, force=False):
-        files = {}
-        for f in self.main_videos():
-            files[utils.sort_title(f.name)] = f.video.path
-        if force or self.stream_info != files:
-            self.stream_info = files
-            stream, created = Stream.objects.get_or_create(item=self,
-                                                           profile=settings.VIDEO_PROFILE)
-            stream.video.name = stream.path()
-            cmd = []
-            if os.path.exists(stream.video.path):
-                os.unlink(stream.video.path)
-            ox.makedirs(os.path.dirname(stream.video.path))
-            if len(files.values()) > 1:
-                if len(files.values()) > 4:
-                    print "FIXME: to many files for this item, not merging entire tv shows"
-                    return
-                for f in sorted(files):
-                    cmd.append('+')
-                    cmd.append(files[f])
-                cmd = [ 'mkvmerge', '-o', stream.video.path ] + cmd[1:]
-                #print cmd
-                p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
-                                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                #p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
-                p.wait()
-            else:
-                os.symlink(files.values()[0], stream.video.path)
-            stream.save()
-
-            self.make_timeline()
-            if 'video' in stream.info and stream.info['video']:
-                v = stream.info['video'][0]
-                self.stream_aspect = v['width']/v['height']
-                self.data['cuts'] = extract.cuts(self.timeline_prefix)
-                self.data['color'] = extract.average_color(self.timeline_prefix)
-                #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
-
-            stream.extract_derivatives()
-            self.make_local_poster()
-            self.make_poster()
-            self.make_icon()
-            self.rendered = files != {} 
-            self.save()
+        streams = self.streams()
+        self.make_timeline()
+        self.data['cuts'] = extract.cuts(self.timeline_prefix)
+        self.data['color'] = extract.average_color(self.timeline_prefix)
+        #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
+        self.make_local_poster()
+        self.make_poster()
+        self.make_icon()
+        self.rendered = streams != []
+        self.save()
 
     '''
         Poster related functions
@@ -886,7 +853,9 @@ class Item(models.Model):
         return None
 
     def make_timeline(self):
-        print "FIXME, needs to build timeline from parts"
+        streams = self.streams()
+        if len(streams) > 1:
+            print "FIXME, needs to build timeline from parts"
 
     def make_poster(self, force=False):
         if not self.poster or force:
@@ -963,7 +932,7 @@ class Item(models.Model):
             if frames and len(frames) > int(self.poster_frame):
                 return frames[int(self.poster_frame)]['path']
             else:
-                size = int(settings.VIDEO_PROFILE.split('.')[0][:-1])
+                size = site_config()['video']['resolutions'][0]
                 return self.frame(self.poster_frame, size)
 
         if frames:

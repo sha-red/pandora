@@ -697,4 +697,6 @@ def video(request, id, resolution, format, index=None):
             response = HttpFileResponse(path, content_type=content_type)
             response['Content-Disposition'] = 'attachment; filename="%s"' % filename
             return response
+    if not settings.XSENDFILE and not settings.XACCELREDIRECT:
+        return redirect(stream.video.url)
     return HttpFileResponse(path)

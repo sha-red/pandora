@@ -14,6 +14,7 @@ from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 from ox.django.views import task_status
 
+from app.models import site_config
 from item import utils
 from item.models import get_item
 from item.views import parse_query
@@ -111,7 +112,8 @@ actions.register(update, cache=False)
 
 @login_required_json
 def encodingProfile(request):
-    profile = "%sp.%s" % (settings.VIDEO_RESOLUTIONS[0], settings.VIDEO_FORMATS[0])
+    config = site_config()['video']
+    profile = "%sp.%s" % (config['resolutions'][0], config['formats'][0])
     response = json_response({'profile': profile})
     return render_to_json_response(response)
 actions.register(encodingProfile)
@@ -166,13 +168,16 @@ class VideoChunkForm(forms.Form):
 def firefogg_upload(request):
     profile = request.GET['profile']
     oshash = request.GET['id']
+    config = site_config()['video']
+    video_profile = "%sp.%s" % (config['resolutions'][0], config['formats'][0])
+
     #handle video upload
     if request.method == 'POST':
         #post next chunk
         if 'chunk' in request.FILES and oshash:
             f = get_object_or_404(models.File, oshash=oshash)
             form = VideoChunkForm(request.POST, request.FILES)
-            if form.is_valid() and profile == settings.VIDEO_PROFILE and f.editable(request.user):
+            if form.is_valid() and profile == video_profile and f.editable(request.user):
                 c = form.cleaned_data['chunk']
                 chunk_id = form.cleaned_data['chunkId']
                 response = {
@@ -194,7 +199,7 @@ def firefogg_upload(request):
                     response['done'] = 1
                 return render_to_json_response(response)
         #init upload
-        elif oshash and profile == settings.VIDEO_PROFILE:
+        elif oshash and profile == video_profile:
             #404 if oshash is not know, files must be registered via update api first
             f = get_object_or_404(models.File, oshash=oshash)
             if f.editable(request.user):

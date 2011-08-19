@@ -17,6 +17,7 @@ import ox
 from ox.normalize import canonicalTitle
 import chardet
 
+from app.models import site_config
 from item import utils
 from item.models import Item
 from person.models import get_name_sort
@@ -248,10 +249,11 @@ class File(models.Model):
 
     def save_chunk(self, chunk, chunk_id=-1, done=False):
         if not self.available:
+            config = site_config()['video']
             stream, created = Stream.objects.get_or_create(
                         file=self,
-                        resolution=settings.VIDEO_RESOLUTIONS[0],
-                        format=settings.VIDEO_FORMATS[0])
+                        resolution=config['resolutions'][0],
+                        format=config['formats'][0])
             if created:
                 stream.video.save(stream.name(), chunk)
             else:
@@ -489,9 +491,9 @@ class Stream(models.Model):
         return self.file.path(name)
 
     def extract_derivatives(self):
-        self.make_timeline()
-        for resolution in settings.VIDEO_RESOLUTIONS:
-            for f in settings.VIDEO_FORMATS:
+        config = site_config()['video']
+        for resolution in config['resolutions']:
+            for f in config['formats']:
                 derivative, created = Stream.objects.get_or_create(file=self.file,
                                                   resolution=resolution, format=f)
                 if created:
