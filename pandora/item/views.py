@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 import os.path
-from datetime import datetime
+from datetime import datetime, timedelta
 import mimetypes
 
 from django.db.models import Count, Sum, Max
@@ -22,7 +22,7 @@ import models
 import utils
 import tasks
 
-from archive.models import File
+from archive.models import File, Stream
 from archive import extract
 from annotation.models import Annotation
 
@@ -658,14 +658,13 @@ def video(request, id, resolution, format, index=None):
         index = int(index) - 1
     else:
         index = 0
-    videos = item.main_videos()
-    if index > len(videos):
+    streams= Stream.objects.filter(file__item__itemId=item.itemId,
+                                   resolution=resolution, format=format)
+    if index > streams.count():
         raise Http404
-
-    stream = videos[index].streams.filter(resolution=resolution, format=format)
-    if stream.count() == 0:
+    stream = streams[index]
+    if not stream.available or not stream.video:
         raise Http404
-    stream = stream[0]
     path = stream.video.path
 
     #server side cutting
@@ -699,4 +698,6 @@ def video(request, id, resolution, format, index=None):
             return response
     if not settings.XSENDFILE and not settings.XACCELREDIRECT:
         return redirect(stream.video.url)
-    return HttpFileResponse(path)
+    response = HttpFileResponse(path)
+    response['Cache-Control'] = 'public'
+    return response
