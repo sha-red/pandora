@@ -214,7 +214,11 @@ pandora.ui.list = function() { // fixme: remove view argument
             },
             openpreview: function(data) {
                 var $video = $('.OxItem.OxSelected > .OxIcon > .OxVideoPlayer');
-                $video && $video.trigger('mousedown');
+                if ($video) {
+                    // trigger singleclick
+                    $video.trigger('mousedown');
+                    Ox.UI.$window.trigger('mouseup');
+                }
                 $video && Ox.print('OPENPREVIEW!!!@!')
                 that.closePreview();
             },
@@ -245,11 +249,6 @@ pandora.ui.list = function() { // fixme: remove view argument
                                     })
                                 })
                                 .addClass('OxTarget')
-                                .bind({
-                                    mousedown: function() {
-                                        Ox.print('MOUSEDOWN...')
-                                    }
-                                })
                                 .bindEvent({
                                     // doubleclick opens item
                                     singleclick: function() {
