@@ -791,7 +791,7 @@ class Item(models.Model):
     def streams(self):
         return [video.streams.filter(source=None)[0] for video in self.main_videos()]
 
-    def update_streams(self, force=False):
+    def update_timeline(self, force=False):
         streams = self.streams()
         self.make_timeline()
         self.data['cuts'] = extract.cuts(self.timeline_prefix)

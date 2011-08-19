@@ -89,3 +89,12 @@ def update_files(user, volume, files):
     #FIXME: can this have any bad consequences? i.e. on the selction of used item files.
     models.Instance.objects.filter(volume=volume).exclude(file__oshash__in=all_files).delete()
 
+@task(queue="encoding")
+def process_stream(fileId):
+    file = models.Stream.objects.get(id=fileId)
+    streams = file.streams.filter(source=None)
+    if streams.count() >0:
+        stream = streams[0]
+        stream.make_timeline()
+        stream.extract_derivatives()
+    return True

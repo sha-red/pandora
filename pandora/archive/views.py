@@ -191,7 +191,7 @@ def firefogg_upload(request):
                     f.save()
                     #FIXME: this fails badly if rabbitmq goes down
                     try:
-                        t = item.tasks.update_streams.delay(f.item.itemId)
+                        t = tasks.process_stream.delay(f.id)
                         response['resultUrl'] = t.task_id
                     except:
                         pass
@@ -270,7 +270,7 @@ def moveFiles(request):
         else:
             c.rendered = False
             c.save()
-            item.tasks.update_streams.delay(itemId)
+            item.tasks.update_timeline.delay(itemId)
     response = json_response(text='updated')
     response['data']['itemId'] = i.itemId
     return render_to_json_response(response)

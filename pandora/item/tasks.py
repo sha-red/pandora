@@ -25,20 +25,10 @@ def update_external(itemId):
     item = models.Item.objects.get(itemId=itemId)
     item.update_external()
 
-
-@task(queue="encoding")
-def update_streams(itemId):
-    '''
-        create stream, extract timeline and create derivatives
-    '''
+@task(queue="default")
+def update_timeline(itemId):
     item = models.Item.objects.get(itemId=itemId)
-    videos = item.main_videos()
-    for video in videos:
-        for f in video.streams.filter(source=None):
-            f.extract_derivatives()
-    #if item.files.filter(is_main=True, is_video=True, available=False).count() == 0:
-    #    item.update_streams()
-    return True
+    item.update_timeline()
 
 def load_subtitles(itemId):
     item = models.Item.objects.get(itemId=itemId)
