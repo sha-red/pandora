@@ -110,7 +110,7 @@ pandora.URL = (function() {
             var oldUserUI = Ox.clone(pandora.user.ui);
             Ox.Request.cancel();
             $('video').each(function() {
-                $(this).trigger('ended');
+                $(this).trigger('stop');
             });
             this.parse();
             if (pandora.user.ui.section != oldUserUI.section) {
