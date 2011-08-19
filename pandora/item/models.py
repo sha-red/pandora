@@ -433,7 +433,8 @@ class Item(models.Model):
         streams = self.streams()
         i['durations'] = [s.duration for s in streams]
         i['duration'] = sum(i['durations'])
-        if streams:
+        i['parts'] = len(i['durations'])
+        if i['parts']:
             i['videoRatio'] = streams[0].aspect_ratio
 
         #only needed by admins
