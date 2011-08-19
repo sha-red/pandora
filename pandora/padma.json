@@ -446,7 +446,7 @@
     },
     "userLevels": ["guest", "member", "staff", "admin"],
     "video": {
-        "formats": ["webm", "h264"],
+        "formats": ["webm", "mp4"],
         "resolutions": [480, 240, 96]
     }
 }
