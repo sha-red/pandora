@@ -214,7 +214,7 @@ pandora.ui.list = function() { // fixme: remove view argument
             },
             openpreview: function(data) {
                 var $video = $('.OxItem.OxSelected > .OxIcon > .OxVideoPlayer');
-                $video && $video.trigger('click');
+                $video && $video.trigger('mousedown');
                 $video && Ox.print('OPENPREVIEW!!!@!')
                 that.closePreview();
             },
