@@ -168,15 +168,14 @@ pandora.ui.list = function() { // fixme: remove view argument
         that = Ox.IconList({
             fixedRatio: fixedRatio,
             item: function(data, sort, size) {
-                Ox.print('DATA', data)
                 size = size || 128;
                 var ratio = data.videoRatio,
                     width = ratio > fixedRatio ? size : Math.round(size * ratio / fixedRatio),
                     height = Math.round(width / ratio),
-                    url = '/' + data.item + '/' + height + 'p' + data['in'] + '.jpg';
+                    url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg';
                 return {
                     height: height,
-                    id: data['id'],
+                    id: data.id,
                     info: Ox.formatDuration(data['in'], 'short') + ' - ' + Ox.formatDuration(data['out'], 'short'),
                     title: data.value,
                     url: url,
@@ -197,7 +196,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                     itemQuery: itemQuery
                 }), callback);
             },
-            keys: ['id', 'value', 'in', 'out', 'video', 'videoRatio', 'item'],
+            keys: ['id', 'value', 'in', 'out', 'videoRatio'],
             max: 1,
             size: 128,
             sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
@@ -208,7 +207,7 @@ pandora.ui.list = function() { // fixme: remove view argument
             },
             open: function(data) {
                 var id = data.ids[0],
-                    item = that.value(id, 'item'),
+                    item = id.split('/')[0],
                     position = that.value(id, 'in');
                 pandora.UI.set('videoPosition|' + item, position);
                 pandora.URL.set(item + '/timeline');
@@ -216,6 +215,7 @@ pandora.ui.list = function() { // fixme: remove view argument
             openpreview: function(data) {
                 var $video = $('.OxItem.OxSelected > .OxIcon > .OxVideoPlayer');
                 $video && $video.trigger('click');
+                $video && Ox.print('OPENPREVIEW!!!@!')
                 that.closePreview();
             },
             select: function(data) {
@@ -227,23 +227,22 @@ pandora.ui.list = function() { // fixme: remove view argument
                     pandora.UI.set(['lists', pandora.user.ui.list, 'selected'].join('|'), item);
                     pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info(data.ids[0].split('/')[0]));
                     if ($img.length) {
-                        width = parseInt($img.css('width'));
-                        height = parseInt($img.css('height'));
-                        pandora.api.findAnnotations({
-                            query: {
-                                conditions:[{key: 'id', value: id, operator: '='}]
-                            },
-                            keys: ['in', 'out']
-                        }, function(result) {
-                            var $player = Ox.VideoPlayer({
+                        var width = parseInt($img.css('width')),
+                            height = parseInt($img.css('height'));
+                        pandora.api.get({id: item, keys: ['parts']}, function(result) {
+                            var inPoint = that.value(id, 'in'),
+                                outPoint = that.value(id, 'out'),
+                                $player = Ox.VideoPlayer({
                                     height: height,
-                                    'in': result.data.items[0]['in'],
-                                    out: result.data.items[0].out,
+                                    'in': inPoint,
+                                    out: outPoint,
                                     paused: true,
                                     playInToOut: true,
-                                    poster: '/' + item + '/' + height + 'p' + result.data.items[0]['in'] + '.jpg',
+                                    poster: '/' + item + '/' + height + 'p' + that.value(id, 'in') + '.jpg',
                                     width: width,
-                                    video: '/' + item + '/96p.webm'
+                                    video: Ox.range(result.data.parts).map(function(i) {
+                                        return '/' + item + '/96p' + (i + 1) + '.' + pandora.user.videoFormat
+                                    })
                                 })
                                 .addClass('OxTarget')
                                 .bindEvent({
