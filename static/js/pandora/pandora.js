@@ -144,17 +144,26 @@ pandora.getListData = function() {
     return data;
 };
 
-pandora.getVideoPartAndPosition = function(durations, position) {
-    var duration = 0, ret;
-    Ox.forEach(durations, function(d, i) {
-        if (duration + d > position) {
-            ret = {
-                part: i,
-                position: position - duration
+pandora.getVideoPartsAndPoints = function(durations, points) {
+    var parts = durations.length,
+        offsets = Ox.range(parts).map(function(i) {
+            return Ox.sum(Ox.sub(durations, 0, i));
+        }),
+        ret = {
+            parts: [],
+            points: []
+        };
+    points.forEach(function(point, i) {
+        Ox.loop(parts - 1, -1, -1, function(i) {
+            if (offsets[i] <= point) {
+                ret.parts[i] = i;
+                return false;
             }
-            return false;
-        }
-        duration += d;
+        });
+    });
+    ret.parts = Ox.unique(ret.parts);
+    ret.points = points.map(function(point) {
+        return point - offsets[ret.parts[0]];
     });
     return ret;
 };

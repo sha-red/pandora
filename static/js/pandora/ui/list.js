@@ -233,18 +233,18 @@ pandora.ui.list = function() { // fixme: remove view argument
                     if ($img.length) {
                         var width = parseInt($img.css('width')),
                             height = parseInt($img.css('height'));
-                        pandora.api.get({id: item, keys: ['parts']}, function(result) {
-                            var inPoint = that.value(id, 'in'),
-                                outPoint = that.value(id, 'out'),
+                        pandora.api.get({id: item, keys: ['durations']}, function(result) {
+                            var points = [that.value(id, 'in'), that.value(id, 'out')],
+                                partsAndPoints = pandora.getVideoPartsAndPoints(result.data.durations, points),
                                 $player = Ox.VideoPlayer({
                                     height: height,
-                                    'in': inPoint,
-                                    out: outPoint,
+                                    'in': partsAndPoints.points[0],
+                                    out: partsAndPoints.points[1],
                                     paused: true,
                                     playInToOut: true,
-                                    poster: '/' + item + '/' + height + 'p' + that.value(id, 'in') + '.jpg',
+                                    poster: '/' + item + '/' + height + 'p' + points[0] + '.jpg',
                                     width: width,
-                                    video: Ox.range(result.data.parts).map(function(i) {
+                                    video: partsAndPoints.parts.map(function(i) {
                                         return '/' + item + '/96p' + (i + 1) + '.' + pandora.user.videoFormat
                                     })
                                 })
