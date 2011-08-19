@@ -112,7 +112,11 @@ pandora.ui.list = function() { // fixme: remove view argument
             unique: 'id'
         });
     } else if (view == 'info') {
-        that = Ox.IconList({
+        that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
+    } else if (view == 'clips') {
+        that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
+    } else if (view == 'timelines') {
+        that = Ox.InfoList({
             borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 16,
             defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
             id: 'list',
@@ -132,22 +136,16 @@ pandora.ui.list = function() { // fixme: remove view argument
                 };
             },
             items: function(data, callback) {
-                //Ox.print('data, pandora.Query.toObject', data, pandora.Query.toObject())
                 pandora.api.find($.extend(data, {
                     query: pandora.Query.toObject()
                 }), callback);
             },
-            keys: ['director', 'id', 'poster', 'title', 'year'],
-            orientation: 'vertical',
+            keys: ['director', 'duration', 'id', 'poster', 'title', 'year'],
             selected: pandora.user.ui.lists[pandora.user.ui.list].selected,
-            size: 128,
+            size: 192,
             sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
             unique: 'id'
-        });
-    } else if (view == 'clips') {
-        that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
-    } else if (view == 'timelines') {
-        that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
+        });        
     } else if (view == 'maps') {
         that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
     } else if (view == 'calendars') {
@@ -231,8 +229,9 @@ pandora.ui.list = function() { // fixme: remove view argument
                                     video: '/' + item + '/96p.webm'
                                 })
                                 .addClass('OxTarget')
-                                .bind({
-                                    click: function() {
+                                .bindEvent({
+                                    // doubleclick opens item
+                                    singleclick: function() {
                                         $player.$element.is('.OxSelectedVideo') && $player.togglePaused();
                                     }
                                 });
@@ -247,7 +246,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                         setTimeout(function() {
                             $('.OxSelectedVideo').removeClass('OxSelectedVideo');
                             $video.addClass('OxSelectedVideo');
-                        }, 25);
+                        }, 300);
                     }
                 }
             }
