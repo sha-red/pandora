@@ -268,6 +268,8 @@ pandora.ui.list = function() { // fixme: remove view argument
                             $video.addClass('OxSelectedVideo');
                         }, 300);
                     }
+                } else {
+                    $('.OxSelectedVideo').removeClass('OxSelectedVideo');
                 }
             }
         });
