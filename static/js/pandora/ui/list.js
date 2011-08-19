@@ -123,16 +123,29 @@ pandora.ui.list = function() { // fixme: remove view argument
             item: function(data, sort, size) {
                 var icons = pandora.user.ui.icons,
                     ratio = icons == 'posters' ? data.poster.width / data.poster.height : 1;
-                size = size || 128;
+                size = 128;
                 return {
-                    height: ratio <= 1 ? size : size / ratio,
-                    id: data.id,
-                    info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
-                    title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
-                    url: icons == 'posters' 
-                        ? '/' + data.id + '/poster' + size + '.jpg'
-                        : '/' + data.id + '/icon' + size + '.jpg',
-                    width: ratio >= 1 ? size : size * ratio
+                    icon: {
+                        height: ratio <= 1 ? size : size / ratio,
+                        id: data.id,
+                        info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
+                        title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
+                        url: icons == 'posters' 
+                            ? '/' + data.id + '/poster' + size + '.jpg'
+                            : '/' + data.id + '/icon' + size + '.jpg',
+                        width: ratio >= 1 ? size : size * ratio    
+                    },
+                    info: {
+                        css: {
+                            margin: '-4px 0 0 -4px'
+                        },
+                        element: Ox.BlockVideoTimeline,
+                        id: data.id,
+                        options: {
+                            duration: data.duration,
+                            getImageURL: '/' + data.id + '/timeline16p.png'                            
+                        }
+                    }
                 };
             },
             items: function(data, callback) {
@@ -189,6 +202,9 @@ pandora.ui.list = function() { // fixme: remove view argument
             sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
             unique: 'id'
         }).bindEvent({
+            init: function(data) {
+                pandora.$ui.total.html(pandora.ui.status('total', data));
+            },
             open: function(data) {
                 var id = data.ids[0],
                     item = that.value(id, 'item'),

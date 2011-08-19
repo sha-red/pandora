@@ -39,7 +39,11 @@ pandora.ui.rightPanel = function() {
                 if (!pandora.user.ui.item) {
                     pandora.resizeGroups(data);
                     pandora.$ui.list.size();
-                    if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'map') {
+                    if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'timelines') {
+                        pandora.$ui.list.options({
+                            width: data
+                        });
+                    } else if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'map') {
                         pandora.$ui.map.resizeMap();
                     }
                 } else {

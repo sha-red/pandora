@@ -544,6 +544,7 @@
             "videoScale": "fit",
             "videoMuted": false,
             "videoSize": "small",
+            "videoView": "player",
             "videoVolume": 1
         },
         "username": ""

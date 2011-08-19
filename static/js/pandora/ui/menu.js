@@ -79,13 +79,18 @@ pandora.ui.mainMenu = function() {
                         }) }
                     ] },
                     {},
-                    { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], disabled: true, items: [
+                    { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], items: [
                         { group: 'movieview', min: 1, max: 1, items: $.map(pandora.site.itemViews, function(view, i) {
                             return Ox.extend({
                                 checked: pandora.user.ui.itemView == view.id,
                             }, view);
                         }) },
                     ]},
+                    { id: 'openvideo', title: 'Open Video Links', items: [
+                        { group: 'videoview', min: 1, max: 1, items: ['player', 'editor'].map(function(view) {
+                            return {id: view, title: Ox.toTitleCase(view), checked: pandora.user.ui.videoView == view};
+                        }) }
+                    ] },
                     {},
                     { id: 'lists', title: 'Hide Lists', keyboard: 'shift l' },
                     { id: 'info', title: 'Hide Info', keyboard: 'shift i' },
