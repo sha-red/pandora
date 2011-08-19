@@ -245,6 +245,11 @@ pandora.ui.list = function() { // fixme: remove view argument
                                     })
                                 })
                                 .addClass('OxTarget')
+                                .bind({
+                                    mousedown: function() {
+                                        Ox.print('MOUSEDOWN...')
+                                    }
+                                })
                                 .bindEvent({
                                     // doubleclick opens item
                                     singleclick: function() {
