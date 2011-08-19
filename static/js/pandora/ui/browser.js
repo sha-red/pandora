@@ -43,7 +43,7 @@ pandora.ui.browser = function() {
             id: 'list',
             item: function(data, sort, size) {
                 var icons = pandora.user.ui.icons,
-                    ratio = icons == 'posters' ? data.poster.width / data.poster.height : 1;
+                    ratio = icons == 'posters' ? data.posterRatio : 1;
                 size = size || 64;
                 return {
                     height: ratio <= 1 ? size : size / ratio,
@@ -61,7 +61,7 @@ pandora.ui.browser = function() {
                     query: pandora.Query.toObject()
                 }), callback);
             },
-            keys: ['director', 'id', 'poster', 'title', 'year'],
+            keys: ['director', 'id', 'posterRatio', 'title', 'year'],
             max: 1,
             min: 1,
             orientation: 'horizontal',

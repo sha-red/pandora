@@ -10,7 +10,7 @@ pandora.ui.infoView = function(data) {
         margin = 16,
         iconSize = pandora.user.ui.infoIconSize,
         iconRatio = pandora.user.ui.icons == 'posters'
-            ? data.poster.width / data.poster.height : 1,
+            ? data.posterRatio : 1,
         iconWidth = iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio),
         iconHeight = iconRatio < 1 ? iconSize : Math.round(iconSize / iconRatio),
         iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
@@ -501,7 +501,7 @@ pandora.ui.infoView = function(data) {
         $reflectionIcon.attr({src: src});
         iconSize = iconSize == 256 ? 512 : 256;
         iconRatio = pandora.user.ui.icons == 'posters'
-            ? data.poster.width / data.poster.height : 1;
+            ? data.posterRatio : 1;
         toggleIconSize();
         pandora.user.level == 'admin' && $list.replaceWith($list = renderList());
     };

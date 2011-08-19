@@ -86,7 +86,7 @@ pandora.ui.list = function() { // fixme: remove view argument
             id: 'list',
             item: function(data, sort, size) {
                 var icons = pandora.user.ui.icons,
-                    ratio = icons == 'posters' ? data.poster.width / data.poster.height : 1;
+                    ratio = icons == 'posters' ? data.posterRatio : 1;
                 size = size || 128;
                 return {
                     height: ratio <= 1 ? size : size / ratio,
@@ -105,7 +105,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                     query: pandora.Query.toObject()
                 }), callback);
             },
-            keys: ['director', 'id', 'poster', 'title', 'year'],
+            keys: ['director', 'id', 'posterRatio', 'title', 'year'],
             selected: pandora.user.ui.lists[pandora.user.ui.list].selected,
             size: 128,
             sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
@@ -122,7 +122,7 @@ pandora.ui.list = function() { // fixme: remove view argument
             id: 'list',
             item: function(data, sort, size) {
                 var icons = pandora.user.ui.icons,
-                    ratio = icons == 'posters' ? data.poster.width / data.poster.height : 1;
+                    ratio = icons == 'posters' ? data.posterRatio : 1;
                 size = 128;
                 return {
                     icon: {
@@ -153,7 +153,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                     query: pandora.Query.toObject()
                 }), callback);
             },
-            keys: ['director', 'duration', 'id', 'poster', 'title', 'year'],
+            keys: ['director', 'duration', 'id', 'posterRatio', 'title', 'year'],
             selected: pandora.user.ui.lists[pandora.user.ui.list].selected,
             size: 192,
             sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
@@ -441,7 +441,7 @@ pandora.ui.list = function() { // fixme: remove view argument
         openpreview: function(data) {
             pandora.requests.preview && pandora.api.cancel(pandora.requests.preview);
             pandora.requests.preview = pandora.api.find({
-                keys: ['director', 'id', 'poster', 'title'],
+                keys: ['director', 'id', 'posterRatio', 'title'],
                 query: {
                     conditions: $.map(data.ids, function(id, i) {
                         return {
@@ -454,8 +454,8 @@ pandora.ui.list = function() { // fixme: remove view argument
                 }
             }, function(result) {
                 var item = result.data.items[0],
-                    title = item.title + ' (' + item.director + ')'
-                    ratio = item.poster.width / item.poster.height,
+                    title = item.title + ' (' + item.director + ')',
+                    ratio = item.posterRatio,
                     windowWidth = window.innerWidth * 0.8,
                     windowHeight = window.innerHeight * 0.8,
                     windowRatio = windowWidth / windowHeight,

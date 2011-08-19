@@ -12,8 +12,8 @@ pandora.ui.info = function(id) {
     if (id) {
         if (!pandora.user.ui.item && pandora.user.ui.lists[pandora.user.ui.list].listView == 'clip') {
             // Poster
-            pandora.api.get({id: id, keys: ['poster']}, function(result) {
-                var ratio = result.data.poster.width / result.data.poster.height,
+            pandora.api.get({id: id, keys: ['posterRatio']}, function(result) {
+                var ratio = result.data.posterRatio,
                     height = pandora.user.ui.sidebarSize;
                 that.empty().append(
                     $('<img>').attr({

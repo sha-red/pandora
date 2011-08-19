@@ -119,7 +119,7 @@ pandora.ui.item = function() {
                 /*
                 $.get('/static/html/itemInfo.html', {}, function(template) {
                     //Ox.print(template);
-                    var posterRatio = result.data.poster.width / result.data.poster.height;
+                    var posterRatio = result.data.posterRatio;
                     result.data.posterWidth = posterRatio > 1 ? 256 : Math.round(256 * posterRatio);
                     result.data.posterHeight = posterRatio < 1 ? 256 : Math.round(256 / posterRatio);
                     result.data.posterLeft = Math.floor((256 - result.data.posterWidth) / 2);
