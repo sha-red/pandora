@@ -484,7 +484,7 @@ def setPoster(request): #parse path and return info
             item.save()
             tasks.update_poster(item.itemId)
             response = json_response()
-            response['data']['poster'] = item.get_poster()
+            response['data']['posterAspect'] = item.poster_width/item.poster_height
         else:
             response = json_response(status=403, text='invalid poster url')
     else:

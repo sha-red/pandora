@@ -238,7 +238,8 @@ class Item(models.Model):
                     t = re.sub('<a href="(/title/.*?/)">(.*?)</a>', fix_titles, t)
                     return t
                 data['trivia'] = [fix_links(t) for t in data['trivia']]
-
+            if 'aspectratio' in data:
+                data['aspectRatio'] = data.pop('aspectratio')
             #filter reviews
             self.external_data = data
             self.save()
@@ -317,13 +318,6 @@ class Item(models.Model):
         self.delete()
         other.save()
         #FIXME: update poster, stills and streams after this
-
-    def get_poster(self):
-        poster = {}
-        poster['width'] = self.poster_width
-        poster['height'] = self.poster_height
-        poster['url'] = '/%s/poster.jpg' % self.itemId
-        return poster
 
     def get_posters(self):
         url = self.prefered_poster_url()
@@ -433,12 +427,14 @@ class Item(models.Model):
         if 'cast' in i and isinstance(i['cast'][0], list):
             i['cast'] = map(lambda x: {'actor': x[0], 'character': x[1]}, i['cast'])
 
-        if not keys or 'poster' in keys:
-            i['poster'] = self.get_poster()
+        if not keys or 'posterRatio' in keys:
+            i['posterRatio'] = self.poster_width / self.poster_height
 
-        i['durations'] = [s.duration for s in self.streams()]
+        streams = self.streams()
+        i['durations'] = [s.duration for s in streams]
         i['duration'] = sum(i['durations'])
-        i['apsectRatio'] = i.get('aspectratio')
+        if streams:
+            i['videoRatio'] = streams[0].aspect_ratio
 
         #only needed by admins
         if keys and 'posters' in keys:
