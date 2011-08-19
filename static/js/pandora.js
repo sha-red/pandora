@@ -81,7 +81,8 @@ Ox.load('Geo', function() {
                 $.extend(pandora.user, {
                     infoRatio: 16 / 9,
                     sectionElement: 'buttons',
-                    selectedMovies: []
+                    selectedMovies: [],
+                    videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
                 });
                 // fixme: this should not happen
                 if (!pandora.user.ui.lists[pandora.user.ui.list]) {

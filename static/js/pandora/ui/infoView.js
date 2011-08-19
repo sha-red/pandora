@@ -501,7 +501,7 @@ pandora.ui.infoView = function(data) {
         $reflectionIcon.attr({src: src});
         iconSize = iconSize == 256 ? 512 : 256;
         iconRatio = pandora.user.ui.icons == 'posters'
-            ? data.posterRatio : 1;
+            ? data.poster.width / data.poster.height : 1;
         toggleIconSize();
         pandora.user.level == 'admin' && $list.replaceWith($list = renderList());
     };

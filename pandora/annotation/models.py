@@ -121,8 +121,10 @@ class Annotation(models.Model):
                 if key in j:
                     _j[key] = j[key]
             j = _j
-            if 'aspectRatio' in keys:
-                j['aspectRatio'] = self.item.stream_aspect
+            if 'videoRatio' in keys:
+                streams = self.item.streams()
+                if streams:
+                    j['videoRatio'] = streams[0].aspect_ratio
             if 'item' in keys:
                 j['item'] = self.item.itemId
         return j

@@ -2,14 +2,14 @@
 
 pandora.ui.videoPreview = function(data) {
     var frameWidth = pandora.user.ui.sidebarSize,
-        frameHeight = Math.round(frameWidth / data.video.aspectRatio),
+        frameHeight = Math.round(frameWidth / data.ratio),
         that = Ox.VideoPreview({
-            duration: data.video.duration,
+            duration: data.duration,
             getFrame: function(position) {
                 var width = pandora.user.ui.sidebarSize,
                     height = Math.round(width / pandora.user.infoRatio),
-                    resolution = Ox.filter(pandora.site.resolutions, function(resolution, i) {
-                        return resolution >= height || i == pandora.site.resolutions.length - 1;
+                    resolution = Ox.filter(pandora.site.video.resolutions, function(resolution, i) {
+                        return resolution >= height || i == pandora.site.video.resolutions.length - 1;
                     })[0];
                 return '/' + data.id + '/' + resolution + 'p' + (
                     Ox.isUndefined(position) ? '' : position

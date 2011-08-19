@@ -444,5 +444,9 @@
         },
         "username": ""
     },
-    "userLevels": ["guest", "member", "staff", "admin"]
+    "userLevels": ["guest", "member", "staff", "admin"],
+    "video": {
+        "formats": ["webm", "h264"],
+        "resolutions": [480, 240, 96]
+    }
 }

@@ -116,18 +116,6 @@ pandora.ui.item = function() {
                             }
                         })
                 );
-                /*
-                $.get('/static/html/itemInfo.html', {}, function(template) {
-                    //Ox.print(template);
-                    var posterRatio = result.data.posterRatio;
-                    result.data.posterWidth = posterRatio > 1 ? 256 : Math.round(256 * posterRatio);
-                    result.data.posterHeight = posterRatio < 1 ? 256 : Math.round(256 / posterRatio);
-                    result.data.posterLeft = Math.floor((256 - result.data.posterWidth) / 2);
-                    pandora.$ui.contentPanel.replaceElement(1,
-                        pandora.$ui.item = Ox.Element().append($.tmpl(template, result.data))
-                    );
-                });
-                */
             }
 
         } else if (pandora.user.ui.itemView == 'map') {
@@ -221,21 +209,20 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'player') {
             // fixme: duplicated
             var layers = [],
-                video = result.data.stream,
-                cuts = result.data.cuts || [],
-                format = $.support.video.supportedFormat(pandora.site.formats),
-                streams = {};
-            video.height = pandora.site.resolutions[0];
-            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
-            pandora.site.resolutions.forEach(function(resolution) {
-                streams[resolution] = video.baseUrl + '/' + resolution + 'p.' + format;
-            });
+                video = {};
             $.each(pandora.site.layers, function(i, layer) {
                 layers[i] = $.extend({}, layer, {items: result.data.layers[layer.id]});
+            });
+            pandora.site.video.resolutions.forEach(function(resolution) {
+                video[resolution] = Ox.range(result.data.parts).map(function(i) {
+                    return '/' + pandora.user.ui.item + '/'
+                        + resolution + 'p' + (i + 1) + '.' + pandora.user.videoFormat;
+                });
             });
             //
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.player = Ox.VideoPanelPlayer({
                 annotationsSize: pandora.user.ui.annotationsSize,
+                cuts: result.data.cuts || [],
                 duration: video.duration,
                 getTimelineImageURL: function(i) {
                     return '/' + pandora.user.ui.item + '/timeline64p' + i + '.png';
@@ -250,10 +237,7 @@ pandora.ui.item = function() {
                     return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
                 }) : [],
                 timeline: '/' + pandora.user.ui.item + '/timeline16p.png',
-                video: streams,
-                videoHeight: video.height,
-                //videoId: pandora.user.ui.item,
-                videoWidth: video.width,
+                video: video,
                 volume: pandora.user.ui.videoVolume,
                 width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             }).bindEvent({
@@ -287,25 +271,23 @@ pandora.ui.item = function() {
 
         } else if (pandora.user.ui.itemView == 'timeline') {
             var layers = [],
-                video = result.data.stream,
-                cuts = result.data.cuts || [],
-                format = $.support.video.supportedFormat(pandora.site.formats),
-                streams = {};
-            video.height = pandora.site.resolutions[0];
-            video.width = parseInt(video.height * video.aspectRatio / 2) * 2;
-            pandora.site.resolutions.forEach(function(resolution) {
-                streams[resolution] = video.baseUrl + '/' + resolution + 'p.' + format;
-            });
+                video = result.data.stream;
             $.each(pandora.site.layers, function(i, layer) {
                 layers[i] = $.extend({}, layer, {items: result.data.layers[layer.id]});
             });
+            pandora.site.video.resolutions.forEach(function(resolution) {
+                video[resolution] = Ox.range(result.data.parts).map(function(i) {
+                    return '/' + pandora.user.ui.item + '/'
+                        + resolution + 'p' + (i + 1) + '.' + pandora.user.videoFormat;
+                });
+            });
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.editor = Ox.VideoEditor({
                 annotationsSize: pandora.user.ui.annotationsSize,
-                cuts: cuts,
+                cuts: result.data.cuts || [],
                 duration: video.duration,
                 find: '',
                 getFrameURL: function(position) {
-                    return '/' + pandora.user.ui.item + '/' + video.height.toString() + 'p' + position.toString() + '.jpg';
+                    return '/' + pandora.user.ui.item + '/' + Ox.last(pandora.site.video.resolutions) + 'p' + position + '.jpg';
                 },
                 getLargeTimelineImageURL: function(i) {
                     return '/' + pandora.user.ui.item + '/timeline64p' + i + '.png';
@@ -326,10 +308,8 @@ pandora.ui.item = function() {
                 subtitles: result.data.layers.subtitles ? result.data.layers.subtitles.map(function(subtitle) {
                     return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
                 }) : [],
-                video: streams,
-                videoHeight: video.height,
-                //videoId: pandora.user.ui.item,
-                videoWidth: video.width,
+                video: video,
+                videoRatio: result.data.videoRatio,
                 videoSize: pandora.user.ui.videoSize,
                 width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             }).bindEvent({

@@ -34,9 +34,6 @@ def site_config():
         site_config['site']['sectionName'] = settings.SITENAME
         site_config['site']['url'] = settings.URL
 
-        site_config['formats'] = settings.VIDEO_FORMATS
-        site_config['resolutions'] = settings.VIDEO_RESOLUTIONS
-
         site_config['keys'] = {}
         for key in site_config['itemKeys']:
             site_config['keys'][key['id']] = key

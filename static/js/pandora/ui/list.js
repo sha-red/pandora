@@ -168,8 +168,9 @@ pandora.ui.list = function() { // fixme: remove view argument
         that = Ox.IconList({
             fixedRatio: fixedRatio,
             item: function(data, sort, size) {
+                Ox.print('DATA', data)
                 size = size || 128;
-                var ratio = data.aspectRatio,
+                var ratio = data.videoRatio,
                     width = ratio > fixedRatio ? size : Math.round(size * ratio / fixedRatio),
                     height = Math.round(width / ratio),
                     url = '/' + data.item + '/' + height + 'p' + data['in'] + '.jpg';
@@ -196,7 +197,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                     itemQuery: itemQuery
                 }), callback);
             },
-            keys: ['id', 'value', 'in', 'out', 'aspectRatio', 'item'],
+            keys: ['id', 'value', 'in', 'out', 'video', 'videoRatio', 'item'],
             max: 1,
             size: 128,
             sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
@@ -310,10 +311,10 @@ pandora.ui.list = function() { // fixme: remove view argument
                     element: pandora.$ui.clips = Ox.IconList({
                         fixedRatio: fixedRatio,
                         item: function(data, sort, size) {
-                            Ox.print('RATIO', data.aspectRatio);
+                            Ox.print('RATIO', data.videoRatio);
                             size = size || 128;
-                            var width = data.aspectRatio < fixedRatio ? size : size * data.aspectRatio / fixedRatio,
-                                height = width / data.aspectRatio,
+                            var width = data.videoRatio < fixedRatio ? size : size * data.videoRatio / fixedRatio,
+                                height = width / data.videoRatio,
                                 url = '/' + data.item + '/' + height + 'p' + data['in'] + '.jpg';
                             return {
                                 height: height,
@@ -326,7 +327,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                             };
                         },
                         items: [],
-                        keys: ['id', 'value', 'in', 'out', 'aspectRatio', 'item'],
+                        keys: ['id', 'value', 'in', 'out', 'videoRatio', 'item'],
                         size: 128,
                         sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
                         unique: 'id'
@@ -454,8 +455,8 @@ pandora.ui.list = function() { // fixme: remove view argument
                 }
             }, function(result) {
                 var item = result.data.items[0],
-                    title = item.title + ' (' + item.director + ')',
-                    ratio = item.posterRatio,
+                    title = item.title + ' (' + item.director + ')'
+                    ratio = item.poster.width / item.poster.height,
                     windowWidth = window.innerWidth * 0.8,
                     windowHeight = window.innerHeight * 0.8,
                     windowRatio = windowWidth / windowHeight,

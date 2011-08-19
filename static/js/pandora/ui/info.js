@@ -1,7 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.info = function(id) {
     id = id || pandora.user.ui.item;
-    Ox.print('ID', id)
     var that = Ox.Element()
         .bindEvent({
             toggle: function(data) {
@@ -32,13 +31,13 @@ pandora.ui.info = function(id) {
             });
         } else {
             // Video Preview
-            pandora.api.get({id: id, keys: ['stream']}, function(result) {
-                var video = result.data.stream;
-                    height = Math.round(pandora.user.ui.sidebarSize / video.aspectRatio) + 16;
+            pandora.api.get({id: id, keys: ['duration', 'videoRatio']}, function(result) {
+                var height = Math.round(pandora.user.ui.sidebarSize / result.data.videoRatio) + 16;
                 pandora.$ui.videoPreview && pandora.$ui.videoPreview.removeElement();
                 pandora.$ui.videoPreview = pandora.ui.videoPreview({
                     id: id,
-                    video: video
+                    duration: result.data.duration,
+                    ratio: result.data.videoRatio
                 }).appendTo(pandora.$ui.info);
                 pandora.user.infoRatio = pandora.user.ui.sidebarSize / height;
                 resize(height);
