@@ -206,6 +206,16 @@ pandora.ui.item = function() {
             .bindEvent('resize', function() {
                 pandora.$ui.map.resizeMap();
             }));
+        } else if (pandora.user.ui.itemView == 'statistics') {
+            var stats = Ox.Container();
+            Ox.TreeList({
+                data: result.data,
+                width: pandora.$ui.mainPanel.size(1) - Ox.UI.SCROLLBAR_SIZE
+            }).appendTo(stats);
+
+            pandora.$ui.contentPanel.replaceElement(1, stats);
+
+
         } else if (pandora.user.ui.itemView == 'player') {
             // fixme: duplicated
             var layers = [],
@@ -223,7 +233,7 @@ pandora.ui.item = function() {
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.player = Ox.VideoPanelPlayer({
                 annotationsSize: pandora.user.ui.annotationsSize,
                 cuts: result.data.cuts || [],
-                duration: video.duration,
+                duration: result.data.duration,
                 getTimelineImageURL: function(i) {
                     return '/' + pandora.user.ui.item + '/timeline64p' + i + '.png';
                 },
@@ -260,18 +270,9 @@ pandora.ui.item = function() {
                     pandora.UI.set('volume', data.volume);
                 },
             }));
-        } else if (pandora.user.ui.itemView == 'statistics') {
-            var stats = Ox.Container();
-            Ox.TreeList({
-                data: result.data,
-                width: pandora.$ui.mainPanel.size(1) - Ox.UI.SCROLLBAR_SIZE
-            }).appendTo(stats);
-
-            pandora.$ui.contentPanel.replaceElement(1, stats);
-
         } else if (pandora.user.ui.itemView == 'timeline') {
             var layers = [],
-                video = result.data.stream;
+                video = {};
             $.each(pandora.site.layers, function(i, layer) {
                 layers[i] = $.extend({}, layer, {items: result.data.layers[layer.id]});
             });
@@ -284,7 +285,7 @@ pandora.ui.item = function() {
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.editor = Ox.VideoEditor({
                 annotationsSize: pandora.user.ui.annotationsSize,
                 cuts: result.data.cuts || [],
-                duration: video.duration,
+                duration: result.data.duration,
                 find: '',
                 getFrameURL: function(position) {
                     return '/' + pandora.user.ui.item + '/' + Ox.last(pandora.site.video.resolutions) + 'p' + position + '.jpg';
