@@ -37,7 +37,7 @@ from person.models import get_name_sort
 from app.models import site_config
 
 
-def get_item(info, user=None):
+def get_item(info, user=None, async=False):
     '''
         info dict with:
             imdbId, title, director, episode_title, season, series
@@ -56,7 +56,10 @@ def get_item(info, user=None):
                     }
                 item.user = user
                 item.save()
-                tasks.update_external.delay(item.itemId)
+                if async:
+                    tasks.update_external.delay(item.itemId)
+                else:
+                    item.update_external()
         else:
             q = Item.objects.all()
             for key in ('title', 'director', 'year'):
