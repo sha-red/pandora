@@ -30,8 +30,9 @@ import ox.image
 import managers
 import utils
 import tasks
-from archive import extract
+from .timelines import join_timelines
 
+from archive import extract
 from annotation.models import Annotation, Layer
 from person.models import get_name_sort
 from app.models import site_config
@@ -863,7 +864,8 @@ class Item(models.Model):
     def make_timeline(self):
         streams = self.streams()
         if len(streams) > 1:
-            print "FIXME, needs to build timeline from parts"
+            timelines = [s.timeline_prefix for s in self.streams()]
+            join_timelines(timelines, self.timeline_prefix)
 
     def make_poster(self, force=False):
         if not self.poster or force:
