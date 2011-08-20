@@ -461,7 +461,7 @@ pandora.ui.list = function() { // fixme: remove view argument
             }, function(result) {
                 var item = result.data.items[0],
                     title = item.title + ' (' + item.director + ')'
-                    ratio = item.poster.width / item.poster.height,
+                    ratio = item.posterRatio,
                     windowWidth = window.innerWidth * 0.8,
                     windowHeight = window.innerHeight * 0.8,
                     windowRatio = windowWidth / windowHeight,
