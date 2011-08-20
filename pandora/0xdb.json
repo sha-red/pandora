@@ -558,6 +558,7 @@
     },
     "userLevels": ["guest", "member", "staff", "admin"],
     "video": {
+        "download": false,
         "formats": ["webm", "mp4"],
         "resolutions": [96]
     }
