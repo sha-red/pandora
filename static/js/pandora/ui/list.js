@@ -191,10 +191,10 @@ pandora.ui.list = function() { // fixme: remove view argument
                         query.conditions.push({key: 'value', value: q.value, operator: q.operator});
                     }
                 });
-                pandora.api.findAnnotations($.extend(data, {
+                pandora.api.findAnnotations(Ox.extend({
                     query: query,
                     itemQuery: itemQuery
-                }), callback);
+                }, data), callback);
             },
             keys: ['id', 'value', 'in', 'out', 'videoRatio'],
             max: 1,
@@ -245,7 +245,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                                     poster: '/' + item + '/' + height + 'p' + points[0] + '.jpg',
                                     width: width,
                                     video: partsAndPoints.parts.map(function(i) {
-                                        return '/' + item + '/96p' + (i + 1) + '.' + pandora.user.videoFormat
+                                        return '/' + item + '/96p' + (i + 1) + '.' + pandora.user.videoFormat;
                                     })
                                 })
                                 .addClass('OxTarget')
@@ -272,6 +272,62 @@ pandora.ui.list = function() { // fixme: remove view argument
                     $('.OxSelectedVideo').removeClass('OxSelectedVideo');
                 }
             }
+        });
+    } else if (view == 'player') {
+        that = Ox.VideoPlayer({
+            controlsBottom: ['play', 'previous', 'next', 'volume'],
+            controlsTop: ['fullscreen', 'scale'],
+            enableMouse: true,
+            height: 384,
+            paused: true,
+            position: 0,
+            video: function(range, callback) {
+                var callback = arguments[arguments.length - 1],
+                    range = arguments.length == 2 ? arguments[0] : null,
+                    itemQuery = pandora.Query.toObject(),
+                    query = {conditions:[]};
+                //fixme: can this be in pandora.Query? dont just check for subtitles
+                itemQuery.conditions.forEach(function(q) {
+                    if (q.key == 'subtitles') {
+                        query.conditions.push({key: 'value', value: q.value, operator: q.operator});
+                    }
+                });
+                pandora.api.findAnnotations(Ox.extend({
+                    query: query,
+                    itemQuery: itemQuery
+                }, range ? {
+                    keys: ['id', 'in', 'out'],
+                    range: range,
+                    sort: pandora.user.ui.lists[pandora.user.ui.list].sort
+                } : {}), function(result) {
+                    //Ox.print('API findAnnotations range', range, 'result', result.data);
+                    if (!range) {
+                        callback(result.data.items);
+                    } else {
+                        var counter = 0,
+                            length = range[1] - range[0],
+                            data = [];
+                        result.data.items.forEach(function(item, i) {
+                            var id = item.id.split('/')[0]
+                            pandora.api.get({id: id, keys: ['durations']}, function(result) {
+                                //Ox.print('API get item', id, 'result', result.data);
+                                var points = [item['in'], item.out],
+                                    partsAndPoints = pandora.getVideoPartsAndPoints(result.data.durations, points);                       
+                                data[i] = {
+                                    parts: partsAndPoints.parts.map(function(i) {
+                                        return '/' + id + '/96p' + (i + 1) + '.' + pandora.user.videoFormat;
+                                    }),
+                                    points: partsAndPoints.points
+                                }
+                                if (++counter == length) {
+                                    callback(data);
+                                }
+                            });
+                        });
+                    }
+                });
+            },
+            width: 512
         });
     } else if (view == 'map') {
         var fixedRatio = 16/9;
