@@ -793,7 +793,8 @@ class Item(models.Model):
         self.save()
 
     def streams(self):
-        return [video.streams.filter(source=None)[0] for video in self.main_videos()]
+        return [video.streams.filter(source=None, available=True)[0]
+                for video in self.main_videos()]
 
     def update_timeline(self, force=False):
         config = site_config()

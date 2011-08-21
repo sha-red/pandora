@@ -161,6 +161,7 @@ class File(models.Model):
     def save(self, *args, **kwargs):
         if self.auto:
             self.set_state()
+        self.available = self.streams.filter(source=None, available=True).count() > 0
         super(File, self).save(*args, **kwargs)
 
     #upload and data handling
@@ -498,6 +499,7 @@ class Stream(models.Model):
                                                   resolution=resolution, format=f)
                 if created:
                     derivative.source = self
+                    derivative.save()
                     name = derivative.name()
                     derivative.video.name = os.path.join(os.path.dirname(self.video.name), name)
                     derivative.encode()
@@ -528,6 +530,8 @@ class Stream(models.Model):
         else:
             self.aspect_ratio = 128/80
         super(Stream, self).save(*args, **kwargs)
+        if self.available and not self.file.available:
+            self.file.save()
 
     def json(self):
         if settings.XSENDFILE or settings.XACCELREDIRECT:
