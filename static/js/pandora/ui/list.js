@@ -517,19 +517,19 @@ pandora.ui.list = function() { // fixme: remove view argument
             }, function(result) {
                 var item = result.data.items[0],
                     title = item.title + ' (' + item.director + ')'
-                    ratio = item.poster.width / item.poster.height,
+                    ratio = item.posterRatio,
                     windowWidth = window.innerWidth * 0.8,
                     windowHeight = window.innerHeight * 0.8,
                     windowRatio = windowWidth / windowHeight,
                     width = Math.round(ratio > windowRatio ? windowWidth : windowHeight * ratio),
                     height = Math.round(ratio < windowRatio ? windowHeight : windowWidth / ratio);
                 pandora.$ui.previewImage = $('<img>')
-                    .attr({src: item.poster.url.replace('.jpg', '128.jpg')})
+                    .attr({src: '/' + item.id + '/poster128.jpg'})
                     .css({width: width + 'px', height: height + 'px'})
                 $('<img>').load(function() {
                         pandora.$ui.previewImage.attr({src: $(this).attr('src')});
                     })
-                    .attr({src: item.poster.url.replace('.jpg', '1024.jpg')});
+                    .attr({src: '/' + item.id + '/poster1024.jpg'});
                 if (!preview) {
                     if (!pandora.$ui.previewDialog) {
                         pandora.$ui.previewDialog = Ox.Dialog({
