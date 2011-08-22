@@ -127,7 +127,7 @@ class File(models.Model):
                 self.display_aspect_ratio = "4:3"
                 self.width = '320'
                 self.height = '240'
-            if 'audio' in self.info and self.info['audio']:
+            if 'audio' in self.info and self.info['audio'] and self.duration > 0:
                 audio = self.info['audio'][0]
                 self.audio_codec = audio['codec']
                 self.samplerate = audio.get('samplerate', 0)
@@ -137,6 +137,9 @@ class File(models.Model):
                     self.is_audio = True
             else:
                 self.is_audio = False
+                self.audio_codec = ''
+                self.sampleate = 0
+                self.channels = 0
 
             if self.framerate:
                 self.pixels = int(self.width * self.height * float(utils.parse_decimal(self.framerate)) * self.duration)
