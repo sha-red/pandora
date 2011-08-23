@@ -604,6 +604,7 @@ def siteposter(request, id, size=None):
     poster = item.path('siteposter.jpg')
     poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
     if size:
+        size = int(size)
         image = Image.open(poster)
         image_size = max(image.size)
         if size < image_size:

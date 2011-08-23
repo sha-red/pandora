@@ -23,7 +23,7 @@ urlpatterns = patterns("item.views",
 
     #poster
     (r'^(?P<id>[A-Z0-9].+)/poster(?P<size>\d+)\.jpg$', 'poster'),
-    (r'^(?P<id>[A-Z0-9].+)/siteposter(?P<size>\d+)\.jpg$', 'siteposter'),
+    (r'^(?P<id>[A-Z0-9].+)/siteposter(?P<size>\d*)\.jpg$', 'siteposter'),
     (r'^(?P<id>[A-Z0-9].+)/poster\.jpg$', 'siteposter'),
     (r'^(?P<id>[A-Z0-9].+)/frameposter(?P<position>\d+).jpg$', 'poster_frame'),
 
