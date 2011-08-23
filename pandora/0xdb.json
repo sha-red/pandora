@@ -2,10 +2,10 @@
     "clipKeys": [
         {"id": "value", "title": "Text"},
         {"id": "in", "title": "Position"},
-        {"id": "duration": "title": "Duration"},
+        {"id": "duration", "title": "Duration"},
         {"id": "hue", "title": "Hue"},
         {"id": "saturation", "title": "Saturation"},
-        {"id": "lightness": "title": "Lightness"},
+        {"id": "lightness", "title": "Lightness"},
         {"id": "volume": "title": "Volume"}
     ],
     "groups": [
