@@ -6,7 +6,7 @@
         {"id": "hue", "title": "Hue"},
         {"id": "saturation", "title": "Saturation"},
         {"id": "lightness", "title": "Lightness"},
-        {"id": "volume": "title": "Volume"}
+        {"id": "volume", "title": "Volume"}
     ],
     "groups": [
         {"id": "director", "title": "Director"},
