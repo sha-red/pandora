@@ -34,6 +34,8 @@ from .timelines import join_timelines
 
 from archive import extract
 from annotation.models import Annotation, Layer
+import archive.models
+
 from person.models import get_name_sort
 from app.models import site_config
 
@@ -340,11 +342,11 @@ class Item(models.Model):
 
         posters = []
         
-        poster = self.path('poster.local.jpg')
+        poster = self.path('siteposter.jpg')
         poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
         if os.path.exists(poster):
             posters.append({
-                'url': '/%s/poster.jpg' % self.itemId,
+                'url': '/%s/siteposter.jpg' % self.itemId,
                 'width': 640,
                 'height': 1024,
                 'source': settings.URL,
@@ -614,18 +616,17 @@ class Item(models.Model):
         s.wordsperminute = 0
         s.clips = 0  #FIXME: get clips from all layers or something
         s.popularity = 0  #FIXME: get popularity from somewhere
-        videos = self.main_videos()
-        if len(videos) > 0:
+        videos = self.files.filter(active=True, is_video=True)
+        if videos.count() > 0:
             s.duration = sum([v.duration for v in videos])
-            s.resolution = videos[0].width * videos[0].height
+            v = videos[0]
+            s.resolution = v.width * v.height
             s.aspectratio = float(utils.parse_decimal(v.display_aspect_ratio))
-            #FIXME: should be average over all files
-            if 'bitrate' in videos[0].info:
-                s.bitrate = videos[0].info['bitrate']
             s.pixels = sum([v.pixels for v in videos])
             s.numberoffiles = self.files.all().count()
-            s.parts = len(videos)
+            s.parts = videos.count()
             s.size = sum([v.size for v in videos]) #FIXME: only size of movies?
+            s.bitrate = s.size * 8 / s.duration
             s.volume = 0
         else:
             s.duration = None
@@ -707,38 +708,62 @@ class Item(models.Model):
 
     @property
     def timeline_prefix(self):
-        videos = self.main_videos()
+        videos = self.streams()
         if len(videos) == 1:
             return os.path.join(settings.MEDIA_ROOT, videos[0].path('timeline'))
         return os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline')
 
-    def main_videos(self):
-        #FIXME: needs to check if more than one user has main files and only
-        #       take from "higher" user
-        videos = self.files.filter(is_main=True, is_video=True, available=True, instances__gt=0).order_by('part')
-        if videos.count()>0:
-            first = videos[0]
-            user = first.instances.all()[0].volume.user
-            #only take videos from same user and with same width/height
-            def check(v):
-                if v.instances.filter(volume__user=user).count()>0 and \
-                    first.width == v.width and first.height == v.height:
-                    return True
-                return False
-            videos = filter(check, videos)
+    def get_files(self, user):
+        #FIXME: limit by user
+        return [f.json() for f in self.files.all()]
+
+    def users_with_files(self):
+        return User.objects.filter(volumes__files__file__item=self).distinct()
+
+    def update_wanted(self):
+        users = self.users_with_files()
+        if users.filter(is_superuser=True).count()>0:
+            files = self.files.filter(instances__volume__user__is_superuser=True)
+            users = User.objects.filter(volumes__files__file__item__in=files,
+                                        is_superuser=True).distinct()
+        elif users.filter(is_staff=True).count()>0:
+            files = self.files.filter(instances__volume__user__is_staff=True)
+            users = User.objects.filter(volumes__files__file__item__in=files,
+                                        is_staff=True).distinct()
         else:
-            audio = self.files.filter(is_main=True, is_audio=True, available=True)
-            if audio.count()>0:
-                first = audio[0]
-                user = first.instances.all()[0].volume.user
-                #only take videos from same user and with same width/height
-                def check(v):
-                    if v.instances.filter(volume__user=user).count()>0:
-                        return True
-                    return False
-                videos = filter(check, audio)
- 
-        return videos
+            files = self.files.all()
+        files = files.filter(is_video=True, instances__extra=False, instances__gt=0).order_by('part')
+        folders = list(set([f.folder for f in files]))
+        if len(folders) > 1:
+            files = files.filter(folder=folders[0])
+        files.update(wanted=True)
+
+    def update_selected(self):
+        files = archive.models.File.objects.filter(item=self,
+                                                   streams__available=True,
+                                                   streams__source=None)
+        def get_level(users):
+            if users.filter(is_superuser=True).count() > 0: level = 0
+            elif users.filter(is_staff=True).count() > 0: level = 1
+            else: level = 2
+            return level
+
+        users = User.objects.filter(volumes__files__file__in=self.files.filter(active=True)).distinct()
+        current_level = get_level(users)
+
+        users = User.objects.filter(volumes__files__file__in=files).distinct()
+        possible_level = get_level(users)
+
+        if possible_level < current_level:
+            files = self.files.filter(instances__volume__user__in=users).order_by('part')
+            #FIXME: this should be instance folders
+            folders = list(set([f.folder
+                                for f in files.filter(is_video=True, instances__extra=False)]))
+            files = files.filter(folder__startswith=folders[0])
+            files.update(active=True)
+            self.rendered = False
+            self.save()
+            self.update_timeline()
 
     def make_torrent(self):
         base = self.path('torrent')
@@ -751,26 +776,25 @@ class Item(models.Model):
         base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, base))
         size = 0
         duration = 0.0
-        if len(self.main_videos()) == 1:
+        streams = self.streams()
+        if streams.count() == 1:
             url =  "%s/torrent/%s.webm" % (self.get_absolute_url(),
                                            quote(self.get('title').encode('utf-8')))
             video = "%s.webm" % base
-            v = self.main_videos()[0]
+            v = streams[0]
             os.symlink(v.video.path, video)
-            info = ox.avinfo(video)
-            size = info.get('size', 0)
-            duration = info.get('duration', 0.0)
+            size = v.video.size
+            duration = v.duration
         else:
             url =  "%s/torrent/" % self.get_absolute_url()
             part = 1
             os.makedirs(base)
-            for v in self.main_videos():
+            for v in streams:
                 video = "%s/%s.Part %d.webm" % (base, self.get('title'), part)
                 part += 1
                 os.symlink(v.video.path, video)
-                info = ox.avinfo(video)
-                size += info.get('size', 0)
-                duration += info.get('duration', 0.0)
+                size += v.video.size
+                duration += v.duration
             video = base
 
         torrent = '%s.torrent' % base
@@ -794,7 +818,7 @@ class Item(models.Model):
 
     def streams(self):
         return [video.streams.filter(source=None, available=True)[0]
-                for video in self.main_videos()]
+                for video in self.files.filter(is_video=True, active=True)]
 
     def update_timeline(self, force=False):
         config = site_config()
@@ -846,8 +870,7 @@ class Item(models.Model):
         else:
             poster= self.path('poster.jpg')
             path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
-        posters = glob(path.replace('.jpg', '*.jpg'))
-        for f in filter(lambda p: not p.endswith('poster.local.jpg'), posters):
+        for f in glob(path.replace('.jpg', '*.jpg')):
             os.unlink(f)
 
     def prefered_poster_url(self):
@@ -883,7 +906,7 @@ class Item(models.Model):
                     self.poster.save('poster.jpg', ContentFile(f.read()))
 
     def make_local_poster(self):
-        poster = self.path('poster.local.jpg')
+        poster = self.path('siteposter.jpg')
         poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
 
         frame = self.get_poster_frame_path()
@@ -914,12 +937,14 @@ class Item(models.Model):
         ox.makedirs(os.path.join(settings.MEDIA_ROOT,self.path()))
         p = subprocess.Popen(cmd)
         p.wait()
+        for f in glob(poster.replace('.jpg', '*.jpg')):
+            os.unlink(f)
         return poster
 
     def poster_frames(self):
         frames = []
         offset = 0
-        for f in self.main_videos():
+        for f in self.files(active=True, is_video=True):
             for ff in f.frames.all():
                 frames.append({
                     'position': offset + ff.position,
@@ -976,7 +1001,7 @@ class Item(models.Model):
         Annotation.objects.filter(layer=layer,item=self).delete()
         offset = 0
         language = ''
-        languages = [f.language for f in self.files.filter(is_main=True, is_subtitle=True,
+        languages = [f.language for f in self.files.filter(active=True, is_subtitle=True,
                                                            available=True)]
         if languages:
             if 'en' in languages:
@@ -985,7 +1010,7 @@ class Item(models.Model):
                 language = ''
             else:
                 language = languages[0] 
-        for f in self.files.filter(is_main=True, is_subtitle=True,
+        for f in self.files.filter(active=True, is_subtitle=True,
                                    available=True, language=language).order_by('part'):
                 user = f.instances.all()[0].volume.user
                 for data in f.srt(offset):
@@ -999,7 +1024,7 @@ class Item(models.Model):
                     )
                     annotation.save()
                 duration = self.files.filter(Q(is_audio=True)|Q(is_video=True)) \
-                                     .filter(is_main=True, available=True, part=f.part)
+                                     .filter(active=True, available=True, part=f.part)
                 if duration:
                     duration = duration[0].duration
                 else:

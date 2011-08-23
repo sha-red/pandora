@@ -81,6 +81,13 @@ class UserProfile(models.Model):
                 del ui['lists'][i]
         return ui
 
+    def get_level(self):
+        if self.user.is_superuser:
+            return 'admin'
+        elif self.user.is_staff:
+            return 'staff'
+        return 'member'
+
 def user_post_save(sender, instance, **kwargs):
     profile, new = UserProfile.objects.get_or_create(user=instance)
 
@@ -92,12 +99,7 @@ def get_user_json(user):
     result = {}
     for key in ('username', ):
         result[key] = getattr(user, key)
-    if user.is_superuser:
-        result['level'] = 'admin'
-    elif user.is_staff:
-        result['level'] = 'staff'
-    else:
-        result['level'] = 'member'
+    result['level'] = profile.get_level()
     result['groups'] = [g.name for g in user.groups.all()]
     result['preferences'] = profile.get_preferences()
     result['ui'] = profile.get_ui()

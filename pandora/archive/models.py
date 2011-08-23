@@ -30,7 +30,7 @@ class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    verified = models.BooleanField(default=False)
+    active = models.BooleanField(default=False)
     auto = models.BooleanField(default=True)
 
     oshash = models.CharField(max_length=16, unique=True)
@@ -69,34 +69,17 @@ class File(models.Model):
 
     #This is true if derivative is available or subtitles where uploaded
     available = models.BooleanField(default = False)
+    wanted = models.BooleanField(default = False)
+    uploading = models.BooleanField(default = False)
 
     is_audio = models.BooleanField(default=False)
     is_video = models.BooleanField(default=False)
-    is_extra = models.BooleanField(default=False)
-    is_main = models.BooleanField(default=False)
     is_subtitle = models.BooleanField(default=False)
-    is_version = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.name
 
     def set_state(self):
-        instance = self.get_instance()
-        if instance:
-            if instance.name.lower().startswith('extras/'):
-                self.is_extra = True
-                self.is_main = False
-            elif instance.name.lower().startswith('versions/'):
-                self.is_version = True
-                self.is_main = False
-            else:
-                self.is_extra = False
-                self.is_main = True
-        else:
-            self.is_main = False
-            self.is_extra = False
-            self.is_version = False
-        
         self.name = self.get_name()
         self.folder = self.get_folder()
         self.sort_name = utils.sort_string(canonicalTitle(self.name))
@@ -284,8 +267,8 @@ class File(models.Model):
             'available': self.available,
             'duration': duration,
             'framerate': self.framerate,
-            'height': self.height,
-            'width': self.width,
+            #'height': self.height,
+            #'width': self.width,
             'resolution': resolution,
             'id': self.oshash,
             'samplerate': self.samplerate,
@@ -293,12 +276,12 @@ class File(models.Model):
             'audio_codec': self.audio_codec,
             'name': self.name,
             'size': self.size,
-            'info': self.info,
-            'users': list(set([i.volume.user.username for i in self.instances.all()])),
+            #'info': self.info,
+            'users': list(set([u.username
+                     for u in User.objects.filter(volumes__files__in=self.instances.all())])),
             'instances': [i.json() for i in self.instances.all()],
             'folder': self.get_folder(),
             'type': self.get_type(),
-            'is_main': self.is_main,
             'part': self.get_part()
         }
         if keys:
@@ -314,12 +297,12 @@ class File(models.Model):
             if self.language:
                 name = name[-(len(self.language)+1)]
             qs = self.item.files.filter(Q(is_video=True)|Q(is_audio=True),
-                                        is_main=True, name__startswith=name)
+                                        active=True, name__startswith=name)
             if qs.count()>0:
                 return qs[0].part
-        if not self.is_extra:
+        if self.active:
             files = list(self.item.files.filter(type=self.type, language=self.language,
-                                                is_main=self.is_main).order_by('sort_name'))
+                                                active=self.active).order_by('sort_name'))
             if self in files:
                 return files.index(self) + 1
         return None
@@ -412,6 +395,7 @@ class Instance(models.Model):
 
     name = models.CharField(max_length=2048)
     folder = models.CharField(max_length=2048)
+    extra = models.BooleanField(default=False)
 
     file = models.ForeignKey(File, related_name='instances')
     volume = models.ForeignKey(Volume, related_name='files')

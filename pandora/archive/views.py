@@ -98,11 +98,12 @@ def update(request):
         if volume:
             files = files.filter(volume=volume)
         response['data']['info'] = [f.file.oshash for f in files.filter(file__info='{}')]
-        #needs some flag to find those that are actually used main is to generic
         response['data']['data'] = [f.file.oshash for f in files.filter(file__is_video=True,
-                                                                        file__is_main=True)]
+                                                                        file__available=False,
+                                                                        file__wanted=True)]
         response['data']['data'] += [f.file.oshash for f in files.filter(file__is_audio=True,
-                                                                         file__is_main=True)]
+                                                                         file__available=False,
+                                                                         file__wanted=True)]
         response['data']['file'] = [f.file.oshash for f in files.filter(file__is_subtitle=True,
                                                                         name__endswith='.srt')]
 
@@ -188,6 +189,7 @@ def firefogg_upload(request):
                     response['result'] = -1
                 elif form.cleaned_data['done']:
                     f.available = True
+                    f.uploading = False
                     f.save()
                     #FIXME: this fails badly if rabbitmq goes down
                     try:
@@ -205,6 +207,7 @@ def firefogg_upload(request):
             if f.editable(request.user):
                 f.streams.all().delete()
                 f.available = False
+                f.uploading = True
                 f.save()
                 response = {
                     #is it possible to no hardcode url here?

@@ -5,6 +5,7 @@ import os.path
 from datetime import datetime, timedelta
 import mimetypes
 
+import Image
 from django.db.models import Count, Sum, Max
 from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404, redirect
@@ -343,6 +344,8 @@ def get(request):
             info['stream'] = item.get_stream()
         if not data['keys'] or 'layers' in data['keys']:
             info['layers'] = item.get_layers(request.user)
+        if data['keys'] and 'files' in data['keys']:
+            info['files'] = item.get_files(request.user)
         response['data'] = info
     else:
         response = json_response(status=403, text='permission denied')
@@ -582,7 +585,7 @@ def poster_frame(request, id, position):
     raise Http404
 
 
-def image_to_response(item, image, size=None):
+def image_to_response(image, size=None):
     if size:
         size = int(size)
         path = image.path.replace('.jpg', '.%d.jpg'%size)
@@ -596,10 +599,17 @@ def image_to_response(item, image, size=None):
         path = image.path
     return HttpFileResponse(path, content_type='image/jpeg')
 
-def poster_local(request, id):
+def siteposter(request, id, size=None):
     item = get_object_or_404(models.Item, itemId=id)
-    poster = item.path('poster.local.jpg')
+    poster = item.path('siteposter.jpg')
     poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
+    if size:
+        image = Image.open(poster)
+        image_size = max(image.size)
+        if size < image_size:
+            path = poster.replace('.jpg', '.%d.jpg'%size)
+            extract.resize_image(poster, path, size=size)
+            poster = path
     return HttpFileResponse(poster, content_type='image/jpeg')
 
 def poster(request, id, size=None):

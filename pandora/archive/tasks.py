@@ -66,6 +66,9 @@ def update_or_create_instance(volume, f):
         instance.file = get_or_create_file(volume, f, volume.user, item) 
         for key in _INSTANCE_KEYS:
             setattr(instance, key, f[key])
+        if instance.name.lower().startswith('extras/') or \
+           instance.name.lower().startswith('versions/'):
+           instance.extra = True
         instance.save()
         instance.file.save()
     return instance
