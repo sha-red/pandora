@@ -439,8 +439,9 @@ pandora.ui.infoView = function(data) {
                         }, pandora.user.ui.icons == 'posters' ? {
                             source: selectedImage.source
                         } : {
-                            position: selectedImage.index // fixme: api slightly inconsistent
+                            position: selectedImage.index // fixme: api slightly inconsistent, this shouldn't be "position"
                         }), function() {
+                            // fixme: update the info (video preview) frame as well
                             var src;
                             if (pandora.user.ui.icons == 'frames') {
                                 src = '/' + data.id + '/icon512.jpg?' + Ox.uid()

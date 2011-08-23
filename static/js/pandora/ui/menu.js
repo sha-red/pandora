@@ -76,7 +76,9 @@ pandora.ui.mainMenu = function() {
                     { id: 'icons', title: 'Icons', items: [
                         { group: 'viewicons', min: 1, max: 1, items: ['posters', 'frames'].map(function(icons) {
                             return {id: icons, title: Ox.toTitleCase(icons), checked: pandora.user.ui.icons == icons};
-                        }) }
+                        }) },
+                        {},
+                        { id: 'usesiteposter', title: 'Always Use ' + pandora.site.site.name + ' Poster' }
                     ] },
                     {},
                     { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], items: [
