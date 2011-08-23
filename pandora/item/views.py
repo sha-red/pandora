@@ -615,7 +615,7 @@ def siteposter(request, id, size=None):
 def poster(request, id, size=None):
     item = get_object_or_404(models.Item, itemId=id)
     if item.poster:
-        return image_to_response(item, item.poster, size)
+        return image_to_response(item.poster, size)
     else:
         poster_path = os.path.join(settings.STATIC_ROOT, 'png/posterDark.48.png')
         response = HttpFileResponse(poster_path, content_type='image/jpeg')
@@ -626,7 +626,7 @@ def poster(request, id, size=None):
 def icon(request, id, size=None):
     item = get_object_or_404(models.Item, itemId=id)
     if item.icon:
-        return image_to_response(item, item.icon, size)
+        return image_to_response(item.icon, size)
     else:
         raise Http404
 
