@@ -15,11 +15,20 @@ Ox.FilesView = function(options, self) {
         size: 24
     });
 
-    self.$orderButton = Ox.Button({
-            title: 'Change Order of Users...'
+    self.$userSelect = Ox.Select({
+            items: [
+                {id: 'admin', title: 'Admin', disabled: true},
+                {id: 'j', title: 'User: j', checked: true},
+                {id: 'rlx', title: 'User: rlx'},
+                {},
+                {id: 'admin', title: 'Staff', disabled: true},
+                {},
+                {id: 'admin', title: 'Member', disabled: true}
+            ]
         })
         .css({
             float: 'left',
+            width: '128px',
             margin: '4px'
         })
         .appendTo(self.$toolbar);

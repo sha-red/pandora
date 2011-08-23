@@ -1,6 +1,113 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.Query = (function() {
 
+    function parseFind2(str) {
+        // takes a string, returns useful information about the application's state
+        Ox.print('parseFind2', str)
+        str = str || '';
+        var conditions,
+            ret = {
+                find: {key: '', value: ''},
+                groups: [],
+                lists: [],
+                query: {conditions: [], operator: ''}
+            },
+            subconditions = str.match(/\[.*?\]/g) || [];
+        // replace subconditions with placeholder,
+        // so we can later split by main operator
+        subconditions.forEach(function(subcondition, i) {
+            subconditions[i] = subcondition.substr(1, subcondition.length - 2);
+            str = str.replace(subconditions[i], i);
+        });
+        if (str.indexOf(',') > -1) {
+            ret.query.operator = '&';
+        } else if (str.indexOf('|') > -1) {
+            ret.query.operator = '|';
+        }
+        ret.query.conditions = (
+            ret.query.operator == '' ? [str] : str.split(ret.query.operator == '&' ? ',' : '|')
+        ).map(function(condition, i) {
+            var kv, ret;
+            if (condition[0] == '[') {
+                // re-insert subcondition
+                ret = parseFind2(subconditions[parseInt(condition.substr(1, condition.length - 2))]).query;
+            } else {
+                kv = ((condition.indexOf(':') > -1 ? '' : ':') + condition).split(':');
+                ret = Ox.extend({key: kv[0]}, parseValue(kv[1]));
+            }
+            return ret;
+        });
+        // lists are selected if exactly one condition in an & query
+        // or every condition in an | query
+        // has "list" as key and "" as operator
+        ret.lists = ret.query.operator == '|'
+            ? everyCondition(ret.query.conditions, 'list', '')
+            : oneCondition(ret.query.conditions, 'list', '');
+        // find is populated if exactly one condition in an & query
+        // has a findKey as key and "" as operator
+        if (ret.query.operator == '|') {
+            ret.find = {key: 'advanced', value: ''};
+        } else {
+            var conditions = Ox.map(pandora.site.findKeys, function(findKey) {
+                var values = oneCondition(ret.query.conditions, findKey.id, '');
+                return values.length ? {key: findKey.id, values: values[0]} : null;
+            });
+            ret.find = conditions.length == 0 ? {key: '', value: ''}
+                : conditions.length == 1 && conditions[0].values.length == 1
+                ? {key: conditions[0].key, value: conditions[0].values[0]}
+                : {key: 'advanced', value: ''}
+        }
+        // a group is selected if exactly one condition in an & query
+        // or every condition in an | query
+        // has the group id as key and "=" as operator
+        ret.groups = pandora.user.ui.groups.map(function(key) {
+            var selected = ret.query.operator == '|'
+                    ? everyCondition(ret.query.conditions, key, '=')
+                    : oneCondition(ret.query.conditions, key, '='),
+                query = selected.length ? {
+                    conditions: Ox.map(ret.query.conditions, function(condition) {
+                        var ret;
+                        if (condition.conditions) {
+                            ret = condition.conditions[0].key != key ? condition : null; // fixme: correct? see below...
+                        } else {
+                            ret = condition.key != key ? condition : null;
+                        }
+                        return ret; 
+                    }),
+                    operator: ret.query.operator
+                } : ret.query;
+            return {
+                query: query,
+                selected: selected
+            };
+        });
+        function oneCondition(conditions, key, operator) {
+            // if exactly one condition has the given key and operator
+            // (including a condition where all subconditions match)
+            // returns the corresponding value(s), otherwise returns []
+            var values = Ox.map(conditions, function(condition) {
+                var ret, same;
+                if (condition.conditions) {
+                    var every = everyCondition(condition.conditions, key, operator); // fixme: what if [key|key],[key|other]?
+                    ret = every.length ? every : null;
+                } else {
+                    ret = condition.key == key && condition.operator == operator ? [condition.value] : null
+                }
+                return ret;
+            });
+            return values.length == 1 ? values[0] : [];
+        }
+        function everyCondition(conditions, key, operator) {
+            // if every condition has the given key and operator
+            // (excluding a condition where all subconditions match)
+            // returns the corresponding value(s), otherwise returns []
+            return Ox.map(conditions, function(condition) {
+                return condition.key == key && condition.operator == operator ? condition.value : null
+            });
+        }
+        return ret;
+    }
+
     function constructFind(query) {
         //Ox.print('cF', query)
         return /*encodeURI(*/$.map(query.conditions, function(v, i) {
@@ -93,6 +200,9 @@ pandora.Query = (function() {
                 query = Ox.unserialize(str.substr(1)),
                 sort = [];
             if ('find' in query) {
+                Ox.print(Ox.repeat('-', 80));
+                Ox.print('parseFind2', parseFind2(query.find));
+                Ox.print(Ox.repeat('-', 80));
                 pandora.user.ui.listQuery = {conditions: [], operator: ''}; // fixme: hackish
                 pandora.user.ui.findQuery = parseFind(query.find);
                 if (pandora.user.ui.listQuery.conditions.length) {
