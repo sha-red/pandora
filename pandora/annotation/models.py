@@ -79,8 +79,9 @@ class Annotation(models.Model):
     user = models.ForeignKey(User)
     item = models.ForeignKey('item.Item', related_name='annotations')
 
+    public_id = models.CharField(max_length=128, unique=True)
     #seconds
-    start = models.FloatField(default=-1)
+    start = models.FloatField(default=-1, db_index=True)
     end = models.FloatField(default=-1)
 
     layer = models.ForeignKey(Layer)
@@ -100,12 +101,15 @@ class Annotation(models.Model):
         else:
             return self.value
 
-    def get_id(self):
-        return '%s/%s' % (self.item.itemId, ox.to32(self.id))
+    def save(self, *args, **kwargs):
+        if not self.id:
+            super(Annotation, self).save(*args, **kwargs)
+        self.public_id = '%s/%s' % (self.item.itemId, ox.to32(self.id))
+        super(Annotation, self).save(*args, **kwargs)
 
     def json(self, layer=False, keys=None):
         j = {
-            'id': self.get_id(),
+            'id': self.public_id,
             'user': self.user.username,
             'in': self.start,
             'out': self.end,
@@ -125,8 +129,6 @@ class Annotation(models.Model):
                 streams = self.item.streams()
                 if streams:
                     j['videoRatio'] = streams[0].aspect_ratio
-            if 'item' in keys:
-                j['item'] = self.item.itemId
         return j
 
     def __unicode__(self):
