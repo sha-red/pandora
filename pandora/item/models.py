@@ -13,7 +13,7 @@ import unicodedata
 from urllib import quote
 
 from django.db import models
-from django.db.models import Sum, Count
+from django.db.models import Count, Q, Sum
 from django.core.files.base import ContentFile
 from django.utils import simplejson as json
 from django.conf import settings
@@ -30,14 +30,15 @@ import ox.image
 import managers
 import utils
 import tasks
-from archive import extract
+from .timelines import join_timelines
 
+from archive import extract
 from annotation.models import Annotation, Layer
 from person.models import get_name_sort
 from app.models import site_config
 
 
-def get_item(info, user=None):
+def get_item(info, user=None, async=False):
     '''
         info dict with:
             imdbId, title, director, episode_title, season, series
@@ -56,7 +57,10 @@ def get_item(info, user=None):
                     }
                 item.user = user
                 item.save()
-                tasks.update_external.delay(item.itemId)
+                if async:
+                    tasks.update_external.delay(item.itemId)
+                else:
+                    item.update_external()
         else:
             q = Item.objects.all()
             for key in ('title', 'director', 'year'):
@@ -789,17 +793,23 @@ class Item(models.Model):
         self.save()
 
     def streams(self):
-        return [video.streams.filter(source=None)[0] for video in self.main_videos()]
+        return [video.streams.filter(source=None, available=True)[0]
+                for video in self.main_videos()]
 
     def update_timeline(self, force=False):
+        config = site_config()
         streams = self.streams()
         self.make_timeline()
         self.data['cuts'] = extract.cuts(self.timeline_prefix)
         self.data['color'] = extract.average_color(self.timeline_prefix)
         #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
+        self.select_frame()
         self.make_local_poster()
         self.make_poster()
         self.make_icon()
+        if config['video']['download']:
+            self.make_torrent()
+        self.load_subtitles()
         self.rendered = streams != []
         self.save()
 
@@ -855,7 +865,8 @@ class Item(models.Model):
     def make_timeline(self):
         streams = self.streams()
         if len(streams) > 1:
-            print "FIXME, needs to build timeline from parts"
+            timelines = [s.timeline_prefix for s in self.streams()]
+            join_timelines(timelines, self.timeline_prefix)
 
     def make_poster(self, force=False):
         if not self.poster or force:
@@ -959,6 +970,43 @@ class Item(models.Model):
         for f in filter(lambda p: not p.endswith('/icon.jpg'), icons):
             os.unlink(f)
         return icon
+
+    def load_subtitles(self):
+        layer = Layer.objects.get(name='subtitles')
+        Annotation.objects.filter(layer=layer,item=self).delete()
+        offset = 0
+        language = ''
+        languages = [f.language for f in self.files.filter(is_main=True, is_subtitle=True,
+                                                           available=True)]
+        if languages:
+            if 'en' in languages:
+                language = 'en'
+            elif '' in languages:
+                language = ''
+            else:
+                language = languages[0] 
+        for f in self.files.filter(is_main=True, is_subtitle=True,
+                                   available=True, language=language).order_by('part'):
+                user = f.instances.all()[0].volume.user
+                for data in f.srt(offset):
+                    annotation = Annotation(
+                        item=f.item,
+                        layer=layer,
+                        start=data['in'],
+                        end=data['out'],
+                        value=data['value'],
+                        user=user
+                    )
+                    annotation.save()
+                duration = self.files.filter(Q(is_audio=True)|Q(is_video=True)) \
+                                     .filter(is_main=True, available=True, part=f.part)
+                if duration:
+                    duration = duration[0].duration
+                else:
+                    Annotation.objects.filter(layer=layer,item=self).delete()
+                    break
+                offset += duration
+        self.update_find()
 
 def delete_item(sender, **kwargs):
     i = kwargs['instance']

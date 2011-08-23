@@ -91,10 +91,11 @@ def update_files(user, volume, files):
 
 @task(queue="encoding")
 def process_stream(fileId):
-    file = models.Stream.objects.get(id=fileId)
+    file = models.File.objects.get(id=fileId)
     streams = file.streams.filter(source=None)
-    if streams.count() >0:
+    if streams.count() > 0:
         stream = streams[0]
         stream.make_timeline()
         stream.extract_derivatives()
+    file.item.update_timeline()
     return True

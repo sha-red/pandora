@@ -134,6 +134,13 @@
             "sort": "person"
         },
         {
+            "id": "parts",
+            "title": "Parts",
+            "type": "integer",
+            "columnWidth": 60,
+            "rightsLevel": 1
+        },
+        {
             "id": "numberofactors",
             "title": "Number of Actors",
             "type": "integer",
@@ -561,6 +568,7 @@
     },
     "userLevels": ["guest", "member", "staff", "admin"],
     "video": {
+        "download": false,
         "formats": ["webm", "mp4"],
         "resolutions": [96]
     }
