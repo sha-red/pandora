@@ -64,7 +64,9 @@ pandora.Query = (function() {
             var selected = ret.query.operator == '|'
                     ? everyCondition(ret.query.conditions, key, '=')
                     : oneCondition(ret.query.conditions, key, '='),
-                query = selected.length ? {
+                query = ret.query;
+            if (selected.length) {
+                query = {
                     conditions: Ox.map(ret.query.conditions, function(condition) {
                         var ret;
                         if (condition.conditions) {
@@ -74,8 +76,20 @@ pandora.Query = (function() {
                         }
                         return ret; 
                     }),
-                    operator: ret.query.operator
-                } : ret.query;
+                    operator: ''
+                };
+                if (query.conditions.length == 1) {
+                    if (query.conditions[0].conditions) {
+                        // unwrap single remaining bracketed query
+                        query = {
+                            conditions: query.conditions[0].conditions,
+                            operator: query.conditions[0].operator
+                        }
+                    } else {
+                        query.operator = '';
+                    }
+                }   
+            }
             return {
                 query: query,
                 selected: selected
@@ -83,7 +97,7 @@ pandora.Query = (function() {
         });
         function oneCondition(conditions, key, operator) {
             // if exactly one condition has the given key and operator
-            // (including a condition where all subconditions match)
+            // (including conditions where all subconditions match)
             // returns the corresponding value(s), otherwise returns []
             var values = Ox.map(conditions, function(condition) {
                 var ret, same;
@@ -99,11 +113,12 @@ pandora.Query = (function() {
         }
         function everyCondition(conditions, key, operator) {
             // if every condition has the given key and operator
-            // (excluding a condition where all subconditions match)
+            // (excluding conditions where all subconditions match)
             // returns the corresponding value(s), otherwise returns []
-            return Ox.map(conditions, function(condition) {
+            var values = Ox.map(conditions, function(condition) {
                 return condition.key == key && condition.operator == operator ? condition.value : null
             });
+            return values.length == conditions.length ? values : [];
         }
         return ret;
     }
