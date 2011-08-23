@@ -9,7 +9,7 @@ import models
 
 class FileAdmin(admin.ModelAdmin):
     search_fields = ['name', 'folder','oshash', 'video_codec']
-    list_display = ['available', 'is_main', '__unicode__', 'itemId']
+    list_display = ['available', 'wanted', 'active', '__unicode__', 'itemId']
     list_display_links = ('__unicode__', )
 
     def itemId(self, obj):

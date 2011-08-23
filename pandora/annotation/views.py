@@ -58,7 +58,7 @@ def findAnnotations(request):
         qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [p.json(keys=data['keys']) for p in qs]
     elif 'position' in query:
-        ids = [i.get_id() for i in qs]
+        ids = [i.public_id for i in qs]
         data['conditions'] = data['conditions'] + {
             'value': data['position'],
             'key': query['sort'][0]['key'],

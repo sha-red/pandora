@@ -309,22 +309,34 @@ def findUser(request):
         param data {
             key: "username",
             value: "foo", operator: "="
+            keys: []
         }
 
         return {
             'status': {'code': int, 'text': string}
             'data': {
-                users = ['user1', 'user2']
+                users = [{username: 'user1', level: ...}, {username: 'user2', ..}]
             }
         }
     '''
     #FIXME: support other operators and keys
     data = json.loads(request.POST['data'])
     response = json_response(status=200, text='ok')
+    keys = data.get('keys')
+    if not keys:
+        keys = ['username', 'level']
+    def user_json(user, keys):
+        return {
+            'usernname': user.username,
+            'level': user.get_profile().get_level()
+        }
+
     if data['key'] == 'email':
-        response['data']['users'] = [u.username for u in User.objects.filter(email__iexact=data['value'])]
+        response['data']['users'] = [user_json(u, keys)
+                                     for u in User.objects.filter(email__iexact=data['value'])]
     else:
-        response['data']['users'] = [u.username for u in User.objects.filter(username__iexact=data['value'])]
+        response['data']['users'] = [user_json(u, keys)
+                                     for u in User.objects.filter(username__iexact=data['value'])]
     return render_to_json_response(response)
 actions.register(findUser)
 
