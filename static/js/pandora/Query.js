@@ -2,7 +2,8 @@
 pandora.Query = (function() {
 
     function parseFind2(str) {
-        // takes a string, returns useful information about the application's state
+        // takes a find query string, returns useful information about the application's state
+        // (selected lists, find input key/value, group queries and selection, query object)
         Ox.print('parseFind2', str)
         str = str || '';
         var conditions,
@@ -48,9 +49,9 @@ pandora.Query = (function() {
         if (ret.query.operator == '|') {
             ret.find = {key: 'advanced', value: ''};
         } else {
-            var conditions = Ox.map(pandora.site.findKeys, function(findKey) {
+            conditions = Ox.map(pandora.site.findKeys, function(findKey) {
                 var values = oneCondition(ret.query.conditions, findKey.id, '');
-                return values.length ? {key: findKey.id, values: values[0]} : null;
+                return values.length ? {key: findKey.id, values: values} : null;
             });
             ret.find = conditions.length == 0 ? {key: '', value: ''}
                 : conditions.length == 1 && conditions[0].values.length == 1
