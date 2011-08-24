@@ -944,7 +944,7 @@ class Item(models.Model):
     def poster_frames(self):
         frames = []
         offset = 0
-        for f in self.files(active=True, is_video=True):
+        for f in self.files.filter(active=True, is_video=True):
             for ff in f.frames.all():
                 frames.append({
                     'position': offset + ff.position,
