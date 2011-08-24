@@ -89,7 +89,6 @@ pandora.Query = (function() {
     function parseFind(str) {
         // takes a find query string, returns useful information about the application's state
         // (selected lists, find input key/value (and index of the corresponding condition), query object)
-        str = str || '';
         var conditions,
             index, indices,
             ret = {
@@ -98,61 +97,65 @@ pandora.Query = (function() {
                 query: {conditions: [], operator: ''}
             },
             subconditions = str.match(/\[.*?\]/g) || [];
-        // replace subconditions with placeholder,
-        // so we can later split by main operator
-        subconditions.forEach(function(subcondition, i) {
-            subconditions[i] = subcondition.substr(1, subcondition.length - 2);
-            str = str.replace(subconditions[i], i);
-        });
-        if (str.indexOf(',') > -1) {
-            ret.query.operator = '&';
-        } else if (str.indexOf('|') > -1) {
-            ret.query.operator = '|';
-        }
-        ret.query.conditions = (
-            ret.query.operator == '' ? [str] : str.split(ret.query.operator == '&' ? ',' : '|')
-        ).map(function(condition, i) {
-            var kv, ret;
-            if (condition[0] == '[') {
-                // re-insert subcondition
-                ret = parseFind(subconditions[parseInt(condition.substr(1, condition.length - 2))]).query;
-            } else {
-                kv = ((condition.indexOf(':') > -1 ? '' : ':') + condition).split(':');
-                ret = Ox.extend({key: kv[0]}, parseValue(kv[1]));
+        if (str.length) {
+            // replace subconditions with placeholder,
+            // so we can later split by main operator
+            subconditions.forEach(function(subcondition, i) {
+                subconditions[i] = subcondition.substr(1, subcondition.length - 2);
+                str = str.replace(subconditions[i], i);
+            });
+            if (str.indexOf(',') > -1) {
+                ret.query.operator = '&';
+            } else if (str.indexOf('|') > -1) {
+                ret.query.operator = '|';
             }
-            return ret;
-        });
-        // a list is selected if exactly one condition in an & query
-        // has "list" as key and "" as operator
-        if (ret.query.operator != '|') {
-            index = oneCondition(ret.query.conditions, 'list', '');
-            if (index > -1 && !ret.query.conditions[index].conditions) {
-                ret.list = ret.query.conditions[index].value;
-            }
-        }
-        // find is populated if exactly one condition in an & query
-        // has a findKey as key and "" as operator
-        // or if all conditions in an | query have the same group id as key
-        if (ret.query.operator == '|') {
-            ret.find = {index: -1, key: 'advanced', value: ''};
-            Ox.map(pandora.user.ui.groups, function(key) {
-                if (everyCondition(ret.query.conditions, key, '=')) {
-                    ret.find.key = '';
-                    return false;
+            ret.query.conditions = (
+                ret.query.operator == '' ? [str] : str.split(ret.query.operator == '&' ? ',' : '|')
+            ).map(function(condition, i) {
+                var kv, ret;
+                if (condition[0] == '[') {
+                    // re-insert subcondition
+                    ret = parseFind(subconditions[parseInt(condition.substr(1, condition.length - 2))]).query;
+                } else {
+                    kv = ((condition.indexOf(':') > -1 ? '' : ':') + condition).split(':');
+                    ret = Ox.extend({key: kv[0]}, parseValue(kv[1]));
                 }
+                return ret;
             });
-        } else {
-            indices = Ox.map(pandora.site.findKeys, function(findKey) {
-                var key = findKey.id == 'all' ? '' : findKey.id, 
-                    index = oneCondition(ret.query.conditions, key, '');
-                return index > -1 ? index : null;
-            });
-            if (indices.length) {
-                ret.find = indices.length == 1 && !ret.query.conditions[indices[0]].conditions ? {
-                    index: indices[0],
-                    key: ret.query.conditions[indices[0]].key,
-                    value: ret.query.conditions[indices[0]].value
-                } : {index: -1, key: 'advanced', value: ''}
+            // a list is selected if exactly one condition in an & query
+            // has "list" as key and "" as operator
+            if (ret.query.operator != '|') {
+                index = oneCondition(ret.query.conditions, 'list', '');
+                if (index > -1 && !ret.query.conditions[index].conditions) {
+                    ret.list = ret.query.conditions[index].value;
+                }
+            }
+            // find is populated if exactly one condition in an & query
+            // has a findKey as key and "" as operator
+            // or if all conditions in an | query have the same group id as key
+            if (ret.query.operator == '|') {
+                ret.find = {index: -1, key: 'advanced', value: ''};
+                Ox.map(pandora.user.ui.groups, function(key) {
+                    if (everyCondition(ret.query.conditions, key, '=')) {
+                        ret.find.key = '';
+                        return false;
+                    }
+                });
+            } else {
+                indices = Ox.map(pandora.site.findKeys, function(findKey) {
+                    var key = findKey.id == 'all' ? '' : findKey.id, 
+                        index = oneCondition(ret.query.conditions, key, '');
+                    return index > -1 ? index : null;
+                });
+                Ox.print('INDICES', indices, indices.length == 1 && !ret.query.conditions[indices[0]].conditions)
+                if (indices.length) {
+                    ret.find = indices.length == 1 && !ret.query.conditions[indices[0]].conditions ? {
+                        index: indices[0],
+                        key: ret.query.conditions[indices[0]].key,
+                        value: ret.query.conditions[indices[0]].value
+                    } : {index: -1, key: 'advanced', value: ''}
+                }
+                Ox.print('FIND', ret.find)
             }
         }
         return ret;
@@ -200,7 +203,7 @@ pandora.Query = (function() {
                 query = Ox.unserialize(str.substr(1)),
                 sort = []
             if ('find' in query) {
-                data = parseFind(query.find);
+                data = parseFind(query.find || '');
                 Ox.print(Ox.repeat('-', 120));
                 Ox.print('STATE', data);
                 Ox.print(Ox.repeat('-', 120));

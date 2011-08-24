@@ -46,10 +46,12 @@ pandora.ui.findElement = function() {
                                 var key = data.selected[0].id;
                                 if (key == 'advanced') {
                                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
+                                    pandora.$ui.findInput.options({placeholder: 'Edit...'})
                                 } else {
                                     pandora.$ui.mainMenu.checkItem('findMenu_find_' + key);
                                     pandora.$ui.findInput.options({
-                                        autocomplete: autocompleteFunction()
+                                        autocomplete: autocompleteFunction(),
+                                        placeholder: ''
                                     }).focus();
                                 }
                             }
@@ -67,7 +69,7 @@ pandora.ui.findElement = function() {
                     })
                     .bindEvent({
                         focus: function(data) {
-                            if (findKey == 'advanced') {
+                            if (pandora.$ui.findSelect.value() == 'advanced') {
                                 pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                             }
                         },

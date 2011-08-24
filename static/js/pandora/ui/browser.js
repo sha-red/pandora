@@ -58,8 +58,8 @@ pandora.ui.browser = function() {
                 };
             },
             items: function(data, callback) {
-                pandora.api.find($.extend(data, {
-                    query: pandora.Query.toObject()
+                pandora.api.find(Ox.extend(data, {
+                    query: pandora.user.ui.query
                 }), callback);
             },
             keys: ['director', 'id', 'posterRatio', 'title', 'year'],
