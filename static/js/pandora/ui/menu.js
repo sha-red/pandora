@@ -28,8 +28,8 @@ pandora.ui.mainMenu = function() {
                     { id: 'preferences', title: 'Preferences...', disabled: isGuest, keyboard: 'control ,' },
                     { id: 'archives', title: 'Archives...', disabled: isGuest },
                     {},
-                    { id: 'register', title: 'Register...', disabled: !isGuest },
-                    { id: 'loginlogout', title: isGuest ? 'Login...' : 'Logout...' }
+                    { id: 'signup', title: 'Sign Up...', disabled: !isGuest },
+                    { id: 'signinsignout', title: isGuest ? 'Sign In...' : 'Sign Out...' }
                 ] },
                 { id: 'listMenu', title: 'List', items: [
                     { id: 'history', title: 'History', items: [
@@ -201,267 +201,21 @@ pandora.ui.mainMenu = function() {
                 }
             },
             click: function(event, data) {
-                if (data.id == 'about') {
-                    var tabs = [
-                        {id: 'about', title: 'About', selected: true},
-                        {id: 'news', title: 'News'},
-                        {id: 'tour', title: 'Take a Tour'},
-                        {id: 'faq', title: 'Frequently Asked Questions'},
-                        {id: 'tos', title: 'Terms of Service'},
-                        {id: 'contact', title: 'Contact'},
-                        {id: 'software', title: 'Software'}
-                    ];
-                    var $tabPanel = Ox.TabPanel({
-                            content: function(id) {
-                                return Ox.SplitPanel({
-                                    elements: [
-                                        {
-                                            element: Ox.Element()
-                                                .css({padding: '16px'})
-                                                .append(
-                                                    $('<img>')
-                                                        .attr({src: '/static/png/logo256.png'})
-                                                        .css({width: '128px'})
-                                                ),
-                                            size: 144
-                                        },
-                                        {
-                                            element: Ox.Element()
-                                                .css({padding: '16px', overflowY: 'auto'})
-                                                .html(Ox.repeat(Ox.getObjectById(tabs, id).title + ' ', 200))
-                                        }
-                                    ],
-                                    orientation: 'horizontal'
-                                });
-                            },
-                            tabs: tabs
-                        })
-                        .bindEvent({
-                            change: function(data) {
-                                $dialog.options({
-                                    title: Ox.getObjectById(tabs, data.selected).title
-                                });
-                            }
-                        });
-                    var $dialog = Ox.Dialog({
-                        buttons: [
-                            Ox.Button({
-                                id: 'close',
-                                title: 'Close'
-                            }).bindEvent({
-                                click: function() {
-                                    $dialog.close();
-                                }
-                            })
-                        ],
-                        //closeButton: true,
-                        content: $tabPanel,
-                        height: Math.round((window.innerHeight - 24) * 0.75),
-                        //maximizeButton: true,
-                        minHeight: 256,
-                        minWidth: 640,
-                        title: 'About',
-                        width: Math.round(window.innerWidth * 0.75),
-                    }).open();
-                } else if (data.id == 'home') {
-                    var $screen = $('<div>')
-                            .attr({id: 'screen'})
-                            .css({
-                                position: 'absolute',
-                                width: '100%',
-                                height: '100%',
-                                background: 'rgb(32, 32, 32)',
-                                opacity: 0,
-                                zIndex: 1000
-                            })
-                            .appendTo(Ox.UI.$body),
-                        $reflectionImage = $('<img>')
-                            .attr({
-                                src: '/static/png/logo256.png'
-                            })
-                            .css({
-                                position: 'absolute',
-                                left: 0,
-                                top: '160px',
-                                right: 0,
-                                bottom: 0,
-                                width: '320px',
-                                margin: 'auto',
-                                opacity: 0,
-                                MozTransform: 'scaleY(-1)',
-                                WebkitTransform: 'scaleY(-1)'
-                            })
-                            .appendTo($screen),
-                        $reflectionGradient = $('<div>')
-                            .css({
-                                position: 'absolute',
-                                left: 0,
-                                top: '160px',
-                                right: 0,
-                                bottom: 0,
-                                width: '320px',
-                                height: '160px',
-                                margin: 'auto',
-                                backgroundImage: '-webkit-linear-gradient(top, rgba(32, 32, 32, 0.8), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))'
-                            })
-                            .appendTo($screen),
-                        $logo = $('<img>')
-                            .attr({
-                                id: 'logo',
-                                src: '/static/png/logo256.png'
-                            })
-                            .css({
-                                position: 'absolute',
-                                left: 0,
-                                top: 0,
-                                right: 0,
-                                bottom: '160px',
-                                width: window.innerWidth + 'px',
-                                margin: 'auto'
-                            })
-                            .bind({
-                                click: function() {
-                                    $screen.find(':not(#logo)').remove();
-                                    $logo.animate({
-                                        width: window.innerWidth + 'px'
-                                    }, 500)
-                                    $screen.animate({opacity: 0}, 500, function() {
-                                        $screen.remove();
-                                    });
-                                }
-                            })
-                            .appendTo($screen),                            
-                        $input = Ox.Input({
-                                width: 156
-                            })
-                            .css({
-                                position: 'absolute',
-                                left: 0,
-                                top: '48px',
-                                right: '164px',
-                                bottom: 0,
-                                margin: 'auto',
-                                opacity: 0
-                            })
-                            .click(function(e) {
-                                e.stopPropagation();
-                            })
-                            .appendTo($screen)
-                            .focusInput(),
-                        $findButton = Ox.Button({
-                                title: 'Find',
-                                width: 74
-                            })
-                            .css({
-                                position: 'absolute',
-                                left: '82px',
-                                top: '48px',
-                                right: 0,
-                                bottom: 0,
-                                margin: 'auto',
-                                opacity: 0
-                            })
-                            .appendTo($screen),
-                        $browseButton = Ox.Button({
-                                title: 'Browse',
-                                width: 74
-                            })
-                            .css({
-                                position: 'absolute',
-                                left: '246px',
-                                top: '48px',
-                                right: 0,
-                                bottom: 0,
-                                margin: 'auto',
-                                opacity: 0
-                            })
-                            .appendTo($screen),
-                        $signupButton = Ox.Button({
-                                title: 'Sign Up',
-                                width: 74
-                            })
-                            .css({
-                                position: 'absolute',
-                                left: 0,
-                                top: '112px',
-                                right: '246px',
-                                bottom: 0,
-                                margin: 'auto',
-                                opacity: 0
-                            })
-                            .appendTo($screen),
-                        $signinButton = Ox.Button({
-                                title: 'Sign In',
-                                width: 74
-                            })
-                            .css({
-                                position: 'absolute',
-                                left: 0,
-                                top: '112px',
-                                right: '82px',
-                                bottom: 0,
-                                margin: 'auto',
-                                opacity: 0
-                            })
-                            .appendTo($screen),
-                        $aboutButton = Ox.Button({
-                                title: 'About ' + pandora.site.site.name,
-                                width: 156
-                            })
-                            .css({
-                                position: 'absolute',
-                                left: '164px',
-                                top: '112px',
-                                right: 0,
-                                bottom: 0,
-                                margin: 'auto',
-                                opacity: 0
-                            })
-                            .appendTo($screen),
-                        $text = $('<div>')
-                            .html('A Movie Database. \u2620 2007-2011 0x2620. All Open Source.')
-                            .css({
-                                position: 'absolute',
-                                left: 0,
-                                top: '176px',
-                                right: 0,
-                                bottom: 0,
-                                width: '360px',
-                                height: '16px',
-                                margin: 'auto',
-                                opacity: 0,
-                                textAlign: 'center'                               
-                            })
-                            .appendTo($screen)
-                    $screen.animate({opacity: 1}, 500, function() {
-                        $screen.find(':not(#logo)').animate({opacity: 1}, 250)
-                    });
-                    $logo.animate({width: '320px'}, 500);
-                        
-                    /*
-                    var $dialog = Ox.Dialog({
-                        buttons: [
-                            Ox.Button({
-                                id: 'close',
-                                title: 'Close'
-                            }).bindEvent({
-                                click: function() {
-                                    $dialog.close();
-                                }
-                            })
-                        ],
-                        height: 498,
-                        id: 'home',
-                        keys: {enter: 'close', escape: 'close'},
-                        title: pandora.site.site.name,
-                        width: 800
-                    }).open();
-                    */
-                } else if (data.id == 'register') {
-                    pandora.$ui.accountDialog = pandora.ui.accountDialog('register').open();
-                } else if (data.id == 'loginlogout') {
-                    pandora.$ui.accountDialog = (pandora.user.level == 'guest' ?
-                        pandora.ui.accountDialog('login') : pandora.ui.accountLogoutDialog()).open();
+                if (data.id == 'home') {
+                    pandora.$ui.home = pandora.ui.home().fadeInScreen();
+                } else if (['about', 'news', 'tour', 'faq', 'tos', 'contact', 'software'].indexOf(data.id) > -1) {
+                    pandora.$ui.siteDialog = pandora.ui.siteDialog(data.id).open();
+                    pandora.URL.push(data.id);
+                } else if (data.id == 'preferences') {
+                    pandora.$ui.preferencesDialog = pandora.ui.preferencesDialog().open();
+                } else if (data.id == 'signup') {
+                    pandora.$ui.accountDialog = pandora.ui.accountDialog('signup').open();
+                } else if (data.id == 'signinsignout') {
+                    pandora.$ui.accountDialog = (
+                        pandora.user.level == 'guest'
+                        ? pandora.ui.accountDialog('signin')
+                        : pandora.ui.accountSignoutDialog()
+                    ).open();
                 } else if (data.id == 'stills') {
                     var id = pandora.user.ui.item || pandora.user.ui.listItem;
                     pandora.$ui.postersDialog = pandora.ui.framesDialog(id).open();

@@ -102,14 +102,14 @@ pandora.getVideoPartsAndPoints = function(durations, points) {
     return ret;
 };
 
-pandora.login = function(data) {
+pandora.signin = function(data) {
     pandora.user = data.user;
     pandora.Query.updateGroups();
     Ox.Theme(pandora.user.ui.theme);
     pandora.$ui.appPanel.reload();
 };
 
-pandora.logout = function(data) {
+pandora.signout = function(data) {
     pandora.user = data.user;
     pandora.Query.updateGroups();
     Ox.Theme(pandora.site.user.ui.theme);

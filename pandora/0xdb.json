@@ -424,7 +424,8 @@
         {"id": "player", "title": "Player"},
         {"id": "timeline", "title": "Timeline"},
         {"id": "map", "title": "Map"},
-        {"id": "calendar", "title": "Calendar"}
+        {"id": "calendar", "title": "Calendar"},
+        {"id": "files", "title": "Files"}
     ],
     "layers": [
         {
@@ -537,6 +538,7 @@
             "showAnnotations": true,
             "showControls": true,
             "showGroups": true,
+            "showHome": true,
             "showInfo": true,
             "showMovies": true,
             "showFolder": {

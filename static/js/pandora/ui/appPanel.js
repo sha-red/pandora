@@ -14,9 +14,11 @@ pandora.ui.appPanel = function() {
         });
     that.display = function() {
         // fixme: move animation into Ox.App
-        pandora.$ui.body.css({opacity: 0});
+        var animate = $('#home').length == 0;
+        Ox.print('ANIMATE?', animate)
+        animate && pandora.$ui.body.css({opacity: 0});
         that.appendTo(pandora.$ui.body);
-        pandora.$ui.body.animate({opacity: 1}, 1000);
+        animate && pandora.$ui.body.animate({opacity: 1}, 1000);
         return that;
     }
     that.reload = function() {

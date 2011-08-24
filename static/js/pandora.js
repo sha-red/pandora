@@ -23,7 +23,7 @@ Ox.load('Geo', function() {
     window.pandora = new Ox.App({url: '/api/'}).bindEvent({
 
         load: function(event, data) {
-            $.extend(pandora, {
+            Ox.extend(pandora, {
                 requests: {},
                 ui: {}
             });
@@ -32,7 +32,7 @@ Ox.load('Geo', function() {
 
                 Ox.UI.hideLoadingScreen();
 
-                $.extend(pandora, {
+                Ox.extend(pandora, {
                     $ui: {
                         body: $('body'),
                         document: $(document),
@@ -41,9 +41,9 @@ Ox.load('Geo', function() {
                             .unload(unloadWindow)
                     },
                     site: data.site,
-                    user: data.user.level == 'guest' ? $.extend({}, data.site.user) : data.user
+                    user: data.user.level == 'guest' ? Ox.extend({}, data.site.user) : data.user
                 });
-                $.extend(pandora.site, {
+                Ox.extend(pandora.site, {
                     findKeys: $.map(data.site.itemKeys, function(key, i) {
                         return key.find ? key : null;
                     }),
@@ -75,10 +75,7 @@ Ox.load('Geo', function() {
                         return key.columnWidth ? key : null;
                     })
                 });
-                pandora.site.itemViews.push(
-                    {id: 'files', title: 'Files', admin: 'true'}
-                );
-                $.extend(pandora.user, {
+                Ox.extend(pandora.user, {
                     infoRatio: 16 / 9,
                     sectionElement: 'buttons',
                     selectedMovies: [],

@@ -41,5 +41,8 @@
   "js/pandora/ui/videoPreview.js", 
   "js/pandora/ui/editor.js",
   "js/pandora/ui/infoView.js",
-  "js/pandora/ui/mediaView.js"
+  "js/pandora/ui/mediaView.js",
+  "js/pandora/ui/home.js",
+  "js/pandora/ui/preferencesDialog.js",
+  "js/pandora/ui/siteDialog.js"
 ]

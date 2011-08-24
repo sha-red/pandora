@@ -22,28 +22,28 @@ pandora.ui.accountDialogOptions = function(action, value) {
     //Ox.print('ACTION', action)
     pandora.$ui.accountForm && pandora.$ui.accountForm.removeElement();
     var buttons = {
-            login: ['register', 'reset'],
-            register: ['login'],
-            reset: ['login'],
-            resetAndLogin: []
+            signin: ['signup', 'reset'],
+            signup: ['signin'],
+            reset: ['signin'],
+            resetAndSignin: []
         },
         buttonTitle = {
-            login: 'Login',
-            register: 'Register',
+            signin: 'Sign In',
+            signup: 'Sign Up',
             reset: 'Reset Password',
-            resetAndLogin: 'Reset Password and Login'
+            resetAndSignin: 'Reset Password and Sign In'
         },
         dialogText = {
-            login: 'To login to your account, please enter your username and password.',
-            register: 'To create a new account, please choose a username and password, and enter your e-mail address.',
+            signin: 'To sign in to your account, please enter your username and password.',
+            signup: 'To sign up for an account, please choose a username and password, and enter your e-mail address.',
             reset: 'To reset your password, please enter either your username or your e-mail address.',
-            resetAndLogin: 'To login to your account, please choose a new password, and enter the code that we have just e-mailed to you.'
+            resetAndSignin: 'To sign in to your account, please choose a new password, and enter the code that we have just e-mailed to you.'
         },
         dialogTitle = {
-            login: 'Login',
-            register: 'Register',
+            signin: 'Sign In',
+            signup: 'Sign Up',
             reset: 'Reset Password',
-            resetAndLogin: 'Reset Password'
+            resetAndSignin: 'Reset Password'
         };
     function button(type) {
         if (type == 'cancel') {
@@ -115,10 +115,10 @@ pandora.ui.accountForm = function(action, value) {
         });
     }
     var items = {
-            'login': ['username', 'password'],
-            'register': ['newUsername', 'password', 'email'],
+            'signin': ['username', 'password'],
+            'signup': ['newUsername', 'password', 'email'],
             'reset': ['usernameOrEmail'],
-            'resetAndLogin': ['oldUsername', 'newPassword', 'code']
+            'resetAndSignin': ['oldUsername', 'newPassword', 'code']
         },
         $items = $.map(items[action], function(v) {
             return item(v, value);
@@ -127,38 +127,39 @@ pandora.ui.accountForm = function(action, value) {
             id: 'accountForm' + Ox.toTitleCase(action),
             items: $items,
             submit: function(data, callback) {
-                if (action == 'login') {
+                if (action == 'signin') {
                     pandora.api.signin(data, function(result) {
                         if (!result.data.errors) {
                             pandora.$ui.accountDialog.close();
-                            pandora.login(result.data);
+                            pandora.signin(result.data);
                         } else {
                             callback([{id: 'password', message: 'Incorrect password'}]);
                         }
                     });
-                } else if (action == 'register') {
+                } else if (action == 'signup') {
                     pandora.api.signup(data, function(result) {
                         if (!result.data.errors) {
                             pandora.$ui.accountDialog.close();
-                            pandora.login(result.data);
+                            pandora.signin(result.data);
                             pandora.ui.accountWelcomeDialog().open();
                         } else {
                             callback([{id: 'password', message: result.data.errors.toString()}]); // fixme
                         }
                     });
                 } else if (action == 'reset') {
+                    Ox.print('DATA???', data)
                     var usernameOrEmail = data.usernameOrEmail,
-                        key = usernameOrEmail[0].id;
+                        key = usernameOrEmail[0];
                     data = {};
                     data[key] = usernameOrEmail[1];
                     pandora.api.requestToken(data, function(result) {
                         if (!result.data.errors) {
-                            pandora.$ui.accountDialog.options(ui.accountDialogOptions('resetAndLogin', result.data.username));
+                            pandora.$ui.accountDialog.options(pandora.ui.accountDialogOptions('resetAndSignin', result.data.username));
                         } else {
                             callback([{id: 'usernameOrEmail', message: 'Unknown ' + (key == 'username' ? 'username' : 'e-mail address')}])
                         }
                     });
-                } else if (action == 'resetAndLogin') {
+                } else if (action == 'resetAndSignin') {
                     pandora.api.resetPassword(data, function(result) {
                         if (!result.data.errors) {
                             pandora.$ui.accountDialog.close();
@@ -302,7 +303,7 @@ pandora.ui.accountForm = function(action, value) {
     return that;            
 };
 
-pandora.ui.accountLogoutDialog = function() {
+pandora.ui.accountSignoutDialog = function() {
     var that = Ox.Dialog({
             buttons: [
                 Ox.Button({
@@ -310,15 +311,15 @@ pandora.ui.accountLogoutDialog = function() {
                     title: 'Cancel'
                 }).bindEvent('click', function() {
                     that.close();
-                    pandora.$ui.mainMenu.getItem('loginlogout').toggleTitle();
+                    pandora.$ui.mainMenu.getItem('signinsignout').toggleTitle();
                 }),
                 Ox.Button({
-                    id: 'logout',
-                    title: 'Logout'
+                    id: 'signout',
+                    title: 'Sign Out'
                 }).bindEvent('click', function() {
                     that.close();
                     pandora.api.signout({}, function(result) {
-                        pandora.logout(result.data);
+                        pandora.signout(result.data);
                     });
                 })
             ],
@@ -331,12 +332,12 @@ pandora.ui.accountLogoutDialog = function() {
                 .append(
                     Ox.Element()
                         .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
-                        .html('Are you sure you want to logout?')
+                        .html('Are you sure you want to sign out?')
                 ),
             fixedSize: true,
             height: 128,
-            keys: {enter: 'logout', escape: 'cancel'},
-            title: 'Logout',
+            keys: {enter: 'signout', escape: 'cancel'},
+            title: 'Sign Out',
             width: 304
         });
     return that;
@@ -350,6 +351,7 @@ pandora.ui.accountWelcomeDialog = function() {
                     title: 'Preferences...'
                 }).bindEvent('click', function() {
                     that.close();
+                    pandora.$ui.preferencesDialog = pandora.ui.preferencesDialog().open();
                 }),
                 {},
                 Ox.Button({

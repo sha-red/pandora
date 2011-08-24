@@ -7,9 +7,7 @@ pandora.ui.viewSelect = function() {
                     checked: pandora.user.ui.lists[pandora.user.ui.list].listView == view.id,
                     title: 'View ' + view.title
                 });
-            }) : pandora.site.itemViews.filter(function(view) {
-                return !view.admin || pandora.user.level == 'admin';
-            }).map(function(view) {
+            }) : pandora.site.itemViews.map(function(view) {
                 return $.extend($.extend({}, view), {
                     checked: pandora.user.ui.itemView == view.id,
                     title: 'View: ' + view.title
