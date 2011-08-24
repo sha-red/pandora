@@ -818,7 +818,7 @@ class Item(models.Model):
 
     def streams(self):
         return [video.streams.filter(source=None, available=True)[0]
-                for video in self.files.filter(is_video=True, active=True)]
+                for video in self.files.filter(is_video=True, active=True).order_by('part')]
 
     def update_timeline(self, force=False):
         config = site_config()
@@ -938,7 +938,8 @@ class Item(models.Model):
         p = subprocess.Popen(cmd)
         p.wait()
         for f in glob(poster.replace('.jpg', '*.jpg')):
-            os.unlink(f)
+            if f != poster:
+                os.unlink(f)
         return poster
 
     def poster_frames(self):

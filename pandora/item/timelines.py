@@ -78,22 +78,25 @@ def join_timelines(timelines, prefix):
     for timeline in timelines:
         tiles += sorted(glob('%s.%s.*.png'%(timeline, height)))
 
-    tiles = map(Image.open, tiles)
-    duration = sum(map(lambda i: i.size[0], tiles))
-    timeline = Image.new("RGB", (duration, height))
-    pos = 0
-    for tile in tiles:
-        timeline.paste(tile, (pos, 0, pos+tile.size[0], height))
-        pos += tile.size[0]
+    timeline = Image.new("RGB", (2 * width, height))
 
     pos = 0
     i = 0
-    while pos < timeline.size[0]:
-        end = min(pos+width, timeline.size[0])
-        timeline_name = '%s.%s.%04d.png' % (prefix, timeline.size[1], i)
-        timeline.crop((pos, 0, end, timeline.size[1])).save(timeline_name)
-        pos += width
-        i += 1
+    for tile in tiles:
+        tile = Image.open(tile)
+        timeline.paste(tile, (pos, 0, pos+tile.size[0], height))
+        pos += tile.size[0]
+        if pos >= width:
+            timeline_name = '%s.%s.%04d.png' % (prefix, height, i)
+            timeline.crop((0, 0, width, height)).save(timeline_name)
+            i += 1
+            if pos > width:
+                t = timeline.crop((width, 0, pos, height))
+                timeline.paste(t, (0, 0, t.size[0], height))
+            pos -= width
+    if pos:
+       timeline_name = '%s.%s.%04d.png' % (prefix, height, i)
+       timeline.crop((0, 0, pos, height)).save(timeline_name)
 
     makeTiles(prefix, 16, 3600)
     makeTimelineOverview(prefix, 1920, height=16)
