@@ -737,6 +737,7 @@ class Item(models.Model):
         if len(folders) > 1:
             files = files.filter(folder=folders[0])
         files.update(wanted=True)
+        self.files.exclude(id__in=files).update(wanted=False)
 
     def update_selected(self):
         files = archive.models.File.objects.filter(item=self,
