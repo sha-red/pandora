@@ -19,18 +19,28 @@ pandora.ui.item = function() {
                     pandora.URL.set(result.data.items[0].id);
                 } else {
                     pandora.$ui.contentPanel.replaceElement(1,
-                        Ox.Element().html(
-                            'Sorry, we can\'t find the ' + pandora.site.itemName.singular + ' you\'re looking for.'));
+                        Ox.Element()
+                            .css({marginTop: '32px', fontSize: '12px', textAlign: 'center'})
+                            .html(
+                                'Sorry, we can\'t find the '
+                                + pandora.site.itemName.singular.toLowerCase()
+                                + ' you\'re looking for.'
+                            )
+                    );
                 }                
             });
         } else if (!result.data.rendered &&
                    ['clips', 'map',
                     'player', 'timeline'].indexOf(pandora.user.ui.itemView)>-1) {
             pandora.$ui.contentPanel.replaceElement(1,
-                Ox.Element().css({margin: '16px'}).html(
-                    'We are sorry, "' + result.data.title +
-                    '" does not have a '+pandora.user.ui.itemView +
-                    ' view right now.'));
+                Ox.Element()
+                    .css({marginTop: '32px', fontSize: '12px', textAlign: 'center'})
+                    .html(
+                        'Sorry, <i>' + result.data.title 
+                        + '</i> currently doesn\'t have a '
+                        + pandora.user.ui.itemView + ' view.'
+                    )
+            );
         } else if (pandora.user.ui.itemView == 'calendar') {
             pandora.$ui.contentPanel.replaceElement(1, Ox.Element().html('Calendar'));
         } else if (pandora.user.ui.itemView == 'clips') {
