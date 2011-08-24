@@ -20,7 +20,7 @@ pandora.ui.item = function() {
                 } else {
                     pandora.$ui.contentPanel.replaceElement(1,
                         Ox.Element().html(
-                            'Sorry, we can\'t find the ' + pandora.site.itemName.singular + ' you\'re looking for.' + '<br/>' + JSON.stringify(result.data)));
+                            'Sorry, we can\'t find the ' + pandora.site.itemName.singular + ' you\'re looking for.'));
                 }                
             });
         } else if (!result.data.rendered &&
