@@ -54,83 +54,10 @@ pandora.getFoldersWidth = function() {
     return width;
 };
 
-pandora.getGroupWidth = function(pos, panelWidth) { // fixme: don't pass panelWidth
-    var width = {};
-    width.list = Math.floor(panelWidth / 5) + (panelWidth % 5 > pos);
-    width.column = width.list - 40 - Ox.UI.SCROLLBAR_SIZE;
-    return width;
-};
-
-pandora.getSortOperator = function(key) { // fixme: make static
-    var type = Ox.getObjectById(pandora.site.itemKeys, key).type;
-    return ['hue', 'string', 'text'].indexOf(
-        Ox.isArray(type) ? type[0] : type
-    ) > -1 ? '+' : '-';
-};
-
-pandora.login = function(data) {
-    pandora.user = data.user;
-    Ox.Theme(pandora.user.ui.theme);
-    pandora.$ui.appPanel.reload();
-};
-
-pandora.logout = function(data) {
-    pandora.user = data.user;
-    Ox.Theme(pandora.site.user.ui.theme);
-    pandora.$ui.appPanel.reload();
-};
-
-pandora.reloadGroups = function(i) {
-    var query = pandora.Query.toObject(),
-        view = pandora.user.ui.lists[pandora.user.ui.list].listView;
-    if(view == 'clip') {
-        pandora.$ui.list.options({
-            items: function(data, callback) {
-                return pandora.api.findAnnotations($.extend(data, {
-                    itemQuery: query
-                }), callback);
-            }
-        });
-    } else if (view == 'map') {
-        pandora.$ui.map.options({
-            places: function(data, callback) {
-                return pandora.api.findPlaces($.extend(data, {
-                    itemQuery: query
-                }), callback);
-            }
-        });
-    } else if (view == 'calendar') {
-        pandora.$ui.list.options({
-            items: function(data, callback) {
-                return pandora.api.findEvents($.extend(data, {
-                    itemQuery: query
-                }), callback);
-            }
-        });
-    } else {
-        pandora.$ui.list.options({
-            items: function(data, callback) {
-                return pandora.api.find($.extend(data, {
-                    query: query
-                }), callback);
-            }
-        });
-    }
-    $.each(pandora.user.queryGroups, function(i_, group_) {
-        if (i_ != i) {
-            //Ox.print('setting groups request', i, i_)
-            pandora.$ui.groups[i_].options({
-                items: function(data, callback) {
-                    delete data.keys;
-                    return pandora.api.find($.extend(data, {
-                        group: group_.id,
-                        query: pandora.Query.toObject(group_.id)
-                    }), callback);
-                }
-            });
-        }
-    });
-    pandora.URL.push(pandora.Query.toString());
+pandora.getGroupsSizes = function() {
+    return Ox.divideInt(
+        window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1, 5
+    )
 };
 
 pandora.getListData = function() {
@@ -142,6 +69,13 @@ pandora.getListData = function() {
     }
     data.editable = data.user == pandora.user.username && data.type == 'static';
     return data;
+};
+
+pandora.getSortOperator = function(key) { // fixme: make static
+    var type = Ox.getObjectById(pandora.site.itemKeys, key).type;
+    return ['hue', 'string', 'text'].indexOf(
+        Ox.isArray(type) ? type[0] : type
+    ) > -1 ? '+' : '-';
 };
 
 pandora.getVideoPartsAndPoints = function(durations, points) {
@@ -168,6 +102,70 @@ pandora.getVideoPartsAndPoints = function(durations, points) {
     return ret;
 };
 
+pandora.login = function(data) {
+    pandora.user = data.user;
+    Ox.Theme(pandora.user.ui.theme);
+    pandora.$ui.appPanel.reload();
+};
+
+pandora.logout = function(data) {
+    pandora.user = data.user;
+    Ox.Theme(pandora.site.user.ui.theme);
+    pandora.$ui.appPanel.reload();
+};
+
+pandora.reloadGroups = function(i) {
+    var query = pandora.user.ui.query,
+        view = pandora.user.ui.lists[pandora.user.ui.list].listView;
+    if (view == 'clip') {
+        pandora.$ui.list.options({
+            items: function(data, callback) {
+                return pandora.api.findAnnotations(Ox.extend(data, {
+                    itemQuery: query
+                }), callback);
+            }
+        });
+    } else if (view == 'map') {
+        pandora.$ui.map.options({
+            places: function(data, callback) {
+                return pandora.api.findPlaces(Ox.extend(data, {
+                    itemQuery: query
+                }), callback);
+            }
+        });
+    } else if (view == 'calendar') {
+        pandora.$ui.list.options({
+            items: function(data, callback) {
+                return pandora.api.findEvents(Ox.extend(data, {
+                    itemQuery: query
+                }), callback);
+            }
+        });
+    } else {
+        pandora.$ui.list.options({
+            items: function(data, callback) {
+                return pandora.api.find(Ox.extend(data, {
+                    query: query
+                }), callback);
+            }
+        });
+    }
+    $.each(pandora.user.ui.groups, function(i_, id) {
+        if (i_ != i) {
+            //Ox.print('setting groups request', i, i_)
+            pandora.$ui.groups[i_].options({
+                items: function(data, callback) {
+                    delete data.keys;
+                    return pandora.api.find(Ox.extend(data, {
+                        group: id,
+                        query: pandora.user.ui.groupsData[i_].query
+                    }), callback);
+                }
+            });
+        }
+    });
+};
+
 pandora.reloadList = function() {
     Ox.print('reloadList')
     var listData = pandora.getListData();
@@ -191,14 +189,16 @@ pandora.reloadList = function() {
 };
 
 pandora.resizeGroups = function(width) {
-    var widths = $.map(pandora.user.queryGroups, function(v, i) {
-        return pandora.getGroupWidth(i, width);
-    });
-    //Ox.print('widths', widths);
-    pandora.$ui.browser.size(0, widths[0].list).size(2, widths[4].list);
-    pandora.$ui.groupsInnerPanel.size(0, widths[1].list).size(2, widths[3].list);
-    $.each(pandora.$ui.groups, function(i, list) {
-        list.resizeColumn('name', widths[i].column);
+    pandora.user.ui.groupsSizes = pandora.getGroupsSizes();
+    Ox.print('{}{}{}', window.innerWidth, window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1, pandora.user.ui.groupsSizes)
+    pandora.$ui.browser
+        .size(0, pandora.user.ui.groupsSizes[0])
+        .size(2, pandora.user.ui.groupsSizes[4]);
+    pandora.$ui.groupsInnerPanel
+        .size(0, pandora.user.ui.groupsSizes[1])
+        .size(2, pandora.user.ui.groupsSizes[3]);
+    pandora.$ui.groups.forEach(function(list, i) {
+        list.resizeColumn('name', pandora.user.ui.groupsSizes[i] - 40 - Ox.UI.SCROLLBAR_SIZE);
     });
 };
 

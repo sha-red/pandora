@@ -1,16 +1,9 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
-pandora.ui.group = function(id, query) {
-    //Ox.print('group', id, query);
-    /*
-    query && query.conditions.length && alert($.map(query.conditions, function(v) {
-        return v.value;
-    }));
-    */
-    //alert(id + ' ' + JSON.stringify(pandora.Query.toObject(id)))
+pandora.ui.group = function(id) {
     var i = pandora.user.ui.groups.indexOf(id),
         panelWidth = pandora.$ui.document.width() - (pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize) - 1,
         title = Ox.getObjectById(pandora.site.groups, id).title,
-        width = pandora.getGroupWidth(i, panelWidth),
+        //width = pandora.getGroupWidth(i, panelWidth),
         that = Ox.TextList({
             columns: [
                 {
@@ -20,7 +13,7 @@ pandora.ui.group = function(id, query) {
                     title: title,
                     unique: true,
                     visible: true,
-                    width: width.column
+                    width: pandora.user.ui.groupsSizes[i] - 40 - Ox.UI.SCROLLBAR_SIZE
                 },
                 {
                     align: 'right',
@@ -36,40 +29,61 @@ pandora.ui.group = function(id, query) {
             items: function(data, callback) {
                 //if (pandora.user.ui.showGroups) {
                     delete data.keys;
-                    //alert(id + " pandora.Query.toObject " + JSON.stringify(pandora.Query.toObject(id)) + ' ' + JSON.stringify(data))
                     return pandora.api.find($.extend(data, {
                         group: id,
-                        query: pandora.Query.toObject(id)
+                        query: pandora.user.ui.groupsData[i].query
                     }), callback);
                 //} else {
                 //    callback({data: {items: data.keys ? [] : 0}});
                 //}
             },
             scrollbarVisible: true,
-            selected: query ? $.map(query.conditions, function(v) {
-                return v.value;
-            }) : [],
-            sort: [
-                {
-                    key: id == 'year' ? 'name' : 'items',
-                    operator: '-'
-                }
-            ]
+            selected: pandora.user.ui.groupsData[i].selected,
+            sort: [{
+                key: id == 'year' ? 'name' : 'items',
+                operator: '-'
+            }]
         })
         .bindEvent({
             paste: function(event, data) {
                 pandora.$ui.list.triggerEvent('paste', data);
             },
             select: function(event, data) {
-                var group = pandora.user.queryGroups[i],
-                    query;
-                pandora.user.queryGroups[i].query.conditions = $.map(data.ids, function(v) {
-                    return {
-                        key: id,
-                        value: v,
-                        operator: '='
-                    };
-                });
+                var conditions = data.ids.map(function(value) {
+                        return {
+                            key: id,
+                            value: value,
+                            operator: '='
+                        };
+                    }),
+                    index = pandora.user.ui.groupsData[i].index;
+                if (Ox.isArray(index)) {
+                    pandora.user.ui.query = {
+                        conditions: conditions,
+                        operator: conditions.length > 1 ? '|' : ''
+                    }
+                } else {
+                    if (index == -1) {
+                        index = pandora.user.ui.query.conditions.length;
+                        pandora.user.ui.query.operator = '&'
+                    }
+                    if (conditions.length == 0) {
+                        pandora.user.ui.query.conditions.splice(index, 1);
+                        if (pandora.user.ui.query.conditions.length == 1) {
+                            pandora.user.ui.query.operator = '';
+                        }
+                    } else if (conditions.length == 1) {
+                        pandora.user.ui.query.conditions[index] = conditions[0];
+                    } else {
+                        pandora.user.ui.query.conditions[index].conditions = conditions;
+                        pandora.user.ui.query.conditions[index].operator = '|';
+                        delete pandora.user.ui.query.conditions[index].key;
+                        delete pandora.user.ui.query.conditions[index].value;
+                    }
+                }
+                pandora.Query.updateGroups();
+                Ox.print('---------', pandora.user.ui.query, pandora.user.ui.groupsData)
+                pandora.URL.push(pandora.Query.toString());
                 pandora.reloadGroups(i);
             }
         });
@@ -156,14 +170,14 @@ pandora.ui.groupsInnerPanel = function() {
         elements: [
             {
                 element: pandora.$ui.groups[1],
-                size: pandora.user.queryGroups[1].size
+                size: pandora.user.ui.groupsSizes[1]
             },
             {
                 element: pandora.$ui.groups[2],
             },
             {
                 element: pandora.$ui.groups[3],
-                size: pandora.user.queryGroups[3].size
+                size: pandora.user.ui.groupsSizes[3]
             }
         ],
         orientation: 'horizontal'

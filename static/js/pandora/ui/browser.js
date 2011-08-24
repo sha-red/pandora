@@ -1,20 +1,21 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.browser = function() {
-    var that;
+    var sizes, that;
     if (!pandora.user.ui.item) {
+        pandora.user.ui.groupsSizes = pandora.getGroupsSizes();
         pandora.$ui.groups = pandora.ui.groups();
         that = Ox.SplitPanel({
             elements: [
                 {
                     element: pandora.$ui.groups[0],
-                    size: pandora.user.queryGroups[0].size
+                    size: pandora.user.ui.groupsSizes[0]
                 },
                 {
                     element: pandora.$ui.groupsInnerPanel = pandora.ui.groupsInnerPanel()
                 },
                 {
                     element: pandora.$ui.groups[4],
-                    size: pandora.user.queryGroups[4].size
+                    size: pandora.user.ui.groupsSizes[4]
                 },
             ],
             id: 'browser',

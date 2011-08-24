@@ -37,7 +37,7 @@ pandora.ui.rightPanel = function() {
         .bindEvent({
             resize: function(event, data) {
                 if (!pandora.user.ui.item) {
-                    pandora.resizeGroups(data);
+                    pandora.resizeGroups();
                     pandora.$ui.list.size();
                     if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'timelines') {
                         pandora.$ui.list.options({

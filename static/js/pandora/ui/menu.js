@@ -120,11 +120,11 @@ pandora.ui.mainMenu = function() {
                 { id: 'findMenu', title: 'Find', items: [
                     { id: 'find', title: 'Find', items: [
                         { group: 'find', min: 1, max: 1, items: pandora.site.findKeys.map(function(key, i) {
+                            var index = pandora.user.ui.find.index;
                             return Ox.extend({
-                                checked: pandora.user.ui.findQuery.conditions.length ? ( 
-                                    pandora.user.ui.findQuery.conditions[0].key == key.id ||
-                                    (pandora.user.ui.findQuery.conditions[0].key === '' && key.id == 'all')
-                                ) : key.id == 'all',
+                                checked: index > -1 && pandora.user.ui.query.conditions[index].key
+                                    ? pandora.user.ui.query.conditions[index].key == key.id
+                                    : key.id == 'all'
                             }, key);
                         }) }
                     ] },

@@ -89,20 +89,20 @@ pandora.ui.list = function() { // fixme: remove view argument
                     ratio = icons == 'posters' ? data.posterRatio : 1;
                 size = size || 128;
                 return {
-                    height: ratio <= 1 ? size : size / ratio,
+                    height: Math.round(ratio <= 1 ? size : size / ratio),
                     id: data.id,
                     info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
                     title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
                     url: icons == 'posters' 
                         ? '/' + data.id + '/poster' + size + '.jpg'
                         : '/' + data.id + '/icon' + size + '.jpg',
-                    width: ratio >= 1 ? size : size * ratio
+                    width: Math.round(ratio >= 1 ? size : size * ratio)
                 };
             },
             items: function(data, callback) {
                 //Ox.print('data, pandora.Query.toObject', data, pandora.Query.toObject())
                 pandora.api.find($.extend(data, {
-                    query: pandora.Query.toObject()
+                    query: pandora.user.ui.query
                 }), callback);
             },
             keys: ['director', 'id', 'posterRatio', 'title', 'year'],

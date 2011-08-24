@@ -513,17 +513,14 @@
         "preferences": {},
         "ui": {
             "annotationsSize": 256,
-            "findKey": "",
-            "findQuery": {"conditions": [], "operator": ""},
+            "find": {"index": -1, "key": "", "value": ""},
             "groups": ["director", "country", "year", "language", "genre"],
-            "groupsQuery": {"conditions": [], "operator": "|"},
             "groupsSize": 176,
             "icons": "posters",
             "infoIconSize": 256,
             "item": "",
             "itemView": "info",
             "list": "",
-            "listQuery": {"conditions": [], "operator": ""},
             "lists": {
                 "": {
                     "columns": ["title", "director", "country", "year", "language", "runtime", "genre"],
@@ -535,6 +532,7 @@
                     ]
                 }
             },
+            "query": {"conditions": [], "operator": ""},
             "section": "items",
             "showAnnotations": true,
             "showControls": true,
