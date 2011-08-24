@@ -79,7 +79,7 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 submit: function(data) {
-                    pandora.URL.set('/?find=' + data.value);
+                    data.value && pandora.URL.set('/?find=' + data.value);
                     that.fadeOutScreen();
                 }
             })
