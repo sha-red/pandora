@@ -35,13 +35,13 @@ pandora.Query = (function() {
         });
     }
 
-    function getGroupsData() {
+    function getGroupsData(fullQuery) {
         // a group is selected if exactly one condition in an & query
         // or every condition in an | query
         // has the group id as key and "=" as operator
         return pandora.user.ui.groups.map(function(key) {
             var index = -1,
-                query = Ox.clone(pandora.user.ui.query, true),
+                query = Ox.clone(fullQuery, true),
                 selected = [];
             if (query.operator == '|') {
                 if (everyCondition(query.conditions, key, '=')) {
@@ -93,6 +93,7 @@ pandora.Query = (function() {
             index, indices,
             ret = {
                 find: {index: -1, key: '', value: ''},
+                groups: [],
                 list: '',
                 query: {conditions: [], operator: ''}
             },
@@ -130,8 +131,10 @@ pandora.Query = (function() {
                     ret.list = ret.query.conditions[index].value;
                 }
             }
+            ret.groups = getGroupsData(ret.query);
             // find is populated if exactly one condition in an & query
             // has a findKey as key and "" as operator
+            // (and all other conditions are either list or groups)
             // or if all conditions in an | query have the same group id as key
             if (ret.query.operator == '|') {
                 ret.find = {index: -1, key: 'advanced', value: ''};
@@ -142,20 +145,26 @@ pandora.Query = (function() {
                     }
                 });
             } else {
+                conditions = ret.query.conditions.length
+                    - (ret.list != '')
+                    - ret.groups.filter(function(group) {
+                        return group.index > -1;
+                    }).length;
                 indices = Ox.map(pandora.site.findKeys, function(findKey) {
                     var key = findKey.id == 'all' ? '' : findKey.id, 
                         index = oneCondition(ret.query.conditions, key, '');
                     return index > -1 ? index : null;
                 });
-                Ox.print('INDICES', indices, indices.length == 1 && !ret.query.conditions[indices[0]].conditions)
-                if (indices.length) {
-                    ret.find = indices.length == 1 && !ret.query.conditions[indices[0]].conditions ? {
+                if (conditions > 0 || indices.length > 0) {
+                    ret.find = (
+                        conditions == 1 && indices.length == 1
+                        && !ret.query.conditions[indices[0]].conditions
+                    ) ? {
                         index: indices[0],
                         key: ret.query.conditions[indices[0]].key,
                         value: ret.query.conditions[indices[0]].value
-                    } : {index: -1, key: 'advanced', value: ''}
+                    } : {index: -1, key: 'advanced', value: ''}                    
                 }
-                Ox.print('FIND', ret.find)
             }
         }
         return ret;
@@ -212,8 +221,8 @@ pandora.Query = (function() {
                 );
                 pandora.UI.set({list: data.list});
                 pandora.user.ui.find = data.find;
+                pandora.user.ui.groupsData = data.groups;
                 pandora.user.ui.query = data.query;
-                pandora.user.ui.groupsData = getGroupsData();
             }
             if ('sort' in query) {
                 sort = query.sort.split(',');
@@ -269,7 +278,7 @@ pandora.Query = (function() {
         },
 
         updateGroups: function() {
-            pandora.user.ui.groupsData = getGroupsData();
+            pandora.user.ui.groupsData = getGroupsData(pandora.user.ui.query);
         }
 
     };
