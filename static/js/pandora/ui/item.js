@@ -6,9 +6,23 @@ pandora.ui.item = function() {
         keys: []
     }, pandora.user.level == 'admin' && pandora.user.ui.itemView == 'info' ? 0 : -1, function(result) {
         if (result.status.code != 200) {
-            pandora.$ui.contentPanel.replaceElement(1,
-                Ox.Element().html(
-                    'The '+pandora.site.itemName.singular+' you are looking for does not exist.'));
+            // fixme: this is quite a hack
+            pandora.api.find({
+                query: {
+                    conditions: [{key: 'title', value: decodeURI(pandora.user.ui.item), operator: '='}],
+                    operator: ''
+                },
+                keys: ['id']
+            }, function(result) {
+                if (result.data.items.length) {
+                    pandora.user.ui.item = '';
+                    pandora.URL.set(result.data.items[0].id);
+                } else {
+                    pandora.$ui.contentPanel.replaceElement(1,
+                        Ox.Element().html(
+                            'Sorry, we can\'t find the ' + pandora.site.itemName.singular + ' you\'re looking for.' + '<br/>' + JSON.stringify(result.data)));
+                }                
+            });
         } else if (!result.data.rendered &&
                    ['clips', 'map',
                     'player', 'timeline'].indexOf(pandora.user.ui.itemView)>-1) {

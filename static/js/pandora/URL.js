@@ -90,12 +90,13 @@ pandora.URL = (function() {
                 view = view ? view[0]
                     : position ? pandora.user.ui.videoView
                     : pandora.user.ui.itemView;
-                pandora.UI.set({
+                pandora.UI.set(Ox.extend({
                     section: 'items',
                     item: item,
                     itemView: view
-                });
-                Ox.print('POSITION', position)
+                }, ['player', 'timeline'].indexOf(view) > -1 ? {
+                    videoView: view
+                } : {}));
                 if (position) {
                     split[length - 1] = position[0].split('-').map(function(point, i) {
                         // fixme: this is duplicated, see Ox.VideoPlayer() parsePositionInput()
