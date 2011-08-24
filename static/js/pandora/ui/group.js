@@ -58,15 +58,25 @@ pandora.ui.group = function(id) {
                     }),
                     index = pandora.user.ui.groupsData[i].index;
                 if (Ox.isArray(index)) {
+                    // this group had multiple selections and the | query
+                    // was on the top level, i.e. not bracketed
                     pandora.user.ui.query = {
                         conditions: conditions,
                         operator: conditions.length > 1 ? '|' : ''
                     }
                 } else {
                     if (index == -1) {
+                        // this group had no selection, i.e. no query
                         index = pandora.user.ui.query.conditions.length;
-                        pandora.user.ui.query.operator = index ? '&' : '';
-                        Ox.print('$$$$$$$$$$$$$$$$$$$', index, pandora.user.ui.query.operator)
+                        if (pandora.user.ui.query.operator == '|') {
+                            pandora.user.ui.query = {
+                                conditions: [pandora.user.ui.query],
+                                operator: '&'
+                            };
+                            index = 1;
+                        } else {
+                            pandora.user.ui.query.operator = index ? '&' : '';
+                        }
                     }
                     if (conditions.length == 0) {
                         pandora.user.ui.query.conditions.splice(index, 1);

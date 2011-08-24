@@ -104,12 +104,14 @@ pandora.getVideoPartsAndPoints = function(durations, points) {
 
 pandora.login = function(data) {
     pandora.user = data.user;
+    pandora.Query.updateGroups();
     Ox.Theme(pandora.user.ui.theme);
     pandora.$ui.appPanel.reload();
 };
 
 pandora.logout = function(data) {
     pandora.user = data.user;
+    pandora.Query.updateGroups();
     Ox.Theme(pandora.site.user.ui.theme);
     pandora.$ui.appPanel.reload();
 };

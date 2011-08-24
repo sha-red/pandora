@@ -93,7 +93,7 @@ pandora.Query = (function() {
             index, indices,
             ret = {
                 find: {index: -1, key: '', value: ''},
-                groups: [],
+                groups: [], // {index, query, selected}
                 list: '',
                 query: {conditions: [], operator: ''}
             },
@@ -131,7 +131,6 @@ pandora.Query = (function() {
                     ret.list = ret.query.conditions[index].value;
                 }
             }
-            ret.groups = getGroupsData(ret.query);
             // find is populated if exactly one condition in an & query
             // has a findKey as key and "" as operator
             // (and all other conditions are either list or groups)
@@ -145,11 +144,13 @@ pandora.Query = (function() {
                     }
                 });
             } else {
+                // number of conditions that are not list or groups
                 conditions = ret.query.conditions.length
                     - (ret.list != '')
                     - ret.groups.filter(function(group) {
                         return group.index > -1;
                     }).length;
+                // indices of non-advanced find queries
                 indices = Ox.map(pandora.site.findKeys, function(findKey) {
                     var key = findKey.id == 'all' ? '' : findKey.id, 
                         index = oneCondition(ret.query.conditions, key, '');
@@ -167,6 +168,7 @@ pandora.Query = (function() {
                 }
             }
         }
+        ret.groups = getGroupsData(ret.query);
         return ret;
     }
 
@@ -222,6 +224,7 @@ pandora.Query = (function() {
                 pandora.UI.set({list: data.list});
                 pandora.user.ui.find = data.find;
                 pandora.user.ui.groupsData = data.groups;
+                Ox.print("PUUGD", pandora.user.ui.groupsData);
                 pandora.user.ui.query = data.query;
             }
             if ('sort' in query) {
