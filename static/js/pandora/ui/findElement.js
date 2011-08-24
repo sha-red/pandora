@@ -75,21 +75,21 @@ pandora.ui.findElement = function() {
                             var findInList = pandora.user.ui.list
                                     && pandora.$ui.findListSelect.value() == 'list',
                                 key = pandora.$ui.findSelect.value(),
-                                condition = {
+                                conditions = data.value ? [{
                                     key: key == 'all' ? '' : key,
                                     value: data.value,
                                     operator: ''
-                                };
+                                }] : [];
                             if (findInList) {
                                 pandora.user.ui.query = {
-                                    conditions: [{
+                                    conditions: Ox.merge([{
                                         key: 'list',
                                         value: pandora.user.ui.list,
                                         operator: ''
-                                    }, condition],
+                                    }], conditions),
                                     operator: '&'
                                 }
-                                findIndex == 0 && pandora.user.ui.query.conditions.reverse();
+                                data.value && findIndex == 0 && pandora.user.ui.query.conditions.reverse();
                             } else {
                                 if (pandora.user.ui.list) {
                                     Ox.forEach(pandora.$ui.folderList, function($list) {
@@ -98,7 +98,7 @@ pandora.ui.findElement = function() {
                                     pandora.UI.set({list: ''});
                                 }
                                 pandora.user.ui.query = {
-                                    conditions: [condition],
+                                    conditions: conditions,
                                     operator: ''
                                 }
                             }

@@ -42,8 +42,8 @@ pandora.ui.list = function() { // fixme: remove view argument
             id: 'list',
             items: function(data, callback) {
                 //Ox.print('data, pandora.Query.toObject', data, pandora.Query.toObject())
-                pandora.api.find($.extend(data, {
-                    query: pandora.Query.toObject()
+                pandora.api.find(Ox.extend(data, {
+                    query: pandora.user.ui.query
                 }), callback);
             },
             scrollbarVisible: true,
@@ -101,7 +101,7 @@ pandora.ui.list = function() { // fixme: remove view argument
             },
             items: function(data, callback) {
                 //Ox.print('data, pandora.Query.toObject', data, pandora.Query.toObject())
-                pandora.api.find($.extend(data, {
+                pandora.api.find(Ox.extend(data, {
                     query: pandora.user.ui.query
                 }), callback);
             },
@@ -149,8 +149,8 @@ pandora.ui.list = function() { // fixme: remove view argument
                 };
             },
             items: function(data, callback) {
-                pandora.api.find($.extend(data, {
-                    query: pandora.Query.toObject()
+                pandora.api.find(Ox.extend(data, {
+                    query: pandora.user.ui.query
                 }), callback);
             },
             keys: ['director', 'duration', 'id', 'posterRatio', 'title', 'year'],
@@ -183,7 +183,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                 };
             },
             items: function(data, callback) {
-                var itemQuery = pandora.Query.toObject(),
+                var itemQuery = pandora.user.ui.query,
                     query = {conditions:[]};
                 //fixme: can this be in pandora.Query? dont just check for subtitles
                 itemQuery.conditions.forEach(function(q) {
@@ -284,7 +284,7 @@ pandora.ui.list = function() { // fixme: remove view argument
             video: function(range, callback) {
                 var callback = arguments[arguments.length - 1],
                     range = arguments.length == 2 ? arguments[0] : null,
-                    itemQuery = pandora.Query.toObject(),
+                    itemQuery = pandora.user.ui.query,
                     query = {conditions:[]};
                 //fixme: can this be in pandora.Query? dont just check for subtitles
                 itemQuery.conditions.forEach(function(q) {
@@ -337,9 +337,9 @@ pandora.ui.list = function() { // fixme: remove view argument
                     element: pandora.$ui.map = Ox.Map({
                         height: window.innerHeight - pandora.user.ui.showGroups * pandora.user.ui.groupsSize - 61,
                         places: function(data, callback) {
-                            var itemQuery = pandora.Query.toObject(),
+                            var itemQuery = pandora.user.ui.query,
                                 query = {conditions:[]};
-                            return pandora.api.findPlaces($.extend(data, {
+                            return pandora.api.findPlaces(Ox.extend(data, {
                                 itemQuery: itemQuery,
                                 query: query
                             }), callback);
@@ -352,11 +352,11 @@ pandora.ui.list = function() { // fixme: remove view argument
                             if(place && place.id[0] != '_') {
                                 pandora.$ui.clips.options({
                                     items: function(data, callback) {
-                                        return pandora.api.findAnnotations($.extend(data, {
+                                        return pandora.api.findAnnotations(Ox.extend(data, {
                                             query: {
                                                 conditions:[{key: 'place', value: place.id, operator:'='}]
                                             },
-                                            itemQuery: pandora.Query.toObject()
+                                            itemQuery: pandora.user.ui.query
                                         }), callback);
                                     }
                                 });
