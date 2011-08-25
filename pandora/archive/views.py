@@ -105,6 +105,7 @@ def update(request):
                                                                          file__available=False,
                                                                          file__wanted=True)]
         response['data']['file'] = [f.file.oshash for f in files.filter(file__is_subtitle=True,
+                                                                        file__available=False,
                                                                         name__endswith='.srt')]
 
     return render_to_json_response(response)
@@ -149,9 +150,11 @@ def upload(request):
             response = json_response(status=403, text='permissino denied')
     if 'file' in request.FILES:
         if not f.available:
+            if f.data:
+                f.data.delete()
             f.data.save('data.raw', request.FILES['file'])
-            f.available = True
             f.save()
+            item.tasks.load_subtitles.delay(f.item.itemId)
             response = json_response(text='file saved')
         else:
             response = json_response(status=403, text='permissino denied')
@@ -188,7 +191,6 @@ def firefogg_upload(request):
                 if not f.save_chunk(c, chunk_id, form.cleaned_data['done']):
                     response['result'] = -1
                 elif form.cleaned_data['done']:
-                    f.available = True
                     f.uploading = False
                     f.save()
                     #FIXME: this fails badly if rabbitmq goes down
@@ -206,7 +208,6 @@ def firefogg_upload(request):
             f = get_object_or_404(models.File, oshash=oshash)
             if f.editable(request.user):
                 f.streams.all().delete()
-                f.available = False
                 f.uploading = True
                 f.save()
                 response = {

@@ -515,6 +515,7 @@ class Item(models.Model):
         #FIXME:
         qs = Annotation.objects.filter(layer__name='subtitles', item=self).order_by('start')
         save('subtitles', '\n'.join([l.value for l in qs]))
+        save('filename', '\n'.join([u'%s/%s' % (f.folder, f.name) for f in self.files.all()]))
 
     def update_sort(self):
         try:
@@ -660,7 +661,10 @@ class Item(models.Model):
         for key in self.facet_keys + ['title']:
             current_values = self.get(key, [])
             if key == 'title':
-                current_values = [current_values]
+                if current_values:
+                    current_values = [current_values]
+                else:
+                    current_values = []
                 ot = self.get('original_title')
                 if ot:
                     current_values.append(ot)
@@ -729,11 +733,11 @@ class Item(models.Model):
         users = self.users_with_files()
         if users.filter(is_superuser=True).count()>0:
             files = self.files.filter(instances__volume__user__is_superuser=True)
-            users = User.objects.filter(volumes__files__file__item__in=files,
+            users = User.objects.filter(volumes__files__file__in=files,
                                         is_superuser=True).distinct()
         elif users.filter(is_staff=True).count()>0:
             files = self.files.filter(instances__volume__user__is_staff=True)
-            users = User.objects.filter(volumes__files__file__item__in=files,
+            users = User.objects.filter(volumes__files__file__in=files,
                                         is_staff=True).distinct()
         else:
             files = self.files.all()
@@ -916,8 +920,7 @@ class Item(models.Model):
         poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
 
         frame = self.get_poster_frame_path()
-        timeline = self.path('timeline.64.png')
-        timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
+        timeline = '%s.64.png' % self.timeline_prefix
 
         director = u', '.join(self.get('director', ['Unknown Director']))
         cmd = [settings.ITEM_POSTER,
@@ -985,8 +988,7 @@ class Item(models.Model):
         frame = self.get_poster_frame_path()
         icon = self.path('icon.jpg')
         self.icon.name = icon
-        timeline = self.path('timeline.64.png')
-        timeline = os.path.abspath(os.path.join(settings.MEDIA_ROOT, timeline))
+        timeline = '%s.64.png' % self.timeline_prefix
         cmd = [settings.ITEM_ICON,
            '-i', self.icon.path
         ]

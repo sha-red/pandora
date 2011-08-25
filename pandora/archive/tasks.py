@@ -101,5 +101,5 @@ def process_stream(fileId):
         stream = streams[0]
         stream.make_timeline()
         stream.extract_derivatives()
-    file.item.update_timeline()
+    file.item.update_selected()
     return True
