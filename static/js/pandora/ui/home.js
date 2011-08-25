@@ -37,6 +37,11 @@ pandora.ui.home = function() {
                 width: '320px',
                 height: '160px',
                 margin: 'auto',
+            })
+            .css({
+                backgroundImage: '-moz-linear-gradient(top, rgba(32, 32, 32, 0.8), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))'
+            })
+            .css({
                 backgroundImage: '-webkit-linear-gradient(top, rgba(32, 32, 32, 0.8), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))'
             })
             .appendTo(that),

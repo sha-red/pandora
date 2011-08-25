@@ -30,7 +30,7 @@ Ox.load('Geo', function() {
             loadResources('/static/json/pandora.json', function() {
                 Ox.print('Ox.App load', data);
 
-                Ox.UI.hideLoadingScreen();
+                // Ox.UI.hideLoadingScreen();
 
                 Ox.extend(pandora, {
                     $ui: {
@@ -94,6 +94,8 @@ Ox.load('Geo', function() {
                 window.onpopstate = function(event) {
                     pandora.URL.update();
                 };
+
+                Ox.UI.hideLoadingScreen();
 
                 Ox.Theme(pandora.user.ui.theme);
                 pandora.$ui.appPanel = pandora.ui.appPanel().display();        
