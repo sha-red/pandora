@@ -61,7 +61,7 @@ def parseCondition(condition):
     if key_type == "string":
         in_find=True
         value_key = 'find__value'
-        if k in models.Item.facet_keys:
+        if k in models.Item.facet_keys + ['title']:
             in_find = False
             if op == '=' or op == '^$':
                 v = models.Item.objects.filter(facets__key=k, facets__value=v)

@@ -657,8 +657,10 @@ class Item(models.Model):
 
     def update_facets(self):
         #FIXME: what to do with Unkown Director, Year, Country etc.
-        for key in self.facet_keys:
+        for key in self.facet_keys + ['title']:
             current_values = self.get(key, [])
+            if key == 'title':
+                current_values += self.get('original_title', [])
             #FIXME: is there a better way to build name collection?
             if key == 'name':
                 current_values = []
