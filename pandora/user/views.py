@@ -459,7 +459,10 @@ def setUI(request):
                     if key not in p:
                         p[key] = {}
                     p = p[key]
-            p[keys[0]] = value
+            if value == None:
+                del p[keys[0]]
+            else:
+                p[keys[0]] = value
         profile.save()
 
     if data.get('item', False):
