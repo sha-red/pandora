@@ -660,7 +660,10 @@ class Item(models.Model):
         for key in self.facet_keys + ['title']:
             current_values = self.get(key, [])
             if key == 'title':
-                current_values += self.get('original_title', [])
+                current_values = [current_values]
+                ot = self.get('original_title')
+                if ot:
+                    current_values.append(ot)
             #FIXME: is there a better way to build name collection?
             if key == 'name':
                 current_values = []
@@ -1137,8 +1140,8 @@ class Facet(models.Model):
 
     item = models.ForeignKey('Item', related_name='facets')
     key = models.CharField(max_length=200, db_index=True)
-    value = models.CharField(max_length=200, db_index=True)
-    value_sort = models.CharField(max_length=200, db_index=True)
+    value = models.CharField(max_length=1000, db_index=True)
+    value_sort = models.CharField(max_length=1000, db_index=True)
 
     def __unicode__(self):
         return u"%s=%s" % (self.key, self.value)
