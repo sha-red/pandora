@@ -97,13 +97,24 @@ pandora.Query = (function() {
                 list: '',
                 query: {conditions: [], operator: ''}
             },
-            subconditions = str.match(/\[.*?\]/g) || [];
+            subconditions = [];
         if (str.length) {
             // replace subconditions with placeholder,
             // so we can later split by main operator
+            var counter = 0;
+            Ox.forEach(str, function(c, i) {
+                if (c == ']') {
+                    counter--;
+                }
+                if (counter >= 1) {
+                    subconditions[subconditions.length - 1] += c;
+                }
+                if (c == '[') {
+                    (++counter == 1) && subconditions.push('');
+                }
+            });
             subconditions.forEach(function(subcondition, i) {
-                subconditions[i] = subcondition.substr(1, subcondition.length - 2);
-                str = str.replace(subconditions[i], i);
+                str = str.replace(subcondition, i);
             });
             if (str.indexOf(',') > -1) {
                 ret.query.operator = '&';
@@ -116,7 +127,7 @@ pandora.Query = (function() {
                 var kv, ret;
                 if (condition[0] == '[') {
                     // re-insert subcondition
-                    ret = parseFind(subconditions[parseInt(condition.substr(1, condition.length - 2))]).query;
+                    ret = parseFind(subconditions[parseInt(Ox.sub(condition, 1, -1))]).query;
                 } else {
                     kv = ((condition.indexOf(':') > -1 ? '' : ':') + condition).split(':');
                     ret = Ox.extend({key: kv[0]}, parseValue(kv[1]));

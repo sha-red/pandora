@@ -28,13 +28,6 @@ pandora.ui.preferencesDialog = function() {
                 });
             },
             tabs: tabs
-        })
-        .bindEvent({
-            change: function(data) {
-                $dialog.options({
-                    title: Ox.getObjectById(tabs, data.selected).title
-                });
-            }
         });
     var $dialog = Ox.Dialog({
         buttons: [
@@ -49,12 +42,12 @@ pandora.ui.preferencesDialog = function() {
         ],
         //closeButton: true,
         content: $tabPanel,
-        height: Math.round((window.innerHeight - 24) * 0.75),
+        height: Math.round((window.innerHeight - 24) * 0.5),
         //maximizeButton: true,
         minHeight: 256,
         minWidth: 640,
         title: 'Preferences',
-        width: Math.round(window.innerWidth * 0.75),
+        width: Math.round(window.innerWidth * 0.5),
     });
 
     return $dialog;

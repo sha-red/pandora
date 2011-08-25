@@ -108,7 +108,7 @@ pandora.URL = (function() {
                             return prev + (parseFloat(curr) || 0) * Math.pow(60, i);
                         }, 0);
                         i == 0 && pandora.UI.set(['videoPosition', item].join('|'), point);
-                        return Ox.formatDuration(point, 2).replace(/\.00$/, '');
+                        return Ox.formatDuration(point, 3).replace(/\.000$/, '');
                     }).join('-');
                     pandora.URL.replace(split.join('/'))
                 }

@@ -459,7 +459,7 @@ def setUI(request):
                     if key not in p:
                         p[key] = {}
                     p = p[key]
-            if value == None:
+            if value == None and keys[0] in p:
                 del p[keys[0]]
             else:
                 p[keys[0]] = value

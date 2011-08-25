@@ -7,16 +7,39 @@ pandora.ui.item = function() {
     }, pandora.user.level == 'admin' && pandora.user.ui.itemView == 'info' ? 0 : -1, function(result) {
         if (result.status.code != 200) {
             // fixme: this is quite a hack
+            var title = decodeURI(pandora.user.ui.item).toLowerCase(),
+                videoPosition;
+            if (pandora.user.ui.item in pandora.user.ui.videoPosition) {
+                videoPosition = pandora.user.ui.videoPosition[pandora.user.ui.item];
+                pandora.UI.set(['videoPosition', pandora.user.ui.item].join('|'), null);
+            }
             pandora.api.find({
                 query: {
-                    conditions: [{key: 'title', value: decodeURI(pandora.user.ui.item), operator: '='}],
+                    conditions: [{key: 'title', value: title, operator: ''}],
                     operator: ''
                 },
-                keys: ['id']
+                sort: [{key: 'votes', operator: '-'}], // fixme: operator '' should work as well
+                range: [0, 100],
+                keys: ['id', 'title', 'votes']
             }, function(result) {
                 if (result.data.items.length) {
+                    Ox.print(result.data.items)
+                    var re = {
+                            exact: new RegExp('^' + title + '$', 'i'),
+                            word: new RegExp('\\b' + title + '\\b', 'i')
+                        },
+                        id = result.data.items.sort(function(a, b) {
+                            return (parseInt(b.votes) || 0)
+                                + re.word.test(b.title) * 1000000
+                                + re.exact.test(b.title) * 2000000
+                                - (parseInt(a.votes) || 0)
+                                - re.word.test(a.title) * 1000000
+                                - re.exact.test(a.title) * 2000000;
+                        })[0].id;
                     pandora.user.ui.item = '';
-                    pandora.URL.set(result.data.items[0].id);
+                    !Ox.isUndefined(videoPosition)
+                        && pandora.UI.set(['videoPosition', id].join('|'), videoPosition);
+                    pandora.URL.set(id);
                 } else {
                     pandora.$ui.contentPanel.replaceElement(1,
                         Ox.Element()
@@ -404,7 +427,7 @@ pandora.ui.item = function() {
             );
         }
         if (result.data) {
-            var director = result.data.director?' ('+result.data.director.join(', ')+')':'';
+            var director = result.data.director ? ' ('+result.data.director.join(', ') + ')' : '';
             pandora.$ui.total.html(result.data.title + director);
         }
     });

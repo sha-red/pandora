@@ -3,17 +3,21 @@ pandora.UI = (function() {
     return {
         set: function(/*{key: val} or key, val*/) {
             var obj = Ox.makeObject(arguments);
-            $.each(obj, function(key, val) {
+            Ox.forEach(obj, function(val, key) {
                 Ox.print('key', key, 'val', val);
                 var i = 0,
                     keys = key.split('|'),
-                    old = pandora.user.ui;
+                    ui = pandora.user.ui;
                 while (i < keys.length - 1) {
-                    old = old[keys[i]];
+                    ui = ui[keys[i]];
                     i++;
                 }
-                if (old[keys[i]] !== val) {
-                    old[keys[i]] = val;
+                if (ui[keys[i]] !== val) {
+                    if (val === null) {
+                        delete ui[keys[i]]
+                    } else {
+                        ui[keys[i]] = val;
+                    }
                 } else {
                     delete obj[key];
                 }

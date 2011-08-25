@@ -175,7 +175,7 @@ pandora.ui.folderList = function(id) {
             click: function(event, data) {
                 var $list = pandora.$ui.folderList[id];
                 if (data.key == 'type') {
-                    pandora.$ui.filterDialog = ui.filterDialog().open();
+                    pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                 } else if (data.key == 'status') {
                     pandora.api.editList({
                         id: data.id,
