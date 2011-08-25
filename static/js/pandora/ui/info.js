@@ -32,15 +32,17 @@ pandora.ui.info = function(id) {
         } else {
             // Video Preview
             pandora.api.get({id: id, keys: ['duration', 'videoRatio']}, function(result) {
-                var height = Math.round(pandora.user.ui.sidebarSize / result.data.videoRatio) + 16;
-                pandora.$ui.videoPreview && pandora.$ui.videoPreview.removeElement();
-                pandora.$ui.videoPreview = pandora.ui.videoPreview({
-                    id: id,
-                    duration: result.data.duration,
-                    ratio: result.data.videoRatio
-                }).appendTo(pandora.$ui.info);
-                pandora.user.infoRatio = pandora.user.ui.sidebarSize / height;
-                resize(height);
+                if(result.data) {
+                    var height = Math.round(pandora.user.ui.sidebarSize / result.data.videoRatio) + 16;
+                    pandora.$ui.videoPreview && pandora.$ui.videoPreview.removeElement();
+                    pandora.$ui.videoPreview = pandora.ui.videoPreview({
+                        id: id,
+                        duration: result.data.duration,
+                        ratio: result.data.videoRatio
+                    }).appendTo(pandora.$ui.info);
+                    pandora.user.infoRatio = pandora.user.ui.sidebarSize / height;
+                    resize(height);
+                }
             });
         }
     } else if (pandora.$ui.leftPanel) {
