@@ -1,4 +1,10 @@
 {
+    "capabilities": {
+        "canPlayClips": {"guest": 1, "member": 2, "staff": 3, "admin": 4},
+        "canPlayVideo": {"guest": 0, "member": 1, "staff": 3, "admin": 4},
+        "canSeeItem": {"guest": 2, "member": 2, "staff": 3, "admin": 4},
+        "canSeeFiles": {"guest": -1, "member": -1, "staff": 3, "admin": 4}
+    },
     "clipKeys": [
         {"id": "value", "title": "Text"},
         {"id": "in", "title": "Position"},
@@ -132,13 +138,6 @@
             "find": true,
             "group": true,
             "sort": "person"
-        },
-        {
-            "id": "parts",
-            "title": "Parts",
-            "type": "integer",
-            "columnWidth": 60,
-            "rightsLevel": 1
         },
         {
             "id": "numberofactors",
@@ -351,31 +350,39 @@
             "id": "size",
             "title": "Size",
             "type": "integer",
+            "capability": "canSeeFiles",
             "columnWidth": 60,
-            "format": {"type": "value", "args": ["B"]},
-            "rightsLevel": 1
+            "format": {"type": "value", "args": ["B"]}
         },
         {
             "id": "bitrate",
             "title": "Bitrate",
             "type": "integer",
+            "capability": "canSeeFiles",
             "columnWidth": 60,
             "format": {"type": "unit", "args": ["kbps"]}
+        },
+        {
+            "id": "parts",
+            "title": "Parts",
+            "type": "integer",
+            "capability": "canSeeFiles",
+            "columnWidth": 60
         },
         {
             "id": "numberoffiles",
             "title": "Number of Files",
             "type": "integer",
+            "capability": "canSeeFiles",
             "columnWidth": 60,
-            "value": {"key": "files", "type": "length"},
-            "rightsLevel": 1
+            "value": {"key": "files", "type": "length"}
         },
         {
             "id": "filename",
             "title": "Filename",
             "type": ["string"],
-            "find": true,
-            "rightsLevel": 1
+            "capability": "canSeeFiles",
+            "find": true
         },
         {
             "id": "published",
@@ -411,6 +418,18 @@
             "type": "integer",
             "columnWidth": 60,
             "format": {"type": "percent", "args": ["auto", 2]}
+        },
+        {
+            "id": "canPlayVideo",
+            "title": "Can Play Video",
+            "type": "boolean",
+            "value": "capability"
+        },
+        {
+            "id": "canPlayClips",
+            "title": "Can Play Clips",
+            "type": "boolean",
+            "value": "capability"
         }
     ],
     "itemName": {
@@ -469,6 +488,14 @@
         "importMoviePosters": true,
         "importPosterFrames": true
     },
+    "rightsLevel": {"member": 5, "staff": 4, "admin": 3},
+    "rightsLevels": [
+        {"name": "Public", "color": [0, 255, 0], "description": "Everyone can see and play."},
+        {"name": "Relaxed", "color": [128, 255, 0], "description": "Guests can't play video."},
+        {"name": "Regular", "color": [255, 255, 0], "description": "Guests can't play clips, members can't play video."},
+        {"name": "Restricted", "color": [255, 128, 0], "description": "Only staff and admin can see and play."},
+        {"name": "Private", "color": [255, 0, 0], "description": "Only admins can see and play."}
+    ],
     "site": {
         "id": "{{settings.SITEID}}",
         "name": "{{settings.SITENAME}}",
@@ -493,15 +520,17 @@
     "user": {
         "level": "guest",
         "lists": {
-            "history": [
-                {"id": "all_movies", "title": "All Movies", "query": {}}
+            "common": [
+                {"id": "all", "title": "All Movies", "query": {}}
             ],
             "personal": [
                 {"user": "foo", "name": "Favorites", "featured": false, "public": true},
                 {"id": "favorites", "title": "Favorites", "public": true, "items": []},
                 {"id": "most_popular", "title": "Most Popular", "query": {}},
                 {"id": "recently_viewed", "title": "Recently Viewed", "query": {}},
-                {"id": "1960s", "title": "1960s", "query": {"conditions": [{"key": "year", "value": "196", "operator": "^"}], "operator": ""}}
+                {"id": "1960s", "title": "1960s", "query": {"conditions": [{"key": "year", "value": "196", "operator": "^"}], "operator": ""}},
+                {"id": "movies_with_full_video", "title": "Movies with Full Video", "query": {"conditions": [{"key": "canPlayVideo", "value": true, "operator": ""}], "operator": ""}},
+                {"id": "movies_with_full_video", "title": "Movies with Clips", "query": {"conditions": [{"key": "canPlayClips", "value": true, "operator": ""}], "operator": ""}}
             ],
             "favorite": [
                 {"id": "rlx:watchme", "title": "rlx: watchme", "public": true, "items": [0, 1, 2, 3, 4]}
@@ -511,6 +540,7 @@
                 {"id": "timelines", "title": "Timelines", "items": [0, 1, 2, 3, 4, 5, 6, 7, 8]}
             ]
         },
+        "notes": "",
         "preferences": {},
         "ui": {
             "annotationsSize": 256,
