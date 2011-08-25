@@ -71,6 +71,7 @@ def update_or_create_instance(volume, f):
            instance.extra = True
         instance.save()
         instance.file.save()
+        instance.file.item.update_wanted()
     return instance
 
 @task(ignore_resulsts=True, queue='default')
