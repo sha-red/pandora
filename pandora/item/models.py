@@ -515,6 +515,7 @@ class Item(models.Model):
         #FIXME:
         qs = Annotation.objects.filter(layer__name='subtitles', item=self).order_by('start')
         save('subtitles', '\n'.join([l.value for l in qs]))
+        save('filename', '\n'.join([u'%s/%s' % (f.folder, f.name) for f in self.files.all()]))
 
     def update_sort(self):
         try:

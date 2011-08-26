@@ -155,6 +155,7 @@ def upload(request):
             f.data.save('data.raw', request.FILES['file'])
             f.available = True
             f.save()
+            item.tasks.load_subtitles.delay(f.item.itemId)
             response = json_response(text='file saved')
         else:
             response = json_response(status=403, text='permissino denied')
