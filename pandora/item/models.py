@@ -920,7 +920,7 @@ class Item(models.Model):
         poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
 
         frame = self.get_poster_frame_path()
-        timeline = '%.64.png' % self.timeline_prefix
+        timeline = '%s.64.png' % self.timeline_prefix
 
         director = u', '.join(self.get('director', ['Unknown Director']))
         cmd = [settings.ITEM_POSTER,
@@ -988,7 +988,7 @@ class Item(models.Model):
         frame = self.get_poster_frame_path()
         icon = self.path('icon.jpg')
         self.icon.name = icon
-        timeline = '%.64.png' % self.timeline_prefix
+        timeline = '%s.64.png' % self.timeline_prefix
         cmd = [settings.ITEM_ICON,
            '-i', self.icon.path
         ]
