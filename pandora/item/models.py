@@ -729,11 +729,11 @@ class Item(models.Model):
         users = self.users_with_files()
         if users.filter(is_superuser=True).count()>0:
             files = self.files.filter(instances__volume__user__is_superuser=True)
-            users = User.objects.filter(volumes__files__file__item__in=files,
+            users = User.objects.filter(volumes__files__file__in=files,
                                         is_superuser=True).distinct()
         elif users.filter(is_staff=True).count()>0:
             files = self.files.filter(instances__volume__user__is_staff=True)
-            users = User.objects.filter(volumes__files__file__item__in=files,
+            users = User.objects.filter(volumes__files__file__in=files,
                                         is_staff=True).distinct()
         else:
             files = self.files.all()

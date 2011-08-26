@@ -84,7 +84,9 @@ class File(models.Model):
         self.folder = self.get_folder()
         self.sort_name = utils.sort_string(canonicalTitle(self.name))
 
-        if self.info:
+        if not os.path.splitext(self.name)[-1] in (
+            '.srt', '.rar', '.sub', '.idx', '.txt', '.jpg', '.png', '.nfo') \
+           and self.info:
             for key in ('duration', 'size'):
                 setattr(self, key, self.info.get(key, 0))
 
@@ -128,12 +130,14 @@ class File(models.Model):
                 self.pixels = int(self.width * self.height * float(utils.parse_decimal(self.framerate)) * self.duration)
 
         else:
-            self.is_video = os.path.splitext(self.name)[-1] in ('.avi', '.mkv', '.dv', '.ogv', '.mpeg', '.mov')
-            self.is_audio = os.path.splitext(self.name)[-1] in ('.mp3', '.wav', '.ogg', '.flac')
+            self.is_video = os.path.splitext(self.name)[-1] in ('.avi', '.mkv', '.dv', '.ogv', '.mpeg', '.mov', '.webm')
+            self.is_audio = os.path.splitext(self.name)[-1] in ('.mp3', '.wav', '.ogg', '.flac', '.oga')
             self.is_subtitle = os.path.splitext(self.name)[-1] in ('.srt', )
 
-        if not self.is_audio and not self.is_video and self.name.endswith('.srt'):
+        if self.name.endswith('.srt'):
             self.is_subtitle = True
+            self.is_audio = False
+            self.is_video = False
         else:
             self.is_subtitle = False
 
