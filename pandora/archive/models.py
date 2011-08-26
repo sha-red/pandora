@@ -151,7 +151,10 @@ class File(models.Model):
     def save(self, *args, **kwargs):
         if self.auto:
             self.set_state()
-        self.available = self.streams.filter(source=None, available=True).count() > 0
+        if self.is_subtitle:
+            self.available = self.data and True or False
+        else:
+            self.available = self.streams.filter(source=None, available=True).count() > 0
         super(File, self).save(*args, **kwargs)
 
     #upload and data handling
