@@ -660,7 +660,10 @@ class Item(models.Model):
         for key in self.facet_keys + ['title']:
             current_values = self.get(key, [])
             if key == 'title':
-                current_values = [current_values]
+                if current_values:
+                    current_values = [current_values]
+                else:
+                    current_values = []
                 ot = self.get('original_title')
                 if ot:
                     current_values.append(ot)
