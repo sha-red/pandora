@@ -25,7 +25,6 @@ from person.models import get_name_sort
 import extract
 
 
-
 class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)

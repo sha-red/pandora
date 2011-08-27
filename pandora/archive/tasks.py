@@ -50,6 +50,9 @@ def update_or_create_instance(volume, f):
                 setattr(instance, key, f[key])
                 updated=True
         if updated:
+            if instance.name.lower().startswith('extras/') or \
+               instance.name.lower().startswith('versions/'):
+               instance.extra = True
             instance.save()
             instance.file.save()
     else:
