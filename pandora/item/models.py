@@ -758,8 +758,8 @@ class Item(models.Model):
             else: level = 2
             return level
 
-        users = User.objects.filter(volumes__files__file__in=self.files.filter(active=True)).distinct()
-        current_level = get_level(users)
+        current_users = User.objects.filter(volumes__files__file__in=self.files.filter(active=True)).distinct()
+        current_level = get_level(current_users)
 
         users = User.objects.filter(volumes__files__file__in=files).distinct()
         possible_level = get_level(users)
@@ -774,6 +774,18 @@ class Item(models.Model):
             self.rendered = False
             self.save()
             self.update_timeline()
+        else:
+            files = self.files.filter(instances__volume__user__in=current_users).order_by('part')
+            #FIXME: this should be instance folders
+            folders = list(set([f.folder
+                                for f in files.filter(is_video=True, instances__extra=False)]))
+            files = files.filter(folder__startswith=folders[0])
+            if files.filter(active=False).count() > 0:
+                files.update(active=True)
+                self.rendered = False
+                self.save()
+                self.update_timeline()
+
 
     def make_torrent(self):
         base = self.path('torrent')
