@@ -361,7 +361,7 @@ pandora.ui.item = function() {
                 videoSize: pandora.user.ui.videoSize,
                 width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             }).bindEvent({
-                resize: function(data) {
+                resize: function(event, data) {
                     pandora.$ui.editor.options({
                         height: data
                     });
