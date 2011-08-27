@@ -839,8 +839,8 @@ class Item(models.Model):
         self.save()
 
     def streams(self):
-        return [video.streams.filter(source=None, available=True)[0]
-                for video in self.files.filter(is_video=True, active=True).order_by('part')]
+        return archive.models.Stream.objects.filter(source=None, available=True,
+            file__item=self, file__is_video=True, file__active=True).order_by('file__part')
 
     def update_timeline(self, force=False):
         config = site_config()
