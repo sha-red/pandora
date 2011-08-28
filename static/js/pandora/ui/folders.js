@@ -13,7 +13,7 @@ pandora.ui.folders = function() {
     pandora.$ui.folderBrowser = {};
     pandora.$ui.folderList = {};
     if (pandora.user.ui.section == 'site') {
-        $.each(pandora.site.sectionFolders.site, function(i, folder) {
+        pandora.site.sectionFolders.site.forEach(function(folder, i) {
             var height = (Ox.getObjectById(pandora.site.sectionFolders.site, folder.id).items.length * 16);
             pandora.$ui.folder[i] = Ox.CollapsePanel({
                     id: folder.id,
@@ -42,7 +42,7 @@ pandora.ui.folders = function() {
         });
         //pandora.resizeFolders();
     } else if (pandora.user.ui.section == 'items') {
-        $.each(pandora.site.sectionFolders.items, function(i, folder) {
+        pandora.site.sectionFolders.items.forEach(function(folder, i) {
             var extras = [];
             if (folder.id == 'personal' && pandora.user.level != 'guest') {
                 extras = [Ox.Select({

@@ -61,10 +61,15 @@ pandora.getGroupsSizes = function() {
 };
 
 pandora.getListData = function() {
-    var data = {};
+    Ox.print('getListData ............')
+    var data = {}, folder;
     if (pandora.user.ui.list) {
-        var folder = pandora.$ui.folderList['personal'].options('selected')[0] ==
-            pandora.user.ui.list ? 'personal' : 'featured';
+        Ox.forEach(pandora.$ui.folderList, function(list, key) {
+            if (list.options('selected').length) {
+                folder = key;
+                return false;
+            }
+        });
         data = pandora.$ui.folderList[folder].value(pandora.user.ui.list);
     }
     data.editable = data.user == pandora.user.username && data.type == 'static';
@@ -218,7 +223,7 @@ pandora.resizeFolders = function() {
         var i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id);
         pandora.$ui.folder[i].css({width: width + 'px'});
         $list.css({width: width + 'px'});
-        Ox.print('...', id, $list.options())
+        Ox.print('...', width, id, $list.options())
         if (pandora.user.ui.section == 'site') {
             $list.resizeColumn('title', columnWidth.title);
         } else if (pandora.user.ui.section == 'items') {

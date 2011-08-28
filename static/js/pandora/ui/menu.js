@@ -139,6 +139,9 @@ pandora.ui.mainMenu = function() {
                     {},
                     { id: 'users', title: 'Manage Users...' },
                     { id: 'lists', title: 'Manage Lists...' },
+                    {},
+                    { id: 'news', title: 'Manage News...' },
+                    { id: 'tour', title: 'Manage Tour...' }
                 ] },
                 { id: 'helpMenu', title: 'Help', items: [
                     { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'shift ?' }

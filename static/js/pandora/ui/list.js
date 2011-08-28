@@ -464,10 +464,12 @@ pandora.ui.list = function() { // fixme: remove view argument
 
     ['list', 'icons'].indexOf(view) > -1 && that.bind({
         dragstart: function(e) {
+            Ox.print('DRAGSTART');
             var editable = pandora.getListData().editable,
                 ids = that.options('selected'),
                 item = ids.length == 1 ? that.value(ids[0], 'title') : ids.length;
             Ox.forEach(pandora.$ui.folderList, function($list, i) {
+                Ox.print('FOLDERLIST', i)
                 $list.find('.OxItem').each(function() {
                     var $item = $(this),
                         data = $list.value($item.data('id'));
@@ -539,6 +541,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                                     setTimeout(function() {
                                         $this.removeClass('OxDragover');
                                     }, 250);
+                                    e.originalEvent.preventDefault();
                                     e.originalEvent.stopPropagation();
                                     return false;
                                 }

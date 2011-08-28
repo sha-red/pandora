@@ -52,16 +52,16 @@ pandora.ui.folderBrowserList = function(id) {
                     clickable: function(data) {
                         return data.type == 'smart';
                     },
-                    format: function(value) {
+                    format: function(value, data) {
                         return $('<img>')
                             .attr({
-                                src: Ox.UI.getImageURL('symbolFind')
+                                src: Ox.UI.getImageURL(value == 'static' ? 'symbolClick' : 'symbolFind')
                             })
                             .css({
                                 width: '10px',
                                 height: '10px',
                                 padding: '3px 2px 1px 2px', // fixme: strange
-                                opacity: value == 'static' ? 0.1 : 1
+                                opacity: data.user == pandora.user.username ? 1 : 0.25
                             });
                     },
                     id: 'type',
@@ -75,6 +75,11 @@ pandora.ui.folderBrowserList = function(id) {
                             height: '10px',
                             padding: '3px 2px 1px 2px',
                         }),
+                    tooltip: function(data) {
+                        return data.type == 'smart'
+                            ? (data.user == pandora.user.username ? 'Edit Query' : 'Show Query')
+                            : '';
+                    },
                     visible: true,
                     width: 16
                 },
@@ -91,8 +96,9 @@ pandora.ui.folderBrowserList = function(id) {
                                 width: '10px',
                                 height: '10px',
                                 padding: '3px 2px 1px 2px',
-                                opacity: id == 'favorite' ? (value ? 1 : 0.1) :
-                                (value == 'featured' ? 1 : 0.1)
+                                opacity: id == 'favorite'
+                                    ? (value ? 1 : 0.1)
+                                    : (value == 'featured' ? 1 : 0.1)
                             });
                     },
                     id: id == 'favorite' ? 'subscribed' : 'status',
@@ -108,6 +114,11 @@ pandora.ui.folderBrowserList = function(id) {
                             height: '10px',
                             padding: '3px 2px 1px 2px'
                         }),
+                    tooltip: function(data) {
+                        var checked = id == 'favorite' ? data.subscribed : data.status == 'featured';
+                        return (checked ? 'Remove from' : 'Add to')
+                            + ' ' + Ox.toTitleCase(id) + ' Lists';
+                    },
                     visible: true,
                     width: 16
                 },

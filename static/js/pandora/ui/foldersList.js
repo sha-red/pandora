@@ -80,6 +80,7 @@ pandora.ui.folderList = function(id) {
                         autovalidate: pandora.ui.autovalidateListname
                     },
                     operator: '+',
+                    tooltip: id == 'personal' ? 'Edit Title' : null,
                     visible: id != 'favorite',
                     width: pandora.user.ui.sidebarWidth - 88
                 },
@@ -94,20 +95,25 @@ pandora.ui.folderList = function(id) {
                     clickable: function(data) {
                         return data.type == 'smart';
                     },
-                    format: function(value) {
+                    format: function(value, data) {
                         return $('<img>')
                             .attr({
-                                src: Ox.UI.getImageURL('symbolFind')
+                                src: Ox.UI.getImageURL(value == 'static' ? 'symbolClick' : 'symbolFind')
                             })
                             .css({
                                 width: '10px',
                                 height: '10px',
                                 padding: '3px 2px 1px 2px',
-                                opacity: value == 'static' ? 0.1 : 1
+                                opacity: data.user == pandora.user.username ? 1 : 0.25
                             });
                     },
                     id: 'type',
                     operator: '+',
+                    tooltip: function(data) {
+                        return data.type == 'smart'
+                            ? (data.user == pandora.user.username ? 'Edit Query' : 'Show Query')
+                            : '';
+                    },
                     visible: true,
                     width: 16
                 },
@@ -130,6 +136,9 @@ pandora.ui.folderList = function(id) {
                     },
                     id: 'status',
                     operator: '+',
+                    tooltip: id == 'personal' ? function(data) {
+                        return data.status == 'private' ? 'Make Public' : 'Make Private';
+                    } : null,
                     visible: true,
                     width: 16
                 }
