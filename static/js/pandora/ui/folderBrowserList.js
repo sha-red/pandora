@@ -189,6 +189,7 @@ pandora.ui.folderBrowserList = function(id) {
     return that;
 };
 
+/*
 pandora.ui.folderList = function(id) {
     var i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id),
         that;
@@ -424,11 +425,9 @@ pandora.ui.folderList = function(id) {
                 pandora.resizeFolders();
             },
             move: function(event, data) {
-                /*
                 data.ids.forEach(function(id, pos) {
                     pandora.user.ui.lists[id].position = pos;
                 });
-                */
                 pandora.api.sortLists({
                     section: id,
                     ids: data.ids
@@ -627,10 +626,8 @@ pandora.ui.folders = function() {
                             });
                         } else if (data.id == 'browse') {
                             alert('??')
-                            /*
-                            pandora.$ui.sectionList[1].replaceWith(pandora.$ui.publicLists = pandora.ui.publicLists());
-                            pandora.site.showAllPublicLists = true;
-                            */
+                            //pandora.$ui.sectionList[1].replaceWith(pandora.$ui.publicLists = pandora.ui.publicLists());
+                            //pandora.site.showAllPublicLists = true;
                         }
                     },
                     toggle: function(event, data) {
@@ -661,4 +658,5 @@ pandora.ui.folders = function() {
     }
     return that;
 };
+*/
 

@@ -149,7 +149,7 @@ pandora.ui.folderList = function(id) {
                 } else if (id == 'featured') {
                     query = {conditions: [{key: 'status', value: 'featured', operator: '='}], operator: '&'};
                 }
-                return pandora.api.findLists($.extend(data, {
+                return pandora.api.findLists(Ox.extend(data, {
                     query: query
                 }), callback);
             },
@@ -187,16 +187,14 @@ pandora.ui.folderList = function(id) {
             },
             'delete': function(event, data) {
                 var $list = pandora.$ui.folderList[id];
-                pandora.user.ui.listQuery.conditions = [];
-                pandora.URL.set(pandora.Query.toString());
+                pandora.URL.set('?find=');
                 $list.options({selected: []});
                 if (id == 'personal') {
                     pandora.api.removeList({
                         id: data.ids[0]
                     }, function(result) {
-                        // fixme: is this the best way to delete a ui preference?
-                        delete pandora.user.ui.lists[data.ids[0]];
-                        pandora.UI.set({lists: pandora.user.ui.lists});
+                        pandora.UI.set(['lists', data.ids[0]].join('|'), null);
+                        Ox.print('SHOULD BE DELETED:', pandora.user.ui.lists)
                         Ox.Request.clearCache(); // fixme: remove
                         $list.reloadList();
                     });

@@ -22,9 +22,9 @@ pandora.ui.siteDialog = function(section) {
                                         .attr({src: '/static/png/' + (
                                             id == 'software' ? 'pandora' : 'logo'
                                         ) + '256.png'})
-                                        .css({width: '128px'})
+                                        .css({width: '256px'})
                                 ),
-                            size: 144
+                            size: 272
                         },
                         {
                             element: Ox.Element()

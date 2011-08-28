@@ -456,16 +456,143 @@ pandora.ui.list = function() { // fixme: remove view argument
             });
     }
 
+    var $tooltip = Ox.Tooltip({
+        animate: false
+    }).css({
+        textAlign: 'center'
+    });
+
     ['list', 'icons'].indexOf(view) > -1 && that.bind({
         dragstart: function(e) {
+            var editable = pandora.getListData().editable,
+                ids = that.options('selected'),
+                item = ids.length == 1 ? that.value(ids[0], 'title') : ids.length;
             Ox.forEach(pandora.$ui.folderList, function($list, i) {
-                $list.addClass('OxDrop');
+                $list.find('.OxItem').each(function() {
+                    var $item = $(this),
+                        data = $list.value($item.data('id'));
+                    if (
+                        data.user == pandora.user.username
+                        && data.type == 'static'
+                        && !$item.is('.OxSelected')
+                    ) {
+                        pandora.api.find({
+                            query: {
+                                conditions: [
+                                    {key: 'list', value: data.id, operator: '='},
+                                    {
+                                        conditions: ids.map(function(id) {
+                                            return {key: 'id', value: id, operator: '='};
+                                        }),
+                                        operator: '|'
+                                    }
+                                ],
+                                operator: '&'
+                            }
+                        }, function(result) {
+                            var items = ids.length - result.data.items;
+                            items && $item.addClass('OxDrop').bind({
+                                dragenter: function(e) {
+                                    $(this).addClass('OxDragover');
+                                },
+                                dragover: function(e) {
+                                    $tooltip.options({
+                                        title: getTitle(e, ids.length == 1 ? item : items, data.id.split('/').pop())
+                                            + (editable && e.shiftKey && result.data.items
+                                                ? '<br/>and remove ' + result.data.items + ' '
+                                                + pandora.site.itemName[result.data.items == 1 ? 'singular' : 'plural'].toLowerCase()
+                                                + '<br/>from the list "' + pandora.user.ui.list.split('/').pop() + '"'
+                                                : '')
+                                    }).show(e);
+                                    //e.originalEvent.dataTransfer.dropEffect = 'none';
+                                    e.originalEvent.preventDefault();
+                                    return false;
+                                },
+                                dragleave: function(e) {
+                                    $(this).removeClass('OxDragover');
+                                },
+                                drop: function(e) {
+                                    Ox.print('DROP', data);
+                                    var $this = $(this), folder, listData;
+                                    if (editable && e.shiftKey) {
+                                        pandora.api.removeListItems({
+                                            list: pandora.user.ui.list,
+                                            items: ids
+                                        }, pandora.reloadList);
+                                        listData = pandora.getListData();
+                                        folder = listData.status == 'private' ? 'personal' : data.status;
+                                        pandora.$ui.folderList[folder].value(
+                                            listData.id, 'items',
+                                            pandora.$ui.folderList[folder].value(listData.id, 'items') - ids.length
+                                        );
+                                    }
+                                    pandora.api.addListItems({
+                                        list: data.id,
+                                        items: ids
+                                    });
+                                    folder = data.status == 'private' ? 'personal' : data.status;
+                                    pandora.$ui.folderList[folder].value(
+                                        data.id, 'items',
+                                        pandora.$ui.folderList[folder].value(data.id, 'items') + items
+                                    );
+                                    Ox.Request.clearCache(); // fixme: remove
+                                    setTimeout(function() {
+                                        $this.removeClass('OxDragover');
+                                    }, 250);
+                                    e.originalEvent.stopPropagation();
+                                    return false;
+                                }
+                            });
+                        });
+                    }
+                });
             });
+            e.originalEvent.dataTransfer.setDragImage(
+                $('<img>').attr({src: Ox.UI.PATH + 'png/transparent.png'})[0], 0, 0
+            );
+            Ox.UI.$document.bind({
+                dragover: function(e) {
+                    $tooltip.options({
+                        title: getTitle(e, item)
+                    }).show(e);
+                    e.originalEvent.preventDefault();
+                    return false;
+                }
+            });
+            function getTitle(e, item, list) {
+                return (editable && e.shiftKey ? 'Move' : 'Copy') + ' ' 
+                    + (Ox.isString(item) ? '"' + item + '"' : item + ' ' + pandora.site.itemName[item == 1 ? 'singular' : 'plural'].toLowerCase())
+                    + (list ? '<br/>to the list "' + list + '"' : '');
+            }
+            //e.originalEvent.dataTransfer.setData('text/plain', JSON.stringify(that.options('selected')));
         },
         dragend: function(e) {
+            Ox.print('DRAGEND')
+            $tooltip.hide();
+            Ox.UI.$document.unbind('dragover');
+            $('.OxDrop').removeClass('OxDrop')
+                .unbind('dragenter')
+                .unbind('dragover')
+                .unbind('dragleave')
+                .unbind('drop');
+            /*
             Ox.forEach(pandora.$ui.folderList, function($list, i) {
-                $list.removeClass('OxDrop');
+                $list.find('.OxItem').each(function() {
+                    var $item = $(this), id = $item.data('id');
+                    if (
+                        $list.value(id, 'user') == pandora.user.username
+                        && $list.value(id, 'type') == 'static'
+                        && !$item.is('.OxSelected')
+                    ) {
+                        $item.removeClass('OxDrop')
+                            .unbind('dragenter')
+                            .unbind('dragover')
+                            .unbind('dragleave')
+                            .unbind('drop');
+                    }
+                });
             });
+            */
         }
     }).bindEvent({
         closepreview: function(data) {
