@@ -3,7 +3,6 @@ pandora.ui.folderBrowserBar = function(id) {
     var that = Ox.Bar({
             size: 24
         });
-    Ox.print('ID', id)
     pandora.$ui.findListElement[id] = Ox.FormElementGroup({
             elements: [
                 pandora.$ui.findListSelect[id] = Ox.Select({
@@ -22,12 +21,14 @@ pandora.ui.folderBrowserBar = function(id) {
                     }
                 }),
                 pandora.$ui.findListInput[id] = Ox.Input({
+                    changeOnKeypress: true,
                     clear: true,
                     placeholder: 'Find: User',
                     width: pandora.getFoldersWidth() - 24
                 })
                 .bindEvent({
-                    submit: function(data) {
+                    change: function(data) {
+                        Ox.print('ID::', id)
                         var key = pandora.$ui.findListSelect[id].value() == 'user' ? 'user' : 'name',
                             value = data.value;
                         pandora.$ui.folderList[id].options({
@@ -55,6 +56,7 @@ pandora.ui.folderBrowserBar = function(id) {
             align: 'right'
         })
         .appendTo(that);
+    
     return that;
 };
 

@@ -55,7 +55,7 @@ pandora.ui.folderBrowserList = function(id) {
                 },
                 {
                     clickable: function(data) {
-                        return data.type == 'smart';
+                        return data.type == 'smart' || data.user == pandora.user.username;
                     },
                     format: function(value, data) {
                         return $('<img>')
@@ -83,7 +83,7 @@ pandora.ui.folderBrowserList = function(id) {
                     tooltip: function(data) {
                         return data.type == 'smart'
                             ? (data.user == pandora.user.username ? 'Edit Query' : 'Show Query')
-                            : '';
+                            : (data.user == pandora.user.username ? 'Edit Default View' : 'Default View: ...');
                     },
                     visible: true,
                     width: 16

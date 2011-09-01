@@ -42,7 +42,7 @@ pandora.ui.folderList = function(id) {
                         autovalidate: pandora.ui.autovalidateListname
                     },
                     operator: '+',
-                    tooltip: id == 'personal' ? 'Edit Title' : null,
+                    tooltip: id == 'personal' ? 'Edit Title' : '',
                     visible: id != 'favorite',
                     width: pandora.user.ui.sidebarWidth - 96
                 },
@@ -56,7 +56,7 @@ pandora.ui.folderList = function(id) {
                 },
                 {
                     clickable: function(data) {
-                        return data.type == 'smart';
+                        return data.type == 'smart' || data.user == pandora.user.username;
                     },
                     format: function(value, data) {
                         return $('<img>')
@@ -75,7 +75,7 @@ pandora.ui.folderList = function(id) {
                     tooltip: function(data) {
                         return data.type == 'smart'
                             ? (data.user == pandora.user.username ? 'Edit Query' : 'Show Query')
-                            : '';
+                            : (data.user == pandora.user.username ? 'Edit Default View' : 'Default View: ...');
                     },
                     visible: true,
                     width: 16
