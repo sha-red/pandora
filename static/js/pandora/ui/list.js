@@ -39,6 +39,7 @@ pandora.ui.list = function() { // fixme: remove view argument
             columnsRemovable: true,
             columnsResizable: true,
             columnsVisible: true,
+            draggable: true,
             id: 'list',
             items: function(data, callback) {
                 //Ox.print('data, pandora.Query.toObject', data, pandora.Query.toObject())
@@ -83,6 +84,7 @@ pandora.ui.list = function() { // fixme: remove view argument
         that = Ox.IconList({
             borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 16,
             defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
+            draggable: true,
             id: 'list',
             item: function(data, sort, size) {
                 var icons = pandora.user.ui.icons,

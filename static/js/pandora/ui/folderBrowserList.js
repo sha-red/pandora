@@ -13,7 +13,7 @@ pandora.ui.folderBrowserList = function(id) {
                         }).css({
                             width: '10px',
                             height: '10px',
-                            padding: '3px 2px 1px 2px'
+                            padding: '3px'
                         });
                     },
                     id: 'id',
@@ -24,7 +24,7 @@ pandora.ui.folderBrowserList = function(id) {
                         .css({
                             width: '10px',
                             height: '10px',
-                            padding: '3px 2px 1px 2px',
+                            padding: '3px',
                         }),
                     unique: true,
                     visible: true,
@@ -65,7 +65,7 @@ pandora.ui.folderBrowserList = function(id) {
                             .css({
                                 width: '10px',
                                 height: '10px',
-                                padding: '3px 2px 1px 2px', // fixme: strange
+                                padding: '3px',
                                 opacity: data.user == pandora.user.username ? 1 : 0.25
                             });
                     },
@@ -78,7 +78,7 @@ pandora.ui.folderBrowserList = function(id) {
                         .css({
                             width: '10px',
                             height: '10px',
-                            padding: '3px 2px 1px 2px',
+                            padding: '3px',
                         }),
                     tooltip: function(data) {
                         return data.type == 'smart'
@@ -100,7 +100,7 @@ pandora.ui.folderBrowserList = function(id) {
                             .css({
                                 width: '10px',
                                 height: '10px',
-                                padding: '3px 2px 1px 2px',
+                                padding: '3px',
                                 opacity: id == 'favorite'
                                     ? (value ? 1 : 0.25)
                                     : (value == 'featured' ? 1 : 0.25)
@@ -117,7 +117,7 @@ pandora.ui.folderBrowserList = function(id) {
                         .css({
                             width: '10px',
                             height: '10px',
-                            padding: '3px 2px 1px 2px'
+                            padding: '3px'
                         }),
                     tooltip: function(data) {
                         var checked = id == 'favorite' ? data.subscribed : data.status == 'featured';

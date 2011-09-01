@@ -13,7 +13,7 @@ pandora.ui.folderList = function(id) {
                             }).css({
                                 width: '10px',
                                 height: '10px',
-                                padding: '3px 2px 1px 2px'
+                                padding: '3px'
                             });
                     },
                     id: 'user',
@@ -66,7 +66,7 @@ pandora.ui.folderList = function(id) {
                             .css({
                                 width: '10px',
                                 height: '10px',
-                                padding: '3px 2px 1px 2px',
+                                padding: '3px',
                                 opacity: data.user == pandora.user.username ? 1 : 0.25
                             });
                     },
@@ -93,7 +93,7 @@ pandora.ui.folderList = function(id) {
                             .css({
                                 width: '10px',
                                 height: '10px',
-                                padding: '3px 2px 1px 2px',
+                                padding: '3px',
                                 opacity: value == 'private' ? 0.25 : 1
                             })
                     },
@@ -134,7 +134,7 @@ pandora.ui.folderList = function(id) {
                             }).css({
                                 width: '10px',
                                 height: '10px',
-                                padding: '3px 2px 1px 2px'
+                                padding: '3px'
                             });
                     },
                     id: 'user',
@@ -171,7 +171,7 @@ pandora.ui.folderList = function(id) {
                             .css({
                                 width: '10px',
                                 height: '10px',
-                                padding: '3px 2px 1px 2px'
+                                padding: '3px'
                             });
                     },
                     id: 'path',
