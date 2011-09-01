@@ -4,104 +4,7 @@ pandora.ui.folderList = function(id) {
         that;
     if (pandora.user.ui.section == 'items') {
         var columns, items;
-        if (id == 'volumes') {
-            columns = [
-                {
-                    format: function() {
-                        return $('<img>').attr({
-                                src: Ox.UI.getImageURL('symbolVolume')
-                            }).css({
-                                width: '10px',
-                                height: '10px',
-                                padding: '3px 1px 1px 3px'
-                            });
-                    },
-                    id: 'user',
-                    operator: '+',
-                    visible: true,
-                    width: 16
-                },
-                {
-                    editable: true,
-                    id: 'name',
-                    operator: '+',
-                    tooltip: 'Edit Title',
-                    unique: true,
-                    visible: true,
-                    width: pandora.user.ui.sidebarWidth - 96
-                },
-                {
-                    align: 'right',
-                    id: 'items',
-                    format: {type: 'number'},
-                    operator: '-',
-                    visible: true,
-                    width: 48
-                },
-                {
-                    clickable: function(data) {
-                        return data.mounted;
-                    },
-                    format: function(value, data) {
-                        return $('<img>')
-                            .attr({
-                                src: Ox.UI.getImageURL(data.mounted ? 'symbolScan' : 'symbolEdit')
-                            })
-                            .css({
-                                width: '10px',
-                                height: '10px',
-                                padding: '3px 2px 1px 2px'
-                            });
-                    },
-                    id: 'path',
-                    operator: '+',
-                    tooltip: function(data) {
-                        return data.mounted ? 'Scan Volume' : 'Edit Path';
-                    },
-                    visible: true,
-                    width: 16
-                },
-                {
-                    clickable: true,
-                    format: function(value, data) {
-                        return $('<img>')
-                            .attr({
-                                src: Ox.UI.getImageURL('symbolMount')
-                            })
-                            .css({
-                                width: '10px',
-                                height: '10px',
-                                padding: '3px 2px 1px 2px',
-                                opacity: data.mounted ? 1 : 0.25
-                            });
-                    },
-                    id: 'mounted',
-                    operator: '+',
-                    tooltip: function(data) {
-                        return data.mounted ? 'Unmount Volume' : 'Mount Volume';
-                    },
-                    visible: true,
-                    width: 16
-                }
-            ];
-            items = function(data, callback) {
-                var volumes = pandora.user.volumes || [
-                    {"name": "Movies A-M", "path": "/Volumes/Movies A-M", "items": 1234},
-                    {"name": "Movies N-Z", "path": "/Volumes/Movies N-Z", "items": 987}
-                ];
-                if (!data.keys) {
-                    data = {items: volumes.length};
-                } else {
-                    data = {items: volumes.map(function(volume) {
-                        return Ox.extend({id: volume.name, user: pandora.user.username, mounted: false}, volume);
-                    })};
-                }
-                // fixme: ridiculous (we're binding to init too late)
-                setTimeout(function() {
-                    callback({data: data});
-                }, 1000);
-            };
-        } else {
+        if (id != 'volumes') {
             columns = [
                 {
                     format: function() {
@@ -110,7 +13,7 @@ pandora.ui.folderList = function(id) {
                             }).css({
                                 width: '10px',
                                 height: '10px',
-                                padding: '3px 1px 1px 3px'
+                                padding: '3px 2px 1px 2px'
                             });
                     },
                     id: 'user',
@@ -191,7 +94,7 @@ pandora.ui.folderList = function(id) {
                                 width: '10px',
                                 height: '10px',
                                 padding: '3px 2px 1px 2px',
-                                opacity: value == 'private' ? 0.1 : 1
+                                opacity: value == 'private' ? 0.25 : 1
                             })
                     },
                     id: 'status',
@@ -221,6 +124,103 @@ pandora.ui.folderList = function(id) {
                 return pandora.api.findLists(Ox.extend(data, {
                     query: query
                 }), callback);
+            };
+        } else {
+            columns = [
+                {
+                    format: function() {
+                        return $('<img>').attr({
+                                src: Ox.UI.getImageURL('symbolVolume')
+                            }).css({
+                                width: '10px',
+                                height: '10px',
+                                padding: '3px 2px 1px 2px'
+                            });
+                    },
+                    id: 'user',
+                    operator: '+',
+                    visible: true,
+                    width: 16
+                },
+                {
+                    editable: true,
+                    id: 'name',
+                    operator: '+',
+                    tooltip: 'Edit Title',
+                    unique: true,
+                    visible: true,
+                    width: pandora.user.ui.sidebarWidth - 96
+                },
+                {
+                    align: 'right',
+                    id: 'items',
+                    format: {type: 'number'},
+                    operator: '-',
+                    visible: true,
+                    width: 48
+                },
+                {
+                    clickable: function(data) {
+                        return data.mounted;
+                    },
+                    format: function(value, data) {
+                        return $('<img>')
+                            .attr({
+                                src: Ox.UI.getImageURL(data.mounted ? 'symbolSync' : 'symbolEdit')
+                            })
+                            .css({
+                                width: '10px',
+                                height: '10px',
+                                padding: '3px 2px 1px 2px'
+                            });
+                    },
+                    id: 'path',
+                    operator: '+',
+                    tooltip: function(data) {
+                        return data.mounted ? 'Scan Volume' : 'Edit Path';
+                    },
+                    visible: true,
+                    width: 16
+                },
+                {
+                    clickable: true,
+                    format: function(value, data) {
+                        return $('<img>')
+                            .attr({
+                                src: Ox.UI.getImageURL('symbolMount')
+                            })
+                            .css({
+                                width: '10px',
+                                height: '10px',
+                                padding: '3px 2px 1px 2px',
+                                opacity: data.mounted ? 1 : 0.25
+                            });
+                    },
+                    id: 'mounted',
+                    operator: '+',
+                    tooltip: function(data) {
+                        return data.mounted ? 'Unmount Volume' : 'Mount Volume';
+                    },
+                    visible: true,
+                    width: 16
+                }
+            ];
+            items = function(data, callback) {
+                var volumes = pandora.user.volumes || [
+                    {"name": "Movies A-M", "path": "/Volumes/Movies A-M", "items": 1234},
+                    {"name": "Movies N-Z", "path": "/Volumes/Movies N-Z", "items": 987}
+                ];
+                if (!data.keys) {
+                    data = {items: volumes.length};
+                } else {
+                    data = {items: volumes.map(function(volume) {
+                        return Ox.extend({id: volume.name, user: pandora.user.username, mounted: volume.name == 'Movies A-M'}, volume);
+                    })};
+                }
+                // fixme: ridiculous (we're binding to init too late)
+                setTimeout(function() {
+                    callback({data: data});
+                }, 1000);
             };
         }
         that = Ox.TextList({

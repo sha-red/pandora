@@ -221,9 +221,12 @@ pandora.resizeFolders = function() {
         var i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id);
         pandora.$ui.folder[i].css({width: width + 'px'});
         $list.css({width: width + 'px'});
-        Ox.print('...', width, id, $list.options())
         if (pandora.user.ui.section == 'items') {
             if (pandora.site.sectionFolders[pandora.user.ui.section][i].showBrowser) {
+                Ox.print('ID', id)
+                pandora.$ui.findListInput[id].options({
+                    width: width - 24
+                });
                 $list.resizeColumn('user', columnWidth.user)
                     .resizeColumn('name', columnWidth.name);
             } else {

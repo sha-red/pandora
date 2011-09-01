@@ -8,16 +8,18 @@ pandora.ui.folderBrowserList = function(id) {
             columns: [
                 {
                     format: function() {
-                        return $('<img>')
-                            .attr({
-                                src: Ox.UI.PATH + 'png/icon16.png'
-                            });
+                        return $('<img>').attr({
+                            src: Ox.UI.getImageURL('symbolIcon')
+                        }).css({
+                            width: '10px',
+                            height: '10px',
+                            padding: '3px 2px 1px 2px'
+                        });
                     },
                     id: 'id',
                     operator: '+',
-                    title: $('<img>')
-                        .attr({
-                            src: Ox.UI.PATH + 'png/icon16.png'
+                    title: $('<img>').attr({
+                            src: Ox.UI.getImageURL('symbolIcon')
                         })
                         .css({
                             width: '10px',
@@ -100,8 +102,8 @@ pandora.ui.folderBrowserList = function(id) {
                                 height: '10px',
                                 padding: '3px 2px 1px 2px',
                                 opacity: id == 'favorite'
-                                    ? (value ? 1 : 0.1)
-                                    : (value == 'featured' ? 1 : 0.1)
+                                    ? (value ? 1 : 0.25)
+                                    : (value == 'featured' ? 1 : 0.25)
                             });
                     },
                     id: id == 'favorite' ? 'subscribed' : 'status',
@@ -129,13 +131,12 @@ pandora.ui.folderBrowserList = function(id) {
             columnsVisible: true,
             items: function(data, callback) {
                 var query = id == 'favorite' ? {conditions: [
-                    {key: 'user', value: pandora.user.username, operator: '!'},
-                    {key: 'status', value: 'public', operator: '='}
-                ], operator: '&'} : {conditions: [
                     {key: 'status', value: 'public', operator: '='},
-                    {key: 'status', value: 'featured', operator: '='}
-                ], operator: '|'};
-                return pandora.api.findLists($.extend(data, {
+                    {key: 'user', value: pandora.user.username, operator: '!'}
+                ], operator: '&'} : {conditions: [
+                    {key: 'status', value: 'private', operator: '!'}
+                ], operator: ''};
+                return pandora.api.findLists(Ox.extend(data, {
                     query: query
                 }), callback);
             },

@@ -12,6 +12,9 @@ pandora.ui.folders = function() {
     pandora.$ui.folder = [];
     pandora.$ui.folderBrowser = {};
     pandora.$ui.folderList = {};
+    pandora.$ui.findListElement = {};
+    pandora.$ui.findListSelect = {};
+    pandora.$ui.findListInput = {};
     if (pandora.user.ui.section == 'items') {
         pandora.site.sectionFolders.items.forEach(function(folder, i) {
             var extras;
