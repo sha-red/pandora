@@ -48,28 +48,22 @@ Ox.load('Geo', function() {
                         return key.find ? key : null;
                     }),
                     sectionFolders: {
-                        site: $.merge([
-                            {id: 'site', title: 'Site', items: $.merge([
-                                {id: 'home', title: 'Home'}
-                            ], $.merge(data.site.sitePages, [
-                                {id: 'software', title: 'Software'},
-                                {id: 'help', title: 'Help'}
-                            ]))},
-                            {id: 'user', title: 'User', items: [
-                                {id: 'preferences', title: 'Preferences'},
-                                {id: 'archives', title: 'Archives'}
-                            ]}
-                        ], data.user.level == 'admin' ? [
-                            {id: 'admin', title: 'Admin', items: [
-                                {id: 'statistics', title: 'Statistics'},
-                                {id: 'users', title: 'Users'}
-                            ]}
-                        ] : []),
                         items: [
                             {id: 'personal', title: 'Personal Lists'},
                             {id: 'favorite', title: 'Favorite Lists', showBrowser: false},
-                            {id: 'featured', title: 'Featured Lists', showBrowser: false}
-                        ]
+                            {id: 'featured', title: 'Featured Lists', showBrowser: false},
+                            {id: 'volumes', title: 'Local Volumes'}
+                        ],
+                        edits: [
+                            {id: 'personal', title: 'Personal Edits'},
+                            {id: 'favorite', title: 'Favorite Edits', showBrowser: false},
+                            {id: 'featured', title: 'Featured Edits', showBrowser: false}                        
+                        ],
+                        texts: [
+                            {id: 'personal', title: 'Personal Texts'},
+                            {id: 'favorite', title: 'Favorite Texts', showBrowser: false},
+                            {id: 'featured', title: 'Featured Texts', showBrowser: false}                        
+                        ] 
                     },
                     sortKeys: $.map(data.site.itemKeys, function(key, i) {
                         return key.columnWidth ? key : null;

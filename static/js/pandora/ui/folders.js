@@ -12,125 +12,130 @@ pandora.ui.folders = function() {
     pandora.$ui.folder = [];
     pandora.$ui.folderBrowser = {};
     pandora.$ui.folderList = {};
-    if (pandora.user.ui.section == 'site') {
-        pandora.site.sectionFolders.site.forEach(function(folder, i) {
-            var height = (Ox.getObjectById(pandora.site.sectionFolders.site, folder.id).items.length * 16);
-            pandora.$ui.folder[i] = Ox.CollapsePanel({
-                    id: folder.id,
-                    collapsed: !pandora.user.ui.showFolder.site[folder.id],
-                    size: 16,
-                    title: folder.title
-                })
-                .bindEvent({
-                    toggle: function(event, data) {
-                        
-                    }
-                });
-            //alert(JSON.stringify(Ox.getObjectById(pandora.site.sectionFolders.site, folder.id)))
-            pandora.$ui.folder[i].$content.css({
-                height: height + 'px'
-            })
-                //.appendTo(that);
-            pandora.$ui.folderList[folder.id] = pandora.ui.folderList(folder.id)
-                .css({
-                    height: height + 'px'
-                })
-                .appendTo(pandora.$ui.folder[i].$content);
-            pandora.$ui.folder.forEach(function($folder) {
-                that.append($folder);
-            });
-        });
-        //pandora.resizeFolders();
-    } else if (pandora.user.ui.section == 'items') {
+    if (pandora.user.ui.section == 'items') {
         pandora.site.sectionFolders.items.forEach(function(folder, i) {
-            var extras = [];
-            if (folder.id == 'personal' && pandora.user.level != 'guest') {
-                extras = [Ox.Select({
-                    items: [
-                        { id: 'new', title: 'New List...' },
-                        { id: 'newfromselection', title: 'New List from Current Selection...', disabled: true },
-                        { id: 'newsmart', title: 'New Smart List...' },
-                        { id: 'newfromresults', title: 'New Smart List from Current Results...', disabled: true },
-                        {},
-                        { id: 'addselection', title: 'Add Selection to List...' }
-                    ],
-                    max: 0,
-                    min: 0,
-                    selectable: false,
-                    type: 'image'
-                })
-                .bindEvent({
-                    click: function(event, data) {
-                        var $list = pandora.$ui.folderList[folder.id],
-                            id;
-                        if (data.id == 'new' || data.id == 'newsmart') {
-                            pandora.api.addList({
-                                name: 'Untitled',
-                                status: 'private',
-                                type: data.id == 'new' ? 'static' : 'smart'
-                            }, function(result) {
-                                id = result.data.id;
-                                pandora.UI.set(['lists', id].join('|'), pandora.site.user.ui.lists['']); // fixme: necessary?
-                                pandora.URL.set('?find=list:' + id)
-                                Ox.Request.clearCache(); // fixme: remove
-                                $list.reloadList().bindEventOnce({
-                                    load: function(event, data) {
-                                        $list.gainFocus()
-                                            .options({selected: [id]})
-                                            .editCell(id, 'name');
-                                    }
+            var extras;
+            if (folder.id == 'personal') {
+                if (pandora.user.level == 'guest') {
+                    extras = [infoButton('Personal Lists', 'To create and publish your own lists of movies, please sign up or sign in.')];
+                } else {
+                    extras = [Ox.Select({
+                        items: [
+                            { id: 'new', title: 'New List...' },
+                            { id: 'newfromselection', title: 'New List from Current Selection...', disabled: true },
+                            { id: 'newsmart', title: 'New Smart List...' },
+                            { id: 'newfromresults', title: 'New Smart List from Current Results...', disabled: true },
+                            {},
+                            { id: 'addselection', title: 'Add Selection to List...' }
+                        ],
+                        max: 0,
+                        min: 0,
+                        selectable: false,
+                        type: 'image'
+                    })
+                    .bindEvent({
+                        click: function(event, data) {
+                            var $list = pandora.$ui.folderList[folder.id],
+                                id;
+                            if (data.id == 'new' || data.id == 'newsmart') {
+                                pandora.api.addList({
+                                    name: 'Untitled',
+                                    status: 'private',
+                                    type: data.id == 'new' ? 'static' : 'smart'
+                                }, function(result) {
+                                    id = result.data.id;
+                                    pandora.UI.set(['lists', id].join('|'), pandora.site.user.ui.lists['']); // fixme: necessary?
+                                    pandora.URL.set('?find=list:' + id)
+                                    Ox.Request.clearCache(); // fixme: remove
+                                    $list.reloadList().bindEventOnce({
+                                        load: function(event, data) {
+                                            $list.gainFocus()
+                                                .options({selected: [id]})
+                                                .editCell(id, 'name');
+                                        }
+                                    });
                                 });
-                            });
+                            }
                         }
-                    }
-                })];
-            } else if (folder.id == 'favorite' && pandora.user.level != 'guest') {
-                extras = [Ox.Button({
-                    selectable: true,
-                    style: 'symbol',
-                    title: 'Edit',
-                    tooltip: 'Manage Favorite Lists',
-                    type: 'image'
-                })
-                .bindEvent({
-                    change: function(event, data) {
-                        Ox.Request.clearCache(); // fixme: remove
-                        pandora.site.sectionFolders.items[i].showBrowser = !pandora.site.sectionFolders.items[i].showBrowser;
-                        if (pandora.site.sectionFolders.items[i].showBrowser) {
-                            pandora.$ui.folderList.favorite.replaceWith(
-                                pandora.$ui.folderBrowser.favorite = pandora.ui.folderBrowser('favorite')
-                            );
-                        } else {
-                            pandora.$ui.folderBrowser.favorite.replaceWith(
-                                pandora.$ui.folderList.favorite = pandora.ui.folderList('favorite')
-                            );
+                    })];
+                }
+            } else if (folder.id == 'favorite') {
+                if (pandora.user.level == 'guest') {
+                    extras = [infoButton('Favorite Lists', 'To browse and subscribe to shared lists from other users, please sign up or sign in.')];
+                } else {
+                    extras = [Ox.Button({
+                        selectable: true,
+                        style: 'symbol',
+                        title: 'Edit',
+                        tooltip: 'Manage Favorite Lists',
+                        type: 'image'
+                    })
+                    .bindEvent({
+                        change: function(event, data) {
+                            Ox.Request.clearCache(); // fixme: remove
+                            pandora.site.sectionFolders.items[i].showBrowser = !pandora.site.sectionFolders.items[i].showBrowser;
+                            if (pandora.site.sectionFolders.items[i].showBrowser) {
+                                pandora.$ui.folderList.favorite.replaceWith(
+                                    pandora.$ui.folderBrowser.favorite = pandora.ui.folderBrowser('favorite')
+                                );
+                            } else {
+                                pandora.$ui.folderBrowser.favorite.replaceWith(
+                                    pandora.$ui.folderList.favorite = pandora.ui.folderList('favorite')
+                                );
+                            }
+                            pandora.resizeFolders();
                         }
-                        pandora.resizeFolders();
-                    }
-                })];
-            } else if (folder.id == 'featured' && pandora.user.level == 'admin') {
-                extras = [Ox.Button({
-                    selectable: true,
-                    style: 'symbol',
-                    title: 'Edit',
-                    tooltip: 'Manage Featured Lists',
-                    type: 'image'
-                })
-                .bindEvent({
-                    change: function(event, data) {
-                        Ox.Request.clearCache(); // fixme: remove
-                        pandora.site.sectionFolders.items[i].showBrowser = !pandora.site.sectionFolders.items[i].showBrowser;
-                        if (pandora.site.sectionFolders.items[i].showBrowser) {
-                            pandora.$ui.folderList.featured.replaceWith(
-                                pandora.$ui.folderBrowser.featured = pandora.ui.folderBrowser('featured'));
-                        } else {
-                            pandora.$ui.folderBrowser.featured.replaceWith(
-                                pandora.$ui.folderList.featured = pandora.ui.folderList('featured')
-                            );
+                    })];
+                }
+            } else if (folder.id == 'featured') {
+                if (pandora.user.level != 'admin') {
+                    extras = [infoButton('Featured Lists', 'Featured lists are selected public lists, picked by the ' + pandora.site.site.name + ' staff.')];
+                } else {
+                    extras = [Ox.Button({
+                        selectable: true,
+                        style: 'symbol',
+                        title: 'Edit',
+                        tooltip: 'Manage Featured Lists',
+                        type: 'image'
+                    })
+                    .bindEvent({
+                        change: function(event, data) {
+                            Ox.Request.clearCache(); // fixme: remove
+                            pandora.site.sectionFolders.items[i].showBrowser = !pandora.site.sectionFolders.items[i].showBrowser;
+                            if (pandora.site.sectionFolders.items[i].showBrowser) {
+                                pandora.$ui.folderList.featured.replaceWith(
+                                    pandora.$ui.folderBrowser.featured = pandora.ui.folderBrowser('featured'));
+                            } else {
+                                pandora.$ui.folderBrowser.featured.replaceWith(
+                                    pandora.$ui.folderList.featured = pandora.ui.folderList('featured')
+                                );
+                            }
+                            pandora.resizeFolders();
                         }
-                        pandora.resizeFolders();
-                    }
-                })];
+                    })];
+                }
+            } else if (folder.id == 'volumes') {
+                if (pandora.user.level == 'guest') {
+                    extras = [infoButton('Local Volumes', 'To import movies from a local disk, please sign up or sign in.')];
+                } else {
+                    extras = [Ox.Select({
+                        items: [
+                            { id: 'add', title: 'Add Volume...' },
+                            { id: 'scan', title: 'Scan Selected Volume...' },
+                            { id: 'remove', title: 'Remove Selected Volume...' },
+                            {},
+                            { id: 'import', title: 'Import Movies...' }
+                        ],
+                        max: 0,
+                        min: 0,
+                        selectable: false,
+                        type: 'image'
+                    })
+                    .bindEvent({
+                        click: function(data) {
+                        }
+                    })];
+                }
             }
             pandora.$ui.folder[i] = Ox.CollapsePanel({
                     id: folder.id,
@@ -180,7 +185,7 @@ pandora.ui.folders = function() {
                 .bindEventOnce({
                     init: function(event, data) {
                         Ox.print('init', i, counter)
-                        if (++counter == 3) {
+                        if (++counter == 4) {
                             pandora.$ui.folder.forEach(function($folder) {
                                 that.append($folder);
                             });
@@ -190,6 +195,53 @@ pandora.ui.folders = function() {
                     }
                 })
                 .appendTo(pandora.$ui.folder[i].$content);
+        });
+    }
+    function infoButton(title, text) {
+        return Ox.Button({
+            style: 'symbol',
+            title: 'info',
+            type: 'image'
+        }).bindEvent({
+            click: function() {
+                var $dialog = Ox.Dialog({
+                    buttons: Ox.merge([
+                        Ox.Button({title: 'Close'}).bindEvent({
+                            click: function() {
+                                $dialog.close();
+                            }
+                        })
+                    ], title != 'Featured Lists' ? [
+                        Ox.Button({title: 'Sign Up'}).bindEvent({
+                            click: function() {
+                                $dialog.close();
+                                pandora.$ui.accountDialog = pandora.ui.accountDialog('signup').open();
+                            }
+                        }),
+                        Ox.Button({title: 'Sign In'}).bindEvent({
+                            click: function() {
+                                $dialog.close();
+                                pandora.$ui.accountDialog = pandora.ui.accountDialog('signin').open();
+                            }
+                        })
+                    ] : []),
+                    content: Ox.Element()
+                        .append(
+                            $('<img>')
+                                .attr({src: '/static/png/icon64.png'})
+                                .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
+                        )
+                        .append(
+                            $('<div>')
+                                .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
+                                .html(text)
+                        ),
+                    fixedSize: true,
+                    height: 128,
+                    width: 304,
+                    title: title
+                }).open();
+            }
         });
     }
     that.toggle = function() {

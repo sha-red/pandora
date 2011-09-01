@@ -330,7 +330,7 @@ pandora.ui.accountSignoutDialog = function() {
                         .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
                 )
                 .append(
-                    Ox.Element()
+                    $('<div>')
                         .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
                         .html('Are you sure you want to sign out?')
                 ),

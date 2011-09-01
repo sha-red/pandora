@@ -25,9 +25,9 @@ pandora.exitFullscreen = function() {
 };
 
 pandora.getFoldersHeight = function() {
-    var height = 48;
+    var height = 0;
     pandora.site.sectionFolders[pandora.user.ui.section].forEach(function(folder, i) {
-        height += pandora.user.ui.showFolder[pandora.user.ui.section][folder.id] * (
+        height += 16 + pandora.user.ui.showFolder[pandora.user.ui.section][folder.id] * (
             !!folder.showBrowser * 40 + folder.items * 16
         );
         Ox.print('h', height);
@@ -212,11 +212,9 @@ pandora.resizeGroups = function(width) {
 pandora.resizeFolders = function() {
     var width = pandora.getFoldersWidth(),
         columnWidth = {};
-    if (pandora.user.ui.section == 'site') {
-        columnWidth.title = width - 16;
-    } else if (pandora.user.ui.section == 'items') {
-        columnWidth = {user: parseInt((width - 88) * 0.4)};
-        columnWidth.name = (width - 88) - columnWidth.user;
+    if (pandora.user.ui.section == 'items') {
+        columnWidth = {user: parseInt((width - 96) * 0.4)};
+        columnWidth.name = (width - 96) - columnWidth.user;
     }
     //Ox.print('sectionsWidth', width)
     $.each(pandora.$ui.folderList, function(id, $list) {
@@ -224,14 +222,12 @@ pandora.resizeFolders = function() {
         pandora.$ui.folder[i].css({width: width + 'px'});
         $list.css({width: width + 'px'});
         Ox.print('...', width, id, $list.options())
-        if (pandora.user.ui.section == 'site') {
-            $list.resizeColumn('title', columnWidth.title);
-        } else if (pandora.user.ui.section == 'items') {
+        if (pandora.user.ui.section == 'items') {
             if (pandora.site.sectionFolders[pandora.user.ui.section][i].showBrowser) {
                 $list.resizeColumn('user', columnWidth.user)
                     .resizeColumn('name', columnWidth.name);
             } else {
-                $list.resizeColumn(id == 'favorite' ? 'id' : 'name', width - 88);
+                $list.resizeColumn(id == 'favorite' ? 'id' : 'name', width - 96);
             }                
         }
         if (!pandora.user.ui.showFolder[pandora.user.ui.section][id]) {

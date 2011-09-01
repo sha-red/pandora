@@ -499,7 +499,6 @@
     "site": {
         "id": "{{settings.SITEID}}",
         "name": "{{settings.SITENAME}}",
-        "sectionName": "{{settings.SITENAME}}",
         "url": "{{settings.URL}}"
     },
     "sitePages": [
@@ -572,15 +571,11 @@
             "showInfo": true,
             "showMovies": true,
             "showFolder": {
-                "site": {
-                    "site": true,
-                    "user": true,
-                    "admin": true
-                },
                 "items": {
                     "personal": true,
                     "favorite": true,
-                    "featured": true
+                    "featured": true,
+                    "volumes": true
                 }
             },
             "showSidebar": true,
@@ -594,7 +589,10 @@
             "videoView": "player",
             "videoVolume": 1
         },
-        "username": ""
+        "username": "",
+        "volumes": [
+            {"name": "Movies A-Z", "path": "", "items": 1234}
+        ]
     },
     "userLevels": ["guest", "member", "staff", "admin"],
     "video": {

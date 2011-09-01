@@ -1,6 +1,8 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.folderBrowserList = function(id) {
-    var columnWidth = (pandora.user.ui.sidebarSize - Ox.UI.SCROLLBAR_SIZE - 88) / 2,
+    // fixme: user and name are set to the same width here,
+    // but resizeFolders will set them to different widths
+    var columnWidth = (pandora.user.ui.sidebarSize - Ox.UI.SCROLLBAR_SIZE - 96) / 2,
         i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id),
         that = Ox.TextList({
             columns: [
@@ -43,10 +45,11 @@ pandora.ui.folderBrowserList = function(id) {
                 {
                     align: 'right',
                     id: 'items',
+                    format: {type: 'number'},
                     operator: '-',
                     title: 'Items',
                     visible: true,
-                    width: 40
+                    width: 48
                 },
                 {
                     clickable: function(data) {
@@ -68,7 +71,7 @@ pandora.ui.folderBrowserList = function(id) {
                     operator: '+',
                     title: $('<img>')
                         .attr({
-                            src: Ox.UI.getImageURL('symbolFind')
+                            src: Ox.UI.getImageURL('symbolEdit')
                         })
                         .css({
                             width: '10px',
@@ -89,7 +92,7 @@ pandora.ui.folderBrowserList = function(id) {
                         return $('<img>')
                             .attr({
                                 src: Ox.UI.getImageURL(
-                                    'symbol' + (id == 'favorite' ? 'Check' : 'Star')
+                                    'symbol' + (id == 'favorite' ? 'Like' : 'Star')
                                 )
                             })
                             .css({
@@ -106,7 +109,7 @@ pandora.ui.folderBrowserList = function(id) {
                     title: $('<img>')
                         .attr({
                             src: Ox.UI.getImageURL(
-                                'symbol' + (id == 'favorite' ? 'Check' : 'Star')
+                                'symbol' + (id == 'favorite' ? 'Like' : 'Star')
                             )
                         })
                         .css({

@@ -459,6 +459,7 @@ pandora.ui.list = function() { // fixme: remove view argument
     var $tooltip = Ox.Tooltip({
         animate: false
     }).css({
+        fontSize: '11px',
         textAlign: 'center'
     });
 
@@ -500,7 +501,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                                 dragover: function(e) {
                                     $tooltip.options({
                                         title: getTitle(e, ids.length == 1 ? item : items, data.id.split('/').pop())
-                                            + (editable && e.shiftKey && result.data.items
+                                            + (editable && e.metaKey && result.data.items
                                                 ? '<br/>and remove ' + result.data.items + ' '
                                                 + pandora.site.itemName[result.data.items == 1 ? 'singular' : 'plural'].toLowerCase()
                                                 + '<br/>from the list "' + pandora.user.ui.list.split('/').pop() + '"'
@@ -516,7 +517,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                                 drop: function(e) {
                                     Ox.print('DROP', data);
                                     var $this = $(this), folder, listData;
-                                    if (editable && e.shiftKey) {
+                                    if (editable && e.metaKey) {
                                         pandora.api.removeListItems({
                                             list: pandora.user.ui.list,
                                             items: ids
@@ -563,7 +564,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                 }
             });
             function getTitle(e, item, list) {
-                return (editable && e.shiftKey ? 'Move' : 'Copy') + ' ' 
+                return (editable && e.metaKey ? 'Move' : 'Copy') + ' ' 
                     + (Ox.isString(item) ? '"' + item + '"' : item + ' ' + pandora.site.itemName[item == 1 ? 'singular' : 'plural'].toLowerCase())
                     + (list ? '<br/>to the list "' + list + '"' : '');
             }

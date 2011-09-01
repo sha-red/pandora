@@ -2,59 +2,116 @@
 pandora.ui.folderList = function(id) {
     var i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id),
         that;
-    if (pandora.user.ui.section == 'site') {
-        that = Ox.TextList({
-            columns: [
+    if (pandora.user.ui.section == 'items') {
+        var columns, items;
+        if (id == 'volumes') {
+            columns = [
                 {
                     format: function() {
-                        return $('<img>')
-                            .attr({
-                                src: Ox.UI.PATH + 'png/icon16.png'
-                            })
+                        return $('<img>').attr({
+                                src: Ox.UI.getImageURL('symbolVolume')
+                            }).css({
+                                width: '10px',
+                                height: '10px',
+                                padding: '3px 1px 1px 3px'
+                            });
                     },
-                    id: 'id',
+                    id: 'user',
                     operator: '+',
-                    unique: true,
                     visible: true,
                     width: 16
                 },
                 {
-                    id: 'title',
+                    editable: true,
+                    id: 'name',
                     operator: '+',
+                    tooltip: 'Edit Title',
+                    unique: true,
                     visible: true,
-                    width: pandora.user.ui.sidebarSize - 16
+                    width: pandora.user.ui.sidebarWidth - 96
+                },
+                {
+                    align: 'right',
+                    id: 'items',
+                    format: {type: 'number'},
+                    operator: '-',
+                    visible: true,
+                    width: 48
+                },
+                {
+                    clickable: function(data) {
+                        return data.mounted;
+                    },
+                    format: function(value, data) {
+                        return $('<img>')
+                            .attr({
+                                src: Ox.UI.getImageURL(data.mounted ? 'symbolScan' : 'symbolEdit')
+                            })
+                            .css({
+                                width: '10px',
+                                height: '10px',
+                                padding: '3px 2px 1px 2px'
+                            });
+                    },
+                    id: 'path',
+                    operator: '+',
+                    tooltip: function(data) {
+                        return data.mounted ? 'Scan Volume' : 'Edit Path';
+                    },
+                    visible: true,
+                    width: 16
+                },
+                {
+                    clickable: true,
+                    format: function(value, data) {
+                        return $('<img>')
+                            .attr({
+                                src: Ox.UI.getImageURL('symbolMount')
+                            })
+                            .css({
+                                width: '10px',
+                                height: '10px',
+                                padding: '3px 2px 1px 2px',
+                                opacity: data.mounted ? 1 : 0.25
+                            });
+                    },
+                    id: 'mounted',
+                    operator: '+',
+                    tooltip: function(data) {
+                        return data.mounted ? 'Unmount Volume' : 'Mount Volume';
+                    },
+                    visible: true,
+                    width: 16
                 }
-            ],
-            items: function(data, callback) {
-                var result = {data: {}};
-                if (!data.range) {
-                    result.data.items = Ox.getObjectById(pandora.site.sectionFolders.site, id).items.length;
+            ];
+            items = function(data, callback) {
+                var volumes = pandora.user.volumes || [
+                    {"name": "Movies A-M", "path": "/Volumes/Movies A-M", "items": 1234},
+                    {"name": "Movies N-Z", "path": "/Volumes/Movies N-Z", "items": 987}
+                ];
+                if (!data.keys) {
+                    data = {items: volumes.length};
                 } else {
-                    result.data.items = Ox.getObjectById(pandora.site.sectionFolders.site, id).items;
+                    data = {items: volumes.map(function(volume) {
+                        return Ox.extend({id: volume.name, user: pandora.user.username, mounted: false}, volume);
+                    })};
                 }
-                callback(result);
-            },
-            max: 1,
-            min: 1,
-            sort: [{key: '', operator: ''}]
-        })
-        .bindEvent({
-            select: function(event, data) {
-                // fixme: duplicated
-                $.each(pandora.$ui.folderList, function(id_, $list) {
-                    id != id_ && $list.options('selected', []);
-                })
-                pandora.URL.set((id == 'admin' ? 'admin/' : '' ) + data.ids[0]);
-            },
-        });
-    } else if (pandora.user.ui.section == 'items') {
-        that = Ox.TextList({
-            columns: [
+                // fixme: ridiculous (we're binding to init too late)
+                setTimeout(function() {
+                    callback({data: data});
+                }, 1000);
+            };
+        } else {
+            columns = [
                 {
                     format: function() {
                         return $('<img>').attr({
-                            src: Ox.UI.PATH + 'png/icon16.png'
-                        });
+                                src: Ox.UI.getImageURL('symbolIcon')
+                            }).css({
+                                width: '10px',
+                                height: '10px',
+                                padding: '3px 1px 1px 3px'
+                            });
                     },
                     id: 'user',
                     operator: '+',
@@ -69,7 +126,9 @@ pandora.ui.folderList = function(id) {
                     operator: '+',
                     unique: true,
                     visible: id == 'favorite',
-                    width: pandora.user.ui.sidebarWidth - 88
+                    // fixme: user and name are set to the same width here,
+                    // but resizeFolders will set them to different widths
+                    width: pandora.user.ui.sidebarWidth - 96
                 },
                 {
                     editable: function(data) {
@@ -82,14 +141,15 @@ pandora.ui.folderList = function(id) {
                     operator: '+',
                     tooltip: id == 'personal' ? 'Edit Title' : null,
                     visible: id != 'favorite',
-                    width: pandora.user.ui.sidebarWidth - 88
+                    width: pandora.user.ui.sidebarWidth - 96
                 },
                 {
                     align: 'right',
                     id: 'items',
+                    format: {type: 'number'},
                     operator: '-',
                     visible: true,
-                    width: 40
+                    width: 48
                 },
                 {
                     clickable: function(data) {
@@ -120,11 +180,11 @@ pandora.ui.folderList = function(id) {
                 {
                     clickable: id == 'personal',
                     format: function(value) {
-                        //var symbols = {private: 'Publish', public: 'Publish', featured: 'Star'};
+                        var symbols = {personal: 'Publish', favorite: 'Like', featured: 'Star'};
                         return $('<img>')
                             .attr({
                                 src: Ox.UI.getImageURL(
-                                    'symbol' + (value == 'featured' ? 'Star' : 'Publish')
+                                    'symbol' + symbols[id]
                                 )
                             })
                             .css({
@@ -142,8 +202,8 @@ pandora.ui.folderList = function(id) {
                     visible: true,
                     width: 16
                 }
-            ],
-            items: function(data, callback) {
+            ];
+            items = function(data, callback) {
                 var query;
                 if (id == 'personal') {
                     query = {conditions: [
@@ -161,24 +221,21 @@ pandora.ui.folderList = function(id) {
                 return pandora.api.findLists(Ox.extend(data, {
                     query: query
                 }), callback);
-            },
+            };
+        }
+        that = Ox.TextList({
+            columns: columns,
+            items: items,
             max: 1,
             min: 0,
             pageLength: 1000,
-            sort: [
-                {key: 'position', operator: '+'}
-            ],
-            sortable: id == 'personal' || id == 'favorite' || pandora.user.level == 'admin'
+            sort: [{key: 'position', operator: '+'}],
+            sortable: id != 'featured' || pandora.user.level == 'admin'
         })
         .css({
             left: 0,
             top: 0,
             width: pandora.user.ui.sidebarWidth + 'px',
-        })
-        .bind({
-            dragenter: function(e) {
-                //Ox.print('DRAGENTER', e)
-            }
         })
         .bindEvent({
             click: function(event, data) {
@@ -192,6 +249,10 @@ pandora.ui.folderList = function(id) {
                     }, function(result) {
                         $list.value(result.data.id, 'status', result.data.status);
                     });
+                } else if (data.key == 'path') {
+                    
+                } else if (data.key == 'mounted') {
+                    alert(JSON.stringify(data));
                 }
             },
             'delete': function(event, data) {
@@ -203,7 +264,6 @@ pandora.ui.folderList = function(id) {
                         id: data.ids[0]
                     }, function(result) {
                         pandora.UI.set(['lists', data.ids[0]].join('|'), null);
-                        Ox.print('SHOULD BE DELETED:', pandora.user.ui.lists)
                         Ox.Request.clearCache(); // fixme: remove
                         $list.reloadList();
                     });
@@ -259,7 +319,7 @@ pandora.ui.folderList = function(id) {
                     $.each(pandora.$ui.folderList, function(id_, $list) {
                         id != id_ && $list.options('selected', []);
                     })
-                    pandora.URL.set('?find=list:' + data.ids[0]);
+                    pandora.URL.set('?find=' + (id == 'volumes' ? 'volume' : 'list') + ':' + data.ids[0]);
                 } else {
                     pandora.URL.set('?find=');
                 }
