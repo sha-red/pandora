@@ -61,7 +61,6 @@ pandora.getGroupsSizes = function() {
 };
 
 pandora.getListData = function() {
-    Ox.print('getListData ............')
     var data = {}, folder;
     if (pandora.user.ui.list) {
         Ox.forEach(pandora.$ui.folderList, function(list, key) {
