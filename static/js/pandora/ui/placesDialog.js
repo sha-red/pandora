@@ -27,7 +27,6 @@ pandora.ui.placesDialog = function() {
                             Ox.Request.clearCache(); // fixme: remove
                             callback(result);
                         });
-
                     },
                     editPlace: function(place, callback) {
                         Ox.print('EDITPLACE', place);
