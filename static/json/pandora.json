@@ -11,7 +11,6 @@
   "js/pandora/ui/group.js", 
   "js/pandora/ui/toolbar.js", 
   "js/pandora/ui/statusbar.js", 
-  "js/pandora/ui/player.js", 
   "js/pandora/ui/sectionButtons.js", 
   "js/pandora/ui/item.js", 
   "js/pandora/ui/folderBrowser.js", 

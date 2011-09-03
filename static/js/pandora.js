@@ -32,6 +32,7 @@ Ox.load('UI', {
                     requests: {},
                     ui: {}
                 });
+
                 loadResources('/static/json/pandora.json', function() {
 
                     Ox.print('Ox.App load', data);
@@ -121,10 +122,10 @@ Ox.load('UI', {
                         return;
                     }
                     var dfd = new $.Deferred();
+                    promises.push(dfd.promise());
                     Ox.loadFile(prefix + file, function() {
                         dfd.resolve();
                     });
-                    promises.push(dfd.promise());
                 });
                 $.when.apply(null, promises)
                     .done(function() {
