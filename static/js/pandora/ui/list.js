@@ -486,9 +486,16 @@ pandora.ui.list = function() { // fixme: remove view argument
         } else {
             image = drag.action == 'copy' ? 'symbolAdd' : 'symbolRemove';
             text = Ox.toTitleCase(drag.action) + ' ' + (
-                Ox.isString(drag.item) ? '"' + drag.item + '"' : drag.item + ' '
-                + pandora.site.itemName[drag.item == 1 ? 'singular' : 'plural'].toLowerCase()
-            ) + '</br> to ' + (drag.target ? 'the list "' + drag.target.name + '"' : 'another list');
+                Ox.isString(drag.item)
+                ? '"' + drag.item + '"'
+                : drag.item + ' ' + pandora.site.itemName[
+                    drag.item == 1 ? 'singular' : 'plural'
+                ].toLowerCase()
+            ) + '</br> to ' + (
+                drag.target && !drag.target.selected 
+                ? 'the list "' + drag.target.name + '"'
+                : 'another list'
+            );
         }
         return $('<div>')
             .append(
@@ -612,7 +619,11 @@ pandora.ui.list = function() { // fixme: remove view argument
         },
         draganddropend: function(data) {
             Ox.print(data, drag, '------------');
-            if (drag.target && drag.target.editable) {
+            Ox.UI.$window.unbind({
+                keydown: keydown,
+                keyup: keyup
+            });
+            if (drag.target && drag.target.editable && !drag.target.selected) {
                 if (drag.action == 'copy' || (
                     drag.action == 'move' && drag.source.editable
                 )) {
@@ -655,10 +666,6 @@ pandora.ui.list = function() { // fixme: remove view argument
                 cleanup(0);
             }
             function cleanup(ms) {
-                Ox.UI.$window.unbind({
-                    keydown: keydown,
-                    keyup: keyup
-                });
                 drag = {};
                 setTimeout(function() {
                     $('.OxDroppable').removeClass('OxDroppable');
