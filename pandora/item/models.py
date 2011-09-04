@@ -163,6 +163,7 @@ class Item(models.Model):
         return default
 
     def access(self, user):
+        #check rights level
         if self.public:
             return True
         elif user.is_authenticated() and \
@@ -752,6 +753,9 @@ class Item(models.Model):
         files = archive.models.File.objects.filter(item=self,
                                                    streams__available=True,
                                                    streams__source=None)
+        if files.count() == 0:
+            return
+
         def get_level(users):
             if users.filter(is_superuser=True).count() > 0: level = 0
             elif users.filter(is_staff=True).count() > 0: level = 1
