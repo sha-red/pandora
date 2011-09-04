@@ -475,7 +475,7 @@ class Item(models.Model):
 
         def save(key, value):
             f, created = ItemFind.objects.get_or_create(item=self, key=key)
-            if value not in ('', ):
+            if value not in ('', None):
                 if isinstance(value, basestring):
                     value = value.strip()
                 f.value = value
@@ -483,9 +483,23 @@ class Item(models.Model):
             else:
                 f.delete()
 
-        #FIXME: use site_config
-        save('title', u'\n'.join([self.get('title', 'Untitled'),
-                                 self.get('original_title', '')]))
+        for key in site_config()['itemKeys']:
+            if key.get('find'):
+                i = key['id']
+                if i == 'title':
+                    save(i, u'\n'.join([self.get('title', 'Untitled'),
+                                        self.get('original_title', '')]))
+                elif i == 'filename':
+                    save(i,
+                        '\n'.join([os.path.join(f.folder, f.name) for f in self.files.all()]))
+                elif key['type'] == 'layer':
+                    qs = Annotation.objects.filter(layer__name=i, item=self).order_by('start')
+                    save(i, '\n'.join([l.value for l in qs]))
+                elif i != 'all' and i not in self.facet_keys:
+                    value = self.get(i)
+                    if isinstance(value, list):
+                        value = u'\n'.join(value)
+                    save(i, value)
 
         for key in self.facet_keys:
             if key == 'character':
@@ -508,15 +522,6 @@ class Item(models.Model):
                 save(key, '\n'.join(values))
             else:
                 save(key, values)
-
-
-        save('summary', self.get('summary', ''))
-        save('trivia', ' '.join(self.get('trivia', [])))
-
-        #FIXME:
-        qs = Annotation.objects.filter(layer__name='subtitles', item=self).order_by('start')
-        save('subtitles', '\n'.join([l.value for l in qs]))
-        save('filename', '\n'.join([u'%s/%s' % (f.folder, f.name) for f in self.files.all()]))
 
     def update_sort(self):
         try:
