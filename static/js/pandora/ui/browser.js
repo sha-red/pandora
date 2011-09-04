@@ -41,6 +41,7 @@ pandora.ui.browser = function() {
             borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 8,
             centered: true,
             defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
+            draggable: true,
             id: 'list',
             item: function(data, sort, size) {
                 var icons = pandora.user.ui.icons,
@@ -88,6 +89,7 @@ pandora.ui.browser = function() {
                 }
             }
         });
+        pandora.enableDragAndDrop(that, false);
     }
     that.update = function() {
         pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
