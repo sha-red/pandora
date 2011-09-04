@@ -16,7 +16,65 @@ pandora.ui.list = function() { // fixme: remove view argument
         Ox.print('$$$$', keys)
         */
         that = Ox.TextList({
-            columns: $.map(pandora.site.sortKeys, function(key, i) {
+            columns: Ox.merge([{
+                align: 'center',
+                defaultWidth: 16,
+                format: function(value, data) {
+                    var icon, width, height, margin, marginCSS, borderRadius;
+                    if (pandora.user.ui.icons == 'posters') {
+                        icon = 'poster';
+                        width = value < 1 ? Math.round(14 * value / 2) * 2 : 14;
+                        height = value < 1 ? 14 : Math.round(14 / value / 2) * 2;
+                        margin = value < 1 ? Math.floor(7 - width / 2) - 3 : Math.floor(7 - height / 2);
+                        marginCSS = value < 1 ? '0 0 0 ' + margin + 'px' : margin + 'px 0 0 -3px';
+                        borderRadius = 0;
+                    } else {
+                        icon = 'icon';
+                        width = 14;
+                        height = 14;
+                        marginCSS = '0 0 0 -3px';
+                        borderRadius = '3px';
+                    }
+                    return $('<img>').css({
+                        width: width - 2 + 'px',
+                        height: height - 2 + 'px',
+                        border: '1px solid rgb(48, 48, 48)',
+                        borderRadius: '2px',
+                        margin: marginCSS,
+                        background: '-webkit-linear-gradient(top, rgb(32, 32, 32), rgb(0, 0, 0))'
+                    }).load(function() {
+                        $(this).css({
+                            width: width + 'px',
+                            height: height + 'px',
+                            border: 0,
+                            borderRadius: borderRadius
+                            //background: 'transparent'
+                        })
+                    }).attr({
+                        src: '/' + data.id + '/' + icon + '14.jpg'
+                    });
+                },
+                id: 'posterRatio',
+                operator: '+',
+                position: 0,
+                removable: true,
+                //title: 'Poster',
+                ///*
+                title: $('<img>').attr({
+                        src: Ox.UI.getImageURL(
+                            pandora.user.ui.icons == 'posters'
+                            ? 'symbolSetPoster' : 'symbolIcon'
+                        )
+                    })
+                    .css({
+                        width: '12px',
+                        height: '12px',
+                        padding: '2px',
+                    }),
+                //*/
+                visible: true,
+                width: 16
+            }], Ox.map(pandora.site.sortKeys, function(key) {
                 var position = pandora.user.ui.lists[pandora.user.ui.list].columns.indexOf(key.id);
                 return {
                     align: ['string', 'text'].indexOf(
@@ -34,7 +92,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                     visible: position > -1,
                     width: pandora.user.ui.lists[pandora.user.ui.list].columnWidth[key.id] || key.columnWidth
                 };
-            }),
+            })),
             columnsMovable: true,
             columnsRemovable: true,
             columnsResizable: true,
