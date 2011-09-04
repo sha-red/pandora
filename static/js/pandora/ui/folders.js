@@ -15,6 +15,7 @@ pandora.ui.folders = function() {
     pandora.$ui.findListElement = {};
     pandora.$ui.findListSelect = {};
     pandora.$ui.findListInput = {};
+    pandora.$ui.manageListsButton = {};
     if (pandora.user.ui.section == 'items') {
         pandora.site.sectionFolders.items.forEach(function(folder, i) {
             var extras;
@@ -26,10 +27,12 @@ pandora.ui.folders = function() {
                         items: [
                             { id: 'new', title: 'New List...' },
                             { id: 'newfromselection', title: 'New List from Current Selection...', disabled: true },
+                            {},
                             { id: 'newsmart', title: 'New Smart List...' },
                             { id: 'newfromresults', title: 'New Smart List from Current Results...', disabled: true },
                             {},
-                            { id: 'addselection', title: 'Add Selection to List...' }
+                            { id: 'copyselection', title: 'Copy Selection to List...' },
+                            { id: 'moveselection', title: 'Move Selection to List...' }
                         ],
                         max: 0,
                         min: 0,
@@ -38,15 +41,15 @@ pandora.ui.folders = function() {
                     })
                     .bindEvent({
                         click: function(event, data) {
-                            var $list = pandora.$ui.folderList[folder.id],
-                                id;
+                            var $list = pandora.$ui.folderList[folder.id];
+                            // fixme: duplicated
                             if (data.id == 'new' || data.id == 'newsmart') {
                                 pandora.api.addList({
                                     name: 'Untitled',
                                     status: 'private',
                                     type: data.id == 'new' ? 'static' : 'smart'
                                 }, function(result) {
-                                    id = result.data.id;
+                                    var id = result.data.id;
                                     pandora.UI.set(['lists', id].join('|'), pandora.site.user.ui.lists['']); // fixme: necessary?
                                     pandora.URL.set('?find=list:' + id)
                                     Ox.Request.clearCache(); // fixme: remove
@@ -66,7 +69,7 @@ pandora.ui.folders = function() {
                 if (pandora.user.level == 'guest') {
                     extras = [infoButton('Favorite Lists', 'To browse and subscribe to shared lists from other users, please sign up or sign in.')];
                 } else {
-                    extras = [Ox.Button({
+                    extras = [pandora.$ui.manageListsButton['favorite'] = Ox.Button({
                         selectable: true,
                         style: 'symbol',
                         title: 'Edit',
@@ -82,6 +85,21 @@ pandora.ui.folders = function() {
                                     pandora.$ui.folderBrowser.favorite = pandora.ui.folderBrowser('favorite')
                                 );
                             } else {
+                                listData = pandora.getListData();
+                                if (
+                                    pandora.$ui.folderList.favorite.options('selected').length
+                                    && !listData.subscribed
+                                ) {
+                                    // the selected list in the favorite browser is not in the favorite folder
+                                    pandora.$ui.folderList.favorite.options({selected: []});
+                                    if (Ox.getObjectById(pandora.site.sectionFolders.items, 'featured').showBrowser) {
+                                        // but in the featured browser
+                                        pandora.$ui.folderList.featured.options({selected: [listData.id]});
+                                    } else {
+                                        // and nowhere else
+                                        pandora.URL.set('?find=');
+                                    }
+                                }
                                 pandora.$ui.folderBrowser.favorite.replaceWith(
                                     pandora.$ui.folderList.favorite = pandora.ui.folderList('favorite')
                                 );
@@ -94,7 +112,7 @@ pandora.ui.folders = function() {
                 if (pandora.user.level != 'admin') {
                     extras = [infoButton('Featured Lists', 'Featured lists are selected public lists, picked by the ' + pandora.site.site.name + ' staff.')];
                 } else {
-                    extras = [Ox.Button({
+                    extras = [pandora.$ui.manageListsButton['featured'] = Ox.Button({
                         selectable: true,
                         style: 'symbol',
                         title: 'Edit',
@@ -103,12 +121,33 @@ pandora.ui.folders = function() {
                     })
                     .bindEvent({
                         change: function(event, data) {
+                            var listData;
                             Ox.Request.clearCache(); // fixme: remove
                             pandora.site.sectionFolders.items[i].showBrowser = !pandora.site.sectionFolders.items[i].showBrowser;
                             if (pandora.site.sectionFolders.items[i].showBrowser) {
                                 pandora.$ui.folderList.featured.replaceWith(
-                                    pandora.$ui.folderBrowser.featured = pandora.ui.folderBrowser('featured'));
+                                    pandora.$ui.folderBrowser.featured = pandora.ui.folderBrowser('featured')
+                                );
                             } else {
+                                listData = pandora.getListData();
+                                Ox.print('FEATURED', listData)
+                                if (
+                                    pandora.$ui.folderList.featured.options('selected').length
+                                    && listData.status != 'featured'
+                                ) {
+                                    // the selected list in the featured browser is not in the featured folder
+                                    pandora.$ui.folderList.featured.options({selected: []});
+                                    if (listData.user == pandora.user.username) {
+                                        // but in the personal folder
+                                        pandora.$ui.folderList.personal.options({selected: [listData.id]});
+                                    } else if (Ox.getObjectById(pandora.site.sectionFolders.items, 'favorite').showBrowser) {
+                                        // but in the favorite browser
+                                        pandora.$ui.folderList.favorite.options({selected: [listData.id]});
+                                    } else {
+                                        // and nowhere else
+                                        pandora.URL.set('?find=');
+                                    }
+                                }
                                 pandora.$ui.folderBrowser.featured.replaceWith(
                                     pandora.$ui.folderList.featured = pandora.ui.folderList('featured')
                                 );

@@ -229,7 +229,8 @@ pandora.ui.folderList = function(id) {
             max: 1,
             min: 0,
             pageLength: 1000,
-            sort: [{key: 'position', operator: '+'}],
+            selected: pandora.getListData().folder == id ? [pandora.user.ui.list] : [],
+            sort: [{key: 'position', operator: '+'}],            
             sortable: id != 'featured' || pandora.user.level == 'admin'
         })
         .css({
@@ -238,6 +239,45 @@ pandora.ui.folderList = function(id) {
             width: pandora.user.ui.sidebarWidth + 'px',
         })
         .bindEvent({
+            add: function(event) {
+                // fixme: this is duplicated,
+                // see folder collapse panel menu handler
+                var i = ['personal', 'favorite', 'featured'].indexOf(id);
+                if (id == 'personal') {
+                    if (event.keys == '' || event.keys == 'alt') {
+                        pandora.api.addList({
+                            name: 'Untitled',
+                            status: 'private',
+                            type: event.keys == '' ? 'static' : 'smart'
+                        }, function(result) {
+                            var id = result.data.id;
+                            pandora.UI.set(['lists', id].join('|'), pandora.site.user.ui.lists['']); // fixme: necessary?
+                            pandora.URL.set('?find=list:' + id)
+                            Ox.Request.clearCache(); // fixme: remove
+                            that.reloadList().bindEventOnce({
+                                load: function(event, data) {
+                                    that.gainFocus()
+                                        .options({selected: [id]})
+                                        .editCell(id, 'name');
+                                }
+                            });
+                        });
+                    }
+                } else if (id == 'favorite' || (id == 'featured' && pandora.user.level == 'admin')) {
+                    // this makes the button trigger a change event,
+                    // which is already being handled in folders.js
+                    pandora.$ui.manageListsButton[id].options({selected: true});
+                    /*
+                    if (!pandora.site.sectionFolders.items[i].showBrowser) {
+                        pandora.site.sectionFolders.items[i].showBrowser = true;
+                        pandora.$ui.manageListsButton[id].options({selected: true});
+                        pandora.$ui.folderList[id].replaceWith(
+                            pandora.$ui.folderBrowser[id] = pandora.ui.folderBrowser(id)
+                        );
+                    }
+                    */
+                }
+            },
             click: function(event, data) {
                 var $list = pandora.$ui.folderList[id];
                 if (data.key == 'type') {
@@ -256,6 +296,7 @@ pandora.ui.folderList = function(id) {
                 }
             },
             'delete': function(event, data) {
+                // fixme: add a confirmation dialog
                 var $list = pandora.$ui.folderList[id];
                 pandora.URL.set('?find=');
                 $list.options({selected: []});
@@ -316,9 +357,9 @@ pandora.ui.folderList = function(id) {
             },
             select: function(event, data) {
                 if (data.ids.length) {
-                    $.each(pandora.$ui.folderList, function(id_, $list) {
+                    Ox.forEach(pandora.$ui.folderList, function($list, id_) {
                         id != id_ && $list.options('selected', []);
-                    })
+                    });
                     pandora.URL.set('?find=' + (id == 'volumes' ? 'volume' : 'list') + ':' + data.ids[0]);
                 } else {
                     pandora.URL.set('?find=');

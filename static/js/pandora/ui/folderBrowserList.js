@@ -141,8 +141,7 @@ pandora.ui.folderBrowserList = function(id) {
                 }), callback);
             },
             pageLength: 1000,
-            // fixme: select if previously selected
-            // selected: pandora.user.ui.list ? [pandora.user.ui.list] : [],
+            selected: pandora.getListData().folder == id ? [pandora.user.ui.list] : [],
             sort: [
                 {key: 'name', operator: '+'}
             ]

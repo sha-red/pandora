@@ -261,9 +261,15 @@ pandora.getListData = function() {
                 return false;
             }
         });
-        data = pandora.$ui.folderList[folder].value(pandora.user.ui.list);
+        // the one case where folder is undefinded is when on page load
+        // the folderLists call getListData to determine which list is selected
+        if (folder) {
+            Ox.print('gLD f', folder)
+            data = pandora.$ui.folderList[folder].value(pandora.user.ui.list);
+            data.editable = data.user == pandora.user.username && data.type == 'static';
+            data.folder = folder;
+        }
     }
-    data.editable = data.user == pandora.user.username && data.type == 'static';
     return data;
 };
 
