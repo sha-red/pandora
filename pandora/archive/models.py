@@ -19,7 +19,6 @@ import chardet
 
 from app.models import site_config
 from item import utils
-from item.models import Item
 from person.models import get_name_sort
 
 import extract
@@ -33,7 +32,7 @@ class File(models.Model):
     auto = models.BooleanField(default=True)
 
     oshash = models.CharField(max_length=16, unique=True)
-    item = models.ForeignKey(Item, related_name='files')
+    item = models.ForeignKey("item.Item", related_name='files')
 
     name = models.CharField(max_length=2048, default="") # canoncial path/file
     folder = models.CharField(max_length=2048, default="") # canoncial path/file
