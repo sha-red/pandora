@@ -37,6 +37,7 @@ pandora.ui.folders = function() {
                         max: 0,
                         min: 0,
                         selectable: false,
+                        tooltip: 'Manage Personal Lists',
                         type: 'image'
                     })
                     .bindEvent({

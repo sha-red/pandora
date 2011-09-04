@@ -80,11 +80,11 @@ pandora.ui.mainMenu = function() {
                         {},
                         { id: 'usesiteposter', title: 'Always Use ' + pandora.site.site.name + ' Poster' }
                     ] },
-                    { id: 'columns', title: 'Column Layout', items: [
-                        { id: 'loadlayout', title: 'Load...' },
-                        { id: 'savelayout', title: 'Save...' },
+                    { id: 'columns', title: 'Columns', items: [
+                        { id: 'loadcolumns', title: 'Load Layout...' },
+                        { id: 'savecolumns', title: 'Save Layout...' },
                         {},
-                        { id: 'resetlayout', title: 'Reset' }
+                        { id: 'resetcolumns', title: 'Reset to Default' }
                     ]},
                     {},
                     { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], items: [

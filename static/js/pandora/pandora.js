@@ -45,6 +45,20 @@ pandora.enableDragAndDrop = function($list, canMove) {
                 title: getTitle(data._event)
             }).show(data._event);
         },
+        draganddroppause: function(data) {
+            var $parent = $(data._event.target).parent(),
+                $grandparent = $parent.parent(),
+                $panel = $parent.is('.OxCollapsePanel') ? $parent
+                    : $grandparent.is('.OxCollapsePanel') ? $grandparent : null,
+                $bar,
+                title;
+            if ($panel) {
+                $bar = $panel.children('.OxBar');
+                title = $bar.children('.OxTitle')
+                    .html().split(' ')[0].toLowerCase();
+                !pandora.user.ui.showFolder.items[title] && $bar.trigger('dblclick');
+            }
+        },
         draganddropenter: function(data) {
             var $parent = $(data._event.target).parent(),
                 $item = $parent.is('.OxItem') ? $parent : $parent.parent(),
