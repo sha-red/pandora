@@ -3,6 +3,8 @@ from django.conf import settings
 from django import forms
 
 import models
+from item.models import Item
+
 
 ajax_filtered_js = (
     settings.ADMIN_MEDIA_PREFIX + "js/SelectBox.js",
@@ -13,7 +15,7 @@ ajax_filtered_js = (
 
 
 class FileAdminForm(forms.ModelForm):
-    item = ForeignKeyByLetter(models.Item, field_name='itemId')
+    item = ForeignKeyByLetter(Item, field_name='itemId')
 
     class Meta:
         model = models.File
