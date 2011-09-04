@@ -13,7 +13,8 @@ pandora.ui.leftPanel = function() {
                     collapsed: !pandora.user.ui.showInfo,
                     collapsible: true,
                     element: pandora.$ui.info = pandora.ui.info(),
-                    size: Math.round(pandora.user.ui.sidebarSize / pandora.user.infoRatio)
+                    size: Math.round(pandora.user.ui.sidebarSize / pandora.user.infoRatio),
+                    tooltip: 'info'
                 }
             ],
             id: 'leftPanel',

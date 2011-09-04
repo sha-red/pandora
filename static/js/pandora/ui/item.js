@@ -293,6 +293,7 @@ pandora.ui.item = function() {
                 subtitles: result.data.layers.subtitles ? result.data.layers.subtitles.map(function(subtitle) {
                     return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
                 }) : [],
+                tooltips: true,
                 timeline: '/' + pandora.user.ui.item + '/timeline16p.png',
                 video: video,
                 volume: pandora.user.ui.videoVolume,
@@ -356,6 +357,7 @@ pandora.ui.item = function() {
                 subtitles: result.data.layers.subtitles ? result.data.layers.subtitles.map(function(subtitle) {
                     return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
                 }) : [],
+                tooltips: true,
                 video: video,
                 videoRatio: result.data.videoRatio,
                 videoSize: pandora.user.ui.videoSize,

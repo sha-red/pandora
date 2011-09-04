@@ -8,7 +8,8 @@ pandora.ui.mainPanel = function() {
                 element: pandora.$ui.leftPanel = pandora.ui.leftPanel(),
                 resizable: true,
                 resize: [192, 256, 320, 384],
-                size: pandora.user.ui.sidebarSize
+                size: pandora.user.ui.sidebarSize,
+                tooltip: 'lists'
             },
             {
                 element: pandora.$ui.rightPanel = pandora.ui.rightPanel()

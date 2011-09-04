@@ -80,6 +80,12 @@ pandora.ui.mainMenu = function() {
                         {},
                         { id: 'usesiteposter', title: 'Always Use ' + pandora.site.site.name + ' Poster' }
                     ] },
+                    { id: 'columns', title: 'Column Layout', items: [
+                        { id: 'loadlayout', title: 'Load...' },
+                        { id: 'savelayout', title: 'Save...' },
+                        {},
+                        { id: 'resetlayout', title: 'Reset' }
+                    ]},
                     {},
                     { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], items: [
                         { group: 'movieview', min: 1, max: 1, items: $.map(pandora.site.itemViews, function(view, i) {
