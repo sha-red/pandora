@@ -702,16 +702,8 @@ pandora.ui.list = function() { // fixme: remove view argument
                                 operator: ''
                             }
                         }, function(result) {
-                            var folder;
-                            if (drag.action == 'move') {
-                                folder = drag.source.status != 'featured' ? 'personal' : 'featured';
-                                pandora.$ui.folderList[folder].value(
-                                    drag.source.id, 'items',
-                                    pandora.$ui.folderList[folder].value(drag.source.id, 'items') - data.ids.length
-                                );
-                            }
-                            folder = drag.target.status != 'featured' ? 'personal' : 'featured';
-                            Ox.print(drag.source.status, '//////', drag.target.status)
+                            var folder = drag.target.status != 'featured' ? 'personal' : 'featured';
+                            //Ox.print(drag.source.status, '//////', drag.target.status)
                             pandora.$ui.folderList[folder].value(
                                 drag.target.id, 'items',
                                 result.data.items

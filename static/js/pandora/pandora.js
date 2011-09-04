@@ -181,7 +181,9 @@ pandora.reloadList = function() {
     });
     pandora.$ui.list.bindEvent({
             init: function(event, data) {
-                var folder = listData.status == 'private' ? 'personal' : listData.status;
+                // fixme: this will not work for lists in the favorites folder
+                // (but then it's also unlikely they'll have to be reloaded)
+                var folder = listData.status != 'featured' ? 'personal' : 'featured';
                 pandora.$ui.folderList[folder].value(listData.id, 'items', data.items);
             }
         })
