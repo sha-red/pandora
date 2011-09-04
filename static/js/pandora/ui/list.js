@@ -16,7 +16,7 @@ pandora.ui.list = function() { // fixme: remove view argument
         Ox.print('$$$$', keys)
         */
         that = Ox.TextList({
-            columns: Ox.merge([{
+            columns: /*Ox.merge([{
                 align: 'center',
                 defaultWidth: 16,
                 format: function(value, data) {
@@ -58,8 +58,8 @@ pandora.ui.list = function() { // fixme: remove view argument
                 operator: '+',
                 position: 0,
                 removable: true,
-                //title: 'Poster',
-                ///*
+                title: 'Poster',
+                *//*
                 title: $('<img>').attr({
                         src: Ox.UI.getImageURL(
                             pandora.user.ui.icons == 'posters'
@@ -71,10 +71,10 @@ pandora.ui.list = function() { // fixme: remove view argument
                         height: '12px',
                         padding: '2px',
                     }),
-                //*/
+                *//*
                 visible: true,
                 width: 16
-            }], Ox.map(pandora.site.sortKeys, function(key) {
+            }], */Ox.map(pandora.site.sortKeys, function(key) {
                 var position = pandora.user.ui.lists[pandora.user.ui.list].columns.indexOf(key.id);
                 return {
                     align: ['string', 'text'].indexOf(
@@ -92,7 +92,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                     visible: position > -1,
                     width: pandora.user.ui.lists[pandora.user.ui.list].columnWidth[key.id] || key.columnWidth
                 };
-            })),
+            })/*)*/,
             columnsMovable: true,
             columnsRemovable: true,
             columnsResizable: true,
