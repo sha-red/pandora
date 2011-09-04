@@ -126,7 +126,7 @@ pandora.ui.folderBrowserList = function(id) {
                     },
                     visible: true,
                     width: 16
-                },
+                }
             ],
             columnsVisible: true,
             items: function(data, callback) {
@@ -140,6 +140,10 @@ pandora.ui.folderBrowserList = function(id) {
                     query: query
                 }), callback);
             },
+            // needed in order to determine if, when switching back
+            // from featured browser to featured folder, the selected
+            // not-featured list may be in the user's favorites folder
+            keys: id == 'featured' ? ['subscribed'] : [],
             pageLength: 1000,
             selected: pandora.getListData().folder == id ? [pandora.user.ui.list] : [],
             sort: [

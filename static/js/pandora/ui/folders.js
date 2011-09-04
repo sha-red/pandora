@@ -90,7 +90,7 @@ pandora.ui.folders = function() {
                                     pandora.$ui.folderList.favorite.options('selected').length
                                     && !listData.subscribed
                                 ) {
-                                    // the selected list in the favorite browser is not in the favorite folder
+                                    // the selected list in the favorites browser is not in the favorites folder
                                     pandora.$ui.folderList.favorite.options({selected: []});
                                     if (Ox.getObjectById(pandora.site.sectionFolders.items, 'featured').showBrowser) {
                                         // but in the featured browser
@@ -140,8 +140,11 @@ pandora.ui.folders = function() {
                                     if (listData.user == pandora.user.username) {
                                         // but in the personal folder
                                         pandora.$ui.folderList.personal.options({selected: [listData.id]});
-                                    } else if (Ox.getObjectById(pandora.site.sectionFolders.items, 'favorite').showBrowser) {
-                                        // but in the favorite browser
+                                    } else if (
+                                        listData.subscribed
+                                        || Ox.getObjectById(pandora.site.sectionFolders.items, 'favorite').showBrowser
+                                    ) {
+                                        // but in the favorites folder or browser
                                         pandora.$ui.folderList.favorite.options({selected: [listData.id]});
                                     } else {
                                         // and nowhere else
