@@ -41,22 +41,31 @@ pandora.enableDragAndDrop = function($list, canMove) {
             });
         },
         draganddrop: function(data) {
+            Ox.print(pandora.$ui.folders.$element.scrollTop(0));
             $tooltip.options({
                 title: getTitle(data._event)
             }).show(data._event);
         },
         draganddroppause: function(data) {
-            var $parent = $(data._event.target).parent(),
-                $grandparent = $parent.parent(),
+            var event = data._event,
+                $parent, $grandparent, $panel, $bar, title;
+            if (
+                // fixme: should be named showLists in the user ui prefs!
+                !pandora.user.ui.showSidebar && event.clientX < 16
+                && event.clientY >= 44 && event.clientY < window.innerHeight - 16
+            ) {
+                pandora.$ui.mainPanel.toggle(0);
+            } else {
+                $parent = $(data._event.target).parent();
+                $grandparent = $parent.parent();
                 $panel = $parent.is('.OxCollapsePanel') ? $parent
-                    : $grandparent.is('.OxCollapsePanel') ? $grandparent : null,
-                $bar,
-                title;
-            if ($panel) {
-                $bar = $panel.children('.OxBar');
-                title = $bar.children('.OxTitle')
-                    .html().split(' ')[0].toLowerCase();
-                !pandora.user.ui.showFolder.items[title] && $bar.trigger('dblclick');
+                    : $grandparent.is('.OxCollapsePanel') ? $grandparent : null;
+                if ($panel) {
+                    $bar = $panel.children('.OxBar');
+                    title = $bar.children('.OxTitle')
+                        .html().split(' ')[0].toLowerCase();
+                    !pandora.user.ui.showFolder.items[title] && $bar.trigger('dblclick');
+                }
             }
         },
         draganddropenter: function(data) {
