@@ -16,7 +16,7 @@ from ox.django.views import task_status
 
 from app.models import site_config
 from item import utils
-from item.models import get_item
+from item.models import get_item, Item
 from item.views import parse_query
 import item.tasks
 from api.actions import actions
@@ -247,8 +247,8 @@ def moveFiles(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    if models.Item.objects.filter(itemId=data['itemId']).count() == 1:
-        i = models.Item.objects.get(itemId=data['itemId'])
+    if Item.objects.filter(itemId=data['itemId']).count() == 1:
+        i = Item.objects.get(itemId=data['itemId'])
     else:
         if len(data['itemId']) != 7:
             del data['itemId']
@@ -268,7 +268,7 @@ def moveFiles(request):
             f.item = i 
             f.save()
     for itemId in changed:
-        c = models.Item.objects.get(itemId=itemId)
+        c = Item.objects.get(itemId=itemId)
         if c.files.count() == 0:
             c.delete()
         else:
