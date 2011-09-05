@@ -2,14 +2,14 @@
 
 pandora.enableDragAndDrop = function($list, canMove) {
 
-    var drag = {},
-        $tooltip = Ox.Tooltip({
+    var $tooltip = Ox.Tooltip({
             animate: false
-        });
+        }),
+        drag = {},
+        scrollInterval;
 
     $list.bindEvent({
         draganddropstart: function(data) {
-            Ox.print('DRAGSTART', pandora.getListData());
             drag.action = 'copy';
             drag.ids = $list.options('selected'),
             drag.item = drag.ids.length == 1
@@ -41,22 +41,27 @@ pandora.enableDragAndDrop = function($list, canMove) {
             });
         },
         draganddrop: function(data) {
-            Ox.print(pandora.$ui.folders.$element.scrollTop(0));
+            var event = data._event;
             $tooltip.options({
-                title: getTitle(data._event)
-            }).show(data._event);
+                title: getTitle(event)
+            }).show(event);
+            if (scrollInterval && !isAtListsTop(event) && !isAtListsBottom(event)) {
+                clearInterval(scrollInterval);
+                scrollInterval = 0;
+            }
         },
         draganddroppause: function(data) {
-            var event = data._event,
+            var event = data._event, scroll,
                 $parent, $grandparent, $panel, $bar, title;
-            if (
-                // fixme: should be named showLists in the user ui prefs!
-                !pandora.user.ui.showSidebar && event.clientX < 16
-                && event.clientY >= 44 && event.clientY < window.innerHeight - 16
-            ) {
-                pandora.$ui.mainPanel.toggle(0);
+            // fixme: should be named showLists in the user ui prefs!
+            if (!pandora.user.ui.showSidebar) {
+                if (event.clientX < 16 && event.clientY >= 44
+                    && event.clientY < window.innerHeight - 16
+                ) {
+                    pandora.$ui.mainPanel.toggle(0);
+                }
             } else {
-                $parent = $(data._event.target).parent();
+                $parent = $(event.target).parent();
                 $grandparent = $parent.parent();
                 $panel = $parent.is('.OxCollapsePanel') ? $parent
                     : $grandparent.is('.OxCollapsePanel') ? $grandparent : null;
@@ -65,6 +70,17 @@ pandora.enableDragAndDrop = function($list, canMove) {
                     title = $bar.children('.OxTitle')
                         .html().split(' ')[0].toLowerCase();
                     !pandora.user.ui.showFolder.items[title] && $bar.trigger('dblclick');
+                }
+                if (!scrollInterval) {
+                    scroll = isAtListsTop(event) ? -16
+                        : isAtListsBottom(event) ? 16 : 0
+                    if (scroll) {
+                        scrollInterval = setInterval(function() {
+                            pandora.$ui.folders.$element.scrollTop(
+                                pandora.$ui.folders.$element.scrollTop() + scroll
+                            );
+                        }, 100);
+                    }
                 }
             }
         },
@@ -129,6 +145,8 @@ pandora.enableDragAndDrop = function($list, canMove) {
             }
             function cleanup(ms) {
                 drag = {};
+                clearInterval(scrollInterval);
+                scrollInterval = 0;
                 setTimeout(function() {
                     $('.OxDroppable').removeClass('OxDroppable');
                     $('.OxDrop').removeClass('OxDrop');
@@ -200,6 +218,19 @@ pandora.enableDragAndDrop = function($list, canMove) {
             )
     }
 
+    function isAtListsTop(e) {
+        return pandora.user.ui.showSidebar
+            && e.clientX < pandora.user.ui.sidebarSize
+            && e.clientY >= 44 && e.clientY < 60;
+    }
+
+    function isAtListsBottom(e) {
+        var listsBottom = window.innerHeight - pandora.getInfoHeight();
+        return pandora.user.ui.showSidebar
+            && e.clientX < pandora.user.ui.sidebarSize
+            && e.clientY >= listsBottom - 16 && e.clientY < listsBottom;
+    }
+
     function keydown(e) {
         if (e.metaKey) {
             drag.action = 'move';
@@ -245,7 +276,7 @@ pandora.getFoldersHeight = function() {
         height += 16 + pandora.user.ui.showFolder[pandora.user.ui.section][folder.id] * (
             !!folder.showBrowser * 40 + folder.items * 16
         );
-        Ox.print('h', height);
+        // // // Ox.print('h', height);
     });
     /*
     $.each(pandora.user.ui.showFolder[pandora.user.ui.section], function(id, show) {
@@ -262,7 +293,7 @@ pandora.getFoldersHeight = function() {
 pandora.getFoldersWidth = function() {
     var width = pandora.user.ui.sidebarSize;
     // fixme: don't use height(), look up in splitpanels
-    Ox.print(pandora.getFoldersHeight(), '>', pandora.$ui.leftPanel.height() - 24 - 1 - pandora.$ui.info.height());
+    // // // Ox.print(pandora.getFoldersHeight(), '>', pandora.$ui.leftPanel.height() - 24 - 1 - pandora.$ui.info.height());
     if (pandora.getFoldersHeight() > pandora.$ui.leftPanel.height() - 24 - 1 - pandora.$ui.info.height()) {
         width -= Ox.UI.SCROLLBAR_SIZE;
     }
@@ -274,6 +305,11 @@ pandora.getGroupsSizes = function() {
         window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1, 5
     )
 };
+
+pandora.getInfoHeight = function() {
+    // fixme: new, check if it can be used more
+    return pandora.user.ui.showInfo * pandora.user.ui.sidebarSize / pandora.user.infoRatio;
+}
 
 pandora.getListData = function() {
     var data = {}, folder;
@@ -287,7 +323,7 @@ pandora.getListData = function() {
         // the one case where folder is undefinded is when on page load
         // the folderLists call getListData to determine which list is selected
         if (folder) {
-            Ox.print('gLD f', folder)
+            //Ox.print('gLD f', folder)
             data = pandora.$ui.folderList[folder].value(pandora.user.ui.list);
             data.editable = data.user == pandora.user.username && data.type == 'static';
             data.folder = folder;
@@ -439,7 +475,7 @@ pandora.resizeFolders = function() {
         columnWidth.name = (width - 96) - columnWidth.user;
     }
     //Ox.print('sectionsWidth', width)
-    $.each(pandora.$ui.folderList, function(id, $list) {
+    Ox.forEach(pandora.$ui.folderList, function($list, id) {
         var i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id);
         pandora.$ui.folder[i].css({width: width + 'px'});
         $list.css({width: width + 'px'});
