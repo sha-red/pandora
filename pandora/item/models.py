@@ -1103,6 +1103,7 @@ table constructed based on info in site_config['itemKeys']
 attrs = {
     '__module__': 'item.models',
     'item': models.OneToOneField('Item', related_name='sort', primary_key=True),
+    'duration': models.FloatField(null=True, blank=True, db_index=True),
 }
 for key in filter(lambda k: 'columnWidth' in k, config['itemKeys']):
     name = key['id']
