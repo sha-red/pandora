@@ -14,7 +14,6 @@ from ox.utils import json
 
 from user.models import get_user_json
 from item.models import ItemSort
-from app.models import site_config
 
 from actions import actions
 
@@ -55,7 +54,7 @@ def init(request):
     '''
     #data = json.loads(request.POST['data'])
     response = json_response({})
-    config = site_config()
+    config = settings.CONFIG.copy()
     del config['keys'] #is this needed?
 
     #populate max values for percent requests

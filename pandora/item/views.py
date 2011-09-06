@@ -288,8 +288,7 @@ def autocomplete(request):
         data['range'] = [0, 10]
     op = data.get('operator', '')
 
-    site_config = models.site_config()
-    key = site_config['keys'][data['key']]
+    key = settings.CONFIG['keys'][data['key']]
     order_by = key.get('autocompleteSortKey', False)
     if order_by:
         order_by = '-sort__%s' % order_by
@@ -452,7 +451,6 @@ def setPosterFrame(request): #parse path and return info
     data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Item, itemId=data['id'])
     if item.editable(request.user):
-        #FIXME: some things need to be updated after changing this
         item.poster_frame = data['position']
         item.save()
         tasks.update_poster(item.itemId)

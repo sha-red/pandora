@@ -37,7 +37,6 @@ from annotation.models import Annotation, Layer
 import archive.models
 
 from person.models import get_name_sort
-from app.models import site_config
 
 
 def get_item(info, user=None, async=False):
@@ -129,7 +128,7 @@ class Item(models.Model):
 
     #while metadata is updated, files are set to rendered=False
     rendered = models.BooleanField(default=False, db_index=True)
-    public = models.BooleanField(default=False, db_index=True)
+    level = models.IntegerField(default=False, db_index=True)
 
     itemId = models.CharField(max_length=128, unique=True, blank=True)
     oxdbId = models.CharField(max_length=42, unique=True, blank=True, null=True)
@@ -163,11 +162,11 @@ class Item(models.Model):
         return default
 
     def access(self, user):
-        #check rights level
-        if self.public:
+        allowed_level = settings.CONFIG['capabilities']['canSeeItem'][user.get_profile().get_level()]
+        if self.level < allowed_level:
             return True
         elif user.is_authenticated() and \
-             (user.is_staff or self.user == user or \
+             (self.user == user or \
               self.groups.filter(id__in=user.groups.all()).count() > 0):
                 return True
         return False
@@ -414,7 +413,7 @@ class Item(models.Model):
         }
         i.update(self.external_data)
         i.update(self.data)
-        for k in site_config()['itemKeys']:
+        for k in settings.CONFIG['itemKeys']:
             key = k['id']
             if not keys or key in keys:
                 if key not in i:
@@ -483,7 +482,7 @@ class Item(models.Model):
             else:
                 f.delete()
 
-        for key in site_config()['itemKeys']:
+        for key in settings.CONFIG['itemKeys']:
             if key.get('find'):
                 i = key['id']
                 if i == 'title':
@@ -514,7 +513,7 @@ class Item(models.Model):
                 values = []
                 for k in map(lambda x: x['id'],
                                filter(lambda x: x.get('sort') == 'person',
-                                      config['itemKeys'])):
+                                      settings.CONFIG['itemKeys'])):
                     values += self.get(k, [])
             else:
                 values = self.get(key, '')
@@ -566,7 +565,7 @@ class Item(models.Model):
             'popularity',
         )
 
-        for key in filter(lambda k: 'columnWidth' in k, config['itemKeys']):
+        for key in filter(lambda k: 'columnWidth' in k, settings.CONFIG['itemKeys']):
             name = key['id']
             source = name
             sort_type = key.get('sort', key['type'])
@@ -619,10 +618,9 @@ class Item(models.Model):
         s.published = self.published
 
         # sort values based on data from videos
-        s.words = 0 #FIXME: get words from all layers or something
-        s.wordsperminute = 0
+        s.words = sum([len(a.value.split()) for a in self.annotations.all()])
+
         s.clips = 0  #FIXME: get clips from all layers or something
-        s.popularity = 0  #FIXME: get popularity from somewhere
         videos = self.files.filter(active=True, is_video=True)
         if videos.count() > 0:
             s.duration = sum([v.duration for v in videos])
@@ -656,8 +654,10 @@ class Item(models.Model):
         s.cuts = len(self.data.get('cuts', []))
         if s.duration:
             s.cutsperminute = s.cuts / (s.duration/60)
+            s.wordsperminute = s.words / (s.duration / 60)
         else:
             s.cutsperminute = None 
+            s.wordsperminute = None
         s.popularity = self.accessed.aggregate(Sum('accessed'))['accessed__sum']
         s.save()
 
@@ -679,7 +679,7 @@ class Item(models.Model):
                 current_values = []
                 for k in map(lambda x: x['id'],
                                filter(lambda x: x.get('sort') == 'person',
-                                      config['itemKeys'])):
+                                      settings.CONFIG['itemKeys'])):
                     current_values += self.get(k, [])
             if not isinstance(current_values, list):
                 current_values = [unicode(current_values)]
@@ -852,7 +852,6 @@ class Item(models.Model):
             file__item=self, file__is_video=True, file__active=True).order_by('file__part')
 
     def update_timeline(self, force=False):
-        config = site_config()
         streams = self.streams()
         self.make_timeline()
         self.data['cuts'] = extract.cuts(self.timeline_prefix)
@@ -862,7 +861,7 @@ class Item(models.Model):
         self.make_local_poster()
         self.make_poster()
         self.make_icon()
-        if config['video']['download']:
+        if settings.CONFIG['video']['download']:
             self.make_torrent()
         self.load_subtitles()
         self.rendered = streams != []
@@ -999,7 +998,7 @@ class Item(models.Model):
             if frames and len(frames) > int(self.poster_frame):
                 return frames[int(self.poster_frame)]['path']
             else:
-                size = site_config()['video']['resolutions'][0]
+                size = settings.CONFIG['video']['resolutions'][0]
                 return self.frame(self.poster_frame, size)
 
         if frames:
@@ -1068,15 +1067,13 @@ def delete_item(sender, **kwargs):
     i.delete_files()
 pre_delete.connect(delete_item, sender=Item)
 
-config = site_config()
-
 Item.facet_keys = []
-for key in config['itemKeys']:
+for key in settings.CONFIG['itemKeys']:
     if 'autocomplete' in key and not 'autocompleteSortKey' in key:
         Item.facet_keys.append(key['id'])
 
 Item.person_keys = []
-for key in config['itemKeys']:
+for key in settings.CONFIG['itemKeys']:
     if 'sort' in key and key['sort'] == 'person':
         Item.person_keys.append(key['id'])
 
@@ -1098,14 +1095,14 @@ class ItemFind(models.Model):
         return u"%s=%s" % (self.key, self.value)
 '''
 ItemSort
-table constructed based on info in site_config['itemKeys']
+table constructed based on info in settings.CONFIG['itemKeys']
 '''
 attrs = {
     '__module__': 'item.models',
     'item': models.OneToOneField('Item', related_name='sort', primary_key=True),
     'duration': models.FloatField(null=True, blank=True, db_index=True),
 }
-for key in filter(lambda k: 'columnWidth' in k, config['itemKeys']):
+for key in filter(lambda k: 'columnWidth' in k, settings.CONFIG['itemKeys']):
     name = key['id']
     name = {'id': 'itemId'}.get(name, name)
     sort_type = key.get('sort', key['type'])

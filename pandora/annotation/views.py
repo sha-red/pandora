@@ -2,13 +2,14 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 
+from django.conf import settings
+
 import ox
 from ox.utils import json
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 
 
-from app.models import site_config
 from item.models import Item
 from api.actions import actions
 
@@ -101,7 +102,7 @@ def addAnnotation(request):
                                                          text='invalid data'))
 
     #FIXME: this should be only called starting up server
-    models.load_layers(site_config()['layers'])
+    models.load_layers(settings.CONFIG['layers'])
 
     item = get_object_or_404_json(Item, itemId=data['item'])
     layer = get_object_or_404_json(models.Layer, name=data['layer'])
