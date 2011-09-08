@@ -14,7 +14,6 @@ from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 from ox.django.views import task_status
 
-from app.models import site_config
 from item import utils
 from item.models import get_item, Item
 from item.views import parse_query
@@ -114,7 +113,7 @@ actions.register(update, cache=False)
 
 @login_required_json
 def encodingProfile(request):
-    config = site_config()['video']
+    config = settings.CONFIG['video']
     profile = "%sp.%s" % (config['resolutions'][0], config['formats'][0])
     response = json_response({'profile': profile})
     return render_to_json_response(response)
@@ -172,7 +171,7 @@ class VideoChunkForm(forms.Form):
 def firefogg_upload(request):
     profile = request.GET['profile']
     oshash = request.GET['id']
-    config = site_config()['video']
+    config = settings.CONFIG['video']
     video_profile = "%sp.%s" % (config['resolutions'][0], config['formats'][0])
 
     #handle video upload

@@ -2,11 +2,15 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
 import os
+import sys
+import time
+import thread
 
 from django.db import models
 from django.conf import settings
 from ox.utils import json
 
+_win = (sys.platform == "win32")
 
 class Page(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -17,24 +21,31 @@ class Page(models.Model):
     def __unicode__(self):
         return self.name
 
+RUN_RELOADER = True
 
-class SiteSettings(models.Model):
-    key = models.CharField(max_length=1024, unique=True)
-    value = models.TextField(blank=True)
+def reloader_thread():
+    _config_mtime = 0
+    while RUN_RELOADER:
+        stat = os.stat(settings.SITE_CONFIG)
+        mtime = stat.st_mtime
+        if _win:
+            mtime -= stat.st_ctime
+        if mtime > _config_mtime:
+            with open(settings.SITE_CONFIG) as f:
+                config = json.load(f)
 
-    def __unicode__(self):
-        return self.key
+            config['site']['id'] = settings.SITEID
+            config['site']['name'] = settings.SITENAME
+            config['site']['sectionName'] = settings.SITENAME
+            config['site']['url'] = settings.URL
 
-def site_config():
-    with open(settings.SITE_CONFIG) as f:
-        site_config = json.load(f)
+            config['keys'] = {}
+            for key in config['itemKeys']:
+                config['keys'][key['id']] = key
 
-        site_config['site']['id'] = settings.SITEID
-        site_config['site']['name'] = settings.SITENAME
-        site_config['site']['sectionName'] = settings.SITENAME
-        site_config['site']['url'] = settings.URL
+            settings.CONFIG = config
+            _config_mtime = mtime
+        time.sleep(1)
 
-        site_config['keys'] = {}
-        for key in site_config['itemKeys']:
-            site_config['keys'][key['id']] = key
-    return site_config
+thread.start_new_thread(reloader_thread, ())
+

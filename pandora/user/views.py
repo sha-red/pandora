@@ -18,7 +18,6 @@ import ox
 import models
 
 from api.actions import actions
-from app.models import site_config
 from item.models import Access, Item
 
 class SigninForm(forms.Form):
@@ -101,7 +100,7 @@ def signout(request):
         response = json_response(text='logged out')
         logout(request)
 
-    response['data']['user'] = site_config()['user']
+    response['data']['user'] = settings.CONFIG['user']
     return render_to_json_response(response)
 actions.register(signout, cache=False)
 

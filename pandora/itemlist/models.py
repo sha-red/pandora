@@ -25,7 +25,7 @@ class List(models.Model):
     status = models.CharField(max_length=20, default='private')
     _status = ['private', 'public', 'featured']
     query = DictField(default={"static": True})
-    type= models.CharField(max_length=255, default='static')
+    type = models.CharField(max_length=255, default='static')
     description = models.TextField(default='')
 
     icon = models.ImageField(default=None, blank=True,

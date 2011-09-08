@@ -17,7 +17,6 @@ import ox
 from ox.normalize import canonicalTitle
 import chardet
 
-from app.models import site_config
 from item import utils
 from person.models import get_name_sort
 
@@ -237,12 +236,11 @@ class File(models.Model):
         return srt
 
     def editable(self, user):
-        #FIXME: check that user has instance of this file
-        return True
+        return self.instances.filter(volume__user=user).count() > 0
 
     def save_chunk(self, chunk, chunk_id=-1, done=False):
         if not self.available:
-            config = site_config()['video']
+            config = settings.CONFIG['video']
             stream, created = Stream.objects.get_or_create(
                         file=self,
                         resolution=config['resolutions'][0],
@@ -485,7 +483,7 @@ class Stream(models.Model):
         return self.file.path(name)
 
     def extract_derivatives(self):
-        config = site_config()['video']
+        config = settings.CONFIG['video']
         for resolution in config['resolutions']:
             for f in config['formats']:
                 derivative, created = Stream.objects.get_or_create(file=self.file,

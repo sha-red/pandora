@@ -5,17 +5,18 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Max
+from django.conf import settings
 
 from ox.django.fields import DictField
 
-from app.models import site_config
 from itemlist.models import List, Position
 
 
 class UserProfile(models.Model):
     reset_token = models.TextField(blank=True, null=True, unique=True)
-    user = models.ForeignKey(User, unique=True)
+    user = models.ForeignKey(User, unique=True, related_name='profile')
 
+    level = models.IntegerField(default=1)
     files_updated = models.DateTimeField(default=datetime.now)
     newsletter = models.BooleanField(default=True)
     ui = DictField(default={})
@@ -28,7 +29,7 @@ class UserProfile(models.Model):
 
     def get_ui(self):
         ui = {}
-        config = site_config()
+        config = settings.CONFIG.copy()
         ui.update(config['user']['ui'])
         def updateUI(ui, new):
             '''
@@ -82,11 +83,7 @@ class UserProfile(models.Model):
         return ui
 
     def get_level(self):
-        if self.user.is_superuser:
-            return 'admin'
-        elif self.user.is_staff:
-            return 'staff'
-        return 'member'
+        return ['guest', 'member', 'staff', 'admin'][self.level]
 
 def user_post_save(sender, instance, **kwargs):
     profile, new = UserProfile.objects.get_or_create(user=instance)
