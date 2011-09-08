@@ -30,7 +30,7 @@ pandora.ui.filterDialog = function() {
                     }
                 })
         ],
-        content: pandora.$ui.filter = new pandora.ui.filter().css({padding: '16px'}),
+        content: pandora.$ui.filter = pandora.ui.filter().css({padding: '16px'}),
         maxWidth: 648 + Ox.UI.SCROLLBAR_SIZE,
         minHeight: 264,
         minWidth: 648 + Ox.UI.SCROLLBAR_SIZE,
