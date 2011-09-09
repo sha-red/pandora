@@ -530,7 +530,7 @@ pandora.ui.list = function() { // fixme: remove view argument
             copy: function(data) {
                 Ox.Clipboard.copy({
                     items: data.ids,
-                    text: $.map(data.ids, function(id) {
+                    text: data.ids.map(function(id) {
                         return pandora.$ui.list.value(id, 'title');
                     }).join('\n')
                 });

@@ -103,7 +103,14 @@ pandora.ui.mainMenu = function() {
                     { id: 'lists', title: 'Hide Lists', keyboard: 'shift l' },
                     { id: 'info', title: 'Hide Info', keyboard: 'shift i' },
                     { id: 'groups', title: 'Hide Groups', keyboard: 'shift g' },
-                    { id: 'movies', title: 'Hide ' + pandora.site.itemName.plural, disabled: true, keyboard: 'shift m' }
+                    { id: 'movies', title: 'Hide ' + pandora.site.itemName.plural, disabled: true, keyboard: 'shift m' },
+                    {},
+                    { id: 'theme', title: 'Theme', items: [
+                        { group: 'settheme', min: 1, max: 1, items: [
+                            { id: 'classic', title: 'Classic', checked: pandora.user.ui.theme == 'classic'},
+                            { id: 'modern', title: 'Modern', checked: pandora.user.ui.theme == 'modern' }
+                        ]}
+                    ] }
                 ]},
                 { id: 'sortMenu', title: 'Sort', items: [
                     { id: 'sortmovies', title: 'Sort ' + pandora.site.itemName.plural + ' by', items: [
@@ -179,6 +186,9 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set(['lists', pandora.user.ui.list, 'sort'].join('|'), [{key: key, operator: operator}]);
                     //pandora.user.ui.lists[pandora.user.ui.list].sort[0] = {key: key, operator: operator};
                     pandora.URL.push(pandora.Query.toString());
+                } else if (data.id == 'settheme') {
+                    Ox.Theme(value);
+                    pandora.UI.set('theme', value);
                 } else if (data.id == 'sortmovies') {
                     var operator = pandora.getSortOperator(value);
                     pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator == '+' ? 'ascending' : 'descending'));
