@@ -45,7 +45,7 @@ def parseCondition(condition):
         else:
             return q
 
-    key_type = settings.config['keys'].get(k, {'type':'string'}).get('type')
+    key_type = settings.CONFIG['keys'].get(k, {'type':'string'}).get('type')
     if isinstance(key_type, list):
         key_type = key_type[0]
     key_type = {
@@ -247,11 +247,11 @@ class ItemManager(Manager):
         
         #anonymous can only see public items
         if user.is_anonymous():
-            allowed_level = settings.config['capabilities']['canSeeItem']['guest']
+            allowed_level = settings.CONFIG['capabilities']['canSeeItem']['guest']
             qs = qs.filter(level__lte=allowed_level)
         #users can see public items, there own items and items of there groups
         else:
-            allowed_level = settings.config['capabilities']['canSeeItem'][user.get_profile().get_level()]
+            allowed_level = settings.CONFIG['capabilities']['canSeeItem'][user.get_profile().get_level()]
             qs = qs.filter(Q(level__lte=allowed_level)|Q(user=user)|Q(groups__in=user.groups.all()))
         #admins can see all available items
         return qs
