@@ -9,6 +9,35 @@ pandora.ui.group = function(id) {
                 {
                     align: 'left',
                     id: 'name',
+                    format: function(value) {
+                        return ['country', 'language'].indexOf(id) > -1
+                            ? $('<div>')
+                                .append(
+                                    $('<img>')
+                                        .attr({src: Ox[
+                                            id == 'country' ? 'getImageByGeoname' : 'getImageByLanguage'
+                                        ]('icon', 16, value)})
+                                        .css({
+                                            float: 'left',
+                                            width: '14px',
+                                            height: '14px',
+                                            margin: '0 3px 0 -2px',
+                                            borderRadius: '4px'
+                                        })
+                                )
+                                .append(
+                                    $('<div>')
+                                        .css({
+                                            float: 'left',
+                                            width: pandora.user.ui.groupsSizes[i] - 64 - Ox.UI.SCROLLBAR_SIZE,
+                                            //background: 'red',
+                                            textOverflow: 'ellipsis',
+                                            overflowX: 'hidden'
+                                        })
+                                        .html(value)
+                                )
+                            : value
+                    },
                     operator: id == 'year' ? '-' : '+',
                     title: title,
                     unique: true,

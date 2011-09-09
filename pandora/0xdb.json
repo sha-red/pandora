@@ -566,6 +566,7 @@
             "section": "items",
             "showAnnotations": true,
             "showControls": true,
+            "showFlags": true,
             "showGroups": true,
             "showHome": true,
             "showInfo": true,
