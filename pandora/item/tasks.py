@@ -29,6 +29,7 @@ def update_timeline(itemId):
     item = models.Item.objects.get(itemId=itemId)
     item.update_timeline()
 
+@task(queue="default")
 def load_subtitles(itemId):
     item = models.Item.objects.get(itemId=itemId)
     item.load_subtitles()
