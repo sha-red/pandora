@@ -128,7 +128,8 @@ class Item(models.Model):
 
     #while metadata is updated, files are set to rendered=False
     rendered = models.BooleanField(default=False, db_index=True)
-    level = models.IntegerField(default=False, db_index=True)
+    #should be set based on user
+    level = models.IntegerField(default=4, db_index=True)
 
     itemId = models.CharField(max_length=128, unique=True, blank=True)
     oxdbId = models.CharField(max_length=42, unique=True, blank=True, null=True)
@@ -162,7 +163,11 @@ class Item(models.Model):
         return default
 
     def access(self, user):
-        allowed_level = settings.CONFIG['capabilities']['canSeeItem'][user.get_profile().get_level()]
+        if user.is_anonymous():
+            level = 'guest'
+        else:
+            level = user.get_profile().get_level()
+        allowed_level = settings.CONFIG['capabilities']['canSeeItem'][level]
         if self.level < allowed_level:
             return True
         elif user.is_authenticated() and \
