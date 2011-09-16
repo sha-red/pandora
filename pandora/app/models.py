@@ -23,6 +23,21 @@ class Page(models.Model):
 
 RUN_RELOADER = True
 
+def load_config():
+    with open(settings.SITE_CONFIG) as f:
+        config = json.load(f)
+
+    config['site']['id'] = settings.SITEID
+    config['site']['name'] = settings.SITENAME
+    config['site']['sectionName'] = settings.SITENAME
+    config['site']['url'] = settings.URL
+
+    config['keys'] = {}
+    for key in config['itemKeys']:
+        config['keys'][key['id']] = key
+
+    settings.CONFIG = config
+
 def reloader_thread():
     _config_mtime = 0
     while RUN_RELOADER:
@@ -31,21 +46,8 @@ def reloader_thread():
         if _win:
             mtime -= stat.st_ctime
         if mtime > _config_mtime:
-            with open(settings.SITE_CONFIG) as f:
-                config = json.load(f)
-
-            config['site']['id'] = settings.SITEID
-            config['site']['name'] = settings.SITENAME
-            config['site']['sectionName'] = settings.SITENAME
-            config['site']['url'] = settings.URL
-
-            config['keys'] = {}
-            for key in config['itemKeys']:
-                config['keys'][key['id']] = key
-
-            settings.CONFIG = config
+            load_config()
             _config_mtime = mtime
         time.sleep(1)
 
 thread.start_new_thread(reloader_thread, ())
-

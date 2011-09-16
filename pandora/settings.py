@@ -120,9 +120,9 @@ INSTALLED_APPS = (
     'devserver',
 #    'south',
     'djcelery',
+    'app',
 
     'annotation',
-    'app',
     'archive',
     'event',
     'item',
@@ -244,4 +244,17 @@ except NameError:
             secret.close()
         except IOError:
             Exception('Please create a %s file with random characters to generate your secret key!' % SECRET_FILE)
+
+from ox.utils import json
+with open(SITE_CONFIG) as f:
+    CONFIG = json.load(f)
+
+CONFIG['site']['id'] = SITEID
+CONFIG['site']['name'] = SITENAME
+CONFIG['site']['sectionName'] = SITENAME
+CONFIG['site']['url'] = URL
+
+CONFIG['keys'] = {}
+for key in CONFIG['itemKeys']:
+    CONFIG['keys'][key['id']] = key
 
