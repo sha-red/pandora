@@ -1,6 +1,8 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.group = function(id) {
-    var i = pandora.user.ui.groups.indexOf(id),
+    //Ox.print('group', id, Ox.getPositionById(pandora.user.ui.groups, id))
+    var i = Ox.getPositionById(pandora.user.ui.groups, id),
+        group = Ox.getObjectById(pandora.site.groups, id),
         panelWidth = pandora.$ui.document.width() - (pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize) - 1,
         title = Ox.getObjectById(pandora.site.groups, id).title,
         //width = pandora.getGroupWidth(i, panelWidth),
@@ -38,7 +40,7 @@ pandora.ui.group = function(id) {
                                 )
                             : value
                     },
-                    operator: id == 'year' ? '-' : '+',
+                    operator: group.type == 'integer' ? '-' : '+',
                     title: title,
                     unique: true,
                     visible: true,
@@ -69,8 +71,8 @@ pandora.ui.group = function(id) {
             scrollbarVisible: true,
             selected: pandora.user.ui.groupsData[i].selected,
             sort: [{
-                key: id == 'year' ? 'name' : 'items',
-                operator: '-'
+                key: pandora.user.ui.groups[i].sort[0].key,
+                operator: pandora.user.ui.groups[i].sort[0].operator
             }]
         })
         .bindEvent({
@@ -124,6 +126,13 @@ pandora.ui.group = function(id) {
                 pandora.Query.updateGroups();
                 pandora.URL.push(pandora.Query.toString());
                 pandora.reloadGroups(i);
+            },
+            sort: function(data) {
+                var groups = Ox.clone(pandora.user.ui.groups);
+                pandora.$ui.mainMenu.checkItem('sortMenu_sortgroups_sortgroup' + id + '_' + data.key);
+                pandora.$ui.mainMenu.checkItem('sortMenu_ordergroups_ordergroup' + id + '_' + (data.operator == '+' ? 'ascending' : 'descending'));
+                groups[i].sort = [{key: data.key, operator: data.operator}];
+                pandora.UI.set({groups: groups});
             }
         });
     Ox.Select({
@@ -141,7 +150,7 @@ pandora.ui.group = function(id) {
         .bindEvent('change', function(data) {
             var groups = Ox.clone(pandora.user.ui.groups),
                 id_ = data.selected[0].id,
-                i_ = pandora.user.ui.groups.indexOf(id_);
+                i_ = Ox.getPositionById(pandora.user.ui.groups, id_);
             if (i_ == -1) {
                 // new group was not part of old group set
                 if (pandora.user.ui.groupsData[i].selected.length) {
@@ -151,23 +160,32 @@ pandora.ui.group = function(id) {
                     pandora.URL.push(pandora.Query.toString());
                     pandora.reloadGroups(i);
                 }
-                groups[i] = id_;
+                groups[i] = makeGroup(id_);
                 pandora.UI.set({groups: groups});
                 replaceGroup(i, id_);
+                // fixme: there is an obscure special case not yet covered:
+                // switching to a new group may change find from advanced to not advanced
+                // if part of the existing query works as a group selection in the new group
             } else {
                 // swap two existing groups
                 var groupsData = Ox.clone(pandora.user.ui.groupsData[i]);
                 pandora.user.ui.groupsData[i] = pandora.user.ui.groupsData[i_];
                 pandora.user.ui.groupsData[i_] = groupsData;
-                groups[i] = id_;
-                groups[i_] = id;
+                groups[i] = makeGroup(id_, pandora.user.ui.groups[i_].sort);
+                groups[i_] = makeGroup(id, pandora.user.ui.groups[i].sort);
                 pandora.UI.set({groups: groups});
                 replaceGroup(i, id_);
                 replaceGroup(i_, id);
             }
-            // fixme: there is an obscure special case not yet covered:
-            // switching to a new group may change find from advanced to not advanced
-            // if part of the existing query works as a group selection in the new group
+            pandora.$ui.mainMenu.replaceMenu('sortMenu', pandora.getSortMenu());
+            function makeGroup(id, sort) {
+                // makes user.ui.groups object from site.groups object
+                var group = Ox.getObjectById(pandora.site.groups, id);
+                return {
+                    id: group.id,
+                    sort: sort || [{key: group.type == 'integer' ? 'name' : 'items', operator: '-'}]
+                };
+            }
             function replaceGroup(i, id, query) {
                 // if query is passed, selected items will be derived from it
                 var isOuter = i % 4 == 0;
@@ -184,8 +202,8 @@ pandora.ui.group = function(id) {
 pandora.ui.groups = function() {
     var $groups = [];
     //pandora.user.queryGroups = [];
-    pandora.user.ui.groups.forEach(function(id, i) {
-        $groups[i] = pandora.ui.group(id);
+    pandora.user.ui.groups.forEach(function(group, i) {
+        $groups[i] = pandora.ui.group(group.id);
     });
     return $groups;
 };

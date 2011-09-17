@@ -328,9 +328,9 @@ pandora.getSortMenu = function() {
     return { id: 'sortMenu', title: 'Sort', items: [
         { id: 'sortmovies', title: 'Sort ' + (isClipView ? 'Clips' : pandora.site.itemName.plural) + ' by', items: [
             { group: 'sortmovies', min: 1, max: 1, items: Ox.merge(isClipView ? Ox.merge(pandora.site.clipKeys.map(function(key) {
-                return Ox.extend(Ox.clone(key), {
+                return Ox.extend({
                     checked: list.sort[0].key == key.id
-                });
+                }, key);
             }), {}) : [], pandora.site.sortKeys.map(function(key) {
                 return Ox.extend({
                     checked: list.sort[0].key == key.id
@@ -345,7 +345,30 @@ pandora.getSortMenu = function() {
         ] },
         { id: 'advancedsort', title: 'Advanced Sort...', keyboard: 'shift control s' },
         {},
-        { id: 'groupsstuff', title: 'Groups Stuff' }
+        { id: 'sortgroups', title: 'Sort Groups', items: pandora.user.ui.groups.map(function(group) {
+            return {
+                id: 'sortgroup' + group.id,
+                title: 'Sort ' + Ox.getObjectById(pandora.site.groups, group.id).title + ' Group by',
+                items: [
+                    { group: 'sortgroup' + group.id, min: 1, max: 1, items: [
+                        { id: 'name', title: 'Name', checked: group.sort[0].key == 'name' },
+                        { id: 'items', title: 'Items', checked: group.sort[0].key == 'items' }
+                    ] }
+                ]
+            }
+        }) },
+        { id: 'ordergroups', title: 'Order Groups', items: pandora.user.ui.groups.map(function(group) {
+            return {
+                id: 'ordergroup' + group.id,
+                title: 'Order ' + Ox.getObjectById(pandora.site.groups, group.id).title + ' Group',
+                items: [
+                    { group: 'ordergroup' + group.id, min: 1, max: 1, items: [
+                        { id: 'ascending', title: 'Ascending', checked: group.sort[0].operator == '+' },
+                        { id: 'descending', title: 'Descending', checked: group.sort[0].operator == '-' }
+                    ] }
+                ]
+            }
+        }) }
     ] };
 };
 
@@ -438,14 +461,14 @@ pandora.reloadGroups = function(i) {
             }
         });
     }
-    Ox.forEach(pandora.user.ui.groups, function(id, i_) {
+    Ox.forEach(pandora.user.ui.groups, function(group, i_) {
         if (i_ != i) {
             //Ox.print('setting groups request', i, i_)
             pandora.$ui.groups[i_].options({
                 items: function(data, callback) {
                     delete data.keys;
                     return pandora.api.find(Ox.extend(data, {
-                        group: id,
+                        group: group.id,
                         query: pandora.user.ui.groupsData[i_].query
                     }), callback);
                 }

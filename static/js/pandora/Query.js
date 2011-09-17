@@ -39,8 +39,9 @@ pandora.Query = (function() {
         // a group is selected if exactly one condition in an & query
         // or every condition in an | query
         // has the group id as key and "=" as operator
-        return pandora.user.ui.groups.map(function(key) {
+        return pandora.user.ui.groups.map(function(group) {
             var index = -1,
+                key = group.id,
                 query = Ox.clone(fullQuery, true),
                 selected = [];
             if (query.operator == '|') {

@@ -101,6 +101,14 @@ pandora.ui.mainMenu = function() {
                         }) }
                     ] },
                     {},
+                    { id: 'groups', title: 'Groups', items: [
+                        { group: 'groups', min: 5, max: 5, items: pandora.site.groups.map(function(group) {
+                            return Ox.extend({
+                                checked: Ox.getPositionById(pandora.user.ui.groups, group.id) > -1
+                            }, group);
+                        }) }
+                    ] },
+                    {},
                     { id: 'lists', title: 'Hide Lists', keyboard: 'shift l' },
                     { id: 'info', title: 'Hide Info', keyboard: 'shift i' },
                     { id: 'groups', title: 'Hide Groups', keyboard: 'shift g' },
@@ -146,7 +154,12 @@ pandora.ui.mainMenu = function() {
                 { id: 'debugMenu', title: 'Debug', items: [
                     { id: 'query', title: 'Show pandora.Query' },
                     { id: 'resetui', title: 'Reset UI Settings'},
-                    { id: 'clearcache', title: 'Clear cache'}
+                    { id: 'clearcache', title: 'Clear cache'},
+                    { id: 'nestedone', title: 'Some Nesting', items: [
+                        { id: 'nestedtwo', title: 'Some More Nesting', items: [
+                            { id: 'nestedthree', title: 'Even More Nesting' }
+                        ] }
+                    ] }
                 ] }
             ]
         })
@@ -157,30 +170,54 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.findSelect.options({value: value});
                 } else if (data.id == 'movieview') {
                     var id = document.location.pathname.split('/')[1];
+                    // fixme: what's this?
                     if (value == 'info')
                         url(id + '/info');
                     else
                         url(id);
+                } else if (Ox.startsWith(data.id, 'ordergroup')) {
+                    var groups = Ox.clone(pandora.user.ui.groups),
+                        id = data.id.replace('ordergroup', ''),
+                        position = Ox.getPositionById(groups, id),
+                        key = groups[position].sort[0].key,
+                        operator = value == 'ascending' ? '+' : '-';
+                    pandora.$ui.groups[position].options({
+                        sort: [{key: key, operator: operator}]
+                    });
+                    groups[position].sort[0].operator = operator;
+                    pandora.UI.set({groups: groups});
                 } else if (data.id == 'ordermovies') {
                     var key = pandora.user.ui.lists[pandora.user.ui.list].sort[0].key,
                         operator = value == 'ascending' ? '+' : '-';
                     pandora.$ui.list.options({
                         sort: [{key: key, operator: operator}]
                     });
-                    pandora.UI.set(['lists', pandora.user.ui.list, 'sort'].join('|'), [{key: key, operator: operator}]);
+                    pandora.UI.set('lists|' + pandora.user.ui.list + '|sort', [{key: key, operator: operator}]);
                     //pandora.user.ui.lists[pandora.user.ui.list].sort[0] = {key: key, operator: operator};
                     pandora.URL.push(pandora.Query.toString());
                 } else if (data.id == 'settheme') {
                     Ox.Theme(value);
                     pandora.UI.set('theme', value);
-                } else if (data.id == 'sortmovies') {
-                    var operator = pandora.getSortOperator(value);
-                    pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator == '+' ? 'ascending' : 'descending'));
-                    pandora.$ui.sortSelect.options({value: value});
-                    pandora.$ui.list.options({
-                        sort: [{key: value, operator: operator}]
+                } else if (Ox.startsWith(data.id, 'sortgroup')) {
+                    var groups = Ox.clone(pandora.user.ui.groups),
+                        id = data.id.replace('sortgroup', ''),
+                        position = Ox.getPositionById(groups, id),
+                        key = value,
+                        operator = '-';
+                    pandora.$ui.groups[position].options({
+                        sort: [{key: key, operator: operator}]
                     });
-                    pandora.UI.set(['lists', pandora.user.ui.list, 'sort'].join('|'), [{key: value, operator: operator}]);
+                    groups[position].sort[0].key = key;
+                    pandora.UI.set({groups: groups});                    
+                } else if (data.id == 'sortmovies') {
+                    var key = value,
+                        operator = pandora.getSortOperator(key);
+                    pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator == '+' ? 'ascending' : 'descending'));
+                    pandora.$ui.sortSelect.options({value: key});
+                    pandora.$ui.list.options({
+                        sort: [{key: key, operator: operator}]
+                    });
+                    pandora.UI.set('lists|' + pandora.user.ui.list + '|sort', [{key: key, operator: operator}]);
                     //pandora.user.ui.lists[pandora.user.ui.list].sort[0] = {key: key, operator: operator};
                     pandora.URL.push(pandora.Query.toString());
 
