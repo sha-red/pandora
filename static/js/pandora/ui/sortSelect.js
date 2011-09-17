@@ -24,9 +24,7 @@ pandora.ui.sortSelect = function() {
                 pandora.$ui.list.options({
                     sort: [{key: key, operator: operator}]
                 });
-                // fixme: why does this not work??
-                // pandora.UI.set(['lists', pandora.user.ui.list, 'sort'].join('|'), [{key: key, operator: operator}]);
-                pandora.user.ui.lists[pandora.user.ui.list].sort[0] = {key: key, operator: operator};
+                pandora.UI.set('lists|' + pandora.user.ui.list + '|sort', [{key: key, operator: operator}]);
                 pandora.URL.push(pandora.Query.toString());
             }
         });
