@@ -72,6 +72,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
                     !pandora.user.ui.showFolder.items[title] && $bar.trigger('dblclick');
                 }
                 if (!scrollInterval) {
+                    //Ox.print('AT TOP', isAtListsTop(event), 'AT BOTTOM', isAtListsBottom(event))
                     scroll = isAtListsTop(event) ? -16
                         : isAtListsBottom(event) ? 16 : 0
                     if (scroll) {
@@ -321,8 +322,38 @@ pandora.getListData = function() {
     return data;
 };
 
+pandora.getSortMenu = function() {
+    var list = pandora.user.ui.lists[pandora.user.ui.list];
+    return { id: 'sortMenu', title: 'Sort', items: [
+        { id: 'sortmovies', title: 'Sort ' + (list.listView == 'clip' ? 'Clips' : pandora.site.itemName.plural) + ' by', items: [
+            { group: 'sortmovies', min: 1, max: 1, items: Ox.merge(list.listView == 'clip' ? Ox.merge(pandora.site.clipKeys.map(function(key) {
+                return Ox.extend(Ox.clone(key), {
+                    checked: list.sort[0].key == key.id
+                });
+            }), {}) : [], pandora.site.sortKeys.map(function(key) {
+                return Ox.extend({
+                    checked: list.sort[0].key == key.id
+                }, key);
+            })) }
+        ] },
+        { id: 'ordermovies', title: 'Order ' + (list.listView == 'clip' ? 'Clips' : pandora.site.itemName.plural), items: [
+            { group: 'ordermovies', min: 1, max: 1, items: [
+                { id: 'ascending', title: 'Ascending', checked: (list.sort[0].operator || pandora.getSortOperator(list.sort[0].key)) == '+' },
+                { id: 'descending', title: 'Descending', checked: (list.sort[0].operator || pandora.getSortOperator(list.sort[0].key)) == '-' }
+            ]}
+        ] },
+        { id: 'advancedsort', title: 'Advanced Sort...', keyboard: 'shift control s' },
+        {},
+        { id: 'groupsstuff', title: 'Groups Stuff' }
+    ] };
+};
+
 pandora.getSortOperator = function(key) { // fixme: make static
-    var type = Ox.getObjectById(pandora.site.itemKeys, key).type;
+    Ox.print('getSortOperator', key)
+    var type = Ox.getObjectById(
+            /^clip:/.test(key) ? pandora.site.clipKeys : pandora.site.itemKeys,
+            key
+        ).type;
     return ['hue', 'string', 'text'].indexOf(
         Ox.isArray(type) ? type[0] : type
     ) > -1 ? '+' : '-';

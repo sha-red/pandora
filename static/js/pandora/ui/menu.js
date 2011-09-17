@@ -1,6 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.mainMenu = function() {
     var isGuest = pandora.user.level == 'guest',
+        list = pandora.user.ui.lists[pandora.user.ui.list],
         that = Ox.MainMenu({
             extras: [
                 $('<div>').html('beta').css({marginRight: '8px', color: 'rgb(128, 128, 128)'}),
@@ -69,7 +70,7 @@ pandora.ui.mainMenu = function() {
                     { id: 'movies', title: 'View ' + pandora.site.itemName.plural, items: [
                         { group: 'viewmovies', min: 1, max: 1, items: pandora.site.listViews.map(function(view) {
                             return Ox.extend({
-                                checked: pandora.user.ui.lists[pandora.user.ui.list].listView == view.id,
+                                checked: list.listView == view.id,
                             }, view);
                         }) },
                     ]},
@@ -112,24 +113,7 @@ pandora.ui.mainMenu = function() {
                         ]}
                     ] }
                 ]},
-                { id: 'sortMenu', title: 'Sort', items: [
-                    { id: 'sortmovies', title: 'Sort ' + pandora.site.itemName.plural + ' by', items: [
-                        { group: 'sortmovies', min: 1, max: 1, items: pandora.site.sortKeys.map(function(key) {
-                            return Ox.extend({
-                                checked: pandora.user.ui.lists[pandora.user.ui.list].sort[0].key == key.id
-                            }, key);
-                        }) }
-                    ] },
-                    { id: 'ordermovies', title: 'Order ' + pandora.site.itemName.plural, items: [
-                        { group: 'ordermovies', min: 1, max: 1, items: [
-                            { id: 'ascending', title: 'Ascending', checked: pandora.user.ui.lists[pandora.user.ui.list].sort[0].operator == '+' },
-                            { id: 'descending', title: 'Descending', checked: pandora.user.ui.lists[pandora.user.ui.list].sort[0].operator == '-' }
-                        ]}
-                    ] },
-                    { id: 'advancedsort', title: 'Advanced Sort...', keyboard: 'shift control s' },
-                    {},
-                    { id: 'groupsstuff', title: 'Groups Stuff' }
-                ] },
+                pandora.getSortMenu(),
                 { id: 'findMenu', title: 'Find', items: [
                     { id: 'find', title: 'Find', items: [
                         { group: 'find', min: 1, max: 1, items: pandora.site.findKeys.map(function(key, i) {

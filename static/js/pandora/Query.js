@@ -142,6 +142,7 @@ pandora.Query = (function() {
                     ret.list = ret.query.conditions[index].value;
                 }
             }
+            ret.groups = getGroupsData(ret.query);
             // find is populated if exactly one condition in an & query
             // has a findKey as key and "" as operator
             // (and all other conditions are either list or groups)
@@ -179,7 +180,6 @@ pandora.Query = (function() {
                 }
             }
         }
-        ret.groups = getGroupsData(ret.query);
         return ret;
     }
 

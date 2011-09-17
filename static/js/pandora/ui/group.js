@@ -165,6 +165,9 @@ pandora.ui.group = function(id) {
                 replaceGroup(i, id_);
                 replaceGroup(i_, id);
             }
+            // fixme: there is an obscure special case not yet covered:
+            // switching to a new group may change find from advanced to not advanced
+            // if part of the existing query works as a group selection in the new group
             function replaceGroup(i, id, query) {
                 // if query is passed, selected items will be derived from it
                 var isOuter = i % 4 == 0;

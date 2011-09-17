@@ -6,13 +6,13 @@
         "canSeeFiles": {"guest": -1, "member": -1, "staff": 3, "admin": 4}
     },
     "clipKeys": [
-        {"id": "value", "title": "Text"},
-        {"id": "in", "title": "Position"},
-        {"id": "duration", "title": "Duration"},
-        {"id": "hue", "title": "Hue"},
-        {"id": "saturation", "title": "Saturation"},
-        {"id": "lightness", "title": "Lightness"},
-        {"id": "volume", "title": "Volume"}
+        {"id": "clip:value", "title": "Clip Text", "type": "string"},
+        {"id": "clip:position", "title": "Clip Position", "type": "float"},
+        {"id": "clip:duration", "title": "Clip Duration", "type": "float"},
+        {"id": "clip:hue", "title": "Clip Hue", "type": "hue"},
+        {"id": "clip:saturation", "title": "Clip Saturation", "type": "float"},
+        {"id": "clip:lightness", "title": "Clip Lightness", "type": "float"},
+        {"id": "clip:volume", "title": "Clip Volume", "type": "float"}
     ],
     "groups": [
         {"id": "director", "title": "Director"},
