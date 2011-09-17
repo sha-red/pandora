@@ -110,11 +110,8 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
-                    if (pandora.user.ui.list) {
-                        Ox.forEach(pandora.$ui.folderList, function($list) {
-                            $list.options({selected: []});
-                        });
-                    }
+                    var folder = pandora.getListData().folder;
+                    folder && pandora.$ui.folderList[folder].options({selected: []});
                     pandora.URL.set('/?find=' + $findInput.value());
                     that.fadeOutScreen();
                 }
