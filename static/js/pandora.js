@@ -49,7 +49,7 @@ Ox.load({
                             .unload(unloadWindow)
                     },
                     site: data.site,
-                    user: data.user.level == 'guest' ? Ox.extend({}, data.site.user) : data.user
+                    user: data.user.level == 'guest' ? Ox.clone(data.site.user) : data.user
                 });
                 Ox.print("USER", data.user)
                 Ox.extend(pandora.site, {
