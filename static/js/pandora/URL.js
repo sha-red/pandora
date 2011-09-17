@@ -10,7 +10,6 @@ pandora.URL = (function() {
                     if (pandora.user.ui.showHome) {
                         pandora.$ui.home = pandora.ui.home().showScreen();
                     }
-                    pandora.Query.updateGroups();
                 } else if (/^\?url=/.test(search)) {
                     document.location = decodeURIComponent(search.substr(5));
                 } else {
@@ -23,21 +22,17 @@ pandora.URL = (function() {
             },
             '^home$': function(pathname, search) {
                 pandora.$ui.home = pandora.ui.home().showScreen();
-                pandora.Query.updateGroups();
             },
             '^(items|edits|texts)$': function(pathname, search) {
                 pandora.UI.set({
                     section: pathname
                 });
-                pandora.Query.updateGroups();
             },
             '^(about|contact|faq|news|software|terms|tour)$': function(pathname, search) {
                 pandora.$ui.siteDialog = pandora.ui.siteDialog(pathname).open();
-                pandora.Query.updateGroups();
             },
             '^help$': function(pathname, search) {
                 pandora.$ui.helpDialog = pandora.ui.helpDialog().open();
-                pandora.Query.updateGroups();
             },
             '^(signin|signout|signup)$': function(pathname, search) {
                 if ((pathname == 'signout') == (pandora.user.level != 'guest')) {
@@ -47,11 +42,9 @@ pandora.URL = (function() {
                         : pandora.ui.accountSignoutDialog()
                     ).open();
                 }
-                pandora.Query.updateGroups();
             },
             '^preferences$': function(pathname, search) {
                 pandora.$ui.preferencesDialog = pandora.ui.preferencesDialog().open();
-                pandora.Query.updateGroups();
             },
             '^(calendar|calendars|clip|clips|flow|grid|list|map|maps|timelines)$': function(pathname, search) {
                 pandora.UI.set({
@@ -59,7 +52,6 @@ pandora.URL = (function() {
                     item: ''
                 });
                 pandora.UI.set(['lists', pandora.user.ui.list, 'listView'].join('|'), pathname);
-                pandora.Query.updateGroups();
                 pandora.Query.fromString(search);
             },
             '^[0-9A-Z]': function(pathname, search) {
@@ -122,6 +114,10 @@ pandora.URL = (function() {
             },
             '.*': function(pathname, search) {
                 var query = search || 'find=' + pathname;
+                pandora.UI.set({
+                    section: 'items',
+                    item: ''
+                });
                 pandora.Query.fromString(query);
                 pandora.URL.replace('?' + query);
             }
@@ -144,6 +140,7 @@ pandora.URL = (function() {
                     + document.location.search
                     + document.location.hash;
             */
+            pandora.Query.updateGroups();
             Ox.forEach(regexps, function(fn, re) {
                 re = new RegExp(re);
                 if (re.test(pathname)) {
