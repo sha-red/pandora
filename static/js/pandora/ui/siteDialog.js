@@ -52,6 +52,7 @@ pandora.ui.siteDialog = function(section) {
             }).bindEvent({
                 click: function() {
                     $dialog.close();
+                    pandora.URL.pushPrevious();
                 }
             })
         ],

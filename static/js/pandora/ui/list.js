@@ -137,7 +137,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                 pandora.URL.push(pandora.Query.toString());
             }
         });
-    } else if (view == 'icons') {
+    } else if (view == 'grid') {
         //alert(JSON.stringify(pandora.user.ui.lists[pandora.user.ui.list].selected))
         that = Ox.IconList({
             borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 16,
@@ -268,8 +268,13 @@ pandora.ui.list = function() { // fixme: remove view argument
             open: function(data) {
                 var id = data.ids[0],
                     item = id.split('/')[0],
-                    position = that.value(id, 'in');
-                pandora.UI.set('videoPosition|' + item, position);
+                    points = {
+                        'in': that.value(id, 'in'),
+                        out: that.value(id, 'out')
+                    };
+                pandora.UI.set('videoPoints|' + item, Ox.extend(points, {
+                    position: points['in']
+                }));
                 pandora.URL.set(item + '/timeline');
             },
             openpreview: function(data) {
@@ -456,8 +461,13 @@ pandora.ui.list = function() { // fixme: remove view argument
                         open: function(data) {
                             var id = data.ids[0],
                                 item = pandora.$ui.clips.value(id, 'item'),
-                                position = pandora.$ui.clips.value(id, 'in');
-                            pandora.UI.set('videoPosition|' + item, position);
+                                points = {
+                                    'in': pandora.$ui.clips.value(id, 'in'),
+                                    out: pandora.$ui.clips.value(id, 'out')
+                                };
+                            pandora.UI.set('videoPoints|' + item, Ox.extend(points, {
+                                position: points['in']
+                            }));
                             pandora.URL.set(item + '/timeline');
                         }
                     }),
@@ -517,7 +527,7 @@ pandora.ui.list = function() { // fixme: remove view argument
             });
     }
 
-    if (['list', 'icons'].indexOf(view) > -1) {
+    if (['list', 'grid'].indexOf(view) > -1) {
 
         pandora.enableDragAndDrop(that, true);
 

@@ -20,16 +20,17 @@ pandora.ui.viewSelect = function() {
             margin: '4px 0 0 4px'
         })
         .bindEvent({
-            change: !pandora.user.ui.item ? function(event, data) {
-                var id = data.selected[0].id;
-                pandora.$ui.mainMenu.checkItem('viewMenu_movies_' + id);
-                pandora.UI.set(['lists', pandora.user.ui.list, 'listView'].join('|'), id);
+            change: !pandora.user.ui.item ? function(data) {
+                var view = data.selected[0].id;
+                pandora.$ui.mainMenu.checkItem('viewMenu_movies_' + view);
+                pandora.UI.set(['lists', pandora.user.ui.list, 'listView'].join('|'), view);
                 pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
-                pandora.URL.push(pandora.Query.toString());
+                pandora.URL.push('/' + view + '/' + document.location.search);
+                // pandora.URL.set('/' + view + '/' + document.location.search);
             } : function(event, data) {
-                var id = data.selected[0].id;
+                var view = data.selected[0].id;
                 //pandora.UI.set({itemView: id});
-                pandora.URL.set(pandora.user.ui.item + '/' + id);
+                pandora.URL.set(pandora.user.ui.item + '/' + view);
                 // pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.item = pandora.ui.item());
             }
         });

@@ -1,6 +1,10 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.UI = (function() {
+    // fixme: why do we use '|', and not '.', as a separator?
     return {
+        // sets pandora.user.ui.key to val
+        // key foo|bar|baz sets pandora.user.ui.foo.bar.baz
+        // val null removes a key
         set: function(/*{key: val} or key, val*/) {
             var obj = Ox.makeObject(arguments);
             Ox.forEach(obj, function(val, key) {

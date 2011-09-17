@@ -222,7 +222,7 @@ pandora.Query = (function() {
 
         fromString: function(str) {
             var data
-                query = Ox.unserialize(str.substr(1)),
+                query = Ox.unserialize(str),
                 sort = []
             if ('find' in query) {
                 data = parseFind(query.find || '');
@@ -284,10 +284,9 @@ pandora.Query = (function() {
             var sort = pandora.user.ui.lists[pandora.user.ui.list].sort[0],
                 key = sort.key,
                 operator = sort.operator;
-            return '?' + Ox.serialize({
+            return pandora.user.ui.lists[pandora.user.ui.list].listView + '/?' + Ox.serialize({
                 find: constructFind(pandora.user.ui.query),
-                sort: (operator == pandora.getSortOperator(key) ? '' : operator) + key,
-                view: pandora.user.ui.lists[pandora.user.ui.list].listView
+                sort: (operator == pandora.getSortOperator(key) ? '' : operator) + key
             });
         },
 

@@ -3,92 +3,79 @@
 
 pandora.URL = (function() {
 
-    var regexps = {
-            '^(|home)$': function(url) {
-                if (url == 'home' || pandora.user.ui.showHome) {
-                    //$('.OxLoadingScreen').stop().remove();
-                    pandora.$ui.home = pandora.ui.home().showScreen();
-                    pandora.user.ui.showHome = false;
+    var previousURL = '',
+        regexps = {
+            '^$': function(pathname, search) {
+                if (!search) {
+                    if (pandora.user.ui.showHome) {
+                        pandora.$ui.home = pandora.ui.home().showScreen();
+                    }
+                    pandora.Query.updateGroups();
+                } else if (/^\?url=/.test(search)) {
+                    document.location = decodeURIComponent(search.substr(5));
+                } else {
+                    pandora.Query.fromString(search);
+                    pandora.UI.set({
+                        section: 'items',
+                        item: ''
+                    });
                 }
+            },
+            '^home$': function(pathname, search) {
+                pandora.$ui.home = pandora.ui.home().showScreen();
                 pandora.Query.updateGroups();
             },
-            '^\\?url=': function(url) {
-                Ox.print('URL', url)
-                document.location = decodeURIComponent(url.substr(5));
-            },
-            '^\\?': function(url) {
-                pandora.Query.fromString(url);
+            '^(items|edits|texts)$': function(pathname, search) {
                 pandora.UI.set({
-                    section: 'items',
-                    item: ''
+                    section: pathname
                 });
-            },
-            '^(about|faq|home|news|software|terms|tour)$': function(url) {
-                pandora.$ui.siteDialog = pandora.ui.siteDialog(url).open();
                 pandora.Query.updateGroups();
             },
-            '^(signin|signout|signup)$': function(url) {
-                if ((url == 'signout') == (pandora.user.level != 'guest')) {
+            '^(about|contact|faq|news|software|terms|tour)$': function(pathname, search) {
+                pandora.$ui.siteDialog = pandora.ui.siteDialog(pathname).open();
+                pandora.Query.updateGroups();
+            },
+            '^help$': function(pathname, search) {
+                pandora.$ui.helpDialog = pandora.ui.helpDialog().open();
+                pandora.Query.updateGroups();
+            },
+            '^(signin|signout|signup)$': function(pathname, search) {
+                if ((pathname == 'signout') == (pandora.user.level != 'guest')) {
                     pandora.$ui.accountDialog = (
                         pandora.user.level == 'guest'
-                        ? pandora.ui.accountDialog(url)
+                        ? pandora.ui.accountDialog(pathname)
                         : pandora.ui.accountSignoutDialog()
                     ).open();
                 }
                 pandora.Query.updateGroups();
             },
-            '^preferences$': function() {
+            '^preferences$': function(pathname, search) {
                 pandora.$ui.preferencesDialog = pandora.ui.preferencesDialog().open();
                 pandora.Query.updateGroups();
             },
-            '^help$': function() {
-                pandora.$ui.helpDialog = pandora.ui.helpDialog().open();
+            '^(calendar|calendars|clip|clips|flow|grid|list|map|maps|timelines)$': function(pathname, search) {
+                pandora.UI.set({
+                    section: 'items',
+                    item: ''
+                });
+                pandora.UI.set(['lists', pandora.user.ui.list, 'listView'].join('|'), pathname);
                 pandora.Query.updateGroups();
+                pandora.Query.fromString(search);
             },
-            '^admin': function(url) {
-                var split = url.split('/'),
-                    section = new RegExp(
-                        '^ˆ(statistics|users)$'
-                    ).exec(split[1]);
-                section = section ? section[0] : 'users';
-                pandora.UI.set({
-                    section: 'site',
-                    sitePage: url
-                });
-            },
-            '^find$': function() {
-                pandora.Query.fromString('?find='); // fixme: silly hack
-                pandora.UI.set({
-                    section: 'items',
-                    item: ''
-                });
-            },
-            '^(calendar|calendars|clips|icons|flow|map|maps|timelines)$': function(url) {
-                pandora.UI.set({
-                    section: 'items',
-                    item: ''
-                });
-                pandora.UI.set(['lists', pandora.user.ui.list, 'listView'].join('|'), url);
-            },
-            '^texts$': function() {
-                pandora.UI.set({
-                    section: 'texts'
-                });
-            },
-            '^[0-9A-Z]': function(url) {
-                var split = url.split('/'),
-                    length = split.length,
+            '^[0-9A-Z]': function(pathname, search) {
+                var split = pathname.split('/'),
                     item = split[0],
+                    points,
+                    time = split.length > 1
+                        ? /[\d\.:,-]+/.exec(split[split.length - 1])
+                        : null,
                     view = new RegExp(
                             '^(' + $.map(pandora.site.itemViews, function(v) {
                                 return v.id;
                             }).join('|') + ')$'
-                        ).exec(split[1]),
-                    position = length > 1
-                        ? /[\d\.:-]+/.exec(split[length - 1])
-                        : null;
+                        ).exec(split[1]);
                 view = view ? view[0]
-                    : position ? pandora.user.ui.videoView
+                    : time ? pandora.user.ui.videoView
                     : pandora.user.ui.itemView;
                 pandora.UI.set(Ox.extend({
                     section: 'items',
@@ -97,25 +84,91 @@ pandora.URL = (function() {
                 }, ['player', 'timeline'].indexOf(view) > -1 ? {
                     videoView: view
                 } : {}));
-                if (position) {
-                    split[length - 1] = position[0].split('-').map(function(point, i) {
-                        // fixme: this is duplicated, see Ox.VideoPlayer() parsePositionInput()
+                if (time) {
+                    points = time[0].split(',');
+                    if (points.length == 2) {
+                        points = Ox.flatten([points[0], points[1].split('-')]);
+                        if (points[2] == '') {
+                            points[2] = '-1';
+                        }
+                    }
+                    // fixme: this is duplicated, see Ox.VideoPlayer() parsePositionInput()
+                    points = points.map(function(point, i) {
                         var parts = point.split(':').reverse();
                         while (parts.length > 3) {
                             parts.pop();
                         }
-                        point = parts.reduce(function(prev, curr, i) {
+                        return parts.reduce(function(prev, curr, i) {
                             return prev + (parseFloat(curr) || 0) * Math.pow(60, i);
                         }, 0);
-                        i == 0 && pandora.UI.set(['videoPosition', item].join('|'), point);
-                        return Ox.formatDuration(point, 3).replace(/\.000$/, '');
-                    }).join('-');
-                    pandora.URL.replace(split.join('/'))
+                    });
+                    pandora.UI.set('videoPoints|' + item, {
+                        'in': points.length == 1 ? 0 : points[points.length - 2],
+                        out: points.length == 1 ? 0 : points[points.length - 1],
+                        position: points[0],
+                    });
+                    points = points.map(function(point) {
+                        return point == -1 ? '' : Ox.formatDuration(point, 3).replace(/\.000$/, '');
+                    });
+                    split[split.length - 1] = points[0] + (
+                        points.length == 1 ? '' : ',' + points[1] + '-' + points[2]
+                    );
+                    pandora.URL.replace(split.join('/'));
+                } else if (!pandora.user.ui.videoPoints[item]) {
+                    pandora.UI.set('videoPoints|' + item, {
+                        'in': 0, out: 0, position: 0
+                    });
                 }
+            },
+            '.*': function(pathname, search) {
+                var query = search || 'find=' + pathname;
+                pandora.Query.fromString(query);
+                pandora.URL.replace('?' + query);
             }
         };
 
+    function saveURL() {
+        previousURL = document.location.pathname + document.location.search;
+    }
+
     return {
+
+        parse: function() {
+            var pathname = document.location.pathname.substr(1),
+                search = document.location.search.substr(1);
+            if (/\/$/.test(pathname)) {
+                pathname = pathname.substr(0, pathname.length - 1);
+            }
+            /*
+            var url = document.location.pathname.substr(1)
+                    + document.location.search
+                    + document.location.hash;
+            */
+            Ox.forEach(regexps, function(fn, re) {
+                re = new RegExp(re);
+                if (re.test(pathname)) {
+                    Ox.print('URL re ' + re);
+                    fn(pathname, search);
+                    return false;
+                }
+            });
+            pandora.user.ui.showHome = false;
+        },
+
+        push: function(title, url) {
+            if (arguments.length == 1) { // fixme: remove later
+                url = title;
+            }
+            if (url[0] != '/') {
+                url = '/' + url;
+            }
+            saveURL();
+            history.pushState({}, pandora.site.site.name + (title ? ' - ' + title : ''), url);
+        },
+
+        pushPrevious: function() {
+            history.pushState({}, '', previousURL);
+        },
 
         set: function(title, url) {
             if (arguments.length == 1) { // fixme: remove later
@@ -128,31 +181,6 @@ pandora.URL = (function() {
             this.update();
         },
 
-        parse: function() {
-            var url = document.location.pathname.substr(1) +
-                    document.location.search +
-                    document.location.hash;
-            Ox.forEach(regexps, function(fn, re) {
-                //Ox.print(url, 're', re)
-                re = new RegExp(re);
-                if (re.test(url)) {
-                    Ox.print('URL re ' + re);
-                    fn(url);
-                    return false;
-                }
-            });
-        },
-
-        push: function(title, url) {
-            if (arguments.length == 1) { // fixme: remove later
-                url = title;
-            }
-            if (url[0] != '/') {
-                url = '/' + url;
-            }
-            history.pushState({}, pandora.site.site.name + (title ? ' - ' + title : ''), url);
-        },
-
         replace: function(title, url) {
             if (arguments.length == 1) { // fixme: remove later
                 url = title;
@@ -160,6 +188,7 @@ pandora.URL = (function() {
             if (url[0] != '/') {
                 url = '/' + url;
             }
+            saveURL();
             history.replaceState({}, pandora.site.site.name + (title ? ' - ' + title : ''), url);
         },
 
@@ -193,7 +222,7 @@ pandora.URL = (function() {
                 pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
                 pandora.$ui.contentPanel.replaceElement(1, pandora.ui.item());
             }
-            // fixme: should be 'editor', not 'timeline'
+            // fixme: should be 'video', not 'player'
             if (
                 oldUserUI.item &&
                 ['player', 'timeline'].indexOf(oldUserUI.itemView) > -1
@@ -202,7 +231,7 @@ pandora.URL = (function() {
                     oldUserUI.itemView == 'player' ? 'player' : 'editor'
                 ];
                 $item && pandora.UI.set(
-                    'videoPosition|' + oldUserUI.item,
+                    'videoPoints|' + oldUserUI.item + '|position',
                     $item.options('position')
                 );
             }

@@ -58,7 +58,7 @@ pandora.ui.group = function(id) {
             items: function(data, callback) {
                 //if (pandora.user.ui.showGroups) {
                     delete data.keys;
-                    return pandora.api.find($.extend(data, {
+                    return pandora.api.find(Ox.extend(data, {
                         group: id,
                         query: pandora.user.ui.groupsData[i].query
                     }), callback);

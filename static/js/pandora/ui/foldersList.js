@@ -362,7 +362,8 @@ pandora.ui.folderList = function(id) {
                     });
                     pandora.URL.set('?find=' + (id == 'volumes' ? 'volume' : 'list') + ':' + data.ids[0]);
                 } else {
-                    pandora.URL.set('?find=');
+                    pandora.UI.set({list: ''});
+                    pandora.URL.set('');
                 }
             },
             submit: function(event, data) {

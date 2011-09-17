@@ -24,7 +24,7 @@ pandora.ui.browser = function() {
         .bindEvent({
             resize: function(event, data) {
                 pandora.user.ui.groupsSize = data;
-                $.each(pandora.$ui.groups, function(i, list) {
+                pandora.$ui.groups.forEach(function(list) {
                     list.size();
                 });
             },

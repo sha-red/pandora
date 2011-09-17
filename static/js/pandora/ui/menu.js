@@ -170,7 +170,7 @@ pandora.ui.mainMenu = function() {
             change: function(event, data) {
                 var value = data.checked[0].id;
                 if (data.id == 'find') {
-                    pandora.$ui.findSelect.selectItem(value);
+                    pandora.$ui.findSelect.options({value: value});
                 } else if (data.id == 'movieview') {
                     var id = document.location.pathname.split('/')[1];
                     if (value == 'info')
@@ -192,7 +192,7 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'sortmovies') {
                     var operator = pandora.getSortOperator(value);
                     pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator == '+' ? 'ascending' : 'descending'));
-                    pandora.$ui.sortSelect.selectItem(value);
+                    pandora.$ui.sortSelect.options({value: value});
                     pandora.$ui.list.options({
                         sort: [{key: value, operator: operator}]
                     });
@@ -208,20 +208,26 @@ pandora.ui.mainMenu = function() {
                             pandora.$ui.item.reload();
                         }
                         $list = pandora.$ui.browser;
-                    } else if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'icons') {
-                        $list = pandora.$ui.list
+                    } else if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'grid') {
+                        $list = pandora.$ui.list;
                     }
                     $list && $list.options({
                         borderRadius: value == 'posters' ? 0 : pandora.user.ui.item ? 8 : 16,
                         defaultRatio: value == 'posters' ? 5/8 : 1
                     }).reloadList(true);
                 } else if (data.id == 'viewmovies') {
-                    url('#view=' + value);
+                    pandora.UI.set(['lists', pandora.user.ui.list, 'listView'].join('|'), value);
+                    pandora.$ui.viewSelect.options({value: value});
+                    pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
+                    pandora.URL.push('/' + value + '/' + document.location.search);
+
+                    //pandora.URL.set('/' + value + '/' + document.location.search);
                 }
             },
             click: function(event, data) {
                 if (data.id == 'home') {
                     pandora.$ui.home = pandora.ui.home().fadeInScreen();
+                    pandora.URL.push('home');
                 } else if (['about', 'news', 'tour', 'faq', 'tos', 'contact', 'software'].indexOf(data.id) > -1) {
                     pandora.$ui.siteDialog = pandora.ui.siteDialog(data.id).open();
                     pandora.URL.push(data.id);

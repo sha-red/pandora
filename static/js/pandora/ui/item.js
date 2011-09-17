@@ -1,17 +1,32 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.item = function() {
+
     var that = Ox.Element();
+
     pandora.api.get({
         id: pandora.user.ui.item,
         keys: []
     }, pandora.user.level == 'admin' && pandora.user.ui.itemView == 'info' ? 0 : -1, function(result) {
+
+        if (result.status.code == 200) {
+            // fixme: probably does not belong here
+            document.title = '0xDB - ' + result.data.title;
+            if (pandora.user.ui.videoPoints[result.data.id].out == -1) {
+                pandora.UI.set('videoPoints|' + result.data.id + '|out', result.data.duration);
+                pandora.URL.replace(
+                    document.location.pathname
+                    + Ox.formatDuration(result.data.duration, 3).replace(/\.000$/, '')
+                );
+            }
+        }
+
         if (result.status.code != 200) {
             // fixme: this is quite a hack
             var title = decodeURI(pandora.user.ui.item).toLowerCase(),
-                videoPosition;
-            if (pandora.user.ui.item in pandora.user.ui.videoPosition) {
-                videoPosition = pandora.user.ui.videoPosition[pandora.user.ui.item];
-                pandora.UI.set(['videoPosition', pandora.user.ui.item].join('|'), null);
+                videoPoints;
+            if (pandora.user.ui.item in pandora.user.ui.videoPoints) {
+                videoPoints = pandora.user.ui.videoPoints[pandora.user.ui.item];
+                pandora.UI.set(['videoPoints', pandora.user.ui.item].join('|'), null);
             }
             pandora.api.find({
                 query: {
@@ -37,8 +52,8 @@ pandora.ui.item = function() {
                                 - re.exact.test(a.title) * 2000000;
                         })[0].id;
                     pandora.user.ui.item = '';
-                    !Ox.isUndefined(videoPosition)
-                        && pandora.UI.set(['videoPosition', id].join('|'), videoPosition);
+                    !Ox.isUndefined(videoPoints)
+                        && pandora.UI.set(['videoPoints', id].join('|'), videoPoints);
                     pandora.URL.set(id);
                 } else {
                     pandora.$ui.contentPanel.replaceElement(1,
@@ -52,9 +67,9 @@ pandora.ui.item = function() {
                     );
                 }                
             });
-        } else if (!result.data.rendered &&
-                   ['clips', 'map',
-                    'player', 'timeline'].indexOf(pandora.user.ui.itemView)>-1) {
+        } else if (!result.data.rendered && [
+            'clips', 'map', 'player', 'timeline'
+        ].indexOf(pandora.user.ui.itemView)>-1) {
             pandora.$ui.contentPanel.replaceElement(1,
                 Ox.Element()
                     .css({marginTop: '32px', fontSize: '12px', textAlign: 'center'})
@@ -64,8 +79,10 @@ pandora.ui.item = function() {
                         + pandora.user.ui.itemView + ' view.'
                     )
             );
+
         } else if (pandora.user.ui.itemView == 'calendar') {
             pandora.$ui.contentPanel.replaceElement(1, Ox.Element().html('Calendar'));
+
         } else if (pandora.user.ui.itemView == 'clips') {
             var ratio = result.data.stream.aspectRatio;
             Ox.print('RATIO', ratio)
@@ -86,7 +103,7 @@ pandora.ui.item = function() {
                     };
                 },
                 items: function(data, callback) {
-                    pandora.api.findAnnotations($.extend(data, {
+                    pandora.api.findAnnotations(Ox.extend(data, {
                         itemQuery: {
                             conditions:[{
                                 key: 'id',
@@ -104,11 +121,17 @@ pandora.ui.item = function() {
                 open: function(event, data) {
                     var id = data.ids[0],
                         item = pandora.user.ui.item,
-                        position = pandora.$ui.clips.value(id, 'in');
-                    pandora.UI.set('videoPosition|' + item, position);
+                        points = {
+                            'in': pandora.$ui.clips.value(id, 'in'),
+                            out: pandora.$ui.clips.value(id, 'out')
+                        };
+                    pandora.UI.set('videoPoints|' + item, Ox.extend(points, {
+                        position: points['in']
+                    }));
                     pandora.URL.set(item + '/timeline');
                 }
             }));
+
         } else if (pandora.user.ui.itemView == 'info') {
             //Ox.print('result.data', result.data)
             if (pandora.user.level == 'admin' && false) {
@@ -239,8 +262,13 @@ pandora.ui.item = function() {
                             open: function(event, data) {
                                 var id = data.ids[0],
                                     item = pandora.user.ui.item,
-                                    position = pandora.$ui.clips.value(id, 'in');
-                                pandora.UI.set('videoPosition|' + item, position);
+                                    points = {
+                                        'in': pandora.$ui.clips.value(id, 'in'),
+                                        out: pandora.$ui.clips.value(id, 'out')
+                                    };
+                                pandora.UI.set('videoPoints|' + item, Ox.extend(points, {
+                                    position: points['in']
+                                }));
                                 pandora.URL.set(item + '/timeline');
                             }
                         }),
@@ -253,6 +281,7 @@ pandora.ui.item = function() {
             .bindEvent('resize', function() {
                 pandora.$ui.map.resizeMap();
             }));
+
         } else if (pandora.user.ui.itemView == 'statistics') {
             var stats = Ox.Container();
             Ox.TreeList({
@@ -261,7 +290,6 @@ pandora.ui.item = function() {
             }).appendTo(stats);
 
             pandora.$ui.contentPanel.replaceElement(1, stats);
-
 
         } else if (pandora.user.ui.itemView == 'player') {
             // fixme: duplicated
@@ -285,8 +313,10 @@ pandora.ui.item = function() {
                     return '/' + pandora.user.ui.item + '/timeline64p' + i + '.png';
                 },
                 height: pandora.$ui.contentPanel.size(1),
+                'in': pandora.user.ui.videoPoints[pandora.user.ui.item]['in'],
                 muted: pandora.user.ui.videoMuted,
-                position: pandora.user.ui.videoPosition[pandora.user.ui.item] || 0,
+                out: pandora.user.ui.videoPoints[pandora.user.ui.item].out,
+                position: pandora.user.ui.videoPoints[pandora.user.ui.item].position,
                 scaleToFill: pandora.user.ui.videoScale == 'fill',
                 showAnnotations: pandora.user.ui.showAnnotations,
                 showControls: pandora.user.ui.showControls,
@@ -318,11 +348,12 @@ pandora.ui.item = function() {
                     pandora.UI.set('volume', data.volume);
                 },
             }));
+
         } else if (pandora.user.ui.itemView == 'timeline') {
             var layers = [],
                 video = {};
-            $.each(pandora.site.layers, function(i, layer) {
-                layers[i] = $.extend({}, layer, {items: result.data.layers[layer.id]});
+            pandora.site.layers.forEach(function(layer) {
+                layers.push(Ox.extend({items: result.data.layers[layer.id]}, layer));
             });
             pandora.site.video.resolutions.forEach(function(resolution) {
                 video[resolution] = Ox.range(result.data.parts).map(function(i) {
@@ -346,10 +377,11 @@ pandora.ui.item = function() {
                 },
                 height: pandora.$ui.contentPanel.size(1),
                 id: 'editor',
-                'in': 0,
+                'in': pandora.user.ui.videoPoints[pandora.user.ui.item]['in'],
                 layers: layers,
-                out: 0,
-                position: pandora.user.ui.videoPosition[pandora.user.ui.item] || 0,
+                muted: pandora.user.ui.videoMuted,
+                out: pandora.user.ui.videoPoints[pandora.user.ui.item].out,
+                position: pandora.user.ui.videoPoints[pandora.user.ui.item].position,
                 posterFrame: parseInt(video.duration / 2),
                 showAnnotations: pandora.user.ui.showAnnotations,
                 showLargeTimeline: true,
@@ -363,6 +395,16 @@ pandora.ui.item = function() {
                 videoSize: pandora.user.ui.videoSize,
                 width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             }).bindEvent({
+                points: function(data) {
+                    pandora.UI.set('videoPoints|' + pandora.user.ui.item, {
+                        'in': data['in'],
+                        out: data.out,
+                        position: pandora.user.ui.videoPoints[pandora.user.ui.item].position
+                    });
+                },
+                position: function(data) {
+                    pandora.UI.set('videoPoints|' + pandora.user.ui.item + '|position', data.position);
+                },
                 resize: function(event, data) {
                     pandora.$ui.editor.options({
                         height: data
@@ -412,13 +454,15 @@ pandora.ui.item = function() {
                     width: data - pandora.$ui.timelinePanel.size(1) - 1
                 });
             });
-            */                        
+            */
+
         } else if (pandora.user.ui.itemView == 'files') {
             pandora.$ui.contentPanel.replaceElement(1,
                 pandora.$ui.item = Ox.FilesView({
                     id: result.data.id
                 })
             );
+
         } else if (pandora.user.ui.itemView == 'frames' || pandora.user.ui.itemView == 'posters') {
             pandora.$ui.contentPanel.replaceElement(1,
                 pandora.$ui.item = pandora.ui.mediaView().bindEvent({
@@ -428,11 +472,15 @@ pandora.ui.item = function() {
                 })
             );
         }
+
         if (result.data) {
             var director = result.data.director ? ' ('+result.data.director.join(', ') + ')' : '';
             pandora.$ui.total.html(result.data.title + director);
         }
+
     });
+
     return that;
+
 };
 

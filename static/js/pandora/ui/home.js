@@ -62,6 +62,7 @@ pandora.ui.home = function() {
             })
             .bind({
                 click: function() {
+                    pandora.URL.pushPrevious();
                     that.fadeOutScreen();
                 }
             })
@@ -124,6 +125,7 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
+                    pandora.URL.pushPrevious();
                     that.fadeOutScreen();
                 }
             })

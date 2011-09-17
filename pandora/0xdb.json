@@ -432,6 +432,7 @@
             "value": "capability"
         }
     ],
+    "fixme": "itemNames should be lowercase!",
     "itemName": {
         "singular": "Movie",
         "plural": "Movies"
@@ -473,7 +474,7 @@
     ],
     "listViews": [
         {"id": "list", "title": "as List"},
-        {"id": "icons", "title": "as Icons"},
+        {"id": "grid", "title": "as Grid"},
         {"id": "info", "title": "with Info"},
         {"id": "clips", "title": "with Clips"},
         {"id": "timelines", "title": "with Timelines"},
@@ -555,7 +556,7 @@
                 "": {
                     "columns": ["title", "director", "country", "year", "language", "runtime", "genre"],
                     "columnWidth": {},
-                    "listView": "icons",
+                    "listView": "grid",
                     "selected": [],
                     "sort": [
                         {"key": "director", "operator": ""}
@@ -583,7 +584,7 @@
             "sidebarSize": 256,
             "sitePage": "home",
             "theme": "modern",
-            "videoPosition": {},
+            "videoPoints": {},
             "videoScale": "fit",
             "videoMuted": false,
             "videoSize": "small",
