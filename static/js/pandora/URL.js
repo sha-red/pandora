@@ -9,13 +9,17 @@ pandora.URL = (function() {
                 if (/^\?url=/.test(search)) {
                     document.location = decodeURIComponent(search.substr(5));
                 } else {
-                    pandora.Query.fromString(search);
-                    pandora.UI.set({
-                        section: 'items',
-                        item: ''
-                    });
                     if (!search && pandora.user.ui.showHome) {
                         pandora.$ui.home = pandora.ui.home().showScreen();
+                        pandora.user.ui.list && pandora.Query.fromString(
+                            'find=list:' + pandora.user.ui.list
+                        );
+                    } else {
+                        pandora.Query.fromString(search);
+                        pandora.UI.set({
+                            section: 'items',
+                            item: ''
+                        });
                     }
                 }
             },
@@ -139,7 +143,6 @@ pandora.URL = (function() {
                     + document.location.search
                     + document.location.hash;
             */
-            pandora.Query.updateGroups();
             Ox.forEach(regexps, function(fn, re) {
                 re = new RegExp(re);
                 if (re.test(pathname)) {
@@ -148,6 +151,7 @@ pandora.URL = (function() {
                     return false;
                 }
             });
+            pandora.Query.updateGroups();
             pandora.user.ui.showHome = false;
         },
 

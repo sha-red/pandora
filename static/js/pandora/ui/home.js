@@ -2,6 +2,8 @@
 
 pandora.ui.home = function() {
 
+    // fixme: if a list was selected previously, it will steal focus from the input element
+
     var that = $('<div>')
             .attr({id: 'home'})
             .css({
@@ -85,8 +87,11 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 submit: function(data) {
-                    data.value && pandora.URL.set('/?find=' + data.value);
-                    that.fadeOutScreen();
+                    if (data.value) {
+                        $findButton.triggerEvent('click');
+                    } else {
+                        $browseButton.triggerEvent('click');
+                    }
                 }
             })
             .appendTo(that),
@@ -105,6 +110,11 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
+                    if (pandora.user.ui.list) {
+                        Ox.forEach(pandora.$ui.folderList, function($list) {
+                            $list.options({selected: []});
+                        });
+                    }
                     pandora.URL.set('/?find=' + $findInput.value());
                     that.fadeOutScreen();
                 }

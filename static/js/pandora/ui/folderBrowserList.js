@@ -181,10 +181,10 @@ pandora.ui.folderBrowserList = function(id) {
                     Ox.forEach(pandora.$ui.folderList, function($list, id_) {
                         id != id_ && $list.options('selected', []);
                     });
-                    pandora.UI.set({list: data.ids[0]});
+                    //pandora.UI.set({list: data.ids[0]});
                     pandora.URL.set('?find=list:' + data.ids[0]);
                 } else {
-                    pandora.UI.set({list: ''});
+                    //pandora.UI.set({list: ''});
                     pandora.URL.set('');
                 }
             }

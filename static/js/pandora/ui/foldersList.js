@@ -361,6 +361,7 @@ pandora.ui.folderList = function(id) {
                     Ox.forEach(pandora.$ui.folderList, function($list, id_) {
                         id != id_ && $list.options('selected', []);
                     });
+                    //pandora.UI.set({list: data.ids[0]});
                     pandora.URL.set('?find=' + (id == 'volumes' ? 'volume' : 'list') + ':' + data.ids[0]);
                 } else {
                     //pandora.UI.set({list: ''});
