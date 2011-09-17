@@ -230,13 +230,13 @@ pandora.Query = (function() {
             !pandora.user.ui.lists[data.list] && pandora.UI.set(
                 'lists|' + data.list, pandora.site.user.ui.lists['']
             );
-            /*
+            ///*
             // ---- fixme: remove, server sends wrong data
             !pandora.user.ui.lists[data.list].sort && pandora.UI.set(
                 'lists|' + data.list, pandora.site.user.ui.lists['']
             );
             // ----
-            */
+            //*/
             Ox.print('@@@@@', data.lists, pandora.user.ui.lists[data.list])
             pandora.UI.set({list: data.list});
             pandora.user.ui.find = data.find;
