@@ -356,13 +356,14 @@ pandora.ui.folderList = function(id) {
                 pandora.$ui.list.triggerEvent('paste', data);
             },
             select: function(data) {
+                //pandora.user.ui.item && pandora.UI.set({item: ''});
                 if (data.ids.length) {
                     Ox.forEach(pandora.$ui.folderList, function($list, id_) {
                         id != id_ && $list.options('selected', []);
                     });
                     pandora.URL.set('?find=' + (id == 'volumes' ? 'volume' : 'list') + ':' + data.ids[0]);
                 } else {
-                    pandora.UI.set({list: ''});
+                    //pandora.UI.set({list: ''});
                     pandora.URL.set('');
                 }
             },

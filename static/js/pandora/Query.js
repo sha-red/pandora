@@ -221,26 +221,20 @@ pandora.Query = (function() {
     return {
 
         fromString: function(str) {
-            var data
-                query = Ox.unserialize(str),
-                sort = []
-            if ('find' in query) {
+            var query = Ox.unserialize(str),
                 data = parseFind(query.find || '');
-                Ox.print(Ox.repeat('-', 120));
-                Ox.print('STATE', data);
-                Ox.print(Ox.repeat('-', 120));
-                !pandora.user.ui.lists[data.list] && pandora.UI.set(
-                    ['lists', data.list].join('|'), pandora.site.user.ui.lists['']
-                );
-                pandora.UI.set({list: data.list});
-                pandora.user.ui.find = data.find;
-                pandora.user.ui.groupsData = data.groups;
-                Ox.print("PUUGD", pandora.user.ui.groupsData);
-                pandora.user.ui.query = data.query;
-            }
+            Ox.print(Ox.repeat('-', 120));
+            Ox.print('STATE', data);
+            Ox.print(Ox.repeat('-', 120));
+            !pandora.user.ui.lists[data.list] && pandora.UI.set(
+                ['lists', data.list].join('|'), pandora.site.user.ui.lists['']
+            );
+            pandora.UI.set({list: data.list});
+            pandora.user.ui.find = data.find;
+            pandora.user.ui.groupsData = data.groups;
+            pandora.user.ui.query = data.query;
             if ('sort' in query) {
-                sort = query.sort.split(',');
-                pandora.UI.set(['lists', pandora.user.ui.list, 'sort'].join('|'), query.sort.split(',').map(function(v) {
+                pandora.UI.set('lists|' + pandora.user.ui.list + '|sort', query.sort.split(',').map(function(v) {
                     var hasOperator = '+-'.indexOf(v[0]) > -1,
                         key = hasOperator ? v.substr(1) : v,
                         operator = hasOperator ? v[0]/*.replace('+', '')*/ : pandora.getSortOperator(key);
@@ -250,9 +244,11 @@ pandora.Query = (function() {
                     };
                 }));
             }
+            /*
             if ('view' in query) {
                 pandora.UI.set(['lists', pandora.user.ui.list, 'listView'].join('|'), query.view);
             }
+            */
         },
 
         /*

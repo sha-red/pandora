@@ -6,11 +6,7 @@ pandora.URL = (function() {
     var previousURL = '',
         regexps = {
             '^$': function(pathname, search) {
-                if (!search) {
-                    if (pandora.user.ui.showHome) {
-                        pandora.$ui.home = pandora.ui.home().showScreen();
-                    }
-                } else if (/^\?url=/.test(search)) {
+                if (/^\?url=/.test(search)) {
                     document.location = decodeURIComponent(search.substr(5));
                 } else {
                     pandora.Query.fromString(search);
@@ -18,6 +14,9 @@ pandora.URL = (function() {
                         section: 'items',
                         item: ''
                     });
+                    if (!search && pandora.user.ui.showHome) {
+                        pandora.$ui.home = pandora.ui.home().showScreen();
+                    }
                 }
             },
             '^home$': function(pathname, search) {
