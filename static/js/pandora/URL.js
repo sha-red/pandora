@@ -11,6 +11,7 @@ pandora.URL = (function() {
                 } else {
                     if (!search && pandora.user.ui.showHome) {
                         pandora.$ui.home = pandora.ui.home().showScreen();
+                        Ox.print('LIST', pandora.user.ui.list)
                         pandora.user.ui.list && pandora.Query.fromString(
                             'find=list:' + pandora.user.ui.list
                         );
@@ -54,7 +55,7 @@ pandora.URL = (function() {
                     section: 'items',
                     item: ''
                 });
-                pandora.UI.set(['lists', pandora.user.ui.list, 'listView'].join('|'), pathname);
+                pandora.UI.set('lists|' + pandora.user.ui.list + '|listView', pathname);
                 pandora.Query.fromString(search);
             },
             '^[0-9A-Z]': function(pathname, search) {

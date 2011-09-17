@@ -86,7 +86,8 @@ Ox.load({
                 });
                 // fixme: this should not happen
                 if (!pandora.user.ui.lists[pandora.user.ui.list]) {
-                    pandora.user.ui.lists[pandora.user.ui.list] = pandora.user.ui.lists[''];
+                    Ox.print('THIS SHOULD NOT HAPPEN', pandora.site.user.ui.lists[''])
+                    pandora.user.ui.lists[pandora.user.ui.list] = pandora.site.user.ui.lists[''];
                 }
 
                 if (data.user.level == 'guest' && $.browser.mozilla) {

@@ -226,9 +226,11 @@ pandora.Query = (function() {
             Ox.print(Ox.repeat('-', 120));
             Ox.print('STATE', data);
             Ox.print(Ox.repeat('-', 120));
+            Ox.print('@@@@@', data.list, pandora.user.ui.lists[data.list])
             !pandora.user.ui.lists[data.list] && pandora.UI.set(
-                'lists|' + data.list, pandora.site.user.lists['']
+                'lists|' + data.list, pandora.site.user.ui.lists['']
             );
+            Ox.print('@@@@@', data.lists, pandora.user.ui.lists[data.list])
             pandora.UI.set({list: data.list});
             pandora.user.ui.find = data.find;
             pandora.user.ui.groupsData = data.groups;
