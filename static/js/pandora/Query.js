@@ -227,7 +227,7 @@ pandora.Query = (function() {
             Ox.print('STATE', data);
             Ox.print(Ox.repeat('-', 120));
             !pandora.user.ui.lists[data.list] && pandora.UI.set(
-                'lists|' + data.list, pandora.site.listDefaults
+                'lists|' + data.list, pandora.site.user.lists['']
             );
             pandora.UI.set({list: data.list});
             pandora.user.ui.find = data.find;

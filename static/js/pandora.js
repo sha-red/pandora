@@ -51,6 +51,7 @@ Ox.load({
                     site: data.site,
                     user: data.user.level == 'guest' ? Ox.extend({}, data.site.user) : data.user
                 });
+                Ox.print("USER", data.user)
                 Ox.extend(pandora.site, {
                     findKeys: Ox.map(data.site.itemKeys, function(key) {
                         return key.find ? key : null;
