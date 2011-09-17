@@ -202,8 +202,11 @@ pandora.ui.mainMenu = function() {
                     var groups = Ox.clone(pandora.user.ui.groups),
                         id = data.id.replace('sortgroup', ''),
                         position = Ox.getPositionById(groups, id),
+                        // fixme: the backend mysteriously omits type
+                        type = Ox.getObjectById(pandora.site.groups, id).type,
                         key = value,
-                        operator = '-';
+                        operator = key == 'name' && type == 'string' ? '+' : '-';
+                    pandora.$ui.mainMenu.checkItem('sortMenu_ordergroups_ordergroup' + id + '_' + (operator == '+' ? 'ascending' : 'descending'))
                     pandora.$ui.groups[position].options({
                         sort: [{key: key, operator: operator}]
                     });
@@ -247,7 +250,6 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.viewSelect.options({value: value});
                     pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
                     pandora.URL.push('/' + value + '/' + document.location.search);
-
                 }
             },
             click: function(data) {
