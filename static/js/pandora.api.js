@@ -90,10 +90,12 @@ function constructList() {
                     return 0;
                 return -1;
             }
-            if(!data.keys) {
+            if (!data.keys) {
                 app.api.api(function(results) {
                     var items = [];
-                    $.each(results.data.actions, function(i, k) {items.push({'name':  i})});
+                    Ox.forEach(results.data.actions, function(v, k) {
+                        items.push({'name':  v})
+                    });
                     items.sort(_sort);
                     var result = {'data': {'items': items.length}};
                     callback(result);
@@ -101,7 +103,9 @@ function constructList() {
             } else {
                 app.api.api(function(results) {
                     var items = [];
-                    $.each(results.data.actions, function(i, k) {items.push({'name':  i})});
+                    Ox.forEach(results.data.actions, function(v, k) {
+                        items.push({'name':  v})
+                    });
                     items.sort(_sort);
                     var result = {'data': {'items': items}};
                     callback(result);
@@ -120,13 +124,13 @@ function constructList() {
            var info = $('<div>').addClass('OxSelectable'),
                hash = '#';
            if(data.ids.length)
-              $.each(data.ids, function(v, k) {
-                info.append($("<h2>").html(k));
+              data.ids.forEach(function(id) {
+                info.append($("<h2>").html(id));
                 var $doc =$('<pre>')
-                           .html(app.actions[k].doc.replace('/\n/<br>\n/g'))
+                           .html(app.actions[id].doc.replace('/\n/<br>\n/g'))
                            .appendTo(info);
-                var $code = $('<code class=" python">')
-                             .html(app.actions[k].code[1].replace('/\n/<br>\n/g'))
+                var $code = $('<code class="python">')
+                             .html(app.actions[id].code[1].replace('/\n/<br>\n/g'))
                              .hide();
                 var $button = new Ox.Button({
                   title: [
@@ -143,7 +147,7 @@ function constructList() {
                 $('<pre>').append($code).appendTo(info) 
                 hljs.highlightBlock($code[0], '    ');
 
-                hash += k + ','
+                hash += id + ','
               });
             else
               info.html(app.site.default_info);

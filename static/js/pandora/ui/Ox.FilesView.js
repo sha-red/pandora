@@ -136,7 +136,7 @@ Ox.FilesView = function(options, self) {
             columnsVisible: true,
             id: 'files',
             items: function(data, callback) {
-                pandora.api.findFiles($.extend(data, {
+                pandora.api.findFiles(Ox.extend(data, {
                     query: {
                         conditions: [{
                             key: 'id',

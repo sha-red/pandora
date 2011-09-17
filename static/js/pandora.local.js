@@ -96,7 +96,7 @@ pandora.afterLaunch.push(function() {
             pandora.local.volumes(function(data) {
                 Ox.print("got volumes", data);
                 var volumes = 0;
-                $.each(data, function(name, info) {
+                Ox.forEach(data, function(info, name) {
                     volumes ++;
                     Ox.print("add volume", name, info);
                     var status = info.available?"online":"offline";
@@ -269,10 +269,10 @@ pandora.afterLaunch.push(function() {
                                 var videos = {};
                                 function parseResult(result) {
                                     //extract and upload requested videos
-                                    $.each(result.data.data, function(i, oshash) {
-                                        $.each(folder_ids, function(i, ids) {
-                                            if($.inArray(oshash, ids) > -1) {
-                                                if(!videos[i]) {
+                                    result.data.data.forEach(function(oshash) {
+                                        folder_ids.forEach(function(ids, i) {
+                                            if (ids.indexOf(oshash) > -1) {
+                                                if (!videos[i]) {
                                                     videos[i] = [];
                                                     var button = new Ox.Button({
                                                                 id: 'upload_' + oshash,
@@ -285,7 +285,7 @@ pandora.afterLaunch.push(function() {
                                                                         title: 'Cancel',
                                                                         width: 48
                                                             }).bindEvent('click', function(data) { 
-                                                              $.each(videos[fid], function(i, oshash) {
+                                                              videos[fid].forEach(function(oshash) {
                                                                 _this.cancel(oshash);
                                                               });
                                                             });
@@ -312,13 +312,13 @@ pandora.afterLaunch.push(function() {
                                         });
                                     });
                                     //upload requested files
-                                    $.each(result.data.file, function(i, oshash) {
+                                    result.data.file.forEach(function(oshash) {
                                         pandora.local.uploadFile(oshash);
                                     });
                                 };
                                 if (result.data.info.length>0) {
                                     var post = {'info': {}};
-                                    $.each(result.data.info, function(i, oshash) {
+                                    result.data.info.forEach(function(oshash) {
                                         if(fileInfo[oshash]) {
                                             post.info[oshash] = fileInfo[oshash];
                                         }
@@ -336,7 +336,7 @@ pandora.afterLaunch.push(function() {
                             }
                             var folder_ids = {};
                             var folders = {};
-                            $.each(result.files, function(i, file) {
+                            result.files.forEach(function(file) {
                                 var f = pandora.local.parsePath(file.path);
                                 if(!folders[f.folder]) {
                                     folders[f.folder] = {
@@ -352,7 +352,7 @@ pandora.afterLaunch.push(function() {
                                 folder_ids[folders[f.folder].id].push(file.oshash);
                             });
                             var j = 1;
-                            $.each(folders, function(i, folder) {
+                            folders.forEach(function(folder) {
                                 data.items.push(folder);
                             });
                             r = {

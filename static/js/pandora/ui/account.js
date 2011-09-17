@@ -1,7 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
 pandora.ui.accountDialog = function(action) {
-    var that = Ox.Dialog($.extend({
+    var that = Ox.Dialog(Ox.extend({
             fixedSize: true,
             height: 192,
             id: 'accountDialog',
@@ -72,7 +72,7 @@ pandora.ui.accountDialogOptions = function(action, value) {
         }
     }
     return {
-        buttons: Ox.merge($.map(buttons[action], function(type) {
+        buttons: Ox.merge(buttons[action].map(function(type) {
                 return button(type);
             }), [{}, button('cancel'), button('submit')]),
         content: Ox.Element()
@@ -120,7 +120,7 @@ pandora.ui.accountForm = function(action, value) {
             'reset': ['usernameOrEmail'],
             'resetAndSignin': ['oldUsername', 'newPassword', 'code']
         },
-        $items = $.map(items[action], function(v) {
+        $items = items[action].map(function(v) {
             return item(v, value);
         }),
         that = Ox.Form({

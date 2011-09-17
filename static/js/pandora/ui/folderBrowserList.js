@@ -178,7 +178,7 @@ pandora.ui.folderBrowserList = function(id) {
             select: function(data) {
                 // fixme: duplicated
                 if (data.ids.length) {
-                    $.each(pandora.$ui.folderList, function(id_, $list) {
+                    Ox.forEach(pandora.$ui.folderList, function($list, id_) {
                         id != id_ && $list.options('selected', []);
                     });
                     pandora.UI.set({list: data.ids[0]});

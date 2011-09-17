@@ -2,9 +2,9 @@
 pandora.ui.sortSelect = function() {
     var that = Ox.Select({
             id: 'sortSelect',
-            items: $.map(pandora.site.sortKeys, function(key) {
+            items: pandora.site.sortKeys.map(function(key) {
                 //Ox.print('????', pandora.user.ui.lists[pandora.user.ui.list].sort.key, key.id)
-                return $.extend($.extend({}, key), {
+                return Ox.extend(Ox.extend({}, key), {
                     checked: pandora.user.ui.lists[pandora.user.ui.list].sort[0].key == key.id,
                     title: 'Sort by ' + key.title
                 });

@@ -17,7 +17,7 @@ pandora.ui.placesDialog = function() {
             content: pandora.$ui.placesElement = Ox.ListMap({
                     height: height - 48,
                     places: function(data, callback) {
-                        return pandora.api.findPlaces($.extend({
+                        return pandora.api.findPlaces(Ox.extend({
                             query: {conditions: [], operator: ''}
                         }, data), callback);
                     },

@@ -276,24 +276,13 @@ pandora.getFoldersHeight = function() {
         height += 16 + pandora.user.ui.showFolder[pandora.user.ui.section][folder.id] * (
             !!folder.showBrowser * 40 + folder.items * 16
         );
-        // // // Ox.print('h', height);
     });
-    /*
-    $.each(pandora.user.ui.showFolder[pandora.user.ui.section], function(id, show) {
-        var i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id);
-        height += show * (
-            pandora.site.sectionFolders[pandora.user.ui.section][i].showBrowser * 40 +
-            pandora.site.sectionFolders[pandora.user.ui.section][i].items * 16
-        );
-    });
-    */
     return height;
 };
 
 pandora.getFoldersWidth = function() {
     var width = pandora.user.ui.sidebarSize;
     // fixme: don't use height(), look up in splitpanels
-    // // // Ox.print(pandora.getFoldersHeight(), '>', pandora.$ui.leftPanel.height() - 24 - 1 - pandora.$ui.info.height());
     if (pandora.getFoldersHeight() > pandora.$ui.leftPanel.height() - 24 - 1 - pandora.$ui.info.height()) {
         width -= Ox.UI.SCROLLBAR_SIZE;
     }
@@ -413,7 +402,7 @@ pandora.reloadGroups = function(i) {
             }
         });
     }
-    $.each(pandora.user.ui.groups, function(i_, id) {
+    Ox.forEach(pandora.user.ui.groups, function(id, i_) {
         if (i_ != i) {
             //Ox.print('setting groups request', i, i_)
             pandora.$ui.groups[i_].options({

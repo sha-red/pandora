@@ -11,7 +11,7 @@ Ox.load('UI', {
 window.pandora = new Ox.App({url: '/api/'}).bindEvent({
     apiURL: '/api/',
 }).bindEvent('load', function(data) {
-    $.extend(pandora, {
+    Ox.extend(pandora, {
         ui: {},
 		info: function(item) {
 			var that = Ox.Element()
@@ -116,7 +116,7 @@ window.pandora = new Ox.App({url: '/api/'}).bindEvent({
                 'value': value
             }
         });
-        $.each(args, function(i, a) {
+        args.forEach(function(a, i) {
             Ox.print(i, a);
             if (a.key == key) {
                 result = a.value;

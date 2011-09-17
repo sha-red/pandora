@@ -203,7 +203,7 @@ pandora.ui.item = function() {
                                         operator: '='
                                     }]},
                                     query = {conditions:[]};
-                                return pandora.api.findPlaces($.extend(data, {
+                                return pandora.api.findPlaces(Ox.extend(data, {
                                     itemQuery: itemQuery,
                                     query: query
                                 }), callback);
@@ -216,7 +216,7 @@ pandora.ui.item = function() {
                                 if(place) {
                                     pandora.$ui.clips.options({
                                         items: function(data, callback) {
-                                            return pandora.api.findAnnotations($.extend(data, {
+                                            return pandora.api.findAnnotations(Ox.extend(data, {
                                                 query: {
                                                     conditions:[{key: 'place', value: place.id, operator:'='}]
                                                 },
@@ -296,8 +296,8 @@ pandora.ui.item = function() {
             // fixme: duplicated
             var layers = [],
                 video = {};
-            $.each(pandora.site.layers, function(i, layer) {
-                layers[i] = $.extend({}, layer, {items: result.data.layers[layer.id]});
+            pandora.site.layers.forEach(function(layer, i) {
+                layers[i] = Ox.extend({}, layer, {items: result.data.layers[layer.id]});
             });
             pandora.site.video.resolutions.forEach(function(resolution) {
                 video[resolution] = Ox.range(result.data.parts).map(function(i) {

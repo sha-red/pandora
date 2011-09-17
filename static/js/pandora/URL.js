@@ -62,7 +62,7 @@ pandora.URL = (function() {
                         ? /[\d\.:,-]+/.exec(split[split.length - 1])
                         : null,
                     view = new RegExp(
-                            '^(' + $.map(pandora.site.itemViews, function(v) {
+                            '^(' + pandora.site.itemViews.map(function(v) {
                                 return v.id;
                             }).join('|') + ')$'
                         ).exec(split[1]);

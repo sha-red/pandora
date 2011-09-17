@@ -48,7 +48,7 @@ pandora.ui.leftPanel = function() {
             toggle: function(data) {
                 pandora.UI.set({showSidebar: !data.collapsed});
                 if (data.collapsed) {
-                    $.each(pandora.$ui.folderList, function(k, $list) {
+                    Ox.forEach(pandora.$ui.folderList, function($list) {
                         $list.loseFocus();
                     });
                 }

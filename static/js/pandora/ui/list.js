@@ -554,7 +554,7 @@ pandora.ui.list = function() { // fixme: remove view argument
             init: function(data) {
                 pandora.$ui.total.html(pandora.ui.status('total', data));
                 data = [];
-                $.each(pandora.site.totals, function(i, v) {
+                pandora.site.totals.forEach(function(v) {
                     data[v.id] = 0;
                 });
                 pandora.$ui.selected.html(pandora.ui.status('selected', data));
@@ -569,7 +569,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                 pandora.requests.preview = pandora.api.find({
                     keys: ['director', 'id', 'posterRatio', 'title'],
                     query: {
-                        conditions: $.map(data.ids, function(id, i) {
+                        conditions: data.ids.map(function(id) {
                             return {
                                 key: 'id',
                                 value: id,
@@ -658,7 +658,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                 pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info(data.ids[0]));
                 pandora.api.find({
                     query: {
-                        conditions: $.map(data.ids, function(id, i) {
+                        conditions: data.ids.map(function(id) {
                             return {
                                 key: 'id',
                                 value: id,

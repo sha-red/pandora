@@ -67,7 +67,7 @@ pandora.ui.mainMenu = function() {
                 ] },
                 { id: 'viewMenu', title: 'View', items: [
                     { id: 'movies', title: 'View ' + pandora.site.itemName.plural, items: [
-                        { group: 'viewmovies', min: 1, max: 1, items: $.map(pandora.site.listViews, function(view, i) {
+                        { group: 'viewmovies', min: 1, max: 1, items: pandora.site.listViews.map(function(view) {
                             return Ox.extend({
                                 checked: pandora.user.ui.lists[pandora.user.ui.list].listView == view.id,
                             }, view);
@@ -88,7 +88,7 @@ pandora.ui.mainMenu = function() {
                     ]},
                     {},
                     { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], items: [
-                        { group: 'movieview', min: 1, max: 1, items: $.map(pandora.site.itemViews, function(view, i) {
+                        { group: 'movieview', min: 1, max: 1, items: pandora.site.itemViews.map(function(view) {
                             return Ox.extend({
                                 checked: pandora.user.ui.itemView == view.id,
                             }, view);
@@ -114,7 +114,7 @@ pandora.ui.mainMenu = function() {
                 ]},
                 { id: 'sortMenu', title: 'Sort', items: [
                     { id: 'sortmovies', title: 'Sort ' + pandora.site.itemName.plural + ' by', items: [
-                        { group: 'sortmovies', min: 1, max: 1, items: $.map(pandora.site.sortKeys, function(key, i) {
+                        { group: 'sortmovies', min: 1, max: 1, items: pandora.site.sortKeys.map(function(key) {
                             return Ox.extend({
                                 checked: pandora.user.ui.lists[pandora.user.ui.list].sort[0].key == key.id
                             }, key);

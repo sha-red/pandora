@@ -18,7 +18,7 @@ pandora.ui.annotations = function() {
             }
         }),
         $bins = [];
-    $.each(pandora.site.layers, function(i, layer) {
+    pandora.site.layers.forEach(function(layer) {
         var $bin = Ox.CollapsePanel({
             id: layer.id,
             size: 16,
@@ -37,7 +37,7 @@ pandora.ui.annotations = function() {
             )
         );
     });
-    $.each($bins, function(i, bin) {
+    $bins.forEach(function(bin) {
         that.append(bin);
     });
     return that;

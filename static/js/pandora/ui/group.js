@@ -127,11 +127,11 @@ pandora.ui.group = function(id) {
             }
         });
     Ox.Select({
-            items: $.map(pandora.site.groups, function(v) {
+            items: pandora.site.groups.map(function(group) {
                 return {
-                    checked: v.id == id,
-                    id: v.id,
-                    title: v.title
+                    checked: group.id == id,
+                    id: group.id,
+                    title: group.title
                 }
             }),
             max: 1,
