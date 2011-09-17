@@ -139,7 +139,8 @@ pandora.ui.group = function(id) {
             type: 'image'
         })
         .bindEvent('change', function(data) {
-            var id_ = data.selected[0].id,
+            var groups = Ox.clone(pandora.user.ui.groups),
+                id_ = data.selected[0].id,
                 i_ = pandora.user.ui.groups.indexOf(id_);
             if (i_ == -1) {
                 // new group was not part of old group set
@@ -150,17 +151,17 @@ pandora.ui.group = function(id) {
                     pandora.URL.push(pandora.Query.toString());
                     pandora.reloadGroups(i);
                 }
-                pandora.user.ui.groups[i] = id_;
-                pandora.UI.set({groups: pandora.user.ui.groups});
+                groups[i] = id_;
+                pandora.UI.set({groups: groups});
                 replaceGroup(i, id_);
             } else {
                 // swap two existing groups
                 var groupsData = Ox.clone(pandora.user.ui.groupsData[i]);
                 pandora.user.ui.groupsData[i] = pandora.user.ui.groupsData[i_];
                 pandora.user.ui.groupsData[i_] = groupsData;
-                pandora.user.ui.groups[i] = id_;
-                pandora.user.ui.groups[i_] = id;
-                pandora.UI.set({groups: pandora.user.ui.groups});
+                groups[i] = id_;
+                groups[i_] = id;
+                pandora.UI.set({groups: groups});
                 replaceGroup(i, id_);
                 replaceGroup(i_, id);
             }
@@ -179,7 +180,7 @@ pandora.ui.group = function(id) {
 
 pandora.ui.groups = function() {
     var $groups = [];
-    pandora.user.queryGroups = [];
+    //pandora.user.queryGroups = [];
     pandora.user.ui.groups.forEach(function(id, i) {
         $groups[i] = pandora.ui.group(id);
     });
