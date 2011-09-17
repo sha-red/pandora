@@ -8,7 +8,7 @@ pandora.ui.sortSelect = function() {
             });
         }),
         that;
-    if (list.listView == 'clip') {
+    if (pandora.isClipView(list.listView)) {
         items = Ox.merge(pandora.site.clipKeys.map(function(key) {
             return Ox.extend(Ox.clone(key), {
                 checked: list.sort[0].key == key.id,

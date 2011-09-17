@@ -200,12 +200,17 @@ pandora.ui.mainMenu = function() {
                         defaultRatio: value == 'posters' ? 5/8 : 1
                     }).reloadList(true);
                 } else if (data.id == 'viewmovies') {
+                    var isClipView = pandora.isClipView(value),
+                        wasClipView = pandora.isClipView(pandora.user.ui.lists[pandora.user.ui.list].listView);
                     pandora.UI.set(['lists', pandora.user.ui.list, 'listView'].join('|'), value);
+                    if (isClipView != wasClipView) {
+                        pandora.$ui.mainMenu.replaceMenu('sortMenu', pandora.getSortMenu());
+                        pandora.$ui.sortSelect.replaceWith(pandora.$ui.sortSelect = pandora.ui.sortSelect());
+                    }
                     pandora.$ui.viewSelect.options({value: value});
                     pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
                     pandora.URL.push('/' + value + '/' + document.location.search);
 
-                    //pandora.URL.set('/' + value + '/' + document.location.search);
                 }
             },
             click: function(data) {

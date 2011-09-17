@@ -323,10 +323,11 @@ pandora.getListData = function() {
 };
 
 pandora.getSortMenu = function() {
-    var list = pandora.user.ui.lists[pandora.user.ui.list];
+    var list = pandora.user.ui.lists[pandora.user.ui.list],
+        isClipView = pandora.isClipView(list.listView);
     return { id: 'sortMenu', title: 'Sort', items: [
-        { id: 'sortmovies', title: 'Sort ' + (list.listView == 'clip' ? 'Clips' : pandora.site.itemName.plural) + ' by', items: [
-            { group: 'sortmovies', min: 1, max: 1, items: Ox.merge(list.listView == 'clip' ? Ox.merge(pandora.site.clipKeys.map(function(key) {
+        { id: 'sortmovies', title: 'Sort ' + (isClipView ? 'Clips' : pandora.site.itemName.plural) + ' by', items: [
+            { group: 'sortmovies', min: 1, max: 1, items: Ox.merge(isClipView ? Ox.merge(pandora.site.clipKeys.map(function(key) {
                 return Ox.extend(Ox.clone(key), {
                     checked: list.sort[0].key == key.id
                 });
@@ -336,7 +337,7 @@ pandora.getSortMenu = function() {
                 }, key);
             })) }
         ] },
-        { id: 'ordermovies', title: 'Order ' + (list.listView == 'clip' ? 'Clips' : pandora.site.itemName.plural), items: [
+        { id: 'ordermovies', title: 'Order ' + (isClipView ? 'Clips' : pandora.site.itemName.plural), items: [
             { group: 'ordermovies', min: 1, max: 1, items: [
                 { id: 'ascending', title: 'Ascending', checked: (list.sort[0].operator || pandora.getSortOperator(list.sort[0].key)) == '+' },
                 { id: 'descending', title: 'Descending', checked: (list.sort[0].operator || pandora.getSortOperator(list.sort[0].key)) == '-' }
@@ -381,6 +382,10 @@ pandora.getVideoPartsAndPoints = function(durations, points) {
         return point - offsets[ret.parts[0]];
     });
     return ret;
+};
+
+pandora.isClipView = function(view) {
+    return ['calendar', 'clip', 'map'].indexOf(view) > -1;
 };
 
 pandora.signin = function(data) {

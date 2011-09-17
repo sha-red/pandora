@@ -22,10 +22,11 @@ pandora.ui.viewSelect = function() {
         .bindEvent({
             change: !pandora.user.ui.item ? function(data) {
                 var view = data.selected[0].id,
-                    wasClipView = pandora.user.ui.lists[pandora.user.ui.list].listView == 'clip';
+                    isClipView = pandora.isClipView(view),
+                    wasClipView = pandora.isClipView(pandora.user.ui.lists[pandora.user.ui.list].listView);
                 pandora.UI.set(['lists', pandora.user.ui.list, 'listView'].join('|'), view);
                 pandora.$ui.mainMenu.checkItem('viewMenu_movies_' + view);
-                if (view == 'clip' || wasClipView) {
+                if (isClipView != wasClipView) {
                     pandora.$ui.mainMenu.replaceMenu('sortMenu', pandora.getSortMenu());
                     pandora.$ui.sortSelect.replaceWith(pandora.$ui.sortSelect = pandora.ui.sortSelect());
                 }
