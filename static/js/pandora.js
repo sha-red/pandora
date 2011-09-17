@@ -52,7 +52,7 @@ Ox.load({
                     user: data.user.level == 'guest' ? Ox.extend({}, data.site.user) : data.user
                 });
                 Ox.extend(pandora.site, {
-                    findKeys: data.site.itemKeys.map(function(key) {
+                    findKeys: Ox.map(data.site.itemKeys, function(key) {
                         return key.find ? key : null;
                     }),
                     sectionFolders: {
@@ -73,7 +73,7 @@ Ox.load({
                             {id: 'featured', title: 'Featured Texts', showBrowser: false}                        
                         ] 
                     },
-                    sortKeys: data.site.itemKeys.map(function(key) {
+                    sortKeys: Ox.map(data.site.itemKeys, function(key) {
                         return key.columnWidth ? key : null;
                     })
                 });

@@ -407,6 +407,7 @@ pandora.ui.item = function() {
                     pandora.UI.set('videoPoints|' + pandora.user.ui.item + '|position', data.position);
                 },
                 resize: function(data) {
+                    Ox.print('RESIZE!!', data.size)
                     pandora.$ui.editor.options({
                         height: data.size
                     });
