@@ -82,7 +82,7 @@ window.pandora = new Ox.App({url: '/api/'}).bindEvent({
 		}, 
         flipbook: function(item) {
             var that = Ox.Flipbook({
-                }).bindEvent('click', function(event, data) {
+                }).bindEvent('click', function(data) {
                     var item_url = document.location.origin + '/' + item;
                     window.top.location.href = item_url + '/timeline#t=' + data.position;
                 });

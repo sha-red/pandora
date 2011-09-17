@@ -437,7 +437,7 @@ pandora.reloadList = function() {
         $group.reloadList();
     });
     pandora.$ui.list.bindEvent({
-            init: function(event, data) {
+            init: function(data) {
                 // fixme: this will not work for lists in the favorites folder
                 // (but then it's also unlikely they'll have to be reloaded)
                 var folder = listData.status != 'featured' ? 'personal' : 'featured';
@@ -445,7 +445,7 @@ pandora.reloadList = function() {
             }
         })
         .bindEventOnce({
-            load: function(event, data) {
+            load: function(data) {
                 pandora.$ui.list.gainFocus();
                 if (data) pandora.$ui.list.options({selected: [data.items]});
             }

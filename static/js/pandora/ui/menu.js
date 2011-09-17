@@ -167,7 +167,7 @@ pandora.ui.mainMenu = function() {
             ]
         })
         .bindEvent({
-            change: function(event, data) {
+            change: function(data) {
                 var value = data.checked[0].id;
                 if (data.id == 'find') {
                     pandora.$ui.findSelect.options({value: value});
@@ -224,7 +224,7 @@ pandora.ui.mainMenu = function() {
                     //pandora.URL.set('/' + value + '/' + document.location.search);
                 }
             },
-            click: function(event, data) {
+            click: function(data) {
                 if (data.id == 'home') {
                     pandora.$ui.home = pandora.ui.home().fadeInScreen();
                     pandora.URL.push('home');
@@ -274,7 +274,7 @@ pandora.ui.mainMenu = function() {
                                                                     type: 'image'
                                                                 })
                                                                 .bindEvent({
-                                                                    change: function(event, data) {
+                                                                    change: function(data) {
                                                                         pandora.$ui.findPlacesSelect.loseFocus();
                                                                         pandora.$ui.findPlacesInput.options({
                                                                             placeholder: data.selected[0].title
@@ -364,7 +364,7 @@ pandora.ui.mainMenu = function() {
                                                         margin: '4px'
                                                     })
                                                     .bindEvent({
-                                                        submit: function(event, data) {
+                                                        submit: function(data) {
                                                             pandora.$ui.map.find(data.value, function(location) {
                                                                 
                                                                 pandora.$ui.placeNameInput.options({

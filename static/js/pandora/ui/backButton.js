@@ -8,7 +8,7 @@ pandora.ui.backButton = function() {
         margin: '4px'
     })
     .bindEvent({
-        click: function(event, data) {
+        click: function() {
             pandora.URL.set(pandora.Query.toString());
         }
     });

@@ -13,7 +13,7 @@ pandora.ui.sectionButtons = function() {
             margin: '4px'
         })
         .bindEvent({
-            change: function(event, data) {
+            change: function(data) {
                 var section = data.selected[0];
                 if (section == 'items') {
                     pandora.URL.set(pandora.Query.toString());

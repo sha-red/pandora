@@ -16,7 +16,7 @@ pandora.ui.sortSelect = function() {
             margin: '4px 0 0 4px'
         })
         .bindEvent({
-            change: function(event, data) {
+            change: function(data) {
                 var key = data.selected[0].id,
                     operator = pandora.getSortOperator(key);
                 pandora.$ui.mainMenu.checkItem('sortMenu_sortmovies_' + key);

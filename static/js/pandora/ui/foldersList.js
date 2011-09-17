@@ -255,7 +255,7 @@ pandora.ui.folderList = function(id) {
                             pandora.URL.set('?find=list:' + id)
                             Ox.Request.clearCache(); // fixme: remove
                             that.reloadList().bindEventOnce({
-                                load: function(event, data) {
+                                load: function(data) {
                                     that.gainFocus()
                                         .options({selected: [id]})
                                         .editCell(id, 'name');
@@ -278,7 +278,7 @@ pandora.ui.folderList = function(id) {
                     */
                 }
             },
-            click: function(event, data) {
+            click: function(data) {
                 var $list = pandora.$ui.folderList[id];
                 if (data.key == 'type') {
                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
@@ -295,7 +295,7 @@ pandora.ui.folderList = function(id) {
                     alert(JSON.stringify(data));
                 }
             },
-            'delete': function(event, data) {
+            'delete': function(data) {
                 // fixme: add a confirmation dialog
                 var $list = pandora.$ui.folderList[id];
                 pandora.URL.set('?find=');
@@ -331,7 +331,7 @@ pandora.ui.folderList = function(id) {
                     });
                 }
             },
-            init: function(event, data) {
+            init: function(data) {
                 pandora.site.sectionFolders[pandora.user.ui.section][i].items = data.items;
                 pandora.$ui.folder[i].$content.css({
                     height: data.items * 16 + 'px'
@@ -341,7 +341,7 @@ pandora.ui.folderList = function(id) {
                 });
                 pandora.resizeFolders();
             },
-            move: function(event, data) {
+            move: function(data) {
                 /*
                 data.ids.forEach(function(id, pos) {
                     pandora.user.ui.lists[id].position = pos;
@@ -352,10 +352,10 @@ pandora.ui.folderList = function(id) {
                     ids: data.ids
                 });
             },
-            paste: function(event, data) {
+            paste: function(data) {
                 pandora.$ui.list.triggerEvent('paste', data);
             },
-            select: function(event, data) {
+            select: function(data) {
                 if (data.ids.length) {
                     Ox.forEach(pandora.$ui.folderList, function($list, id_) {
                         id != id_ && $list.options('selected', []);
@@ -366,7 +366,7 @@ pandora.ui.folderList = function(id) {
                     pandora.URL.set('');
                 }
             },
-            submit: function(event, data) {
+            submit: function(data) {
                 data_ = {id: data.id};
                 data_[data.key] = data.value;
                 pandora.api.editList(data_, function(result) {

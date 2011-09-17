@@ -22,16 +22,16 @@ pandora.ui.browser = function() {
             orientation: 'horizontal'
         })
         .bindEvent({
-            resize: function(event, data) {
-                pandora.user.ui.groupsSize = data;
+            resize: function(data) {
+                pandora.user.ui.groupsSize = data.size;
                 pandora.$ui.groups.forEach(function(list) {
                     list.size();
                 });
             },
-            resizeend: function(event, data){
-                pandora.UI.set({groupsSize: data});
+            resizeend: function(data) {
+                pandora.UI.set({groupsSize: data.size});
             },
-            toggle: function(event, data) {
+            toggle: function(data) {
                 pandora.UI.set({showGroups: !data.collapsed});
                 data.collapsed && pandora.$ui.list.gainFocus();
             }
@@ -73,14 +73,14 @@ pandora.ui.browser = function() {
             unique: 'id'
         })
         .bindEvent({
-            open: function(event, data) {
+            open: function() {
                 that.scrollToSelection();
             },
-            select: function(event, data) {
+            select: function(data) {
                 pandora.UI.set('lists|' + pandora.user.ui.list + '|selected', data.ids);
                 pandora.URL.set(data.ids[0]);
             },
-            toggle: function(event, data) {
+            toggle: function(data) {
                 pandora.UI.set({showMovies: !data.collapsed});
                 if (data.collapsed) {
                     if (pandora.user.ui.itemView == 'timeline') {

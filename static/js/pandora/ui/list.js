@@ -7,7 +7,7 @@ pandora.ui.list = function() { // fixme: remove view argument
     //Ox.print('constructList', view);
     if (view == 'list') {
         /*
-        keys = Ox.unique($.merge(
+        keys = Ox.unique(Ox.merge(
             $.map(pandora.user.ui.lists[pandora.user.ui.list].columns, function(id) {
                 return Ox.getObjectById(pandora.site.sortKeys, id);
             }),
@@ -514,7 +514,7 @@ pandora.ui.list = function() { // fixme: remove view argument
             ],
             orientation: 'horizontal'
         })
-        .bindEvent('resize', function() {
+        .bindEvent('resize', function(data) {
 
         });
     } else {
@@ -611,10 +611,10 @@ pandora.ui.list = function() { // fixme: remove view argument
                                         that.closePreview();
                                         preview = false;
                                     },
-                                    resize: function(event) {
+                                    resize: function(data) {
                                         pandora.$ui.previewImage.css({
-                                            width: event.width + 'px',
-                                            height: event.height + 'px'
+                                            width: data.width + 'px',
+                                            height: data.height + 'px'
                                         });
                                     }
                                 })

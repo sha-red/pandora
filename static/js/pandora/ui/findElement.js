@@ -4,7 +4,7 @@ pandora.ui.findElement = function() {
         findKey = pandora.user.ui.find.key,
         findValue = pandora.user.ui.find.value;
     var that = Ox.FormElementGroup({
-            elements: $.merge(pandora.user.ui.list ? [
+            elements: Ox.merge(pandora.user.ui.list ? [
                     pandora.$ui.findListSelect = Ox.Select({
                             items: [
                                 {id: 'all', title: 'Find: All ' + pandora.site.itemName.plural},
@@ -14,7 +14,7 @@ pandora.ui.findElement = function() {
                             type: 'image'
                         })
                         .bindEvent({
-                            change: function(event, data) {
+                            change: function(data) {
                                 var key = data.selected[0].id;
                                 pandora.$ui.findInput.options({
                                     autocomplete: autocompleteFunction()
@@ -42,7 +42,7 @@ pandora.ui.findElement = function() {
                             width: 112
                         })
                         .bindEvent({
-                            change: function(event, data) {
+                            change: function(data) {
                                 var key = data.selected[0].id;
                                 if (key == 'advanced') {
                                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();

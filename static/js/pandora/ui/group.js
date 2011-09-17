@@ -74,10 +74,10 @@ pandora.ui.group = function(id) {
             }]
         })
         .bindEvent({
-            paste: function(event, data) {
+            paste: function(data) {
                 pandora.$ui.list.triggerEvent('paste', data);
             },
-            select: function(event, data) {
+            select: function(data) {
                 var conditions = data.ids.map(function(value) {
                         return {
                             key: id,
@@ -138,7 +138,7 @@ pandora.ui.group = function(id) {
             min: 1,
             type: 'image'
         })
-        .bindEvent('change', function(event, data) {
+        .bindEvent('change', function(data) {
             var id_ = data.selected[0].id,
                 i_ = pandora.user.ui.groups.indexOf(id_);
             if (i_ == -1) {

@@ -351,7 +351,7 @@ Ox.FilesView = function(options, self) {
             orientation: 'horizontal'
         });
 
-    function openFiles(event, data) {
+    function openFiles(data) {
         Ox.print('........', JSON.stringify(self.$filesList.value(data.ids[0], 'instances')))
     }
 

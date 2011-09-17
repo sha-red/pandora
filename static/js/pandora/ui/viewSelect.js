@@ -27,7 +27,7 @@ pandora.ui.viewSelect = function() {
                 pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
                 pandora.URL.push('/' + view + '/' + document.location.search);
                 // pandora.URL.set('/' + view + '/' + document.location.search);
-            } : function(event, data) {
+            } : function(data) {
                 var view = data.selected[0].id;
                 //pandora.UI.set({itemView: id});
                 pandora.URL.set(pandora.user.ui.item + '/' + view);

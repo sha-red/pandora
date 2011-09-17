@@ -21,15 +21,15 @@ pandora.ui.leftPanel = function() {
             orientation: 'vertical'
         })
         .bindEvent({
-            resize: function(event, data) {
+            resize: function(data) {
                 Ox.print('LEFT PANEL RESIZE')
-                var infoSize = Math.round(data / pandora.user.infoRatio);
-                pandora.UI.set('sidebarSize', data);
-                if (data < pandora.site.sectionButtonsWidth && pandora.$ui.sectionButtons) {
+                var infoSize = Math.round(data.size / pandora.user.infoRatio);
+                pandora.UI.set('sidebarSize', data.size);
+                if (data.size < pandora.site.sectionButtonsWidth && pandora.$ui.sectionButtons) {
                     pandora.$ui.sectionButtons.removeElement();
                     delete pandora.$ui.sectionButtons;
                     pandora.$ui.sectionbar.append(pandora.$ui.sectionSelect = pandora.ui.sectionSelect());
-                } else if (data >= pandora.site.sectionButtonsWidth && pandora.$ui.sectionSelect) {
+                } else if (data.size >= pandora.site.sectionButtonsWidth && pandora.$ui.sectionSelect) {
                     pandora.$ui.sectionSelect.removeElement();
                     delete pandora.$ui.sectionSelect;
                     pandora.$ui.sectionbar.append(pandora.$ui.sectionButtons = pandora.ui.sectionButtons());
@@ -38,14 +38,14 @@ pandora.ui.leftPanel = function() {
                 pandora.$ui.leftPanel.size(2, infoSize);
                 pandora.$ui.videoPreview && pandora.$ui.videoPreview.options({
                     frameHeight: infoSize - 16,
-                    frameWidth: data
+                    frameWidth: data.size
                 });
                 pandora.resizeFolders();
             },
-            resizeend: function(event, data) {
-                pandora.UI.set({sidebarSize: data});
+            resizeend: function(data) {
+                pandora.UI.set({sidebarSize: data.size});
             },
-            toggle: function(event, data) {
+            toggle: function(data) {
                 pandora.UI.set({showSidebar: !data.collapsed});
                 if (data.collapsed) {
                     $.each(pandora.$ui.folderList, function(k, $list) {

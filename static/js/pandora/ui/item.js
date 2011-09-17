@@ -118,7 +118,7 @@ pandora.ui.item = function() {
                 sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
                 unique: 'id'
             }).bindEvent({
-                open: function(event, data) {
+                open: function(data) {
                     var id = data.ids[0],
                         item = pandora.user.ui.item,
                         points = {
@@ -156,7 +156,8 @@ pandora.ui.item = function() {
                         title: 'Save',
                         type: 'text'
                     }).bindEvent({
-                        click: function(event, data) {
+                        click: function(data) {
+                            // fixme: cleanup
                             var values = $form.value();
                             var changed = {};
                             Ox.map(pandora.site.itemKeys, function(key, i) {
@@ -259,7 +260,7 @@ pandora.ui.item = function() {
                             sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
                             unique: 'id'
                         }).bindEvent({
-                            open: function(event, data) {
+                            open: function(data) {
                                 var id = data.ids[0],
                                     item = pandora.user.ui.item,
                                     points = {
@@ -405,13 +406,13 @@ pandora.ui.item = function() {
                 position: function(data) {
                     pandora.UI.set('videoPoints|' + pandora.user.ui.item + '|position', data.position);
                 },
-                resize: function(event, data) {
+                resize: function(data) {
                     pandora.$ui.editor.options({
-                        height: data
+                        height: data.size
                     });
                 },
                 resizeend: function(data) {
-                    pandora.UI.set({annotationsSize: data});
+                    pandora.UI.set({annotationsSize: data.size});
                 },
                 togglesize: function(data) {
                     pandora.UI.set({videoSize: data.size});
@@ -441,14 +442,14 @@ pandora.ui.item = function() {
                     });
                 }
             }));
-            that.bindEvent('resize', function(event, data) {
+            that.bindEvent('resize', function(data) {
                 //Ox.print('resize item', data)
                 pandora.$ui.editor.options({
-                    height: data
+                    height: data.size
                 });
             });
             /*
-            pandora.$ui.rightPanel.bindEvent('resize', function(event, data) {
+            pandora.$ui.rightPanel.bindEvent('resize', function(data) {
                 Ox.print('... rightPanel resize', data, pandora.$ui.timelinePanel.size(1))
                 pandora.$ui.editor.options({
                     width: data - pandora.$ui.timelinePanel.size(1) - 1

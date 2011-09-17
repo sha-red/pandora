@@ -35,13 +35,13 @@ pandora.ui.rightPanel = function() {
             orientation: 'vertical'
         })
         .bindEvent({
-            resize: function(event, data) {
+            resize: function(data) {
                 if (!pandora.user.ui.item) {
                     pandora.resizeGroups();
                     pandora.$ui.list.size();
                     if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'timelines') {
                         pandora.$ui.list.options({
-                            width: data
+                            width: data.size
                         });
                     } else if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'map') {
                         pandora.$ui.map.resizeMap();
@@ -49,10 +49,10 @@ pandora.ui.rightPanel = function() {
                 } else {
                     pandora.$ui.browser.scrollToSelection();
                     pandora.user.ui.itemView == 'player' && pandora.$ui.player.options({
-                        width: data
+                        width: data.size
                     });
                     pandora.user.ui.itemView == 'timeline' && pandora.$ui.editor.options({
-                        width: data
+                        width: data.size
                     });
                 }
             }

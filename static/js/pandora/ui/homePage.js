@@ -35,8 +35,7 @@ pandora.ui.homePage = function() {
         // fixme: duplicated
         $select = Ox.Select({
             id: 'select',
-            items: $.merge($.map(pandora.site.findKeys,
-            function(key, i) {
+            items: Ox.merge(pandora.site.findKeys.map(function(key) {
                 return {
                     id: key.id,
                     title: 'Find: ' + key.title

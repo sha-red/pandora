@@ -10,7 +10,7 @@ Ox.load('UI', {
 var app = new Ox.App({
     apiURL: '/api/',
     init: 'init',
-}).bindEvent('load', function(event, data) {
+}).bindEvent('load', function(data) {
     app.site = data.site;
     app.user = data.user;
     app.site.default_info = '<div class="OxSelectable"><h2>Pan.do/ra API Overview</h2>use this api in the browser with <a href="/static/oxjs/demos/doc2/index.html#Ox.App">Ox.app</a> or use <a href="http://code.0x2620.org/pandora_client">pandora_client</a> it in python. Further description of the api can be found <a href="https://wiki.0x2620.org/wiki/pandora/API">on the wiki</a></div>';
@@ -116,7 +116,7 @@ function constructList() {
             }
         ]
     }).bindEvent({
-       select: function(event, data) {
+       select: function(data) {
            var info = $('<div>').addClass('OxSelectable'),
                hash = '#';
            if(data.ids.length)

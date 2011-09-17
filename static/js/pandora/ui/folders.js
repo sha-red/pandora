@@ -3,9 +3,7 @@ pandora.ui.folders = function() {
     var that = Ox.Element()
         .css({overflowX: 'hidden', overflowY: 'auto'})
         .bindEvent({
-            resize: function(event, data) {
-                pandora.resizeFolders();
-            }
+            resize: pandora.resizeFolders
         });
     var counter = 0;
     //var $sections = [];
@@ -41,7 +39,7 @@ pandora.ui.folders = function() {
                         type: 'image'
                     })
                     .bindEvent({
-                        click: function(event, data) {
+                        click: function(data) {
                             var $list = pandora.$ui.folderList[folder.id];
                             // fixme: duplicated
                             if (data.id == 'new' || data.id == 'newsmart') {
@@ -55,7 +53,7 @@ pandora.ui.folders = function() {
                                     pandora.URL.set('?find=list:' + id)
                                     Ox.Request.clearCache(); // fixme: remove
                                     $list.reloadList().bindEventOnce({
-                                        load: function(event, data) {
+                                        load: function(data) {
                                             $list.gainFocus()
                                                 .options({selected: [id]})
                                                 .editCell(id, 'name');
@@ -78,7 +76,7 @@ pandora.ui.folders = function() {
                         type: 'image'
                     })
                     .bindEvent({
-                        change: function(event, data) {
+                        change: function(data) {
                             Ox.Request.clearCache(); // fixme: remove
                             pandora.site.sectionFolders.items[i].showBrowser = !pandora.site.sectionFolders.items[i].showBrowser;
                             if (pandora.site.sectionFolders.items[i].showBrowser) {
@@ -98,7 +96,7 @@ pandora.ui.folders = function() {
                                         pandora.$ui.folderList.featured.options({selected: [listData.id]});
                                     } else {
                                         // and nowhere else
-                                        pandora.URL.set('?find=');
+                                        pandora.URL.set('');
                                     }
                                 }
                                 pandora.$ui.folderBrowser.favorite.replaceWith(
@@ -121,7 +119,7 @@ pandora.ui.folders = function() {
                         type: 'image'
                     })
                     .bindEvent({
-                        change: function(event, data) {
+                        change: function(data) {
                             var listData;
                             Ox.Request.clearCache(); // fixme: remove
                             pandora.site.sectionFolders.items[i].showBrowser = !pandora.site.sectionFolders.items[i].showBrowser;
@@ -149,7 +147,7 @@ pandora.ui.folders = function() {
                                         pandora.$ui.folderList.favorite.options({selected: [listData.id]});
                                     } else {
                                         // and nowhere else
-                                        pandora.URL.set('?find=');
+                                        pandora.URL.set('');
                                     }
                                 }
                                 pandora.$ui.folderBrowser.featured.replaceWith(
@@ -192,7 +190,7 @@ pandora.ui.folders = function() {
                 })
                 .bindEvent({
                     // fixme: duplicated
-                    click: function(event, data) {
+                    click: function(data) {
                         var $list = pandora.$ui.folderList[i],
                             hasFocus, id;
                         if (data.id == 'new' || data.id == 'newsmart') {
@@ -205,7 +203,7 @@ pandora.ui.folders = function() {
                                 pandora.URL.set('?find=list:' + id)
                                 Ox.Request.clearCache(); // fixme: remove
                                 $list.reloadList().bindEventOnce({
-                                    load: function(event, data) {
+                                    load: function(data) {
                                         $list.gainFocus()
                                             .options({selected: [id]})
                                             .editCell(id, 'name');
@@ -220,7 +218,7 @@ pandora.ui.folders = function() {
                             */
                         }
                     },
-                    toggle: function(event, data) {
+                    toggle: function(data) {
                         data.collapsed && pandora.$ui.folderList[folder.id].loseFocus();
                         pandora.UI.set('showFolder|items|' + folder.id, !data.collapsed);
                         pandora.resizeFolders();
@@ -229,7 +227,7 @@ pandora.ui.folders = function() {
             //$sections.push(pandora.$ui.section[i]);
             pandora.$ui.folderList[folder.id] = pandora.ui.folderList(folder.id)
                 .bindEventOnce({
-                    init: function(event, data) {
+                    init: function(data) {
                         Ox.print('init', i, counter)
                         if (++counter == 4) {
                             pandora.$ui.folder.forEach(function($folder) {

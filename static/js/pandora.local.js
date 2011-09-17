@@ -92,6 +92,7 @@ pandora.afterLaunch.push(function() {
             });
 
             pandora.$ui.sections.push($section);
+            // fixme: cleanup
             pandora.local.volumes(function(data) {
                 Ox.print("got volumes", data);
                 var volumes = 0;
@@ -123,14 +124,14 @@ pandora.afterLaunch.push(function() {
                             id: 'add_volume',
                             title: 'add',
                             width: 32
-                }).bindEvent('click', function(event, data) {
+                }).bindEvent('click', function(data) {
                     if(_this.api.setLocation("Volume "+(volumes+1))) _this.loadVolumes();
                 });
                 var update_button = new Ox.Button({
                             id: 'update_archive',
                             title: 'update',
                             width: 48
-                }).bindEvent('click', function(event, data) {
+                }).bindEvent('click', function(data) {
                     update_button.options({disabled: true});
                     _this.api.update(function() {
                         update_button.options({disabled: false});
@@ -277,13 +278,13 @@ pandora.afterLaunch.push(function() {
                                                                 id: 'upload_' + oshash,
                                                                 title: 'Upload',
                                                                 width: 48
-                                                    }).bindEvent('click', function(fid) { return function(event, data) {
+                                                    }).bindEvent('click', function(fid) { return function(data) {
                                                         Ox.print(videos[fid]);
                                                         $($('#'+fid).find('.OxCell')[1]).html(function(fid) {
                                                             var button = new Ox.Button({
                                                                         title: 'Cancel',
                                                                         width: 48
-                                                            }).bindEvent('click', function(event, data) { 
+                                                            }).bindEvent('click', function(data) { 
                                                               $.each(videos[fid], function(i, oshash) {
                                                                 _this.cancel(oshash);
                                                               });

@@ -8,14 +8,12 @@ pandora.ui.annotations = function() {
         })
         .bindEvent({
             resize: function(data) {
-                pandora.user.ui.annotationsSize = data;
+                pandora.user.ui.annotationsSize = data.size;
             },
             resizeend: function(data) {
-                //alert('resizeend', JSON.stringify(data))
-                pandora.UI.set({annotationsSize: data});
+                pandora.UI.set({annotationsSize: data.size});
             },
             toggle: function(data) {
-                //alert('toggle', JSON.stringify(data))
                 pandora.UI.set({showAnnotations: !data.collapsed});
             }
         }),

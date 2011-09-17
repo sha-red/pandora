@@ -8,7 +8,7 @@ pandora.ui.accountDialog = function(action) {
             width: 432
         }, pandora.ui.accountDialogOptions(action)))
         .bindEvent({
-            resize: function(event, data) {
+            resize: function(data) {
                 var width = data.width - 32;
                 pandora.$ui.accountForm.items.forEach(function(item) {
                     item.options({width: width});
@@ -171,10 +171,10 @@ pandora.ui.accountForm = function(action, value) {
                 }
             }
         }).bindEvent({
-            submit: function(event, data) {
+            submit: function(data) {
         
             },
-            validate: function(event, data) {
+            validate: function(data) {
                 //Ox.print('FORM VALIDATE', data)
                 pandora.$ui.accountDialog[
                     (data.valid ? 'enable' : 'disable') + 'Button'
@@ -278,7 +278,7 @@ pandora.ui.accountForm = function(action, value) {
                             width: 128
                         })
                         .bindEvent({
-                            change: function(event, data) {
+                            change: function(data) {
                                 var selected = data.selected[0].id;
                                 pandora.$ui.usernameOrEmailInput.options({
                                     autovalidate: selected == 'username' ? pandora.autovalidateUsername : autovalidateEmail,
