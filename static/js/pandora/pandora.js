@@ -373,7 +373,6 @@ pandora.getSortMenu = function() {
 };
 
 pandora.getSortOperator = function(key) { // fixme: make static
-    Ox.print('getSortOperator', key)
     var type = Ox.getObjectById(
             /^clip:/.test(key) ? pandora.site.clipKeys : pandora.site.itemKeys,
             key

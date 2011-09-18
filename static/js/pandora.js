@@ -63,6 +63,13 @@ Ox.load({
                         ]
                     }
                 };
+                pandora.site.user.ui.groups = [
+                    {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
+                    {"id": "country", "sort": [{"key": "items", "operator": "-"}]},
+                    {"id": "year", "sort": [{"key": "name", "operator": "-"}]},
+                    {"id": "language", "sort": [{"key": "items", "operator": "-"}]},
+                    {"id": "genre", "sort": [{"key": "items", "operator": "-"}]}
+                ];
                 // ----
                 Ox.print("USER.UI.LISTS", data.user.ui.lists, "SITE.USER.UI.LISTS", data.site.user.ui.lists)
                 Ox.extend(pandora.site, {

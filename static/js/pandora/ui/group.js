@@ -40,7 +40,7 @@ pandora.ui.group = function(id) {
                                 )
                             : value
                     },
-                    operator: group.type == 'integer' ? '-' : '+',
+                    operator: group.type == 'string' ? '+' : '-',
                     title: title,
                     unique: true,
                     visible: true,
@@ -128,6 +128,7 @@ pandora.ui.group = function(id) {
                 pandora.reloadGroups(i);
             },
             sort: function(data) {
+                Ox.print('SORT', data)
                 var groups = Ox.clone(pandora.user.ui.groups);
                 pandora.$ui.mainMenu.checkItem('sortMenu_sortgroups_sortgroup' + id + '_' + data.key);
                 pandora.$ui.mainMenu.checkItem('sortMenu_ordergroups_ordergroup' + id + '_' + (data.operator == '+' ? 'ascending' : 'descending'));

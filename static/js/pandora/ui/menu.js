@@ -85,7 +85,7 @@ pandora.ui.mainMenu = function() {
                         { id: 'loadcolumns', title: 'Load Layout...' },
                         { id: 'savecolumns', title: 'Save Layout...' },
                         {},
-                        { id: 'resetcolumns', title: 'Reset to Default' }
+                        { id: 'resetcolumns', title: 'Reset Layout' }
                     ]},
                     {},
                     { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], items: [
@@ -106,7 +106,9 @@ pandora.ui.mainMenu = function() {
                             return Ox.extend({
                                 checked: Ox.getPositionById(pandora.user.ui.groups, group.id) > -1
                             }, group);
-                        }) }
+                        }) },
+                        {},
+                        { id: 'resetgroups', title: 'Reset Groups' }
                     ] },
                     {},
                     { id: 'lists', title: 'Hide Lists', keyboard: 'shift l' },
@@ -574,6 +576,11 @@ pandora.ui.mainMenu = function() {
                         title: 'Query',
                         width: 384
                     }).open();
+                } else if (data.id == 'resetgroups') {
+                    pandora.UI.set({
+                        groups: pandora.site.user.ui.groups
+                    });
+                    pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
                 } else if (data.id == 'resetui') {
                     pandora.api.resetUI({}, function() {
                         pandora.$ui.appPanel.reload();
