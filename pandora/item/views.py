@@ -67,11 +67,11 @@ def _order_query(qs, sort, prefix='sort__'):
 def _order_by_group(query):
     if 'sort' in query:
         if len(query['sort']) == 1 and query['sort'][0]['key'] == 'items':
+            order_by = query['sort'][0]['operator'] == '-' and '-items' or 'items'
             if query['group'] == "year":
-                order_by = query['sort'][0]['operator'] == '-' and 'items' or '-items'
-            else:
-                order_by = query['sort'][0]['operator'] == '-' and '-items' or 'items'
-            if query['group'] != "keyword":
+                secondary = query['sort'][0]['operator'] == '-' and '-value_sort' or 'value_sort'
+                order_by = (order_by, secondary)
+            elif query['group'] != "keyword":
                 order_by = (order_by, 'value_sort')
             else:
                 order_by = (order_by,)
