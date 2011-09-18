@@ -214,6 +214,8 @@ pandora.URL = (function() {
                     pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
                     pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
                 }
+                // fixme: should list selection and deselection happen here?
+                // (home and menu may cause a list switch)
             } else if (!pandora.user.ui.item || !oldUserUI.item) {
                 // list to item or item to list
                 pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());

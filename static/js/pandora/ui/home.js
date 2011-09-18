@@ -5,12 +5,12 @@ pandora.ui.home = function() {
     // fixme: if a list was selected previously, it will steal focus from the input element
 
     var that = $('<div>')
+            .addClass('OxScreen')
             .attr({id: 'home'})
             .css({
                 position: 'absolute',
                 width: '100%',
                 height: '100%',
-                background: 'rgb(32, 32, 32)',
                 opacity: 0,
                 zIndex: 1000
             }),
@@ -30,6 +30,7 @@ pandora.ui.home = function() {
             })
             .appendTo(that),
         $reflectionGradient = $('<div>')
+            .addClass('OxReflection')
             .css({
                 position: 'absolute',
                 left: 0,
@@ -39,12 +40,6 @@ pandora.ui.home = function() {
                 width: '320px',
                 height: '160px',
                 margin: 'auto',
-            })
-            .css({
-                backgroundImage: '-moz-linear-gradient(top, rgba(32, 32, 32, 0.8), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))'
-            })
-            .css({
-                backgroundImage: '-webkit-linear-gradient(top, rgba(32, 32, 32, 0.8), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))'
             })
             .appendTo(that),
         $logo = $('<img>')
