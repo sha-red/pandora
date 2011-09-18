@@ -298,7 +298,19 @@ pandora.getGroupsSizes = function() {
 
 pandora.getInfoHeight = function() {
     // fixme: new, check if it can be used more
-    return pandora.user.ui.showInfo * pandora.user.ui.sidebarSize / pandora.user.infoRatio;
+    var isVideoPreview, list 
+    if (!pandora.user.ui.item) {
+        list = pandora.user.ui.lists[pandora.user.ui.list];
+        isVideoPreview = list.selected.length && !pandora.isClipView(list.listView);
+    } else {
+        isVideoPreview = !pandora.isClipView(pandora.user.ui.itemView, true);
+    }
+    return pandora.user.ui.showInfo * Math.min(
+        isVideoPreview
+        ? pandora.user.ui.sidebarSize / (16/9) + 16 
+        : pandora.user.ui.sidebarSize,
+        window.innerHeight - 109 // 20 menu + 24 bar + 64 (4 closed folders) + 1 resizebar
+    );
 }
 
 pandora.getListData = function() {

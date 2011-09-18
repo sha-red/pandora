@@ -284,7 +284,6 @@ pandora.ui.list = function() { // fixme: remove view argument
                     $video.trigger('mousedown');
                     Ox.UI.$window.trigger('mouseup');
                 }
-                $video && Ox.print('OPENPREVIEW!!!@!')
                 that.closePreview();
             },
             select: function(data) {
@@ -334,6 +333,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                         }, 300);
                     }
                 } else {
+                    pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
                     $('.OxSelectedVideo').removeClass('OxSelectedVideo');
                 }
             }
@@ -655,7 +655,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                     pandora.$ui.mainMenu.disableItem('copy');
                     pandora.$ui.mainMenu.disableItem('openmovie');            
                 }
-                pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info(data.ids[0]));
+                pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
                 pandora.api.find({
                     query: {
                         conditions: data.ids.map(function(id) {

@@ -222,7 +222,9 @@ pandora.URL = (function() {
                 pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
             } else {
                 // item to item
-                pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
+                if (pandora.user.ui.item != oldUserUI.item) {
+                    pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
+                }
                 pandora.$ui.contentPanel.replaceElement(1, pandora.ui.item());
             }
             // fixme: should be 'video', not 'player'

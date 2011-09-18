@@ -51,29 +51,7 @@ Ox.load({
                     site: data.site,
                     user: data.user.level == 'guest' ? Ox.clone(data.site.user) : data.user
                 });
-                /*
-                // ---- fixme: remove, server sends wrong data
-                pandora.site.user.ui.lists = {
-                    "": {
-                        "columns": ["title", "director", "country", "year", "language", "runtime", "genre"],
-                        "columnWidth": {},
-                        "listView": "grid",
-                        "selected": [],
-                        "sort": [
-                            {"key": "director", "operator": ""}
-                        ]
-                    }
-                };
-                pandora.site.user.ui.groups = [
-                    {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
-                    {"id": "country", "sort": [{"key": "items", "operator": "-"}]},
-                    {"id": "year", "sort": [{"key": "name", "operator": "-"}]},
-                    {"id": "language", "sort": [{"key": "items", "operator": "-"}]},
-                    {"id": "genre", "sort": [{"key": "items", "operator": "-"}]}
-                ];
-                // ----
-                */
-                Ox.print("USER.UI.LISTS", data.user.ui.lists, "SITE.USER.UI.LISTS", data.site.user.ui.lists)
+
                 Ox.extend(pandora.site, {
                     findKeys: Ox.map(data.site.itemKeys, function(key) {
                         return key.find ? key : null;
@@ -101,7 +79,6 @@ Ox.load({
                     })
                 });
                 Ox.extend(pandora.user, {
-                    infoRatio: 16 / 9,
                     sectionElement: 'buttons',
                     selectedMovies: [],
                     videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
@@ -164,6 +141,8 @@ Ox.load({
 
     function resizeWindow() {
         pandora.resizeFolders();
+        pandora.$ui.leftPanel.size(2, pandora.getInfoHeight());
+        pandora.$ui.info.resizeInfo();
         if (!pandora.user.ui.item) {
             pandora.$ui.list.size();
             pandora.resizeGroups(pandora.$ui.rightPanel.width());

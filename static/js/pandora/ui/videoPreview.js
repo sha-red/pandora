@@ -14,7 +14,8 @@ pandora.ui.videoPreview = function(data) {
                 ) + '.jpg';
             },
             frameRatio: data.frameRatio,
-            height: Math.min(pandora.user.ui.sidebarSize, 256),
+            height: pandora.getInfoHeight(),
+            scaleToFill: true,
             timeline: '/' + data.id + '/timeline16p.png',
             width: pandora.user.ui.sidebarSize
         })

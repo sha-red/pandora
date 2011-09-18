@@ -13,7 +13,7 @@ pandora.ui.leftPanel = function() {
                     collapsed: !pandora.user.ui.showInfo,
                     collapsible: true,
                     element: pandora.$ui.info = pandora.ui.info(),
-                    size: Math.min(pandora.user.ui.sidebarSize, 256),
+                    size: pandora.getInfoHeight(),
                     tooltip: 'info'
                 }
             ],
@@ -22,10 +22,7 @@ pandora.ui.leftPanel = function() {
         })
         .bindEvent({
             resize: function(data) {
-                Ox.print('LEFT PANEL RESIZE')
-                var infoSize = Math.min(data.size, 256);
-                // fixme: don't make a request here:
-                pandora.UI.set('sidebarSize', data.size);
+                pandora.user.ui.sidebarSize = data.size;
                 if (data.size < pandora.site.sectionButtonsWidth && pandora.$ui.sectionButtons) {
                     pandora.$ui.sectionButtons.removeElement();
                     delete pandora.$ui.sectionButtons;
@@ -36,18 +33,13 @@ pandora.ui.leftPanel = function() {
                     pandora.$ui.sectionbar.append(pandora.$ui.sectionButtons = pandora.ui.sectionButtons());
                 }
                 !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -infoSize});
-                pandora.$ui.leftPanel.size(2, infoSize);
-                if (pandora.$ui.videoPreview) {
-                    pandora.$ui.videoPreview.options({
-                        height: infoSize,
-                        width: data.size
-                    });
-                } else {
-                    pandora.$ui.info.find('img').css({height: infoSize + 'px'})
-                }
+                pandora.$ui.leftPanel.size(2, pandora.getInfoHeight());
+                pandora.$ui.info.resizeInfo();
                 pandora.resizeFolders();
             },
             resizeend: function(data) {
+                // set to 0 so that UI.set registers a change of the value
+                pandora.user.ui.sidebarSize = 0;
                 pandora.UI.set({sidebarSize: data.size});
             },
             toggle: function(data) {
