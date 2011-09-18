@@ -1,7 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
-pandora.ui.info = function(id) {
+pandora.ui.info = function() {
     var list = pandora.user.ui.lists[pandora.user.ui.list],
-        id = id || pandora.user.ui.item || (list.selected.length ? list.selected[list.selected.length - 1] : null),
+        id = pandora.user.ui.item || (list.selected.length ? list.selected[list.selected.length - 1] : null),
         view = getView(),
         that = Ox.Element()
             .css({overflowX: 'hidden', overflowY: 'auto'})
@@ -11,6 +11,7 @@ pandora.ui.info = function(id) {
                     pandora.resizeFolders();
                 }
             });
+    Ox.print('INFO', view)
     if (view == 'list') {
         that.empty().append(pandora.$ui.listInfo = pandora.ui.listInfo(list));
     } else if (view == 'poster') {
@@ -36,7 +37,7 @@ pandora.ui.info = function(id) {
     pandora.$ui.leftPanel && resize();
     function getView() {
         return !id ? 'list'
-            : !pandora.user.ui.item && pandora.isClipView(list.listView) ? 'poster'
+            : !pandora.user.ui.item && pandora.isClipView() ? 'poster'
             : 'video';
     }
     function resize() {

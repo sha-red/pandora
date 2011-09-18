@@ -445,6 +445,7 @@ pandora.getVideoPartsAndPoints = function(durations, points) {
 };
 
 pandora.isClipView = function(view) {
+    view = view || pandora.user.ui.lists[pandora.user.ui.list].listView;
     return ['calendar', 'clip', 'map'].indexOf(view) > -1;
 };
 

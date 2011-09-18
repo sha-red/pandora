@@ -292,8 +292,8 @@ pandora.ui.list = function() { // fixme: remove view argument
                         item = id.split('/')[0], width, height,
                         $img = $('.OxItem.OxSelected > .OxIcon > img'),
                         $video = $('.OxItem.OxSelected > .OxIcon > .OxVideoPlayer');
-                    pandora.UI.set(['lists', pandora.user.ui.list, 'selected'].join('|'), item);
-                    pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info(data.ids[0].split('/')[0]));
+                    pandora.UI.set('lists|' + pandora.user.ui.list + '|selected', [item]);
+                    pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
                     if ($img.length) {
                         var width = parseInt($img.css('width')),
                             height = parseInt($img.css('height'));
@@ -333,6 +333,7 @@ pandora.ui.list = function() { // fixme: remove view argument
                         }, 300);
                     }
                 } else {
+                    pandora.UI.set('lists|' + pandora.user.ui.list + '|selected', []);
                     pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
                     $('.OxSelectedVideo').removeClass('OxSelectedVideo');
                 }

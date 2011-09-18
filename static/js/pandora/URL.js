@@ -211,8 +211,15 @@ pandora.URL = (function() {
                     Ox.print('EQUAL', pandora.user.ui.findQuery, oldUserUI.findQuery)
                     pandora.$ui.contentPanel.replaceElement(1, pandora.ui.list());
                 } else {
+                    if (pandora.isClipView()) {
+                        pandora.UI.set('lists|' + pandora.user.ui.list + '|selected', []);
+                    }
                     pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
-                    pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
+                    if (pandora.user.ui.list == oldUserUI.list) {
+                        pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
+                    } else {
+                        pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
+                    }
                 }
                 // fixme: should list selection and deselection happen here?
                 // (home and menu may cause a list switch)
