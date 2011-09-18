@@ -3,6 +3,7 @@
 from __future__ import division, with_statement
 
 import os
+import copy
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -54,7 +55,7 @@ def init(request):
     '''
     #data = json.loads(request.POST['data'])
     response = json_response({})
-    config = settings.CONFIG.copy()
+    config = copy.deepcopy(settings.CONFIG)
     del config['keys'] #is this needed?
 
     #populate max values for percent requests

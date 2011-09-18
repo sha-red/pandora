@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+import copy
 from datetime import datetime
 
 from django.contrib.auth.models import User
@@ -29,7 +30,7 @@ class UserProfile(models.Model):
 
     def get_ui(self):
         ui = {}
-        config = settings.CONFIG.copy()
+        config = copy.deepcopy(settings.CONFIG)
         ui.update(config['user']['ui'])
         def updateUI(ui, new):
             '''
@@ -44,7 +45,7 @@ class UserProfile(models.Model):
         ui = updateUI(ui, self.ui)
         if not 'lists' in ui:
             ui['lists'] = {}
-            ui['lists'][''] = config['uiDefaults']['list']
+            ui['lists'][''] = copy.deepcopy(config['user']['ui']['lists'][''])
 
         def add(lists, section):
             ids = []
