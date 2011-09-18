@@ -51,6 +51,7 @@ Ox.load({
                     site: data.site,
                     user: data.user.level == 'guest' ? Ox.clone(data.site.user) : data.user
                 });
+                /*
                 // ---- fixme: remove, server sends wrong data
                 pandora.site.user.ui.lists = {
                     "": {
@@ -71,6 +72,7 @@ Ox.load({
                     {"id": "genre", "sort": [{"key": "items", "operator": "-"}]}
                 ];
                 // ----
+                */
                 Ox.print("USER.UI.LISTS", data.user.ui.lists, "SITE.USER.UI.LISTS", data.site.user.ui.lists)
                 Ox.extend(pandora.site, {
                     findKeys: Ox.map(data.site.itemKeys, function(key) {

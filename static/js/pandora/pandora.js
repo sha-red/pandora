@@ -322,6 +322,32 @@ pandora.getListData = function() {
     return data;
 };
 
+pandora.getListMenu = function(lists) {
+    return { id: 'listMenu', title: 'List', items: [
+        { id: 'history', title: 'History', items: [
+            { id: 'allmovies', title: 'All ' + pandora.site.itemName.plural }
+        ] },
+        { id: 'viewlist', title: 'View List', items: lists ? ['personal', 'favorite', 'featured'].map(function(folder) {
+            return { id: folder + 'lists', title: Ox.toTitleCase(folder) + ' Lists', items: [
+                { group: folder + 'lists', min: 0, max: 1, items: lists[folder].map(function(list) {
+                    return { id: 'viewlist' + list.id, title: (folder == 'favorite' ? list.user + ': ' : '') + list.name, checked: list.id == pandora.user.ui.list };
+                }) }
+            ] };
+        }) : [
+            { id: 'loading', title: 'Loading...', disabled: true }
+        ] },
+        {},
+        { id: 'newlist', title: 'New List...', keyboard: 'control n' },
+        { id: 'newlistfromselection', title: 'New List from Selection...', disabled: true, keyboard: 'shift control n' },
+        { id: 'newsmartlist', title: 'New Smart List...', keyboard: 'alt control n' },
+        { id: 'newsmartlistfromresults', title: 'New Smart List from Results...', keyboard: 'shift alt control n' },
+        {},
+        { id: 'addmovietolist', title: ['Add Selected ' + pandora.site.itemName.singular + ' to List...', 'Add Selected ' + pandora.site.itemName.plural + ' to List...'], disabled: true },
+        {},
+        { id: 'setposterframe', title: 'Set Poster Frame', disabled: true }
+    ] };
+};
+
 pandora.getSortMenu = function() {
     var list = pandora.user.ui.lists[pandora.user.ui.list],
         isClipView = pandora.isClipView(list.listView);

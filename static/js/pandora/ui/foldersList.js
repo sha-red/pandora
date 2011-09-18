@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+// fixme: the filename should be folderList.js
 pandora.ui.folderList = function(id) {
     var i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id),
         that;
@@ -119,7 +120,9 @@ pandora.ui.folderList = function(id) {
                         {key: 'status', value: 'featured', operator: '!'},
                     ], operator: '&'};
                 } else if (id == 'featured') {
-                    query = {conditions: [{key: 'status', value: 'featured', operator: '='}], operator: '&'};
+                    query = {conditions: [
+                        {key: 'status', value: 'featured', operator: '='}
+                    ], operator: '&'};
                 }
                 return pandora.api.findLists(Ox.extend(data, {
                     query: query

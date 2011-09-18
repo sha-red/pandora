@@ -32,27 +32,7 @@ pandora.ui.mainMenu = function() {
                     { id: 'signup', title: 'Sign Up...', disabled: !isGuest },
                     { id: 'signinsignout', title: isGuest ? 'Sign In...' : 'Sign Out...' }
                 ] },
-                { id: 'listMenu', title: 'List', items: [
-                    { id: 'history', title: 'History', items: [
-                        { id: 'allmovies', title: 'All ' + pandora.site.itemName.plural }
-                    ] },
-                    { id: 'lists', title: 'View List', items: [
-                        { id: 'favorites', title: 'Favorites' }
-                    ] },
-                    { id: 'features', title: 'View Feature', items: [
-                        { id: 'situationistfilm', title: 'Situationist Film' },
-                        { id: 'timelines', title: 'Timelines' }
-                    ] },
-                    {},
-                    { id: 'newlist', title: 'New List...', keyboard: 'control n' },
-                    { id: 'newlistfromselection', title: 'New List from Selection...', disabled: true, keyboard: 'shift control n' },
-                    { id: 'newsmartlist', title: 'New Smart List...', keyboard: 'alt control n' },
-                    { id: 'newsmartlistfromresults', title: 'New Smart List from Results...', keyboard: 'shift alt control n' },
-                    {},
-                    { id: 'addmovietolist', title: ['Add Selected ' + pandora.site.itemName.singular + ' to List...', 'Add Selected ' + pandora.site.itemName.plural + ' to List...'], disabled: true },
-                    {},
-                    { id: 'setposterframe', title: 'Set Poster Frame', disabled: true }
-                ]},
+                pandora.getListMenu(),
                 { id: 'editMenu', title: 'Edit', items: [
                     { id: 'undo', title: 'Undo', disabled: true, keyboard: 'control z' },
                     { id: 'redo', title: 'Redo', disabled: true, keyboard: 'shift control z' },
@@ -167,7 +147,7 @@ pandora.ui.mainMenu = function() {
         })
         .bindEvent({
             change: function(data) {
-                var value = data.checked[0].id;
+                var value = data.checked[0] ? data.checked[0].id : null;
                 if (data.id == 'find') {
                     pandora.$ui.findSelect.options({value: value});
                 } else if (data.id == 'movieview') {
@@ -204,7 +184,6 @@ pandora.ui.mainMenu = function() {
                     var groups = Ox.clone(pandora.user.ui.groups),
                         id = data.id.replace('sortgroup', ''),
                         position = Ox.getPositionById(groups, id),
-                        // fixme: the backend mysteriously omits type
                         type = Ox.getObjectById(pandora.site.groups, id).type,
                         key = value,
                         operator = key == 'name' && type == 'string' ? '+' : '-';
@@ -252,6 +231,10 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.viewSelect.options({value: value});
                     pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
                     pandora.URL.push('/' + value + '/' + document.location.search);
+                } else if (['personallists', 'favoritelists', 'featuredlists'].indexOf(data.id) > -1) {
+                    pandora.URL.set(
+                        data.checked[0] ? '?find=list:' + data.checked[0].id.substr(8) : ''
+                    );
                 }
             },
             click: function(data) {
@@ -590,6 +573,40 @@ pandora.ui.mainMenu = function() {
                 }
             }
         });
+
+    // fixme: the sidebar makes the same requests.
+    // is it ok to make them twice, or should the sidebar trigger the menu replace?
+
+    var counter = 0,
+        lists = {},
+        queries = {
+            // fixme: duplicated
+            personal: {conditions: [
+                {key: 'user', value: pandora.user.username, operator: '='},
+                {key: 'status', value: 'featured', operator: '!'}
+            ], operator: '&'},
+            favorite: {conditions: [
+                {key: 'subscribed', value: true, operator: '='},
+                {key: 'status', value: 'featured', operator: '!'},
+            ], operator: '&'},
+            featured: {conditions: [
+                {key: 'status', value: 'featured', operator: '='}
+            ], operator: '&'}
+        };
+
+    Ox.forEach(queries, function(query, folder) {
+        pandora.api.findLists({
+            query: query,
+            keys: ['id', 'name', 'user']
+        }, function(result) {
+            lists[folder] = result.data.items;
+            if (++counter == 3) {
+                Ox.print('--------------------------------------------', lists)
+                pandora.$ui.mainMenu.replaceMenu('listMenu', pandora.getListMenu(lists));
+            }
+        });
+    });
+
     return that;
 };
 
