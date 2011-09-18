@@ -1,13 +1,11 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
 pandora.ui.videoPreview = function(data) {
-    var frameWidth = pandora.user.ui.sidebarSize,
-        frameHeight = Math.round(frameWidth / data.ratio),
-        that = Ox.VideoPreview({
+    var that = Ox.VideoPreview({
             duration: data.duration,
             getFrame: function(position) {
                 var width = pandora.user.ui.sidebarSize,
-                    height = Math.round(width / pandora.user.infoRatio),
+                    height = Math.min(width, 256),
                     resolution = Ox.filter(pandora.site.video.resolutions, function(resolution, i) {
                         return resolution >= height || i == pandora.site.video.resolutions.length - 1;
                     })[0];
@@ -15,9 +13,10 @@ pandora.ui.videoPreview = function(data) {
                     Ox.isUndefined(position) ? '' : position
                 ) + '.jpg';
             },
-            frameHeight: frameHeight,
-            frameWidth: frameWidth,
+            frameRatio: data.frameRatio,
+            height: Math.min(pandora.user.ui.sidebarSize, 256),
             timeline: '/' + data.id + '/timeline16p.png',
+            width: pandora.user.ui.sidebarSize
         })
         .bindEvent({
             click: function(event) {
@@ -28,16 +27,16 @@ pandora.ui.videoPreview = function(data) {
                         position: event.position
                     });
                 } else {
-                    pandora.UI.set('videoPosition|' + data.id, event.position);
+                    pandora.UI.set(
+                        'videoPoints|' + data.id,
+                        {'in': 0, out: 0, position: event.position}
+                    );
                     pandora.URL.set(
                         '/' + data.id + '/timeline' //'/' + Ox.formatDuration(event.position, 2)
                     );
                 }
             }
         });
-    function getResolution() {
-        return 
-    }
     return that;
 };
 

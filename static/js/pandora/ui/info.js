@@ -9,54 +9,47 @@ pandora.ui.info = function(id) {
             }
         });
     if (id) {
-        if (!pandora.user.ui.item && pandora.user.ui.lists[pandora.user.ui.list].listView == 'clip') {
+        if (!pandora.user.ui.item && pandora.isClipView(pandora.user.ui.lists[pandora.user.ui.list].listView)) {
             // Poster
-            pandora.api.get({id: id, keys: ['posterRatio']}, function(result) {
+            pandora.api.get({id: id, keys: ['director', 'posterRatio', 'title']}, function(result) {
                 var ratio = result.data.posterRatio,
-                    height = pandora.user.ui.sidebarSize;
+                    height = Math.min(pandora.user.ui.sidebarSize, 256);
                 that.empty().append(
-                    $('<img>').attr({
-                        src: '/' + id + '/poster' + pandora.user.ui.sidebarSize + '.jpg'
+                    Ox.Element({
+                        element: '<img>',
+                        tooltip: '<span class="OxBright">' + result.data.title + '</span>' + (
+                            result.data.director ? '<br/>' + result.data.director.join(', ') : ''
+                        )
+                    }).attr({
+                        src: '/' + id + '/poster256.jpg'
                     }).css({
                         position: 'absolute',
                         left: 0,
                         top: 0,
                         right: 0,
                         bottom: 0,
+                        height: height + 'px',
                         margin: 'auto'
                     })
                 );
                 pandora.user.infoRatio = 1;
-                resize(height);
             });
         } else {
             // Video Preview
             pandora.api.get({id: id, keys: ['duration', 'videoRatio']}, function(result) {
-                if(result.data) {
-                    var height = Math.round(pandora.user.ui.sidebarSize / result.data.videoRatio) + 16;
+                if (result.data) {
                     pandora.$ui.videoPreview && pandora.$ui.videoPreview.removeElement();
                     pandora.$ui.videoPreview = pandora.ui.videoPreview({
                         id: id,
                         duration: result.data.duration,
-                        ratio: result.data.videoRatio
+                        frameRatio: result.data.videoRatio
                     }).appendTo(pandora.$ui.info);
-                    pandora.user.infoRatio = pandora.user.ui.sidebarSize / height;
-                    resize(height);
                 }
             });
         }
     } else if (pandora.$ui.leftPanel) {
-        pandora.user.infoRatio = 1;
-        resize(pandora.user.ui.sidebarSize);
-    }
-    function resize(height) {
-        !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -height});
-        pandora.$ui.leftPanel.size(2, height);
-        that.animate({
-            height: height + 'px'
-        }, 250, function() {
-            pandora.resizeFolders();
-        });
+        //pandora.user.infoRatio = 1;
+        //resize(pandora.user.ui.sidebarSize);
     }
     return that;
 };

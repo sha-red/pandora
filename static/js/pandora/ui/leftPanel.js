@@ -13,7 +13,7 @@ pandora.ui.leftPanel = function() {
                     collapsed: !pandora.user.ui.showInfo,
                     collapsible: true,
                     element: pandora.$ui.info = pandora.ui.info(),
-                    size: Math.round(pandora.user.ui.sidebarSize / pandora.user.infoRatio),
+                    size: Math.min(pandora.user.ui.sidebarSize, 256),
                     tooltip: 'info'
                 }
             ],
@@ -23,7 +23,8 @@ pandora.ui.leftPanel = function() {
         .bindEvent({
             resize: function(data) {
                 Ox.print('LEFT PANEL RESIZE')
-                var infoSize = Math.round(data.size / pandora.user.infoRatio);
+                var infoSize = Math.min(data.size, 256);
+                // fixme: don't make a request here:
                 pandora.UI.set('sidebarSize', data.size);
                 if (data.size < pandora.site.sectionButtonsWidth && pandora.$ui.sectionButtons) {
                     pandora.$ui.sectionButtons.removeElement();
@@ -36,10 +37,14 @@ pandora.ui.leftPanel = function() {
                 }
                 !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -infoSize});
                 pandora.$ui.leftPanel.size(2, infoSize);
-                pandora.$ui.videoPreview && pandora.$ui.videoPreview.options({
-                    frameHeight: infoSize - 16,
-                    frameWidth: data.size
-                });
+                if (pandora.$ui.videoPreview) {
+                    pandora.$ui.videoPreview.options({
+                        height: infoSize,
+                        width: data.size
+                    });
+                } else {
+                    pandora.$ui.info.find('img').css({height: infoSize + 'px'})
+                }
                 pandora.resizeFolders();
             },
             resizeend: function(data) {
