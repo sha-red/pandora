@@ -29,7 +29,11 @@ pandora.ui.filter = function(list) {
                         id: list.id,
                         query: data.query
                     }, function(result) {
-                        Ox.Request.clearCache('"' + list.id + '"');
+                        Ox.Request.clearCache(list.id);
+                        //Ox.Request.clearCache();
+                        pandora.$ui.groups.forEach(function($group) {
+                            $group.reloadList();
+                        });
                         pandora.$ui.list
                             .bindEventOnce({
                                 init: function(data) {
