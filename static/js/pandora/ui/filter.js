@@ -29,7 +29,7 @@ pandora.ui.filter = function(list) {
                         id: list.id,
                         query: data.query
                     }, function(result) {
-                        Ox.Request.clearCache(); // fixme: remove later
+                        Ox.Request.clearCache('"' + list.id + '"');
                         pandora.$ui.list
                             .bindEventOnce({
                                 init: function(data) {
