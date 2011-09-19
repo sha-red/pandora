@@ -21,7 +21,29 @@ pandora.ui.filter = function(list) {
             sortKeys: pandora.site.sortKeys,
             viewKeys: pandora.site.listViews
         })
-        .css({padding: '16px'});
+        .css({padding: '16px'})
+        .bindEvent({
+            change: function(data) {
+                if (list) {
+                    pandora.api.editList({
+                        id: list.id,
+                        query: data.query
+                    }, function(result) {
+                        Ox.Request.clearCache(); // fixme: remove later
+                        pandora.$ui.list
+                            .bindEventOnce({
+                                init: function(data) {
+                                    Ox.print('NUMBER OF ITEMS:', data.items);
+                                    pandora.$ui.folderList[
+                                        pandora.getListData().folder
+                                    ].value(list.id, 'items', data.items);
+                                }
+                            })
+                            .reloadList();
+                    });
+                }
+            }
+        });
     return that;
 };
 

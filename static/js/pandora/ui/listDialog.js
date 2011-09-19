@@ -17,7 +17,7 @@ pandora.ui.listDialog = function(list, section) {
                 } else if (id == 'icon') {
                     return pandora.ui.listIconPanel(list);
                 } else if (id == 'query') {
-                    return pandora.$ui.filter = pandora.ui.filter();
+                    return pandora.$ui.filter = pandora.ui.filter(list);
                 }
             },
             tabs: tabs
