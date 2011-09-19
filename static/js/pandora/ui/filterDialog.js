@@ -1,5 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
-pandora.ui.filterDialog = function() {
+pandora.ui.filterDialog = function(list) {
     var that = Ox.Dialog({
         buttons: [
             Ox.Button({
@@ -11,6 +11,7 @@ pandora.ui.filterDialog = function() {
                         alert(JSON.stringify(pandora.$ui.filter.options('query')));
                     }
                 }),
+            /*
             Ox.Button({
                     id: 'cancel',
                     title: 'Cancel'
@@ -20,9 +21,10 @@ pandora.ui.filterDialog = function() {
                         pandora.$ui.filterDialog.close();
                     }
                 }),
+            */
             Ox.Button({
-                    id: 'save',
-                    title: 'Save'
+                    id: 'done',
+                    title: 'Done'
                 })
                 .bindEvent({
                     click: function() {
@@ -30,13 +32,13 @@ pandora.ui.filterDialog = function() {
                     }
                 })
         ],
-        content: pandora.$ui.filter = pandora.ui.filter().css({padding: '16px'}),
+        content: pandora.$ui.filter = pandora.ui.filter(list),
         maxWidth: 648 + Ox.UI.SCROLLBAR_SIZE,
         minHeight: 264,
         minWidth: 648 + Ox.UI.SCROLLBAR_SIZE,
         height: 264,
-        keys: {enter: 'save', escape: 'cancel'},
-        title: 'Advanced Find',
+        // keys: {enter: 'save', escape: 'cancel'},
+        title: list ? 'Smart List - ' + list.name : 'Advanced Find',
         width: 648 + Ox.UI.SCROLLBAR_SIZE
     });
     return that;

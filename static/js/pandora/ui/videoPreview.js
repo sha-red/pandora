@@ -4,20 +4,19 @@ pandora.ui.videoPreview = function(data) {
     var that = Ox.VideoPreview({
             duration: data.duration,
             getFrame: function(position) {
-                var width = pandora.user.ui.sidebarSize,
-                    height = Math.min(width, 256),
-                    resolution = Ox.filter(pandora.site.video.resolutions, function(resolution, i) {
-                        return resolution >= height || i == pandora.site.video.resolutions.length - 1;
+                var resolution = Ox.filter(pandora.site.video.resolutions, function(resolution, i) {
+                        return resolution >= data.height || i == pandora.site.video.resolutions.length - 1;
                     })[0];
                 return '/' + data.id + '/' + resolution + 'p' + (
                     Ox.isUndefined(position) ? '' : position
                 ) + '.jpg';
             },
+            frameCSS: data.frameCSS,
             frameRatio: data.frameRatio,
-            height: pandora.getInfoHeight(),
+            height: data.height,
             scaleToFill: true,
             timeline: '/' + data.id + '/timeline16p.png',
-            width: pandora.user.ui.sidebarSize
+            width: data.width
         })
         .bindEvent({
             click: function(event) {

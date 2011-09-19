@@ -8,6 +8,9 @@ pandora.ui.folderList = function(id) {
         if (id != 'volumes') {
             columns = [
                 {
+                    clickable: function(data) {
+                        return data.user == pandora.user.username;
+                    },
                     format: function() {
                         return $('<img>').attr({
                                 src: Ox.UI.getImageURL('symbolIcon')
@@ -19,6 +22,9 @@ pandora.ui.folderList = function(id) {
                     },
                     id: 'user',
                     operator: '+',
+                    tooltip: function(data) {
+                        return data.user == pandora.user.username ? 'Edit Icon' : '';
+                    },
                     visible: true,
                     width: 16
                 },
@@ -229,6 +235,7 @@ pandora.ui.folderList = function(id) {
         that = Ox.TextList({
             columns: columns,
             items: items,
+            keys: ['query'],
             max: 1,
             min: 0,
             pageLength: 1000,
@@ -282,15 +289,20 @@ pandora.ui.folderList = function(id) {
                 }
             },
             click: function(data) {
-                var $list = pandora.$ui.folderList[id];
-                if (data.key == 'type') {
-                    pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
+                //var $list = pandora.$ui.folderList[id];
+                if (data.key == 'user') {
+                    pandora.$ui.filterDialog = pandora.ui.listDialog(that.value(data.id), 'icon').open();
+                    
+                } else if (data.key == 'type') {
+                    if (that.value(data.id, 'type') == 'smart') {
+                        pandora.$ui.filterDialog = pandora.ui.listDialog(that.value(data.id), 'query').open();
+                    }
                 } else if (data.key == 'status') {
                     pandora.api.editList({
                         id: data.id,
-                        status: $list.value(data.id, data.key) == 'private' ? 'public' : 'private'
+                        status: that.value(data.id, data.key) == 'private' ? 'public' : 'private'
                     }, function(result) {
-                        $list.value(result.data.id, 'status', result.data.status);
+                        that.value(result.data.id, 'status', result.data.status);
                     });
                 } else if (data.key == 'path') {
                     
@@ -300,23 +312,23 @@ pandora.ui.folderList = function(id) {
             },
             'delete': function(data) {
                 // fixme: add a confirmation dialog
-                var $list = pandora.$ui.folderList[id];
+                //var $list = pandora.$ui.folderList[id];
                 pandora.URL.set('?find=');
-                $list.options({selected: []});
+                that.options({selected: []});
                 if (id == 'personal') {
                     pandora.api.removeList({
                         id: data.ids[0]
                     }, function(result) {
                         pandora.UI.set(['lists', data.ids[0]].join('|'), null);
                         Ox.Request.clearCache(); // fixme: remove
-                        $list.reloadList();
+                        that.reloadList();
                     });
                 } else if (id == 'favorite') {
                     pandora.api.unsubscribeFromList({
                         id: data.ids[0]
                     }, function(result) {
                         Ox.Request.clearCache(); // fixme: remove
-                        $list.reloadList();
+                        that.reloadList();
                     });
                 } else if (id == 'featured' && pandora.user.level == 'admin') {
                     pandora.api.editList({
@@ -330,7 +342,7 @@ pandora.ui.folderList = function(id) {
                                 result.data.user == pandora.user.username ? 'personal' : 'favorite'
                             ].reloadList();
                         }
-                        $list.reloadList();
+                        that.reloadList();
                     });
                 }
             },

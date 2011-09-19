@@ -31,7 +31,7 @@
         {
             "id": "all",
             "title": "All",
-            "type": "string",
+            "type": "text",
             "find": true
         },
         {

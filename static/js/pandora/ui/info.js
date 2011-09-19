@@ -27,9 +27,11 @@ pandora.ui.info = function() {
             if (result.data) {
                 pandora.$ui.videoPreview && pandora.$ui.videoPreview.removeElement();
                 pandora.$ui.videoPreview = pandora.ui.videoPreview({
-                    id: id,
                     duration: result.data.duration,
-                    frameRatio: result.data.videoRatio
+                    frameRatio: result.data.videoRatio,
+                    height: pandora.getInfoHeight(),
+                    id: id,
+                    width: pandora.user.ui.sidebarSize
                 }).appendTo(pandora.$ui.info);
             }
         });

@@ -138,7 +138,11 @@ pandora.ui.folderBrowserList = function(id) {
         .bindEvent({
             click: function(data) {
                 if (data.key == 'type') {
-                    alert('...');
+                    /*
+                    if (that.value(data.id, 'type') == 'smart') {
+                        pandora.$ui.filterDialog = pandora.ui.filterDialog(that.value(data.id, 'query')).open();
+                    }
+                    */
                 } else if (data.key == 'subscribed') {
                     var subscribed = that.value(data.id, 'subscribed');
                     pandora.api[subscribed ? 'unsubscribeFromList' : 'subscribeToList']({

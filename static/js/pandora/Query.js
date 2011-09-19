@@ -96,7 +96,7 @@ pandora.Query = (function() {
                 find: {index: -1, key: '', value: ''},
                 groups: [], // {index, query, selected}
                 list: '',
-                query: {conditions: [], operator: ''}
+                query: {conditions: [], operator: '&'}
             },
             subconditions = [];
         if (str.length) {

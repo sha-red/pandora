@@ -94,7 +94,7 @@ function constructList() {
                 app.api.api(function(results) {
                     var items = [];
                     Ox.forEach(results.data.actions, function(v, k) {
-                        items.push({'name':  v})
+                        items.push({'name':  k})
                     });
                     items.sort(_sort);
                     var result = {'data': {'items': items.length}};
@@ -104,7 +104,7 @@ function constructList() {
                 app.api.api(function(results) {
                     var items = [];
                     Ox.forEach(results.data.actions, function(v, k) {
-                        items.push({'name':  v})
+                        items.push({'name':  k})
                     });
                     items.sort(_sort);
                     var result = {'data': {'items': items}};
@@ -142,7 +142,7 @@ function constructList() {
                 .addClass("margin")
                 .click(function() { $code.toggle()})
                 .appendTo(info)
-                var f = app.actions[k].code[0];
+                var f = app.actions[id].code[0];
                 $('<span>').html(' View Source ('+f+')').appendTo(info)
                 $('<pre>').append($code).appendTo(info) 
                 hljs.highlightBlock($code[0], '    ');
