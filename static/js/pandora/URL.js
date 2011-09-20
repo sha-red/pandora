@@ -3,7 +3,8 @@
 
 pandora.URL = (function() {
 
-    var previousURL = '',
+    var previousUI = {},
+        previousURL = '',
         regexps = {
             '^$': function(pathname, search) {
                 if (/^\?url=/.test(search)) {
@@ -179,7 +180,7 @@ pandora.URL = (function() {
                 url = '/' + url;
             }
             history.pushState({}, pandora.site.site.name + (title ? ' - ' + title : ''), url);
-            this.update();
+            this._update();
         },
 
         replace: function(title, url) {
@@ -194,56 +195,76 @@ pandora.URL = (function() {
         },
 
         update: function() {
-            var oldUserUI = Ox.clone(pandora.user.ui);
+            this.set(pandora.Query.toString());
+        },
+
+        _update: function() {
+            // fixme: make this method private
+            var previousUI = pandora.UI.getPrevious();
+            Ox.print('now', pandora.user.ui, 'previously', previousUI)
             Ox.Request.cancel();
             $('video').each(function() {
                 $(this).trigger('stop');
             });
             this.parse();
-            if (pandora.user.ui.section != oldUserUI.section) {
+            if (pandora.user.ui.section != previousUI.section) {
                 pandora.$ui.appPanel.replaceElement(1, pandora.$ui.mainPanel = pandora.ui.mainPanel());
-            } else if (pandora.user.ui.sitePage != oldUserUI.sitePage) {
-                pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
-            } else if (!pandora.user.ui.item && !oldUserUI.item) {
+            } else if (!pandora.user.ui.item && !previousUI.item) {
                 // list to list
-                // fixme: isEqual doesn't work here
-                if (Ox.isEqual(pandora.user.ui.findQuery, oldUserUI.findQuery) && false) {
-                    Ox.print('EQUAL', pandora.user.ui.findQuery, oldUserUI.findQuery)
-                    pandora.$ui.contentPanel.replaceElement(1, pandora.ui.list());
+                var isClipView = pandora.isClipView(),
+                    list = pandora.user.ui.lists[pandora.user.ui.list],
+                    previousList = previousUI.lists[previousUI.list],
+                    wasClipView = pandora.isClipView(previousList.listView);
+                if (list.listView != previousList.listView) {
+                    pandora.$ui.mainMenu.checkItem('viewMenu_movies_' + list.listView);
+                    pandora.$ui.viewSelect.options({value: list.listView});
+                    Ox.print('is', isClipView, 'was', wasClipView);
+                    if (isClipView != wasClipView) {
+                        pandora.$ui.mainMenu.replaceMenu('sortMenu', pandora.getSortMenu());
+                        pandora.$ui.sortSelect.replaceWith(pandora.$ui.sortSelect = pandora.ui.sortSelect());
+                        if (isClipView && !wasClipView) {
+                            pandora.UI.set('lists|' + pandora.user.ui.list + '|selected', []);
+                        }
+                    }                    
+                }
+                if (!Ox.isEqual(list.sort, previousList.sort)) {
+                    pandora.$ui.mainMenu.checkItem('sortMenu_sortmovies_' + list.sort[0].key);
+                    pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (
+                        list.sort[0].operator == '' ? pandora.getSortOperator(list.sort[0].key)
+                        : list.sort[0].operator == '+' ? 'ascending' : 'descending'
+                    ));
+                    pandora.$ui.sortSelect.options({value: list.sort[0].key});
+                }
+                pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
+                Ox.print('EQUAL?', pandora.user.ui.query, previousUI.query, Ox.isEqual(pandora.user.ui.query, previousUI.query))
+                if (Ox.isEqual(pandora.user.ui.query, previousUI.query)) {
+                    pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
                 } else {
-                    if (pandora.isClipView()) {
-                        pandora.UI.set('lists|' + pandora.user.ui.list + '|selected', []);
-                    }
-                    pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
-                    if (pandora.user.ui.list == oldUserUI.list) {
-                        pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
-                    } else {
-                        pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
-                    }
+                    pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
                 }
                 // fixme: should list selection and deselection happen here?
                 // (home and menu may cause a list switch)
-            } else if (!pandora.user.ui.item || !oldUserUI.item) {
+            } else if (!pandora.user.ui.item || !previousUI.item) {
                 // list to item or item to list
                 pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
                 pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
             } else {
                 // item to item
-                if (pandora.user.ui.item != oldUserUI.item) {
+                if (pandora.user.ui.item != previousUI.item) {
                     pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
                 }
                 pandora.$ui.contentPanel.replaceElement(1, pandora.ui.item());
             }
             // fixme: should be 'video', not 'player'
             if (
-                oldUserUI.item &&
-                ['player', 'timeline'].indexOf(oldUserUI.itemView) > -1
+                previousUI.item &&
+                ['player', 'timeline'].indexOf(previousUI.itemView) > -1
             ) {
                 var $item = pandora.$ui[
-                    oldUserUI.itemView == 'player' ? 'player' : 'editor'
+                    previousUI.itemView == 'player' ? 'player' : 'editor'
                 ];
                 $item && pandora.UI.set(
-                    'videoPoints|' + oldUserUI.item + '|position',
+                    'videoPoints|' + previousUI.item + '|position',
                     $item.options('position')
                 );
             }

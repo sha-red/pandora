@@ -17,6 +17,10 @@ pandora.ui.filter = function(list) {
                 title: 'List',
                 type: 'list'
             }),
+            list: list ? null : {
+                sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
+                view: pandora.user.ui.lists[pandora.user.ui.list].listView
+            },
             query: list ? list.query : pandora.user.ui.query,
             sortKeys: pandora.site.sortKeys,
             viewKeys: pandora.site.listViews
@@ -30,14 +34,12 @@ pandora.ui.filter = function(list) {
                         query: data.query
                     }, function(result) {
                         Ox.Request.clearCache(list.id);
-                        //Ox.Request.clearCache();
                         pandora.$ui.groups.forEach(function($group) {
                             $group.reloadList();
                         });
                         pandora.$ui.list
                             .bindEventOnce({
                                 init: function(data) {
-                                    Ox.print('NUMBER OF ITEMS:', data.items);
                                     pandora.$ui.folderList[
                                         pandora.getListData().folder
                                     ].value(list.id, 'items', data.items);
@@ -45,6 +47,10 @@ pandora.ui.filter = function(list) {
                             })
                             .reloadList();
                     });
+                } else {
+                    pandora.user.ui.query = data.query;
+                    pandora.URL.update();
+                    //reload();
                 }
             }
         });

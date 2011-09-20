@@ -21,21 +21,12 @@ pandora.ui.viewSelect = function() {
         })
         .bindEvent({
             change: !pandora.user.ui.item ? function(data) {
-                var view = data.selected[0].id,
-                    isClipView = pandora.isClipView(view),
-                    wasClipView = pandora.isClipView();
-                pandora.UI.set('lists|' + pandora.user.ui.list + '|listView', view);
-                pandora.$ui.mainMenu.checkItem('viewMenu_movies_' + view);
-                if (isClipView != wasClipView) {
-                    pandora.$ui.mainMenu.replaceMenu('sortMenu', pandora.getSortMenu());
-                    pandora.$ui.sortSelect.replaceWith(pandora.$ui.sortSelect = pandora.ui.sortSelect());
-                }
-                pandora.URL.set(view + '/' + document.location.search);
-                // pandora.URL.set('/' + view + '/' + document.location.search);
+                pandora.UI.set('lists|' + pandora.user.ui.list + '|listView', data.selected[0].id);
+                pandora.URL.update();
+                //pandora.URL.set('/' + data.selected[0].id + '/' + document.location.search);
             } : function(data) {
-                var view = data.selected[0].id;
-                //pandora.UI.set({itemView: id});
-                pandora.URL.set(pandora.user.ui.item + '/' + view);
+                pandora.UI.set({itemView: data.selected[0].id});
+                pandora.URL.update();
                 // pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.item = pandora.ui.item());
             }
         });

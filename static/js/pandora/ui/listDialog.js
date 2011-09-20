@@ -189,7 +189,49 @@ pandora.ui.listIconPanel = function(list) {
                 size: 288
             },
             {
-                element: $list
+                element: Ox.SplitPanel({
+                    elements: [
+                        {
+                            element: Ox.Bar({size: 24}).append(
+                                Ox.FormElementGroup({
+                                        elements: [
+                                            pandora.$ui.findIconItemSelect = Ox.Select({
+                                                items: pandora.site.findKeys,
+                                                overlap: 'right',
+                                                type: 'image'
+                                            })
+                                            .bindEvent({
+                                                change: function(data) {
+
+                                                }
+                                            }),
+                                            pandora.$ui.findIconItemInput = Ox.Input({
+                                                changeOnKeypress: true,
+                                                clear: true,
+                                                placeholder: 'Find: Foo',
+                                                width: 120
+                                            })
+                                            .bindEvent({
+                                                change: function(data) {
+
+                                                }
+                                            })
+                                        ],
+                                    })
+                                    .css({
+                                        float: 'right',
+                                        margin: '4px',
+                                        align: 'right'
+                                    })
+                            ),
+                            size: 24
+                        },
+                        {
+                            element: $list
+                        }
+                    ],
+                    orientation: 'vertical'
+                })
             },
             {
                 element: $preview,

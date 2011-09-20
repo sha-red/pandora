@@ -27,15 +27,14 @@ pandora.ui.sortSelect = function() {
     })
     .bindEvent({
         change: function(data) {
-            var key = data.selected[0].id,
-                operator = pandora.getSortOperator(key);
-            pandora.$ui.mainMenu.checkItem('sortMenu_sortmovies_' + key);
-            pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator == '+' ? 'ascending' : 'descending'));
-            pandora.$ui.list.options({
-                sort: [{key: key, operator: operator}]
-            });
-            pandora.UI.set('lists|' + pandora.user.ui.list + '|sort', [{key: key, operator: operator}]);
-            pandora.URL.push(pandora.Query.toString());
+            //var query = Ox.unserialize(document.location.search);
+            //query.sort = data.selected.id;
+            //pandora.URL.set('/' + pandora.user.ui.lists[pandora.user.ui.list].listView + '/?' + Ox.serialize(query));
+            pandora.UI.set(
+                'lists|' + pandora.user.ui.list + '|sort',
+                [{key: data.selected[0].id, operator: ''}]
+            );
+            pandora.URL.update();
         }
     });
     return that;

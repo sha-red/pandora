@@ -194,17 +194,11 @@ pandora.ui.mainMenu = function() {
                     groups[position].sort[0].key = key;
                     pandora.UI.set({groups: groups});                    
                 } else if (data.id == 'sortmovies') {
-                    var key = value,
-                        operator = pandora.getSortOperator(key);
-                    pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (operator == '+' ? 'ascending' : 'descending'));
-                    pandora.$ui.sortSelect.options({value: key});
-                    pandora.$ui.list.options({
-                        sort: [{key: key, operator: operator}]
-                    });
-                    pandora.UI.set('lists|' + pandora.user.ui.list + '|sort', [{key: key, operator: operator}]);
-                    //pandora.user.ui.lists[pandora.user.ui.list].sort[0] = {key: key, operator: operator};
-                    pandora.URL.push(pandora.Query.toString());
-
+                    pandora.UI.set(
+                        'lists|' + pandora.user.ui.list + '|sort',
+                        [{key: value, operator: ''}]
+                    );
+                    pandora.URL.update();
                 } else if (data.id == 'viewicons') {
                     var $list;
                     pandora.UI.set({icons: value});
@@ -221,19 +215,11 @@ pandora.ui.mainMenu = function() {
                         defaultRatio: value == 'posters' ? 5/8 : 1
                     }).reloadList(true);
                 } else if (data.id == 'viewmovies') {
-                    var isClipView = pandora.isClipView(value),
-                        wasClipView = pandora.isClipView(pandora.user.ui.lists[pandora.user.ui.list].listView);
-                    pandora.UI.set(['lists', pandora.user.ui.list, 'listView'].join('|'), value);
-                    if (isClipView != wasClipView) {
-                        pandora.$ui.mainMenu.replaceMenu('sortMenu', pandora.getSortMenu());
-                        pandora.$ui.sortSelect.replaceWith(pandora.$ui.sortSelect = pandora.ui.sortSelect());
-                    }
-                    pandora.$ui.viewSelect.options({value: value});
-                    pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
-                    pandora.URL.push('/' + value + '/' + document.location.search);
-                } else if (['personallists', 'favoritelists', 'featuredlists'].indexOf(data.id) > -1) {
+                    pandora.UI.set('lists|' + pandora.user.ui.list + '|listView', value);
+                    pandora.URL.update();
+                } else if (['personallists', 'favoritelists', 'featuredlists'].indexOf(value) > -1) {
                     pandora.URL.set(
-                        data.checked[0] ? '?find=list:' + data.checked[0].id.substr(8) : ''
+                        data.checked[0] ? '?find=list:' + value.substr(8) : ''
                     );
                 }
             },
