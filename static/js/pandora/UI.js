@@ -13,7 +13,7 @@ pandora.UI = (function() {
             var obj = Ox.makeObject(arguments);
             previousUI = Ox.clone(pandora.user.ui, true);
             Ox.forEach(obj, function(val, key) {
-                Ox.print('key', key, 'val', val);
+                Ox.print('UI.set key', key, 'val', val);
                 var i = 0,
                     keys = key.split('|'),
                     ui = pandora.user.ui;

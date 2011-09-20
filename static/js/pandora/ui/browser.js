@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.browser = function() {
-    var sizes, that;
+    var that;
     if (!pandora.user.ui.item) {
         pandora.user.ui.groupsSizes = pandora.getGroupsSizes();
         pandora.$ui.groups = pandora.ui.groups();

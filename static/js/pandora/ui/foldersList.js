@@ -371,17 +371,18 @@ pandora.ui.folderList = function(id) {
                 pandora.$ui.list.triggerEvent('paste', data);
             },
             select: function(data) {
-                //pandora.user.ui.item && pandora.UI.set({item: ''});
                 if (data.ids.length) {
                     Ox.forEach(pandora.$ui.folderList, function($list, id_) {
                         id != id_ && $list.options('selected', []);
                     });
-                    //pandora.UI.set({list: data.ids[0]});
-                    pandora.URL.set('?find=' + (id == 'volumes' ? 'volume' : 'list') + ':' + data.ids[0]);
-                } else {
-                    //pandora.UI.set({list: ''});
-                    pandora.URL.set('');
                 }
+                pandora.URL.set(data.ids.length ? '?find=list:' + data.ids[0] : '');
+                /*
+                pandora.UI.set({
+                    item: '',
+                    list: data.ids.length ? data.ids[0] : ''
+                });
+                */
             },
             submit: function(data) {
                 data_ = {id: data.id};

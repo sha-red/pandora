@@ -93,23 +93,26 @@ Ox.load({
                     pandora.user.ui.theme = 'classic';
                 }
 
-                pandora.URL.parse();
                 window.onpopstate = function(event) {
                     pandora.URL.update();
                 };
 
-                Ox.UI.hideLoadingScreen();
+                pandora.URL.parse(function() {
 
-                Ox.Theme(pandora.user.ui.theme);
-                pandora.$ui.appPanel = pandora.ui.appPanel().display();        
+                    Ox.UI.hideLoadingScreen();
 
-                Ox.Request.requests() && pandora.$ui.loadingIcon.start();
-                pandora.$ui.body.ajaxStart(pandora.$ui.loadingIcon.start);
-                pandora.$ui.body.ajaxStop(pandora.$ui.loadingIcon.stop);
+                    Ox.Theme(pandora.user.ui.theme);
+                    pandora.$ui.appPanel = pandora.ui.appPanel().display();        
 
-                pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
+                    Ox.Request.requests() && pandora.$ui.loadingIcon.start();
+                    pandora.$ui.body.ajaxStart(pandora.$ui.loadingIcon.start);
+                    pandora.$ui.body.ajaxStop(pandora.$ui.loadingIcon.stop);
 
-            }, '/static/');
+                    pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
+                    
+                });
+
+            }, '/static/'); // fixme: why does loadResources have an argument after callback????
         }
     });
 

@@ -9,7 +9,8 @@ pandora.ui.backButton = function() {
     })
     .bindEvent({
         click: function() {
-            pandora.URL.set(pandora.Query.toString());
+            pandora.UI.set({item: null});
+            pandora.URL.update();
         }
     });
     return that;

@@ -227,19 +227,10 @@ pandora.Query = (function() {
             Ox.print(Ox.repeat('-', 120));
             Ox.print('STATE', data);
             Ox.print(Ox.repeat('-', 120));
-            Ox.print('@@@@@', data.list, pandora.user.ui.lists[data.list])
+            pandora.UI.set({list: data.list});
             !pandora.user.ui.lists[data.list] && pandora.UI.set(
                 'lists|' + data.list, pandora.site.user.ui.lists['']
             );
-            ///*
-            // ---- fixme: remove, server sends wrong data
-            !pandora.user.ui.lists[data.list].sort && pandora.UI.set(
-                'lists|' + data.list, pandora.site.user.ui.lists['']
-            );
-            // ----
-            //*/
-            Ox.print('@@@@@', data.lists, pandora.user.ui.lists[data.list])
-            pandora.UI.set({list: data.list});
             pandora.user.ui.find = data.find;
             pandora.user.ui.groupsData = data.groups;
             pandora.user.ui.query = data.query;
@@ -287,13 +278,18 @@ pandora.Query = (function() {
 
         toString: function() {
             //Ox.print('tS', pandora.user.ui.find)
-            var sort = pandora.user.ui.lists[pandora.user.ui.list].sort[0],
-                key = sort.key,
-                operator = sort.operator;
-            return pandora.user.ui.lists[pandora.user.ui.list].listView + '/?' + Ox.serialize({
-                find: constructFind(pandora.user.ui.query),
-                sort: (operator == pandora.getSortOperator(key) ? '' : operator) + key
-            });
+            if (!pandora.user.ui.item) {
+                var sort = pandora.user.ui.lists[pandora.user.ui.list].sort[0],
+                    key = sort.key,
+                    operator = sort.operator;
+                return pandora.user.ui.lists[pandora.user.ui.list].listView + '/?' + Ox.serialize({
+                    find: constructFind(pandora.user.ui.query),
+                    sort: (operator == pandora.getSortOperator(key) ? '' : operator) + key
+                });
+                
+            } else {
+                return pandora.user.ui.item + '/' + pandora.user.ui.itemView;
+            }
         },
 
         updateGroups: function() {

@@ -11,63 +11,21 @@ pandora.ui.item = function() {
         if (result.status.code == 200) {
             // fixme: probably does not belong here
             document.title = '0xDB - ' + result.data.title;
-            if (pandora.user.ui.videoPoints[result.data.id].out == -1) {
-                pandora.UI.set('videoPoints|' + result.data.id + '|out', result.data.duration);
-                pandora.URL.replace(
-                    document.location.pathname
-                    + Ox.formatDuration(result.data.duration, 3).replace(/\.000$/, '')
-                );
-            }
         }
 
-        if (result.status.code != 200) {
-            // fixme: this is quite a hack
-            var title = decodeURI(pandora.user.ui.item).toLowerCase(),
-                videoPoints;
-            if (pandora.user.ui.item in pandora.user.ui.videoPoints) {
-                videoPoints = pandora.user.ui.videoPoints[pandora.user.ui.item];
-                pandora.UI.set(['videoPoints', pandora.user.ui.item].join('|'), null);
-            }
-            pandora.api.find({
-                query: {
-                    conditions: [{key: 'title', value: title, operator: ''}],
-                    operator: ''
-                },
-                sort: [{key: 'votes', operator: '-'}], // fixme: operator '' should work as well
-                range: [0, 100],
-                keys: ['id', 'title', 'votes']
-            }, function(result) {
-                if (result.data.items.length) {
-                    Ox.print(result.data.items)
-                    var re = {
-                            exact: new RegExp('^' + title + '$', 'i'),
-                            word: new RegExp('\\b' + title + '\\b', 'i')
-                        },
-                        id = result.data.items.sort(function(a, b) {
-                            return (parseInt(b.votes) || 0)
-                                + re.word.test(b.title) * 1000000
-                                + re.exact.test(b.title) * 2000000
-                                - (parseInt(a.votes) || 0)
-                                - re.word.test(a.title) * 1000000
-                                - re.exact.test(a.title) * 2000000;
-                        })[0].id;
-                    pandora.user.ui.item = '';
-                    !Ox.isUndefined(videoPoints)
-                        && pandora.UI.set(['videoPoints', id].join('|'), videoPoints);
-                    pandora.URL.set(id);
-                } else {
-                    pandora.$ui.contentPanel.replaceElement(1,
-                        Ox.Element()
-                            .css({marginTop: '32px', fontSize: '12px', textAlign: 'center'})
-                            .html(
-                                'Sorry, we can\'t find the '
-                                + pandora.site.itemName.singular.toLowerCase()
-                                + ' you\'re looking for.'
-                            )
-                    );
-                }                
-            });
-        } else if (!result.data.rendered && [
+        /*if (result.status.code != 200) {
+            pandora.$ui.contentPanel.replaceElement(1,
+                Ox.Element()
+                    .css({marginTop: '32px', fontSize: '12px', textAlign: 'center'})
+                    .html(
+                        'Sorry, we can\'t find the '
+                        + pandora.site.itemName.singular.toLowerCase()
+                        + ' you\'re looking for.'
+                    )
+            );
+        }*/
+
+        if (!result.data.rendered && [
             'clips', 'map', 'player', 'timeline'
         ].indexOf(pandora.user.ui.itemView)>-1) {
             pandora.$ui.contentPanel.replaceElement(1,
