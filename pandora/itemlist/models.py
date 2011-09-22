@@ -68,7 +68,7 @@ class List(models.Model):
         return self.get_id()
 
     def get_id(self):
-        return u'%s/%s' % (self.user.username, self.name)
+        return u'%s:%s' % (self.user.username, self.name)
 
     def editable(self, user):
         #FIXME: make permissions work

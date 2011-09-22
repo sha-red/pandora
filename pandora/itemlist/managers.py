@@ -37,7 +37,7 @@ def parseCondition(condition, user):
     else:
         exclude = False
     if k == 'id':
-        v = v.split('/')
+        v = v.split(':')
         if len(v) == 2:
             q = Q(user__username=v[0], name=v[1])
         else:

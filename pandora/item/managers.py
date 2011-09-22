@@ -30,14 +30,14 @@ def parseCondition(condition):
     v = condition['value']
     op = condition.get('operator')
     if not op:
-        op = ''
+        op = '='
     if op.startswith('!'):
         op = op[1:]
         exclude = True
     else:
         exclude = False
 
-    if op == '-':
+    if isinstance(v, list):
         q = parseCondition({'key': k, 'value': v[0], 'operator': '>='}) \
             & parseCondition({'key': k, 'value': v[1], 'operator': '<'})
         if exclude:
@@ -65,7 +65,7 @@ def parseCondition(condition):
         value_key = 'find__value'
         if k in models.Item.facet_keys + ['title']:
             in_find = False
-            if op == '=' or op == '^$':
+            if op == '==':
                 v = models.Item.objects.filter(facets__key=k, facets__value=v)
             elif op == '^':
                 v = models.Item.objects.filter(facets__key=k, facets__value__istartswith=v)
@@ -74,26 +74,24 @@ def parseCondition(condition):
             else:
                 v = models.Item.objects.filter(facets__key=k, facets__value__icontains=v)
             k = 'id__in'
-        elif op == '=' or op == '^$':
+        elif op == '==':
             value_key = 'find__value__iexact'
         elif op == '^':
-            v = v[1:]
             value_key = 'find__value__istartswith'
         elif op == '$':
-            v = v[:-1]
             value_key = 'find__value__iendswith'
         else: # default
             value_key = 'find__value__icontains'
         k = str(k)
         if exclude:
-            if k == 'all':
+            if k == '*':
                 q = ~Q(**{value_key: v})
             elif in_find and not k.startswith('itemId'):
                 q = ~Q(**{'find__key': k, value_key: v})
             else:
                 q = ~Q(**{k: v})
         else:
-            if k == 'all':
+            if k == '*':
                 q = Q(**{value_key: v})
             elif in_find and not k.startswith('itemId'):
                 q = Q(**{'find__key': k, value_key: v})
@@ -102,7 +100,7 @@ def parseCondition(condition):
         return q
     elif key_type == 'list':
         q = Q(itemId=False)
-        l = v.split("/")
+        l = v.split(":")
         if len(l) == 2:
             lqs = list(List.objects.filter(name=l[1], user__username=l[0]))
             if len(lqs) == 1:
@@ -123,7 +121,7 @@ def parseCondition(condition):
 
         if key_type == "date":
             v = parseDate(v.split('.'))
-        if op == '=' or op == '^$':
+        if op == '==':
             vk = 'value__exact'
         elif op == '>':
             vk = 'value__gt'
@@ -133,7 +131,7 @@ def parseCondition(condition):
             vk = 'value__lt'
         elif op == '<=':
             vk = 'value__lte'
-        elif op == '':
+        else: 
             vk = 'value__exact'
 
         vk = 'find__%s' % vk
