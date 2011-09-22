@@ -26,7 +26,7 @@ pandora.ui.item = function() {
         }*/
 
         if (!result.data.rendered && [
-            'clips', 'map', 'player', 'timeline'
+            'clips', 'map', 'video', 'timeline'
         ].indexOf(pandora.user.ui.itemView)>-1) {
             pandora.$ui.contentPanel.replaceElement(1,
                 Ox.Element()
@@ -250,7 +250,7 @@ pandora.ui.item = function() {
 
             pandora.$ui.contentPanel.replaceElement(1, stats);
 
-        } else if (pandora.user.ui.itemView == 'player') {
+        } else if (pandora.user.ui.itemView == 'video') {
             // fixme: duplicated
             var layers = [],
                 video = {};

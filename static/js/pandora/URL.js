@@ -1,5 +1,12 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
+
+/*
+FIXME:
+we may want slashes in list names, and ampersands in queries
+
+*/
+
 pandora.URL = (function() {
 
     var previousURL = '',
@@ -125,7 +132,7 @@ pandora.URL = (function() {
                         section: 'items',
                         item: item,
                         itemView: view
-                    }, ['player', 'timeline'].indexOf(view) > -1 ? {
+                    }, ['video', 'timeline'].indexOf(view) > -1 ? {
                         videoView: view
                     } : {}));
                     if (time) {
@@ -259,13 +266,12 @@ pandora.URL = (function() {
                 }
                 pandora.$ui.contentPanel.replaceElement(1, pandora.ui.item());
             }
-            // fixme: should be 'video', not 'player'
             if (
                 previousUI.item &&
-                ['player', 'timeline'].indexOf(previousUI.itemView) > -1
+                ['video', 'timeline'].indexOf(previousUI.itemView) > -1
             ) {
                 var $item = pandora.$ui[
-                    previousUI.itemView == 'player' ? 'player' : 'editor'
+                    previousUI.itemView == 'video' ? 'player' : 'editor'
                 ];
                 $item && pandora.UI.set(
                     'videoPoints|' + previousUI.item + '|position',

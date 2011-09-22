@@ -53,6 +53,11 @@ Ox.load({
                 });
 
                 Ox.extend(pandora.site, {
+                    clipKeys: Ox.map(data.site.clipKeys, function(key) {
+                        return Ox.extend(key, {
+                            operator: pandora._getSortOperator(key.type)
+                        });
+                    }),
                     findKeys: Ox.map(data.site.itemKeys, function(key) {
                         return key.find ? key : null;
                     }),
@@ -75,7 +80,9 @@ Ox.load({
                         ] 
                     },
                     sortKeys: Ox.map(data.site.itemKeys, function(key) {
-                        return key.columnWidth ? key : null;
+                        return key.columnWidth ? Ox.extend(key, {
+                            operator: pandora._getSortOperator(key.type)
+                        }) : null;
                     })
                 });
                 Ox.extend(pandora.user, {
@@ -96,6 +103,79 @@ Ox.load({
                 window.onpopstate = function(event) {
                     pandora.URL.update();
                 };
+
+                // set up url controller
+
+                var itemsName = pandora.site.itemName.plural.toLowerCase(),
+                    sortKeys = {}, spanType = {}, views = {};
+                views[itemsName] = {
+                    list: Ox.merge(
+                        // 'grid' is the default view
+                        ['grid'],
+                        Ox.map(pandora.site.listViews, function(view) {
+                            return view.id == 'grid' ? null : view.id;
+                        })
+                    ),
+                    item: Ox.merge(
+                        // 'info' is the default view, pandora.user.ui.videoView
+                        // is the default view if there is a duration
+                        ['info', pandora.user.ui.videoView],
+                        pandora.site.itemViews.map(function(view) {
+                            return [
+                                'info', pandora.user.ui.videoView
+                            ].indexOf(view.id) > -1 ? null : view.id;
+                        })
+                    )
+                };
+                sortKeys[itemsName] = {list: {}, item: {}};
+                views[itemsName].list.forEach(function(view) {
+                    sortKeys[itemsName].list[view] = Ox.merge(
+                        pandora.isClipView(view) ? Ox.clone(pandora.site.clipKeys) : [],
+                        // 'director' is the default sort key
+                        [Ox.getObjectById(pandora.site.sortKeys, 'director')],
+                        Ox.map(pandora.site.sortKeys, function(key) {
+                            return key.id == 'director' ? null : key;
+                        })
+                    );
+                });
+                views[itemsName].item.forEach(function(view) {
+                    if (pandora.isClipView(view, true)) {
+                        sortKeys[itemsName].item[view] = Ox.merge(
+                            // 'clip:position' is the default sort key
+                            [Ox.getObjectById(pandora.site.clipKeys, 'clip:position')],
+                            Ox.map(pandora.site.clipKeys, function(key) {
+                                return key.id == 'clip:position' ? null : key;
+                            })
+                        );
+                    }
+                });
+                spanType[itemsName] = {
+                    list: {
+                        map: 'location',
+                        calendar: 'date'
+                    },
+                    item: {
+                        video: 'duration',
+                        timeline: 'duration',
+                        map: 'location',
+                        calendar: 'date'
+                    }
+                };
+                                
+                pandora._URL = Ox.URL({
+                    findKeys: pandora.site.findKeys,
+                    getItem: pandora.getItemByIdOrTitle,
+                    getSpan: pandora.getMetadataByIdOrName,
+                    pages: [
+                        'about', 'contact', 'faq', 'help', 'home', 'news',
+                        'preferences', 'signin', 'signout', 'signup',
+                        'software', 'terms', 'tour'
+                    ],
+                    sortKeys: sortKeys,
+                    spanType: spanType,
+                    types: [pandora.site.itemName.plural.toLowerCase(), 'edits', 'texts'],
+                    views: views
+                });
 
                 pandora.URL.parse(function() {
 

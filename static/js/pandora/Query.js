@@ -17,6 +17,7 @@ pandora.Query = (function() {
     }
 
     function constructValue(value, operator) {
+        value = encodeURIComponent(value);
         operator = operator.replace('=', '^$');
         if (operator.indexOf('$') > -1) {
             value = operator.substr(0, operator.length - 1) + value + '$';
@@ -176,7 +177,7 @@ pandora.Query = (function() {
                     ) ? {
                         index: indices[0],
                         key: ret.query.conditions[indices[0]].key,
-                        value: ret.query.conditions[indices[0]].value
+                        value: decodeURIComponent(ret.query.conditions[indices[0]].value)
                     } : {index: -1, key: 'advanced', value: ''}                    
                 }
             }

@@ -6,7 +6,7 @@
         "canSeeFiles": {"guest": -1, "member": -1, "staff": 3, "admin": 4}
     },
     "clipKeys": [
-        {"id": "clip:value", "title": "Clip Text", "type": "string"},
+        {"id": "clip:text", "title": "Clip Text", "type": "string"},
         {"id": "clip:position", "title": "Clip Position", "type": "float"},
         {"id": "clip:duration", "title": "Clip Duration", "type": "float"},
         {"id": "clip:hue", "title": "Clip Hue", "type": "hue"},
@@ -432,7 +432,6 @@
             "value": "capability"
         }
     ],
-    "fixme": "itemNames should be lowercase!",
     "itemName": {
         "singular": "Movie",
         "plural": "Movies"
@@ -441,7 +440,7 @@
         {"id": "info", "title": "Info"},
         {"id": "statistics", "title": "Statistics"},
         {"id": "clips", "title": "Clips"},
-        {"id": "player", "title": "Player"},
+        {"id": "video", "title": "Video"},
         {"id": "timeline", "title": "Timeline"},
         {"id": "map", "title": "Map"},
         {"id": "calendar", "title": "Calendar"},
@@ -481,7 +480,7 @@
         {"id": "maps", "title": "with Maps"},
         {"id": "calendars", "title": "with Calendars"},
         {"id": "clip", "title": "as Clips"},
-        {"id": "player", "title": "as Player"},
+        {"id": "video", "title": "as Video"},
         {"id": "map", "title": "on Map"},
         {"id": "calendar", "title": "on Calendar"}
     ],
@@ -594,7 +593,7 @@
             "videoScale": "fit",
             "videoMuted": false,
             "videoSize": "small",
-            "videoView": "player",
+            "videoView": "video",
             "videoVolume": 1
         },
         "username": "",

@@ -8,9 +8,9 @@ pandora.ui.filter = function(list) {
                     format: key.format,
                     id: key.id,
                     title: key.title,
-                    type: key.type == 'layer' ? Ox.getObjectById(
-                        pandora.site.layers, key.id
-                    ).type : key.type
+                    type: key.type == 'layer'
+                        ? Ox.getObjectById(pandora.site.layers, key.id).type
+                        : key.type
                 };
             }), {
                 id: 'list',
@@ -34,9 +34,6 @@ pandora.ui.filter = function(list) {
                         query: data.query
                     }, function(result) {
                         Ox.Request.clearCache(list.id);
-                        pandora.$ui.groups.forEach(function($group) {
-                            $group.reloadList();
-                        });
                         pandora.$ui.list
                             .bindEventOnce({
                                 init: function(data) {
@@ -46,6 +43,10 @@ pandora.ui.filter = function(list) {
                                 }
                             })
                             .reloadList();
+                        pandora.$ui.groups.forEach(function($group) {
+                            $group.reloadList();
+                        });
+                        
                     });
                 } else {
                     pandora.user.ui.query = data.query;

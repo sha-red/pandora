@@ -388,6 +388,7 @@ pandora.ui.folderList = function(id) {
                 data_ = {id: data.id};
                 data_[data.key] = data.value;
                 pandora.api.editList(data_, function(result) {
+                    // fixme: we may want slashes in list names
                     if (result.data.id != data.id) {
                         pandora.$ui.folderList[id].value(data.id, 'name', result.data.name);
                         pandora.$ui.folderList[id].value(data.id, 'id', result.data.id);

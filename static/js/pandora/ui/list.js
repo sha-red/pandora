@@ -647,8 +647,7 @@ pandora.ui.list = function() { // fixme: remove view argument
             },
             select: function(data) {
                 var $still, $timeline;
-                pandora.UI.set(['lists', pandora.user.ui.list, 'selected'].join('|'), data.ids);
-                //pandora.user.ui.lists[pandora.user.ui.list].selected = data.ids;
+                pandora.UI.set('lists|' + pandora.user.ui.list + '|selected', data.ids);
                 if (data.ids.length) {
                     pandora.$ui.mainMenu.enableItem('copy');
                     pandora.$ui.mainMenu.enableItem('openmovie');

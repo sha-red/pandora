@@ -313,6 +313,43 @@ pandora.getInfoHeight = function() {
     );
 }
 
+pandora.getItemByIdOrTitle = function(str, callback) {
+    pandora.api.get({id: str, keys: ['id']}, function(result) {
+        if (result.status.code == 200) {
+            callback(result.data.id);
+        } else {
+            pandora.api.find({
+                query: {
+                    conditions: [{key: 'title', value: str, operator: ''}], // fixme: operator will be "="
+                    operator: '&'
+                },
+                sort: [{key: 'votes', operator: ''}], // fixme: not all systems have "votes"
+                range: [0, 100],
+                keys: ['id', 'title', 'votes']
+            }, function(result) {
+                var id = '';
+                if (result.data.items.length) {
+                    Ox.print('AAAAAA', result.data.items)
+                    var items = Ox.map(result.data.items, function(item) {
+                        // test if exact match or word match
+                        var sort = new RegExp('^' + str + '$', 'i').test(item.title) ? 2000000
+                            : new RegExp('\\b' + str + '\\b', 'i').test(item.title) ? 1000000 : 0;
+                        return sort ? {id: item.id, sort: sort + (parseInt(item.votes) || 0)} : null;
+                        // fixme: remove the (...|| 0) check once the backend sends correct data
+                    });
+                    if (items.length) {
+                        Ox.print('BBBBBB', items)
+                        id = items.sort(function(a, b) {
+                            return b.sort - a.sort;
+                        })[0].id;
+                    }
+                }
+                callback(id);
+            });
+        }
+    });
+}
+
 pandora.getListData = function() {
     var data = {}, folder;
     if (pandora.user.ui.list) {
@@ -358,6 +395,66 @@ pandora.getListMenu = function(lists) {
         {},
         { id: 'setposterframe', title: 'Set Poster Frame', disabled: true }
     ] };
+};
+
+pandora.getMetadataByIdOrName = function(item, view, str, callback) {
+    // For a given item (or none) and a given view (or any), this takes a string
+    // and checks if it's an annotation/event/place id or an event/place name,
+    // and returns the id (or none) and the view (or none)
+    // fixme: "subtitles:23" is still missing
+    Ox.print('getMetadataByIdOrName', item, view, str);
+    var isName = str[0] == '@',
+        canBeAnnotation = (
+            !view || view == 'video' || view == 'timeline'
+        ) && item && !isName,
+        canBeEvent = !view || view == 'calendar',
+        canBePlace = !view || view == 'map';
+    str = isName ? str.substr(1) : str;
+    getId(canBeAnnotation ? 'annotation' : '', function(id) {
+        if (id) {
+            Ox.print('id?', id)
+            callback(id, pandora.user.ui.videoView);
+        } else {
+            getId(canBePlace ? 'place' : '', function(id) {
+                if (id) {
+                    callback(id, 'map');
+                } else {
+                    getId(canBeEvent ? 'event' : '', function(id) {
+                        if (id) {
+                            callback(id, 'calendar');
+                        } else if (canBePlace && isName) {
+                            // set map query ...
+                            pandora.user.ui.mapFind = str;
+                            callback('@' + str, 'map');
+                        } else {
+                            callback();
+                        }
+                    });
+                }
+            });
+        }
+    });
+    function getId(type, callback) {
+        if (type) {
+            pandora.api['find' + Ox.toTitleCase(type + 's')](Ox.extend({
+                query: {
+                    key: isName ? 'name' : 'id',
+                    value: type == 'annotation' ? item + '/' + str : str,
+                    operator: '='
+                },
+                keys: ['id'],
+                range: [0, 1]
+            }, item ? {
+                itemQuery: {key: 'id', value: item, operator: '='}
+            } : {}), function(result) {
+                // fixme: this has to be fixed on the backend!
+                if (result.data.events) { result.data.items = result.data.events; };
+                callback(result.data.items.length ? result.data.items[0].id : '');
+            });
+        } else {
+            callback();
+        }
+    }
 };
 
 pandora.getSortMenu = function() {
@@ -410,7 +507,13 @@ pandora.getSortMenu = function() {
     ] };
 };
 
-pandora.getSortOperator = function(key) { // fixme: make static
+pandora._getSortOperator = function(type) {
+    return ['hue', 'string', 'text'].indexOf(
+        Ox.isArray(type) ? type[0] : type
+    ) > -1 ? '+' : '-';
+}
+
+pandora.getSortOperator = function(key) { // fixme: remove
     var type = Ox.getObjectById(
             /^clip:/.test(key) ? pandora.site.clipKeys : pandora.site.itemKeys,
             key
@@ -444,9 +547,11 @@ pandora.getVideoPartsAndPoints = function(durations, points) {
     return ret;
 };
 
-pandora.isClipView = function(view) {
+pandora.isClipView = function(view, item) {
     view = view || pandora.user.ui.lists[pandora.user.ui.list].listView;
-    return ['calendar', 'clip', 'map'].indexOf(view) > -1;
+    return (
+        !item ? ['calendar', 'clip', 'map'] : ['calendar', 'clips', 'map']
+    ).indexOf(view) > -1;
 };
 
 pandora.signin = function(data) {
