@@ -28,6 +28,14 @@ pandora.ui.contentPanel = function() {
         ],
         orientation: 'vertical'
     });
+    Ox.Event.bind({
+        listView: function() {
+            that.replaceElement(1, pandora.$ui.list = pandora.ui.list());
+        },
+        itemView: function() {
+            that.replaceElement(1, pandora.$ui.item = pandora.ui.item());
+        }
+    });
     return that;
 };
 

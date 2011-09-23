@@ -40,24 +40,30 @@ pandora.ui.rightPanel = function() {
                     pandora.resizeGroups();
                     pandora.$ui.list.size();
                     if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'timelines') {
-                        pandora.$ui.list.options({
-                            width: data.size
-                        });
+                        pandora.$ui.list.options({width: data.size});
                     } else if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'map') {
                         pandora.$ui.map.resizeMap();
+                    } else if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'calendar') {
+                        
                     }
                 } else {
                     pandora.$ui.browser.scrollToSelection();
-                    pandora.user.ui.itemView == 'player' && pandora.$ui.player.options({
-                        width: data.size
-                    });
-                    pandora.user.ui.itemView == 'timeline' && pandora.$ui.editor.options({
-                        width: data.size
-                    });
+                    if (pandora.user.ui.itemView == 'video') {
+                        pandora.$ui.player.options({width: data.size});
+                    } else if (pandora.user.ui.itemView == 'timeline') {
+                        pandora.$ui.editor.options({width: data.size});
+                    }
                 }
             }
         });
     }
+    Ox.Event.bind({
+        itemView: function(value) {
+            if (pandora.isClipView() != pandora.isClipView(pandora.UI.getPrevious('itemView'))) {
+                that.replaceElement(0, pandora.$ui.toolbar = pandora.ui.toolbar());
+            }
+        }
+    })
     return that;
 };
 

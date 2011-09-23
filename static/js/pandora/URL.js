@@ -1,237 +1,366 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
-
-/*
-FIXME:
-we may want slashes in list names, and ampersands in queries
-
-*/
-
 pandora.URL = (function() {
 
-    var previousURL = '',
-        regexps = {
-            '^$': function(pathname, search, callback) {
-                if (/^\?url=/.test(search)) {
-                    document.location = decodeURIComponent(search.substr(5));
+    var self = {}, that = {};
+
+    /*
+    function foundItem() {
+        pandora.UI.set(Ox.extend({
+            section: 'items',
+            item: item,
+            itemView: view
+        }, ['video', 'timeline'].indexOf(view) > -1 ? {
+            videoView: view
+        } : {}));
+        if (time) {
+            points = time[0].split(',');
+            if (
+                points.length == 2 
+                && (points = Ox.flatten([points[0], points[1].split('-')]))[2] == ''
+            ) {
+                pandora.api.get({
+                    id: item,
+                    keys: ['duration']
+                }, function(result) {
+                    points[2] = result.data.duration.toString();
+                    foundTime();
+                });
+            } else {
+                foundTime();
+            }
+        } else {
+            if (!pandora.user.ui.videoPoints[item]) {
+                pandora.UI.set('videoPoints|' + item, {
+                    'in': 0, out: 0, position: 0
+                });
+            }
+            foundTime();
+        }
+        function foundTime() {
+            if (time) {
+                // fixme: this is duplicated, see Ox.VideoPlayer() parsePositionInput()
+                points = points.map(function(point, i) {
+                    var parts = point.split(':').reverse();
+                    while (parts.length > 3) {
+                        parts.pop();
+                    }
+                    return parts.reduce(function(prev, curr, i) {
+                        return prev + (parseFloat(curr) || 0) * Math.pow(60, i);
+                    }, 0);
+                });
+                pandora.UI.set('videoPoints|' + item, {
+                    'in': points.length == 1 ? 0 : points[points.length - 2],
+                    out: points.length == 1 ? 0 : points[points.length - 1],
+                    position: points[0],
+                });
+                points = points.map(function(point) {
+                    return point == -1 ? '' : Ox.formatDuration(point, 3).replace(/\.000$/, '');
+                });
+                split[split.length - 1] = points[0] + (
+                    points.length == 1 ? '' : ',' + points[1] + '-' + points[2]
+                );
+            }
+            pandora.URL.replace(split.join('/'));
+            // on page load, we have to check if the item is in the previously selected list
+            // if it is not, the movie browser has to be reloaded
+            if (pandora.user.ui.list) {
+                pandora.user.ui.query = {
+                    conditions: [{key: 'list', value: pandora.user.ui.list, operator: ''}],
+                    operator: '&'
+                };
+                pandora.api.find({
+                    query: pandora.user.ui.query,
+                    positions: [pandora.user.ui.item],
+                    sort: [{key: 'id', operator: ''}]
+                }, function(result) {
+                    if (Ox.isUndefined(result.data.positions[pandora.user.ui.item])) {
+                        pandora.UI.set({list: ''});
+                        pandora.user.ui.query = {conditions:[], operator: '&'};
+                    }
+                    callback();
+                });
+            } else {
+                callback();
+            }
+        }
+    }
+    */
+
+    function everyCondition(conditions, key, operator) {
+        // If every condition has the given key and operator
+        // (excluding conditions where all subconditions match)
+        // returns true, otherwise false
+        return Ox.every(conditions, function(condition) {
+            return condition.key == key && condition.operator == operator;
+        });
+    }
+
+    function getFindState(find, listsState, groupsState) {
+        // The find element is populated if exactly one condition in an & query
+        // has a findKey as key and "=" as operator (and all other conditions
+        // are either list or groups), or if all conditions in an | query have
+        // the same group id as key and "==" as operator
+        var conditions, indices, state = {index: -1, key: '*', value: ''};
+        if (find.operator == '&') {
+            // number of conditions that are not list or groups
+            conditions = find.conditions.length
+                - (listsState != '')
+                - groupsState.filter(function(group) {
+                    return group.index > -1;
+                }).length;
+            // indices of non-advanced find queries
+            indices = Ox.map(pandora.site.findKeys, function(findKey) {
+                var index = oneCondition(find.conditions, findKey.id, '=');
+                return index > -1 ? index : null;
+            });
+            state = conditions == 1 && indices.length == 1 ? {
+                index: indices[0],
+                key: find.conditions[indices[0]].key,
+                value: decodeURIComponent(find.conditions[indices[0]].value)
+            } : {
+                index: -1,
+                key: conditions == 0 && indices.length == 0 ? '*' : 'advanced',
+                value: ''
+            };
+        } else {
+            state = {
+                index: -1,
+                key: 'advanced',
+                value: ''
+            };
+            Ox.forEach(pandora.user.ui.groups, function(key) {
+                if (everyCondition(find.conditions, key, '==')) {
+                    state.key = '*';
+                    return false;
+                }
+            });
+        }
+        return state;
+    }
+
+    function getGroupsState(find) {
+        // A group is selected if exactly one condition in an & query or every
+        // condition in an | query has the group id as key and "==" as operator
+        return pandora.user.ui.groups.map(function(group) {
+            // FIXME: cant index be an empty array, instead of -1?
+            var key = group.id,
+                state = {index: -1, find: Ox.clone(find, true), selected: []};
+            if (find.operator == '&') {
+                // include conditions where all subconditions match
+                state.index = oneCondition(find.conditions, key, '==', true);
+                if (state.index > -1) {
+                    state.selected = find.conditions[state.index].conditions
+                        ? find.conditions[state.index].conditions.map(function(condition) {
+                            return condition.value;
+                        })
+                        : [find.conditions[state.index].value];
+                }
+            } else {
+                if (everyCondition(find.conditions, key, '==')) {
+                    state.index = Ox.range(find.conditions.length);
+                    state.selected = find.conditions.map(function(condition) {
+                        return condition.value;
+                    });
+                }
+            }
+            if (state.selected.length) {
+                if (Ox.isArray(state.index)) {
+                    // every condition in an | query matches this group
+                    state.find = {conditions: [], operator: ''};
                 } else {
-                    if (!search && pandora.user.ui.showHome) {
-                        pandora.$ui.home = pandora.ui.home().showScreen();
-                        Ox.print('LIST', pandora.user.ui.list)
-                        pandora.user.ui.list && pandora.Query.fromString(
-                            'find=list:' + pandora.user.ui.list
-                        );
-                    } else {
-                        pandora.Query.fromString(search);
-                        pandora.UI.set({
-                            section: 'items',
-                            item: ''
-                        });
-                    }
-                }
-                callback();
-            },
-            '^home$': function(pathname, search, callback) {
-                pandora.$ui.home = pandora.ui.home().showScreen();
-                callback();
-            },
-            '^(items|edits|texts)$': function(pathname, search, callback) {
-                pandora.UI.set({
-                    section: pathname
-                });
-                callback();
-            },
-            '^(about|contact|faq|news|software|terms|tour)$': function(pathname, search, callback) {
-                pandora.$ui.siteDialog = pandora.ui.siteDialog(pathname).open();
-                callback();
-            },
-            '^help$': function(pathname, search, callback) {
-                pandora.$ui.helpDialog = pandora.ui.helpDialog().open();
-                callback();
-            },
-            '^(signin|signout|signup)$': function(pathname, search, callback) {
-                if ((pathname == 'signout') == (pandora.user.level != 'guest')) {
-                    pandora.$ui.accountDialog = (
-                        pandora.user.level == 'guest'
-                        ? pandora.ui.accountDialog(pathname)
-                        : pandora.ui.accountSignoutDialog()
-                    ).open();
-                }
-                callback();
-            },
-            '^preferences$': function(pathname, search, callback) {
-                pandora.$ui.preferencesDialog = pandora.ui.preferencesDialog().open();
-                callback();
-            },
-            '^(calendar|calendars|clip|clips|flow|grid|list|map|maps|timelines)$': function(pathname, search, callback) {
-                pandora.UI.set({
-                    section: 'items',
-                    item: ''
-                });
-                pandora.UI.set('lists|' + pandora.user.ui.list + '|listView', pathname);
-                pandora.Query.fromString(search);
-                callback();
-            },
-            '.*': function(pathname, search, callback) {
-                var split = pathname.split('/'),
-                    item = decodeURI(split[0]),
-                    points,
-                    time = split.length > 1
-                        ? /[\d\.:,-]+/.exec(split[split.length - 1])
-                        : null,
-                    view = new RegExp(
-                            '^(' + pandora.site.itemViews.map(function(v) {
-                                return v.id;
-                            }).join('|') + ')$'
-                        ).exec(split[1]);
-                view = view ? view[0]
-                    : time ? pandora.user.ui.videoView
-                    : pandora.user.ui.itemView;
-                pandora.api.get({id: item, keys: ['id']}, function(result) {
-                    if (result.status.code == 200) {
-                        foundItem();
-                    } else {
-                        pandora.api.find({
-                            query: {
-                                conditions: [{key: 'title', value: item, operator: ''}],
-                                operator: '&'
-                            },
-                            sort: [{key: 'votes', operator: ''}], // fixme: not all systems have "votes"
-                            range: [0, 100],
-                            keys: ['id', 'title', 'votes']
-                        }, function(result) {
-                            if (result.data.items.length) {
-                                var re = {
-                                        exact: new RegExp('^' + item + '$', 'i'),
-                                        word: new RegExp('\\b' + item + '\\b', 'i')
-                                    };
-                                item = result.data.items.sort(function(a, b) {
-                                    return (parseInt(b.votes) || 0)
-                                        + re.word.test(b.title) * 1000000
-                                        + re.exact.test(b.title) * 2000000
-                                        - (parseInt(a.votes) || 0)
-                                        - re.word.test(a.title) * 1000000
-                                        - re.exact.test(a.title) * 2000000;
-                                })[0].id;
-                                split[0] = item;
-                                foundItem();
-                            } else {
-                                pandora.UI.set({
-                                    section: 'items',
-                                    item: ''
-                                });
-                                pandora.Query.fromString('?find=' + pathname);
-                                pandora.URL.replace('?find=' + pathname);
-                                callback();
-                            }
-                        });
-                    }
-                });
-                function foundItem() {
-                    pandora.UI.set(Ox.extend({
-                        section: 'items',
-                        item: item,
-                        itemView: view
-                    }, ['video', 'timeline'].indexOf(view) > -1 ? {
-                        videoView: view
-                    } : {}));
-                    if (time) {
-                        points = time[0].split(',');
-                        if (
-                            points.length == 2 
-                            && (points = Ox.flatten([points[0], points[1].split('-')]))[2] == ''
-                        ) {
-                            pandora.api.get({
-                                id: item,
-                                keys: ['duration']
-                            }, function(result) {
-                                points[2] = result.data.duration.toString();
-                                foundTime();
-                            });
-                        } else {
-                            foundTime();
-                        }
-                    } else {
-                        if (!pandora.user.ui.videoPoints[item]) {
-                            pandora.UI.set('videoPoints|' + item, {
-                                'in': 0, out: 0, position: 0
-                            });
-                        }
-                        foundTime();
-                    }
-                    function foundTime() {
-                        if (time) {
-                            // fixme: this is duplicated, see Ox.VideoPlayer() parsePositionInput()
-                            points = points.map(function(point, i) {
-                                var parts = point.split(':').reverse();
-                                while (parts.length > 3) {
-                                    parts.pop();
-                                }
-                                return parts.reduce(function(prev, curr, i) {
-                                    return prev + (parseFloat(curr) || 0) * Math.pow(60, i);
-                                }, 0);
-                            });
-                            pandora.UI.set('videoPoints|' + item, {
-                                'in': points.length == 1 ? 0 : points[points.length - 2],
-                                out: points.length == 1 ? 0 : points[points.length - 1],
-                                position: points[0],
-                            });
-                            points = points.map(function(point) {
-                                return point == -1 ? '' : Ox.formatDuration(point, 3).replace(/\.000$/, '');
-                            });
-                            split[split.length - 1] = points[0] + (
-                                points.length == 1 ? '' : ',' + points[1] + '-' + points[2]
-                            );
-                        }
-                        pandora.URL.replace(split.join('/'));
-                        // on page load, we have to check if the item is in the previously selected list
-                        // if it is not, the movie browser has to be reloaded
-                        if (pandora.user.ui.list) {
-                            pandora.user.ui.query = {
-                                conditions: [{key: 'list', value: pandora.user.ui.list, operator: ''}],
-                                operator: '&'
+                    // one condition in an & query matches this group
+                    state.find.conditions.splice(state.index, 1);
+                    if (state.find.conditions.length == 1) {
+                        if (state.find.conditions[0].conditions) {
+                            // unwrap single remaining bracketed query
+                            state.find = {
+                                conditions: state.find.conditions[0].conditions,
+                                operator: state.find.conditions[0].operator
                             };
-                            pandora.api.find({
-                                query: pandora.user.ui.query,
-                                positions: [pandora.user.ui.item],
-                                sort: [{key: 'id', operator: ''}]
-                            }, function(result) {
-                                if (Ox.isUndefined(result.data.positions[pandora.user.ui.item])) {
-                                    pandora.UI.set({list: ''});
-                                    pandora.user.ui.query = {conditions:[], operator: '&'};
-                                }
-                                callback();
-                            });
-                        } else {
-                            callback();
                         }
                     }
                 }
             }
-        };
-
-    function saveURL() {
-        previousURL = document.location.pathname + document.location.search;
+            return state;
+        });
     }
 
-    function updateURL() {
+    function getListsState(find) {
+        // A list is selected if exactly one condition in an & query has "list"
+        // as key and "==" as operator
+        var index, state = '';
+        if (find.operator == '&') {
+            index = oneCondition(find.conditions, 'list', '==');
+            if (index > -1) {
+                state = find.conditions[index].value;
+            }
+        }
+        return state;
+    }
+
+    function getState() {
+        if (!pandora.user.ui.lists[pandora.user.ui.list]) {
+            pandora.user.ui.lists[pandora.user.ui.list] = pandora.site.user.ui.lists[''];
+        }
+        return {
+            type: pandora.user.ui.section == 'items'
+                ? pandora.site.itemsSection
+                : pandora.user.ui.section,
+            item: pandora.user.ui.item,
+            view: !pandora.user.ui.item
+                ? pandora.user.ui.lists[pandora.user.ui.list].view
+                : pandora.user.ui.itemView,
+            sort: !pandora.user.ui.item
+                ? pandora.user.ui.lists[pandora.user.ui.list].sort
+                : pandora.isClipView(pandora.user.ui.itemView)
+                    ? pandora.user.ui.itemSort : [],
+            find: !pandora.user.ui.item
+                ? pandora.user.ui.find
+                : ''
+        };
+    }
+
+    function oneCondition(conditions, key, operator, includeSubconditions) {
+        // If exactly one condition has the given key and operator
+        // (including or excluding conditions where all subconditions match)
+        // returns the corresponding index, otherwise returns -1
+        var indices = Ox.map(conditions, function(condition, i) {
+            return (
+                condition.conditions
+                ? includeSubconditions && everyCondition(condition.conditions, key, operator)
+                : condition.key == key && condition.operator == operator
+            ) ? i : null;
+        });
+        return indices.length == 1 ? indices[0] : -1;
+    }
+
+    function setState(state) {
+        Ox.print('STATE:', state)
         var previousUI = pandora.UI.getPrevious();
+        // var previousUI = Ox.clone(pandora.user.ui);
         Ox.Request.cancel();
         $('video').each(function() {
             $(this).trigger('stop');
         });
-        pandora.URL.parse(function() {
+        pandora.user.ui._groupsState = getGroupsState(pandora.user.ui.find);
+        pandora.user.ui._findState = getFindState(pandora.user.ui.find, pandora.user.ui.list, pandora.user.ui._groupsState);
+        if (Ox.isEmpty(state)) {
+            if (pandora.user.ui.showHome) {
+                pandora.$ui.home = pandora.ui.home().showScreen();
+                /*
+                Ox.print('LIST', pandora.user.ui.list)
+                pandora.user.ui.list && pandora.Query.fromString(
+                    'find=list:' + pandora.user.ui.list
+                );
+                */
+            } else {
+                pandora.UI.set({
+                    section: 'items',
+                    item: ''
+                });
+            }                
+        } else if (state.page) {
+            if (state.page == 'home') {
+                //pandora.$ui.home = pandora.ui.home().showScreen();
+                pandora.$ui.home = pandora.ui.home().fadeInScreen();
+            } else if ([
+                'about', 'contact', 'faq', 'news', 'software', 'terms', 'tour'
+            ].indexOf(state.page) > -1) {
+                pandora.$ui.siteDialog = pandora.ui.siteDialog(state.page).open();
+            } else if (state.page == 'help') {
+                pandora.$ui.helpDialog = pandora.ui.helpDialog().open();
+            } else if (['signup', 'signin'].indexOf(state.page) > -1) {
+                if (pandora.user.level == 'guest') {
+                    pandora.ui.accountDialog(state.page).open();
+                } else {
+                    pandora.URL.replace('/');
+                }
+            } else if (['preferences', 'signout'].indexOf(state.page) > -1) {
+                if (pandora.user.level == 'guest') {
+                    pandora.URL.replace('/');
+                } else if (state.page == 'preferences') {
+                    pandora.ui.preferencesDialog().open();
+                } else {
+                    pandora.ui.accountSignoutDialog().open();
+                }
+            } else if (state.page == 'api') {
+                document.location.href = '/api/';
+            }
+        } else {
+            pandora.UI.set({
+                section: state.type == pandora.site.itemsSection ? 'items' : state.type,
+                item: state.item,
+            });
+
+            state.find && pandora.UI.set({
+                find: state.find,
+                list: getListsState(state.find)
+            });
+
+            if (!pandora.user.ui.lists[pandora.user.ui.list]) {
+                pandora.UI.set(
+                    'lists|' + pandora.user.ui.list,
+                    pandora.site.user.ui.lists['']
+                );
+            }
+
+            if (state.view) {
+                pandora.UI.set(
+                    !pandora.user.ui.item
+                        ? 'lists|' + pandora.user.ui.list + '|view'
+                        : 'itemView',
+                    state.view
+                );
+            }
+
+            pandora.user.ui._groupsState = getGroupsState(pandora.user.ui.find);
+            Ox.print('_groupsState =', pandora.user.ui._groupsState);
+            pandora.user.ui._findState = getFindState(pandora.user.ui.find, pandora.user.ui.list, pandora.user.ui._groupsState);
+                
+            if (['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
+                if (state.span) {
+                    pandora.UI.set('videoPoints|' + pandora.user.ui.item, {
+                        position: state.span[0],
+                        'in': state.span[1] || 0,
+                        out: state.span[2] || 0
+                    });
+                } else if (!pandora.user.ui.videoPoints[pandora.user.ui.item]) {
+                    pandora.UI.set('videoPoints|' + pandora.user.ui.item, {
+                        position: 0,
+                        'in': 0,
+                        out: 0
+                    });
+                }
+            }
+
+            state.sort && pandora.UI.set(
+                !pandora.user.ui.item
+                    ? 'lists|' + pandora.user.ui.list + '|sort'
+                    : 'itemSort',
+                state.sort
+            );
+
+            if (!pandora.$ui.appPanel) {
+                return;
+            }
+
             if (pandora.user.ui.section != previousUI.section) {
+                // new section
                 pandora.$ui.appPanel.replaceElement(1, pandora.$ui.mainPanel = pandora.ui.mainPanel());
             } else if (!pandora.user.ui.item && !previousUI.item) {
                 // list to list
+                Ox.print('pUI', previousUI);
                 var isClipView = pandora.isClipView(),
                     list = pandora.user.ui.lists[pandora.user.ui.list],
                     previousList = previousUI.lists[previousUI.list],
-                    wasClipView = pandora.isClipView(previousList.listView);
-                if (list.listView != previousList.listView) {
-                    pandora.$ui.mainMenu.checkItem('viewMenu_movies_' + list.listView);
-                    pandora.$ui.viewSelect.options({value: list.listView});
+                    wasClipView = pandora.isClipView(previousList.view);
+                if (pandora.user.ui.list != previousUI.list) {
+                    pandora.$ui.findElement.replaceWith(pandora.$ui.findElement = pandora.ui.findElement());
+                }
+                if (list.view != previousList.view) {
+                    pandora.$ui.mainMenu.checkItem('viewMenu_movies_' + list.view);
+                    pandora.$ui.viewSelect.options({value: list.view});
                     if (isClipView != wasClipView) {
                         pandora.$ui.mainMenu.replaceMenu('sortMenu', pandora.getSortMenu());
                         pandora.$ui.sortSelect.replaceWith(pandora.$ui.sortSelect = pandora.ui.sortSelect());
@@ -248,7 +377,84 @@ pandora.URL = (function() {
                     pandora.$ui.sortSelect.options({value: list.sort[0].key});
                 }
                 pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
-                if (Ox.isEqual(pandora.user.ui.query, previousUI.query)) {
+                if (Ox.isEqual(pandora.user.ui.find, previousUI.find)) {
+                    pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
+                } else {
+                    pandora.user.ui._groupsState.forEach(function(data, i) {
+                        if (!Ox.isEqual(data.find, previousUI._groupsState[i].find)) {
+                            pandora.$ui.groups[i].reloadList();
+                        }
+                    });
+                    pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
+                    //pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
+                }
+                // fixme: should list selection and deselection happen here?
+                // (home and menu may cause a list switch)
+            } else if (!pandora.user.ui.item || !previousUI.item) {
+                // list to item or item to list
+                pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
+                pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
+            } else {
+                // item to item
+                if (pandora.user.ui.item != previousUI.item) {
+                    pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
+                }
+                pandora.$ui.contentPanel.replaceElement(1, pandora.ui.item());
+            }
+            if (
+                previousUI.item
+                && ['video', 'timeline'].indexOf(previousUI.itemView) > -1
+            ) {
+                var $item = pandora.$ui[
+                    previousUI.itemView == 'video' ? 'player' : 'editor'
+                ];
+                $item && pandora.UI.set(
+                    'videoPoints|' + previousUI.item + '|position',
+                    $item.options('position')
+                );
+            }
+            
+        }
+        pandora.user.ui.showHome = false;
+        
+    }
+
+    function updateUI() {
+        // remove later
+        var previousUI = pandora.UI.getPrevious();
+        Ox.Request.cancel();
+        $('video').each(function() {
+            $(this).trigger('stop');
+        });
+        pandora.URL.parse(function() {
+            if (pandora.user.ui.section != previousUI.section) {
+                pandora.$ui.appPanel.replaceElement(1, pandora.$ui.mainPanel = pandora.ui.mainPanel());
+            } else if (!pandora.user.ui.item && !previousUI.item) {
+                // list to list
+                var isClipView = pandora.isClipView(),
+                    list = pandora.user.ui.lists[pandora.user.ui.list],
+                    previousList = previousUI.lists[previousUI.list],
+                    wasClipView = pandora.isClipView(previousList.view);
+                if (list.view != previousList.view) {
+                    pandora.$ui.mainMenu.checkItem('viewMenu_movies_' + list.view);
+                    pandora.$ui.viewSelect.options({value: list.view});
+                    if (isClipView != wasClipView) {
+                        pandora.$ui.mainMenu.replaceMenu('sortMenu', pandora.getSortMenu());
+                        pandora.$ui.sortSelect.replaceWith(pandora.$ui.sortSelect = pandora.ui.sortSelect());
+                        if (isClipView && !wasClipView) {
+                            pandora.UI.set('lists|' + pandora.user.ui.list + '|selected', []);
+                        }
+                    }                    
+                }
+                if (!Ox.isEqual(list.sort, previousList.sort)) {
+                    pandora.$ui.mainMenu.checkItem('sortMenu_sortmovies_' + list.sort[0].key);
+                    pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + ((
+                        list.sort[0].operator || pandora.getSortOperator(list.sort[0].key)
+                    ) == '+' ? 'ascending' : 'descending'));
+                    pandora.$ui.sortSelect.options({value: list.sort[0].key});
+                }
+                pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
+                if (Ox.isEqual(pandora.user.ui.find, previousUI.find)) {
                     pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
                 } else {
                     pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
@@ -281,8 +487,133 @@ pandora.URL = (function() {
         });
     }
 
-    return {
+    that.init = function() {
 
+        var itemsSection = pandora.site.itemsSection,
+            findKeys, sortKeys = {}, spanType = {}, views = {};
+
+        views[itemsSection] = {
+            list: Ox.merge(
+                // listView is the default view
+                [pandora.user.ui.listView],
+                Ox.map(pandora.site.listViews, function(view) {
+                    return view.id == pandora.user.ui.listView ? null : view.id;
+                })
+            ),
+            item: Ox.merge(
+                // itemView is the default view,
+                // videoView is the default view if there is a duration
+                [pandora.user.ui.itemView, pandora.user.ui.videoView],
+                pandora.site.itemViews.map(function(view) {
+                    return [
+                        'info', pandora.user.ui.videoView
+                    ].indexOf(view.id) > -1 ? null : view.id;
+                })
+            )
+        };
+
+        sortKeys[itemsSection] = {list: {}, item: {}};
+        views[itemsSection].list.forEach(function(view) {
+            sortKeys[itemsSection].list[view] = Ox.merge(
+                pandora.isClipView(view) ? Ox.clone(pandora.site.clipKeys) : [],
+                // listSort[0].key is the default sort key
+                [Ox.getObjectById(pandora.site.sortKeys, pandora.user.ui.listSort[0].key)],
+                Ox.map(pandora.site.sortKeys, function(key) {
+                    return key.id == pandora.user.ui.listSort[0].key ? null : key;
+                })
+            );
+        });
+        views[itemsSection].item.forEach(function(view) {
+            if (pandora.isClipView(view, true)) {
+                sortKeys[itemsSection].item[view] = Ox.merge(
+                    // itemSort[0].key is the default sort key
+                    [Ox.getObjectById(pandora.site.clipKeys, pandora.user.ui.itemSort[0].key)],
+                    Ox.map(pandora.site.clipKeys, function(key) {
+                        return key.id == pandora.user.ui.itemSort ? null : key;
+                    })
+                );
+            }
+        });
+
+        spanType[itemsSection] = {
+            list: {
+                map: 'location',
+                calendar: 'date'
+            },
+            item: {
+                video: 'duration',
+                timeline: 'duration',
+                map: 'location',
+                calendar: 'date'
+            }
+        };
+
+        findKeys = Ox.merge([{id: 'list', type: 'string'}], pandora.site.itemKeys);
+
+        self.URL = Ox.URL({
+            findKeys: findKeys,
+            getItem: pandora.getItemByIdOrTitle,
+            getSpan: pandora.getMetadataByIdOrName,
+            pages: [
+                'about', 'api', 'contact', 'faq', 'help', 'home', 'news',
+                'preferences', 'signin', 'signout', 'signup',
+                'software', 'terms', 'tour'
+            ],
+            sortKeys: sortKeys,
+            spanType: spanType,
+            types: [pandora.site.itemName.plural.toLowerCase(), 'edits', 'texts'],
+            views: views
+        });
+
+        return that;
+
+    };
+
+    // on page load, this sets the state from the URL
+    that.parse = function(callback) {
+        if (document.location.pathname.substr(0, 4) == 'url=') {
+            document.location.href = decodeURI(document.location.pathname.substr(4));
+        } else {
+            self.URL.parse(function(state) {
+                setState(state);
+                callback();
+            });
+        }
+        return that;
+    };
+
+    // sets the URL to the previous URL
+    that.pop = function() {
+        self.URL.pop();
+    };
+
+    // pushes a new URL (as string or from state)
+    that.push = function(url) {
+        Ox.print('push', arguments[0])
+        if (url) {
+            self.URL.push(url, setState);
+        } else {
+            var state = getState();
+            Ox.print('&&&&&&&', state)
+            self.URL.push(state);
+            setState(state);
+        }
+        return that;
+    };
+
+    // replaces the current URL (as string or from state)
+    that.replace = function(url) {
+        if (url) {
+            self.URL.replace(url, setState)
+        } else {
+            self.URL.replace(getState());
+        }
+        return that;
+    };
+
+    return that;
+
+    /*
         parse: function(callback) {
             var pathname = document.location.pathname.substr(1),
                 search = document.location.search.substr(1);
@@ -342,8 +673,8 @@ pandora.URL = (function() {
 
         update: function() {
             this.set(pandora.Query.toString());
-        },
+        }
 
-    };
+    */
 
 }());

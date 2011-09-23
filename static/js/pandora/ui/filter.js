@@ -49,8 +49,8 @@ pandora.ui.filter = function(list) {
                         
                     });
                 } else {
-                    pandora.user.ui.query = data.query;
-                    pandora.URL.update();
+                    pandora.UI.set('query', data.query);
+                    pandora.URL.push();
                     //reload();
                 }
             }

@@ -10,7 +10,6 @@ pandora.ui.backButton = function() {
     .bindEvent({
         click: function() {
             pandora.UI.set({item: null});
-            pandora.URL.update();
         }
     });
     return that;

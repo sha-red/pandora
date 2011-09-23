@@ -16,7 +16,14 @@ pandora.ui.mainPanel = function() {
             }
         ],
         orientation: 'horizontal'
-    })
+    });
+    Ox.Event.bind({
+        item: function(value) {
+            if (!value || !pandora.UI.getPrevious('item')) {
+                that.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
+            }
+        }
+    });
     return that;
 };
 

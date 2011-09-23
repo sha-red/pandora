@@ -298,16 +298,15 @@ pandora.getGroupsSizes = function() {
 
 pandora.getInfoHeight = function() {
     // fixme: new, check if it can be used more
-    var isVideoPreview, list 
+    var isVideoPreview 
     if (!pandora.user.ui.item) {
-        list = pandora.user.ui.lists[pandora.user.ui.list];
-        isVideoPreview = list.selected.length && !pandora.isClipView(list.listView);
+        isVideoPreview = pandora.user.ui.listSelection.length && !pandora.isClipView();
     } else {
-        isVideoPreview = !pandora.isClipView(pandora.user.ui.itemView, true);
+        isVideoPreview = !pandora.isClipView();
     }
     return pandora.user.ui.showInfo * Math.min(
         isVideoPreview
-        ? pandora.user.ui.sidebarSize / (16/9) + 16 
+        ? Math.round(pandora.user.ui.sidebarSize / (16/9)) + 16 
         : pandora.user.ui.sidebarSize,
         window.innerHeight - 109 // 20 menu + 24 bar + 64 (4 closed folders) + 1 resizebar
     );
@@ -329,7 +328,6 @@ pandora.getItemByIdOrTitle = function(str, callback) {
             }, function(result) {
                 var id = '';
                 if (result.data.items.length) {
-                    Ox.print('AAAAAA', result.data.items)
                     var items = Ox.map(result.data.items, function(item) {
                         // test if exact match or word match
                         var sort = new RegExp('^' + str + '$', 'i').test(item.title) ? 2000000
@@ -338,7 +336,6 @@ pandora.getItemByIdOrTitle = function(str, callback) {
                         // fixme: remove the (...|| 0) check once the backend sends correct data
                     });
                     if (items.length) {
-                        Ox.print('BBBBBB', items)
                         id = items.sort(function(a, b) {
                             return b.sort - a.sort;
                         })[0].id;
@@ -458,24 +455,24 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
 };
 
 pandora.getSortMenu = function() {
-    var list = pandora.user.ui.lists[pandora.user.ui.list],
-        isClipView = pandora.isClipView(list.listView);
+    var ui = pandora.user.ui,
+        isClipView = pandora.isClipView(ui.listView);
     return { id: 'sortMenu', title: 'Sort', items: [
         { id: 'sortmovies', title: 'Sort ' + (isClipView ? 'Clips' : pandora.site.itemName.plural) + ' by', items: [
             { group: 'sortmovies', min: 1, max: 1, items: Ox.merge(isClipView ? Ox.merge(pandora.site.clipKeys.map(function(key) {
                 return Ox.extend({
-                    checked: list.sort[0].key == key.id
+                    checked: ui.listSort[0].key == key.id
                 }, key);
             }), {}) : [], pandora.site.sortKeys.map(function(key) {
                 return Ox.extend({
-                    checked: list.sort[0].key == key.id
+                    checked: ui.listSort[0].key == key.id
                 }, key);
             })) }
         ] },
         { id: 'ordermovies', title: 'Order ' + (isClipView ? 'Clips' : pandora.site.itemName.plural), items: [
             { group: 'ordermovies', min: 1, max: 1, items: [
-                { id: 'ascending', title: 'Ascending', checked: (list.sort[0].operator || pandora.getSortOperator(list.sort[0].key)) == '+' },
-                { id: 'descending', title: 'Descending', checked: (list.sort[0].operator || pandora.getSortOperator(list.sort[0].key)) == '-' }
+                { id: 'ascending', title: 'Ascending', checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '+' },
+                { id: 'descending', title: 'Descending', checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '-' }
             ]}
         ] },
         { id: 'advancedsort', title: 'Advanced Sort...', keyboard: 'shift control s' },
@@ -548,7 +545,10 @@ pandora.getVideoPartsAndPoints = function(durations, points) {
 };
 
 pandora.isClipView = function(view, item) {
-    view = view || pandora.user.ui.lists[pandora.user.ui.list].listView;
+    if (arguments.length == 0) {
+        item = pandora.user.ui.item;
+        view = !item ? pandora.user.ui.listView : pandora.user.ui.itemView;
+    }
     return (
         !item ? ['calendar', 'clip', 'map'] : ['calendar', 'clips', 'map']
     ).indexOf(view) > -1;

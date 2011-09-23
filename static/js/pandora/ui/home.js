@@ -59,7 +59,7 @@ pandora.ui.home = function() {
             })
             .bind({
                 click: function() {
-                    pandora.URL.pushPrevious();
+                    pandora.URL.pop();
                     that.fadeOutScreen();
                 }
             })
@@ -107,7 +107,7 @@ pandora.ui.home = function() {
                 click: function() {
                     var folder = pandora.getListData().folder;
                     folder && pandora.$ui.folderList[folder].options({selected: []});
-                    pandora.URL.set('/?find=' + $findInput.value());
+                    pandora.URL.push('/*=' + $findInput.value());
                     that.fadeOutScreen();
                 }
             })
@@ -127,7 +127,7 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
-                    pandora.URL.pushPrevious();
+                    pandora.URL.push();
                     that.fadeOutScreen();
                 }
             })
@@ -147,7 +147,7 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
-                    pandora.URL.set('/signup');
+                    pandora.URL.push('/signup');
                     that.fadeOutScreen();
                 }
             }),    
@@ -166,7 +166,7 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
-                    pandora.URL.set('/signin');
+                    pandora.URL.push('/signin');
                     that.fadeOutScreen();
                 }
             }),    
@@ -185,7 +185,7 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
-                    pandora.URL.set('/preferences');
+                    pandora.URL.push('/preferences');
                     that.fadeOutScreen();
                 }
             }),    
@@ -204,7 +204,7 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
-                    pandora.URL.set('/about');
+                    pandora.URL.push('/about');
                     that.fadeOutScreen();
                 }
             })

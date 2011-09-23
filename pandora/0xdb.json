@@ -6,13 +6,13 @@
         "canSeeFiles": {"guest": -1, "member": -1, "staff": 3, "admin": 4}
     },
     "clipKeys": [
-        {"id": "clip:text", "title": "Clip Text", "type": "string"},
-        {"id": "clip:position", "title": "Clip Position", "type": "float"},
-        {"id": "clip:duration", "title": "Clip Duration", "type": "float"},
-        {"id": "clip:hue", "title": "Clip Hue", "type": "hue"},
-        {"id": "clip:saturation", "title": "Clip Saturation", "type": "float"},
-        {"id": "clip:lightness", "title": "Clip Lightness", "type": "float"},
-        {"id": "clip:volume", "title": "Clip Volume", "type": "float"}
+        {"id": "clip:text", "title": "Text", "type": "string"},
+        {"id": "clip:position", "title": "Position", "type": "float"},
+        {"id": "clip:duration", "title": "Duration", "type": "float"},
+        {"id": "clip:hue", "title": "Hue", "type": "hue"},
+        {"id": "clip:saturation", "title": "Saturation", "type": "float"},
+        {"id": "clip:lightness", "title": "Lightness", "type": "float"},
+        {"id": "clip:volume", "title": "Volume", "type": "float"}
     ],
     "groups": [
         {"id": "director", "title": "Director", "type": "string"},
@@ -29,7 +29,7 @@
     ],
     "itemKeys": [
         {
-            "id": "all",
+            "id": "*",
             "title": "All",
             "type": "text",
             "find": true
@@ -543,7 +543,13 @@
         "preferences": {},
         "ui": {
             "annotationsSize": 256,
-            "find": {"index": -1, "key": "", "value": ""},
+            "columns": {
+                "Colors": {
+                    "columns": ["title", "director", "country", "year", "hue", "saturation", "brightness"],
+                    "columnWidth": {}
+                }
+            },
+            "find": {"conditions": [], "operator": "&"},
             "groups": [
                 {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "country", "sort": [{"key": "items", "operator": "-"}]},
@@ -555,20 +561,15 @@
             "icons": "posters",
             "infoIconSize": 256,
             "item": "",
+            "itemSort": [{"key": "clip:position", "operator": ""}],
             "itemView": "info",
             "list": "",
-            "lists": {
-                "": {
-                    "columns": ["title", "director", "country", "year", "language", "runtime", "genre"],
-                    "columnWidth": {},
-                    "listView": "grid",
-                    "selected": [],
-                    "sort": [
-                        {"key": "director", "operator": ""}
-                    ]
-                }
-            },
-            "query": {"conditions": [], "operator": ""},
+            "listColumns": ["title", "director", "country", "year", "language", "runtime", "genre"],
+            "listColumnWidth": {},
+            "listSelection": [],
+            "listSort": [{"key": "director", "operator": ""}],
+            "listView": "grid",
+            "lists": {},
             "section": "items",
             "showAnnotations": true,
             "showControls": true,
@@ -586,8 +587,8 @@
                 }
             },
             "showSidebar": true,
+            "showSitePosters": false,
             "sidebarSize": 256,
-            "sitePage": "home",
             "theme": "modern",
             "videoPoints": {},
             "videoScale": "fit",

@@ -23,10 +23,10 @@ def parseCondition(condition):
     }
     ...
     '''
-    k = condition.get('key', 'all')
+    k = condition.get('key', '*')
     k = {'id': 'itemId'}.get(k, k)
     if not k:
-        k = 'all'
+        k = '*'
     v = condition['value']
     op = condition.get('operator')
     if not op:
@@ -192,7 +192,7 @@ class ItemManager(Manager):
         return QuerySet(self.model)
 
     def filter_list(self, qs, l, user):
-        if l != "all":
+        if l != "*":
             l = l.split(":")
             only_public = True
             if not user.is_anonymous():

@@ -1,8 +1,8 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.findElement = function() {
-    var findIndex = pandora.user.ui.find.index,
-        findKey = pandora.user.ui.find.key,
-        findValue = pandora.user.ui.find.value;
+    var findIndex = pandora.user.ui._findState.index,
+        findKey = pandora.user.ui._findState.key,
+        findValue = pandora.user.ui._findState.value;
     var that = Ox.FormElementGroup({
             elements: Ox.merge(pandora.user.ui.list ? [
                     pandora.$ui.findListSelect = Ox.Select({
@@ -78,20 +78,21 @@ pandora.ui.findElement = function() {
                                     && pandora.$ui.findListSelect.value() == 'list',
                                 key = pandora.$ui.findSelect.value(),
                                 conditions = data.value ? [{
-                                    key: key == 'all' ? '' : key,
+                                    key: key,
                                     value: data.value,
-                                    operator: ''
+                                    operator: '='
                                 }] : [];
                             if (findInList) {
-                                pandora.user.ui.query = {
+                                pandora.UI.set('find', {
                                     conditions: Ox.merge([{
                                         key: 'list',
                                         value: pandora.user.ui.list,
-                                        operator: ''
+                                        operator: '=='
                                     }], conditions),
                                     operator: '&'
-                                }
-                                data.value && findIndex == 0 && pandora.user.ui.query.conditions.reverse();
+                                });
+                                // fixme: what was this?
+                                // data.value && findIndex == 0 && pandora.user.ui.find.conditions.reverse();
                             } else {
                                 if (pandora.user.ui.list) {
                                     Ox.forEach(pandora.$ui.folderList, function($list) {
@@ -99,12 +100,12 @@ pandora.ui.findElement = function() {
                                     });
                                     pandora.UI.set({list: ''});
                                 }
-                                pandora.user.ui.query = {
+                                pandora.UI.set('find', {
                                     conditions: conditions,
                                     operator: ''
-                                }
+                                });
                             }
-                            pandora.URL.set(pandora.Query.toString());
+                            pandora.URL.push();
                         }
                     })
             ]),
@@ -115,7 +116,7 @@ pandora.ui.findElement = function() {
             margin: '4px'
         });
     function autocompleteFunction() {
-        return pandora.user.ui.query.conditions.length ? function(value, callback) {
+        return pandora.user.ui.find.conditions.length ? function(value, callback) {
             var elementValue = that.value(),
                 key = elementValue[pandora.user.ui.list ? 1 : 0],
                 findKey = Ox.getObjectById(pandora.site.findKeys, key);

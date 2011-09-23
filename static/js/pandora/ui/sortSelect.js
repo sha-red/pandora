@@ -1,20 +1,24 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.sortSelect = function() {
-    var list = pandora.user.ui.lists[pandora.user.ui.list],
-        items = pandora.site.sortKeys.map(function(key) {
-            return Ox.extend(Ox.clone(key), {
-                checked: list.sort[0].key == key.id,
-                title: 'Sort by ' + key.title
-            });
-        }),
+    var items = [],
+        sortKey = !pandora.user.ui.item ? 'listSort' : 'itemSort',
         that;
-    if (pandora.isClipView(list.listView)) {
-        items = Ox.merge(pandora.site.clipKeys.map(function(key) {
+    if (pandora.isClipView()) {
+        items = pandora.site.clipKeys.map(function(key) {
             return Ox.extend(Ox.clone(key), {
-                checked: list.sort[0].key == key.id,
+                checked: key.id == pandora.user.ui[sortKey][0].key,
+                title: 'Sort by ' + (!pandora.user.ui.item ? 'Clip ' : '') + key.title
+            });
+        });
+        !pandora.user.ui.item && items.push({});
+    }
+    if (!pandora.user.ui.item) {
+        items = Ox.merge(items, pandora.site.sortKeys.map(function(key) {
+            return Ox.extend(Ox.clone(key), {
+                checked: key.id == pandora.user.ui[sortKey][0].key,
                 title: 'Sort by ' + key.title
             });
-        }), {}, items);
+        }));
     }
     that = Ox.Select({
         id: 'sortSelect',
@@ -27,14 +31,18 @@ pandora.ui.sortSelect = function() {
     })
     .bindEvent({
         change: function(data) {
-            //var query = Ox.unserialize(document.location.search);
-            //query.sort = data.selected.id;
-            //pandora.URL.set('/' + pandora.user.ui.lists[pandora.user.ui.list].listView + '/?' + Ox.serialize(query));
-            pandora.UI.set(
-                'lists|' + pandora.user.ui.list + '|sort',
-                [{key: data.selected[0].id, operator: ''}]
-            );
-            pandora.URL.update();
+            pandora.UI.set(sortKey, [{key: data.selected[0].id, operator: ''}]);
+        }
+    });
+    Ox.Event.bind({
+        listSort: function(value) {
+            that.selectItem(value[0].key);
+        },
+        item: function(valye) {
+            
+        },
+        itemSort: function(value) {
+            that.selectItem(value[0].key);
         }
     });
     return that;

@@ -29,9 +29,11 @@ pandora.ui.folderList = function(id) {
                     width: 16
                 },
                 {
+                    /*
                     format: function(value) {
                         return value.split('/').join(': ');
                     },
+                    */
                     id: 'id',
                     operator: '+',
                     unique: true,
@@ -376,13 +378,25 @@ pandora.ui.folderList = function(id) {
                         id != id_ && $list.options('selected', []);
                     });
                 }
-                pandora.URL.set(data.ids.length ? '?find=list:' + data.ids[0] : '');
+                // pandora.URL.push(data.ids.length ? '/list==' + data.ids[0] : '')
                 /*
                 pandora.UI.set({
                     item: '',
                     list: data.ids.length ? data.ids[0] : ''
-                });
+                })
+                pandora.URL.push();
                 */
+                pandora.UI.set({
+                    item: '',
+                    list: data.ids.length ? data.ids[0] : '',
+                    find: {
+                        conditions: data.ids.length ? [
+                            {key: 'list', value: data.ids[0], operator: '=='}
+                        ] : [],
+                        operator: '&'
+                    }
+                })
+                pandora.URL.push();
             },
             submit: function(data) {
                 data_ = {id: data.id};

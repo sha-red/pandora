@@ -1,7 +1,10 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.info = function() {
-    var list = pandora.user.ui.lists[pandora.user.ui.list],
-        id = pandora.user.ui.item || (list.selected.length ? list.selected[list.selected.length - 1] : null),
+    var id = pandora.user.ui.item || (
+            pandora.user.ui.listSelection.length
+            ? pandora.user.ui.listSelection[pandora.user.ui.listSelection.length - 1]
+            : null
+        ),
         view = getView(),
         that = Ox.Element()
             .css({overflowX: 'hidden', overflowY: 'auto'})
@@ -13,7 +16,7 @@ pandora.ui.info = function() {
             });
     Ox.print('INFO', view)
     if (view == 'list') {
-        that.empty().append(pandora.$ui.listInfo = pandora.ui.listInfo(list));
+        that.empty().append(pandora.$ui.listInfo = pandora.ui.listInfo(pandora.user.ui.list));
     } else if (view == 'poster') {
         pandora.api.get({id: id, keys: ['director', 'posterRatio', 'title']}, function(result) {
             var ratio = result.data.posterRatio,
@@ -75,7 +78,7 @@ pandora.ui.listInfo = function(data) {
         .attr({src: !pandora.user.ui.list ? '/static/png/icon256.png' : Ox.UI.getImageURL('symbolIcon')})
         .css(getIconCSS())
         .appendTo(that);
-    $('<div>').css({padding: '16px 0 16px 0', fontWeight: 'bold'}).html(!pandora.user.ui.list ? 'All Movies' : pandora.user.ui.list.replace('/', ': ')).appendTo(that);
+    $('<div>').css({padding: '16px 0 16px 0', fontWeight: 'bold'}).html(!pandora.user.ui.list ? 'All Movies' : pandora.user.ui.list.replace(':', ': ')).appendTo(that);
     $('<div>').css({textAlign: 'left'}).html(Ox.repeat('This is the list info text. ', 10)).appendTo(that);
     function getIconCSS() {
         var size = Math.round(pandora.user.ui.sidebarSize / 2);

@@ -20,9 +20,9 @@ pandora.ui.videoPreview = function(data) {
         })
         .bindEvent({
             click: function(event) {
-                if (pandora.user.ui.item) {
+                if (pandora.user.ui.item && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
                     pandora.$ui[
-                        pandora.user.ui.itemView == 'player' ? 'player' : 'editor'
+                        pandora.user.ui.itemView == 'video' ? 'player' : 'editor'
                     ].options({
                         position: event.position
                     });
@@ -31,8 +31,8 @@ pandora.ui.videoPreview = function(data) {
                         'videoPoints|' + data.id,
                         {'in': 0, out: 0, position: event.position}
                     );
-                    pandora.URL.set(
-                        '/' + data.id + '/timeline' //'/' + Ox.formatDuration(event.position, 2)
+                    pandora.URL.push(
+                        '/' + data.id + '/' + pandora.user.ui.videoView + '/' + Ox.formatDuration(event.position, 2)
                     );
                 }
             }
