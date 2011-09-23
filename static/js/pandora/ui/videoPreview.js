@@ -31,10 +31,10 @@ pandora.ui.videoPreview = function(data) {
                         'videoPoints.' + data.id,
                         {'in': 0, out: 0, position: event.position}
                     );
-                    pandora.UI.set(
+                    pandora.UI.set({
                         item: data.id,
                         itemView: pandora.user.ui.videoView
-                    );
+                    });
                 }
             }
         });
