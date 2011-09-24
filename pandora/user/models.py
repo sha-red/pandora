@@ -91,6 +91,12 @@ def user_post_save(sender, instance, **kwargs):
 
 models.signals.post_save.connect(user_post_save, sender=User)
 
+#FIXME: this should be one function
+def user_json(user, keys, request_user=None):
+    return {
+        'username': user.username,
+        'level': user.get_profile().get_level()
+    }
 
 def get_user_json(user):
     profile = user.get_profile()
@@ -101,4 +107,6 @@ def get_user_json(user):
     result['groups'] = [g.name for g in user.groups.all()]
     result['preferences'] = profile.get_preferences()
     result['ui'] = profile.get_ui()
+    result['volumes'] = [v.json() for v in user.volumes.all()] 
     return result
+

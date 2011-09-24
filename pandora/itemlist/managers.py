@@ -18,7 +18,6 @@ def parseCondition(condition, user):
             value: "1970-1980,
             operator: "!="
     }
-    ...
     '''
     k = condition.get('key', 'name')
     k = {
@@ -49,16 +48,11 @@ def parseCondition(condition, user):
     elif isinstance(v, bool): #featured and public flag
         key = k
     else:
-        if op == '=':
-            key = '%s__iexact'%k
-        elif op == '^':
-            v = v[1:]
-            key = '%s__istartswith'%k
-        elif op == '$':
-            v = v[:-1]
-            key = '%s__iendswith'%k
-        else: # default
-            key = '%s__icontains'%k
+        key = "%s%s" % (k, {
+            '==': '__iexact',
+            '^': '__istartswith',
+            '$': '__iendswith',
+        }.get(op, '__icontains'))
 
     key = str(key)
     if exclude:

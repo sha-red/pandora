@@ -499,18 +499,17 @@ pandora.ui.list = function() { // fixme: remove view argument
 
         });
         pandora.api.findEvents({
-            query: '',
-            itemQuery: pandora.user.ui.query
+            itemQuery: pandora.user.ui.query,
+            keys: ['id', 'name', 'start', 'end'],
+            query: {}
         }, function(result) {
-            Ox.print(">>>>>>>", result);
-            that.replaceElement(0,
-            pandora.$ui.calendar = Ox.Calendar({
-                        date: new Date(0),
-                        events: result.data.events,
-                        height: window.innerHeight - pandora.user.ui.showGroups * pandora.user.ui.groupsSize - 61,
-                        range: [-5000, 5000],
-                        width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE,
-                        zoom: 4
+            that.replaceElement(0, pandora.$ui.calendar = Ox.Calendar({
+                date: new Date(0),
+                events: result.data.items,
+                height: window.innerHeight - pandora.user.ui.showGroups * pandora.user.ui.groupsSize - 61,
+                range: [-5000, 5000],
+                width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE,
+                zoom: 4
             }));
         });
     } else {

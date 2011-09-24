@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from django.contrib.auth.models import User
 
-from django.db.models import Q, Manager
+from django.db.models import Q
 
 def parseCondition(condition, user):
     k = condition.get('key', 'name')
@@ -59,17 +60,12 @@ def parseConditions(conditions, operator, user):
         return q
     return None
 
-class EventManager(Manager):
-
-    def get_query_set(self):
-        return super(EventManager, self).get_query_set()
-
-    def find(self, data, user):
-        qs = self.get_query_set()
-        query = data.get('query', {})
-        conditions = parseConditions(query.get('conditions', []),
-                                     query.get('operator', '&'),
-                                     user)
-        if conditions:
-            qs = qs.filter(conditions)
-        return qs
+def find_user(data, user):
+    qs = User.objects.all()
+    query = data.get('query', {})
+    conditions = parseConditions(query.get('conditions', []),
+                                 query.get('operator', '&'),
+                                 user)
+    if conditions:
+        qs = qs.filter(conditions)
+    return qs

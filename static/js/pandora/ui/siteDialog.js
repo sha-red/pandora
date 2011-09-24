@@ -12,6 +12,10 @@ pandora.ui.siteDialog = function(section) {
     Ox.getObjectById(tabs, section).selected = true;
     var $tabPanel = Ox.TabPanel({
             content: function(id) {
+                var content = Ox.Element().css({padding: '16px', overflowY: 'auto'});
+                pandora.api.getPage({name:id}, function(result) {
+                    content.html(result.data.body);
+                });
                 return Ox.SplitPanel({
                     elements: [
                         {
@@ -27,9 +31,7 @@ pandora.ui.siteDialog = function(section) {
                             size: 272
                         },
                         {
-                            element: Ox.Element()
-                                .css({padding: '16px', overflowY: 'auto'})
-                                .html(Ox.repeat(Ox.getObjectById(tabs, id).title + ' ', 200))
+                            element: content
                         }
                     ],
                     orientation: 'horizontal'

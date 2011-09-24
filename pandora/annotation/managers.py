@@ -15,7 +15,6 @@ def parseCondition(condition, user):
             value: "1970-1980,
             operator: "!="
     }
-    ...
     '''
     k = condition.get('key', 'name')
     k = {
@@ -48,27 +47,18 @@ def parseCondition(condition, user):
         key = k
     elif k in ('lat', 'lng', 'area', 'south', 'west', 'north', 'east', 'matches',
                'id', 'places__id'):
-        if op == '>':
-            key = '%s__gt'%k
-        elif op == '>=':
-            key = '%s__gte'%k
-        elif op == '<':
-            key = '%s__lt'%k
-        elif op == '<=':
-            key = '%s__lte'%k
-        else: #default is exact match
-            key = k
+        key = "%s%s" % (k, {
+            '>': '__gt',
+            '>=': '__gte',
+            '<': '__lt',
+            '<=': '__lte',
+        }.get(op, ''))
     else:
-        if op == '=' or op == '^$':
-            key = '%s__iexact'%k
-        elif op == '^':
-            v = v[1:]
-            key = '%s__istartswith'%k
-        elif op == '$':
-            v = v[:-1]
-            key = '%s__iendswith'%k
-        else: # default
-            key = '%s__icontains'%k
+        key = "%s%s" % (k, {
+            '==': '__iexact',
+            '^': '__istartswith',
+            '$': '__iendswith',
+        }.get(op, '__icontains'))
 
     key = str(key)
     if exclude:

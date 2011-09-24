@@ -18,15 +18,15 @@ def parseCondition(condition):
     or
     condition: {
             key: "year",
-            value: "1970-1980,
-            operator: "!="
+            value: [1970, 1980],
+            operator: "="
     }
     ...
     '''
-    k = condition.get('key', 'all')
+    k = condition.get('key', '*')
     k = {'id': 'itemId'}.get(k, k)
     if not k:
-        k = 'all'
+        k = '*'
     v = condition['value']
     op = condition.get('operator')
     if not op:
@@ -65,23 +65,20 @@ def parseCondition(condition):
         value_key = 'find__value'
         if k in models.Item.facet_keys + ['title']:
             in_find = False
-            if op == '==':
-                v = models.Item.objects.filter(facets__key=k, facets__value=v)
-            elif op == '^':
-                v = models.Item.objects.filter(facets__key=k, facets__value__istartswith=v)
-            elif op == '$':
-                v = models.Item.objects.filter(facets__key=k, facets__value__iendswith=v)
-            else:
-                v = models.Item.objects.filter(facets__key=k, facets__value__icontains=v)
+            facet_value = 'facets__value%s' % {
+                '==': '__iexact',
+                '^': '__istartswith',
+                '$': '__iendswith',
+            }.get(op, '__icontains')
+            v = models.Item.objects.filter(**{'facets__key':k, facet_value:v})
             k = 'id__in'
-        elif op == '==':
-            value_key = 'find__value__iexact'
-        elif op == '^':
-            value_key = 'find__value__istartswith'
-        elif op == '$':
-            value_key = 'find__value__iendswith'
-        else: # default
-            value_key = 'find__value__icontains'
+        else:
+            value_key = 'find__value%s' % {
+                '==': '__iexact',
+                '^': '__istartswith',
+                '$': '__iendswith',
+            }.get(op, '__icontains')
+
         k = str(k)
         if exclude:
             if k == '*':
@@ -121,21 +118,18 @@ def parseCondition(condition):
 
         if key_type == "date":
             v = parseDate(v.split('.'))
-        if op == '==':
-            vk = 'value__exact'
-        elif op == '>':
-            vk = 'value__gt'
-        elif op == '>=':
-            vk = 'value__gte'
-        elif op == '<':
-            vk = 'value__lt'
-        elif op == '<=':
-            vk = 'value__lte'
-        else: 
-            vk = 'value__exact'
+        else:
+            vk = 'value%s' % ({
+                '==': '__exact',
+                '>': '__gt',
+                '>=': '__gte',
+                '<': '__lt',
+                '<=': '__lte',
+                '^': '__istartswith',
+                '$': '__iendswith',
+            }.get(op,'__exact'))
 
-        vk = 'find__%s' % vk
-        vk = str(vk)
+        vk = str('find__%s' % vk)
 
         if exclude: #!1960
             return ~Q(**{'find__key': k, vk: v})
@@ -192,7 +186,7 @@ class ItemManager(Manager):
         return QuerySet(self.model)
 
     def filter_list(self, qs, l, user):
-        if l != "all":
+        if l != "*":
             l = l.split(":")
             only_public = True
             if not user.is_anonymous():

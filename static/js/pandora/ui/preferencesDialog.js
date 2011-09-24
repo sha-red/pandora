@@ -6,6 +6,36 @@ pandora.ui.preferencesDialog = function() {
     ];
     var $tabPanel = Ox.TabPanel({
             content: function(id) {
+                var content = Ox.Element().css({padding: '16px', overflowY: 'auto'});
+                if (id == 'account') {
+                    content.append(Ox.FormElementGroup({
+                        elements: Ox.values(Ox.map(pandora.user.preferences, function(v, k) { 
+                            return Ox.Input({
+                                id: k,
+                                width: 400,
+                                label: Ox.toTitleCase(k),
+                                value: v 
+                            });
+                        }))
+                    }));
+                } else {
+                    content.append(Ox.FormElementGroup({
+                        elements: [
+                            Ox.Checkbox({
+                                checked: true ,
+                                id: 'showEpisodes',
+                                title: 'Show Episodes',
+                                width: 400
+                            }),
+                            Ox.Checkbox({
+                                checked: true ,
+                                id: 'newsletter',
+                                title: 'Receive Newsletter',
+                                width: 400
+                            })
+                            ]
+                    }));
+                }
                 return Ox.SplitPanel({
                     elements: [
                         {
@@ -19,9 +49,7 @@ pandora.ui.preferencesDialog = function() {
                             size: 144
                         },
                         {
-                            element: Ox.Element()
-                                .css({padding: '16px', overflowY: 'auto'})
-                                .html(Ox.repeat(Ox.getObjectById(tabs, id).title + ' ', 200))
+                            element: content
                         }
                     ],
                     orientation: 'horizontal'

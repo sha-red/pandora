@@ -15,10 +15,14 @@ from ox.django.shortcuts import render_to_json_response, json_response, get_obje
 from ox.django.decorators import login_required_json
 import ox
 
-import models
 
 from api.actions import actions
 from item.models import Access, Item
+from item import utils 
+
+import models
+import managers
+
 
 class SigninForm(forms.Form):
     username = forms.TextInput()
@@ -318,26 +322,140 @@ def findUser(request):
             }
         }
     '''
+    #admins should be able to find all users, other users only exact matches 
     #FIXME: support other operators and keys
     data = json.loads(request.POST['data'])
     response = json_response(status=200, text='ok')
     keys = data.get('keys')
     if not keys:
         keys = ['username', 'level']
-    def user_json(user, keys):
-        return {
-            'usernname': user.username,
-            'level': user.get_profile().get_level()
-        }
 
     if data['key'] == 'email':
-        response['data']['users'] = [user_json(u, keys)
+        response['data']['users'] = [models.user_json(u, keys)
                                      for u in User.objects.filter(email__iexact=data['value'])]
     else:
-        response['data']['users'] = [user_json(u, keys)
+        response['data']['users'] = [models.user_json(u, keys)
                                      for u in User.objects.filter(username__iexact=data['value'])]
     return render_to_json_response(response)
 actions.register(findUser)
+
+
+def parse_query(data, user):
+    query = {}
+    query['range'] = [0, 100]
+    query['sort'] = [{'key':'name', 'operator':'+'}]
+    for key in ('keys', 'range', 'sort', 'query'):
+        if key in data:
+            query[key] = data[key]
+    query['qs'] = managers.find_user(query, user)
+    return query
+
+def order_query(qs, sort):
+    order_by = []
+    for e in sort:
+        operator = e['operator']
+        if operator != '-':
+            operator = ''
+        key = {
+        }.get(e['key'], e['key'])
+        order = '%s%s' % (operator, key)
+        order_by.append(order)
+    if order_by:
+        qs = qs.order_by(*order_by, nulls_last=True)
+    return qs
+
+def findUsers(request):
+    '''
+        param data {
+            query: {
+                conditions: [
+                    {
+                        key: 'user',
+                        value: 'something',
+                        operator: '='
+                    }
+                ]
+                operator: ","
+            },
+            sort: [{key: 'username', operator: '+'}],
+            range: [0, 100]
+            keys: []
+        }
+
+        possible query keys:
+            username, email, lastLogin, browser
+        
+        return {
+                status: {
+                    code: int,
+                    text: string
+                },
+                data: {
+                    items: [
+                        {name:, user:, featured:, public...}
+                    ]
+                }
+        }
+        param data
+            {'query': query, 'sort': array, 'range': array}
+
+            query: query object, more on query syntax at
+                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
+            sort: array of key, operator dics
+                [
+                    {
+                        key: "year",
+                        operator: "-"
+                    },
+                    {
+                        key: "director",
+                        operator: ""
+                    }
+                ]
+            range:       result range, array [from, to]
+
+        with keys, items is list of dicts with requested properties:
+          return {'status': {'code': int, 'text': string},
+                'data': {items: array}}
+
+Positions
+        param data
+            {'query': query, 'positions': []}
+
+            query: query object, more on query syntax at
+                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
+            positions:  ids of places for which positions are required
+    '''
+    if request.user.is_anonymous() or request.user.get_profile().get_level() != 'admin': 
+        response = json_response(status=403, text='permission denied')
+        return
+    response = json_response(status=200, text='ok')
+
+    data = json.loads(request.POST['data'])
+    query = parse_query(data, request.user)
+    qs = query['qs']
+    if 'keys' in data:
+        qs = qs[query['range'][0]:query['range'][1]]
+        response['data']['items'] = [models.user_json(p, data['keys'], request.user) for p in qs]
+    elif 'position' in query:
+        ids = [i.get_id() for i in qs]
+        data['conditions'] = data['conditions'] + {
+            'value': data['position'],
+            'key': query['sort'][0]['key'],
+            'operator': '^'
+        }
+        query = parse_query(data, request.user)
+        qs = order_query(query['qs'], query['sort'])
+        if qs.count() > 0:
+            response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
+    elif 'positions' in data:
+        ids = [i.get_id() for i in qs]
+        response['data']['positions'] = utils.get_positions(ids, data['positions'])
+    else:
+        response['data']['items'] = qs.count()
+
+    return render_to_json_response(response)
+actions.register(findUsers)
 
 
 class ContactForm(forms.Form):

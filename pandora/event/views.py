@@ -6,8 +6,10 @@ from ox.utils import json
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 
-import models
 from api.actions import actions
+from item import utils
+
+import models
 
 
 @login_required_json
@@ -88,6 +90,33 @@ def removeEvent(request):
     return render_to_json_response(response)
 actions.register(removeEvent, cache=False)
 
+def parse_query(data, user):
+    query = {}
+    query['range'] = [0, 100]
+    query['sort'] = [{'key':'name', 'operator':'+'}]
+    for key in ('keys', 'group', 'list', 'range', 'sort', 'query'):
+        if key in data:
+            query[key] = data[key]
+    query['qs'] = models.Event.objects.find(query, user)
+    if 'itemQuery' in data:
+        item_query = models.Item.objects.find({'query': data['itemQuery']}, user)
+        query['qs'] = query['qs'].filter(items__in=item_query)
+    return query
+
+def order_query(qs, sort):
+    order_by = []
+    for e in sort:
+        operator = e['operator']
+        if operator != '-':
+            operator = ''
+        key = {
+            'name': 'name_sort',
+        }.get(e['key'], e['key'])
+        order = '%s%s' % (operator, key)
+        order_by.append(order)
+    if order_by:
+        qs = qs.order_by(*order_by, nulls_last=True)
+    return qs
 
 def findEvents(request):
     '''
@@ -126,11 +155,30 @@ Positions
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
             ids:  ids of events for which positions are required
     '''
-    data = json.loads(request.POST['data'])
     response = json_response(status=200, text='ok')
-    response['data']['events'] = []
-    #FIXME: add coordinates to limit search
-    for p in models.Event.objects.find(data['query']):
-        response['data']['events'].append(p.json())
+
+    data = json.loads(request.POST['data'])
+    query = parse_query(data, request.user)
+    qs = query['qs']
+    if 'keys' in data:
+        qs = qs[query['range'][0]:query['range'][1]]
+        response['data']['items'] = [p.json(request.user) for p in qs]
+    elif 'position' in query:
+        ids = [i.get_id() for i in qs]
+        data['conditions'] = data['conditions'] + {
+            'value': data['position'],
+            'key': query['sort'][0]['key'],
+            'operator': '^'
+        }
+        query = parse_query(data, request.user)
+        qs = order_query(query['qs'], query['sort'])
+        if qs.count() > 0:
+            response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
+    elif 'positions' in data:
+        ids = [i.get_id() for i in qs]
+        response['data']['positions'] = utils.get_positions(ids, data['positions'])
+    else:
+        response['data']['items'] = qs.count()
+
     return render_to_json_response(response)
 actions.register(findEvents)

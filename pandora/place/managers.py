@@ -26,7 +26,7 @@ def parseCondition(condition, user):
     v = condition['value']
     op = condition.get('operator')
     if not op:
-        op = ''
+        op = '='
     if op.startswith('!'):
         op = op[1:]
         exclude = True
@@ -44,27 +44,18 @@ def parseCondition(condition, user):
     if isinstance(v, bool): #featured and public flag
         key = k
     elif k in ('lat', 'lng', 'area', 'south', 'west', 'north', 'east', 'matches', 'id'):
-        if op == '>':
-            key = '%s__gt'%k
-        elif op == '>=':
-            key = '%s__gte'%k
-        elif op == '<':
-            key = '%s__lt'%k
-        elif op == '<=':
-            key = '%s__lte'%k
-        else: #default is exact match
-            key = k
+        key = '%s%s' % (k, {
+            '>': '__gt',
+            '>=': '__gte',
+            '<': '__lt',
+            '<=': '__lte',
+        }.get(op,''))
     else:
-        if op == '=' or op == '^$':
-            key = '%s__iexact'%k
-        elif op == '^':
-            v = v[1:]
-            key = '%s__istartswith'%k
-        elif op == '$':
-            v = v[:-1]
-            key = '%s__iendswith'%k
-        else: # default
-            key = '%s__icontains'%k
+        key = '%s%s' % (k, {
+            '==': '__iexact',
+            '^': '__istartswith',
+            '$': '__iendswith',
+        }.get(op,'__icontains'))
 
     key = str(key)
     if exclude:
@@ -146,8 +137,9 @@ class PlaceManager(Manager):
         #join query with operator
         qs = self.get_query_set()
         
-        conditions = parseConditions(data.get('query', {}).get('conditions', []),
-                                     data.get('query', {}).get('operator', '&'),
+        query = data.get('query', {})
+        conditions = parseConditions(query.get('conditions', []),
+                                     query.get('operator', '&'),
                                      user)
         if conditions:
             qs = qs.filter(conditions)

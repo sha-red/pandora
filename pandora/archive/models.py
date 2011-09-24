@@ -385,6 +385,13 @@ class Volume(models.Model):
     def __unicode__(self):
         return u"%s's %s"% (self.user, self.name)
 
+    def json(self):
+        return {
+            'name': self.name,
+            'path': 'unknown',
+            'items': self.files.count()
+        }
+
 class Instance(models.Model):
 
     class Meta:

@@ -29,7 +29,7 @@
     ],
     "itemKeys": [
         {
-            "id": "all",
+            "id": "*",
             "title": "All",
             "type": "text",
             "find": true

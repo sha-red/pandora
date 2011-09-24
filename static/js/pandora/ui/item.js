@@ -39,11 +39,49 @@ pandora.ui.item = function() {
             );
 
         } else if (pandora.user.ui.itemView == 'calendar') {
-            pandora.$ui.contentPanel.replaceElement(1, Ox.Element().html('Calendar'));
+            pandora.api.findEvents({
+                itemQuery: {conditions: [{key: 'id', value: pandora.user.ui.item, operator:'='}]},
+                keys: ['id', 'name', 'start', 'end'],
+                query: {}
+            }, function(r) {
+                if (r.data.items.length>0) {
+                    pandora.$ui.contentPanel.replaceElement(1, Ox.SplitPanel({
+                        elements: [
+                            {
+                                element: pandora.$ui.calendar = Ox.Calendar({
+                                    date: new Date(0),
+                                    events: r.data.items,
+                                    height: window.innerHeight - pandora.user.ui.showGroups * pandora.user.ui.groupsSize - 61,
+                                    range: [-5000, 5000],
+                                    width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE,
+                                    zoom: 4
+                                })
+                            },
+                            {
+                                element: Ox.Element(),
+                                id: 'place',
+                                size: 144 + Ox.UI.SCROLLBAR_SIZE
+                            }
+                        ],
+                        orientation: 'horizontal'
+                    })
+                    .bindEvent('resize', function(data) {
+
+                    }));
+                } else {
+                    pandora.$ui.contentPanel.replaceElement(1,
+                        Ox.Element()
+                            .css({marginTop: '32px', fontSize: '12px', textAlign: 'center'})
+                            .html(
+                                'Sorry, <i>' + result.data.title 
+                                + '</i> currently doesn\'t have a '
+                                + pandora.user.ui.itemView + ' view.'
+                    ));
+                }
+            });
 
         } else if (pandora.user.ui.itemView == 'clips') {
             var ratio = result.data.stream.aspectRatio;
-            Ox.print('RATIO', ratio)
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.clips = Ox.IconList({
                 fixedRatio: ratio,
                 item: function(data, sort, size) {

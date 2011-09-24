@@ -499,7 +499,7 @@ class Item(models.Model):
                 elif key['type'] == 'layer':
                     qs = Annotation.objects.filter(layer__name=i, item=self).order_by('start')
                     save(i, '\n'.join([l.value for l in qs]))
-                elif i != 'all' and i not in self.facet_keys:
+                elif i != '*' and i not in self.facet_keys:
                     value = self.get(i)
                     if isinstance(value, list):
                         value = u'\n'.join(value)

@@ -521,6 +521,12 @@ pandora.ui.mainMenu = function() {
                             overflow: 'hidden'
                         }).append($manage).open();
                     */
+                } else if (data.id == 'events') {
+                    pandora.$ui.eventsDialog = pandora.ui.eventsDialog().open();
+                } else if (data.id == 'users') {
+                    pandora.$ui.eventsDialog = pandora.ui.usersDialog().open();
+                } else if (data.id == 'lists') {
+                    pandora.$ui.eventsDialog = pandora.ui.listsDialog().open();
                 } else if (data.id == 'query') {
                     var $dialog = Ox.Dialog({
                         buttons: [

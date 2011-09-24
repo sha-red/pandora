@@ -44,5 +44,7 @@
   "js/pandora/ui/home.js",
   "js/pandora/ui/preferencesDialog.js",
   "js/pandora/ui/listDialog.js",
-  "js/pandora/ui/siteDialog.js"
+  "js/pandora/ui/siteDialog.js",
+  "js/pandora/ui/eventsDialog.js",
+  "js/pandora/ui/usersDialog.js"
 ]
