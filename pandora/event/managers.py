@@ -11,5 +11,6 @@ class EventManager(Manager):
 
     def find(self, q=''):
         qs = self.get_query_set()
-        qs = qs.filter(Q(name_find__icontains=q))
+        if q:
+            qs = qs.filter(Q(name_find__icontains=q))
         return qs

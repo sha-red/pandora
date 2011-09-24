@@ -19,6 +19,9 @@ class Event(models.Model):
         Events are events in time that can be once or recurring,
         From Mondays to Spring to 1989 to Roman Empire
     '''
+    class Meta:
+        ordering = ('name_sort', )
+
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -32,9 +35,6 @@ class Event(models.Model):
     alternativeNames = fields.TupleField(default=[])
 
     objects = managers.EventManager()
-
-    class Meta:
-        ordering = ('name_sort', )
 
     #start yyyy-mm-dd|mm-dd|dow 00:00|00:00
     start = models.CharField(default='', max_length=255)
@@ -51,7 +51,10 @@ class Event(models.Model):
 
     matches = models.IntegerField(default=0)
     items = models.ManyToManyField(Item, blank=True, related_name='events')
-    
+
+    def __unicode__(self):
+        return self.name
+ 
     def get_matches(self):
         q = Q(value__icontains=" " + self.name)|Q(value__startswith=self.name)
         for name in self.alternativeNames:
@@ -80,8 +83,9 @@ class Event(models.Model):
     def json(self, user=None):
         j = {
             'id': self.get_id(),
-            'user': self.user.username,
         }
+        if self.user:
+            j['user'] = self.user.username
         for key in ('created', 'modified',
                     'name', 'alternativeNames',
                     'start', 'end', 'duration',

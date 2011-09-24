@@ -485,27 +485,7 @@ pandora.ui.list = function() { // fixme: remove view argument
         that = Ox.SplitPanel({
             elements: [
                 {
-                    element: pandora.$ui.calendar = Ox.Calendar({
-                        date: new Date(0),
-                        events: [
-                            {name: 'Thirty Years\' War', start: '1618', end: '1648', type: 'other'},
-                            {name: 'American Civil War', start: '1861-04-12', end: '1865-04-09', type: 'other'},
-                            {name: 'Franco-Prussian War', start: '1870-07-19', end: '1871-05-10', type: 'other'},
-                            {name: 'World War One', start: '1914-07-28', end: '1918-11-11', type: 'other'},
-                            {name: 'World War Two', start: '1939-09-01', end: '1945-09-02', type: 'other'},
-                            {name: 'Cold War', start: '1947', end: '1991', type: 'other'},
-                            {name: 'Korean War', start: '1950-06-25', end: '1953-07-27', type: 'other'},
-                            {name: 'Algerian War', start: '1954-11-01', end: '1962-03-19', type: 'other'},
-                            {name: 'Vietnam War', start: '1955-11-01', end: '1975-04-30', type: 'other'},
-                            {name: 'Six-Day War', start: '1967-06-05', end: '1967-06-11', type: 'other'},
-                            {name: 'Iran-Iraq War', start: '1980-09-22', end: '1988-08-20', type: 'other'},
-                            {name: 'Gulf War', start: '1990-08-02', end: '1991-02-28', type: 'other'}
-                        ],
-                        height: window.innerHeight - pandora.user.ui.showGroups * pandora.user.ui.groupsSize - 61,
-                        range: [-5000, 5000],
-                        width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE,
-                        zoom: 4
-                    })
+                    element: pandora.$ui.calendar = Ox.Element()
                 },
                 {
                     element: Ox.Element(),
@@ -517,6 +497,21 @@ pandora.ui.list = function() { // fixme: remove view argument
         })
         .bindEvent('resize', function(data) {
 
+        });
+        pandora.api.findEvents({
+            query: '',
+            itemQuery: pandora.user.ui.query
+        }, function(result) {
+            Ox.print(">>>>>>>", result);
+            that.replaceElement(0,
+            pandora.$ui.calendar = Ox.Calendar({
+                        date: new Date(0),
+                        events: result.data.events,
+                        height: window.innerHeight - pandora.user.ui.showGroups * pandora.user.ui.groupsSize - 61,
+                        range: [-5000, 5000],
+                        width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE,
+                        zoom: 4
+            }));
         });
     } else {
         // fixme: ???
