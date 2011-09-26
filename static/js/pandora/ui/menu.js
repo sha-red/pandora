@@ -1,7 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.mainMenu = function() {
     var isGuest = pandora.user.level == 'guest',
-        list = pandora.user.ui.lists[pandora.user.ui.list],
+        ui = pandora.user.ui,
         that = Ox.MainMenu({
             extras: [
                 $('<div>').html('beta').css({marginRight: '8px', color: 'rgb(128, 128, 128)'}),
@@ -30,7 +30,8 @@ pandora.ui.mainMenu = function() {
                     { id: 'archives', title: 'Archives...', disabled: isGuest },
                     {},
                     { id: 'signup', title: 'Sign Up...', disabled: !isGuest },
-                    { id: 'signinsignout', title: isGuest ? 'Sign In...' : 'Sign Out...' }
+                    isGuest ? { id: 'signin', title: 'Sign In...' }
+                        : { id: 'signout', title: 'Sign Out...'}
                 ] },
                 pandora.getListMenu(),
                 { id: 'editMenu', title: 'Edit', items: [
@@ -50,16 +51,16 @@ pandora.ui.mainMenu = function() {
                     { id: 'movies', title: 'View ' + pandora.site.itemName.plural, items: [
                         { group: 'viewmovies', min: 1, max: 1, items: pandora.site.listViews.map(function(view) {
                             return Ox.extend({
-                                checked: list.listView == view.id,
+                                checked: ui.listView == view.id,
                             }, view);
                         }) },
                     ]},
                     { id: 'icons', title: 'Icons', items: [
                         { group: 'viewicons', min: 1, max: 1, items: ['posters', 'frames'].map(function(icons) {
-                            return {id: icons, title: Ox.toTitleCase(icons), checked: pandora.user.ui.icons == icons};
+                            return {id: icons, title: Ox.toTitleCase(icons), checked: ui.icons == icons};
                         }) },
                         {},
-                        { id: 'usesiteposter', title: 'Always Use ' + pandora.site.site.name + ' Poster' }
+                        { id: 'showsiteposter', title: 'Always Show ' + pandora.site.site.name + ' Poster', checked: ui.showSitePoster }
                     ] },
                     { id: 'columns', title: 'Columns', items: [
                         { id: 'loadcolumns', title: 'Load Layout...' },
@@ -71,20 +72,20 @@ pandora.ui.mainMenu = function() {
                     { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], items: [
                         { group: 'movieview', min: 1, max: 1, items: pandora.site.itemViews.map(function(view) {
                             return Ox.extend({
-                                checked: pandora.user.ui.itemView == view.id,
+                                checked: ui.itemView == view.id,
                             }, view);
                         }) },
                     ]},
                     { id: 'openvideo', title: 'Open Video Links', items: [
                         { group: 'videoview', min: 1, max: 1, items: ['player', 'editor'].map(function(view) {
-                            return {id: view, title: Ox.toTitleCase(view), checked: pandora.user.ui.videoView == view};
+                            return {id: view, title: Ox.toTitleCase(view), checked: ui.videoView == view};
                         }) }
                     ] },
                     {},
                     { id: 'groups', title: 'Groups', items: [
                         { group: 'groups', min: 5, max: 5, items: pandora.site.groups.map(function(group) {
                             return Ox.extend({
-                                checked: Ox.getPositionById(pandora.user.ui.groups, group.id) > -1
+                                checked: Ox.getPositionById(ui.groups, group.id) > -1
                             }, group);
                         }) },
                         {},
@@ -98,8 +99,8 @@ pandora.ui.mainMenu = function() {
                     {},
                     { id: 'theme', title: 'Theme', items: [
                         { group: 'settheme', min: 1, max: 1, items: [
-                            { id: 'classic', title: 'Classic', checked: pandora.user.ui.theme == 'classic'},
-                            { id: 'modern', title: 'Modern', checked: pandora.user.ui.theme == 'modern' }
+                            { id: 'classic', title: 'Classic', checked: ui.theme == 'classic'},
+                            { id: 'modern', title: 'Modern', checked: ui.theme == 'modern' }
                         ]}
                     ] }
                 ]},
@@ -107,10 +108,10 @@ pandora.ui.mainMenu = function() {
                 { id: 'findMenu', title: 'Find', items: [
                     { id: 'find', title: 'Find', items: [
                         { group: 'find', min: 1, max: 1, items: pandora.site.findKeys.map(function(key, i) {
-                            var index = pandora.user.ui.find.index;
+                            var index = ui._findState.index;
                             return Ox.extend({
-                                checked: index > -1 && pandora.user.ui.query.conditions[index].key
-                                    ? pandora.user.ui.query.conditions[index].key == key.id
+                                checked: index > -1 && ui.find.conditions[index].key
+                                    ? ui.find.conditions[index].key == key.id
                                     : key.id == 'all'
                             }, key);
                         }) }
@@ -169,19 +170,16 @@ pandora.ui.mainMenu = function() {
                     groups[position].sort[0].operator = operator;
                     pandora.UI.set({groups: groups});
                 } else if (data.id == 'ordermovies') {
-                    var key = pandora.user.ui.lists[pandora.user.ui.list].sort[0].key,
+                    var key = pandora.user.ui.listSort[0].key,
                         operator = value == 'ascending' ? '+' : '-';
-                    pandora.$ui.list.options({
-                        sort: [{key: key, operator: operator}]
-                    });
-                    pandora.UI.set('lists|' + pandora.user.ui.list + '|sort', [{key: key, operator: operator}]);
-                    //pandora.user.ui.lists[pandora.user.ui.list].sort[0] = {key: key, operator: operator};
-                    pandora.URL.push(pandora.Query.toString());
+                    pandora.UI.set({listSort: [{key: key, operator: operator}]});
                 } else if (data.id == 'settheme') {
                     Ox.Theme(value);
                     pandora.UI.set('theme', value);
+                } else if (data.id == 'showsiteposter') {
+                    pandora.UI.set('showSitePoster', data.checked)
                 } else if (Ox.startsWith(data.id, 'sortgroup')) {
-                    var groups = Ox.clone(pandora.user.ui.groups),
+                    var groups = Ox.clone(ui.groups),
                         id = data.id.replace('sortgroup', ''),
                         position = Ox.getPositionById(groups, id),
                         type = Ox.getObjectById(pandora.site.groups, id).type,
@@ -194,52 +192,21 @@ pandora.ui.mainMenu = function() {
                     groups[position].sort[0].key = key;
                     pandora.UI.set({groups: groups});                    
                 } else if (data.id == 'sortmovies') {
-                    pandora.UI.set(
-                        'lists|' + pandora.user.ui.list + '|sort',
-                        [{key: value, operator: ''}]
-                    );
-                    pandora.URL.update();
+                    pandora.UI.set({listSort: [{key: value, operator: ''}]});
                 } else if (data.id == 'viewicons') {
-                    var $list;
                     pandora.UI.set({icons: value});
-                    if (pandora.user.ui.item) {
-                        if (pandora.user.ui.itemView == 'info') {
-                            pandora.$ui.item.reload();
-                        }
-                        $list = pandora.$ui.browser;
-                    } else if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'grid') {
-                        $list = pandora.$ui.list;
-                    }
-                    $list && $list.options({
-                        borderRadius: value == 'posters' ? 0 : pandora.user.ui.item ? 8 : 16,
-                        defaultRatio: value == 'posters' ? 5/8 : 1
-                    }).reloadList(true);
                 } else if (data.id == 'viewmovies') {
-                    pandora.UI.set('lists|' + pandora.user.ui.list + '|listView', value);
-                    pandora.URL.update();
+                    pandora.UI.set('listView', value);
                 } else if (['personallists', 'favoritelists', 'featuredlists'].indexOf(value) > -1) {
-                    pandora.URL.set(
-                        data.checked[0] ? '?find=list:' + value.substr(8) : ''
-                    );
+                    pandora.UI.set({list: value.substr(8)});
                 }
             },
             click: function(data) {
-                if (data.id == 'home') {
-                    pandora.$ui.home = pandora.ui.home().fadeInScreen();
-                    pandora.URL.push('home');
-                } else if (['about', 'news', 'tour', 'faq', 'tos', 'contact', 'software'].indexOf(data.id) > -1) {
-                    pandora.$ui.siteDialog = pandora.ui.siteDialog(data.id).open();
-                    pandora.URL.push(data.id);
-                } else if (data.id == 'preferences') {
-                    pandora.$ui.preferencesDialog = pandora.ui.preferencesDialog().open();
-                } else if (data.id == 'signup') {
-                    pandora.$ui.accountDialog = pandora.ui.accountDialog('signup').open();
-                } else if (data.id == 'signinsignout') {
-                    pandora.$ui.accountDialog = (
-                        pandora.user.level == 'guest'
-                        ? pandora.ui.accountDialog('signin')
-                        : pandora.ui.accountSignoutDialog()
-                    ).open();
+                if ([
+                    'home', 'about', 'news', 'tour', 'faq', 'tos', 'contact', 'software',
+                    'signup', 'signin', 'signout', 'preferences', 'help'
+                ].indexOf(data.id) > -1) {
+                    pandora.URL.push('/' + data.id);
                 } else if (data.id == 'stills') {
                     var id = pandora.user.ui.item || pandora.user.ui.listItem;
                     pandora.$ui.postersDialog = pandora.ui.framesDialog(id).open();

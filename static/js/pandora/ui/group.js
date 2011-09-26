@@ -1,6 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.group = function(id) {
-    //Ox.print('group', id, Ox.getPositionById(pandora.user.ui.groups, id))
     var i = Ox.getPositionById(pandora.user.ui.groups, id),
         group = Ox.getObjectById(pandora.site.groups, id),
         panelWidth = pandora.$ui.document.width() - (pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize) - 1,
@@ -32,7 +31,6 @@ pandora.ui.group = function(id) {
                                         .css({
                                             float: 'left',
                                             width: pandora.user.ui.groupsSizes[i] - 64 - Ox.UI.SCROLLBAR_SIZE,
-                                            //background: 'red',
                                             textOverflow: 'ellipsis',
                                             overflowX: 'hidden'
                                         })
@@ -62,14 +60,14 @@ pandora.ui.group = function(id) {
                     delete data.keys;
                     return pandora.api.find(Ox.extend(data, {
                         group: id,
-                        query: pandora.user.ui.groupsData[i].query
+                        query: pandora.user.ui._groupsState[i].find
                     }), callback);
                 //} else {
                 //    callback({data: {items: data.keys ? [] : 0}});
                 //}
             },
             scrollbarVisible: true,
-            selected: pandora.user.ui.groupsData[i].selected,
+            selected: pandora.user.ui._groupsState[i].selected,
             sort: [{
                 key: pandora.user.ui.groups[i].sort[0].key,
                 operator: pandora.user.ui.groups[i].sort[0].operator
@@ -80,52 +78,61 @@ pandora.ui.group = function(id) {
                 pandora.$ui.list.triggerEvent('paste', data);
             },
             select: function(data) {
+                // FIXME: cant index be an empty array, instead of -1?
                 var conditions = data.ids.map(function(value) {
                         return {
                             key: id,
                             value: value,
-                            operator: '='
+                            operator: '=='
                         };
                     }),
-                    index = pandora.user.ui.groupsData[i].index;
+                    index = pandora.user.ui._groupsState[i].index,
+                    find = Ox.clone(pandora.user.ui.find, true);
                 if (Ox.isArray(index)) {
                     // this group had multiple selections and the | query
                     // was on the top level, i.e. not bracketed
-                    pandora.user.ui.query = {
+                    find = {
                         conditions: conditions,
-                        operator: conditions.length > 1 ? '|' : ''
+                        operator: conditions.length > 1 ? '|' : '&'
                     }
                 } else {
                     if (index == -1) {
                         // this group had no selection, i.e. no query
-                        index = pandora.user.ui.query.conditions.length;
-                        if (pandora.user.ui.query.operator == '|') {
-                            pandora.user.ui.query = {
-                                conditions: [pandora.user.ui.query],
+                        index = find.conditions.length;
+                        if (find.operator == '|') {
+                            find = {
+                                conditions: [find],
                                 operator: '&'
                             };
                             index = 1;
                         } else {
-                            pandora.user.ui.query.operator = index ? '&' : '';
+                            find.operator = '&';
                         }
                     }
                     if (conditions.length == 0) {
-                        pandora.user.ui.query.conditions.splice(index, 1);
-                        if (pandora.user.ui.query.conditions.length == 1) {
-                            pandora.user.ui.query.operator = '';
+                        // nothing selected
+                        find.conditions.splice(index, 1);
+                        if (find.conditions.length == 1) {
+                            find.operator = '&';
                         }
                     } else if (conditions.length == 1) {
-                        pandora.user.ui.query.conditions[index] = conditions[0];
+                        // one item selected
+                        find.conditions[index] = conditions[0];
                     } else {
-                        pandora.user.ui.query.conditions[index].conditions = conditions;
-                        pandora.user.ui.query.conditions[index].operator = '|';
-                        delete pandora.user.ui.query.conditions[index].key;
-                        delete pandora.user.ui.query.conditions[index].value;
+                        // multiple items selected
+                        find.conditions[index].conditions = conditions;
+                        find.conditions[index].operator = '|';
+                        delete find.conditions[index].key;
+                        delete find.conditions[index].value;
                     }
                 }
+                /*
                 pandora.Query.updateGroups();
                 pandora.URL.push(pandora.Query.toString());
                 pandora.reloadGroups(i);
+                */
+                pandora.UI.set('find', find);
+                pandora.URL.push();
             },
             sort: function(data) {
                 Ox.print('SORT', data)
@@ -154,9 +161,9 @@ pandora.ui.group = function(id) {
                 i_ = Ox.getPositionById(pandora.user.ui.groups, id_);
             if (i_ == -1) {
                 // new group was not part of old group set
-                if (pandora.user.ui.groupsData[i].selected.length) {
+                if (pandora.user.ui._groupsState[i].selected.length) {
                     // if group with selection gets replaced, reload
-                    pandora.user.ui.query.conditions.splice(pandora.user.ui.groupsData[i].index, 1);
+                    pandora.user.ui.find.conditions.splice(pandora.user.ui._groupsState[i].index, 1);
                     pandora.Query.updateGroups();
                     pandora.URL.push(pandora.Query.toString());
                     pandora.reloadGroups(i);
@@ -169,9 +176,9 @@ pandora.ui.group = function(id) {
                 // if part of the existing query works as a group selection in the new group
             } else {
                 // swap two existing groups
-                var groupsData = Ox.clone(pandora.user.ui.groupsData[i]);
-                pandora.user.ui.groupsData[i] = pandora.user.ui.groupsData[i_];
-                pandora.user.ui.groupsData[i_] = groupsData;
+                var groupsData = Ox.clone(pandora.user.ui._groupsState[i]);
+                pandora.user.ui._groupsState[i] = pandora.user.ui._groupsState[i_];
+                pandora.user.ui._groupsState[i_] = groupsData;
                 groups[i] = makeGroup(id_, pandora.user.ui.groups[i_].sort);
                 groups[i_] = makeGroup(id, pandora.user.ui.groups[i].sort);
                 pandora.UI.set({groups: groups});
@@ -187,8 +194,8 @@ pandora.ui.group = function(id) {
                     sort: sort || [{key: group.type == 'integer' ? 'name' : 'items', operator: '-'}]
                 };
             }
-            function replaceGroup(i, id, query) {
-                // if query is passed, selected items will be derived from it
+            function replaceGroup(i, id, find) {
+                // if find is passed, selected items will be derived from it
                 var isOuter = i % 4 == 0;
                 pandora.$ui[isOuter ? 'browser' : 'groupsInnerPanel'].replaceElement(
                     isOuter ? i / 2 : i - 1,
@@ -202,7 +209,6 @@ pandora.ui.group = function(id) {
 
 pandora.ui.groups = function() {
     var $groups = [];
-    //pandora.user.queryGroups = [];
     pandora.user.ui.groups.forEach(function(group, i) {
         $groups[i] = pandora.ui.group(group.id);
     });

@@ -50,6 +50,7 @@ urlpatterns += patterns('',
     (r'^[A-Z0-9].*$', 'app.views.index'),
     (r'^[a-z0-9].+$', 'app.views.index'),
     (r'^$', 'app.views.index'),
+    (r'^.*$', 'app.views.index'),
 )
 
 urlpatterns += patterns('django.views.generic.simple',

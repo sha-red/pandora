@@ -44,23 +44,25 @@ pandora.ui.browser = function() {
             draggable: true,
             id: 'list',
             item: function(data, sort, size) {
-                var icons = pandora.user.ui.icons,
-                    ratio = icons == 'posters' ? data.posterRatio : 1;
+                var ui = pandora.user.ui,
+                    ratio = ui.icons == 'posters'
+                        ? (ui.showSitePoster ? 5/8 : data.posterRatio) : 1,
                 size = size || 64;
                 return {
                     height: ratio <= 1 ? size : size / ratio,
                     id: data.id,
                     info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
                     title: data.title + (data.director ? ' (' + data.director + ')' : ''),
-                    url: icons == 'posters' 
-                        ? '/' + data.id + '/poster' + size + '.jpg'
-                        : '/' + data.id + '/icon' + size + '.jpg',
+                    url: '/' + data.id + '/' + (
+                        ui.icons == 'posters'
+                        ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
+                    ) + size + '.jpg',
                     width: ratio >= 1 ? size : size * ratio
                 };
             },
             items: function(data, callback) {
                 pandora.api.find(Ox.extend(data, {
-                    query: pandora.user.ui.query
+                    query: pandora.user.ui.find
                 }), callback);
             },
             keys: ['director', 'id', 'posterRatio', 'title', 'year'],
@@ -69,7 +71,7 @@ pandora.ui.browser = function() {
             orientation: 'horizontal',
             selected: [pandora.user.ui.item],
             size: 64,
-            sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
+            sort: pandora.user.ui.listSort,
             unique: 'id'
         })
         .bindEvent({
@@ -77,8 +79,10 @@ pandora.ui.browser = function() {
                 that.scrollToSelection();
             },
             select: function(data) {
-                pandora.UI.set('lists|' + pandora.user.ui.list + '|selected', data.ids);
-                pandora.URL.set(data.ids[0]);
+                pandora.UI.set({
+                    'listSelection': data.ids,
+                    'item': data.ids[0] 
+                });
             },
             toggle: function(data) {
                 pandora.UI.set({showMovies: !data.collapsed});
@@ -90,6 +94,17 @@ pandora.ui.browser = function() {
             }
         });
         pandora.enableDragAndDrop(that, false);
+        pandora.UI.bind({
+            icons: function(value) {
+                that.options({
+                    borderRadius: value == 'posters' ? 0 : 8,
+                    defaultRatio: value == 'posters' ? 5/8 : 1
+                }).reloadList(true);
+            },
+            showSitePoster: function() {
+                that.reloadList(true);
+            }
+        });
     }
     that.update = function() {
         pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());

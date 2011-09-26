@@ -29,9 +29,11 @@ pandora.ui.folderList = function(id) {
                     width: 16
                 },
                 {
+                    /*
                     format: function(value) {
                         return value.split('/').join(': ');
                     },
+                    */
                     id: 'id',
                     operator: '+',
                     unique: true,
@@ -261,7 +263,7 @@ pandora.ui.folderList = function(id) {
                             type: event.keys == '' ? 'static' : 'smart'
                         }, function(result) {
                             var id = result.data.id;
-                            pandora.UI.set(['lists', id].join('|'), pandora.site.user.ui.lists['']); // fixme: necessary?
+                            pandora.UI.set('lists.' + id, pandora.site.user.ui.lists['']); // fixme: necessary?
                             pandora.URL.set('?find=list:' + id)
                             Ox.Request.clearCache(); // fixme: remove
                             that.reloadList().bindEventOnce({
@@ -319,7 +321,7 @@ pandora.ui.folderList = function(id) {
                     pandora.api.removeList({
                         id: data.ids[0]
                     }, function(result) {
-                        pandora.UI.set(['lists', data.ids[0]].join('|'), null);
+                        pandora.UI.set('lists.' + data.ids[0], null);
                         Ox.Request.clearCache(); // fixme: remove
                         that.reloadList();
                     });
@@ -376,13 +378,25 @@ pandora.ui.folderList = function(id) {
                         id != id_ && $list.options('selected', []);
                     });
                 }
-                pandora.URL.set(data.ids.length ? '?find=list:' + data.ids[0] : '');
+                // pandora.URL.push(data.ids.length ? '/list==' + data.ids[0] : '')
                 /*
                 pandora.UI.set({
                     item: '',
                     list: data.ids.length ? data.ids[0] : ''
-                });
+                })
+                pandora.URL.push();
                 */
+                pandora.UI.set({
+                    item: '',
+                    list: data.ids.length ? data.ids[0] : '',
+                    find: {
+                        conditions: data.ids.length ? [
+                            {key: 'list', value: data.ids[0], operator: '=='}
+                        ] : [],
+                        operator: '&'
+                    }
+                })
+                pandora.URL.push();
             },
             submit: function(data) {
                 data_ = {id: data.id};

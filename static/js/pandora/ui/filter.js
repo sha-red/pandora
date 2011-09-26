@@ -18,8 +18,8 @@ pandora.ui.filter = function(list) {
                 type: 'list'
             }),
             list: list ? null : {
-                sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
-                view: pandora.user.ui.lists[pandora.user.ui.list].listView
+                sort: pandora.user.ui.listSort,
+                view: pandora.user.ui.listView
             },
             query: list ? list.query : pandora.user.ui.query,
             sortKeys: pandora.site.sortKeys,
@@ -49,8 +49,8 @@ pandora.ui.filter = function(list) {
                         
                     });
                 } else {
-                    pandora.user.ui.query = data.query;
-                    pandora.URL.update();
+                    pandora.UI.set({find: data.query});
+                    pandora.URL.push();
                     //reload();
                 }
             }
