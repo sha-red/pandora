@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 import random
 random.seed()
+import re
 
 from django import forms
 from django.contrib.auth.models import User
@@ -514,7 +515,7 @@ def setPreferences(request):
         return
     '''
     data = json.loads(request.POST['data'])
-    keys = data.keys()[0].split('.')
+    keys = re.sub('([^\\\\])\.', '\\1\n', data.keys()[0]).split('\n')
     value = data.values()[0]
     profile = request.user.get_profile()
     p = profile.preferences
