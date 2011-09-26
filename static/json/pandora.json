@@ -27,7 +27,7 @@
   "js/pandora/ui/Ox.FilesView.js", 
   "js/pandora/ui/browser.js", 
   "js/pandora/ui/list.js", 
-  "js/pandora/ui/foldersList.js", 
+  "js/pandora/ui/folderList.js", 
   "js/pandora/ui/findElement.js", 
   "js/pandora/ui/filterDialog.js", 
   "js/pandora/ui/account.js", 
