@@ -70,7 +70,7 @@ pandora.ui.mainMenu = function() {
                     ]},
                     {},
                     { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], items: [
-                        { group: 'movieview', min: 1, max: 1, items: pandora.site.itemViews.map(function(view) {
+                        { group: 'itemview', min: 1, max: 1, items: pandora.site.itemViews.map(function(view) {
                             return Ox.extend({
                                 checked: ui.itemView == view.id,
                             }, view);
@@ -151,13 +151,8 @@ pandora.ui.mainMenu = function() {
                 var value = data.checked[0] ? data.checked[0].id : null;
                 if (data.id == 'find') {
                     pandora.$ui.findSelect.options({value: value});
-                } else if (data.id == 'movieview') {
-                    var id = document.location.pathname.split('/')[1];
-                    // fixme: what's this?
-                    if (value == 'info')
-                        url(id + '/info');
-                    else
-                        url(id);
+                } else if (data.id == 'itemview') {
+                    pandora.UI.set({itemView: value});
                 } else if (Ox.startsWith(data.id, 'ordergroup')) {
                     var groups = Ox.clone(pandora.user.ui.groups),
                         id = data.id.replace('ordergroup', ''),

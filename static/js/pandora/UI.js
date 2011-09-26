@@ -20,12 +20,21 @@ pandora.UI = (function() {
         self.previousUI = Ox.clone(pandora.user.ui, true);
         Ox.forEach(obj, function(val, key) {
             var listSettings = pandora.site.listSettings
-            if (key == 'list' && !pandora.user.ui.lists[val]) {
-                // add default list settings
-                obj['lists.' + that.encode(val)] = {};
+            if (key == 'list') {
+                if (!pandora.user.ui.lists[val]) {
+                    obj['lists.' + that.encode(val)] = {};
+                }
                 Ox.forEach(listSettings, function(listSetting, setting) {
-                    obj['lists.' + that.encode(val)][listSetting] = pandora.site.user.ui[setting];
+                    if (!pandora.user.ui.lists[val]) {
+                        // add default list settings and copy to settings
+                        obj['lists.' + that.encode(val)][listSetting] = pandora.site.user.ui[setting];
+                        obj[setting] = pandora.site.user.ui[setting];
+                    } else {
+                        // copy list settings to setting
+                        obj[setting] = pandora.user.ui.lists[val][listSetting];
+                    }
                 });
+                Ox.forEach()
             } else if (Object.keys(listSettings).indexOf(key) > -1) {
                 // add list setting
                 obj['lists.' + that.encode(pandora.user.ui.list) + '.' + listSettings[key]] = val;
@@ -52,9 +61,12 @@ pandora.UI = (function() {
                 } else {
                     ui[keys[i]] = val;
                 }
-                // set[key] = val;
-                // fixme: remove later
-                set[key.replace(/\./g, '|')] = val;
+                if (key[0] != '_') {
+                    // don't send private keys
+                    // set[key] = val;
+                    // fixme: remove later
+                    set[key.replace(/\./g, '|')] = val;
+                }
             }
         });
         if (Ox.len(set)) {

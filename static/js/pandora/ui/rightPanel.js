@@ -58,6 +58,9 @@ pandora.ui.rightPanel = function() {
         });
     }
     pandora.UI.bind({
+        list: function() {
+            that.replaceElement(1, pandora.$ui.contentPanel = pandora.ui.contentPanel());
+        },
         itemView: function(value) {
             if (pandora.isClipView() != pandora.isClipView(pandora.UI.getPrevious('itemView'))) {
                 that.replaceElement(0, pandora.$ui.toolbar = pandora.ui.toolbar());

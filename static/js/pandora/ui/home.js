@@ -127,7 +127,7 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
-                    pandora.URL.push();
+                    //pandora.URL.push();
                     that.fadeOutScreen();
                 }
             })

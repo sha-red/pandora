@@ -90,7 +90,7 @@ Ox.load({
                 pandora.site.listSettings = {};
                 Ox.map(pandora.site.user.ui, function(val, key) {
                     if (/^list[A-Z]/.test(key)) {
-                        pandora.site.listSettings[key] = key[0].toLowerCase() + key.substr(1);
+                        pandora.site.listSettings[key] = key[4].toLowerCase() + key.substr(5);
                     }
                 });
                 if (Ox.isEmpty(pandora.user.ui.lists)) {
@@ -98,7 +98,7 @@ Ox.load({
                     Ox.forEach(pandora.site.listSettings, function(listSetting, setting) {
                         listSettings[listSetting] = pandora.site.user.ui[setting];
                     });
-                    pandora.UI.set('lists|', listSettings);
+                    pandora.UI.set('lists.', listSettings);
                 }
 
                 Ox.extend(pandora.user, {

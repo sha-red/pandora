@@ -80,54 +80,6 @@ pandora.ui.item = function() {
                 }
             });
 
-        } else if (pandora.user.ui.itemView == 'clips') {
-            var ratio = result.data.stream.aspectRatio;
-            pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.clips = Ox.IconList({
-                fixedRatio: ratio,
-                item: function(data, sort, size) {
-                    size = size || 128;
-                    var width = ratio > 1 ? size : Math.round(size * ratio),
-                        height = ratio > 1 ? Math.round(size / ratio) : size,
-                        url = '/' + pandora.user.ui.item + '/' + height + 'p' + data['in'] + '.jpg';
-                    return {
-                        height: height,
-                        id: data['id'],
-                        info: Ox.formatDuration(data['in'], 'short') + ' - ' + Ox.formatDuration(data['out'], 'short'),
-                        title: data.value,
-                        url: url,
-                        width: width 
-                    };
-                },
-                items: function(data, callback) {
-                    pandora.api.findAnnotations(Ox.extend(data, {
-                        itemQuery: {
-                            conditions:[{
-                                key: 'id',
-                                value: pandora.user.ui.item,
-                                operator: '='
-                            }]
-                        }
-                    }), callback);
-                },
-                keys: ['id', 'value', 'in', 'out'],
-                size: 128,
-                sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
-                unique: 'id'
-            }).bindEvent({
-                open: function(data) {
-                    var id = data.ids[0],
-                        item = pandora.user.ui.item,
-                        points = {
-                            'in': pandora.$ui.clips.value(id, 'in'),
-                            out: pandora.$ui.clips.value(id, 'out')
-                        };
-                    pandora.UI.set('videoPoints|' + item, Ox.extend(points, {
-                        position: points['in']
-                    }));
-                    pandora.URL.set(item + '/timeline');
-                }
-            }));
-
         } else if (pandora.user.ui.itemView == 'info') {
             //Ox.print('result.data', result.data)
             if (pandora.user.level == 'admin' && false) {
@@ -196,7 +148,6 @@ pandora.ui.item = function() {
 
         } else if (pandora.user.ui.itemView == 'clips') {
             var ratio = result.data.videoRatio;
-            Ox.print('RATIO', ratio)
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.clips = Ox.IconList({
                 fixedRatio: ratio,
                 item: function(data, sort, size) {
@@ -214,7 +165,6 @@ pandora.ui.item = function() {
                     };
                 },
                 items: function(data, callback) {
-                    Ox.print('DATA', data)
                     pandora.api.findAnnotations(Ox.extend(data, {
                         itemQuery: {
                             conditions:[{
@@ -241,7 +191,7 @@ pandora.ui.item = function() {
                     }));
                     pandora.UI.set({
                         itemView: pandora.user.ui.videoView
-                    })
+                    });
                 },
                 // fixme: duplicated
                 openpreview: function(data) {

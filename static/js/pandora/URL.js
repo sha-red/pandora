@@ -555,6 +555,12 @@ pandora.URL = (function() {
             views: views
         });
 
+        ['item', 'itemSort', 'itemView', 'list', 'listSort', 'listView'].forEach(function(event) {
+            pandora.UI.bind(event, function() {
+                that.push();
+            });
+        });
+
         return that;
 
     };
@@ -586,7 +592,7 @@ pandora.URL = (function() {
             var state = getState();
             Ox.print('&&&&&&&', state)
             self.URL.push(state);
-            setState(state);
+            //setState(state);
         }
         return that;
     };

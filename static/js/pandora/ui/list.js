@@ -507,7 +507,7 @@ pandora.ui.list = function() {
 
         });
         pandora.api.findEvents({
-            itemQuery: pandora.user.ui.query,
+            itemQuery: pandora.user.ui.find,
             keys: ['id', 'name', 'start', 'end'],
             query: {}
         }, function(result) {
@@ -674,10 +674,6 @@ pandora.ui.list = function() {
         });
         
     }
-
-    that.display = function() { // fixme: used?
-        pandora.$ui.rightPanel.replaceElement(1, pandora.$ui.contentPanel = pandora.ui.contentPanel());
-    };
 
     pandora.UI.bind({
         listSort: function(value) {

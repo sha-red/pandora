@@ -18,14 +18,13 @@ pandora.ui.infoView = function(data) {
         iconHeight = iconRatio < 1 ? iconSize : Math.round(iconSize / iconRatio),
         iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
         borderRadius = pandora.user.ui.icons == 'posters' ? 0 : iconSize / 8,
-        edit = false,
         that = Ox.Element(),
         uid = Ox.uid(),
         $list,
         $info = $('<div>')
             .css({
                 position: 'absolute',
-                left: pandora.user.level == 'admin' ? -listWidth + 'px' : 0,
+                left: pandora.user.level == 'admin' && !pandora.user.ui.editPoster ? -listWidth + 'px' : 0,
                 top: 0,
                 right: 0,
             })
@@ -328,16 +327,15 @@ pandora.ui.infoView = function(data) {
 
         $icon.bindEvent({
             doubleclick: function() {
-                if (!edit) {
+                pandora.UI.set('editPoster', !pandora.user.ui.editPoster);
+                if (pandora.user.ui.editPoster) {
                     $info.animate({
                         left: 0
                     }, 250);
-                    edit = true;
                 } else {
                     $info.animate({
                         left: -listWidth + 'px'
                     }, 250);
-                    edit = false;
                 }
             }
         });
@@ -367,7 +365,6 @@ pandora.ui.infoView = function(data) {
             id: data.id,
             keys: [pandora.user.ui.icons == 'posters' ? 'posters' : 'frames']
         }, 0, function(result) {
-            Ox.print('RESULT', result.data)
             var images = result.data[pandora.user.ui.icons == 'posters' ? 'posters' : 'frames'],
                 selectedImage = images.filter(function(image) {
                     return image.selected;

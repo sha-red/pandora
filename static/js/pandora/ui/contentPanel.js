@@ -32,6 +32,9 @@ pandora.ui.contentPanel = function() {
         listView: function() {
             that.replaceElement(1, pandora.$ui.list = pandora.ui.list());
         },
+        item: function() {
+            that.replaceElement(1, pandora.$ui.item = pandora.ui.item());
+        },
         itemView: function() {
             that.replaceElement(1, pandora.$ui.item = pandora.ui.item());
         }

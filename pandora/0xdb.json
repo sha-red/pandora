@@ -549,6 +549,7 @@
                     "columnWidth": {}
                 }
             },
+            "editIcon": false,
             "find": {"conditions": [], "operator": "&"},
             "groups": [
                 {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
