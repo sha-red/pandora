@@ -20,6 +20,10 @@ pandora.ui.videoPreview = function(data) {
         })
         .bindEvent({
             click: function(event) {
+                pandora.UI.set(
+                    'videoPoints.' + data.id,
+                    {'in': 0, out: 0, position: event.position}
+                );
                 if (pandora.user.ui.item && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
                     pandora.$ui[
                         pandora.user.ui.itemView == 'video' ? 'player' : 'editor'
@@ -27,10 +31,6 @@ pandora.ui.videoPreview = function(data) {
                         position: event.position
                     });
                 } else {
-                    pandora.UI.set(
-                        'videoPoints.' + data.id,
-                        {'in': 0, out: 0, position: event.position}
-                    );
                     pandora.UI.set({
                         item: data.id,
                         itemView: pandora.user.ui.videoView
