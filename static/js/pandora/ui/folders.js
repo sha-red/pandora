@@ -49,7 +49,7 @@ pandora.ui.folders = function() {
                                     type: data.id == 'new' ? 'static' : 'smart'
                                 }, function(result) {
                                     var id = result.data.id;
-                                    pandora.UI.set(['lists', id].join('|'), pandora.site.user.ui.lists['']); // fixme: necessary?
+                                    pandora.UI.set('lists.' + id, pandora.site.user.ui.lists['']); // fixme: necessary?
                                     pandora.URL.set('?find=list:' + id)
                                     Ox.Request.clearCache(); // fixme: remove
                                     $list.reloadList().bindEventOnce({
@@ -220,7 +220,7 @@ pandora.ui.folders = function() {
                     },
                     toggle: function(data) {
                         data.collapsed && pandora.$ui.folderList[folder.id].loseFocus();
-                        pandora.UI.set('showFolder|items|' + folder.id, !data.collapsed);
+                        pandora.UI.set('showFolder.items.' + folder.id, !data.collapsed);
                         pandora.resizeFolders();
                     }
                 });

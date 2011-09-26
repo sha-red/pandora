@@ -94,7 +94,7 @@ pandora.ui.browser = function() {
             }
         });
         pandora.enableDragAndDrop(that, false);
-        Ox.Event.bind({
+        pandora.UI.bind({
             icons: function(value) {
                 that.options({
                     borderRadius: value == 'posters' ? 0 : 8,

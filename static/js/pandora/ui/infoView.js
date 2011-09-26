@@ -518,7 +518,7 @@ pandora.ui.infoView = function(data) {
         $data.css({height: height + 'px'});
     };
 
-    Ox.Event.bind({
+    pandora.UI.bind({
         icons: that.reload,
         showSitePoster: that.reload
     });

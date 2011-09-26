@@ -21,7 +21,7 @@ pandora.ui.viewSelect = function() {
                 pandora.UI.set(viewKey, data.selected[0].id);
             }
         });
-    Ox.Event.bind({
+    pandora.UI.bind({
         listView: function(value) {
             that.selectItem(value);
         },

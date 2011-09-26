@@ -34,7 +34,7 @@ pandora.ui.sortSelect = function() {
             pandora.UI.set(sortKey, [{key: data.selected[0].id, operator: ''}]);
         }
     });
-    Ox.Event.bind({
+    pandora.UI.bind({
         listSort: function(value) {
             that.selectItem(value[0].key);
         },

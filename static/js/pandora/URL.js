@@ -200,19 +200,16 @@ pandora.URL = (function() {
     }
 
     function getState() {
-        if (!pandora.user.ui.lists[pandora.user.ui.list]) {
-            pandora.user.ui.lists[pandora.user.ui.list] = pandora.site.user.ui.lists[''];
-        }
         return {
             type: pandora.user.ui.section == 'items'
                 ? pandora.site.itemsSection
                 : pandora.user.ui.section,
             item: pandora.user.ui.item,
             view: !pandora.user.ui.item
-                ? pandora.user.ui.lists[pandora.user.ui.list].view
+                ? pandora.user.ui.listView
                 : pandora.user.ui.itemView,
             sort: !pandora.user.ui.item
-                ? pandora.user.ui.lists[pandora.user.ui.list].sort
+                ? pandora.user.ui.listSort
                 : pandora.isClipView(pandora.user.ui.itemView)
                     ? pandora.user.ui.itemSort : [],
             find: !pandora.user.ui.item
@@ -298,17 +295,10 @@ pandora.URL = (function() {
                 list: getListsState(state.find)
             });
 
-            if (!pandora.user.ui.lists[pandora.user.ui.list]) {
-                pandora.UI.set(
-                    'lists|' + pandora.user.ui.list,
-                    pandora.site.user.ui.lists['']
-                );
-            }
-
             if (state.view) {
                 pandora.UI.set(
                     !pandora.user.ui.item
-                        ? 'lists|' + pandora.user.ui.list + '|view'
+                        ? 'lists.' + pandora.user.ui.list + '.view'
                         : 'itemView',
                     state.view
                 );
@@ -320,13 +310,13 @@ pandora.URL = (function() {
                 
             if (['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
                 if (state.span) {
-                    pandora.UI.set('videoPoints|' + pandora.user.ui.item, {
+                    pandora.UI.set('videoPoints.' + pandora.user.ui.item, {
                         position: state.span[0],
                         'in': state.span[1] || 0,
                         out: state.span[2] || 0
                     });
                 } else if (!pandora.user.ui.videoPoints[pandora.user.ui.item]) {
-                    pandora.UI.set('videoPoints|' + pandora.user.ui.item, {
+                    pandora.UI.set('videoPoints.' + pandora.user.ui.item, {
                         position: 0,
                         'in': 0,
                         out: 0
@@ -336,7 +326,7 @@ pandora.URL = (function() {
 
             state.sort && pandora.UI.set(
                 !pandora.user.ui.item
-                    ? 'lists|' + pandora.user.ui.list + '|sort'
+                    ? 'lists.' + pandora.user.ui.list + '.sort'
                     : 'itemSort',
                 state.sort
             );
@@ -365,7 +355,7 @@ pandora.URL = (function() {
                         pandora.$ui.mainMenu.replaceMenu('sortMenu', pandora.getSortMenu());
                         pandora.$ui.sortSelect.replaceWith(pandora.$ui.sortSelect = pandora.ui.sortSelect());
                         if (isClipView && !wasClipView) {
-                            pandora.UI.set('lists|' + pandora.user.ui.list + '|selected', []);
+                            pandora.UI.set('lists.' + pandora.user.ui.list + '.selected', []);
                         }
                     }                    
                 }
@@ -409,7 +399,7 @@ pandora.URL = (function() {
                     previousUI.itemView == 'video' ? 'player' : 'editor'
                 ];
                 $item && pandora.UI.set(
-                    'videoPoints|' + previousUI.item + '|position',
+                    'videoPoints.' + previousUI.item + '.position',
                     $item.options('position')
                 );
             }
@@ -442,7 +432,7 @@ pandora.URL = (function() {
                         pandora.$ui.mainMenu.replaceMenu('sortMenu', pandora.getSortMenu());
                         pandora.$ui.sortSelect.replaceWith(pandora.$ui.sortSelect = pandora.ui.sortSelect());
                         if (isClipView && !wasClipView) {
-                            pandora.UI.set('lists|' + pandora.user.ui.list + '|selected', []);
+                            pandora.UI.set('lists.' + pandora.user.ui.list + '.selected', []);
                         }
                     }                    
                 }
@@ -480,7 +470,7 @@ pandora.URL = (function() {
                     previousUI.itemView == 'video' ? 'player' : 'editor'
                 ];
                 $item && pandora.UI.set(
-                    'videoPoints|' + previousUI.item + '|position',
+                    'videoPoints.' + previousUI.item + '.position',
                     $item.options('position')
                 );
             }

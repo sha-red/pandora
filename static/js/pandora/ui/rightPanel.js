@@ -39,12 +39,12 @@ pandora.ui.rightPanel = function() {
                 if (!pandora.user.ui.item) {
                     pandora.resizeGroups();
                     pandora.$ui.list.size();
-                    if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'timelines') {
+                    if (pandora.user.ui.listView == 'timelines') {
                         pandora.$ui.list.options({width: data.size});
-                    } else if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'map') {
+                    } else if (pandora.user.ui.listView == 'map') {
                         pandora.$ui.map.resizeMap();
-                    } else if (pandora.user.ui.lists[pandora.user.ui.list].listView == 'calendar') {
-                        
+                    } else if (pandora.user.ui.listView == 'calendar') {
+                        pandora.$ui.calendar.resizeCalendar();
                     }
                 } else {
                     pandora.$ui.browser.scrollToSelection();
@@ -57,7 +57,7 @@ pandora.ui.rightPanel = function() {
             }
         });
     }
-    Ox.Event.bind({
+    pandora.UI.bind({
         itemView: function(value) {
             if (pandora.isClipView() != pandora.isClipView(pandora.UI.getPrevious('itemView'))) {
                 that.replaceElement(0, pandora.$ui.toolbar = pandora.ui.toolbar());

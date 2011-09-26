@@ -1,15 +1,19 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.UI = (function() {
-    // fixme: "|" as separator doesn't buy us much, use "."
     var self = {}, that = {};
     self.previousUI = {};
-    // sets pandora.user.ui.key to val
-    // key foo|bar|baz sets pandora.user.ui.foo.bar.baz
-    // (we have to use '|' as a separator since list names may contain '.')
-    // val null removes a key
+    that.bind = function() {
+        Ox.Event.bind.apply(null, arguments);
+    };
+    that.encode = function(val) {
+        return val.replace(/\./g, '\\.');
+    };
     that.getPrevious = function(key) {
         return !key ? self.previousUI : self.previousUI[key];
     };
+    // sets pandora.user.ui.key to val
+    // key foo.bar.baz sets pandora.user.ui.foo.bar.baz
+    // val null removes a key
     that.set = function(/*{key: val} or key, val*/) {
         var obj = Ox.makeObject(arguments),
             set = {};
@@ -18,25 +22,25 @@ pandora.UI = (function() {
             var listSettings = pandora.site.listSettings
             if (key == 'list' && !pandora.user.ui.lists[val]) {
                 // add default list settings
-                obj['lists|' + val] = {};
+                obj['lists.' + that.encode(val)] = {};
                 Ox.forEach(listSettings, function(listSetting, setting) {
-                    obj['lists|' + val][listSetting] = pandora.site.user.ui[setting];
+                    obj['lists.' + that.encode(val)][listSetting] = pandora.site.user.ui[setting];
                 });
             } else if (Object.keys(listSettings).indexOf(key) > -1) {
                 // add list setting
-                obj['lists|' + pandora.user.ui.list + '|' + listSettings[key]] = val;
+                obj['lists.' + that.encode(pandora.user.ui.list) + '.' + listSettings[key]] = val;
             } else if (
                 key == 'itemView'
                 && ['video', 'timeline'].indexOf(val) > -1
                 && !pandora.user.ui.videoPoints[pandora.user.ui.item]
             ) {
                 // add default videoPoints
-                obj['videoPoints|' + pandora.user.ui.item] = {'in': 0, out: 0, position: 0};
+                obj['videoPoints.' + pandora.user.ui.item] = {'in': 0, out: 0, position: 0};
             }
         });
         Ox.forEach(obj, function(val, key) {
             var i = 0,
-                keys = key.split('|'),
+                keys = key.split('.'),
                 ui = pandora.user.ui;
             while (i < keys.length - 1) {
                 ui = ui[keys[i]];
@@ -48,7 +52,9 @@ pandora.UI = (function() {
                 } else {
                     ui[keys[i]] = val;
                 }
-                set[key] = val;
+                // set[key] = val;
+                // fixme: remove later
+                set[key.replace(/\./g, '|')] = val;
             }
         });
         if (Ox.len(set)) {

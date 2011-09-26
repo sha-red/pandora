@@ -28,11 +28,12 @@ pandora.ui.videoPreview = function(data) {
                     });
                 } else {
                     pandora.UI.set(
-                        'videoPoints|' + data.id,
+                        'videoPoints.' + data.id,
                         {'in': 0, out: 0, position: event.position}
                     );
-                    pandora.URL.push(
-                        '/' + data.id + '/' + pandora.user.ui.videoView + '/' + Ox.formatDuration(event.position, 2)
+                    pandora.UI.set(
+                        item: data.id,
+                        itemView: pandora.user.ui.videoView
                     );
                 }
             }

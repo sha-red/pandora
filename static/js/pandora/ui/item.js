@@ -146,7 +146,7 @@ pandora.ui.item = function() {
                             'in': pandora.$ui.clips.value(id, 'in'),
                             out: pandora.$ui.clips.value(id, 'out')
                         };
-                    pandora.UI.set('videoPoints|' + pandora.user.ui.item, Ox.extend(points, {
+                    pandora.UI.set('videoPoints.' + pandora.user.ui.item, Ox.extend(points, {
                         position: points['in']
                     }));
                     pandora.UI.set({
@@ -212,7 +212,7 @@ pandora.ui.item = function() {
                     }
                 }
             }));
-            Ox.Event.bind({
+            pandora.UI.bind({
                 itemSort: function(value) {
                     pandora.$ui.clips.options({sort: value});
                 }
@@ -323,14 +323,14 @@ pandora.ui.item = function() {
                 width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             }).bindEvent({
                 points: function(data) {
-                    pandora.UI.set('videoPoints|' + pandora.user.ui.item, {
+                    pandora.UI.set('videoPoints.' + pandora.user.ui.item, {
                         'in': data['in'],
                         out: data.out,
                         position: pandora.user.ui.videoPoints[pandora.user.ui.item].position
                     });
                 },
                 position: function(data) {
-                    pandora.UI.set('videoPoints|' + pandora.user.ui.item + '|position', data.position);
+                    pandora.UI.set('videoPoints.' + pandora.user.ui.item + '|position', data.position);
                 },
                 resize: function(data) {
                     Ox.print('RESIZE!!', data.size)
@@ -453,7 +453,7 @@ pandora.ui.item = function() {
                             items: [],
                             keys: ['id', 'value', 'in', 'out', 'aspectRatio', 'item'],
                             size: 128,
-                            sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
+                            sort: pandora.user.ui.itemSort,
                             unique: 'id'
                         }).bindEvent({
                             open: function(data) {
@@ -463,7 +463,7 @@ pandora.ui.item = function() {
                                         'in': pandora.$ui.clips.value(id, 'in'),
                                         out: pandora.$ui.clips.value(id, 'out')
                                     };
-                                pandora.UI.set('videoPoints|' + item, Ox.extend(points, {
+                                pandora.UI.set('videoPoints.' + item, Ox.extend(points, {
                                     position: points['in']
                                 }));
                                 pandora.URL.set(item + '/timeline');

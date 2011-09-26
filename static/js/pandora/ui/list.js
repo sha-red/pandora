@@ -112,18 +112,18 @@ pandora.ui.list = function() {
         .bindEvent({
             columnchange: function(data) {
                 var columnWidth = {};
-                pandora.UI.set(['lists', pandora.user.ui.list, 'columns'].join('|'), data.ids);
+                pandora.UI.set({listColumns: data.ids});
                 /*
                 data.ids.forEach(function(id) {
                     columnWidth[id] = 
-                        pandora.user.ui.lists[pandora.user.ui.list].columnWidth[id] ||
-                        Ox.getObjectById(pandora.site.sortKeys, id).width
+                        pandora.user.ui.lists[pandora.user.ui.list].columnWidth[id]
+                        || Ox.getObjectById(pandora.site.sortKeys, id).width
                 });
-                pandora.UI.set(['lists', pandora.user.ui.list, 'columnWidth'].join('|'), columnWidth);
+                pandora.UI.set({listColumnWidth: columnWidth});
                 */
             },
             columnresize: function(data) {
-                pandora.UI.set(['lists', pandora.user.ui.list, 'columnWidth', data.id].join('|'), data.width);
+                pandora.UI.set('listColumnWidth.' + data.id, data.width);
             },
             resize: function(data) { // this is the resize event of the split panel
                 that.size();
@@ -276,7 +276,7 @@ pandora.ui.list = function() {
                         'in': that.value(id, 'in'),
                         out: that.value(id, 'out')
                     };
-                pandora.UI.set('videoPoints|' + item, Ox.extend(points, {
+                pandora.UI.set('videoPoints.' + item, Ox.extend(points, {
                     position: points['in']
                 }));
                 pandora.UI.set({
@@ -474,7 +474,7 @@ pandora.ui.list = function() {
                                     'in': pandora.$ui.clips.value(id, 'in'),
                                     out: pandora.$ui.clips.value(id, 'out')
                                 };
-                            pandora.UI.set('videoPoints|' + item, Ox.extend(points, {
+                            pandora.UI.set('videoPoints.' + item, Ox.extend(points, {
                                 position: points['in']
                             }));
                             pandora.URL.set(item + '/timeline');
@@ -680,13 +680,13 @@ pandora.ui.list = function() {
         pandora.$ui.rightPanel.replaceElement(1, pandora.$ui.contentPanel = pandora.ui.contentPanel());
     };
 
-    Ox.Event.bind({
+    pandora.UI.bind({
         listSort: function(value) {
             that.options({sort: value});
         }
     });
     if (pandora.user.ui.listView == 'grid') {
-        Ox.Event.bind({
+        pandora.UI.bind({
             icons: function(value) {
                 that.options({
                     borderRadius: value == 'posters' ? 0 : 16,

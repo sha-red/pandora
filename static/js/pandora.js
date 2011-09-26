@@ -191,13 +191,13 @@ Ox.load({
 
     function unloadWindow() {
         // fixme: ajax request has to have async set to false for this to work
-        pandora.user.ui.section == 'items' &&
-            ['player', 'timeline'].indexOf(pandora.user.ui.itemView) > -1 &&
-            pandora.user.ui.item &&
-            pandora.UI.set(
-                'videoPosition|' + pandora.user.ui.item,
+        pandora.user.ui.section == 'items'
+            && pandora.user.ui.item
+            && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
+            && pandora.UI.set(
+                'videoPosition.' + pandora.user.ui.item,
                 pandora.$ui[
-                    pandora.user.ui.itemView == 'player' ? 'player' : 'editor'
+                    pandora.user.ui.itemView == 'video' ? 'player' : 'editor'
                 ].options('position')
             );
     }

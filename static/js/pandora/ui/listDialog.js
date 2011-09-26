@@ -128,7 +128,7 @@ pandora.ui.listIconPanel = function(list) {
         min: 1,
         orientation: 'vertical',
         size: 128,
-        sort: pandora.user.ui.lists[pandora.user.ui.list].sort,
+        sort: pandora.user.ui.listSort,
         unique: 'id'
     })
     .css({width: '144px'})

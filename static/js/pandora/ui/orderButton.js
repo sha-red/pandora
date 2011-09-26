@@ -25,7 +25,7 @@ pandora.ui.orderButton = function() {
     function getTitle() {
         return pandora.user.ui.listSort[0].operator == '+' ? 'up' : 'down';
     }
-    Ox.Event.bind({
+    pandora.UI.bind({
         listSort: function() {
             that.options({title: getTitle()});
         }

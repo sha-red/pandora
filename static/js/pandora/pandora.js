@@ -569,6 +569,7 @@ pandora.signout = function(data) {
 };
 
 pandora.reloadGroups = function(i) {
+    // fixme: no longer needed
     var query = pandora.user.ui.query,
         view = pandora.user.ui.lists[pandora.user.ui.list].listView;
     if (view == 'clip') {
@@ -686,10 +687,6 @@ pandora.resizeFolders = function() {
             pandora.$ui.folder[i].update();
         }
     });
-};
-
-pandora.saveVideoPosition = function() {
-    //alert(JSON.stringify(['videoPosition|' + old.user.ui.item, pandora.$ui[old.user.ui.itemView == 'player' ? 'player' : 'editor'].options('position')]));
 };
 
 pandora.selectList = function() {

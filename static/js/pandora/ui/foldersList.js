@@ -263,7 +263,7 @@ pandora.ui.folderList = function(id) {
                             type: event.keys == '' ? 'static' : 'smart'
                         }, function(result) {
                             var id = result.data.id;
-                            pandora.UI.set(['lists', id].join('|'), pandora.site.user.ui.lists['']); // fixme: necessary?
+                            pandora.UI.set('lists.' + id, pandora.site.user.ui.lists['']); // fixme: necessary?
                             pandora.URL.set('?find=list:' + id)
                             Ox.Request.clearCache(); // fixme: remove
                             that.reloadList().bindEventOnce({
@@ -321,7 +321,7 @@ pandora.ui.folderList = function(id) {
                     pandora.api.removeList({
                         id: data.ids[0]
                     }, function(result) {
-                        pandora.UI.set(['lists', data.ids[0]].join('|'), null);
+                        pandora.UI.set('lists.' + data.ids[0], null);
                         Ox.Request.clearCache(); // fixme: remove
                         that.reloadList();
                     });

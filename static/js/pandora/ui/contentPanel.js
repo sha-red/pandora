@@ -28,7 +28,7 @@ pandora.ui.contentPanel = function() {
         ],
         orientation: 'vertical'
     });
-    Ox.Event.bind({
+    pandora.UI.bind({
         listView: function() {
             that.replaceElement(1, pandora.$ui.list = pandora.ui.list());
         },
