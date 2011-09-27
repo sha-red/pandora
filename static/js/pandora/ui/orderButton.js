@@ -18,7 +18,7 @@ pandora.ui.orderButton = function() {
                         key: pandora.user.ui.listSort[0].key,
                         operator: pandora.user.ui.listSort[0].operator == '+' ? '-' : '+'
                     }]
-                })
+                });
                 that.options({title: getTitle()});
             }
         });

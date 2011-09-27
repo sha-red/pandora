@@ -113,17 +113,32 @@ pandora.ui.group = function(id) {
                         // nothing selected
                         find.conditions.splice(index, 1);
                         if (find.conditions.length == 1) {
-                            find.operator = '&';
+                            if (find.conditions[0].conditions) {
+                                // unwrap single remaining bracketed query
+                                find = {
+                                    conditions: find.conditions[0].conditions,
+                                    operator: '|'
+                                };
+                            } else {
+                                find.operator = '&';
+                            }
                         }
                     } else if (conditions.length == 1) {
                         // one item selected
                         find.conditions[index] = conditions[0];
                     } else {
                         // multiple items selected
-                        find.conditions[index].conditions = conditions;
-                        find.conditions[index].operator = '|';
-                        delete find.conditions[index].key;
-                        delete find.conditions[index].value;
+                        if (pandora.user.ui.find.conditions.length == 1) {
+                            find = {
+                                conditions: conditions,
+                                operator: '|'
+                            };
+                        } else {
+                            find.conditions[index] = {
+                                conditions: conditions,
+                                operator: '|'
+                            };
+                        }
                     }
                 }
                 /*

@@ -115,8 +115,8 @@ pandora.URL = (function() {
         $('video').each(function() {
             $(this).trigger('stop');
         });
-        pandora.user.ui._groupsState = pandora.getGroupsState();
-        pandora.user.ui._findState = pandora.getFindState();
+        pandora.user.ui._groupsState = pandora.getGroupsState(pandora.user.ui.find);
+        pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
         if (Ox.isEmpty(state)) {
             if (pandora.user.ui.showHome) {
                 pandora.$ui.home = pandora.ui.home().showScreen();
@@ -160,51 +160,50 @@ pandora.URL = (function() {
                 document.location.href = '/api/';
             }
         } else {
-            pandora.UI.set({
+            
+            var set = {
                 section: state.type == pandora.site.itemsSection ? 'items' : state.type,
                 item: state.item,
-            });
-
-            state.find && pandora.UI.set({
-                find: state.find,
-                list: pandora.getListsState(state.find)
-            });
+                //find: state.find
+            };
 
             if (state.view) {
-                pandora.UI.set(
-                    !pandora.user.ui.item
-                        ? 'listView'
-                        : 'itemView',
-                    state.view
-                );
+                set[!pandora.user.ui.item ? 'listView' : 'itemView'] = state.view;
             }
 
-            pandora.user.ui._groupsState = pandora.getGroupsState();
-            Ox.print('_groupsState =', pandora.user.ui._groupsState);
-            pandora.user.ui._findState = pandora.getFindState();
+            if (state.sort) {
+                set[!pandora.user.ui.item ? 'listSort' : 'itemSort'] = state.sort;
+            }
+
+            ///*
+            if (state.find) {
+                set.find = state.find;
+            } else {
+                var find = pandora.user.ui.find;
+                pandora.user.ui._list = pandora.getListsState(find)
+                pandora.user.ui._groupsState = pandora.getGroupsState(find);
+                pandora.user.ui._findState = pandora.getFindState(find);
+            }
+            //*/
                 
             if (['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
                 if (state.span) {
-                    pandora.UI.set('videoPoints.' + pandora.user.ui.item, {
+                    set['videoPoints.' + pandora.user.ui.item] = {
                         position: state.span[0],
                         'in': state.span[1] || 0,
                         out: state.span[2] || 0
-                    });
+                    }
                 } else if (!pandora.user.ui.videoPoints[pandora.user.ui.item]) {
-                    pandora.UI.set('videoPoints.' + pandora.user.ui.item, {
+                    set['videoPoints.' + pandora.user.ui.item] = {
                         position: 0,
                         'in': 0,
                         out: 0
-                    });
+                    }
                 }
             }
 
-            state.sort && pandora.UI.set(
-                !pandora.user.ui.item
-                    ? 'lists.' + pandora.user.ui.list + '.sort'
-                    : 'itemSort',
-                state.sort
-            );
+
+            pandora.UI.set(set);
 
             /*
             if (!pandora.$ui.appPanel) {
@@ -382,9 +381,14 @@ pandora.URL = (function() {
         sortKeys[itemsSection] = {list: {}, item: {}};
         views[itemsSection].list.forEach(function(view) {
             sortKeys[itemsSection].list[view] = Ox.merge(
-                pandora.isClipView(view) ? Ox.clone(pandora.site.clipKeys) : [],
                 // listSort[0].key is the default sort key
-                [Ox.getObjectById(pandora.site.sortKeys, pandora.user.ui.listSort[0].key)],
+                Ox.getObjectById(pandora.site.sortKeys, pandora.user.ui.listSort[0].key)
+                    || pandora.isClipView(view)
+                        && Ox.getObjectById(pandora.site.clipKeys, pandora.user.ui.listSort[0].key)
+                    || [],
+                pandora.isClipView(view) ? Ox.map(pandora.site.clipKeys, function(key) {
+                    return key.id == pandora.user.ui.listSort[0].key ? null : key;
+                }) : [],
                 Ox.map(pandora.site.sortKeys, function(key) {
                     return key.id == pandora.user.ui.listSort[0].key ? null : key;
                 })

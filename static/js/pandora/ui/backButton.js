@@ -9,7 +9,7 @@ pandora.ui.backButton = function() {
     })
     .bindEvent({
         click: function() {
-            pandora.UI.set({item: null});
+            pandora.UI.set({item: ''});
         }
     });
     return that;

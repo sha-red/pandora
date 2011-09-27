@@ -39,7 +39,7 @@ class UserProfile(models.Model):
             for key in new:
                 if isinstance(new[key], dict) and key in ui:
                     ui[key] = updateUI(ui[key], new[key])
-                else:
+                elif isinstance(ui, dict):
                     ui[key] = new[key]
             return ui
         ui = updateUI(ui, self.ui)

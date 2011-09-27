@@ -10,7 +10,7 @@ pandora.ui.sortSelect = function() {
                 title: 'Sort by ' + (!pandora.user.ui.item ? 'Clip ' : '') + key.title
             });
         });
-        !pandora.user.ui.item && items.push({});
+        //!pandora.user.ui.item && items.push({});
     }
     if (!pandora.user.ui.item) {
         items = Ox.merge(items, pandora.site.sortKeys.map(function(key) {
@@ -32,19 +32,15 @@ pandora.ui.sortSelect = function() {
     .bindEvent({
         change: function(data) {
             pandora.UI.set(sortKey, [{key: data.selected[0].id, operator: ''}]);
+        },
+        pandora_listsort: function(data) {
+            that.selectItem(data.value[0].key);
+        },
+        pandora_itemsort: function(value) {
+            that.selectItem(data.value[0].key);
         }
     });
-    pandora.UI.bind({
-        listSort: function(value) {
-            that.selectItem(value[0].key);
-        },
-        item: function(value) {
-            
-        },
-        itemSort: function(value) {
-            that.selectItem(value[0].key);
-        }
-    });
+
     return that;
 };
 

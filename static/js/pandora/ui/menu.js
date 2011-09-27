@@ -272,10 +272,11 @@ pandora.ui.mainMenu = function() {
         return { id: 'sortMenu', title: 'Sort', items: [
             { id: 'sortmovies', title: 'Sort ' + (isClipView ? 'Clips' : pandora.site.itemName.plural) + ' by', items: [
                 { group: 'sortmovies', min: 1, max: 1, items: Ox.merge(isClipView ? Ox.merge(pandora.site.clipKeys.map(function(key) {
-                    return Ox.extend({
-                        checked: ui.listSort[0].key == key.id
-                    }, key);
-                }), {}) : [], pandora.site.sortKeys.map(function(key) {
+                    return Ox.extend(Ox.clone(key), {
+                        checked: ui.listSort[0].key == key.id,
+                        title: 'Clip ' + key.title
+                    });
+                }), /*{}*/[]) : [], pandora.site.sortKeys.map(function(key) {
                     return Ox.extend({
                         checked: ui.listSort[0].key == key.id
                     }, key);
@@ -349,6 +350,15 @@ pandora.ui.mainMenu = function() {
         });
     });
 
+    pandora.UI.bind({
+        listView: function(value) {
+            if (pandora.isClipView() != pandora.isClipView(pandora.UI.getPrevious('listView'))) {
+                that.replaceMenu('sortMenu', getSortMenu());
+            }
+        }
+    });
+
     return that;
+
 };
 

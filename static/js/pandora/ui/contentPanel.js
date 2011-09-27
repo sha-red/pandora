@@ -33,7 +33,9 @@ pandora.ui.contentPanel = function() {
             that.replaceElement(1, pandora.$ui.list = pandora.ui.list());
         },
         item: function(value) {
-            value && that.replaceElement(1, pandora.$ui.item = pandora.ui.item());
+            if (value && pandora.UI.getPrevious('item')) {
+                that.replaceElement(1, pandora.$ui.item = pandora.ui.item());
+            }
         },
         itemView: function() {
             that.replaceElement(1, pandora.$ui.item = pandora.ui.item());

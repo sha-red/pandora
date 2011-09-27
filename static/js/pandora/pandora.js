@@ -349,21 +349,16 @@ pandora.getItemByIdOrTitle = function(str, callback) {
 
 pandora.getListData = function() {
     var data = {}, folder;
-    if (pandora.user.ui.list) {
+    if (pandora.user.ui._list) {
         Ox.forEach(pandora.$ui.folderList, function(list, key) {
             if (list.options('selected').length) {
                 folder = key;
                 return false;
             }
         });
-        // the one case where folder is undefinded is when on page load
-        // the folderLists call getListData to determine which list is selected
-        if (folder) {
-            //Ox.print('gLD f', folder)
-            data = pandora.$ui.folderList[folder].value(pandora.user.ui.list);
-            data.editable = data.user == pandora.user.username && data.type == 'static';
-            data.folder = folder;
-        }
+        data = pandora.$ui.folderList[folder].value(pandora.user.ui._list);
+        data.editable = data.user == pandora.user.username && data.type == 'static';
+        data.folder = folder;
     }
     return data;
 };
@@ -559,12 +554,11 @@ pandora.resizeFolders = function() {
 };
 
 pandora.selectList = function() {
-    // fixme: can this be removed?
-    if (pandora.user.ui.list) {
+    if (pandora.user.ui._list) {
         pandora.api.findLists({
             keys: ['status', 'user'],
             query: {
-                conditions: [{key: 'id', value: pandora.user.ui.list, operator: '='}],
+                conditions: [{key: 'id', value: pandora.user.ui._list, operator: '='}],
                 operator: ''
             },
             range: [0, 1]
@@ -576,7 +570,7 @@ pandora.selectList = function() {
                     list.user == pandora.user.username ? 'personal' : 'favorite'
                 );
                 pandora.$ui.folderList[folder]
-                    .options('selected', [pandora.user.ui.list])
+                    .options('selected', [pandora.user.ui._list])
                     .gainFocus();
             } else {
                 pandora.user.ui.list = '';
@@ -612,19 +606,16 @@ pandora.selectList = function() {
         return indices.length == 1 ? indices[0] : -1;
     }
 
-    pandora.getFindState = function() {
+    pandora.getFindState = function(find) {
         // The find element is populated if exactly one condition in an & query
         // has a findKey as key and "=" as operator (and all other conditions
         // are either list or groups), or if all conditions in an | query have
         // the same group id as key and "==" as operator
-        var conditions,
-            find = pandora.user.ui.find,
-            indices,
-            state = {index: -1, key: '*', value: ''};
+        var conditions, indices, state = {index: -1, key: '*', value: ''};
         if (find.operator == '&') {
             // number of conditions that are not list or groups
             conditions = find.conditions.length
-                - !!pandora.user.ui.list
+                - !!pandora.user.ui._list
                 - pandora.user.ui._groupsState.filter(function(group) {
                     return group.index > -1;
                 }).length;
@@ -658,10 +649,9 @@ pandora.selectList = function() {
         return state;
     }
 
-    pandora.getGroupsState = function() {
+    pandora.getGroupsState = function(find) {
         // A group is selected if exactly one condition in an & query or every
         // condition in an | query has the group id as key and "==" as operator
-        var find = pandora.user.ui.find;
         return pandora.user.ui.groups.map(function(group) {
             // FIXME: cant index be an empty array, instead of -1?
             var key = group.id,
@@ -691,14 +681,15 @@ pandora.selectList = function() {
                 } else {
                     // one condition in an & query matches this group
                     state.find.conditions.splice(state.index, 1);
-                    if (state.find.conditions.length == 1) {
-                        if (state.find.conditions[0].conditions) {
-                            // unwrap single remaining bracketed query
-                            state.find = {
-                                conditions: state.find.conditions[0].conditions,
-                                operator: state.find.conditions[0].operator
-                            };
-                        }
+                    if (
+                        state.find.conditions.length == 1
+                        && state.find.conditions[0].conditions
+                    ) {
+                        // unwrap single remaining bracketed query
+                        state.find = {
+                            conditions: state.find.conditions[0].conditions,
+                            operator: state.find.conditions[0].operator
+                        };
                     }
                 }
             }
@@ -706,10 +697,10 @@ pandora.selectList = function() {
         });
     }
 
-    pandora.getListsState = function() {
+    pandora.getListsState = function(find) {
         // A list is selected if exactly one condition in an & query has "list"
         // as key and "==" as operator
-        var find = pandora.user.ui.find, index, state = '';
+        var index, state = '';
         if (find.operator == '&') {
             index = oneCondition(find.conditions, 'list', '==');
             if (index > -1) {

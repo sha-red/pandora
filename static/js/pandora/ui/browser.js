@@ -80,7 +80,6 @@ pandora.ui.browser = function() {
             },
             select: function(data) {
                 pandora.UI.set({
-                    'listSelection': data.ids,
                     'item': data.ids[0] 
                 });
             },

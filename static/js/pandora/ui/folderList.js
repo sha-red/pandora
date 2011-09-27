@@ -241,7 +241,7 @@ pandora.ui.folderList = function(id) {
             max: 1,
             min: 0,
             pageLength: 1000,
-            selected: pandora.getListData().folder == id ? [pandora.user.ui.list] : [],
+            //selected: pandora.getListData().folder == id ? [pandora.user.ui._list] : [],
             sort: [{key: 'position', operator: '+'}],            
             sortable: id != 'featured' || pandora.user.level == 'admin'
         })

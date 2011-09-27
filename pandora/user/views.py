@@ -566,7 +566,7 @@ def setUI(request):
     if request.user.is_authenticated():
         profile = request.user.get_profile()
         for key in data:
-            keys = key.split('|')
+            keys = re.sub('([^\\\\])\.', '\\1\n', key).split('\n')
             value = data[key]
             p = profile.ui
             while len(keys)>1:

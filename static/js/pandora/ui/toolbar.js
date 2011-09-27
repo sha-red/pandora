@@ -25,6 +25,15 @@ pandora.ui.toolbar = function() {
     that.append(
         pandora.$ui.findElement = pandora.ui.findElement()
     );
+    pandora.UI.bind({
+        listView: function(value) {
+            if (pandora.isClipView() != pandora.isClipView(pandora.UI.getPrevious('listView'))) {
+                pandora.$ui.sortSelect.replaceWith(
+                    pandora.$ui.sortSelect = pandora.ui.sortSelect()
+                );
+            }
+        }
+    })
     return that;
 };
 

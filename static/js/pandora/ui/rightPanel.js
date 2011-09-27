@@ -58,22 +58,6 @@ pandora.ui.rightPanel = function() {
         });
     }
     pandora.UI.bind({
-        find: function() {
-            var previousUI = pandora.UI.getPrevious();
-            if (pandora.user.ui.list == previousUI.list) {
-                pandora.$ui.list.reloadList();
-                pandora.user.ui._groupsState.forEach(function(data, i) {
-                    if (!Ox.isEqual(data.selected, previousUI._groupsState[i].selected)) {
-                        pandora.$ui.groups[i].options({selected: data.selected});
-                    }
-                    if (!Ox.isEqual(data.find, previousUI._groupsState[i].find)) {
-                        pandora.$ui.groups[i].reloadList();
-                    } 
-                });
-            } else {
-                that.replaceElement(1, pandora.$ui.contentPanel = pandora.ui.contentPanel());
-            }
-        },
         itemView: function(value) {
             if (pandora.isClipView() != pandora.isClipView(pandora.UI.getPrevious('itemView'))) {
                 that.replaceElement(0, pandora.$ui.toolbar = pandora.ui.toolbar());
