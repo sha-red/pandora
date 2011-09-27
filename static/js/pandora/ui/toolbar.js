@@ -25,9 +25,9 @@ pandora.ui.toolbar = function() {
     that.append(
         pandora.$ui.findElement = pandora.ui.findElement()
     );
-    pandora.UI.bind({
-        listView: function(value) {
-            if (pandora.isClipView() != pandora.isClipView(pandora.UI.getPrevious('listView'))) {
+    that.bindEvent({
+        pandora_listview: function(data) {
+            if (pandora.isClipView() != pandora.isClipView(data.previousValue)) {
                 pandora.$ui.sortSelect.replaceWith(
                     pandora.$ui.sortSelect = pandora.ui.sortSelect()
                 );

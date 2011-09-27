@@ -436,12 +436,6 @@ pandora.URL = (function() {
             views: views
         });
 
-        ['find', 'item', 'itemSort', 'itemView', 'list', 'listSort', 'listView'].forEach(function(event) {
-            pandora.UI.bind(event, function() {
-                that.push();
-            });
-        });
-
         return that;
 
     };

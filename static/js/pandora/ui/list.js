@@ -675,20 +675,20 @@ pandora.ui.list = function() {
         
     }
 
-    pandora.UI.bind({
-        listSort: function(value) {
-            that.options({sort: value});
+    that.bindEvent({
+        pandora_listsort: function(data) {
+            that.options({sort: data.value});
         }
     });
     if (pandora.user.ui.listView == 'grid') {
-        pandora.UI.bind({
-            icons: function(value) {
+        that.bindEvent({
+            pandora_icons: function(data) {
                 that.options({
-                    borderRadius: value == 'posters' ? 0 : 16,
-                    defaultRatio: value == 'posters' ? 5/8 : 1
+                    borderRadius: data.value == 'posters' ? 0 : 16,
+                    defaultRatio: data.value == 'posters' ? 5/8 : 1
                 }).reloadList(true);
             },
-            showSitePoster: function() {
+            pandora_showsiteposter: function() {
                 pandora.user.ui.icons == 'poster' && that.reloadList(true);
             }
         });

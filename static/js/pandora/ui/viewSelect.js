@@ -19,16 +19,14 @@ pandora.ui.viewSelect = function() {
         .bindEvent({
             change: function(data) {
                 pandora.UI.set(viewKey, data.selected[0].id);
+            },
+            pandora_listview: function(data) {
+                that.selectItem(data.value);
+            },
+            pandora_itemview: function(data) {
+                that.selectItem(data.value);
             }
-        });
-    pandora.UI.bind({
-        listView: function(value) {
-            that.selectItem(value);
-        },
-        itemView: function(value) {
-            that.selectItem(value);
-        }
-    });    
+        });  
     return that;
 };
 

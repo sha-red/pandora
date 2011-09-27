@@ -54,16 +54,14 @@ pandora.ui.rightPanel = function() {
                         pandora.$ui.editor.options({width: data.size});
                     }
                 }
+            },
+            pandora_itemview: function(data) {
+                if (pandora.isClipView() != pandora.isClipView(data.previousValue)) {
+                    that.replaceElement(0, pandora.$ui.toolbar = pandora.ui.toolbar());
+                }
             }
         });
     }
-    pandora.UI.bind({
-        itemView: function(value) {
-            if (pandora.isClipView() != pandora.isClipView(pandora.UI.getPrevious('itemView'))) {
-                that.replaceElement(0, pandora.$ui.toolbar = pandora.ui.toolbar());
-            }
-        }
-    })
     return that;
 };
 

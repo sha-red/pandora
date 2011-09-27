@@ -250,13 +250,11 @@ pandora.ui.item = function() {
                     } else {
                         $('.OxSelectedVideo').removeClass('OxSelectedVideo');
                     }
+                },
+                pandora_itemsort: function(data) {
+                    pandora.$ui.clips.options({sort: data.value});
                 }
             }));
-            pandora.UI.bind({
-                itemSort: function(value) {
-                    pandora.$ui.clips.options({sort: value});
-                }
-            });
 
         } else if (pandora.user.ui.itemView == 'video') {
             // fixme: duplicated

@@ -5,15 +5,12 @@ pandora.UI = (function() {
 
     self.previousUI = {};
 
-    that.bind = function() {
-        Ox.Event.bind.apply(null, arguments);
-    };
-
     that.encode = function(val) {
         return val.replace(/\./g, '\\.');
     };
 
     that.getPrevious = function(key) {
+        // fixme: probably unneeded by now
         return !key ? self.previousUI : self.previousUI[key];
     };
 
@@ -94,11 +91,6 @@ pandora.UI = (function() {
         });
         Ox.len(set) && pandora.api.setUI(set);
         Ox.forEach(trigger, function(val, key) {
-            // fixme: send previousVal as second parameter
-            Ox.Event.trigger(key, val);
-        });
-
-        Ox.forEach(trigger, function(val, key) {
             Ox.forEach(pandora.$ui, function(element) {
                 // fixme: send previousVal as second parameter
                 element.ox && element.triggerEvent('pandora_' + key.toLowerCase(), {
@@ -107,6 +99,7 @@ pandora.UI = (function() {
                 });
             });
         });
+        Ox.len(trigger) && Ox.URL.push();
     };
 
     return that;

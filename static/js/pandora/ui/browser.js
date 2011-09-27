@@ -90,20 +90,18 @@ pandora.ui.browser = function() {
                         pandora.$ui.editor.gainFocus();
                     }
                 }
-            }
-        });
-        pandora.enableDragAndDrop(that, false);
-        pandora.UI.bind({
-            icons: function(value) {
+            },
+            pandora_icons: function(data) {
                 that.options({
-                    borderRadius: value == 'posters' ? 0 : 8,
-                    defaultRatio: value == 'posters' ? 5/8 : 1
+                    borderRadius: data.value == 'posters' ? 0 : 8,
+                    defaultRatio: data.value == 'posters' ? 5/8 : 1
                 }).reloadList(true);
             },
-            showSitePoster: function() {
+            pandora_showsiteposter: function() {
                 pandora.user.ui.icons == 'poster' && that.reloadList(true);
             }
         });
+        pandora.enableDragAndDrop(that, false);
     }
     return that;
 };

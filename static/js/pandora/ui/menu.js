@@ -229,6 +229,11 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'clearcache') {
                     Ox.Request.clearCache();
                 }
+            },
+            pandora_listView: function(data) {
+                if (pandora.isClipView() != pandora.isClipView(data.previousValue)) {
+                    that.replaceMenu('sortMenu', getSortMenu());
+                }
             }
         });
 
@@ -348,14 +353,6 @@ pandora.ui.mainMenu = function() {
                 pandora.$ui.mainMenu.replaceMenu('listMenu', getListMenu(lists));
             }
         });
-    });
-
-    pandora.UI.bind({
-        listView: function(value) {
-            if (pandora.isClipView() != pandora.isClipView(pandora.UI.getPrevious('listView'))) {
-                that.replaceMenu('sortMenu', getSortMenu());
-            }
-        }
     });
 
     return that;

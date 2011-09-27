@@ -235,7 +235,7 @@ pandora.ui.folders = function() {
                                 that.append($folder);
                             });
                             pandora.resizeFolders();
-                            pandora.selectList(); //fixme: doesn't work
+                            //pandora.selectList();
                         }
                     }
                 })

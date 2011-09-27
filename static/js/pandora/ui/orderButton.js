@@ -20,15 +20,13 @@ pandora.ui.orderButton = function() {
                     }]
                 });
                 that.options({title: getTitle()});
+            },
+            pandora_listsort: function() {
+                that.options({title: getTitle()});
             }
         });
     function getTitle() {
         return pandora.user.ui.listSort[0].operator == '+' ? 'up' : 'down';
     }
-    pandora.UI.bind({
-        listSort: function() {
-            that.options({title: getTitle()});
-        }
-    });
     return that;
 }
