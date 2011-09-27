@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+
 pandora.ui.folderList = function(id) {
     var i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id),
         that;
@@ -372,30 +373,20 @@ pandora.ui.folderList = function(id) {
                 pandora.$ui.list.triggerEvent('paste', data);
             },
             select: function(data) {
-                if (data.ids.length) {
+                var list = data.ids.length ? data.ids[0] : '';
+                if (list) {
                     Ox.forEach(pandora.$ui.folderList, function($list, id_) {
                         id != id_ && $list.options('selected', []);
                     });
                 }
-                // pandora.URL.push(data.ids.length ? '/list==' + data.ids[0] : '')
-                /*
                 pandora.UI.set({
-                    item: '',
-                    list: data.ids.length ? data.ids[0] : ''
-                })
-                pandora.URL.push();
-                */
-                pandora.UI.set({
-                    item: '',
-                    list: data.ids.length ? data.ids[0] : '',
                     find: {
-                        conditions: data.ids.length ? [
+                        conditions: list ? [
                             {key: 'list', value: data.ids[0], operator: '=='}
                         ] : [],
                         operator: '&'
                     }
-                })
-                pandora.URL.push();
+                });
             },
             submit: function(data) {
                 data_ = {id: data.id};

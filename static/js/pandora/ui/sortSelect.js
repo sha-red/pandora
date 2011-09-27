@@ -38,7 +38,7 @@ pandora.ui.sortSelect = function() {
         listSort: function(value) {
             that.selectItem(value[0].key);
         },
-        item: function(valye) {
+        item: function(value) {
             
         },
         itemSort: function(value) {

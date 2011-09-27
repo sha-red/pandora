@@ -105,7 +105,6 @@ pandora.ui.findElement = function() {
                                     operator: ''
                                 });
                             }
-                            pandora.URL.push();
                         }
                     })
             ]),
@@ -120,12 +119,15 @@ pandora.ui.findElement = function() {
             var elementValue = that.value(),
                 key = elementValue[pandora.user.ui.list ? 1 : 0],
                 findKey = Ox.getObjectById(pandora.site.findKeys, key);
-            Ox.print('!!!!', key, findKey, 'autocomplete' in findKey && findKey.autocomplete)
             value === '' && Ox.print('Warning: autocomplete function should never be called with empty value');
-            if ('autocomplete' in findKey && findKey.autocomplete) {
+            if (findKey.autocomplete) {
                 pandora.api.autocomplete({
                     key: key,
-                    query: elementValue[0].id == 'list' ? pandora.user.ui.listQuery : {conditions: [], operator: ''},
+                    query: {
+                        conditions: pandora.$ui.findListSelect.value() == 'list'
+                            ? [{key: 'list', value: pandora.user.ui.list, operator: '=='}] : [],
+                        operator: '&'
+                    },
                     range: [0, 20],
                     sort: [{
                         key: 'votes',

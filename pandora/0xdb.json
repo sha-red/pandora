@@ -564,7 +564,6 @@
             "item": "",
             "itemSort": [{"key": "clip:position", "operator": ""}],
             "itemView": "info",
-            "list": "",
             "listColumns": ["title", "director", "country", "year", "language", "runtime", "genre"],
             "listColumnWidth": {},
             "listSelection": [],

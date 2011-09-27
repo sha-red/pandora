@@ -689,7 +689,7 @@ pandora.ui.list = function() {
                 }).reloadList(true);
             },
             showSitePoster: function() {
-                that.reloadList(true);
+                pandora.user.ui.icons == 'poster' && that.reloadList(true);
             }
         });
     }

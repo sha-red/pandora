@@ -102,12 +102,9 @@ pandora.ui.browser = function() {
                 }).reloadList(true);
             },
             showSitePoster: function() {
-                that.reloadList(true);
+                pandora.user.ui.icons == 'poster' && that.reloadList(true);
             }
         });
-    }
-    that.update = function() {
-        pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
     }
     return that;
 };

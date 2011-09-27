@@ -3,9 +3,25 @@
     Pandora
 ***/
 
+/*
+---- UI Tree ----
+appPanel
+    mainMenu
+    mainPanel
+        leftPanel
+            sectionbar
+            folders
+            info
+        rightPanel
+            toolbar
+            contentPanel
+                browser <-- should be filters or browser
+                list or item
+            statusbar
+*/
+
 // fixme: never set pandora.ui.videoPosition to 0 ... set to null a.k.a. delete
 // fixme: sort=-director doesn't work
-// fixme: don't reload full right panel on sortSelect
 // fixme: clear items cache after login/logout
 
 Ox.load({
@@ -112,7 +128,7 @@ Ox.load({
                 }
 
                 window.onpopstate = function(event) {
-                    pandora.URL.update();
+                    //pandora.URL.update();
                 };
 
                 // set up url controller

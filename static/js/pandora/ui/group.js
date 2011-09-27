@@ -132,7 +132,7 @@ pandora.ui.group = function(id) {
                 pandora.reloadGroups(i);
                 */
                 pandora.UI.set('find', find);
-                pandora.URL.push();
+                //pandora.URL.push();
             },
             sort: function(data) {
                 Ox.print('SORT', data)

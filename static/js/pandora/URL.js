@@ -87,117 +87,6 @@ pandora.URL = (function() {
     }
     */
 
-    function everyCondition(conditions, key, operator) {
-        // If every condition has the given key and operator
-        // (excluding conditions where all subconditions match)
-        // returns true, otherwise false
-        return Ox.every(conditions, function(condition) {
-            return condition.key == key && condition.operator == operator;
-        });
-    }
-
-    function getFindState(find, listsState, groupsState) {
-        // The find element is populated if exactly one condition in an & query
-        // has a findKey as key and "=" as operator (and all other conditions
-        // are either list or groups), or if all conditions in an | query have
-        // the same group id as key and "==" as operator
-        var conditions, indices, state = {index: -1, key: '*', value: ''};
-        if (find.operator == '&') {
-            // number of conditions that are not list or groups
-            conditions = find.conditions.length
-                - (listsState != '')
-                - groupsState.filter(function(group) {
-                    return group.index > -1;
-                }).length;
-            // indices of non-advanced find queries
-            indices = Ox.map(pandora.site.findKeys, function(findKey) {
-                var index = oneCondition(find.conditions, findKey.id, '=');
-                return index > -1 ? index : null;
-            });
-            state = conditions == 1 && indices.length == 1 ? {
-                index: indices[0],
-                key: find.conditions[indices[0]].key,
-                value: decodeURIComponent(find.conditions[indices[0]].value)
-            } : {
-                index: -1,
-                key: conditions == 0 && indices.length == 0 ? '*' : 'advanced',
-                value: ''
-            };
-        } else {
-            state = {
-                index: -1,
-                key: 'advanced',
-                value: ''
-            };
-            Ox.forEach(pandora.user.ui.groups, function(key) {
-                if (everyCondition(find.conditions, key, '==')) {
-                    state.key = '*';
-                    return false;
-                }
-            });
-        }
-        return state;
-    }
-
-    function getGroupsState(find) {
-        // A group is selected if exactly one condition in an & query or every
-        // condition in an | query has the group id as key and "==" as operator
-        return pandora.user.ui.groups.map(function(group) {
-            // FIXME: cant index be an empty array, instead of -1?
-            var key = group.id,
-                state = {index: -1, find: Ox.clone(find, true), selected: []};
-            if (find.operator == '&') {
-                // include conditions where all subconditions match
-                state.index = oneCondition(find.conditions, key, '==', true);
-                if (state.index > -1) {
-                    state.selected = find.conditions[state.index].conditions
-                        ? find.conditions[state.index].conditions.map(function(condition) {
-                            return condition.value;
-                        })
-                        : [find.conditions[state.index].value];
-                }
-            } else {
-                if (everyCondition(find.conditions, key, '==')) {
-                    state.index = Ox.range(find.conditions.length);
-                    state.selected = find.conditions.map(function(condition) {
-                        return condition.value;
-                    });
-                }
-            }
-            if (state.selected.length) {
-                if (Ox.isArray(state.index)) {
-                    // every condition in an | query matches this group
-                    state.find = {conditions: [], operator: ''};
-                } else {
-                    // one condition in an & query matches this group
-                    state.find.conditions.splice(state.index, 1);
-                    if (state.find.conditions.length == 1) {
-                        if (state.find.conditions[0].conditions) {
-                            // unwrap single remaining bracketed query
-                            state.find = {
-                                conditions: state.find.conditions[0].conditions,
-                                operator: state.find.conditions[0].operator
-                            };
-                        }
-                    }
-                }
-            }
-            return state;
-        });
-    }
-
-    function getListsState(find) {
-        // A list is selected if exactly one condition in an & query has "list"
-        // as key and "==" as operator
-        var index, state = '';
-        if (find.operator == '&') {
-            index = oneCondition(find.conditions, 'list', '==');
-            if (index > -1) {
-                state = find.conditions[index].value;
-            }
-        }
-        return state;
-    }
 
     function getState() {
         return {
@@ -218,20 +107,6 @@ pandora.URL = (function() {
         };
     }
 
-    function oneCondition(conditions, key, operator, includeSubconditions) {
-        // If exactly one condition has the given key and operator
-        // (including or excluding conditions where all subconditions match)
-        // returns the corresponding index, otherwise returns -1
-        var indices = Ox.map(conditions, function(condition, i) {
-            return (
-                condition.conditions
-                ? includeSubconditions && everyCondition(condition.conditions, key, operator)
-                : condition.key == key && condition.operator == operator
-            ) ? i : null;
-        });
-        return indices.length == 1 ? indices[0] : -1;
-    }
-
     function setState(state) {
         Ox.print('STATE:', state)
         var previousUI = pandora.UI.getPrevious();
@@ -240,8 +115,8 @@ pandora.URL = (function() {
         $('video').each(function() {
             $(this).trigger('stop');
         });
-        pandora.user.ui._groupsState = getGroupsState(pandora.user.ui.find);
-        pandora.user.ui._findState = getFindState(pandora.user.ui.find, pandora.user.ui.list, pandora.user.ui._groupsState);
+        pandora.user.ui._groupsState = pandora.getGroupsState();
+        pandora.user.ui._findState = pandora.getFindState();
         if (Ox.isEmpty(state)) {
             if (pandora.user.ui.showHome) {
                 pandora.$ui.home = pandora.ui.home().showScreen();
@@ -292,21 +167,21 @@ pandora.URL = (function() {
 
             state.find && pandora.UI.set({
                 find: state.find,
-                list: getListsState(state.find)
+                list: pandora.getListsState(state.find)
             });
 
             if (state.view) {
                 pandora.UI.set(
                     !pandora.user.ui.item
-                        ? 'lists.' + pandora.user.ui.list + '.view'
+                        ? 'listView'
                         : 'itemView',
                     state.view
                 );
             }
 
-            pandora.user.ui._groupsState = getGroupsState(pandora.user.ui.find);
+            pandora.user.ui._groupsState = pandora.getGroupsState();
             Ox.print('_groupsState =', pandora.user.ui._groupsState);
-            pandora.user.ui._findState = getFindState(pandora.user.ui.find, pandora.user.ui.list, pandora.user.ui._groupsState);
+            pandora.user.ui._findState = pandora.getFindState();
                 
             if (['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
                 if (state.span) {
@@ -331,6 +206,7 @@ pandora.URL = (function() {
                 state.sort
             );
 
+            /*
             if (!pandora.$ui.appPanel) {
                 return;
             }
@@ -403,6 +279,7 @@ pandora.URL = (function() {
                     $item.options('position')
                 );
             }
+            */
             
         }
         pandora.user.ui.showHome = false;
@@ -555,7 +432,7 @@ pandora.URL = (function() {
             views: views
         });
 
-        ['item', 'itemSort', 'itemView', 'list', 'listSort', 'listView'].forEach(function(event) {
+        ['find', 'item', 'itemSort', 'itemView', 'list', 'listSort', 'listView'].forEach(function(event) {
             pandora.UI.bind(event, function() {
                 that.push();
             });

@@ -29,6 +29,7 @@ pandora.ui.folders = function() {
                             { id: 'newsmart', title: 'New Smart List...' },
                             { id: 'newfromresults', title: 'New Smart List from Current Results...', disabled: true },
                             {},
+                            { id: 'duplicate', title: 'Duplicate List' },
                             { id: 'copyselection', title: 'Copy Selection to List...' },
                             { id: 'moveselection', title: 'Move Selection to List...' }
                         ],

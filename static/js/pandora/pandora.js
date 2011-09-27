@@ -368,32 +368,6 @@ pandora.getListData = function() {
     return data;
 };
 
-pandora.getListMenu = function(lists) {
-    return { id: 'listMenu', title: 'List', items: [
-        { id: 'history', title: 'History', items: [
-            { id: 'allmovies', title: 'All ' + pandora.site.itemName.plural }
-        ] },
-        { id: 'viewlist', title: 'View List', items: lists ? ['personal', 'favorite', 'featured'].map(function(folder) {
-            return { id: folder + 'lists', title: Ox.toTitleCase(folder) + ' Lists', items: [
-                { group: folder + 'lists', min: 0, max: 1, items: lists[folder].map(function(list) {
-                    return { id: 'viewlist' + list.id, title: (folder == 'favorite' ? list.user + ': ' : '') + list.name, checked: list.id == pandora.user.ui.list };
-                }) }
-            ] };
-        }) : [
-            { id: 'loading', title: 'Loading...', disabled: true }
-        ] },
-        {},
-        { id: 'newlist', title: 'New List...', keyboard: 'control n' },
-        { id: 'newlistfromselection', title: 'New List from Selection...', disabled: true, keyboard: 'shift control n' },
-        { id: 'newsmartlist', title: 'New Smart List...', keyboard: 'alt control n' },
-        { id: 'newsmartlistfromresults', title: 'New Smart List from Results...', keyboard: 'shift alt control n' },
-        {},
-        { id: 'addmovietolist', title: ['Add Selected ' + pandora.site.itemName.singular + ' to List...', 'Add Selected ' + pandora.site.itemName.plural + ' to List...'], disabled: true },
-        {},
-        { id: 'setposterframe', title: 'Set Poster Frame', disabled: true }
-    ] };
-};
-
 pandora.getMetadataByIdOrName = function(item, view, str, callback) {
     // For a given item (or none) and a given view (or any), this takes a string
     // and checks if it's an annotation/event/place id or an event/place name,
@@ -452,56 +426,6 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
             callback();
         }
     }
-};
-
-pandora.getSortMenu = function() {
-    var ui = pandora.user.ui,
-        isClipView = pandora.isClipView(ui.listView);
-    return { id: 'sortMenu', title: 'Sort', items: [
-        { id: 'sortmovies', title: 'Sort ' + (isClipView ? 'Clips' : pandora.site.itemName.plural) + ' by', items: [
-            { group: 'sortmovies', min: 1, max: 1, items: Ox.merge(isClipView ? Ox.merge(pandora.site.clipKeys.map(function(key) {
-                return Ox.extend({
-                    checked: ui.listSort[0].key == key.id
-                }, key);
-            }), {}) : [], pandora.site.sortKeys.map(function(key) {
-                return Ox.extend({
-                    checked: ui.listSort[0].key == key.id
-                }, key);
-            })) }
-        ] },
-        { id: 'ordermovies', title: 'Order ' + (isClipView ? 'Clips' : pandora.site.itemName.plural), items: [
-            { group: 'ordermovies', min: 1, max: 1, items: [
-                { id: 'ascending', title: 'Ascending', checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '+' },
-                { id: 'descending', title: 'Descending', checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '-' }
-            ]}
-        ] },
-        { id: 'advancedsort', title: 'Advanced Sort...', keyboard: 'shift control s' },
-        {},
-        { id: 'sortgroups', title: 'Sort Groups', items: pandora.user.ui.groups.map(function(group) {
-            return {
-                id: 'sortgroup' + group.id,
-                title: 'Sort ' + Ox.getObjectById(pandora.site.groups, group.id).title + ' Group by',
-                items: [
-                    { group: 'sortgroup' + group.id, min: 1, max: 1, items: [
-                        { id: 'name', title: 'Name', checked: group.sort[0].key == 'name' },
-                        { id: 'items', title: 'Items', checked: group.sort[0].key == 'items' }
-                    ] }
-                ]
-            }
-        }) },
-        { id: 'ordergroups', title: 'Order Groups', items: pandora.user.ui.groups.map(function(group) {
-            return {
-                id: 'ordergroup' + group.id,
-                title: 'Order ' + Ox.getObjectById(pandora.site.groups, group.id).title + ' Group',
-                items: [
-                    { group: 'ordergroup' + group.id, min: 1, max: 1, items: [
-                        { id: 'ascending', title: 'Ascending', checked: group.sort[0].operator == '+' },
-                        { id: 'descending', title: 'Descending', checked: group.sort[0].operator == '-' }
-                    ] }
-                ]
-            }
-        }) }
-    ] };
 };
 
 pandora._getSortOperator = function(type) {
@@ -568,59 +492,6 @@ pandora.signout = function(data) {
     pandora.$ui.appPanel.reload();
 };
 
-pandora.reloadGroups = function(i) {
-    // fixme: no longer needed
-    var query = pandora.user.ui.query,
-        view = pandora.user.ui.lists[pandora.user.ui.list].listView;
-    if (view == 'clip') {
-        pandora.$ui.list.options({
-            items: function(data, callback) {
-                return pandora.api.findAnnotations(Ox.extend(data, {
-                    itemQuery: query
-                }), callback);
-            }
-        });
-    } else if (view == 'map') {
-        pandora.$ui.map.options({
-            places: function(data, callback) {
-                return pandora.api.findPlaces(Ox.extend(data, {
-                    itemQuery: query
-                }), callback);
-            }
-        });
-    } else if (view == 'calendar') {
-        pandora.$ui.list.options({
-            items: function(data, callback) {
-                return pandora.api.findEvents(Ox.extend(data, {
-                    itemQuery: query
-                }), callback);
-            }
-        });
-    } else {
-        pandora.$ui.list.options({
-            items: function(data, callback) {
-                return pandora.api.find(Ox.extend(data, {
-                    query: query
-                }), callback);
-            }
-        });
-    }
-    Ox.forEach(pandora.user.ui.groups, function(group, i_) {
-        if (i_ != i) {
-            //Ox.print('setting groups request', i, i_)
-            pandora.$ui.groups[i_].options({
-                items: function(data, callback) {
-                    delete data.keys;
-                    return pandora.api.find(Ox.extend(data, {
-                        group: group.id,
-                        query: pandora.user.ui.groupsData[i_].query
-                    }), callback);
-                }
-            });
-        }
-    });
-};
-
 pandora.reloadList = function() {
     Ox.print('reloadList')
     var listData = pandora.getListData();
@@ -628,7 +499,8 @@ pandora.reloadList = function() {
     pandora.$ui.groups.forEach(function($group) {
         $group.reloadList();
     });
-    pandora.$ui.list.bindEvent({
+    pandora.$ui.list
+        .bindEvent({
             init: function(data) {
                 // fixme: this will not work for lists in the favorites folder
                 // (but then it's also unlikely they'll have to be reloaded)
@@ -647,7 +519,6 @@ pandora.reloadList = function() {
 
 pandora.resizeGroups = function(width) {
     pandora.user.ui.groupsSizes = pandora.getGroupsSizes();
-    Ox.print('{}{}{}', window.innerWidth, window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1, pandora.user.ui.groupsSizes)
     pandora.$ui.browser
         .size(0, pandora.user.ui.groupsSizes[0])
         .size(2, pandora.user.ui.groupsSizes[4]);
@@ -666,14 +537,12 @@ pandora.resizeFolders = function() {
         columnWidth = {user: parseInt((width - 96) * 0.4)};
         columnWidth.name = (width - 96) - columnWidth.user;
     }
-    //Ox.print('sectionsWidth', width)
     Ox.forEach(pandora.$ui.folderList, function($list, id) {
-        var i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id);
-        pandora.$ui.folder[i].css({width: width + 'px'});
+        var pos = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id);
+        pandora.$ui.folder[pos].css({width: width + 'px'});
         $list.css({width: width + 'px'});
         if (pandora.user.ui.section == 'items') {
-            if (pandora.site.sectionFolders[pandora.user.ui.section][i].showBrowser) {
-                Ox.print('ID', id)
+            if (pandora.site.sectionFolders[pandora.user.ui.section][pos].showBrowser) {
                 pandora.$ui.findListInput[id].options({
                     width: width - 24
                 });
@@ -684,12 +553,13 @@ pandora.resizeFolders = function() {
             }                
         }
         if (!pandora.user.ui.showFolder[pandora.user.ui.section][id]) {
-            pandora.$ui.folder[i].update();
+            pandora.$ui.folder[pos].update();
         }
     });
 };
 
 pandora.selectList = function() {
+    // fixme: can this be removed?
     if (pandora.user.ui.list) {
         pandora.api.findLists({
             keys: ['status', 'user'],
@@ -710,10 +580,143 @@ pandora.selectList = function() {
                     .gainFocus();
             } else {
                 pandora.user.ui.list = '';
-                //pandora.user.ui.listQuery.conditions = []; // fixme: Query should read from pandora.ui.list, and not need pandora.ui.listQuery to be reset
-                //pandora.URL.set(pandora.Query.toString());
             }
         });
     }
 };
 
+(function() {
+
+    // Note: getFindState has to run after getListState and getGroupsState
+
+    function everyCondition(conditions, key, operator) {
+        // If every condition has the given key and operator
+        // (excluding conditions where all subconditions match)
+        // returns true, otherwise false
+        return Ox.every(conditions, function(condition) {
+            return condition.key == key && condition.operator == operator;
+        });
+    }
+
+    function oneCondition(conditions, key, operator, includeSubconditions) {
+        // If exactly one condition has the given key and operator
+        // (including or excluding conditions where all subconditions match)
+        // returns the corresponding index, otherwise returns -1
+        var indices = Ox.map(conditions, function(condition, i) {
+            return (
+                condition.conditions
+                ? includeSubconditions && everyCondition(condition.conditions, key, operator)
+                : condition.key == key && condition.operator == operator
+            ) ? i : null;
+        });
+        return indices.length == 1 ? indices[0] : -1;
+    }
+
+    pandora.getFindState = function() {
+        // The find element is populated if exactly one condition in an & query
+        // has a findKey as key and "=" as operator (and all other conditions
+        // are either list or groups), or if all conditions in an | query have
+        // the same group id as key and "==" as operator
+        var conditions,
+            find = pandora.user.ui.find,
+            indices,
+            state = {index: -1, key: '*', value: ''};
+        if (find.operator == '&') {
+            // number of conditions that are not list or groups
+            conditions = find.conditions.length
+                - !!pandora.user.ui.list
+                - pandora.user.ui._groupsState.filter(function(group) {
+                    return group.index > -1;
+                }).length;
+            // indices of non-advanced find queries
+            indices = Ox.map(pandora.site.findKeys, function(findKey) {
+                var index = oneCondition(find.conditions, findKey.id, '=');
+                return index > -1 ? index : null;
+            });
+            state = conditions == 1 && indices.length == 1 ? {
+                index: indices[0],
+                key: find.conditions[indices[0]].key,
+                value: decodeURIComponent(find.conditions[indices[0]].value)
+            } : {
+                index: -1,
+                key: conditions == 0 && indices.length == 0 ? '*' : 'advanced',
+                value: ''
+            };
+        } else {
+            state = {
+                index: -1,
+                key: 'advanced',
+                value: ''
+            };
+            Ox.forEach(pandora.user.ui.groups, function(key) {
+                if (everyCondition(find.conditions, key, '==')) {
+                    state.key = '*';
+                    return false;
+                }
+            });
+        }
+        return state;
+    }
+
+    pandora.getGroupsState = function() {
+        // A group is selected if exactly one condition in an & query or every
+        // condition in an | query has the group id as key and "==" as operator
+        var find = pandora.user.ui.find;
+        return pandora.user.ui.groups.map(function(group) {
+            // FIXME: cant index be an empty array, instead of -1?
+            var key = group.id,
+                state = {index: -1, find: Ox.clone(find, true), selected: []};
+            if (find.operator == '&') {
+                // include conditions where all subconditions match
+                state.index = oneCondition(find.conditions, key, '==', true);
+                if (state.index > -1) {
+                    state.selected = find.conditions[state.index].conditions
+                        ? find.conditions[state.index].conditions.map(function(condition) {
+                            return condition.value;
+                        })
+                        : [find.conditions[state.index].value];
+                }
+            } else {
+                if (everyCondition(find.conditions, key, '==')) {
+                    state.index = Ox.range(find.conditions.length);
+                    state.selected = find.conditions.map(function(condition) {
+                        return condition.value;
+                    });
+                }
+            }
+            if (state.selected.length) {
+                if (Ox.isArray(state.index)) {
+                    // every condition in an | query matches this group
+                    state.find = {conditions: [], operator: ''};
+                } else {
+                    // one condition in an & query matches this group
+                    state.find.conditions.splice(state.index, 1);
+                    if (state.find.conditions.length == 1) {
+                        if (state.find.conditions[0].conditions) {
+                            // unwrap single remaining bracketed query
+                            state.find = {
+                                conditions: state.find.conditions[0].conditions,
+                                operator: state.find.conditions[0].operator
+                            };
+                        }
+                    }
+                }
+            }
+            return state;
+        });
+    }
+
+    pandora.getListsState = function() {
+        // A list is selected if exactly one condition in an & query has "list"
+        // as key and "==" as operator
+        var find = pandora.user.ui.find, index, state = '';
+        if (find.operator == '&') {
+            index = oneCondition(find.conditions, 'list', '==');
+            if (index > -1) {
+                state = find.conditions[index].value;
+            }
+        }
+        return state;
+    };
+
+}());
