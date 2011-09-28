@@ -96,7 +96,6 @@ def findLists(request):
     else:
         qs = _order_query(query['qs'], query['sort'])
 
-    qs = qs.distinct()
     response = json_response()
     if 'keys' in data:
         qs = qs[query['range'][0]:query['range'][1]]

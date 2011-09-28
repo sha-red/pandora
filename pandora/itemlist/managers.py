@@ -10,6 +10,7 @@ import models
 def parseCondition(condition, user):
     '''
     '''
+    print condition, user
     k = condition.get('key', 'name')
     k = {
         'user': 'user__username',
@@ -20,7 +21,7 @@ def parseCondition(condition, user):
     v = condition['value']
     op = condition.get('operator')
     if not op:
-        op = ''
+        op = '='
     if op.startswith('!'):
         op = op[1:]
         exclude = True
@@ -45,7 +46,6 @@ def parseCondition(condition, user):
             '^': '__istartswith',
             '$': '__iendswith',
         }.get(op, '__icontains'))
-
     key = str(key)
     if exclude:
         q = ~Q(**{key: v})
@@ -81,9 +81,7 @@ def parseConditions(conditions, operator, user):
                 conn.append(q)
             pass
         else:
-            if condition.get('value', '') != '' or \
-               condition.get('operator', '') == '=':
-                conn.append(parseCondition(condition, user))
+            conn.append(parseCondition(condition, user))
     if conn:
         q = conn[0]
         for c in conn[1:]:

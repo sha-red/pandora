@@ -166,9 +166,7 @@ def parseConditions(conditions, operator):
                 conn.append(q)
             pass
         else:
-            if condition.get('value', '') != '' or \
-               condition.get('operator', '') == '=':
-                conn.append(parseCondition(condition))
+            conn.append(parseCondition(condition))
     if conn:
         q = conn[0]
         for c in conn[1:]:
