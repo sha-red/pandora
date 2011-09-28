@@ -37,12 +37,12 @@ pandora.UI = (function() {
                 pandora.user.ui._findState = pandora.getFindState(val);
                 if (list != self.previousUI._list) {
                     if (!pandora.user.ui.lists[list]) {
-                        add['lists.' + list] = {};
+                        add['lists.' +that.encode(list)] = {};
                     }
                     Ox.forEach(listSettings, function(listSetting, setting) {
                         if (!pandora.user.ui.lists[list]) {
                             // add default list setting and copy to settings
-                            add['lists.' + list][listSetting] = pandora.site.user.ui[setting];
+                            add['lists.' + that.encode(list)][listSetting] = pandora.site.user.ui[setting];
                             add[setting] = pandora.site.user.ui[setting];
                         } else {
                             // copy lists setting to settings
