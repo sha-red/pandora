@@ -422,13 +422,16 @@ pandora.ui.list = function() {
                         toolbar: true,
                         width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE,
                     }).bindEvent({
-                        selectplace: function(event, place) {
+                        selectplace: function(place) {
                             if(place && place.id[0] != '_') {
                                 pandora.$ui.clips.options({
                                     items: function(data, callback) {
                                         return pandora.api.findAnnotations(Ox.extend(data, {
                                             query: {
-                                                conditions:[{key: 'place', value: place.id, operator:'='}]
+                                                conditions:[{key: 'place',
+                                                             value: place.id,
+                                                             operator:'=='
+                                                }]
                                             },
                                             itemQuery: pandora.user.ui.find
                                         }), callback);
@@ -446,11 +449,11 @@ pandora.ui.list = function() {
                     element: pandora.$ui.clips = Ox.IconList({
                         fixedRatio: fixedRatio,
                         item: function(data, sort, size) {
-                            Ox.print('RATIO', data.videoRatio);
                             size = size || 128;
                             var width = data.videoRatio < fixedRatio ? size : size * data.videoRatio / fixedRatio,
-                                height = width / data.videoRatio,
-                                url = '/' + data.item + '/' + height + 'p' + data['in'] + '.jpg';
+                                height = Math.round(width / data.videoRatio),
+                                itemId = data.id.split('/')[0],
+                                url = '/' + itemId + '/' + height + 'p' + data['in'] + '.jpg';
                             return {
                                 height: height,
                                 id: data.id,
@@ -462,7 +465,7 @@ pandora.ui.list = function() {
                             };
                         },
                         items: [],
-                        keys: ['id', 'value', 'in', 'out', 'videoRatio', 'item'],
+                        keys: ['id', 'value', 'in', 'out', 'videoRatio'],
                         size: 128,
                         sort: pandora.user.ui.listSort,
                         unique: 'id'
@@ -477,10 +480,10 @@ pandora.ui.list = function() {
                             pandora.UI.set('videoPoints.' + item, Ox.extend(points, {
                                 position: points['in']
                             }));
-                            pandora.URL.set(item + '/timeline');
+                            pandora.UI.set('itemView', 'timeline');
                         }
                     }),
-                    id: 'place',
+                    id: 'clips',
                     size: 144 + Ox.UI.SCROLLBAR_SIZE
                 }
             ],
@@ -490,14 +493,52 @@ pandora.ui.list = function() {
             pandora.$ui.map.resizeMap();
         });
     } else if (view == 'calendar') {
+        var fixedRatio = 16/9;
         that = Ox.SplitPanel({
             elements: [
                 {
                     element: pandora.$ui.calendar = Ox.Element()
                 },
                 {
-                    element: Ox.Element(),
-                    id: 'place',
+                    element: pandora.$ui.clips = Ox.IconList({
+                        fixedRatio: fixedRatio,
+                        item: function(data, sort, size) {
+                            size = size || 128;
+                            var width = data.videoRatio < fixedRatio ? size : size * data.videoRatio / fixedRatio,
+                                height = Math.round(width / data.videoRatio),
+                                itemId = data.id.split('/')[0],
+                                url = '/' + itemId + '/' + height + 'p' + data['in'] + '.jpg';
+                            Ox.print(data.videoRatio, size, fixedRatio, width, height);
+                            return {
+                                height: height,
+                                id: data.id,
+                                info: Ox.formatDuration(data['in'], 'short') + ' - '
+                                    + Ox.formatDuration(data['out'], 'short'),
+                                title: data.value,
+                                url: url,
+                                width: width
+                            };
+                        },
+                        items: [],
+                        keys: ['id', 'value', 'in', 'out', 'videoRatio'],
+                        size: 128,
+                        sort: pandora.user.ui.listSort,
+                        unique: 'id'
+                    }).bindEvent({
+                        open: function(data) {
+                            var id = data.ids[0],
+                                item = pandora.$ui.clips.value(id, 'item'),
+                                points = {
+                                    'in': pandora.$ui.clips.value(id, 'in'),
+                                    out: pandora.$ui.clips.value(id, 'out')
+                                };
+                            pandora.UI.set('videoPoints.' + item, Ox.extend(points, {
+                                position: points['in']
+                            }));
+                            pandora.UI.set('itemView', 'timeline');
+                        }
+                    }),
+                    id: 'clips',
                     size: 144 + Ox.UI.SCROLLBAR_SIZE
                 }
             ],
@@ -518,6 +559,22 @@ pandora.ui.list = function() {
                 range: [-5000, 5000],
                 width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE,
                 zoom: 4
+            }).bindEvent({
+                select: function(event) {
+                    pandora.$ui.clips.options({
+                        items: function(data, callback) {
+                            return pandora.api.findAnnotations(Ox.extend(data, {
+                                query: {
+                                    conditions:[{key: 'event',
+                                                 value: event.id,
+                                                 operator:'=='
+                                    }]
+                                },
+                                itemQuery: pandora.user.ui.find
+                            }), callback);
+                        }
+                    });
+                }
             }));
         });
     } else {
@@ -574,7 +631,7 @@ pandora.ui.list = function() {
                             return {
                                 key: 'id',
                                 value: id,
-                                operator: '='
+                                operator: '=='
                             }
                         }),
                         operator: '|'
@@ -662,7 +719,7 @@ pandora.ui.list = function() {
                             return {
                                 key: 'id',
                                 value: id,
-                                operator: '='
+                                operator: '=='
                             }
                         }),
                         operator: '|'

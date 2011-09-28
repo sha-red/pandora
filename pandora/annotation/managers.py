@@ -20,6 +20,7 @@ def parseCondition(condition, user):
     k = {
         'user': 'user__username',
         'place': 'places__id',
+        'event': 'events__id',
     }.get(k, k)
     if not k:
         k = 'name'
@@ -41,12 +42,12 @@ def parseCondition(condition, user):
             return q
     if k == 'id':
         v = ox.from32(v.split('/')[-1])
-    elif k in ('places__id', ):
+    elif k in ('places__id', 'events__id'):
         v = ox.from32(v)
     if isinstance(v, bool): #featured and public flag
         key = k
     elif k in ('lat', 'lng', 'area', 'south', 'west', 'north', 'east', 'matches',
-               'id', 'places__id'):
+               'id', 'places__id', 'events__id'):
         key = "%s%s" % (k, {
             '>': '__gt',
             '>=': '__gte',

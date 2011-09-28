@@ -39,6 +39,7 @@ pandora.ui.item = function() {
             );
 
         } else if (pandora.user.ui.itemView == 'calendar') {
+            var video = result.data.stream;
             pandora.api.findEvents({
                 itemQuery: {conditions: [{key: 'id', value: pandora.user.ui.item, operator:'='}]},
                 keys: ['id', 'name', 'start', 'end'],
@@ -55,10 +56,68 @@ pandora.ui.item = function() {
                                     range: [-5000, 5000],
                                     width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE,
                                     zoom: 4
+                                }).bindEvent({
+                                    select: function(event) {
+                                        pandora.$ui.clips.options({
+                                            items: function(data, callback) {
+                                                pandora.api.findAnnotations(Ox.extend(data, {
+                                                    query: {
+                                                        conditions:[{
+                                                            key: 'event',
+                                                            value: event.id,
+                                                            operator:'=='
+                                                        }]
+                                                    },
+                                                    itemQuery: {conditions: [{
+                                                            key: 'id',
+                                                            value: pandora.user.ui.item,
+                                                            operator: '=='
+                                                     }]}
+                                                }), callback);
+                                            }
+                                        });
+                                        
+                                    }
                                 })
                             },
                             {
                                 element: Ox.Element(),
+                                element: pandora.$ui.clips = Ox.IconList({
+                                    fixedRatio: video.aspectRatio,
+                                    item: function(data, sort, size) {
+                                        size = size || 128;
+                                        var width = size,
+                                            height = Math.round(size / video.aspectRatio),
+                                            itemId = data.id.split('/')[0],
+                                            url = '/' + itemId + '/' + height + 'p' + data['in'] + '.jpg';
+                                        return {
+                                            height: height,
+                                            id: data['id'],
+                                            info: Ox.formatDuration(data['in'], 'short') +' - '+ Ox.formatDuration(data['out'], 'short'),
+                                            title: data.value,
+                                            url: url,
+                                            width: width
+                                        };
+                                    },
+                                    items: [],
+                                    keys: ['id', 'value', 'in', 'out'],
+                                    size: 128,
+                                    sort: pandora.user.ui.itemSort,
+                                    unique: 'id'
+                                }).bindEvent({
+                                    open: function(data) {
+                                        var id = data.ids[0],
+                                            item = pandora.user.ui.item,
+                                            points = {
+                                                'in': pandora.$ui.clips.value(id, 'in'),
+                                                out: pandora.$ui.clips.value(id, 'out')
+                                            };
+                                        pandora.UI.set('videoPoints.' + item, Ox.extend(points, {
+                                            position: points['in']
+                                        }));
+                                        pandora.UI.set('itemView', 'timeline');
+                                    }
+                                }),
                                 id: 'place',
                                 size: 144 + Ox.UI.SCROLLBAR_SIZE
                             }
@@ -449,18 +508,22 @@ pandora.ui.item = function() {
                             toolbar: true,
                             width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE
                         }).bindEvent({
-                            selectplace: function(event, place) {
+                            selectplace: function(place) {
                                 if(place) {
                                     pandora.$ui.clips.options({
                                         items: function(data, callback) {
                                             return pandora.api.findAnnotations(Ox.extend(data, {
                                                 query: {
-                                                    conditions:[{key: 'place', value: place.id, operator:'='}]
+                                                    conditions:[{
+                                                        key: 'place',
+                                                        value: place.id,
+                                                        operator:'=='
+                                                    }]
                                                 },
                                                 itemQuery: {conditions: [{
                                                         key: 'id',
                                                         value: pandora.user.ui.item,
-                                                        operator: '='
+                                                        operator: '=='
                                                  }]}
                                             }), callback);
                                         }
@@ -478,10 +541,11 @@ pandora.ui.item = function() {
                             fixedRatio: video.aspectRatio,
                             item: function(data, sort, size) {
                                 size = size || 128;
-                                var ratio = data.aspectRatio,
-                                    width = size,
-                                    height = Math.round(size / ratio),
-                                    url = '/' + data.item + '/' + height + 'p' + data['in'] + '.jpg';
+                                Ox.print('DATA', data);
+                                var width = size,
+                                    height = Math.round(size / video.aspectRatio),
+                                    itemId = data.id.split('/')[0],
+                                    url = '/' + itemId + '/' + height + 'p' + data['in'] + '.jpg';
                                 return {
                                     height: height,
                                     id: data['id'],
@@ -492,7 +556,7 @@ pandora.ui.item = function() {
                                 };
                             },
                             items: [],
-                            keys: ['id', 'value', 'in', 'out', 'aspectRatio', 'item'],
+                            keys: ['id', 'value', 'in', 'out'],
                             size: 128,
                             sort: pandora.user.ui.itemSort,
                             unique: 'id'
@@ -507,7 +571,7 @@ pandora.ui.item = function() {
                                 pandora.UI.set('videoPoints.' + item, Ox.extend(points, {
                                     position: points['in']
                                 }));
-                                pandora.URL.set(item + '/timeline');
+                                pandora.UI.set('itemView', 'timeline');
                             }
                         }),
                         id: 'place',

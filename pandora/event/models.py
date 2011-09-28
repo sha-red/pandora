@@ -51,6 +51,7 @@ class Event(models.Model):
 
     matches = models.IntegerField(default=0)
     items = models.ManyToManyField(Item, blank=True, related_name='events')
+    annotations = models.ManyToManyField(Annotation, blank=True, related_name='events')
 
     def __unicode__(self):
         return self.name
@@ -64,6 +65,10 @@ class Event(models.Model):
     def update_matches(self):
         matches = self.get_matches()
         self.matches = matches.count()
+        for i in self.annotations.exclude(id__in=matches):
+            self.annotations.remove(i)
+        for i in matches.exclude(id__in=self.annotations.all()):
+            self.annotations.add(i)
         ids = list(set([a.item.id for a in matches]))
         for i in self.items.exclude(id__in=ids):
             self.items.remove(i)
