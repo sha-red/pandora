@@ -4,11 +4,15 @@ pandora.ui.viewSelect = function() {
     var viewKey = !pandora.user.ui.item ? 'listView' : 'itemView',
         that = Ox.Select({
             id: 'viewSelect',
-            items: pandora.site[viewKey + 's'].map(function(view) {
-                return Ox.extend(Ox.clone(view), {
-                    checked: view.id == pandora.user.ui[viewKey],
-                    title: 'View ' + view.title
-                });
+            items: Ox.map(pandora.site[viewKey + 's'], function(view) {
+                return viewKey == 'listView'
+                    || ['data', 'files'].indexOf(view.id) == -1
+                    || pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level]
+                    ? Ox.extend(Ox.clone(view), {
+                        checked: view.id == pandora.user.ui[viewKey],
+                        title: 'View ' + view.title
+                    })
+                    : null;
             }),
             width: !pandora.user.ui.item ? 144 : 128
         })

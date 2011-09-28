@@ -117,9 +117,9 @@ pandora.ui.folderBrowserList = function(id) {
             items: function(data, callback) {
                 var query = id == 'favorite' ? {conditions: [
                     {key: 'status', value: 'public', operator: '='},
-                    {key: 'user', value: pandora.user.username, operator: '!'}
+                    {key: 'user', value: pandora.user.username, operator: '!=='}
                 ], operator: '&'} : {conditions: [
-                    {key: 'status', value: 'private', operator: '!'}
+                    {key: 'status', value: 'private', operator: '!='}
                 ], operator: ''};
                 return pandora.api.findLists(Ox.extend(data, {
                     query: query

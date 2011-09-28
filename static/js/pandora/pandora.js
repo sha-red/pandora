@@ -284,7 +284,10 @@ pandora.getFoldersHeight = function() {
 pandora.getFoldersWidth = function() {
     var width = pandora.user.ui.sidebarSize;
     // fixme: don't use height(), look up in splitpanels
-    if (pandora.getFoldersHeight() > pandora.$ui.leftPanel.height() - 24 - 1 - pandora.$ui.info.height()) {
+    if (
+        /*pandora.$ui.appPanel
+        &&*/ pandora.getFoldersHeight() > pandora.$ui.leftPanel.height() - 24 - 1 - pandora.$ui.info.height()
+    ) {
         width -= Ox.UI.SCROLLBAR_SIZE;
     }
     return width;
@@ -319,7 +322,7 @@ pandora.getItemByIdOrTitle = function(str, callback) {
         } else {
             pandora.api.find({
                 query: {
-                    conditions: [{key: 'title', value: str, operator: ''}], // fixme: operator will be "="
+                    conditions: [{key: 'title', value: str, operator: '='}],
                     operator: '&'
                 },
                 sort: [{key: 'votes', operator: ''}], // fixme: not all systems have "votes"
@@ -356,9 +359,11 @@ pandora.getListData = function() {
                 return false;
             }
         });
-        data = pandora.$ui.folderList[folder].value(pandora.user.ui._list);
-        data.editable = data.user == pandora.user.username && data.type == 'static';
-        data.folder = folder;
+        if (folder) {
+            data = pandora.$ui.folderList[folder].value(pandora.user.ui._list);
+            data.editable = data.user == pandora.user.username && data.type == 'static';
+            data.folder = folder;
+        }
     }
     return data;
 };
@@ -558,7 +563,7 @@ pandora.selectList = function() {
         pandora.api.findLists({
             keys: ['status', 'user'],
             query: {
-                conditions: [{key: 'id', value: pandora.user.ui._list, operator: '='}],
+                conditions: [{key: 'id', value: pandora.user.ui._list, operator: '=='}],
                 operator: ''
             },
             range: [0, 1]

@@ -50,8 +50,12 @@ pandora.ui.folders = function() {
                                     type: data.id == 'new' ? 'static' : 'smart'
                                 }, function(result) {
                                     var id = result.data.id;
-                                    pandora.UI.set('lists.' + id, pandora.site.user.ui.lists['']); // fixme: necessary?
-                                    pandora.URL.set('?find=list:' + id)
+                                    pandora.UI.set({
+                                        find: {
+                                            conditions: [{key: 'list', value: id, operator: '=='}],
+                                            operator: '&'
+                                        }
+                                    });
                                     Ox.Request.clearCache(); // fixme: remove
                                     $list.reloadList().bindEventOnce({
                                         load: function(data) {
@@ -235,7 +239,7 @@ pandora.ui.folders = function() {
                                 that.append($folder);
                             });
                             pandora.resizeFolders();
-                            //pandora.selectList();
+                            pandora.selectList();
                         }
                     }
                 })

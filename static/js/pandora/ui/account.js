@@ -147,7 +147,6 @@ pandora.ui.accountForm = function(action, value) {
                         }
                     });
                 } else if (action == 'reset') {
-                    Ox.print('DATA???', data)
                     var usernameOrEmail = data.usernameOrEmail,
                         key = usernameOrEmail[0];
                     data = {};

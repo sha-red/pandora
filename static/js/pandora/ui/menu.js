@@ -330,12 +330,12 @@ pandora.ui.mainMenu = function() {
         queries = {
             // fixme: duplicated
             personal: {conditions: [
-                {key: 'user', value: pandora.user.username, operator: '='},
-                {key: 'status', value: 'featured', operator: '!'}
+                {key: 'user', value: pandora.user.username, operator: '=='},
+                {key: 'status', value: 'featured', operator: '!='}
             ], operator: '&'},
             favorite: {conditions: [
                 {key: 'subscribed', value: true, operator: '='},
-                {key: 'status', value: 'featured', operator: '!'},
+                {key: 'status', value: 'featured', operator: '!='},
             ], operator: '&'},
             featured: {conditions: [
                 {key: 'status', value: 'featured', operator: '='}

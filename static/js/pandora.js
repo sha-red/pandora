@@ -129,10 +129,6 @@ Ox.load({
                     pandora.user.ui.theme = 'classic';
                 }
 
-                window.onpopstate = function(event) {
-                    //pandora.URL.update();
-                };
-
                 // set up url controller
 
                 pandora.URL.init().parse(function() {

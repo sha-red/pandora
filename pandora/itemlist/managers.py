@@ -9,15 +9,6 @@ import models
 
 def parseCondition(condition, user):
     '''
-    condition: {
-            value: "war"
-    }
-    or
-    condition: {
-            key: "year",
-            value: "1970-1980,
-            operator: "!="
-    }
     '''
     k = condition.get('key', 'name')
     k = {
@@ -36,8 +27,9 @@ def parseCondition(condition, user):
     else:
         exclude = False
     if k == 'id':
-        v = v.split(':')
-        if len(v) == 2:
+        v = v.split(":")
+        if len(v) >= 2:
+            v = (v[0], ":".join(v[1:]))
             q = Q(user__username=v[0], name=v[1])
         else:
             q = Q(id__in=[])
@@ -142,4 +134,4 @@ class ListManager(Manager):
             qs = qs.filter(Q(status='public') | Q(status='featured'))
         else:
             qs = qs.filter(Q(status='public') | Q(status='featured') | Q(user=user))
-        return qs
+        return qs.distinct()

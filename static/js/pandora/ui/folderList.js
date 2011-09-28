@@ -119,17 +119,17 @@ pandora.ui.folderList = function(id) {
                 var query;
                 if (id == 'personal') {
                     query = {conditions: [
-                        {key: 'user', value: pandora.user.username, operator: '='},
-                        {key: 'status', value: 'featured', operator: '!'}
+                        {key: 'user', value: pandora.user.username, operator: '=='},
+                        {key: 'status', value: 'featured', operator: '!='}
                     ], operator: '&'};
                 } else if (id == 'favorite') {
                     query = {conditions: [
                         {key: 'subscribed', value: true, operator: '='},
-                        {key: 'status', value: 'featured', operator: '!'},
+                        {key: 'status', value: 'featured', operator: '!='},
                     ], operator: '&'};
                 } else if (id == 'featured') {
                     query = {conditions: [
-                        {key: 'status', value: 'featured', operator: '='}
+                        {key: 'status', value: 'featured', operator: '='} // fixme: '==' performs better
                     ], operator: '&'};
                 }
                 return pandora.api.findLists(Ox.extend(data, {
@@ -263,8 +263,12 @@ pandora.ui.folderList = function(id) {
                             type: event.keys == '' ? 'static' : 'smart'
                         }, function(result) {
                             var id = result.data.id;
-                            pandora.UI.set('lists.' + id, pandora.site.user.ui.lists['']); // fixme: necessary?
-                            pandora.URL.set('?find=list:' + id)
+                            pandora.UI.set({
+                                find: {
+                                    conditions: [{key: 'list', value: id, operator: '=='}],
+                                    operator: '&'
+                                }
+                            });
                             Ox.Request.clearCache(); // fixme: remove
                             that.reloadList().bindEventOnce({
                                 load: function(data) {
@@ -313,19 +317,47 @@ pandora.ui.folderList = function(id) {
                 }
             },
             'delete': function(data) {
-                // fixme: add a confirmation dialog
-                //var $list = pandora.$ui.folderList[id];
-                pandora.URL.set('?find=');
-                that.options({selected: []});
                 if (id == 'personal') {
-                    pandora.api.removeList({
-                        id: data.ids[0]
-                    }, function(result) {
-                        pandora.UI.set('lists.' + data.ids[0], null);
-                        Ox.Request.clearCache(); // fixme: remove
-                        that.reloadList();
-                    });
+                    var $dialog = Ox.Dialog({
+                        buttons: [
+                            Ox.Button({
+                                id: 'cancel',
+                                title: 'Cancel'
+                            }).bindEvent({
+                                click: function() {
+                                    $dialog.close();
+                                }
+                            }),
+                            Ox.Button({
+                                id: 'delete',
+                                title: 'Delete'
+                            }).bindEvent({
+                                click: function() {
+                                    $dialog.close();
+                                    that.options({selected: []});
+                                    pandora.api.removeList({
+                                        id: data.ids[0]
+                                    }, function(result) {
+                                        pandora.UI.set('lists.' + data.ids[0], null);
+                                        pandora.UI.set({
+                                            find: pandora.site.user.ui.find
+                                        });
+                                        Ox.Request.clearCache(); // fixme: remove
+                                        that.reloadList();
+                                    });
+                                }
+                            })
+                        ],
+                        content: $('<div>')
+                            .css({margin: '16px'})
+                            .html('Do you want to delete the list ' + data.ids[0] + '?'),
+                        height: 128,
+                        keys: {enter: 'delete', escape: 'cancel'},
+                        title: 'Delete List',
+                        width: 304
+                    }).open();
                 } else if (id == 'favorite') {
+                    that.options({selected: []});
                     pandora.api.unsubscribeFromList({
                         id: data.ids[0]
                     }, function(result) {
@@ -333,6 +365,7 @@ pandora.ui.folderList = function(id) {
                         that.reloadList();
                     });
                 } else if (id == 'featured' && pandora.user.level == 'admin') {
+                    that.options({selected: []});
                     pandora.api.editList({
                         id: data.ids[0],
                         status: 'public'
@@ -392,11 +425,15 @@ pandora.ui.folderList = function(id) {
                 data_ = {id: data.id};
                 data_[data.key] = data.value;
                 pandora.api.editList(data_, function(result) {
-                    // fixme: we may want slashes in list names
                     if (result.data.id != data.id) {
                         pandora.$ui.folderList[id].value(data.id, 'name', result.data.name);
                         pandora.$ui.folderList[id].value(data.id, 'id', result.data.id);
-                        pandora.URL.set('?find=list:' + result.data.id);
+                        pandora.UI.set({
+                            find: {
+                                conditions: [{key: 'list', value: result.data.id, operator: '=='}],
+                                operator: '&'
+                            }
+                        }, false);
                     }
                 });
             }

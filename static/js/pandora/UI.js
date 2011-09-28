@@ -17,12 +17,20 @@ pandora.UI = (function() {
     // sets pandora.user.ui.key to val
     // key foo.bar.baz sets pandora.user.ui.foo.bar.baz
     // val null removes a key
-    that.set = function(/*{key: val} or key, val*/) {
+    that.set = function(/* {key: val}[, flag] or key, val[, flag] */) {
         var add = {},
-            args = Ox.makeObject(arguments),
+            args,
+            doNotTriggerEvents,
             listSettings = pandora.site.listSettings,
             set = {},
             trigger = {};
+        if (Ox.isObject(arguments[0])) {
+            args = arguments[0];
+            triggerEvents = Ox.isUndefined(arguments[1]) ? true : arguments[1];
+        } else {
+            args = Ox.makeObject([arguments[0], arguments[1]]);
+            triggerEvents = Ox.isUndefined(arguments[2]) ? true : arguments[1];
+        }
         Ox.print('UI SET', args)
         self.previousUI = Ox.clone(pandora.user.ui, true);
         Ox.forEach(args, function(val, key) {
@@ -37,7 +45,7 @@ pandora.UI = (function() {
                 pandora.user.ui._findState = pandora.getFindState(val);
                 if (list != self.previousUI._list) {
                     if (!pandora.user.ui.lists[list]) {
-                        add['lists.' +that.encode(list)] = {};
+                        add['lists.' + that.encode(list)] = {};
                     }
                     Ox.forEach(listSettings, function(listSetting, setting) {
                         if (!pandora.user.ui.lists[list]) {
@@ -73,7 +81,7 @@ pandora.UI = (function() {
                 )] = {'in': 0, out: 0, position: 0};
             }
         });
-        [add, args].forEach(function(obj, isArg) {
+        [args, add].forEach(function(obj, isAdd) {
             Ox.forEach(obj, function(val, key) {
                 var keys = key.replace(/([^\\])\./g, '$1\n').split('\n'),
                     ui = pandora.user.ui;
@@ -87,23 +95,29 @@ pandora.UI = (function() {
                         ui[keys[0]] = val;
                     }
                     set[key] = val;
-                    if (isArg) {
+                    if (!isAdd) {
                         trigger[key] = val;
                     }
                 }
             });
         });
         Ox.len(set) && pandora.api.setUI(set);
-        Ox.forEach(trigger, function(val, key) {
+        triggerEvents && Ox.forEach(trigger, function(val, key) {
             Ox.forEach(pandora.$ui, function(element) {
-                // fixme: send previousVal as second parameter
                 element.ox && element.triggerEvent('pandora_' + key.toLowerCase(), {
                     value: val,
                     previousValue: self.previousUI[key]
                 });
             });
         });
-        Ox.len(trigger) && pandora.URL.push();
+        /*
+        if (!pandora.$ui.appPanel) {
+            pandora.URL.replace();
+        } else if (Ox.len(trigger)) {
+            pandora.URL.push();
+        }
+        */
+        pandora.URL.update(Object.keys(trigger));
     };
 
     return that;

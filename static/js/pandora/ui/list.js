@@ -130,17 +130,12 @@ pandora.ui.list = function() {
             },
             sort: function(data) {
                 Ox.print('---- SORT ----', data)
-                pandora.$ui.mainMenu.checkItem('sortMenu_sortmovies_' + data.key);
-                pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + (data.operator == '+' ? 'ascending' : 'descending'));
-                pandora.$ui.sortSelect.selectItem(data.key);
                 pandora.UI.set({
                     listSort: [{key: data.key, operator: data.operator}]
                 });
-                pandora.URL.push();
             }
         });
     } else if (view == 'grid') {
-        //alert(JSON.stringify(pandora.user.ui.lists[pandora.user.ui.list].selected))
         that = Ox.IconList({
             borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 16,
             defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
@@ -164,7 +159,6 @@ pandora.ui.list = function() {
                 };
             },
             items: function(data, callback) {
-                //Ox.print('data, pandora.Query.toObject', data, pandora.Query.toObject())
                 pandora.api.find(Ox.extend(data, {
                     query: pandora.user.ui.find
                 }), callback);
