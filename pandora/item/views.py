@@ -7,7 +7,7 @@ import mimetypes
 
 import Image
 from django.db.models import Count, Sum, Max
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 
@@ -551,6 +551,8 @@ actions.register(getImdbId)
 '''
 def frame(request, id, size, position=None):
     item = get_object_or_404(models.Item, itemId=id)
+    if not item.access(request.user):
+        return HttpResponseForbidden()
     frame = None
     if not position:
         frames = item.poster_frames()
@@ -575,6 +577,8 @@ def frame(request, id, size, position=None):
 
 def poster_frame(request, id, position):
     item = get_object_or_404(models.Item, itemId=id)
+    if not item.access(request.user):
+        return HttpResponseForbidden()
     position = int(position)
     frames = item.poster_frames()
     if frames and len(frames) > position:
@@ -599,6 +603,8 @@ def image_to_response(image, size=None):
 
 def siteposter(request, id, size=None):
     item = get_object_or_404(models.Item, itemId=id)
+    if not item.access(request.user):
+        return HttpResponseForbidden()
     poster = item.path('siteposter.jpg')
     poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
     if size:
@@ -613,6 +619,8 @@ def siteposter(request, id, size=None):
 
 def poster(request, id, size=None):
     item = get_object_or_404(models.Item, itemId=id)
+    if not item.access(request.user):
+        return HttpResponseForbidden()
     if item.poster:
         return image_to_response(item.poster, size)
     else:
@@ -624,6 +632,8 @@ def poster(request, id, size=None):
 
 def icon(request, id, size=None):
     item = get_object_or_404(models.Item, itemId=id)
+    if not item.access(request.user):
+        return HttpResponseForbidden()
     if item.icon:
         return image_to_response(item.icon, size)
     else:
@@ -632,17 +642,23 @@ def icon(request, id, size=None):
 
 def timeline(request, id, size, position):
     item = get_object_or_404(models.Item, itemId=id)
+    if not item.access(request.user):
+        return HttpResponseForbidden()
     timeline = '%s.%s.%04d.png' %(item.timeline_prefix, size, int(position))
     return HttpFileResponse(timeline, content_type='image/png')
 
 
 def timeline_overview(request, id, size):
     item = get_object_or_404(models.Item, itemId=id)
+    if not item.access(request.user):
+        return HttpResponseForbidden()
     timeline = '%s.%s.png' %(item.timeline_prefix, size)
     return HttpFileResponse(timeline, content_type='image/png')
 
 def torrent(request, id, filename=None):
     item = get_object_or_404(models.Item, itemId=id)
+    if not item.access(request.user):
+        return HttpResponseForbidden()
     if not item.torrent:
         raise Http404
     if not filename or filename.endswith('.torrent'):
@@ -663,6 +679,8 @@ def torrent(request, id, filename=None):
 
 def video(request, id, resolution, format, index=None):
     item = get_object_or_404(models.Item, itemId=id)
+    if not item.access(request.user):
+        return HttpResponseForbidden()
     if index:
         index = int(index) - 1
     else:

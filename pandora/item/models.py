@@ -57,6 +57,7 @@ def get_item(info, user=None, async=False):
                         'year': info.get('year', '')
                     }
                 item.user = user
+                item.oxdbId = item.itemId
                 item.save()
                 if async:
                     tasks.update_external.delay(item.itemId)
@@ -168,7 +169,7 @@ class Item(models.Model):
         else:
             level = user.get_profile().get_level()
         allowed_level = settings.CONFIG['capabilities']['canSeeItem'][level]
-        if self.level < allowed_level:
+        if self.level <= allowed_level:
             return True
         elif user.is_authenticated() and \
              (self.user == user or \
@@ -272,7 +273,9 @@ class Item(models.Model):
             if not settings.USE_IMDB:
                 self.itemId = ox.to32(self.id)
  
-        self.oxdbId = self.oxdb_id()
+        oxdbId = self.oxdb_id()
+        if oxdbId:
+            self.oxdbId = oxdbId
         
         #id changed, what about existing item with new id?
         if settings.USE_IMDB and len(self.itemId) != 7 and self.oxdbId != self.itemId:
