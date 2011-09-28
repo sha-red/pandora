@@ -8,6 +8,7 @@ import ox
 
 import utils
 import managers
+from archive import extract
 
 
 def load_layers(layers):
@@ -87,6 +88,12 @@ class Annotation(models.Model):
     layer = models.ForeignKey(Layer)
     value = models.TextField()
 
+    duration = models.FloatField(default=0, db_index=True)
+    hue = models.FloatField(default=0, db_index=True)
+    saturation = models.FloatField(default=0, db_index=True)
+    lightness = models.FloatField(default=0, db_index=True)
+    volume = models.FloatField(default=0, db_index=True)
+
     def editable(self, user):
         if user.is_authenticated():
             if user.is_staff or \
@@ -105,6 +112,14 @@ class Annotation(models.Model):
         if not self.id:
             super(Annotation, self).save(*args, **kwargs)
         self.public_id = '%s/%s' % (self.item.itemId, ox.to32(self.id))
+        if self.duration != self.end - self.start:
+            self.duration = self.end - self.start
+            if self.duration > 0:
+                self.hue, self.saturation, self.lightness = extract.average_color(
+                               self.item.timeline_prefix, self.start, self.end)
+            else:
+                self.hue = self.saturation = self.lightness = 0
+            #FIXME: set volume here
         super(Annotation, self).save(*args, **kwargs)
 
     def json(self, layer=False, keys=None):

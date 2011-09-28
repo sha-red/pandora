@@ -279,20 +279,39 @@ def timeline(video, prefix):
     p.wait()
 
 
-def average_color(prefix):
+def average_color(prefix, start=0, end=0):
     height = 64
-    width = 1500
     frames = 0
     pixels = []
     color = np.asarray([0, 0, 0], dtype=np.float32)
 
+    if end:
+        start = int(start * 25)
+        end = int(end * 25)
     for image in sorted(glob("%s.%d.*.png" % (prefix, height))):
+        start_offset = 0
         timeline = Image.open(image)
         frames += timeline.size[0]
+        if start and frames < start:
+            continue
+        elif start and frames > start > frames-timeline.size[0]:
+            start_offset = start - (frames-timeline.size[0])
+            box = (start_offset, 0, timeline.size[0], height)
+            timeline = timeline.crop(box)
+        if end and frames > end:
+            end_offset = timeline.size[0] - (frames - end)
+            box = (0, 0, end_offset, height)
+            timeline = timeline.crop(box)
+        
         p = np.asarray(timeline, dtype=np.float32)
         p = np.sum(p, axis=0) / height               #average color per frame
         pixels.append(p)
 
+        if end and frames >= end:
+            break
+
+    if end:
+        frames = end - start
     for i in range(0, len(pixels)):
         p = np.sum(pixels[i], axis=0) / frames
         color += p

@@ -32,8 +32,28 @@ def parse_query(data, user):
         query['qs'] = query['qs'].filter(item__in=item_query)
     return query
 
+def annotation_sort_key(key):
+    return {
+        'text': 'value',
+        'position': 'start',
+    }.get(key, key)
+
 def order_query(qs, sort):
-    qs = qs.order_by('start')
+    order_by = []
+    print sort
+    for e in sort:
+        operator = e['operator']
+        if operator != '-':
+            operator = ''
+        if e['key'].startswith('clip:'):
+            key = annotation_sort_key(e['key'][len('clip:'):])
+        else:
+            #key mgith need to be changed, see order_sort in item/views.py
+            key = "item__sort__%s" % e['key']
+        order = '%s%s' % (operator, key)
+        order_by.append(order)
+    if order_by:
+        qs = qs.order_by(*order_by, nulls_last=True)
     return qs
 
 def findAnnotations(request):
@@ -70,7 +90,7 @@ def findAnnotations(request):
         if qs.count() > 0:
             response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
     elif 'positions' in data:
-        ids = [i.get_id() for i in qs]
+        ids = [i.public_id for i in qs]
         response['data']['positions'] = utils.get_positions(ids, data['positions'])
     else:
         response['data']['items'] = qs.count()
