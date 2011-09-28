@@ -98,7 +98,7 @@ pandora.ui.browser = function() {
                 }).reloadList(true);
             },
             pandora_showsiteposter: function() {
-                pandora.user.ui.icons == 'poster' && that.reloadList(true);
+                pandora.user.ui.icons == 'posters' && that.reloadList(true);
             }
         });
         pandora.enableDragAndDrop(that, false);

@@ -57,16 +57,23 @@ pandora.UI = (function() {
                 // when switching to an item, update list selection
                 add['listSelection'] = [val];
                 add['lists.' + that.encode(pandora.user.ui._list || '') + '.selection'] = [val];
-            } else if (
+            }
+            if ((
+                key == 'item'
+                && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
+                && !pandora.user.ui.videoPoints[val]
+                ) || (
                 key == 'itemView'
                 && ['video', 'timeline'].indexOf(val) > -1
                 && !pandora.user.ui.videoPoints[pandora.user.ui.item]
-            ) {
+            )) {
                 // add default videoPoints
-                add['videoPoints.' + pandora.user.ui.item] = {'in': 0, out: 0, position: 0};
+                add['videoPoints.' + (
+                    key == 'item' ? val : pandora.user.ui.item
+                )] = {'in': 0, out: 0, position: 0};
             }
         });
-        [args, add].forEach(function(obj, isAdd) {
+        [add, args].forEach(function(obj, isArg) {
             Ox.forEach(obj, function(val, key) {
                 var keys = key.replace(/([^\\])\./g, '$1\n').split('\n'),
                     ui = pandora.user.ui;
@@ -79,11 +86,8 @@ pandora.UI = (function() {
                     } else {
                         ui[keys[0]] = val;
                     }
-                    // don't save or trigger events for private keys
-                    //if (key[0] != '_') {
-                    //}
                     set[key] = val;
-                    if (!isAdd) {
+                    if (isArg) {
                         trigger[key] = val;
                     }
                 }
@@ -99,7 +103,7 @@ pandora.UI = (function() {
                 });
             });
         });
-        Ox.len(trigger) && Ox.URL.push();
+        Ox.len(trigger) && pandora.URL.push();
     };
 
     return that;

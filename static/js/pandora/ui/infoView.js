@@ -518,7 +518,7 @@ pandora.ui.infoView = function(data) {
     that.bindEvent({
         pandora_icons: that.reload,
         pandora_showsiteposter: function() {
-            pandora.user.ui.icons == 'poster' && that.reload();
+            pandora.user.ui.icons == 'posters' && that.reload();
         }
     });
 

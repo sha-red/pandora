@@ -550,7 +550,7 @@ pandora.ui.list = function() {
             },
             'delete': function(data) {
                 pandora.getListData().editable && pandora.api.removeListItems({
-                    list: pandora.user.ui.list,
+                    list: pandora.user.ui._list,
                     items: data.ids
                 }, pandora.reloadList);
             },
@@ -641,7 +641,7 @@ pandora.ui.list = function() {
             },
             paste: function(data) {
                 data.items && pandora.getListData().editable && pandora.api.addListItems({
-                    list: pandora.user.ui.list,
+                    list: pandora.user.ui._list,
                     items: data.items
                 }, pandora.reloadList);
             },
@@ -689,7 +689,7 @@ pandora.ui.list = function() {
                 }).reloadList(true);
             },
             pandora_showsiteposter: function() {
-                pandora.user.ui.icons == 'poster' && that.reloadList(true);
+                pandora.user.ui.icons == 'posters' && that.reloadList(true);
             }
         });
     }

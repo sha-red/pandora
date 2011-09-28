@@ -251,7 +251,7 @@ pandora.ui.mainMenu = function() {
                             return {
                                 id: 'viewlist' + list.id,
                                 title: (folder == 'favorite' ? list.user + ': ' : '') + list.name,
-                                checked: list.id == pandora.user.ui.list
+                                checked: list.id == pandora.user.ui._list
                             };
                         }) : [{id: 'loading', title: 'Loading...', disabled: true}]
                     }]

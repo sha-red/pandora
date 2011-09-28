@@ -4,7 +4,7 @@ pandora.ui.findElement = function() {
         findKey = pandora.user.ui._findState.key,
         findValue = pandora.user.ui._findState.value;
     var that = Ox.FormElementGroup({
-            elements: Ox.merge(pandora.user.ui.list ? [
+            elements: Ox.merge(pandora.user.ui._list ? [
                     pandora.$ui.findListSelect = Ox.Select({
                             items: [
                                 {id: 'all', title: 'Find: All ' + pandora.site.itemName.plural},
@@ -74,7 +74,7 @@ pandora.ui.findElement = function() {
                             }
                         },
                         submit: function(data) {
-                            var findInList = pandora.user.ui.list
+                            var findInList = pandora.user.ui._list
                                     && pandora.$ui.findListSelect.value() == 'list',
                                 key = pandora.$ui.findSelect.value(),
                                 conditions = data.value ? [{
@@ -86,7 +86,7 @@ pandora.ui.findElement = function() {
                                 pandora.UI.set('find', {
                                     conditions: Ox.merge([{
                                         key: 'list',
-                                        value: pandora.user.ui.list,
+                                        value: pandora.user.ui._list,
                                         operator: '=='
                                     }], conditions),
                                     operator: '&'
@@ -94,7 +94,7 @@ pandora.ui.findElement = function() {
                                 // fixme: what was this?
                                 // data.value && findIndex == 0 && pandora.user.ui.find.conditions.reverse();
                             } else {
-                                if (pandora.user.ui.list) {
+                                if (pandora.user.ui._list) {
                                     Ox.forEach(pandora.$ui.folderList, function($list) {
                                         $list.options({selected: []});
                                     });
@@ -117,7 +117,7 @@ pandora.ui.findElement = function() {
     function autocompleteFunction() {
         return pandora.user.ui.find.conditions.length ? function(value, callback) {
             var elementValue = that.value(),
-                key = elementValue[pandora.user.ui.list ? 1 : 0],
+                key = elementValue[pandora.user.ui._list ? 1 : 0],
                 findKey = Ox.getObjectById(pandora.site.findKeys, key);
             value === '' && Ox.print('Warning: autocomplete function should never be called with empty value');
             if (findKey.autocomplete) {
@@ -125,7 +125,7 @@ pandora.ui.findElement = function() {
                     key: key,
                     query: {
                         conditions: pandora.$ui.findListSelect.value() == 'list'
-                            ? [{key: 'list', value: pandora.user.ui.list, operator: '=='}] : [],
+                            ? [{key: 'list', value: pandora.user.ui._list, operator: '=='}] : [],
                         operator: '&'
                     },
                     range: [0, 20],

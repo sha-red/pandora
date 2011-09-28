@@ -121,9 +121,9 @@ pandora.URL = (function() {
             if (pandora.user.ui.showHome) {
                 pandora.$ui.home = pandora.ui.home().showScreen();
                 /*
-                Ox.print('LIST', pandora.user.ui.list)
-                pandora.user.ui.list && pandora.Query.fromString(
-                    'find=list:' + pandora.user.ui.list
+                Ox.print('LIST', pandora.user.ui._list)
+                pandora.user.ui._list && pandora.Query.fromString(
+                    'find=list:' + pandora.user.ui._list
                 );
                 */
             } else {

@@ -116,7 +116,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
                 )) {
                     if (drag.action == 'move') {
                         pandora.api.removeListItems({
-                            list: pandora.user.ui.list,
+                            list: pandora.user.ui._list,
                             items: data.ids
                         }, pandora.reloadList);
                     }
@@ -572,8 +572,6 @@ pandora.selectList = function() {
                 pandora.$ui.folderList[folder]
                     .options('selected', [pandora.user.ui._list])
                     .gainFocus();
-            } else {
-                pandora.user.ui.list = '';
             }
         });
     }

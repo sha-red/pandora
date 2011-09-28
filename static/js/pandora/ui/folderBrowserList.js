@@ -130,7 +130,7 @@ pandora.ui.folderBrowserList = function(id) {
             // not-featured list may be in the user's favorites folder
             keys: id == 'featured' ? ['subscribed'] : [],
             pageLength: 1000,
-            selected: pandora.getListData().folder == id ? [pandora.user.ui.list] : [],
+            selected: pandora.getListData().folder == id ? [pandora.user.ui._list] : [],
             sort: [
                 {key: 'name', operator: '+'}
             ]
@@ -181,16 +181,20 @@ pandora.ui.folderBrowserList = function(id) {
             },
             select: function(data) {
                 // fixme: duplicated
-                if (data.ids.length) {
+                var list = data.ids.length ? data.ids[0] : '';
+                if (list) {
                     Ox.forEach(pandora.$ui.folderList, function($list, id_) {
                         id != id_ && $list.options('selected', []);
                     });
-                    //pandora.UI.set({list: data.ids[0]});
-                    pandora.URL.set('?find=list:' + data.ids[0]);
-                } else {
-                    //pandora.UI.set({list: ''});
-                    pandora.URL.set('');
                 }
+                pandora.UI.set({
+                    find: {
+                        conditions: list ? [
+                            {key: 'list', value: data.ids[0], operator: '=='}
+                        ] : [],
+                        operator: '&'
+                    }
+                });
             }
         });
     return that;

@@ -109,6 +109,7 @@ Ox.load({
                         pandora.site.listSettings[key] = key[4].toLowerCase() + key.substr(5);
                     }
                 });
+                /*
                 if (Ox.isEmpty(pandora.user.ui.lists)) {
                     var listSettings = {};
                     Ox.forEach(pandora.site.listSettings, function(listSetting, setting) {
@@ -116,6 +117,7 @@ Ox.load({
                     });
                     pandora.UI.set('lists.', listSettings);
                 }
+                */
 
                 Ox.extend(pandora.user, {
                     sectionElement: 'buttons',
@@ -192,7 +194,7 @@ Ox.load({
             //Ox.print('pandora.$ui.window.resize');
             pandora.$ui.browser.scrollToSelection();
             pandora.user.ui.itemView == 'info' && pandora.$ui.item.resize();
-            pandora.user.ui.itemView == 'player' && pandora.$ui.player.options({
+            pandora.user.ui.itemView == 'video' && pandora.$ui.player.options({
                 // fixme: duplicated
                 height: pandora.$ui.contentPanel.size(1),
                 width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
