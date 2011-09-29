@@ -493,6 +493,28 @@ def setPoster(request): #parse path and return info
     return render_to_json_response(response)
 actions.register(setPoster, cache=False)
 
+def updateExternalData(request):
+    '''
+        param data {
+            id: itemId,
+        }
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+                poster: {url,width,height}
+            }
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    item = get_object_or_404_json(models.Item, itemId=data['id'])
+    response = json_response()
+    if item.editable(request.user):
+        item.update_external()
+    else:
+        response = json_response(status=403, text='permission denied')
+    return render_to_json_response(response)
+actions.register(updateExternalData, cache=False)
+
 def lookup(request):
     '''
         param data {

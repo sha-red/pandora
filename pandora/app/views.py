@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.conf import settings
 
-from ox.django.shortcuts import json_response, render_to_json_response, get_object_or_404_json
+from ox.django.shortcuts import json_response, render_to_json_response
 from ox.django.decorators import login_required_json
 
 from ox.utils import json
@@ -27,11 +27,6 @@ def index(request):
 def embed(request):
     context = RequestContext(request, {'settings': settings})
     return render_to_response('embed.html', context)
-
-
-def timeline(request):
-    context = RequestContext(request, {'settings': settings})
-    return render_to_response('timeline.html', context)
 
 
 def getPage(request):
@@ -87,3 +82,7 @@ def editPage(request):
     return render_to_json_response(response)
 actions.register(getPage)
 
+def redirect_url(request, url):
+    if request.META['QUERY_STRING']:
+        url += "?" + request.META['QUERY_STRING']
+    return redirect(url, permanent=True)
