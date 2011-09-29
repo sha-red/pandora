@@ -3,13 +3,16 @@
 from __future__ import division, with_statement
 import os
 import subprocess
+from glob import glob
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
+import ox
 
-from ox.django.fields import DictField
+from ox.django.fields import DictField, TupleField
 
-
+from archive import extract
 import managers
 
 
@@ -31,10 +34,13 @@ class List(models.Model):
     icon = models.ImageField(default=None, blank=True,
                              upload_to=lambda i, x: i.path("icon.jpg"))
 
+    poster_frames = TupleField(default=[], editable=False)
+
     #is through table still required?
     items = models.ManyToManyField('item.Item', related_name='lists',
                                                 through='ListItem')
 
+    items_sum = models.IntegerField(default=0)
     subscribed_users = models.ManyToManyField(User, related_name='subscribed_lists')
 
     objects = managers.ListManager()
@@ -44,9 +50,10 @@ class List(models.Model):
             self.type = 'static'
         else:
             self.type = 'smart'
+        self.items_sum = self.get_items_sum(self.user)
         super(List, self).save(*args, **kwargs)
 
-    def get_number_of_items(self, user=None):
+    def get_items_sum(self, user=None):
         if self.query.get('static', False):
             return self.items.count()
         else:
@@ -78,11 +85,11 @@ class List(models.Model):
 
     def json(self, keys=None, user=None):
         if not keys:
-             keys=['id', 'name', 'user', 'type', 'query', 'status', 'subscribed']
+             keys=['id', 'name', 'user', 'type', 'query', 'status', 'subscribed', 'posterFrames']
         response = {}
         for key in keys:
             if key == 'items':
-                response[key] = self.get_number_of_items(user)
+                response[key] = self.get_items_sum(user)
             elif key == 'id':
                 response[key] = self.get_id()
             elif key == 'user':
@@ -90,30 +97,64 @@ class List(models.Model):
             elif key == 'query':
                 if not self.query.get('static', False):
                     response[key] = self.query
+            elif key == 'subscribers':
+                response[key] = self.subscribed_users.all().count()
             elif key == 'subscribed':
                 if user and not user.is_anonymous():
                     response[key] = self.subscribed_users.filter(id=user.id).exists()
             else:
-                response[key] = getattr(self, key)
+                response[key] = getattr(self, {
+                    'posterFrames': 'poster_frames'
+                }.get(key, key))
         return response
 
     def path(self, name=''):
-        h = self.get_id()
+        h = "%06d" % self.id
         return os.path.join('lists', h[:2], h[2:4], h[4:6], h[6:], name)
 
-    def make_icon(self):
+    def update_icon(self):
         frames = []
-        self.icon.name = self.path('icon.png')
+        for i in self.poster_frames:
+            qs = self.items.filter(itemId=i['item'])
+            if qs.count() > 0:
+                frame = qs[0].frame(i['position'])
+                if frame:
+                    frames.append(frame)
+        self.icon.name = self.path('icon.jpg')
         icon = self.icon.path
         if frames:
+            while len(frames) < 4:
+                frames += frames
+            folder = os.path.dirname(icon)
+            ox.makedirs(folder)
+            for f in glob("%s/icon*.jpg" % folder):
+                os.unlink(f)
             cmd = [
-                'scripts/list_icon',
+                settings.LIST_ICON,
                 '-f', ','.join(frames),
                 '-o', icon
             ]
             p = subprocess.Popen(cmd)
             p.wait()
+            self.save()
 
+    def get_icon(self, size=16):
+        path = self.path('icon%d.jpg' % size)
+        path = os.path.join(settings.MEDIA_ROOT, path)
+        if not os.path.exists(path):
+            folder = os.path.dirname(path)
+            ox.makedirs(folder)
+            if self.icon:
+                source = self.icon.path
+                max_size = min(self.icon.width, self.icon.height)
+            else:
+                source = os.path.join(settings.STATIC_ROOT, 'png/list256.png')
+                max_size = 256
+            if size < max_size:
+                extract.resize_image(source, path, size=size)
+            else:
+                path = source
+        return path
 
 class ListItem(models.Model):
     created = models.DateTimeField(auto_now_add=True)

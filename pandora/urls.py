@@ -28,6 +28,7 @@ urlpatterns = patterns('',
     (r'^file/(?P<oshash>.*)$', 'archive.views.lookup_file'),
     (r'^api/$', include('api.urls')),
     (r'', include('item.urls')),
+    (r'^list/(?P<id>.*?)/icon(?P<size>\d*).jpg$', 'itemlist.views.icon'),
     (r'^robots.txt$', serve_static_file, {'location': os.path.join(settings.STATIC_ROOT, 'robots.txt'), 'content_type': 'text/plain'}),
     (r'^favicon.ico$', serve_static_file, {'location': os.path.join(settings.STATIC_ROOT, 'png/icon.16.png'), 'content_type': 'image/x-icon'}),
 )

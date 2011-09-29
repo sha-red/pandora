@@ -10,11 +10,11 @@ import models
 def parseCondition(condition, user):
     '''
     '''
-    print condition, user
     k = condition.get('key', 'name')
     k = {
         'user': 'user__username',
         'position': 'position__position',
+        'posterFrames': 'poster_frames',
     }.get(k, k)
     if not k:
         k = 'name'
@@ -132,4 +132,4 @@ class ListManager(Manager):
             qs = qs.filter(Q(status='public') | Q(status='featured'))
         else:
             qs = qs.filter(Q(status='public') | Q(status='featured') | Q(user=user))
-        return qs.distinct()
+        return qs

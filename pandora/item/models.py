@@ -444,6 +444,7 @@ class Item(models.Model):
         if not keys or 'posterRatio' in keys:
             i['posterRatio'] = self.poster_width / self.poster_height
 
+
         streams = self.streams()
         i['durations'] = [s.duration for s in streams]
         i['duration'] = sum(i['durations'])
@@ -454,8 +455,16 @@ class Item(models.Model):
         #only needed by admins
         if keys and 'posters' in keys:
             i['posters'] = self.get_posters()
+
+        frames = self.get_frames()
         if keys and 'frames' in keys:
-            i['frames'] = self.get_frames()
+            i['frames'] = frames
+
+        if frames:
+            i['posterFrame'] = filter(lambda f: f['selected'], frames)[0]['position']
+        elif self.poster_frame != -1.0:
+            i['posterFrame'] = self.poster_frame
+
         if keys:
             info = {}
             for key in keys:

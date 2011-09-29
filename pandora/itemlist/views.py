@@ -2,10 +2,12 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 
-from django.db.models import Max
+from django.db.models import Max, Sum
+from django.http import HttpResponseForbidden, Http404
 from ox.utils import json
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
+from ox.django.http import HttpFileResponse
 
 import models
 from api.actions import actions
@@ -25,10 +27,13 @@ def _order_query(qs, sort):
         if operator != '-':
             operator = ''
         key = {
-            'subscribed': 'subscribed_users'
+            'subscribed': 'subscribed_users',
+            'items': 'items_sum'
         }.get(e['key'], e['key'])
         order = '%s%s' % (operator, key)
         order_by.append(order)
+        if key == 'subscribers':
+            qs = qs.annotate(subscribers=Sum('subscribed_users'))
     if order_by:
         qs = qs.order_by(*order_by)
     return qs
@@ -181,6 +186,13 @@ def addList(request):
         param data {
             name: value,
         }
+        possible keys to create list:
+            name
+            description
+            type
+            query
+            items
+
         return {
             status: {'code': int, 'text': string},
             data: {
@@ -197,7 +209,7 @@ def addList(request):
     while not created:
         list, created = models.List.objects.get_or_create(name=name, user=request.user)
         num += 1
-        name = data['name'] + ' (%d)' % num
+        name = data['name'] + ' [%d]' % num
 
     for key in data:
         if key == 'query' and not data['query']:
@@ -223,6 +235,10 @@ def addList(request):
             list.description = data['description']
     list.save()
 
+    if 'items' in data:
+        for item in Item.objects.filter(itemId__in=data['items']):
+            list.add(item)
+
     if list.status == 'featured':
         pos, created = models.Position.objects.get_or_create(list=list,
                                          user=request.user, section='featured')
@@ -246,9 +262,11 @@ def editList(request):
             id: listId,
             key: value,
         }
-        keys: name, status, query, position
+        keys: name, status, query, position, posterFrames
         if you change status you have to provide position of list
 
+        posterFrames:
+            array with objects that have item/position
         return {
             status: {'code': int, 'text': string},
             data: {
@@ -330,6 +348,9 @@ def editList(request):
             if list.status == 'private':
                 pos.section = 'personal'
             pos.save()
+        if 'posterFrames' in data:
+            list.poster_frames = tuple(data['posterFrames'])
+            list.update_icon()
         list.save()
         response['data'] = list.json(user=request.user)
     else:
@@ -462,3 +483,13 @@ def sortLists(request):
         response = json_response()
     return render_to_json_response(response)
 actions.register(sortLists, cache=False)
+
+
+def icon(request, id, size=16):
+    if not size:
+        size = 16
+    list = get_list_or_404_json(id)
+    icon = list.get_icon(int(size))
+    if icon:
+        return HttpFileResponse(icon, content_type='image/jpeg')
+    raise Http404
