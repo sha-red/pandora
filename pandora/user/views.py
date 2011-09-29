@@ -429,7 +429,7 @@ Positions
     '''
     if request.user.is_anonymous() or request.user.get_profile().get_level() != 'admin': 
         response = json_response(status=403, text='permission denied')
-        return
+        return response
     response = json_response(status=200, text='ok')
 
     data = json.loads(request.POST['data'])
