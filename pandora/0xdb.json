@@ -3,7 +3,8 @@
         "canPlayClips": {"guest": 1, "member": 2, "staff": 3, "admin": 4},
         "canPlayVideo": {"guest": 0, "member": 1, "staff": 3, "admin": 4},
         "canSeeItem": {"guest": 2, "member": 2, "staff": 3, "admin": 4},
-        "canSeeFiles": {"guest": -1, "member": -1, "staff": 3, "admin": 4}
+        "canSeeFiles": {"guest": -1, "member": -1, "staff": 3, "admin": 4},
+        "canSeeExtraItemViews": {"guest": false, "member": false, "staff": true, "admin": true}
     },
     "clipKeys": [
         {"id": "clip:text", "title": "Text", "type": "string"},
@@ -438,12 +439,12 @@
     },
     "itemViews": [
         {"id": "info", "title": "Info"},
-        {"id": "statistics", "title": "Statistics"},
         {"id": "clips", "title": "Clips"},
         {"id": "video", "title": "Video"},
         {"id": "timeline", "title": "Timeline"},
         {"id": "map", "title": "Map"},
         {"id": "calendar", "title": "Calendar"},
+        {"id": "data", "title": "Data"},
         {"id": "files", "title": "Files"}
     ],
     "layers": [
@@ -527,9 +528,9 @@
                 {"id": "favorites", "title": "Favorites", "public": true, "items": []},
                 {"id": "most_popular", "title": "Most Popular", "query": {}},
                 {"id": "recently_viewed", "title": "Recently Viewed", "query": {}},
-                {"id": "1960s", "title": "1960s", "query": {"conditions": [{"key": "year", "value": "196", "operator": "^"}], "operator": ""}},
-                {"id": "movies_with_full_video", "title": "Movies with Full Video", "query": {"conditions": [{"key": "canPlayVideo", "value": true, "operator": ""}], "operator": ""}},
-                {"id": "movies_with_full_video", "title": "Movies with Clips", "query": {"conditions": [{"key": "canPlayClips", "value": true, "operator": ""}], "operator": ""}}
+                {"id": "1960s", "title": "1960s", "query": {"conditions": [{"key": "year", "value": "196", "operator": "^"}], "operator": "&"}},
+                {"id": "movies_with_full_video", "title": "Movies with Full Video", "query": {"conditions": [{"key": "canPlayVideo", "value": true, "operator": ""}], "operator": "&"}},
+                {"id": "movies_with_full_video", "title": "Movies with Clips", "query": {"conditions": [{"key": "canPlayClips", "value": true, "operator": ""}], "operator": "&"}}
             ],
             "favorite": [
                 {"id": "rlx:watchme", "title": "rlx: watchme", "public": true, "items": [0, 1, 2, 3, 4]}

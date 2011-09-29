@@ -196,15 +196,6 @@ pandora.ui.item = function() {
                 );
             }
 
-        } else if (pandora.user.ui.itemView == 'statistics') {
-            var stats = Ox.Container();
-            Ox.TreeList({
-                data: result.data,
-                width: pandora.$ui.mainPanel.size(1) - Ox.UI.SCROLLBAR_SIZE
-            }).appendTo(stats);
-
-            pandora.$ui.contentPanel.replaceElement(1, stats);
-
         } else if (pandora.user.ui.itemView == 'clips') {
             var ratio = result.data.videoRatio;
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.clips = Ox.IconList({
@@ -266,7 +257,7 @@ pandora.ui.item = function() {
                     if (data.ids.length) {
                         var id = data.ids[0],
                             item = id.split('/')[0], width, height,
-                            $img = $('.OxItem.OxSelected > .OxIcon > img'),
+                            $img = pandora.$ui.clips.find('.OxItem.OxSelected > .OxIcon > img'),
                             $video = $('.OxItem.OxSelected > .OxIcon > .OxVideoPlayer');
                         if ($img.length) {
                             var width = ratio > 1 ? 128 : Math.round(128 * ratio),
@@ -587,6 +578,14 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'calendar') {
             pandora.$ui.contentPanel.replaceElement(1, Ox.Element().html('Calendar'));
 
+        } else if (pandora.user.ui.itemView == 'data') {
+            var stats = Ox.Container();
+            Ox.TreeList({
+                data: result.data,
+                width: pandora.$ui.mainPanel.size(1) - Ox.UI.SCROLLBAR_SIZE
+            }).appendTo(stats);
+
+            pandora.$ui.contentPanel.replaceElement(1, stats);
 
         } else if (pandora.user.ui.itemView == 'files') {
             pandora.$ui.contentPanel.replaceElement(1,

@@ -13,7 +13,9 @@ from item import utils
 from item.models import Item
 
 def get_list_or_404_json(id):
-    username, listname = id.split(':')
+    id = id.split(':')
+    username = id[0]
+    listname = ":".join(id[1:])
     return get_object_or_404_json(models.List, user__username=username, name=listname)
 
 def _order_query(qs, sort):
@@ -94,7 +96,6 @@ def findLists(request):
     else:
         qs = _order_query(query['qs'], query['sort'])
 
-    #range
     response = json_response()
     if 'keys' in data:
         qs = qs[query['range'][0]:query['range'][1]]

@@ -97,6 +97,9 @@ pandora.ui.browser = function() {
                     defaultRatio: data.value == 'posters' ? 5/8 : 1
                 }).reloadList(true);
             },
+            pandora_item: function(data) {
+                that.options({selected: [data.value]});
+            },
             pandora_showsiteposter: function() {
                 pandora.user.ui.icons == 'posters' && that.reloadList(true);
             }

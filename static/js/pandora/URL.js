@@ -4,120 +4,87 @@ pandora.URL = (function() {
 
     var self = {}, that = {};
 
-    /*
-    function foundItem() {
-        pandora.UI.set(Ox.extend({
-            section: 'items',
-            item: item,
-            itemView: view
-        }, ['video', 'timeline'].indexOf(view) > -1 ? {
-            videoView: view
-        } : {}));
-        if (time) {
-            points = time[0].split(',');
-            if (
-                points.length == 2 
-                && (points = Ox.flatten([points[0], points[1].split('-')]))[2] == ''
-            ) {
-                pandora.api.get({
-                    id: item,
-                    keys: ['duration']
-                }, function(result) {
-                    points[2] = result.data.duration.toString();
-                    foundTime();
-                });
-            } else {
-                foundTime();
-            }
-        } else {
-            if (!pandora.user.ui.videoPoints[item]) {
-                pandora.UI.set('videoPoints|' + item, {
-                    'in': 0, out: 0, position: 0
-                });
-            }
-            foundTime();
+    function getState(keys) {
+        Ox.print('KEYS', keys)
+        var state = {};
+        /*
+        if (keys.indexOf('type') > -1) {
+            state.type = pandora.user.ui.section == 'items'
+                ? pandora.site.itemsSection
+                : pandora.user.ui.section;
         }
-        function foundTime() {
-            if (time) {
-                // fixme: this is duplicated, see Ox.VideoPlayer() parsePositionInput()
-                points = points.map(function(point, i) {
-                    var parts = point.split(':').reverse();
-                    while (parts.length > 3) {
-                        parts.pop();
-                    }
-                    return parts.reduce(function(prev, curr, i) {
-                        return prev + (parseFloat(curr) || 0) * Math.pow(60, i);
-                    }, 0);
-                });
-                pandora.UI.set('videoPoints|' + item, {
-                    'in': points.length == 1 ? 0 : points[points.length - 2],
-                    out: points.length == 1 ? 0 : points[points.length - 1],
-                    position: points[0],
-                });
-                points = points.map(function(point) {
-                    return point == -1 ? '' : Ox.formatDuration(point, 3).replace(/\.000$/, '');
-                });
-                split[split.length - 1] = points[0] + (
-                    points.length == 1 ? '' : ',' + points[1] + '-' + points[2]
+        */
+        state.type = pandora.site.itemsSection;
+        if (!keys || keys.indexOf('item') > -1) {
+            state.item = pandora.user.ui.item;
+        }
+        if (!keys || keys.indexOf('listView') > -1 || keys.indexOf('itemView') > -1) {
+            if (!pandora.user.ui.item) {
+                state.view = pandora.user.ui.listView;
+            } else {
+                state.item = pandora.user.ui.item;
+                state.view = pandora.user.ui.itemView;
+            }
+        }
+        if (!keys || keys.filter(function(key) {
+            return /^videoPoints/.test(key);
+        }).length) {
+            var videoPoints = pandora.user.ui.videoPoints;
+            state.item = pandora.user.ui.item;
+            state.view = pandora.user.ui.itemView;
+            state.span = [];
+            if (
+                pandora.user.ui.item
+                && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
+                && videoPoints[pandora.user.ui.item]
+            ) {
+                videoPoints = videoPoints[pandora.user.ui.item];
+                state.span = Ox.merge(
+                    videoPoints.position
+                        ? videoPoints.position
+                        : [],
+                    videoPoints['in'] || videoPoints.out
+                        ? [videoPoints['in'], videoPoints.out]
+                        : []
                 );
             }
-            pandora.URL.replace(split.join('/'));
-            // on page load, we have to check if the item is in the previously selected list
-            // if it is not, the movie browser has to be reloaded
-            if (pandora.user.ui.list) {
-                pandora.user.ui.query = {
-                    conditions: [{key: 'list', value: pandora.user.ui.list, operator: ''}],
-                    operator: '&'
-                };
-                pandora.api.find({
-                    query: pandora.user.ui.query,
-                    positions: [pandora.user.ui.item],
-                    sort: [{key: 'id', operator: ''}]
-                }, function(result) {
-                    if (Ox.isUndefined(result.data.positions[pandora.user.ui.item])) {
-                        pandora.UI.set({list: ''});
-                        pandora.user.ui.query = {conditions:[], operator: '&'};
-                    }
-                    callback();
-                });
-            } else {
-                callback();
-            }
         }
-    }
-    */
-
-
-    function getState() {
-        return {
-            type: pandora.user.ui.section == 'items'
-                ? pandora.site.itemsSection
-                : pandora.user.ui.section,
-            item: pandora.user.ui.item,
-            view: !pandora.user.ui.item
-                ? pandora.user.ui.listView
-                : pandora.user.ui.itemView,
-            sort: !pandora.user.ui.item
-                ? pandora.user.ui.listSort
-                : pandora.isClipView(pandora.user.ui.itemView)
-                    ? pandora.user.ui.itemSort : [],
-            find: !pandora.user.ui.item
-                ? pandora.user.ui.find
-                : ''
-        };
+        if (!keys || keys.indexOf('listSort') > -1 || keys.indexOf('itemSort') > -1) {
+            if (!pandora.user.ui.item) {
+                state.view = pandora.user.ui.listView;
+                state.sort = pandora.user.ui.listSort;
+            } else {
+                state.item = pandora.user.ui.item;
+                state.view = pandora.user.ui.itemView;
+                state.sort = pandora.user.ui.itemSort;
+            }
+            /*
+            : pandora.isClipView(pandora.user.ui.itemView)
+                ? pandora.user.ui.itemSort : [],
+            */
+        }
+        if (!state.item) {
+            state.find = pandora.user.ui.find;
+        }
+        Ox.print('STATE .................... ->', state)
+        return state;
     }
 
-    function setState(state) {
-        Ox.print('STATE:', state)
-        var previousUI = pandora.UI.getPrevious();
-        // var previousUI = Ox.clone(pandora.user.ui);
+    function setState(state, callback) {
+
+        Ox.print('SET STATE:', state)
+        var find, previousUI = pandora.UI.getPrevious();
+
         Ox.Request.cancel();
         $('video').each(function() {
             $(this).trigger('stop');
         });
+
         pandora.user.ui._groupsState = pandora.getGroupsState(pandora.user.ui.find);
         pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
+
         if (Ox.isEmpty(state)) {
+
             if (pandora.user.ui.showHome) {
                 pandora.$ui.home = pandora.ui.home().showScreen();
                 /*
@@ -127,12 +94,17 @@ pandora.URL = (function() {
                 );
                 */
             } else {
+                /*
                 pandora.UI.set({
                     section: 'items',
                     item: ''
                 });
-            }                
+                */
+            }
+            callback && callback();
+
         } else if (state.page) {
+
             if (state.page == 'home') {
                 //pandora.$ui.home = pandora.ui.home().showScreen();
                 pandora.$ui.home = pandora.ui.home().fadeInScreen();
@@ -159,6 +131,8 @@ pandora.URL = (function() {
             } else if (state.page == 'api') {
                 document.location.href = '/api/';
             }
+            callback && callback();
+
         } else {
             
             var set = {
@@ -168,11 +142,21 @@ pandora.URL = (function() {
             };
 
             if (state.view) {
-                set[!pandora.user.ui.item ? 'listView' : 'itemView'] = state.view;
+                set[!state.item ? 'listView' : 'itemView'] = state.view;
+            }
+
+            if (state.span) {
+                if (['video', 'timeline'].indexOf(state.view) > -1) {
+                    set['videoPoints.' + state.item] = {
+                        position: state.span[0],
+                        'in': state.span[1] || 0,
+                        out: state.span[2] || 0
+                    }
+                }
             }
 
             if (state.sort) {
-                set[!pandora.user.ui.item ? 'listSort' : 'itemSort'] = state.sort;
+                set[!state.item ? 'listSort' : 'itemSort'] = state.sort;
             }
 
             ///*
@@ -185,172 +169,31 @@ pandora.URL = (function() {
                 pandora.user.ui._findState = pandora.getFindState(find);
             }
             //*/
-                
-            if (['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
-                if (state.span) {
-                    set['videoPoints.' + pandora.user.ui.item] = {
-                        position: state.span[0],
-                        'in': state.span[1] || 0,
-                        out: state.span[2] || 0
+
+            if (!pandora.$ui.appPanel && state.item && pandora.user.ui.find) {
+                // on page load, if item is set and there is or was a query,
+                // we have to check if the item actually matches the query,
+                // and otherwise reset find
+                pandora.api.find({
+                    query: pandora.user.ui.find,
+                    positions: [state.item],
+                    sort: [{key: 'id', operator: ''}]
+                }, function(result) {
+                    if (Ox.isUndefined(result.data.positions[state.item])) {
+                        set.find = pandora.site.user.ui.find
                     }
-                } else if (!pandora.user.ui.videoPoints[pandora.user.ui.item]) {
-                    set['videoPoints.' + pandora.user.ui.item] = {
-                        position: 0,
-                        'in': 0,
-                        out: 0
-                    }
-                }
-            }
-
-
-            pandora.UI.set(set);
-
-            /*
-            if (!pandora.$ui.appPanel) {
-                return;
-            }
-
-            if (pandora.user.ui.section != previousUI.section) {
-                // new section
-                pandora.$ui.appPanel.replaceElement(1, pandora.$ui.mainPanel = pandora.ui.mainPanel());
-            } else if (!pandora.user.ui.item && !previousUI.item) {
-                // list to list
-                Ox.print('pUI', previousUI);
-                var isClipView = pandora.isClipView(),
-                    list = pandora.user.ui.lists[pandora.user.ui.list],
-                    previousList = previousUI.lists[previousUI.list],
-                    wasClipView = pandora.isClipView(previousList.view);
-                if (pandora.user.ui.list != previousUI.list) {
-                    pandora.$ui.findElement.replaceWith(pandora.$ui.findElement = pandora.ui.findElement());
-                }
-                if (list.view != previousList.view) {
-                    pandora.$ui.mainMenu.checkItem('viewMenu_movies_' + list.view);
-                    pandora.$ui.viewSelect.options({value: list.view});
-                    if (isClipView != wasClipView) {
-                        pandora.$ui.mainMenu.replaceMenu('sortMenu', pandora.getSortMenu());
-                        pandora.$ui.sortSelect.replaceWith(pandora.$ui.sortSelect = pandora.ui.sortSelect());
-                        if (isClipView && !wasClipView) {
-                            pandora.UI.set('lists.' + pandora.user.ui.list + '.selected', []);
-                        }
-                    }                    
-                }
-                if (!Ox.isEqual(list.sort, previousList.sort)) {
-                    pandora.$ui.mainMenu.checkItem('sortMenu_sortmovies_' + list.sort[0].key);
-                    pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + ((
-                        list.sort[0].operator || pandora.getSortOperator(list.sort[0].key)
-                    ) == '+' ? 'ascending' : 'descending'));
-                    pandora.$ui.sortSelect.options({value: list.sort[0].key});
-                }
-                pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
-                if (Ox.isEqual(pandora.user.ui.find, previousUI.find)) {
-                    pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
-                } else {
-                    pandora.user.ui._groupsState.forEach(function(data, i) {
-                        if (!Ox.isEqual(data.find, previousUI._groupsState[i].find)) {
-                            pandora.$ui.groups[i].reloadList();
-                        }
-                    });
-                    pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
-                    //pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
-                }
-                // fixme: should list selection and deselection happen here?
-                // (home and menu may cause a list switch)
-            } else if (!pandora.user.ui.item || !previousUI.item) {
-                // list to item or item to list
-                pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
-                pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
+                    pandora.UI.set(set);
+                    callback && callback();
+                });
             } else {
-                // item to item
-                if (pandora.user.ui.item != previousUI.item) {
-                    pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
-                }
-                pandora.$ui.contentPanel.replaceElement(1, pandora.ui.item());
+                pandora.UI.set(set);
+                callback && callback();
             }
-            if (
-                previousUI.item
-                && ['video', 'timeline'].indexOf(previousUI.itemView) > -1
-            ) {
-                var $item = pandora.$ui[
-                    previousUI.itemView == 'video' ? 'player' : 'editor'
-                ];
-                $item && pandora.UI.set(
-                    'videoPoints.' + previousUI.item + '.position',
-                    $item.options('position')
-                );
-            }
-            */
-            
+
         }
+
         pandora.user.ui.showHome = false;
         
-    }
-
-    function updateUI() {
-        // remove later
-        var previousUI = pandora.UI.getPrevious();
-        Ox.Request.cancel();
-        $('video').each(function() {
-            $(this).trigger('stop');
-        });
-        pandora.URL.parse(function() {
-            if (pandora.user.ui.section != previousUI.section) {
-                pandora.$ui.appPanel.replaceElement(1, pandora.$ui.mainPanel = pandora.ui.mainPanel());
-            } else if (!pandora.user.ui.item && !previousUI.item) {
-                // list to list
-                var isClipView = pandora.isClipView(),
-                    list = pandora.user.ui.lists[pandora.user.ui.list],
-                    previousList = previousUI.lists[previousUI.list],
-                    wasClipView = pandora.isClipView(previousList.view);
-                if (list.view != previousList.view) {
-                    pandora.$ui.mainMenu.checkItem('viewMenu_movies_' + list.view);
-                    pandora.$ui.viewSelect.options({value: list.view});
-                    if (isClipView != wasClipView) {
-                        pandora.$ui.mainMenu.replaceMenu('sortMenu', pandora.getSortMenu());
-                        pandora.$ui.sortSelect.replaceWith(pandora.$ui.sortSelect = pandora.ui.sortSelect());
-                        if (isClipView && !wasClipView) {
-                            pandora.UI.set('lists.' + pandora.user.ui.list + '.selected', []);
-                        }
-                    }                    
-                }
-                if (!Ox.isEqual(list.sort, previousList.sort)) {
-                    pandora.$ui.mainMenu.checkItem('sortMenu_sortmovies_' + list.sort[0].key);
-                    pandora.$ui.mainMenu.checkItem('sortMenu_ordermovies_' + ((
-                        list.sort[0].operator || pandora.getSortOperator(list.sort[0].key)
-                    ) == '+' ? 'ascending' : 'descending'));
-                    pandora.$ui.sortSelect.options({value: list.sort[0].key});
-                }
-                pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
-                if (Ox.isEqual(pandora.user.ui.find, previousUI.find)) {
-                    pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.list = pandora.ui.list());
-                } else {
-                    pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
-                }
-                // fixme: should list selection and deselection happen here?
-                // (home and menu may cause a list switch)
-            } else if (!pandora.user.ui.item || !previousUI.item) {
-                // list to item or item to list
-                pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
-                pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
-            } else {
-                // item to item
-                if (pandora.user.ui.item != previousUI.item) {
-                    pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
-                }
-                pandora.$ui.contentPanel.replaceElement(1, pandora.ui.item());
-            }
-            if (
-                previousUI.item &&
-                ['video', 'timeline'].indexOf(previousUI.itemView) > -1
-            ) {
-                var $item = pandora.$ui[
-                    previousUI.itemView == 'video' ? 'player' : 'editor'
-                ];
-                $item && pandora.UI.set(
-                    'videoPoints.' + previousUI.item + '.position',
-                    $item.options('position')
-                );
-            }
-        });
     }
 
     that.init = function() {
@@ -400,7 +243,7 @@ pandora.URL = (function() {
                     // itemSort[0].key is the default sort key
                     [Ox.getObjectById(pandora.site.clipKeys, pandora.user.ui.itemSort[0].key)],
                     Ox.map(pandora.site.clipKeys, function(key) {
-                        return key.id == pandora.user.ui.itemSort ? null : key;
+                        return key.id == pandora.user.ui.itemSort[0].key ? null : key;
                     })
                 );
             }
@@ -436,6 +279,21 @@ pandora.URL = (function() {
             views: views
         });
 
+        ///*
+        window.onhashchange = function() {
+            that.parse();
+        };
+        window.onpopstate = function(e) {
+            self.isPopState = true;
+            if (!Ox.isEmpty(e.state)) {
+                Ox.print('E.STATE', e.state)
+                setState(e.state);
+            } else {
+                that.parse();
+            }
+        };
+        //*/
+
         return that;
 
     };
@@ -446,8 +304,7 @@ pandora.URL = (function() {
             document.location.href = decodeURI(document.location.pathname.substr(4));
         } else {
             self.URL.parse(function(state) {
-                setState(state);
-                callback();
+                setState(state, callback);
             });
         }
         return that;
@@ -460,14 +317,11 @@ pandora.URL = (function() {
 
     // pushes a new URL (as string or from state)
     that.push = function(url) {
-        Ox.print('push', arguments[0])
         if (url) {
-            self.URL.push(url, setState);
+            self.URL.push(null, '', url, setState);
         } else {
-            var state = getState();
-            Ox.print('&&&&&&&', state)
-            self.URL.push(state);
-            //setState(state);
+            alert('DO YOU REALLY WANT TO CALL PUSH WITHOUT URL?')
+            //self.URL.push(getState());
         }
         return that;
     };
@@ -475,77 +329,32 @@ pandora.URL = (function() {
     // replaces the current URL (as string or from state)
     that.replace = function(url) {
         if (url) {
-            self.URL.replace(url, setState)
+            self.URL.replace(null, '', url, setState)
         } else {
             self.URL.replace(getState());
         }
         return that;
     };
 
-    return that;
-
-    /*
-        parse: function(callback) {
-            var pathname = document.location.pathname.substr(1),
-                search = document.location.search.substr(1);
-            if (/\/$/.test(pathname)) {
-                pathname = pathname.substr(0, pathname.length - 1);
+    that.update = function(keys) {
+        var action;
+        if (self.isPopState) {
+            self.isPopState = false;
+        } else {
+            if (
+                !pandora.$ui.appPanel
+                || keys.every(function(key) {
+                    return /^videoPoints/.test(key);
+                })
+            ) {
+                action = 'replace'
+            } else {
+                action = 'push'
             }
-            Ox.forEach(regexps, function(fn, re) {
-                re = new RegExp(re);
-                if (re.test(pathname)) {
-                    Ox.print('URL re ' + re);
-                    fn(pathname, search, function() {
-                        pandora.Query.updateGroups();
-                        pandora.user.ui.showHome = false;
-                        callback();
-                    });
-                    return false;
-                }
-            });
-        },
-
-        push: function(title, url) {
-            if (arguments.length == 1) { // fixme: remove later
-                url = title;
-            }
-            if (url[0] != '/') {
-                url = '/' + url;
-            }
-            saveURL();
-            history.pushState({}, pandora.site.site.name + (title ? ' - ' + title : ''), url);
-        },
-
-        pushPrevious: function() {
-            history.pushState({}, '', previousURL);
-        },
-
-        set: function(title, url) {
-            if (arguments.length == 1) { // fixme: remove later
-                url = title;
-            }
-            if (url[0] != '/') {
-                url = '/' + url;
-            }
-            history.pushState({}, pandora.site.site.name + (title ? ' - ' + title : ''), url);
-            updateURL();
-        },
-
-        replace: function(title, url) {
-            if (arguments.length == 1) { // fixme: remove later
-                url = title;
-            }
-            if (url[0] != '/') {
-                url = '/' + url;
-            }
-            saveURL();
-            history.replaceState({}, pandora.site.site.name + (title ? ' - ' + title : ''), url);
-        },
-
-        update: function() {
-            this.set(pandora.Query.toString());
+            self.URL[action](getState(), 'title', getState(keys));            
         }
+    };
 
-    */
+    return that;
 
 }());
