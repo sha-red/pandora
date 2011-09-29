@@ -203,6 +203,16 @@ pandora.ui.mainMenu = function() {
                     'signup', 'signin', 'signout', 'preferences', 'help'
                 ].indexOf(data.id) > -1) {
                     pandora.URL.push('/' + data.id);
+                } else if ([
+                    'newlist', 'newlistfromselection', 'newsmartlist', 'newsmartlistfromresults'
+                ].indexOf(data.id) > -1) {
+                    pandora.addList(data.id.indexOf('smart') > -1, data.id.indexOf('from') > -1);
+                } else if (data.id == 'duplicatelist') {
+                    pandora.addList(pandora.user.ui._list);
+                } else if (data.id == 'editlist') {
+                    pandora.ui.listDialog().open();
+                } else if (data.id == 'deletelist') {
+                    pandora.ui.deleteListDialog().open();
                 } else if (data.id == 'stills') {
                     var id = pandora.user.ui.item || pandora.user.ui.listItem;
                     pandora.$ui.postersDialog = pandora.ui.framesDialog(id).open();
@@ -230,7 +240,19 @@ pandora.ui.mainMenu = function() {
                     Ox.Request.clearCache();
                 }
             },
-            pandora_listView: function(data) {
+            pandora_find: function() {
+                var action = ui._list
+                    && pandora.getListData(ui._list).user == pandora.user.username
+                    ? 'enableItem' : 'disableItem';
+                that[action]('editlist');
+                that[action]('duplicatelist');
+                that[action]('deletelist');
+                that[pandora.user.ui.listSelection.length ? 'enableItem' : 'disableItem']('newlistfromselection');
+            },
+            pandora_listselection: function(data) {
+                that[data.value.length ? 'enableItem' : 'disableItem']('newlistfromselection');
+            },
+            pandora_listview: function(data) {
                 if (pandora.isClipView() != pandora.isClipView(data.previousValue)) {
                     that.replaceMenu('sortMenu', getSortMenu());
                 }
@@ -259,15 +281,14 @@ pandora.ui.mainMenu = function() {
             }),
             [
                 {},
-                { id: 'newlist', title: 'New List...', keyboard: 'control n' },
-                { id: 'newlistfromselection', title: 'New List from Selection...', disabled: true, keyboard: 'shift control n' },
-                { id: 'newsmartlist', title: 'New Smart List...', keyboard: 'alt control n' },
-                { id: 'newsmartlistfromresults', title: 'New Smart List from Results...', keyboard: 'shift alt control n' },
-                { id: 'duplicatelist', title: 'Duplicate Selected List', keyboard: 'control d' },
+                { id: 'newlist', title: 'New List', keyboard: 'control n' },
+                { id: 'newlistfromselection', title: 'New List from Selection', disabled: ui.listSelection.length == 0, keyboard: 'shift control n' },
+                { id: 'newsmartlist', title: 'New Smart List', keyboard: 'alt control n' },
+                { id: 'newsmartlistfromresults', title: 'New Smart List from Results', keyboard: 'shift alt control n' },
                 {},
-                { id: 'addmovietolist', title: ['Add Selected ' + pandora.site.itemName.singular + ' to List...', 'Add Selected ' + pandora.site.itemName.plural + ' to List...'], disabled: true },
-                {},
-                { id: 'setposterframe', title: 'Set Poster Frame', disabled: true }
+                { id: 'duplicatelist', title: 'Duplicate Selected List', disabled: !pandora.user.ui._list, keyboard: 'control d' },
+                { id: 'editlist', title: 'Edit Selected List...', disabled: !pandora.user.ui._list, keyboard: 'control e' },
+                { id: 'deletelist', title: 'Delete Selected List...', disabled: !pandora.user.ui._list, keyboard: 'delete' },
             ]
         )};
     };

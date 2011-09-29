@@ -23,11 +23,11 @@ pandora.ui.folders = function() {
                 } else {
                     extras = [Ox.Select({
                         items: [
-                            { id: 'new', title: 'New List...' },
-                            { id: 'newfromselection', title: 'New List from Current Selection...', disabled: true },
+                            { id: 'newlist', title: 'New List...' },
+                            { id: 'newlistfromselection', title: 'New List from Current Selection...', disabled: true },
                             {},
-                            { id: 'newsmart', title: 'New Smart List...' },
-                            { id: 'newfromresults', title: 'New Smart List from Current Results...', disabled: true },
+                            { id: 'newsmartlist', title: 'New Smart List...' },
+                            { id: 'newsmartlistfromresults', title: 'New Smart List from Current Results...', disabled: true },
                             {},
                             { id: 'duplicate', title: 'Duplicate List' },
                             { id: 'copyselection', title: 'Copy Selection to List...' },
@@ -56,7 +56,7 @@ pandora.ui.folders = function() {
                                             operator: '&'
                                         }
                                     });
-                                    Ox.Request.clearCache(); // fixme: remove
+                                    Ox.Request.clearCache('"findLists"');
                                     $list.reloadList().bindEventOnce({
                                         load: function(data) {
                                             $list.gainFocus()
@@ -152,7 +152,9 @@ pandora.ui.folders = function() {
                                         pandora.$ui.folderList.favorite.options({selected: [listData.id]});
                                     } else {
                                         // and nowhere else
-                                        pandora.URL.set('');
+                                        pandora.UI.set({
+                                            find: pandora.site.user.ui.find
+                                        });
                                     }
                                 }
                                 pandora.$ui.folderBrowser.featured.replaceWith(

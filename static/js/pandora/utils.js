@@ -1,5 +1,139 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
+pandora.addList = function() {
+    // addList(isSmart, isFrom) or addList(list) [=duplicate]
+    var $folderList = pandora.$ui.folderList.personal,
+        isDuplicate = arguments.length == 1,
+        isSmart, isFrom, list, listData, data;
+    if (!isDuplicate) {
+        isSmart = arguments[0];
+        isFrom = arguments[1];
+        data = {
+            name: 'Untitled',
+            status: 'private',
+            type: !isSmart ? 'static' : 'smart'
+        };
+        if (isFrom) {
+            if (!isSmart) {
+                data.items = pandora.user.ui.listSelection;
+            } else {
+                data.query = pandora.user.ui.find;
+            }
+        }
+    } else {
+        list = arguments[0];
+        listData = pandora.getListData();
+        data = {
+            name: listData.name,
+            status: listData.status,
+            type: listData.type
+        };
+        if (data.type == 'smart') {
+            data.query = listData.query;
+        }
+    }
+    if (isDuplicate && listData.type == 'static') {
+        var query = {
+            conditions: [{key: 'list', value: list, operator: '=='}],
+            operator: '&'
+        };
+        pandora.api.find({
+            query: query
+        }, function(result) {
+            if (result.data.items) {
+                pandora.api.find({
+                    query: query,
+                    keys: ['id'],
+                    sort: [{key: 'id', operator: ''}]
+                }, function(result) {
+                    var items = result.data.items.map(function(item) {
+                        return item.id;
+                    });
+                    addList(items);
+                })
+            } else {
+                addList();
+            }
+        })
+    } else {
+        addList();
+    }
+    function addList(items) {
+        pandora.api.addList(data, function(result) {
+            var newList = result.data.id;
+            if (items) {
+                pandora.api.addListItems({
+                    list: newList,
+                    items: items
+                }, function() {
+                    getPosterFrames(newList);
+                })
+            } else {
+                getPosterFrames(newList);
+            }
+        });
+    }
+    function getPosterFrames(newList) {
+        if (!isDuplicate) {
+            pandora.api.find({
+                query: {
+                    conditions: [{key: 'list', value: newList, operator: '=='}],
+                    operator: '&'
+                },
+                keys: ['id', 'posterFrame'],
+                sort: [{key: 'votes', operator: ''}], // fixme: may not always exist
+                range: [0, 4]
+            }, function(result) {
+                var posterFrames = result.data.items.map(function(item) {
+                    return {item: item.id, position: item.posterFrame};
+                });
+                posterFrames = posterFrames.length == 1 
+                    ? Ox.repeat([posterFrames[0]], 4)
+                    : posterFrames.length == 2
+                    ? [posterFrames[0], posterFrames[1], posterFrames[1], posterFrames[0]]
+                    : posterFrames.length == 3
+                    ? [posterFrames[0], posterFrames[1], posterFrames[2], posterFrames[0]]
+                    : posterFrames;
+                setPosterFrames(newList, posterFrames);
+            })
+        } else {
+            pandora.api.findLists({
+                query: {
+                    conditions: [{key: 'id', value: list, operator: '=='}],
+                    operator: '&'
+                },
+                keys: ['posterFrames']
+            }, function(result) {
+                setPosterFrames(newList, result.data.items[0].posterFrames);
+            });
+        }
+    }
+    function setPosterFrames(newList, posterFrames) {
+        pandora.api.editList({
+            id: newList,
+            posterFrames: posterFrames
+        }, function() {
+            reloadFolder(newList);
+        });
+    }
+    function reloadFolder(newList) {
+        Ox.Request.clearCache('findLists');
+        $folderList.bindEventOnce({
+            load: function(data) {
+                $folderList.gainFocus()
+                    .options({selected: [list]})
+                    .editCell(newList, 'name');
+                pandora.UI.set({
+                    find: {
+                        conditions: [{key: 'list', value: newList, operator: '=='}],
+                        operator: '&'
+                    }
+                });                    
+            }
+        }).reloadList();
+    }
+};
+
 pandora.enableDragAndDrop = function($list, canMove) {
 
     var $tooltip = Ox.Tooltip({
@@ -482,6 +616,7 @@ pandora.signin = function(data) {
     pandora.user = data.user;
     pandora.Query.updateGroups();
     Ox.Theme(pandora.user.ui.theme);
+    pandora.UI.set({find: pandora.user.ui.find})
     pandora.$ui.appPanel.reload();
 };
 
@@ -489,6 +624,7 @@ pandora.signout = function(data) {
     pandora.user = data.user;
     pandora.Query.updateGroups();
     Ox.Theme(pandora.site.user.ui.theme);
+    pandora.UI.set({find: pandora.user.ui.find})
     pandora.$ui.appPanel.reload();
 };
 

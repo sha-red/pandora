@@ -116,7 +116,7 @@ pandora.URL = (function() {
                 pandora.$ui.helpDialog = pandora.ui.helpDialog().open();
             } else if (['signup', 'signin'].indexOf(state.page) > -1) {
                 if (pandora.user.level == 'guest') {
-                    pandora.ui.accountDialog(state.page).open();
+                    pandora.$ui.accountDialog = pandora.ui.accountDialog(state.page).open();
                 } else {
                     pandora.URL.replace('/');
                 }

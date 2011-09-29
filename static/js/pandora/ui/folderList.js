@@ -11,13 +11,14 @@ pandora.ui.folderList = function(id) {
                     clickable: function(data) {
                         return data.user == pandora.user.username;
                     },
-                    format: function() {
+                    format: function(value, data) {
                         return $('<img>').attr({
-                                src: Ox.UI.getImageURL('symbolIcon')
+                                src: '/list/' + data.id + '/icon16.jpg'
                             }).css({
-                                width: '10px',
-                                height: '10px',
-                                padding: '3px'
+                                width: '14px',
+                                height: '14px',
+                                borderRadius: '4px',
+                                margin: '0 0 0 -3px'
                             });
                     },
                     id: 'user',
@@ -297,11 +298,11 @@ pandora.ui.folderList = function(id) {
             click: function(data) {
                 //var $list = pandora.$ui.folderList[id];
                 if (data.key == 'user') {
-                    pandora.$ui.filterDialog = pandora.ui.listDialog(that.value(data.id), 'icon').open();
+                    pandora.$ui.listDialog = pandora.ui.listDialog('icon').open();
                     
                 } else if (data.key == 'type') {
                     if (that.value(data.id, 'type') == 'smart') {
-                        pandora.$ui.filterDialog = pandora.ui.listDialog(that.value(data.id), 'query').open();
+                        pandora.$ui.listDialog = pandora.ui.listDialog('query').open();
                     }
                 } else if (data.key == 'status') {
                     pandora.api.editList({
@@ -318,44 +319,7 @@ pandora.ui.folderList = function(id) {
             },
             'delete': function(data) {
                 if (id == 'personal') {
-                    var $dialog = Ox.Dialog({
-                        buttons: [
-                            Ox.Button({
-                                id: 'cancel',
-                                title: 'Cancel'
-                            }).bindEvent({
-                                click: function() {
-                                    $dialog.close();
-                                }
-                            }),
-                            Ox.Button({
-                                id: 'delete',
-                                title: 'Delete'
-                            }).bindEvent({
-                                click: function() {
-                                    $dialog.close();
-                                    that.options({selected: []});
-                                    pandora.api.removeList({
-                                        id: data.ids[0]
-                                    }, function(result) {
-                                        pandora.UI.set('lists.' + data.ids[0], null);
-                                        pandora.UI.set({
-                                            find: pandora.site.user.ui.find
-                                        });
-                                        Ox.Request.clearCache(); // fixme: remove
-                                        that.reloadList();
-                                    });
-                                }
-                            })
-                        ],
-                        content: $('<div>')
-                            .css({margin: '16px'})
-                            .html('Do you want to delete the list ' + data.ids[0] + '?'),
-                        height: 128,
-                        keys: {enter: 'delete', escape: 'cancel'},
-                        title: 'Delete List',
-                        width: 304
-                    }).open();
+                    pandora.ui.deleteListDialog().open();
                 } else if (id == 'favorite') {
                     that.options({selected: []});
                     pandora.api.unsubscribeFromList({

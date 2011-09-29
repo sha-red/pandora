@@ -1,14 +1,14 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.autovalidateCode = function(value, blur, callback) {
     value = value.toUpperCase().split('').map(function(v) {
-        return /[0-9A-Z]/(v) ? v : null;
+        return /[0-9A-Z]/.test(v) ? v : null;
     }).join('');
     callback(value);
 };
 
 pandora.autovalidateEmail = function(value, blur, callback) {
     value = value.toLowerCase().split('').map(function(v, i) {
-        return /[0-9a-z\.\+\-_@]/(v) ? v : null;
+        return /[0-9a-z\.\+\-_@]/.test(v) ? v : null;
     }).join('');
     callback(value);
 };

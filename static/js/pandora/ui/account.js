@@ -174,7 +174,7 @@ pandora.ui.accountForm = function(action, value) {
         
             },
             validate: function(data) {
-                //Ox.print('FORM VALIDATE', data)
+                Ox.print('FORM VALIDATE', data, action, 'submit' + Ox.toTitleCase(action));
                 pandora.$ui.accountDialog[
                     (data.valid ? 'enable' : 'disable') + 'Button'
                 ]('submit' + Ox.toTitleCase(action));

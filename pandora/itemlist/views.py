@@ -238,12 +238,17 @@ def addList(request):
         list.view = data['view']
     if 'sort' in data:
         list.sort= tuple(data['sort'])
+    if 'posterFrames' in data:
+        list.poster_frames = tuple(data['posterFrames'])
 
     list.save()
 
     if 'items' in data:
         for item in Item.objects.filter(itemId__in=data['items']):
             list.add(item)
+
+    if 'posterFrames' in data:
+        list.update_icon()
 
     if list.status == 'featured':
         pos, created = models.Position.objects.get_or_create(list=list,

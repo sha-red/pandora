@@ -30,12 +30,33 @@ pandora.ui.info = function() {
             if (result.data) {
                 pandora.$ui.videoPreview && pandora.$ui.videoPreview.removeElement();
                 pandora.$ui.videoPreview = pandora.ui.videoPreview({
-                    duration: result.data.duration,
-                    frameRatio: result.data.videoRatio,
-                    height: pandora.getInfoHeight(),
-                    id: id,
-                    width: pandora.user.ui.sidebarSize
-                }).appendTo(pandora.$ui.info);
+                        duration: result.data.duration,
+                        frameRatio: result.data.videoRatio,
+                        height: pandora.getInfoHeight(),
+                        id: id,
+                        width: pandora.user.ui.sidebarSize
+                    })
+                    .bindEvent({
+                        click: function(data) {
+                            pandora.UI.set(
+                                'videoPoints.' + id,
+                                {'in': 0, out: 0, position: data.position}
+                            );
+                            if (pandora.user.ui.item && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
+                                pandora.$ui[
+                                    pandora.user.ui.itemView == 'video' ? 'player' : 'editor'
+                                ].options({
+                                    position: data.position
+                                });
+                            } else {
+                                pandora.UI.set({
+                                    item: id,
+                                    itemView: pandora.user.ui.videoView
+                                });
+                            }
+                        }
+                    })
+                    .appendTo(pandora.$ui.info);
             }
         });
     }
@@ -66,7 +87,7 @@ pandora.ui.info = function() {
             pandora.$ui.videoPreview.options({
                 height: pandora.getInfoHeight(),
                 width: pandora.user.ui.sidebarSize
-            })
+            });
         }
     };
     return that;
@@ -75,14 +96,22 @@ pandora.ui.info = function() {
 pandora.ui.listInfo = function(data) {
     var that = $('<div>').css({padding: '16px', textAlign: 'center'});
     var $icon = $('<img>')
-        .attr({src: !pandora.user.ui._list ? '/static/png/icon256.png' : Ox.UI.getImageURL('symbolIcon')})
+        .attr({
+            src: !pandora.user.ui._list
+                ? '/static/png/icon256.png'
+                : '/list/' + pandora.user.ui._list + '/icon256.jpg?' + Ox.uid()
+        })
         .css(getIconCSS())
         .appendTo(that);
     $('<div>').css({padding: '16px 0 16px 0', fontWeight: 'bold'}).html(!pandora.user.ui._list ? 'All Movies' : pandora.user.ui._list.replace(':', ': ')).appendTo(that);
     $('<div>').css({textAlign: 'left'}).html(Ox.repeat('This is the list info text. ', 10)).appendTo(that);
     function getIconCSS() {
         var size = Math.round(pandora.user.ui.sidebarSize / 2);
-        return {width: size + 'px', height: size + 'px'};
+        return {
+            width: size + 'px',
+            height: size + 'px',
+            borderRadius: Math.round(size / 4) + 'px'
+        };
     }
     that.resizeIcon = function() {
         $icon.css(getIconCSS());

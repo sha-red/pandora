@@ -1,42 +1,80 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
-pandora.ui.listDialog = function(list, section) {
+pandora.ui.listDialog = function(section) {
 
-    var tabs = Ox.merge([
-        {id: 'general', title: 'General'},
-        {id: 'icon', title: 'Icon'}
-    ], list.type == 'smart'
-        ? {id: 'query', title: 'Query'}
-        : []
-    );
+    section = section || 'general';
+    var width = getWidth(section);
+    var listData = pandora.getListData(),
+        tabs = Ox.merge([
+            {id: 'general', title: 'General'},
+            {id: 'icon', title: 'Icon'}
+        ], listData.type == 'smart'
+            ? [{id: 'query', title: 'Query'}]
+            : []
+        );
     Ox.getObjectById(tabs, section).selected = true;
+
     var $tabPanel = Ox.TabPanel({
             content: function(id) {
                 if (id == 'general') {
-                    return Ox.Element({}).css({padding: '16px'}).html('General');
+                    return pandora.ui.listGeneralPanel(listData);
                 } else if (id == 'icon') {
-                    return pandora.ui.listIconPanel(list);
+                    return pandora.ui.listIconPanel(listData);
                 } else if (id == 'query') {
-                    return pandora.$ui.filter = pandora.ui.filter(list);
+                    return pandora.$ui.filter = pandora.ui.filter(listData);
                 }
             },
             tabs: tabs
         })
         .bindEvent({
             change: function(data) {
+                var width = getWidth(data.selected);
                 $dialog.options({
-                    title: 'Smart List - ' + list.name + ' - '
+                    maxWidth: width,
+                    minWidth: width,
+                    title: 'Smart List - ' + listData.name + ' - '
                         + Ox.getObjectById(tabs, data.selected).title
                 });
-                if (data.selected == 'icon') {
-                    $dialog.options({
-                        maxWidth: 704 + Ox.UI.SCROLLBAR_SIZE,
-                        minWidth: 704 + Ox.UI.SCROLLBAR_SIZE,
-                        width: 704 + Ox.UI.SCROLLBAR_SIZE
-                    });
-                }
+                $dialog.setSize(width, 312);
+                $findElement[data.selected == 'icon' ? 'show' : 'hide']();
             }
         });
+
+    var $findElement = Ox.FormElementGroup({
+            elements: [
+                pandora.$ui.findIconItemSelect = Ox.Select({
+                    items: pandora.site.findKeys,
+                    overlap: 'right',
+                    type: 'image'
+                })
+                .bindEvent({
+                    change: function(data) {
+
+                    }
+                }),
+                pandora.$ui.findIconItemInput = Ox.Input({
+                    changeOnKeypress: true,
+                    clear: true,
+                    placeholder: 'Find: Foo',
+                    width: 120 + Ox.UI.SCROLLBAR_SIZE
+                })
+                .bindEvent({
+                    change: function(data) {
+
+                    }
+                })
+            ],
+        })
+        .css({
+            float: 'right',
+            margin: '4px',
+            align: 'right'
+        });
+    if (section != 'icon') {
+        $findElement.hide();
+    }
+    $findElement.appendTo($tabPanel.children('.OxBar'));
+
 
     var $dialog = Ox.Dialog({
         buttons: [
@@ -49,196 +87,284 @@ pandora.ui.listDialog = function(list, section) {
                         alert(JSON.stringify(pandora.$ui.filter.options('query')));
                     }
                 }),
-            /*
-            Ox.Button({
-                    id: 'cancel',
-                    title: 'Cancel'
-                })
-                .bindEvent({
-                    click: function() {
-                        pandora.$ui.filterDialog.close();
-                    }
-                }),
-            */
             Ox.Button({
                     id: 'done',
                     title: 'Done'
                 })
                 .bindEvent({
                     click: function() {
-                        pandora.$ui.filterDialog.close();
+                        $dialog.close();
                     }
                 })
         ],
         content: $tabPanel,
-        maxWidth: (section == 'icon' ? 704 : 648) + Ox.UI.SCROLLBAR_SIZE,
+        maxWidth: width,
         minHeight: 312,
-        minWidth: (section == 'icon' ? 704 : 648) + Ox.UI.SCROLLBAR_SIZE,
+        minWidth: width,
         height: 312,
         // keys: {enter: 'save', escape: 'cancel'},
-        //title: list ? 'Smart List - ' + list.name : 'Advanced Find',
-        title: 'Smart List - ' + list.name + ' - '
-            + Ox.getObjectById(tabs, section).title,
-        width: (section == 'icon' ? 704 : 648) + Ox.UI.SCROLLBAR_SIZE
+        title: 'Smart List - ' + listData.name,
+        width: width
     });
+
+    function getWidth(section) {
+        return section == 'general' ? 496
+            : (section == 'icon' ? 696 : 648) + Ox.UI.SCROLLBAR_SIZE;
+    }
 
     return $dialog;
 
 };
 
-pandora.ui.listIconPanel = function(list) {
+pandora.ui.listGeneralPanel = function(listData) {
+    var that = Ox.Element({}),
+        $icon = $('<img>')
+            .attr({src: '/list/' + listData.id + '/icon256.jpg?' + Ox.uid()})
+            .css({position: 'absolute', left: '16px', top: '16px', width: '128px', height: '128px', borderRadius: '32px'})
+            .appendTo(that);
+        $nameInput = Ox.Input({
+                label: 'Name',
+                labelWidth: 80,
+                value: listData.name,
+                width: 320
+            })
+            .css({position: 'absolute', left: '160px', top: '16px'})
+            .appendTo(that);
+        $itemsInput = Ox.Input({
+                disabled: true,
+                label: 'Items',
+                labelWidth: 80,
+                value: listData.items,
+                width: 320
+            })
+            .css({position: 'absolute', left: '160px', top: '40px'})
+            .appendTo(that);
+        $statusSelect = Ox.Select({
+                items: [
+                    {id: 'private', title: 'Private', selected: listData.status == 'private'},
+                    {id: 'public', title: 'Public', selected: listData.status == 'public'},
+                    {id: 'featured', title: 'Featured', selected: listData.status == 'featured'},
+                ],
+                label: 'Status',
+                labelWidth: 80,
+                width: 320
+            })
+            .css({position: 'absolute', left: '160px', top: '64px'})
+            .appendTo(that);
+        $subscribersInput = Ox.Input({
+                disabled: true,
+                label: 'Subscribers',
+                labelWidth: 80,
+                value: 0,
+                width: 320
+            })
+            .css({position: 'absolute', left: '160px', top: '88px'})
+            .appendTo(that);
+    return that;
+};
 
-    var quarter = 'top-left';
+pandora.ui.listIconPanel = function(listData) {
 
-    var $interface = Ox.Element({
-            tooltip: function(e) {
-                return 'Edit ' + $(e.target).attr('id').replace('-', ' ') + ' image';
-            }
-        })
-        .css({position: 'absolute', width: '256px', height: '256px', margin: '16px', cursor: 'pointer'})
-        .click(function(e) {
-            quarter = $(e.target).attr('id');
-            renderQuarters();
+    var quarter = 0,
+        quarters = ['top-left', 'top-right', 'bottom-left', 'bottom-right'],
+
+        $iconPanel = Ox.Element(),
+
+        $icon = $('<img>')
+            .attr({src: '/list/' + listData.id + '/icon256.jpg?' + Ox.uid()})
+            .css({position: 'absolute', borderRadius: '64px', margin: '16px'})
+            .appendTo($iconPanel),
+
+        $previewPanel = Ox.Element(),
+
+        $preview,
+
+        $list = Ox.Element(),
+
+        that = Ox.SplitPanel({
+            elements: [
+                {
+                    element: $iconPanel,
+                    size: 280
+                },
+                {
+                    element: $previewPanel
+                },
+                {
+                    element: $list,
+                    size: 144 + Ox.UI.SCROLLBAR_SIZE
+                }
+            ],
+            orientation: 'horizontal'
         });
 
-    var $list = Ox.IconList({
-        borderRadius: 16,
-        item: function(data, sort) {
-            var size = 128;
-            return {
-                height: size,
-                id: data.id,
-                info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
-                title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
-                url: '/' + data.id + '/icon' + size + '.jpg',
-                width: size
-            };
+    pandora.api.findLists({
+        query: {
+            conditions: [{key: 'id', value: listData.id, operator: '=='}],
+            operator: '&'
         },
-        items: function(data, callback) {
-            //Ox.print('data, pandora.Query.toObject', data, pandora.Query.toObject())
-            pandora.api.find(Ox.extend(data, {
-                query: {
-                    conditions: [{key: 'list', value: list.id, operator: '='}],
-                    operator: '&'
-                }
-            }), callback);
-        },
-        keys: ['director', 'duration', 'id', 'title', 'videoRatio', 'year'],
-        max: 1,
-        min: 1,
-        orientation: 'vertical',
-        size: 128,
-        sort: pandora.user.ui.listSort,
-        unique: 'id'
-    })
-    .css({width: '144px'})
-    .bindEvent({
-        select: function(data) {
-            var value = $list.value(data.ids[0]);
-            //frameCSS['border-' + quarter + '-radius'] = '120px';
-            Ox.print("$$$", value)
-            $preview.empty().append(
-                    pandora.ui.videoPreview({
-                        duration: value.duration,
-                        frameRatio: value.videoRatio,
-                        height: 256,
-                        id: value.id,
-                        width: 240
-                    })
-                    .css({margin: '16px', overflow: 'hidden'})
-            );
-        }
-    })   
-    
-    var $preview = Ox.Element()
-        .css({width: '256px', height: '256px'});
+        keys: ['posterFrames']
+    }, function(result) {
 
-    renderQuarters();
+        var posterFrames = result.data.items[0].posterFrames,
+            posterFrame = posterFrames[quarter],
+
+            $interface = Ox.Element({
+                    tooltip: function(e) {
+                        return 'Edit ' + $(e.target).attr('id').replace('-', ' ') + ' image';
+                    }
+                })
+                .css({
+                    position: 'absolute',
+                    width: '256px',
+                    height: '256px',
+                    marginLeft: '16px',
+                    marginTop: '16px',
+                    cursor: 'pointer'
+                })
+                .bind({
+                    click: function(e) {
+                        clickIcon(e);
+                    },
+                    dblclick: function(e) {
+                        clickIcon(e, true);
+                    }
+                })
+                .appendTo($iconPanel);
+
+        renderQuarters();
+
+        $list = Ox.IconList({
+            borderRadius: 16,
+            item: function(data, sort) {
+                var size = 128;
+                return {
+                    height: size,
+                    id: data.id,
+                    info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
+                    title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
+                    url: '/' + data.id + '/icon' + size + '.jpg',
+                    width: size
+                };
+            },
+            items: function(data, callback) {
+                //Ox.print('data, pandora.Query.toObject', data, pandora.Query.toObject())
+                pandora.api.find(Ox.extend(data, {
+                    query: {
+                        conditions: [{key: 'list', value: listData.id, operator: '='}],
+                        operator: '&'
+                    }
+                }), callback);
+            },
+            keys: ['director', 'duration', 'id', 'posterFrame', 'title', 'videoRatio', 'year'],
+            max: 1,
+            min: 1,
+            //orientation: 'vertical',
+            selected: posterFrame ? [posterFrame.item] : [],
+            size: 128,
+            sort: pandora.user.ui.listSort,
+            unique: 'id'
+        })
+        //.css({width: '144px'})
+        .bindEvent({
+            open: function(data) {
+                setPosterFrame(data.ids[0], $list.value(data.ids[0], 'posterFrame'))
+            },
+            select: function(data) {
+                renderPreview($list.value(data.ids[0]));
+            }
+        })
+        .bindEventOnce({
+            load: function() {
+                var itemData;
+                if (!posterFrame) {
+                    itemData = $list.value(0);
+                    $list.options({selected: [itemData.id]});
+                } else {
+                    itemData = $list.value(posterFrame.item);
+                }
+                renderPreview(itemData);
+            }
+        })
+        .gainFocus();
+
+        that.replaceElement(2, $list);
+
+        function clickIcon(e, isDoubleClick) {
+            quarter = quarters.indexOf($(e.target).attr('id'));
+            renderQuarters();
+            if (isDoubleClick) {
+                var item = posterFrames[quarter].item;
+                $list.options({selected: [item]});
+                renderPreview($list.value(item), posterFrames[quarter].position);
+            }
+        }
+
+        function renderPreview(itemData, position) {
+            $preview = pandora.ui.videoPreview({
+                duration: itemData.duration,
+                frameRatio: itemData.videoRatio,
+                height: 256,
+                id: itemData.id,
+                position: position,
+                width: 256
+            })
+            .css({marginLeft: '8px', marginTop: '16px', overflow: 'hidden'})
+            .bindEvent({
+                click: function(data) {
+                    setPosterFrame(itemData.id, data.position);
+                }
+            });
+            /*
+            // fixme: need canvas for this
+            $($preview.children('.OxFrame')[0])
+                .css('border-' + quarter + '-radius', '128px');
+            */
+            $previewPanel.empty().append($preview);
+        }
+
+        function renderQuarters() {
+            $interface.empty();
+            quarters.forEach(function(q, i) {
+                $interface.append(
+                    $('<div>')
+                        .attr({id: q})
+                        .css({
+                            float: 'left',
+                            width: '126px',
+                            height: '126px',
+                            border: '1px solid rgba(255, 255, 255, ' + (i == quarter ? 0.75 : 0) + ')',
+                            background: 'rgba(0, 0, 0, ' + (i == quarter ? 0 : 0.75) + ')'
+                        })
+                        .css('border-' + q + '-radius', '64px')
+                );
+            });
+        }
+
+        function setPosterFrame(item, position) {
+            var posterFrame = {item: item, position: position};
+            if (posterFrames.length) {
+                posterFrames[quarter] = posterFrame;
+            } else {
+                posterFrames = Ox.repeat([posterFrame], 4);
+            }
+            pandora.api.editList({
+                id: listData.id,
+                posterFrames: posterFrames
+            }, function() {
+                $icon.attr({src: '/list/' + listData.id + '/icon256.jpg?' + Ox.uid()});
+            });
+            $preview.options({position: position});
+        }
+
+    });
 
     function renderFrame() {
         $frame.css({borderRadius: 0});
-        $frame.css('border-' + quarter + '-radius', '128px');
+        $frame.css('border-' + quarters[quarter] + '-radius', '128px');
     }
 
-    function renderQuarters() {
-        $interface.empty();
-        ['top-left', 'top-right', 'bottom-left', 'bottom-right'].forEach(function(q) {
-            $interface.append(
-                $('<div>')
-                    .attr({id: q})
-                    .css({
-                        float: 'left',
-                        width: '126px',
-                        height: '126px',
-                        border: '1px solid rgba(255, 255, 255, ' + (q == quarter ? 0.75 : 0) + ')',
-                        background: 'rgba(0, 0, 0, ' + (q == quarter ? 0 : 0.75) + ')'
-                    })
-                    .css('border-' + q + '-radius', '64px')
-            );
-        });
-    }
-        
-    var that = Ox.SplitPanel({
-        elements: [
-            {
-                element: Ox.Element({}).append(
-                    $('<img>').css({position: 'absolute', margin: '16px'}).attr({src: '/static/png/icon256.png'})
-                ).append(
-                    $interface
-                ),
-                size: 288
-            },
-            {
-                element: Ox.SplitPanel({
-                    elements: [
-                        {
-                            element: Ox.Bar({size: 24}).append(
-                                Ox.FormElementGroup({
-                                        elements: [
-                                            pandora.$ui.findIconItemSelect = Ox.Select({
-                                                items: pandora.site.findKeys,
-                                                overlap: 'right',
-                                                type: 'image'
-                                            })
-                                            .bindEvent({
-                                                change: function(data) {
 
-                                                }
-                                            }),
-                                            pandora.$ui.findIconItemInput = Ox.Input({
-                                                changeOnKeypress: true,
-                                                clear: true,
-                                                placeholder: 'Find: Foo',
-                                                width: 120
-                                            })
-                                            .bindEvent({
-                                                change: function(data) {
-
-                                                }
-                                            })
-                                        ],
-                                    })
-                                    .css({
-                                        float: 'right',
-                                        margin: '4px',
-                                        align: 'right'
-                                    })
-                            ),
-                            size: 24
-                        },
-                        {
-                            element: $list
-                        }
-                    ],
-                    orientation: 'vertical'
-                })
-            },
-            {
-                element: $preview,
-                size: 272                
-            }
-        ],
-        orientation: 'horizontal'
-    })
     return that;
+
 }
