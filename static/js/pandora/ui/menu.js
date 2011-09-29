@@ -263,6 +263,7 @@ pandora.ui.mainMenu = function() {
                 { id: 'newlistfromselection', title: 'New List from Selection...', disabled: true, keyboard: 'shift control n' },
                 { id: 'newsmartlist', title: 'New Smart List...', keyboard: 'alt control n' },
                 { id: 'newsmartlistfromresults', title: 'New Smart List from Results...', keyboard: 'shift alt control n' },
+                { id: 'duplicatelist', title: 'Duplicate Selected List', keyboard: 'control d' },
                 {},
                 { id: 'addmovietolist', title: ['Add Selected ' + pandora.site.itemName.singular + ' to List...', 'Add Selected ' + pandora.site.itemName.plural + ' to List...'], disabled: true },
                 {},

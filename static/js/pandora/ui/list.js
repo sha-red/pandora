@@ -145,11 +145,14 @@ pandora.ui.list = function() {
                 var ui = pandora.user.ui,
                     ratio = ui.icons == 'posters'
                         ? (ui.showSitePoster ? 5/8 : data.posterRatio) : 1,
+                    info = ['hue', 'saturation', 'lightness'].indexOf(sort[0].key) > -1
+                        ? Ox.formatColor(data[sort[0].key], sort[0].key)
+                        : data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key];
                 size = size || 128;
                 return {
                     height: Math.round(ratio <= 1 ? size : size / ratio),
                     id: data.id,
-                    info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
+                    info: info,
                     title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
                     url: '/' + data.id + '/' + (
                         ui.icons == 'posters'
@@ -230,11 +233,18 @@ pandora.ui.list = function() {
                 var ratio = data.videoRatio,
                     width = ratio > fixedRatio ? size : Math.round(size * ratio / fixedRatio),
                     height = Math.round(width / ratio),
-                    url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg';
+                    url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg',
+                    sortKey = sort[0].key.split(':').pop(),
+                    info = ['hue', 'saturation', 'lightness'].indexOf(sortKey) > -1
+                        ? Ox.formatColor(data[sort[0].key], sortKey)
+                        : data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key];
                 return {
                     height: height,
                     id: data.id,
-                    info: Ox.formatDuration(data['in'], 'short') + ' - ' + Ox.formatDuration(data['out'], 'short'),
+                    info: sort[0].key == 'clip:hue' ? Ox.formatColor(data['hue'], 'hue')
+                        : sort[0].key == 'clip:saturation' ? Ox.formatColor(data['saturation'], 'saturation')
+                        : sort[0].key == 'clip:lightness' ? Ox.formatColor(data['lightness'], 'lightness')
+                        : Ox.formatDuration(data['in'], 'short') + ' - ' + Ox.formatDuration(data['out'], 'short'),
                     title: data.value,
                     url: url,
                     width: width
