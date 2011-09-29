@@ -36,7 +36,7 @@ pandora.ui.sortSelect = function() {
         pandora_listsort: function(data) {
             that.selectItem(data.value[0].key);
         },
-        pandora_itemsort: function(value) {
+        pandora_itemsort: function(data) {
             that.selectItem(data.value[0].key);
         }
     });
