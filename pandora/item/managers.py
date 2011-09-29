@@ -67,6 +67,10 @@ def parseCondition(condition):
             in_find = False
             facet_value = 'facets__value%s' % {
                 '==': '__iexact',
+                '>': '__gt',
+                '>=': '__gte',
+                '<': '__lt',
+                '<=': '__lte',
                 '^': '__istartswith',
                 '$': '__iendswith',
             }.get(op, '__icontains')
@@ -75,6 +79,10 @@ def parseCondition(condition):
         else:
             value_key = 'find__value%s' % {
                 '==': '__iexact',
+                '>': '__gt',
+                '>=': '__gte',
+                '<': '__lt',
+                '<=': '__lte',
                 '^': '__istartswith',
                 '$': '__iendswith',
             }.get(op, '__icontains')
@@ -131,7 +139,7 @@ def parseCondition(condition):
             }.get(op,'__exact'))
 
         vk = str('find__%s' % vk)
-
+        
         if exclude: #!1960
             return ~Q(**{'find__key': k, vk: v})
         else: #1960

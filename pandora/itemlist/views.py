@@ -192,6 +192,8 @@ def addList(request):
             type
             query
             items
+            view
+            sort
 
         return {
             status: {'code': int, 'text': string},
@@ -211,28 +213,32 @@ def addList(request):
         num += 1
         name = data['name'] + ' [%d]' % num
 
-    for key in data:
-        if key == 'query' and not data['query']:
-            setattr(list, key, {"static":True})
-        elif key == 'query':
-            setattr(list, key, data[key])
-        elif key == 'type':
-            if data[key] == 'static':
-                list.query = {"static":True}
-                list.type = 'static'
-            else:
-                list.type = 'dynamic'
-                if list.query.get('static', False):
-                     list.query = {}
-        elif key == 'status':
-            value = data[key]
-            if value not in list._status:
-                value = list._status[0]
-            if not request.user.is_staff and value == 'featured':
-                value = 'private'
-            setattr(list, key, value)
-        elif key == 'description':
-            list.description = data['description']
+    if 'query' in data and data['query']:
+        setattr(list, 'query', data['query'])
+    else:
+        setattr(list, 'query', {"static":True})
+    if 'type' in data:
+        if data['type'] == 'static':
+            list.query = {"static":True}
+            list.type = 'static'
+        else:
+            list.type = 'dynamic'
+            if list.query.get('static', False):
+                 list.query = {}
+    if 'status' in data:
+        value = data['status']
+        if value not in list._status:
+            value = list._status[0]
+        if not request.user.is_staff and value == 'featured':
+            value = 'private'
+        list.status = value
+    if 'description' in data:
+        list.description = data['description']
+    if 'view' in data:
+        list.view = data['view']
+    if 'sort' in data:
+        list.sort= tuple(data['sort'])
+
     list.save()
 
     if 'items' in data:
@@ -351,6 +357,10 @@ def editList(request):
         if 'posterFrames' in data:
             list.poster_frames = tuple(data['posterFrames'])
             list.update_icon()
+        if 'view' in data:
+            list.view = data['view']
+        if 'sort' in data:
+            list.sort= tuple(data['sort'])
         list.save()
         response['data'] = list.json(user=request.user)
     else:

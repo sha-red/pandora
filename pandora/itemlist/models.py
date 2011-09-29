@@ -34,6 +34,9 @@ class List(models.Model):
     icon = models.ImageField(default=None, blank=True,
                              upload_to=lambda i, x: i.path("icon.jpg"))
 
+    view = models.TextField(default=settings.CONFIG['user']['ui']['listView'])
+    sort = TupleField(default=tuple(settings.CONFIG['user']['ui']['listSort']), editable=False)
+
     poster_frames = TupleField(default=[], editable=False)
 
     #is through table still required?
@@ -50,7 +53,8 @@ class List(models.Model):
             self.type = 'static'
         else:
             self.type = 'smart'
-        self.items_sum = self.get_items_sum(self.user)
+        if self.id:
+            self.items_sum = self.get_items_sum(self.user)
         super(List, self).save(*args, **kwargs)
 
     def get_items_sum(self, user=None):
@@ -144,7 +148,7 @@ class List(models.Model):
         if not os.path.exists(path):
             folder = os.path.dirname(path)
             ox.makedirs(folder)
-            if self.icon:
+            if self.icon and os.path.exists(self.icon.path):
                 source = self.icon.path
                 max_size = min(self.icon.width, self.icon.height)
             else:
