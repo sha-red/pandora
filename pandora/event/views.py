@@ -159,7 +159,7 @@ Positions
 
     data = json.loads(request.POST['data'])
     query = parse_query(data, request.user)
-    qs = query['qs']
+    qs = query['qs'].distinct()
     if 'keys' in data:
         qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [p.json(request.user) for p in qs]
