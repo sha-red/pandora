@@ -108,18 +108,21 @@ class Annotation(models.Model):
         else:
             return self.value
 
+    def update_calculated_values(self):
+        self.duration = self.end - self.start
+        if self.duration > 0:
+            self.hue, self.saturation, self.lightness = extract.average_color(
+                           self.item.timeline_prefix, self.start, self.end)
+        else:
+            self.hue = self.saturation = self.lightness = 0
+        #FIXME: set volume here
+
     def save(self, *args, **kwargs):
         if not self.id:
             super(Annotation, self).save(*args, **kwargs)
         self.public_id = '%s/%s' % (self.item.itemId, ox.to32(self.id))
         if self.duration != self.end - self.start:
-            self.duration = self.end - self.start
-            if self.duration > 0:
-                self.hue, self.saturation, self.lightness = extract.average_color(
-                               self.item.timeline_prefix, self.start, self.end)
-            else:
-                self.hue = self.saturation = self.lightness = 0
-            #FIXME: set volume here
+            self.update_calculated_values()
         super(Annotation, self).save(*args, **kwargs)
 
     def json(self, layer=False, keys=None):
