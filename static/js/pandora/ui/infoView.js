@@ -354,7 +354,7 @@ pandora.ui.infoView = function(data) {
 
     function formatConnections(connections) {
         return connections.map(function(c) {
-            return '<a href="/' + c.item + '">' + c.title + '</a>';
+            return c.item ? '<a href="/' + c.item + '">' + c.title + '</a>' : c.title;
         }).join(', ');
     }
 

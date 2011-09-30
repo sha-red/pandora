@@ -258,15 +258,23 @@ class Item(models.Model):
 
     def expand_connections(self):
         c = self.get('connections')
-        connections = {}
         if c:
-            for t in c:
-                connections[t] = [{'item': l.itemId, 'title': l.get('title')}
-                                  for l in Item.objects.filter(itemId__in=c[t])]
-                connections[t].sort(key=lambda a: c[t].index(a['item']))
-                if not connections[t]:
-                    del connections[t]
-        return connections
+            for t in c.keys():
+                if c[t]:
+                    if isinstance(c[t][0], basestring):
+                        c[t]= [{'id': i, 'title': None} for i in c[t]]
+                    ids = [i['id'] for i in c[t]]
+                    known  = {}
+                    for l in Item.objects.filter(itemId__in=ids):
+                        known[l.itemId] = l.get('title')
+                    for i in c[t]:
+                        if i['id'] in known:
+                            i['item'] = i['id']
+                            i['title'] = known[i['id']]
+                    c[t]= filter(lambda x: x['title'], c[t])
+                if not c[t]:
+                    del c[t]
+        return c
 
     def __unicode__(self):
         year = self.get('year')
