@@ -256,6 +256,18 @@ class Item(models.Model):
             self.external_data = data
             self.save()
 
+    def expand_connections(self):
+        c = self.get('connections')
+        connections = {}
+        if c:
+            for t in c:
+                connections[t] = [{'item': l.itemId, 'title': l.get('title')}
+                                  for l in Item.objects.filter(itemId__in=c[t])]
+                connections[t].sort(key=lambda a: c[t].index(a['item']))
+                if not connections[t]:
+                    del connections[t]
+        return connections
+
     def __unicode__(self):
         year = self.get('year')
         if year:
@@ -440,6 +452,9 @@ class Item(models.Model):
             i['cast'] = [i['cast']]
         if 'cast' in i and isinstance(i['cast'][0], list):
             i['cast'] = map(lambda x: {'actor': x[0], 'character': x[1]}, i['cast'])
+
+        if 'connections' in i:
+            i['connections'] = self.expand_connections()
 
         if not keys or 'posterRatio' in keys:
             i['posterRatio'] = self.poster_width / self.poster_height

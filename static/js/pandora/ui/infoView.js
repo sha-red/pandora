@@ -304,7 +304,7 @@ pandora.ui.infoView = function(data) {
             'Spoofs', 'Spoofed in'
         ].forEach(function(key) {
             data.connections[key] && html.push(
-                formatKey(key) + formatValue(data.connections[key])
+                formatKey(key) + formatConnections(data.connections[key])
             );
         });
         $div.html(html.join('; '));
@@ -350,6 +350,12 @@ pandora.ui.infoView = function(data) {
 
     function formatLight(str) {
         return '<span style="color: rgb(128, 128, 128)">' + str + '</span>';
+    }
+
+    function formatConnections(connections) {
+        return connections.map(function(c) {
+            return '<a href="/' + c.item + '">' + c.title + '</a>';
+        }).join(', ');
     }
 
     function formatValue(value, key) {
