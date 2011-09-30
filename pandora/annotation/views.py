@@ -45,11 +45,15 @@ def order_query(qs, sort):
         operator = e['operator']
         if operator != '-':
             operator = ''
-        if e['key'].startswith('clip:'):
+        key = {
+            'in': 'start',
+            'out': 'end',
+        }.get(e['key'], e['key'])
+        if key.startswith('clip:'):
             key = annotation_sort_key(e['key'][len('clip:'):])
-        else:
+        elif key not in ('start', 'end', 'value'):
             #key mgith need to be changed, see order_sort in item/views.py
-            key = "item__sort__%s" % e['key']
+            key = "item__sort__%s" % key
         order = '%s%s' % (operator, key)
         order_by.append(order)
     if order_by:
@@ -155,13 +159,12 @@ def removeAnnotations(request):
     '''
     response = json_response({})
     data = json.loads(request.POST['data'])
-    ids = map(ox.from32, data['ids'])
     failed = []
-    for a in models.Annotation.objects.filter(id__in=ids):
+    for a in models.Annotation.objects.filter(public_id__in=data['ids']):
         if a.editable(request.user):
             a.delete()
         else:
-            failed.append(a.get_id)
+            failed.append(a.public_id)
     if failed:
         response = json_response(status=403, text='permission denied')
         response['data']['ids'] = failed
@@ -187,8 +190,7 @@ def editAnnotation(request):
     '''
     response = json_response({})
     data = json.loads(request.POST['data'])
-    itemId, annotationId = data['id'].split('/')
-    a = get_object_or_404_json(models.Annotation, pk=ox.from32(annotationId))
+    a = get_object_or_404_json(models.Annotation, public_id=data['id'])
     if a.editable(request.user):
         a.value = data['value']
         a.start = data['in']

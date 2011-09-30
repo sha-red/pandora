@@ -291,7 +291,7 @@ class Item(models.Model):
                 self.itemId = str(uuid.uuid1())
             super(Item, self).save(*args, **kwargs)
             if not settings.USE_IMDB:
-                self.itemId = ox.to32(self.id)
+                self.itemId = ox.to26(self.id)
  
         oxdbId = self.oxdb_id()
         if oxdbId:

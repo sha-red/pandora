@@ -40,7 +40,7 @@ def parseCondition(condition, user):
         else:
             return q
     if k == 'id':
-        v = ox.from32(v)
+        v = ox.from26(v)
     if isinstance(v, bool): #featured and public flag
         key = k
     elif k in ('lat', 'lng', 'area', 'south', 'west', 'north', 'east', 'matches', 'id'):

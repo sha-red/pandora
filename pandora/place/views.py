@@ -71,7 +71,7 @@ def editPlace(request):
         can contain any of the allowed keys for place 
     '''
     data = json.loads(request.POST['data'])
-    place = get_object_or_404_json(models.Place, pk=ox.from32(data['id']))
+    place = get_object_or_404_json(models.Place, pk=ox.from26(data['id']))
     names = data.get('name', [])
     if isinstance(names, basestring):
         names = [names]
@@ -111,7 +111,7 @@ def removePlace(request):
     data = json.loads(request.POST['data'])
     if isinstance(data, dict):
         data = data['id']
-    place = get_object_or_404_json(models.Place, pk=ox.from32(data))
+    place = get_object_or_404_json(models.Place, pk=ox.from26(data))
     if place.editable(request.user):
         place.delete()
         response = json_response(status=200, text='deleted')
@@ -227,7 +227,7 @@ Positions
     qs = order_query(query['qs'], query['sort'])
     if 'keys' in data:
         qs = qs[query['range'][0]:query['range'][1]]
-        response['data']['items'] = [p.json(request.user) for p in qs]
+        response['data']['items'] = [p.json(data['keys'], request.user) for p in qs]
     elif 'position' in query:
         ids = [i.get_id() for i in qs]
         data['conditions'] = data['conditions'] + {

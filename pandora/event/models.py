@@ -83,7 +83,7 @@ class Event(models.Model):
         super(Event, self).save(*args, **kwargs)
 
     def get_id(self):
-        return ox.to32(self.id)
+        return ox.to26(self.id)
 
     def json(self, user=None):
         j = {

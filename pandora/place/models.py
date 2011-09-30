@@ -59,9 +59,9 @@ class Place(models.Model):
         return False
 
     def get_id(self):
-        return ox.to32(self.id)
+        return ox.to26(self.id)
 
-    def json(self, user=None):
+    def json(self, keys=None, user=None):
         j = {
             'id': self.get_id(),
             'user': self.user.username,
@@ -71,7 +71,8 @@ class Place(models.Model):
                     'name', 'alternativeNames', 'geoname', 'countryCode',
                     'south', 'west', 'north', 'east',
                     'lat', 'lng', 'area', 'matches', 'type'):
-            j[key] = getattr(self, key)
+            if not keys or key in keys:
+                j[key] = getattr(self, key)
         return j
 
     def get_matches(self):

@@ -117,10 +117,14 @@ class Annotation(models.Model):
             self.hue = self.saturation = self.lightness = 0
         #FIXME: set volume here
 
+    def set_public_id(self):
+        public_id = Annotation.objects.filter(item=self.item, id__lt=self.id).count()
+        self.public_id = "%s/%s" % ( self.item.itemId, ox.to26(public_id))
+
     def save(self, *args, **kwargs):
         if not self.id:
             super(Annotation, self).save(*args, **kwargs)
-        self.public_id = '%s/%s' % (self.item.itemId, ox.to32(self.id))
+            self.set_public_id()
         if self.duration != self.end - self.start:
             self.update_calculated_values()
         super(Annotation, self).save(*args, **kwargs)

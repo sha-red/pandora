@@ -21,6 +21,9 @@ def parseCondition(condition, user):
         'user': 'user__username',
         'place': 'places__id',
         'event': 'events__id',
+        'in': 'start',
+        'out': 'end',
+        'id': 'public_id',
     }.get(k, k)
     if not k:
         k = 'name'
@@ -40,10 +43,8 @@ def parseCondition(condition, user):
             return ~q
         else:
             return q
-    if k == 'id':
-        v = ox.from32(v.split('/')[-1])
-    elif k in ('places__id', 'events__id'):
-        v = ox.from32(v)
+    if k in ('places__id', 'events__id'):
+        v = ox.from26(v)
     if isinstance(v, bool): #featured and public flag
         key = k
     elif k in ('lat', 'lng', 'area', 'south', 'west', 'north', 'east', 'matches',
@@ -56,7 +57,12 @@ def parseCondition(condition, user):
         }.get(op, ''))
     else:
         key = "%s%s" % (k, {
+            '>': '__gt',
+            '>=': '__gte',
+            '<': '__lt',
+            '<=': '__lte',
             '==': '__iexact',
+            '=': '__icontains',
             '^': '__istartswith',
             '$': '__iendswith',
         }.get(op, '__icontains'))
