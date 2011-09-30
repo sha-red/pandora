@@ -57,12 +57,15 @@ class List(models.Model):
             self.items_sum = self.get_items_sum(self.user)
         super(List, self).save(*args, **kwargs)
 
-    def get_items_sum(self, user=None):
+    def get_items(self, user=None):
         if self.query.get('static', False):
-            return self.items.count()
-        else:
-            from item.models import Item
-            return Item.objects.find({'query': self.query}, user).count()
+            return self.items
+        from item.models import Item
+        return Item.objects.find({'query': self.query}, user)
+
+
+    def get_items_sum(self, user=None):
+        return self.get_items(user).count()
 
     def add(self, item):
         q = self.items.filter(id=item.id)
@@ -119,7 +122,8 @@ class List(models.Model):
     def update_icon(self):
         frames = []
         for i in self.poster_frames:
-            qs = self.items.filter(itemId=i['item'])
+            from item.models import Item
+            qs = Item.objects.filter(itemId=i['item'])
             if qs.count() > 0:
                 frame = qs[0].frame(i['position'])
                 if frame:
