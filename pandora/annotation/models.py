@@ -127,14 +127,15 @@ class Annotation(models.Model):
 
     def json(self, layer=False, keys=None):
         j = {
-            'id': self.public_id,
             'user': self.user.username,
-            'in': self.start,
-            'out': self.end,
-            'value': self.value,
-            'created': self.created,
-            'modified': self.modified
         }
+        for field in ('id', 'in', 'out', 'value', 'created', 'modified',
+                      'hue', 'saturation', 'lightness', 'volume'):
+            j[field] = getattr(self, {
+                'id': 'public_id',
+                'in': 'start',
+                'out': 'end',
+            }.get(field, field))
         if layer:
             j['layer'] = self.layer.name
         if keys:
