@@ -1,84 +1,107 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.info = function() {
-    var id = pandora.user.ui.item || (
-            pandora.user.ui.listSelection.length
-            ? pandora.user.ui.listSelection[pandora.user.ui.listSelection.length - 1]
-            : null
-        ),
+    
+    var ui = pandora.user.ui,
         view = getView(),
+
         that = Ox.Element()
             .css({overflowX: 'hidden', overflowY: 'auto'})
             .bindEvent({
                 toggle: function(data) {
                     pandora.UI.set({showInfo: !data.collapsed});
                     pandora.resizeFolders();
-                }
+                },
+                pandora_find: function() {
+                    if (pandora.user.ui._list != pandora.UI.getPrevious('_list')) {
+                        updateInfo();
+                    }
+                },
+                pandora_item: updateInfo,
+                pandora_listselection: updateInfo
             });
-    Ox.print('INFO', view)
-    if (view == 'list') {
-        that.empty().append(pandora.$ui.listInfo = pandora.ui.listInfo(pandora.user.ui._list));
-    } else if (view == 'poster') {
-        pandora.api.get({id: id, keys: ['director', 'posterRatio', 'title']}, function(result) {
-            var ratio = result.data.posterRatio,
-                height = pandora.getInfoHeight();
-            that.empty().append(
-                pandora.$ui.posterInfo = pandora.ui.posterInfo(Ox.extend(result.data, {id: id}))
-            );
-        });
-    } else if (view == 'video') {
-        pandora.api.get({id: id, keys: ['duration', 'videoRatio']}, function(result) {
-            if (result.data) {
-                pandora.$ui.videoPreview && pandora.$ui.videoPreview.removeElement();
-                pandora.$ui.videoPreview = pandora.ui.videoPreview({
-                        duration: result.data.duration,
-                        frameRatio: result.data.videoRatio,
-                        height: pandora.getInfoHeight(),
-                        id: id,
-                        width: pandora.user.ui.sidebarSize
-                    })
-                    .bindEvent({
-                        click: function(data) {
-                            pandora.UI.set(
-                                'videoPoints.' + id,
-                                {'in': 0, out: 0, position: data.position}
-                            );
-                            if (pandora.user.ui.item && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
-                                pandora.$ui[
-                                    pandora.user.ui.itemView == 'video' ? 'player' : 'editor'
-                                ].options({
-                                    position: data.position
-                                });
-                            } else {
-                                pandora.UI.set({
-                                    item: id,
-                                    itemView: pandora.user.ui.videoView
-                                });
-                            }
-                        }
-                    })
-                    .appendTo(pandora.$ui.info);
-            }
-        });
+
+    //pandora.$ui.leftPanel && resize();
+
+    updateInfo();
+
+    function getId() {
+        return ui.item || (
+            ui.listSelection.length
+            ? ui.listSelection[ui.listSelection.length - 1]
+            : null
+        );
     }
-    pandora.$ui.leftPanel && resize();
+
     function getView() {
-        return !id ? 'list'
-            : !pandora.user.ui.item && pandora.isClipView() ? 'poster'
+        return !getId() ? 'list'
+            : !ui.item && pandora.isClipView() ? 'poster'
             : 'video';
     }
-    function resize() {
+
+    function resizeInfo() {
         var height = pandora.getInfoHeight();
-        if (height != pandora.$ui.leftPanel.size(2)) {
-            !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -height});
-            // fixme: why is this timeout needed?
-            setTimeout(function() {
-                pandora.$ui.leftPanel.size(2, height, function() {
-                    pandora.resizeFolders();
-                });
-            }, 0)
+        !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -height});
+        pandora.$ui.leftPanel.size(2, height, function() {
+            pandora.resizeFolders();
+        });
+    }
+
+    function updateInfo() {
+        var id = getId(),
+            previousView = view;
+        view = getView(); 
+        if (view == 'list') {
+            that.empty().append(pandora.$ui.listInfo = pandora.ui.listInfo(ui._list));
+            previousView == 'video' && resizeInfo();
+        } else if (view == 'poster') {
+            pandora.api.get({id: id, keys: ['director', 'posterRatio', 'title']}, function(result) {
+                var ratio = result.data.posterRatio,
+                    height = pandora.getInfoHeight();
+                that.empty().append(
+                    pandora.$ui.posterInfo = pandora.ui.posterInfo(Ox.extend(result.data, {id: id}))
+                );
+                previousView == 'video' && resizeInfo();
+            });
+        } else if (view == 'video') {
+            pandora.api.get({id: id, keys: ['duration', 'videoRatio']}, function(result) {
+                if (result.data) {
+                    pandora.$ui.videoPreview && pandora.$ui.videoPreview.removeElement();
+                    pandora.$ui.videoPreview = pandora.ui.videoPreview({
+                            duration: result.data.duration,
+                            frameRatio: result.data.videoRatio,
+                            height: pandora.getInfoHeight(),
+                            id: id,
+                            width: ui.sidebarSize
+                        })
+                        .bindEvent({
+                            click: function(data) {
+                                pandora.UI.set(
+                                    'videoPoints.' + id,
+                                    {'in': 0, out: 0, position: data.position}
+                                );
+                                if (ui.item && ['video', 'timeline'].indexOf(ui.itemView) > -1) {
+                                    pandora.$ui[
+                                        ui.itemView == 'video' ? 'player' : 'editor'
+                                    ].options({
+                                        position: data.position
+                                    });
+                                } else {
+                                    pandora.UI.set({
+                                        item: id,
+                                        itemView: ui.videoView
+                                    });
+                                }
+                            }
+                        })
+                        .appendTo(pandora.$ui.info);
+                    previousView != 'video' && resizeInfo();
+                }
+            });
         }
     }
+
     that.resizeInfo = function() {
+        var view = getView();
         if (view == 'list') {
             pandora.$ui.listInfo.resizeIcon();
         } else if (view == 'poster') {
@@ -86,11 +109,13 @@ pandora.ui.info = function() {
         } else if (view == 'video') {
             pandora.$ui.videoPreview.options({
                 height: pandora.getInfoHeight(),
-                width: pandora.user.ui.sidebarSize
+                width: ui.sidebarSize
             });
         }
     };
+
     return that;
+
 };
 
 pandora.ui.listInfo = function(data) {
@@ -137,7 +162,7 @@ pandora.ui.posterInfo = function(data) {
                 data.title + (
                     data.director ? ' (' + data.director.join(', ') + ')' : ''
                 )
-            );
+            ),
         that = Ox.SplitPanel({
             elements: [
                 {

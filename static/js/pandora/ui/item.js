@@ -197,114 +197,14 @@ pandora.ui.item = function() {
             }
 
         } else if (pandora.user.ui.itemView == 'clips') {
-            var ratio = result.data.videoRatio;
-            pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.clips = Ox.IconList({
-                fixedRatio: ratio,
-                item: function(data, sort, size) {
-                    size = size || 128;
-                    var width = ratio > 1 ? size : Math.round(size * ratio),
-                        height = ratio > 1 ? Math.round(size / ratio) : size,
-                        url = '/' + pandora.user.ui.item + '/' + height + 'p' + data['in'] + '.jpg';
-                    return {
-                        height: height,
-                        id: data['id'],
-                        info: Ox.formatDuration(data['in'], 'short') + ' - ' + Ox.formatDuration(data['out'], 'short'),
-                        title: data.value,
-                        url: url,
-                        width: width 
-                    };
-                },
-                items: function(data, callback) {
-                    pandora.api.findAnnotations(Ox.extend(data, {
-                        itemQuery: {
-                            conditions:[{
-                                key: 'id',
-                                value: pandora.user.ui.item,
-                                operator: '='
-                            }],
+            pandora.$ui.contentPanel.replaceElement(1,
+                pandora.$ui.clips = pandora.ui.clipList(result.data.videoRatio)
+                    .bindEvent({
+                        pandora_itemsort: function(data) {
+                            pandora.$ui.clips.options({sort: data.value});
                         }
-                    }), callback);
-                },
-                keys: ['id', 'value', 'in', 'out'],
-                size: 128,
-                sort: pandora.user.ui.itemSort,
-                unique: 'id'
-            }).bindEvent({
-                open: function(data) {
-                    var id = data.ids[0],
-                        points = {
-                            'in': pandora.$ui.clips.value(id, 'in'),
-                            out: pandora.$ui.clips.value(id, 'out')
-                        };
-                    pandora.UI.set('videoPoints.' + pandora.user.ui.item, Ox.extend(points, {
-                        position: points['in']
-                    }));
-                    pandora.UI.set({
-                        itemView: pandora.user.ui.videoView
-                    });
-                },
-                // fixme: duplicated
-                openpreview: function(data) {
-                    var $video = $('.OxItem.OxSelected > .OxIcon > .OxVideoPlayer');
-                    if ($video) {
-                        // trigger singleclick
-                        $video.trigger('mousedown');
-                        Ox.UI.$window.trigger('mouseup');
-                    }
-                    that.closePreview();
-                },
-                select: function(data) {
-                    if (data.ids.length) {
-                        var id = data.ids[0],
-                            item = id.split('/')[0], width, height,
-                            $img = pandora.$ui.clips.find('.OxItem.OxSelected > .OxIcon > img'),
-                            $video = $('.OxItem.OxSelected > .OxIcon > .OxVideoPlayer');
-                        if ($img.length) {
-                            var width = ratio > 1 ? 128 : Math.round(128 * ratio),
-                                height = ratio > 1 ? Math.round(128 / ratio) : 128;
-                            pandora.api.get({id: item, keys: ['durations']}, function(result) {
-                                var points = [pandora.$ui.clips.value(id, 'in'), pandora.$ui.clips.value(id, 'out')],
-                                    partsAndPoints = pandora.getVideoPartsAndPoints(result.data.durations, points),
-                                    $player = Ox.VideoPlayer({
-                                        height: height,
-                                        'in': partsAndPoints.points[0],
-                                        out: partsAndPoints.points[1],
-                                        paused: true,
-                                        playInToOut: true,
-                                        poster: '/' + item + '/' + height + 'p' + points[0] + '.jpg',
-                                        width: width,
-                                        video: partsAndPoints.parts.map(function(i) {
-                                            return '/' + item + '/96p' + (i + 1) + '.' + pandora.user.videoFormat;
-                                        })
-                                    })
-                                    .addClass('OxTarget')
-                                    .bindEvent({
-                                        // doubleclick opens item
-                                        singleclick: function() {
-                                            $player.$element.is('.OxSelectedVideo') && $player.togglePaused();
-                                        }
-                                    });
-                                $img.replaceWith($player.$element);
-                                $('.OxSelectedVideo').removeClass('OxSelectedVideo');
-                                $player.$element.addClass('OxSelectedVideo');
-                            });
-                        } else if ($video.length) {
-                            // item select fires before video click
-                            // so we have to make sure that selecting
-                            // doesn't click through to play
-                            setTimeout(function() {
-                                $('.OxSelectedVideo').removeClass('OxSelectedVideo');
-                                $video.addClass('OxSelectedVideo');
-                            }, 300);
-                        }
-                    } else {
-                        $('.OxSelectedVideo').removeClass('OxSelectedVideo');
-                    }
-                },
-                pandora_itemsort: function(data) {
-                    pandora.$ui.clips.options({sort: data.value});
-                }
-            }));
+                    })
+            );
 
         } else if (pandora.user.ui.itemView == 'video') {
             // fixme: duplicated
@@ -477,103 +377,7 @@ pandora.ui.item = function() {
 
 
         } else if (pandora.user.ui.itemView == 'map') {
-            var video = result.data.stream;
-            pandora.$ui.contentPanel.replaceElement(1, Ox.SplitPanel({
-                elements: [
-                    {
-                        element: pandora.$ui.map = Ox.Map({
-                            height: window.innerHeight - pandora.user.ui.showGroups * pandora.user.ui.groupsSize - 61,
-                            places: function(data, callback) {
-                                var itemQuery = {conditions: [{
-                                        key: 'id',
-                                        value: pandora.user.ui.item,
-                                        operator: '='
-                                    }]},
-                                    query = {conditions:[]};
-                                return pandora.api.findPlaces(Ox.extend(data, {
-                                    itemQuery: itemQuery,
-                                    query: query
-                                }), callback);
-                            },
-                            showTypes: true,
-                            toolbar: true,
-                            width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE
-                        }).bindEvent({
-                            selectplace: function(place) {
-                                if(place) {
-                                    pandora.$ui.clips.options({
-                                        items: function(data, callback) {
-                                            return pandora.api.findAnnotations(Ox.extend(data, {
-                                                query: {
-                                                    conditions:[{
-                                                        key: 'place',
-                                                        value: place.id,
-                                                        operator:'=='
-                                                    }]
-                                                },
-                                                itemQuery: {conditions: [{
-                                                        key: 'id',
-                                                        value: pandora.user.ui.item,
-                                                        operator: '=='
-                                                 }]}
-                                            }), callback);
-                                        }
-                                    });
-                                } else {
-                                    pandora.$ui.clips.options({
-                                        items: []
-                                    });
-                                }
-                            }
-                        })
-                    },
-                    {
-                        element: pandora.$ui.clips = Ox.IconList({
-                            fixedRatio: video.aspectRatio,
-                            item: function(data, sort, size) {
-                                size = size || 128;
-                                Ox.print('DATA', data);
-                                var width = size,
-                                    height = Math.round(size / video.aspectRatio),
-                                    itemId = data.id.split('/')[0],
-                                    url = '/' + itemId + '/' + height + 'p' + data['in'] + '.jpg';
-                                return {
-                                    height: height,
-                                    id: data['id'],
-                                    info: Ox.formatDuration(data['in'], 'short') +' - '+ Ox.formatDuration(data['out'], 'short'),
-                                    title: data.value,
-                                    url: url,
-                                    width: width
-                                };
-                            },
-                            items: [],
-                            keys: ['id', 'value', 'in', 'out'],
-                            size: 128,
-                            sort: pandora.user.ui.itemSort,
-                            unique: 'id'
-                        }).bindEvent({
-                            open: function(data) {
-                                var id = data.ids[0],
-                                    item = pandora.user.ui.item,
-                                    points = {
-                                        'in': pandora.$ui.clips.value(id, 'in'),
-                                        out: pandora.$ui.clips.value(id, 'out')
-                                    };
-                                pandora.UI.set('videoPoints.' + item, Ox.extend(points, {
-                                    position: points['in']
-                                }));
-                                pandora.UI.set('itemView', 'timeline');
-                            }
-                        }),
-                        id: 'place',
-                        size: 144 + Ox.UI.SCROLLBAR_SIZE
-                    }
-                ],
-                orientation: 'horizontal'
-            })
-            .bindEvent('resize', function() {
-                pandora.$ui.map.resizeMap();
-            }));
+            pandora.$ui.contentPanel.replaceElement(1, pandora.ui.mapView(result.data.videoRatio));
 
         } else if (pandora.user.ui.itemView == 'calendar') {
             pandora.$ui.contentPanel.replaceElement(1, Ox.Element().html('Calendar'));

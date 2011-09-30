@@ -435,12 +435,9 @@ pandora.getGroupsSizes = function() {
 
 pandora.getInfoHeight = function() {
     // fixme: new, check if it can be used more
-    var isVideoPreview 
-    if (!pandora.user.ui.item) {
-        isVideoPreview = pandora.user.ui.listSelection.length && !pandora.isClipView();
-    } else {
-        isVideoPreview = !pandora.isClipView();
-    }
+    var isVideoPreview = pandora.user.ui.item || (
+        pandora.user.ui.listSelection.length && !pandora.isClipView()
+    );
     return pandora.user.ui.showInfo * Math.min(
         isVideoPreview
         ? Math.round(pandora.user.ui.sidebarSize / (16/9)) + 16 

@@ -544,6 +544,7 @@
         "preferences": {},
         "ui": {
             "annotationsSize": 256,
+            "clipsColumns": 1,
             "columns": {
                 "Colors": {
                     "columns": ["title", "director", "country", "year", "hue", "saturation", "brightness"],

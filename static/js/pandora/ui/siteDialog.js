@@ -44,6 +44,9 @@ pandora.ui.siteDialog = function(section) {
                 $dialog.options({
                     title: Ox.getObjectById(tabs, data.selected).title
                 });
+                //fixme: this should be using URL.push / UI.set
+                //but that currenlty causes another dialog to be opened
+                history.pushState({}, '', '/' + data.selected);
             }
         });
     var $dialog = Ox.Dialog({
@@ -54,7 +57,9 @@ pandora.ui.siteDialog = function(section) {
             }).bindEvent({
                 click: function() {
                     $dialog.close();
-                    pandora.URL.push();
+                    //fixme: this should be using URL.push / UI.set
+                    //but that currenlty causes a reload
+                    history.pushState({}, '', '/');
                 }
             })
         ],

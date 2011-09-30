@@ -1,7 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
 pandora.ui.list = function() {
-    var that, $map,
+    var that
         view = pandora.user.ui.listView,
         preview = false
 
@@ -225,132 +225,7 @@ pandora.ui.list = function() {
     } else if (view == 'calendars') {
         that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
     } else if (view == 'clip') {
-        var fixedRatio = 16/9;
-        that = Ox.IconList({
-            fixedRatio: fixedRatio,
-            item: function(data, sort, size) {
-                size = size || 128;
-                var ratio = data.videoRatio,
-                    width = ratio > fixedRatio ? size : Math.round(size * ratio / fixedRatio),
-                    height = Math.round(width / ratio),
-                    url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg',
-                    sortKey = sort[0].key.split(':').pop(),
-                    info = ['hue', 'saturation', 'lightness'].indexOf(sortKey) > -1
-                        ? Ox.formatColor(data[sortKey], sortKey)
-                        : data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key];
-                return {
-                    height: height,
-                    id: data.id,
-                    info: sort[0].key == 'clip:hue' ? Ox.formatColor(data['hue'], 'hue')
-                        : sort[0].key == 'clip:saturation' ? Ox.formatColor(data['saturation'], 'saturation')
-                        : sort[0].key == 'clip:lightness' ? Ox.formatColor(data['lightness'], 'lightness')
-                        : Ox.formatDuration(data['in'], 'short') + ' - ' + Ox.formatDuration(data['out'], 'short'),
-                    title: data.value,
-                    url: url,
-                    width: width
-                };
-            },
-            items: function(data, callback) {
-                var itemQuery = pandora.user.ui.find,
-                    query = {conditions:[]};
-                //fixme: can this be in pandora.Query? dont just check for subtitles
-                itemQuery.conditions.forEach(function(q) {
-                    if (q.key == 'subtitles') {
-                        query.conditions.push({key: 'value', value: q.value, operator: q.operator});
-                    }
-                });
-                pandora.api.findAnnotations(Ox.extend({
-                    query: query,
-                    itemQuery: itemQuery
-                }, data), callback);
-            },
-            keys: ['id', 'value', 'in', 'out', 'videoRatio'],
-            max: 1,
-            size: 128,
-            sort: pandora.user.ui.listSort,
-            unique: 'id'
-        }).bindEvent({
-            init: function(data) {
-                pandora.$ui.total.html(pandora.ui.status('total', data));
-            },
-            open: function(data) {
-                var id = data.ids[0],
-                    item = id.split('/')[0],
-                    points = {
-                        'in': that.value(id, 'in'),
-                        out: that.value(id, 'out')
-                    };
-                pandora.UI.set('videoPoints.' + item, Ox.extend(points, {
-                    position: points['in']
-                }));
-                pandora.UI.set({
-                    item: item,
-                    itemView: pandora.user.ui.videoView
-                });
-                pandora.URL.push();
-            },
-            openpreview: function(data) {
-                var $video = $('.OxItem.OxSelected > .OxIcon > .OxVideoPlayer');
-                if ($video) {
-                    // trigger singleclick
-                    $video.trigger('mousedown');
-                    Ox.UI.$window.trigger('mouseup');
-                }
-                that.closePreview();
-            },
-            select: function(data) {
-                if (data.ids.length) {
-                    var id = data.ids[0],
-                        item = id.split('/')[0], width, height,
-                        $img = $('.OxItem.OxSelected > .OxIcon > img'),
-                        $video = $('.OxItem.OxSelected > .OxIcon > .OxVideoPlayer');
-                    pandora.UI.set('listSelection', [item]);
-                    pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
-                    if ($img.length) {
-                        var width = parseInt($img.css('width')),
-                            height = parseInt($img.css('height'));
-                        pandora.api.get({id: item, keys: ['durations']}, function(result) {
-                            var points = [that.value(id, 'in'), that.value(id, 'out')],
-                                partsAndPoints = pandora.getVideoPartsAndPoints(result.data.durations, points),
-                                $player = Ox.VideoPlayer({
-                                    height: height,
-                                    'in': partsAndPoints.points[0],
-                                    out: partsAndPoints.points[1],
-                                    paused: true,
-                                    playInToOut: true,
-                                    poster: '/' + item + '/' + height + 'p' + points[0] + '.jpg',
-                                    width: width,
-                                    video: partsAndPoints.parts.map(function(i) {
-                                        return '/' + item + '/96p' + (i + 1) + '.' + pandora.user.videoFormat;
-                                    })
-                                })
-                                .addClass('OxTarget')
-                                .bindEvent({
-                                    // doubleclick opens item
-                                    singleclick: function() {
-                                        $player.$element.is('.OxSelectedVideo') && $player.togglePaused();
-                                    }
-                                });
-                            $img.replaceWith($player.$element);
-                            $('.OxSelectedVideo').removeClass('OxSelectedVideo');
-                            $player.$element.addClass('OxSelectedVideo');
-                        });
-                    } else if ($video.length) {
-                        // item select fires before video click
-                        // so we have to make sure that selecting
-                        // doesn't click through to play
-                        setTimeout(function() {
-                            $('.OxSelectedVideo').removeClass('OxSelectedVideo');
-                            $video.addClass('OxSelectedVideo');
-                        }, 300);
-                    }
-                } else {
-                    pandora.UI.set('listSelection', []);
-                    pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
-                    $('.OxSelectedVideo').removeClass('OxSelectedVideo');
-                }
-            }
-        });
+        that = pandora.ui.clipList();
     } else if (view == 'player') {
         that = Ox.VideoPlayer({
             controlsBottom: ['play', 'previous', 'next', 'volume'],
@@ -408,94 +283,7 @@ pandora.ui.list = function() {
             width: 512
         });
     } else if (view == 'map') {
-        var fixedRatio = 16/9;
-        that = Ox.SplitPanel({
-            elements: [
-                {
-                    element: pandora.$ui.map = Ox.Map({
-                        height: window.innerHeight - pandora.user.ui.showGroups * pandora.user.ui.groupsSize - 61,
-                        places: function(data, callback) {
-                            var itemQuery = pandora.user.ui.find,
-                                query = {conditions:[]};
-                            return pandora.api.findPlaces(Ox.extend(data, {
-                                itemQuery: itemQuery,
-                                query: query
-                            }), callback);
-                        },
-                        showTypes: true,
-                        toolbar: true,
-                        width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE,
-                    }).bindEvent({
-                        selectplace: function(place) {
-                            if(place && place.id[0] != '_') {
-                                pandora.$ui.clips.options({
-                                    items: function(data, callback) {
-                                        return pandora.api.findAnnotations(Ox.extend(data, {
-                                            query: {
-                                                conditions:[{key: 'place',
-                                                             value: place.id,
-                                                             operator:'=='
-                                                }]
-                                            },
-                                            itemQuery: pandora.user.ui.find
-                                        }), callback);
-                                    }
-                                });
-                            } else {
-                                pandora.$ui.clips.options({
-                                    items: []
-                                });
-                            }
-                        }
-                    })
-                },
-                {
-                    element: pandora.$ui.clips = Ox.IconList({
-                        fixedRatio: fixedRatio,
-                        item: function(data, sort, size) {
-                            size = size || 128;
-                            var width = data.videoRatio < fixedRatio ? size : size * data.videoRatio / fixedRatio,
-                                height = Math.round(width / data.videoRatio),
-                                itemId = data.id.split('/')[0],
-                                url = '/' + itemId + '/' + height + 'p' + data['in'] + '.jpg';
-                            return {
-                                height: height,
-                                id: data.id,
-                                info: Ox.formatDuration(data['in'], 'short') + ' - '
-                                    + Ox.formatDuration(data['out'], 'short'),
-                                title: data.value,
-                                url: url,
-                                width: width
-                            };
-                        },
-                        items: [],
-                        keys: ['id', 'value', 'in', 'out', 'videoRatio'],
-                        size: 128,
-                        sort: pandora.user.ui.listSort,
-                        unique: 'id'
-                    }).bindEvent({
-                        open: function(data) {
-                            var id = data.ids[0],
-                                item = pandora.$ui.clips.value(id, 'item'),
-                                points = {
-                                    'in': pandora.$ui.clips.value(id, 'in'),
-                                    out: pandora.$ui.clips.value(id, 'out')
-                                };
-                            pandora.UI.set('videoPoints.' + item, Ox.extend(points, {
-                                position: points['in']
-                            }));
-                            pandora.UI.set('itemView', 'timeline');
-                        }
-                    }),
-                    id: 'clips',
-                    size: 144 + Ox.UI.SCROLLBAR_SIZE
-                }
-            ],
-            orientation: 'horizontal'
-        })
-        .bindEvent('resize', function() {
-            pandora.$ui.map.resizeMap();
-        });
+        that = pandora.ui.mapView();
     } else if (view == 'calendar') {
         var fixedRatio = 16/9;
         that = Ox.SplitPanel({
