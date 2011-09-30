@@ -236,7 +236,7 @@ pandora.ui.list = function() {
                     url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg',
                     sortKey = sort[0].key.split(':').pop(),
                     info = ['hue', 'saturation', 'lightness'].indexOf(sortKey) > -1
-                        ? Ox.formatColor(data[sort[0].key], sortKey)
+                        ? Ox.formatColor(data[sortKey], sortKey)
                         : data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key];
                 return {
                     height: height,
