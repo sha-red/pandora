@@ -649,7 +649,10 @@ class Item(models.Model):
             s.numberoffiles = self.files.all().count()
             s.parts = videos.count()
             s.size = sum([v.size for v in videos]) #FIXME: only size of movies?
-            s.bitrate = s.size * 8 / s.duration
+            if s.duration:
+                s.bitrate = s.size * 8 / s.duration
+            else:
+                s.bitrate = 0
             s.volume = 0
         else:
             s.duration = None
