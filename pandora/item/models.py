@@ -460,8 +460,9 @@ class Item(models.Model):
         if keys and 'frames' in keys:
             i['frames'] = frames
 
-        if frames:
-            i['posterFrame'] = filter(lambda f: f['selected'], frames)[0]['position']
+        selected_frame = filter(lambda f: f['selected'], frames)
+        if selected_frame:
+            i['posterFrame'] = selected_frame[0]['position']
         elif self.poster_frame != -1.0:
             i['posterFrame'] = self.poster_frame
 
