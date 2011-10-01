@@ -252,7 +252,9 @@ pandora.ui.infoView = function(data) {
     data.filming_locations && $('<div>')
         .css(css)
         .html(
-            formatKey('Filming Locations') + data.filming_locations.join('; ')
+            formatKey('Filming Locations') + data.filming_locations.map(function(location) {
+                return  '<a href="/map/@' + location + '">' + location + '</a>'
+            }).join(', ')
         )
         .appendTo($text);
 
@@ -304,7 +306,11 @@ pandora.ui.infoView = function(data) {
             'Spoofs', 'Spoofed in'
         ].forEach(function(key) {
             data.connections[key] && html.push(
-                formatKey(key) + formatConnections(data.connections[key])
+                formatKey(key) + data.connections[key].map(function(connection) {
+                    return connection.item
+                        ? '<a href="/' + connection.item + '">' + connection.title + '</a>'
+                        : connection.title;
+                }).join(', ')
             );
         });
         $div.html(html.join('; '));
@@ -350,12 +356,6 @@ pandora.ui.infoView = function(data) {
 
     function formatLight(str) {
         return '<span style="color: rgb(128, 128, 128)">' + str + '</span>';
-    }
-
-    function formatConnections(connections) {
-        return connections.map(function(c) {
-            return c.item ? '<a href="/' + c.item + '">' + c.title + '</a>' : c.title;
-        }).join(', ');
     }
 
     function formatValue(value, key) {

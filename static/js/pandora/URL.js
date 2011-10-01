@@ -116,7 +116,7 @@ pandora.URL = (function() {
                 pandora.$ui.helpDialog = pandora.ui.helpDialog().open();
             } else if (['signup', 'signin'].indexOf(state.page) > -1) {
                 if (pandora.user.level == 'guest') {
-                    pandora.$ui.accountDialog = pandora.ui.accountDialog(state.page).open();
+                    pandora.ui.accountDialog(state.page).open();
                 } else {
                     pandora.URL.replace('/');
                 }
@@ -147,10 +147,22 @@ pandora.URL = (function() {
 
             if (state.span) {
                 if (['video', 'timeline'].indexOf(state.view) > -1) {
+                    // fixme: this doesn't handle annotation ids
                     set['videoPoints.' + state.item] = {
                         position: state.span[0],
                         'in': state.span[1] || 0,
                         out: state.span[2] || 0
+                    }
+                } else if (state.view == 'map') {
+                    // fixme: this doesn't handle map coordinates
+                    if (state.span[0] != '@') {
+                        pandora.user.ui.mapSelection = state.span;
+                        //set['mapSelection'] = state.span;
+                        //set['mapFind'] = '';
+                    } else {
+                        pandora.user.ui.mapFind = state.span.substr(1);
+                        //set['mapFind'] = state.span.substr(1);
+                        //set['mapSelection'] = '';
                     }
                 }
             }
@@ -304,7 +316,7 @@ pandora.URL = (function() {
             document.location.href = decodeURI(document.location.pathname.substr(4));
         } else {
             self.URL.parse(function(state) {
-                setState(state, callback);
+                setState(state, callback); // setState -> UI.set -> URL.update
             });
         }
         return that;
@@ -337,6 +349,7 @@ pandora.URL = (function() {
     };
 
     that.update = function(keys) {
+        // this gets called from pandora.UI
         var action;
         if (self.isPopState) {
             self.isPopState = false;

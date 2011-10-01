@@ -182,8 +182,18 @@ Ox.load({
         if (!pandora.user.ui.item) {
             pandora.$ui.list.size();
             pandora.resizeGroups(pandora.$ui.rightPanel.width());
-            if (pandora.user.ui.listView == 'map') {
-                pandora.$ui.map.resize();
+            if (!pandora.user.ui.item) {
+                if (pandora.user.ui.listView == 'map') {
+                    pandora.$ui.map.resize();
+                } else {
+                    pandora.$ui.list.size();
+                }
+                // ...
+            } else {
+                if (pandora.user.ui.itemView == 'map') {
+                    pandora.$ui.map.resize();
+                }
+                // ...
             }
         } else {
             //Ox.print('pandora.$ui.window.resize');

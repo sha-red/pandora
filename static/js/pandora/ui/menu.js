@@ -136,14 +136,8 @@ pandora.ui.mainMenu = function() {
                     { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'shift ?' }
                 ] },
                 { id: 'debugMenu', title: 'Debug', items: [
-                    { id: 'query', title: 'Show pandora.Query' },
-                    { id: 'resetui', title: 'Reset UI Settings'},
                     { id: 'clearcache', title: 'Clear cache'},
-                    { id: 'nestedone', title: 'Some Nesting', items: [
-                        { id: 'nestedtwo', title: 'Some More Nesting', items: [
-                            { id: 'nestedthree', title: 'Even More Nesting' }
-                        ] }
-                    ] }
+                    { id: 'resetui', title: 'Reset UI Settings'}
                 ] }
             ]
         })

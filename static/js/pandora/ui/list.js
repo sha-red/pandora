@@ -525,6 +525,7 @@ pandora.ui.list = function() {
     }
 
     that.bindEvent({
+        // fixme: this is nonsense for map and calendar
         pandora_listsort: function(data) {
             that.options({sort: data.value});
         }

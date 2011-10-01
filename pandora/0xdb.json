@@ -572,6 +572,8 @@
             "listSort": [{"key": "director", "operator": ""}],
             "listView": "grid",
             "lists": {},
+            "mapFind": "",
+            "mapSelection": "",
             "section": "items",
             "showAnnotations": true,
             "showControls": true,

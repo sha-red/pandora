@@ -419,8 +419,8 @@ pandora.getFoldersWidth = function() {
     var width = pandora.user.ui.sidebarSize;
     // fixme: don't use height(), look up in splitpanels
     if (
-        /*pandora.$ui.appPanel
-        &&*/ pandora.getFoldersHeight() > pandora.$ui.leftPanel.height() - 24 - 1 - pandora.$ui.info.height()
+        pandora.$ui.appPanel
+        && pandora.getFoldersHeight() > pandora.$ui.leftPanel.height() - 24 - 1 - pandora.$ui.info.height()
     ) {
         width -= Ox.UI.SCROLLBAR_SIZE;
     }
@@ -525,8 +525,6 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
                         if (id) {
                             callback(id, 'calendar');
                         } else if (canBePlace && isName) {
-                            // set map query ...
-                            pandora.user.ui.mapFind = str;
                             callback('@' + str, 'map');
                         } else {
                             callback();
@@ -540,17 +538,21 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
         if (type) {
             pandora.api['find' + Ox.toTitleCase(type + 's')](Ox.extend({
                 query: {
-                    key: isName ? 'name' : 'id',
-                    value: type == 'annotation' ? item + '/' + str : str,
-                    operator: '='
+                    conditions: [{
+                        key: isName ? 'name' : 'id',
+                        value: type == 'annotation' ? item + '/' + str : str,
+                        operator: '=='
+                    }],
+                    operator: '&'
                 },
                 keys: ['id'],
                 range: [0, 1]
             }, item ? {
-                itemQuery: {key: 'id', value: item, operator: '='}
+                itemQuery: {
+                    conditions: [{key: 'id', value: item, operator: '=='}],
+                    operator: '&'
+                }
             } : {}), function(result) {
-                // fixme: this has to be fixed on the backend!
-                if (result.data.events) { result.data.items = result.data.events; };
                 callback(result.data.items.length ? result.data.items[0].id : '');
             });
         } else {

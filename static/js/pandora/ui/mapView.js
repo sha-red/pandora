@@ -12,6 +12,7 @@ pandora.ui.mapView = function(videoRatio) {
         listSize = listSizes[ui.clipsColumns - 1],
 
         $map = Ox.Map({
+            find: ui.mapFind,
             // 20 menu + 24 toolbar + 1 resizebar + 16 statusbar
             height: window.innerHeight - ui.showGroups * ui.groupsSize - 61,
             places: function(data, callback) {
@@ -24,11 +25,11 @@ pandora.ui.mapView = function(videoRatio) {
                         operator: '&'
                     };
                 }
-                return pandora.api.findPlaces(Ox.extend(data, {
-                    itemQuery: itemQuery,
-                    query: {conditions: [], operator: '&'}
-                }), callback);
+                return pandora.api.findPlaces(Ox.extend({
+                    itemQuery: itemQuery
+                }, data), callback);
             },
+            selected: ui.mapSelection,
             showTypes: true,
             toolbar: true,
             width: window.innerWidth - ui.showSidebar * ui.sidebarSize - listSize - 2,
@@ -40,6 +41,7 @@ pandora.ui.mapView = function(videoRatio) {
             },
             selectplace: function(data) {
                 var id = data.id || '';
+                updateToolbar(id ? data : null);
                 if (id && id[0] != '_') {
                     $list.options({
                         items: function(data, callback) {
@@ -61,10 +63,12 @@ pandora.ui.mapView = function(videoRatio) {
                             }, data), callback);
                         }
                     });
-                    updateToolbar(data);
                 } else {
-                    $list.options({items: []});
-                    updateToolbar();
+                    $list.options({
+                        items: function(data, callback) {
+                            callback({data: {items: data.keys ? [] : 0}});
+                        }
+                    });
                 }
             }
         }),
@@ -91,6 +95,7 @@ pandora.ui.mapView = function(videoRatio) {
             .bindEvent({
                 click: function() {
                     $map.options({selected: null});
+                    updateStatusbar(0);
                 }
             }),
 
@@ -199,7 +204,19 @@ pandora.ui.mapView = function(videoRatio) {
         $placeButton.options({disabled: !place});
     }
 
-    // fixme: this is needed for the main window resize handler
+    that.bindEvent({
+        pandora_itemsort: function(data) {
+            ui.item && $list.options({sort: data.value});
+        },
+        pandora_listsort: function(data) {
+            !ui.item && $list.options({sort: data.value});
+        }
+    });
+
+    pandora.user.ui.mapFind = '';
+    pandora.user.ui.mapSelection = '';
+
+    // fixme: this is needed for some resize handlers further up
     pandora.$ui.map = $map;
 
     return that;

@@ -117,7 +117,11 @@ pandora.UI = (function() {
             pandora.URL.push();
         }
         */
-        pandora.URL.update(Object.keys(trigger));
+        // pandora.URL.update(Object.keys(trigger));
+        pandora.URL.update(Object.keys(
+            !pandora.$ui.appPanel ? args : trigger
+        ));
+
     };
 
     return that;

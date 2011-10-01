@@ -23,17 +23,27 @@ pandora.ui.browser = function() {
         })
         .bindEvent({
             resize: function(data) {
-                pandora.user.ui.groupsSize = data.size;
                 pandora.$ui.groups.forEach(function(list) {
                     list.size();
                 });
+                if (!pandora.user.ui.item) {
+                    if (pandora.user.ui.listView == 'map') {
+                        pandora.$ui.map.resize();
+                    }
+                    // ...
+                } else {
+                    if (pandora.user.ui.itemView == 'map') {
+                        pandora.$ui.map.resize();
+                    }
+                    // ...
+                }
             },
             resizeend: function(data) {
                 pandora.UI.set({groupsSize: data.size});
             },
             toggle: function(data) {
-                pandora.UI.set({showGroups: !data.collapsed});
                 data.collapsed && pandora.$ui.list.gainFocus();
+                pandora.UI.set({showGroups: !data.collapsed});
             }
         });
     } else {

@@ -34,7 +34,12 @@ pandora.ui.clipList = function(videoRatio) {
                     width: width
                 };
             },
-            items: isClipView ? function(data, callback) {
+            items: function(data, callback) {
+                if (!isClipView) {
+                    // fixme: this will have to be updated
+                    callback({data: {items: []}});
+                    return;
+                }
                 var itemQuery, query;
                 if (!ui.item) {
                     itemQuery = ui.find;
@@ -64,7 +69,7 @@ pandora.ui.clipList = function(videoRatio) {
                     itemQuery: itemQuery,
                     query: query
                 }, data), callback);
-            } : [],
+            },
             keys: Ox.merge(
                 ['id', 'in', 'out', 'value'],
                 !ui.item ? ['videoRatio'] : []
