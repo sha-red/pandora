@@ -60,7 +60,7 @@ pandora.ui.item = function() {
                                     select: function(event) {
                                         pandora.$ui.clips.options({
                                             items: function(data, callback) {
-                                                pandora.api.findAnnotations(Ox.extend(data, {
+                                                pandora.api.findClips(Ox.extend(data, {
                                                     query: {
                                                         conditions:[{
                                                             key: 'event',

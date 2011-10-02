@@ -245,11 +245,11 @@ pandora.ui.list = function() {
                         query.conditions.push({key: 'value', value: q.value, operator: q.operator});
                     }
                 });
-                pandora.api.findAnnotations(Ox.extend({
+                pandora.api.findClips(Ox.extend({
                     query: query,
                     itemQuery: itemQuery
                 }, range ? {
-                    keys: ['id', 'in', 'out'],
+                    keys: ['id', 'in', 'out', 'subtitles'],
                     range: range,
                     sort: pandora.user.ui.listSort
                 } : {}), function(result) {
@@ -355,7 +355,7 @@ pandora.ui.list = function() {
                 select: function(event) {
                     pandora.$ui.clips.options({
                         items: function(data, callback) {
-                            return pandora.api.findAnnotations(Ox.extend(data, {
+                            return pandora.api.findClips(Ox.extend(data, {
                                 query: {
                                     conditions:[{key: 'event',
                                                  value: event.id,

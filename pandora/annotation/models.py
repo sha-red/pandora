@@ -6,9 +6,11 @@ from django.db import models
 from django.contrib.auth.models import User
 import ox
 
+from archive import extract
+from clip.models import Clip
+
 import utils
 import managers
-from archive import extract
 
 
 def load_layers(layers):
@@ -79,6 +81,7 @@ class Annotation(models.Model):
     modified = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User)
     item = models.ForeignKey('item.Item', related_name='annotations')
+    clip = models.ForeignKey('clip.Clip', null=True, related_name='annotations')
 
     public_id = models.CharField(max_length=128, unique=True)
     #seconds
@@ -127,14 +130,26 @@ class Annotation(models.Model):
             self.set_public_id()
         if self.duration != self.end - self.start:
             self.update_calculated_values()
+        if not self.clip and not self.layer.private:
+            self.clip, created = Clip.objects.get_or_create(item=self.item,
+                                                            start=self.start,
+                                                            end=self.end)
+            if created:
+                #FIXME, only clips should have those values
+                self.clip.duration = self.duration
+                self.clip.hue = self.hue
+                self.clip.saturation = self.saturation
+                self.clip.lightness = self.lightness
+                self.clip.volume = self.volume
+                self.clip.save()
         super(Annotation, self).save(*args, **kwargs)
 
     def json(self, layer=False, keys=None):
         j = {
             'user': self.user.username,
         }
-        for field in ('id', 'in', 'out', 'value', 'created', 'modified',
-                      'hue', 'saturation', 'lightness', 'volume'):
+        for field in ('id', 'in', 'out', 'value', 'created', 'modified'):
+
             j[field] = getattr(self, {
                 'id': 'public_id',
                 'in': 'start',

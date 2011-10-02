@@ -54,7 +54,7 @@ pandora.ui.mapView = function(videoRatio) {
                                     operator: '&'
                                 };
                             }
-                            return pandora.api.findAnnotations(Ox.extend({
+                            return pandora.api.findClips(Ox.extend({
                                 itemQuery: itemQuery,
                                 query: {
                                     conditions: [{key: 'place', value: id, operator:'=='}],

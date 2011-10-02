@@ -318,6 +318,9 @@ def average_color(prefix, start=0, end=0):
     color = list(map(float, color))
     return ox.image.getHSL(color)
 
+def average_volume(prefix, start=0, end=0):
+    #FIXME: actually compute volume
+    return 0
 
 def get_distance(rgb0, rgb1):
     dst = math.sqrt(pow(rgb0[0] - rgb1[0], 2) + pow(rgb0[0] - rgb1[0], 2) + pow(rgb0[0] - rgb1[0], 2))

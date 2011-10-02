@@ -24,12 +24,13 @@ pandora.ui.clipList = function(videoRatio) {
                 info = ['hue', 'saturation', 'lightness'].indexOf(sortKey) > -1
                     ? Ox.formatColor(data[sortKey], sortKey)
                     : Ox.formatDuration(data['in'], 'short') + ' - '
-                    + Ox.formatDuration(data['out'], 'short');
+                    + Ox.formatDuration(data['out'], 'short'),
+                title = data.subtitles[0]; //fixme: could be other layer
                 return {
                     height: height,
                     id: data.id,
                     info: info,
-                    title: data.value,
+                    title: title,
                     url: url,
                     width: width
                 };
@@ -65,13 +66,13 @@ pandora.ui.clipList = function(videoRatio) {
                     // we'll need something like itemFind (vs. listFind)
                     query = {conditions: [], operator: '&'};
                 }
-                pandora.api.findAnnotations(Ox.extend({
+                pandora.api.findClips(Ox.extend({
                     itemQuery: itemQuery,
                     query: query
                 }, data), callback);
             },
             keys: Ox.merge(
-                ['id', 'in', 'out', 'value'],
+                ['id', 'in', 'out', 'subtitles'], //fixme: could be other layer
                 !ui.item ? ['videoRatio'] : []
             ),
             max: 1,

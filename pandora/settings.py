@@ -123,6 +123,7 @@ INSTALLED_APPS = (
     'app',
 
     'annotation',
+    'clip',
     'archive',
     'event',
     'item',
