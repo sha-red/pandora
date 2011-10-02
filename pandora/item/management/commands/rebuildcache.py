@@ -20,8 +20,8 @@ class Command(BaseCommand):
     def handle(self, **options):
         offset = 0
         chunk = 100
-        pos = models.Item.objects.count()
-        while offset <= models.Item.objects.count():
+        count = pos = models.Item.objects.count()
+        while offset <= count:
             for i in models.Item.objects.all().order_by('id')[offset:offset+chunk]:
                 print pos, i.itemId
                 i.save()
