@@ -32,7 +32,7 @@ class Clip(models.Model):
     hue = models.FloatField(default=0, db_index=True)
     saturation = models.FloatField(default=0, db_index=True)
     lightness = models.FloatField(default=0, db_index=True)
-    volume = models.FloatField(default=0, db_index=True)
+    volume = models.FloatField(default=0, null=True, db_index=True)
 
     def update_calculated_values(self):
         self.duration = self.end - self.start

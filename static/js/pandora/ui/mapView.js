@@ -43,6 +43,7 @@ pandora.ui.mapView = function(videoRatio) {
                 var id = data.id || '';
                 updateToolbar(id ? data : null);
                 if (id && id[0] != '_') {
+                    $status.html('loading...');
                     $list.options({
                         items: function(data, callback) {
                             var itemQuery;
@@ -54,7 +55,7 @@ pandora.ui.mapView = function(videoRatio) {
                                     operator: '&'
                                 };
                             }
-                            return pandora.api.findClips(Ox.extend({
+                            return pandora.api.findAnnotations(Ox.extend({
                                 itemQuery: itemQuery,
                                 query: {
                                     conditions: [{key: 'place', value: id, operator:'=='}],
@@ -193,7 +194,10 @@ pandora.ui.mapView = function(videoRatio) {
     }
 
     function updateStatusbar(items) {
-        $status.html((items || 'No') + ' clip' + (items == 1 ? '' : 's'));
+        $status.html(
+            (items ? Ox.formatNumber(items) : 'No')
+            + ' clip' + (items == 1 ? '' : 's')
+        );
     }
 
     function updateToolbar(place) {
