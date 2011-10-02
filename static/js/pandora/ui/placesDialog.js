@@ -34,7 +34,7 @@ pandora.ui.placesDialog = function() {
                     },
                     removePlace: function(place, callback) {
                         Ox.print('REMOVEPLACE', place);
-                        pandora.api.removePlace(place.id, function(result) {
+                        pandora.api.removePlace(place, function(result) {
                             Ox.Request.clearCache(); // fixme: remove
                             callback(result);
                         });
