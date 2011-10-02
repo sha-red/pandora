@@ -5,8 +5,6 @@ from __future__ import division, with_statement
 from django.db import models
 from django.conf import settings
 
-import ox
-
 from archive import extract
 import managers
 
@@ -49,9 +47,6 @@ class Clip(models.Model):
         if self.duration != self.end - self.start:
             self.update_calculated_values()
         super(Clip, self).save(*args, **kwargs)
-
-    def set_public_id(self):
-        self.public_id = u"%s/%s-%s" %(self.item.itemId, self.start, self.end)
 
     def json(self, keys=None):
         j = {}
