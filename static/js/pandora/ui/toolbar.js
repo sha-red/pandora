@@ -23,7 +23,10 @@ pandora.ui.toolbar = function() {
             pandora.$ui.orderButton = pandora.ui.orderButton()
         );
     }
-    if (ui.item && ui.itemView == 'info' && pandora.user.level == 'admin') {
+    if (
+        ui.item && ui.itemView == 'info'
+        && pandora.site.capabilities.canReloadMetadata[pandora.user.level]
+    ) {
         that.append(
             Ox.Button({
                 title: 'Reload Metadata'

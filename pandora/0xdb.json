@@ -1,10 +1,13 @@
 {
     "capabilities": {
-        "canPlayClips": {"guest": 1, "member": 2, "staff": 3, "admin": 4},
-        "canPlayVideo": {"guest": 0, "member": 1, "staff": 3, "admin": 4},
-        "canSeeItem": {"guest": 2, "member": 2, "staff": 3, "admin": 4},
-        "canSeeFiles": {"guest": -1, "member": -1, "staff": 3, "admin": 4},
-        "canSeeExtraItemViews": {"guest": false, "member": false, "staff": true, "admin": true}
+        "canDeleteItems": {"admin": true},
+        "canEditItemIcons": {"staff": true, "admin": true},
+        "canPlayClips": {"guest": 1, "member": 2, "friend": 3, "staff": 4, "admin": 4},
+        "canPlayVideo": {"guest": 0, "member": 1, "friend": 3, "staff": 4, "admin": 4},
+        "canReloadMetadata": {"staff": true, "admin": true},
+        "canSeeFiles": {"guest": -1, "member": -1, "friend": -1, "staff": 4, "admin": 4},
+        "canSeeItem": {"guest": 2, "member": 2, "friend": 3, "staff": 4, "admin": 4},
+        "canSeeExtraItemViews": {"friend": true, "staff": true, "admin": true}
     },
     "clipKeys": [
         {"id": "clip:text", "title": "Text", "type": "string"},
@@ -551,7 +554,6 @@
                     "columnWidth": {}
                 }
             },
-            "editIcon": false,
             "find": {"conditions": [], "operator": "&"},
             "groups": [
                 {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
@@ -580,6 +582,7 @@
             "showFlags": true,
             "showGroups": true,
             "showHome": true,
+            "showIconBrowser": false,
             "showInfo": true,
             "showMapControls": false,
             "showMapLabels": false,
@@ -608,7 +611,7 @@
             {"name": "Movies A-Z", "path": "", "items": 1234}
         ]
     },
-    "userLevels": ["guest", "member", "staff", "admin"],
+    "userLevels": ["guest", "member", "friend", "staff", "admin"],
     "video": {
         "download": false,
         "formats": ["webm", "mp4"],
