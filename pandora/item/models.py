@@ -833,7 +833,7 @@ class Item(models.Model):
             folders = list(set([f.folder
                                 for f in files.filter(is_video=True, instances__extra=False)]))
             files = files.filter(folder__startswith=folders[0])
-            if files.filter(active=False).count() > 0:
+            if files.filter(active=False, is_video=True).count() > 0:
                 files.update(active=True)
                 self.rendered = False
                 self.save()
