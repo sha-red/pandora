@@ -20,12 +20,13 @@ def parseCondition(condition, user):
     '''
     k = condition.get('key', 'name')
     k = {
-        'user': 'annotations__user__username',
-        'place': 'annotations__places__id',
         'event': 'annotations__events__id',
+        'id': 'public_id',
         'in': 'start',
         'out': 'end',
-        'id': 'public_id',
+        'place': 'annotations__places__id',
+        'text': 'annotations__value',
+        'user': 'annotations__user__username',
     }.get(k, k)
     if not k:
         k = 'name'

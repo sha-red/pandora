@@ -29,6 +29,8 @@ class UserProfile(models.Model):
     useragent = models.CharField(default='', max_length=255)
     windowsize = models.CharField(default='', max_length=255)
     screensize = models.CharField(default='', max_length=255)
+    info = DictField(default={})
+    note = models.TextField(default='')
 
     def get_preferences(self):
         prefs = self.preferences
@@ -90,8 +92,11 @@ class UserProfile(models.Model):
                 del ui['lists'][i]
         return ui
 
+    def set_level(self, level):
+        self.level = settings.CONFIG['userLevels'].index(level)
+
     def get_level(self):
-        return ['guest', 'member', 'staff', 'admin'][self.level]
+        return settings.CONFIG['userLevels'][self.level]
 
 def user_post_save(sender, instance, **kwargs):
     profile, new = UserProfile.objects.get_or_create(user=instance)
@@ -106,6 +111,7 @@ def user_json(user, keys, request_user=None):
         'ip': p.ip,
         'lastseen': user.last_login,
         'level': p.get_level(),
+        'note': p.note,
         'numberoflists': user.lists.count(),
         'screensize': p.screensize,
         'timesseen': p.timesseen,
@@ -123,6 +129,7 @@ def init_user(user, request=None):
     profile = user.get_profile()
     if request:
         data = json.loads(request.POST.get('data', '{}'))
+        profile.info = data
         screen = data.get('screen', {})
         if 'height' in screen and 'width' in screen:
             profile.screensize = '%sx%s' % (screen['width'], screen['height'])

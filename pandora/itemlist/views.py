@@ -36,6 +36,7 @@ def _order_query(qs, sort):
             qs = qs.annotate(subscribers=Sum('subscribed_users'))
     if order_by:
         qs = qs.order_by(*order_by)
+    qs = qs.distinct()
     return qs
 
 def parse_query(data, user):

@@ -14,7 +14,7 @@ from django.core.mail import send_mail, BadHeaderError
 from django.db.models import Sum
 
 from ox.django.shortcuts import render_to_json_response, json_response, get_object_or_404_json
-from ox.django.decorators import login_required_json
+from ox.django.decorators import admin_required_json, login_required_json
 import ox
 
 
@@ -309,6 +309,57 @@ def requestToken(request):
 actions.register(requestToken, cache=False)
 
 
+@admin_required_json
+def editUser(request):
+    '''
+        param data {
+            key: value
+        }
+        required key: username
+        optional keys: newUsername, email, level, note
+
+        return {
+            'status': {'code': int, 'text': string}
+            'data': {
+            }
+        }
+    '''
+    response = json_response()
+    data = json.load(request.POST['data'])
+    user = get_object_or_404_json(models.User, username=data['username'])
+    profile = user.get_profile()
+    if 'email' in data:
+        user.email = data['email']
+    if 'level' in data:
+        profile.set_level(data['level'])
+    if 'note' in data:
+        profile.note = data['note']
+    if 'newUsername' in data:
+        user.username = data['newUsername']
+    user.save()
+    profile.save()
+    return render_to_json_response(response)
+actions.register(editUser, cache=False)
+
+@admin_required_json
+def removeUser(request):
+    '''
+        param data {
+            username: username
+        }
+        return {
+            'status': {'code': int, 'text': string}
+            'data': {
+            }
+        }
+    '''
+    response = json_response()
+    data = json.load(request.POST['data'])
+    user = get_object_or_404_json(models.User, username=data['username'])
+    user.delete()
+    return render_to_json_response(response)
+actions.register(removeUser, cache=False)
+
 def findUser(request):
     '''
         param data {
@@ -324,8 +375,6 @@ def findUser(request):
             }
         }
     '''
-    #admins should be able to find all users, other users only exact matches 
-    #FIXME: support other operators and keys
     data = json.loads(request.POST['data'])
     response = json_response(status=200, text='ok')
     #keys = data.get('keys')
@@ -377,6 +426,7 @@ def order_query(qs, sort):
         qs = qs.order_by(*order_by)
     return qs
 
+@admin_required_json
 def findUsers(request):
     '''
         param data {
@@ -439,10 +489,6 @@ Positions
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
             positions:  ids of places for which positions are required
     '''
-    if request.user.is_anonymous() or request.user.get_profile().get_level() != 'admin': 
-        response = json_response(status=403, text='permission denied')
-        return render_to_json_response(response)
-
     response = json_response(status=200, text='ok')
     data = json.loads(request.POST['data'])
     query = parse_query(data, request.user)
