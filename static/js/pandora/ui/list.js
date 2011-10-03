@@ -1,9 +1,9 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
 pandora.ui.list = function() {
-    var that
+    var that,
         view = pandora.user.ui.listView,
-        preview = false
+        preview = false;
 
     if (view == 'list') {
         /*
