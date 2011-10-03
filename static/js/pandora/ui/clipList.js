@@ -5,7 +5,6 @@ pandora.ui.clipList = function(videoRatio) {
     var ui = pandora.user.ui,
         fixedRatio = !ui.item ? 16/9 : videoRatio,
         isClipView = !ui.item ? ui.listView == 'clip' : ui.itemView == 'clips',
-        $selectedVideo,
 
         that = Ox.IconList({
             fixedRatio: fixedRatio,
@@ -138,6 +137,7 @@ pandora.ui.clipList = function(videoRatio) {
                                     paused: true,
                                     playInToOut: true,
                                     poster: '/' + item + '/' + height + 'p' + points[0] + '.jpg',
+                                    rewind: true,
                                     width: width,
                                     video: partsAndPoints.parts.map(function(i) {
                                         return '/' + item + '/96p' + (i + 1)
@@ -154,7 +154,6 @@ pandora.ui.clipList = function(videoRatio) {
                             $img.replaceWith($player.$element);
                             $('.OxSelectedVideo').removeClass('OxSelectedVideo');
                             $player.$element.addClass('OxSelectedVideo');
-                            $selectedVideo = $player;
                         });
                     } else if ($video.length) {
                         // item select fires before video click
@@ -164,15 +163,11 @@ pandora.ui.clipList = function(videoRatio) {
                         setTimeout(function() {
                             $('.OxSelectedVideo').removeClass('OxSelectedVideo');
                             $video.addClass('OxSelectedVideo');
-                            $selectedVideo = $video;
                         }, 300);
                     }
                     !ui.item && pandora.UI.set('listSelection', [item]);
                 } else {
                     $('.OxSelectedVideo').removeClass('OxSelectedVideo');
-                    $selectedVideo && $selectedVideo.options({
-                        position: $selectedVideo.options('in')
-                    });
                     !ui.item && pandora.UI.set('listSelection', []);
                 }
             }

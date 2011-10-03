@@ -367,7 +367,7 @@ def order_query(qs, sort):
         }.get(e['key'], 'profile__%s'%e['key'])
         if key == 'profile__numberoflists':
             qs = qs.annotate(numberoflists=Sum('lists'))
-            key = 'numberoffiles'
+            key = 'numberoflists'
         order = '%s%s' % (operator, key)
         order_by.append(order)
     if order_by:
