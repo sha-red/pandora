@@ -31,7 +31,6 @@ pandora.ui.folderBrowserBar = function(id) {
                 })
                 .bindEvent({
                     change: function(data) {
-                        Ox.print('ID::', id)
                         var key = pandora.$ui.findListSelect[id].value() == 'user' ? 'user' : 'name',
                             value = data.value;
                         updateItems(key, value);
@@ -51,10 +50,10 @@ pandora.ui.folderBrowserBar = function(id) {
                 var query = id == 'favorite' ? {conditions: [
                     {key: 'status', value: 'public', operator: '='},
                     {key: 'user', value: pandora.user.username, operator: '!=='},
-                    {key: key, value: value, operator: ''}
+                    {key: key, value: value, operator: '='}
                 ], operator: '&'} : {conditions: [
                     {key: 'status', value: 'private', operator: '!='},
-                    {key: key, value: value, operator: ''}
+                    {key: key, value: value, operator: '='}
                 ], operator: '&'};
                 return pandora.api.findLists(Ox.extend(data, {
                     query: query
