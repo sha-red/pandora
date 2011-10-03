@@ -329,15 +329,22 @@ def editUser(request):
     user = get_object_or_404_json(models.User, username=data['id'])
     profile = user.get_profile()
     if 'email' in data:
+        if models.User.objects.filter(email=data['email']).exclude(id=user.id).count()>0:
+            response = json_response(status=403, text='email already in use')
+            return render_to_json_response(response)
         user.email = data['email']
     if 'level' in data:
         profile.set_level(data['level'])
     if 'note' in data:
         profile.note = data['note']
     if 'username' in data:
+        if models.User.objects.filter(username=data['username']).exclude(id=user.id).count()>0:
+            response = json_response(status=403, text='username already in use')
+            return render_to_json_response(response)
         user.username = data['username']
     user.save()
     profile.save()
+    response['data'] = models.user_json()
     return render_to_json_response(response)
 actions.register(editUser, cache=False)
 
