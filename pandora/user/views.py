@@ -325,7 +325,7 @@ def editUser(request):
         }
     '''
     response = json_response()
-    data = json.load(request.POST['data'])
+    data = json.loads(request.POST['data'])
     user = get_object_or_404_json(models.User, username=data['id'])
     profile = user.get_profile()
     if 'email' in data:
