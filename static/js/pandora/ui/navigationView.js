@@ -29,7 +29,15 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 title: '',
                 width: 96 + Ox.UI.SCROLLBAR_SIZE
             })
-            .css({float: 'left', margin: '4px 0 4px 0'}),
+            .css({float: 'left', margin: '4px 0 4px 0'})
+            .bindEvent({
+                singleclick: function() {
+                    $element[type == 'map' ? 'panToPlace' : 'panToEvent']();
+                },
+                doubleclick: function() {
+                    $element[type == 'map' ? 'zoomToPlace' : 'zoomToEvent']();
+                }
+            }),
 
         $itemButton = Ox.Button({
                 title: 'close',
