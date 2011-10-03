@@ -33,6 +33,17 @@ def parseCondition(condition, user):
     op = condition.get('operator')
     if not op:
         op = ''
+    public_layers = [l['id']
+                     for l in filter(lambda l: not l.get('private', False),
+                                     settings.CONFIG['layers'])]
+    if k in public_layers:
+        return parseCondition({'key': 'annotations__value',
+                               'value': v,
+                               'operator': op}, user) \
+             & parseCondition({'key': 'annotations__layer__name',
+                               'value': k,
+                               'operator': '=='}, user)
+
     if op.startswith('!'):
         op = op[1:]
         exclude = True
