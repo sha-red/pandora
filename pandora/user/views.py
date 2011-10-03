@@ -315,8 +315,8 @@ def editUser(request):
         param data {
             key: value
         }
-        required key: username
-        optional keys: newUsername, email, level, note
+        required key: id 
+        optional keys: username, email, level, note
 
         return {
             'status': {'code': int, 'text': string}
@@ -326,7 +326,7 @@ def editUser(request):
     '''
     response = json_response()
     data = json.load(request.POST['data'])
-    user = get_object_or_404_json(models.User, username=data['username'])
+    user = get_object_or_404_json(models.User, username=data['id'])
     profile = user.get_profile()
     if 'email' in data:
         user.email = data['email']
@@ -334,8 +334,8 @@ def editUser(request):
         profile.set_level(data['level'])
     if 'note' in data:
         profile.note = data['note']
-    if 'newUsername' in data:
-        user.username = data['newUsername']
+    if 'username' in data:
+        user.username = data['username']
     user.save()
     profile.save()
     return render_to_json_response(response)
