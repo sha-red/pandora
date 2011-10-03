@@ -26,15 +26,9 @@ pandora.ui.browser = function() {
                 pandora.$ui.groups.forEach(function(list) {
                     list.size();
                 });
-                if (!pandora.user.ui.item) {
-                    if (pandora.user.ui.listView == 'map') {
-                        pandora.$ui.map.resize();
-                    }
-                    // ...
-                } else {
-                    if (pandora.user.ui.itemView == 'map') {
-                        pandora.$ui.map.resize();
-                    }
+                if (pandora.user.ui.listView == 'map') {
+                    pandora.$ui.map.resizeMap();
+                } else if (pandora.user.ui.listView == 'calendar') {
                     // ...
                 }
             },
@@ -44,6 +38,11 @@ pandora.ui.browser = function() {
             toggle: function(data) {
                 data.collapsed && pandora.$ui.list.gainFocus();
                 pandora.UI.set({showGroups: !data.collapsed});
+                if (pandora.user.ui.listView == 'map') {
+                    pandora.$ui.map.resizeMap();
+                } else if (pandora.user.ui.listView == 'calendar') {
+                    // ...
+                }
             }
         });
     } else {
@@ -88,6 +87,13 @@ pandora.ui.browser = function() {
             open: function() {
                 that.scrollToSelection();
             },
+            resize: function(data) {
+                if (pandora.user.ui.itemView == 'map') {
+                    pandora.ui.$map.resizeMap();
+                } else if (pandora.user.ui.itemView == 'calendar') {
+                    // ...
+                }
+            },
             select: function(data) {
                 pandora.UI.set({
                     'item': data.ids[0] 
@@ -99,6 +105,11 @@ pandora.ui.browser = function() {
                     if (pandora.user.ui.itemView == 'timeline') {
                         pandora.$ui.editor.gainFocus();
                     }
+                }
+                if (pandora.user.ui.itemView == 'map') {
+                    pandora.ui.$map.resizeMap();
+                } else if (pandora.user.ui.itemView == 'calendar') {
+                    // ...
                 }
             },
             pandora_icons: function(data) {

@@ -180,35 +180,36 @@ Ox.load({
         pandora.$ui.leftPanel.size(2, pandora.getInfoHeight());
         pandora.$ui.info.resizeInfo();
         if (!pandora.user.ui.item) {
-            pandora.$ui.list.size();
             pandora.resizeGroups(pandora.$ui.rightPanel.width());
-            if (!pandora.user.ui.item) {
-                if (pandora.user.ui.listView == 'map') {
-                    pandora.$ui.map.resize();
-                } else {
-                    pandora.$ui.list.size();
-                }
+            if (pandora.user.ui.listView == 'map') {
+                pandora.$ui.map.resizeMap();
+            } else if (pandora.user.ui.listView == 'calendar') {
                 // ...
             } else {
-                if (pandora.user.ui.itemView == 'map') {
-                    pandora.$ui.map.resize();
-                }
-                // ...
+                pandora.$ui.list.size();
             }
         } else {
             //Ox.print('pandora.$ui.window.resize');
             pandora.$ui.browser.scrollToSelection();
-            pandora.user.ui.itemView == 'info' && pandora.$ui.item.resize();
-            pandora.user.ui.itemView == 'video' && pandora.$ui.player.options({
-                // fixme: duplicated
-                height: pandora.$ui.contentPanel.size(1),
-                width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
-            });
-            pandora.user.ui.itemView == 'timeline' && pandora.$ui.editor.options({
-                // fixme: duplicated
-                height: pandora.$ui.contentPanel.size(1),
-                width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
-            });
+            if (pandora.user.ui.itemView == 'info') {
+                pandora.$ui.info.resize();
+            } else if (pandora.user.ui.itemView == 'video') {
+                pandora.$ui.player.options({
+                   // fixme: duplicated
+                   height: pandora.$ui.contentPanel.size(1),
+                   width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+                });
+            } else if (pandora.user.ui.itemView == 'timeline') {
+                pandora.$ui.editor.options({
+                    // fixme: duplicated
+                    height: pandora.$ui.contentPanel.size(1),
+                    width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+                });
+            } else if (pandora.user.ui.itemView == 'map') {
+                pandora.$ui.map.resizeMap();
+            } else if (pandora.user.ui.itemView == 'calendar') {
+                // ...
+            }
         }
     }
 
