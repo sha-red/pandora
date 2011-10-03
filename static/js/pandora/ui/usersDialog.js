@@ -273,9 +273,7 @@ pandora.ui.usersDialog = function() {
                         $userLabel.options({
                             title: values.username + ' &lt;' + values.email + '&gt;'
                         });
-                        $user
-                            .append(renderUserForm(values))
-                            .append($deleteButton);
+                        $user.append(renderUserForm(values))
                     } else {
                         $userLabel.options({title: 'No user selected'});
                     }
@@ -290,57 +288,6 @@ pandora.ui.usersDialog = function() {
             .css({margin: '4px'}),
 
         $user = Ox.Element({}),
-
-        $deleteButton = Ox.Button({
-                title: 'Delete User',
-                width: 96
-            })
-            .css({position: 'absolute', left: 8, bottom: 8})
-            .bindEvent({
-                click: function() {
-                    var $dialog = Ox.Dialog({
-                            buttons: [
-                                Ox.Button({
-                                        title: 'Cancel'
-                                    })
-                                    .bindEvent({
-                                        click: function() {
-                                            $dialog.close();
-                                        }
-                                    }),
-                                Ox.Button({
-                                        title: 'Delete User'
-                                    })
-                                    .bindEvent({
-                                        click: function() {
-                                            // ...
-                                            $dialog.close();
-                                        }
-                                    })
-                            ],
-                            // fixme: we need a template for this!
-                            content: Ox.Element()
-                                .append(
-                                    $('<img>')
-                                        .attr({src: '/static/png/icon64.png'})
-                                        .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
-                                )
-                                .append(
-                                    Ox.Element()
-                                        .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
-                                        .html(
-                                            'Are you sure that you want do delete the user "'
-                                            + $list.value($list.options('selected')[0], 'username')
-                                            + '"? This action cannot be undone.'
-                                        )
-                                ),
-                            height: 128,
-                            title: 'Delete User',
-                            width: 304
-                        })
-                        .open()
-                }
-            }),
 
         that = Ox.Dialog({
             buttons: [
@@ -409,6 +356,8 @@ pandora.ui.usersDialog = function() {
                 items: [
                     $checkbox = Ox.Checkbox({
                             checked: !data.disabled,
+                            label: 'Status',
+                            labelWidth: 80,
                             title: 'Enabled',
                             width: 240
                         })
@@ -416,6 +365,28 @@ pandora.ui.usersDialog = function() {
                             change: function(data) {
                                 // fixme: it would be really nice to have "this" here
                                 $checkbox.options({title: data.checked ? 'Enabled' : 'Disabled'})
+                            }
+                        }),
+                    Ox.Input({
+                            label: 'Username',
+                            labelWidth: 80,
+                            value: data.username,
+                            width: 240
+                        })
+                        .bindEvent({
+                            submit: function(data) {
+                                
+                            }
+                        }),
+                    Ox.Input({
+                            label: 'E-Mail',
+                            labelWidth: 80,
+                            value: data.email,
+                            width: 240
+                        })
+                        .bindEvent({
+                            submit: function(data) {
+
                             }
                         }),
                     Ox.Select({
@@ -427,7 +398,7 @@ pandora.ui.usersDialog = function() {
                             };
                         }),
                         label: 'Level',
-                        labelWidth: 64,
+                        labelWidth: 80,
                         width: 240
                     }),
                     /*
@@ -436,7 +407,7 @@ pandora.ui.usersDialog = function() {
                     }),
                     */
                     Ox.Input({
-                        height: 240,
+                        height: 120,
                         placeholder: 'Notes',
                         type: 'textarea',
                         width: 240
