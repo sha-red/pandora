@@ -191,6 +191,10 @@ pandora.ui.usersDialog = function() {
                     },
                     {
                         align: 'right',
+                        // fixme: there should be a better option for dates
+                        format: function(value) {
+                            return value.replace(/[TZ]/g, ' ')
+                        },
                         id: 'firstseen',
                         operator: '-',
                         title: 'First Seen',
@@ -199,6 +203,9 @@ pandora.ui.usersDialog = function() {
                     },
                     {
                         align: 'right',
+                        format: function(value) {
+                            return value.replace(/[TZ]/g, ' ')
+                        },
                         id: 'lastseen',
                         operator: '-',
                         title: 'Last Seen',
@@ -234,31 +241,12 @@ pandora.ui.usersDialog = function() {
                         operator: '-',
                         title: 'User Agent',
                         visible: true,
-                        width: 720
+                        width: 810
                     }
                 ],
                 columnsRemovable: true,
                 columnsVisible: true,
-                items: function(data, callback) {
-                    // pandora.api.findUsers(data, callback);
-                    pandora.api.findUsers(data, function(result) {
-                        if (Ox.isArray(result.data.items)) {
-                            result.data.items = result.data.items.map(function(item) {
-                                return Ox.extend({
-                                    disabled: false,
-                                    email: 'mail@example.com',
-                                    firstseen: '2011-10-01 15:05:25',
-                                    lastseen: '2011-10-03 05:53:06',
-                                    ip: '91.22.155.104',
-                                    screensize: '1280 x 800',
-                                    windowsize: '1024 x 720',
-                                    useragent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_1) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.186 Safari/535.1'
-                                }, item);
-                            });
-                        }
-                        callback(result);
-                    });
-                },
+                items: pandora.api.findUsers,
                 keys: [],
                 max: 1,
                 scrollbarVisible: true,
