@@ -26,7 +26,7 @@ pandora.ui.usersDialog = function() {
                 click: function() {
                     pandora.api.findUsers({
                         query: {conditions: [], operator: '&'},
-                        keys: ['mail', 'username'],
+                        keys: ['email', 'username'],
                         range: [0, numberOfUsers],
                         sort: [{key: 'username', operator: '+'}]
                     }, function(result) {
@@ -46,7 +46,7 @@ pandora.ui.usersDialog = function() {
                                     .css({margin: '16px'})
                                     .html(
                                         result.data.items.map(function(item) {
-                                            return item.username + ' &lt;' + 'mail@example.com' + '&gt;'
+                                            return item.username + ' &lt;' + item.email + '&gt;'
                                         }).join(', ')
                                     ),
                                 title: 'E-Mail Addresses'
@@ -101,6 +101,12 @@ pandora.ui.usersDialog = function() {
         $list = Ox.TextList({
                 columns: [
                     {
+                        id: 'id',
+                        title: 'ID',
+                        unique: true,
+                        visible: false,
+                    },
+                    {
                         format: function(value) {
                             Ox.print('&&', value)
                             return $('<img>')
@@ -136,7 +142,6 @@ pandora.ui.usersDialog = function() {
                         removable: false,
                         title: 'Username',
                         visible: true,
-                        unique: true,
                         width: 120
                     },
                     {
@@ -250,7 +255,7 @@ pandora.ui.usersDialog = function() {
                 columnsRemovable: true,
                 columnsVisible: true,
                 items: pandora.api.findUsers,
-                keys: [],
+                keys: ['notes'],
                 max: 1,
                 scrollbarVisible: true,
                 sort: [
@@ -426,7 +431,7 @@ pandora.ui.usersDialog = function() {
             .css({margin: '8px'})
             .bindEvent({
                 change: function(event) {
-                    var data = {id: userData.username}, key, value;
+                    var data = {id: userData.id}, key, value;
                     if (event.id == 'status') {
                         data.disabled = !event.data.checked;
                     } else if (event.id == 'level') {
@@ -434,8 +439,9 @@ pandora.ui.usersDialog = function() {
                     } else {
                         data[event.id] = event.data.value;
                     }
+                    $list.value(userData.id, event.id, data[event.id]); 
                     pandora.api.editUser(data, function(result) {
-                        // ...
+                        Ox.Request.clearCache('findUsers');
                     });
                 }
             });

@@ -98,7 +98,7 @@ pandora.UI = (function() {
                     if (!isAdd) {
                         trigger[key] = val;
                     }
-                }
+                }// else { alert(keys[0] + ' equal\n\n' + JSON.stringify([ui[keys[0]], val])); }
             });
         });
         Ox.len(set) && pandora.api.setUI(set);

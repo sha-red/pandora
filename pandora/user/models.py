@@ -8,6 +8,7 @@ from django.db import models
 from django.db.models import Max
 from django.conf import settings
 
+import ox
 from ox.django.fields import DictField
 from ox.utils import json
 
@@ -30,7 +31,7 @@ class UserProfile(models.Model):
     windowsize = models.CharField(default='', max_length=255)
     screensize = models.CharField(default='', max_length=255)
     info = DictField(default={})
-    note = models.TextField(default='')
+    notes = models.TextField(default='')
 
     def get_preferences(self):
         prefs = self.preferences
@@ -103,15 +104,17 @@ def user_post_save(sender, instance, **kwargs):
 
 models.signals.post_save.connect(user_post_save, sender=User)
 
-def user_json(user, keys, request_user=None):
+def user_json(user, keys=None, request_user=None):
     p = user.get_profile()
     j = {
+        'disabled': not user.is_active,
         'email': user.email,
         'firstseen': user.date_joined,
         'ip': p.ip,
+        'id': ox.to26(user.id),
         'lastseen': user.last_login,
         'level': p.get_level(),
-        'note': p.note,
+        'notes': p.notes,
         'numberoflists': user.lists.count(),
         'screensize': p.screensize,
         'timesseen': p.timesseen,

@@ -50,8 +50,7 @@ pandora.ui.filter = function(list) {
                     });
                 } else {
                     pandora.UI.set({find: data.query});
-                    pandora.URL.push();
-                    //reload();
+                    //pandora.URL.replace();
                 }
             }
         });

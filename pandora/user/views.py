@@ -316,7 +316,7 @@ def editUser(request):
             key: value
         }
         required key: id 
-        optional keys: username, email, level, note
+        optional keys: username, email, level, notes
 
         return {
             'status': {'code': int, 'text': string}
@@ -326,8 +326,10 @@ def editUser(request):
     '''
     response = json_response()
     data = json.loads(request.POST['data'])
-    user = get_object_or_404_json(models.User, username=data['id'])
+    user = get_object_or_404_json(models.User, pk=ox.from26(data['id']))
     profile = user.get_profile()
+    if 'disabled' in data:
+        user.is_active = not data['disabled']
     if 'email' in data:
         if models.User.objects.filter(email=data['email']).exclude(id=user.id).count()>0:
             response = json_response(status=403, text='email already in use')
@@ -335,8 +337,8 @@ def editUser(request):
         user.email = data['email']
     if 'level' in data:
         profile.set_level(data['level'])
-    if 'note' in data:
-        profile.note = data['note']
+    if 'notes' in data:
+        profile.notes = data['notes']
     if 'username' in data:
         if models.User.objects.filter(username=data['username']).exclude(id=user.id).count()>0:
             response = json_response(status=403, text='username already in use')
@@ -344,7 +346,7 @@ def editUser(request):
         user.username = data['username']
     user.save()
     profile.save()
-    response['data'] = models.user_json()
+    response['data'] = models.user_json(user)
     return render_to_json_response(response)
 actions.register(editUser, cache=False)
 
@@ -515,7 +517,7 @@ Positions
         if qs.count() > 0:
             response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
     elif 'positions' in data:
-        ids = [i.username for i in qs]
+        ids = [ox.to26(i.id) for i in qs]
         response['data']['positions'] = utils.get_positions(ids, data['positions'])
     else:
         response['data']['items'] = qs.count()
