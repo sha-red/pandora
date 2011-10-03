@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+
 pandora.ui.item = function() {
 
     var that = Ox.Element();
@@ -377,7 +378,7 @@ pandora.ui.item = function() {
 
 
         } else if (pandora.user.ui.itemView == 'map') {
-            pandora.$ui.contentPanel.replaceElement(1, pandora.ui.mapView(result.data.videoRatio));
+            pandora.$ui.contentPanel.replaceElement(1, pandora.ui.navigationView('map', result.data.videoRatio));
 
         } else if (pandora.user.ui.itemView == 'calendar') {
             pandora.$ui.contentPanel.replaceElement(1, Ox.Element().html('Calendar'));
