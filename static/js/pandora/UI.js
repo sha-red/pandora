@@ -118,6 +118,7 @@ pandora.UI = (function() {
         }
         */
         // pandora.URL.update(Object.keys(trigger));
+        Ox.print('isBooting?', !pandora.$ui.appPanel, Object.keys(args));
         pandora.URL.update(Object.keys(
             !pandora.$ui.appPanel ? args : trigger
         ));

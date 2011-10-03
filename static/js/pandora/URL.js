@@ -332,7 +332,8 @@ pandora.URL = (function() {
         if (url) {
             self.URL.push(null, '', url, setState);
         } else {
-            alert('DO YOU REALLY WANT TO CALL PUSH WITHOUT URL?')
+            // fixme
+            //alert('DO YOU REALLY WANT TO CALL PUSH WITHOUT URL?')
             //self.URL.push(getState());
         }
         return that;
@@ -349,6 +350,7 @@ pandora.URL = (function() {
     };
 
     that.update = function(keys) {
+        Ox.print('update.........', keys)
         // this gets called from pandora.UI
         var action;
         if (self.isPopState) {

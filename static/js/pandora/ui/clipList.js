@@ -5,6 +5,7 @@ pandora.ui.clipList = function(videoRatio) {
     var ui = pandora.user.ui,
         fixedRatio = !ui.item ? 16/9 : videoRatio,
         isClipView = !ui.item ? ui.listView == 'clip' : ui.itemView == 'clips',
+        $selectedVideo,
 
         that = Ox.IconList({
             fixedRatio: fixedRatio,
@@ -47,14 +48,9 @@ pandora.ui.clipList = function(videoRatio) {
                     query = {conditions: [], operator: '&'};
                     // if the item query contains a layer condition,
                     // then this condition is added to the clip query
-                    // fixme: don't just check for 'subtitles'
                     itemQuery.conditions.forEach(function(condition) {
-                        if (condition.key == 'subtitles') {
-                            query.conditions.push({
-                                key: 'value',
-                                value: condition.value,
-                                operator: condition.operator
-                            });
+                        if (Ox.getPositionById(pandora.site.layers, condition.key) > -1) {
+                            query.conditions.push(condition);
                         }
                     });
                 } else {
@@ -158,6 +154,7 @@ pandora.ui.clipList = function(videoRatio) {
                             $img.replaceWith($player.$element);
                             $('.OxSelectedVideo').removeClass('OxSelectedVideo');
                             $player.$element.addClass('OxSelectedVideo');
+                            $selectedVideo = $player;
                         });
                     } else if ($video.length) {
                         // item select fires before video click
@@ -167,11 +164,15 @@ pandora.ui.clipList = function(videoRatio) {
                         setTimeout(function() {
                             $('.OxSelectedVideo').removeClass('OxSelectedVideo');
                             $video.addClass('OxSelectedVideo');
+                            $selectedVideo = $video;
                         }, 300);
                     }
                     !ui.item && pandora.UI.set('listSelection', [item]);
                 } else {
                     $('.OxSelectedVideo').removeClass('OxSelectedVideo');
+                    $selectedVideo && $selectedVideo.options({
+                        position: $selectedVideo.options('in')
+                    });
                     !ui.item && pandora.UI.set('listSelection', []);
                 }
             }

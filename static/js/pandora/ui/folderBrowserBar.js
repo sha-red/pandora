@@ -17,7 +17,7 @@ pandora.ui.folderBrowserBar = function(id) {
                     change: function(data) {
                         var key = data.selected[0].id == 'user' ? 'user' : 'name',
                             value = pandora.$ui.findListInput[id].value();
-                        value && updateItems(key, value);
+                        value && updateList(key, value);
                         pandora.$ui.findListInput[id].options({
                             placeholder: data.selected[0].title
                         });
@@ -33,7 +33,7 @@ pandora.ui.folderBrowserBar = function(id) {
                     change: function(data) {
                         var key = pandora.$ui.findListSelect[id].value() == 'user' ? 'user' : 'name',
                             value = data.value;
-                        updateItems(key, value);
+                        updateList(key, value);
                     }
                 })
             ],
@@ -44,7 +44,7 @@ pandora.ui.folderBrowserBar = function(id) {
             align: 'right'
         })
         .appendTo(that);
-    function updateItems(key, value) {
+    function updateList(key, value) {
         pandora.$ui.folderList[id].options({
             items: function(data, callback) {
                 var query = id == 'favorite' ? {conditions: [

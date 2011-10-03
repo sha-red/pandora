@@ -68,7 +68,7 @@ pandora.ui.usersDialog = function() {
                 change: function(data) {
                     var key = data.selected[0].id,
                         value = $findInput.value();
-                    value && updateItems(key, value);
+                    value && updateList(key, value);
                     $findInput.options({
                         placeholder: data.selected[0].title
                     });
@@ -85,7 +85,7 @@ pandora.ui.usersDialog = function() {
                 change: function(data) {
                     var key = $findSelect.value(),
                         value = data.value;
-                    updateItems(key, value);
+                    updateList(key, value);
                 }
             }),
 
@@ -396,7 +396,7 @@ pandora.ui.usersDialog = function() {
             
     }
 
-    function updateItems(key, value) {
+    function updateList(key, value) {
         var query = {
                 conditions: Ox.merge(
                     key != 'email' ? [{key: 'username', value: value, operator: '='}] : [],
@@ -410,8 +410,7 @@ pandora.ui.usersDialog = function() {
                     query: query
                 }), callback);
             }
-        });
-        
+        });        
     }
 
     return that;
