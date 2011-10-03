@@ -508,7 +508,7 @@ Positions
         if qs.count() > 0:
             response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
     elif 'positions' in data:
-        ids = [i.get_id() for i in qs]
+        ids = [i.username for i in qs]
         response['data']['positions'] = utils.get_positions(ids, data['positions'])
     else:
         response['data']['items'] = qs.count()
