@@ -7,6 +7,9 @@ from django.db.models import Q
 def parseCondition(condition, user):
     k = condition.get('key', 'name')
     k = {
+        'email': 'user__email',
+        'firstseen': 'user__created',
+        'lastseen': 'user__last_login',
         'user': 'user__username',
     }.get(k, k)
     v = condition['value']

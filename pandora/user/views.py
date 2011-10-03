@@ -11,6 +11,7 @@ from django.template import RequestContext, loader
 from django.utils import simplejson as json
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
+from django.db.models import Sum
 
 from ox.django.shortcuts import render_to_json_response, json_response, get_object_or_404_json
 from ox.django.decorators import login_required_json
@@ -64,7 +65,7 @@ def signin(request):
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    user_json = models.get_user_json(user)
+                    user_json = models.init_user(user, request)
                     response = json_response({
                         'user': user_json
                     })
@@ -327,9 +328,10 @@ def findUser(request):
     #FIXME: support other operators and keys
     data = json.loads(request.POST['data'])
     response = json_response(status=200, text='ok')
-    keys = data.get('keys')
-    if not keys:
-        keys = ['username', 'level']
+    #keys = data.get('keys')
+    #if not keys:
+    #    keys = ['username', 'level']
+    keys = ['username', 'level']
 
     if data['key'] == 'email':
         response['data']['users'] = [models.user_json(u, keys)
@@ -358,11 +360,21 @@ def order_query(qs, sort):
         if operator != '-':
             operator = ''
         key = {
-        }.get(e['key'], e['key'])
+            'email': 'email',
+            'firstseen': 'date_joined',
+            'lastseen': 'last_login',
+            'username': 'username',
+        }.get(e['key'], 'profile__%s'%e['key'])
+        if key == 'profile__numberoflists':
+            qs = qs.annotate(numberoflists=Sum('lists'))
+            key = 'numberoffiles'
         order = '%s%s' % (operator, key)
         order_by.append(order)
     if order_by:
-        qs = qs.order_by(*order_by, nulls_last=True)
+        print order_by
+        #user table does not support this
+        #qs = qs.order_by(*order_by, nulls_last=True)
+        qs = qs.order_by(*order_by)
     return qs
 
 def findUsers(request):
@@ -429,12 +441,12 @@ Positions
     '''
     if request.user.is_anonymous() or request.user.get_profile().get_level() != 'admin': 
         response = json_response(status=403, text='permission denied')
-        return response
-    response = json_response(status=200, text='ok')
+        return render_to_json_response(response)
 
+    response = json_response(status=200, text='ok')
     data = json.loads(request.POST['data'])
     query = parse_query(data, request.user)
-    qs = query['qs']
+    qs = order_query(query['qs'], query['sort'])
     if 'keys' in data:
         qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [models.user_json(p, data['keys'], request.user) for p in qs]

@@ -9,6 +9,7 @@ from django.db.models import Max
 from django.conf import settings
 
 from ox.django.fields import DictField
+from ox.utils import json
 
 from itemlist.models import List, Position
 
@@ -22,6 +23,12 @@ class UserProfile(models.Model):
     newsletter = models.BooleanField(default=True)
     ui = DictField(default={})
     preferences = DictField(default={})
+
+    timesseen = models.IntegerField(default=0)
+    ip = models.CharField(default='', max_length=255)
+    useragent = models.CharField(default='', max_length=255)
+    windowsize = models.CharField(default='', max_length=255)
+    screensize = models.CharField(default='', max_length=255)
 
     def get_preferences(self):
         prefs = self.preferences
@@ -91,15 +98,43 @@ def user_post_save(sender, instance, **kwargs):
 
 models.signals.post_save.connect(user_post_save, sender=User)
 
-#FIXME: this should be one function
 def user_json(user, keys, request_user=None):
-    return {
+    p = user.get_profile()
+    j = {
+        'email': user.email,
+        'firstseen': user.date_joined,
+        'ip': p.ip,
+        'lastseen': user.last_login,
+        'level': p.get_level(),
+        'numberoflists': user.lists.count(),
+        'screensize': p.screensize,
+        'timesseen': p.timesseen,
         'username': user.username,
-        'level': user.get_profile().get_level()
+        'useragent': p.useragent,
+        'windowsize': p.windowsize,
     }
+    if keys:
+        for key in j.keys():
+            if key not in keys:
+                del j[key]
+    return j
 
-def get_user_json(user):
+def init_user(user, request=None):
     profile = user.get_profile()
+    if request:
+        data = json.loads(request.POST.get('data', '{}'))
+        screen = data.get('screen', {})
+        if 'height' in screen and 'width' in screen:
+            profile.screensize = '%sx%s' % (screen['width'], screen['height'])
+        window = data.get('window', {})
+        if 'outerHeight' in window and 'outerWidth' in window:
+            profile.windowsize = '%sx%s' % (window['outerWidth'], window['outerHeight'])
+        profile.ip = request.META['REMOTE_ADDR']
+        profile.useragent = request.META['HTTP_USER_AGENT']
+        if not profile.timesseen:
+            profile.timesseen = 0
+        profile.timesseen += 1
+        profile.save()
     result = {}
     for key in ('username', ):
         result[key] = getattr(user, key)

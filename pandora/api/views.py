@@ -13,7 +13,7 @@ from django.db.models import Max, Sum
 from ox.django.shortcuts import render_to_json_response, json_response
 from ox.utils import json
 
-from user.models import get_user_json
+from user.models import init_user
 from item.models import ItemSort
 
 from actions import actions
@@ -53,7 +53,6 @@ def init(request):
         return {'status': {'code': int, 'text': string},
                 'data': {user: object}}
     '''
-    #data = json.loads(request.POST['data'])
     response = json_response({})
     config = copy.deepcopy(settings.CONFIG)
     del config['keys'] #is this needed?
@@ -71,7 +70,7 @@ def init(request):
 
     response['data']['site'] = config
     if request.user.is_authenticated():
-        response['data']['user'] = get_user_json(request.user)
+        response['data']['user'] = init_user(request.user, request)
     else:
         response['data']['user'] = response['data']['site']['user']
 

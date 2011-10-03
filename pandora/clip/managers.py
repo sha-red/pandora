@@ -81,7 +81,6 @@ def parseCondition(condition, user):
         }.get(op, '__icontains'))
 
     key = str(key)
-    print key, v, exclude
     if exclude:
         q = ~Q(**{key: v})
     else:
