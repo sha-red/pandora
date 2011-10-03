@@ -4,10 +4,11 @@ pandora.ui.usersDialog = function() {
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = Math.round(window.innerWidth * 0.9),
         levelColors = {
-            'member': [128, 128, 0],
-            'friend': [0, 128, 0],
-            'staff': [0, 128, 128],
-            'admin': [0, 0, 128]
+            'guest': [64, 0, 0],
+            'member': [64, 64, 0],
+            'friend': [0, 64, 0],
+            'staff': [0, 64, 64],
+            'admin': [0, 0, 64]
         },
         numberOfUsers = 0,
         userLevels = ['member', 'friend', 'staff', 'admin'],
@@ -100,8 +101,8 @@ pandora.ui.usersDialog = function() {
         $list = Ox.TextList({
                 columns: [
                     {
-                        clickable: true,
                         format: function(value) {
+                            Ox.print('&&', value)
                             return $('<img>')
                                 .attr({
                                     src: Ox.UI.getImageURL('symbolCheck')
@@ -153,22 +154,24 @@ pandora.ui.usersDialog = function() {
                     {
                         align: 'center',
                         format: function(value) {
+                            var dark = 'rgb(' + levelColors[value].map(function(color) {
+                                    return color.toString()
+                                }).join(', ') + ')',
+                                light = 'rgb(' + levelColors[value].map(function(color) {
+                                    return (color + 128).toString()
+                                }).join(', ') + ')';
                             return $('<div>')
                                 .css({
                                     borderRadius: '4px',
                                     padding: '0 3px 1px 3px',
-                                    background: 'rgb(' + levelColors[value].map(function(color) {
-                                        return color.toString()
-                                    }).join(', ') + ')',
+                                    background: pandora.user.ui.theme == 'classic' ? light : dark,
                                     textAlign: 'center',                       
-                                    color: 'rgb(' + levelColors[value].map(function(color) {
-                                        return (color + 128).toString()
-                                    }).join(', ') + ')'                                    
+                                    color: pandora.user.ui.theme == 'classic' ? dark : light
                                 })
                                 .html(Ox.toTitleCase(value))
                         },
                         id: 'level',
-                        operator: '+',
+                        operator: '-',
                         title: 'Level',
                         visible: true,
                         width: 60
@@ -215,7 +218,7 @@ pandora.ui.usersDialog = function() {
                     {
                         align: 'right',
                         id: 'ip',
-                        operator: '-',
+                        operator: '+',
                         title: 'IP Address',
                         visible: true,
                         width: 120
@@ -238,7 +241,7 @@ pandora.ui.usersDialog = function() {
                     },
                     {
                         id: 'useragent',
-                        operator: '-',
+                        operator: '+',
                         title: 'User Agent',
                         visible: true,
                         width: 810
@@ -255,14 +258,12 @@ pandora.ui.usersDialog = function() {
                 ]
             })
             .bindEvent({
-                click: function(data) {
-                    // ...
-                },
                 init: function(data) {
                     numberOfUsers = data.items;
                     $status.options({
                         title: Ox.formatNumber(numberOfUsers)
                             + ' user' + (numberOfUsers == 1 ? '' : 's')
+                            + ' (' + Ox.formatNumber(numberOfUsers) + ' registered, 0 guests)' 
                     });
                 },
                 select: function(data) {
@@ -350,12 +351,13 @@ pandora.ui.usersDialog = function() {
             width: width
         });
 
-    function renderUserForm(data) {
+    function renderUserForm(userData) {
         var $checkbox;
         return Ox.Form({
                 items: [
                     $checkbox = Ox.Checkbox({
-                            checked: !data.disabled,
+                            checked: !userData.disabled,
+                            id: 'status',
                             label: 'Status',
                             labelWidth: 80,
                             title: 'Enabled',
@@ -364,13 +366,14 @@ pandora.ui.usersDialog = function() {
                         .bindEvent({
                             change: function(data) {
                                 // fixme: it would be really nice to have "this" here
-                                $checkbox.options({title: data.checked ? 'Enabled' : 'Disabled'})
+                                $checkbox.options({title: userData.checked ? 'Enabled' : 'Disabled'})
                             }
                         }),
                     Ox.Input({
+                            id: 'username',
                             label: 'Username',
                             labelWidth: 80,
-                            value: data.username,
+                            value: userData.username,
                             width: 240
                         })
                         .bindEvent({
@@ -379,9 +382,10 @@ pandora.ui.usersDialog = function() {
                             }
                         }),
                     Ox.Input({
+                            id: 'email',
                             label: 'E-Mail',
                             labelWidth: 80,
-                            value: data.email,
+                            value: userData.email,
                             width: 240
                         })
                         .bindEvent({
@@ -390,9 +394,10 @@ pandora.ui.usersDialog = function() {
                             }
                         }),
                     Ox.Select({
+                        id: 'level',
                         items: userLevels.map(function(level) {
                             return {
-                                checked: level == data.level,
+                                checked: level == userData.level,
                                 id: level,
                                 title: Ox.toTitleCase(level)
                             };
@@ -408,16 +413,32 @@ pandora.ui.usersDialog = function() {
                     */
                     Ox.Input({
                         height: 120,
+                        id: 'notes',
                         placeholder: 'Notes',
                         type: 'textarea',
+                        value: userData.notes,
                         width: 240
                     })
                     .css({height: '240px'})
                 ],
                 width: 240
             })
-            .css({margin: '8px'});
-            
+            .css({margin: '8px'})
+            .bindEvent({
+                change: function(event) {
+                    var data = {id: userData.username}, key, value;
+                    if (event.id == 'status') {
+                        data.disabled = !event.data.checked;
+                    } else if (event.id == 'level') {
+                        data.level = event.data.selected[0].id;
+                    } else {
+                        data[event.id] = event.data.value;
+                    }
+                    pandora.api.editUser(data, function(result) {
+                        // ...
+                    });
+                }
+            });
     }
 
     function updateList(key, value) {

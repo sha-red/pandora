@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+
 pandora.ui.eventsDialog = function() {
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = Math.round(window.innerWidth * 0.9),
@@ -14,44 +15,7 @@ pandora.ui.eventsDialog = function() {
                 })
             ],
             closeButton: true,
-            content: pandora.$ui.eventsElement = Ox.TextList({
-                    columns: [
-                        {
-                            id: 'id',
-                            title: 'ID',
-                            operator: '+',
-                            unique: true,
-                            visible: false,
-                            width: 16 
-                        },
-                        {
-                            id: 'name',
-                            title: 'Name',
-                            operator: '+',
-                            visible: true,
-                            width: 256
-                        },
-                        {
-                            id: 'start',
-                            operator: '+',
-                            visible: true,
-                            width: 256
-                        },
-                        {
-                            id: 'end',
-                            operator: '+',
-                            visible: true,
-                            width: 256
-                        }
-                    ],
-                    items: function(data, callback) {
-                        pandora.api.findEvents(data, callback);
-                    },
-                    keys: ['name', 'start', 'end'],
-                    sort: [
-                        {key: 'name', operator: '+'}
-                    ]
-                }),
+            content: Ox.Element(),
             height: height,
             maximizeButton: true,
             minHeight: 256,
@@ -60,6 +24,26 @@ pandora.ui.eventsDialog = function() {
             title: 'Manage Events',
             width: width
         });
+
+    pandora.api.findEvents({
+        query: {conditions: [], operator: '&'}        
+    }, function(result) {
+        pandora.api.findEvents({
+            query: {conditions: [], operator: '&'},
+            keys: [],
+            range: [0, result.data.items],
+            sort: [{key: 'name', operator: '+'}]
+        }, function(result) {
+            that.options({
+                content: Ox.ListCalendar({
+                    height: height - 48,
+                    events: result.data.items,
+                    width: width
+                })
+            });
+        })
+    })
+
     return that;
 };
 

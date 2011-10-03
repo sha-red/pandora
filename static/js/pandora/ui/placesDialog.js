@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+
 pandora.ui.placesDialog = function() {
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = Math.round(window.innerWidth * 0.9),
@@ -14,7 +15,7 @@ pandora.ui.placesDialog = function() {
                 })
             ],
             closeButton: true,
-            content: pandora.$ui.placesElement = Ox.ListMap({
+            content: Ox.ListMap({
                     height: height - 48,
                     places: function(data, callback) {
                         return pandora.api.findPlaces(Ox.extend({
