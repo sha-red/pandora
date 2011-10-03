@@ -21,7 +21,7 @@ pandora.ui.filter = function(list) {
                 sort: pandora.user.ui.listSort,
                 view: pandora.user.ui.listView
             },
-            query: list ? list.query : pandora.user.ui.query,
+            query: list ? list.query : pandora.user.ui.find,
             sortKeys: pandora.site.sortKeys,
             viewKeys: pandora.site.listViews
         })
