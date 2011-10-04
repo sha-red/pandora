@@ -24,8 +24,13 @@ def addEvent(request):
             required keys: name, start, end
     '''
     data = json.loads(request.POST['data'])
-    #FIXME: check for alternativeNames too!
-    if models.Event.filter(name=data['name']).count() == 0:
+    existing_names = []
+    exists = False
+    for name in [data['name']] + data.get('alternativeNames', []):
+        if models.Event.objects.filter(name_find__icontains=u'|%s|'%name).count() != 0:
+            exists = True
+            existing_names.append(name)
+    if not exists:
         event = models.Event(name = data['name'])
         for key in ('start', 'end', 'alternativeNames'):
             if key in data and data[key]:
@@ -33,7 +38,8 @@ def addEvent(request):
         event.save()
         response = json_response(status=200, text='created')
     else:
-        response = json_response(status=403, text='event name exists')
+        response = json_response(status=403, text='name exists')
+        response['data']['names'] = existing_names
     return render_to_json_response(response)
 actions.register(addEvent, cache=False)
 
@@ -53,10 +59,12 @@ def editEvent(request):
     event = get_object_or_404_json(models.Event, pk=data['id'])
     if event.editable(request.user):
         conflict = False
+        conflict_names = []
         names = [data.get('name', event.name)] + data.get('alternativeNames', [])
-        for name in names: #FIXME: also check aliases!
-            if models.Event.filter(name=data['name']).exclude(id=event.id).count() != 0:
+        for name in names:
+            if models.Event.objects.filter(name_find__icontains=u'|%s|'%name).exclude(id=event.id).count() != 0:
                 conflict = True
+                conflict_names.append(name)
         if not conflict:
             for key in ('start', 'end', 'alternativeNames'):
                 if key in data:
@@ -65,6 +73,7 @@ def editEvent(request):
             response = json_response(status=200, text='updated')
         else:
             response = json_response(status=403, text='Event name conflict')
+            response['data']['names'] = conflict_names
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
