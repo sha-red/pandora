@@ -46,12 +46,16 @@ def order_query(qs, sort):
         if operator != '-':
             operator = ''
         key = {
+            'duration': 'clip__duration',
             'in': 'start',
+            'lightness': 'clip__lightness',
             'out': 'end',
+            'saturation': 'clip__saturation',
+            'volume': 'clip__volume',
         }.get(e['key'], e['key'])
         if key.startswith('clip:'):
             key = annotation_sort_key(e['key'][len('clip:'):])
-        elif key not in ('start', 'end', 'value'):
+        elif key not in ('start', 'end', 'value') and not key.startswith('clip__'):
             #key mgith need to be changed, see order_sort in item/views.py
             key = "item__sort__%s" % key
         order = '%s%s' % (operator, key)

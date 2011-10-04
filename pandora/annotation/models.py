@@ -91,12 +91,6 @@ class Annotation(models.Model):
     layer = models.ForeignKey(Layer)
     value = models.TextField()
 
-    duration = models.FloatField(default=0, db_index=True)
-    hue = models.FloatField(default=0, db_index=True)
-    saturation = models.FloatField(default=0, db_index=True)
-    lightness = models.FloatField(default=0, db_index=True)
-    volume = models.FloatField(default=0, db_index=True)
-
     def editable(self, user):
         if user.is_authenticated():
             if user.is_staff or \
@@ -111,15 +105,6 @@ class Annotation(models.Model):
         else:
             return self.value
 
-    def update_calculated_values(self):
-        self.duration = self.end - self.start
-        if self.duration > 0:
-            self.hue, self.saturation, self.lightness = extract.average_color(
-                           self.item.timeline_prefix, self.start, self.end)
-        else:
-            self.hue = self.saturation = self.lightness = 0
-        #FIXME: set volume here
-
     def set_public_id(self):
         public_id = Annotation.objects.filter(item=self.item, id__lt=self.id).count()
         self.public_id = "%s/%s" % ( self.item.itemId, ox.to26(public_id))
@@ -128,20 +113,18 @@ class Annotation(models.Model):
         if not self.id:
             super(Annotation, self).save(*args, **kwargs)
             self.set_public_id()
-        if self.duration != self.end - self.start:
-            self.update_calculated_values()
-        if not self.clip and not self.layer.private:
+
+        #no clip or update clip
+        if not self.clip and not self.layer.private or \
+            (self.clip and not self.layer.private and \
+                self.start != self.clip.start or self.end != self.clip.end):
+
             self.clip, created = Clip.objects.get_or_create(item=self.item,
                                                             start=self.start,
                                                             end=self.end)
             if created:
-                #FIXME, only clips should have those values
-                self.clip.duration = self.duration
-                self.clip.hue = self.hue
-                self.clip.saturation = self.saturation
-                self.clip.lightness = self.lightness
-                self.clip.volume = self.volume
                 self.clip.save()
+
         super(Annotation, self).save(*args, **kwargs)
 
     def json(self, layer=False, keys=None):
@@ -151,9 +134,14 @@ class Annotation(models.Model):
         for field in ('id', 'in', 'out', 'value', 'created', 'modified'):
 
             j[field] = getattr(self, {
+                'duration': 'clip__duration',
+                'hue': 'clip__hue',
                 'id': 'public_id',
                 'in': 'start',
+                'lightness': 'clip__lightness',
                 'out': 'end',
+                'saturation': 'clip__saturation',
+                'volume': 'clip__volume',
             }.get(field, field))
         if layer:
             j['layer'] = self.layer.name
