@@ -37,10 +37,16 @@ def addPlace(request):
     '''
     data = json.loads(request.POST['data'])
     exists = False
+    existing_name = existing_geoname = ''
     names = data.pop('name')
     for name in [names] + data.get('alternativeNames', []):
         if models.Place.objects.filter(name_find__icontains=u'|%s|'%name).count() != 0:
             exists = True
+            existing_name = name
+    if 'geoname' in data: 
+        if models.Place.objects.filter(geoname=data['geoname']).count() > 0:
+            exists = True
+            existing_geoname = data['geoname']
     if not exists:
         place = models.Place()
         place.user = request.user
@@ -55,7 +61,9 @@ def addPlace(request):
         #tasks.update_matches.delay(place.id)
         response = json_response(place.json())
     else:
-        response = json_response(status=403, text='place name exists')
+        response = json_response(status=403,
+                                 text='%s "%s" exists'%(existing_name and 'Name' or 'Geoname',
+                                                        existing_name or existing_geoname))
     return render_to_json_response(response)
 actions.register(addPlace, cache=False)
 
@@ -77,12 +85,15 @@ def editPlace(request):
         names = [names]
     if place.editable(request.user):
         conflict = False
+        confict_name = confict_geoname = ''
         for name in names + data.get('alternativeNames', []):
             if models.Place.objects.filter(name_find__icontains=u'|%s|'%name).exclude(id=place.id).count() != 0:
                 conflict = True
+                confict_name = name
         if 'geoname' in data:
             if models.Place.objects.filter(geoname=data['geoname']).exclude(id=place.id).count() != 0:
                 conflict = True
+                confict_geoname = data['geoname']
         if not conflict:
             for key in data:
                 if key != 'id':
@@ -94,7 +105,9 @@ def editPlace(request):
             #tasks.update_matches.delay(place.id)
             response = json_response(place.json())
         else:
-            response = json_response(status=403, text='place name/geoname conflict')
+            response = json_response(status=403,
+                                     text='%s "%s" exists'%(confict_name and 'Name' or 'Geoname',
+                                                            confict_name or confict_geoname))
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
