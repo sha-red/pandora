@@ -160,6 +160,8 @@ pandora.ui.navigationView = function(type, videoRatio) {
                     }, data), callback);
                 },
                 selected: ui.mapSelection,
+                showControls: ui.showMapControls,
+                showLabels: ui.showMapLabels,
                 showTypes: true,
                 toolbar: true,
                 width: window.innerWidth - ui.showSidebar * ui.sidebarSize - listSize - 2,
@@ -169,7 +171,13 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 resize: function() {
                     $element.resizeMap();
                 },
-                selectplace: selectItem
+                selectplace: selectItem,
+                togglecontrols: function(data) {
+                    pandora.UI.set('showMapControls', data.visible);
+                },
+                togglelabels: function(data) {
+                    pandora.UI.set('showMapLabels', data.visible);
+                }
             })
         );
         
