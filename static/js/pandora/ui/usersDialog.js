@@ -108,7 +108,6 @@ pandora.ui.usersDialog = function() {
                     },
                     {
                         format: function(value) {
-                            Ox.print('&&', value)
                             return $('<img>')
                                 .attr({
                                     src: Ox.UI.getImageURL('symbolCheck')
@@ -117,7 +116,7 @@ pandora.ui.usersDialog = function() {
                                     width: '10px',
                                     height: '10px',
                                     padding: '3px',
-                                    opacity: value ? 0.25 : 1
+                                    opacity: value ? 0 : 1
                                 });
                         },
                         id: 'disabled',
@@ -134,7 +133,7 @@ pandora.ui.usersDialog = function() {
                     {
                         format: function(value, data) {
                             return '<span style="opacity: ' + (
-                                data.disabled ? 0.25 : 1
+                                data.disabled ? 0.5 : 1
                             ) + '">' + value + '</span>';
                         },
                         id: 'username',
@@ -147,7 +146,7 @@ pandora.ui.usersDialog = function() {
                     {
                         format: function(value, data) {
                             return '<span style="opacity: ' + (
-                                data.disabled ? 0.25 : 1
+                                data.disabled ? 0.5 : 1
                             ) + '">' + value + '</span>';
                         },
                         id: 'email',

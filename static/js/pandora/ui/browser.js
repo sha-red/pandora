@@ -107,7 +107,7 @@ pandora.ui.browser = function() {
                     }
                 }
                 if (pandora.user.ui.itemView == 'map') {
-                    pandora.ui.$map.resizeMap();
+                    pandora.$ui.map.resizeMap();
                 } else if (pandora.user.ui.itemView == 'calendar') {
                     // ...
                 }
