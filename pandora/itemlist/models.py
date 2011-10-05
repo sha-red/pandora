@@ -43,7 +43,7 @@ class List(models.Model):
     items = models.ManyToManyField('item.Item', related_name='lists',
                                                 through='ListItem')
 
-    items_sum = models.IntegerField(default=0)
+    numberofitems = models.IntegerField(default=0)
     subscribed_users = models.ManyToManyField(User, related_name='subscribed_lists')
 
     objects = managers.ListManager()
@@ -54,7 +54,7 @@ class List(models.Model):
         else:
             self.type = 'smart'
         if self.id:
-            self.items_sum = self.get_items_sum(self.user)
+            self.numberofitems = self.get_numberofitems(self.user)
         super(List, self).save(*args, **kwargs)
 
     def get_items(self, user=None):
@@ -64,7 +64,7 @@ class List(models.Model):
         return Item.objects.find({'query': self.query}, user)
 
 
-    def get_items_sum(self, user=None):
+    def get_numberofitems(self, user=None):
         return self.get_items(user).count()
 
     def add(self, item):
@@ -96,7 +96,7 @@ class List(models.Model):
         response = {}
         for key in keys:
             if key == 'items':
-                response[key] = self.get_items_sum(user)
+                response[key] = self.get_numberofitems(user)
             elif key == 'id':
                 response[key] = self.get_id()
             elif key == 'user':
