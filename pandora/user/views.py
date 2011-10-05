@@ -178,7 +178,7 @@ def signup(request):
             user = authenticate(username=form.data['username'],
                                 password=form.data['password'])
             login(request, user)
-            user_json = models.get_user_json(user)
+            user_json = models.init_user(user)
             response = json_response({
                 'user': user_json
             }, text='account created')
@@ -226,7 +226,7 @@ def resetPassword(request):
                 user = authenticate(username=user.username, password=data['password'])
                 login(request, user)
 
-                user_json = models.get_user_json(user)
+                user_json = models.init_user(user)
                 response = json_response({
                     'user': user_json
                 }, text='password reset')
