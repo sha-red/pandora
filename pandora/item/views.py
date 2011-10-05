@@ -580,7 +580,7 @@ def frame(request, id, size, position=None):
         frames = item.poster_frames()
         if frames:
             position = item.poster_frame
-            if position == -1:
+            if position == -1 or position > len(frames):
                 position = int(len(frames)/2)
             position = frames[int(position)]['position']
         elif item.poster_frame == -1 and item.sort.duration:
