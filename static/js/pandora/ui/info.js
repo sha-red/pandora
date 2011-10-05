@@ -118,18 +118,41 @@ pandora.ui.info = function() {
 
 };
 
-pandora.ui.listInfo = function(data) {
+pandora.ui.listInfo = function(list) {
     var that = $('<div>').css({padding: '16px', textAlign: 'center'});
     var $icon = $('<img>')
         .attr({
-            src: !pandora.user.ui._list
-                ? '/static/png/icon256.png'
-                : '/list/' + pandora.user.ui._list + '/icon256.jpg?' + Ox.uid()
+            src: list
+                ? '/list/' + list + '/icon256.jpg?' + Ox.uid()
+                : '/static/png/icon256.png'
         })
         .css(getIconCSS())
-        .appendTo(that);
-    $('<div>').css({padding: '16px 0 16px 0', fontWeight: 'bold'}).html(!pandora.user.ui._list ? 'All Movies' : pandora.user.ui._list.replace(':', ': ')).appendTo(that);
-    $('<div>').css({textAlign: 'left'}).html(Ox.repeat('This is the list info text. ', 10)).appendTo(that);
+        .appendTo(that),
+        title = list ? list.replace(':', ': ') : 'All ' + pandora.site.itemName.plural,
+        description = '';
+
+    $('<div>').css({padding: '16px 0 16px 0', fontWeight: 'bold'}).html(title).appendTo(that);
+    //fixme: allow editing
+    //pandora.api.editList({id: list, description: 'foobbar'}, callback)
+    //pandora.api.editPage({name: 'allItems', body: 'foobar'}, callback)
+    if(list) {
+        pandora.api.findLists({
+            query: { conditions: [{key: 'id', value: list, operator:'=='}] },
+            keys:['description']
+        }, function(result) {
+            $('<div>').css({textAlign: 'left'})
+                      .html(result.data.items[0].description)
+                      .appendTo(that);
+        });
+    }
+    else {
+        pandora.api.getPage({name: 'allItems'}, function(result) {
+            $('<div>').css({textAlign: 'left'})
+                      .html(result.data.body)
+                      .appendTo(that);
+        });
+    }
+
     function getIconCSS() {
         var size = Math.round(pandora.user.ui.sidebarSize / 2);
         return {
@@ -140,7 +163,7 @@ pandora.ui.listInfo = function(data) {
     }
     that.resizeIcon = function() {
         $icon.css(getIconCSS());
-    }
+    };
     return that;
 };
 

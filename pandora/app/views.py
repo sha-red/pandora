@@ -80,7 +80,7 @@ def editPage(request):
     page.save()
     response = json_response({'name': page.name, 'page': page.body})
     return render_to_json_response(response)
-actions.register(getPage)
+actions.register(editPage)
 
 def redirect_url(request, url):
     if request.META['QUERY_STRING']:
