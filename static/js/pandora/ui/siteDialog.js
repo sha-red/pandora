@@ -1,3 +1,4 @@
+// vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.siteDialog = function(section) {
 
     var tabs = [
@@ -13,9 +14,13 @@ pandora.ui.siteDialog = function(section) {
     var $tabPanel = Ox.TabPanel({
             content: function(id) {
                 var content = Ox.Element().css({padding: '16px', overflowY: 'auto'});
-                pandora.api.getPage({name:id}, function(result) {
-                    content.html(result.data.body);
-                });
+                if (id == 'contact') {
+                    content.append(pandora.ui.contactForm());
+                } else {
+                    pandora.api.getPage({name:id}, function(result) {
+                        content.html(result.data.body);
+                    });
+                }
                 return Ox.SplitPanel({
                     elements: [
                         {

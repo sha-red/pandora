@@ -536,6 +536,7 @@ def contact(request):
     '''
         param data {
             'email': string,
+            'subject': string,
             'message': string
         }
 

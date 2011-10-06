@@ -11,6 +11,7 @@
   "js/pandora/ui/browser.js", 
   "js/pandora/ui/clipList.js", 
   "js/pandora/ui/contentPanel.js", 
+  "js/pandora/ui/contactForm.js", 
   "js/pandora/ui/deleteListDialog.js", 
   "js/pandora/ui/editor.js",
   "js/pandora/ui/eventsDialog.js",
