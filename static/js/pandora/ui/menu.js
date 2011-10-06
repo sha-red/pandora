@@ -1,7 +1,8 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.mainMenu = function() {
 
-    var isGuest = pandora.user.level == 'guest',
+    var isAdmin = pandora.user.level == 'admin',
+        isGuest = pandora.user.level == 'guest',
         ui = pandora.user.ui,
         that = Ox.MainMenu({
             extras: [
@@ -93,10 +94,33 @@ pandora.ui.mainMenu = function() {
                         { id: 'resetgroups', title: 'Reset Groups' }
                     ] },
                     {},
-                    { id: 'lists', title: 'Hide Lists', keyboard: 'shift l' },
-                    { id: 'info', title: 'Hide Info', keyboard: 'shift i' },
-                    { id: 'groups', title: 'Hide Groups', keyboard: 'shift g' },
-                    { id: 'movies', title: 'Hide ' + pandora.site.itemName.plural, disabled: true, keyboard: 'shift m' },
+                    {
+                        id: 'togglelists',
+                        title: Ox.map([pandora.user.ui.showSidebar? 'Hide': 'Show',
+                                       pandora.user.ui.showSidebar? 'Show': 'Hide' ],
+                                       function(t) { return t + ' Lists'; } ),
+                        keyboard: 'shift l'
+                    },
+                    {
+                        id: 'toggleinfo',
+                        title: Ox.map([pandora.user.ui.showInfo? 'Hide': 'Show',
+                                       pandora.user.ui.showInfo? 'Show': 'Hide' ],
+                                       function(t) { return t + ' Info'; } ),
+                        keyboard: 'shift i'
+                    },
+                    {
+                        id: 'togglegroups',
+                        title: Ox.map([pandora.user.ui.showGroups? 'Hide': 'Show',
+                                       pandora.user.ui.showGroups? 'Show': 'Hide' ],
+                                       function(t) { return t + ' Groups'; } ),
+                        keyboard: 'shift g'
+                    },
+                    {
+                        id: 'movies', title:
+                        'Hide ' + pandora.site.itemName.plural,
+                        disabled: true,
+                        keyboard: 'shift m'
+                    },
                     {},
                     { id: 'theme', title: 'Theme', items: [
                         { group: 'settheme', min: 1, max: 1, items: [
@@ -120,17 +144,17 @@ pandora.ui.mainMenu = function() {
                     { id: 'advancedfind', title: 'Advanced Find...', keyboard: 'shift control f' }
                 ] },
                 { id: 'dataMenu', title: 'Data', items: [
-                    { id: 'titles', title: 'Manage Titles...' },
-                    { id: 'names', title: 'Manage Names...' },
+                    { id: 'titles', title: 'Manage Titles...', disabled: !isAdmin },
+                    { id: 'names', title: 'Manage Names...', disabled: !isAdmin },
                     {},
-                    { id: 'places', title: 'Manage Places...' },
-                    { id: 'events', title: 'Manage Events...' },
+                    { id: 'places', title: 'Manage Places...', disabled: isGuest },
+                    { id: 'events', title: 'Manage Events...', disabled: isGuest },
                     {},
-                    { id: 'users', title: 'Manage Users...' },
-                    { id: 'lists', title: 'Manage Lists...' },
+                    { id: 'users', title: 'Manage Users...', disabled: !isAdmin },
+                    { id: 'lists', title: 'Manage Lists...', disabled: !isAdmin },
                     {},
-                    { id: 'news', title: 'Manage News...' },
-                    { id: 'tour', title: 'Manage Tour...' }
+                    { id: 'news', title: 'Manage News...', disabled: !isAdmin },
+                    { id: 'tour', title: 'Manage Tour...', disabled: !isAdmin }
                 ] },
                 { id: 'helpMenu', title: 'Help', items: [
                     { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'shift ?' }
@@ -232,6 +256,12 @@ pandora.ui.mainMenu = function() {
                     });
                 } else if (data.id == 'clearcache') {
                     Ox.Request.clearCache();
+                } else if (data.id == 'togglegroups') {
+                    pandora.$ui.contentPanel.toggle(0);
+                } else if (data.id == 'toggleinfo') {
+                    pandora.$ui.leftPanel.toggle(2);
+                } else if (data.id == 'togglelists') {
+                    pandora.$ui.mainPanel.toggle(0);
                 }
             },
             pandora_find: function() {
