@@ -42,6 +42,15 @@ Ox.load({
         load: function(data) {
 
             if (!browserSupported) {
+                $('.OxLoadingScreen').find('div').append(
+                    $('<div>')
+                    .css({
+                        width: '100%',
+                        paddingTop: '78px',
+                        textAlign: 'center'
+                    })
+                    .html(data.site.site.name + ' does not support your browser,<br /> please update to one of these browsers.')
+                );
                 return;
             }
 
