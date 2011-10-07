@@ -107,7 +107,7 @@ pandora.ui.home = function() {
                 click: function() {
                     var folder = pandora.getListData().folder;
                     folder && pandora.$ui.folderList[folder].options({selected: []});
-                    pandora.URL.push('/*=' + $findInput.value());
+                    pandora.URL.push('/=' + $findInput.value());
                     that.fadeOutScreen();
                 }
             })
