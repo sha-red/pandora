@@ -390,6 +390,13 @@ pandora.ui.infoView = function(data) {
         }).join(', ');
     }
 
+    $text.find('a').click(function(event) {
+        if (event.target.hostname == document.location.hostname &&
+            event.target.pathname.substr(0, 5) != '/url=') {
+            pandora.URL.push(event.target.pathname);
+            return false;
+        }
+    });
     function renderList() {
         pandora.api.get({
             id: data.id,
