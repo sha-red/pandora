@@ -52,5 +52,6 @@
   "js/pandora/ui/usersDialog.js",
   "js/pandora/ui/videoPreview.js", 
   "js/pandora/ui/viewSelect.js",
-  "js/pandora/ui/helpDialog.js" 
+  "js/pandora/ui/helpDialog.js",
+  "js/pandora/ui/clipPlayer.js"
 ]
