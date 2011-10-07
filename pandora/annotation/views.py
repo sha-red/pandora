@@ -144,9 +144,6 @@ def addAnnotation(request):
     annotation.save()
     response = json_response(annotation.json())
     return render_to_json_response(response)
-
-    response = {'status': {'code': 501, 'text': 'not implemented'}}
-    return render_to_json_response(response)
 actions.register(addAnnotation, cache=False)
 
 
