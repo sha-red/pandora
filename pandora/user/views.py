@@ -191,15 +191,16 @@ actions.register(signup, cache=False)
 def resetPassword(request):
     '''
         param data {
-            token: reset token
+            username: username,
             password: new password
+            code: reset code 
         }
 
         return {
             status: {'code': int, 'text': string}
             data: {
                 errors: {
-                    token: 'Invalid token'
+                    code: 'Invalid Code'
                 }
                 user {
                 }
@@ -207,7 +208,7 @@ def resetPassword(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    if 'token' in data and 'password' in data:
+    if 'code' in data and 'password' in data:
         if not data['password']:
             response = json_response({
                 'errors': {
@@ -215,13 +216,13 @@ def resetPassword(request):
                 }
             })
         else:
-            qs = models.UserProfile.objects.filter(reset_token=data['token'])
+            qs = models.UserProfile.objects.filter(reset_code=data['code'])
             if qs.count() == 1:
                 user = qs[0].user
                 user.set_password(data['password'])
                 user.save()
                 user_profile = user.get_profile()
-                user_profile.reset_token = None
+                user_profile.reset_code = None
                 user_profile.save()
                 user = authenticate(username=user.username, password=data['password'])
                 login(request, user)
@@ -233,7 +234,7 @@ def resetPassword(request):
             else:
                 response = json_response({
                     'errors': {
-                        'token': 'Invalid token'
+                        'code': 'Invalid code'
                     }
                 })
 
@@ -275,17 +276,17 @@ def requestToken(request):
             user = None
     if user:
         while True:
-            token = ox.to26(random.randint(32768, 1048575))
-            if models.UserProfile.objects.filter(reset_token=token).count() == 0:
+            code = ox.to26(random.randint(32768, 1048575))
+            if models.UserProfile.objects.filter(reset_code=code).count() == 0:
                 break
         user_profile = user.get_profile()
-        user_profile.reset_token = token
+        user_profile.reset_code = code 
         user_profile.save()
 
         template = loader.get_template('password_reset_email.txt')
         context = RequestContext(request, {
             'url': request.build_absolute_uri("/"),
-            'token': token,
+            'code': code,
             'sitename': settings.SITENAME,
         })
         message = template.render(context)

@@ -27,7 +27,7 @@ pandora.autovalidateListname = function(value, blur, callback) {
         while (value.indexOf(v) > -1) {
             value = value.replace(new RegExp(v, 'g'), v[0] + (v[0] == '\\' ? v[1] : ''));
         }
-    })
+    });
     callback(value);
 };
 
@@ -44,7 +44,7 @@ pandora.autovalidateUsername = function(value, blur, callback) {
         while (value.indexOf(v) > -1) {
             value = value.replace(new RegExp(v, 'g'), v[0]);
         }
-    })
+    });
     callback(value);
 };
 
