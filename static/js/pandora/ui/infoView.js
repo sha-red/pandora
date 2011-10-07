@@ -343,7 +343,7 @@ pandora.ui.infoView = function(data) {
             .css(css)
             .html(
                 formatKey(key) + data[key].map(function(value) {
-                    return '<a href="/url=' + encodeURIComponent(value.url) + '">' + value.source + '</a>'
+                    return '<a href="' + value.url + '">' + value.source + '</a>'
                 }).join(', ')
             )
             .appendTo($text);
@@ -385,18 +385,20 @@ pandora.ui.infoView = function(data) {
     function formatValue(value, key) {
         return (Ox.isArray(value) ? value : [value]).map(function(value) {
             return key ?
-                '<a href="/' + key + '==' + value + '">' + value + '</a>'
+                '<a href="/' + key + '=' + value + '">' + value + '</a>'
                 : value;
         }).join(', ');
     }
 
     $text.find('a').click(function(event) {
-        if (event.target.hostname == document.location.hostname &&
-            event.target.pathname.substr(0, 5) != '/url=') {
-            pandora.URL.push(event.target.pathname);
-            return false;
-        }
+        pandora.URL.push(
+            event.target.hostname == document.location.hostname
+                ? event.target.pathname
+                : '/url=' + encodeURIComponent(event.target.href)
+        );
+        return false;
     });
+
     function renderList() {
         pandora.api.get({
             id: data.id,

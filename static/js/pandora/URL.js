@@ -293,9 +293,11 @@ pandora.URL = (function() {
 
         ///*
         window.onhashchange = function() {
+            Ox.Request.cancel();
             that.parse();
         };
         window.onpopstate = function(e) {
+            Ox.Request.cancel();
             self.isPopState = true;
             if (!Ox.isEmpty(e.state)) {
                 Ox.print('E.STATE', e.state)
