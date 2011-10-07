@@ -14,7 +14,7 @@ class News(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, related_name='news')
 
     title = models.TextField()
     content = models.TextField()

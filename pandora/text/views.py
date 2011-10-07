@@ -11,45 +11,6 @@ import models
 from api.actions import actions
 
 
-def getNews(request):
-    '''
-        param data
-            string id
-
-        return page
-    '''
-    response = json_response({})
-    itemId = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.News, pk=itemId)
-    response['data']['page'] = item.html()
-    return render_to_json_response(response)
-actions.register(getNews)
-
-
-@login_required_json
-def editNews(request):
-    '''
-        param data
-            string id
-
-        return page
-    '''
-    response = json_response({})
-    itemId = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Text, pk=itemId)
-    response['data']['page'] = item.html()
-    return render_to_json_response(response)
-actions.register(editNews, cache=False)
-
-
-def findNews(request):
-    '''
-    '''
-    response = json_response({})
-    return render_to_json_response(response)
-actions.register(findNews)
-
-
 def getText(request):
     '''
         param data

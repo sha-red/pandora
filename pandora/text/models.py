@@ -7,24 +7,6 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-class News(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    published = models.DateTimeField(default=datetime.now, editable=False)
-    public = models.BooleanField(default=False)
-
-    user = models.ForeignKey(User)
-    slug = models.SlugField()
-    title = models.CharField(null=True, max_length=255)
-    body = models.TextField(default='')
-
-    def __unicode__(self):
-        return u"%s <%s>" % (self.title, self.slug)
-
-    def get_absolute_url(self):
-        return '/text/%s' % self.slug
-
-
 class Text(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
