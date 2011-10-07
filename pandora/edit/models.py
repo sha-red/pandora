@@ -6,7 +6,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-class Timeline(models.Model):
+class Edit(models.Model):
 
     class Meta:
         unique_together = ("user", "name")
@@ -40,12 +40,13 @@ class Timeline(models.Model):
 class Clip(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    timeline = models.ForeignKey(Timeline)
+
+    edit = models.ForeignKey(Edit)
     position = models.IntegerField(default=0) #clip position
-    timeline_position = models.FloatField(default=0) #time on timeline
+    edit_position = models.FloatField(default=0) #Position in seconds on edit 
     item = models.ForeignKey("item.Item")
     start = models.FloatField(default=0)
-    end = models.FloatField(default=-1)
+    end = models.FloatField(default=0)
 
     def __unicode__(self):
         return u'%s/%0.3f-%0.3f' % (self.item.itemId, self.start, self.end)
