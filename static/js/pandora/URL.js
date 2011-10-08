@@ -17,6 +17,9 @@ pandora.URL = (function() {
         state.type = pandora.site.itemsSection;
         if (!keys || keys.indexOf('item') > -1) {
             state.item = pandora.user.ui.item;
+            if (pandora.user.ui.item) {
+                state.view = pandora.user.ui.itemView;
+            }
         }
         if (!keys || keys.indexOf('listView') > -1 || keys.indexOf('itemView') > -1) {
             if (!pandora.user.ui.item) {
@@ -33,12 +36,14 @@ pandora.URL = (function() {
             state.view = 'map';
             state.span = pandora.user.ui.mapSelection
                 ? '@' + pandora.user.ui.mapSelection : '';
+            state.sort = pandora.user.ui.sort;
         }
         if (!keys || keys.indexOf('mapFind') > -1) {
             state.item = pandora.user.ui.item;
             state.view = 'map';
             state.span = pandora.user.ui.mapFind
                 ? '@' + pandora.user.ui.mapFind : '';
+            state.sort = pandora.user.ui.sort;
         }
         if (!keys || keys.filter(function(key) {
             return /^videoPoints/.test(key);

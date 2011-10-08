@@ -65,6 +65,7 @@ pandora.ui.preferencesDialog = function() {
             }).bindEvent({
                 click: function() {
                     $dialog.close();
+                    pandora.URL.update();
                 }
             })
         ],

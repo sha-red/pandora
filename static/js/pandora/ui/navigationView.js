@@ -242,15 +242,16 @@ pandora.ui.navigationView = function(type, videoRatio) {
                     }, data), callback);
                 }
             });
+            type == 'map' && pandora.UI.set({mapSelection: data.name});
         } else {
             $list.options({
                 items: function(data, callback) {
                     callback({data: {items: data.keys ? [] : 0}});
                 }
             });
+            type == 'map' && pandora.UI.set({mapSelection: id ? $element.options('find') : ''});
         }
         Ox.print('MAP SELECTION', id, data)
-        pandora.UI.set({mapSelection: id ? data.name : ''});
     }
 
     function updateStatusbar(items) {
