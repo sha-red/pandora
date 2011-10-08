@@ -391,11 +391,11 @@ pandora.ui.infoView = function(data) {
     }
 
     $text.find('a').click(function(event) {
-        pandora.URL.push(
-            event.target.hostname == document.location.hostname
-                ? event.target.pathname
-                : '/url=' + encodeURIComponent(event.target.href)
-        );
+        if (event.target.hostname == document.location.hostname) {
+            pandora.URL.push(event.target.pathname);
+        } else {
+            document.location.href = '/url=' + encodeURIComponent(event.target.href);
+        }
         return false;
     });
 
@@ -429,7 +429,7 @@ pandora.ui.infoView = function(data) {
                         : ['index', 'position', 'width', 'height', 'url'],
                     max: 1,
                     min: 1,
-                    orientation: 'vertical',
+                    orientation: 'both',
                     selected: [selectedImage['index']],
                     size: 128,
                     sort: [{key: 'index', operator: '+'}],

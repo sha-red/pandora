@@ -10,6 +10,7 @@ pandora.ui.item = function() {
     }, pandora.user.level == 'admin' && pandora.user.ui.itemView == 'info' ? 0 : -1, function(result) {
 
         if (result.status.code == 200) {
+            // fixme: can the history state title get updated too?
             document.title = pandora.getPageTitle(result.data.title);
         }
 

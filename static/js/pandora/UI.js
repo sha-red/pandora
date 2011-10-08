@@ -43,11 +43,12 @@ pandora.UI = (function() {
                 pandora.user.ui._list = list;
                 pandora.user.ui._groupsState = pandora.getGroupsState(val);
                 pandora.user.ui._findState = pandora.getFindState(val);
-                // make sure we don't do this on page load
+                if (!pandora.user.ui.lists[list]) {
+                    add['lists.' + that.encode(list)] = {};
+                }
+                // fixme: if we did this on page load,
+                // find would get set to advanced
                 if (pandora.$ui.appPanel && list != self.previousUI._list) {
-                    if (!pandora.user.ui.lists[list]) {
-                        add['lists.' + that.encode(list)] = {};
-                    }
                     Ox.forEach(listSettings, function(listSetting, setting) {
                         if (!pandora.user.ui.lists[list]) {
                             // add default list setting and copy to settings
@@ -111,7 +112,6 @@ pandora.UI = (function() {
                 });
             });
         });
-        Ox.print('isBooting?', !pandora.$ui.appPanel, Object.keys(args), pandora.user.ui.listView);
         pandora.URL.update(Object.keys(
             !pandora.$ui.appPanel ? args : trigger
         ));

@@ -26,7 +26,7 @@ appPanel
 
 Ox.load({
     UI: {
-        debug: true,
+        //debug: true,
         hideScreen: false,
         loadImages: true,
         showScreen: true,
@@ -42,15 +42,6 @@ Ox.load({
         load: function(data) {
 
             if (!browserSupported) {
-                $('.OxLoadingScreen').find('div').append(
-                    $('<div>')
-                    .css({
-                        width: '100%',
-                        paddingTop: '78px',
-                        textAlign: 'center'
-                    })
-                    .html(data.site.site.name + ' does not support your browser,<br /> please update to one of these browsers.')
-                );
                 return;
             }
 
@@ -62,8 +53,6 @@ Ox.load({
             loadResources('/static/json/pandora.json', function() {
 
                 Ox.print('Ox.App load', data);
-
-                // Ox.UI.hideLoadingScreen();
 
                 Ox.extend(pandora, {
                     $ui: {
@@ -118,15 +107,6 @@ Ox.load({
                         pandora.site.listSettings[key] = key[4].toLowerCase() + key.substr(5);
                     }
                 });
-                /*
-                if (Ox.isEmpty(pandora.user.ui.lists)) {
-                    var listSettings = {};
-                    Ox.forEach(pandora.site.listSettings, function(listSetting, setting) {
-                        listSettings[listSetting] = pandora.site.user.ui[setting];
-                    });
-                    pandora.UI.set('lists.', listSettings);
-                }
-                */
 
                 Ox.extend(pandora.user, {
                     sectionElement: 'buttons',
@@ -163,8 +143,8 @@ Ox.load({
         $.getJSON(json, function(files) {
             var promises = [];
             files.forEach(function(file) {
-                // fixme: opera doesnt fire onload for svg
-                // fixme: we don't have any svgs, right?
+                // fixme: opera doesnt fire onload for svgs
+                // (but neither do we support opera nor do we have svgs)
                 if ($.browser.opera && Ox.endsWith(file, '.svg')) {
                     return;
                 }

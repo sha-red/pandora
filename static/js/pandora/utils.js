@@ -565,6 +565,7 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
 (function() {
     var itemTitles = {};
     pandora.getPageTitle = function(itemTitle) {
+        Ox.print('ITEM TITLES', itemTitles)
         if (itemTitle) {
             itemTitles[pandora.user.ui.item] = itemTitle 
         }

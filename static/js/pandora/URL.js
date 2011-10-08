@@ -392,9 +392,12 @@ pandora.URL = (function() {
         } else {
             if (
                 !pandora.$ui.appPanel
-                || (keys.length == 1 && keys[0] == 'span')
                 || keys.every(function(key) {
-                    return /^videoPoints/.test(key);
+                    return [
+                            'listColumnWidth', 'listColumns', 'listSelection',
+                            'mapFind', 'mapSelection'
+                        ].indexOf(key) > -1
+                        || /^videoPoints/.test(key);
                 })
             ) {
                 action = 'replace';

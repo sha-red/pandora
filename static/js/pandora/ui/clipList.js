@@ -9,7 +9,6 @@ pandora.ui.clipList = function(videoRatio) {
         that = Ox.IconList({
             fixedRatio: fixedRatio,
             item: function(data, sort, size) {
-                Ox.print('*********', data)
                 size = size || 128; // fixme: is this needed?
                 var ratio, width, height, url, sortKey, info;
                 if (!ui.item) {
