@@ -43,7 +43,8 @@ pandora.UI = (function() {
                 pandora.user.ui._list = list;
                 pandora.user.ui._groupsState = pandora.getGroupsState(val);
                 pandora.user.ui._findState = pandora.getFindState(val);
-                if (list != self.previousUI._list) {
+                // make sure we don't do this on page load
+                if (pandora.$ui.appPanel && list != self.previousUI._list) {
                     if (!pandora.user.ui.lists[list]) {
                         add['lists.' + that.encode(list)] = {};
                     }
@@ -98,7 +99,7 @@ pandora.UI = (function() {
                     if (!isAdd) {
                         trigger[key] = val;
                     }
-                }// else { alert(keys[0] + ' equal\n\n' + JSON.stringify([ui[keys[0]], val])); }
+                }
             });
         });
         Ox.len(set) && pandora.api.setUI(set);
@@ -110,19 +111,10 @@ pandora.UI = (function() {
                 });
             });
         });
-        /*
-        if (!pandora.$ui.appPanel) {
-            pandora.URL.replace();
-        } else if (Ox.len(trigger)) {
-            pandora.URL.push();
-        }
-        */
-        // pandora.URL.update(Object.keys(trigger));
-        Ox.print('isBooting?', !pandora.$ui.appPanel, Object.keys(args));
+        Ox.print('isBooting?', !pandora.$ui.appPanel, Object.keys(args), pandora.user.ui.listView);
         pandora.URL.update(Object.keys(
             !pandora.$ui.appPanel ? args : trigger
         ));
-
     };
 
     return that;

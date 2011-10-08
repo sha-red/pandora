@@ -21,9 +21,11 @@ pandora.URL = (function() {
         if (!keys || keys.indexOf('listView') > -1 || keys.indexOf('itemView') > -1) {
             if (!pandora.user.ui.item) {
                 state.view = pandora.user.ui.listView;
+                state.sort = pandora.user.ui.listSort;
             } else {
                 state.item = pandora.user.ui.item;
                 state.view = pandora.user.ui.itemView;
+                state.sort = pandora.user.ui.itemSort;
             }
         }
         if (!keys || keys.indexOf('mapSelection') > -1) {
@@ -77,6 +79,17 @@ pandora.URL = (function() {
         }
         if (!state.item) {
             state.find = pandora.user.ui.find;
+        }
+        if (!keys || keys.indexOf('find') > -1) {
+            if (!pandora.user.ui.item) {
+                state.view = pandora.user.ui.listView;
+                state.sort = pandora.user.ui.listSort;
+            } else {
+                state.item = pandora.user.ui.item;
+                state.view = pandora.user.ui.itemView;
+                state.sort = pandora.user.ui.itemSort;
+            }
+            state.find = pandora.user.ui.find
         }
         Ox.print('STATE .................... ->', state)
         return state;
@@ -367,6 +380,12 @@ pandora.URL = (function() {
         Ox.print('update.........', keys)
         // this gets called from pandora.UI
         var action;
+        if (!keys) {
+            // may get called from home screen too
+            keys = !pandora.user.ui.item
+                ? ['listView', 'listSort', 'find']
+                : ['item', 'itemView', 'itemSort'];
+        }
         if (self.isPopState) {
             self.isPopState = false;
         } else {

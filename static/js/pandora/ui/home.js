@@ -59,8 +59,7 @@ pandora.ui.home = function() {
             })
             .bind({
                 click: function() {
-                    pandora.URL.pop();
-                    that.fadeOutScreen();
+                    $browseButton.triggerEvent('click');
                 }
             })
             .appendTo(that),
@@ -105,18 +104,21 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
-                    var folder = pandora.getListData().folder;
+                    var folder = pandora.getListData().folder,
+                        value = $findInput.value();
                     folder && pandora.$ui.folderList[folder].options({selected: []});
-                    //pandora.URL.push('/=' + $findInput.value());
+                    pandora.$ui.findInput.options({
+                        value: value
+                    });
+                    that.fadeOutScreen();
                     pandora.UI.set('find', {
                         conditions: [{
                             key: '*',
-                            value: $findInput.value(),
+                            value: value,
                             operator: '='
                         }],
                         operator: '&'
                     });
-                    that.fadeOutScreen();
                 }
             })
             .appendTo(that),
@@ -135,7 +137,7 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
-                    //pandora.URL.push();
+                    pandora.URL.update();
                     that.fadeOutScreen();
                 }
             })
