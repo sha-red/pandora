@@ -52,6 +52,7 @@ pandora.ui.accountDialogOptions = function(action, value) {
                 title: 'Cancel'
             }).bindEvent('click', function() {
                 pandora.$ui.accountDialog.close();
+                pandora.URL.update();
             });
         } else if (type == 'submit') {
             return Ox.Button({
@@ -305,41 +306,41 @@ pandora.ui.accountForm = function(action, value) {
 
 pandora.ui.accountSignoutDialog = function() {
     var that = Ox.Dialog({
-            buttons: [
-                Ox.Button({
-                    id: 'cancel',
-                    title: 'Cancel'
-                }).bindEvent('click', function() {
-                    that.close();
-                    pandora.$ui.mainMenu.getItem('signinsignout').toggleTitle();
-                }),
-                Ox.Button({
-                    id: 'signout',
-                    title: 'Sign Out'
-                }).bindEvent('click', function() {
-                    that.close();
-                    pandora.api.signout({}, function(result) {
-                        pandora.signout(result.data);
-                    });
-                })
-            ],
-            content: Ox.Element()
-                .append(
-                    $('<img>')
-                        .attr({src: '/static/png/icon64.png'})
-                        .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
-                )
-                .append(
-                    $('<div>')
-                        .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
-                        .html('Are you sure you want to sign out?')
-                ),
-            fixedSize: true,
-            height: 128,
-            keys: {enter: 'signout', escape: 'cancel'},
-            title: 'Sign Out',
-            width: 304
-        });
+        buttons: [
+            Ox.Button({
+                id: 'cancel',
+                title: 'Cancel'
+            }).bindEvent('click', function() {
+                that.close();
+                pandora.URL.update();
+            }),
+            Ox.Button({
+                id: 'signout',
+                title: 'Sign Out'
+            }).bindEvent('click', function() {
+                that.close();
+                pandora.api.signout({}, function(result) {
+                    pandora.signout(result.data);
+                });
+            })
+        ],
+        content: Ox.Element()
+            .append(
+                $('<img>')
+                    .attr({src: '/static/png/icon64.png'})
+                    .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
+            )
+            .append(
+                $('<div>')
+                    .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
+                    .html('Are you sure you want to sign out?')
+            ),
+        fixedSize: true,
+        height: 128,
+        keys: {enter: 'signout', escape: 'cancel'},
+        title: 'Sign Out',
+        width: 304
+    });
     return that;
 };
 

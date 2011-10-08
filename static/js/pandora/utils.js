@@ -632,7 +632,9 @@ pandora.isClipView = function(view, item) {
 
 pandora.signin = function(data) {
     pandora.user = data.user;
-    pandora.Query.updateGroups();
+    pandora.user.ui._list = pandora.getListsState(pandora.user.ui.find);
+    pandora.user.ui._groupsState = pandora.getGroupsState(pandora.user.ui.find);
+    pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
     Ox.Theme(pandora.user.ui.theme);
     pandora.UI.set({find: pandora.user.ui.find})
     pandora.$ui.appPanel.reload();
@@ -640,7 +642,9 @@ pandora.signin = function(data) {
 
 pandora.signout = function(data) {
     pandora.user = data.user;
-    pandora.Query.updateGroups();
+    pandora.user.ui._list = pandora.getListsState(pandora.user.ui.find);
+    pandora.user.ui._groupsState = pandora.getGroupsState(pandora.user.ui.find);
+    pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
     Ox.Theme(pandora.site.user.ui.theme);
     pandora.UI.set({find: pandora.user.ui.find})
     pandora.$ui.appPanel.reload();
@@ -738,7 +742,7 @@ pandora.selectList = function() {
 
 (function() {
 
-    // Note: getFindState has to run after getListState and getGroupsState
+    // Note: getFindState has to run after getListsState and getGroupsState
 
     function everyCondition(conditions, key, operator) {
         // If every condition has the given key and operator
