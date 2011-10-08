@@ -372,6 +372,7 @@ pandora.URL = (function() {
         } else {
             if (
                 !pandora.$ui.appPanel
+                || (keys.length == 1 && keys[0] == 'span')
                 || keys.every(function(key) {
                     return /^videoPoints/.test(key);
                 })

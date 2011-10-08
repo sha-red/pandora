@@ -113,6 +113,14 @@ pandora.ui.findElement = function() {
         .css({
             float: 'right',
             margin: '4px'
+        })
+        .bindEvent({
+            // find may be changed from the home screen
+            pandora_find: function(data) {
+                pandora.$ui.findInput.options({
+                    value: data.value.conditions[0].value
+                });
+            }
         });
     function autocompleteFunction() {
         return pandora.user.ui.find.conditions.length ? function(value, callback) {

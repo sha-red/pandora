@@ -750,6 +750,7 @@ pandora.selectList = function() {
         // has a findKey as key and "=" as operator (and all other conditions
         // are either list or groups), or if all conditions in an | query have
         // the same group id as key and "==" as operator
+        Ox.print('getFindState', find)
         var conditions, indices, state = {index: -1, key: '*', value: ''};
         if (find.operator == '&') {
             // number of conditions that are not list or groups
