@@ -100,11 +100,6 @@ pandora.URL = (function() {
         Ox.print('SET STATE:', state)
         var find, previousUI = pandora.UI.getPrevious();
 
-        Ox.Request.cancel();
-        $('video').each(function() {
-            $(this).trigger('stop');
-        });
-
         pandora.user.ui._groupsState = pandora.getGroupsState(pandora.user.ui.find);
         pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
 
@@ -206,6 +201,11 @@ pandora.URL = (function() {
                 pandora.user.ui._findState = pandora.getFindState(find);
             }
             //*/
+
+            Ox.Request.cancel();
+            $('video').each(function() {
+                $(this).trigger('stop');
+            });
 
             if (!pandora.$ui.appPanel && state.item && pandora.user.ui.find) {
                 // on page load, if item is set and there is or was a query,

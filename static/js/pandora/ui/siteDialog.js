@@ -62,9 +62,7 @@ pandora.ui.siteDialog = function(section) {
             }).bindEvent({
                 click: function() {
                     $dialog.close();
-                    //fixme: this should be using URL.push / UI.set
-                    //but that currenlty causes a reload
-                    history.pushState({}, '', '/');
+                    pandora.URL.update();
                 }
             })
         ],
