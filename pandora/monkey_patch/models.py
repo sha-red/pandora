@@ -1,6 +1,10 @@
 from django.contrib.auth.models import User
 from django.core.validators import MaxLengthValidator
 
+#load config from json
+import app.models
+app.models.load_config()
+
 NEW_USERNAME_LENGTH = 255
 
 def monkey_patch_username():
