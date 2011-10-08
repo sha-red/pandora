@@ -29,7 +29,7 @@ pandora.ui.browser = function() {
                 if (pandora.user.ui.listView == 'map') {
                     pandora.$ui.map.resizeMap();
                 } else if (pandora.user.ui.listView == 'calendar') {
-                    // ...
+                    pandora.$ui.calendar.resizeCalendar();
                 }
             },
             resizeend: function(data) {
@@ -41,7 +41,7 @@ pandora.ui.browser = function() {
                 if (pandora.user.ui.listView == 'map') {
                     pandora.$ui.map.resizeMap();
                 } else if (pandora.user.ui.listView == 'calendar') {
-                    // ...
+                    pandora.$ui.calendar.resizeCalendar();
                 }
             }
         });
@@ -91,7 +91,7 @@ pandora.ui.browser = function() {
                 if (pandora.user.ui.itemView == 'map') {
                     pandora.ui.$map.resizeMap();
                 } else if (pandora.user.ui.itemView == 'calendar') {
-                    // ...
+                    pandora.ui.$calendar.resizeCalendar();
                 }
             },
             select: function(data) {
@@ -109,7 +109,7 @@ pandora.ui.browser = function() {
                 if (pandora.user.ui.itemView == 'map') {
                     pandora.$ui.map.resizeMap();
                 } else if (pandora.user.ui.itemView == 'calendar') {
-                    // ...
+                    pandora.$ui.calendar.resizeCalendar();
                 }
             },
             pandora_icons: function(data) {

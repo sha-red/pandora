@@ -26,7 +26,6 @@ appPanel
 
 Ox.load({
     UI: {
-        //debug: true,
         hideScreen: false,
         loadImages: true,
         showScreen: true,

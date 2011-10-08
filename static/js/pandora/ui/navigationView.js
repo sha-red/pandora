@@ -180,6 +180,8 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 }
             })
         );
+        // needed for resize handlers further up
+        pandora.$ui.map = $element;
         
     } else {
 
@@ -205,6 +207,8 @@ pandora.ui.navigationView = function(type, videoRatio) {
                     select: selectItem
                 })
             );
+            // needed for resize handlers further up
+            pandora.$ui.calendar = $element;
         }); 
 
     }
@@ -284,9 +288,6 @@ pandora.ui.navigationView = function(type, videoRatio) {
         pandora.user.ui.mapFind = '';
         pandora.user.ui.mapSelection = '';
     }
-
-    // fixme: this is needed for some resize handlers further up
-    pandora.$ui[type] = $element;
 
     return that;
 
