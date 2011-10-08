@@ -10,8 +10,7 @@ pandora.ui.item = function() {
     }, pandora.user.level == 'admin' && pandora.user.ui.itemView == 'info' ? 0 : -1, function(result) {
 
         if (result.status.code == 200) {
-            // fixme: probably does not belong here
-            document.title = '0xDB - ' + Ox.stripTags(result.data.title);
+            document.title = pandora.getPageTitle(result.data.title);
         }
 
         /*if (result.status.code != 200) {

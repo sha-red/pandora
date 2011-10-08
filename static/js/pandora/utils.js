@@ -562,6 +562,24 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
     }
 };
 
+(function() {
+    var itemTitles = {};
+    pandora.getPageTitle = function(itemTitle) {
+        if (itemTitle) {
+            itemTitles[pandora.user.ui.item] = itemTitle 
+        }
+        var parts = [pandora.site.site.name];
+        if (!pandora.user.ui.item) {
+            pandora.user.ui._list && parts.push('List ' + pandora.user.ui._list);
+            parts.push(Ox.toTitleCase(pandora.user.ui.listView) + ' View');
+        } else {
+            parts.push(itemTitles[pandora.user.ui.item] || pandora.user.ui.item);
+            parts.push(Ox.toTitleCase(pandora.user.ui.itemView) + ' View');
+        }
+        return parts.join(' - ');
+    };
+}());
+
 pandora._getSortOperator = function(type) {
     return ['hue', 'string', 'text'].indexOf(
         Ox.isArray(type) ? type[0] : type

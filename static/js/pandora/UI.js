@@ -34,7 +34,7 @@ pandora.UI = (function() {
         Ox.print('UI SET', args)
         self.previousUI = Ox.clone(pandora.user.ui, true);
         Ox.forEach(args, function(val, key) {
-            if (key == 'find') {
+            if (key == 'find' && !Ox.isEqual(val, pandora.user.ui.find)) {
                 // the challenge here is that find may change list,
                 // and list may then change listSort and listView,
                 // which we don't want to trigger, since find triggers

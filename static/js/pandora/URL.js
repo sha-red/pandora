@@ -326,6 +326,7 @@ pandora.URL = (function() {
             self.isPopState = true;
             if (!Ox.isEmpty(e.state)) {
                 Ox.print('E.STATE', e.state)
+                document.title = e.state.title;
                 setState(e.state);
             } else {
                 that.parse();
@@ -357,7 +358,7 @@ pandora.URL = (function() {
     // pushes a new URL (as string or from state)
     that.push = function(url) {
         if (url) {
-            self.URL.push(null, '', url, setState);
+            self.URL.push(null, pandora.getPageTitle(), url, setState);
         } else {
             // fixme
             //alert('DO YOU REALLY WANT TO CALL PUSH WITHOUT URL?')
@@ -369,7 +370,7 @@ pandora.URL = (function() {
     // replaces the current URL (as string or from state)
     that.replace = function(url) {
         if (url) {
-            self.URL.replace(null, '', url, setState)
+            self.URL.replace(null, pandora.getPageTitle(), url, setState)
         } else {
             self.URL.replace(getState());
         }
@@ -396,11 +397,11 @@ pandora.URL = (function() {
                     return /^videoPoints/.test(key);
                 })
             ) {
-                action = 'replace'
+                action = 'replace';
             } else {
-                action = 'push'
+                action = 'push';
             }
-            self.URL[action](getState(), 'title', getState(keys));            
+            self.URL[action](getState(), pandora.getPageTitle(), getState(keys));            
         }
     };
 
