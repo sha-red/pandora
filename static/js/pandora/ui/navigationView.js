@@ -249,6 +249,8 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 }
             });
         }
+        Ox.print('MAP SELECTION', id, data)
+        pandora.UI.set({mapSelection: id ? data.name : ''});
     }
 
     function updateStatusbar(items) {

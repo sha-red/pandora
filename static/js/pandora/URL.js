@@ -26,6 +26,18 @@ pandora.URL = (function() {
                 state.view = pandora.user.ui.itemView;
             }
         }
+        if (!keys || keys.indexOf('mapSelection') > -1) {
+            state.item = pandora.user.ui.item;
+            state.view = 'map';
+            state.span = pandora.user.ui.mapSelection
+                ? '@' + pandora.user.ui.mapSelection : '';
+        }
+        if (!keys || keys.indexOf('mapFind') > -1) {
+            state.item = pandora.user.ui.item;
+            state.view = 'map';
+            state.span = pandora.user.ui.mapFind
+                ? '@' + pandora.user.ui.mapFind : '';
+        }
         if (!keys || keys.filter(function(key) {
             return /^videoPoints/.test(key);
         }).length) {
@@ -156,13 +168,13 @@ pandora.URL = (function() {
                 } else if (state.view == 'map') {
                     // fixme: this doesn't handle map coordinates
                     if (state.span[0] != '@') {
-                        pandora.user.ui.mapSelection = state.span;
-                        //set['mapSelection'] = state.span;
-                        //set['mapFind'] = '';
+                        //pandora.user.ui.mapSelection = state.span;
+                        set['mapSelection'] = state.span;
+                        set['mapFind'] = '';
                     } else {
-                        pandora.user.ui.mapFind = state.span.substr(1);
-                        //set['mapFind'] = state.span.substr(1);
-                        //set['mapSelection'] = '';
+                        //pandora.user.ui.mapFind = state.span.substr(1);
+                        set['mapFind'] = state.span.substr(1);
+                        set['mapSelection'] = '';
                     }
                 }
             }

@@ -519,6 +519,7 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
         } else {
             getId(canBePlace ? 'place' : '', function(id) {
                 if (id) {
+                    Ox.print('found place id', id)
                     callback(id, 'map');
                 } else {
                     getId(canBeEvent ? 'event' : '', function(id) {

@@ -1,5 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.clipPlayer = function() {
+    // FIXME: is clipPlayer the best name for this?
     var that = Ox.VideoPlayer({
         controlsBottom: ['play', 'previous', 'next', 'volume'],
         controlsTop: ['fullscreen', 'scale'],
