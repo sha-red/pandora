@@ -31,7 +31,11 @@ pandora.ui.sortSelect = function() {
     })
     .bindEvent({
         change: function(data) {
-            pandora.UI.set(sortKey, [{key: data.selected[0].id, operator: ''}]);
+            var key = data.selected[0].id;
+            pandora.UI.set(sortKey, [{
+                key: key,
+                operator: pandora.getSortOperator(key)
+            }]);
         },
         pandora_listsort: function(data) {
             that.selectItem(data.value[0].key);

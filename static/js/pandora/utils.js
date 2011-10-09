@@ -598,7 +598,7 @@ pandora._getSortOperator = function(type) {
     ) > -1 ? '+' : '-';
 }
 
-pandora.getSortOperator = function(key) { // fixme: remove
+pandora.getSortOperator = function(key) { // fixme: remove?
     var type = Ox.getObjectById(
             /^clip:/.test(key) ? pandora.site.clipKeys : pandora.site.itemKeys,
             key
