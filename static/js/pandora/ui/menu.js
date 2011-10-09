@@ -264,10 +264,13 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'clearcache') {
                     Ox.Request.clearCache();
                 } else if (data.id == 'togglegroups') {
+                    that.getItem('viewMenu_togglegroups').toggleTitle();
                     pandora.$ui.contentPanel.toggle(0);
                 } else if (data.id == 'toggleinfo') {
+                    that.getItem('viewMenu_toggleinfo').toggleTitle();
                     pandora.$ui.leftPanel.toggle(2);
                 } else if (data.id == 'togglelists') {
+                    that.getItem('viewMenu_togglelists').toggleTitle();
                     pandora.$ui.mainPanel.toggle(0);
                 }
             },

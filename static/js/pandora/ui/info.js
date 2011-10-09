@@ -9,6 +9,7 @@ pandora.ui.info = function() {
             .bindEvent({
                 toggle: function(data) {
                     pandora.UI.set({showInfo: !data.collapsed});
+                    pandora.$ui.mainMenu.getItem('viewMenu_toggleinfo').toggleTitle();
                     pandora.resizeFolders();
                 },
                 pandora_find: function() {

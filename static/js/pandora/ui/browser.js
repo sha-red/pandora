@@ -38,6 +38,7 @@ pandora.ui.browser = function() {
             toggle: function(data) {
                 data.collapsed && pandora.$ui.list.gainFocus();
                 pandora.UI.set({showGroups: !data.collapsed});
+                pandora.$ui.mainMenu.getItem('viewMenu_togglegroups').toggleTitle();
                 if (pandora.user.ui.listView == 'map') {
                     pandora.$ui.map.resizeMap();
                 } else if (pandora.user.ui.listView == 'calendar') {

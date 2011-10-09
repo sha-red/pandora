@@ -45,6 +45,7 @@ pandora.ui.leftPanel = function() {
             },
             toggle: function(data) {
                 pandora.UI.set({showSidebar: !data.collapsed});
+                pandora.$ui.mainMenu.getItem('viewMenu_togglelists').toggleTitle();
                 if (data.collapsed) {
                     Ox.forEach(pandora.$ui.folderList, function($list) {
                         $list.loseFocus();
