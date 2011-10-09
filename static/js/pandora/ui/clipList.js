@@ -10,7 +10,8 @@ pandora.ui.clipList = function(videoRatio) {
             fixedRatio: fixedRatio,
             item: function(data, sort, size) {
                 size = size || 128; // fixme: is this needed?
-                var ratio, width, height, url, sortKey, info;
+                var ratio, width, height,
+                    format, info, sortKey, url;
                 if (!ui.item) {
                     ratio = data.videoRatio;
                     width = ratio > fixedRatio ? size : Math.round(size * ratio / fixedRatio);
@@ -19,13 +20,19 @@ pandora.ui.clipList = function(videoRatio) {
                     width = fixedRatio > 1 ? size : Math.round(size * fixedRatio);
                     height = fixedRatio > 1 ? Math.round(size / fixedRatio) : size;
                 }
-                url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg';
-                sortKey = sort[0].key.split(':').pop();
-                info = ['hue', 'saturation', 'lightness'].indexOf(sortKey) > -1
-                    ? Ox.formatColor(data[sortKey], sortKey)
-                    : Ox.formatDuration(data['in'], 'short') + ' - '
-                    + Ox.formatDuration(data['out'], 'short'),
                 title = data.subtitles[0]; //fixme: could be other layer
+                url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg';
+                sortKey = sort[0].key;
+                if (['text', 'position', 'duration'].indexOf(sortKey) > -1) {
+                    info = Ox.formatDuration(data['in'], 'short') + ' - '
+                        + Ox.formatDuration(data.out, 'short');
+                } else {
+                    format = pandora.getSortKeyData(sortKey).format;
+                    info = format
+                        ? Ox['format' + Ox.toTitleCase(format.type)]
+                            .apply(this, Ox.merge([data[sortKey]], format.args || []))
+                        : data[sortKey];
+                }
                 return {
                     height: height,
                     id: data.id,

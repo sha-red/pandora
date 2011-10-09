@@ -145,19 +145,28 @@ pandora.ui.list = function() {
                 var ui = pandora.user.ui,
                     ratio = ui.icons == 'posters'
                         ? (ui.showSitePoster ? 5/8 : data.posterRatio) : 1,
-                    info = ['hue', 'saturation', 'lightness'].indexOf(sort[0].key) > -1
-                        ? Ox.formatColor(data[sort[0].key], sort[0].key)
-                        : data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key];
+                    url = '/' + data.id + '/' + (
+                        ui.icons == 'posters'
+                        ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
+                    ) + size + '.jpg',
+                    format, info, sortKey;
+                if (['title', 'director'].indexOf(sort[0].key) > -1) {
+                    info = data['year']
+                } else {
+                    sortKey = sort[0].key,
+                    format = pandora.getSortKeyData(sortKey).format,
+                    info = format
+                        ? Ox['format' + Ox.toTitleCase(format.type)]
+                            .apply(this, Ox.merge([data[sortKey]], format.args || []))
+                        : data[sortKey];
+                }
                 size = size || 128;
                 return {
                     height: Math.round(ratio <= 1 ? size : size / ratio),
                     id: data.id,
                     info: info,
                     title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
-                    url: '/' + data.id + '/' + (
-                        ui.icons == 'posters'
-                        ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
-                    ) + size + '.jpg',
+                    url: url,
                     width: Math.round(ratio >= 1 ? size : size * ratio)
                 };
             },

@@ -73,7 +73,7 @@ Ox.load({
                 Ox.extend(pandora.site, {
                     clipKeys: Ox.map(data.site.clipKeys, function(key) {
                         return Ox.extend(key, {
-                            operator: pandora._getSortOperator(key.type)
+                            operator: pandora.getSortOperator(key.id)
                         });
                     }),
                     findKeys: Ox.map(data.site.itemKeys, function(key) {
@@ -100,7 +100,7 @@ Ox.load({
                     },
                     sortKeys: Ox.map(pandora.site.itemKeys, function(key) {
                         return key.columnWidth ? Ox.extend(key, {
-                            operator: pandora._getSortOperator(key.type)
+                            operator: pandora.getSortOperator(key.id)
                         }) : null;
                     })
                 });

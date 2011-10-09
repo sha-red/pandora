@@ -414,7 +414,7 @@ pandora.URL = (function() {
             } else {
                 action = 'push';
             }
-            self.URL[action](getState(), pandora.getPageTitle(), getState(keys));            
+            self.URL[action](getState(), pandora.getPageTitle(), getState(/*keys*/));            
         }
     };
 
