@@ -71,7 +71,7 @@ def findClips(request):
     query = parse_query(data, request.user)
     qs = order_query(query['qs'], query['sort'])
     if 'keys' in data:
-        qs = qs[query['range'][0]:query['range'][1]]
+        qs = qs.select_related()[query['range'][0]:query['range'][1]]
         response['data']['items'] = [p.json(keys=data['keys']) for p in qs]
     elif 'position' in query:
         ids = [i.public_id for i in qs]

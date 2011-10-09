@@ -50,19 +50,18 @@ class Clip(models.Model):
 
     def json(self, keys=None):
         j = {}
-        for field in ('id', 'in', 'out', 'created', 'modified',
-                      'hue', 'saturation', 'lightness', 'volume'):
-            j[field] = getattr(self, {
+        clip_keys = ('id', 'in', 'out', 'created', 'modified',
+                     'hue', 'saturation', 'lightness', 'volume')
+        for key in clip_keys:
+            j[key] = getattr(self, {
                 'id': 'public_id',
                 'in': 'start',
                 'out': 'end',
-            }.get(field, field))
+            }.get(key, key))
         if keys:
-            _j = {}
-            for key in keys:
-                if key in j:
-                    _j[key] = j[key]
-            j = _j
+            for key in j.keys():
+                if key not in keys:
+                    del j[key]
             if 'videoRatio' in keys:
                 streams = self.item.streams()
                 if streams:
@@ -73,6 +72,9 @@ class Clip(models.Model):
             for layer in filter(lambda l: l in keys, public_layers):
                 j[layer] = [a.json(keys=['value'])['value']
                             for a in self.annotations.filter(layer__name=layer)]
+            for key in keys:
+                if key not in clip_keys and key not in j:
+                    j[key] = self.item.get(key)
         return j
 
     def __unicode__(self):
