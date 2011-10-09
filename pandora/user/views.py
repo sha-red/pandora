@@ -602,7 +602,6 @@ def setPreferences(request):
 actions.register(setPreferences, cache=False)
 
 
-@login_required_json
 def resetUI(request):
     '''
         reset user ui settings to defaults
