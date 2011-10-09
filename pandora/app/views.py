@@ -86,6 +86,8 @@ actions.register(editPage)
 def redirect_url(request, url):
     if request.META['QUERY_STRING']:
         url += "?" + request.META['QUERY_STRING']
-    response = HttpResponse()
-    response.write('<script>document.location.href="%s";</script>'%url)
-    return response
+
+    if settings.CONFIG.get('sendReferrer', False):
+        return redirect(url)
+    else:
+        return HttpResponse('<script>document.location.href=%s;</script>'%json.dumps(url))
