@@ -79,7 +79,7 @@ class Event(models.Model):
     def save(self, *args, **kwargs):
         if not self.name_sort:
             self.name_sort = self.name
-        self.name_find = self.name + '||'.join(self.alternativeNames)
+        self.name_find = '||' + self.name + '||'.join(self.alternativeNames) + '||'
         super(Event, self).save(*args, **kwargs)
 
     def get_id(self):

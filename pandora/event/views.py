@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 
+import ox
 from ox.utils import json
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
@@ -10,7 +11,7 @@ from api.actions import actions
 from item import utils
 
 import models
-
+import tasks
 
 @login_required_json
 def addEvent(request):
@@ -37,7 +38,9 @@ def addEvent(request):
             if key in data and data[key]:
                 setattr(event, key, data[key])
         event.save()
+        tasks.update_matches.delay(event.id)
         response = json_response(status=200, text='created')
+        response['data'] = event.json()
     else:
         response = json_response(status=403, text='name exists')
         response['data']['names'] = existing_names
@@ -57,7 +60,7 @@ def editEvent(request):
             update provides keys of event with id
     '''
     data = json.loads(request.POST['data'])
-    event = get_object_or_404_json(models.Event, pk=data['id'])
+    event = get_object_or_404_json(models.Event, pk=ox.from26(data['id']))
     if event.editable(request.user):
         conflict = False
         conflict_names = []
@@ -72,6 +75,7 @@ def editEvent(request):
                 if key in data:
                     setattr(event, key, data[key])
             event.save()
+            tasks.update_matches.delay(event.id)
             response = json_response(status=200, text='updated')
         else:
             response = json_response(status=403, text='Event name conflict')
