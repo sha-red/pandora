@@ -149,9 +149,10 @@ pandora.ui.list = function() {
                         ui.icons == 'posters'
                         ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
                     ) + size + '.jpg',
-                    format, info, sortKey;
-                if (['title', 'director'].indexOf(sort[0].key) > -1) {
-                    info = data['year']
+                    sortKey = sort[0].key,
+                    format, info;
+                if (['title', 'director'].indexOf(sortKey) > -1) {
+                    info = data['year'];
                 } else {
                     sortKey = sort[0].key,
                     format = pandora.getSortKeyData(sortKey).format,

@@ -1,7 +1,8 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
 pandora.ui.viewSelect = function() {
-    var viewKey = !pandora.user.ui.item ? 'listView' : 'itemView',
+    var sortKey = !pandora.user.ui.item ? 'listSort' : 'itemSort',
+        viewKey = !pandora.user.ui.item ? 'listView' : 'itemView',
         that = Ox.Select({
             id: 'viewSelect',
             items: Ox.map(pandora.site[viewKey + 's'], function(view) {
@@ -22,7 +23,16 @@ pandora.ui.viewSelect = function() {
         })
         .bindEvent({
             change: function(data) {
-                pandora.UI.set(viewKey, data.selected[0].id);
+                var key = data.selected[0].id,
+                    set = {};
+                set[viewKey] = key
+                if (
+                    !pandora.isClipView(key, pandora.user.ui.item)
+                    && ['title', 'position'].indexOf(pandora.user.ui[sortKey][0].key) > -1
+                ) {
+                    set[sortKey] = pandora.site.user.ui.listSort;
+                }
+                pandora.UI.set(set);
             },
             pandora_listview: function(data) {
                 that.selectItem(data.value);

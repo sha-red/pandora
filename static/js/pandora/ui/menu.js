@@ -210,7 +210,14 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'viewicons') {
                     pandora.UI.set({icons: value});
                 } else if (data.id == 'viewmovies') {
-                    pandora.UI.set('listView', value);
+                    var set = {listView: value};
+                    if (
+                        !pandora.isClipView(key, pandora.user.ui.item)
+                        && ['title', 'position'].indexOf(pandora.user.ui.listSort[0].key) > -1
+                    ) {
+                        set.listSort = pandora.site.user.ui.listSort;
+                    }
+                    pandora.UI.set(set);
                 } else if (['personallists', 'favoritelists', 'featuredlists'].indexOf(value) > -1) {
                     pandora.UI.set({list: value.substr(8)});
                 }
@@ -277,6 +284,7 @@ pandora.ui.mainMenu = function() {
                 that[data.value.length ? 'enableItem' : 'disableItem']('newlistfromselection');
             },
             pandora_listview: function(data) {
+                pandora.$ui.mainMenu.checkItem('viewMenu_movies_' + data.value);
                 if (pandora.isClipView() != pandora.isClipView(data.previousValue)) {
                     that.replaceMenu('sortMenu', getSortMenu());
                 }
