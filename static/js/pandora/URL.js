@@ -36,14 +36,16 @@ pandora.URL = (function() {
             state.view = 'map';
             state.span = pandora.user.ui.mapSelection
                 ? '@' + pandora.user.ui.mapSelection : '';
-            state.sort = pandora.user.ui.sort;
+            state.sort = !pandora.user.ui.item
+                ? pandora.user.ui.listSort : pandora.user.ui.itemSort;
         }
         if (!keys || keys.indexOf('mapFind') > -1) {
             state.item = pandora.user.ui.item;
             state.view = 'map';
             state.span = pandora.user.ui.mapFind
                 ? '@' + pandora.user.ui.mapFind : '';
-            state.sort = pandora.user.ui.sort;
+            state.sort = !pandora.user.ui.item
+                ? pandora.user.ui.listSort : pandora.user.ui.itemSort;
         }
         if (!keys || keys.filter(function(key) {
             return /^videoPoints/.test(key);
@@ -76,6 +78,11 @@ pandora.URL = (function() {
                 state.item = pandora.user.ui.item;
                 state.view = pandora.user.ui.itemView;
                 state.sort = pandora.user.ui.itemSort;
+            }
+            if (pandora.user.ui.mapSelection) {
+                state.span = '@' + pandora.user.ui.mapSelection;
+            } else if (pandora.user.ui.mapFind) {
+                state.span = '@' + pandora.user.ui.mapFind;
             }
             /*
             : pandora.isClipView(pandora.user.ui.itemView)
