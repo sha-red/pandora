@@ -13,5 +13,4 @@ django-celery>2.1.1
 -e git://github.com/bit/django-extensions.git#egg=django_extensions
 -e bzr+http://firefogg.org/dev/python-firefogg/#egg=python-firefogg
 -e git+git://github.com/dcramer/django-devserver#egg=django_devserver
-transmissionrpc
 gunicorn

@@ -132,7 +132,6 @@ INSTALLED_APPS = (
     'person',
     'place',
     'text',
-    'torrent',
     'edit',
     'news',
     'user',
