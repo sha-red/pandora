@@ -249,6 +249,7 @@ Positions
         if 'accessed' in _p:
             qs = qs.annotate(a=Max('accessed__access'))
         if 'viewed' in _p or 'popularity' in _p or 'accessed' in _p:
+            qs = qs.select_realed()
             response['data']['items'] = [only_p_sums(m) for m in qs]
         else:
             response['data']['items'] = [only_p(m['json']) for m in qs.values('json')]

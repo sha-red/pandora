@@ -13,7 +13,7 @@ from django.db.models import Max, Sum
 from ox.django.shortcuts import render_to_json_response, json_response
 from ox.utils import json
 
-from user.models import init_user
+from user.models import init_user, get_ui
 from item.models import ItemSort
 
 from actions import actions
@@ -73,7 +73,8 @@ def init(request):
         response['data']['user'] = init_user(request.user, request)
     else:
         response['data']['user'] = response['data']['site']['user']
-
+        response['data']['user']['ui'] = get_ui(json.loads(request.session.get('ui', '{}')))
+    print request.session, request.session.keys()
     return render_to_json_response(response)
 actions.register(init)
 
