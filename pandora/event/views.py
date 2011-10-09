@@ -32,7 +32,8 @@ def addEvent(request):
             existing_names.append(name)
     if not exists:
         event = models.Event(name = data['name'])
-        for key in ('start', 'end', 'alternativeNames'):
+        for key in ('start', 'startTime', 'end', 'endTime', 'duration', 'durationTime',
+                    'alternativeNames'):
             if key in data and data[key]:
                 setattr(event, key, data[key])
         event.save()
@@ -66,7 +67,8 @@ def editEvent(request):
                 conflict = True
                 conflict_names.append(name)
         if not conflict:
-            for key in ('start', 'end', 'alternativeNames'):
+            for key in ('start', 'startTime', 'end', 'endTime', 'duration', 'durationTime',
+                        'alternativeNames'):
                 if key in data:
                     setattr(event, key, data[key])
             event.save()
