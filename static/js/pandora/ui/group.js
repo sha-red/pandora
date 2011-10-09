@@ -78,7 +78,9 @@ pandora.ui.group = function(id) {
                 pandora.$ui.list.triggerEvent('paste', data);
             },
             select: function(data) {
-                // FIXME: cant index be an empty array, instead of -1?
+                // fixme: cant index be an empty array, instead of -1?
+                // FIXME: this is still incorrect when deselecting a group item
+                // makes a selected item in another group disappear
                 var conditions = data.ids.map(function(value) {
                         return {
                             key: id,

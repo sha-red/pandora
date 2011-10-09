@@ -42,6 +42,11 @@ Ox.load({
 
             if (!browserSupported) {
                 return;
+                /*
+                $('.OxLoadingScreen')
+                    .css({opacity: 0.9})
+                    .click($(this).remove);
+                */
             }
 
             Ox.extend(pandora, {

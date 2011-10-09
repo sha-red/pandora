@@ -500,6 +500,7 @@
         {"name": "Restricted", "color": [255, 128, 0], "description": "Only staff and admin can see and play."},
         {"name": "Private", "color": [255, 0, 0], "description": "Only admins can see and play."}
     ],
+    "sendReferrer": false,
     "site": {
         "id": "{{settings.SITEID}}",
         "name": "{{settings.SITENAME}}",

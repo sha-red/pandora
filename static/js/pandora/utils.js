@@ -134,6 +134,17 @@ pandora.addList = function() {
     }
 };
 
+pandora.createLinks = function($element) {
+    $element.find('a').click(function(event) {
+        if (event.target.hostname == document.location.hostname) {
+            pandora.URL.push(event.target.pathname);
+        } else {
+            document.location.href = '/url=' + encodeURIComponent(event.target.href);
+        }
+        return false;
+    });
+};
+
 pandora.enableDragAndDrop = function($list, canMove) {
 
     var $tooltip = Ox.Tooltip({
@@ -774,6 +785,8 @@ pandora.selectList = function() {
         // are either list or groups), or if all conditions in an | query have
         // the same group id as key and "==" as operator
         Ox.print('getFindState', find)
+        // FIXME: this is still incorrect when you select a lot of group items
+        // and reload the page (will be advanced)
         var conditions, indices, state = {index: -1, key: '*', value: ''};
         if (find.operator == '&') {
             // number of conditions that are not list or groups

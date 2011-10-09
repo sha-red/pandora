@@ -390,14 +390,7 @@ pandora.ui.infoView = function(data) {
         }).join(', ');
     }
 
-    $text.find('a').click(function(event) {
-        if (event.target.hostname == document.location.hostname) {
-            pandora.URL.push(event.target.pathname);
-        } else {
-            document.location.href = '/url=' + encodeURIComponent(event.target.href);
-        }
-        return false;
-    });
+    pandora.createLinks($text);
 
     function renderList() {
         pandora.api.get({
