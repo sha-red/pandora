@@ -3,6 +3,7 @@
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.conf import settings
+from django.http import HttpResponse
 
 from ox.django.shortcuts import json_response, render_to_json_response
 from ox.django.decorators import login_required_json
@@ -85,4 +86,6 @@ actions.register(editPage)
 def redirect_url(request, url):
     if request.META['QUERY_STRING']:
         url += "?" + request.META['QUERY_STRING']
-    return redirect(url, permanent=True)
+    response = HttpResponse()
+    response.write('<script>document.location.href="%s";</script>'%url)
+    return response
