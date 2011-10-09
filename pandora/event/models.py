@@ -19,8 +19,9 @@ class Event(models.Model):
         Events are events in time that can be once or recurring,
         From Mondays to Spring to 1989 to Roman Empire
     '''
-    class Meta:
-        ordering = ('name_sort', )
+    #class Meta:
+    #    ordering = ('name_sort', )
+
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -55,6 +56,11 @@ class Event(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def editable(self, user):
+        if self.user == user or user.is_staff:
+            return True
+        return False
  
     def get_matches(self):
         q = Q(value__icontains=" " + self.name)|Q(value__startswith=self.name)
@@ -80,6 +86,7 @@ class Event(models.Model):
         if not self.name_sort:
             self.name_sort = self.name
         self.name_find = '||' + self.name + '||'.join(self.alternativeNames) + '||'
+        self.durationTime = self.endTime - self.startTime
         super(Event, self).save(*args, **kwargs)
 
     def get_id(self):
@@ -94,6 +101,8 @@ class Event(models.Model):
         for key in ('created', 'modified',
                     'name', 'alternativeNames',
                     'start', 'end', 'duration',
+                    'startTime', 'endTime', 'durationTime',
                     'type', 'matches'):
             j[key] = getattr(self, key)
+        j['nameSort'] = self.name_sort
         return j

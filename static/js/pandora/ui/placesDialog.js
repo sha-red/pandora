@@ -23,18 +23,18 @@ pandora.ui.placesDialog = function() {
                         }, data), callback);
                     },
                     addPlace: function(place, callback) {
-                        Ox.print('ADDPLACE', place);
                         pandora.api.addPlace(place, function(result) {
                             Ox.Request.clearCache(); // fixme: remove
                             callback(result);
                         });
                     },
                     editPlace: function(place, callback) {
-                        Ox.print('EDITPLACE', place);
-                        pandora.api.editPlace(place, callback);
+                        pandora.api.editPlace(place, function(result) {
+                            Ox.Request.clearCache(); // fixme: remove
+                            callback(result);
+                        });
                     },
                     removePlace: function(place, callback) {
-                        Ox.print('REMOVEPLACE', place);
                         pandora.api.removePlace(place, function(result) {
                             Ox.Request.clearCache(); // fixme: remove
                             callback(result);

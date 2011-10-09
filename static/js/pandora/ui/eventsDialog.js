@@ -36,8 +36,26 @@ pandora.ui.eventsDialog = function() {
         }, function(result) {
             that.options({
                 content: Ox.ListCalendar({
-                    height: height - 48,
+                    addEvent: function(event, callback) {
+                        pandora.api.addEvent(event, function(result) {
+                            Ox.Request.clearCache(); // fixme: remove
+                            callback(result);
+                        });
+                    },
+                    editEvent: function(event, callback) {
+                        pandora.api.editEvent(event, function(result) {
+                            Ox.Request.clearCache(); // fixme: remove
+                            callback(result);
+                        });
+                    },
                     events: result.data.items,
+                    height: height - 48,
+                    removeEvent: function(event, callback) {
+                        pandora.api.removeEvent(event, function(result) {
+                            Ox.Request.clearCache(); // fixme: remove
+                            callback(result);
+                        });
+                    },
                     width: width
                 })
             });

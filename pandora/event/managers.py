@@ -2,6 +2,8 @@
 # vi:si:et:sw=4:sts=4:ts=4
 
 from django.db.models import Q, Manager
+from ox.django.query import QuerySet
+
 
 def parseCondition(condition, user):
     k = condition.get('key', 'name')
@@ -60,7 +62,7 @@ def parseConditions(conditions, operator, user):
 class EventManager(Manager):
 
     def get_query_set(self):
-        return super(EventManager, self).get_query_set()
+        return QuerySet(self.model)
 
     def find(self, data, user):
         qs = self.get_query_set()

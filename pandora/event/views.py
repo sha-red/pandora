@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
+import unicodedata
 
 import ox
 from ox.utils import json
@@ -34,9 +35,14 @@ def addEvent(request):
     if not exists:
         event = models.Event(name = data['name'])
         for key in ('start', 'startTime', 'end', 'endTime', 'duration', 'durationTime',
-                    'alternativeNames'):
+                    'type', 'alternativeNames'):
             if key in data and data[key]:
-                setattr(event, key, data[key])
+                value = data[key]
+                if key == 'alternativeNames':
+                    value = tuple(value)
+                setattr(event, key, value)
+        if 'nameSort' in data:
+            event.name_sort = unicodedata.normalize('NFKD', data['nameSort'])
         event.save()
         tasks.update_matches.delay(event.id)
         response = json_response(status=200, text='created')
@@ -70,13 +76,19 @@ def editEvent(request):
                 conflict = True
                 conflict_names.append(name)
         if not conflict:
-            for key in ('start', 'startTime', 'end', 'endTime', 'duration', 'durationTime',
-                        'alternativeNames'):
+            for key in ('name', 'start', 'startTime', 'end', 'endTime', 'duration', 'durationTime',
+                        'type', 'alternativeNames'):
                 if key in data:
-                    setattr(event, key, data[key])
+                    value = data[key]
+                    if key == 'alternativeNames':
+                        value = tuple(value)
+                    setattr(event, key, value)
+            if 'nameSort' in data:
+                event.name_sort = unicodedata.normalize('NFKD', data['nameSort'])
             event.save()
             tasks.update_matches.delay(event.id)
             response = json_response(status=200, text='updated')
+            response['data'] = event.json()
         else:
             response = json_response(status=403, text='Event name conflict')
             response['data']['names'] = conflict_names
@@ -96,7 +108,7 @@ def removeEvent(request):
 
     '''
     data = json.loads(request.POST['data'])
-    event = get_object_or_404_json(models.Event, pk=data['id'])
+    event = get_object_or_404_json(models.Event, pk=ox.from26(data['id']))
     if event.editable(request.user):
         event.delete()
         response = json_response(status=200, text='removed')
@@ -174,7 +186,8 @@ Positions
 
     data = json.loads(request.POST['data'])
     query = parse_query(data, request.user)
-    qs = query['qs'].distinct()
+    qs = order_query(query['qs'], query['sort'])
+    qs = qs.distinct()
     if 'keys' in data:
         qs = qs[query['range'][0]:query['range'][1]]
         qs = qs.select_related()

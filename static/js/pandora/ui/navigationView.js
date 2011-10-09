@@ -202,6 +202,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 })
                 .bindEvent({
                     resize: function(data) {
+                        // triggered by SplitPanel
                         $element.resizeCalendar();
                     },
                     select: selectItem
