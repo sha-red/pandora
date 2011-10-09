@@ -246,7 +246,7 @@ Positions
     qs = order_query(query['qs'], query['sort'])
     qs = qs.distinct()
     if 'keys' in data:
-        qs = qs.select_realed()
+        qs = qs.select_related()
         qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [p.json(data['keys'], request.user) for p in qs]
     elif 'position' in query:
