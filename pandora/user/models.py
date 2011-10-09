@@ -39,59 +39,7 @@ class UserProfile(models.Model):
         return prefs
 
     def get_ui(self):
-        ui = {}
-        config = copy.deepcopy(settings.CONFIG)
-        ui.update(config['user']['ui'])
-        def updateUI(ui, new):
-            '''
-                only update set keys in dicts
-            '''
-            for key in new:
-                if isinstance(new[key], dict) and key in ui:
-                    ui[key] = updateUI(ui[key], new[key])
-                elif isinstance(ui, dict):
-                    ui[key] = new[key]
-            return ui
-        ui = updateUI(ui, self.ui)
-        if not 'lists' in ui:
-            ui['lists'] = {}
-            ui['lists'][''] = copy.deepcopy(config['user']['ui']['lists'][''])
-
-        def add(lists, section):
-            ids = []
-            for l in lists:
-                qs = Position.objects.filter(section=section)
-                if section == 'featured':
-                    try:
-                        pos = Position.objects.get(list=l, section=section)
-                        created = False
-                    except Position.DoesNotExist:
-                        pos = Position(list=l, section=section, user=self.user)
-                        pos.save()
-                        created = True 
-                else:
-                    pos, created = Position.objects.get_or_create(list=l, user=self.user, section=section)
-                    qs = qs.filter(user=self.user)
-                if created:
-                    pos.position = qs.aggregate(Max('position'))['position__max'] + 1
-                    pos.save()
-                id = l.get_id()
-                '''
-                if id not in ui['lists']:
-                    ui['lists'][id] = {}
-                    ui['lists'][id].update(ui['lists'][''])
-                '''
-                ids.append(id)
-            return ids
-
-        ids = ['']
-        ids += add(self.user.lists.exclude(status="featured"), 'personal')
-        ids += add(self.user.subscribed_lists.filter(status='public'), 'public')
-        ids += add(List.objects.filter(status='featured'), 'featured')
-        for i in ui['lists'].keys():
-            if i not in ids:
-                del ui['lists'][i]
-        return ui
+        return get_ui(self.ui, self.user)
 
     def set_level(self, level):
         self.level = settings.CONFIG['userLevels'].index(level)
@@ -103,6 +51,62 @@ def user_post_save(sender, instance, **kwargs):
     profile, new = UserProfile.objects.get_or_create(user=instance)
 
 models.signals.post_save.connect(user_post_save, sender=User)
+
+def get_ui(user_ui, user=None):
+    ui = {}
+    config = copy.deepcopy(settings.CONFIG)
+    ui.update(config['user']['ui'])
+    def updateUI(ui, new):
+        '''
+            only update set keys in dicts
+        '''
+        for key in new:
+            if isinstance(new[key], dict) and key in ui:
+                ui[key] = updateUI(ui[key], new[key])
+            elif isinstance(ui, dict):
+                ui[key] = new[key]
+        return ui
+    ui = updateUI(ui, user_ui)
+    if not 'lists' in ui:
+        ui['lists'] = {}
+        ui['lists'][''] = copy.deepcopy(config['user']['ui']['lists'][''])
+
+    def add(lists, section):
+        ids = []
+        for l in lists:
+            qs = Position.objects.filter(section=section)
+            if section == 'featured':
+                try:
+                    pos = Position.objects.get(list=l, section=section)
+                    created = False
+                except Position.DoesNotExist:
+                    pos = Position(list=l, section=section, user=user)
+                    pos.save()
+                    created = True 
+            else:
+                pos, created = Position.objects.get_or_create(list=l, user=user, section=section)
+                qs = qs.filter(user=user)
+            if created:
+                pos.position = qs.aggregate(Max('position'))['position__max'] + 1
+                pos.save()
+            id = l.get_id()
+            '''
+            if id not in ui['lists']:
+                ui['lists'][id] = {}
+                ui['lists'][id].update(ui['lists'][''])
+            '''
+            ids.append(id)
+        return ids
+
+    ids = ['']
+    if user:
+        ids += add(user.lists.exclude(status="featured"), 'personal')
+        ids += add(user.subscribed_lists.filter(status='public'), 'public')
+    ids += add(List.objects.filter(status='featured'), 'featured')
+    for i in ui['lists'].keys():
+        if i not in ids:
+            del ui['lists'][i]
+    return ui
 
 def user_json(user, keys=None, request_user=None):
     p = user.get_profile()

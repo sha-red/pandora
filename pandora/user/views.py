@@ -64,6 +64,7 @@ def signin(request):
             user = authenticate(username=data['username'], password=data['password'])
             if user is not None:
                 if user.is_active:
+                    request.session['ui'] = '{}'
                     login(request, user)
                     user_json = models.init_user(user, request)
                     response = json_response({
@@ -612,10 +613,13 @@ def resetUI(request):
             'status': {'code': int, 'text': string}
         }
     '''
-    profile = request.user.get_profile()
-    profile.ui = {}
-    profile.save()
     response = json_response()
+    if request.user.is_authenticated():
+        profile = request.user.get_profile()
+        profile.ui = {}
+        profile.save()
+    else:
+        request.session['ui'] = '{}'
     return render_to_json_response(response)
 actions.register(resetUI, cache=False)
 
@@ -634,23 +638,29 @@ def setUI(request):
     data = json.loads(request.POST['data'])
     if request.user.is_authenticated():
         profile = request.user.get_profile()
-        for key in data:
-            keys = re.sub('([^\\\\])\.', '\\1\n', key).split('\n')
-            value = data[key]
-            p = profile.ui
-            while len(keys)>1:
-                key = keys.pop(0)
-                if isinstance(p, list):
-                    p = p[getPositionById(p, key)]
-                else:
-                    if key not in p:
-                        p[key] = {}
-                    p = p[key]
-            if value == None and keys[0] in p:
-                del p[keys[0]]
+        ui = profile.ui
+    else:
+        ui = json.loads(request.session.get('ui', '{}'))
+    for key in data:
+        keys = re.sub('([^\\\\])\.', '\\1\n', key).split('\n')
+        value = data[key]
+        p = ui
+        while len(keys)>1:
+            key = keys.pop(0)
+            if isinstance(p, list):
+                p = p[getPositionById(p, key)]
             else:
-                p[keys[0]] = value
+                if key not in p:
+                    p[key] = {}
+                p = p[key]
+        if value == None and keys[0] in p:
+            del p[keys[0]]
+        else:
+            p[keys[0]] = value
+    if request.user.is_authenticated():
         profile.save()
+    else:
+        request.session['ui'] = json.dumps(ui)
 
     if data.get('item', False):
         item = get_object_or_404_json(Item, itemId=data['item'])
