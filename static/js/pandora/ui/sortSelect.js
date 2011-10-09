@@ -1,23 +1,27 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.sortSelect = function() {
-    var items = [],
+    var isClipView = pandora.isClipView(),
+        items = [],
         sortKey = !pandora.user.ui.item ? 'listSort' : 'itemSort',
         that;
-    if (pandora.isClipView()) {
+    if (isClipView) {
         items = pandora.site.clipKeys.map(function(key) {
             return Ox.extend(Ox.clone(key), {
                 checked: key.id == pandora.user.ui[sortKey][0].key,
                 title: 'Sort by ' + (!pandora.user.ui.item ? 'Clip ' : '') + key.title
             });
         });
-        //!pandora.user.ui.item && items.push({});
+        // fixme: a separator would be good
+        // !pandora.user.ui.item && items.push({});
     }
     if (!pandora.user.ui.item) {
-        items = Ox.merge(items, pandora.site.sortKeys.map(function(key) {
-            return Ox.extend(Ox.clone(key), {
-                checked: key.id == pandora.user.ui[sortKey][0].key,
-                title: 'Sort by ' + key.title
-            });
+        items = Ox.merge(items, Ox.map(pandora.site.sortKeys, function(key) {
+            return Ox.getPositionById(items, key.id) == -1
+                ? Ox.extend(Ox.clone(key), {
+                    checked: key.id == pandora.user.ui[sortKey][0].key,
+                    title: 'Sort by ' + key.title
+                })
+                : null;
         }));
     }
     that = Ox.Select({

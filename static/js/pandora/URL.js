@@ -79,10 +79,12 @@ pandora.URL = (function() {
                 state.view = pandora.user.ui.itemView;
                 state.sort = pandora.user.ui.itemSort;
             }
-            if (pandora.user.ui.mapSelection) {
-                state.span = '@' + pandora.user.ui.mapSelection;
-            } else if (pandora.user.ui.mapFind) {
-                state.span = '@' + pandora.user.ui.mapFind;
+            if (state.view == 'map') {
+                if (pandora.user.ui.mapSelection) {
+                    state.span = '@' + pandora.user.ui.mapSelection;
+                } else if (pandora.user.ui.mapFind) {
+                    state.span = '@' + pandora.user.ui.mapFind;
+                }
             }
             /*
             : pandora.isClipView(pandora.user.ui.itemView)
@@ -414,7 +416,7 @@ pandora.URL = (function() {
             } else {
                 action = 'push';
             }
-            self.URL[action](getState(), pandora.getPageTitle(), getState(keys));            
+            self.URL[action](getState(), pandora.getPageTitle(), getState(/*keys*/));            
         }
     };
 

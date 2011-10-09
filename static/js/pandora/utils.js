@@ -592,19 +592,15 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
     };
 }());
 
-pandora._getSortOperator = function(type) {
-    return ['hue', 'string', 'text'].indexOf(
-        Ox.isArray(type) ? type[0] : type
-    ) > -1 ? '+' : '-';
+pandora.getSortKeyData = function(key) {
+    return Ox.getObjectById(pandora.site.itemKeys, key)
+        || Ox.getObjectById(pandora.site.clipKeys, key);
 }
 
-pandora.getSortOperator = function(key) { // fixme: remove?
-    var type = Ox.getObjectById(
-            /^clip:/.test(key) ? pandora.site.clipKeys : pandora.site.itemKeys,
-            key
-        ).type;
-    return ['hue', 'string', 'text'].indexOf(
-        Ox.isArray(type) ? type[0] : type
+pandora.getSortOperator = function(key) {
+    var data = pandora.getSortKeyData(key);
+    return data.sortOperator || ['string', 'text'].indexOf(
+        Ox.isArray(data.type) ? data.type[0] : data.type
     ) > -1 ? '+' : '-';
 };
 

@@ -50,13 +50,14 @@ class Clip(models.Model):
 
     def json(self, keys=None):
         j = {}
-        clip_keys = ('id', 'in', 'out', 'created', 'modified',
+        clip_keys = ('id', 'in', 'out', 'position', 'created', 'modified',
                      'hue', 'saturation', 'lightness', 'volume')
         for key in clip_keys:
             j[key] = getattr(self, {
                 'id': 'public_id',
                 'in': 'start',
                 'out': 'end',
+                'position': 'start',
             }.get(key, key))
         if keys:
             for key in j.keys():

@@ -31,9 +31,14 @@ def order_query(qs, sort):
         operator = e['operator']
         if operator != '-':
             operator = ''
+        clip_keys = ('public_id', 'start', 'end', 'hue', 'saturation', 'lightness', 'volume',
+                     'annotations__value')
         key = {
+            'id': 'public_id',
             'in': 'start',
             'out': 'end',
+            'position': 'start',
+            'text': 'annotations__value',
         }.get(e['key'], e['key'])
         if key.startswith('clip:'):
             key = e['key'][len('clip:'):]
@@ -41,7 +46,7 @@ def order_query(qs, sort):
                 'text': 'annotations__value',
                 'position': 'start',
             }.get(key, key)
-        elif key not in ('start', 'end', 'annotations__value'):
+        elif key not in clip_keys:
             #key mgith need to be changed, see order_sort in item/views.py
             key = "item__sort__%s" % key
         order = '%s%s' % (operator, key)

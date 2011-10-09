@@ -10,13 +10,13 @@
         "canSeeExtraItemViews": {"friend": true, "staff": true, "admin": true}
     },
     "clipKeys": [
-        {"id": "clip:text", "title": "Text", "type": "string"},
-        {"id": "clip:position", "title": "Position", "type": "float"},
-        {"id": "clip:duration", "title": "Duration", "type": "float"},
-        {"id": "clip:hue", "title": "Hue", "type": "hue"},
-        {"id": "clip:saturation", "title": "Saturation", "type": "float"},
-        {"id": "clip:lightness", "title": "Lightness", "type": "float"},
-        {"id": "clip:volume", "title": "Volume", "type": "float"}
+        {"id": "text", "title": "Text", "type": "string"},
+        {"id": "position", "title": "Position", "type": "float", "sortOperator": "-"},
+        {"id": "duration", "title": "Duration", "type": "float"},
+        {"id": "hue", "title": "Hue", "type": "float", "sortOperator": "-"},
+        {"id": "saturation", "title": "Saturation", "type": "float"},
+        {"id": "lightness", "title": "Lightness", "type": "float"},
+        {"id": "volume", "title": "Volume", "type": "float"}
     ],
     "groups": [
         {"id": "director", "title": "Director", "type": "string"},
@@ -298,9 +298,10 @@
         {
             "id": "hue",
             "title": "Hue",
-            "type": "hue",
+            "type": "float",
             "columnWidth": 90,
-            "format": {"type": "color", "args": ["hue"]}
+            "format": {"type": "color", "args": ["hue"]},
+            "sortOperator": "-"
         },
         {
             "id": "saturation",
@@ -567,7 +568,7 @@
             "icons": "posters",
             "infoIconSize": 256,
             "item": "",
-            "itemSort": [{"key": "clip:position", "operator": "+"}],
+            "itemSort": [{"key": "position", "operator": "+"}],
             "itemView": "info",
             "listColumns": ["title", "director", "country", "year", "language", "runtime", "genre"],
             "listColumnWidth": {},
