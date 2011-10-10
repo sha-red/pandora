@@ -76,6 +76,8 @@ def editEvent(request):
                 conflict = True
                 conflict_names.append(name)
         if not conflict:
+            if 'name' in data and event.name_sort == unicodedata.normalize('NFKD', event.name):
+                event.name_sort = unicodedata.normalize('NFKD', data['name'])
             for key in ('name', 'start', 'startTime', 'end', 'endTime', 'duration', 'durationTime',
                         'type', 'alternativeNames'):
                 if key in data:
