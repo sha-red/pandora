@@ -24,8 +24,8 @@ pandora.ui.clipList = function(videoRatio) {
                 url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg';
                 sortKey = sort[0].key;
                 if (['text', 'position', 'duration'].indexOf(sortKey) > -1) {
-                    info = Ox.formatDuration(data['in'], 'short') + ' - '
-                        + Ox.formatDuration(data.out, 'short');
+                    info = Ox.formatDuration(data['in']) + ' - '
+                        + Ox.formatDuration(data.out);
                 } else {
                     format = pandora.getSortKeyData(sortKey).format;
                     info = format

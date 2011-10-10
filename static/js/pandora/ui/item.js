@@ -94,7 +94,8 @@ pandora.ui.item = function() {
                                         return {
                                             height: height,
                                             id: data['id'],
-                                            info: Ox.formatDuration(data['in'], 'short') +' - '+ Ox.formatDuration(data['out'], 'short'),
+                                            info: Ox.formatDuration(data['in']) + ' - '
+                                                + Ox.formatDuration(data['out']),
                                             title: data.value,
                                             url: url,
                                             width: width

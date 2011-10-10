@@ -112,6 +112,7 @@ pandora.UI = (function() {
                 });
             });
         });
+
         pandora.URL.update(Object.keys(
             !pandora.$ui.appPanel ? args : trigger
         ));

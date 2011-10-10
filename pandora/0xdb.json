@@ -273,7 +273,7 @@
             "title": "Duration",
             "type": "float",
             "columnWidth": 90,
-            "format": {"type": "duration", "args": [0, "short"]}
+            "format": {"type": "duration", "args": []}
         },
         {
             "id": "resolution",
