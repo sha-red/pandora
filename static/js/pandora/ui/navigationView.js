@@ -188,7 +188,8 @@ pandora.ui.navigationView = function(type, videoRatio) {
         pandora.api.findEvents({
             itemQuery: ui.find,
             keys: ['id', 'name', 'start', 'end'],
-            query: {}
+            query: {},
+            range: [0, 1000000]
         }, function(result) {
             that.replaceElement(0,
                 $element = Ox.Calendar({

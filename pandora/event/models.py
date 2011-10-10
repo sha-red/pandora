@@ -101,7 +101,6 @@ class Event(models.Model):
         for key in ('created', 'modified',
                     'name', 'alternativeNames',
                     'start', 'end', 'duration',
-                    'startTime', 'endTime', 'durationTime',
                     'type', 'matches'):
             j[key] = getattr(self, key)
         j['nameSort'] = self.name_sort
