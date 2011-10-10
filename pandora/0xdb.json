@@ -92,7 +92,7 @@
             "title": "Runtime", 
             "type": "integer",
             "columnWidth": 60,
-            "format": {"type": "duration", "args": [0, "medium"]}
+            "format": {"type": "duration", "args": [0, "short"]}
         },
         {
             "id": "writer",
