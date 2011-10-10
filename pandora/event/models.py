@@ -29,7 +29,7 @@ class Event(models.Model):
     user = models.ForeignKey(User, null=True, related_name='events')
 
     name = models.CharField(null=True, max_length=255, unique=True)
-    name_sort = models.CharField(null=True, max_length=255, unique=True)
+    name_sort = models.CharField(null=True, max_length=255, db_index=True)
     name_find = models.TextField(default='', editable=True)
     wikipediaId = models.CharField(max_length=1000, blank=True)
 
