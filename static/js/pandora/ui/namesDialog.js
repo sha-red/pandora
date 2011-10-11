@@ -5,11 +5,6 @@ pandora.ui.namesDialog = function() {
         width = 576 + Ox.UI.SCROLLBAR_SIZE,
         numberOfNames = 0,
 
-        $status = Ox.Label({
-                title: 'Loading...'
-            })
-            .css({float: 'left', margin: '4px'}),
-
         $findSelect = Ox.Select({
                 items: [
                     {id: 'all', title: 'Find: All'}
@@ -85,7 +80,6 @@ pandora.ui.namesDialog = function() {
                         width: 64
                     },
                 ],
-                columnsRemovable: true,
                 columnsVisible: true,
                 items: pandora.api.findNames,
                 max: 1,
@@ -95,10 +89,10 @@ pandora.ui.namesDialog = function() {
             .bindEvent({
                 init: function(data) {
                     numberOfNames = data.items;
-                    $status.options({
-                        title: Ox.formatNumber(numberOfNames)
-                            + ' name' + (numberOfNames == 1 ? '' : 's')
-                    });
+                    $status.html(
+                        Ox.formatNumber(numberOfNames)
+                        + ' name' + (numberOfNames == 1 ? '' : 's')
+                    );
                 },
                 submit: function(data) {
                     pandora.api.editName({
@@ -143,7 +137,20 @@ pandora.ui.namesDialog = function() {
             padding: 0,
             title: 'Manage Names',
             width: width
-        });
+        }),
+
+    $status = $('<div>')
+        .css({
+            position: 'absolute',
+            top: '4px',
+            left: '64px',
+            right: '64px',
+            bottom: '4px',
+            paddingTop: '2px',
+            fontSize: '9px',
+            textAlign: 'center',
+        })
+        .appendTo(that.$element.find('.OxButtonsbar'));
 
     function updateList(key, value) {
         var query = {

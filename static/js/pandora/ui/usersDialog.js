@@ -13,11 +13,6 @@ pandora.ui.usersDialog = function() {
         numberOfUsers = 0,
         userLevels = ['member', 'friend', 'staff', 'admin'],
 
-        $status = Ox.Label({
-                title: 'Loading...'
-            })
-            .css({float: 'left', margin: '4px'}),
-
         $findSelect = Ox.Select({
                 items: [
                     {id: 'all', title: 'Find: All', checked: true},
@@ -226,11 +221,11 @@ pandora.ui.usersDialog = function() {
             .bindEvent({
                 init: function(data) {
                     numberOfUsers = data.items;
-                    $status.options({
-                        title: Ox.formatNumber(numberOfUsers)
-                            + ' user' + (numberOfUsers == 1 ? '' : 's')
-                            + ' (' + Ox.formatNumber(numberOfUsers) + ' registered, 0 guests)' 
-                    });
+                    $status.html(
+                        Ox.formatNumber(numberOfUsers)
+                        + ' user' + (numberOfUsers == 1 ? '' : 's')
+                        + ' (' + Ox.formatNumber(numberOfUsers) + ' registered, 0 guests)' 
+                    );
                 },
                 select: function(data) {
                     var values;
@@ -351,7 +346,21 @@ pandora.ui.usersDialog = function() {
             padding: 0,
             title: 'Manage Users',
             width: width
-        });
+        }),
+
+        $status = $('<div>')
+            .css({
+                position: 'absolute',
+                top: '4px',
+                left: '4px',
+                right: '256px',
+                bottom: '4px',
+                paddingTop: '2px',
+                fontSize: '9px',
+                textAlign: 'center',
+            })
+            .appendTo(that.$element.find('.OxButtonsbar'));
+
 
     function renderUserForm(userData) {
         var $checkbox;

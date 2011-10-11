@@ -5,11 +5,6 @@ pandora.ui.titlesDialog = function() {
         width = 512 + Ox.UI.SCROLLBAR_SIZE,
         numberOfTitles = 0,
 
-        $status = Ox.Label({
-                title: 'Loading...'
-            })
-            .css({float: 'left', margin: '4px'}),
-
         $findSelect = Ox.Select({
                 items: [
                     {id: 'all', title: 'Find: All'}
@@ -75,7 +70,6 @@ pandora.ui.titlesDialog = function() {
                         width: 256
                     },
                 ],
-                columnsRemovable: true,
                 columnsVisible: true,
                 items: pandora.api.findTitles,
                 keys: [],
@@ -86,10 +80,10 @@ pandora.ui.titlesDialog = function() {
             .bindEvent({
                 init: function(data) {
                     numberOfTitles = data.items;
-                    $status.options({
-                        title: Ox.formatNumber(numberOfTitles)
-                            + ' title' + (numberOfTitles == 1 ? '' : 's')
-                    });
+                    $status.html(
+                        Ox.formatNumber(numberOfTitles)
+                        + ' title' + (numberOfTitles == 1 ? '' : 's')
+                    );
                 },
                 submit: function(data) {
                     pandora.api.editTitle({
@@ -134,7 +128,20 @@ pandora.ui.titlesDialog = function() {
             padding: 0,
             title: 'Manage Titles',
             width: width
-        });
+        }),
+
+        $status = $('<div>')
+            .css({
+                position: 'absolute',
+                top: '4px',
+                left: '64px',
+                right: '64px',
+                bottom: '4px',
+                paddingTop: '2px',
+                fontSize: '9px',
+                textAlign: 'center',
+            })
+            .appendTo(that.$element.find('.OxButtonsbar'));
 
     function updateList(key, value) {
         var query = {
