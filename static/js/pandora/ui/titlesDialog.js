@@ -71,7 +71,13 @@ pandora.ui.titlesDialog = function() {
                         + ' title' + (numberOfTitles == 1 ? '' : 's')
                     );
                 },
+                open: function(data) {
+                    $list.$element
+                        .find('.OxItem.OxSelected > .OxCell.OxColumnSorttitle')
+                        .trigger('mousedown');
+                },
                 submit: function(data) {
+                    Ox.Request.clearCache('findTitles');
                     pandora.api.editTitle({
                         id: data.id,
                         sorttitle: data.value

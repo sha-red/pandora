@@ -1,6 +1,8 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.namesDialog = function() {
 
+    // FIXME: add cache invalidation
+
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = 576 + Ox.UI.SCROLLBAR_SIZE,
         numberOfNames = 0,
@@ -80,7 +82,13 @@ pandora.ui.namesDialog = function() {
                         + ' name' + (numberOfNames == 1 ? '' : 's')
                     );
                 },
+                open: function(data) {
+                    $list.$element
+                        .find('.OxItem.OxSelected > .OxCell.OxColumnSortname')
+                        .trigger('mousedown');
+                },
                 submit: function(data) {
+                    Ox.Request.clearCache('findNames');
                     pandora.api.editName({
                         id: data.id,
                         sortname: data.value
