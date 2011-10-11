@@ -57,6 +57,7 @@ def order_query(qs, sort):
         if operator != '-':
             operator = ''
         key = {
+            'sorttitle': 'sortsorttitle'
         }.get(e['key'], e['key'])
         order = '%s%s' % (operator, key)
         order_by.append(order)

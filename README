@@ -33,6 +33,8 @@ you need python, bazaar, pip and virtualenv and several other python modules:
   and run ./manage.py syncdb to populate the database
   you might want to load example configurations from fixutes.
 
+    createdb --locale=C --encoding=UTF8 pandora
+
 * RabbitMQ
   For background tasks we use RabbitMQ, to install rabbitmq:
     sudo apt-get install rabbitmq-server

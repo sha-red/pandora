@@ -9,7 +9,10 @@ from django.db import models
 from ox.django import fields
 import ox
 
+from item import utils
+
 import managers
+
 
 def get_name_sort(name):
     person, created = Person.objects.get_or_create(name=name)
@@ -19,6 +22,7 @@ def get_name_sort(name):
 class Person(models.Model):
     name = models.CharField(max_length=200, unique=True)
     sortname = models.CharField(max_length=200)
+    sortsortname = models.CharField(max_length=200)
     edited = models.BooleanField(default=False)
     numberofnames = models.IntegerField(default=0)
 
@@ -37,6 +41,7 @@ class Person(models.Model):
         if not self.sortname:
             self.sortname = ox.get_sort_name(self.name)
             self.sortname = unicodedata.normalize('NFKD', self.sortname)
+        self.sortsortname = utils.sort_string(self.sortname)
         self.numberofnames = len(self.name.split(' '))
         super(Person, self).save(*args, **kwargs)
 

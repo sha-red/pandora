@@ -8,6 +8,8 @@ from django.db import models
 
 import ox
 
+from item import utils
+
 import managers
 
 def get_title_sort(title):
@@ -18,6 +20,7 @@ def get_title_sort(title):
 class Title(models.Model):
     title = models.CharField(max_length=1000, unique=True)
     sorttitle = models.CharField(max_length=1000)
+    sortsorttitle = models.CharField(max_length=1000)
     edited = models.BooleanField(default=False)
 
     imdbId = models.CharField(max_length=7, blank=True)
@@ -31,6 +34,7 @@ class Title(models.Model):
         if not self.sorttitle:
             self.sorttitle = ox.get_sort_title(self.title)
             self.sorttitle = unicodedata.normalize('NFKD', self.sorttitle)
+        self.sortsorttitle = utils.sort_string(self.sorttitle)
         super(Title, self).save(*args, **kwargs)
 
     def get_or_create(model, title, imdbId=None):
