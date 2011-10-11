@@ -28,7 +28,7 @@ class Title(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.title_sort:
-            self.title_sort = ox.normalize.canonicalTitle(self.title)
+            self.title_sort = ox.get_sort_title(self.title)
             self.title_sort = unicodedata.normalize('NFKD', self.title_sort)
         super(Title, self).save(*args, **kwargs)
 

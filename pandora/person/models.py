@@ -34,7 +34,7 @@ class Person(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.name_sort:
-            self.name_sort = ox.normalize.canonicalName(self.name)
+            self.name_sort = ox.get_sort_name(self.name)
             self.name_sort = unicodedata.normalize('NFKD', self.name_sort)
         self.numberofnames = len(self.name.split(' '))
         super(Person, self).save(*args, **kwargs)

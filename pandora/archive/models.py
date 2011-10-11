@@ -14,7 +14,6 @@ from django.db.models.signals import pre_delete
 
 from ox.django import fields
 import ox
-from ox.normalize import canonicalTitle
 import chardet
 
 from item import utils
@@ -79,7 +78,7 @@ class File(models.Model):
     def set_state(self):
         self.name = self.get_name()
         self.folder = self.get_folder()
-        self.sort_name = utils.sort_string(canonicalTitle(self.name))
+        self.sort_name = utils.sort_string(ox.get_sort_title(self.name))
 
         if not os.path.splitext(self.name)[-1] in (
             '.srt', '.rar', '.sub', '.idx', '.txt', '.jpg', '.png', '.nfo') \
