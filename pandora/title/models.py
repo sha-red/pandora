@@ -18,6 +18,7 @@ def get_title_sort(title):
 class Title(models.Model):
     title = models.CharField(max_length=1000, unique=True)
     title_sort = models.CharField(max_length=1000)
+    edited = models.BooleanField(default=False)
 
     imdbId = models.CharField(max_length=7, blank=True)
 

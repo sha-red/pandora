@@ -29,6 +29,7 @@ def editName(request):
     response = json_response()
     if 'nameSort' in data:
         person.name_sort = utils.sort_string(data['nameSort'])
+        person.edited = True
     person.save()
     response['data'] = person.json()
     return render_to_json_response(response)

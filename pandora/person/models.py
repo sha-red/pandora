@@ -19,6 +19,7 @@ def get_name_sort(name):
 class Person(models.Model):
     name = models.CharField(max_length=200, unique=True)
     name_sort = models.CharField(max_length=200)
+    edited = models.BooleanField(default=False)
     numberofnames = models.IntegerField(default=0)
 
     #FIXME: how to deal with aliases

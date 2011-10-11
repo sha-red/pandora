@@ -31,6 +31,7 @@ def editTitle(request):
     if 'titleSort' in data:
         title.title_sort = data['titleSort']
         title.title_sort = unicodedata.normalize('NFKD', title.title_sort)
+        title.edited = True
     title.save()
     response['data'] = title.json()
     return render_to_json_response(response)
