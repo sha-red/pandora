@@ -16,8 +16,8 @@ def get_title_sort(title):
     return title_sort
 
 class Title(models.Model):
-    title = models.CharField(max_length=200, unique=True)
-    title_sort = models.CharField(max_length=200)
+    title = models.CharField(max_length=1000, unique=True)
+    title_sort = models.CharField(max_length=1000)
 
     imdbId = models.CharField(max_length=7, blank=True)
 
