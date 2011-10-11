@@ -15,6 +15,7 @@ import managers
 
 
 def get_name_sort(name):
+    name = unicodedata.normalize('NFKD', name)
     person, created = Person.objects.get_or_create(name=name)
     sortname = unicodedata.normalize('NFKD', person.sortname)
     return sortname

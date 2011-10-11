@@ -13,6 +13,7 @@ from item import utils
 import managers
 
 def get_title_sort(title):
+    title = unicodedata.normalize('NFKD', title)
     title, created = Title.objects.get_or_create(title=title)
     sorttitle = unicodedata.normalize('NFKD', title.sorttitle)
     return sorttitle
