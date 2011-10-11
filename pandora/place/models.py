@@ -93,7 +93,7 @@ class Place(models.Model):
             self.items.remove(i)
         for i in Item.objects.filter(id__in=ids).exclude(id__in=self.items.all()):
             self.items.add(i)
-        self.save()
+        Place.objects.filter(id=self.id).update(matches=self.matches)
 
     def save(self, *args, **kwargs):
         if not self.name_sort:

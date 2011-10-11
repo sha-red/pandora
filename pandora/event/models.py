@@ -82,7 +82,8 @@ class Event(models.Model):
             self.items.remove(i)
         for i in Item.objects.filter(id__in=ids).exclude(id__in=self.items.all()):
             self.items.add(i)
-        self.save()
+        #only update matches, other values might have been changed
+        Event.objects.filter(id=self.id).update(matches=self.matches)
 
     def set_name_sort(self, value=None):
         if not value:

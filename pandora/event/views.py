@@ -87,7 +87,8 @@ def editEvent(request):
             if 'nameSort' in data:
                 event.set_name_sort(data['nameSort'])
             event.save()
-            tasks.update_matches.delay(event.id)
+            if 'name' in data or 'alternativeNames' in data:
+                tasks.update_matches.delay(event.id)
             response = json_response(status=200, text='updated')
             response['data'] = event.json()
         else:

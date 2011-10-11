@@ -106,7 +106,8 @@ def editPlace(request):
                         value = tuple(value)
                     setattr(place, key, value)
             place.save()
-            #tasks.update_matches.delay(place.id)
+            if 'name' in data or 'alternativeNames' in data:
+                tasks.update_matches.delay(place.id)
             response = json_response(place.json())
         else:
             response = json_response(status=403,
