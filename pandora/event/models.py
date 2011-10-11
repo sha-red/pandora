@@ -10,7 +10,9 @@ import ox
 from ox.django import fields
 
 from annotation.models import Annotation
-from item.models import Item
+from item.models import Item, canonicalTitle
+from item import utils
+from person.models import get_name_sort
 import managers
 
 
@@ -82,9 +84,18 @@ class Event(models.Model):
             self.items.add(i)
         self.save()
 
+    def set_name_sort(self, value=None):
+        if not value:
+            value = self.name
+            if self.type == 'person':
+                value = get_name_sort(value)
+            else:
+                value = utils.sort_title(canonicalTitle(value))
+        self.name_sort = utils.sort_string(value)
+
     def save(self, *args, **kwargs):
         if not self.name_sort:
-            self.name_sort = self.name
+            self.set_name_sort()
         self.name_find = '||' + self.name + '||'.join(self.alternativeNames) + '||'
         self.durationTime = self.endTime - self.startTime
         super(Event, self).save(*args, **kwargs)

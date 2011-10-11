@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
-import unicodedata
 
 import ox
 from ox.utils import json
@@ -42,7 +41,7 @@ def addEvent(request):
                     value = tuple(value)
                 setattr(event, key, value)
         if 'nameSort' in data:
-            event.name_sort = unicodedata.normalize('NFKD', data['nameSort'])
+            event.set_name_sort(data['nameSort'])
         event.save()
         tasks.update_matches.delay(event.id)
         response = json_response(status=200, text='created')
@@ -76,8 +75,8 @@ def editEvent(request):
                 conflict = True
                 conflict_names.append(name)
         if not conflict:
-            if 'name' in data and event.name_sort == unicodedata.normalize('NFKD', event.name):
-                event.name_sort = unicodedata.normalize('NFKD', data['name'])
+            if 'name' in data:
+                event.set_name_sort(data['name'])
             for key in ('name', 'start', 'startTime', 'end', 'endTime', 'duration', 'durationTime',
                         'type', 'alternativeNames'):
                 if key in data:
@@ -86,7 +85,7 @@ def editEvent(request):
                         value = tuple(value)
                     setattr(event, key, value)
             if 'nameSort' in data:
-                event.name_sort = unicodedata.normalize('NFKD', data['nameSort'])
+                event.set_name_sort(data['nameSort'])
             event.save()
             tasks.update_matches.delay(event.id)
             response = json_response(status=200, text='updated')
