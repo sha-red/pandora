@@ -2,7 +2,7 @@
 pandora.ui.namesDialog = function() {
 
     var height = Math.round((window.innerHeight - 48) * 0.9),
-        width = Math.round(window.innerWidth * 0.9),
+        width = 576 + Ox.UI.SCROLLBAR_SIZE,
         numberOfNames = 0,
 
         $status = Ox.Label({
@@ -57,6 +57,7 @@ pandora.ui.namesDialog = function() {
                         title: 'ID',
                         unique: true,
                         visible: false,
+                        width: 0
                     },
                     {
                         id: 'name',
@@ -64,33 +65,32 @@ pandora.ui.namesDialog = function() {
                         removable: false,
                         title: 'Name',
                         visible: true,
-                        width: 250
+                        width: 256
                     },
                     {
-                        id: 'nameSort',
+                        editable: true,
+                        id: 'sortname',
                         operator: '+',
                         title: 'Sort Name',
+                        tooltip: 'Edit Sort Name',
                         visible: true,
-                        width: 250
+                        width: 256
                     },
                     {
                         id: 'numberofnames',
                         align: 'right',
                         operator: '-',
-                        title: 'Number of Names',
+                        title: 'Names',
                         visible: true,
-                        width: 60
+                        width: 64
                     },
                 ],
                 columnsRemovable: true,
                 columnsVisible: true,
                 items: pandora.api.findNames,
-                keys: [],
                 max: 1,
                 scrollbarVisible: true,
-                sort: [
-                    {key: 'name', operator: '+'}
-                ]
+                sort: [{key: 'sortname', operator: '+'}]
             })
             .bindEvent({
                 init: function(data) {
@@ -100,29 +100,13 @@ pandora.ui.namesDialog = function() {
                             + ' name' + (numberOfNames == 1 ? '' : 's')
                     });
                 },
-                select: function(data) {
-                    var values;
-                    $name.empty();
-                    if (data.ids.length) {
-                        values = $list.value(data.ids[0]);
-                        $nameLabel.options({
-                            title: values.name + ' &lt;' + values.nameSort + '&gt;'
-                        });
-                        $name.append(renderNameForm(values))
-                    } else {
-                        $nameLabel.options({title: 'No name selected'});
-                    }
+                submit: function(data) {
+                    pandora.api.editName({
+                        id: data.id,
+                        sortname: data.sortname
+                    });
                 }
             }),
-
-        $nameLabel = Ox.Label({
-                textAlign: 'center',
-                title: 'No name selected',
-                width: 248
-            })
-            .css({margin: '4px'}),
-
-        $name = Ox.Element({}),
 
         that = Ox.Dialog({
             buttons: [
@@ -139,41 +123,18 @@ pandora.ui.namesDialog = function() {
             content: Ox.SplitPanel({
                 elements: [
                     {
-                        element: Ox.SplitPanel({
-                            elements: [
-                                {
-                                    element: Ox.Bar({size: 24})
-                                        .append($status)
-                                        .append(
-                                            $findElement
-                                        ),
-                                    size: 24
-                                },
-                                {
-                                    element: $list
-                                }
-                            ],
-                            orientation: 'vertical'
-                        })      
+                        element: Ox.Bar({size: 24})
+                            .append($status)
+                            .append(
+                                $findElement
+                            ),
+                        size: 24
                     },
                     {
-                        element: Ox.SplitPanel({
-                            elements: [
-                                {
-                                    element: Ox.Bar({size: 24})
-                                        .append($nameLabel),
-                                    size: 24
-                                },
-                                {
-                                    element: $name
-                                }
-                            ],
-                            orientation: 'vertical'
-                        }),
-                        size: 256
+                        element: $list
                     }
                 ],
-                orientation: 'horizontal'
+                orientation: 'vertical'
             }),
             height: height,
             maximizeButton: true,
@@ -183,50 +144,6 @@ pandora.ui.namesDialog = function() {
             title: 'Manage Names',
             width: width
         });
-
-    function renderNameForm(nameData) {
-        var $checkbox;
-        return Ox.Form({
-                items: [
-                    Ox.Input({
-                            id: 'name',
-                            label: 'Name',
-                            labelWidth: 80,
-                            value: nameData.name,
-                            width: 240
-                        })
-                        .bindEvent({
-                            submit: function(data) {
-                                
-                            }
-                        }),
-                    Ox.Input({
-                            id: 'nameSort',
-                            label: 'Sort Name',
-                            labelWidth: 80,
-                            value: nameData.nameSort,
-                            width: 240
-                        })
-                        .bindEvent({
-                            submit: function(data) {
-
-                            }
-                        }),
-                ],
-                width: 240
-            })
-            .css({margin: '8px'})
-            .bindEvent({
-                change: function(event) {
-                    var data = {id: nameData.id}, key, value;
-                    data[event.id] = event.data.value;
-                    $list.value(nameData.id, event.id, data[event.id]); 
-                    pandora.api.editName(data, function(result) {
-                        Ox.Request.clearCache('findNames');
-                    });
-                }
-            });
-    }
 
     function updateList(key, value) {
         var query = {

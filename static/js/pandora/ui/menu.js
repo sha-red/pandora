@@ -150,11 +150,11 @@ pandora.ui.mainMenu = function() {
                     { id: 'places', title: 'Manage Places...', disabled: isGuest },
                     { id: 'events', title: 'Manage Events...', disabled: isGuest },
                     {},
-                    { id: 'users', title: 'Manage Users...', disabled: !isAdmin },
+                    { id: 'users', title: 'Manage Users...', disabled: !isAdmin }/*,
                     { id: 'lists', title: 'Manage Lists...', disabled: !isAdmin },
                     {},
                     { id: 'news', title: 'Manage News...', disabled: !isAdmin },
-                    { id: 'tour', title: 'Manage Tour...', disabled: !isAdmin }
+                    { id: 'tour', title: 'Manage Tour...', disabled: !isAdmin }*/
                 ] },
                 { id: 'helpMenu', title: 'Help', items: [
                     { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'shift ?' }

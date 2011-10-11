@@ -18,44 +18,6 @@ pandora.ui.usersDialog = function() {
             })
             .css({float: 'left', margin: '4px'}),
 
-        $exportButton = Ox.Button({
-                title: 'Export E-Mail Addresses'
-            })
-            .css({margin: '4px 4px 4px 0'})
-            .bindEvent({
-                click: function() {
-                    pandora.api.findUsers({
-                        query: {conditions: [], operator: '&'},
-                        keys: ['email', 'username'],
-                        range: [0, numberOfUsers],
-                        sort: [{key: 'username', operator: '+'}]
-                    }, function(result) {
-                        var $dialog = Ox.Dialog({
-                                buttons: [
-                                    Ox.Button({
-                                            title: 'Close'
-                                        })
-                                        .bindEvent({
-                                            click: function() {
-                                                $dialog.close();
-                                            }
-                                        })
-                                ],
-                                content: Ox.Element()
-                                    .addClass('OxSelectable')
-                                    .css({margin: '16px'})
-                                    .html(
-                                        result.data.items.map(function(item) {
-                                            return item.username + ' &lt;' + item.email + '&gt;'
-                                        }).join(', ')
-                                    ),
-                                title: 'E-Mail Addresses'
-                            })
-                            .open()
-                    })
-                }
-            }),
-
         $findSelect = Ox.Select({
                 items: [
                     {id: 'all', title: 'Find: All', checked: true},
@@ -297,13 +259,50 @@ pandora.ui.usersDialog = function() {
         that = Ox.Dialog({
             buttons: [
                 Ox.Button({
-                    id: 'done',
-                    title: 'Done'
-                }).bindEvent({
-                    click: function() {
-                        that.close();
-                    }
-                })
+                        title: 'Export E-Mail Addresses'
+                    })
+                    .css({margin: '4px 4px 4px 0'})
+                    .bindEvent({
+                        click: function() {
+                            pandora.api.findUsers({
+                                query: {conditions: [], operator: '&'},
+                                keys: ['email', 'username'],
+                                range: [0, numberOfUsers],
+                                sort: [{key: 'username', operator: '+'}]
+                            }, function(result) {
+                                var $dialog = Ox.Dialog({
+                                        buttons: [
+                                            Ox.Button({
+                                                    title: 'Close'
+                                                })
+                                                .bindEvent({
+                                                    click: function() {
+                                                        $dialog.close();
+                                                    }
+                                                })
+                                        ],
+                                        content: Ox.Element()
+                                            .addClass('OxSelectable')
+                                            .css({margin: '16px'})
+                                            .html(
+                                                result.data.items.map(function(item) {
+                                                    return item.username + ' &lt;' + item.email + '&gt;'
+                                                }).join(', ')
+                                            ),
+                                        title: 'E-Mail Addresses'
+                                    })
+                                    .open()
+                            })
+                        }
+                    }),
+                Ox.Button({
+                        id: 'done',
+                        title: 'Done'
+                    }).bindEvent({
+                        click: function() {
+                            that.close();
+                        }
+                    })
             ],
             closeButton: true,
             content: Ox.SplitPanel({
@@ -314,7 +313,6 @@ pandora.ui.usersDialog = function() {
                                 {
                                     element: Ox.Bar({size: 24})
                                         .append($status)
-                                        .append($exportButton)
                                         .append(
                                             $findElement
                                         ),

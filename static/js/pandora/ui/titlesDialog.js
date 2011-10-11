@@ -2,7 +2,7 @@
 pandora.ui.titlesDialog = function() {
 
     var height = Math.round((window.innerHeight - 48) * 0.9),
-        width = Math.round(window.innerWidth * 0.9),
+        width = 512 + Ox.UI.SCROLLBAR_SIZE,
         numberOfTitles = 0,
 
         $status = Ox.Label({
@@ -64,14 +64,15 @@ pandora.ui.titlesDialog = function() {
                         removable: false,
                         title: 'Title',
                         visible: true,
-                        width: 250
+                        width: 256
                     },
                     {
-                        id: 'titleSort',
+                        editable: true,
+                        id: 'sorttitle',
                         operator: '+',
                         title: 'Sort Title',
                         visible: true,
-                        width: 250
+                        width: 256
                     },
                 ],
                 columnsRemovable: true,
@@ -80,9 +81,7 @@ pandora.ui.titlesDialog = function() {
                 keys: [],
                 max: 1,
                 scrollbarVisible: true,
-                sort: [
-                    {key: 'title', operator: '+'}
-                ]
+                sort: [{key: 'sorttitle', operator: '+'}]
             })
             .bindEvent({
                 init: function(data) {
@@ -92,29 +91,13 @@ pandora.ui.titlesDialog = function() {
                             + ' title' + (numberOfTitles == 1 ? '' : 's')
                     });
                 },
-                select: function(data) {
-                    var values;
-                    $title.empty();
-                    if (data.ids.length) {
-                        values = $list.value(data.ids[0]);
-                        $titleLabel.options({
-                            title: values.title + ' &lt;' + values.titleSort + '&gt;'
-                        });
-                        $title.append(renderTitleForm(values))
-                    } else {
-                        $titleLabel.options({title: 'No title selected'});
-                    }
+                submit: function(data) {
+                    pandora.api.editTitle({
+                        id: data.id,
+                        sortname: data.sortname
+                    });
                 }
             }),
-
-        $titleLabel = Ox.Label({
-                textAlign: 'center',
-                title: 'No title selected',
-                width: 248
-            })
-            .css({margin: '4px'}),
-
-        $title = Ox.Element({}),
 
         that = Ox.Dialog({
             buttons: [
@@ -131,41 +114,18 @@ pandora.ui.titlesDialog = function() {
             content: Ox.SplitPanel({
                 elements: [
                     {
-                        element: Ox.SplitPanel({
-                            elements: [
-                                {
-                                    element: Ox.Bar({size: 24})
-                                        .append($status)
-                                        .append(
-                                            $findElement
-                                        ),
-                                    size: 24
-                                },
-                                {
-                                    element: $list
-                                }
-                            ],
-                            orientation: 'vertical'
-                        })      
+                        element: Ox.Bar({size: 24})
+                            .append($status)
+                            .append(
+                                $findElement
+                            ),
+                        size: 24
                     },
                     {
-                        element: Ox.SplitPanel({
-                            elements: [
-                                {
-                                    element: Ox.Bar({size: 24})
-                                        .append($titleLabel),
-                                    size: 24
-                                },
-                                {
-                                    element: $title
-                                }
-                            ],
-                            orientation: 'vertical'
-                        }),
-                        size: 256
+                        element: $list
                     }
                 ],
-                orientation: 'horizontal'
+                orientation: 'vertical'
             }),
             height: height,
             maximizeButton: true,
@@ -175,50 +135,6 @@ pandora.ui.titlesDialog = function() {
             title: 'Manage Titles',
             width: width
         });
-
-    function renderTitleForm(titleData) {
-        var $checkbox;
-        return Ox.Form({
-                items: [
-                    Ox.Input({
-                            id: 'title',
-                            label: 'Title',
-                            labelWidth: 80,
-                            value: titleData.title,
-                            width: 240
-                        })
-                        .bindEvent({
-                            submit: function(data) {
-                                
-                            }
-                        }),
-                    Ox.Input({
-                            id: 'titleSort',
-                            label: 'Sort Title',
-                            labelWidth: 80,
-                            value: titleData.titleSort,
-                            width: 240
-                        })
-                        .bindEvent({
-                            submit: function(data) {
-
-                            }
-                        }),
-                ],
-                width: 240
-            })
-            .css({margin: '8px'})
-            .bindEvent({
-                change: function(event) {
-                    var data = {id: titleData.id}, key, value;
-                    data[event.id] = event.data.value;
-                    $list.value(titleData.id, event.id, data[event.id]); 
-                    pandora.api.editTitle(data, function(result) {
-                        Ox.Request.clearCache('findTitles');
-                    });
-                }
-            });
-    }
 
     function updateList(key, value) {
         var query = {
