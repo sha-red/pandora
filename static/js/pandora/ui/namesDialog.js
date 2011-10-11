@@ -87,6 +87,9 @@ pandora.ui.namesDialog = function() {
                         .find('.OxItem.OxSelected > .OxCell.OxColumnSortname')
                         .trigger('mousedown');
                 },
+                select: function(data) {
+                    $findButton.options({disabled: !data.ids.length});
+                },
                 submit: function(data) {
                     Ox.Request.clearCache('findNames');
                     pandora.api.editName({
@@ -96,10 +99,27 @@ pandora.ui.namesDialog = function() {
                 }
             }),
 
+        $findButton = Ox.Button({
+                disabled: true,
+                title: 'Find',
+                width: 48,
+            }).bindEvent({
+                click: function() {
+                    that.close();
+                    pandora.UI.set('find', {
+                        conditions: [{
+                            key: 'name',
+                            value: $list.value($list.options('selected'), 'name'),
+                            operator: '='
+                        }],
+                        operator: '&'
+                    })
+                }
+            }),
+        
         that = Ox.Dialog({
             buttons: [
                 Ox.Button({
-                    id: 'manageTitles',
                     title: 'Manage Titles...'
                 }).bindEvent({
                     click: function() {
@@ -107,9 +127,10 @@ pandora.ui.namesDialog = function() {
                     }
                 }),
                 {},
+                $findButton,
                 Ox.Button({
-                    id: 'done',
-                    title: 'Done'
+                    title: 'Done',
+                    width: 48
                 }).bindEvent({
                     click: function() {
                         that.close();
