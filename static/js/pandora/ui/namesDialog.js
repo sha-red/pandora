@@ -5,45 +5,31 @@ pandora.ui.namesDialog = function() {
         width = 576 + Ox.UI.SCROLLBAR_SIZE,
         numberOfNames = 0,
 
-        $findSelect = Ox.Select({
-                items: [
-                    {id: 'all', title: 'Find: All'}
-                ],
-                overlap: 'right',
-                type: 'image'
-            })
-            .bindEvent({
-                change: function(data) {
-                    var key = data.selected[0].id,
-                        value = $findInput.value();
-                    value && updateList(key, value);
-                    $findInput.options({
-                        placeholder: data.selected[0].title
-                    });
-                }
-            }),
-
         $findInput = Ox.Input({
                 changeOnKeypress: true,
                 clear: true,
-                placeholder: 'Find: All',
+                placeholder: 'Find',
                 width: 192
             })
+            .css({float: 'right', margin: '4px'})
             .bindEvent({
                 change: function(data) {
-                    var key = $findSelect.value(),
-                        value = data.value;
-                    updateList(key, value);
+                    var query = {
+                            conditions: [
+                                {key: 'name', value: data.value, operator: '='},
+                                {key: 'sortname', value: data.value, operator: '='}
+                            ],
+                            operator: '|'
+                        };
+                    $list.options({
+                        items: function(data, callback) {
+                            return pandora.api.findNames(Ox.extend(data, {
+                                query: query
+                            }), callback);
+                        }
+                    });        
                 }
             }),
-
-        $findElement = Ox.FormElementGroup({
-                elements: [
-                    $findSelect,
-                    $findInput
-                ]
-            })
-            .css({float: 'right', margin: '4px'}),
 
         $list = Ox.TextList({
                 columns: [
@@ -120,7 +106,7 @@ pandora.ui.namesDialog = function() {
                         element: Ox.Bar({size: 24})
                             .append($status)
                             .append(
-                                $findElement
+                                $findInput
                             ),
                         size: 24
                     },
@@ -151,20 +137,6 @@ pandora.ui.namesDialog = function() {
             textAlign: 'center',
         })
         .appendTo(that.$element.find('.OxButtonsbar'));
-
-    function updateList(key, value) {
-        var query = {
-                conditions: [{key: 'name', value: value, operator: '='}],
-                operator: '&'
-            };
-        $list.options({
-            items: function(data, callback) {
-                return pandora.api.findNames(Ox.extend(data, {
-                    query: query
-                }), callback);
-            }
-        });        
-    }
 
     return that;
 
