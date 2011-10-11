@@ -619,7 +619,7 @@ class Item(models.Model):
             if name not in base_keys:
                 if sort_type == 'title':
                     value = get_title_sort(self.get(source, u'Untitled'))
-                    value = utils.sort_string(value)[:955]
+                    value = utils.sort_title(value)[:955]
                     set_value(s, name, value)
                 elif sort_type == 'person':
                     value = sortNames(self.get(source, []))

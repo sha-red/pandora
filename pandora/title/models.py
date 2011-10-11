@@ -13,9 +13,12 @@ from item import utils
 import managers
 
 def get_title_sort(title):
-    title = unicodedata.normalize('NFKD', title)
-    title, created = Title.objects.get_or_create(title=title)
-    sorttitle = unicodedata.normalize('NFKD', title.sorttitle)
+    title = unicodedata.normalize('NFKD', title).strip()
+    if title:
+        title, created = Title.objects.get_or_create(title=title)
+        sorttitle = unicodedata.normalize('NFKD', title.sorttitle)
+    else:
+        sorttitle = u''
     return sorttitle
 
 class Title(models.Model):
@@ -35,7 +38,7 @@ class Title(models.Model):
         if not self.sorttitle:
             self.sorttitle = ox.get_sort_title(self.title)
             self.sorttitle = unicodedata.normalize('NFKD', self.sorttitle)
-        self.sortsorttitle = utils.sort_string(self.sorttitle)
+        self.sortsorttitle = utils.sort_title(self.sorttitle)
         super(Title, self).save(*args, **kwargs)
 
     def get_or_create(model, title, imdbId=None):

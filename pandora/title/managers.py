@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+import unicodedata
 from django.db.models import Q, Manager
 from ox.django.query import QuerySet
 import ox
@@ -41,6 +42,8 @@ def parseCondition(condition, user):
             return q
     if k == 'id':
         v = ox.from26(v)
+    elif isinstance(v, unicode):
+        v = unicodedata.normalize('NFKD', v)
     if isinstance(v, bool): #featured and public flag
         key = k
     elif k in ('lat', 'lng', 'area', 'south', 'west', 'north', 'east', 'matches', 'id'):

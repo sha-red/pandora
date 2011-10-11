@@ -15,9 +15,12 @@ import managers
 
 
 def get_name_sort(name):
-    name = unicodedata.normalize('NFKD', name)
-    person, created = Person.objects.get_or_create(name=name)
-    sortname = unicodedata.normalize('NFKD', person.sortname)
+    name = unicodedata.normalize('NFKD', name).strip()
+    if name:
+        person, created = Person.objects.get_or_create(name=name)
+        sortname = unicodedata.normalize('NFKD', person.sortname)
+    else:
+        sortname = u''
     return sortname
 
 class Person(models.Model):
