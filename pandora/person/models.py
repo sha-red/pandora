@@ -62,7 +62,7 @@ class Person(models.Model):
         j = {
             'id': self.get_id(),
             'name': self.name,
-            'nameSort': self.name_sort,
+            'sortName': self.name_sort,
             'numberofnames': self.numberofnames,
         }
         if keys:

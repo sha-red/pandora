@@ -55,7 +55,7 @@ class Title(models.Model):
         j = {
             'id': self.get_id(),
             'title': self.title,
-            'titleSort': self.title_sort,
+            'sortTitle': self.title_sort,
         }
         if keys:
             for key in j.keys():

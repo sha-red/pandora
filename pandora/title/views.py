@@ -21,15 +21,15 @@ def editTitle(request):
     '''
         param data {
             'id': titleid,
-            'titleSort': ...
+            'sortTitle': ...
         }
         can contain any of the allowed keys for title 
     '''
     data = json.loads(request.POST['data'])
     title = get_object_or_404_json(models.Title, pk=ox.from26(data['id']))
     response = json_response()
-    if 'titleSort' in data:
-        title.title_sort = data['titleSort']
+    if 'sortTitle' in data:
+        title.title_sort = data['sortTitle']
         title.title_sort = unicodedata.normalize('NFKD', title.title_sort)
         title.edited = True
     title.save()
@@ -57,7 +57,7 @@ def order_query(qs, sort):
         if operator != '-':
             operator = ''
         key = {
-            'titleSort': 'title_sort',
+            'sortTitle': 'title_sort',
         }.get(e['key'], e['key'])
         order = '%s%s' % (operator, key)
         order_by.append(order)
@@ -90,7 +90,7 @@ def findTitles(request):
             title, numberoftitles
 
         possible keys:
-            title, titleSort, numberoftitles
+            title, sortTitle, numberoftitles
         
         return {
                 status: {
