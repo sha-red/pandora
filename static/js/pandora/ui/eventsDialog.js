@@ -16,7 +16,8 @@ pandora.ui.eventsDialog = function() {
                 {},
                 Ox.Button({
                     id: 'done',
-                    title: 'Done'
+                    title: 'Done',
+                    width: 48
                 }).bindEvent({
                     click: function() {
                         that.close();
