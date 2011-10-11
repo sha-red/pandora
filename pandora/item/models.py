@@ -23,7 +23,6 @@ from django.contrib.sites.models import Site
 
 import ox
 from ox.django import fields
-from ox.normalize import canonicalTitle
 import ox.web.imdb
 import ox.image
 
@@ -37,6 +36,7 @@ from annotation.models import Annotation, Layer
 import archive.models
 
 from person.models import get_name_sort
+from title.models import get_title_sort
 
 
 def get_item(info, user=None, async=False):
@@ -618,8 +618,8 @@ class Item(models.Model):
 
             if name not in base_keys:
                 if sort_type == 'title':
-                    value = utils.sort_title(canonicalTitle(self.get(source, u'Untitled')))
-                    value = utils.sort_string(value)
+                    value = get_title_sort(self.get(source, u'Untitled'))
+                    value = utils.sort_string(value)[:955]
                     set_value(s, name, value)
                 elif sort_type == 'person':
                     value = sortNames(self.get(source, []))

@@ -244,6 +244,10 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'posters') {
                     var id = pandora.user.ui.item || pandora.user.ui.listItem;
                     pandora.$ui.postersDialog = pandora.ui.postersDialog(id).open();
+                } else if (data.id == 'names') {
+                    pandora.$ui.namesDialog = pandora.ui.namesDialog().open();
+                } else if (data.id == 'titles') {
+                    pandora.$ui.titlesDialog = pandora.ui.titlesDialog().open();
                 } else if (data.id == 'places') {
                     pandora.$ui.placesDialog = pandora.ui.placesDialog().open();
                 } else if (data.id == 'events') {

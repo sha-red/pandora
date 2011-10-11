@@ -130,6 +130,7 @@ INSTALLED_APPS = (
     'item',
     'itemlist',
     'person',
+    'title',
     'place',
     'text',
     'edit',

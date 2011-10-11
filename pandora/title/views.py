@@ -7,7 +7,7 @@ from django.db.models import Max, Min
 import ox
 from ox.utils import json
 
-from ox.django.decorators import login_required_json, admin_required_json
+from ox.django.decorators import admin_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 
 from api.actions import actions
@@ -16,32 +16,32 @@ from item import utils
 import models
 
 @admin_required_json
-def editName(request):
+def editTitle(request):
     '''
         param data {
-            'id': nameid,
-            'nameSort': ...
+            'id': titleid,
+            'titleSort': ...
         }
-        can contain any of the allowed keys for name 
+        can contain any of the allowed keys for title 
     '''
     data = json.loads(request.POST['data'])
-    person = get_object_or_404_json(models.Person, pk=ox.from26(data['id']))
+    title = get_object_or_404_json(models.Title, pk=ox.from26(data['id']))
     response = json_response()
-    if 'nameSort' in data:
-        person.name_sort = utils.sort_string(data['nameSort'])
-    person.save()
-    response['data'] = person.json()
+    if 'titleSort' in data:
+        title.title_sort = utils.sort_string(data['titleSort'])
+    title.save()
+    response['data'] = title.json()
     return render_to_json_response(response)
-actions.register(editName, cache=False)
+actions.register(editTitle, cache=False)
 
 def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
-    query['sort'] = [{'key':'name', 'operator':'+'}]
+    query['sort'] = [{'key':'title', 'operator':'+'}]
     for key in ('keys', 'group', 'list', 'range', 'sort', 'query'):
         if key in data:
             query[key] = data[key]
-    query['qs'] = models.Person.objects.find(query, user)
+    query['qs'] = models.Title.objects.find(query, user)
     #if 'itemQuery' in data:
     #    item_query = models.Item.objects.find({'query': data['itemQuery']}, user)
     #    query['qs'] = query['qs'].filter(items__in=item_query)
@@ -54,8 +54,8 @@ def order_query(qs, sort):
         if operator != '-':
             operator = ''
         key = {
-            'name': 'name_sort',
-            'nameSort': 'name_sort',
+            'title': 'title_sort',
+            'titleSort': 'title_sort',
         }.get(e['key'], e['key'])
         order = '%s%s' % (operator, key)
         order_by.append(order)
@@ -63,7 +63,7 @@ def order_query(qs, sort):
         qs = qs.order_by(*order_by, nulls_last=True)
     return qs
 
-def findNames(request):
+def findTitles(request):
     '''
         param data {
             query: {
@@ -79,16 +79,16 @@ def findNames(request):
             itemQuery: {
                 //see find request
             },
-            sort: [{key: 'name', operator: '+'}],
+            sort: [{key: 'title', operator: '+'}],
             range: [0, 100]
             keys: []
         }
 
         possible query keys:
-            name, numberofnames
+            title, numberoftitles
 
         possible keys:
-            name, nameSort, numberofnames
+            title, titleSort, numberoftitles
         
         return {
                 status: {
@@ -97,7 +97,7 @@ def findNames(request):
                 },
                 data: {
                     items: [
-                        {name:, user:, featured:, public...}
+                        {title:, user:, featured:, public...}
                     ]
                 }
         }
@@ -151,4 +151,4 @@ def findNames(request):
     else:
         response['data']['items'] = qs.count()
     return render_to_json_response(response)
-actions.register(findNames)
+actions.register(findTitles)

@@ -9,6 +9,7 @@ from django.db import models
 from ox.django import fields
 import ox
 
+import managers
 
 def get_name_sort(name):
     person, created = Person.objects.get_or_create(name=name)
@@ -18,6 +19,7 @@ def get_name_sort(name):
 class Person(models.Model):
     name = models.CharField(max_length=200, unique=True)
     name_sort = models.CharField(max_length=200)
+    numberofnames = models.IntegerField(default=0)
 
     #FIXME: how to deal with aliases
     aliases = fields.TupleField(default=[])
@@ -25,8 +27,7 @@ class Person(models.Model):
     imdbId = models.CharField(max_length=7, blank=True)
     wikipediaId = models.CharField(max_length=1000, blank=True)
 
-    class Meta:
-        ordering = ('name_sort', )
+    objects = managers.PersonManager()
 
     def __unicode__(self):
         return self.name
@@ -34,6 +35,8 @@ class Person(models.Model):
     def save(self, *args, **kwargs):
         if not self.name_sort:
             self.name_sort = ox.normalize.canonicalName(self.name)
+            self.name_sort = unicodedata.normalize('NFKD', self.name_sort)
+        self.numberofnames = len(self.name.split(' '))
         super(Person, self).save(*args, **kwargs)
 
     def get_or_create(model, name, imdbId=None):
@@ -51,5 +54,18 @@ class Person(models.Model):
         return o
     get_or_create = classmethod(get_or_create)
 
-    def json(self):
-        return self.name
+    def get_id(self):
+        return ox.to26(self.id)
+
+    def json(self, keys=None, user=None):
+        j = {
+            'id': self.get_id(),
+            'name': self.name,
+            'nameSort': self.name_sort,
+            'numberofnames': self.numberofnames,
+        }
+        if keys:
+            for key in j.keys():
+                if key not in keys:
+                    del j[key]
+        return j

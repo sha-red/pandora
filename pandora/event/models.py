@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
+import unicodedata
+import string
 
 from django.db import models
 from django.contrib.auth.models import User, Group
@@ -10,9 +12,10 @@ import ox
 from ox.django import fields
 
 from annotation.models import Annotation
-from item.models import Item, canonicalTitle
+from item.models import Item
 from item import utils
 from person.models import get_name_sort
+from title.models import get_title_sort
 import managers
 
 
@@ -63,7 +66,7 @@ class Event(models.Model):
         if self.user == user or user.is_staff:
             return True
         return False
- 
+     
     def get_matches(self):
         q = Q(value__icontains=" " + self.name)|Q(value__startswith=self.name)
         for name in self.alternativeNames:
@@ -91,7 +94,7 @@ class Event(models.Model):
             if self.type == 'person':
                 value = get_name_sort(value)
             else:
-                value = utils.sort_title(canonicalTitle(value))
+                value = get_title_sort(value)
         self.name_sort = utils.sort_string(value)
 
     def save(self, *args, **kwargs):

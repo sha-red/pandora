@@ -15,6 +15,8 @@
   "js/pandora/ui/deleteListDialog.js", 
   "js/pandora/ui/editor.js",
   "js/pandora/ui/eventsDialog.js",
+  "js/pandora/ui/namesDialog.js",
+  "js/pandora/ui/titlesDialog.js",
   "js/pandora/ui/filter.js", 
   "js/pandora/ui/filterDialog.js", 
   "js/pandora/ui/findElement.js", 
