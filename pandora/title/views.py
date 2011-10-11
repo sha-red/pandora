@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
+import unicodedata
 
 from django.db.models import Max, Min
 
@@ -28,7 +29,8 @@ def editTitle(request):
     title = get_object_or_404_json(models.Title, pk=ox.from26(data['id']))
     response = json_response()
     if 'titleSort' in data:
-        title.title_sort = utils.sort_string(data['titleSort'])
+        title.title_sort = data['titleSort']
+        title.title_sort = unicodedata.normalize('NFKD', title.title_sort)
     title.save()
     response['data'] = title.json()
     return render_to_json_response(response)
@@ -54,7 +56,6 @@ def order_query(qs, sort):
         if operator != '-':
             operator = ''
         key = {
-            'title': 'title_sort',
             'titleSort': 'title_sort',
         }.get(e['key'], e['key'])
         order = '%s%s' % (operator, key)
