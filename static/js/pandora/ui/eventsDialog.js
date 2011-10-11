@@ -15,7 +15,20 @@ pandora.ui.eventsDialog = function() {
                 })
             ],
             closeButton: true,
-            content: Ox.Element(),
+            content: Ox.Element().append(
+                $('<img>')
+                    .attr({src: Ox.UI.getImageURL('symbolLoadingAnimated')})
+                    .css({
+                        position: 'absolute',
+                        width: '32px',
+                        height: '32px',
+                        left: 0,
+                        top: 0,
+                        right: 0,
+                        bottom: 0,
+                        margin: 'auto'
+                    })
+            ),
             height: height,
             maximizeButton: true,
             minHeight: 256,
@@ -23,7 +36,17 @@ pandora.ui.eventsDialog = function() {
             padding: 0,
             title: 'Manage Events',
             width: width
-        });
+        })
+        .bindEvent({
+            resize: function(data) {
+                // setting width would cause an expensive calendar redraw
+                $content && $content.options({height: data.height});
+            },
+            resizeend: function(data) {
+                $content && $content.options(data);
+            }
+        }),
+        $content;
 
     pandora.api.findEvents({
         query: {conditions: [], operator: '&'}        
@@ -35,7 +58,7 @@ pandora.ui.eventsDialog = function() {
             sort: [{key: 'name', operator: '+'}]
         }, function(result) {
             that.options({
-                content: Ox.ListCalendar({
+                content: $content = Ox.ListCalendar({
                     addEvent: function(event, callback) {
                         pandora.api.addEvent(event, function(result) {
                             Ox.Request.clearCache(); // fixme: remove

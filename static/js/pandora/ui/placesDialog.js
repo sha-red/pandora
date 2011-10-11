@@ -3,6 +3,34 @@
 pandora.ui.placesDialog = function() {
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = Math.round(window.innerWidth * 0.9),
+        $content = Ox.ListMap({
+            height: height - 48,
+            places: function(data, callback) {
+                return pandora.api.findPlaces(Ox.extend({
+                    query: {conditions: [], operator: ''}
+                }, data), callback);
+            },
+            addPlace: function(place, callback) {
+                pandora.api.addPlace(place, function(result) {
+                    Ox.Request.clearCache(); // fixme: remove
+                    callback(result);
+                });
+            },
+            editPlace: function(place, callback) {
+                pandora.api.editPlace(place, function(result) {
+                    Ox.Request.clearCache(); // fixme: remove
+                    callback(result);
+                });
+            },
+            removePlace: function(place, callback) {
+                pandora.api.removePlace(place, function(result) {
+                    Ox.Request.clearCache(); // fixme: remove
+                    callback(result);
+                });
+            },
+            showTypes: true,
+            width: width
+        }),
         that = Ox.Dialog({
             buttons: [
                 Ox.Button({
@@ -15,34 +43,7 @@ pandora.ui.placesDialog = function() {
                 })
             ],
             closeButton: true,
-            content: Ox.ListMap({
-                    height: height - 48,
-                    places: function(data, callback) {
-                        return pandora.api.findPlaces(Ox.extend({
-                            query: {conditions: [], operator: ''}
-                        }, data), callback);
-                    },
-                    addPlace: function(place, callback) {
-                        pandora.api.addPlace(place, function(result) {
-                            Ox.Request.clearCache(); // fixme: remove
-                            callback(result);
-                        });
-                    },
-                    editPlace: function(place, callback) {
-                        pandora.api.editPlace(place, function(result) {
-                            Ox.Request.clearCache(); // fixme: remove
-                            callback(result);
-                        });
-                    },
-                    removePlace: function(place, callback) {
-                        pandora.api.removePlace(place, function(result) {
-                            Ox.Request.clearCache(); // fixme: remove
-                            callback(result);
-                        });
-                    },
-                    showTypes: true,
-                    width: width
-                }),
+            content: $content,
             height: height,
             maximizeButton: true,
             minHeight: 256,
@@ -51,6 +52,12 @@ pandora.ui.placesDialog = function() {
             padding: 0,
             title: 'Manage Places',
             width: width
+        })
+        .bindEvent({
+            resize: function(data) {
+                // data is {width: ..., height: ...}
+                $content.options(data);
+            }
         });
     return that;
 };
