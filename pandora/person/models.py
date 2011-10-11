@@ -13,12 +13,12 @@ import managers
 
 def get_name_sort(name):
     person, created = Person.objects.get_or_create(name=name)
-    name_sort = unicodedata.normalize('NFKD', person.name_sort)
-    return name_sort
+    sortname = unicodedata.normalize('NFKD', person.sortname)
+    return sortname
 
 class Person(models.Model):
     name = models.CharField(max_length=200, unique=True)
-    name_sort = models.CharField(max_length=200)
+    sortname = models.CharField(max_length=200)
     edited = models.BooleanField(default=False)
     numberofnames = models.IntegerField(default=0)
 
@@ -34,9 +34,9 @@ class Person(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if not self.name_sort:
-            self.name_sort = ox.get_sort_name(self.name)
-            self.name_sort = unicodedata.normalize('NFKD', self.name_sort)
+        if not self.sortname:
+            self.sortname = ox.get_sort_name(self.name)
+            self.sortname = unicodedata.normalize('NFKD', self.sortname)
         self.numberofnames = len(self.name.split(' '))
         super(Person, self).save(*args, **kwargs)
 
@@ -62,7 +62,7 @@ class Person(models.Model):
         j = {
             'id': self.get_id(),
             'name': self.name,
-            'sortName': self.name_sort,
+            'sortname': self.sortname,
             'numberofnames': self.numberofnames,
         }
         if keys:
@@ -74,10 +74,10 @@ class Person(models.Model):
 
 def update_sort_name():
     for p in Person.objects.all():
-        _name_sort = ox.get_sort_name(p.name)
-        _name_sort = unicodedata.normalize('NFKD', _name_sort)
-        if (not p.edited and _name_sort != p.name_sort) or \
-           (p.edited and _name_sort == p.name_sort):
-            p.name_sort = _name_sort
+        _sortname = ox.get_sort_name(p.name)
+        _sortname = unicodedata.normalize('NFKD', _sortname)
+        if (not p.edited and _sortname != p.sortname) or \
+           (p.edited and _sortname == p.sortname):
+            p.sortname = _sortname
             p.edited = False
             p.save()

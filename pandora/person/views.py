@@ -20,15 +20,15 @@ def editName(request):
     '''
         param data {
             'id': nameid,
-            'sortName': ...
+            'sortname': ...
         }
         can contain any of the allowed keys for name 
     '''
     data = json.loads(request.POST['data'])
     person = get_object_or_404_json(models.Person, pk=ox.from26(data['id']))
     response = json_response()
-    if 'sortName' in data:
-        person.name_sort = utils.sort_string(data['sortName'])
+    if 'sortname' in data:
+        person.sortname = utils.sort_string(data['sortname'])
         person.edited = True
     person.save()
     response['data'] = person.json()
@@ -55,8 +55,6 @@ def order_query(qs, sort):
         if operator != '-':
             operator = ''
         key = {
-            'name': 'name_sort',
-            'sortName': 'name_sort',
         }.get(e['key'], e['key'])
         order = '%s%s' % (operator, key)
         order_by.append(order)
@@ -89,7 +87,7 @@ def findNames(request):
             name, numberofnames
 
         possible keys:
-            name, sortName, numberofnames
+            name, sortname, numberofnames
         
         return {
                 status: {

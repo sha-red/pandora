@@ -12,12 +12,12 @@ import managers
 
 def get_title_sort(title):
     title, created = Title.objects.get_or_create(title=title)
-    title_sort = unicodedata.normalize('NFKD', title.title_sort)
-    return title_sort
+    sorttitle = unicodedata.normalize('NFKD', title.sorttitle)
+    return sorttitle
 
 class Title(models.Model):
     title = models.CharField(max_length=1000, unique=True)
-    title_sort = models.CharField(max_length=1000)
+    sorttitle = models.CharField(max_length=1000)
     edited = models.BooleanField(default=False)
 
     imdbId = models.CharField(max_length=7, blank=True)
@@ -28,9 +28,9 @@ class Title(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        if not self.title_sort:
-            self.title_sort = ox.get_sort_title(self.title)
-            self.title_sort = unicodedata.normalize('NFKD', self.title_sort)
+        if not self.sorttitle:
+            self.sorttitle = ox.get_sort_title(self.title)
+            self.sorttitle = unicodedata.normalize('NFKD', self.sorttitle)
         super(Title, self).save(*args, **kwargs)
 
     def get_or_create(model, title, imdbId=None):
@@ -55,7 +55,7 @@ class Title(models.Model):
         j = {
             'id': self.get_id(),
             'title': self.title,
-            'sortTitle': self.title_sort,
+            'sorttitle': self.sorttitle,
         }
         if keys:
             for key in j.keys():
@@ -65,10 +65,10 @@ class Title(models.Model):
 
 def update_sort_title():
     for t in Title.objects.all():
-        _title_sort = ox.get_sort_title(t.title)
-        _title_sort = unicodedata.normalize('NFKD', _title_sort)
-        if (not t.edited and _title_sort != t.title_sort) or \
-           (t.edited and _title_sort == t.title_sort):
-            t.title_sort = _title_sort
+        _sorttitle = ox.get_sort_title(t.title)
+        _sorttitle = unicodedata.normalize('NFKD', _sorttitle)
+        if (not t.edited and _sorttitle != t.sorttitle) or \
+           (t.edited and _sorttitle == t.sorttitle):
+            t.sorttitle = _sorttitle
             t.edited = False
             t.save()
