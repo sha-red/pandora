@@ -152,7 +152,7 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($text);
 
-    $('<div>')
+    data.director && $('<div>')
         .css({
             marginTop: '2px',
             fontWeight: 'bold',
