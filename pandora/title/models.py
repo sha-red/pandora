@@ -62,3 +62,13 @@ class Title(models.Model):
                 if key not in keys:
                     del j[key]
         return j
+
+def update_sort_title():
+    for t in Title.objects.all():
+        _title_sort = ox.get_sort_title(t.title)
+        _title_sort = unicodedata.normalize('NFKD', _title_sort)
+        if (not t.edited and _title_sort != t.title_sort) or \
+           (t.edited and _title_sort == t.title_sort):
+            t.title_sort = _title_sort
+            t.edited = False
+            t.save()

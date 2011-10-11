@@ -70,3 +70,14 @@ class Person(models.Model):
                 if key not in keys:
                     del j[key]
         return j
+
+
+def update_sort_name():
+    for p in Person.objects.all():
+        _name_sort = ox.get_sort_name(p.name)
+        _name_sort = unicodedata.normalize('NFKD', _name_sort)
+        if (not p.edited and _name_sort != p.name_sort) or \
+           (p.edited and _name_sort == p.name_sort):
+            p.name_sort = _name_sort
+            p.edited = False
+            p.save()
