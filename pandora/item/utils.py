@@ -202,7 +202,7 @@ def sort_string(string):
 
 def sort_title(title):
 
-    #title = title.replace(u'Æ', 'Ae')
+    title = title.replace(u'Æ', 'Ae')
     if isinstance(title, str):
         title = unicode(title)
     title = sort_string(title)

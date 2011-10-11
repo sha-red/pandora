@@ -28,7 +28,7 @@ def editName(request):
     person = get_object_or_404_json(models.Person, pk=ox.from26(data['id']))
     response = json_response()
     if 'sortname' in data:
-        person.sortname = utils.sort_string(data['sortname'])
+        person.sortname = data['sortname']
         person.edited = True
     person.save()
     response['data'] = person.json()
