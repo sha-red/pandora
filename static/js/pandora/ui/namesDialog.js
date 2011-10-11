@@ -83,7 +83,7 @@ pandora.ui.namesDialog = function() {
                 submit: function(data) {
                     pandora.api.editName({
                         id: data.id,
-                        sortname: data.sortname
+                        sortname: data.value
                     });
                 }
             }),
