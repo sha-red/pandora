@@ -72,6 +72,7 @@ pandora.ui.titlesDialog = function() {
                     );
                 },
                 submit: function(data) {
+                    Ox.print('SUBMIT', data)
                     pandora.api.editTitle({
                         id: data.id,
                         sortname: data.value
