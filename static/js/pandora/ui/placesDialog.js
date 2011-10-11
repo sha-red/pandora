@@ -34,6 +34,15 @@ pandora.ui.placesDialog = function() {
         that = Ox.Dialog({
             buttons: [
                 Ox.Button({
+                    id: 'manageEvents',
+                    title: 'Manage Events...'
+                }).bindEvent({
+                    click: function() {
+                        // ...
+                    }
+                }),
+                {},
+                Ox.Button({
                     id: 'done',
                     title: 'Done'
                 }).bindEvent({

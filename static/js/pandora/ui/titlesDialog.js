@@ -82,6 +82,15 @@ pandora.ui.titlesDialog = function() {
         that = Ox.Dialog({
             buttons: [
                 Ox.Button({
+                    id: 'manageNames',
+                    title: 'Manage Names...'
+                }).bindEvent({
+                    click: function() {
+                        // ...
+                    }
+                }),
+                {},
+                Ox.Button({
                     id: 'done',
                     title: 'Done'
                 }).bindEvent({
@@ -120,8 +129,8 @@ pandora.ui.titlesDialog = function() {
             .css({
                 position: 'absolute',
                 top: '4px',
-                left: '64px',
-                right: '64px',
+                left: '128px',
+                right: '128px',
                 bottom: '4px',
                 paddingTop: '2px',
                 fontSize: '9px',

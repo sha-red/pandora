@@ -6,6 +6,15 @@ pandora.ui.eventsDialog = function() {
         that = Ox.Dialog({
             buttons: [
                 Ox.Button({
+                    id: 'managePlaces',
+                    title: 'Manage Places...'
+                }).bindEvent({
+                    click: function() {
+                        // ...
+                    }
+                }),
+                {},
+                Ox.Button({
                     id: 'done',
                     title: 'Done'
                 }).bindEvent({
