@@ -32,7 +32,7 @@ pandora.ui.viewSelect = function() {
                     if (pandora.isClipView(key)) {
                         // ... to a clip view, set listSelection to empty
                         set.listSelection = [];
-                    } else if (['title', 'position'].indexOf(ui.listSort[0].key) > -1) {
+                    } else if (['text', 'position'].indexOf(ui.listSort[0].key) > -1) {
                         // ... to a non-clip view, with a sort key that only exists
                         // in clip views, reset listSort to the default listSort
                         set.listSort = pandora.site.user.ui.listSort;

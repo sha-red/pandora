@@ -262,9 +262,9 @@ pandora.URL = (function() {
                 // itemView is the default view,
                 // videoView is the default view if there is a duration
                 [pandora.user.ui.itemView, pandora.user.ui.videoView],
-                pandora.site.itemViews.map(function(view) {
+                Ox.map(pandora.site.itemViews, function(view) {
                     return [
-                        'info', pandora.user.ui.videoView
+                        pandora.user.ui.itemView, pandora.user.ui.videoView
                     ].indexOf(view.id) > -1 ? null : view.id;
                 })
             )
