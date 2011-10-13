@@ -34,7 +34,9 @@ pandora.ui.rightPanel = function() {
                     }
                 } else {
                     pandora.$ui.browser.scrollToSelection();
-                    if (pandora.user.ui.itemView == 'video') {
+                    if (pandora.user.ui.itemView == 'clips') {
+                        pandora.$ui.clips.size();
+                    } else if (pandora.user.ui.itemView == 'video') {
                         pandora.$ui.player.options({width: data.size});
                     } else if (pandora.user.ui.itemView == 'timeline') {
                         pandora.$ui.editor.options({width: data.size});
