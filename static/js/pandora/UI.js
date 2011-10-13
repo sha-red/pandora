@@ -34,33 +34,38 @@ pandora.UI = (function() {
         Ox.print('UI SET', args)
         self.previousUI = Ox.clone(pandora.user.ui, true);
         Ox.forEach(args, function(val, key) {
-            if (key == 'find' && !Ox.isEqual(val, pandora.user.ui.find)) {
+            if (key == 'find') {
                 // the challenge here is that find may change list,
                 // and list may then change listSort and listView,
                 // which we don't want to trigger, since find triggers
                 var list = pandora.getListsState(val);
-                add['item'] = '';
                 pandora.user.ui._list = list;
                 pandora.user.ui._groupsState = pandora.getGroupsState(val);
                 pandora.user.ui._findState = pandora.getFindState(val);
-                if (!pandora.user.ui.lists[list]) {
-                    add['lists.' + that.encode(list)] = {};
+                if (!Ox.isEqual(val, pandora.user.ui.find)) {
+                    if (pandora.$ui.appPanel) {
+                        // if find has changed and we're not on page load,
+                        // switch from item view to list view
+                        add['item'] = '';
+                    }
+                    if (!pandora.user.ui.lists[list]) {
+                        add['lists.' + that.encode(list)] = {};
+                    }
+                    if (list != self.previousUI._list) {
+                        Ox.forEach(listSettings, function(listSetting, setting) {
+                            if (!pandora.user.ui.lists[list]) {
+                                // add default list setting and copy to settings
+                                add['lists.' + that.encode(list)][listSetting] = pandora.site.user.ui[setting];
+                                add[setting] = pandora.site.user.ui[setting];
+                            } else {
+                                // copy lists setting to settings
+                                add[setting] = pandora.user.ui.lists[list][listSetting]
+                            }
+                        });
+                    }
                 }
-                // fixme: if we did this on page load,
-                // find would get set to advanced
-                if (pandora.$ui.appPanel && list != self.previousUI._list) {
-                    Ox.forEach(listSettings, function(listSetting, setting) {
-                        if (!pandora.user.ui.lists[list]) {
-                            // add default list setting and copy to settings
-                            add['lists.' + that.encode(list)][listSetting] = pandora.site.user.ui[setting];
-                            add[setting] = pandora.site.user.ui[setting];
-                        } else {
-                            // copy lists setting to settings
-                            add[setting] = pandora.user.ui.lists[list][listSetting]
-                        }
-                    });
-                }
-            } else if (Object.keys(listSettings).indexOf(key) > -1) {
+            }  
+            else if (Object.keys(listSettings).indexOf(key) > -1) {
                 // copy setting to list setting
                 add['lists.' + that.encode(pandora.user.ui._list || '') + '.' + listSettings[key]] = val;
             } else if (key == 'item' && val) {
