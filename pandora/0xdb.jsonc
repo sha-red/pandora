@@ -6,8 +6,11 @@
 {
     /*
         Capabilities are per user level.
-        They can either be general (true/false)
-        or related to items (max. item rights level)
+        They can either be general:
+            {level: true} means a user of that level has the capability)
+        or related to items:
+            {level: x} means a user of that level has the capability
+            for items of a rights level up to and including x
     */
     "capabilities": {
         "canDeleteItems": {"admin": true},
@@ -19,15 +22,20 @@
         "canSeeItem": {"guest": 2, "member": 2, "friend": 3, "staff": 4, "admin": 4},
         "canSeeExtraItemViews": {"friend": true, "staff": true, "admin": true}
     },
+    /*
+        clipKeys are the properties that clips can by sorted by.
+        If sortOperator is not specified, it will be + for strings and - for numbers.
+    */
     "clipKeys": [
         {"id": "text", "title": "Text", "type": "string"},
-        {"id": "position", "title": "Position", "type": "float", "sortOperator": "-"},
+        {"id": "position", "title": "Position", "type": "float", "sortOperator": "+"},
         {"id": "duration", "title": "Duration", "type": "float"},
-        {"id": "hue", "title": "Hue", "type": "float", "sortOperator": "-"},
+        {"id": "hue", "title": "Hue", "type": "float", "sortOperator": "+"},
         {"id": "saturation", "title": "Saturation", "type": "float"},
         {"id": "lightness", "title": "Lightness", "type": "float"},
         {"id": "volume", "title": "Volume", "type": "float"}
     ],
+    // fixme: either this, or group: true in itemKeys, but not both
     "groups": [
         {"id": "director", "title": "Director", "type": "string"},
         {"id": "country", "title": "Country", "type": "string"},
@@ -41,6 +49,27 @@
         {"id": "actor", "title": "Actor", "type": "string"},
         {"id": "keyword", "title": "Keyword", "type": "string"}
     ],
+    /*
+        An itemKey must have the following properties:
+            id: The id of the key (as known by the server)
+            title: The title of the key (as displayed by the client)
+            type: text, string, float, integer, or array of any of these
+        and can have any of the following properties:
+            autocomplete: If true, find element will autocomplete
+            autocompleteSortKey: The key that suggestions will be sorted by
+            capability: A capability required to see this key
+            columnRequired: If true, the column can't be removed
+            columnWidth: Default column width in px
+            find: If true, will appear as a find option
+            format: {type: "...", args: [...]}, for special formatting
+                (Ox.formatType(args) will be called)
+            group: if true, one can group results by this key
+            sort: special sort rule (title, person)
+            sortOperator: sort operator (+, -), in case it differs from the
+                default for the key's type (+ for strings, - for numbers)
+            value: {key: "...", type: "..."}, for keys that are derived
+                from other keys (like number of actors), or "capability"
+    */
     "itemKeys": [
         {
             "id": "*",
@@ -82,7 +111,7 @@
         {
             "id": "year",
             "title": "Year",
-            "type": "year",
+            "type": "year", // fixme: do we need this?
             "autocomplete": true,
             "columnWidth": 60,
             "find": true,
@@ -447,6 +476,10 @@
             "value": "capability"
         }
     ],
+    /*
+        itemName specifies how items are being referred to.
+        Anything excessively long may cause layout errors.
+    */
     "itemName": {
         "singular": "Movie",
         "plural": "Movies"

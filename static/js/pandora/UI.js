@@ -90,7 +90,6 @@ pandora.UI = (function() {
             }
         });
         [args, add].forEach(function(obj, isAdd) {
-            Ox.print('UUU', obj)
             Ox.forEach(obj, function(val, key) {
                 // make sure to not split at escaped dots ('\.')
                 var keys = key.replace(/\\\./g, '\n').split('.').map(function(key) {
