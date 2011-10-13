@@ -177,6 +177,12 @@ pandora.ui.clipList = function(videoRatio) {
                     $('.OxSelectedVideo').removeClass('OxSelectedVideo');
                     !ui.item && pandora.UI.set('listSelection', []);
                 }
+            },
+            pandora_itemsort: function(data) {
+                that.options({sort: data.value});                
+            },
+            pandora_listsort: function(data) {
+                that.options({sort: data.value});
             }
         });
 

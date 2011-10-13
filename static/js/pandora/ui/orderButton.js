@@ -1,7 +1,8 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
 pandora.ui.orderButton = function() {
-    var that = Ox.Button({
+    var sortKey = !pandora.user.ui.item ? 'listSort' : 'itemSort',
+        that = Ox.Button({
             id: 'orderButton',
             title: getTitle(),
             // tooltip: 'Change sort order',
@@ -13,20 +14,21 @@ pandora.ui.orderButton = function() {
         })
         .bindEvent({
             click: function(data) {
-                pandora.UI.set({
-                    listSort: [{
-                        key: pandora.user.ui.listSort[0].key,
-                        operator: pandora.user.ui.listSort[0].operator == '+' ? '-' : '+'
-                    }]
-                });
+                pandora.UI.set(sortKey, [{
+                    key: pandora.user.ui[sortKey][0].key,
+                    operator: pandora.user.ui[sortKey][0].operator == '+' ? '-' : '+'
+                }]);
                 that.options({title: getTitle()});
             },
             pandora_listsort: function() {
                 that.options({title: getTitle()});
+            },
+            pandora_itemsort: function() {
+                that.options({title: getTitle()});
             }
         });
     function getTitle() {
-        return pandora.user.ui.listSort[0].operator == '+' ? 'up' : 'down';
+        return pandora.user.ui[sortKey][0].operator == '+' ? 'up' : 'down';
     }
     return that;
 }

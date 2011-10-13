@@ -39,108 +39,6 @@ pandora.ui.item = function() {
                     )
             );
 
-        } else if (pandora.user.ui.itemView == 'calendar') {
-            var video = result.data.stream;
-            pandora.api.findEvents({
-                itemQuery: {conditions: [{key: 'id', value: pandora.user.ui.item, operator:'='}]},
-                keys: ['id', 'name', 'start', 'end'],
-                query: {}
-            }, function(r) {
-                if (r.data.items.length>0) {
-                    pandora.$ui.contentPanel.replaceElement(1, Ox.SplitPanel({
-                        elements: [
-                            {
-                                element: pandora.$ui.calendar = Ox.Calendar({
-                                    date: new Date(0),
-                                    events: r.data.items,
-                                    height: window.innerHeight - pandora.user.ui.showGroups * pandora.user.ui.groupsSize - 61,
-                                    range: [-5000, 5000],
-                                    width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 2 - 144 - Ox.UI.SCROLLBAR_SIZE,
-                                    zoom: 4
-                                }).bindEvent({
-                                    select: function(event) {
-                                        pandora.$ui.clips.options({
-                                            items: function(data, callback) {
-                                                pandora.api.findClips(Ox.extend(data, {
-                                                    query: {
-                                                        conditions:[{
-                                                            key: 'event',
-                                                            value: event.id,
-                                                            operator:'=='
-                                                        }]
-                                                    },
-                                                    itemQuery: {conditions: [{
-                                                            key: 'id',
-                                                            value: pandora.user.ui.item,
-                                                            operator: '=='
-                                                     }]}
-                                                }), callback);
-                                            }
-                                        });
-                                        
-                                    }
-                                })
-                            },
-                            {
-                                element: Ox.Element(),
-                                element: pandora.$ui.clips = Ox.IconList({
-                                    fixedRatio: video.aspectRatio,
-                                    item: function(data, sort, size) {
-                                        size = size || 128;
-                                        var width = size,
-                                            height = Math.round(size / video.aspectRatio),
-                                            itemId = data.id.split('/')[0],
-                                            url = '/' + itemId + '/' + height + 'p' + data['in'] + '.jpg';
-                                        return {
-                                            height: height,
-                                            id: data['id'],
-                                            info: Ox.formatDuration(data['in']) + ' - '
-                                                + Ox.formatDuration(data['out']),
-                                            title: data.value,
-                                            url: url,
-                                            width: width
-                                        };
-                                    },
-                                    items: [],
-                                    keys: ['id', 'value', 'in', 'out'],
-                                    size: 128,
-                                    sort: pandora.user.ui.itemSort,
-                                    unique: 'id'
-                                }).bindEvent({
-                                    open: function(data) {
-                                        var id = data.ids[0],
-                                            item = pandora.user.ui.item,
-                                            points = {
-                                                'in': pandora.$ui.clips.value(id, 'in'),
-                                                out: pandora.$ui.clips.value(id, 'out')
-                                            };
-                                        pandora.UI.set('videoPoints.' + item, Ox.extend(points, {
-                                            position: points['in']
-                                        }));
-                                        pandora.UI.set('itemView', 'timeline');
-                                    }
-                                }),
-                                id: 'place',
-                                size: 144 + Ox.UI.SCROLLBAR_SIZE
-                            }
-                        ],
-                        orientation: 'horizontal'
-                    })
-                    .bindEvent('resize', function(data) {
-
-                    }));
-                } else {
-                    pandora.$ui.contentPanel.replaceElement(1,
-                        Ox.Element()
-                            .css({marginTop: '32px', fontSize: '12px', textAlign: 'center'})
-                            .html(
-                                'Sorry, <i>' + result.data.title 
-                                + '</i> currently doesn\'t have a '
-                                + pandora.user.ui.itemView + ' view.'
-                    ));
-                }
-            });
-
         } else if (pandora.user.ui.itemView == 'info') {
             //Ox.print('result.data', result.data)
             if (pandora.user.level == 'admin' && false) {
@@ -201,11 +99,6 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'clips') {
             pandora.$ui.contentPanel.replaceElement(1,
                 pandora.$ui.clips = pandora.ui.clipList(result.data.videoRatio)
-                    .bindEvent({
-                        pandora_itemsort: function(data) {
-                            pandora.$ui.clips.options({sort: data.value});
-                        }
-                    })
             );
 
         } else if (pandora.user.ui.itemView == 'video') {
@@ -388,7 +281,7 @@ pandora.ui.item = function() {
             pandora.$ui.contentPanel.replaceElement(1, pandora.ui.navigationView('map', result.data.videoRatio));
 
         } else if (pandora.user.ui.itemView == 'calendar') {
-            pandora.$ui.contentPanel.replaceElement(1, Ox.Element().html('Calendar'));
+            pandora.$ui.contentPanel.replaceElement(1, pandora.ui.navigationView('calendar', result.data.videoRatio));
 
         } else if (pandora.user.ui.itemView == 'data') {
             var stats = Ox.Container();

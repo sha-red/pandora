@@ -80,7 +80,8 @@ pandora.ui.browser = function() {
             orientation: 'horizontal',
             selected: [pandora.user.ui.item],
             size: 64,
-            sort: pandora.user.ui.listSort,
+            sort: ['text', 'position'].indexOf(pandora.user.ui.listSort) > -1
+                ? pandora.site.user.ui.listSort : pandora.user.ui.listSort,
             unique: 'id'
         })
         .bindEvent({

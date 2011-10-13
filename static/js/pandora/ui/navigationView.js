@@ -186,7 +186,10 @@ pandora.ui.navigationView = function(type, videoRatio) {
     } else {
 
         pandora.api.findEvents({
-            itemQuery: ui.find,
+            itemQuery: !ui.item ? ui.find : {
+                conditions: [{key: 'id', value: ui.item, operator: '=='}],
+                operator: '&'
+            },
             keys: ['id', 'name', 'start', 'end'],
             query: {},
             range: [0, 1000000]
@@ -277,19 +280,13 @@ pandora.ui.navigationView = function(type, videoRatio) {
         $itemButton.options({disabled: !item});
     }
 
-    that.bindEvent({
-        pandora_itemsort: function(data) {
-            ui.item && $list.options({sort: data.value});
-        },
-        pandora_listsort: function(data) {
-            !ui.item && $list.options({sort: data.value});
-        }
-    });
-
     if (type == 'map') {
         pandora.user.ui.mapFind = '';
         pandora.user.ui.mapSelection = '';
     }
+
+    // needed to it can recieve events from UI module
+    pandora.$ui.clipList = $list;
 
     return that;
 

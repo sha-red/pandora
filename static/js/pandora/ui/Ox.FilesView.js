@@ -352,11 +352,11 @@ Ox.FilesView = function(options, self) {
         });
 
     function openFiles(data) {
-        Ox.print('........', JSON.stringify(self.$filesList.value(data.ids[0], 'instances')))
+        //Ox.print('........', JSON.stringify(self.$filesList.value(data.ids[0], 'instances')))
     }
 
     function selectFiles(data) {
-        Ox.print('........', JSON.stringify(self.$filesList.value(data.ids[0], 'instances')))
+        //Ox.print('........', JSON.stringify(self.$filesList.value(data.ids[0], 'instances')))
         self.selected = data.ids;
         self.$instancesList.options({
             items: data.ids.length == 1

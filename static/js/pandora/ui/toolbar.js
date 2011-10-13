@@ -18,7 +18,7 @@ pandora.ui.toolbar = function() {
             pandora.$ui.sortSelect = pandora.ui.sortSelect()
         );
     }
-    if (!ui.item) {
+    if (!ui.item || pandora.isClipView()) {
         that.append(
             pandora.$ui.orderButton = pandora.ui.orderButton()
         );

@@ -390,17 +390,14 @@ pandora.ui.list = function() {
                 }, function(result) {
                     pandora.$ui.selected.html(pandora.ui.status('selected', result.data));
                 });
+            },
+            pandora_listsort: function(data) {
+                that.options({sort: data.value});
             }
         });
         
     }
 
-    that.bindEvent({
-        // fixme: this is nonsense for map and calendar
-        pandora_listsort: function(data) {
-            that.options({sort: data.value});
-        }
-    });
     if (pandora.user.ui.listView == 'grid') {
         that.bindEvent({
             pandora_icons: function(data) {
