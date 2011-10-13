@@ -171,5 +171,4 @@ class ClipManager(Manager):
             filter_layers = filter(lambda k: k in public_layers, data['keys'])
             if filter_layers:
                 qs = qs.filter(annotations__layer__name__in=filter_layers)
-        qs = qs.distinct()
         return qs

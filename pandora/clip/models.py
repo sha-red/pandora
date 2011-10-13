@@ -9,6 +9,10 @@ from archive import extract
 import managers
 
 class Clip(models.Model):
+    '''
+    CREATE INDEX clip_clip_title_idx ON clip_clip (title ASC NULLS LAST);
+    CREATE INDEX clip_clip_director_idx ON clip_clip (director ASC NULLS LAST);
+    '''
     class Meta:
         unique_together = ("item", "start", "end")
 
@@ -32,6 +36,9 @@ class Clip(models.Model):
     lightness = models.FloatField(default=0, db_index=True)
     volume = models.FloatField(default=0, null=True, db_index=True)
 
+    director = models.CharField(max_length=1000)
+    title = models.CharField(max_length=1000)
+
     def update_calculated_values(self):
         self.duration = self.end - self.start
         if self.duration > 0:
@@ -41,6 +48,8 @@ class Clip(models.Model):
         else:
             self.hue = self.saturation = self.lightness = 0
             self.volume = 0
+        self.director = self.item.sort.director
+        self.title = self.item.sort.title
     
     def save(self, *args, **kwargs):
         self.public_id = u"%s/%s-%s" %(self.item.itemId, self.start, self.end)
