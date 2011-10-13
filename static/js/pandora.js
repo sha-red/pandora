@@ -177,7 +177,7 @@ Ox.load({
             if (pandora.user.ui.listView == 'map') {
                 pandora.$ui.map.resizeMap();
             } else if (pandora.user.ui.listView == 'calendar') {
-                // ...
+                pandora.$ui.calendar.resizeCalendar();
             } else {
                 pandora.$ui.list.size();
             }
@@ -186,6 +186,8 @@ Ox.load({
             pandora.$ui.browser.scrollToSelection();
             if (pandora.user.ui.itemView == 'info') {
                 pandora.$ui.info.resize();
+            } else if (pandora.user.ui.itemView == 'clips') {
+                pandora.$ui.clips.size();
             } else if (pandora.user.ui.itemView == 'video') {
                 pandora.$ui.player.options({
                    // fixme: duplicated
@@ -201,7 +203,7 @@ Ox.load({
             } else if (pandora.user.ui.itemView == 'map') {
                 pandora.$ui.map.resizeMap();
             } else if (pandora.user.ui.itemView == 'calendar') {
-                // ...
+                pandora.$ui.calendar.resizeCalendar();
             }
         }
     }
