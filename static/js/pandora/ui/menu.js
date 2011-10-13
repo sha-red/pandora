@@ -265,10 +265,15 @@ pandora.ui.mainMenu = function() {
                     that[data.value ? 'disableItem' : 'enableItem']('showgroups');
                     that[data.value ? 'enableItem' : 'disableItem']('showbrowser');
                 }
+                if (!data.value) {
+                    that.disableItem('showannotations');
+                } else if (['video', 'timeline'].indexOf(ui.itemView) > -1) {
+                    that.enableItem('showannotations');
+                }
             },
             pandora_itemview: function(data) {
-                var isVideoView = ['video', 'timeline'].indexOf(data.value) > 1,
-                    wasVideoView = ['video', 'timeline'].indexOf(data.previousValue) > 1;
+                var isVideoView = ['video', 'timeline'].indexOf(data.value) > -1,
+                    wasVideoView = ['video', 'timeline'].indexOf(data.previousValue) > -1;
                 if (isVideoView != wasVideoView) {
                     that[isVideoView ? 'enableItem' : 'disableItem']('showannotations');
                 }
