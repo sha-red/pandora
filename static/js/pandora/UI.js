@@ -33,40 +33,41 @@ pandora.UI = (function() {
         }
         Ox.print('UI SET', args)
         self.previousUI = Ox.clone(pandora.user.ui, true);
-        Ox.forEach(args, function(val, key) {
-            if (key == 'find') {
-                // the challenge here is that find may change list,
-                // and list may then change listSort and listView,
-                // which we don't want to trigger, since find triggers
-                var list = pandora.getListsState(val);
-                pandora.user.ui._list = list;
-                pandora.user.ui._groupsState = pandora.getGroupsState(val);
-                pandora.user.ui._findState = pandora.getFindState(val);
-                if (!Ox.isEqual(val, pandora.user.ui.find)) {
-                    if (pandora.$ui.appPanel) {
-                        // if find has changed and we're not on page load,
-                        // switch from item view to list view
-                        add['item'] = '';
-                    }
+        if ('find' in args) {
+            // the challenge here is that find may change list,
+            // and list may then change listSort and listView,
+            // which we don't want to trigger, since find triggers
+            // (values we put in add will be changed, but won't trigger)
+            var list = pandora.getListsState(args.find);
+            pandora.user.ui._list = list;
+            pandora.user.ui._groupsState = pandora.getGroupsState(args.find);
+            pandora.user.ui._findState = pandora.getFindState(args.find);
+            if (pandora.$ui.appPanel) {
+                // if we're not on page load,
+                // switch from item view to list view
+                add['item'] = '';
+            }
+            if (!pandora.user.ui.lists[list]) {
+                add['lists.' + that.encode(list)] = {};
+            }
+            if (list != self.previousUI._list) {
+                Ox.forEach(listSettings, function(listSetting, setting) {
                     if (!pandora.user.ui.lists[list]) {
-                        add['lists.' + that.encode(list)] = {};
+                        // add default list setting and copy to settings
+                        add['lists.' + that.encode(list)][listSetting] = pandora.site.user.ui[setting];
+                        add[setting] = pandora.site.user.ui[setting];
+                    } else {
+                        // copy lists setting to settings
+                        add[setting] = pandora.user.ui.lists[list][listSetting]
                     }
-                    if (list != self.previousUI._list) {
-                        Ox.forEach(listSettings, function(listSetting, setting) {
-                            if (!pandora.user.ui.lists[list]) {
-                                // add default list setting and copy to settings
-                                add['lists.' + that.encode(list)][listSetting] = pandora.site.user.ui[setting];
-                                add[setting] = pandora.site.user.ui[setting];
-                            } else {
-                                // copy lists setting to settings
-                                add[setting] = pandora.user.ui.lists[list][listSetting]
-                            }
-                        });
-                    }
-                }
-            }  
-            else if (Object.keys(listSettings).indexOf(key) > -1) {
-                // copy setting to list setting
+                });
+            }
+        }
+        // it is important to check for find first, so that if find
+        // changes list, pandora.user.ui._list is correct here
+        Ox.forEach(args, function(val, key) {
+            if (Object.keys(listSettings).indexOf(key) > -1) {
+                // if applicable, copy setting to list setting
                 add['lists.' + that.encode(pandora.user.ui._list || '') + '.' + listSettings[key]] = val;
             } else if (key == 'item' && val) {
                 // when switching to an item, update list selection
@@ -82,16 +83,21 @@ pandora.UI = (function() {
                 && ['video', 'timeline'].indexOf(val) > -1
                 && !pandora.user.ui.videoPoints[pandora.user.ui.item]
             )) {
-                // add default videoPoints
+                // when switching to a video view, add default videoPoints
                 add['videoPoints.' + (
                     key == 'item' ? val : pandora.user.ui.item
                 )] = {'in': 0, out: 0, position: 0};
             }
         });
         [args, add].forEach(function(obj, isAdd) {
+            Ox.print('UUU', obj)
             Ox.forEach(obj, function(val, key) {
-                var keys = key.replace(/([^\\])\./g, '$1\n').split('\n'),
+                // make sure to not split at escaped dots ('\.')
+                var keys = key.replace(/\\\./g, '\n').split('.').map(function(key) {
+                        return key.replace(/\n/g, '.')
+                    }),
                     ui = pandora.user.ui;
+                Ox.print(key, '......', keys)
                 while (keys.length > 1) {
                     ui = ui[keys.shift()];
                 }

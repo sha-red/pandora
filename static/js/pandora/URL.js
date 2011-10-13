@@ -205,9 +205,10 @@ pandora.URL = (function() {
 
             ///*
             if (state.find) {
-                set.find = state.find;
+                find = state.find;
+                set.find = find;
             } else {
-                var find = pandora.user.ui.find;
+                find = pandora.user.ui.find;
                 pandora.user.ui._list = pandora.getListsState(find)
                 pandora.user.ui._groupsState = pandora.getGroupsState(find);
                 pandora.user.ui._findState = pandora.getFindState(find);
@@ -219,12 +220,12 @@ pandora.URL = (function() {
                 $(this).trigger('stop');
             });
 
-            if (!pandora.$ui.appPanel && state.item && pandora.user.ui.find) {
+            if (!pandora.$ui.appPanel && state.item && find) {
                 // on page load, if item is set and there is or was a query,
                 // we have to check if the item actually matches the query,
                 // and otherwise reset find
                 pandora.api.find({
-                    query: pandora.user.ui.find,
+                    query: find,
                     positions: [state.item],
                     sort: [{key: 'id', operator: ''}]
                 }, function(result) {
