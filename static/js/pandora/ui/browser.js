@@ -38,7 +38,6 @@ pandora.ui.browser = function() {
             toggle: function(data) {
                 data.collapsed && pandora.$ui.list.gainFocus();
                 pandora.UI.set({showGroups: !data.collapsed});
-                pandora.$ui.mainMenu.getItem('viewMenu_togglegroups').toggleTitle();
                 if (pandora.user.ui.listView == 'map') {
                     pandora.$ui.map.resizeMap();
                 } else if (pandora.user.ui.listView == 'calendar') {
@@ -101,7 +100,7 @@ pandora.ui.browser = function() {
                 });
             },
             toggle: function(data) {
-                pandora.UI.set({showMovies: !data.collapsed});
+                pandora.UI.set({showBrowser: !data.collapsed});
                 if (data.collapsed) {
                     if (pandora.user.ui.itemView == 'timeline') {
                         pandora.$ui.editor.gainFocus();

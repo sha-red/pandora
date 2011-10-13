@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
+
 import os
 import sys
 import time
@@ -8,7 +9,7 @@ import thread
 
 from django.db import models
 from django.conf import settings
-from ox.utils import json
+import ox.jsonc
 
 _win = (sys.platform == "win32")
 
@@ -25,7 +26,7 @@ RUN_RELOADER = True
 
 def load_config():
     with open(settings.SITE_CONFIG) as f:
-        config = json.load(f)
+        config = ox.jsonc.load(f)
 
     config['site']['id'] = settings.SITEID
     config['site']['name'] = settings.SITENAME

@@ -9,7 +9,6 @@ pandora.ui.info = function() {
             .bindEvent({
                 toggle: function(data) {
                     pandora.UI.set({showInfo: !data.collapsed});
-                    pandora.$ui.mainMenu.getItem('viewMenu_toggleinfo').toggleTitle();
                     pandora.resizeFolders();
                 },
                 pandora_find: function() {
@@ -18,7 +17,10 @@ pandora.ui.info = function() {
                     }
                 },
                 pandora_item: updateInfo,
-                pandora_listselection: updateInfo
+                pandora_listselection: updateInfo,
+                pandora_showinfo: function(data) {
+                    pandora.resizeFolders();
+                }
             });
 
     //pandora.$ui.leftPanel && resize();

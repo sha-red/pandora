@@ -16,11 +16,11 @@ pandora.ui.contentPanel = function() {
                 }
             ] : [
                 {
-                    collapsed: !pandora.user.ui.showMovies,
+                    collapsed: !pandora.user.ui.showBrowser,
                     collapsible: true,
                     element: pandora.$ui.browser = pandora.ui.browser(),
                     size: 112 + Ox.UI.SCROLLBAR_SIZE,
-                    tooltip: pandora.site.itemName.plural.toLowerCase()
+                    tooltip: pandora.site.itemName.singular.toLowerCase() + ' browser'
                 },
                 {
                     element: pandora.$ui.item = pandora.ui.item()
@@ -39,6 +39,12 @@ pandora.ui.contentPanel = function() {
             },
             pandora_itemview: function() {
                 that.replaceElement(1, pandora.$ui.item = pandora.ui.item());
+            },
+            pandora_showbrowser: function(data) {
+                data.value == that.options('elements')[0].collapsed && that.toggle(0);
+            },
+            pandora_showgroups: function(data) {
+                data.value == that.options('elements')[0].collapsed && that.toggle(0);
             }
         });
     return that;

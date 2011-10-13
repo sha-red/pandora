@@ -94,33 +94,11 @@ pandora.ui.mainMenu = function() {
                         { id: 'resetgroups', title: 'Reset Groups' }
                     ] },
                     {},
-                    {
-                        id: 'togglelists',
-                        title: Ox.map([pandora.user.ui.showSidebar? 'Hide': 'Show',
-                                       pandora.user.ui.showSidebar? 'Show': 'Hide' ],
-                                       function(t) { return t + ' Lists'; } ),
-                        keyboard: 'shift l'
-                    },
-                    {
-                        id: 'toggleinfo',
-                        title: Ox.map([pandora.user.ui.showInfo? 'Hide': 'Show',
-                                       pandora.user.ui.showInfo? 'Show': 'Hide' ],
-                                       function(t) { return t + ' Info'; } ),
-                        keyboard: 'shift i'
-                    },
-                    {
-                        id: 'togglegroups',
-                        title: Ox.map([pandora.user.ui.showGroups? 'Hide': 'Show',
-                                       pandora.user.ui.showGroups? 'Show': 'Hide' ],
-                                       function(t) { return t + ' Groups'; } ),
-                        keyboard: 'shift g'
-                    },
-                    {
-                        id: 'movies', title:
-                        'Hide ' + pandora.site.itemName.plural,
-                        disabled: true,
-                        keyboard: 'shift m'
-                    },
+                    { id: 'showsidebar', title: (ui.showSidebar ? 'Hide' : 'Show') + ' Sidebar', keyboard: 'shift s' },
+                    { id: 'showinfo', title: (ui.showInfo ? 'Hide' : 'Show') + ' Info', keyboard: 'shift i' },
+                    { id: 'showgroups', title: (ui.showGroups ? 'Hide' : 'Show') + ' Groups', disabled: !!ui.item, keyboard: 'shift g' },
+                    { id: 'showbrowser', title: (ui.showBrowser ? 'Hide' : 'Show') + ' ' + pandora.site.itemName.singular + ' Browser', disabled: !ui.item, keyboard: 'shift b' },
+                    { id: 'showannotations', title: (ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations', disabled: !ui.item || ['timeline', 'video'].indexOf(ui.itemView) == -1, keyboard: 'shift a' },
                     {},
                     { id: 'theme', title: 'Theme', items: [
                         { group: 'settheme', min: 1, max: 1, items: [
@@ -238,12 +216,16 @@ pandora.ui.mainMenu = function() {
                     pandora.ui.listDialog().open();
                 } else if (data.id == 'deletelist') {
                     pandora.ui.deleteListDialog().open();
-                } else if (data.id == 'stills') {
-                    var id = pandora.user.ui.item || pandora.user.ui.listItem;
-                    pandora.$ui.postersDialog = pandora.ui.framesDialog(id).open();
-                } else if (data.id == 'posters') {
-                    var id = pandora.user.ui.item || pandora.user.ui.listItem;
-                    pandora.$ui.postersDialog = pandora.ui.postersDialog(id).open();
+                } else if (data.id == 'showsidebar') {
+                    pandora.UI.set({showSidebar: !ui.showSidebar});
+                } else if (data.id == 'showinfo') {
+                    pandora.UI.set({showInfo: !ui.showInfo});
+                } else if (data.id == 'showgroups') {
+                    pandora.UI.set({showGroups: !ui.showGroups});
+                } else if (data.id == 'showbrowser') {
+                    pandora.UI.set({showBrowser: !ui.showBrowser});
+                } else if (data.id == 'showannotations') {
+                    pandora.UI.set({showAnnotations: !ui.showAnnotations});
                 } else if (data.id == 'names') {
                     pandora.$ui.namesDialog = pandora.ui.namesDialog().open();
                 } else if (data.id == 'titles') {
@@ -267,15 +249,6 @@ pandora.ui.mainMenu = function() {
                     });
                 } else if (data.id == 'clearcache') {
                     Ox.Request.clearCache();
-                } else if (data.id == 'togglegroups') {
-                    that.getItem('viewMenu_togglegroups').toggleTitle();
-                    pandora.$ui.contentPanel.toggle(0);
-                } else if (data.id == 'toggleinfo') {
-                    that.getItem('viewMenu_toggleinfo').toggleTitle();
-                    pandora.$ui.leftPanel.toggle(2);
-                } else if (data.id == 'togglelists') {
-                    that.getItem('viewMenu_togglelists').toggleTitle();
-                    pandora.$ui.mainPanel.toggle(0);
                 }
             },
             pandora_find: function() {
@@ -285,7 +258,20 @@ pandora.ui.mainMenu = function() {
                 that[action]('editlist');
                 that[action]('duplicatelist');
                 that[action]('deletelist');
-                that[pandora.user.ui.listSelection.length ? 'enableItem' : 'disableItem']('newlistfromselection');
+                that[ui.listSelection.length ? 'enableItem' : 'disableItem']('newlistfromselection');
+            },
+            pandora_item: function(data) {
+                if (!!data.value != !!data.previousValue) {
+                    that[data.value ? 'disableItem' : 'enableItem']('showgroups');
+                    that[data.value ? 'enableItem' : 'disableItem']('showbrowser');
+                }
+            },
+            pandora_itemview: function(data) {
+                var isVideoView = ['video', 'timeline'].indexOf(data.value) > 1,
+                    wasVideoView = ['video', 'timeline'].indexOf(data.previousValue) > 1;
+                if (isVideoView != wasVideoView) {
+                    that[isVideoView ? 'enableItem' : 'disableItem']('showannotations');
+                }
             },
             pandora_listselection: function(data) {
                 that[data.value.length ? 'enableItem' : 'disableItem']('newlistfromselection');
@@ -295,6 +281,21 @@ pandora.ui.mainMenu = function() {
                 if (pandora.isClipView() != pandora.isClipView(data.previousValue)) {
                     that.replaceMenu('sortMenu', getSortMenu());
                 }
+            },
+            pandora_showannotations: function(data) {
+                that.setItemTitle('showannotations', (data.value ? 'Hide' : 'Show') + ' Annotations');
+            },
+            pandora_showbrowser: function(data) {
+                that.setItemTitle('showbrowser', (data.value ? 'Hide' : 'Show') + ' ' + pandora.site.itemName.singular + ' Browser');
+            },
+            pandora_showgroups: function(data) {
+                that.setItemTitle('showgroups', (data.value ? 'Hide' : 'Show') + ' Groups');
+            },
+            pandora_showinfo: function(data) {
+                that.setItemTitle('showinfo', (data.value ? 'Hide' : 'Show') + ' Info');
+            },
+            pandora_showsidebar: function(data) {
+                that.setItemTitle('showsidebar', (data.value ? 'Hide' : 'Show') + ' Sidebar');
             }
         });
 

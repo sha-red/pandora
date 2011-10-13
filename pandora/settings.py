@@ -25,7 +25,7 @@ ADMINS = (
      #('admin', 'admin@example.com'),
 )
 
-DEFAULT_FROM_EMAIL='admin@' + URL.split('/')[0]
+DEFAULT_FROM_EMAIL='system@' + URL.split('/')[0]
 #DEFAULT_FROM_EMAIL='admin@example.com'
 SERVER_EMAIL=DEFAULT_FROM_EMAIL
 
@@ -165,20 +165,11 @@ LOGGING = {
 
 AUTH_PROFILE_MODULE = 'user.UserProfile'
 
-#Video encoding settings
-#available profiles: 96p, 240p, 360p, 480p, 720p, 1080p
 
-SITE_CONFIG = join(PROJECT_ROOT, '0xdb.json')
-DEFAULT_SORT = [{"key": "director", "operator": ""}]
-DEFAULT_THEME = "classic"
+SITE_CONFIG = join(PROJECT_ROOT, '0xdb.jsonc')
 
 
 TRACKER_URL="http://url2torrent.net:6970/announce"
-
-TRANSMISSON_HOST = 'localhost'
-TRANSMISSON_PORT = 9091
-TRANSMISSON_USER = 'transmission'
-TRANSMISSON_PASSWORD = 'transmission'
 
 
 #Movie related settings
@@ -247,17 +238,4 @@ except NameError:
             secret.close()
         except IOError:
             Exception('Please create a %s file with random characters to generate your secret key!' % SECRET_FILE)
-
-from ox.utils import json
-with open(SITE_CONFIG) as f:
-    CONFIG = json.load(f)
-
-CONFIG['site']['id'] = SITEID
-CONFIG['site']['name'] = SITENAME
-CONFIG['site']['sectionName'] = SITENAME
-CONFIG['site']['url'] = URL
-
-CONFIG['keys'] = {}
-for key in CONFIG['itemKeys']:
-    CONFIG['keys'][key['id']] = key
 

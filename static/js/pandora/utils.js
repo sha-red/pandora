@@ -396,10 +396,10 @@ pandora.enterFullscreen = function() {
     pandora.$ui.appPanel.size(0, 0);
     pandora.user.ui.showSidebar && pandora.$ui.mainPanel.size(0, 0);
     pandora.$ui.rightPanel.size(0, 0).size(2, 0);
-    !pandora.user.ui.showMovies && pandora.$ui.contentPanel.css({
+    !pandora.user.ui.showBrowser && pandora.$ui.contentPanel.css({
         top: (-112 - Ox.UI.SCROLLBAR_SIZE) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
     });
-    pandora.user.ui.showMovies && pandora.$ui.contentPanel.size(0, 0);
+    pandora.user.ui.showBrowser && pandora.$ui.contentPanel.size(0, 0);
     pandora.$ui.player.options({
         height: pandora.$document.height() - 2,
         width: pandora.$document.width() - 2
@@ -410,10 +410,10 @@ pandora.exitFullscreen = function() {
     pandora.$ui.appPanel.size(0, 20);
     pandora.user.ui.showSidebar && pandora.$ui.mainPanel.size(0, pandora.user.ui.sidebarSize);
     pandora.$ui.rightPanel.size(0, 24).size(2, 16);
-    !pandora.user.ui.showMovies && pandora.$ui.contentPanel.css({
+    !pandora.user.ui.showBrowser && pandora.$ui.contentPanel.css({
         top: 24 + (-112 - Ox.UI.SCROLLBAR_SIZE) + 'px' // fixme: rightPanel.size(0, 0) doesn't preserve negative top of browser
     });
-    pandora.user.ui.showMovies && pandora.$ui.contentPanel.size(0, 112 + Ox.UI.SCROLLBAR_SIZE);
+    pandora.user.ui.showBrowser && pandora.$ui.contentPanel.size(0, 112 + Ox.UI.SCROLLBAR_SIZE);
 };
 
 pandora.getFoldersHeight = function() {

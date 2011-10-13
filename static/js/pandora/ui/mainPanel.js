@@ -9,7 +9,7 @@ pandora.ui.mainPanel = function() {
                     resizable: true,
                     resize: [192, 256, 320, 384],
                     size: pandora.user.ui.sidebarSize,
-                    tooltip: 'lists'
+                    tooltip: 'sidebar'
                 },
                 {
                     element: pandora.$ui.rightPanel = pandora.ui.rightPanel()
@@ -44,6 +44,9 @@ pandora.ui.mainPanel = function() {
                 if (!data.value || !data.previousValue) {
                     that.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
                 }
+            },
+            pandora_showsidebar: function(data) {
+                data.value == that.options('elements')[0].collapsed && that.toggle(0);
             }
         });
     return that;

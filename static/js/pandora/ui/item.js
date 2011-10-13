@@ -267,6 +267,9 @@ pandora.ui.item = function() {
                 volume: function(data) {
                     pandora.UI.set('volume', data.volume);
                 },
+                pandora_showannotations: function(data) {
+                    pandora.$ui.player.options({showAnnotations: data.value});
+                }
             }));
 
         } else if (pandora.user.ui.itemView == 'timeline') {
@@ -360,6 +363,9 @@ pandora.ui.item = function() {
                         Ox.print('done updateAnnotation', result);
                         
                     });
+                },
+                pandora_showannotations: function(data) {
+                    pandora.$ui.editor.options({showAnnotations: data.value});
                 }
             }));
             that.bindEvent('resize', function(data) {

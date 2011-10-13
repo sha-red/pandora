@@ -1,11 +1,21 @@
+/*
+    Pan.do/ra Settings
+
+    You can edit this file.
+*/
 {
+    /*
+        Capabilities are per user level.
+        They can either be general (true/false)
+        or related to items (max. item rights level)
+    */
     "capabilities": {
         "canDeleteItems": {"admin": true},
         "canEditItemIcons": {"staff": true, "admin": true},
         "canPlayClips": {"guest": 1, "member": 2, "friend": 3, "staff": 4, "admin": 4},
         "canPlayVideo": {"guest": 0, "member": 1, "friend": 3, "staff": 4, "admin": 4},
         "canReloadMetadata": {"staff": true, "admin": true},
-        "canSeeFiles": {"guest": -1, "member": -1, "friend": -1, "staff": 4, "admin": 4},
+        "canSeeFiles": {"staff": true, "admin": true},
         "canSeeItem": {"guest": 2, "member": 2, "friend": 3, "staff": 4, "admin": 4},
         "canSeeExtraItemViews": {"friend": true, "staff": true, "admin": true}
     },
@@ -493,6 +503,15 @@
         "importMoviePosters": true,
         "importPosterFrames": true
     },
+    "personalLists": [
+        {"id": "favorites", "title": "Favorites"},
+        {"id": "most_popular", "title": "Most Popular", "query": {}},
+        {"id": "recently_viewed", "title": "Recently Viewed", "query": {}},
+        {"id": "1960s", "title": "1960s", "query": {"conditions": [{"key": "year", "value": "196", "operator": "^"}], "operator": "&"}},
+        {"id": "movies_with_full_video", "title": "Movies with Full Video", "query": {"conditions": [{"key": "canPlayVideo", "value": true, "operator": "="}], "operator": "&"}},
+        {"id": "movies_with_clips", "title": "Movies with Clips", "query": {"conditions": [{"key": "canPlayClips", "value": true, "operator": "="}], "operator": "&"}},
+        {"id": "no_tv_series", "title": "No TV Series", "query": {"conditions": [{"key": "isSeries", "value": false, "operator": "="}], "operator": "&"}}
+    ],
     "rightsLevel": {"member": 5, "staff": 4, "admin": 3},
     "rightsLevels": [
         {"name": "Public", "color": [0, 255, 0], "description": "Everyone can see and play."},
@@ -503,6 +522,12 @@
     ],
     "sendReferrer": false,
     "site": {
+        "email": {
+            // E-mail address in contact form (to)
+            "contact": "0xdb@0xdb.org",
+            // E-mail address uses by the system (from)
+            "system": "0xdb@0xdb.org"
+        },
         "id": "{{settings.SITEID}}",
         "name": "{{settings.SITENAME}}",
         "url": "{{settings.URL}}"
@@ -524,28 +549,6 @@
     ],
     "user": {
         "level": "guest",
-        "lists": {
-            "common": [
-                {"id": "all", "title": "All Movies", "query": {}}
-            ],
-            "personal": [
-                {"user": "foo", "name": "Favorites", "featured": false, "public": true},
-                {"id": "favorites", "title": "Favorites", "public": true, "items": []},
-                {"id": "most_popular", "title": "Most Popular", "query": {}},
-                {"id": "recently_viewed", "title": "Recently Viewed", "query": {}},
-                {"id": "1960s", "title": "1960s", "query": {"conditions": [{"key": "year", "value": "196", "operator": "^"}], "operator": "&"}},
-                {"id": "movies_with_full_video", "title": "Movies with Full Video", "query": {"conditions": [{"key": "canPlayVideo", "value": true, "operator": ""}], "operator": "&"}},
-                {"id": "movies_with_full_video", "title": "Movies with Clips", "query": {"conditions": [{"key": "canPlayClips", "value": true, "operator": ""}], "operator": "&"}}
-            ],
-            "favorite": [
-                {"id": "rlx:watchme", "title": "rlx: watchme", "public": true, "items": [0, 1, 2, 3, 4]}
-            ],
-            "featured": [
-                {"id": "situationist_film", "title": "Situationist Film", "query": {}},
-                {"id": "timelines", "title": "Timelines", "items": [0, 1, 2, 3, 4, 5, 6, 7, 8]}
-            ]
-        },
-        "notes": "",
         "preferences": {},
         "ui": {
             "annotationsSize": 256,
@@ -580,6 +583,7 @@
             "mapSelection": "",
             "section": "items",
             "showAnnotations": true,
+            "showBrowser": true,
             "showControls": true,
             "showFlags": true,
             "showGroups": true,
@@ -588,7 +592,6 @@
             "showInfo": true,
             "showMapControls": false,
             "showMapLabels": false,
-            "showMovies": true,
             "showFolder": {
                 "items": {
                     "personal": true,
@@ -609,9 +612,7 @@
             "videoVolume": 1
         },
         "username": "",
-        "volumes": [
-            {"name": "Movies A-Z", "path": "", "items": 1234}
-        ]
+        "volumes": []
     },
     "userLevels": ["guest", "member", "friend", "staff", "admin"],
     "video": {

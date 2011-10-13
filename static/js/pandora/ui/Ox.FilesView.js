@@ -259,7 +259,7 @@ Ox.FilesView = function(options, self) {
     self.$checkbox = Ox.Checkbox({
         checked: false,
         id: 'go',
-        title: 'Go to this movie after moving files', // fixme: wrong, can be 'Go to video' etc
+        title: 'Switch to this movie after moving files', // fixme: wrong, can be 'Go to video' etc
         width: 240
     });
 
@@ -305,8 +305,8 @@ Ox.FilesView = function(options, self) {
                 });
                 Ox.Request.clearCache(); // fixme: remove
                 pandora.api.moveFiles(data, function(result) {
-                    if(self.$checkbox.value()) {
-                        pandora.URL.set(result.data.itemId);
+                    if (self.$checkbox.value()) {
+                        pandora.UI.set({item: result.data.itemId});
                     } else {
                         Ox.print('moved', self.selected, result.data.itemId);
                         self.$filesList.reloadList();
