@@ -53,19 +53,31 @@ pandora.ui.browser = function() {
             draggable: true,
             id: 'list',
             item: function(data, sort, size) {
+                size = size || 64;
                 var ui = pandora.user.ui,
                     ratio = ui.icons == 'posters'
                         ? (ui.showSitePoster ? 5/8 : data.posterRatio) : 1,
-                size = size || 64;
-                return {
-                    height: ratio <= 1 ? size : size / ratio,
-                    id: data.id,
-                    info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
-                    title: data.title + (data.director ? ' (' + data.director + ')' : ''),
-                    url: '/' + data.id + '/' + (
+                    url = '/' + data.id + '/' + (
                         ui.icons == 'posters'
                         ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
                     ) + size + '.jpg',
+                    format, info, sortKey;
+                if (['title', 'director'].indexOf(sortKey) > -1) {
+                    info = data['year'];
+                } else {
+                    sortKey = sort[0].key;
+                    format = pandora.getSortKeyData(sortKey).format;
+                    info = format
+                        ? Ox['format' + Ox.toTitleCase(format.type)]
+                            .apply(this, Ox.merge([data[sortKey]], format.args || []))
+                        : data[sortKey];
+                }
+                return {
+                    height: ratio <= 1 ? size : size / ratio,
+                    id: data.id,
+                    info: info,
+                    title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
+                    url: url,
                     width: ratio >= 1 ? size : size * ratio
                 };
             },
@@ -81,7 +93,7 @@ pandora.ui.browser = function() {
             selected: [pandora.user.ui.item],
             size: 64,
             sort: ['text', 'position'].indexOf(pandora.user.ui.listSort) > -1
-                ? pandora.site.user.ui.listSort : pandora.user.ui.listSort,
+                ? pandora.site.user.ui.listSort: pandora.user.ui.listSort,
             unique: 'id'
         })
         .bindEvent({

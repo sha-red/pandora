@@ -149,13 +149,12 @@ pandora.ui.list = function() {
                         ui.icons == 'posters'
                         ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
                     ) + size + '.jpg',
-                    sortKey = sort[0].key,
-                    format, info;
+                    format, info, sortKey;
                 if (['title', 'director'].indexOf(sortKey) > -1) {
                     info = data['year'];
                 } else {
-                    sortKey = sort[0].key,
-                    format = pandora.getSortKeyData(sortKey).format,
+                    sortKey = sort[0].key;
+                    format = pandora.getSortKeyData(sortKey).format;
                     info = format
                         ? Ox['format' + Ox.toTitleCase(format.type)]
                             .apply(this, Ox.merge([data[sortKey]], format.args || []))
