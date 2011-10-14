@@ -243,6 +243,7 @@ class ItemManager(Manager):
         conditions = parseConditions(data.get('query', {}).get('conditions', []),
                                      data.get('query', {}).get('operator', '&'))
         qs = qs.filter(conditions)
+        qs = qs.distinct()
         
         #anonymous can only see public items
         if user.is_anonymous():
