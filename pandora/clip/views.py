@@ -20,7 +20,7 @@ def parse_query(data, user):
         if key in data:
             query[key] = data[key]
     query['qs'] = models.Clip.objects.find(query, user)
-    if 'itemQuery' in data:
+    if 'itemQuery' in data and data['itemQuery'].get('conditions'):
         item_query = Item.objects.find({'query': data['itemQuery']}, user)
         query['qs'] = query['qs'].filter(item__in=item_query)
     return query
@@ -32,7 +32,8 @@ def order_query(qs, sort):
         if operator != '-':
             operator = ''
         clip_keys = ('public_id', 'start', 'end', 'hue', 'saturation', 'lightness', 'volume',
-                     'annotations__value')
+                     'annotations__value',
+                     'director', 'title')
         key = {
             'id': 'public_id',
             'in': 'start',
@@ -53,7 +54,6 @@ def order_query(qs, sort):
         order_by.append(order)
     if order_by:
         qs = qs.order_by(*order_by, nulls_last=True)
-    qs = qs.distinct()
     return qs
 
 def findClips(request):
@@ -76,7 +76,8 @@ def findClips(request):
     query = parse_query(data, request.user)
     qs = order_query(query['qs'], query['sort'])
     if 'keys' in data:
-        qs = qs.select_related()[query['range'][0]:query['range'][1]]
+        qs = qs.select_related()
+        qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [p.json(keys=data['keys']) for p in qs]
     elif 'position' in query:
         ids = [i.public_id for i in qs]

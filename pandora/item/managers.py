@@ -242,7 +242,7 @@ class ItemManager(Manager):
         #only include items that have hard metadata
         conditions = parseConditions(data.get('query', {}).get('conditions', []),
                                      data.get('query', {}).get('operator', '&'))
-        qs = qs.filter(conditions).distinct()
+        qs = qs.filter(conditions)
         
         #anonymous can only see public items
         if user.is_anonymous():
