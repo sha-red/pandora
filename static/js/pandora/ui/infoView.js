@@ -355,7 +355,7 @@ pandora.ui.infoView = function(data) {
         $('<div>')
         .css({marginBottom: '4px'})
         .append(formatKey(key, true))
-        .append(Ox.formatColor(data[key], key))
+        .append(Ox.formatColor(data[key] || 0, key))
         .appendTo($statistics);
     });
     

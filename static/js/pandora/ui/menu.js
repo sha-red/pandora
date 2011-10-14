@@ -12,136 +12,142 @@ pandora.ui.mainMenu = function() {
                 })
             ],
             id: 'mainMenu',
-            menus: [
-                { id: pandora.site.site.id + 'Menu', title: pandora.site.site.name, items: [
-                    { id: 'home', title: 'Home' },
-                    {},
-                    { id: 'about', title: 'About ' + pandora.site.site.name },
-                    { id: 'news', title: pandora.site.site.name + ' News' },
-                    { id: 'tour', title: 'Take a Tour' },
-                    { id: 'faq', title: 'Frequently Asked Questions' },
-                    { id: 'terms', title: 'Terms of Service' },
-                    { id: 'contact', title: 'Contact ' + pandora.site.site.name },
-                    {},
-                    { id: 'software', title: 'Software' }
-                ] },
-                { id: 'userMenu', title: 'User', items: [
-                    { id: 'username', title: 'User: ' + (isGuest ? 'not logged in' : pandora.user.username), disabled: true },
-                    {},
-                    { id: 'preferences', title: 'Preferences...', disabled: isGuest, keyboard: 'control ,' },
-                    { id: 'archives', title: 'Archives...', disabled: isGuest },
-                    {},
-                    { id: 'signup', title: 'Sign Up...', disabled: !isGuest },
-                    isGuest ? { id: 'signin', title: 'Sign In...' }
-                        : { id: 'signout', title: 'Sign Out...'}
-                ] },
-                getListMenu(),
-                { id: 'editMenu', title: 'Edit', items: [
-                    { id: 'undo', title: 'Undo', disabled: true, keyboard: 'control z' },
-                    { id: 'redo', title: 'Redo', disabled: true, keyboard: 'shift control z' },
-                    {},
-                    { id: 'cut', title: 'Cut', disabled: true, keyboard: 'control x' },
-                    { id: 'copy', title: 'Copy', disabled: true, keyboard: 'control c' },
-                    { id: 'paste', title: 'Paste', disabled: true, keyboard: 'control v' },
-                    { id: 'delete', title: 'Delete', disabled: true, keyboard: 'delete' },
-                    {},
-                    { id: 'selectall', title: 'Select All', disabled: true, keyboard: 'control a' },
-                    { id: 'selectnone', title: 'Select None', disabled: true, keyboard: 'shift control a' },
-                    { id: 'invertselection', title: 'Invert Selection', disabled: true, keyboard: 'alt control a' }
-                ] },
-                { id: 'viewMenu', title: 'View', items: [
-                    { id: 'movies', title: 'View ' + pandora.site.itemName.plural, items: [
-                        { group: 'viewmovies', min: 1, max: 1, items: pandora.site.listViews.map(function(view) {
-                            return Ox.extend({
-                                checked: ui.listView == view.id,
-                            }, view);
-                        }) },
-                    ]},
-                    { id: 'icons', title: 'Icons', items: [
-                        { group: 'viewicons', min: 1, max: 1, items: ['posters', 'frames'].map(function(icons) {
-                            return {id: icons, title: Ox.toTitleCase(icons), checked: ui.icons == icons};
-                        }) },
+            menus: Ox.merge(
+                [
+                    { id: pandora.site.site.id + 'Menu', title: pandora.site.site.name, items: [
+                        { id: 'home', title: 'Home' },
                         {},
-                        { id: 'showsiteposter', title: 'Always Show ' + pandora.site.site.name + ' Poster', checked: ui.showSitePoster }
-                    ] },
-                    { id: 'columns', title: 'Columns', items: [
-                        { id: 'loadcolumns', title: 'Load Layout...' },
-                        { id: 'savecolumns', title: 'Save Layout...' },
+                        { id: 'about', title: 'About ' + pandora.site.site.name },
+                        { id: 'news', title: pandora.site.site.name + ' News' },
+                        { id: 'tour', title: 'Take a Tour' },
+                        { id: 'faq', title: 'Frequently Asked Questions' },
+                        { id: 'terms', title: 'Terms of Service' },
+                        { id: 'contact', title: 'Contact ' + pandora.site.site.name },
                         {},
-                        { id: 'resetcolumns', title: 'Reset Layout' }
-                    ]},
-                    {},
-                    { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], items: [
-                        { group: 'itemview', min: 1, max: 1, items: pandora.site.itemViews.map(function(view) {
-                            return Ox.extend({
-                                checked: ui.itemView == view.id,
-                            }, view);
-                        }) },
-                    ]},
-                    { id: 'openvideo', title: 'Open Video Links', items: [
-                        { group: 'videoview', min: 1, max: 1, items: ['player', 'editor'].map(function(view) {
-                            return {id: view, title: Ox.toTitleCase(view), checked: ui.videoView == view};
-                        }) }
+                        { id: 'software', title: 'Software' }
                     ] },
-                    {},
-                    { id: 'groups', title: 'Groups', items: [
-                        { group: 'groups', min: 5, max: 5, items: pandora.site.groups.map(function(group) {
-                            return Ox.extend({
-                                checked: Ox.getPositionById(ui.groups, group.id) > -1
-                            }, group);
-                        }) },
+                    { id: 'userMenu', title: 'User', items: [
+                        { id: 'username', title: 'User: ' + (isGuest ? 'not logged in' : pandora.user.username), disabled: true },
                         {},
-                        { id: 'resetgroups', title: 'Reset Groups' }
+                        { id: 'preferences', title: 'Preferences...', disabled: isGuest, keyboard: 'control ,' },
+                        { id: 'archives', title: 'Archives...', disabled: isGuest },
+                        {},
+                        { id: 'signup', title: 'Sign Up...', disabled: !isGuest },
+                        isGuest ? { id: 'signin', title: 'Sign In...' }
+                            : { id: 'signout', title: 'Sign Out...'}
                     ] },
-                    {},
-                    { id: 'showsidebar', title: (ui.showSidebar ? 'Hide' : 'Show') + ' Sidebar', keyboard: 'shift s' },
-                    { id: 'showinfo', title: (ui.showInfo ? 'Hide' : 'Show') + ' Info', keyboard: 'shift i' },
-                    { id: 'showgroups', title: (ui.showGroups ? 'Hide' : 'Show') + ' Groups', disabled: !!ui.item, keyboard: 'shift g' },
-                    { id: 'showbrowser', title: (ui.showBrowser ? 'Hide' : 'Show') + ' ' + pandora.site.itemName.singular + ' Browser', disabled: !ui.item, keyboard: 'shift b' },
-                    { id: 'showannotations', title: (ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations', disabled: !ui.item || ['timeline', 'video'].indexOf(ui.itemView) == -1, keyboard: 'shift a' },
-                    {},
-                    { id: 'theme', title: 'Theme', items: [
-                        { group: 'settheme', min: 1, max: 1, items: [
-                            { id: 'classic', title: 'Classic', checked: ui.theme == 'classic'},
-                            { id: 'modern', title: 'Modern', checked: ui.theme == 'modern' }
-                        ]}
+                    getListMenu(),
+                    { id: 'editMenu', title: 'Edit', items: [
+                        { id: 'undo', title: 'Undo', disabled: true, keyboard: 'control z' },
+                        { id: 'redo', title: 'Redo', disabled: true, keyboard: 'shift control z' },
+                        {},
+                        { id: 'cut', title: 'Cut', disabled: true, keyboard: 'control x' },
+                        { id: 'copy', title: 'Copy', disabled: true, keyboard: 'control c' },
+                        { id: 'paste', title: 'Paste', disabled: true, keyboard: 'control v' },
+                        { id: 'delete', title: 'Delete', disabled: true, keyboard: 'delete' },
+                        {},
+                        { id: 'selectall', title: 'Select All', disabled: true, keyboard: 'control a' },
+                        { id: 'selectnone', title: 'Select None', disabled: true, keyboard: 'shift control a' },
+                        { id: 'invertselection', title: 'Invert Selection', disabled: true, keyboard: 'alt control a' }
+                    ] },
+                    { id: 'viewMenu', title: 'View', items: [
+                        { id: 'movies', title: 'View ' + pandora.site.itemName.plural, items: [
+                            { group: 'viewmovies', min: 1, max: 1, items: pandora.site.listViews.map(function(view) {
+                                return Ox.extend({
+                                    checked: ui.listView == view.id,
+                                }, view);
+                            }) },
+                        ]},
+                        { id: 'icons', title: 'Icons', items: [
+                            { group: 'viewicons', min: 1, max: 1, items: ['posters', 'frames'].map(function(icons) {
+                                return {id: icons, title: Ox.toTitleCase(icons), checked: ui.icons == icons};
+                            }) },
+                            {},
+                            { id: 'showsiteposter', title: 'Always Show ' + pandora.site.site.name + ' Poster', checked: ui.showSitePoster }
+                        ] },
+                        { id: 'columns', title: 'Columns', items: [
+                            { id: 'loadcolumns', title: 'Load Layout...' },
+                            { id: 'savecolumns', title: 'Save Layout...' },
+                            {},
+                            { id: 'resetcolumns', title: 'Reset Layout' }
+                        ]},
+                        {},
+                        { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], items: [
+                            { group: 'itemview', min: 1, max: 1, items: pandora.site.itemViews.map(function(view) {
+                                return Ox.extend({
+                                    checked: ui.itemView == view.id,
+                                }, view);
+                            }) },
+                        ]},
+                        { id: 'openvideo', title: 'Open Video Links', items: [
+                            { group: 'videoview', min: 1, max: 1, items: ['player', 'editor'].map(function(view) {
+                                return {id: view, title: Ox.toTitleCase(view), checked: ui.videoView == view};
+                            }) }
+                        ] },
+                        {},
+                        { id: 'groups', title: 'Groups', items: [
+                            { group: 'groups', min: 5, max: 5, items: pandora.site.groups.map(function(group) {
+                                return Ox.extend({
+                                    checked: Ox.getPositionById(ui.groups, group.id) > -1
+                                }, group);
+                            }) },
+                            {},
+                            { id: 'resetgroups', title: 'Reset Groups' }
+                        ] },
+                        {},
+                        { id: 'showsidebar', title: (ui.showSidebar ? 'Hide' : 'Show') + ' Sidebar', keyboard: 'shift s' },
+                        { id: 'showinfo', title: (ui.showInfo ? 'Hide' : 'Show') + ' Info', keyboard: 'shift i' },
+                        { id: 'showgroups', title: (ui.showGroups ? 'Hide' : 'Show') + ' Groups', disabled: !!ui.item, keyboard: 'shift g' },
+                        { id: 'showbrowser', title: (ui.showBrowser ? 'Hide' : 'Show') + ' ' + pandora.site.itemName.singular + ' Browser', disabled: !ui.item, keyboard: 'shift b' },
+                        { id: 'showannotations', title: (ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations', disabled: !ui.item || ['timeline', 'video'].indexOf(ui.itemView) == -1, keyboard: 'shift a' },
+                        {},
+                        { id: 'theme', title: 'Theme', items: [
+                            { group: 'settheme', min: 1, max: 1, items: [
+                                { id: 'classic', title: 'Classic', checked: ui.theme == 'classic'},
+                                { id: 'modern', title: 'Modern', checked: ui.theme == 'modern' }
+                            ]}
+                        ] }
+                    ]},
+                    getSortMenu(),
+                    { id: 'findMenu', title: 'Find', items: [
+                        { id: 'find', title: 'Find', items: [
+                            { group: 'find', min: 1, max: 1, items: pandora.site.findKeys.map(function(key, i) {
+                                var index = ui._findState.index;
+                                return Ox.extend({
+                                    checked: index > -1 && ui.find.conditions[index].key
+                                        ? ui.find.conditions[index].key == key.id
+                                        : key.id == 'all'
+                                }, key);
+                            }) }
+                        ] },
+                        { id: 'advancedfind', title: 'Advanced Find...', keyboard: 'shift control f' }
+                    ] },
+                    { id: 'dataMenu', title: 'Data', items: [
+                        { id: 'titles', title: 'Manage Titles...', disabled: !isAdmin },
+                        { id: 'names', title: 'Manage Names...', disabled: !isAdmin },
+                        {},
+                        { id: 'places', title: 'Manage Places...', disabled: isGuest },
+                        { id: 'events', title: 'Manage Events...', disabled: isGuest },
+                        {},
+                        { id: 'users', title: 'Manage Users...', disabled: !isAdmin }/*,
+                        { id: 'lists', title: 'Manage Lists...', disabled: !isAdmin },
+                        {},
+                        { id: 'news', title: 'Manage News...', disabled: !isAdmin },
+                        { id: 'tour', title: 'Manage Tour...', disabled: !isAdmin }*/
+                    ] },
+                    { id: 'helpMenu', title: 'Help', items: [
+                        { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'shift ?' }
                     ] }
-                ]},
-                getSortMenu(),
-                { id: 'findMenu', title: 'Find', items: [
-                    { id: 'find', title: 'Find', items: [
-                        { group: 'find', min: 1, max: 1, items: pandora.site.findKeys.map(function(key, i) {
-                            var index = ui._findState.index;
-                            return Ox.extend({
-                                checked: index > -1 && ui.find.conditions[index].key
-                                    ? ui.find.conditions[index].key == key.id
-                                    : key.id == 'all'
-                            }, key);
-                        }) }
-                    ] },
-                    { id: 'advancedfind', title: 'Advanced Find...', keyboard: 'shift control f' }
-                ] },
-                { id: 'dataMenu', title: 'Data', items: [
-                    { id: 'titles', title: 'Manage Titles...', disabled: !isAdmin },
-                    { id: 'names', title: 'Manage Names...', disabled: !isAdmin },
-                    {},
-                    { id: 'places', title: 'Manage Places...', disabled: isGuest },
-                    { id: 'events', title: 'Manage Events...', disabled: isGuest },
-                    {},
-                    { id: 'users', title: 'Manage Users...', disabled: !isAdmin }/*,
-                    { id: 'lists', title: 'Manage Lists...', disabled: !isAdmin },
-                    {},
-                    { id: 'news', title: 'Manage News...', disabled: !isAdmin },
-                    { id: 'tour', title: 'Manage Tour...', disabled: !isAdmin }*/
-                ] },
-                { id: 'helpMenu', title: 'Help', items: [
-                    { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'shift ?' }
-                ] },
-                { id: 'debugMenu', title: 'Debug', items: [
-                    { id: 'clearcache', title: 'Clear cache'},
-                    { id: 'resetui', title: 'Reset UI Settings'}
-                ] }
-            ]
+                ],
+                pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
+                    ? [
+                        { id: 'debugMenu', title: 'Debug', items: [
+                            { id: 'clearcache', title: 'Clear cache'},
+                            { id: 'resetui', title: 'Reset UI Settings'}
+                        ] }
+                    ]
+                    : []
+            )
         })
         .bindEvent({
             change: function(data) {

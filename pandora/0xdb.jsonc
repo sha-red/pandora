@@ -18,6 +18,7 @@
         "canPlayClips": {"guest": 1, "member": 2, "friend": 3, "staff": 4, "admin": 4},
         "canPlayVideo": {"guest": 0, "member": 1, "friend": 3, "staff": 4, "admin": 4},
         "canReloadMetadata": {"staff": true, "admin": true},
+        "canSeeDebugMenu": {"admin": true},
         "canSeeFiles": {"staff": true, "admin": true},
         "canSeeItem": {"guest": 2, "member": 2, "friend": 3, "staff": 4, "admin": 4},
         "canSeeExtraItemViews": {"friend": true, "staff": true, "admin": true}
