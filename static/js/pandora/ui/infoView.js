@@ -193,6 +193,7 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($text);
 
+    // fixme: creator seems to be always missing
     if (data.creator || data.writer || data.producer || data.cinematographer || data.editor) {
         $div = $('<div>')
             .css(css)

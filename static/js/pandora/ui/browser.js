@@ -61,11 +61,10 @@ pandora.ui.browser = function() {
                         ui.icons == 'posters'
                         ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
                     ) + size + '.jpg',
-                    format, info, sortKey;
+                    format, info, sortKey = sort[0].key;
                 if (['title', 'director'].indexOf(sortKey) > -1) {
                     info = data['year'];
                 } else {
-                    sortKey = sort[0].key;
                     format = pandora.getSortKeyData(sortKey).format;
                     info = format
                         ? Ox['format' + Ox.toTitleCase(format.type)]
