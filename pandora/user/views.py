@@ -169,7 +169,7 @@ def signup(request):
             user.is_staff = first_user
             user.save()
             #create default user lists:
-            for l in settings.DEFAULT_LISTS:
+            for l in settings.CONFIG['personalLists']:
                 list = models.List(name=l['name'], user=user)
                 for key in ('query', 'public', 'featured'):
                     if key in l:

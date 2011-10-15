@@ -8,7 +8,7 @@ from glob import glob
 import Image
 
 def loadTimeline(timeline_prefix, height=64):
-    files = sorted(glob('%s.%s.*.png' % (timeline_prefix, height)))
+    files = sorted(glob('%s%sp*.png' % (timeline_prefix, height)))
     f = Image.open(files[0])
     width = f.size[0]
     f = Image.open(files[-1])
@@ -22,7 +22,7 @@ def loadTimeline(timeline_prefix, height=64):
     return timeline
 
 def makeTiles(timeline_prefix, height=16, width=3600):
-    files = glob('%s.64.*.png' % timeline_prefix)
+    files = glob('%s64p*.png' % timeline_prefix)
     fps = 25
     part_step = 60
     output_width = width
@@ -43,14 +43,14 @@ def makeTiles(timeline_prefix, height=16, width=3600):
     i = 0
     while pos < timeline.size[0]:
       end = min(pos+output_width, timeline.size[0])
-      timeline.crop((pos, 0, end, timeline.size[1])).save('%s.%s.%04d.png' % (timeline_prefix, timeline.size[1], i))
+      timeline.crop((pos, 0, end, timeline.size[1])).save('%s%sp%04d.png' % (timeline_prefix, timeline.size[1], i))
       pos += output_width
       i += 1
 
 def makeTimelineOverview(timeline_prefix, width, inpoint=0, outpoint=0, duration=-1, height=16):
     input_scale = 25
     
-    timeline_file = '%s.%s.png' % (timeline_prefix, height)
+    timeline_file = '%s%sp.png' % (timeline_prefix, height)
     if outpoint > 0:
         timeline_file = '%s.overview.%s.%d-%d.png' % (timeline_prefix, height, inpoint, outpoint)
 
@@ -76,7 +76,7 @@ def join_timelines(timelines, prefix):
 
     tiles = [] 
     for timeline in timelines:
-        tiles += sorted(glob('%s.%s.*.png'%(timeline, height)))
+        tiles += sorted(glob('%s%sp*.png'%(timeline, height)))
 
     timeline = Image.new("RGB", (2 * width, height))
 
@@ -87,7 +87,7 @@ def join_timelines(timelines, prefix):
         timeline.paste(tile, (pos, 0, pos+tile.size[0], height))
         pos += tile.size[0]
         if pos >= width:
-            timeline_name = '%s.%s.%04d.png' % (prefix, height, i)
+            timeline_name = '%s%sp%04d.png' % (prefix, height, i)
             timeline.crop((0, 0, width, height)).save(timeline_name)
             i += 1
             if pos > width:
@@ -95,7 +95,7 @@ def join_timelines(timelines, prefix):
                 timeline.paste(t, (0, 0, t.size[0], height))
             pos -= width
     if pos:
-       timeline_name = '%s.%s.%04d.png' % (prefix, height, i)
+       timeline_name = '%s%sp%04d.png' % (prefix, height, i)
        timeline.crop((0, 0, pos, height)).save(timeline_name)
 
     makeTiles(prefix, 16, 3600)

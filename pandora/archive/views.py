@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
 from django.db.models import Count, Sum
 
+import ox
 from ox.utils import json
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
@@ -105,7 +106,7 @@ def update(request):
                                                                          file__wanted=True)]
         response['data']['file'] = [f.file.oshash for f in files.filter(file__is_subtitle=True,
                                                                         file__available=False,
-                                                                        name__endswith='.srt')]
+                                                                        path__endswith='.srt')]
 
     return render_to_json_response(response)
 actions.register(update, cache=False)
@@ -319,24 +320,8 @@ def lookup_file(request, oshash):
 def _order_query(qs, sort, prefix=''):
     order_by = []
     if len(sort) == 1:
-        sort.append({'operator': '+', 'key': 'sort_name'})
+        sort.append({'operator': '+', 'key': 'path'})
         sort.append({'operator': '-', 'key': 'created'})
-    '''
-        if sort[0]['key'] == 'title':
-            sort.append({'operator': '-', 'key': 'year'})
-            sort.append({'operator': '+', 'key': 'director'})
-        elif sort[0]['key'] == 'director':
-            sort.append({'operator': '-', 'key': 'year'})
-            sort.append({'operator': '+', 'key': 'title'})
-        elif sort[0]['key'] == 'year':
-            sort.append({'operator': '+', 'key': 'director'})
-            sort.append({'operator': '+', 'key': 'title'})
-        elif not sort[0]['key'] in ('value', 'value_sort'):
-            sort.append({'operator': '+', 'key': 'director'})
-            sort.append({'operator': '-', 'key': 'year'})
-            sort.append({'operator': '+', 'key': 'title'})
-
-    '''
 
     for e in sort:
         operator = e['operator']
@@ -346,7 +331,7 @@ def _order_query(qs, sort, prefix=''):
             'id': 'item__itemId',
             'users': 'instances__volume__user__username',
             'resolution': 'width',
-            'name': 'sort_name'
+            'path': 'sort_path'
         }.get(e['key'], e['key'])
         #if operator=='-' and '%s_desc'%key in models.ItemSort.descending_fields:
         #    key = '%s_desc' % key
@@ -400,10 +385,10 @@ Groups
             keys:  array of keys to return
             group:    group elements by, country, genre, director...
 
-        possible values for keys: name, items
+        possible values for keys: path, items
 
         with keys
-        items contains list of {'name': string, 'items': int}:
+        items contains list of {'path': string, 'items': int}:
         return {'status': {'code': int, 'text': string},
             'data': {items: array}}
 
@@ -465,7 +450,7 @@ Positions
 
         elif 'range' in data:
             qs = qs[query['range'][0]:query['range'][1]]
-            response['data']['items'] = [{'name': i['value'], 'items': i[items]} for i in qs]
+            response['data']['items'] = [{'path': i['value'], 'items': i[items]} for i in qs]
         else:
             response['data']['items'] = qs.count()
     elif 'positions' in query:
@@ -481,6 +466,7 @@ Positions
         response['data']['items'] = []
         qs = models.File.objects.filter(item__in=query['qs'])
         qs = _order_query(qs, query['sort'])
+        qs = qs.select_related()
         keys = query['keys']
         qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [f.json(keys) for f in qs]
@@ -492,3 +478,19 @@ Positions
 
 actions.register(findFiles)
 
+def parsePath(request): #parse path and return info
+    '''
+        param data {
+            path: string
+        }
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+                imdb: string
+            }
+        }
+    '''
+    path = json.loads(request.POST['data'])['path']
+    response = json_response(ox.parse_movie_path(path))
+    return render_to_json_response(response)
+actions.register(parsePath)

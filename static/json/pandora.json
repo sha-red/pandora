@@ -4,7 +4,7 @@
   "js/pandora/URL.js", 
   "js/pandora/autovalidate.js", 
   "js/pandora/utils.js", 
-  "js/pandora/ui/Ox.FilesView.js", 
+  "js/pandora/ui/filesView.js", 
   "js/pandora/ui/account.js", 
   "js/pandora/ui/appPanel.js", 
   "js/pandora/ui/backButton.js", 

@@ -25,7 +25,7 @@ class FileAdminForm(forms.ModelForm):
 
 
 class InstanceAdminForm(forms.ModelForm):
-    file = ForeignKeyByLetter(models.File, field_name='name')
+    file = ForeignKeyByLetter(models.File, field_name='path')
 
     class Meta:
         model = models.Instance

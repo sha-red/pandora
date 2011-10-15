@@ -1,29 +1,19 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-import os
-
 from celery.decorators import task
+import ox
 
-from item.utils import parse_path
 from item.models import get_item
 from django.conf import settings
 
 import models
 
-_INSTANCE_KEYS = ('mtime', 'name', 'folder')
 
+_INSTANCE_KEYS = ('mtime', 'path')
 
-def get_or_create_item(volume, f, user):
-    in_same_folder = models.Instance.objects.filter(folder=f['folder'], volume=volume)
-    if in_same_folder.count() > 0:
-        i = in_same_folder[0].file.item
-    else:
-        if settings.USE_FOLDER:
-            item_info = parse_path(f['folder'])
-        else:
-            item_info = parse_path(f['path'])
-        i = get_item(item_info, user)
-    return i
+def get_or_create_item(volume, info, user):
+    item_info = ox.parse_movie_info(info['path'])
+    return get_item(item_info, user)
 
 def get_or_create_file(volume, f, user, item=None):
     try:
@@ -31,7 +21,7 @@ def get_or_create_file(volume, f, user, item=None):
     except models.File.DoesNotExist:
         file = models.File()
         file.oshash = f['oshash']
-        file.name = f['name']
+        file.path = f['path']
         if item:
             file.item = item
         else:
@@ -50,13 +40,11 @@ def update_or_create_instance(volume, f):
                 setattr(instance, key, f[key])
                 updated=True
         if updated:
-            if instance.name.lower().startswith('extras/') or \
-               instance.name.lower().startswith('versions/'):
-               instance.extra = True
+            instance.ignore = False
             instance.save()
             instance.file.save()
     else:
-        instance = models.Instance.objects.filter(name=f['name'], folder=f['folder'], volume=volume)
+        instance = models.Instance.objects.filter(path=f['path'], volume=volume)
         if instance.count()>0:
             #same path, other oshash, keep path/item mapping, remove instance
             item = instance[0].file.item
@@ -69,9 +57,6 @@ def update_or_create_instance(volume, f):
         instance.file = get_or_create_file(volume, f, volume.user, item) 
         for key in _INSTANCE_KEYS:
             setattr(instance, key, f[key])
-        if instance.name.lower().startswith('extras/') or \
-           instance.name.lower().startswith('versions/'):
-           instance.extra = True
         instance.save()
         instance.file.save()
         instance.file.item.update_wanted()
@@ -83,17 +68,15 @@ def update_files(user, volume, files):
     volume, created = models.Volume.objects.get_or_create(user=user, name=volume)
     all_files = []
     for f in files:
-        folder = f['path'].split('/')
-        name = folder.pop()
-        if folder and folder[-1].lower() in ('extras', 'versions', 'dvds'):
-            name = '/'.join([folder.pop(), name])
-        f['folder'] = '/'.join(folder)
-        f['name'] = name
-        all_files.append(f['oshash'])
-        update_or_create_instance(volume, f)
-    
+        #ignore extras etc,
+        #imdb stlye is L/Last, First/Title (Year)/Title.. 4
+        #otherwise  T/Title (Year)/Title... 3
+        folder_depth = settings.USE_IMDB and 4 or 3
+        if len(f['path'].split('/')) == folder_depth:
+            all_files.append(f['oshash'])
+            update_or_create_instance(volume, f)
+
     #remove deleted files
-    #FIXME: can this have any bad consequences? i.e. on the selction of used item files.
     models.Instance.objects.filter(volume=volume).exclude(file__oshash__in=all_files).delete()
 
 @task(queue="encoding")

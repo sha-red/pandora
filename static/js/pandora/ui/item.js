@@ -293,7 +293,7 @@ pandora.ui.item = function() {
 
         } else if (pandora.user.ui.itemView == 'files') {
             pandora.$ui.contentPanel.replaceElement(1,
-                pandora.$ui.item = Ox.FilesView({
+                pandora.$ui.item = pandora.ui.filesView({
                     id: result.data.id
                 })
             );

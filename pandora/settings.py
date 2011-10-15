@@ -172,20 +172,10 @@ SITE_CONFIG = join(PROJECT_ROOT, '0xdb.jsonc')
 TRACKER_URL="http://url2torrent.net:6970/announce"
 
 
-#Movie related settings
-REVIEW_WHITELIST = {
-    u'.filmcritic.com': u'Filmcritic',
-    u'metacritic.com': u'Metacritic',
-    u'nytimes.com': u'New York Times',
-    u'rottentomatoes.com': u'Rotten Tomatoes',
-    u'salon.com': u'Salon.com',
-    u'sensesofcinema.com': u'Senses of Cinema',
-    u'villagevoice.com': u'Village Voice'
-}
 
-#list of poster services, https://wiki.0x2620.org/wiki/pandora/posterservice
-POSTER_SERVICES = []
+DATA_SERVICE = ''
 POSTER_PRECEDENCE = (
+    'piratecinema.org',
     'local',
     'criterion.com',
     'wikipedia.org',
@@ -196,19 +186,8 @@ POSTER_PRECEDENCE = (
     'other'
 )
 
-DEFAULT_LISTS = [
-    {"name": "Favorites"},
-    {"name": "1960s", "query": {
-                "conditions": [{"key": "year", "value": "196", "operator": "^"}],
-                "operator": ""}
-    }
-]
 #0xdb.org
 USE_IMDB = True
-#this should idealy go away, one folder per item
-USE_FOLDER = True
-
-#POSTER_SERVICES=['http://data.0xdb.org/poster/']
 
 #copy scripts and adjust to customize
 ITEM_POSTER = join('scripts', 'oxdb_poster')

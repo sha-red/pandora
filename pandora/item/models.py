@@ -15,7 +15,6 @@ from urllib import quote
 from django.db import models
 from django.db.models import Count, Q, Sum
 from django.core.files.base import ContentFile
-from django.utils import simplejson as json
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.db.models.signals import pre_delete
@@ -30,6 +29,7 @@ import managers
 import utils
 import tasks
 from .timelines import join_timelines
+from data_api import external_data
 
 from archive import extract
 from annotation.models import Annotation, Layer
@@ -39,11 +39,45 @@ from person.models import get_name_sort
 from title.models import get_title_sort
 
 
+def get_id(info):
+    q = Item.objects.all()
+    for key in ('title', 'director', 'year'):
+        #       'episodeTitle', 'episodeDirector', 'episodeYear', 'season', 'episode'):
+        if key in info and info[key]:
+            k = 'find__key'
+            v = 'find__value'
+            if key in Item.facet_keys + ['title']:
+                k = 'facets__key'
+                v = 'facets__value'
+            if isinstance(info[key], list):
+                for value in info[key]:
+                    q = q.filter(**{k: key, v: value})
+            else:
+                q = q.filter(**{k:key, v:info[key]})
+    if q.count() == 1:
+        return q[0].itemId
+    if settings.DATA_SERVICE:
+        r = external_data('getId', info)
+        if r['status']['code'] == 200:
+            imdbId = r['data']['imdbId']
+            return imdbId
+    return None
+
 def get_item(info, user=None, async=False):
     '''
         info dict with:
-            imdbId, title, director, episode_title, season, series
+            imdbId, title, director, year,
+            season, episode, episodeTitle, episodeDirector, episodeYear
     '''
+    item_data = {
+        'title': info['title'],
+        'director': info['director'],
+        'year': info.get('year', '')
+    }
+    for key in ('episodeTitle', 'episodeDirector', 'episodeYear',
+                'season', 'episode', 'seriesTitle'):
+        if key in info and info[key]:
+            item_data[key] = info[key]
     if settings.USE_IMDB:
         if 'imdbId' in info and info['imdbId']:
             try:
@@ -51,11 +85,7 @@ def get_item(info, user=None, async=False):
             except Item.DoesNotExist:
                 item = Item(itemId=info['imdbId'])
                 if 'title' in info and 'director' in info:
-                    item.external_data = {
-                        'title': info['title'],
-                        'director': info['director'],
-                        'year': info.get('year', '')
-                    }
+                    item.external_data = item_data
                 item.user = user
                 item.oxdbId = item.itemId
                 item.save()
@@ -64,60 +94,38 @@ def get_item(info, user=None, async=False):
                 else:
                     item.update_external()
         else:
-            q = Item.objects.all()
-            for key in ('title', 'director', 'year'):
-                if key in info and info[key]:
-                    if isinstance(info[key], list):
-                        q = q.filter(find__key=key, find__value='\n'.join(info[key]))
-                    else:
-                        q = q.filter(find__key=key, find__value=info[key])
-            if q.count() >= 1:
-                item = q[0]
-            elif not 'oxdbId' in info:
-                item = Item()
-                item.data = {
-                    'title': info['title'],
-                    'director': info['director'],
-                    'year': info.get('year', '')
-                }
-                for key in ('episode_title', 'series_title', 'season', 'episode'):
-                    if key in info and info[key]:
-                        item.data[key] = info[key]
-                item.oxdbId = item.oxdb_id()
-                item.save()
-            else:
+            itemId = get_id(info)
+            if itemId:
                 try:
-                    item = Item.objects.get(itemId=info['oxdbId'])
+                    item = Item.objects.get(itemId=itemId)
                 except Item.DoesNotExist:
-                    item = Item()
-                    item.data = {
-                        'title': info['title'],
-                        'director': info['director'],
-                        'year': info.get('year', '')
-                    }
-                    item.itemId = info['oxdbId']
+                    info['imdbId'] = itemId
+                    item = get_item(info)
+                return item
 
-                    for key in ('episode_title', 'series_title', 'season', 'episode'):
-                        if key in info and info[key]:
-                            item.data[key] = info[key]
-                    try:
-                        existing_item = Item.objects.get(oxdbId=item.oxdb_id())
-                        item = existing_item
-                    except Item.DoesNotExist:
-                        item.save()
+            try:
+                item = Item.objects.get(itemId=info.get('oxdbId'))
+            except Item.DoesNotExist:
+                item = Item()
+                item.user = user
+                item.data = item_data
+                item.itemId = info.get('oxdbId', item.oxdb_id())
+                try:
+                    existing_item = Item.objects.get(oxdbId=item.oxdb_id())
+                    item = existing_item
+                except Item.DoesNotExist:
+                    item.oxdbId = item.oxdb_id()
+                    item.save()
     else:
         qs = Item.objects.filter(find__key='title', find__value=info['title'])
         if qs.count() == 1:
             item = qs[0]
         else:
             item = Item()
-            item.data = {
-                'title': info['title']
-            }
+            item.data = item_data
             item.user = user
             item.save()
     return item
-
 
 class Item(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -202,59 +210,13 @@ class Item(models.Model):
                 self.data[key] = data[key]
         self.save()
 
-    def reviews(self):
-        reviews = self.get('reviews', [])
-        _reviews = []
-        for r in reviews:
-            for url in settings.REVIEW_WHITELIST:
-                if url in r[0]:
-                    _reviews.append({
-                        'source': settings.REVIEW_WHITELIST[url],
-                        'url': r[0]
-                    })
-        return _reviews
-
     def update_external(self):
-        if len(self.itemId) == 7:
-            data = ox.web.imdb.Imdb(self.itemId)
-            #FIXME: all this should be in ox.web.imdb.Imdb
-            for key in ('directors', 'writers', 'editors', 'producers',
-                        'cinematographers', 'languages', 'genres', 'keywords',
-                        'episode_directors'):
-                if key in data:
-                    data[key[:-1]] = data.pop(key)
-            if 'countries' in data:
-                data['country'] = data.pop('countries')
-            if 'release date' in data:
-                data['releasedate'] = data.pop('release date')
-                if isinstance(data['releasedate'], list):
-                    data['releasedate'] = min(data['releasedate'])
-            if 'plot' in data:
-                data['summary'] = data.pop('plot')
-            if 'cast' in data:
-                if isinstance(data['cast'][0], basestring):
-                    data['cast'] = [data['cast']]
-                data['actor'] = [c[0] for c in data['cast']]
-                data['cast'] = map(lambda x: {'actor': x[0], 'character': x[1]}, data['cast'])
-            if 'trivia' in data:
-                def fix_links(t):
-                    def fix_names(m):
-                        return '<a href="/?find=name:%s">%s</a>' % (
-                            quote(m.group(2).encode('utf-8')), m.group(2)
-                        )
-                    t = re.sub('<a href="(/name/.*?/)">(.*?)</a>', fix_names, t)
-                    def fix_titles(m):
-                        return '<a href="/?find=title:%s">%s</a>' % (
-                            quote(m.group(2).encode('utf-8')), m.group(2)
-                        )
-                    t = re.sub('<a href="(/title/.*?/)">(.*?)</a>', fix_titles, t)
-                    return t
-                data['trivia'] = [fix_links(t) for t in data['trivia']]
-            if 'aspectratio' in data:
-                data['aspectRatio'] = data.pop('aspectratio')
-            #filter reviews
-            self.external_data = data
-            self.save()
+        if settings.DATA_SERVICE and not self.itemId.startswith('0x'):
+            response = external_data('getData', {'id': self.itemId})
+            if response['status']['code'] == 200:
+                self.external_data = response['data']
+                self.save()
+                self.make_poster(True)
 
     def expand_connections(self):
         c = self.get('connections')
@@ -292,10 +254,17 @@ class Item(models.Model):
             super(Item, self).save(*args, **kwargs)
             if not settings.USE_IMDB:
                 self.itemId = ox.to26(self.id)
- 
+
+        #this does not work if another item without imdbid has the same metadata
         oxdbId = self.oxdb_id()
         if oxdbId:
-            self.oxdbId = oxdbId
+            if self.oxdbId != oxdbId:
+                q = Item.objects.filter(oxdbId=oxdbId).exclude(id=self.id)
+                if q.count() != 0:
+                    self.oxdbId = None
+                    q[0].merge_with(self, save=False)
+                else:
+                    self.oxdbId = oxdbId
         
         #id changed, what about existing item with new id?
         if settings.USE_IMDB and len(self.itemId) != 7 and self.oxdbId != self.itemId:
@@ -333,7 +302,7 @@ class Item(models.Model):
         self.delete_files()
         super(Item, self).delete(*args, **kwargs)
 
-    def merge_with(self, other):
+    def merge_with(self, other, save=True):
         '''
             move all related tables to other and delete self
         '''
@@ -350,15 +319,15 @@ class Item(models.Model):
                 f.item = other
                 f.save()
         self.delete()
-        other.save()
-        #FIXME: update poster, stills and streams after this
+        if save:
+            other.save()
+            #FIXME: update poster, stills and streams after this
 
     def get_posters(self):
         url = self.prefered_poster_url()
+        external_posters = self.external_data.get('posters', {})
+        services = external_posters.keys()
         index = []
-        services = [p['service']
-                    for p in self.poster_urls.values("service")
-                                             .annotate(Count("id")).order_by()]
         for service in settings.POSTER_PRECEDENCE:
             if service in services:
                 index.append(service)
@@ -369,7 +338,6 @@ class Item(models.Model):
             index.append(settings.URL)
 
         posters = []
-        
         poster = self.path('siteposter.jpg')
         poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
         if os.path.exists(poster):
@@ -382,18 +350,12 @@ class Item(models.Model):
                 'index': index.index(settings.URL)
             })
 
-        got = {}
-        for p in self.poster_urls.all().order_by('-height'):
-            if p.service not in got:
-                got[p.service] = 1
-                posters.append({
-                    'url': p.url,
-                    'width': p.width,
-                    'height': p.height,
-                    'source': p.service,
-                    'selected': p.url == url,
-                    'index': index.index(p.service)
-                })
+        for service in external_posters:
+            p = external_posters[service][0]
+            p['source'] = service
+            p['selected'] = p['url'] == url
+            p['index'] = index.index(service)
+            posters.append(p)
         posters.sort(key=lambda a: a['index'])
         return posters
 
@@ -452,10 +414,6 @@ class Item(models.Model):
                     if value:
                         i[key] = value
 
-        if 'reviews' in i:
-            i['reviews'] = self.reviews()
-            if not i['reviews']:
-                del i['reviews']
         if 'cast' in i and isinstance(i['cast'][0], basestring):
             i['cast'] = [i['cast']]
         if 'cast' in i and isinstance(i['cast'][0], list):
@@ -497,15 +455,16 @@ class Item(models.Model):
             return info
         return i
 
-
     def oxdb_id(self):
         if not settings.USE_IMDB:
             return self.itemId
         if not self.get('title') and not self.get('director'):
             return None
-        return utils.oxdb_id(self.get('title', ''), self.get('director', []), str(self.get('year', '')),
-                          self.get('season', ''), self.get('episode', ''),
-                          self.get('episode_title', ''), self.get('episode_director', []), self.get('episode_year', ''))
+        return ox.get_oxid(self.get('title', ''), self.get('director', []),
+                           str(self.get('year', '')),
+                           self.get('season', ''), self.get('episode', ''),
+                           self.get('episodeTitle', ''),
+                           self.get('episodeDirector', []), self.get('episodeYear', ''))
 
     '''
         Search related functions
@@ -528,10 +487,10 @@ class Item(models.Model):
                 i = key['id']
                 if i == 'title':
                     save(i, u'\n'.join([self.get('title', 'Untitled'),
-                                        self.get('original_title', '')]))
+                                        self.get('originalTitle', '')]))
                 elif i == 'filename':
                     save(i,
-                        '\n'.join([os.path.join(f.folder, f.name) for f in self.files.all()]))
+                        '\n'.join([f.path for f in self.files.all()]))
                 elif key['type'] == 'layer':
                     qs = Annotation.objects.filter(layer__name=i, item=self).order_by('start')
                     save(i, '\n'.join([l.value for l in qs]))
@@ -662,7 +621,7 @@ class Item(models.Model):
         s.words = sum([len(a.value.split()) for a in self.annotations.all()])
 
         s.clips = 0  #FIXME: get clips from all layers or something
-        videos = self.files.filter(active=True, is_video=True)
+        videos = self.files.filter(selected=True, is_video=True)
         if videos.count() > 0:
             s.duration = sum([v.duration for v in videos])
             v = videos[0]
@@ -715,7 +674,7 @@ class Item(models.Model):
                     current_values = [current_values]
                 else:
                     current_values = []
-                ot = self.get('original_title')
+                ot = self.get('originalTitle')
                 if ot:
                     current_values.append(ot)
             #FIXME: is there a better way to build name collection?
@@ -777,75 +736,43 @@ class Item(models.Model):
         return [f.json() for f in self.files.all()]
 
     def users_with_files(self):
-        return User.objects.filter(volumes__files__file__item=self).distinct()
+        return User.objects.filter(
+            volumes__files__file__item=self
+        ).order_by('-profile__level', 'date_joined').distinct()
+
+    def sets(self):
+        sets = []
+        for user in self.users_with_files():
+            files = self.files.filter(instances__volume__user=user, instances__ignore=False)
+            sets.append(files)
+        return sets
 
     def update_wanted(self):
-        users = self.users_with_files()
-        if users.filter(is_superuser=True).count()>0:
-            files = self.files.filter(instances__volume__user__is_superuser=True)
-            users = User.objects.filter(volumes__files__file__in=files,
-                                        is_superuser=True).distinct()
-        elif users.filter(is_staff=True).count()>0:
-            files = self.files.filter(instances__volume__user__is_staff=True)
-            users = User.objects.filter(volumes__files__file__in=files,
-                                        is_staff=True).distinct()
-        else:
-            files = self.files.all()
-        files = files.filter(is_video=True, instances__extra=False, instances__gt=0).order_by('part')
-        folders = list(set([f.folder for f in files]))
-        if len(folders) > 1:
-            files = files.filter(folder=folders[0])
-        files.update(wanted=True)
-        self.files.exclude(id__in=files).update(wanted=False)
+        wanted = []
+        for s in self.sets():
+            if s.filter(selected=False).count() != 0:
+                wanted += [i.id for i in s]
+            else:
+                break
+        self.files.filter(id__in=wanted).update(wanted=True)
+        self.files.exclude(id__in=wanted).update(wanted=False)
 
     def update_selected(self):
-        files = archive.models.File.objects.filter(item=self,
-                                                   streams__available=True,
-                                                   streams__source=None)
-        if files.count() == 0:
-            return
-
-        def get_level(users):
-            if users.filter(is_superuser=True).count() > 0: level = 0
-            elif users.filter(is_staff=True).count() > 0: level = 1
-            else: level = 2
-            return level
-
-        current_users = User.objects.filter(volumes__files__file__in=self.files.filter(active=True)).distinct()
-        current_level = get_level(current_users)
-
-        users = User.objects.filter(volumes__files__file__in=files).distinct()
-        possible_level = get_level(users)
-
-        if possible_level < current_level:
-            files = self.files.filter(instances__volume__user__in=users).order_by('part')
-            #FIXME: this should be instance folders
-            folders = list(set([f.folder
-                                for f in files.filter(is_video=True, instances__extra=False)]))
-            files = files.filter(folder__startswith=folders[0])
-            files.update(active=True)
-            self.rendered = False
-            self.save()
-            self.update_timeline()
-        else:
-            files = self.files.filter(instances__volume__user__in=current_users).order_by('part')
-            #FIXME: this should be instance folders
-            folders = list(set([f.folder
-                                for f in files.filter(is_video=True, instances__extra=False)]))
-            files = files.filter(folder__startswith=folders[0])
-            if files.filter(active=False, is_video=True).count() > 0:
-                files.update(active=True)
-                self.rendered = False
-                self.save()
-                self.update_timeline()
-
+        for s in self.sets():
+            if s.filter(Q(is_video=True)|Q(is_audio=True)).filter(available=False).count() == 0:
+                if s.filter(selected=False).count() > 0:
+                    s.update(selected=True, wanted=False)
+                    self.rendered = False
+                    self.save()
+                    self.update_timeline()
+                break
 
     def make_torrent(self):
         base = self.path('torrent')
         base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, base))
         if os.path.exists(base):
             shutil.rmtree(base)
-        os.makedirs(base)
+        ox.makedirs(base)
 
         base = self.path('torrent/%s' % self.get('title'))
         base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, base))
@@ -893,7 +820,7 @@ class Item(models.Model):
 
     def streams(self):
         return archive.models.Stream.objects.filter(source=None, available=True,
-            file__item=self, file__is_video=True, file__active=True).order_by('file__part')
+            file__item=self, file__is_video=True, file__selected=True).order_by('file__part')
 
     def update_timeline(self, force=False):
         streams = self.streams()
@@ -911,32 +838,6 @@ class Item(models.Model):
         self.rendered = streams != []
         self.save()
 
-    '''
-        Poster related functions
-    '''
-
-    def update_poster_urls(self):
-        _current = {}
-        for s in settings.POSTER_SERVICES:
-            url = '%s?id=%s'%(s, self.itemId)
-            try:
-                data = json.loads(ox.net.readUrlUnicode(url))
-            except:
-                continue
-            for service in data:
-                if service not in _current:
-                    _current[service] = []
-                for poster in data[service]:
-                    _current[service].append(poster)
-        #FIXME: remove urls that are no longer listed
-        for service in _current:
-            for poster in _current[service]:
-                p, created = PosterUrl.objects.get_or_create(item=self, url=poster['url'], service=service)
-                if created:
-                    p.width = poster['width']
-                    p.height = poster['height']
-                    p.save()
-
     def delete_poster(self):
         if self.poster:
             path = self.poster.path
@@ -948,15 +849,14 @@ class Item(models.Model):
             os.unlink(f)
 
     def prefered_poster_url(self):
-        self.update_poster_urls()
+        external_posters = self.external_data.get('posters', {})
         service = self.poster_source
-        if service and service != settings.URL:
-            for u in self.poster_urls.filter(service=service).order_by('-height'):
-                return u.url
+        if service and service != settings.URL and service in external_posters:
+            return external_posters[service][0]['url']
         if not service:
             for service in settings.POSTER_PRECEDENCE:
-                for u in self.poster_urls.filter(service=service).order_by('-height'):
-                    return u.url
+                if service in external_posters:
+                    return external_posters[service][0]['url']
         return None
 
     def make_timeline(self):
@@ -984,7 +884,7 @@ class Item(models.Model):
         poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
 
         frame = self.get_poster_frame_path()
-        timeline = '%s.64.png' % self.timeline_prefix
+        timeline = '%s64p.png' % self.timeline_prefix
 
         director = u', '.join(self.get('director', ['Unknown Director']))
         cmd = [settings.ITEM_POSTER,
@@ -1018,7 +918,7 @@ class Item(models.Model):
     def poster_frames(self):
         frames = []
         offset = 0
-        for f in self.files.filter(active=True, is_video=True):
+        for f in self.files.filter(selected=True, is_video=True):
             for ff in f.frames.all():
                 frames.append({
                     'position': offset + ff.position,
@@ -1052,7 +952,7 @@ class Item(models.Model):
         frame = self.get_poster_frame_path()
         icon = self.path('icon.jpg')
         self.icon.name = icon
-        timeline = '%s.64.png' % self.timeline_prefix
+        timeline = '%s64p.png' % self.timeline_prefix
         cmd = [settings.ITEM_ICON,
            '-i', self.icon.path
         ]
@@ -1074,8 +974,8 @@ class Item(models.Model):
         Annotation.objects.filter(layer=layer,item=self).delete()
         offset = 0
         language = ''
-        languages = [f.language for f in self.files.filter(active=True, is_subtitle=True,
-                                                           available=True)]
+        subtitles = self.files.filter(selected=True, is_subtitle=True, available=True)
+        languages = [f.language for f in subtitles]
         if languages:
             if 'en' in languages:
                 language = 'en'
@@ -1083,10 +983,18 @@ class Item(models.Model):
                 language = ''
             else:
                 language = languages[0] 
-        for f in self.files.filter(active=True, is_subtitle=True,
-                                   available=True, language=language).order_by('part'):
-                user = f.instances.all()[0].volume.user
-                for data in f.srt(offset):
+
+        #loop over all videos
+        for f in self.files.filter(Q(is_audio=True)|Q(is_video=True)) \
+                           .filter(selected=True).order_by('part'):
+            prefix = os.path.splitext(f.path)[0]
+            #if there is a subtitle with the same prefix, import
+            q = subtitles.filter(path__startswith=prefix,
+                                 language=language)
+            if q.count() == 1:
+                s = q[0]
+                user = s.instances.all()[0].volume.user
+                for data in s.srt(offset):
                     annotation = Annotation(
                         item=f.item,
                         layer=layer,
@@ -1096,14 +1004,7 @@ class Item(models.Model):
                         user=user
                     )
                     annotation.save()
-                duration = self.files.filter(Q(is_audio=True)|Q(is_video=True)) \
-                                     .filter(active=True, available=True, part=f.part)
-                if duration:
-                    duration = duration[0].duration
-                else:
-                    Annotation.objects.filter(layer=layer,item=self).delete()
-                    break
-                offset += duration
+            offset += f.duration
         self.update_find()
 
 def delete_item(sender, **kwargs):

@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
-Ox.FilesView = function(options, self) {
+pandora.ui.filesView = function(options, self) {
 
     var self = self || {},
         that = Ox.Element({}, self)
@@ -55,19 +55,11 @@ Ox.FilesView = function(options, self) {
                 },
                 {
                     align: 'left',
-                    id: 'folder',
+                    id: 'path',
                     operator: '+',
-                    title: 'Folder',
+                    title: 'Path',
                     visible: true,
-                    width: 180
-                },
-                {
-                    align: 'left',
-                    id: 'name',
-                    operator: '+',
-                    title: 'Name',
-                    visible: true,
-                    width: 360
+                    width: 560
                 },
                 {
                     align: 'left',
@@ -147,7 +139,7 @@ Ox.FilesView = function(options, self) {
                 }), callback);
             },
             scrollbarVisible: true,
-            sort: [{key: 'name', operator: '+'}]
+            sort: [{key: 'path', operator: '+'}]
         })
         .bindEvent({
             open: openFiles,
@@ -174,19 +166,11 @@ Ox.FilesView = function(options, self) {
             },
             {
                 align: 'left',
-                id: 'folder',
+                id: 'path',
                 operator: '+',
-                title: 'Folder',
+                title: 'Path',
                 visible: true,
-                width: 180
-            },
-            {
-                align: 'left',
-                id: 'name',
-                operator: '+',
-                title: 'Name',
-                visible: true,
-                width: 360
+                width: 560
             },
         ],
         columnsMovable: true,
@@ -352,11 +336,19 @@ Ox.FilesView = function(options, self) {
         });
 
     function openFiles(data) {
-        //Ox.print('........', JSON.stringify(self.$filesList.value(data.ids[0], 'instances')))
+        data.ids.length == 1 && pandora.api.parsePath({
+            path: self.$filesList.value(data.ids[0], 'path')
+        }, function(result) {
+            ['title', 'director', 'year'].forEach(function(key) {
+                if (result.data[key]) {
+                    self['$' + key + 'Input'].options({value: result.data[key]});
+                }
+            });
+            updateForm();
+        });
     }
 
     function selectFiles(data) {
-        //Ox.print('........', JSON.stringify(self.$filesList.value(data.ids[0], 'instances')))
         self.selected = data.ids;
         self.$instancesList.options({
             items: data.ids.length == 1

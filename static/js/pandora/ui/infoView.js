@@ -146,8 +146,8 @@ pandora.ui.infoView = function(data) {
         })
         .html(
             data.title + (
-                data.original_title && data.original_title != data.title
-                ? ' ' + formatLight('(' + data.original_title + ')') : ''
+                data.originalTitle && data.originalTitle != data.title
+                ? ' ' + formatLight('(' + data.originalTitle + ')') : ''
             )
         )
         .appendTo($text);
@@ -182,11 +182,10 @@ pandora.ui.infoView = function(data) {
         $div.html(html.join('; '));
     }
 
-    // fixme: should be camelCase!
-    data.alternative_titles && $('<div>')
+    data.alternativeTitles && $('<div>')
         .css(css)
         .html(
-            formatKey('Alternative Titles') + data.alternative_titles.map(function(value) {
+            formatKey('Alternative Titles') + data.alternativeTitles.map(function(value) {
                 return value[0] + (value[1] ? ' '
                     + formatLight('(' + value[1] + ')') : '');
             }).join(', ')
@@ -225,9 +224,9 @@ pandora.ui.infoView = function(data) {
             .css(css)
             .appendTo($text);
         html = [];
-        ['genre', 'keyword'].forEach(function(key) {
+        ['genre', 'keywords'].forEach(function(key) {
             data[key] && html.push(
-                formatKey(key == 'keyword' ? 'keywords' : key)
+                formatKey(key)
                 + formatValue(data[key], key)
             );
         });
@@ -272,19 +271,19 @@ pandora.ui.infoView = function(data) {
             .appendTo($text);
     });
 
-    data.filming_locations && $('<div>')
+    data.filmingLocations && $('<div>')
         .css(css)
         .html(
-            formatKey('Filming Locations') + data.filming_locations.map(function(location) {
+            formatKey('Filming Locations') + data.filmingLocations.map(function(location) {
                 return  '<a href="/map/@' + location + '">' + location + '</a>'
             }).join(', ')
         )
         .appendTo($text);
 
-    data.releasedate && $('<div>')
+    data.releaseDate && $('<div>')
         .css(css)
         .html(
-            formatKey('Release Date') + Ox.formatDate(data.releasedate, '%A, %B %e, %Y')
+            formatKey('Release Date') + Ox.formatDate(data.releaseDate, '%A, %B %e, %Y')
         )
         .appendTo($text);
 
