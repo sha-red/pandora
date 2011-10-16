@@ -198,7 +198,7 @@ pandora.ui.infoView = function(data) {
             .css(css)
             .appendTo($text);
         html = [];
-        ['episode_director', 'writer', 'producer', 'cinematographer', 'editor'].forEach(function(key) {
+        ['episodeDirector', 'writer', 'producer', 'cinematographer', 'editor'].forEach(function(key) {
             data[key] && html.push(
                 formatKey(key == 'episodeDirector' ? 'director' : key) + formatValue(data[key], 'name')
             );
