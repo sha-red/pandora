@@ -223,36 +223,15 @@
             "group": true
         },
         {
-            "id": "numberofkeywords", 
-            "title": "Number of Keywords", 
-            "type": "integer",
-            "columnWidth": 60,
-            "value": {"key": "keyword", "type": "length"}
-        },
-        {
             "id": "summary",
             "title": "Summary",
             "type": "text",
             "find": true
         },
         {
-            "id": "wordsinsummary",
-            "title": "Words in Summary",
-            "type": "integer",
-            "columnWidth": 60,
-            "value": {"key": "summary", "type": "words"}
-        },
-        {
             "id": "trivia",
             "title": "Trivia",
             "type": ["text"]
-        },
-        {
-            "id": "wordsintrivia",
-            "title": "Words in Trivia",
-            "type": "integer",
-            "columnWidth": 60,
-            "value": {"key": "trivia", "type": "words"}
         },
         {
             "id": "releasedate",
@@ -526,10 +505,10 @@
         {"id": "info", "title": "with Info"},
         {"id": "clips", "title": "with Clips"},
         {"id": "timelines", "title": "with Timelines"},
-        {"id": "maps", "title": "with Maps"},
-        {"id": "calendars", "title": "with Calendars"},
+        //{"id": "maps", "title": "with Maps"},
+        //{"id": "calendars", "title": "with Calendars"},
         {"id": "clip", "title": "as Clips"},
-        {"id": "video", "title": "as Video"},
+        //{"id": "video", "title": "as Video"},
         {"id": "map", "title": "on Map"},
         {"id": "calendar", "title": "on Calendar"}
     ],
