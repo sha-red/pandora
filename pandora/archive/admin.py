@@ -8,8 +8,8 @@ import models
 
 
 class FileAdmin(admin.ModelAdmin):
-    search_fields = ['name', 'folder','oshash', 'video_codec']
-    list_display = ['available', 'wanted', 'active', '__unicode__', 'itemId']
+    search_fields = ['path','oshash', 'video_codec']
+    list_display = ['available', 'wanted', 'selected', '__unicode__', 'itemId']
     list_display_links = ('__unicode__', )
 
     def itemId(self, obj):
@@ -21,7 +21,7 @@ admin.site.register(models.File, FileAdmin)
 
 
 class InstanceAdmin(admin.ModelAdmin):
-    search_fields = ['name', 'folder', 'volume__name', 'file__oshash']
+    search_fields = ['path', 'volume__name', 'file__oshash']
     form = InstanceAdminForm
 
 admin.site.register(models.Instance, InstanceAdmin)

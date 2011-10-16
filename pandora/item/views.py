@@ -419,22 +419,6 @@ actions.register(remove, cache=False)
 '''
     Poster API
 '''
-def parse(request): #parse path and return info
-    '''
-        param data {
-            path: string
-        }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-                imdb: string
-            }
-        }
-    '''
-    path = json.loads(request.POST['data'])['path']
-    response = json_response(utils.parse_path(path))
-    return render_to_json_response(response)
-actions.register(parse)
 
 
 def setPosterFrame(request): #parse path and return info
@@ -667,7 +651,7 @@ def timeline(request, id, size, position):
     item = get_object_or_404(models.Item, itemId=id)
     if not item.access(request.user):
         return HttpResponseForbidden()
-    timeline = '%s.%s.%04d.png' %(item.timeline_prefix, size, int(position))
+    timeline = '%s%sp%04d.png' %(item.timeline_prefix, size, int(position))
     return HttpFileResponse(timeline, content_type='image/png')
 
 
@@ -675,7 +659,7 @@ def timeline_overview(request, id, size):
     item = get_object_or_404(models.Item, itemId=id)
     if not item.access(request.user):
         return HttpResponseForbidden()
-    timeline = '%s.%s.png' %(item.timeline_prefix, size)
+    timeline = '%s%sp.png' %(item.timeline_prefix, size)
     return HttpFileResponse(timeline, content_type='image/png')
 
 def torrent(request, id, filename=None):
@@ -708,6 +692,11 @@ def video(request, id, resolution, format, index=None):
         index = int(index) - 1
     else:
         index = 0
+    #streams = Stream.object.filter(file__item__itemId=item.itemId,
+    #                               file__selected=True, file__part=index,
+    #                               resolution=resolution, format=format)
+    #if streams.count() != 1:
+    # reise Http404
     streams = Stream.objects.filter(file__item__itemId=item.itemId,
                                     resolution=resolution, format=format).order_by('file__part')
     if index > streams.count():

@@ -13,9 +13,13 @@ from item import utils
 import managers
 
 def get_title_sort(title):
+    if isinstance(title, str):
+        title = unicode(title)
     title = unicodedata.normalize('NFKD', title).strip()
     if title:
         title, created = Title.objects.get_or_create(title=title)
+        if created:
+            title.save()
         sorttitle = unicodedata.normalize('NFKD', title.sorttitle)
     else:
         sorttitle = u''

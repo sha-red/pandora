@@ -6,10 +6,10 @@ import os.path
 import re
 import time
 
+from django.conf import settings
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
-from django.contrib.auth.models import User
-from django.conf import settings
 from django.db.models.signals import pre_delete
 
 from ox.django import fields
@@ -17,7 +17,6 @@ import ox
 import chardet
 
 from item import utils
-from person.models import get_name_sort
 
 import extract
 
@@ -26,19 +25,17 @@ class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    active = models.BooleanField(default=False)
     auto = models.BooleanField(default=True)
 
     oshash = models.CharField(max_length=16, unique=True)
     item = models.ForeignKey("item.Item", related_name='files')
 
-    name = models.CharField(max_length=2048, default="") # canoncial path/file
-    folder = models.CharField(max_length=2048, default="") # canoncial path/file
-    sort_name = models.CharField(max_length=2048, default="") # sort name
+    path = models.CharField(max_length=2048, default="") # canoncial path/file
+    sort_path = models.CharField(max_length=2048, default="") # sort name
 
     type = models.CharField(default="", max_length=255)
     part = models.IntegerField(null=True)
-    version = models.CharField(default="", max_length=255) # sort path/file name
+    version = models.CharField(default="", max_length=255) 
     language = models.CharField(default="", max_length=8)
 
     season = models.IntegerField(default=-1)
@@ -65,22 +62,22 @@ class File(models.Model):
 
     #This is true if derivative is available or subtitles where uploaded
     available = models.BooleanField(default = False)
-    wanted = models.BooleanField(default = False)
+    selected = models.BooleanField(default = False)
     uploading = models.BooleanField(default = False)
+    wanted = models.BooleanField(default = False)
 
     is_audio = models.BooleanField(default=False)
     is_video = models.BooleanField(default=False)
     is_subtitle = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return self.name
+        return self.path
 
     def set_state(self):
-        self.name = self.get_name()
-        self.folder = self.get_folder()
-        self.sort_name = utils.sort_string(ox.get_sort_title(self.name))
+        self.path = self.create_path()
+        self.sort_path= utils.sort_string(self.path)
 
-        if not os.path.splitext(self.name)[-1] in (
+        if not os.path.splitext(self.path)[-1] in (
             '.srt', '.rar', '.sub', '.idx', '.txt', '.jpg', '.png', '.nfo') \
            and self.info:
             for key in ('duration', 'size'):
@@ -99,8 +96,8 @@ class File(models.Model):
                     self.display_aspect_ratio = "%s:%s" % (self.width, self.height)
                 self.is_video = True
                 self.is_audio = False
-                if self.name.endswith('.jpg') or \
-                   self.name.endswith('.png') or \
+                if self.path.endswith('.jpg') or \
+                   self.path.endswith('.png') or \
                    self.duration == 0.04:
                     self.is_video = False
             else:
@@ -126,11 +123,11 @@ class File(models.Model):
                 self.pixels = int(self.width * self.height * float(utils.parse_decimal(self.framerate)) * self.duration)
 
         else:
-            self.is_video = os.path.splitext(self.name)[-1] in ('.avi', '.mkv', '.dv', '.ogv', '.mpeg', '.mov', '.webm')
-            self.is_audio = os.path.splitext(self.name)[-1] in ('.mp3', '.wav', '.ogg', '.flac', '.oga')
-            self.is_subtitle = os.path.splitext(self.name)[-1] in ('.srt', )
+            self.is_video = os.path.splitext(self.path)[-1] in ('.avi', '.mkv', '.dv', '.ogv', '.mpeg', '.mov', '.webm')
+            self.is_audio = os.path.splitext(self.path)[-1] in ('.mp3', '.wav', '.ogg', '.flac', '.oga')
+            self.is_subtitle = os.path.splitext(self.path)[-1] in ('.srt', )
 
-        if self.name.endswith('.srt'):
+        if self.path.endswith('.srt'):
             self.is_subtitle = True
             self.is_audio = False
             self.is_video = False
@@ -138,7 +135,8 @@ class File(models.Model):
             self.is_subtitle = False
 
         self.type = self.get_type()
-        self.language = self.get_language()
+        info = ox.parse_movie_path(self.path)
+        self.language = info['language']
         self.part = self.get_part()
 
         if self.type not in ('audio', 'video'):
@@ -156,9 +154,9 @@ class File(models.Model):
 
     #upload and data handling
     data = models.FileField(null=True, blank=True,
-                            upload_to=lambda f, x: f.path('data.bin'))
+                            upload_to=lambda f, x: f.get_path('data.bin'))
 
-    def path(self, name):
+    def get_path(self, name):
         h = self.oshash
         return os.path.join('files', h[:2], h[2:4], h[4:6], h[6:], name)
 
@@ -277,13 +275,12 @@ class File(models.Model):
             'samplerate': self.samplerate,
             'video_codec': self.video_codec,
             'audio_codec': self.audio_codec,
-            'name': self.name,
+            'path': self.path,
             'size': self.size,
             #'info': self.info,
             'users': list(set([u.username
                      for u in User.objects.filter(volumes__files__in=self.instances.all())])),
             'instances': [i.json() for i in self.instances.all()],
-            'folder': self.get_folder(),
             'type': self.get_type(),
             'part': self.get_part()
         }
@@ -295,17 +292,17 @@ class File(models.Model):
 
     def get_part(self):
         #FIXME: this breaks for sub/idx/srt
-        if os.path.splitext(self.name)[-1] in ('.sub', '.idx', '.srt'):
-            name = os.path.splitext(self.name)[0]
+        if os.path.splitext(self.path)[-1] in ('.sub', '.idx', '.srt'):
+            name = os.path.splitext(self.path)[0]
             if self.language:
                 name = name[-(len(self.language)+1)]
             qs = self.item.files.filter(Q(is_video=True)|Q(is_audio=True),
-                                        active=True, name__startswith=name)
+                                        selected=True, path__startswith=name)
             if qs.count()>0:
                 return qs[0].part
-        if self.active:
+        if self.selected:
             files = list(self.item.files.filter(type=self.type, language=self.language,
-                                                active=self.active).order_by('sort_name'))
+                                                selected=self.selected).order_by('sort_path'))
             if self in files:
                 return files.index(self) + 1
         return None
@@ -315,7 +312,7 @@ class File(models.Model):
             return 'video'
         if self.is_audio:
             return 'audio'
-        if self.is_subtitle or os.path.splitext(self.name)[-1] in ('.sub', '.idx'):
+        if self.is_subtitle or os.path.splitext(self.path)[-1] in ('.sub', '.idx'):
             return 'subtitle'
         return 'unknown'
 
@@ -325,30 +322,10 @@ class File(models.Model):
             return self.instances.all()[0]
         return None
 
-    def get_folder(self):
+    def create_path(self):
         instance = self.get_instance()
         if instance:
-            return instance.folder
-        name = os.path.splitext(self.get_name())[0]
-        name = name.replace('. ', '||').split('.')[0].replace('||', '. ')
-        if self.item:
-            if settings.USE_IMDB:
-                director = self.item.get('director', ['Unknown Director'])
-                director = map(get_name_sort, director)
-                director = u'; '.join(director)
-                director = re.sub(r'[:\\/]', '_', director)
-                name = os.path.join(director, name)
-            year = self.item.get('year')
-            if year:
-                name += u' (%s)' % year
-            name = os.path.join(name[0].upper(), name)
-            return name
-        return u''
-
-    def get_name(self):
-        instance = self.get_instance()
-        if instance:
-            return instance.name
+            return instance.path
         if self.item:
             name = self.item.get('title', 'Untitled')
             name = re.sub(r'[:\\/]', '_', name)
@@ -356,12 +333,6 @@ class File(models.Model):
             name = 'Untitled'
         ext = '.unknown'
         return name + ext
-
-    def get_language(self):
-        language = self.name.split('.')
-        if len(language) >= 3 and len(language[-2]) == 2:
-            return language[-2]
-        return ''
 
 def delete_file(sender, **kwargs):
     f = kwargs['instance']
@@ -394,7 +365,7 @@ class Volume(models.Model):
 class Instance(models.Model):
 
     class Meta:
-        unique_together = ("name", "folder", "volume")
+        unique_together = ("path", "volume")
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -403,15 +374,14 @@ class Instance(models.Model):
     ctime = models.IntegerField(default=lambda: int(time.time()), editable=False)
     mtime = models.IntegerField(default=lambda: int(time.time()), editable=False)
 
-    name = models.CharField(max_length=2048)
-    folder = models.CharField(max_length=2048)
-    extra = models.BooleanField(default=False)
+    path = models.CharField(max_length=2048)
+    ignore = models.BooleanField(default=False)
 
     file = models.ForeignKey(File, related_name='instances')
     volume = models.ForeignKey(Volume, related_name='files')
 
     def __unicode__(self):
-        return u"%s's %s <%s>"% (self.volume.user, self.name, self.file.oshash)
+        return u"%s's %s <%s>"% (self.volume.user, self.path, self.file.oshash)
 
     @property
     def itemId(self):
@@ -421,14 +391,13 @@ class Instance(models.Model):
         return {
             'user': self.volume.user.username,
             'volume': self.volume.name,
-            'folder': self.folder,
-            'name': self.name
+            'path': self.path
         }
 
 def frame_path(frame, name):
     ext = os.path.splitext(name)[-1]
     name = "%s%s" % (frame.position, ext)
-    return frame.file.path(name)
+    return frame.file.get_path(name)
 
 
 class Frame(models.Model):
@@ -486,7 +455,7 @@ class Stream(models.Model):
         return u"%s/%s" % (self.file, self.name())
 
     def path(self, name=''):
-        return self.file.path(name)
+        return self.file.get_path(name)
 
     def extract_derivatives(self):
         config = settings.CONFIG['video']
