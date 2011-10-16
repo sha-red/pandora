@@ -248,7 +248,7 @@ pandora.ui.list = function() {
             });
     }
 
-    if (['list', 'grid'].indexOf(view) > -1) {
+    if (['list', 'grid', 'timelines'].indexOf(view) > -1) {
 
         pandora.enableDragAndDrop(that, true);
 

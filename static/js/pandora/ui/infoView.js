@@ -193,15 +193,15 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($text);
 
-    // fixme: creator seems to be always missing
-    if (data.creator || data.writer || data.producer || data.cinematographer || data.editor) {
+    // fixme: episodeDirector seems to be always missing
+    if (data.episodeDirector || data.writer || data.producer || data.cinematographer || data.editor) {
         $div = $('<div>')
             .css(css)
             .appendTo($text);
         html = [];
-        ['creator', 'writer', 'producer', 'cinematographer', 'editor'].forEach(function(key) {
+        ['episode_director', 'writer', 'producer', 'cinematographer', 'editor'].forEach(function(key) {
             data[key] && html.push(
-                formatKey(key) + formatValue(data[key], 'name')
+                formatKey(key == 'episodeDirector' ? 'director' : key) + formatValue(data[key], 'name')
             );
         });
         $div.html(html.join('; '));
