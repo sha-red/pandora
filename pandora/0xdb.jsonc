@@ -502,7 +502,7 @@
     "listViews": [
         {"id": "list", "title": "as List"},
         {"id": "grid", "title": "as Grid"},
-        {"id": "info", "title": "with Info"},
+        //{"id": "info", "title": "with Info"},
         {"id": "clips", "title": "with Clips"},
         {"id": "timelines", "title": "with Timelines"},
         //{"id": "maps", "title": "with Maps"},
