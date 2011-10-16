@@ -190,19 +190,32 @@ pandora.ui.list = function() {
             defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
             id: 'list',
             item: function(data, sort, size) {
-                var icons = pandora.user.ui.icons,
-                    ratio = icons == 'posters' ? data.posterRatio : 1;
                 size = 128;
+                var ui = pandora.user.ui,
+                    ratio = ui.icons == 'posters'
+                        ? (ui.showSitePoster ? 5/8 : data.posterRatio) : 1,
+                    url = '/' + data.id + '/' + (
+                        ui.icons == 'posters'
+                        ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
+                    ) + size + '.jpg',
+                    format, info, sortKey = sort[0].key;
+                if (['title', 'director'].indexOf(sortKey) > -1) {
+                    info = data['year'];
+                } else {
+                    format = pandora.getSortKeyData(sortKey).format;
+                    info = format
+                        ? Ox['format' + Ox.toTitleCase(format.type)]
+                            .apply(this, Ox.merge([data[sortKey]], format.args || []))
+                        : data[sortKey];
+                }                
                 return {
                     icon: {
-                        height: ratio <= 1 ? size : size / ratio,
+                        height: Math.round(ratio <= 1 ? size : size / ratio),
                         id: data.id,
-                        info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
+                        info: info,
                         title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
-                        url: icons == 'posters' 
-                            ? '/' + data.id + '/poster' + size + '.jpg'
-                            : '/' + data.id + '/icon' + size + '.jpg',
-                        width: ratio >= 1 ? size : size * ratio    
+                        url: url,
+                        width: Math.round(ratio >= 1 ? size : size * ratio)
                     },
                     info: {
                         css: {
