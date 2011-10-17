@@ -188,6 +188,7 @@ pandora.ui.list = function() {
         that = Ox.InfoList({
             borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 16,
             defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
+            draggable: true,
             id: 'list',
             item: function(data, sort, size) {
                 size = 128;
