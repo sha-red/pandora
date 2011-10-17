@@ -27,6 +27,7 @@ pandora.ui.viewSelect = function() {
                 var key = data.selected[0].id,
                     set = {};
                 set[viewKey] = key;
+                // FIXME: this may not work on page load, and would then have to be part of UI.js
                 if (!ui.item) {
                     // when changing the list view ...
                     if (pandora.isClipView(key)) {

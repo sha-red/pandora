@@ -69,7 +69,8 @@ pandora.UI = (function() {
             if (Object.keys(listSettings).indexOf(key) > -1) {
                 // if applicable, copy setting to list setting
                 add['lists.' + that.encode(pandora.user.ui._list || '') + '.' + listSettings[key]] = val;
-            } else if (key == 'item' && val) {
+            }
+            if (key == 'item' && val) {
                 // when switching to an item, update list selection
                 add['listSelection'] = [val];
                 add['lists.' + that.encode(pandora.user.ui._list || '') + '.selection'] = [val];
@@ -87,6 +88,10 @@ pandora.UI = (function() {
                 add['videoPoints.' + (
                     key == 'item' ? val : pandora.user.ui.item
                 )] = {'in': 0, out: 0, position: 0};
+            }
+            if (key == 'itemView' && ['video', 'timeline'].indexOf(val) > -1) {
+                // when switching to a video view, add it as default video view
+                add.videoView = val;
             }
         });
         [args, add].forEach(function(obj, isAdd) {

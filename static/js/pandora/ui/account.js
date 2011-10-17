@@ -76,7 +76,7 @@ pandora.ui.accountDialogOptions = function(action, value) {
     return {
         buttons: Ox.merge(buttons[action].map(function(type) {
                 return button(type);
-            }), [button('cancel'), button('submit')]),
+            }), [{}, button('cancel'), button('submit')]),
         content: Ox.Element()
             .append(
                 $('<img>')

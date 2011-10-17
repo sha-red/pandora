@@ -218,14 +218,29 @@ pandora.ui.list = function() {
                         width: Math.round(ratio >= 1 ? size : size * ratio)
                     },
                     info: {
+                        /*
                         css: {
-                            margin: '-4px 0 0 -4px'
+                            margin: '4px'
                         },
+                        */
                         element: Ox.BlockVideoTimeline,
+                        events: {
+                            position: function(event) {
+                                //that.options({selected: [data.id]});
+                                pandora.$ui.videoPreview.options({
+                                    position: event.position
+                                });
+                                pandora.UI.set('videoPoints.' + data.id + '.position', event.position);
+                            }
+                        },
                         id: data.id,
                         options: {
                             duration: data.duration,
-                            getImageURL: '/' + data.id + '/timeline16p.png'                            
+                            getImageURL: function(i) {
+                                return '/' + data.id + '/timeline16p' + i + '.png';
+                            },
+                            position: pandora.user.ui.videoPoints[data.id]
+                                ? pandora.user.ui.videoPoints[data.id].position : 0
                         }
                     }
                 };
@@ -294,7 +309,11 @@ pandora.ui.list = function() {
                 pandora.$ui.selected.html(pandora.ui.status('selected', data));
             },
             open: function(data) {
-                pandora.UI.set({item: data.ids[0]});
+                pandora.UI.set(Ox.extend({
+                    item: data.ids[0]
+                }, view == 'timelines' && data.isSpecialTarget ? {
+                    itemView: pandora.user.ui.videoView
+                } : {}));
             },
             openpreview: function(data) {
                 pandora.requests.preview && pandora.api.cancel(pandora.requests.preview);
@@ -409,7 +428,7 @@ pandora.ui.list = function() {
         
     }
 
-    if (pandora.user.ui.listView == 'grid') {
+    if (['grid', 'timelines'].indexOf(pandora.user.ui.listView) > -1) {
         that.bindEvent({
             pandora_icons: function(data) {
                 that.options({
