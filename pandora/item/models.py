@@ -70,8 +70,8 @@ def get_item(info, user=None, async=False):
             season, episode, episodeTitle, episodeDirector, episodeYear
     '''
     item_data = {
-        'title': info['title'],
-        'director': info['director'],
+        'title': info.get('title', ''),
+        'director': info.get('director', []),
         'year': info.get('year', '')
     }
     for key in ('episodeTitle', 'episodeDirector', 'episodeYear',
