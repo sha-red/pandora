@@ -183,7 +183,93 @@ pandora.ui.list = function() {
     } else if (view == 'info') {
         that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
     } else if (view == 'clips') {
-        that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
+        that = Ox.InfoList({
+            borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 16,
+            defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
+            draggable: true,
+            id: 'list',
+            item: function(data, sort, size) {
+                size = 128;
+                var ui = pandora.user.ui,
+                    ratio = ui.icons == 'posters'
+                        ? (ui.showSitePoster ? 5/8 : data.posterRatio) : 1,
+                    url = '/' + data.id + '/' + (
+                        ui.icons == 'posters'
+                        ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
+                    ) + size + '.jpg',
+                    format, info, sortKey = sort[0].key;
+                if (['title', 'director'].indexOf(sortKey) > -1) {
+                    info = data['year'];
+                } else {
+                    format = pandora.getSortKeyData(sortKey).format;
+                    info = format
+                        ? Ox['format' + Ox.toTitleCase(format.type)]
+                            .apply(this, Ox.merge([data[sortKey]], format.args || []))
+                        : data[sortKey];
+                }
+                return {
+                    icon: {
+                        height: Math.round(ratio <= 1 ? size : size / ratio),
+                        id: data.id,
+                        info: info,
+                        title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
+                        url: url,
+                        width: Math.round(ratio >= 1 ? size : size * ratio)
+                    },
+                    info: {
+                        css: {height: '192px'},
+                        element: Ox.IconList,
+                        id: data.id,
+                        options: {
+                            item: function(data, sort, size) {
+                                size = size || 128; // fixme: is this needed?
+                                var width = data.videoRatio > 1 ? size : Math.round(size * data.videoRatio),
+                                    height = data.videoRatio > 1 ? Math.round(size / data.videoRatio) : size;
+                                    url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg';
+                                return {
+                                    height: height,
+                                    id: data.id,
+                                    info: Ox.formatDuration(data['in']) + ' - ' + Ox.formatDuration(data.out),
+                                    title: '',
+                                    url: url,
+                                    width: width
+                                };
+                            },
+                            items: pandora.getClipPoints(data.duration, 5).map(function(points) {
+                                return Ox.extend(points, {
+                                    id: data.id + '/' + points['in'],
+                                    videoRatio: data.videoRatio
+                                });
+                            }),
+                            max: 1,
+                            orientation: 'horizontal',
+                            size: 128,
+                            sort: [{key: 'in', operator: '+'}],
+                            unique: 'id'
+                        }
+                    }
+                };
+            },
+            items: function(data, callback) {
+                pandora.api.find(Ox.extend(data, {
+                    query: pandora.user.ui.find,
+                    // clipsQuery: ...
+                }), callback);
+            },
+            keys: ['director', 'duration', 'id', 'posterRatio', 'title', 'videoRatio', 'year'],
+            selected: pandora.user.ui.listSelection,
+            size: 192,
+            sort: pandora.user.ui.listSort,
+            unique: 'id'
+        })
+        .bindEvent({
+            key_left: function() {
+                // ...
+            },
+            key_right: function() {
+                // ...
+            }
+        });
     } else if (view == 'timelines') {
         that = Ox.InfoList({
             borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 16,
@@ -208,7 +294,7 @@ pandora.ui.list = function() {
                         ? Ox['format' + Ox.toTitleCase(format.type)]
                             .apply(this, Ox.merge([data[sortKey]], format.args || []))
                         : data[sortKey];
-                }                
+                }
                 return {
                     icon: {
                         height: Math.round(ratio <= 1 ? size : size / ratio),
@@ -219,15 +305,10 @@ pandora.ui.list = function() {
                         width: Math.round(ratio >= 1 ? size : size * ratio)
                     },
                     info: {
-                        /*
-                        css: {
-                            margin: '4px'
-                        },
-                        */
+                        css: {marginTop: '2px'},
                         element: Ox.BlockVideoTimeline,
                         events: {
                             position: function(event) {
-                                //that.options({selected: [data.id]});
                                 pandora.$ui.videoPreview.options({
                                     position: event.position
                                 });
@@ -237,18 +318,21 @@ pandora.ui.list = function() {
                         id: data.id,
                         options: {
                             duration: data.duration,
+                            // find: '...',
                             getImageURL: function(i) {
                                 return '/' + data.id + '/timeline16p' + i + '.png';
                             },
                             position: pandora.user.ui.videoPoints[data.id]
-                                ? pandora.user.ui.videoPoints[data.id].position : 0
+                                ? pandora.user.ui.videoPoints[data.id].position : 0,
+                            // subtitles: data.subtitles
                         }
                     }
                 };
             },
             items: function(data, callback) {
                 pandora.api.find(Ox.extend(data, {
-                    query: pandora.user.ui.find
+                    query: pandora.user.ui.find,
+                    // clipsQuery: ...
                 }), callback);
             },
             keys: ['director', 'duration', 'id', 'posterRatio', 'title', 'year'],
@@ -256,7 +340,15 @@ pandora.ui.list = function() {
             size: 192,
             sort: pandora.user.ui.listSort,
             unique: 'id'
-        });        
+        })
+        .bindEvent({
+            key_left: function() {
+                // ...
+            },
+            key_right: function() {
+                // ...
+            }
+        });
     } else if (view == 'maps') {
         that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
     } else if (view == 'calendars') {
@@ -277,7 +369,7 @@ pandora.ui.list = function() {
             });
     }
 
-    if (['list', 'grid', 'timelines'].indexOf(view) > -1) {
+    if (['list', 'grid', 'clips', 'timelines'].indexOf(view) > -1) {
 
         pandora.enableDragAndDrop(that, true);
 
