@@ -332,14 +332,14 @@ pandora.ui.mainMenu = function() {
             }),
             [
                 {},
-                { id: 'newlist', title: 'New List', keyboard: 'control n' },
-                { id: 'newlistfromselection', title: 'New List from Selection', disabled: ui.listSelection.length == 0, keyboard: 'shift control n' },
-                { id: 'newsmartlist', title: 'New Smart List', keyboard: 'alt control n' },
-                { id: 'newsmartlistfromresults', title: 'New Smart List from Results', keyboard: 'shift alt control n' },
+                { id: 'newlist', title: 'New List', disabled: isGuest, keyboard: 'control n' },
+                { id: 'newlistfromselection', title: 'New List from Selection', disabled: isGuest || ui.listSelection.length == 0, keyboard: 'shift control n' },
+                { id: 'newsmartlist', title: 'New Smart List', disabled: isGuest, keyboard: 'alt control n' },
+                { id: 'newsmartlistfromresults', title: 'New Smart List from Results', disabled: isGuest, keyboard: 'shift alt control n' },
                 {},
-                { id: 'duplicatelist', title: 'Duplicate Selected List', disabled: !pandora.user.ui._list, keyboard: 'control d' },
-                { id: 'editlist', title: 'Edit Selected List...', disabled: !pandora.user.ui._list, keyboard: 'control e' },
-                { id: 'deletelist', title: 'Delete Selected List...', disabled: !pandora.user.ui._list, keyboard: 'delete' },
+                { id: 'duplicatelist', title: 'Duplicate Selected List', disabled: isGuest || !pandora.user.ui._list, keyboard: 'control d' },
+                { id: 'editlist', title: 'Edit Selected List...', disabled: isGuest || !pandora.user.ui._list, keyboard: 'control e' },
+                { id: 'deletelist', title: 'Delete Selected List...', disabled: isGuest || !pandora.user.ui._list, keyboard: 'delete' },
             ]
         )};
     };
