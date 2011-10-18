@@ -233,7 +233,8 @@ class File(models.Model):
         return srt
 
     def editable(self, user):
-        return self.instances.filter(volume__user=user).count() > 0
+        return user.get_profile().get_level() == 'admin' or \
+               self.instances.filter(volume__user=user).count() > 0
 
     def save_chunk(self, chunk, chunk_id=-1, done=False):
         if not self.available:
