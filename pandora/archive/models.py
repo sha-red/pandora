@@ -295,7 +295,7 @@ class File(models.Model):
             qs = self.item.files.filter(Q(is_video=True)|Q(is_audio=True),
                                         selected=True, path__startswith=name)
             if qs.count()>0:
-                return qs[0].part
+                return qs[0].get_part()
         if self.selected:
             files = list(self.item.files.filter(type=self.type, language=self.language,
                                                 selected=self.selected).order_by('sort_path'))
