@@ -687,6 +687,7 @@ pandora.reloadList = function() {
         .bindEventOnce({
             load: function(data) {
                 pandora.$ui.list.gainFocus();
+                // fixme: what is this?
                 if (data) pandora.$ui.list.options({selected: [data.items]});
             }
         })

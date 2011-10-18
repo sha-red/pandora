@@ -391,7 +391,10 @@ pandora.ui.list = function() {
                 pandora.getListData().editable && pandora.api.removeListItems({
                     list: pandora.user.ui._list,
                     items: data.ids
-                }, pandora.reloadList);
+                }, function() {
+                    that.options({selected: []});
+                    pandora.reloadList();
+                });
             },
             init: function(data) {
                 pandora.$ui.total.html(pandora.ui.status('total', data));
