@@ -188,7 +188,6 @@ class File(models.Model):
                 bomDetection = bomDict.get((byte1, byte2, byte3, None))
                 if not bomDetection:
                     bomDetection = bomDict.get((byte1, byte2, None, None))
-
             ## if BOM detected, we're done :-)
             fp.seek(oldFP)
             if bomDetection:
@@ -211,7 +210,6 @@ class File(models.Model):
         encoding = _detectEncoding(f)
         data = f.read()
         f.close()
-        data = data.replace('\r\n', '\n')
         try:
             data = unicode(data, encoding)
         except:
@@ -220,7 +218,7 @@ class File(models.Model):
             except:
                 print "failed to detect encoding, giving up"
                 return srt
-
+        data = data.replace('\r\n', '\n')
         srts = re.compile('(\d\d:\d\d:\d\d[,.]\d\d\d)\s*-->\s*(\d\d:\d\d:\d\d[,.]\d\d\d)\s*(.+?)\n\n', re.DOTALL)
         i = 0
         for s in srts.findall(data):

@@ -387,7 +387,7 @@ class Item(models.Model):
         layers = {}
         for l in Layer.objects.all():
             ll = layers.setdefault(l.name, [])
-            qs = Annotation.objects.filter(layer=l, item=self)
+            qs = Annotation.objects.filter(layer=l, item=self).select_related()
             if l.private:
                 if user and user.is_anonymous():
                     user = None
@@ -460,11 +460,14 @@ class Item(models.Model):
             return self.itemId
         if not self.get('title') and not self.get('director'):
             return None
-        return ox.get_oxid(self.get('title', ''), self.get('director', []),
-                           str(self.get('year', '')),
-                           self.get('season', ''), self.get('episode', ''),
+        return ox.get_oxid(self.get('seriesTitle', self.get('title', '')),
+                           self.get('director', []),
+                           self.get('year', ''),
+                           self.get('season', ''),
+                           self.get('episode', ''),
                            self.get('episodeTitle', ''),
-                           self.get('episodeDirector', []), self.get('episodeYear', ''))
+                           self.get('episodeDirector', []),
+                           self.get('episodeYear', ''))
 
     '''
         Search related functions
@@ -1003,7 +1006,7 @@ class Item(models.Model):
                 user = s.instances.all()[0].volume.user
                 for data in s.srt(offset):
                     annotation = Annotation(
-                        item=f.item,
+                        item=self,
                         layer=layer,
                         start=data['in'],
                         end=data['out'],
