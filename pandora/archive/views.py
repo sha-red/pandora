@@ -7,7 +7,7 @@ from datetime import datetime
 from django import forms
 from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
-from django.db.models import Count, Sum
+from django.db.models import Count
 
 import ox
 from ox.utils import json
@@ -288,7 +288,8 @@ def editFile(request):
         param data {
             id: hash of file
             part:
-            id_extra: boolean
+            language:
+            ignore: boolean
         }
 
         return {
@@ -297,17 +298,26 @@ def editFile(request):
             }
         }
     '''
-    #FIXME: permissions, need to be checked
     data = json.loads(request.POST['data'])
     f = get_object_or_404_json(models.File, oshash=data['id'])
     response = json_response()
-    if data.keys() != ('id', ):
-        for key in data:
-            if key in ('is_extra', 'is_subtitle', 'is_video', 'is_version',
-                       'part', 'language'):
+    if f.editable(request.user):
+        update = False
+        #FIXME: should all instances be ignored?
+        if 'ignore' in data:
+            f.instances.update(ignore=True)
+            #FIXME: is this to slow to run sync?
+            f.item.update_selected()
+        for key in ('part', 'language'):
+            if key in data:
                 setattr(f, key, data[key])
-        f.auto = False
-        f.save()
+                f.auto = False
+                update = True
+        if update:
+            f.save()
+            response = json_response(status=200, text='updated')
+    else:
+        response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
 actions.register(editFile, cache=False)
 
@@ -415,8 +425,6 @@ Positions
         }
     '''
     data = json.loads(request.POST['data'])
-    if settings.JSON_DEBUG:
-        print json.dumps(data, indent=2)
     query = parse_query(data, request.user)
 
     response = json_response({})

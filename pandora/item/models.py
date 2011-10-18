@@ -59,7 +59,7 @@ def get_id(info):
     if settings.DATA_SERVICE:
         r = external_data('getId', info)
         if r['status']['code'] == 200:
-            imdbId = r['data']['imdbId']
+            imdbId = r['data']['id']
             return imdbId
     return None
 
@@ -542,6 +542,8 @@ class Item(models.Model):
         def set_value(s, name, value):
             if not value:
                 value = None
+            if isinstance(value, basestring):
+                value = value.lower()
             setattr(s, name, value)
 
         base_keys = (
@@ -553,7 +555,7 @@ class Item(models.Model):
             'lightness',
             'volume',
             'clips',
-            'cuts',
+            'numberofcuts',
             'cutsperminute',
             'words',
             'wordsperminute',
@@ -622,8 +624,8 @@ class Item(models.Model):
 
         # sort values based on data from videos
         s.words = sum([len(a.value.split()) for a in self.annotations.all()])
+        s.clips= self.clips.count()
 
-        s.clips = 0  #FIXME: get clips from all layers or something
         videos = self.files.filter(selected=True, is_video=True)
         if videos.count() > 0:
             s.duration = sum([v.duration for v in videos])
@@ -657,16 +659,15 @@ class Item(models.Model):
             s.hue = None
             s.saturation = None
             s.brighness = None
-        s.cuts = len(self.data.get('cuts', []))
+        s.numberofcuts = len(self.data.get('cuts', []))
         if s.duration:
-            s.cutsperminute = s.cuts / (s.duration/60)
+            s.cutsperminute = s.numberofcuts / (s.duration/60)
             s.wordsperminute = s.words / (s.duration / 60)
         else:
             s.cutsperminute = None 
             s.wordsperminute = None
         s.popularity = self.accessed.aggregate(Sum('accessed'))['accessed__sum']
         s.save()
-
 
     def update_facets(self):
         #FIXME: what to do with Unkown Director, Year, Country etc.
@@ -735,8 +736,10 @@ class Item(models.Model):
         return os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline')
 
     def get_files(self, user):
-        #FIXME: limit by user
-        return [f.json() for f in self.files.all()]
+        files = self.files.all().select_related()
+        if user.get_profile().get_level() != 'admin':
+            files = files.filter(instances__volume__user=user)
+        return [f.json() for f in files]
 
     def users_with_files(self):
         return User.objects.filter(
@@ -764,6 +767,7 @@ class Item(models.Model):
         for s in self.sets():
             if s.filter(Q(is_video=True)|Q(is_audio=True)).filter(available=False).count() == 0:
                 update = False
+                self.files.exclude(id__in=s).exclude(part=None).update(part=None)
                 deselect = self.files.filter(selected=True).exclude(id__in=s)
                 if deselect.count() > 0:
                     deselect.update(selected=False)
@@ -771,6 +775,10 @@ class Item(models.Model):
                 if s.filter(selected=False).count() > 0:
                     s.update(selected=True, wanted=False)
                     update = True
+                for f in s:
+                    if f.get_part() != f.part:
+                        f.save()
+                        update = True
                 if update:
                     self.rendered = False
                     self.save()
