@@ -577,29 +577,34 @@ def getPositionById(list, key):
 
 
 @login_required_json
-def setPreferences(request):
+def editPreferences(request):
     '''
         param data {
-            key.subkey: value
+            key: value
         }
+        keys: email, password
         return
     '''
     data = json.loads(request.POST['data'])
-    keys = re.sub('([^\\\\])\.', '\\1\n', data.keys()[0]).split('\n')
-    value = data.values()[0]
-    profile = request.user.get_profile()
-    p = profile.preferences
-    while len(keys)>1:
-        key = keys.pop(0)
-        if isinstance(p, list):
-            p = p[getPositionById(p, key)]
-        else:
-            p = p[key]
-    p[keys[0]] = value
-    profile.save()
+    errors = {}
+    change = False
     response = json_response()
+    if 'email' in data:
+        if models.User.objects.filter(
+                email=data['email']).exclude(username=request.user.username).count()>0:
+            errors['email'] = 'Email address already in use'
+        else:
+            change = True
+            request.user.email = data['email']
+    if 'password' in data:
+        change = True
+        request.user.password = data['password']
+    if change:
+        request.user.save()
+    if errors:
+        response = json_response({ 'errors': errors})
     return render_to_json_response(response)
-actions.register(setPreferences, cache=False)
+actions.register(editPreferences, cache=False)
 
 
 def resetUI(request):
