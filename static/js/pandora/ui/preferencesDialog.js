@@ -6,62 +6,72 @@ pandora.ui.preferencesDialog = function() {
     ];
     var $tabPanel = Ox.TabPanel({
             content: function(id) {
-                var content = Ox.Element().css({padding: '16px', overflowY: 'auto'});
+                var $content = Ox.Element()
+                    .css({overflowY: 'auto'})
+                    .append(
+                        $('<img>')
+                            .attr({src: '/static/png/icon64.png'})
+                            .css({position: 'absolute', left: '16px', top: '16px'})
+                    );
                 if (id == 'account') {
-                    content.append(Ox.FormElementGroup({
-                        elements: Ox.values(Ox.map(pandora.user.preferences, function(v, k) { 
-                            return Ox.Input({
-                                id: k,
-                                width: 400,
-                                label: Ox.toTitleCase(k),
-                                value: v 
-                            });
-                        }))
-                    }));
+                    $content.append(
+                        Ox.Form({
+                            items: [
+                                Ox.Input({
+                                    disabled: true,
+                                    id: 'username',
+                                    label: 'Username',
+                                    labelWidth: 120,
+                                    value: pandora.user.username,
+                                    width: 320
+                                }),
+                                Ox.Input({
+                                    id: 'password',
+                                    label: 'New Passowrd',
+                                    labelWidth: 120,
+                                    type: 'password',
+                                    width: 320
+                                }),
+                                Ox.Input({
+                                    id: 'email',
+                                    label: 'E-Mail Address',
+                                    labelWidth: 120,
+                                    value: pandora.user.email,
+                                    width: 320
+                                })
+                            ]
+                        })
+                        .css({position: 'absolute', left: '96px', top: '16px'})
+                    );
                 } else {
+                    /*
                     content.append(Ox.FormElementGroup({
                         elements: [
                             Ox.Checkbox({
                                 checked: true ,
                                 id: 'showEpisodes',
                                 title: 'Show Episodes',
-                                width: 400
+                                width: 320
                             }),
                             Ox.Checkbox({
                                 checked: true ,
                                 id: 'newsletter',
                                 title: 'Receive Newsletter',
-                                width: 400
+                                width: 320
                             })
                             ]
                     }));
+                    */
                 }
-                return Ox.SplitPanel({
-                    elements: [
-                        {
-                            element: Ox.Element()
-                                .css({padding: '16px'})
-                                .append(
-                                    $('<img>')
-                                        .attr({src: '/static/png/logo256.png'})
-                                        .css({width: '128px'})
-                                ),
-                            size: 144
-                        },
-                        {
-                            element: content
-                        }
-                    ],
-                    orientation: 'horizontal'
-                });
+                return $content;
             },
             tabs: tabs
         });
     var $dialog = Ox.Dialog({
         buttons: [
             Ox.Button({
-                id: 'close',
-                title: 'Close'
+                id: 'done',
+                title: 'Done'
             }).bindEvent({
                 click: function() {
                     $dialog.close();
@@ -71,12 +81,12 @@ pandora.ui.preferencesDialog = function() {
         ],
         //closeButton: true,
         content: $tabPanel,
-        height: Math.round((window.innerHeight - 24) * 0.5),
+        height: 192,
         //maximizeButton: true,
-        minHeight: 256,
-        minWidth: 640,
+        minHeight: 192,
+        minWidth: 432,
         title: 'Preferences',
-        width: Math.round(window.innerWidth * 0.5),
+        width: 432
     });
 
     return $dialog;
