@@ -83,7 +83,7 @@ class Annotation(models.Model):
     item = models.ForeignKey('item.Item', related_name='annotations')
     clip = models.ForeignKey('clip.Clip', null=True, related_name='annotations')
 
-    public_id = models.CharField(max_length=128, unique=True)
+    public_id = models.CharField(max_length=128, unique=True, null=True)
     #seconds
     start = models.FloatField(default=-1, db_index=True)
     end = models.FloatField(default=-1)
