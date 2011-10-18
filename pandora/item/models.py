@@ -760,8 +760,15 @@ class Item(models.Model):
     def update_selected(self):
         for s in self.sets():
             if s.filter(Q(is_video=True)|Q(is_audio=True)).filter(available=False).count() == 0:
+                update = False
+                deselect = self.files.filter(selected=True).exclude(id__in=s)
+                if deselect.count() > 0:
+                    deselect.update(selected=False)
+                    update = True
                 if s.filter(selected=False).count() > 0:
                     s.update(selected=True, wanted=False)
+                    update = True
+                if update:
                     self.rendered = False
                     self.save()
                     self.update_timeline()
@@ -1117,18 +1124,3 @@ class Facet(models.Model):
             self.value_sort = utils.sort_string(self.value)
         super(Facet, self).save(*args, **kwargs)
 
-
-class PosterUrl(models.Model):
-
-    class Meta:
-        unique_together = ("item", "service", "url")
-        ordering = ('-height', )
-
-    item = models.ForeignKey(Item, related_name='poster_urls')
-    url = models.CharField(max_length=1024)
-    service = models.CharField(max_length=1024)
-    width = models.IntegerField(default=80)
-    height = models.IntegerField(default=128)
-
-    def __unicode__(self):
-        return u'%s %s %dx%d' % (unicode(self.item), self.service, self.width, self.height)

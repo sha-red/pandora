@@ -5,8 +5,9 @@ To setup a development instance of pan.do/ra,
 you need python, bazaar, pip and virtualenv and several other python modules:
 
 * Packages
-    apt-get install python-setuptools python-pip python-virtualenv ipython
-    apt-get install python-dev python-imaging python-numpy python-psycopg2
+    apt-get install bzr git subversion mercurial \
+            python-setuptools python-pip python-virtualenv ipython \
+            python-dev python-imaging python-numpy python-psycopg2
 
     bzr branch http://code.0x2620.org/pandora pandora
     cd pandora
@@ -17,13 +18,12 @@ you need python, bazaar, pip and virtualenv and several other python modules:
     bzr branch http://code.0x2620.org/oxjs
 
 * Additional pandora tools:
-  You need current versions of mkvtoolnix, oxframe, oxtimeline installed.
+  You need current versions of oxframe, oxtimeline installed.
   For Ubuntu we provide these packages in a ppa:
-    sudo apt-get install python-software-properties
-    sudo add-apt-repository ppa:j/pandora
-    sudo add-apt-repository ppa:gstreamer-developers/ppa
-    sudo apt-get update
-    sudo apt-get install oxframe oxtimeline mkvtoolnix
+    apt-get install python-software-properties
+    add-apt-repository ppa:j/pandora
+    apt-get update
+    apt-get install oxframe oxtimeline 
 
 * Database
   We use postgresql but other databases might also work
