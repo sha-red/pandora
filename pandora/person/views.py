@@ -43,8 +43,8 @@ def parse_query(data, user):
         if key in data:
             query[key] = data[key]
     query['qs'] = models.Person.objects.find(query, user)
-    #if 'itemQuery' in data:
-    #    item_query = models.Item.objects.find({'query': data['itemQuery']}, user)
+    #if 'itemsQuery' in data:
+    #    item_query = models.Item.objects.find({'query': data['itemsQuery']}, user)
     #    query['qs'] = query['qs'].filter(items__in=item_query)
     return query
 
@@ -76,7 +76,7 @@ def findNames(request):
                 ]
                 operator: ","
             },
-            itemQuery: {
+            itemsQuery: {
                 //see find request
             },
             sort: [{key: 'name', operator: '+'}],

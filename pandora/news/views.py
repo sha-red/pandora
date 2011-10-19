@@ -27,8 +27,8 @@ def parse_query(data, user):
         if key in data:
             query[key] = data[key]
     query['qs'] = models.News.objects.find(query, user)
-    if 'itemQuery' in data:
-        item_query = Item.objects.find({'query': data['itemQuery']}, user)
+    if 'itemsQuery' in data:
+        item_query = Item.objects.find({'query': data['itemsQuery']}, user)
         query['qs'] = query['qs'].filter(item__in=item_query)
     return query
 
@@ -68,7 +68,7 @@ def findNews(request):
     '''
         param data {
             query: ...
-            itemQuery: ...
+            itemsQuery: ...
         }
 
         return {

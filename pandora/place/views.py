@@ -148,8 +148,8 @@ def parse_query(data, user):
         if key in data:
             query[key] = data[key]
     query['qs'] = models.Place.objects.find(query, user)
-    if 'itemQuery' in data:
-        item_query = models.Item.objects.find({'query': data['itemQuery']}, user)
+    if 'itemsQuery' in data:
+        item_query = models.Item.objects.find({'query': data['itemsQuery']}, user)
         query['qs'] = query['qs'].filter(items__in=item_query)
     return query
 
@@ -182,7 +182,7 @@ def findPlaces(request):
                 ]
                 operator: ","
             },
-            itemQuery: {
+            itemsQuery: {
                 //see find request
             },
             sort: [{key: 'name', operator: '+'}],
@@ -193,7 +193,7 @@ def findPlaces(request):
         possible query keys:
             name, geoname, user
 
-        itemQuery can be used to limit the resuts to matches in those items.
+        itemsQuery can be used to limit the resuts to matches in those items.
                   Uses the same query syntax as used in the find request.
 
         possible keys:

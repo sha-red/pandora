@@ -20,8 +20,8 @@ def parse_query(data, user):
         if key in data:
             query[key] = data[key]
     query['qs'] = models.Clip.objects.find(query, user)
-    if 'itemQuery' in data and data['itemQuery'].get('conditions'):
-        item_query = Item.objects.find({'query': data['itemQuery']}, user)
+    if 'itemsQuery' in data and data['itemsQuery'].get('conditions'):
+        item_query = Item.objects.find({'query': data['itemsQuery']}, user)
         query['qs'] = query['qs'].filter(item__in=item_query)
     return query
 
@@ -60,7 +60,7 @@ def findClips(request):
     '''
         param data {
             query: ...
-            itemQuery: ...
+            itemsQuery: ...
         }
 
         return {

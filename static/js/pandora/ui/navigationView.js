@@ -146,17 +146,17 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 // 20 menu + 24 toolbar + 1 resizebar + 16 statusbar
                 height: window.innerHeight - ui.showGroups * ui.groupsSize - 61,
                 places: function(data, callback) {
-                    var itemQuery;
+                    var itemsQuery;
                     if (!ui.item) {
-                        itemQuery = ui.find;
+                        itemsQuery = ui.find;
                     } else {
-                        itemQuery = {
+                        itemsQuery = {
                             conditions: [{key: 'id', value: ui.item, operator: '=='}],
                             operator: '&'
                         };
                     }
                     return pandora.api.findPlaces(Ox.extend({
-                        itemQuery: itemQuery
+                        itemsQuery: itemsQuery
                     }, data), callback);
                 },
                 selected: ui.mapSelection,
@@ -186,7 +186,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
     } else {
 
         pandora.api.findEvents({
-            itemQuery: !ui.item ? ui.find : {
+            itemsQuery: !ui.item ? ui.find : {
                 conditions: [{key: 'id', value: ui.item, operator: '=='}],
                 operator: '&'
             },
@@ -233,17 +233,17 @@ pandora.ui.navigationView = function(type, videoRatio) {
             $status.html('loading...');
             $list.options({
                 items: function(data, callback) {
-                    var itemQuery;
+                    var itemsQuery;
                     if (!ui.item) {
-                        itemQuery = ui.find;
+                        itemsQuery = ui.find;
                     } else {
-                        itemQuery = {
+                        itemsQuery = {
                             conditions: [{key: 'id', value: ui.item, operator: '=='}],
                             operator: '&'
                         };
                     }
                     return pandora.api.findClips(Ox.extend({
-                        itemQuery: itemQuery,
+                        itemsQuery: itemsQuery,
                         query: {
                             conditions: [{key: itemName, value: id, operator:'=='}],
                             operator: '&'

@@ -127,8 +127,8 @@ def parse_query(data, user):
         if key in data:
             query[key] = data[key]
     query['qs'] = models.Event.objects.find(query, user)
-    if 'itemQuery' in data:
-        item_query = models.Item.objects.find({'query': data['itemQuery']}, user)
+    if 'itemsQuery' in data:
+        item_query = models.Item.objects.find({'query': data['itemsQuery']}, user)
         query['qs'] = query['qs'].filter(items__in=item_query)
     return query
 
@@ -154,7 +154,7 @@ def findEvents(request):
 
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            itemQuery: {
+            itemsQuery: {
                 //see find request
             },
             sort: array of key, operator dics
@@ -170,7 +170,7 @@ def findEvents(request):
                 ]
             range:       result range, array [from, to]
 
-        itemQuery can be used to limit the resuts to matches in those items.
+        itemsQuery can be used to limit the resuts to matches in those items.
         
         with keys, items is list of dicts with requested properties:
           return {'status': {'code': int, 'text': string},

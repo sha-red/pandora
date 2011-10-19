@@ -11,17 +11,17 @@ pandora.ui.clipPlayer = function() {
         video: function(range, callback) {
             var callback = arguments[arguments.length - 1],
                 range = arguments.length == 2 ? arguments[0] : null,
-                itemQuery = pandora.user.ui.find,
+                itemsQuery = pandora.user.ui.find,
                 query = {conditions:[]};
             //fixme: can this be in pandora.Query? dont just check for subtitles
-            itemQuery.conditions.forEach(function(q) {
+            itemsQuery.conditions.forEach(function(q) {
                 if (q.key == 'subtitles') {
                     query.conditions.push({key: 'subtitles', value: q.value, operator: q.operator});
                 }
             });
             pandora.api.findClips(Ox.extend({
                 query: query,
-                itemQuery: itemQuery
+                itemsQuery: itemsQuery
             }, range ? {
                 keys: ['id', 'in', 'out', 'subtitles'],
                 range: range,

@@ -48,19 +48,19 @@ pandora.ui.clipList = function(videoRatio) {
                     callback({data: {items: []}});
                     return;
                 }
-                var itemQuery, query;
+                var itemsQuery, query;
                 if (!ui.item) {
-                    itemQuery = ui.find;
+                    itemsQuery = ui.find;
                     query = {conditions: [], operator: '&'};
                     // if the item query contains a layer condition,
                     // then this condition is added to the clip query
-                    itemQuery.conditions.forEach(function(condition) {
+                    itemsQuery.conditions.forEach(function(condition) {
                         if (Ox.getPositionById(pandora.site.layers, condition.key) > -1) {
                             query.conditions.push(condition);
                         }
                     });
                 } else {
-                    itemQuery = {
+                    itemsQuery = {
                         conditions:[{key: 'id', value: ui.item, operator: '=='}],
                         operator: '&'
                     };
@@ -69,7 +69,7 @@ pandora.ui.clipList = function(videoRatio) {
                     query = {conditions: [], operator: '&'};
                 }
                 pandora.api.findClips(Ox.extend({
-                    itemQuery: itemQuery,
+                    itemsQuery: itemsQuery,
                     query: query
                 }, data), callback);
             },
