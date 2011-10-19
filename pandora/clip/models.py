@@ -20,7 +20,7 @@ class Clip(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    public_id = models.CharField(max_length=128, unique=True)
+    public_id = models.CharField(max_length=128, unique=True, null=True)
 
     item = models.ForeignKey('item.Item', related_name='clips')
 

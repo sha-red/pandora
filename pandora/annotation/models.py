@@ -123,7 +123,8 @@ class Annotation(models.Model):
                                                             start=self.start,
                                                             end=self.end)
             if created:
-                self.clip.save()
+                clip = Clip.objects.get(pk=self.clip.pk)
+                clip.save()
 
         super(Annotation, self).save(*args, **kwargs)
 
