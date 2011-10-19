@@ -9,6 +9,14 @@ pandora.ui.backButton = function() {
     })
     .bindEvent({
         click: function() {
+            /*
+            FIXME: if, on page load, one clicks back quickly,
+            the item content may overwrite the list content.
+            but we cannot cancel all requests, since that
+            might keep the lists folders from loading.
+            so we'd have to cancel with a function -- and
+            it's unclear if the best place for that is here
+            */
             pandora.UI.set({item: ''});
         }
     });

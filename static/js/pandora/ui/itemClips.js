@@ -46,6 +46,10 @@ pandora.ui.itemClips = function(options) {
 
     function doubleclick(data) {
         var $item, $target = $(data.target), item, points, set;
+        if ($target.parent().parent().is('.OxSpecialTarget')) {
+            // for videos, the click registers deeper inside
+            $target = $target.parent().parent();
+        }
         if ($target.is('.OxSpecialTarget')) {
             $item = $target.parent().parent();
             item = self.options.id;
@@ -56,17 +60,15 @@ pandora.ui.itemClips = function(options) {
                 out: points[1],
                 position: points[0]
             };
-            //Ox.print('SETTING VIDEO POINTS', set)
             pandora.UI.set(set);
         }
     }
 
     function singleclick(data) {
-        var $img, $item, $target = $(data.target), $video, points;
+        var $img, $item, $target = $(data.target), points;
         if ($target.is('.OxSpecialTarget')) {
             $item = $target.parent().parent();
             $img = $item.find('.OxIcon > img');
-            $video = $item.find('.OxIcon > .OxVideoPlayer');
             points = [$item.data('in'), $item.data('out')];
             if ($img.length) {
                 pandora.api.get({id: self.options.id, keys: ['durations']}, function(result) {

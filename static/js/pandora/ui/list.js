@@ -387,7 +387,6 @@ pandora.ui.list = function() {
                 if (data.isSpecialTarget) {
                     set.itemView = pandora.user.ui.videoView;
                 }
-                //Ox.print('SETTING ITEM', set)
                 pandora.UI.set(set);
             },
             openpreview: function(data) {
