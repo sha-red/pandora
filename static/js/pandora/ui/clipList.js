@@ -145,11 +145,11 @@ pandora.ui.clipList = function(videoRatio) {
                                     playInToOut: true,
                                     poster: '/' + item + '/' + height + 'p' + points[0] + '.jpg',
                                     rewind: true,
-                                    width: width,
                                     video: partsAndPoints.parts.map(function(i) {
                                         return '/' + item + '/96p' + (i + 1)
                                             + '.' + pandora.user.videoFormat;
-                                    })
+                                    }),
+                                    width: width
                                 })
                                 .addClass('OxTarget')
                                 .bindEvent({

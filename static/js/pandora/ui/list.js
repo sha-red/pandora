@@ -217,35 +217,13 @@ pandora.ui.list = function() {
                         width: Math.round(ratio >= 1 ? size : size * ratio)
                     },
                     info: {
-                        css: {height: '192px'},
-                        element: Ox.IconList,
+                        element: pandora.ui.itemClips,
                         id: data.id,
                         options: {
-                            item: function(data, sort, size) {
-                                size = size || 128; // fixme: is this needed?
-                                var width = data.videoRatio > 1 ? size : Math.round(size * data.videoRatio),
-                                    height = data.videoRatio > 1 ? Math.round(size / data.videoRatio) : size;
-                                    url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg';
-                                return {
-                                    height: height,
-                                    id: data.id,
-                                    info: Ox.formatDuration(data['in']) + ' - ' + Ox.formatDuration(data.out),
-                                    title: '',
-                                    url: url,
-                                    width: width
-                                };
-                            },
-                            items: pandora.getClipPoints(data.duration, 5).map(function(points) {
-                                return Ox.extend(points, {
-                                    id: data.id + '/' + points['in'],
-                                    videoRatio: data.videoRatio
-                                });
-                            }),
-                            max: 1,
-                            orientation: 'horizontal',
-                            size: 128,
-                            sort: [{key: 'in', operator: '+'}],
-                            unique: 'id'
+                            clips: 5,
+                            duration: data.duration,
+                            id: data.id,
+                            ratio: data.videoRatio
                         }
                     }
                 };
