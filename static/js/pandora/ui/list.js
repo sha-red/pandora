@@ -383,11 +383,12 @@ pandora.ui.list = function() {
                 pandora.$ui.selected.html(pandora.ui.status('selected', data));
             },
             open: function(data) {
-                pandora.UI.set(Ox.extend({
-                    item: data.ids[0]
-                }, view == 'timelines' && data.isSpecialTarget ? {
-                    itemView: pandora.user.ui.videoView
-                } : {}));
+                var set = {item: data.ids[0]};
+                if (data.isSpecialTarget) {
+                    set.itemView = pandora.user.ui.videoView;
+                }
+                //Ox.print('SETTING ITEM', set)
+                pandora.UI.set(set);
             },
             openpreview: function(data) {
                 pandora.requests.preview && pandora.api.cancel(pandora.requests.preview);

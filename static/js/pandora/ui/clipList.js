@@ -155,7 +155,7 @@ pandora.ui.clipList = function(videoRatio) {
                                 .bindEvent({
                                     // doubleclick opens item
                                     singleclick: function() {
-                                        $player.$element.is('.OxSelectedVideo')&& $player.togglePaused();
+                                        $player.$element.is('.OxSelectedVideo') && $player.togglePaused();
                                     }
                                 });
                             $img.replaceWith($player.$element);
@@ -167,10 +167,12 @@ pandora.ui.clipList = function(videoRatio) {
                         // so we have to make sure that selecting
                         // an item that already has a video
                         // doesn't click through to play
+                        ///*
                         setTimeout(function() {
                             $('.OxSelectedVideo').removeClass('OxSelectedVideo');
                             $video.addClass('OxSelectedVideo');
                         }, 300);
+                        //*/
                     }
                     !ui.item && pandora.UI.set('listSelection', [item]);
                 } else {

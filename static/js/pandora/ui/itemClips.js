@@ -7,6 +7,7 @@ pandora.ui.itemClips = function(options) {
                 margin: '4px'
             })
             .bindEvent({
+                doubleclick: doubleclick,
                 singleclick: singleclick
             });
 
@@ -43,6 +44,23 @@ pandora.ui.itemClips = function(options) {
         that.append($item);
     });
 
+    function doubleclick(data) {
+        var $item, $target = $(data.target), item, points, set;
+        if ($target.is('.OxSpecialTarget')) {
+            $item = $target.parent().parent();
+            item = self.options.id;
+            points = [$item.data('in'), $item.data('out')];
+            set = {};
+            set['videoPoints.' + item] = {
+                'in': points[0],
+                out: points[1],
+                position: points[0]
+            };
+            //Ox.print('SETTING VIDEO POINTS', set)
+            pandora.UI.set(set);
+        }
+    }
+
     function singleclick(data) {
         var $img, $item, $target = $(data.target), $video, points;
         if ($target.is('.OxSpecialTarget')) {
@@ -56,10 +74,10 @@ pandora.ui.itemClips = function(options) {
                             result.data.durations, points
                         ),
                         $player = Ox.VideoPlayer({
+                            enableMouse: true,
                             height: self.height,
                             'in': partsAndPoints.points[0],
                             out: partsAndPoints.points[1],
-                            //paused: true,
                             playInToOut: true,
                             poster: '/' + self.options.id + '/' + self.height + 'p' + points[0] + '.jpg',
                             rewind: true,
@@ -69,25 +87,7 @@ pandora.ui.itemClips = function(options) {
                             }),
                             width: self.width
                         })
-                        .addClass('OxTarget OxSpecialTarget')
-                        .bindEvent({
-                            doubleclick: function() {
-                                var item = self.options.id,
-                                    set = {
-                                        item: item,
-                                        itemView: pandora.user.ui.videoView
-                                    };
-                                set['videoPoints.' + item] = {
-                                    'in': points[0],
-                                    out: points[1],
-                                    position: points[0]
-                                };
-                                pandora.UI.set(set);
-                            },
-                            singleclick: function() {
-                                $player.togglePaused();
-                            }
-                        });
+                        .addClass('OxTarget OxSpecialTarget');
                         $img.replaceWith($player.$element);
                 });
             }
