@@ -144,7 +144,7 @@ class Annotation(models.Model):
                 'saturation': 'clip__saturation',
                 'volume': 'clip__volume',
             }.get(field, field))
-        if layer:
+        if layer or (keys and 'layer' in keys):
             j['layer'] = self.layer.name
         if keys:
             _j = {}

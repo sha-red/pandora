@@ -25,7 +25,7 @@ import tasks
 
 from archive.models import File, Stream
 from archive import extract
-from annotation.models import Annotation
+from clip.models import Clip 
 
 from api.actions import actions
 
@@ -90,10 +90,11 @@ def parse_query(data, user):
         if key in data:
             query[key] = data[key]
     query['qs'] = models.Item.objects.find(data, user)
-    if 'annotations' in data:
-        query['annotations'] = data['annotations']
-        #FIXME: annotations need manager find(data, user)
-        query['aqs'] = Annotation.objects.filter(Q(layer__private=False)|Q(user=user))
+
+    if 'clipQuery' in data:
+        query['clip_qs'] = Clip.objects.find({'query': data['clipQuery']}, user).order_by('start')
+        query['clip_items'] = data['clipQuery'].get('items', 5)
+        query['clip_keys'] = data['clipQuery'].get('keys', ['id', 'in', 'out', 'annotations'])
 
     #group by only allows sorting by name or number of itmes
     return query
@@ -104,6 +105,7 @@ def find(request):
             'query': query,
             'sort': array,
             'range': array
+            clipQuery: ...
         }
 
             query: query object, more on query syntax at
@@ -226,10 +228,16 @@ Positions
                     r[p] = m.sort.popularity
                 else:
                     r[p] = m.json.get(p, '')
-            if 'annotations' in query:
-                n = query['annotations']
-                r['annotations'] = [a.json(layer=True)
-                                    for a in query['aqs'].filter(itemID=m.id)[:n]]
+            if 'clip_qs' in query:
+                qs = query['clip_qs'].filter(item=m)
+                n = qs.count()
+                if n > query['clip_items']:
+                    clips = []
+                    for i in range(0, n, int(n/query['clip_items'])):
+                        clips.append(qs[i])
+                else:
+                    clips = qs
+                r['clips'] = [c.json(query['clip_keys']) for c in clips]
             return r
         def only_p(m):
             r = {}
@@ -237,10 +245,16 @@ Positions
                 m = json.loads(m, object_hook=ox.django.fields.from_json)
                 for p in _p:
                     r[p] = m.get(p, '')
-            if 'annotations' in query:
-                n = query['annotations']
-                r['annotations'] = [a.json(layer=True)
-                                    for a in query['aqs'].filter(item__itemId=m['id'])[:n]]
+            if 'clip_qs' in query:
+                qs = query['clip_qs'].filter(item__itemId=m['id'])
+                n = qs.count()
+                if n > query['clip_items']:
+                    clips = []
+                    for i in range(0, n, int(n/query['clip_items'])):
+                        clips.append(qs[i])
+                else:
+                    clips = qs
+                r['clips'] = [c.json(query['clip_keys']) for c in clips]
             return r
         qs = qs[query['range'][0]:query['range'][1]]
         #response['data']['items'] = [m.get_json(_p) for m in qs]
