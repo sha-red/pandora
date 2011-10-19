@@ -220,6 +220,19 @@ Positions
         response['data']['items'] = []
         qs = _order_query(query['qs'], query['sort'])
         _p = query['keys']
+
+        def get_clips(qs):
+            n = qs.count()
+            if n > query['clip_items']:
+                clips = []
+                step = int(n/query['clip_items'])
+                offset = int((n - step * query['clip_items']) / 2)
+                for i in range(offset, n, step):
+                    clips.append(qs[i])
+            else:
+                clips = qs
+            return [c.json(query['clip_keys']) for c in clips]
+
         def only_p_sums(m):
             r = {}
             for p in _p:
@@ -233,15 +246,7 @@ Positions
                 else:
                     r[p] = m.json.get(p, '')
             if 'clip_qs' in query:
-                qs = query['clip_qs'].filter(item=m)
-                n = qs.count()
-                if n > query['clip_items']:
-                    clips = []
-                    for i in range(0, n, int(n/query['clip_items'])):
-                        clips.append(qs[i])
-                else:
-                    clips = qs
-                r['clips'] = [c.json(query['clip_keys']) for c in clips]
+                r['clips'] = get_clips(query['clip_qs'].filter(item=m))
             return r
         def only_p(m):
             r = {}
@@ -250,15 +255,7 @@ Positions
                 for p in _p:
                     r[p] = m.get(p, '')
             if 'clip_qs' in query:
-                qs = query['clip_qs'].filter(item__itemId=m['id'])
-                n = qs.count()
-                if n > query['clip_items']:
-                    clips = []
-                    for i in range(0, n, int(n/query['clip_items'])):
-                        clips.append(qs[i])
-                else:
-                    clips = qs
-                r['clips'] = [c.json(query['clip_keys']) for c in clips]
+                r['clips'] = get_clips(query['clip_qs'].filter(item__itemId=m['id']))
             return r
         qs = qs[query['range'][0]:query['range'][1]]
         #response['data']['items'] = [m.get_json(_p) for m in qs]
