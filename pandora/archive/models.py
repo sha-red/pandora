@@ -261,28 +261,26 @@ class File(models.Model):
         if resolution == (0, 0):
             resolution = None
         duration = self.duration
-        if self.get_type() != 'video':
+        if self.type != 'video':
             duration = None
         data = {
+            'audioCodec': self.audio_codec,
             'available': self.available,
             'duration': duration,
             'framerate': self.framerate,
-            #'height': self.height,
-            #'width': self.width,
-            'resolution': resolution,
             'id': self.oshash,
-            'samplerate': self.samplerate,
-            'video_codec': self.video_codec,
-            'audio_codec': self.audio_codec,
-            'path': self.path,
-            'size': self.size,
-            #'info': self.info,
-            'users': list(set([u.username
-                     for u in User.objects.filter(volumes__files__in=self.instances.all())])),
             'instances': [i.json() for i in self.instances.all()],
-            'type': self.get_type(),
-            'part': self.get_part()
+            'part': self.part,
+            'path': self.path,
+            'resolution': resolution,
+            'samplerate': self.samplerate,
+            'selected': self.selected,
+            'size': self.size,
+            'type': self.type,
+            'videoCodec': self.video_codec,
+            'wanted': self.wanted,
         }
+        data['users'] = [i['user'] for i in data['instances']]
         if keys:
             for k in data.keys():
                 if k not in keys:
@@ -290,7 +288,6 @@ class File(models.Model):
         return data
 
     def get_part(self):
-        #FIXME: this breaks for sub/idx/srt
         if os.path.splitext(self.path)[-1] in ('.sub', '.idx', '.srt'):
             name = os.path.splitext(self.path)[0]
             if self.language:
@@ -298,7 +295,7 @@ class File(models.Model):
             qs = self.item.files.filter(Q(is_video=True)|Q(is_audio=True),
                                         selected=True, path__startswith=name)
             if qs.count()>0:
-                return qs[0].part
+                return qs[0].get_part()
         if self.selected:
             files = list(self.item.files.filter(type=self.type, language=self.language,
                                                 selected=self.selected).order_by('sort_path'))
@@ -388,9 +385,10 @@ class Instance(models.Model):
 
     def json(self):
         return {
+            'ignore': self.ignore,
+            'path': self.path,
             'user': self.volume.user.username,
             'volume': self.volume.name,
-            'path': self.path
         }
 
 def frame_path(frame, name):

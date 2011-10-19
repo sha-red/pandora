@@ -33,11 +33,6 @@ class UserProfile(models.Model):
     info = DictField(default={})
     notes = models.TextField(default='')
 
-    def get_preferences(self):
-        prefs = self.preferences
-        prefs['email'] = self.user.email
-        return prefs
-
     def get_ui(self):
         return get_ui(self.ui, self.user)
 
@@ -154,7 +149,7 @@ def init_user(user, request=None):
         result[key] = getattr(user, key)
     result['level'] = profile.get_level()
     result['groups'] = [g.name for g in user.groups.all()]
-    result['preferences'] = profile.get_preferences()
+    result['email'] = user.email
     result['ui'] = profile.get_ui()
     result['volumes'] = [v.json() for v in user.volumes.all()] 
     return result

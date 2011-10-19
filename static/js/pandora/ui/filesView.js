@@ -46,12 +46,35 @@ pandora.ui.filesView = function(options, self) {
     self.$filesList = Ox.TextList({
             columns: [
                 {
+                    format: function(value, data) {
+                        Ox.print('File', value, data.wanted, data);
+                        return $('<img>')
+                            .attr({
+                                src: data.wanted ? Ox.UI.getImageURL('symbolStar') :
+                                                   Ox.UI.getImageURL('symbolCheck')
+                            })
+                            .css({
+                                width: '10px',
+                                height: '10px',
+                                padding: '3px',
+                                opacity: (value || data.wanted) ? 1 : 0
+                            });
+                    },
+                    id: 'selected',
+                    operator: '-',
+                    title: $('<img>').attr({
+                        src: Ox.UI.getImageURL('symbolCheck')
+                    }),
+                    visible: true,
+                    width: 16
+                },
+                {
                     align: 'left',
                     id: 'users',
                     operator: '+',
                     title: 'Users',
                     visible: true,
-                    width: 120
+                    width: 50
                 },
                 {
                     align: 'left',
@@ -133,11 +156,12 @@ pandora.ui.filesView = function(options, self) {
                         conditions: [{
                             key: 'id',
                             value: self.options.id,
-                            operator: '='
+                            operator: '=='
                         }]
                     }
                 }), callback);
             },
+            keys: ['wanted'],
             scrollbarVisible: true,
             sort: [{key: 'path', operator: '+'}]
         })
@@ -202,13 +226,14 @@ pandora.ui.filesView = function(options, self) {
             change: function(data) {
                 var conditions;
                 if (data.value.length) {
+                    /*
                     if (key == 'id') {
-                        conditions = [{key: 'id', value: data.value, operator: '='}]
+                        conditions = [{key: 'id', value: data.value, operator: '=='}]
                     } else {
                         conditions = Ox.map(['title', 'director', 'year'], function(key) {
                             var value = self['$' + key + 'Input'].options('value')
                             return value.length ? {key: key, value: value, operator: '='} : null;
-                        })
+                        });
                     }
                     pandora.api.find({
                         keys: ['title', 'director', 'year', 'id'],
@@ -218,6 +243,15 @@ pandora.ui.filesView = function(options, self) {
                         },
                         range: [0, 2]
                     }, function(result) {
+                    */
+                    conditions = {};
+                    Ox.map(['id', 'title', 'director', 'year'], function(key) {
+                        var value = self['$' + key + 'Input'].options('value');
+                        if(value.length) {
+                            conditions[key] = value;
+                        }
+                    });
+                    pandora.api.findId(conditions, function(result) {
                         var length = result.data.items.length;
                         if (length == 0) {
                             if (key != 'id') {
@@ -234,7 +268,7 @@ pandora.ui.filesView = function(options, self) {
                         } else {
                             self.$idInput.options({value: ''});
                         }
-                    })
+                    });
                 }
             }
         });
@@ -345,6 +379,7 @@ pandora.ui.filesView = function(options, self) {
                 }
             });
             updateForm();
+            self.$titleInput.triggerEvent('change', {value: result.data['title']});
         });
     }
 
