@@ -91,10 +91,13 @@ def parse_query(data, user):
             query[key] = data[key]
     query['qs'] = models.Item.objects.find(data, user)
 
-    if 'clipsQuery' in data:
-        query['clip_qs'] = Clip.objects.find({'query': data['clipsQuery']}, user).order_by('start')
-        query['clip_items'] = data['clipsQuery'].get('items', 5)
-        query['clip_keys'] = data['clipsQuery'].get('keys', ['id', 'in', 'out', 'annotations'])
+    if 'clips' in data:
+        query['clip_qs'] = Clip.objects.find({'query': data['clips']['query']},
+                                             user).order_by('start')
+        query['clip_items'] = data['clips'].get('items', 5)
+        query['clip_keys'] = data['clips'].get('keys')
+        if not query['clip_keys']:
+            query['clip_keys'] = ['id', 'in', 'out', 'annotations']
 
     #group by only allows sorting by name or number of itmes
     return query
@@ -135,6 +138,7 @@ Groups
             'key': string,
             'group': string,
             'range': array
+            clips: {}
         }
 
             query: query object, more on query syntax at
