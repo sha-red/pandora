@@ -5,7 +5,7 @@ pandora.URL = (function() {
     var self = {}, that = {};
 
     function getState(keys) {
-        Ox.print('KEYS', keys)
+        Ox.print('GET STATE, UI', pandora.user.ui)
         var state = {};
         /*
         if (keys.indexOf('type') > -1) {

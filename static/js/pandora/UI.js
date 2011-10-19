@@ -33,6 +33,7 @@ pandora.UI = (function() {
         }
         Ox.print('UI SET', args)
         self.previousUI = Ox.clone(pandora.user.ui, true);
+        self.previousUI._list = pandora.getListsState(self.previousUI.find);
         if ('find' in args) {
             // the challenge here is that find may change list,
             // and list may then change listSort and listView,
@@ -101,7 +102,6 @@ pandora.UI = (function() {
                         return key.replace(/\n/g, '.')
                     }),
                     ui = pandora.user.ui;
-                Ox.print(key, '......', keys)
                 while (keys.length > 1) {
                     ui = ui[keys.shift()];
                 }
