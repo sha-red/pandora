@@ -7,7 +7,7 @@ pandora.ui.itemClips = function(options) {
                 margin: '4px'
             })
             .bindEvent({
-                mousedown: mousedown
+                singleclick: singleclick
             });
 
     self.options = Ox.extend({
@@ -43,8 +43,7 @@ pandora.ui.itemClips = function(options) {
         that.append($item);
     });
 
-    function mousedown(data) {
-        Ox.print('MOUSEDOWN', data)
+    function singleclick(data) {
         var $img, $item, $target = $(data.target), $video, points;
         if ($target.is('.OxSpecialTarget')) {
             $item = $target.parent().parent();
@@ -73,7 +72,17 @@ pandora.ui.itemClips = function(options) {
                         .addClass('OxTarget OxSpecialTarget')
                         .bindEvent({
                             doubleclick: function() {
-                                
+                                var item = self.options.id,
+                                    set = {
+                                        item: item,
+                                        itemView: pandora.user.ui.videoView
+                                    };
+                                set['videoPoints.' + item] = {
+                                    'in': points[0],
+                                    out: points[1],
+                                    position: points[0]
+                                };
+                                pandora.UI.set(set);
                             },
                             singleclick: function() {
                                 $player.togglePaused();
