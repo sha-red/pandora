@@ -1005,14 +1005,17 @@ class Item(models.Model):
         #loop over all videos
         for f in self.files.filter(Q(is_audio=True)|Q(is_video=True)) \
                            .filter(selected=True).order_by('part'):
+            subtitles_added = False
             prefix = os.path.splitext(f.path)[0]
+            user = f.instances.all()[0].volume.user
+
             #if there is a subtitle with the same prefix, import
             q = subtitles.filter(path__startswith=prefix,
                                  language=language)
             if q.count() == 1:
                 s = q[0]
-                user = s.instances.all()[0].volume.user
                 for data in s.srt(offset):
+                    subtitles_added = True
                     annotation = Annotation(
                         item=self,
                         layer=layer,
@@ -1022,6 +1025,20 @@ class Item(models.Model):
                         user=user
                     )
                     annotation.save()
+            #otherwise add empty 5 seconds annotation every minute
+            if not subtitles_added:
+                i = offset
+                while i < offset + f.duration - 5:
+                    annotation = Annotation(
+                        item=self,
+                        layer=layer,
+                        start=i,
+                        end=i + 5,
+                        value='',
+                        user=user
+                    )
+                    annotation.save()
+                    i += 60
             offset += f.duration
         self.update_find()
 
