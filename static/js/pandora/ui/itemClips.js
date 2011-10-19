@@ -12,26 +12,28 @@ pandora.ui.itemClips = function(options) {
             });
 
     self.options = Ox.extend({
-        clips: 5,
+        clips: [],
         duration: 0,
         id: '',
         ratio: 8/5
     }, options);
 
-    self.clips = pandora.getClipPoints(self.options.duration, self.options.clips);
     self.size = 128;
     self.width = self.options.ratio > 1 ? self.size : Math.round(self.size * self.options.ratio);
     self.height = self.options.ratio > 1 ? Math.round(self.size / self.options.ratio) : self.size;
 
-    self.clips.forEach(function(clip, i) {
+    self.options.clips.forEach(function(clip, i) {
         var id = self.options.id + '/' + clip['in'],
+            title = Ox.map(clip.annotations, function(annotation) {
+                return annotation.layer == 'subtitles' ? annotation.value : 0
+            }),
             url = '/' + self.options.id + '/' + self.height + 'p' + clip['in'] + '.jpg',
             $item = Ox.IconItem({
                 imageHeight: self.height,
                 imageWidth: self.width,
                 id: id,
                 info: Ox.formatDuration(clip['in']) + ' - ' + Ox.formatDuration(clip.out),
-                title: '',
+                title: title[0] || '',
                 url: url,
             })
             .addClass('OxInfoIcon')

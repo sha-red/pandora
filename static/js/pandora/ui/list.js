@@ -207,6 +207,7 @@ pandora.ui.list = function() {
                             .apply(this, Ox.merge([data[sortKey]], format.args || []))
                         : data[sortKey];
                 }
+                Ox.print('CLIPS::', data.clips)
                 return {
                     icon: {
                         height: Math.round(ratio <= 1 ? size : size / ratio),
@@ -220,7 +221,7 @@ pandora.ui.list = function() {
                         element: pandora.ui.itemClips,
                         id: data.id,
                         options: {
-                            clips: 5,
+                            clips: data.clips,
                             duration: data.duration,
                             id: data.id,
                             ratio: data.videoRatio
@@ -231,10 +232,17 @@ pandora.ui.list = function() {
             items: function(data, callback) {
                 pandora.api.find(Ox.extend(data, {
                     query: pandora.user.ui.find,
-                    // clipsQuery: ...
+                    clips: {
+                        query: {
+                            conditions: [],
+                            operator: '&'
+                        },
+                        items: 5,
+                        keys: []
+                    }
                 }), callback);
             },
-            keys: ['director', 'duration', 'id', 'posterRatio', 'title', 'videoRatio', 'year'],
+            keys: ['clips', 'director', 'duration', 'id', 'posterRatio', 'title', 'videoRatio', 'year'],
             selected: pandora.user.ui.listSelection,
             size: 192,
             sort: pandora.user.ui.listSort,
