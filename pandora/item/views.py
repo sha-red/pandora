@@ -224,11 +224,13 @@ Positions
         def get_clips(qs):
             n = qs.count()
             if n > query['clip_items']:
+                num = query['clip_items']
                 clips = []
-                step = int(n/query['clip_items'])
-                offset = int((n - step * query['clip_items']) / 2)
-                for i in range(offset, n, step):
+                step = int(n / (num + 1))
+                i = step
+                while i <= (n - step) and i < n and len(clips) < num:
                     clips.append(qs[i])
+                    i += step
             else:
                 clips = qs
             return [c.json(query['clip_keys']) for c in clips]

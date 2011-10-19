@@ -1007,8 +1007,11 @@ class Item(models.Model):
                            .filter(selected=True).order_by('part'):
             subtitles_added = False
             prefix = os.path.splitext(f.path)[0]
-            user = f.instances.all()[0].volume.user
-
+            if f.instances.all().count() > 0:
+                user = f.instances.all()[0].volume.user
+            else:
+                #FIXME: allow annotations from no user instead?
+                user = User.objects.all().order_by('id')[0]
             #if there is a subtitle with the same prefix, import
             q = subtitles.filter(path__startswith=prefix,
                                  language=language)
