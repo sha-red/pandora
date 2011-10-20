@@ -39,7 +39,9 @@ pandora.ui.itemClips = function(options) {
             .addClass('OxInfoIcon')
             .css({
                 float: 'left',
-                margin: '2px'
+                margin: i == 0 ? '2px 2px 2px -2px'
+                    : i == self.options.clips.length - 1 ? '2px -2px 2px 2px'
+                    : '2px'
             })
             .data({'in': clip['in'], out: clip.out});
         $item.$element.find('.OxTarget').addClass('OxSpecialTarget');

@@ -174,8 +174,24 @@ Ox.load({
         pandora.$ui.info.resizeInfo();
         if (!pandora.user.ui.item) {
             pandora.resizeGroups(pandora.$ui.rightPanel.width());
-            if (pandora.user.ui.listView == 'timelines') {
-                pandora.$ui.list.options({width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1});
+            if (pandora.user.ui.listView == 'clips') {
+                var clipsItems = pandora.getClipsItems();
+                    previousClipsItems = pandora.getClipsItems(pandora.$ui.list.options('width'));
+                pandora.$ui.list.options({
+                    width: window.innerWidth
+                        - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
+                        - Ox.UI.SCROLLBAR_SIZE
+                });
+                if (clipsItems != previousClipsItems) {
+                    Ox.Request.clearCache(); // fixme
+                    pandora.$ui.list.reloadList(true);
+                }
+            } else if (pandora.user.ui.listView == 'timelines') {
+                pandora.$ui.list.options({
+                    width: window.innerWidth
+                        - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
+                        - Ox.UI.SCROLLBAR_SIZE
+                });
             } else if (pandora.user.ui.listView == 'map') {
                 pandora.$ui.map.resizeMap();
             } else if (pandora.user.ui.listView == 'calendar') {

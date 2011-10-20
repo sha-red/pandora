@@ -25,7 +25,15 @@ pandora.ui.rightPanel = function() {
                 if (!pandora.user.ui.item) {
                     pandora.resizeGroups();
                     pandora.$ui.list.size();
-                    if (pandora.user.ui.listView == 'timelines') {
+                    if (pandora.user.ui.listView == 'clips') {
+                        var clipsItems = pandora.getClipsItems();
+                            previousClipsItems = pandora.getClipsItems(pandora.$ui.list.options('width'));
+                        pandora.$ui.list.options({width: data.size});
+                        if (clipsItems != previousClipsItems) {
+                            Ox.Request.clearCache(); // fixme
+                            pandora.$ui.list.reloadList(true);
+                        }
+                    } else if (pandora.user.ui.listView == 'timelines') {
                         pandora.$ui.list.options({width: data.size});
                     } else if (pandora.user.ui.listView == 'map') {
                         pandora.$ui.map.resizeMap();
