@@ -391,7 +391,7 @@ def get(request):
         info = item.get_json(data['keys'])
         if not data['keys'] or 'stream' in data['keys']:
             info['stream'] = item.get_stream()
-        if not data['keys'] or 'layers' in data['keys']:
+        if data['keys'] and 'layers' in data['keys']:
             info['layers'] = item.get_layers(request.user)
         if data['keys'] and 'files' in data['keys']:
             info['files'] = item.get_files(request.user)
