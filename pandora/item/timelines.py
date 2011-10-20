@@ -8,8 +8,12 @@ import Image
 
 import ox
 
+def getTiles(timeline_prefix, height=64):
+    files = glob('%s%sp*.png' % (timeline_prefix, height))
+    return sorted(filter(lambda f: f!='%s%sp.png' % (timeline_prefix, height), files))
+    
 def loadTimeline(timeline_prefix, height=64):
-    files = sorted(glob('%s%sp*.png' % (timeline_prefix, height)))
+    files = getTiles(timeline_prefix, height)
     f = Image.open(files[0])
     width = f.size[0]
     f = Image.open(files[-1])
@@ -23,7 +27,7 @@ def loadTimeline(timeline_prefix, height=64):
     return timeline
 
 def makeTiles(timeline_prefix, height=16, width=3600):
-    files = glob('%s64p*.png' % timeline_prefix)
+    files = getTiles(timeline_prefix, 64)
     fps = 25
     part_step = 60
     output_width = width
@@ -53,7 +57,7 @@ def makeTimelineOverview(timeline_prefix, width, inpoint=0, outpoint=0, duration
     
     timeline_file = '%s%sp.png' % (timeline_prefix, height)
     if outpoint > 0:
-        timeline_file = '%s.overview.%s.%d-%d.png' % (timeline_prefix, height, inpoint, outpoint)
+        timeline_file = '%s%sp.%d-%d.png' % (timeline_prefix, height, inpoint, outpoint)
 
     timeline = loadTimeline(timeline_prefix)
     duration = timeline.size[0]
@@ -70,14 +74,16 @@ def makeTimelineOverview(timeline_prefix, width, inpoint=0, outpoint=0, duration
     timeline = timeline.crop((inpoint, 0, outpoint, timeline.size[1])).resize((width, height), Image.ANTIALIAS)
     timeline.save(timeline_file)
 
-
 def join_timelines(timelines, prefix):
     height = 64
     width = 1500
 
+    for f in glob('%s*'%prefix):
+        os.unlink(f)
+
     tiles = [] 
     for timeline in timelines:
-        tiles += sorted(glob('%s%sp*.png'%(timeline, height)))
+        tiles += getTiles(timeline, height)
 
     timeline = Image.new("RGB", (2 * width, height))
 
