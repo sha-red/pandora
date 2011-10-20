@@ -124,10 +124,13 @@ pandora.ui.item = function() {
                         return '/' + pandora.user.ui.item + '/timeline64p' + i + '.png';
                     },
                     height: pandora.$ui.contentPanel.size(1),
-                    'in': pandora.user.ui.videoPoints[pandora.user.ui.item]['in'],
+                    'in': pandora.user.ui.videoPoints[pandora.user.ui.item]
+                        ? pandora.user.ui.videoPoints[pandora.user.ui.item]['in'] : 0,
                     muted: pandora.user.ui.videoMuted,
-                    out: pandora.user.ui.videoPoints[pandora.user.ui.item].out,
-                    position: pandora.user.ui.videoPoints[pandora.user.ui.item].position,
+                    out: pandora.user.ui.videoPoints[pandora.user.ui.item]
+                        ? pandora.user.ui.videoPoints[pandora.user.ui.item].out : 0,
+                    position: pandora.user.ui.videoPoints[pandora.user.ui.item]
+                        ? pandora.user.ui.videoPoints[pandora.user.ui.item].position : 0,
                     scaleToFill: pandora.user.ui.videoScale == 'fill',
                     showAnnotations: pandora.user.ui.showAnnotations,
                     showControls: pandora.user.ui.showControls,
@@ -197,11 +200,14 @@ pandora.ui.item = function() {
                     },
                     height: pandora.$ui.contentPanel.size(1),
                     id: 'editor',
-                    'in': pandora.user.ui.videoPoints[pandora.user.ui.item]['in'],
+                    'in': pandora.user.ui.videoPoints[pandora.user.ui.item]
+                        ? pandora.user.ui.videoPoints[pandora.user.ui.item]['in'] : 0,
                     layers: layers,
                     muted: pandora.user.ui.videoMuted,
-                    out: pandora.user.ui.videoPoints[pandora.user.ui.item].out,
-                    position: pandora.user.ui.videoPoints[pandora.user.ui.item].position,
+                    out: pandora.user.ui.videoPoints[pandora.user.ui.item]
+                        ? pandora.user.ui.videoPoints[pandora.user.ui.item].out : 0,
+                    position: pandora.user.ui.videoPoints[pandora.user.ui.item]
+                        ? pandora.user.ui.videoPoints[pandora.user.ui.item].position : 0,
                     posterFrame: parseInt(video.duration / 2),
                     showAnnotations: pandora.user.ui.showAnnotations,
                     showLargeTimeline: true,

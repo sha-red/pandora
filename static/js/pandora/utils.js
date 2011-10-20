@@ -416,14 +416,6 @@ pandora.exitFullscreen = function() {
     pandora.user.ui.showBrowser && pandora.$ui.contentPanel.size(0, 112 + Ox.UI.SCROLLBAR_SIZE);
 };
 
-pandora.getClipPoints = function(duration, number) {
-    var step = Math.max(Math.floor((duration - 5) / 60 / (number + 1)), 1) * 60;
-    Ox.print('STEP', step)
-    return Ox.range(step, duration - 4.999, step).map(function(position) {
-        return {'in': position, 'out': position + 5};
-    });
-};
-
 pandora.getFoldersHeight = function() {
     var height = 0;
     pandora.site.sectionFolders[pandora.user.ui.section].forEach(function(folder, i) {

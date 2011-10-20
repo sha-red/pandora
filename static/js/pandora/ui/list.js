@@ -207,7 +207,6 @@ pandora.ui.list = function() {
                             .apply(this, Ox.merge([data[sortKey]], format.args || []))
                         : data[sortKey];
                 }
-                Ox.print('CLIPS::', data.clips)
                 return {
                     icon: {
                         height: Math.round(ratio <= 1 ? size : size / ratio),

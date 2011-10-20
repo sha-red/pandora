@@ -73,22 +73,12 @@ pandora.UI = (function() {
             }
             if (key == 'item' && val) {
                 // when switching to an item, update list selection
+                var list = pandora.user.ui._list || '';
                 add['listSelection'] = [val];
-                add['lists.' + that.encode(pandora.user.ui._list || '') + '.selection'] = [val];
-            }
-            if ((
-                key == 'item'
-                && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
-                && !pandora.user.ui.videoPoints[val]
-                ) || (
-                key == 'itemView'
-                && ['video', 'timeline'].indexOf(val) > -1
-                && !pandora.user.ui.videoPoints[pandora.user.ui.item]
-            )) {
-                // when switching to a video view, add default videoPoints
-                add['videoPoints.' + (
-                    key == 'item' ? val : pandora.user.ui.item
-                )] = {'in': 0, out: 0, position: 0};
+                if (!pandora.user.ui.lists[list]) {
+                    add['lists.' + that.encode(list)] = {};
+                }
+                add['lists.' + that.encode(list) + '.selection'] = [val];
             }
             if (key == 'itemView' && ['video', 'timeline'].indexOf(val) > -1) {
                 // when switching to a video view, add it as default video view
@@ -97,6 +87,7 @@ pandora.UI = (function() {
         });
         [args, add].forEach(function(obj, isAdd) {
             Ox.forEach(obj, function(val, key) {
+                Ox.print('key/val', key, val)
                 // make sure to not split at escaped dots ('\.')
                 var keys = key.replace(/\\\./g, '\n').split('.').map(function(key) {
                         return key.replace(/\n/g, '.')
@@ -105,6 +96,7 @@ pandora.UI = (function() {
                 while (keys.length > 1) {
                     ui = ui[keys.shift()];
                 }
+                Ox.print(keys[0])
                 if (!Ox.isEqual(ui[keys[0]], val)) {
                     if (val === null) {
                         delete ui[keys[0]]
