@@ -668,7 +668,7 @@ class Item(models.Model):
         s.popularity = self.accessed.aggregate(Sum('accessed'))['accessed__sum']
         s.save()
         #update cached values in clips
-        self.clips.all().update(director=s.director, year=s.title)
+        self.clips.all().update(director=s.director, title=s.title)
 
     def update_facets(self):
         for key in self.facet_keys + ['title']:
