@@ -686,6 +686,8 @@ class Item(models.Model):
             elif key == 'character':
                 current_values = filter(lambda x: x.strip(),
                                         [f['character'] for f in self.get('cast', [])])
+                current_values = [item for sublist in [x.split(' / ') for x in current_values]
+                                  for item in sublist]
             elif key == 'name':
                 current_values = []
                 #FIXME: is there a better way to build name collection?
