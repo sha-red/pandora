@@ -135,8 +135,9 @@ class File(models.Model):
             self.is_subtitle = False
 
         self.type = self.get_type()
-        info = ox.parse_movie_path(self.path)
-        self.language = info['language']
+        if self.instances.count()>0:
+            info = ox.parse_movie_path(self.path)
+            self.language = info['language']
         self.part = self.get_part()
 
         if self.type not in ('audio', 'video'):

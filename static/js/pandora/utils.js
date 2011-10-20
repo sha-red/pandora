@@ -416,6 +416,13 @@ pandora.exitFullscreen = function() {
     pandora.user.ui.showBrowser && pandora.$ui.contentPanel.size(0, 112 + Ox.UI.SCROLLBAR_SIZE);
 };
 
+pandora.getClipsItems = function(width) {
+    width = width || window.innerWidth
+        - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
+        - Ox.UI.SCROLLBAR_SIZE;
+    return Math.floor((width - 8) / (128 + 8)) - 1;
+};
+
 pandora.getClipsQuery = function() {
     function addClipsConditions(conditions) {
         conditions.forEach(function(condition) {

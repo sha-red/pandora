@@ -233,7 +233,7 @@ pandora.ui.list = function() {
                     query: pandora.user.ui.find,
                     clips: {
                         query: pandora.getClipsQuery(),
-                        items: 5,
+                        items: pandora.getClipsItems(),
                         keys: []
                     }
                 }), callback);
@@ -242,7 +242,10 @@ pandora.ui.list = function() {
             selected: pandora.user.ui.listSelection,
             size: 192,
             sort: pandora.user.ui.listSort,
-            unique: 'id'
+            unique: 'id',
+            width: window.innerWidth
+                - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
+                - Ox.UI.SCROLLBAR_SIZE
         })
         .bindEvent({
             key_left: function() {
