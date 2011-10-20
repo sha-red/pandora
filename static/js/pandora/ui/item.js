@@ -102,10 +102,10 @@ pandora.ui.item = function() {
             );
 
         } else if (pandora.user.ui.itemView == 'video') {
-            // fixme: duplicated
-            var layers = [],
-                video = {};
             pandora.api.get({id: pandora.user.ui.item, keys: ['layers']}, function(r) {
+                // fixme: duplicated
+                var layers = [],
+                    video = {};
                 pandora.site.layers.forEach(function(layer, i) {
                     layers[i] = Ox.extend({}, layer, {items: r.data.layers[layer.id]});
                 });
@@ -169,9 +169,9 @@ pandora.ui.item = function() {
             });
 
         } else if (pandora.user.ui.itemView == 'timeline') {
-            var layers = [],
-                video = {};
             pandora.api.get({id: pandora.user.ui.item, keys: ['layers']}, function(r) {
+                var layers = [],
+                    video = {};
                 pandora.site.layers.forEach(function(layer) {
                     layers.push(Ox.extend({items: r.data.layers[layer.id]}, layer));
                 });
@@ -272,17 +272,15 @@ pandora.ui.item = function() {
                         height: data.size
                     });
                 });
-            });
-            /*
-            pandora.$ui.rightPanel.bindEvent('resize', function(data) {
-                Ox.print('... rightPanel resize', data, pandora.$ui.timelinePanel.size(1))
-                pandora.$ui.editor.options({
-                    width: data - pandora.$ui.timelinePanel.size(1) - 1
+                /*
+                pandora.$ui.rightPanel.bindEvent('resize', function(data) {
+                    Ox.print('... rightPanel resize', data, pandora.$ui.timelinePanel.size(1))
+                    pandora.$ui.editor.options({
+                        width: data - pandora.$ui.timelinePanel.size(1) - 1
+                    });
                 });
+                */
             });
-            */
-
-
         } else if (pandora.user.ui.itemView == 'map') {
             pandora.$ui.contentPanel.replaceElement(1, pandora.ui.navigationView('map', result.data.videoRatio));
 
