@@ -174,7 +174,9 @@ Ox.load({
         pandora.$ui.info.resizeInfo();
         if (!pandora.user.ui.item) {
             pandora.resizeGroups(pandora.$ui.rightPanel.width());
-            if (pandora.user.ui.listView == 'map') {
+            if (pandora.user.ui.listView == 'timelines') {
+                pandora.$ui.list.options({width: window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1});
+            } else if (pandora.user.ui.listView == 'map') {
                 pandora.$ui.map.resizeMap();
             } else if (pandora.user.ui.listView == 'calendar') {
                 pandora.$ui.calendar.resizeCalendar();
