@@ -59,7 +59,7 @@ def addPlace(request):
                 value = tuple(value)
             setattr(place, key, value)
         place.save()
-        #tasks.update_matches.delay(place.id)
+        tasks.update_matches.delay(place.id)
         response = json_response(place.json())
     else:
         response = json_response(status=403,

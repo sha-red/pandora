@@ -5,7 +5,7 @@ import ox
 
 from django.conf import settings
 
-from item.models import get_item
+from item.models import get_item, Item
 import item.tasks
 
 import models
@@ -80,11 +80,11 @@ def update_files(user, volume, files):
 
     #remove deleted files
     removed = models.Instance.objects.filter(volume=volume).exclude(file__oshash__in=all_files)
-    ids = [i['itemId'] for i in Item.models.objects.filter(
-           files__instances__in=removed.filter(selected=True)).distinct().values('itemId')]
+    ids = [i['itemId'] for i in Item.objects.filter(
+           files__instances__in=removed.filter(file__selected=True)).distinct().values('itemId')]
     removed.delete()
     for i in ids:
-        i = Item.models.objects.get(itemId=i)
+        i = Item.objects.get(itemId=i)
         i.update_selected()
 
 @task(queue="encoding")
