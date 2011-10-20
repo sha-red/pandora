@@ -507,17 +507,16 @@ class Item(models.Model):
             if key == 'character':
                 values = self.get('cast', '')
                 if values:
-                    if isinstance(values[0], basestring):
-                        values = [values]
-                    if isinstance(values[0], list):
-                        values = map(lambda x: {'actor': x[0], 'character': x[1]}, values)
-                    values = [i['character'] for i in values]
+                    values = filter(lambda x: x.strip(),
+                                    [f['character'] for f in values])
+                    values = list(set(values))
             elif key == 'name':
                 values = []
                 for k in map(lambda x: x['id'],
                                filter(lambda x: x.get('sort') == 'person',
                                       settings.CONFIG['itemKeys'])):
                     values += self.get(k, [])
+                values = list(set(values))
             else:
                 values = self.get(key, '')
             if isinstance(values, list):
@@ -547,27 +546,27 @@ class Item(models.Model):
             setattr(s, name, value)
 
         base_keys = (
-            'id',
             'aspectratio',
+            'bitrate',
+            'clips',
+            'cutsperminute',
             'duration',
             'hue',
-            'saturation',
+            'id',
             'lightness',
-            'volume',
-            'clips',
+            'modified',
             'numberofcuts',
-            'cutsperminute',
-            'words',
-            'wordsperminute',
-            'resolution',
-            'pixels',
-            'size',
-            'bitrate',
             'numberoffiles',
             'parts',
-            'published',
-            'modified',
+            'pixels',
             'popularity',
+            'published',
+            'resolution',
+            'saturation',
+            'size',
+            'volume',
+            'words',
+            'wordsperminute',
         )
 
         for key in filter(lambda k: 'columnWidth' in k, settings.CONFIG['itemKeys']):
@@ -623,9 +622,8 @@ class Item(models.Model):
         s.published = self.published
 
         s.aspectratio = self.get('aspectRatio')
-        # sort values based on data from videos
-        s.words = sum([len(a.value.split()) for a in self.annotations.all()])
-        s.clips= self.clips.count()
+        s.words = sum([len(a.value.split()) for a in self.annotations.exclude(value='')])
+        s.clips = self.clips.count()
 
         videos = self.files.filter(selected=True, is_video=True)
         if videos.count() > 0:
@@ -671,7 +669,6 @@ class Item(models.Model):
         s.save()
 
     def update_facets(self):
-        #FIXME: what to do with Unkown Director, Year, Country etc.
         for key in self.facet_keys + ['title']:
             current_values = self.get(key, [])
             if key == 'title':
@@ -682,9 +679,12 @@ class Item(models.Model):
                 ot = self.get('originalTitle')
                 if ot:
                     current_values.append(ot)
-            #FIXME: is there a better way to build name collection?
-            if key == 'name':
+            elif key == 'character':
+                current_values = filter(lambda x: x.strip(),
+                                        [f['character'] for f in self.get('cast', [])])
+            elif key == 'name':
                 current_values = []
+                #FIXME: is there a better way to build name collection?
                 for k in map(lambda x: x['id'],
                                filter(lambda x: x.get('sort') == 'person',
                                       settings.CONFIG['itemKeys'])):
