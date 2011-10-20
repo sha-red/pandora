@@ -416,6 +416,27 @@ pandora.exitFullscreen = function() {
     pandora.user.ui.showBrowser && pandora.$ui.contentPanel.size(0, 112 + Ox.UI.SCROLLBAR_SIZE);
 };
 
+pandora.getClipsQuery = function() {
+    function addClipsConditions(conditions) {
+        conditions.forEach(function(condition) {
+            if (condition.conditions) {
+                addClipsConditions(condition.conditions);
+            } else if (
+                Ox.getPositionById(pandora.site.layers, condition.key) > -1
+                && condition.operator == '='
+            ) {
+                clipsQuery.conditions.push(condition);
+            }
+        });
+    }
+    var clipsQuery = {
+        conditions: []
+    };
+    addClipsConditions(pandora.user.ui.find.conditions);
+    clipsQuery.operator = clipsQuery.conditions.length ? '|' : '&';
+    return clipsQuery;
+};
+
 pandora.getFoldersHeight = function() {
     var height = 0;
     pandora.site.sectionFolders[pandora.user.ui.section].forEach(function(folder, i) {

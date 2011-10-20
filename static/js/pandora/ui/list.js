@@ -232,10 +232,7 @@ pandora.ui.list = function() {
                 pandora.api.find(Ox.extend(data, {
                     query: pandora.user.ui.find,
                     clips: {
-                        query: {
-                            conditions: [],
-                            operator: '&'
-                        },
+                        query: pandora.getClipsQuery(),
                         items: 5,
                         keys: []
                     }
@@ -256,6 +253,8 @@ pandora.ui.list = function() {
             }
         });
     } else if (view == 'timelines') {
+        var clipsQuery = pandora.getClipsQuery(),
+            isClipsQuery = clipsQuery.conditions.length;
         that = Ox.InfoList({
             borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 16,
             defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
@@ -303,24 +302,35 @@ pandora.ui.list = function() {
                         id: data.id,
                         options: {
                             duration: data.duration,
-                            // find: '...',
+                            find: 'cinema',
                             getImageURL: function(i) {
                                 return '/' + data.id + '/timeline16p' + i + '.png';
                             },
                             position: pandora.user.ui.videoPoints[data.id]
                                 ? pandora.user.ui.videoPoints[data.id].position : 0,
-                            // subtitles: data.subtitles
+                            results: data.clips ? data.clips.map(function(clip) {
+                                return {'in': clip['in'], out: clip.out};
+                            }) : [],
+                            subtitles: data.clips ? data.clips.map(function(clip) {
+                                return {'in': clip['in'], out: clip.out, text: clip.annotations[0].value};
+                            }) : []
                         }
                     }
                 };
             },
             items: function(data, callback) {
-                pandora.api.find(Ox.extend(data, {
-                    query: pandora.user.ui.find,
-                    // clipsQuery: ...
-                }), callback);
+                pandora.api.find(Ox.extend(data, Ox.extend({
+                    query: pandora.user.ui.find
+                }, isClipsQuery ? {clips: {
+                    query: clipsQuery,
+                    items: 1000000,
+                    keys: []
+                }} : {})), callback);
             },
-            keys: ['director', 'duration', 'id', 'posterRatio', 'title', 'year'],
+            keys: Ox.merge(
+                ['director', 'duration', 'id', 'posterRatio', 'title', 'year'],
+                isClipsQuery ? ['clips'] : []
+            ),
             selected: pandora.user.ui.listSelection,
             size: 192,
             sort: pandora.user.ui.listSort,
