@@ -388,6 +388,8 @@ class Item(models.Model):
         for l in Layer.objects.all():
             ll = layers.setdefault(l.name, [])
             qs = Annotation.objects.filter(layer=l, item=self).select_related()
+            if l.name == 'subtitles':
+                qs = qs.exclude(value='')
             if l.private:
                 if user and user.is_anonymous():
                     user = None
