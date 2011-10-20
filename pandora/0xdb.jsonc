@@ -562,7 +562,6 @@
     ],
     "user": {
         "level": "guest",
-        "preferences": {},
         "ui": {
             "annotationsSize": 256,
             "clipsColumns": 2,

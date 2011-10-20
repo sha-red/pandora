@@ -622,6 +622,7 @@ class Item(models.Model):
         s.modified = self.modified
         s.published = self.published
 
+        s.aspectratio = self.get('aspectRatio')
         # sort values based on data from videos
         s.words = sum([len(a.value.split()) for a in self.annotations.all()])
         s.clips= self.clips.count()
@@ -631,7 +632,8 @@ class Item(models.Model):
             s.duration = sum([v.duration for v in videos])
             v = videos[0]
             s.resolution = v.width * v.height
-            s.aspectratio = float(utils.parse_decimal(v.display_aspect_ratio))
+            if not s.aspectratio:
+                s.aspectratio = float(utils.parse_decimal(v.display_aspect_ratio))
             s.pixels = sum([v.pixels for v in videos])
             s.numberoffiles = self.files.all().count()
             s.parts = videos.count()
@@ -644,7 +646,6 @@ class Item(models.Model):
         else:
             s.duration = None
             s.resolution = None
-            s.aspectratio = None
             s.bitrate = None
             s.pixels = None
             s.filename = None

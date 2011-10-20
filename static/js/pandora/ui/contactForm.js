@@ -7,7 +7,7 @@ pandora.ui.contactForm = function() {
                         id: 'email',
                         label: 'E-Mail',
                         labelWidth: 60,
-                        value: pandora.user.preferences.email,
+                        value: pandora.user.email,
                         width: 240
                 }),
                 Ox.Input({
