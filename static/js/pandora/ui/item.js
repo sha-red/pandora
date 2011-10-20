@@ -7,7 +7,7 @@ pandora.ui.item = function() {
     pandora.api.get({
         id: pandora.user.ui.item,
         keys: ['video', 'timeline'].indexOf(pandora.user.ui.itemView)>-1 ?
-              ['rendered', 'cuts', 'videoRatio', 'duration', 'layers', 'parts', 'size'] : []
+              [ 'cuts', 'duration', 'layers', 'parts', 'rendered', 'size', 'title', 'videoRatio'] : []
     }, pandora.user.level == 'admin' && pandora.user.ui.itemView == 'info' ? 0 : -1, function(result) {
 
         if (result.status.code == 200) {
