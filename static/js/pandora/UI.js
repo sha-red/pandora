@@ -66,19 +66,33 @@ pandora.UI = (function() {
         }
         // it is important to check for find first, so that if find
         // changes list, pandora.user.ui._list is correct here
+        var item = args['item'] || pandora.user.ui.item,
+            list = pandora.user.ui._list || '';
+        Ox.print('item/list', item, list, '...', args['videoPoints.' + item])
         Ox.forEach(args, function(val, key) {
             if (Object.keys(listSettings).indexOf(key) > -1) {
                 // if applicable, copy setting to list setting
-                add['lists.' + that.encode(pandora.user.ui._list || '') + '.' + listSettings[key]] = val;
+                add['lists.' + that.encode(list) + '.' + listSettings[key]] = val;
             }
             if (key == 'item' && val) {
                 // when switching to an item, update list selection
-                var list = pandora.user.ui._list || '';
                 add['listSelection'] = [val];
                 if (!pandora.user.ui.lists[list]) {
                     add['lists.' + that.encode(list)] = {};
                 }
                 add['lists.' + that.encode(list) + '.selection'] = [val];
+            }
+            if (!args['videoPoints.' + item] && ((
+                key == 'item'
+                && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
+                && !pandora.user.ui.videoPoints[val]
+                ) || (
+                key == 'itemView'
+                && ['video', 'timeline'].indexOf(val) > -1
+                && !pandora.user.ui.videoPoints[item]
+            ))) {
+                // when switching to a video view, add default videoPoints
+                add['videoPoints.' + item] = {'in': 0, out: 0, position: 0};
             }
             if (key == 'itemView' && ['video', 'timeline'].indexOf(val) > -1) {
                 // when switching to a video view, add it as default video view
@@ -96,7 +110,6 @@ pandora.UI = (function() {
                 while (keys.length > 1) {
                     ui = ui[keys.shift()];
                 }
-                Ox.print(keys[0])
                 if (!Ox.isEqual(ui[keys[0]], val)) {
                     if (val === null) {
                         delete ui[keys[0]]
