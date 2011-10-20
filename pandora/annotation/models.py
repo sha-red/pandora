@@ -118,13 +118,7 @@ class Annotation(models.Model):
         if not self.clip and not self.layer.private or \
             (self.clip and not self.layer.private and \
                 self.start != self.clip.start or self.end != self.clip.end):
-
-            self.clip, created = Clip.objects.get_or_create(item=self.item,
-                                                            start=self.start,
-                                                            end=self.end)
-            if created:
-                clip = Clip.objects.get(pk=self.clip.pk)
-                clip.save()
+            self.clip, created = Clip.get_or_create(self.item, self.start, self.end)
 
         super(Annotation, self).save(*args, **kwargs)
 
