@@ -8,6 +8,7 @@ from django.conf import settings
 from archive import extract
 import managers
 
+
 class Clip(models.Model):
     '''
     CREATE INDEX clip_clip_title_idx ON clip_clip (title ASC NULLS LAST);
@@ -20,7 +21,7 @@ class Clip(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    public_id = models.CharField(max_length=128, unique=True, null=True)
+    public_id = models.CharField(max_length=128, unique=True)
 
     item = models.ForeignKey('item.Item', related_name='clips')
 
@@ -52,7 +53,7 @@ class Clip(models.Model):
         self.title = self.item.sort.title
     
     def save(self, *args, **kwargs):
-        self.public_id = u"%s/%s-%s" %(self.item.itemId, self.start, self.end)
+        self.public_id = u"%s/%s-%s" %(self.item.itemId, float(self.start), float(self.end))
         if self.duration != self.end - self.start:
             self.update_calculated_values()
         super(Clip, self).save(*args, **kwargs)
@@ -90,6 +91,21 @@ class Clip(models.Model):
                     j[key] = self.item.get(key)
         return j
 
+    @classmethod
+    def get_or_create(cls, item, start, end):
+        start = float(start)
+        end = float(end)
+        public_id = u"%s/%s-%s" %(item.itemId, start, end)
+        qs = cls.objects.filter(public_id=public_id)
+        if qs.count() == 0:
+            clip = Clip(item=item, start=start, end=end, public_id=public_id)
+            clip.save()
+            created = True
+        else:
+            clip = qs[0]
+            created = False
+        return clip, created
+
     def __unicode__(self):
-        return u"%s/%s-%s" %(self.item, self.start, self.end)
+        return self.public_id
 
