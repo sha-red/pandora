@@ -253,8 +253,6 @@ pandora.ui.list = function() {
             }
         });
     } else if (view == 'timelines') {
-        var clipsQuery = pandora.getClipsQuery(),
-            isClipsQuery = clipsQuery.conditions.length;
         that = Ox.InfoList({
             borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 16,
             defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
@@ -262,7 +260,9 @@ pandora.ui.list = function() {
             id: 'list',
             item: function(data, sort, size) {
                 size = 128;
-                var ui = pandora.user.ui,
+                var clipsQuery = pandora.getClipsQuery(),
+                    isClipsQuery = !!clipsQuery.conditions.length,
+                    ui = pandora.user.ui,
                     ratio = ui.icons == 'posters'
                         ? (ui.showSitePoster ? 5/8 : data.posterRatio) : 1,
                     url = '/' + data.id + '/' + (
@@ -296,22 +296,26 @@ pandora.ui.list = function() {
                                 pandora.$ui.videoPreview.options({
                                     position: event.position
                                 });
-                                pandora.UI.set('videoPoints.' + data.id + '.position', event.position);
+                                if (pandora.user.ui.videoPoints[data.id]) {
+                                    pandora.UI.set('videoPoints.' + data.id + '.position', event.position);
+                                } else {
+                                    pandora.UI.set('videoPoints.' + data.id, {'in': 0, out: 0, position: event.position});
+                                }
                             }
                         },
                         id: data.id,
                         options: {
                             duration: data.duration,
-                            find: 'cinema',
+                            find: isClipsQuery ? clipsQuery.conditions[0].value : '',
                             getImageURL: function(i) {
                                 return '/' + data.id + '/timeline16p' + i + '.png';
                             },
                             position: pandora.user.ui.videoPoints[data.id]
                                 ? pandora.user.ui.videoPoints[data.id].position : 0,
-                            results: data.clips ? data.clips.map(function(clip) {
+                            results: isClipsQuery ? data.clips.map(function(clip) {
                                 return {'in': clip['in'], out: clip.out};
                             }) : [],
-                            subtitles: data.clips ? data.clips.map(function(clip) {
+                            subtitles: isClipsQuery ? data.clips.map(function(clip) {
                                 return {'in': clip['in'], out: clip.out, text: clip.annotations[0].value};
                             }) : []
                         }
@@ -319,6 +323,8 @@ pandora.ui.list = function() {
                 };
             },
             items: function(data, callback) {
+                var clipsQuery = pandora.getClipsQuery(),
+                    isClipsQuery = !!clipsQuery.conditions.length;
                 pandora.api.find(Ox.extend(data, Ox.extend({
                     query: pandora.user.ui.find
                 }, isClipsQuery ? {clips: {
@@ -327,10 +333,7 @@ pandora.ui.list = function() {
                     keys: []
                 }} : {})), callback);
             },
-            keys: Ox.merge(
-                ['director', 'duration', 'id', 'posterRatio', 'title', 'year'],
-                isClipsQuery ? ['clips'] : []
-            ),
+            keys: ['clips', 'director', 'duration', 'id', 'posterRatio', 'title', 'year'],
             selected: pandora.user.ui.listSelection,
             size: 192,
             sort: pandora.user.ui.listSort,

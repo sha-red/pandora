@@ -104,7 +104,9 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'video') {
             pandora.api.get({id: pandora.user.ui.item, keys: ['layers']}, function(r) {
                 // fixme: duplicated
-                var layers = [],
+                var clipsQuery = pandora.getClipsQuery(),
+                    isClipsQuery = !!clipsQuery.conditions.length,
+                    layers = [],
                     video = {};
                 pandora.site.layers.forEach(function(layer, i) {
                     layers[i] = Ox.extend({}, layer, {items: r.data.layers[layer.id]});
@@ -120,6 +122,7 @@ pandora.ui.item = function() {
                     annotationsSize: pandora.user.ui.annotationsSize,
                     cuts: result.data.cuts || [],
                     duration: result.data.duration,
+                    find: isClipsQuery ? clipsQuery.conditions[0].value : '',
                     getTimelineImageURL: function(i) {
                         return '/' + pandora.user.ui.item + '/timeline64p' + i + '.png';
                     },
@@ -170,7 +173,9 @@ pandora.ui.item = function() {
 
         } else if (pandora.user.ui.itemView == 'timeline') {
             pandora.api.get({id: pandora.user.ui.item, keys: ['layers']}, function(r) {
-                var layers = [],
+                var clipsQuery = pandora.getClipsQuery(),
+                    isClipsQuery = !!clipsQuery.conditions.length,
+                    layers = [],
                     video = {};
                 pandora.site.layers.forEach(function(layer) {
                     layers.push(Ox.extend({items: r.data.layers[layer.id]}, layer));
@@ -185,7 +190,7 @@ pandora.ui.item = function() {
                     annotationsSize: pandora.user.ui.annotationsSize,
                     cuts: result.data.cuts || [],
                     duration: result.data.duration,
-                    find: '',
+                    find: isClipsQuery ? clipsQuery.conditions[0].value : '',
                     getFrameURL: function(position) {
                         return '/' + pandora.user.ui.item + '/' + Ox.last(pandora.site.video.resolutions) + 'p' + position + '.jpg';
                     },
