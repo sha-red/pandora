@@ -64,7 +64,6 @@ def get_ui(user_ui, user=None):
     ui = updateUI(ui, user_ui)
     if not 'lists' in ui:
         ui['lists'] = {}
-        ui['lists'][''] = copy.deepcopy(config['user']['ui']['lists'][''])
 
     def add(lists, section):
         ids = []

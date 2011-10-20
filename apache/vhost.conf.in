@@ -10,7 +10,7 @@
 
     <Location />
         XSendFile on
-        XSendFileAllowAbove on
+        XSendFilePath __PREFIX__
     </Location>
 
     Alias /.bzr        __PREFIX__/.bzr
