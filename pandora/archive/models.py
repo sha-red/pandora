@@ -442,6 +442,9 @@ class Stream(models.Model):
     duration = models.FloatField(default=0)
     aspect_ratio = models.FloatField(default=0)
 
+    cuts = fields.TupleField(default=[])
+    color = fields.TupleField(default=[])
+
     @property
     def timeline_prefix(self):
         return os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline')
@@ -484,6 +487,8 @@ class Stream(models.Model):
     def make_timeline(self):
         if self.available and not self.source:
             extract.timeline(self.video.path, self.timeline_prefix)
+            self.cuts = tuple(extract.cuts(self.timeline_prefix))
+            self.color = tuple(extract.average_color(self.timeline_prefix))
 
     def save(self, *args, **kwargs):
         if self.video and not self.info:
