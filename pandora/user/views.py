@@ -12,6 +12,7 @@ from django.utils import simplejson as json
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
 from django.db.models import Sum
+from django.shortcuts import redirect
 
 from ox.django.shortcuts import render_to_json_response, json_response, get_object_or_404_json
 from ox.django.decorators import admin_required_json, login_required_json
@@ -606,6 +607,16 @@ def editPreferences(request):
     return render_to_json_response(response)
 actions.register(editPreferences, cache=False)
 
+
+def reset_ui(request):
+    response = json_response()
+    if request.user.is_authenticated():
+        profile = request.user.get_profile()
+        profile.ui = {}
+        profile.save()
+    else:
+        request.session['ui'] = '{}'
+    return redirect('/')
 
 def resetUI(request):
     '''
