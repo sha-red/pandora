@@ -75,7 +75,6 @@ class File(models.Model):
 
     def set_state(self):
         self.path = self.create_path()
-        self.sort_path= utils.sort_string(self.path)
 
         if not os.path.splitext(self.path)[-1] in (
             '.srt', '.rar', '.sub', '.idx', '.txt', '.jpg', '.png', '.nfo') \
@@ -146,6 +145,7 @@ class File(models.Model):
     def save(self, *args, **kwargs):
         if self.auto:
             self.set_state()
+        self.sort_path= utils.sort_string(self.path)
         if self.is_subtitle:
             self.available = self.data and True or False
         else:
