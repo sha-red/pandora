@@ -78,6 +78,7 @@ def join_timelines(timelines, prefix):
     height = 64
     width = 1500
 
+    ox.makedirs(os.path.dirname(prefix))
     for f in glob('%s*'%prefix):
         os.unlink(f)
 
@@ -105,7 +106,6 @@ def join_timelines(timelines, prefix):
        timeline_name = '%s%sp%04d.png' % (prefix, height, i)
        timeline.crop((0, 0, pos, height)).save(timeline_name)
 
-    ox.makedirs(os.path.dirname(prefix))
     makeTiles(prefix, 16, 3600)
     makeTimelineOverview(prefix, 1920, height=16)
     makeTimelineOverview(prefix, 1920, height=64)
