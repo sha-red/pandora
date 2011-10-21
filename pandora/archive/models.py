@@ -489,6 +489,7 @@ class Stream(models.Model):
             extract.timeline(self.video.path, self.timeline_prefix)
             self.cuts = tuple(extract.cuts(self.timeline_prefix))
             self.color = tuple(extract.average_color(self.timeline_prefix))
+            self.save()
 
     def save(self, *args, **kwargs):
         if self.video and not self.info:
