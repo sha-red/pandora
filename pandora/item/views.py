@@ -426,7 +426,7 @@ actions.register(getItem)
 
 
 @login_required_json
-def editItem(request):
+def edit(request):
     '''
         param data {
             id: string,
@@ -445,11 +445,14 @@ def editItem(request):
             if request.user.get_profile().capability('canSeeNotes'):
                 item.notes = data['notes']
             del data['notes']
+        if 'rightsLevel' in data:
+            item.level = data['rightsLevel']
+            del data['rightsLevel']
         item.edit(data)
     else:
         response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
-actions.register(editItem, cache=False)
+actions.register(edit, cache=False)
 
 @login_required_json
 def remove(request):

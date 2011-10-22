@@ -584,7 +584,7 @@ def editPreferences(request):
             request.user.email = data['email']
     if 'password' in data:
         change = True
-        request.user.password = data['password']
+        request.user.set_password(data['password'])
     if change:
         request.user.save()
     if errors:

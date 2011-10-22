@@ -190,7 +190,8 @@ class Item(models.Model):
     def editable(self, user):
         if user.is_anonymous():
             return False
-        if user.is_staff or \
+        if user.get_profile().capability('canEditMetadata') == True or \
+           user.is_staff or \
            self.user == user or \
            self.groups.filter(id__in=user.groups.all()).count() > 0:
             return True

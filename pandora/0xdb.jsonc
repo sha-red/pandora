@@ -14,7 +14,7 @@
     */
     "capabilities": {
         "canDeleteItems": {"admin": true},
-        "canEditItemIcons": {"staff": true, "admin": true},
+        "canEditMetadata": {"staff": true, "admin": true},
         "canPlayClips": {"guest": 2, "member": 2, "friend": 3, "staff": 4, "admin": 4},
         "canPlayVideo": {"guest": 1, "member": 1, "friend": 3, "staff": 4, "admin": 4},
         "canReloadMetadata": {"staff": true, "admin": true},
@@ -196,7 +196,7 @@
             "type": ["string"],
             "autocomplete": true,
             "find": true,
-            "sort": "person"
+            "sort": "string"
         },
         {
             "id": "name",

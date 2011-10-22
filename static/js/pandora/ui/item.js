@@ -108,7 +108,7 @@ pandora.ui.item = function() {
                                 }
                             });
                             if(changed) {
-                                pandora.api.editItem(Ox.extend(changed, {id: pandora.user.ui.item}), function(result) {
+                                pandora.api.edit(Ox.extend(changed, {id: pandora.user.ui.item}), function(result) {
                                     //fixme just reload parts that need reloading
                                     window.location.reload();
                                 });    

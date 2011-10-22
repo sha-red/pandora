@@ -82,7 +82,7 @@ pandora.ui.filesView = function(options, self) {
                     operator: '+',
                     title: 'Path',
                     visible: true,
-                    width: 720
+                    width: 480
                 },
                 {
                     align: 'left',
@@ -194,7 +194,7 @@ pandora.ui.filesView = function(options, self) {
                 operator: '+',
                 title: 'Path',
                 visible: true,
-                width: 720
+                width: 480
             },
         ],
         columnsMovable: true,

@@ -281,7 +281,7 @@ class File(models.Model):
             'videoCodec': self.video_codec,
             'wanted': self.wanted,
         }
-        data['users'] = [i['user'] for i in data['instances']]
+        data['users'] = list(set([i['user'] for i in data['instances']]))
         if keys:
             for k in data.keys():
                 if k not in keys:

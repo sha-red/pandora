@@ -4,7 +4,7 @@ pandora.ui.infoView = function(data) {
     // when collapsing the movies browser, the info view should become a split panel
 
     var ui = pandora.user.ui,
-        canEditIcons = pandora.site.capabilities.canEditItemIcons[pandora.user.level],
+        canEdit = pandora.site.capabilities.canEditMetadata[pandora.user.level],
         borderRadius = ui.icons == 'posters' ? 0 : iconSize / 8,
         css = {
             marginTop: '4px',
@@ -30,7 +30,7 @@ pandora.ui.infoView = function(data) {
         $info = $('<div>')
             .css({
                 position: 'absolute',
-                left: canEditIcons && !ui.showIconBrowser ? -listWidth + 'px' : 0,
+                left: canEdit && !ui.showIconBrowser ? -listWidth + 'px' : 0,
                 top: 0,
                 right: 0,
             })
@@ -39,7 +39,7 @@ pandora.ui.infoView = function(data) {
         $data = Ox.Container()
             .css({
                 position: 'absolute',
-                left: (canEditIcons ? listWidth : 0) + 'px',
+                left: (canEdit ? listWidth : 0) + 'px',
                 top: 0,
                 right: 0,
                 height: pandora.$ui.contentPanel.size(1) + 'px'
@@ -377,7 +377,7 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($statistics);
 
-    if (canEditIcons) {
+    if (canEdit) {
         $icon.bindEvent({
             doubleclick: function() {
                 pandora.UI.set('showIconBrowser', !ui.showIconBrowser);
