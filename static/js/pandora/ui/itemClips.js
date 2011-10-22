@@ -75,11 +75,14 @@ pandora.ui.itemClips = function(options) {
             $img = $item.find('.OxIcon > img');
             points = [$item.data('in'), $item.data('out')];
             if ($img.length) {
-                pandora.api.get({id: self.options.id, keys: ['durations']}, function(result) {
+                pandora.api.get({id: self.options.id, keys: ['durations', 'rightsLevel']}, function(result) {
                     var partsAndPoints = pandora.getVideoPartsAndPoints(
                             result.data.durations, points
                         ),
                         $player = Ox.VideoPlayer({
+                            censored: pandora.site.capabilities.canPlayClips[pandora.user.level] < result.data.rightsLevel
+                                ? [{'in': partsAndPoints.points[0], out: partsAndPoints.points[1]}]
+                                : [],
                             enableMouse: true,
                             height: self.height,
                             'in': partsAndPoints.points[0],

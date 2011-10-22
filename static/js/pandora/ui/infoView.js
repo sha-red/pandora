@@ -358,7 +358,24 @@ pandora.ui.infoView = function(data) {
         .append(Ox.formatColor(data[key] || 0, key))
         .appendTo($statistics);
     });
-    
+
+    var rightsLevel = pandora.site.rightsLevels[data['rightsLevel']];
+    $('<div>')
+        .css({marginBottom: '4px'})
+        .append(formatKey('Rights Level', true))
+        .append(
+            $('<div>')
+                .css({
+                    paddingLeft: '3px',
+                    borderRadius: '4px',
+                    backgroundColor: 'rgb(' + rightsLevel.color.map(function(value) {
+                        return value - 128;
+                    }).join(', ') + ')',
+                    color: 'rgb(' + rightsLevel.color.join(', ') + ')'
+                })
+                .html(rightsLevel.name)
+        )
+        .appendTo($statistics);
 
     if (canEditIcons) {
         $icon.bindEvent({

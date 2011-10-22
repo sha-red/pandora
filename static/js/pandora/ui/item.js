@@ -6,8 +6,8 @@ pandora.ui.item = function() {
 
     pandora.api.get({
         id: pandora.user.ui.item,
-        keys: ['video', 'timeline'].indexOf(pandora.user.ui.itemView)>-1 ?
-              [ 'cuts', 'duration', 'layers', 'parts', 'rendered', 'size', 'title', 'videoRatio'] : []
+        keys: ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1 ?
+              [ 'cuts', 'duration', 'layers', 'parts', 'rendered', 'rightsLevel', 'size', 'title', 'videoRatio'] : []
     }, pandora.user.level == 'admin' && pandora.user.ui.itemView == 'info' ? 0 : -1, function(result) {
 
         if (result.status.code == 200) {
@@ -27,9 +27,39 @@ pandora.ui.item = function() {
             );
         }*/
 
+        if (['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
+            var subtitles = result.data.layers.subtitles
+                    ? result.data.layers.subtitles.map(function(subtitle) {
+                        return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
+                    })
+                    : [],
+                canPlayClips = pandora.site.capabilities.canPlayClips[pandora.user.level] >= result.data.rightsLevel,
+                canPlayVideo = pandora.site.capabilities.canPlayVideo[pandora.user.level] >= result.data.rightsLevel,
+                censored = canPlayVideo ? []
+                    : canPlayClips ? (
+                        subtitles.length
+                            ? Ox.merge(
+                                subtitles.map(function(subtitle, i) {
+                                    return {
+                                        'in': i == 0 ? 0 : subtitles[i - 1].out,
+                                        out: subtitle['in']
+                                    };
+                                }),
+                                [{'in': Ox.last(subtitles).out, out: result.data.duration}]
+                            )
+                            : Ox.range(0, result.data.duration - 5, 60).map(function(position) {
+                                return {
+                                    'in': position + 5,
+                                    out: Math.max(position + 60, result.data.duration)
+                                };
+                            })
+                    )
+                    : [{'in': 0, out: result.data.duration}];
+        }
+
         if (!result.data.rendered && [
             'clips', 'map', 'video', 'timeline'
-        ].indexOf(pandora.user.ui.itemView)>-1) {
+        ].indexOf(pandora.user.ui.itemView) > -1) {
             pandora.$ui.contentPanel.replaceElement(1,
                 Ox.Element()
                     .css({marginTop: '32px', fontSize: '12px', textAlign: 'center'})
@@ -120,6 +150,7 @@ pandora.ui.item = function() {
             //
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.player = Ox.VideoPanelPlayer({
                 annotationsSize: pandora.user.ui.annotationsSize,
+                censored: censored,
                 cuts: result.data.cuts || [],
                 duration: result.data.duration,
                 find: isClipsQuery ? clipsQuery.conditions[0].value : '',
@@ -134,10 +165,7 @@ pandora.ui.item = function() {
                 scaleToFill: pandora.user.ui.videoScale == 'fill',
                 showAnnotations: pandora.user.ui.showAnnotations,
                 showControls: pandora.user.ui.showControls,
-                subtitles: result.data.layers.subtitles ?
-                    result.data.layers.subtitles.map(function(subtitle) {
-                        return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
-                    }) : [],
+                subtitles: subtitles,
                 tooltips: true,
                 timeline: '/' + pandora.user.ui.item + '/timeline16p.png',
                 video: video,
@@ -186,6 +214,7 @@ pandora.ui.item = function() {
             });
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.editor = Ox.VideoEditor({
                 annotationsSize: pandora.user.ui.annotationsSize,
+                censored: censored,
                 cuts: result.data.cuts || [],
                 duration: result.data.duration,
                 find: isClipsQuery ? clipsQuery.conditions[0].value : '',
@@ -209,10 +238,7 @@ pandora.ui.item = function() {
                 showAnnotations: pandora.user.ui.showAnnotations,
                 showLargeTimeline: true,
                 // fixme: layers have value, subtitles has text?
-                subtitles: result.data.layers.subtitles ?
-                    result.data.layers.subtitles.map(function(subtitle) {
-                        return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
-                    }) : [],
+                subtitles: subtitles,
                 tooltips: true,
                 video: video,
                 videoRatio: result.data.videoRatio,

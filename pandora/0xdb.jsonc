@@ -15,13 +15,12 @@
     "capabilities": {
         "canDeleteItems": {"admin": true},
         "canEditItemIcons": {"staff": true, "admin": true},
-        "canPlayClips": {"guest": 1, "member": 2, "friend": 3, "staff": 4, "admin": 4},
-        "canPlayVideo": {"guest": 0, "member": 1, "friend": 3, "staff": 4, "admin": 4},
+        "canPlayClips": {"guest": 2, "member": 2, "friend": 3, "staff": 4, "admin": 4},
+        "canPlayVideo": {"guest": 1, "member": 1, "friend": 3, "staff": 4, "admin": 4},
         "canReloadMetadata": {"staff": true, "admin": true},
         "canSeeDebugMenu": {"admin": true},
         "canSeeFiles": {"staff": true, "admin": true},
-        "canSeeItem": {"guest": 2, "member": 2, "friend": 3, "staff": 4, "admin": 4},
-        "canSeeNotes": {"staff": true, "admin": true},
+        "canSeeItem": {"guest": 3, "member": 3, "friend": 3, "staff": 4, "admin": 4},
         "canSeeExtraItemViews": {"friend": true, "staff": true, "admin": true}
     },
     /*
@@ -528,11 +527,11 @@
     ],
     "rightsLevel": {"member": 5, "staff": 4, "admin": 3},
     "rightsLevels": [
-        {"name": "Public", "color": [0, 255, 0], "description": "Everyone can see and play."},
-        {"name": "Relaxed", "color": [128, 255, 0], "description": "Guests can't play video."},
-        {"name": "Regular", "color": [255, 255, 0], "description": "Guests can't play clips, members can't play video."},
-        {"name": "Restricted", "color": [255, 128, 0], "description": "Only staff and admin can see and play."},
-        {"name": "Private", "color": [255, 0, 0], "description": "Only admins can see and play."}
+        {"name": "Public", "color": [128, 255, 128], "description": "Everyone can see and play."},
+        {"name": "Relaxed", "color": [192, 255, 128], "description": "Guests can't play video."},
+        {"name": "Regular", "color": [255, 255, 128], "description": "Guests can't play clips, members can't play video."},
+        {"name": "Restricted", "color": [255, 192, 128], "description": "Only friend, staff and admin can see and play."},
+        {"name": "Private", "color": [255, 128, 128], "description": "Only staff and admin can see and play."}
     ],
     "sendReferrer": false,
     "site": {
