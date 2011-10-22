@@ -403,7 +403,8 @@ class Item(models.Model):
     def get_json(self, keys=None):
         i = {
             'id': self.itemId,
-            'rendered': self.rendered
+            'rendered': self.rendered,
+            'rightsLevel': self.level
         }
         i.update(self.external_data)
         i.update(self.data)
