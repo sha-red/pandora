@@ -14,6 +14,13 @@ pandora.UI = (function() {
         return !key ? self.previousUI : self.previousUI[key];
     };
 
+    that.reset = function() {
+        pandora.user.ui = pandora.site.user.ui;
+        pandora.user.ui._list = pandora.getListsState(pandora.user.ui.find);
+        pandora.user.ui._groupsState = pandora.getGroupsState(pandora.user.ui.find);
+        pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);        
+    };
+
     // sets pandora.user.ui.key to val
     // key foo.bar.baz sets pandora.user.ui.foo.bar.baz
     // val null removes a key

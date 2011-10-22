@@ -674,7 +674,8 @@ pandora.signin = function(data) {
     pandora.user.ui._groupsState = pandora.getGroupsState(pandora.user.ui.find);
     pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
     Ox.Theme(pandora.user.ui.theme);
-    pandora.UI.set({find: pandora.user.ui.find})
+    pandora.UI.set({find: pandora.user.ui.find});
+    Ox.Request.clearCache();
     pandora.$ui.appPanel.reload();
 };
 
@@ -684,7 +685,8 @@ pandora.signout = function(data) {
     pandora.user.ui._groupsState = pandora.getGroupsState(pandora.user.ui.find);
     pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
     Ox.Theme(pandora.site.user.ui.theme);
-    pandora.UI.set({find: pandora.user.ui.find})
+    pandora.UI.set({find: pandora.user.ui.find});
+    Ox.Request.clearCache();
     pandora.$ui.appPanel.reload();
 };
 
@@ -755,6 +757,64 @@ pandora.resizeFolders = function() {
     });
 };
 
+pandora.resizeWindow = function() {
+    pandora.resizeFolders();
+    pandora.$ui.leftPanel.size(2, pandora.getInfoHeight());
+    pandora.$ui.info.resizeInfo();
+    if (!pandora.user.ui.item) {
+        pandora.resizeGroups(pandora.$ui.rightPanel.width());
+        if (pandora.user.ui.listView == 'clips') {
+            var clipsItems = pandora.getClipsItems();
+                previousClipsItems = pandora.getClipsItems(pandora.$ui.list.options('width'));
+            pandora.$ui.list.options({
+                width: window.innerWidth
+                    - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
+                    - Ox.UI.SCROLLBAR_SIZE
+            });
+            if (clipsItems != previousClipsItems) {
+                Ox.Request.clearCache(); // fixme
+                pandora.$ui.list.reloadList(true);
+            }
+        } else if (pandora.user.ui.listView == 'timelines') {
+            pandora.$ui.list.options({
+                width: window.innerWidth
+                    - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
+                    - Ox.UI.SCROLLBAR_SIZE
+            });
+        } else if (pandora.user.ui.listView == 'map') {
+            pandora.$ui.map.resizeMap();
+        } else if (pandora.user.ui.listView == 'calendar') {
+            pandora.$ui.calendar.resizeCalendar();
+        } else {
+            pandora.$ui.list.size();
+        }
+    } else {
+        //Ox.print('pandora.$ui.window.resize');
+        pandora.$ui.browser.scrollToSelection();
+        if (pandora.user.ui.itemView == 'info') {
+            pandora.$ui.info.resize();
+        } else if (pandora.user.ui.itemView == 'clips') {
+            pandora.$ui.clips.size();
+        } else if (pandora.user.ui.itemView == 'video') {
+            pandora.$ui.player.options({
+               // fixme: duplicated
+               height: pandora.$ui.contentPanel.size(1),
+               width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+            });
+        } else if (pandora.user.ui.itemView == 'timeline') {
+            pandora.$ui.editor.options({
+                // fixme: duplicated
+                height: pandora.$ui.contentPanel.size(1),
+                width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+            });
+        } else if (pandora.user.ui.itemView == 'map') {
+            pandora.$ui.map.resizeMap();
+        } else if (pandora.user.ui.itemView == 'calendar') {
+            pandora.$ui.calendar.resizeCalendar();
+        }
+    }
+};
+
 pandora.selectList = function() {
     if (pandora.user.ui._list) {
         pandora.api.findLists({
@@ -777,6 +837,19 @@ pandora.selectList = function() {
             }
         });
     }
+};
+
+pandora.unloadWindow = function() {
+    // fixme: ajax request has to have async set to false for this to work
+    pandora.user.ui.section == 'items'
+        && pandora.user.ui.item
+        && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
+        && pandora.UI.set(
+            'videoPosition.' + pandora.user.ui.item,
+            pandora.$ui[
+                pandora.user.ui.itemView == 'video' ? 'player' : 'editor'
+            ].options('position')
+        );
 };
 
 (function() {

@@ -1,51 +1,69 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+
 pandora.autovalidateCode = function(value, blur, callback) {
-    value = value.toUpperCase().split('').map(function(v) {
-        return /[0-9A-Z]/.test(v) ? v : null;
-    }).join('');
-    callback(value);
+    value = value.split('').map(function(v) {
+        return /[A-Z]/.test(v) ? v : null;
+    }).join('').substr(0, 16);
+    callback({valid: value.length == 16, value: value});
 };
 
 pandora.autovalidateEmail = function(value, blur, callback) {
     value = value.toLowerCase().split('').map(function(v, i) {
         return /[0-9a-z\.\+\-_@]/.test(v) ? v : null;
-    }).join('');
-    callback(value);
+    }).join('').substr(0, 255);
+    callback({valid: Ox.isValidEmail(value), value: value});
 };
 
 pandora.autovalidateListname = function(value, blur, callback) {
+    // A valid listname consists of 1 to 255 unicode characters,
+    // without leading, trailing or consecutive spaces
     var length = value.length;
-    value = value.split('').map(function(v, i) {
-        if (new RegExp('[0-9' + Ox.regexp.letters + '\\(\\)' + ((i == 0 || (i == length - 1 && blur)) ? '' : ' \-') + ']', 'i').test(v)) {
-            return v;
-        } else {
-            return null;
-        }
+    value = value.toLowerCase().split('').map(function(v, i) {
+        return /\s/.test(v) && (i == 0 || (i == length - 1 && blur)) ? null : v;
     }).join('');
-    ['  ', ' -', '- ', '--', '\\(\\(', '\\)\\(', '\\)\\)'].forEach(function(v) {
-        //Ox.print(v, v[0], v[0] == '\\')
-        while (value.indexOf(v) > -1) {
-            value = value.replace(new RegExp(v, 'g'), v[0] + (v[0] == '\\' ? v[1] : ''));
-        }
-    });
-    callback(value);
+    value = value.replace(/\s+/g, ' ').substr(0, 255);
+    callback({valid: !!value.length, value: value});
 };
 
 pandora.autovalidateUsername = function(value, blur, callback) {
+    // A valid username consists of 1 to 255 unicode characters,
+    // without leading, trailing or consecutive spaces
     var length = value.length;
     value = value.toLowerCase().split('').map(function(v, i) {
-        if (new RegExp('[0-9a-z' + ((i == 0 || (i == length - 1 && blur)) ? '' : '\-_') + ']').test(v)) {
-            return v;
-        } else {
-            return null;
-        }
+        return /\s/.test(v) && (i == 0 || (i == length - 1 && blur)) ? null : v;
     }).join('');
-    ['--', '-_', '_-', '__'].forEach(function(v) {
-        while (value.indexOf(v) > -1) {
-            value = value.replace(new RegExp(v, 'g'), v[0]);
-        }
+    value = value.replace(/\s+/g, ' ').substr(0, 255);
+    callback({valid: !!value.length, value: value});
+};
+
+pandora.validateNewEmail = function(value, callback) {
+    value == pandora.user.email ? callback({
+        message: '',
+        valid: true,
+        value: value
+    }) : Ox.isValidEmail(value) ? pandora.api.findUser({
+        key: 'email',
+        value: value,
+        operator: '=='
+    }, function(result) {
+        callback({
+            message: 'E-mail address already exists',
+            valid: !result.data.users.length,
+            value: value
+        });
+    }) : callback({
+        message: (!value.length ? 'Missing' : 'Invalid') + ' e-mail address',
+        valid: false,
+        value: value
     });
-    callback(value);
+};
+
+pandora.validateNewPassword = function(value, callback) {
+    callback({
+        message: 'Missing password',
+        valid: value.length > 0,
+        value: value
+    });
 };
 
 pandora.validateUser = function(key, existing) {
@@ -56,7 +74,7 @@ pandora.validateUser = function(key, existing) {
         valid ? pandora.api.findUser({
             key: key,
             value: value,
-            operator: '='
+            operator: '=='
         }, function(result) {
             var valid = existing == !!result.data.users.length;
             //Ox.print(existing, result.data.users)

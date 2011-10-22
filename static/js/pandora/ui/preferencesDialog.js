@@ -26,24 +26,66 @@ pandora.ui.preferencesDialog = function() {
                                     width: 320
                                 }),
                                 Ox.Input({
-                                    id: 'password',
-                                    label: 'New Passowrd',
-                                    labelWidth: 120,
-                                    type: 'password',
-                                    width: 320
-                                }),
+                                        autovalidate: /.+/,
+                                        id: 'password',
+                                        label: 'New Password',
+                                        labelWidth: 120,
+                                        type: 'password',
+                                        validate: pandora.validateNewPassword,
+                                        width: 320
+                                    })
+                                    .bindEvent({
+                                        validate: function(data) {
+                                            data.valid && pandora.api.editPreferences({password: data.value});
+                                        }
+                                    }),
                                 Ox.Input({
-                                    id: 'email',
-                                    label: 'E-Mail Address',
-                                    labelWidth: 120,
-                                    value: pandora.user.email,
-                                    width: 320
-                                })
+                                        autovalidate: pandora.autovalidateEmail,
+                                        id: 'email',
+                                        label: 'E-Mail Address',
+                                        labelWidth: 120,
+                                        validate: pandora.validateNewEmail,
+                                        value: pandora.user.email,
+                                        width: 320
+                                    })
+                                    .bindEvent({
+                                        validate: function(data) {
+                                            if (data.valid && data.value != pandora.user.email) {
+                                                pandora.user.email = data.value;
+                                                pandora.api.editPreferences({email: data.value});
+                                            }
+                                        }
+                                    })
                             ]
                         })
                         .css({position: 'absolute', left: '96px', top: '16px'})
+                        .bindEvent({
+                            change: function(data) {
+                                return;
+                                var preferences = {};
+                                preferences[data.id] = data.data.value;
+                                pandora.api.editPreferences(preferences, function(result) {
+                                    if (data.id == 'email') {
+                                        pandora.user.email = data.data.value;
+                                    }
+                                });
+                            }
+                        })
                     );
                 } else {
+                    $content.append(
+                        Ox.Button({
+                            title: 'Reset UI Settings',
+                            width: 150
+                        })
+                        .bindEvent({
+                            click: function() {
+                                pandora.UI.reset();
+                                pandora.$ui.appPanel.reload();
+                            }
+                        })
+                        .css({position: 'absolute', left: '96px', top: '16px'})
+                    );
                     /*
                     content.append(Ox.FormElementGroup({
                         elements: [
