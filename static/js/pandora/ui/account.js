@@ -215,12 +215,7 @@ pandora.ui.accountForm = function(action, value) {
                 label: 'New Password',
                 labelWidth: 120,
                 type: 'password',
-                validate: function(value, callback) {
-                    callback({
-                        message: 'Missing password',
-                        valid: value.length > 0
-                    });
-                },
+                validate: pandora.validateNewPassword,
                 width: 320
             });
         } else if (type == 'newUsername') {
@@ -282,10 +277,12 @@ pandora.ui.accountForm = function(action, value) {
                             change: function(data) {
                                 var selected = data.selected[0].id;
                                 pandora.$ui.usernameOrEmailInput.options({
-                                    autovalidate: selected == 'username' ? pandora.autovalidateUsername : autovalidateEmail,
-                                    validate: validateUser(selected, true),
+                                    autovalidate: selected == 'username'
+                                        ? pandora.autovalidateUsername : pandora.autovalidateEmail,
+                                    validate: pandora.validateUser(selected, true),
                                     value: ''
                                 }).focus();
+                                pandora.$ui.accountDialog.disableButton('submitReset');
                             }
                         }),
                     pandora.$ui.usernameOrEmailInput = Ox.Input({
