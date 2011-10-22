@@ -192,7 +192,7 @@ def resetPassword(request):
             status: {'code': int, 'text': string}
             data: {
                 errors: {
-                    code: 'Invalid Code'
+                    code: 'Incorrect Code'
                 }
                 user {
                 }
@@ -226,7 +226,7 @@ def resetPassword(request):
             else:
                 response = json_response({
                     'errors': {
-                        'code': 'Invalid code'
+                        'code': 'Incorrect code'
                     }
                 })
 

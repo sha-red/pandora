@@ -1,7 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
 pandora.autovalidateCode = function(value, blur, callback) {
-    value = value.split('').map(function(v) {
+    value = value.toUpperCase().split('').map(function(v) {
         return /[A-Z]/.test(v) ? v : null;
     }).join('').substr(0, 16);
     callback({valid: value.length == 16, value: value});

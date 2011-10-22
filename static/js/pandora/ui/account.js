@@ -31,7 +31,7 @@ pandora.ui.accountDialogOptions = function(action, value) {
             signin: 'Sign In',
             signup: 'Sign Up',
             reset: 'Reset Password',
-            resetAndSignin: 'Reset Password and Sign In'
+            resetAndSignin: 'Sign In'
         },
         dialogText = {
             signin: 'To sign in to your account, please enter your username and password.',
@@ -67,16 +67,19 @@ pandora.ui.accountDialogOptions = function(action, value) {
                 id: type,
                 title: buttonTitle[type] + '...'
             }).bindEvent('click', function() {
-                //Ox.print('CLICK EVENT', type)
                 pandora.$ui.accountDialog.options(pandora.ui.accountDialogOptions(type));
             });
         }
     }
 
     return {
-        buttons: Ox.merge(buttons[action].map(function(type) {
+        buttons: Ox.merge(
+            buttons[action].map(function(type) {
                 return button(type);
-            }), [{}, button('cancel'), button('submit')]),
+            }),
+            buttons[action].length ? [{}] : [],
+            [button('cancel'), button('submit')]
+        ),
         content: Ox.Element()
             .append(
                 $('<img>')
