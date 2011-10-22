@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
+import os
 
 from django.db.models import Max, Sum
 from django.http import HttpResponseForbidden, Http404
+from django.conf import settings
 from ox.utils import json
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 from ox.django.http import HttpFileResponse
+
 
 import models
 from api.actions import actions
@@ -504,8 +507,14 @@ actions.register(sortLists, cache=False)
 def icon(request, id, size=16):
     if not size:
         size = 16
-    list = get_list_or_404_json(id)
-    icon = list.get_icon(int(size))
-    if icon:
-        return HttpFileResponse(icon, content_type='image/jpeg')
-    raise Http404
+
+    id = id.split(':')
+    username = id[0]
+    listname = ":".join(id[1:])
+    qs = models.List.objects.filter(user__username=username, name=listname)
+    if qs.count() == 1 and qs[0].accessible(request.user):
+        list = qs[0]
+        icon = list.get_icon(int(size))
+    else:
+        icon = os.path.join(settings.STATIC_ROOT, 'jpg/list.jpg')
+    return HttpFileResponse(icon, content_type='image/jpeg')

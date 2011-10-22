@@ -54,7 +54,7 @@ pandora.ui.info = function() {
             previousView = view;
         view = getView(); 
         if (view == 'list') {
-            that.empty().append(pandora.$ui.listInfo = pandora.ui.listInfo(ui._list));
+            that.empty().append(pandora.$ui.listInfo = pandora.ui.listInfo());
             previousView == 'video' && resizeInfo();
         } else if (view == 'poster') {
             pandora.api.get({id: id, keys: ['director', 'posterRatio', 'title']}, function(result) {
@@ -121,39 +121,55 @@ pandora.ui.info = function() {
 
 };
 
-pandora.ui.listInfo = function(list) {
-    var that = $('<div>').css({padding: '16px', textAlign: 'center'});
-    var $icon = $('<img>')
-        .attr({
-            src: list
-                ? '/list/' + list + '/icon256.jpg?' + Ox.uid()
-                : '/static/png/icon256.png'
-        })
-        .css(getIconCSS())
-        .appendTo(that),
-        title = list ? list.replace(':', ': ') : 'All ' + pandora.site.itemName.plural,
-        description = '';
+pandora.ui.listInfo = function() {
 
-    $('<div>').css({padding: '16px 0 16px 0', fontWeight: 'bold'}).html(title).appendTo(that);
+    var list = pandora.user.ui._list,
+        that = $('<div>').css({padding: '16px', textAlign: 'center'}),
+        $icon = $('<img>')
+            .attr({
+                src: list
+                    ? '/list/' + list + '/icon256.jpg?' + Ox.uid()
+                    : '/static/png/icon256.png'
+            })
+            .css(getIconCSS())
+            .appendTo(that);
+
     //fixme: allow editing
     //pandora.api.editList({id: list, description: 'foobbar'}, callback)
     //pandora.api.editPage({name: 'allItems', body: 'foobar'}, callback)
-    if(list) {
+    if (list) {
         pandora.api.findLists({
-            query: { conditions: [{key: 'id', value: list, operator:'=='}] },
-            keys:['description']
+            query: { conditions: [{key: 'id', value: list, operator: '=='}] },
+            keys: ['description']
         }, function(result) {
-            $('<div>').css({textAlign: 'left'})
-                      .html(result.data.items[0].description)
-                      .appendTo(that);
+            if (result.data.items.length) {
+                that.append(
+                    $('<div>')
+                        .css({paddingTop: '16px', fontWeight: 'bold'})
+                        .html(Ox.encodeHTML(list))
+                ).append(
+                    $('<div>')
+                        .css({paddingTop: '16px', textAlign: 'left'})
+                        .html(
+                            result.data.items.length
+                            ? result.data.items[0].description
+                            : 'List not found'
+                        )
+                );
+            } else {
+                that.append(
+                    $('<div>')
+                        .css({paddingTop: '16px',})
+                        .html('List not found')
+                );
+            }
         });
-    }
-    else {
-        pandora.api.getPage({name: 'allItems'}, function(result) {
-            $('<div>').css({textAlign: 'left'})
-                      .html(result.data.body)
-                      .appendTo(that);
-        });
+    } else {
+        that.append(
+            $('<div>')
+                .css({paddingTop: '16px', fontWeight: 'bold'})
+                .html('All ' + pandora.site.itemName.plural)
+        );
     }
 
     function getIconCSS() {

@@ -10,7 +10,7 @@ import models
 
 from ox.django.query import QuerySet
 
-def parseCondition(condition):
+def parseCondition(condition, user):
     '''
     condition: {
             value: "war"
@@ -38,8 +38,8 @@ def parseCondition(condition):
         exclude = False
 
     if isinstance(v, list):
-        q = parseCondition({'key': k, 'value': v[0], 'operator': '>='}) \
-            & parseCondition({'key': k, 'value': v[1], 'operator': '<'})
+        q = parseCondition({'key': k, 'value': v[0], 'operator': '>='}, user) \
+            & parseCondition({'key': k, 'value': v[1], 'operator': '<'}, user)
         if exclude:
             return ~q
         else:
@@ -109,14 +109,17 @@ def parseCondition(condition):
         if len(l) >= 2:
             l = (l[0], ":".join(l[1:]))
             lqs = list(List.objects.filter(name=l[1], user__username=l[0]))
-            if len(lqs) == 1:
-                l = lqs[0]
-                if l.query.get('static', False) == False:
-                    data = l.query
-                    q = parseConditions(data.get('conditions', []),
-                                        data.get('operator', '&'))
-                else:
-                    q = Q(id__in=l.items.all())
+            if len(lqs) == 1 and lqs[0].accessible(user):
+                    l = lqs[0]
+                    if l.query.get('static', False) == False:
+                        data = l.query
+                        q = parseConditions(data.get('conditions', []),
+                                            data.get('operator', '&'),
+                                            user)
+                    else:
+                        q = Q(id__in=l.items.all())
+            else:
+                q = Q(id=0)
         return q
     else: #number or date
 
@@ -146,7 +149,7 @@ def parseCondition(condition):
             return Q(**{'find__key': k, vk: v})
 
 
-def parseConditions(conditions, operator):
+def parseConditions(conditions, operator, user):
     '''
     conditions: [
         {
@@ -169,12 +172,12 @@ def parseConditions(conditions, operator):
     for condition in conditions:
         if 'conditions' in condition:
             q = parseConditions(condition['conditions'],
-                             condition.get('operator', '&'))
+                             condition.get('operator', '&'), user)
             if q:
                 conn.append(q)
             pass
         else:
-            conn.append(parseCondition(condition))
+            conn.append(parseCondition(condition, user))
     if conn:
         q = conn[0]
         for c in conn[1:]:
@@ -209,7 +212,8 @@ class ItemManager(Manager):
                     if lqs[0].query:
                         data = lqs[0].query
                         conditions = parseConditions(data['query']['conditions'],
-                                                     data['query'].get('operator', '&'))
+                                                     data['query'].get('operator', '&'),
+                                                     user)
                         qs = qs.filter(conditions)
                     else:
                         qs = qs.filter(id__in=lqs[0].items.all())
@@ -241,7 +245,8 @@ class ItemManager(Manager):
         qs = self.get_query_set()
         #only include items that have hard metadata
         conditions = parseConditions(data.get('query', {}).get('conditions', []),
-                                     data.get('query', {}).get('operator', '&'))
+                                     data.get('query', {}).get('operator', '&'),
+                                     user)
         qs = qs.filter(conditions)
         qs = qs.distinct()
         

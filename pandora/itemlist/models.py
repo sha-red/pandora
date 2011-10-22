@@ -84,6 +84,9 @@ class List(models.Model):
     def get_id(self):
         return u'%s:%s' % (self.user.username, self.name)
 
+    def accessible(self, user):
+        return self.user == user or self.status in ('public', 'featured')
+
     def editable(self, user):
         #FIXME: make permissions work
         if self.user == user or user.is_staff:
