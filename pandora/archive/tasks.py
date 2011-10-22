@@ -3,8 +3,10 @@
 from celery.decorators import task
 import ox
 
-from item.models import get_item
 from django.conf import settings
+
+from item.models import get_item, Item
+import item.tasks
 
 import models
 
@@ -12,7 +14,7 @@ import models
 _INSTANCE_KEYS = ('mtime', 'path')
 
 def get_or_create_item(volume, info, user):
-    item_info = ox.parse_movie_info(info['path'])
+    item_info = ox.parse_movie_path(info['path'])
     return get_item(item_info, user)
 
 def get_or_create_file(volume, f, user, item=None):
@@ -67,17 +69,23 @@ def update_files(user, volume, files):
     user = models.User.objects.get(username=user)
     volume, created = models.Volume.objects.get_or_create(user=user, name=volume)
     all_files = []
+    #ignore extras etc,
+    #imdb stlye is L/Last, First/Title (Year)/Title.. 4
+    #otherwise  T/Title (Year)/Title... 3
+    folder_depth = settings.USE_IMDB and 4 or 3
     for f in files:
-        #ignore extras etc,
-        #imdb stlye is L/Last, First/Title (Year)/Title.. 4
-        #otherwise  T/Title (Year)/Title... 3
-        folder_depth = settings.USE_IMDB and 4 or 3
         if len(f['path'].split('/')) == folder_depth:
             all_files.append(f['oshash'])
             update_or_create_instance(volume, f)
 
     #remove deleted files
-    models.Instance.objects.filter(volume=volume).exclude(file__oshash__in=all_files).delete()
+    removed = models.Instance.objects.filter(volume=volume).exclude(file__oshash__in=all_files)
+    ids = [i['itemId'] for i in Item.objects.filter(
+           files__instances__in=removed.filter(file__selected=True)).distinct().values('itemId')]
+    removed.delete()
+    for i in ids:
+        i = Item.objects.get(itemId=i)
+        i.update_selected()
 
 @task(queue="encoding")
 def process_stream(fileId):

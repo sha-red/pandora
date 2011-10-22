@@ -387,7 +387,7 @@ class Item(models.Model):
         layers = {}
         for l in Layer.objects.all():
             ll = layers.setdefault(l.name, [])
-            qs = Annotation.objects.filter(layer=l, item=self).select_related()
+            qs = Annotation.objects.filter(layer=l, item=self)
             if l.name == 'subtitles':
                 qs = qs.exclude(value='')
             if l.private:
@@ -850,8 +850,22 @@ class Item(models.Model):
     def update_timeline(self, force=False):
         streams = self.streams()
         self.make_timeline()
-        self.data['cuts'] = extract.cuts(self.timeline_prefix)
-        self.data['color'] = extract.average_color(self.timeline_prefix)
+        if streams.count() == 1:
+            self.data['color'] = streams[0].color
+            self.data['cuts'] = streams[0].cuts
+        else:
+            #self.data['color'] = extract.average_color(self.timeline_prefix)
+            #self.data['cuts'] = extract.cuts(self.timeline_prefix)
+            self.data['cuts'] = []
+            offset = 0
+            color = [0, 0, 0]
+            n = streams.count()
+            for s in streams:
+                for c in s.cuts:
+                    self.data['cuts'].append(c+offset)
+                    color = map(lambda a,b: (a+b)/n, color,ox.image.getRGB(s.color))
+                offset += s.duration
+            self.data['color'] = ox.image.getHSL(color)
         #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
         self.select_frame()
         self.make_local_poster()
