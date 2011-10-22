@@ -366,7 +366,8 @@ def findUser(request):
     '''
         param data {
             key: "username",
-            value: "foo", operator: "="
+            value: "foo",
+            operator: "=="
             keys: []
         }
 
