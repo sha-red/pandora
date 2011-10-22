@@ -268,7 +268,8 @@ def requestToken(request):
             user = None
     if user:
         while True:
-            code = ox.to26(random.randint(32768, 1048575))
+            code = ox.to26(random.randint(ox.from26('BAAAAAAAAAAAAAAA'),
+                                          ox.from26('BAAAAAAAAAAAAAAAA')))
             if models.UserProfile.objects.filter(reset_code=code).count() == 0:
                 break
         user_profile = user.get_profile()

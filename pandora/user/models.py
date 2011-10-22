@@ -16,7 +16,7 @@ from itemlist.models import List, Position
 
 
 class UserProfile(models.Model):
-    reset_code = models.TextField(blank=True, null=True, unique=True)
+    reset_code = models.CharField(max_length=255, blank=True, null=True, unique=True)
     user = models.ForeignKey(User, unique=True, related_name='profile')
 
     level = models.IntegerField(default=1)
