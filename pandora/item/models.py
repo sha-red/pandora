@@ -159,6 +159,8 @@ class Item(models.Model):
                                upload_to=lambda i, x: i.path('torrent.torrent'))
     stream_info = fields.DictField(default={}, editable=False)
 
+    notes = models.TextField(default='')
+
     #stream related fields
     stream_aspect = models.FloatField(default=4/3)
 
@@ -401,7 +403,8 @@ class Item(models.Model):
     def get_json(self, keys=None):
         i = {
             'id': self.itemId,
-            'rendered': self.rendered
+            'rendered': self.rendered,
+            'rightsLevel': self.level
         }
         i.update(self.external_data)
         i.update(self.data)

@@ -4,7 +4,6 @@ import random
 random.seed()
 import re
 
-from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext, loader
@@ -12,6 +11,7 @@ from django.utils import simplejson as json
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError
 from django.db.models import Sum
+from django.shortcuts import redirect
 
 from ox.django.shortcuts import render_to_json_response, json_response, get_object_or_404_json
 from ox.django.decorators import admin_required_json, login_required_json
@@ -24,11 +24,6 @@ from item import utils
 
 import models
 import managers
-
-
-class SigninForm(forms.Form):
-    username = forms.TextInput()
-    password = forms.TextInput()
 
 
 def signin(request):
@@ -52,9 +47,10 @@ def signin(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    form = SigninForm(data, request.FILES)
-    if form.is_valid():
-        if models.User.objects.filter(username=form.data['username']).count() == 0:
+    if 'username' in data and 'password' in data:
+        data['username'] = data['username'].strip()
+        data['password'] = data['password'].strip()
+        if models.User.objects.filter(username=data['username']).count() == 0:
             response = json_response({
                 'errors': {
                     'username': 'Unknown Username'
@@ -112,12 +108,6 @@ def signout(request):
 actions.register(signout, cache=False)
 
 
-class SignupForm(forms.Form):
-    username = forms.TextInput()
-    password = forms.TextInput()
-    email = forms.TextInput()
-
-
 def signup(request):
     '''
         param data {
@@ -140,21 +130,22 @@ def signup(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    form = SignupForm(data, request.FILES)
-    if form.is_valid():
-        if models.User.objects.filter(username=form.data['username']).count() > 0:
+    if 'username' in data and 'password' in data:
+        data['username'] = data['username'].strip()
+        data['password'] = data['password'].strip()
+        if models.User.objects.filter(username=data['username']).count() > 0:
             response = json_response({
                 'errors': {
                     'username': 'Username already exists'
                 }
             })
-        elif models.User.objects.filter(email=form.data['email']).count() > 0:
+        elif models.User.objects.filter(email=data['email']).count() > 0:
             response = json_response({
                 'errors': {
                     'email': 'Email address already exits'
                 }
             })
-        elif not form.data['password']:
+        elif not data['password']:
             response = json_response({
                 'errors': {
                     'password': 'Password can not be empty'
@@ -162,8 +153,8 @@ def signup(request):
             })
         else:
             first_user = models.User.objects.count() == 0
-            user = models.User(username=form.data['username'], email=form.data['email'])
-            user.set_password(form.data['password'])
+            user = models.User(username=data['username'], email=data['email'])
+            user.set_password(data['password'])
             #make first user admin
             user.is_superuser = first_user
             user.is_staff = first_user
@@ -176,8 +167,8 @@ def signup(request):
                         setattr(list, key, l[key])
                 list.save()
 
-            user = authenticate(username=form.data['username'],
-                                password=form.data['password'])
+            user = authenticate(username=data['username'],
+                                password=data['password'])
             login(request, user)
             user_json = models.init_user(user)
             response = json_response({
@@ -375,7 +366,8 @@ def findUser(request):
     '''
         param data {
             key: "username",
-            value: "foo", operator: "="
+            value: "foo",
+            operator: "=="
             keys: []
         }
 
@@ -528,12 +520,6 @@ Positions
 actions.register(findUsers)
 
 
-class ContactForm(forms.Form):
-    email = forms.EmailField()
-    subject = forms.TextInput()
-    message = forms.TextInput()
-
-
 def contact(request):
     '''
         param data {
@@ -547,8 +533,7 @@ def contact(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    form = ContactForm(data, request.FILES)
-    if form.is_valid():
+    if 'email' in data and 'message' in data:
         email = data['email']
         template = loader.get_template('contact_email.txt')
         context = RequestContext(request, {
@@ -606,6 +591,16 @@ def editPreferences(request):
     return render_to_json_response(response)
 actions.register(editPreferences, cache=False)
 
+
+def reset_ui(request):
+    response = json_response()
+    if request.user.is_authenticated():
+        profile = request.user.get_profile()
+        profile.ui = {}
+        profile.save()
+    else:
+        request.session['ui'] = '{}'
+    return redirect('/')
 
 def resetUI(request):
     '''

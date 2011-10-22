@@ -504,14 +504,9 @@ class Stream(models.Model):
             self.file.save()
 
     def json(self):
-        if settings.XSENDFILE or settings.XACCELREDIRECT:
-            base_url = '/%s' % self.file.item.itemId
-        else:
-            base_url = os.path.dirname(self.video.url)
         return {
             'duration': self.duration,
             'aspectRatio': self.aspect_ratio,
-            'baseUrl': base_url
         }
 
 def delete_stream(sender, **kwargs):

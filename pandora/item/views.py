@@ -395,6 +395,9 @@ def get(request):
             info['layers'] = item.get_layers(request.user)
         if data['keys'] and 'files' in data['keys']:
             info['files'] = item.get_files(request.user)
+        if not data['keys'] or 'notes' in data['keys'] \
+           and request.user.get_profile().capability('canSeeNotes'):
+            info['notes'] = item.notes
         response['data'] = info
     else:
         response = json_response(status=403, text='permission denied')
@@ -438,6 +441,10 @@ def editItem(request):
     item = get_object_or_404_json(models.Item, itemId=data['id'])
     if item.editable(request.user):
         response = json_response(status=200, text='ok')
+        if 'notes' in data:
+            if request.user.get_profile().capability('canSeeNotes'):
+                item.notes = data['notes']
+            del data['notes']
         item.edit(data)
     else:
         response = json_response(status=403, text='permissino denied')

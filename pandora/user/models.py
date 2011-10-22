@@ -42,6 +42,9 @@ class UserProfile(models.Model):
     def get_level(self):
         return settings.CONFIG['userLevels'][self.level]
 
+    def capability(self, capability):
+        return settings.CONFIG['capabilities'][capability].get(self.get_level()) == True
+
 def user_post_save(sender, instance, **kwargs):
     profile, new = UserProfile.objects.get_or_create(user=instance)
 
