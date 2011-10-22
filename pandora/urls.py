@@ -48,7 +48,7 @@ urlpatterns += patterns('',
     (r'^(V[a-z0-9]*/.*)$', 'urlalias.views.padma_video'),
 )
 urlpatterns += patterns('',
-    (r'^.*?embed$', 'app.views.embed'),
+    (r'^(?P<id>[A-Z0-9].+)/embed', 'app.views.embed'),
     (r'^[A-Z0-9].*$', 'app.views.index'),
     (r'^[a-z0-9].+$', 'app.views.index'),
     (r'^$', 'app.views.index'),
