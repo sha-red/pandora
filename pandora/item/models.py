@@ -159,6 +159,8 @@ class Item(models.Model):
                                upload_to=lambda i, x: i.path('torrent.torrent'))
     stream_info = fields.DictField(default={}, editable=False)
 
+    notes = models.TextField(default='')
+
     #stream related fields
     stream_aspect = models.FloatField(default=4/3)
 
