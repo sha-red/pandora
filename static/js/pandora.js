@@ -63,8 +63,14 @@ Ox.load({
                         body: $('body'),
                         document: $(document),
                         window: $(window)
-                            .resize(resizeWindow)
-                            .unload(unloadWindow)
+                            .bind({
+                                resize: function() {
+                                    pandora.resizeWindow();
+                                },
+                                unload: function() {
+                                    pandora.unloadWindow();
+                                }
+                            })
                     },
                     site: data.site,
                     user: data.user.level == 'guest' ? Ox.clone(data.site.user) : data.user
@@ -166,77 +172,6 @@ Ox.load({
                     throw new Error('File not found.')
                 });
         });            
-    }
-
-    function resizeWindow() {
-        pandora.resizeFolders();
-        pandora.$ui.leftPanel.size(2, pandora.getInfoHeight());
-        pandora.$ui.info.resizeInfo();
-        if (!pandora.user.ui.item) {
-            pandora.resizeGroups(pandora.$ui.rightPanel.width());
-            if (pandora.user.ui.listView == 'clips') {
-                var clipsItems = pandora.getClipsItems();
-                    previousClipsItems = pandora.getClipsItems(pandora.$ui.list.options('width'));
-                pandora.$ui.list.options({
-                    width: window.innerWidth
-                        - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
-                        - Ox.UI.SCROLLBAR_SIZE
-                });
-                if (clipsItems != previousClipsItems) {
-                    Ox.Request.clearCache(); // fixme
-                    pandora.$ui.list.reloadList(true);
-                }
-            } else if (pandora.user.ui.listView == 'timelines') {
-                pandora.$ui.list.options({
-                    width: window.innerWidth
-                        - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
-                        - Ox.UI.SCROLLBAR_SIZE
-                });
-            } else if (pandora.user.ui.listView == 'map') {
-                pandora.$ui.map.resizeMap();
-            } else if (pandora.user.ui.listView == 'calendar') {
-                pandora.$ui.calendar.resizeCalendar();
-            } else {
-                pandora.$ui.list.size();
-            }
-        } else {
-            //Ox.print('pandora.$ui.window.resize');
-            pandora.$ui.browser.scrollToSelection();
-            if (pandora.user.ui.itemView == 'info') {
-                pandora.$ui.info.resize();
-            } else if (pandora.user.ui.itemView == 'clips') {
-                pandora.$ui.clips.size();
-            } else if (pandora.user.ui.itemView == 'video') {
-                pandora.$ui.player.options({
-                   // fixme: duplicated
-                   height: pandora.$ui.contentPanel.size(1),
-                   width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
-                });
-            } else if (pandora.user.ui.itemView == 'timeline') {
-                pandora.$ui.editor.options({
-                    // fixme: duplicated
-                    height: pandora.$ui.contentPanel.size(1),
-                    width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
-                });
-            } else if (pandora.user.ui.itemView == 'map') {
-                pandora.$ui.map.resizeMap();
-            } else if (pandora.user.ui.itemView == 'calendar') {
-                pandora.$ui.calendar.resizeCalendar();
-            }
-        }
-    }
-
-    function unloadWindow() {
-        // fixme: ajax request has to have async set to false for this to work
-        pandora.user.ui.section == 'items'
-            && pandora.user.ui.item
-            && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
-            && pandora.UI.set(
-                'videoPosition.' + pandora.user.ui.item,
-                pandora.$ui[
-                    pandora.user.ui.itemView == 'video' ? 'player' : 'editor'
-                ].options('position')
-            );
     }
 
 });
