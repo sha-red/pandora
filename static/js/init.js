@@ -29,7 +29,7 @@ Ox.load({
         hideScreen: false,
         loadImages: true,
         showScreen: true,
-        theme: localStorage?localStorage.theme:'modern'
+        theme: localStorage && localStorage.theme ? localStorage.theme : 'modern'
     },
     Geo: {}
 }, function(browserSupported) {
