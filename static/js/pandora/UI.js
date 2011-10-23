@@ -79,6 +79,9 @@ pandora.UI = (function() {
         var item = args['item'] || pandora.user.ui.item,
             list = pandora.user.ui._list || '';
         Ox.print('item/list', item, list, '...', args['videoPoints.' + item])
+        if (!pandora.user.ui.lists[list]) {
+            add['lists.' + that.encode(list)] = {};
+        }
         Ox.forEach(args, function(val, key) {
             if (Object.keys(listSettings).indexOf(key) > -1) {
                 // if applicable, copy setting to list setting

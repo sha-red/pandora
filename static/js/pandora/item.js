@@ -149,7 +149,7 @@ pandora.ui.item = function() {
             // fixme: duplicated
             var clipsQuery = pandora.getClipsQuery(),
                 isClipsQuery = !!clipsQuery.conditions.length;
-            //
+            // ...
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.player = Ox.VideoPanelPlayer({
                 annotationsSize: pandora.user.ui.annotationsSize,
                 censored: censored,
