@@ -4,3 +4,5 @@ lib
 include
 src
 bin
+static/json/pandora.json
+static/js/pandora.js
