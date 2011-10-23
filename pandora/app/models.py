@@ -10,6 +10,7 @@ import thread
 from django.db import models
 from django.conf import settings
 import ox.jsonc
+from ox.utils import json
 
 _win = (sys.platform == "win32")
 
@@ -52,3 +53,28 @@ def reloader_thread():
         time.sleep(1)
 
 thread.start_new_thread(reloader_thread, ())
+
+def update_static():
+    oxjs_build = os.path.join(settings.STATIC_ROOT, 'oxjs/tools/build/build.py')
+    if os.path.exists(oxjs_build):
+        os.system(oxjs_build)
+
+    data = ''
+    js = []
+    pandora_js = os.path.join(settings.STATIC_ROOT, 'js/pandora.js')
+    pandora_json = os.path.join(settings.STATIC_ROOT, 'json/pandora.json')
+    for root, folders, files in os.walk(os.path.join(settings.STATIC_ROOT, 'js/pandora')):
+        for f in files:
+            js.append(os.path.join(root, f)[len(settings.STATIC_ROOT)+1:])
+            with open(os.path.join(root, f)) as j:
+                data += j.read() + '\n'
+
+    print 'write', pandora_js
+    with open(pandora_js, 'w') as f:
+        #data = ox.js.minify(data)
+        f.write(data)
+
+    print 'write', pandora_json
+    with open(pandora_json, 'w') as f:
+        json.dump(sorted(js), f, indent=2)
+    
