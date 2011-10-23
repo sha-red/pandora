@@ -3,7 +3,6 @@
 
 from django.contrib import admin
 
-from forms import FileAdminForm, InstanceAdminForm
 import models
 
 
@@ -15,13 +14,11 @@ class FileAdmin(admin.ModelAdmin):
     def itemId(self, obj):
         return '%s'%(obj.item.itemId)
 
-    form = FileAdminForm
 
 admin.site.register(models.File, FileAdmin)
 
 
 class InstanceAdmin(admin.ModelAdmin):
     search_fields = ['path', 'volume__name', 'file__oshash']
-    form = InstanceAdminForm
 
 admin.site.register(models.Instance, InstanceAdmin)

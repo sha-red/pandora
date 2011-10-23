@@ -28,6 +28,7 @@ pandora.ui.item = function() {
         }*/
 
         if (['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
+            // fixme: layers have value, subtitles has text?
             var subtitles = result.data.layers.subtitles
                     ? result.data.layers.subtitles.map(function(subtitle) {
                         return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
@@ -54,7 +55,19 @@ pandora.ui.item = function() {
                                 };
                             })
                     )
-                    : [{'in': 0, out: result.data.duration}];
+                    : [{'in': 0, out: result.data.duration}],
+                layers = [],
+                video = {};
+
+            pandora.site.layers.forEach(function(layer, i) {
+                layers[i] = Ox.extend({}, layer, {items: result.data.layers[layer.id]});
+            });
+            pandora.site.video.resolutions.forEach(function(resolution) {
+                video[resolution] = Ox.range(result.data.parts).map(function(i) {
+                    return '/' + pandora.user.ui.item + '/'
+                        + resolution + 'p' + (i + 1) + '.' + pandora.user.videoFormat;
+                });
+            });
         }
 
         if (!result.data.rendered && [
@@ -64,7 +77,7 @@ pandora.ui.item = function() {
                 Ox.Element()
                     .css({marginTop: '32px', fontSize: '12px', textAlign: 'center'})
                     .html(
-                        'Sorry, <i>' + result.data.title 
+                        'Sorry, <i>' + result.data.title
                         + '</i> currently doesn\'t have a '
                         + pandora.user.ui.itemView + ' view.'
                     )
@@ -135,18 +148,7 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'video') {
             // fixme: duplicated
             var clipsQuery = pandora.getClipsQuery(),
-                isClipsQuery = !!clipsQuery.conditions.length,
-                layers = [],
-                video = {};
-            pandora.site.layers.forEach(function(layer, i) {
-                layers[i] = Ox.extend({}, layer, {items: result.data.layers[layer.id]});
-            });
-            pandora.site.video.resolutions.forEach(function(resolution) {
-                video[resolution] = Ox.range(result.data.parts).map(function(i) {
-                    return '/' + pandora.user.ui.item + '/'
-                        + resolution + 'p' + (i + 1) + '.' + pandora.user.videoFormat;
-                });
-            });
+                isClipsQuery = !!clipsQuery.conditions.length;
             //
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.player = Ox.VideoPanelPlayer({
                 annotationsSize: pandora.user.ui.annotationsSize,
@@ -200,18 +202,7 @@ pandora.ui.item = function() {
 
         } else if (pandora.user.ui.itemView == 'timeline') {
             var clipsQuery = pandora.getClipsQuery(),
-                isClipsQuery = !!clipsQuery.conditions.length,
-                layers = [],
-                video = {};
-            pandora.site.layers.forEach(function(layer) {
-                layers.push(Ox.extend({items: result.data.layers[layer.id]}, layer));
-            });
-            pandora.site.video.resolutions.forEach(function(resolution) {
-                video[resolution] = Ox.range(result.data.parts).map(function(i) {
-                    return '/' + pandora.user.ui.item + '/'
-                        + resolution + 'p' + (i + 1) + '.' + pandora.user.videoFormat;
-                });
-            });
+                isClipsQuery = !!clipsQuery.conditions.length;
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.editor = Ox.VideoEditor({
                 annotationsSize: pandora.user.ui.annotationsSize,
                 censored: censored,
@@ -237,7 +228,6 @@ pandora.ui.item = function() {
                 posterFrame: parseInt(video.duration / 2),
                 showAnnotations: pandora.user.ui.showAnnotations,
                 showLargeTimeline: true,
-                // fixme: layers have value, subtitles has text?
                 subtitles: subtitles,
                 tooltips: true,
                 video: video,

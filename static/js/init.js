@@ -29,7 +29,7 @@ Ox.load({
         hideScreen: false,
         loadImages: true,
         showScreen: true,
-        theme: 'modern'
+        theme: localStorage?localStorage.theme:'modern'
     },
     Geo: {}
 }, function(browserSupported) {
@@ -54,7 +54,7 @@ Ox.load({
                 ui: {}
             });
 
-            loadResources('/static/json/pandora.json', function() {
+            loadResources(function() {
 
                 Ox.print('Ox.App load', data);
 
@@ -144,34 +144,33 @@ Ox.load({
                     
                 });
 
-            }, '/static/'); // fixme: why does loadResources have an argument after callback????
+            });
         }
     });
 
-    function loadResources(json, callback, prefix) {
-        prefix = prefix || '';
-        $.getJSON(json, function(files) {
-            var promises = [];
-            files.forEach(function(file) {
-                // fixme: opera doesnt fire onload for svgs
-                // (but neither do we support opera nor do we have svgs)
-                if ($.browser.opera && Ox.endsWith(file, '.svg')) {
-                    return;
-                }
-                var dfd = new $.Deferred();
-                promises.push(dfd.promise());
-                Ox.loadFile(prefix + file, function() {
-                    dfd.resolve();
+    function loadResources(callback) {
+        var prefix = '/static/';
+        if(localStorage && localStorage.debug) {
+            Ox.getJSON(prefix + 'json/pandora.json', function(files) {
+                var promises = [];
+                files.forEach(function(file) {
+                    var dfd = new $.Deferred();
+                    promises.push(dfd.promise());
+                    Ox.loadFile(prefix + file, function() {
+                        dfd.resolve();
+                    });
                 });
+                $.when.apply(null, promises)
+                    .done(function() {
+                        callback();
+                    })
+                    .fail(function() {
+                        throw new Error('File not found.');
+                    });
             });
-            $.when.apply(null, promises)
-                .done(function() {
-                    callback();
-                })
-                .fail(function() {
-                    throw new Error('File not found.')
-                });
-        });            
+        } else {
+            Ox.loadFile(prefix + 'js/pandora.js', callback);
+        }
     }
 
 });
