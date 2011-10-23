@@ -218,15 +218,12 @@ pandora.ui.folderList = function(id) {
                 }
             ];
             items = function(data, callback) {
-                var volumes = pandora.user.volumes || [
-                    {"name": "Movies A-M", "path": "/Volumes/Movies A-M", "items": 1234},
-                    {"name": "Movies N-Z", "path": "/Volumes/Movies N-Z", "items": 987}
-                ];
+                var volumes = pandora.user.volumes || [];
                 if (!data.keys) {
                     data = {items: volumes.length};
                 } else {
                     data = {items: volumes.map(function(volume) {
-                        return Ox.extend({id: volume.name, user: pandora.user.username, mounted: volume.name == 'Movies A-M'}, volume);
+                        return Ox.extend({id: volume.name, user: pandora.user.username}, volume);
                     })};
                 }
                 // fixme: ridiculous (we're binding to init too late)

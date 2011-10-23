@@ -46,6 +46,9 @@ pandora.ui.filesView = function(options, self) {
     self.$filesList = Ox.TextList({
             columns: [
                 {
+                    clickable: function(data) {
+                        return true;
+                    },
                     format: function(value, data) {
                         Ox.print('File', value, data.wanted, data);
                         return $('<img>')
@@ -65,6 +68,11 @@ pandora.ui.filesView = function(options, self) {
                     title: $('<img>').attr({
                         src: Ox.UI.getImageURL('symbolCheck')
                     }),
+                    tooltip: function (data) {
+                        return data.instances.filter(function(i) {return i.ignore; }).length > 0
+                            ? 'Use this file'
+                            : 'Dont use this file';
+                    },
                     visible: true,
                     width: 16
                 },
@@ -166,8 +174,21 @@ pandora.ui.filesView = function(options, self) {
             sort: [{key: 'path', operator: '+'}]
         })
         .bindEvent({
+            click: function(data) {
+                if (data.key == 'selected') {
+                    var ignored = self.$filesList.value(data.id, 'instances')
+                            .filter(function(i) {return i.ignore; }).length > 0;
+                    pandora.api.editFile({
+                        id: data.id,
+                        ignore: !ignored
+                    }, function(result) {
+                        Ox.Request.clearCache();
+                        self.$filesList.reloadList();
+                    });
+                }
+            },
             open: openFiles,
-            select: selectFiles
+            select: selectFiles,
         });
 
     self.$instancesList = Ox.TextList({

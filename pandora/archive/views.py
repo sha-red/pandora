@@ -305,9 +305,12 @@ def editFile(request):
         update = False
         #FIXME: should all instances be ignored?
         if 'ignore' in data:
-            f.instances.update(ignore=True)
+            f.auto = True
+            f.instances.update(ignore=data['ignore'])
+            f.save()
             #FIXME: is this to slow to run sync?
             f.item.update_selected()
+            f.item.update_wanted()
         for key in ('part', 'language'):
             if key in data:
                 setattr(f, key, data[key])

@@ -658,7 +658,7 @@ class Item(models.Model):
             s.volume = None
             s.parts = 0
 
-        if 'color' in self.data:
+        if 'color' in self.data and len(self.data['color']) == 3:
             s.hue, s.saturation, s.lightness = self.data['color']
         else:
             s.hue = None
@@ -878,7 +878,7 @@ class Item(models.Model):
         if settings.CONFIG['video']['download']:
             self.make_torrent()
         self.load_subtitles()
-        self.rendered = streams != []
+        self.rendered = streams.count() > 0
         self.save()
 
     def delete_poster(self):

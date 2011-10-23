@@ -65,9 +65,10 @@ def update_static():
     pandora_json = os.path.join(settings.STATIC_ROOT, 'json/pandora.json')
     for root, folders, files in os.walk(os.path.join(settings.STATIC_ROOT, 'js/pandora')):
         for f in files:
-            js.append(os.path.join(root, f)[len(settings.STATIC_ROOT)+1:])
-            with open(os.path.join(root, f)) as j:
-                data += j.read() + '\n'
+            if f.endswith('.js'):
+                js.append(os.path.join(root, f)[len(settings.STATIC_ROOT)+1:])
+                with open(os.path.join(root, f)) as j:
+                    data += j.read() + '\n'
 
     print 'write', pandora_js
     with open(pandora_js, 'w') as f:
