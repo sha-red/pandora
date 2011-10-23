@@ -280,6 +280,47 @@ def moveFiles(request):
     return render_to_json_response(response)
 actions.register(moveFiles, cache=False)
 
+@login_required_json
+def editFiles(request):
+    '''
+        change file / item link
+        param data {
+            ids: ids of files 
+            part:
+            language:
+            ignore: boolean
+        }
+
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+            }
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    files = models.File.objects.filter(oshash__in=data['ids'])
+    response = json_response()
+    #FIXME: only editable files!
+    if True:
+        if 'ignore' in data:
+            models.Instance.objects.filter(file__in=files).update(ignore=data['ignore'])
+            files.update(auto=True)
+            #FIXME: is this to slow to run sync?
+            for i in Item.objects.filter(files__in=files).distinct():
+                i.update_selected()
+                i.update_wanted()
+            response = json_response(status=200, text='updated')
+        updates = {}
+        for key in ('part', 'language'):
+            if key in data:
+                updates[key] = data[key]
+        if updates:
+            files.update(**updates)
+            response = json_response(status=200, text='updated')
+    else:
+        response = json_response(status=403, text='permissino denied')
+    return render_to_json_response(response)
+actions.register(editFiles, cache=False)
 
 @login_required_json
 def editFile(request):

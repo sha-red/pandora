@@ -33,15 +33,27 @@ pandora.ui.filesView = function(options, self) {
         })
         .appendTo(self.$toolbar);
 
-    self.$moveButton = Ox.Button({
+    self.$ignoreButton = Ox.Button({
             disabled: 'true',
-            title: 'Move Selected Files...'
+            title: 'Ignore Selected Files...'
         })
         .css({
             float: 'right',
             margin: '4px'
         })
-        .appendTo(self.$toolbar);
+        .appendTo(self.$toolbar)
+        .bindEvent({
+            click: function() {
+                var data = {
+                    ids: self.selected,
+                    ignore: true
+                };
+                pandora.api.editFiles(data, function(result) {
+                    Ox.Request.clearCache();
+                    self.$filesList.reloadList();
+                });
+            }
+        });
 
     self.$filesList = Ox.TextList({
             columns: [
@@ -415,6 +427,9 @@ pandora.ui.filesView = function(options, self) {
 
     function updateForm() {
         self.$moveButton.options({
+            disabled: self.selected.length === 0
+        });
+        self.$ignoreButton.options({
             disabled: self.selected.length === 0
         });
     }
