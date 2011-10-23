@@ -323,13 +323,7 @@ class File(models.Model):
         instance = self.get_instance()
         if instance:
             return instance.path
-        if self.item:
-            name = self.item.get('title', 'Untitled')
-            name = re.sub(r'[:\\/]', '_', name)
-        if not name:
-            name = 'Untitled'
-        ext = '.unknown'
-        return name + ext
+        return self.path
 
 def delete_file(sender, **kwargs):
     f = kwargs['instance']
