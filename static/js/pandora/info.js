@@ -66,8 +66,11 @@ pandora.ui.info = function() {
                 previousView == 'video' && resizeInfo();
             });
         } else if (view == 'video') {
-            pandora.api.get({id: id, keys: ['duration', 'videoRatio']}, function(result) {
-                if (result.data) {
+            pandora.api.get({
+                id: id,
+                keys: ['duration', 'rendered', 'videoRatio']
+            }, function(result) {
+                if (result.data && result.data.rendered) {
                     pandora.$ui.videoPreview && pandora.$ui.videoPreview.removeElement();
                     pandora.$ui.videoPreview = pandora.ui.videoPreview({
                             duration: result.data.duration,
