@@ -71,7 +71,7 @@ def update_static():
 
     print 'write', pandora_js
     with open(pandora_js, 'w') as f:
-        #data = ox.js.minify(data)
+        data = ox.js.minify(data)
         f.write(data)
 
     print 'write', pandora_json

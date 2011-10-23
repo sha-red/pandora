@@ -6,7 +6,6 @@ pandora.ui.home = function() {
 
     var that = $('<div>')
             .addClass('OxScreen')
-            .attr({id: 'home'})
             .css({
                 position: 'absolute',
                 width: '100%',
@@ -26,6 +25,7 @@ pandora.ui.home = function() {
                 margin: 'auto',
                 opacity: 0,
                 MozTransform: 'scaleY(-1)',
+                OTransform: 'scaleY(-1)',
                 WebkitTransform: 'scaleY(-1)'
             })
             .appendTo(that),
