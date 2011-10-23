@@ -351,30 +351,54 @@ pandora.ui.infoView = function(data) {
     
     $('<div>').css({height: '8px'}).appendTo($text);
 
-    ['hue', 'saturation', 'lightness'].forEach(function(key) {
+    ['hue', 'saturation', 'lightness', 'volume'].forEach(function(key) {
         $('<div>')
-        .css({marginBottom: '4px'})
-        .append(formatKey(key, true))
-        .append(Ox.formatColor(data[key] || 0, key))
-        .appendTo($statistics);
+            .css({marginBottom: '4px'})
+            .append(formatKey(key, true))
+            .append(Ox.formatColor(data[key] || 0, key == 'volume' ? 'lightness' : key))
+            .appendTo($statistics);
     });
 
-    var rightsLevel = pandora.site.rightsLevels[data['rightsLevel']];
+    var rightsLevelCSS = getRightsLevelCSS(data.rightsLevel),
+        $rightsLevel, $rightsLevelSelect, $rightsLevelDescription;
+    if (canEdit) {
+        $rightsLevel = $('<div>');
+        $rightsLevelSelect = Ox.Select({
+                items: pandora.site.rightsLevels.map(function(rightsLevel, i) {
+                    return {id: i, title: rightsLevel.name, checked: i == data.rightsLevel};
+                }),
+                width: 128
+            })
+            .css(Ox.extend({
+                marginBottom: '4px'
+            }, rightsLevelCSS))
+            .bindEvent({
+                change: function(event) {
+                    var rightsLevel = event.selected[0].id;
+                    $rightsLevelSelect.css(getRightsLevelCSS(rightsLevel));
+                    $rightsLevelDescription.html(pandora.site.rightsLevels[rightsLevel].description);
+                    pandora.api.edit({id: data.id, rightsLevel: rightsLevel}, function(result) {
+                        // ...
+                    });
+                }
+            })
+            .appendTo($rightsLevel);
+        $rightsLevelDescription = $('<div>')
+            .css({})
+            .html(pandora.site.rightsLevels[data.rightsLevel].description)
+            .appendTo($rightsLevel)
+    } else {
+        $rightsLevel = $('<div>')
+            .css(Ox.extend({
+                paddingLeft: '3px',
+                borderRadius: '4px'
+            }, rightsLevelCSS))
+            .html(pandora.site.rightsLevels[data.rightsLevel].name);
+    }
     $('<div>')
         .css({marginBottom: '4px'})
         .append(formatKey('Rights Level', true))
-        .append(
-            $('<div>')
-                .css({
-                    paddingLeft: '3px',
-                    borderRadius: '4px',
-                    backgroundColor: 'rgb(' + rightsLevel.color.map(function(value) {
-                        return value - 128;
-                    }).join(', ') + ')',
-                    color: 'rgb(' + rightsLevel.color.join(', ') + ')'
-                })
-                .html(rightsLevel.name)
-        )
+        .append($rightsLevel)
         .appendTo($statistics);
 
     if (canEdit) {
@@ -405,6 +429,16 @@ pandora.ui.infoView = function(data) {
                 '<a href="/' + key + '=' + value + '">' + value + '</a>'
                 : value;
         }).join(', ');
+    }
+
+    function getRightsLevelCSS(rightsLevel) {
+        rightsLevel = pandora.site.rightsLevels[rightsLevel];
+        return {
+            background: 'rgb(' + rightsLevel.color.map(function(value) {
+                return value - 128;
+            }).join(', ') + ')',
+            color: 'rgb(' + rightsLevel.color.join(', ') + ')'
+        };
     }
 
     pandora.createLinks($text);

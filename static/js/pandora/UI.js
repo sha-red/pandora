@@ -59,6 +59,9 @@ pandora.UI = (function() {
                 add['lists.' + that.encode(list)] = {};
             }
             if (list != self.previousUI._list) {
+                if (!pandora.user.ui.lists[list]) {
+                    add['lists.' + that.encode(list)] = {};
+                }
                 Ox.forEach(listSettings, function(listSetting, setting) {
                     if (!pandora.user.ui.lists[list]) {
                         // add default list setting and copy to settings
