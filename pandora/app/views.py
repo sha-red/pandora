@@ -91,3 +91,4 @@ def redirect_url(request, url):
         return redirect(url)
     else:
         return HttpResponse('<script>document.location.href=%s;</script>'%json.dumps(url))
+
