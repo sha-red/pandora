@@ -267,6 +267,7 @@ class Item(models.Model):
                     q[0].merge_with(self, save=False)
                 else:
                     self.oxdbId = oxdbId
+                self.make_local_poster()
         
         #id changed, what about existing item with new id?
         if settings.USE_IMDB and len(self.itemId) != 7 and self.oxdbId != self.itemId:
