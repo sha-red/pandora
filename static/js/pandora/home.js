@@ -2,8 +2,6 @@
 
 pandora.ui.home = function() {
 
-    // fixme: if a list was selected previously, it will steal focus from the input element
-
     var that = $('<div>')
             .addClass('OxScreen')
             .css({

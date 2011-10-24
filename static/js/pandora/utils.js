@@ -832,8 +832,9 @@ pandora.selectList = function() {
                     list.user == pandora.user.username ? 'personal' : 'favorite'
                 );
                 pandora.$ui.folderList[folder]
-                    .options('selected', [pandora.user.ui._list])
-                    .gainFocus();
+                    .options({selected: [pandora.user.ui._list]});
+                // Don't steal focus from home screen
+                $('.OxScreen').length == 0 && pandora.$ui.folderList[folder].gainFocus();
             }
         });
     }
