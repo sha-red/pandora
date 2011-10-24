@@ -528,11 +528,11 @@
     ],
     "rightsLevel": {"member": 5, "staff": 4, "admin": 3},
     "rightsLevels": [
-        {"name": "Public", "color": [128, 255, 128], "description": "Everyone can play and download."},
-        {"name": "Relaxed", "color": [192, 255, 128], "description": "Only friends, staff and admins can download."},
-        {"name": "Regular", "color": [255, 255, 128], "description": "Only friends, staff and admins can play video."},
-        {"name": "Restricted", "color": [255, 192, 128], "description": "Only friends, staff and admins can play clips."},
-        {"name": "Private", "color": [255, 128, 128], "description": "Only staff and admins can see."}
+        {"name": "Public", "color": [128, 255, 128]},
+        {"name": "Relaxed", "color": [192, 255, 128]},
+        {"name": "Regular", "color": [255, 255, 128]},
+        {"name": "Restricted", "color": [255, 192, 128]},
+        {"name": "Private", "color": [255, 128, 128]}
     ],
     "sendReferrer": false,
     "site": {
@@ -627,6 +627,7 @@
         "username": "",
         "volumes": []
     },
+    // fixme: this should include colors
     "userLevels": ["guest", "member", "friend", "staff", "admin"],
     "video": {
         "download": false,

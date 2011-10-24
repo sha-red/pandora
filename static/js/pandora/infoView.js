@@ -351,6 +351,8 @@ pandora.ui.infoView = function(data) {
     
     $('<div>').css({height: '8px'}).appendTo($text);
 
+    pandora.createLinks($text);
+
     ['hue', 'saturation', 'lightness', 'volume'].forEach(function(key) {
         $('<div>')
             .css({marginBottom: '4px'})
@@ -359,47 +361,13 @@ pandora.ui.infoView = function(data) {
             .appendTo($statistics);
     });
 
-    var rightsLevelCSS = getRightsLevelCSS(data.rightsLevel),
-        $rightsLevel, $rightsLevelSelect, $rightsLevelDescription;
-    if (canEdit) {
-        $rightsLevel = $('<div>');
-        $rightsLevelSelect = Ox.Select({
-                items: pandora.site.rightsLevels.map(function(rightsLevel, i) {
-                    return {id: i, title: rightsLevel.name, checked: i == data.rightsLevel};
-                }),
-                width: 128
-            })
-            .css(Ox.extend({
-                marginBottom: '4px'
-            }, rightsLevelCSS))
-            .bindEvent({
-                change: function(event) {
-                    var rightsLevel = event.selected[0].id;
-                    $rightsLevelSelect.css(getRightsLevelCSS(rightsLevel));
-                    $rightsLevelDescription.html(pandora.site.rightsLevels[rightsLevel].description);
-                    pandora.api.edit({id: data.id, rightsLevel: rightsLevel}, function(result) {
-                        // ...
-                    });
-                }
-            })
-            .appendTo($rightsLevel);
-        $rightsLevelDescription = $('<div>')
-            .css({})
-            .html(pandora.site.rightsLevels[data.rightsLevel].description)
-            .appendTo($rightsLevel)
-    } else {
-        $rightsLevel = $('<div>')
-            .css(Ox.extend({
-                paddingLeft: '3px',
-                borderRadius: '4px'
-            }, rightsLevelCSS))
-            .html(pandora.site.rightsLevels[data.rightsLevel].name);
-    }
+    var $rightsLevel = $('<div>');
     $('<div>')
         .css({marginBottom: '4px'})
         .append(formatKey('Rights Level', true))
         .append($rightsLevel)
         .appendTo($statistics);
+    renderRightsLevel();
 
     if (canEdit) {
         $icon.bindEvent({
@@ -431,17 +399,100 @@ pandora.ui.infoView = function(data) {
         }).join(', ');
     }
 
+    function getCapabilityCSS(hasCapability) {
+        var colors = [[255, 128, 128], [128, 255, 128]];
+        return {
+            background: 'rgb(' + colors[+hasCapability].map(function(value) {
+                return pandora.user.ui.theme == 'classic'
+                    ? value : value - 128;
+            }).join(', ') + ')',
+            color: pandora.user.ui.theme == 'classic'
+                ? 'rgb(64, 64, 64)' : 'rgb(192, 192, 192)'
+        };
+    }
+
     function getRightsLevelCSS(rightsLevel) {
         rightsLevel = pandora.site.rightsLevels[rightsLevel];
         return {
             background: 'rgb(' + rightsLevel.color.map(function(value) {
-                return value - 128;
+                return pandora.user.ui.theme == 'classic'
+                    ? value : value - 128;
             }).join(', ') + ')',
-            color: 'rgb(' + rightsLevel.color.join(', ') + ')'
+            color: pandora.user.ui.theme == 'classic'
+                ? 'rgb(64, 64, 64)' : 'rgb(192, 192, 192)'
         };
     }
 
-    pandora.createLinks($text);
+    function getUserLevelCSS(userLevel) {
+        // FIXME: colors should be part of config
+        var colors = {
+            'guest': [255, 128, 128],
+            'member': [255, 255, 128],
+            'friend': [128, 255, 128],
+            'staff': [128, 255, 255],
+            'admin': [128, 128, 255]
+        };
+        return {
+            background: 'rgb(' + colors[userLevel].map(function(value) {
+                return pandora.user.ui.theme == 'classic'
+                    ? value : value - 128;
+            }).join(', ') + ')',
+            color: pandora.user.ui.theme == 'classic'
+                ? 'rgb(64, 64, 64)' : 'rgb(192, 192, 192)'
+        }
+    }
+
+    function renderCapabilities(rightsLevel) {
+        var capabilities = Ox.merge(
+                canEdit ? [{name: 'canSeeItem', symbol: 'View'}] : [],
+                [
+                    {name: 'canPlayClips', symbol: 'PlayInToOut'},
+                    {name: 'canPlayVideo', symbol: 'Play'},
+                    {name: 'canDownloadVideo', symbol: 'Download'}
+                ]
+            ),
+            userLevels = canEdit ? pandora.site.userLevels : [pandora.user.level];
+        $capabilities.empty();
+        userLevels.forEach(function(userLevel) {
+            var $line = $('<div>')
+                .css({
+                    height: '16px',
+                    marginBottom: '4px'
+                })
+                .appendTo($capabilities);
+            Ox.Label({
+                    textAlign: 'center',
+                    title: canEdit ? Ox.toTitleCase(userLevel) : pandora.site.rightsLevels[data.rightsLevel].name,
+                    width: canEdit ? 48 : 68
+                })
+                .css(Ox.extend(
+                    {
+                        float: 'left',
+                        paddingTop: '2px',
+                        height: '12px',
+                        fontSize: '8px'
+                    },
+                    canEdit ? getUserLevelCSS(userLevel) : getRightsLevelCSS(data.rightsLevel)
+                ))
+                .appendTo($line);
+            capabilities.forEach(function(capability) {
+                var hasCapability = pandora.site.capabilities[capability.name][userLevel] >= rightsLevel;
+                Ox.Button({
+                        tooltip: (canEdit ? Ox.toTitleCase(userLevel) : 'You') + ' '
+                            + (hasCapability ? 'can' : 'can\'t') + ' '
+                            + Ox.map(Ox.toSlashes(capability.name).split('/'), function(word, i) {
+                                return i == 0 ? null : word.toLowerCase();
+                            }).join(' '),
+                        title: capability.symbol,
+                        type: 'image'
+                    })
+                    .css(Ox.extend({
+                        marginLeft: '4px'
+                    }, getCapabilityCSS(hasCapability)))
+                    .appendTo($line);
+            });
+        });
+    }
 
     function renderList() {
         pandora.api.get({
@@ -545,6 +596,36 @@ pandora.ui.infoView = function(data) {
         
     }
 
+    function renderRightsLevel() {
+        var $capabilites, $rightsLevelSelect,
+            rightsLevelCSS = getRightsLevelCSS(data.rightsLevel);        
+        $rightsLevel.empty();
+        if (canEdit) {
+            $rightsLevelSelect = Ox.Select({
+                    items: pandora.site.rightsLevels.map(function(rightsLevel, i) {
+                        return {id: i, title: rightsLevel.name, checked: i == data.rightsLevel};
+                    }),
+                    width: 128
+                })
+                .css(Ox.extend({
+                    marginBottom: '4px'
+                }, rightsLevelCSS))
+                .bindEvent({
+                    change: function(event) {
+                        var rightsLevel = event.selected[0].id;
+                        $rightsLevelSelect.css(getRightsLevelCSS(rightsLevel));
+                        renderCapabilities(rightsLevel);
+                        pandora.api.edit({id: data.id, rightsLevel: rightsLevel}, function(result) {
+                            // ...
+                        });
+                    }
+                })
+                .appendTo($rightsLevel);
+        }
+        $capabilities = $('<div>').appendTo($rightsLevel);
+        renderCapabilities(data.rightsLevel);
+    }
+
     function toggleIconSize() {
         iconSize = iconSize == 256 ? 512 : 256;
         iconWidth = iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio);
@@ -590,6 +671,10 @@ pandora.ui.infoView = function(data) {
             ? (ui.showSitePoster ? 5/8 : data.posterRatio) : 1;
         toggleIconSize();
         pandora.user.level == 'admin' && $list.replaceWith($list = renderList());
+    };
+
+    that.renderRightsLevel = function() {
+        renderRightsLevel();
     };
 
     that.resize = function() {

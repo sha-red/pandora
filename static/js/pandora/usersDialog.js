@@ -3,12 +3,13 @@ pandora.ui.usersDialog = function() {
 
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = Math.round(window.innerWidth * 0.9),
+        // FIXME: colors should be part of config
         levelColors = {
-            'guest': [64, 0, 0],
-            'member': [64, 64, 0],
-            'friend': [0, 64, 0],
-            'staff': [0, 64, 64],
-            'admin': [0, 0, 64]
+            'guest': [255, 128, 128],
+            'member': [255, 255, 128],
+            'friend': [128, 255, 128],
+            'staff': [128, 255, 255],
+            'admin': [128, 128, 255]
         },
         numberOfUsers = 0,
         userLevels = ['member', 'friend', 'staff', 'admin'],
@@ -116,10 +117,10 @@ pandora.ui.usersDialog = function() {
                         align: 'center',
                         format: function(value) {
                             var dark = 'rgb(' + levelColors[value].map(function(color) {
-                                    return color.toString()
+                                    return (color - 128).toString();
                                 }).join(', ') + ')',
                                 light = 'rgb(' + levelColors[value].map(function(color) {
-                                    return (color + 128).toString()
+                                    return color.toString()
                                 }).join(', ') + ')';
                             return $('<div>')
                                 .css({

@@ -55,7 +55,15 @@ pandora.ui.preferencesDialog = function() {
                                                 pandora.api.editPreferences({email: data.value});
                                             }
                                         }
-                                    })
+                                    }),
+                                Ox.Input({
+                                    disabled: true,
+                                    id: 'level',
+                                    label: 'Level',
+                                    labelWidth: 120,
+                                    value: Ox.toTitleCase(pandora.user.level),
+                                    width: 320
+                                })
                             ]
                         })
                         .css({position: 'absolute', left: '96px', top: '16px'})
