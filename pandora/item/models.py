@@ -721,9 +721,7 @@ class Item(models.Model):
                     value_sort = value
                     if key in self.person_keys:
                         value_sort = get_name_sort(value)
-                    f = Facet(key=key, value=value, value_sort=value_sort)
-                    f.item = self
-                    f.save()
+                    Facet.objects.get_or_create(item=self, key=key, value=value, value_sort=value_sort)
 
     def path(self, name=''):
         h = self.itemId
