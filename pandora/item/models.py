@@ -947,7 +947,8 @@ class Item(models.Model):
         if settings.USE_IMDB:
             if len(self.itemId) == 7:
                 cmd += ['-i', self.itemId]
-            cmd += ['-o', self.oxdbId]
+            oxdbId = self.oxdbId or self.oxdb_id() or self.ItemId
+            cmd += ['-o', oxdbId]
         else:
             cmd += ['-i', self.itemId]
         ox.makedirs(os.path.join(settings.MEDIA_ROOT,self.path()))
