@@ -7,6 +7,19 @@ pandora.ui.folderBrowserList = function(id) {
         that = Ox.TextList({
             columns: [
                 {
+                    clickable: true,
+                    format: function(value) {
+                        return $('<img>').attr({
+                                src: '/list/' + value + '/icon16.jpg'
+                            }).css({
+                                width: '14px',
+                                height: '14px',
+                                borderRadius: '4px',
+                                margin: '0 0 0 -3px'
+                            });
+                    },
+                    // FIXME: why does the above only work with clickable: true ??
+                    /*
                     format: function() {
                         return $('<img>').attr({
                             src: Ox.UI.getImageURL('symbolIcon')
@@ -16,6 +29,7 @@ pandora.ui.folderBrowserList = function(id) {
                             padding: '3px'
                         });
                     },
+                    */
                     id: 'id',
                     operator: '+',
                     title: $('<img>').attr({

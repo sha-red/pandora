@@ -197,11 +197,13 @@ pandora.ui.infoView = function(data) {
                 .html(formatKey(key).replace('</span>', '&nbsp;</span>'))
                 .appendTo($div);
             Ox.Editable({
+                    clickLink: clickLink,
                     format: function(value) {                        
                         return value
                             ? formatValue(value.split(', '), key)
                             : formatLight('unknown');
                     },
+                    tooltip: 'Doubleclick to edit',
                     value: key == 'country'
                         ? (data[key] ? data[key].join(', ') : [''])
                         : data[key] || ''
