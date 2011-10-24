@@ -264,10 +264,19 @@ class Item(models.Model):
             if self.oxdbId != oxdbId:
                 q = Item.objects.filter(oxdbId=oxdbId).exclude(id=self.id)
                 if q.count() != 0:
-                    self.oxdbId = None
-                    q[0].merge_with(self, save=False)
-                else:
-                    self.oxdbId = oxdbId
+                    if len(self.itemId) == 7:
+                        self.oxdbId = None
+                        q[0].merge_with(self, save=False)
+                    else:
+                        n = 1
+                        key = 'episodeTitle' in self.data and 'episodeTitle' or 'title'
+                        title = self.get(key, 'Untitled')
+                        while q.count() != 0:
+                            n += 1
+                            self.data[key] = u'%s [%d]' % (title, n)
+                            oxdbId = self.oxdb_id()
+                            q = Item.objects.filter(oxdbId=oxdbId).exclude(id=self.id)
+                self.oxdbId = oxdbId
                 update_poster = True
         
         #id changed, what about existing item with new id?
