@@ -467,7 +467,7 @@ class Item(models.Model):
             return None
         return ox.get_oxid(self.get('seriesTitle', self.get('title', '')),
                            self.get('director', []),
-                           self.get('year', ''),
+                           self.get('seriesYear', self.get('year', '')),
                            self.get('season', ''),
                            self.get('episode', ''),
                            self.get('episodeTitle', ''),
