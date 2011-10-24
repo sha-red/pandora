@@ -917,15 +917,14 @@ class Item(models.Model):
 
     def make_poster(self, force=False):
         if not self.poster or force:
-            url = self.prefered_poster_url()
+            self.delete_poster()
             poster = self.make_siteposter()
+            url = self.prefered_poster_url()
             if url:
                 data = ox.net.readUrl(url)
-                self.delete_poster()
                 self.poster.save('poster.jpg', ContentFile(data))
                 self.save()
-            else:
-                self.delete_poster()
+            elif os.path.exists(poster):
                 with open(poster) as f:
                     self.poster.save('poster.jpg', ContentFile(f.read()))
 
