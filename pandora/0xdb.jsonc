@@ -14,14 +14,14 @@
     */
     "capabilities": {
         "canDeleteItems": {"admin": true},
-        "canDownloadVideo": {"guest": 0, "member": 0, "friend": 3, "staff": 4, "admin": 4},
+        "canDownloadVideo": {"guest": 0, "member": 0, "friend": 4, "staff": 4, "admin": 4},
         "canEditMetadata": {"staff": true, "admin": true},
-        "canPlayClips": {"guest": 2, "member": 2, "friend": 3, "staff": 4, "admin": 4},
-        "canPlayVideo": {"guest": 1, "member": 1, "friend": 3, "staff": 4, "admin": 4},
+        "canPlayClips": {"guest": 2, "member": 2, "friend": 4, "staff": 4, "admin": 4},
+        "canPlayVideo": {"guest": 1, "member": 1, "friend": 4, "staff": 4, "admin": 4},
         "canReloadMetadata": {"staff": true, "admin": true},
         "canSeeDebugMenu": {"admin": true},
         "canSeeFiles": {"staff": true, "admin": true},
-        "canSeeItem": {"guest": 3, "member": 3, "friend": 3, "staff": 4, "admin": 4},
+        "canSeeItem": {"guest": 3, "member": 3, "friend": 4, "staff": 4, "admin": 4},
         "canSeeExtraItemViews": {"friend": true, "staff": true, "admin": true}
     },
     /*
@@ -551,7 +551,9 @@
         {"id": "news", "title": "News"},
         {"id": "tour", "title": "Take a Tour"},
         {"id": "faq", "title": "Frequently Asked Questions"},
-        {"id": "terms", "title": "Terms of Service"}
+        {"id": "terms", "title": "Terms of Service"},
+        {"id": "rights", "title": "Rights Management"},
+        {"id": "contact", "title": "Contact"}
     ],
     "totals": [
         {"id": "items"},

@@ -1,15 +1,10 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.siteDialog = function(section) {
 
-    var tabs = [
-        {id: 'about', title: 'About'},
-        {id: 'news', title: 'News'},
-        {id: 'tour', title: 'Take a Tour'},
-        {id: 'faq', title: 'Frequently Asked Questions'},
-        {id: 'tos', title: 'Terms of Service'},
-        {id: 'contact', title: 'Contact'},
-        {id: 'software', title: 'Software'}
-    ];
+    var tabs = Ox.merge(
+        Ox.clone(pandora.site.sitePages),
+        [{id: 'software', title: 'Software'}]
+    );
     Ox.getObjectById(tabs, section).selected = true;
     var $tabPanel = Ox.TabPanel({
             content: function(id) {

@@ -141,7 +141,7 @@ pandora.URL = (function() {
                 //pandora.$ui.home = pandora.ui.home().showScreen();
                 pandora.$ui.home = pandora.ui.home().fadeInScreen();
             } else if ([
-                'about', 'contact', 'faq', 'news', 'software', 'terms', 'tour'
+                'about', 'contact', 'faq', 'news', 'rights', 'software', 'terms', 'tour'
             ].indexOf(state.page) > -1) {
                 pandora.$ui.siteDialog = pandora.ui.siteDialog(state.page).open();
             } else if (state.page == 'help') {
@@ -320,7 +320,7 @@ pandora.URL = (function() {
             getSpan: pandora.getMetadataByIdOrName,
             pages: [
                 'about', 'api', 'contact', 'faq', 'help', 'home', 'news',
-                'preferences', 'signin', 'signout', 'signup',
+                'preferences', 'rights', 'signin', 'signout', 'signup',
                 'software', 'terms', 'tour'
             ],
             sortKeys: sortKeys,

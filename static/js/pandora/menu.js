@@ -14,18 +14,17 @@ pandora.ui.mainMenu = function() {
             id: 'mainMenu',
             menus: Ox.merge(
                 [
-                    { id: pandora.site.site.id + 'Menu', title: pandora.site.site.name, items: [
-                        { id: 'home', title: 'Home' },
-                        {},
-                        { id: 'about', title: 'About ' + pandora.site.site.name },
-                        { id: 'news', title: pandora.site.site.name + ' News' },
-                        { id: 'tour', title: 'Take a Tour' },
-                        { id: 'faq', title: 'Frequently Asked Questions' },
-                        { id: 'terms', title: 'Terms of Service' },
-                        { id: 'contact', title: 'Contact ' + pandora.site.site.name },
-                        {},
-                        { id: 'software', title: 'Software' }
-                    ] },
+                    { id: pandora.site.site.id + 'Menu', title: pandora.site.site.name, items: Ox.merge(
+                        [
+                            { id: 'home', title: 'Home' },
+                            {}
+                        ],
+                        pandora.site.sitePages,
+                        [
+                            {},
+                            { id: 'software', title: 'Software' }
+                        ]
+                    ) },
                     { id: 'userMenu', title: 'User', items: [
                         { id: 'username', title: 'User: ' + (isGuest ? 'not logged in' : pandora.user.username), disabled: true },
                         {},
@@ -211,7 +210,7 @@ pandora.ui.mainMenu = function() {
             },
             click: function(data) {
                 if ([
-                    'home', 'about', 'news', 'tour', 'faq', 'tos', 'contact', 'software',
+                    'home', 'about', 'news', 'tour', 'faq', 'terms', 'rights', 'contact', 'software',
                     'signup', 'signin', 'signout', 'preferences', 'help'
                 ].indexOf(data.id) > -1) {
                     pandora.URL.push('/' + data.id);
