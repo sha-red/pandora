@@ -210,7 +210,7 @@ class Item(models.Model):
                 self.groups.add(group)
         for key in data:
             self.data[key] = data[key]
-        self.save()
+        return self.save()
 
     def update_external(self):
         if settings.DATA_SERVICE and not self.itemId.startswith('0x'):
@@ -250,6 +250,7 @@ class Item(models.Model):
         return '/%s' % self.itemId
 
     def save(self, *args, **kwargs):
+        update_poster = False
         if not self.id:
             if not self.itemId:
                 self.itemId = str(uuid.uuid1())
@@ -267,7 +268,7 @@ class Item(models.Model):
                     q[0].merge_with(self, save=False)
                 else:
                     self.oxdbId = oxdbId
-                self.make_poster(True)
+                update_poster = True
         
         #id changed, what about existing item with new id?
         if settings.USE_IMDB and len(self.itemId) != 7 and self.oxdbId != self.itemId:
@@ -283,7 +284,6 @@ class Item(models.Model):
         self.update_find()
         self.update_sort()
         self.update_facets()
-        update_poster = False
         if not settings.USE_IMDB:
             if self.poster_frame == -1 and self.sort.duration:
                 self.poster_frame = self.sort.duration/2
@@ -294,7 +294,8 @@ class Item(models.Model):
         self.json = self.get_json()
         super(Item, self).save(*args, **kwargs)
         if update_poster:
-            tasks.update_poster.delay(self.itemId)
+            return tasks.update_poster.delay(self.itemId)
+        return None
 
     def delete_files(self):
         path = os.path.join(settings.MEDIA_ROOT, self.path())
@@ -482,14 +483,14 @@ class Item(models.Model):
     def update_find(self):
 
         def save(key, value):
-            f, created = ItemFind.objects.get_or_create(item=self, key=key)
             if value not in ('', None):
+                f, created = ItemFind.objects.get_or_create(item=self, key=key)
                 if isinstance(value, basestring):
                     value = value.strip()
                 f.value = value
                 f.save()
             else:
-                f.delete()
+                ItemFind.objects.filter(item=self, key=key).delete()
 
         for key in settings.CONFIG['itemKeys']:
             if key.get('find'):
