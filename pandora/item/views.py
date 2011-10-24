@@ -449,6 +449,7 @@ def edit(request):
             item.level = data['rightsLevel']
             del data['rightsLevel']
         item.edit(data)
+        response['data'] = item.get_json()
     else:
         response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)

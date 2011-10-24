@@ -209,8 +209,7 @@ class Item(models.Model):
                 group, created = Group.objects.get_or_create(name=g) 
                 self.groups.add(group)
         for key in data:
-            if key != 'id':
-                self.data[key] = data[key]
+            self.data[key] = data[key]
         self.save()
 
     def update_external(self):
