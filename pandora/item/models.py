@@ -267,7 +267,7 @@ class Item(models.Model):
                     q[0].merge_with(self, save=False)
                 else:
                     self.oxdbId = oxdbId
-                self.make_local_poster()
+                self.make_poster(True)
         
         #id changed, what about existing item with new id?
         if settings.USE_IMDB and len(self.itemId) != 7 and self.oxdbId != self.itemId:
@@ -872,7 +872,6 @@ class Item(models.Model):
             self.data['color'] = ox.image.getHSL(color)
         #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
         self.select_frame()
-        self.make_local_poster()
         self.make_poster()
         self.make_icon()
         if settings.CONFIG['video']['download']:
@@ -911,6 +910,7 @@ class Item(models.Model):
     def make_poster(self, force=False):
         if not self.poster or force:
             url = self.prefered_poster_url()
+            poster = self.make_siteposter()
             if url:
                 data = ox.net.readUrl(url)
                 self.delete_poster()
@@ -918,11 +918,10 @@ class Item(models.Model):
                 self.save()
             else:
                 self.delete_poster()
-                poster = self.make_local_poster()
                 with open(poster) as f:
                     self.poster.save('poster.jpg', ContentFile(f.read()))
 
-    def make_local_poster(self):
+    def make_siteposter(self):
         poster = self.path('siteposter.jpg')
         poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
 
