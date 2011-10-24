@@ -134,10 +134,7 @@ pandora.ui.infoView = function(data) {
 
         $browserImages = [];
 
-    var match = /(\(S\d{2}(E\d{2})?\))/.exec(data.title);
-    if (match) {
-        data.title = data.title.replace(match[0], formatLight(match[0]));
-    }
+    // Title -------------------------------------------------------------------
 
     $('<div>')
         .css({
@@ -146,11 +143,11 @@ pandora.ui.infoView = function(data) {
         .append(
             Ox.Editable({
                     editable: isEditable,
+                    format: function(value) {
+                        return formatTitle(value);
+                    },
                     tooltip: isEditable ? 'Doubleclick to edit' : '', 
-                    value: data.title + (
-                        data.originalTitle && data.originalTitle != data.title
-                        ? ' ' + formatLight('(' + data.originalTitle + ')') : ''
-                    )
+                    value: formatTitle(data.title)
                 })
                 .css({
                     display: 'inline-block',
@@ -158,34 +155,52 @@ pandora.ui.infoView = function(data) {
                     fontSize: '13px',
                     MozUserSelect: 'text',
                     WebkitUserSelect: 'text'
+                })
+                .bindEvent({
+                    submit: function(event) {
+                        editMetadata('title', event.value);
+                    }
                 })
                 .appendTo($text)
         )
         .appendTo($text);
 
-    $('<div>')
-        .css({
-            marginTop: '2px'
-        })
-        .append(
-            Ox.Editable({
-                    clickLink: clickLink,
-                    editable: isEditable,
-                    format: function(value) {
-                        return formatValue((value || 'Unknown Director').split(', '), 'name');
-                    },
-                    tooltip: isEditable ? 'Doubleclick to edit' : '',
-                    value: data.director ? data.director.join(', ') : 'Unknown Director'
-                })
-                .css({
-                    display: 'inline-block',
-                    fontWeight: 'bold',
-                    fontSize: '13px',
-                    MozUserSelect: 'text',
-                    WebkitUserSelect: 'text'
-                })
-        )
-        .appendTo($text);
+    // Director ----------------------------------------------------------------
+
+    if (data.director || isEditable) {
+        $('<div>')
+            .css({
+                marginTop: '2px'
+            })
+            .append(
+                Ox.Editable({
+                        clickLink: clickLink,
+                        editable: isEditable,
+                        format: function(value) {
+                            return value
+                                ? formatValue(value.split(', '), 'name')
+                                : formatLight('Unknown Director');
+                        },
+                        tooltip: isEditable ? 'Doubleclick to edit' : '',
+                        value: data.director ? data.director.join(', ') : 'Unknown Director'
+                    })
+                    .css({
+                        display: 'inline-block',
+                        fontWeight: 'bold',
+                        fontSize: '13px',
+                        MozUserSelect: 'text',
+                        WebkitUserSelect: 'text'
+                    })
+                    .bindEvent({
+                        submit: function(event) {
+                            editMetadata('director', event.value);
+                        }
+                    })
+            )
+            .appendTo($text);
+    }
+
+    // Country, Year, Language, Runtime ----------------------------------------
 
     if (isEditable) {
         var $div = $('<div>')
@@ -209,6 +224,11 @@ pandora.ui.infoView = function(data) {
                         : data[key] || ''
                 })
                 .css({float: 'left'})
+                .bindEvent({
+                    submit: function(event) {
+                        editMetadata(key, event.value);
+                    }
+                })
                 .appendTo($div);
             key == 'country' && $('<div>').css({float: 'left'}).html(';&nbsp;').appendTo($div);
         });
@@ -226,6 +246,8 @@ pandora.ui.infoView = function(data) {
         });
         $('<div>').css(css).html(html.join('; ')).appendTo($text);
     }
+
+    // Alternative Titles ------------------------------------------------------
 
     data.alternativeTitles && $('<div>')
         .css(css)
@@ -435,6 +457,30 @@ pandora.ui.infoView = function(data) {
         return false;
     }
 
+    function editMetadata(key, value) {
+        var edit = {id: data.id};
+        if (key == 'title') {
+            Ox.extend(edit, parseTitle(value));
+        } else if (key == 'director' || key == 'country') {
+            edit[key] = value.split(', ');
+        } else {
+            edit[key] = value;
+        }
+        pandora.api.edit(edit, function(result) {
+            if (result.data.id != data.id) {
+                Ox.Request.clearCache(); // fixme: too much
+                pandora.UI.set({item: result.data.id});
+                pandora.$ui.browser.value(data.id, 'id', result.data.id);
+            }
+            // FIXME: value function should accept {k: v, ...}
+            pandora.$ui.browser.value(result.data.id, 'title', result.data.title);
+            pandora.$ui.browser.value(result.data.id, 'director', result.data.director);
+            pandora.$ui.browser.value(result.data.id, 'country', result.data.country);
+            pandora.$ui.browser.value(result.data.id, 'year', result.data.year);
+            //pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
+        });
+    }
+
     function formatKey(key, isStatistics) {
         return isStatistics
             ? $('<div>').css({marginBottom: '2px', fontWeight: 'bold'}).html(Ox.toTitleCase(key))
@@ -443,6 +489,17 @@ pandora.ui.infoView = function(data) {
 
     function formatLight(str) {
         return '<span style="color: rgb(128, 128, 128)">' + str + '</span>';
+    }
+
+    function formatTitle(title) {
+        var match = /(\(S\d{2}E\d{2}\))/.exec(title);
+        if (match) {
+            title = title.replace(match[0], formatLight(match[0]));
+        }
+        return title + (
+            data.originalTitle && data.originalTitle != title
+            ? ' ' + formatLight('(' + data.originalTitle + ')') : ''
+        );
     }
 
     function formatValue(value, key) {
@@ -494,6 +551,20 @@ pandora.ui.infoView = function(data) {
             color: pandora.user.ui.theme == 'classic'
                 ? 'rgb(64, 64, 64)' : 'rgb(192, 192, 192)'
         }
+    }
+
+    function parseTitle(title) {
+        var data = {title: title},
+            match = /(\(S(\d{2})E(\d{2})\))/.exec(title),
+            split;
+        if (match) {
+            data.season = parseInt(match[2], 10);
+            data.episode = parseInt(match[3], 10);
+            split = title.split(match[1]);
+            data.seriesTitle = split[0].trim();
+            data.episodeTitle = split[1].trim();
+        }
+        return data;
     }
 
     function renderCapabilities(rightsLevel) {
