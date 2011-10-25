@@ -511,22 +511,23 @@ class Item(models.Model):
                 ItemFind.objects.filter(item=self, key=key).delete()
 
         for key in settings.CONFIG['itemKeys']:
-            if key.get('find'):
-                i = key['id']
-                if i == 'title':
-                    save(i, u'\n'.join([self.get('title', 'Untitled'),
-                                        self.get('originalTitle', '')]))
-                elif i == 'filename':
-                    save(i,
-                        '\n'.join([f.path for f in self.files.all()]))
-                elif key['type'] == 'layer':
-                    qs = Annotation.objects.filter(layer__name=i, item=self).order_by('start')
-                    save(i, '\n'.join([l.value for l in qs]))
-                elif i != '*' and i not in self.facet_keys:
-                    value = self.get(i)
-                    if isinstance(value, list):
-                        value = u'\n'.join(value)
-                    save(i, value)
+            i = key['id']
+            if i == 'title':
+                save(i, u'\n'.join([self.get('title', 'Untitled'),
+                                    self.get('originalTitle', '')]))
+            elif i == 'rightslevel':
+                save(i, self.level)
+            elif i == 'filename':
+                save(i,
+                    '\n'.join([f.path for f in self.files.all()]))
+            elif key['type'] == 'layer':
+                qs = Annotation.objects.filter(layer__name=i, item=self).order_by('start')
+                save(i, '\n'.join([l.value for l in qs]))
+            elif i != '*' and i not in self.facet_keys:
+                value = self.get(i)
+                if isinstance(value, list):
+                    value = u'\n'.join(value)
+                save(i, value)
 
         for key in self.facet_keys:
             if key == 'character':
