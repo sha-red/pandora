@@ -78,7 +78,7 @@ def parseCondition(condition, user):
                 '$': '__iendswith',
             }.get(op, '__icontains')
             v = models.Item.objects.filter(**{'facets__key':k, facet_value:v})
-            k = 'id__in'
+            value_key = 'id__in'
         else:
             value_key = '%s%s' % (value_key, {
                 '==': '__iexact',
@@ -91,6 +91,7 @@ def parseCondition(condition, user):
             }.get(op, '__icontains'))
 
         k = str(k)
+        value_key = str(value_key)
         if exclude:
             if k == '*':
                 q = ~Q(**{value_key: v})
