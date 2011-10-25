@@ -7,9 +7,6 @@ from ox.django.http import HttpFileResponse
 
 from django.conf import settings
 
-#gunicorn has issues with settings.CONFIG otherwise
-import app.models
-
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()

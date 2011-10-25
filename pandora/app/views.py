@@ -92,3 +92,32 @@ def redirect_url(request, url):
     else:
         return HttpResponse('<script>document.location.href=%s;</script>'%json.dumps(url))
 
+def log(request):
+    '''
+        param data {
+            type: 'ERROR', 'WARN' 
+            message: text
+        }
+        return {
+            status: ...
+            data: {
+                name:
+                body:
+            }
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    if not request.user.is_authenticated:
+        user = request.user
+    else:
+        user = None
+    if 'message' in data:
+        l = models.Log(
+            user=user,
+            type=data.get('type', 'ERROR'),
+            message=data['message']
+        )
+        l.save()
+    response = json_response()
+    return render_to_json_response(response)
+actions.register(log)

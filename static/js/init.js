@@ -20,6 +20,16 @@ appPanel
             statusbar
 */
 
+window.onerror = function(error, url, line) {
+    try {
+        pandora.api.log({
+            text: error,
+            url: url,
+            line: line
+        });
+    } catch(e) {}
+};
+
 (function() {
 
     var debug = localStorage && localStorage.debug,

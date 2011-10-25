@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from django.core.management.base import BaseCommand
 
-from ... import models
+from ... import config
 
 
 class Command(BaseCommand):
@@ -12,4 +12,4 @@ class Command(BaseCommand):
     args = ''
 
     def handle(self, **options):
-        models.update_static()
+        config.update_static()

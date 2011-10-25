@@ -2,8 +2,8 @@ from django.contrib.auth.models import User
 from django.core.validators import MaxLengthValidator
 
 #load config from json
-import app.models
-app.models.load_config()
+import app.config
+app.config.init()
 
 NEW_LENGTH = {
     'username': 255,

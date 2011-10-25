@@ -4,6 +4,7 @@
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
 
+import monkey_patch.models
 from ... import models
 
 
