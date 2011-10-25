@@ -124,7 +124,8 @@ pandora.ui.findElement = function() {
                 pandora.api.autocomplete({
                     key: key,
                     query: {
-                        conditions: pandora.$ui.findListSelect.value() == 'list'
+                        conditions: pandora.$ui.findListSelect
+                                 && pandora.$ui.findListSelect.value() == 'list'
                             ? [{key: 'list', value: pandora.user.ui._list, operator: '=='}] : [],
                         operator: '&'
                     },
