@@ -251,6 +251,7 @@ class Item(models.Model):
 
     def save(self, *args, **kwargs):
         update_poster = False
+        update_ids = False
         if not self.id:
             if not self.itemId:
                 self.itemId = str(uuid.uuid1())
@@ -278,6 +279,7 @@ class Item(models.Model):
                             q = Item.objects.filter(oxdbId=oxdbId).exclude(id=self.id)
                 self.oxdbId = oxdbId
                 update_poster = True
+                update_ids = True
         
         #id changed, what about existing item with new id?
         if settings.USE_IMDB and len(self.itemId) != 7 and self.oxdbId != self.itemId:
@@ -302,8 +304,15 @@ class Item(models.Model):
                 self.update_sort()
         self.json = self.get_json()
         super(Item, self).save(*args, **kwargs)
+        if update_ids:
+            for c in self.clips.all(): c.save()
+            for a in self.annotations.all():
+                public_id = a.public_id.split('/')[1]
+                a.public_id = "%s/%s" % ( self.itemId, public_id)
+                a.save()
         if update_poster:
             return tasks.update_poster.delay(self.itemId)
+
         return None
 
     def delete_files(self):
