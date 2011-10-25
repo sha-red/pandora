@@ -593,7 +593,9 @@ class Item(models.Model):
                 if 'layer' in key['value']:
                    continue 
                 source = key['value']['key']
-                sort_type = key['value'].get('type', sort_type) 
+                sort_type = key['value'].get('type', sort_type)
+                if isinstance(sort_type, list):
+                    sort_type = sort_type[0]
 
             if name not in base_keys:
                 if sort_type == 'title':
