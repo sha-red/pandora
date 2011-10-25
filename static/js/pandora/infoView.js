@@ -416,9 +416,9 @@ pandora.ui.infoView = function(data) {
             .appendTo($text);
     });
     
-    $('<div>').css({height: '8px'}).appendTo($text);
+    $('<div>').css({height: '16px'}).appendTo($text);
 
-    //pandora.createLinks($text);
+    // Hue, Saturation, Lightness, Volume --------------------------------------
 
     ['hue', 'saturation', 'lightness', 'volume'].forEach(function(key) {
         $('<div>')
@@ -428,6 +428,8 @@ pandora.ui.infoView = function(data) {
             .appendTo($statistics);
     });
 
+    // Rights Level ------------------------------------------------------------
+
     var $rightsLevel = $('<div>');
     $('<div>')
         .css({marginBottom: '4px'})
@@ -435,6 +437,43 @@ pandora.ui.infoView = function(data) {
         .append($rightsLevel)
         .appendTo($statistics);
     renderRightsLevel();
+
+    // Notes -------------------------------------------------------------------
+
+    if (canEdit) {
+
+        Ox.print('DATA', data)
+        $('<div>')
+            .css({marginBottom: '4px'})
+            .append(formatKey('Notes', true))
+            .append(
+                Ox.Editable({
+                        format: function(value) {
+                            return value || formatLight('No notes');
+                        },
+                        height: 128,
+                        placeholder: formatLight('No notes'),
+                        tooltip: 'Doubleclick to edit',
+                        type: 'textarea',
+                        value: data.notes,
+                        width: 128
+                    })
+                    .bindEvent({
+                        submit: function(event) {
+                            pandora.api.edit({
+                                id: data.id,
+                                notes: event.value
+                            }, function(result) {
+                                // ...
+                            });
+                        }
+                    })
+            )
+            .appendTo($statistics);
+        
+    }
+
+    $('<div>').css({height: '16px'}).appendTo($statistics);
 
     if (canEdit) {
         $icon.bindEvent({
@@ -587,21 +626,23 @@ pandora.ui.infoView = function(data) {
                     marginBottom: '4px'
                 })
                 .appendTo($capabilities);
-            Ox.Label({
-                    textAlign: 'center',
-                    title: canEdit ? Ox.toTitleCase(userLevel) : pandora.site.rightsLevels[data.rightsLevel].name,
-                    width: canEdit ? 48 : 68
-                })
-                .css(Ox.extend(
-                    {
-                        float: 'left',
-                        paddingTop: '2px',
-                        height: '12px',
-                        fontSize: '8px'
-                    },
-                    canEdit ? getUserLevelCSS(userLevel) : getRightsLevelCSS(data.rightsLevel)
-                ))
-                .appendTo($line);
+            if (canEdit) {
+                Ox.Label({
+                        textAlign: 'center',
+                        title: Ox.toTitleCase(userLevel),
+                        width: 48
+                    })
+                    .css(Ox.extend(
+                        {
+                            float: 'left',
+                            paddingTop: '2px',
+                            height: '12px',
+                            fontSize: '8px'
+                        },
+                        getUserLevelCSS(userLevel)
+                    ))
+                    .appendTo($line);
+            }
             capabilities.forEach(function(capability) {
                 var hasCapability = pandora.site.capabilities[capability.name][userLevel] >= rightsLevel;
                 Ox.Button({
@@ -613,11 +654,24 @@ pandora.ui.infoView = function(data) {
                         title: capability.symbol,
                         type: 'image'
                     })
-                    .css(Ox.extend({
-                        marginLeft: '4px'
-                    }, getCapabilityCSS(hasCapability)))
+                    .css(getCapabilityCSS(hasCapability))
+                    .css('margin' + (canEdit ? 'Left' : 'Right'), '4px')
                     .appendTo($line);
             });
+            if (!canEdit) {
+                Ox.Button({
+                    title: 'Help',
+                    tooltip: 'About Rights',
+                    type: 'image'
+                })
+                .css({marginLeft: '52px'})
+                .bindEvent({
+                    click: function() {
+                        pandora.URL.push('/rights');
+                    }
+                })
+                .appendTo($line);
+            }
         });
     }
 
@@ -724,13 +778,13 @@ pandora.ui.infoView = function(data) {
     }
 
     function renderRightsLevel() {
-        var $capabilites, $rightsLevelSelect,
-            rightsLevelCSS = getRightsLevelCSS(data.rightsLevel);        
+        var $capabilites, $rightsLevelLabel, $rightsLevelSelect,
+            rightsLevelCSS = getRightsLevelCSS(data.rightslevel);        
         $rightsLevel.empty();
         if (canEdit) {
             $rightsLevelSelect = Ox.Select({
                     items: pandora.site.rightsLevels.map(function(rightsLevel, i) {
-                        return {id: i, title: rightsLevel.name, checked: i == data.rightsLevel};
+                        return {id: i, title: rightsLevel.name, checked: i == data.rightslevel};
                     }),
                     width: 128
                 })
@@ -742,15 +796,24 @@ pandora.ui.infoView = function(data) {
                         var rightsLevel = event.selected[0].id;
                         $rightsLevelSelect.css(getRightsLevelCSS(rightsLevel));
                         renderCapabilities(rightsLevel);
-                        pandora.api.edit({id: data.id, rightsLevel: rightsLevel}, function(result) {
+                        pandora.api.edit({id: data.id, rightslevel: rightsLevel}, function(result) {
                             // ...
                         });
                     }
                 })
                 .appendTo($rightsLevel);
+        } else {
+            $rightsLevelLabel = Ox.Label({
+                    title: pandora.site.rightsLevels[data.rightslevel].name,
+                    width: 128
+                })
+                .css(Ox.extend({
+                    marginBottom: '4px'
+                }, rightsLevelCSS))
+                .appendTo($rightsLevel);
         }
         $capabilities = $('<div>').appendTo($rightsLevel);
-        renderCapabilities(data.rightsLevel);
+        renderCapabilities(data.rightslevel);
     }
 
     function toggleIconSize() {

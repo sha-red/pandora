@@ -16,10 +16,11 @@
         "canDeleteItems": {"admin": true},
         "canDownloadVideo": {"guest": 0, "member": 0, "friend": 4, "staff": 4, "admin": 4},
         "canEditMetadata": {"staff": true, "admin": true},
+        "canEditUsers": {"admin": true},
         "canPlayClips": {"guest": 2, "member": 2, "friend": 4, "staff": 4, "admin": 4},
         "canPlayVideo": {"guest": 1, "member": 1, "friend": 4, "staff": 4, "admin": 4},
         "canReloadMetadata": {"staff": true, "admin": true},
-        "canSeeDebugMenu": {"admin": true},
+        "canSeeDebugMenu": {"staff": true, "admin": true},
         "canSeeFiles": {"staff": true, "admin": true},
         "canSeeItem": {"guest": 3, "member": 3, "friend": 4, "staff": 4, "admin": 4},
         "canSeeExtraItemViews": {"friend": true, "staff": true, "admin": true}
@@ -321,7 +322,7 @@
             "type": "float",
             "columnWidth": 90,
             "format": {"type": "color", "args": ["hue"]},
-            "sortOperator": "-"
+            "sortOperator": "+"
         },
         {
             "id": "saturation",
@@ -443,6 +444,13 @@
             "type": "integer",
             "columnWidth": 60,
             "format": {"type": "percent", "args": ["auto", 2]}
+        },
+        {
+            "id": "rightslevel",
+            "title": "Rights Level",
+            "type": "integer",
+            "columnWidth": 60,
+            "sortOperator": "+"
         },
         {
             "id": "canPlayVideo",

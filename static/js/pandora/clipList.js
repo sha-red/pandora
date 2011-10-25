@@ -132,13 +132,13 @@ pandora.ui.clipList = function(videoRatio) {
                             width = fixedRatio > 1 ? size : Math.round(size * fixedRatio);
                             height = fixedRatio > 1 ? Math.round(size / fixedRatio) : size;
                         }
-                        pandora.api.get({id: item, keys: ['durations', 'rightsLevel']}, function(result) {
+                        pandora.api.get({id: item, keys: ['durations', 'rightslevel']}, function(result) {
                             var points = [that.value(id, 'in'), that.value(id, 'out')],
                                 partsAndPoints = pandora.getVideoPartsAndPoints(
                                     result.data.durations, points
                                 ),
                                 $player = Ox.VideoPlayer({
-                                    censored: pandora.site.capabilities.canPlayClips[pandora.user.level] < result.data.rightsLevel
+                                    censored: pandora.site.capabilities.canPlayClips[pandora.user.level] < result.data.rightslevel
                                         ? [{'in': partsAndPoints.points[0], out: partsAndPoints.points[1]}]
                                         : [],
                                     height: height,

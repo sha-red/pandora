@@ -18,18 +18,22 @@ RUN_RELOADER = True
 
 def load_config():
     with open(settings.SITE_CONFIG) as f:
-        config = ox.jsonc.load(f)
+        try:
+            config = ox.jsonc.load(f)
+        except:
+            config = None
 
-    config['site']['id'] = settings.SITEID
-    config['site']['name'] = settings.SITENAME
-    config['site']['sectionName'] = settings.SITENAME
-    config['site']['url'] = settings.URL
+    if config:
+        config['site']['id'] = settings.SITEID
+        config['site']['name'] = settings.SITENAME
+        config['site']['sectionName'] = settings.SITENAME
+        config['site']['url'] = settings.URL
 
-    config['keys'] = {}
-    for key in config['itemKeys']:
-        config['keys'][key['id']] = key
+        config['keys'] = {}
+        for key in config['itemKeys']:
+            config['keys'][key['id']] = key
 
-    settings.CONFIG = config
+        settings.CONFIG = config
 
 def reloader_thread():
     _config_mtime = 0

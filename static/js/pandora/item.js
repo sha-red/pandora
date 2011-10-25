@@ -7,7 +7,7 @@ pandora.ui.item = function() {
     pandora.api.get({
         id: pandora.user.ui.item,
         keys: ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1 ?
-              [ 'cuts', 'duration', 'layers', 'parts', 'rendered', 'rightsLevel', 'size', 'title', 'videoRatio'] : []
+              [ 'cuts', 'duration', 'layers', 'parts', 'rendered', 'rightslevel', 'size', 'title', 'videoRatio'] : []
     }, pandora.user.level == 'admin' && pandora.user.ui.itemView == 'info' ? 0 : -1, function(result) {
 
         if (result.status.code == 200) {
@@ -34,8 +34,8 @@ pandora.ui.item = function() {
                         return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
                     })
                     : [],
-                canPlayClips = pandora.site.capabilities.canPlayClips[pandora.user.level] >= result.data.rightsLevel,
-                canPlayVideo = pandora.site.capabilities.canPlayVideo[pandora.user.level] >= result.data.rightsLevel,
+                canPlayClips = pandora.site.capabilities.canPlayClips[pandora.user.level] >= result.data.rightslevel,
+                canPlayVideo = pandora.site.capabilities.canPlayVideo[pandora.user.level] >= result.data.rightslevel,
                 censored = canPlayVideo ? []
                     : canPlayClips ? (
                         subtitles.length

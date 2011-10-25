@@ -424,7 +424,7 @@ class Item(models.Model):
         i = {
             'id': self.itemId,
             'rendered': self.rendered,
-            'rightsLevel': self.level
+            'rightslevel': self.level
         }
         i.update(self.external_data)
         i.update(self.data)
@@ -587,6 +587,7 @@ class Item(models.Model):
             'popularity',
             'published',
             'resolution',
+            'rightslevel',
             'saturation',
             'size',
             'volume',
@@ -647,6 +648,7 @@ class Item(models.Model):
         s.itemId = self.itemId.replace('0x', 'xx')
         s.modified = self.modified
         s.published = self.published
+        s.rightslevel = self.level
 
         s.aspectratio = self.get('aspectRatio')
         s.words = sum([len(a.value.split()) for a in self.annotations.exclude(value='')])

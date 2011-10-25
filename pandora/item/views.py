@@ -396,7 +396,7 @@ def get(request):
         if data['keys'] and 'files' in data['keys']:
             info['files'] = item.get_files(request.user)
         if not data['keys'] or 'notes' in data['keys'] \
-           and request.user.get_profile().capability('canSeeNotes'):
+           and request.user.get_profile().capability('canEditMetadata'):
             info['notes'] = item.notes
         response['data'] = info
     else:
@@ -442,12 +442,12 @@ def edit(request):
     if item.editable(request.user):
         response = json_response(status=200, text='ok')
         if 'notes' in data:
-            if request.user.get_profile().capability('canSeeNotes'):
+            if request.user.get_profile().capability('canEditMetadata'):
                 item.notes = data['notes']
             del data['notes']
-        if 'rightsLevel' in data:
-            item.level = data['rightsLevel']
-            del data['rightsLevel']
+        if 'rightslevel' in data:
+            item.level = data['rightslevel']
+            del data['rightslevel']
         r = item.edit(data)
         if r:
             r.wait()
