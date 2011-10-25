@@ -122,7 +122,7 @@ class File(models.Model):
                 self.pixels = int(self.width * self.height * float(utils.parse_decimal(self.framerate)) * self.duration)
 
         else:
-            self.is_video = os.path.splitext(self.path)[-1] in ('.avi', '.mkv', '.dv', '.ogv', '.mpeg', '.mov', '.webm')
+            self.is_video = os.path.splitext(self.path)[-1] in ('.avi', '.mkv', '.dv', '.ogv', '.mpeg', '.mov', '.webm', '.mp4', '.mpg')
             self.is_audio = os.path.splitext(self.path)[-1] in ('.mp3', '.wav', '.ogg', '.flac', '.oga')
             self.is_subtitle = os.path.splitext(self.path)[-1] in ('.srt', )
 
