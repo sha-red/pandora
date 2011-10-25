@@ -20,7 +20,7 @@ pandora.ui.mainPanel = function() {
         .bindEvent({
             pandora_find: function() {
                 var previousUI = pandora.UI.getPrevious();
-                if (pandora.user.ui._list == previousUI._list) {
+                if (pandora.user.ui._list == previousUI._list && pandora.$ui.list) {
                     if (['map', 'calendar'].indexOf(pandora.user.ui.listView) > -1) {
                         pandora.$ui.contentPanel.replaceElement(1,
                             pandora.ui.navigationView(pandora.user.ui.listView)
