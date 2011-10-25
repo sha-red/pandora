@@ -95,8 +95,9 @@ def redirect_url(request, url):
 def log(request):
     '''
         param data {
-            type: 'ERROR', 'WARN' 
-            message: text
+            url: url
+            line: line
+            text: text
         }
         return {
             status: ...
@@ -111,11 +112,12 @@ def log(request):
         user = request.user
     else:
         user = None
-    if 'message' in data:
+    if 'text' in data:
         l = models.Log(
             user=user,
-            type=data.get('type', 'ERROR'),
-            message=data['message']
+            text=data['text'],
+            line=int(data.get('line', 0)),
+            url=data.get('url', '')
         )
         l.save()
     response = json_response()
