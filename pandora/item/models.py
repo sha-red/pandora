@@ -893,9 +893,9 @@ class Item(models.Model):
     def delete_poster(self):
         if self.poster:
             path = self.poster.path
-            if os.path.exists(path):
+            try:
                 self.poster.delete()
-            else:
+            except:
                 self.poster.name = None
         else:
             poster= self.path('poster.jpg')
