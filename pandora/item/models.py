@@ -893,7 +893,10 @@ class Item(models.Model):
     def delete_poster(self):
         if self.poster:
             path = self.poster.path
-            self.poster.delete()
+            if os.path.exists(path):
+                self.poster.delete()
+            else:
+                self.poster.name = None
         else:
             poster= self.path('poster.jpg')
             path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
