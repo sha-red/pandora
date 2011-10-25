@@ -7,7 +7,7 @@ from os.path import join, dirname, basename, splitext, exists
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
-mport monkey_patch.models
+import monkey_patch.models
 from ... import models
 
 
