@@ -147,7 +147,7 @@ pandora.ui.infoView = function(data) {
                         return formatTitle(value);
                     },
                     tooltip: isEditable ? 'Doubleclick to edit' : '', 
-                    value: formatTitle(data.title)
+                    value: data.title
                 })
                 .css({
                     display: 'inline-block',
