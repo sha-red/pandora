@@ -61,8 +61,11 @@ def parseCondition(condition, user):
         key_type = 'list'
 
     if key_type == "string":
-        in_find=True
-        value_key = 'find__value'
+        in_find = not k.startswith('itemId')
+        if in_find:
+            value_key = 'find__value'
+        else:
+            value_key = k
         if k in models.Item.facet_keys + ['title']:
             in_find = False
             facet_value = 'facets__value%s' % {
@@ -77,7 +80,7 @@ def parseCondition(condition, user):
             v = models.Item.objects.filter(**{'facets__key':k, facet_value:v})
             k = 'id__in'
         else:
-            value_key = 'find__value%s' % {
+            value_key = '%s%s' % (value_key, {
                 '==': '__iexact',
                 '>': '__gt',
                 '>=': '__gte',
@@ -85,23 +88,23 @@ def parseCondition(condition, user):
                 '<=': '__lte',
                 '^': '__istartswith',
                 '$': '__iendswith',
-            }.get(op, '__icontains')
+            }.get(op, '__icontains'))
 
         k = str(k)
         if exclude:
             if k == '*':
                 q = ~Q(**{value_key: v})
-            elif in_find and not k.startswith('itemId'):
+            elif in_find:
                 q = ~Q(**{'find__key': k, value_key: v})
             else:
-                q = ~Q(**{k: v})
+                q = ~Q(**{value_key: v})
         else:
             if k == '*':
                 q = Q(**{value_key: v})
-            elif in_find and not k.startswith('itemId'):
+            elif in_find:
                 q = Q(**{'find__key': k, value_key: v})
             else:
-                q = Q(**{k: v})
+                q = Q(**{value_key: v})
         return q
     elif key_type == 'list':
         q = Q(itemId=False)
