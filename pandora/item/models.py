@@ -1159,6 +1159,7 @@ for key in filter(lambda k: 'columnWidth' in k, settings.CONFIG['itemKeys']):
         'length': 'integer',
         'date': 'date',
         'hue': 'float',
+        'label': 'integer',
     }.get(sort_type, sort_type)]
     attrs[name] = model[0](**model[1])
 
