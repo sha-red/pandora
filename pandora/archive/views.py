@@ -257,9 +257,9 @@ def moveFiles(request):
                     data['director'] = []
                 else:
                     data['director'] = data['director'].split(', ')
-            i = get_item(data)
+            i = get_item(data, user=request.user)
         else:
-            i = get_item({'imdbId': data['itemId']})
+            i = get_item({'imdbId': data['itemId']}, user=request.user)
     changed = [i.itemId]
     for f in models.File.objects.filter(oshash__in=data['ids']):
         if f.item.id != i.itemId and f.editable(request.user):

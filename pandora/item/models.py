@@ -253,6 +253,8 @@ class Item(models.Model):
         update_poster = False
         update_ids = False
         if not self.id:
+            if self.user:
+                self.level = settings.CONFIG['rightsLevel'][self.user.get_profile().get_level()]
             if not self.itemId:
                 self.itemId = str(uuid.uuid1())
             super(Item, self).save(*args, **kwargs)
@@ -943,7 +945,9 @@ class Item(models.Model):
                 self.save()
             elif os.path.exists(poster):
                 with open(poster) as f:
-                    self.poster.save('poster.jpg', ContentFile(f.read()))
+                    data = f.read()
+                    if data:
+                        self.poster.save('poster.jpg', ContentFile(data))
 
     def make_siteposter(self):
         poster = self.path('siteposter.jpg')
