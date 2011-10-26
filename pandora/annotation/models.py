@@ -108,11 +108,13 @@ class Annotation(models.Model):
     def set_public_id(self):
         public_id = Annotation.objects.filter(item=self.item, id__lt=self.id).count()
         self.public_id = "%s/%s" % ( self.item.itemId, ox.to26(public_id))
+        Annotation.objects.filter(id=self.id).update(public_id=public_id)
 
     def save(self, *args, **kwargs):
         if not self.id:
-            super(Annotation, self).save(*args, **kwargs)
-            self.set_public_id()
+            set_public_id = True
+        else:
+            set_public_id = False
 
         #no clip or update clip
         if not self.clip and not self.layer.private or \
@@ -121,6 +123,8 @@ class Annotation(models.Model):
             self.clip, created = Clip.get_or_create(self.item, self.start, self.end)
 
         super(Annotation, self).save(*args, **kwargs)
+        if set_public_id:
+            self.set_public_id()
 
     def json(self, layer=False, keys=None):
         j = {
