@@ -3,14 +3,6 @@ pandora.ui.usersDialog = function() {
 
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = Math.round(window.innerWidth * 0.9),
-        // FIXME: colors should be part of config
-        levelColors = {
-            'guest': [255, 128, 128],
-            'member': [255, 255, 128],
-            'friend': [128, 255, 128],
-            'staff': [128, 255, 255],
-            'admin': [128, 128, 255]
-        },
         numberOfUsers = 0,
         userLevels = ['member', 'friend', 'staff', 'admin'],
 
@@ -116,25 +108,18 @@ pandora.ui.usersDialog = function() {
                     {
                         align: 'center',
                         format: function(value) {
-                            var dark = 'rgb(' + levelColors[value].map(function(color) {
-                                    return (color - 128).toString();
-                                }).join(', ') + ')',
-                                light = 'rgb(' + levelColors[value].map(function(color) {
-                                    return color.toString()
-                                }).join(', ') + ')';
-                            return $('<div>')
-                                .css({
-                                    borderRadius: '4px',
-                                    padding: '0 3px 1px 3px',
-                                    background: pandora.user.ui.theme == 'classic' ? light : dark,
-                                    textAlign: 'center',                       
-                                    color: pandora.user.ui.theme == 'classic' ? dark : light
-                                })
-                                .html(Ox.toTitleCase(value))
+                            return Ox.Theme.formatColorLevel(
+                                pandora.site.userLevels.indexOf(value),
+                                pandora.site.userLevels.map(function(userLevel) {
+                                    return Ox.toTitleCase(userLevel);
+                                }),
+                                [0, 240]
+                            );
                         },
                         id: 'level',
                         operator: '-',
                         title: 'Level',
+                        type: 'label',
                         visible: true,
                         width: 60
                     },

@@ -65,11 +65,17 @@ pandora.ui.browser = function() {
                 if (['title', 'director'].indexOf(sortKey) > -1) {
                     info = data['year'];
                 } else {
+                    // fixme: this is duplicated many times
                     format = pandora.getSortKeyData(sortKey).format;
-                    info = format
-                        ? Ox['format' + Ox.toTitleCase(format.type)]
-                            .apply(this, Ox.merge([data[sortKey]], format.args || []))
-                        : data[sortKey];
+                    if (format) {
+                        info = (
+                            /^color/.test(format.type.toLowerCase()) ? Ox.Theme : Ox
+                        )['format' + Ox.toTitleCase(format.type)].apply(
+                            this, Ox.merge([data[sortKey]], format.args || [])
+                        );
+                    } else {
+                        info = data[sortKey];
+                    }
                 }
                 return {
                     height: ratio <= 1 ? size : size / ratio,

@@ -173,9 +173,6 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'settheme') {
                     Ox.Theme(value);
                     pandora.UI.set('theme', value);
-                    if (ui.item && ui.itemView == 'info') {
-                        pandora.$ui.item.renderRightsLevel();
-                    }
                 } else if (data.id == 'showsiteposter') {
                     pandora.UI.set('showSitePoster', data.checked)
                 } else if (Ox.startsWith(data.id, 'sortgroup')) {

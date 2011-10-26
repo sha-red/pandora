@@ -79,7 +79,7 @@ pandora.ui.list = function() {
                 return {
                     align: ['string', 'text'].indexOf(
                         Ox.isArray(key.type) ? key.type[0]: key.type
-                    ) > -1 ? 'left' : 'right',
+                    ) > -1 ? 'left' : key.type == 'label' ? 'center' : 'right',
                     defaultWidth: key.columnWidth,
                     format: key.format,
                     id: key.id,
@@ -154,10 +154,15 @@ pandora.ui.list = function() {
                     info = data['year'];
                 } else {
                     format = pandora.getSortKeyData(sortKey).format;
-                    info = format
-                        ? Ox['format' + Ox.toTitleCase(format.type)]
-                            .apply(this, Ox.merge([data[sortKey]], format.args || []))
-                        : data[sortKey];
+                    if (format) {
+                        info = (
+                            /^color/.test(format.type.toLowerCase()) ? Ox.Theme : Ox
+                        )['format' + Ox.toTitleCase(format.type)].apply(
+                            this, Ox.merge([data[sortKey]], format.args || [])
+                        );
+                    } else {
+                        info = data[sortKey];
+                    }
                 }
                 size = size || 128;
                 return {
@@ -202,10 +207,15 @@ pandora.ui.list = function() {
                     info = data['year'];
                 } else {
                     format = pandora.getSortKeyData(sortKey).format;
-                    info = format
-                        ? Ox['format' + Ox.toTitleCase(format.type)]
-                            .apply(this, Ox.merge([data[sortKey]], format.args || []))
-                        : data[sortKey];
+                    if (format) {
+                        info = (
+                            /^color/.test(format.type.toLowerCase()) ? Ox.Theme : Ox
+                        )['format' + Ox.toTitleCase(format.type)].apply(
+                            this, Ox.merge([data[sortKey]], format.args || [])
+                        );
+                    } else {
+                        info = data[sortKey];
+                    }
                 }
                 return {
                     icon: {

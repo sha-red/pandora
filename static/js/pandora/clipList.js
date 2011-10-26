@@ -28,10 +28,15 @@ pandora.ui.clipList = function(videoRatio) {
                         + Ox.formatDuration(data.out);
                 } else {
                     format = pandora.getSortKeyData(sortKey).format;
-                    info = format
-                        ? Ox['format' + Ox.toTitleCase(format.type)]
-                            .apply(this, Ox.merge([data[sortKey]], format.args || []))
-                        : data[sortKey];
+                    if (format) {
+                        info = (
+                            /^color/.test(format.type.toLowerCase()) ? Ox.Theme : Ox
+                        )['format' + Ox.toTitleCase(format.type)].apply(
+                            this, Ox.merge([data[sortKey]], format.args || [])
+                        );
+                    } else {
+                        info = data[sortKey];
+                    }
                 }
                 return {
                     height: height,
