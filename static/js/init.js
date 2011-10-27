@@ -109,7 +109,7 @@ window.onerror = function(error, url, line) {
         gradient.style.background = theme == 'classic'
             ? '-webkit-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
             : '-webkit-linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
-        loadingScreen = document.createElement('div');
+        var loadingScreen = document.createElement('div');
         loadingScreen.setAttribute('id', 'loadingScreen');
         loadingScreen.className = 'OxScreen';
         loadingScreen.style.position = 'absolute';

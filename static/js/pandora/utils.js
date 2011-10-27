@@ -134,15 +134,26 @@ pandora.addList = function() {
     }
 };
 
+pandora.clickLink = function(e) {
+    if (e.target.hostname == document.location.hostname) {
+        pandora.URL.push(e.target.pathname);
+    } else {
+        document.location.href = '/url=' + encodeURIComponent(e.target.href);
+    }
+};
+
 pandora.createLinks = function($element) {
-    $element.find('a').click(function(event) {
-        if (event.target.hostname == document.location.hostname) {
-            pandora.URL.push(event.target.pathname);
-        } else {
-            document.location.href = '/url=' + encodeURIComponent(event.target.href);
-        }
-        return false;
-    });
+    $element
+        .bind({
+            click: function() {
+                return false;
+            }
+        })
+        .bindEvent({
+            singleclick: function(e) {
+                $(e.target).is('a') && pandora.clickLink(e);
+            }
+        });
 };
 
 pandora.enableDragAndDrop = function($list, canMove) {
