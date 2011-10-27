@@ -516,5 +516,5 @@ def icon(request, id, size=16):
         list = qs[0]
         icon = list.get_icon(int(size))
     else:
-        icon = os.path.join(settings.STATIC_ROOT, 'jpg/list.jpg')
+        icon = os.path.join(settings.STATIC_ROOT, 'jpg/list256.jpg')
     return HttpFileResponse(icon, content_type='image/jpeg')

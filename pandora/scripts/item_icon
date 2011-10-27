@@ -15,7 +15,7 @@ from optparse import OptionParser
 import sys
 
 
-static_root = os.path.join(os.path.dirname(__file__), '..', '..', 'static')
+static_root = os.path.join(os.path.dirname(__file__), 'data')
 
 def render_icon(frame, timeline, icon):
     icon_width = 1024

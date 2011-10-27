@@ -4,6 +4,7 @@ from __future__ import division, with_statement
 
 import os
 import sys
+import shutil
 import time
 import thread
 
@@ -71,6 +72,18 @@ def update_static():
     print 'write', pandora_json
     with open(pandora_json, 'w') as f:
         json.dump(sorted(js), f, indent=2)
+
+    for size in (16, 64, 256):
+        pandora = os.path.join(settings.STATIC_ROOT, 'png/pandora/icon%d.png'%size)
+        image = os.path.join(settings.STATIC_ROOT, 'png/icon%d.png'%size)
+        if not os.path.exists(image):
+            shutil.copyfile(pandora, image)
+
+    for size in (256, 1024):
+        pandora = os.path.join(settings.STATIC_ROOT, 'png/pandora/logo%d.png'%size)
+        image = os.path.join(settings.STATIC_ROOT, 'png/logo%d.png'%size)
+        if not os.path.exists(image):
+            shutil.copyfile(pandora, image)
 
 def init():    
     load_config()

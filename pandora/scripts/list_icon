@@ -16,7 +16,7 @@ from optparse import OptionParser
 from ox.image import drawText, wrapText
 import sys
 
-static_root = os.path.join(os.path.dirname(__file__), '..', '..', 'static')
+static_root = os.path.join(os.path.dirname(__file__), 'data')
 
 def render_list_icon(frames, icon):
     icon_width = 256

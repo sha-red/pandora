@@ -693,7 +693,7 @@ def poster(request, id, size=None):
     if item.poster:
         return image_to_response(item.poster, size)
     else:
-        poster_path = os.path.join(settings.STATIC_ROOT, 'png/poster.png')
+        poster_path = os.path.join(settings.STATIC_ROOT, 'jpg/poster.jpg')
         response = HttpFileResponse(poster_path, content_type='image/jpeg')
         response['Cache-Control'] = 'no-cache'
         return response

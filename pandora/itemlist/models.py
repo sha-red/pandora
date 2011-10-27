@@ -159,7 +159,7 @@ class List(models.Model):
                 source = self.icon.path
                 max_size = min(self.icon.width, self.icon.height)
             else:
-                source = os.path.join(settings.STATIC_ROOT, 'png/list256.png')
+                source = os.path.join(settings.STATIC_ROOT, 'jpg/list256.jpg')
                 max_size = 256
             if size < max_size:
                 extract.resize_image(source, path, size=size)

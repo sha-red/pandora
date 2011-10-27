@@ -17,7 +17,7 @@ from ox.image import drawText, wrapText
 import sys
 
 
-static_root = os.path.join(os.path.dirname(__file__), '..', '..', 'static')
+static_root = os.path.join(os.path.dirname(__file__), 'data')
 
 def render_poster(title, director, year, series, oxdb_id, imdb_id, frame, timeline, poster):
     def get_oxdb_color(oxdb_id, series=False):
@@ -107,7 +107,7 @@ def render_poster(title, director, year, series, oxdb_id, imdb_id, frame, timeli
 
     # logo
     logo_height = 32
-    logo_image = Image.open(os.path.join(static_root, 'png', 'logo.poster.png'))
+    logo_image = Image.open(os.path.join(static_root, 'png', 'logo.png'))
     logo_width = int(round(logo_height * logo_image.size[0] / logo_image.size[1]))
     logo_image = logo_image.resize((logo_width, logo_height), Image.ANTIALIAS)
     logo_left = text_width - text_margin - logo_width

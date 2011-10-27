@@ -6,3 +6,4 @@ src
 bin
 static/json/pandora.json
 static/js/pandora.js
+static/png/*.png
