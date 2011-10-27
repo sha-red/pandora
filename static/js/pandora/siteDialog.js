@@ -42,7 +42,7 @@ pandora.ui.siteDialog = function(section) {
                                 .append(
                                     $('<img>')
                                         .attr({src: '/static/png/' + (
-                                            id == 'software' ? 'pandora' : 'logo'
+                                            id == 'software' ? 'pandora/icon' : 'logo'
                                         ) + '256.png'})
                                         .css({width: '256px'})
                                 ),
