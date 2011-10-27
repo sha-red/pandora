@@ -114,10 +114,7 @@ class Annotation(models.Model):
         Annotation.objects.filter(id=self.id).update(public_id=self.public_id)
 
     def save(self, *args, **kwargs):
-        if not self.id:
-            set_public_id = True
-        else:
-            set_public_id = False
+        set_public_id = not self.id
 
         #no clip or update clip
         if not self.clip and not self.layer.private or \
