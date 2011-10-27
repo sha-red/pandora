@@ -3,6 +3,7 @@
 from __future__ import division, with_statement
 
 from datetime import datetime
+import math
 import os.path
 import re
 import subprocess
@@ -1083,8 +1084,7 @@ class Item(models.Model):
                     annotation.save()
             #otherwise add empty 5 seconds annotation every minute
             if not subtitles_added:
-                i = offset
-                while i < offset + f.duration - 5:
+                for i in range(int(math.ceil(offset)), int(offset + f.duration) - 5, 60):
                     annotation = Annotation(
                         item=self,
                         layer=layer,
@@ -1094,7 +1094,6 @@ class Item(models.Model):
                         user=user
                     )
                     annotation.save()
-                    i += 60
             offset += f.duration
         self.update_find()
 
