@@ -40,14 +40,14 @@ def render_icon(frame, timeline, icon):
     timeline_width = 896
     timeline_height = 128
     timeline_image = Image.new('RGB', (timeline_width + 8, timeline_height + 8), (255, 255, 255))
-    mask_image = Image.open(os.path.join(static_root, 'png', 'iconTimelineOuterMask.png'))
+    mask_image = Image.open(os.path.join(static_root, 'iconTimelineOuterMask.png'))
     icon_image.paste(timeline_image, (timeline_left - 4, timeline_top - 4), mask=mask_image)
     timeline_image = Image.open(timeline) if timeline else Image.new('RGB', (timeline_width, timeline_height), (0, 0, 0))
     timeline_image = timeline_image.resize((timeline_width, timeline_height), Image.ANTIALIAS)
-    mask_image = Image.open(os.path.join(static_root, 'png', 'iconTimelineInnerMask.png'))
+    mask_image = Image.open(os.path.join(static_root, 'iconTimelineInnerMask.png'))
     icon_image.paste(timeline_image, (timeline_left, timeline_top), mask=mask_image)
     # we're using jpegs with border-radius
-    # mask_image = Image.open(os.path.join(static_root, 'png', 'iconMask.png'))
+    # mask_image = Image.open(os.path.join(static_root, 'iconMask.png'))
     # icon_image.putalpha(mask_image)
     icon_image.save(icon)
 

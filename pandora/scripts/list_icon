@@ -39,7 +39,7 @@ def render_list_icon(frames, icon):
             frame_image = frame_image.crop((0, top, frame_width_, top + frame_height))
         icon_image.paste(frame_image, (i % 2 * frame_width + (1 if i % 2 == 2 else 0),
                                        int(i / 2) * frame_height))
-    mask_image = Image.open(os.path.join(static_root, 'png', 'iconMask.png'))
+    mask_image = Image.open(os.path.join(static_root, 'iconMask.png'))
     mask_image = mask_image.resize((icon_width, icon_height))
     icon_image.putalpha(mask_image)
     icon_image.save(icon)

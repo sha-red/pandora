@@ -24,7 +24,7 @@ def render_poster(id, title, frame, timeline, poster):
     poster_ratio = poster_width / poster_height
     poster_color = (255, 255, 0)
     poster_image = Image.new('RGB', (poster_width, poster_height))
-    font_file = os.path.join(static_root, 'ttf', 'DejaVuSansCondensedBold.ttf')
+    font_file = os.path.join(static_root, 'DejaVuSansCondensedBold.ttf')
     font_size = 48
 
     # timeline

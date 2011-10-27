@@ -43,7 +43,7 @@ def render_poster(title, director, year, series, oxdb_id, imdb_id, frame, timeli
     poster_ratio = poster_width / poster_height
     poster_image = Image.new('RGB', (poster_width, poster_height))
     draw = ImageDraw.Draw(poster_image)
-    font_file = os.path.join(static_root, 'ttf', 'DejaVuSansCondensedBold.ttf')
+    font_file = os.path.join(static_root, 'DejaVuSansCondensedBold.ttf')
 
     font_size = {
         'small': 28,
@@ -107,7 +107,7 @@ def render_poster(title, director, year, series, oxdb_id, imdb_id, frame, timeli
 
     # logo
     logo_height = 32
-    logo_image = Image.open(os.path.join(static_root, 'png', 'logo.png'))
+    logo_image = Image.open(os.path.join(static_root, 'logo.png'))
     logo_width = int(round(logo_height * logo_image.size[0] / logo_image.size[1]))
     logo_image = logo_image.resize((logo_width, logo_height), Image.ANTIALIAS)
     logo_left = text_width - text_margin - logo_width
