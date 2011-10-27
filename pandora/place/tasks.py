@@ -18,3 +18,4 @@ def update_all_matches(**kwargs):
 def update_matches(id):
     place = models.Place.objects.get(pk=id)
     place.update_matches()
+
