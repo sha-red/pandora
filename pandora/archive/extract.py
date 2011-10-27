@@ -265,8 +265,8 @@ def resize_image(image_source, image_output, width=None, size=None):
             height = int(width / (float(source_width) / source_height))
             height = height - height % 2
 
-        width = min(width, 1)
-        height = min(height, 1)
+        width = max(width, 1)
+        height = max(height, 1)
 
         if width < source_width:
             resize_method = Image.ANTIALIAS
