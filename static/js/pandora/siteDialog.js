@@ -15,12 +15,13 @@ pandora.ui.siteDialog = function(section) {
                     pandora.api.getPage({name: id}, function(result) {
                         Ox.print('DATA::', result.data)
                         Ox.Editable({
+                                clickLink: pandora.clickLink,
                                 editable: pandora.site.capabilities.canEditSitePages[pandora.user.level],
                                 tooltip: 'Doubleclick to edit',
                                 type: 'textarea',
                                 value: result.data.body
                             })
-                            .css({width: '100%'})
+                            .css({width: '100%'/*, height: '100%'*/})
                             .bindEvent({
                                 submit: function(data) {
                                     Ox.Request.clearCache('getPage');

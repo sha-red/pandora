@@ -111,16 +111,6 @@ pandora.ui.infoView = function(data) {
                 right: margin + statisticsWidth + margin + 'px',
                 //background: 'green'
             })
-            .bind({
-                click: function() {
-                    return false;
-                }
-            })
-            .bindEvent({
-                singleclick: function(e) {
-                    $(e.target).is('a') && clickLink(e);
-                }
-            })
             .appendTo($data.$element),
 
         $statistics = $('<div>')
@@ -133,6 +123,8 @@ pandora.ui.infoView = function(data) {
             .appendTo($data.$element),
 
         $browserImages = [];
+
+    pandora.createLinks($text);
 
     // Title -------------------------------------------------------------------
 
@@ -174,7 +166,7 @@ pandora.ui.infoView = function(data) {
             })
             .append(
                 Ox.Editable({
-                        clickLink: clickLink,
+                        clickLink: pandora.clickLink,
                         editable: isEditable,
                         format: function(value) {
                             return value
@@ -212,7 +204,7 @@ pandora.ui.infoView = function(data) {
                 .html(formatKey(key).replace('</span>', '&nbsp;</span>'))
                 .appendTo($div);
             Ox.Editable({
-                    clickLink: clickLink,
+                    clickLink: pandora.clickLink,
                     format: function(value) {
                         return value
                             ? formatValue(value.split(', '), key)
@@ -488,15 +480,6 @@ pandora.ui.infoView = function(data) {
             }
         });
         renderList();
-    }
-
-    function clickLink(e) {
-        if (e.target.hostname == document.location.hostname) {
-            pandora.URL.push(e.target.pathname);
-        } else {
-            document.location.href = '/url=' + encodeURIComponent(e.target.href);
-        }
-        return false;
     }
 
     function editMetadata(key, value) {
