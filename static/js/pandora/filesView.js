@@ -408,7 +408,11 @@ pandora.ui.filesView = function(options, self) {
         }, function(result) {
             ['title', 'director', 'year'].forEach(function(key) {
                 if (result.data[key]) {
-                    self['$' + key + 'Input'].options({value: result.data[key]});
+                    self['$' + key + 'Input'].options({
+                        value: key == 'director'
+                            ? result.data[key].join(', ')
+                            : result.data[key]
+                    });
                 }
             });
             updateForm();
