@@ -3,11 +3,13 @@
 from datetime import timedelta
 
 from celery.decorators import task, periodic_task
+from celery.task.schedules import crontab
+
 
 from models import Event
 
 
-@periodic_task(run_every=timedelta(days=1), queue='encoding')
+@periodic_task(run_every=crontab(hour=7, minute=30), queue='encoding')
 def update_all_matches(**kwargs):
     ids = [e['id'] for e in Event.objects.all().values('id')]
     for i in ids:
