@@ -213,7 +213,7 @@ pandora.ui.infoView = function(data) {
                 .appendTo($div);
             Ox.Editable({
                     clickLink: clickLink,
-                    format: function(value) {                        
+                    format: function(value) {
                         return value
                             ? formatValue(value.split(', '), key)
                             : formatLight('unknown');
@@ -424,7 +424,11 @@ pandora.ui.infoView = function(data) {
         $('<div>')
             .css({marginBottom: '4px'})
             .append(formatKey(key, true))
-            .append(Ox.Theme.formatColor(data[key] || 0, key == 'volume' ? 'lightness' : key))
+            .append(
+                Ox.Theme.formatColor(
+                    data[key] || 0, key == 'volume' ? 'lightness' : key
+                ).css({textAlign: 'right'})
+            )
             .appendTo($statistics);
     });
 
