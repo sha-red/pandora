@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
-import unicodedata
-import string
 
 from django.db import models
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.db.models import Q
 
 import ox
@@ -16,6 +14,7 @@ from item.models import Item
 from item import utils
 from person.models import get_name_sort
 from title.models import get_title_sort
+
 import managers
 
 

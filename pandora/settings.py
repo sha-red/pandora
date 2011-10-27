@@ -75,9 +75,13 @@ MEDIA_ROOT = normpath(join(PROJECT_ROOT, '..', 'data'))
 STATIC_ROOT = normpath(join(PROJECT_ROOT, '..', 'static'))
 TESTS_ROOT = join(PROJECT_ROOT, 'tests')
 
+#if videos are served from another subdomain
+VIDEO_PREFIX = ''
+
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
+
 MEDIA_URL = '/data/'
 
 STATIC_URL = '/static/'
@@ -140,23 +144,19 @@ INSTALLED_APPS = (
     'urlalias',
 )
 
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error.
-# See http://docs.djangoproject.com/en/dev/topics/logging for
-# more details on how to customize your logging configuration.
+# Log errors into db
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
-        'mail_admins': {
+        'errors': {
             'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler'
+            'class': 'pandora.app.log.ErrorHandler'
         }
     },
     'loggers': {
         'django.request': {
-            'handlers': ['mail_admins'],
+            'handlers': ['errors'],
             'level': 'ERROR',
             'propagate': True,
         },

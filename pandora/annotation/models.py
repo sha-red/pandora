@@ -9,8 +9,11 @@ import ox
 from archive import extract
 from clip.models import Clip
 
-import utils
+
 import managers
+import utils
+from tasks import update_matching_events, update_matching_places
+
 
 
 def load_layers(layers):
@@ -104,7 +107,7 @@ class Annotation(models.Model):
             return utils.html_parser(self.value)
         else:
             return self.value
-
+    
     def set_public_id(self):
         public_id = Annotation.objects.filter(item=self.item, id__lt=self.id).count()
         self.public_id = "%s/%s" % (self.item.itemId, ox.to26(public_id))
@@ -125,6 +128,9 @@ class Annotation(models.Model):
         super(Annotation, self).save(*args, **kwargs)
         if set_public_id:
             self.set_public_id()
+        #how expensive is this?
+        #update_matching_events.delay(self.value)
+        #update_matching_places.delay(self.value)
 
     def json(self, layer=False, keys=None):
         j = {

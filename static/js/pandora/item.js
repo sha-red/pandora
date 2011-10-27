@@ -64,7 +64,7 @@ pandora.ui.item = function() {
             });
             pandora.site.video.resolutions.forEach(function(resolution) {
                 video[resolution] = Ox.range(result.data.parts).map(function(i) {
-                    return '/' + pandora.user.ui.item + '/'
+                    return pandora.site.site.videoprefix + '/' + pandora.user.ui.item + '/'
                         + resolution + 'p' + (i + 1) + '.' + pandora.user.videoFormat;
                 });
             });

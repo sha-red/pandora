@@ -557,7 +557,8 @@
         // fixme: there should be no magic applied to this file
         "id": "{{settings.SITEID}}",
         "name": "{{settings.SITENAME}}",
-        "url": "{{settings.URL}}"
+        "url": "{{settings.URL}}",
+        "videoprefix": ""
     },
     "sitePages": [
         {"id": "about", "title": "About"},

@@ -24,7 +24,7 @@ class Log(models.Model):
     text = models.TextField(blank=True)
 
     def __unicode__(self):
-        return self.id
+        return u"%s" % self.id
 
     def json(self):
         return {
