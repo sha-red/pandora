@@ -108,17 +108,18 @@ def log(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    if not request.user.is_authenticated:
+    if request.user.is_authenticated():
         user = request.user
     else:
         user = None
     if 'text' in data:
         l = models.Log(
-            user=user,
             text=data['text'],
             line=int(data.get('line', 0)),
             url=data.get('url', '')
         )
+        if user:
+            l.user = user
         l.save()
     response = json_response()
     return render_to_json_response(response)
