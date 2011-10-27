@@ -1084,7 +1084,9 @@ class Item(models.Model):
                     annotation.save()
             #otherwise add empty 5 seconds annotation every minute
             if not subtitles_added:
-                for i in range(int(math.ceil(offset)), int(offset + f.duration) - 5, 60):
+                for i in range(int (offset / 60) * 60 + 60,
+                               int(offset + f.duration) - 5,
+                               60):
                     annotation = Annotation(
                         item=self,
                         layer=layer,
