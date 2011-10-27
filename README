@@ -54,7 +54,7 @@ Running developer environment:
   in one terminal:
     ./manage.py runserver
   and in another one:
-    ./manage.py celeryd -Q default,encoding
+    ./manage.py celeryd -Q default,encoding -B
 
 Updating database:
  right now database updates are not managed, each time you update to current bzr
