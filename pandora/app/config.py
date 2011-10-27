@@ -79,7 +79,7 @@ def update_static():
         if not os.path.exists(image):
             shutil.copyfile(pandora, image)
 
-    for size in (256, 1024):
+    for size in (256, ):
         pandora = os.path.join(settings.STATIC_ROOT, 'png/pandora/logo%d.png'%size)
         image = os.path.join(settings.STATIC_ROOT, 'png/logo%d.png'%size)
         if not os.path.exists(image):
