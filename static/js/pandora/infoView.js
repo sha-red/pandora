@@ -626,10 +626,7 @@ pandora.ui.infoView = function(data) {
                         type: 'image'
                     })
                     .addClass('OxColor OxColorGradient')
-                    .css({
-                        background: $element.css('background'),
-                        color: $element.css('color')
-                    })
+                    .css({background: $element.css('background')})
                     .css('margin' + (canEdit ? 'Left' : 'Right'), '4px')
                     .data({OxColor: $element.data('OxColor')})
                     .appendTo($line);

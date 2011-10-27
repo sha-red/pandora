@@ -141,7 +141,8 @@ pandora.ui.mainMenu = function() {
                 pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
                     ? [
                         { id: 'debugMenu', title: 'Debug', items: [
-                            { id: 'clearcache', title: 'Clear cache'},
+                            { id: 'clearcache', title: 'Clear Cache'},
+                            { id: 'reloadapplication', title: 'Reload Application'},
                             { id: 'resetui', title: 'Reset UI Settings'}
                         ] }
                     ]
@@ -248,12 +249,14 @@ pandora.ui.mainMenu = function() {
                         groups: pandora.site.user.ui.groups
                     });
                     pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
+                } else if (data.id == 'clearcache') {
+                    Ox.Request.clearCache();
+                } else if (data.id == 'reloadapplication') {
+                    pandora.$ui.appPanel.reload();
                 } else if (data.id == 'resetui') {
                     pandora.api.resetUI({}, function() {
                         pandora.$ui.appPanel.reload();
                     });
-                } else if (data.id == 'clearcache') {
-                    Ox.Request.clearCache();
                 }
             },
             pandora_find: function() {
