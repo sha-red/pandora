@@ -9,6 +9,8 @@ pandora.ui.filesView = function(options, self) {
             })
             .options(options || {});
 
+    self.wasChecked = false;
+    self.numberOfItems = 0;
     self.selected = [];
 
     self.$toolbar = Ox.Bar({
@@ -199,6 +201,9 @@ pandora.ui.filesView = function(options, self) {
                     });
                 }
             },
+            init: function(data) {
+                self.numberOfItems = data.items;
+            },
             open: openFiles,
             select: selectFiles,
         });
@@ -310,7 +315,9 @@ pandora.ui.filesView = function(options, self) {
     self.$checkbox = Ox.Checkbox({
         checked: false,
         id: 'go',
-        title: 'Switch to this movie after moving files', // fixme: wrong, can be 'Go to video' etc
+        title: 'Switch to this '
+            + pandora.site.itemName.singular.toLowerCase()
+            + ' after moving files',
         width: 240
     });
 
@@ -346,25 +353,7 @@ pandora.ui.filesView = function(options, self) {
         })
         .css({margin: '0 4px 4px 4px'})
         .bindEvent({
-            click: function() {
-                var data = {
-                    ids: self.selected,
-                    itemId: self.$idInput.value()
-                };
-                ['title', 'director', 'year'].forEach(function(key) {
-                    data[key] = self['$' + key + 'Input'].value();
-                });
-                Ox.Request.clearCache(); // fixme: remove
-                pandora.api.moveFiles(data, function(result) {
-                    if (self.$checkbox.value()) {
-                        pandora.UI.set({item: result.data.itemId});
-                    } else {
-                        Ox.print('moved', self.selected, result.data.itemId);
-                        self.$filesList.reloadList();
-                        self.$instancesList.reloadList();
-                    }
-                });
-            }
+            click: moveFiles
         });
 
     self.$moviePanel = Ox.Element()
@@ -402,6 +391,26 @@ pandora.ui.filesView = function(options, self) {
             orientation: 'horizontal'
         });
 
+    function moveFiles(data) {
+        var data = {
+            ids: self.selected,
+            itemId: self.$idInput.value()
+        };
+        ['title', 'director', 'year'].forEach(function(key) {
+            data[key] = self['$' + key + 'Input'].value();
+        });
+        pandora.api.moveFiles(data, function(result) {
+            if (self.$checkbox.value()) {
+                Ox.Request.clearCache(); // fixme: remove
+                pandora.UI.set({item: result.data.itemId});
+            } else {
+                Ox.print('moved', self.selected, result.data.itemId);
+                self.$filesList.reloadList();
+                self.$instancesList.reloadList();
+            }
+        });
+    }
+
     function openFiles(data) {
         data.ids.length == 1 && pandora.api.parsePath({
             path: self.$filesList.value(data.ids[0], 'path')
@@ -426,11 +435,23 @@ pandora.ui.filesView = function(options, self) {
     }
 
     function updateForm() {
+        if (self.selected.length == self.numberOfItems) {
+            self.wasChecked = self.$checkbox.options('checked');
+            self.$checkbox.options({
+                checked: true,
+                disabled: true
+            });
+        } else {
+            self.$checkbox.options({
+                checked: self.wasChecked,
+                disabled: false
+            });
+        }
         self.$moveButton.options({
-            disabled: self.selected.length === 0
+            disabled: self.selected.length == 0
         });
         self.$ignoreButton.options({
-            disabled: self.selected.length === 0
+            disabled: self.selected.length == 0
         });
     }
 
