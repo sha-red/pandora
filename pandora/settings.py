@@ -75,9 +75,13 @@ MEDIA_ROOT = normpath(join(PROJECT_ROOT, '..', 'data'))
 STATIC_ROOT = normpath(join(PROJECT_ROOT, '..', 'static'))
 TESTS_ROOT = join(PROJECT_ROOT, 'tests')
 
+#if videos are served from another subdomain
+VIDEO_PREFIX = ''
+
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
+
 MEDIA_URL = '/data/'
 
 STATIC_URL = '/static/'

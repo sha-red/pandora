@@ -28,6 +28,7 @@ def load_config():
         config['site']['name'] = settings.SITENAME
         config['site']['sectionName'] = settings.SITENAME
         config['site']['url'] = settings.URL
+        config['site']['videoprefix'] = settings.VIDEO_PREFIX
 
         config['keys'] = {}
         for key in config['itemKeys']:
