@@ -88,7 +88,10 @@ class Clip(models.Model):
                             for a in self.annotations.filter(layer__name=layer)]
             for key in keys:
                 if key not in clip_keys and key not in j:
-                    j[key] = self.item.get(key)
+                    value = self.item.get(key)
+                    if not value and hasattr(self.item.sort, key):
+                        value = getattr(self.item.sort, key)
+                    j[key] = value
         return j
 
     @classmethod
