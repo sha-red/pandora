@@ -657,7 +657,7 @@ class Item(models.Model):
         s.published = self.published
         s.rightslevel = self.level
 
-        s.aspectratio = self.get('aspectRatio')
+        s.aspectratio = self.get('aspectratio')
         s.words = sum([len(a.value.split()) for a in self.annotations.exclude(value='')])
         s.clips = self.clips.count()
 
