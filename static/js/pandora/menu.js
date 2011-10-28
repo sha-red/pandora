@@ -143,7 +143,8 @@ pandora.ui.mainMenu = function() {
                         { id: 'debugMenu', title: 'Debug', items: [
                             { id: 'clearcache', title: 'Clear Cache'},
                             { id: 'reloadapplication', title: 'Reload Application'},
-                            { id: 'resetui', title: 'Reset UI Settings'}
+                            { id: 'resetui', title: 'Reset UI Settings'},
+                            { id: 'debug', title: (localStorage.debug?'Disable':'Enable')+' Debug Mode'}
                         ] }
                     ]
                     : []
@@ -258,6 +259,14 @@ pandora.ui.mainMenu = function() {
                     pandora.api.resetUI({}, function() {
                         pandora.$ui.appPanel.reload();
                     });
+                } else if (data.id == 'debug') {
+                    if(localStorage.debug) {
+                        delete localStorage.debug;
+                    } else {
+                        localStorage.debug = 1;
+                    }
+
+                    that.setItemTitle('debug', (localStorage.debug ? 'Disable' : 'Enable') + ' Debug Mode');
                 }
             },
             pandora_find: function() {
