@@ -269,6 +269,7 @@ window.onerror = function(error, url, line) {
             }
 
             Ox.Theme(pandora.user.ui.theme);
+            localStorage.theme = pandora.user.ui.theme;
             pandora.$ui.appPanel = pandora.ui.appPanel().display();        
             Ox.Request.requests() && pandora.$ui.loadingIcon.start();
             pandora.$ui.body.ajaxStart(pandora.$ui.loadingIcon.start);
