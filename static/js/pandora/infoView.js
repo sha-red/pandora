@@ -340,10 +340,10 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($text);
 
-    data.releasedate && $('<div>')
+    data.releaseDate && $('<div>')
         .css(css)
         .html(
-            formatKey('Release Date') + Ox.formatDate(data.releasedate, '%A, %B %e, %Y')
+            formatKey('Release Date') + Ox.formatDate(data.releaseDate, '%A, %B %e, %Y')
         )
         .appendTo($text);
 
@@ -728,7 +728,7 @@ pandora.ui.infoView = function(data) {
                             $browserImages.each(function() {
                                 $(this).attr({src: '/' + data.id + '/' + (
                                     ui.icons == 'posters' ? 'poster' : 'icon'
-                                ) + '64.jpg?' + Ox.uid()});
+                                ) + '128.jpg?' + Ox.uid()});
                             });
                         });
                     }
