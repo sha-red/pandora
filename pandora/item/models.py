@@ -168,6 +168,8 @@ class Item(models.Model):
     objects = managers.ItemManager()
 
     def get(self, key, default=None):
+        if key == 'rightslevel':
+            return self.level
         if self.data and key in self.data:
             return self.data[key]
         if self.external_data and key in self.external_data:
