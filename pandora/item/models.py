@@ -892,7 +892,7 @@ class Item(models.Model):
             for s in streams:
                 for c in s.cuts:
                     self.data['cuts'].append(c+offset)
-                    color = map(lambda a,b: (a+b)/n, color,ox.image.getRGB(s.color))
+                color = map(lambda a,b: (a+b)/n, color,ox.image.getRGB(s.color))
                 offset += s.duration
             self.data['color'] = ox.image.getHSL(color)
         #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
