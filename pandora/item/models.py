@@ -462,6 +462,7 @@ class Item(models.Model):
         i['parts'] = len(i['durations'])
         if i['parts']:
             i['videoRatio'] = streams[0].aspect_ratio
+            i['resolution'] = (streams[0].file.width, streams[0].file.height)
 
         #only needed by admins
         if keys and 'posters' in keys:
