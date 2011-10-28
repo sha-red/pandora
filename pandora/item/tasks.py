@@ -17,7 +17,7 @@ def update_poster(itemId):
     item = models.Item.objects.get(itemId=itemId)
     item.make_poster(True)
     item.make_icon()
-
+    item.save()
 
 @task(ignore_resulsts=True, queue='default')
 def update_external(itemId):
