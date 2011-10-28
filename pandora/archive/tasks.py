@@ -96,4 +96,6 @@ def process_stream(fileId):
         stream.make_timeline()
         stream.extract_derivatives()
     file.item.update_selected()
+    if not file.item.rendered:
+        file.item.update_timeline()
     return True
