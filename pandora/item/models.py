@@ -218,8 +218,8 @@ class Item(models.Model):
             response = external_data('getData', {'id': self.itemId})
             if response['status']['code'] == 200:
                 self.external_data = response['data']
-                self.save()
                 self.make_poster(True)
+                self.save()
 
     def expand_connections(self):
         c = self.get('connections')
@@ -817,7 +817,6 @@ class Item(models.Model):
                         update = True
                 if update:
                     self.rendered = False
-                    self.save()
                     self.update_timeline()
                 break
 
@@ -943,7 +942,6 @@ class Item(models.Model):
             if url:
                 data = ox.net.readUrl(url)
                 self.poster.save('poster.jpg', ContentFile(data))
-                self.save()
             elif os.path.exists(poster):
                 with open(poster) as f:
                     data = f.read()
@@ -1006,7 +1004,6 @@ class Item(models.Model):
         if frames:
             heat = [ox.image.getImageHeat(f['path']) for f in frames] 
             self.poster_frame = heat.index(max(heat))
-            self.save()
 
     def get_poster_frame_path(self):
         frames = self.poster_frames()
@@ -1034,7 +1031,6 @@ class Item(models.Model):
            cmd += ['-f', frame]
         p = subprocess.Popen(cmd)
         p.wait()
-        self.save()
         icons = os.path.abspath(os.path.join(settings.MEDIA_ROOT, icon))
         icons = glob(icons.replace('.jpg', '*.jpg'))
         for f in filter(lambda p: not p.endswith('/icon.jpg'), icons):
