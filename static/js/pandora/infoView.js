@@ -339,10 +339,10 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($text);
 
-    data.releaseDate && $('<div>')
+    data.releasedate && $('<div>')
         .css(css)
         .html(
-            formatKey('Release Date') + Ox.formatDate(data.releaseDate, '%A, %B %e, %Y')
+            formatKey('Release Date') + Ox.formatDate(data.releasedate, '%A, %B %e, %Y')
         )
         .appendTo($text);
 
