@@ -244,7 +244,8 @@ pandora.ui.infoView = function(data) {
     data.alternativeTitles && $('<div>')
         .css(css)
         .html(
-            formatKey('Alternative Titles') + data.alternativeTitles.map(function(value) {
+            formatKey('Alternative Title' + (data.alternativeTitles.length == 1 ? '' : 's'))
+            + data.alternativeTitles.map(function(value) {
                 return value[0] + (value[1] ? ' '
                     + formatLight('(' + value[1] + ')') : '');
             }).join(', ')

@@ -60,7 +60,7 @@ pandora.ui.browser = function() {
                     url = '/' + data.id + '/' + (
                         ui.icons == 'posters'
                         ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
-                    ) + size + '.jpg',
+                    ) + '128.jpg',
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director'].indexOf(sortKey) > -1) {
                     info = data['year'];
@@ -95,6 +95,7 @@ pandora.ui.browser = function() {
             max: 1,
             min: 1,
             orientation: 'horizontal',
+            pageLength: 32,
             selected: [pandora.user.ui.item],
             size: 64,
             sort: ['text', 'position'].indexOf(pandora.user.ui.listSort) > -1
