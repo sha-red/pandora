@@ -22,6 +22,7 @@ class Clip(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     public_id = models.CharField(max_length=128, unique=True)
+    aspect_ratio = models.FloatField(default=0)
 
     item = models.ForeignKey('item.Item', related_name='clips')
 
@@ -37,8 +38,8 @@ class Clip(models.Model):
     lightness = models.FloatField(default=0, db_index=True)
     volume = models.FloatField(default=0, null=True, db_index=True)
 
-    director = models.CharField(max_length=1000)
-    title = models.CharField(max_length=1000)
+    director = models.CharField(max_length=1000, db_index=True)
+    title = models.CharField(max_length=1000, db_index=True)
 
     def update_calculated_values(self):
         self.duration = self.end - self.start
@@ -51,41 +52,44 @@ class Clip(models.Model):
             self.volume = 0
         self.director = self.item.sort.director
         self.title = self.item.sort.title
-    
+  
     def save(self, *args, **kwargs):
         self.public_id = u"%s/%s-%s" %(self.item.itemId, float(self.start), float(self.end))
         if self.duration != self.end - self.start:
             self.update_calculated_values()
+        if not self.aspect_ratio and self.item:
+            streams = self.item.streams()
+            if streams:
+                self.aspect_ratio = streams[0].aspect_ratio
         super(Clip, self).save(*args, **kwargs)
 
     def json(self, keys=None):
         j = {}
         clip_keys = ('id', 'in', 'out', 'position', 'created', 'modified',
-                     'hue', 'saturation', 'lightness', 'volume')
+                     'hue', 'saturation', 'lightness', 'volume', 'videoRatio')
         for key in clip_keys:
             j[key] = getattr(self, {
                 'id': 'public_id',
                 'in': 'start',
                 'out': 'end',
                 'position': 'start',
+                'videoRatio': 'aspect_ratio',
             }.get(key, key))
         if keys:
             for key in j.keys():
                 if key not in keys:
                     del j[key]
-            if 'videoRatio' in keys:
-                streams = self.item.streams()
-                if streams:
-                    j['videoRatio'] = streams[0].aspect_ratio
             public_layers = [l['id']
                              for l in filter(lambda l: not l.get('private', False),
                                              settings.CONFIG['layers'])]
             if 'annotations' in keys:
                 j['annotations'] = [a.json(keys=['value', 'id', 'layer'])
                                     for a in self.annotations.filter(layer__name__in=public_layers).select_related()]
+
             for layer in filter(lambda l: l in keys, public_layers):
                 j[layer] = [a.json(keys=['id', 'value'])
                             for a in self.annotations.filter(layer__name=layer)]
+
             for key in keys:
                 if key not in clip_keys and key not in j:
                     value = self.item.get(key)
