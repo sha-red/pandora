@@ -109,12 +109,13 @@ class Annotation(models.Model):
             return self.value
     
     def set_public_id(self):
-        public_id = Annotation.objects.filter(item=self.item, id__lt=self.id).count()
-        self.public_id = "%s/%s" % (self.item.itemId, ox.to26(public_id))
-        Annotation.objects.filter(id=self.id).update(public_id=self.public_id)
+        if self.id:
+            public_id = Annotation.objects.filter(item=self.item, id__lt=self.id).count()
+            self.public_id = "%s/%s" % (self.item.itemId, ox.to26(public_id))
+            Annotation.objects.filter(id=self.id).update(public_id=self.public_id)
 
     def save(self, *args, **kwargs):
-        set_public_id = not self.id
+        set_public_id = not self.id or not self.public_id
 
         #no clip or update clip
         if not self.clip and not self.layer.private or \

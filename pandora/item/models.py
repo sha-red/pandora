@@ -340,6 +340,8 @@ class Item(models.Model):
         #FIXME: should this really happen for annotations?
         for a in self.annotations.all():
             a.item = other
+            a.public_id = None
+            a.save()
 
         if hasattr(self, 'files'):
             for f in self.files.all():
