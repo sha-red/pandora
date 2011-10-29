@@ -294,11 +294,12 @@ def average_color(prefix, start=0, end=0):
     timelines = sorted(filter(lambda t: t!= '%s%sp.png'%(prefix,height), glob("%s%sp*.png"%(prefix, height))))
     for image in timelines:
         start_offset = 0
-        timeline = Image.open(image).convert('RGB')
-        frames += timeline.size[0]
-        if start and frames < start:
+        if start and frames + 1500 < start:
+            frames += 1500
             continue
-        elif start and frames > start > frames-timeline.size[0]:
+        timeline = Image.open(image)
+        frames += timeline.size[0]
+        if start and frames > start > frames-timeline.size[0]:
             start_offset = start - (frames-timeline.size[0])
             box = (start_offset, 0, timeline.size[0], height)
             timeline = timeline.crop(box)
@@ -307,7 +308,7 @@ def average_color(prefix, start=0, end=0):
             box = (0, 0, end_offset, height)
             timeline = timeline.crop(box)
         
-        p = np.asarray(timeline, dtype=np.float32)
+        p = np.asarray(timeline.convert('RGB'), dtype=np.float32)
         p = np.sum(p, axis=0) / height               #average color per frame
         pixels.append(p)
 

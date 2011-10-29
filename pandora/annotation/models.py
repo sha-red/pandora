@@ -161,5 +161,5 @@ class Annotation(models.Model):
         return j
 
     def __unicode__(self):
-        return u"%s/%s-%s" %(self.item, self.start, self.end)
+        return u"%s %s-%s" %(self.public_id, self.start, self.end)
 

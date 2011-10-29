@@ -935,7 +935,7 @@ class Item(models.Model):
 
     def make_timeline(self):
         streams = self.streams()
-        if len(streams) > 1:
+        if streams.count() > 1:
             timelines = [s.timeline_prefix for s in self.streams()]
             join_timelines(timelines, self.timeline_prefix)
 
