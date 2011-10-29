@@ -8,6 +8,9 @@ pandora.ui.accountDialog = function(action) {
             width: 432
         }, pandora.ui.accountDialogOptions(action)))
         .bindEvent({
+            open: function() {
+                pandora.$ui.accountForm.find('input')[0].focus();
+            },
             resize: function(data) {
                 var width = data.width - 32;
                 pandora.$ui.accountForm.items.forEach(function(item) {
@@ -68,6 +71,7 @@ pandora.ui.accountDialogOptions = function(action, value) {
                 title: buttonTitle[type] + '...'
             }).bindEvent('click', function() {
                 pandora.$ui.accountDialog.options(pandora.ui.accountDialogOptions(type));
+                pandora.$ui.accountForm.find('input')[0].focus();
             });
         }
     }
@@ -132,12 +136,14 @@ pandora.ui.accountForm = function(action, value) {
             id: 'accountForm' + Ox.toTitleCase(action),
             items: $items,
             submit: function(data, callback) {
+                pandora.$ui.accountDialog.disableButtons();
                 if (action == 'signin') {
                     pandora.api.signin(data, function(result) {
                         if (!result.data.errors) {
                             pandora.$ui.accountDialog.close();
                             pandora.signin(result.data);
                         } else {
+                            pandora.$ui.accountDialog.enableButtons();
                             callback([{id: 'password', message: 'Incorrect password'}]);
                         }
                     });
@@ -148,6 +154,7 @@ pandora.ui.accountForm = function(action, value) {
                             pandora.signin(result.data);
                             pandora.ui.accountWelcomeDialog().open();
                         } else {
+                            pandora.$ui.accountDialog.enableButtons();
                             callback([{id: 'password', message: result.data.errors.toString()}]); // fixme
                         }
                     });
@@ -160,6 +167,7 @@ pandora.ui.accountForm = function(action, value) {
                         if (!result.data.errors) {
                             pandora.$ui.accountDialog.options(pandora.ui.accountDialogOptions('resetAndSignin', result.data.username));
                         } else {
+                            pandora.$ui.accountDialog.enableButtons();
                             callback([{id: 'usernameOrEmail', message: 'Unknown ' + (key == 'username' ? 'username' : 'e-mail address')}])
                         }
                     });
@@ -169,6 +177,7 @@ pandora.ui.accountForm = function(action, value) {
                             pandora.$ui.accountDialog.close();
                             pandora.signin(result.data);
                         } else {
+                            pandora.$ui.accountDialog.enableButtons();
                             callback([{id: 'code', message: 'Incorrect code'}]);
                         }
                     });
@@ -248,7 +257,7 @@ pandora.ui.accountForm = function(action, value) {
                 type: 'password',
                 validate: function(value, callback) {
                     callback({
-                        message: 'Missing Password',
+                        message: 'Missing password',
                         valid: value.length > 0
                     });
                 },
