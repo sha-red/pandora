@@ -124,7 +124,6 @@ pandora.URL = (function() {
                 pandora.user.ui._list = pandora.getListsState(pandora.user.ui.find);
                 pandora.user.ui._groupsState = pandora.getGroupsState(pandora.user.ui.find);
                 pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
-                
             } else {
                 /*
                 pandora.UI.set({
@@ -166,7 +165,7 @@ pandora.URL = (function() {
             callback && callback();
 
         } else {
-            
+
             var set = {
                 section: state.type == pandora.site.itemsSection ? 'items' : state.type,
                 item: state.item,
@@ -243,7 +242,7 @@ pandora.URL = (function() {
         }
 
         pandora.user.ui.showHome = false;
-        
+
     }
 
     that.init = function() {
@@ -417,7 +416,7 @@ pandora.URL = (function() {
             } else {
                 action = 'push';
             }
-            self.URL[action](getState(), pandora.getPageTitle(), getState(/*keys*/));            
+            self.URL[action](getState(), pandora.getPageTitle(), getState(/*keys*/));
         }
     };
 

@@ -98,7 +98,7 @@ pandora.ui.mediaView = function() {
     function renderPreview() {
         var previewWidth = pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1 - listWidth,
             previewHeight = pandora.$ui.contentPanel.size(1),
-            previewRatio = previewWidth / previewHeight,        
+            previewRatio = previewWidth / previewHeight,
             imageRatio = selectedImage.width / selectedImage.height,
             imageWidth = imageRatio > previewRatio ? previewWidth : Math.round(previewHeight * imageRatio),
             imageHeight = imageRatio < previewRatio ? previewHeight : Math.round(previewWidth / imageRatio),

@@ -98,7 +98,7 @@ pandora.ui.item = function() {
                                 labelWidth: 100,
                                 value: result.data[key.id],
                                 type: 'text',
-                                width: 500 
+                                width: 500
                             });
                         }),
                         separators: [
@@ -126,7 +126,7 @@ pandora.ui.item = function() {
                                 pandora.api.edit(Ox.extend(changed, {id: pandora.user.ui.item}), function(result) {
                                     //fixme just reload parts that need reloading
                                     window.location.reload();
-                                });    
+                                });
                             }
                         }
                     }));
@@ -280,7 +280,6 @@ pandora.ui.item = function() {
                     //fixme: check that edit was successfull
                     pandora.api.editAnnotation(data, function(result) {
                         Ox.print('done updateAnnotation', result);
-                        
                     });
                 },
                 pandora_showannotations: function(data) {

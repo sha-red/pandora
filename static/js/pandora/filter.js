@@ -46,7 +46,6 @@ pandora.ui.filter = function(list) {
                         pandora.$ui.groups.forEach(function($group) {
                             $group.reloadList();
                         });
-                        
                     });
                 } else {
                     pandora.UI.set({find: data.query});

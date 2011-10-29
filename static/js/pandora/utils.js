@@ -87,7 +87,7 @@ pandora.addList = function() {
                 var posterFrames = result.data.items.map(function(item) {
                     return {item: item.id, position: item.posterFrame};
                 });
-                posterFrames = posterFrames.length == 1 
+                posterFrames = posterFrames.length == 1
                     ? Ox.repeat([posterFrames[0]], 4)
                     : posterFrames.length == 2
                     ? [posterFrames[0], posterFrames[1], posterFrames[1], posterFrames[0]]
@@ -128,7 +128,7 @@ pandora.addList = function() {
                         conditions: [{key: 'list', value: newList, operator: '=='}],
                         operator: '&'
                     }
-                });                    
+                });
             }
         }).reloadList();
     }
@@ -340,7 +340,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
                     drag.item == 1 ? 'singular' : 'plural'
                 ].toLowerCase()
             ) + '</br> to ' + (
-                drag.target && !drag.target.selected 
+                drag.target && !drag.target.selected
                 ? 'the list "' + drag.target.name + '"'
                 : 'another list'
             );
@@ -489,7 +489,7 @@ pandora.getInfoHeight = function(includeHidden) {
     );
     return (pandora.user.ui.showInfo || includeHidden) * Math.min(
         isVideoPreview
-        ? Math.round(pandora.user.ui.sidebarSize / (16/9)) + 16 
+        ? Math.round(pandora.user.ui.sidebarSize / (16/9)) + 16
         : pandora.user.ui.sidebarSize,
         window.innerHeight - 109 // 20 menu + 24 bar + 64 (4 closed folders) + 1 resizebar
     );
@@ -616,7 +616,7 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
     pandora.getPageTitle = function(itemTitle) {
         Ox.print('ITEM TITLES', itemTitles)
         if (itemTitle) {
-            itemTitles[pandora.user.ui.item] = itemTitle 
+            itemTitles[pandora.user.ui.item] = itemTitle
         }
         var parts = [pandora.site.site.name];
         if (!pandora.user.ui.item) {
@@ -760,7 +760,7 @@ pandora.resizeFolders = function() {
                     .resizeColumn('name', columnWidth.name);
             } else {
                 $list.resizeColumn(id == 'favorite' ? 'id' : 'name', width - 96);
-            }                
+            }
         }
         if (!pandora.user.ui.showFolder[pandora.user.ui.section][id]) {
             pandora.$ui.folder[pos].update();

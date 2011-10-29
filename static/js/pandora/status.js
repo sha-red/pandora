@@ -6,7 +6,6 @@ pandora.ui.status = function(key, data) {
     if (!pandora.user.ui.item && pandora.user.ui.listView == 'clip') {
         itemName = data.items != 1 ? 'Clips' : 'Clip';
     }
-    
     segments.push(Ox.formatNumber(data.items) + ' '+ itemName);
     if (data.runtime)
         segments.push(Ox.formatDuration(data.runtime, 'short'));

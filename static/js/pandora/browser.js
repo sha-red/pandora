@@ -115,7 +115,7 @@ pandora.ui.browser = function() {
             },
             select: function(data) {
                 pandora.UI.set({
-                    'item': data.ids[0] 
+                    'item': data.ids[0]
                 });
             },
             toggle: function(data) {

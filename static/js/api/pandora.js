@@ -144,7 +144,7 @@ function constructList() {
                 .appendTo(info)
                 var f = app.actions[id].code[0];
                 $('<span>').html(' View Source ('+f+')').appendTo(info)
-                $('<pre>').append($code).appendTo(info) 
+                $('<pre>').append($code).appendTo(info)
                 hljs.highlightBlock($code[0], '    ');
 
                 hash += id + ','

@@ -132,7 +132,7 @@ window.onerror = function(error, url, line) {
         script.onload = callback;
         script.src = '/static/oxjs/dev/Ox.js';
         script.type = 'text/javascript';
-        document.head.appendChild(script);            
+        document.head.appendChild(script);
     }
 
     function loadOxUI(callback) {
@@ -226,13 +226,13 @@ window.onerror = function(error, url, line) {
                 edits: [
                     {id: 'personal', title: 'Personal Edits'},
                     {id: 'favorite', title: 'Favorite Edits', showBrowser: false},
-                    {id: 'featured', title: 'Featured Edits', showBrowser: false}                        
+                    {id: 'featured', title: 'Featured Edits', showBrowser: false}
                 ],
                 texts: [
                     {id: 'personal', title: 'Personal Texts'},
                     {id: 'favorite', title: 'Favorite Texts', showBrowser: false},
-                    {id: 'featured', title: 'Featured Texts', showBrowser: false}                        
-                ] 
+                    {id: 'featured', title: 'Featured Texts', showBrowser: false}
+                ]
             },
             sortKeys: Ox.map(pandora.site.itemKeys, function(key) {
                 return key.columnWidth ? Ox.extend(key, {
@@ -270,7 +270,7 @@ window.onerror = function(error, url, line) {
 
             Ox.Theme(pandora.user.ui.theme);
             localStorage.theme = pandora.user.ui.theme;
-            pandora.$ui.appPanel = pandora.ui.appPanel().display();        
+            pandora.$ui.appPanel = pandora.ui.appPanel().display();
             Ox.Request.requests() && pandora.$ui.loadingIcon.start();
             pandora.$ui.body.ajaxStart(pandora.$ui.loadingIcon.start);
             pandora.$ui.body.ajaxStop(pandora.$ui.loadingIcon.stop);
@@ -278,7 +278,7 @@ window.onerror = function(error, url, line) {
             pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
 
         });
-        
+
     }
 
     function loadBrowserMessage() {
@@ -345,14 +345,13 @@ window.onerror = function(error, url, line) {
                             .css({width: '32px', height: '32px', margin: '4px'})
                     )
                     .appendTo($images);
-            });        
+            });
             $('<div>')
                 .css({
                     textAlign: 'center'
                 })
                 .html(html)
                 .appendTo($message);
-            
         });
 
         function loadImages(images, callback) {

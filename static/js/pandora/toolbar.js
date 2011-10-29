@@ -11,7 +11,7 @@ pandora.ui.toolbar = function() {
         pandora.$ui.backButton = pandora.ui.backButton()
     );
     that.append(
-        pandora.$ui.viewSelect = pandora.ui.viewSelect() 
+        pandora.$ui.viewSelect = pandora.ui.viewSelect()
     );
     if (!ui.item || pandora.isClipView()) {
         that.append(
@@ -38,7 +38,7 @@ pandora.ui.toolbar = function() {
                     // fixme: maybe there's a better method name for this?
                     pandora.api.updateExternalData({
                         id: ui.item
-                    }, function(result) { 
+                    }, function(result) {
                         Ox.Request.clearCache(item);
                         if (ui.item == item && ui.itemView == 'info') {
                             pandora.$ui.contentPanel.replaceElement(

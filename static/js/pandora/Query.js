@@ -166,7 +166,7 @@ pandora.Query = (function() {
                     }).length;
                 // indices of non-advanced find queries
                 indices = Ox.map(pandora.site.findKeys, function(findKey) {
-                    var key = findKey.id == 'all' ? '' : findKey.id, 
+                    var key = findKey.id == 'all' ? '' : findKey.id,
                         index = oneCondition(ret.query.conditions, key, '');
                     return index > -1 ? index : null;
                 });
@@ -178,7 +178,7 @@ pandora.Query = (function() {
                         index: indices[0],
                         key: ret.query.conditions[indices[0]].key,
                         value: decodeURIComponent(ret.query.conditions[indices[0]].value)
-                    } : {index: -1, key: 'advanced', value: ''}                    
+                    } : {index: -1, key: 'advanced', value: ''}
                 }
             }
         }
@@ -287,7 +287,6 @@ pandora.Query = (function() {
                     find: constructFind(pandora.user.ui.query),
                     sort: (operator == pandora.getSortOperator(key) ? '' : operator) + key
                 });
-                
             } else {
                 return pandora.user.ui.item + '/' + pandora.user.ui.itemView;
             }

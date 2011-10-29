@@ -18,7 +18,7 @@ pandora.UI = (function() {
         pandora.user.ui = pandora.site.user.ui;
         pandora.user.ui._list = pandora.getListsState(pandora.user.ui.find);
         pandora.user.ui._groupsState = pandora.getGroupsState(pandora.user.ui.find);
-        pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);        
+        pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
     };
 
     // sets pandora.user.ui.key to val

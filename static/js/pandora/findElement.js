@@ -139,7 +139,7 @@ pandora.ui.findElement = function() {
                     callback(result.data.items);
                 });
             } else {
-                callback([]);                            
+                callback([]);
             }
         } : null;
     }

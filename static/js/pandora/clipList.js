@@ -190,7 +190,7 @@ pandora.ui.clipList = function(videoRatio) {
                 }
             },
             pandora_itemsort: function(data) {
-                that.options({sort: data.value});                
+                that.options({sort: data.value});
             },
             pandora_listsort: function(data) {
                 that.options({sort: data.value});

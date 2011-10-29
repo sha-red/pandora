@@ -115,7 +115,7 @@ pandora.ui.list = function() {
                 pandora.UI.set({listColumns: data.ids});
                 /*
                 data.ids.forEach(function(id) {
-                    columnWidth[id] = 
+                    columnWidth[id] =
                         pandora.user.ui.lists[pandora.user.ui.list].columnWidth[id]
                         || Ox.getObjectById(pandora.site.sortKeys, id).width
                 });
@@ -515,7 +515,7 @@ pandora.ui.list = function() {
                     pandora.$ui.mainMenu.enableItem('openmovie');
                 } else {
                     pandora.$ui.mainMenu.disableItem('copy');
-                    pandora.$ui.mainMenu.disableItem('openmovie');            
+                    pandora.$ui.mainMenu.disableItem('openmovie');
                 }
                 pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
                 pandora.api.find({
@@ -540,7 +540,7 @@ pandora.ui.list = function() {
                 that.options({sort: data.value});
             }
         });
-        
+
     }
 
     if (['grid', 'timelines'].indexOf(pandora.user.ui.listView) > -1) {

@@ -34,7 +34,7 @@ pandora.ui.mainPanel = function() {
                         }
                         if (!Ox.isEqual(data.find, previousUI._groupsState[i].find)) {
                             pandora.$ui.groups[i].reloadList();
-                        } 
+                        }
                     });
                 } else {
                     that.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());

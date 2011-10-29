@@ -157,7 +157,7 @@ pandora.ui.home = function() {
                     pandora.URL.push('/signup');
                     that.fadeOutScreen();
                 }
-            }),    
+            }),
         $signinButton = Ox.Button({
                 title: 'Sign In',
                 width: 74
@@ -176,7 +176,7 @@ pandora.ui.home = function() {
                     pandora.URL.push('/signin');
                     that.fadeOutScreen();
                 }
-            }),    
+            }),
         $preferencesButton = Ox.Button({
                 title: 'Preferences',
                 width: 156
@@ -195,7 +195,7 @@ pandora.ui.home = function() {
                     pandora.URL.push('/preferences');
                     that.fadeOutScreen();
                 }
-            }),    
+            }),
         $aboutButton = Ox.Button({
                 title: 'About ' + pandora.site.site.name,
                 width: 156
@@ -228,7 +228,7 @@ pandora.ui.home = function() {
                 height: '16px',
                 margin: 'auto',
                 opacity: 0,
-                textAlign: 'center'                               
+                textAlign: 'center'
             })
             .appendTo(that);
 
@@ -276,5 +276,5 @@ pandora.ui.home = function() {
     };
 
     return that;
-  
+
 };

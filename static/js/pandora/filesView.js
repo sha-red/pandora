@@ -125,7 +125,7 @@ pandora.ui.filesView = function(options, self) {
                 {
                     align: 'right',
                     format: {type: 'value', args: ['B']},
-                    id: 'size',                    
+                    id: 'size',
                     operator: '-',
                     title: 'Size',
                     visible: true,

@@ -182,7 +182,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
         );
         // needed for resize handlers further up
         pandora.$ui.map = $element;
-        
+
     } else {
 
         pandora.api.findEvents({
@@ -214,7 +214,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
             );
             // needed for resize handlers further up
             pandora.$ui.calendar = $element;
-        }); 
+        });
 
     }
 

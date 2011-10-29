@@ -59,7 +59,7 @@ pandora.ui.eventsDialog = function() {
         $content;
 
     pandora.api.findEvents({
-        query: {conditions: [], operator: '&'}        
+        query: {conditions: [], operator: '&'}
     }, function(result) {
         pandora.api.findEvents({
             query: {conditions: [], operator: '&'},

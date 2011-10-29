@@ -271,7 +271,7 @@ pandora.ui.accountForm = function(action, value) {
                 labelWidth: 120,
                 validate: pandora.validateUser('username', true),
                 width: 320
-            });    
+            });
         } else if (type == 'usernameOrEmail') {
             return Ox.FormElementGroup({
                 id: 'usernameOrEmail',
@@ -310,7 +310,7 @@ pandora.ui.accountForm = function(action, value) {
             });
         }
     }
-    return that;            
+    return that;
 };
 
 pandora.ui.accountSignoutDialog = function() {

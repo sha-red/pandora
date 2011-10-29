@@ -32,5 +32,4 @@ pandora.ui.helpDialog = function() {
         content.html('Help is coming soon...')
     });
     return that;
-  
 };

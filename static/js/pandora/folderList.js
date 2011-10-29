@@ -240,7 +240,7 @@ pandora.ui.folderList = function(id) {
             min: 0,
             pageLength: 1000,
             //selected: pandora.getListData().folder == id ? [pandora.user.ui._list] : [],
-            sort: [{key: 'position', operator: '+'}],            
+            sort: [{key: 'position', operator: '+'}],
             sortable: id != 'featured' || pandora.user.level == 'admin'
         })
         .css({
@@ -296,7 +296,6 @@ pandora.ui.folderList = function(id) {
                 //var $list = pandora.$ui.folderList[id];
                 if (data.key == 'user') {
                     pandora.$ui.listDialog = pandora.ui.listDialog('icon').open();
-                    
                 } else if (data.key == 'type') {
                     if (that.value(data.id, 'type') == 'smart') {
                         pandora.$ui.listDialog = pandora.ui.listDialog('query').open();

@@ -58,7 +58,7 @@ Ox.load('UI', {
                         Ox.UI.hideLoadingScreen();
                     });
                     return that;
-                }, 
+                },
             });
             Ox.extend(pandora.user, {
                 videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)

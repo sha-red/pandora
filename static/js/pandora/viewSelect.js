@@ -47,7 +47,7 @@ pandora.ui.viewSelect = function() {
             pandora_itemview: function(data) {
                 that.selectItem(data.value);
             }
-        });  
+        });
     return that;
 };
 

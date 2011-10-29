@@ -190,7 +190,7 @@ pandora.ui.mainMenu = function() {
                         sort: [{key: key, operator: operator}]
                     });
                     groups[position].sort[0].key = key;
-                    pandora.UI.set({groups: groups});                    
+                    pandora.UI.set({groups: groups});
                 } else if (data.id == 'sortmovies') {
                     pandora.UI.set({listSort: [{key: value, operator: ''}]});
                 } else if (data.id == 'viewicons') {

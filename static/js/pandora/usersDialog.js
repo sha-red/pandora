@@ -210,7 +210,7 @@ pandora.ui.usersDialog = function() {
                     $status.html(
                         Ox.formatNumber(numberOfUsers)
                         + ' user' + (numberOfUsers == 1 ? '' : 's')
-                        + ' (' + Ox.formatNumber(numberOfUsers) + ' registered, 0 guests)' 
+                        + ' (' + Ox.formatNumber(numberOfUsers) + ' registered, 0 guests)'
                     );
                 },
                 select: function(data) {
@@ -305,7 +305,7 @@ pandora.ui.usersDialog = function() {
                                 }
                             ],
                             orientation: 'vertical'
-                        })      
+                        })
                     },
                     {
                         element: Ox.SplitPanel({
@@ -432,7 +432,7 @@ pandora.ui.usersDialog = function() {
                     } else {
                         data[event.id] = event.data.value;
                     }
-                    $list.value(userData.id, event.id, data[event.id]); 
+                    $list.value(userData.id, event.id, data[event.id]);
                     pandora.api.editUser(data, function(result) {
                         Ox.Request.clearCache('findUsers');
                     });
@@ -454,7 +454,7 @@ pandora.ui.usersDialog = function() {
                     query: query
                 }), callback);
             }
-        });        
+        });
     }
 
     return that;

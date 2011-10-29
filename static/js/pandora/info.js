@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.info = function() {
-    
+
     var ui = pandora.user.ui,
         view = getView(),
 
@@ -63,7 +63,7 @@ pandora.ui.info = function() {
     function updateInfo() {
         var id = getId(),
             previousView = view;
-        view = getView(); 
+        view = getView();
         if (view == 'list') {
             that.empty().append(pandora.$ui.listInfo = pandora.ui.listInfo());
             previousView == 'video' && resizeInfo();

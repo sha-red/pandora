@@ -27,7 +27,7 @@ pandora.ui.titlesDialog = function() {
                                 query: query
                             }), callback);
                         }
-                    });        
+                    });
                 }
             }),
 

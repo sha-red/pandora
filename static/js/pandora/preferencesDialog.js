@@ -140,5 +140,5 @@ pandora.ui.preferencesDialog = function() {
     });
 
     return $dialog;
-  
+
 };

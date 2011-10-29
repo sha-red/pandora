@@ -141,7 +141,7 @@ pandora.ui.infoView = function(data) {
                     format: function(value) {
                         return formatTitle(value);
                     },
-                    tooltip: isEditable ? 'Doubleclick to edit' : '', 
+                    tooltip: isEditable ? 'Doubleclick to edit' : '',
                     value: data.title
                 })
                 .css({
@@ -411,7 +411,7 @@ pandora.ui.infoView = function(data) {
             )
             .appendTo($text);
     });
-    
+
     $('<div>').css({height: '16px'}).appendTo($text);
 
     // Hue, Saturation, Lightness, Volume --------------------------------------
@@ -469,7 +469,7 @@ pandora.ui.infoView = function(data) {
                     })
             )
             .appendTo($statistics);
-        
+
     }
 
     $('<div>').css({height: '16px'}).appendTo($statistics);
@@ -738,7 +738,6 @@ pandora.ui.infoView = function(data) {
                 })
                 .appendTo($info);
         });
-        
     }
 
     function renderRightsLevel() {
@@ -794,7 +793,7 @@ pandora.ui.infoView = function(data) {
             left: margin + iconLeft + 'px',
             width: iconWidth + 'px',
             height: iconHeight + 'px',
-            borderRadius: borderRadius + 'px'   
+            borderRadius: borderRadius + 'px'
         }, 250);
         $reflection.animate({
             top: margin + iconHeight + 'px',

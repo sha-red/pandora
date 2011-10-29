@@ -29,7 +29,7 @@ pandora.ui.namesDialog = function() {
                                 query: query
                             }), callback);
                         }
-                    });        
+                    });
                 }
             }),
 
@@ -116,7 +116,7 @@ pandora.ui.namesDialog = function() {
                     })
                 }
             }),
-        
+
         that = Ox.Dialog({
             buttons: [
                 Ox.Button({

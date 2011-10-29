@@ -90,5 +90,5 @@ pandora.ui.siteDialog = function(section) {
     });
 
     return $dialog;
-  
+
 };
