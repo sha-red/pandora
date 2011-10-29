@@ -35,17 +35,19 @@ pandora.ui.clipPlayer = function() {
                         length = range[1] - range[0],
                         data = [];
                     result.data.items.forEach(function(item, i) {
-                        var id = item.id.split('/')[0]
+                        var id = item.id.split('/')[0];
                         pandora.api.get({id: id, keys: ['durations']}, function(result) {
                             //Ox.print('API get item', id, 'result', result.data);
                             var points = [item['in'], item.out],
                                 partsAndPoints = pandora.getVideoPartsAndPoints(result.data.durations, points);                       
                             data[i] = {
                                 parts: partsAndPoints.parts.map(function(i) {
-                                    return '/' + id + '/96p' + (i + 1) + '.' + pandora.user.videoFormat;
+                                    var part = (i + 1),
+                                        prefix = pandora.site.site.videoprefix.replace('PART', part);
+                                    return prefix + '/' + id + '/96p' + part + '.' + pandora.user.videoFormat;
                                 }),
                                 points: partsAndPoints.points
-                            }
+                            };
                             if (++counter == length) {
                                 callback(data);
                             }

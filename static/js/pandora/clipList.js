@@ -154,8 +154,9 @@ pandora.ui.clipList = function(videoRatio) {
                                     poster: '/' + item + '/' + height + 'p' + points[0] + '.jpg',
                                     rewind: true,
                                     video: partsAndPoints.parts.map(function(i) {
-                                        return '/' + item + '/96p' + (i + 1)
-                                            + '.' + pandora.user.videoFormat;
+                                        var part = (i + 1),
+                                            prefix = pandora.site.site.videoprefix.replace('PART', part);
+                                        return prefix + '/' + item + '/96p' + part + '.' + pandora.user.videoFormat;
                                     }),
                                     width: width
                                 })

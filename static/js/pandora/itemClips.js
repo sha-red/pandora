@@ -91,8 +91,9 @@ pandora.ui.itemClips = function(options) {
                             poster: '/' + self.options.id + '/' + self.height + 'p' + points[0] + '.jpg',
                             rewind: true,
                             video: partsAndPoints.parts.map(function(i) {
-                                return '/' + self.options.id + '/96p' + (i + 1)
-                                    + '.' + pandora.user.videoFormat;
+                                var part = (i + 1),
+                                    prefix = pandora.site.site.videoprefix.replace('PART', part);
+                                return prefix + '/' + self.options.id + '/96p' + part + '.' + pandora.user.videoFormat;
                             }),
                             width: self.width
                         })
