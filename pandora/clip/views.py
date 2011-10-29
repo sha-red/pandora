@@ -80,8 +80,32 @@ def findClips(request):
         qs = order_query(qs, query['sort'])
         qs = qs[query['range'][0]:query['range'][1]]
         qs = qs.select_related('item__sort')
-        #qs = qs.prefetch_related('annotations')
         response['data']['items'] = [p.json(keys=data['keys']) for p in qs]
+        from django.conf import settings
+        from annotation.models import Annotation
+
+        keys = data['keys']
+        public_layers = [l['id']
+                         for l in filter(lambda l: not l.get('private', False),
+                                         settings.CONFIG['layers'])]
+
+        def merge_annotations(layer, qs):
+            for a in qs.values('public_id', 'value', 'clip__public_id'):
+                for i in response['data']['items']:
+                    if i['id'] == a['clip__public_id']:
+                        if not i[layer]:
+                            i[layer] = []
+                        i[layer].append({
+                            'id': a['public_id'],
+                            'value': a['value'],
+                        })
+
+        if 'annotations' in keys:
+            merge_annotations('annotations',
+                Annotation.objects.filter(layer__name__in=public_layers, clip__in=qs))
+        for layer in filter(lambda l: l in keys, public_layers):
+            merge_annotations(layer,
+                Annotation.objects.filter(layer__name=layer, clip__in=qs))
     elif 'position' in query:
         qs = order_query(qs, query['sort'])
         ids = [i.public_id for i in qs]
