@@ -1085,7 +1085,8 @@ class Item(models.Model):
                     annotation.save()
             #otherwise add empty 5 seconds annotation every minute
             if not subtitles_added:
-                for i in range(int (offset / 60) * 60 + 60,
+                start = offset and int (offset / 60) * 60 + 60 or 0
+                for i in range(start,
                                int(offset + f.duration) - 5,
                                60):
                     annotation = Annotation(
