@@ -89,7 +89,6 @@ class Clip(models.Model):
             for layer in filter(lambda l: l in keys, public_layers):
                 j[layer] = [a.json(keys=['id', 'value'])
                             for a in self.annotations.filter(layer__name=layer)]
-
             for key in keys:
                 if key not in clip_keys and key not in j:
                     value = self.item.get(key)

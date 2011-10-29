@@ -32,8 +32,8 @@ def create_or_update_layer(data):
 
 class Layer(models.Model):
 
-    class Meta:
-        ordering = ('position', )
+    #class Meta:
+    #    ordering = ('position', )
 
     enabled = models.BooleanField(default=True)
 

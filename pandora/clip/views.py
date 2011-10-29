@@ -75,12 +75,15 @@ def findClips(request):
     response = json_response()
 
     query = parse_query(data, request.user)
-    qs = order_query(query['qs'], query['sort'])
+    qs = query['qs']
     if 'keys' in data:
+        qs = order_query(qs, query['sort'])
         qs = qs[query['range'][0]:query['range'][1]]
-        qs = qs.select_related()
+        qs = qs.select_related('item__sort')
+        #qs = qs.prefetch_related('annotations')
         response['data']['items'] = [p.json(keys=data['keys']) for p in qs]
     elif 'position' in query:
+        qs = order_query(qs, query['sort'])
         ids = [i.public_id for i in qs]
         data['conditions'] = data['conditions'] + {
             'value': data['position'],
@@ -92,6 +95,7 @@ def findClips(request):
         if qs.count() > 0:
             response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
     elif 'positions' in data:
+        qs = order_query(qs, query['sort'])
         ids = [i.public_id for i in qs]
         response['data']['positions'] = utils.get_positions(ids, data['positions'])
     else:
