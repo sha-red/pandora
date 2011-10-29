@@ -13,7 +13,7 @@ import uuid
 import unicodedata
 from urllib import quote
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Count, Q, Sum
 from django.core.files.base import ContentFile
 from django.conf import settings
@@ -518,45 +518,46 @@ class Item(models.Model):
             else:
                 ItemFind.objects.filter(item=self, key=key).delete()
 
-        for key in settings.CONFIG['itemKeys']:
-            i = key['id']
-            if i == 'title':
-                save(i, u'\n'.join([self.get('title', 'Untitled'),
-                                    self.get('originalTitle', '')]))
-            elif i == 'rightslevel':
-                save(i, self.level)
-            elif i == 'filename':
-                save(i,
-                    '\n'.join([f.path for f in self.files.all()]))
-            elif key['type'] == 'layer':
-                qs = Annotation.objects.filter(layer__name=i, item=self).order_by('start')
-                save(i, '\n'.join([l.value for l in qs]))
-            elif i != '*' and i not in self.facet_keys:
-                value = self.get(i)
-                if isinstance(value, list):
-                    value = u'\n'.join(value)
-                save(i, value)
+        with transaction.commit_on_success():
+            for key in settings.CONFIG['itemKeys']:
+                i = key['id']
+                if i == 'title':
+                    save(i, u'\n'.join([self.get('title', 'Untitled'),
+                                        self.get('originalTitle', '')]))
+                elif i == 'rightslevel':
+                    save(i, self.level)
+                elif i == 'filename':
+                    save(i,
+                        '\n'.join([f.path for f in self.files.all()]))
+                elif key['type'] == 'layer':
+                    qs = Annotation.objects.filter(layer__name=i, item=self).order_by('start')
+                    save(i, '\n'.join([l.value for l in qs]))
+                elif i != '*' and i not in self.facet_keys:
+                    value = self.get(i)
+                    if isinstance(value, list):
+                        value = u'\n'.join(value)
+                    save(i, value)
 
-        for key in self.facet_keys:
-            if key == 'character':
-                values = self.get('cast', '')
-                if values:
-                    values = filter(lambda x: x.strip(),
-                                    [f['character'] for f in values])
+            for key in self.facet_keys:
+                if key == 'character':
+                    values = self.get('cast', '')
+                    if values:
+                        values = filter(lambda x: x.strip(),
+                                        [f['character'] for f in values])
+                        values = list(set(values))
+                elif key == 'name':
+                    values = []
+                    for k in map(lambda x: x['id'],
+                                   filter(lambda x: x.get('sort') == 'person',
+                                          settings.CONFIG['itemKeys'])):
+                        values += self.get(k, [])
                     values = list(set(values))
-            elif key == 'name':
-                values = []
-                for k in map(lambda x: x['id'],
-                               filter(lambda x: x.get('sort') == 'person',
-                                      settings.CONFIG['itemKeys'])):
-                    values += self.get(k, [])
-                values = list(set(values))
-            else:
-                values = self.get(key, '')
-            if isinstance(values, list):
-                save(key, '\n'.join(values))
-            else:
-                save(key, values)
+                else:
+                    values = self.get(key, '')
+                if isinstance(values, list):
+                    save(key, '\n'.join(values))
+                else:
+                    save(key, values)
 
     def update_sort(self):
         try:
@@ -1043,62 +1044,63 @@ class Item(models.Model):
         return icon
 
     def load_subtitles(self):
-        layer = Layer.objects.get(name='subtitles')
-        Annotation.objects.filter(layer=layer,item=self).delete()
-        offset = 0
-        language = ''
-        subtitles = self.files.filter(selected=True, is_subtitle=True, available=True)
-        languages = [f.language for f in subtitles]
-        if languages:
-            if 'en' in languages:
-                language = 'en'
-            elif '' in languages:
-                language = ''
-            else:
-                language = languages[0] 
+        with transaction.commit_on_success():
+            layer = Layer.objects.get(name='subtitles')
+            Annotation.objects.filter(layer=layer,item=self).delete()
+            offset = 0
+            language = ''
+            subtitles = self.files.filter(selected=True, is_subtitle=True, available=True)
+            languages = [f.language for f in subtitles]
+            if languages:
+                if 'en' in languages:
+                    language = 'en'
+                elif '' in languages:
+                    language = ''
+                else:
+                    language = languages[0] 
 
-        #loop over all videos
-        for f in self.files.filter(Q(is_audio=True)|Q(is_video=True)) \
-                           .filter(selected=True).order_by('part'):
-            subtitles_added = False
-            prefix = os.path.splitext(f.path)[0]
-            if f.instances.all().count() > 0:
-                user = f.instances.all()[0].volume.user
-            else:
-                #FIXME: allow annotations from no user instead?
-                user = User.objects.all().order_by('id')[0]
-            #if there is a subtitle with the same prefix, import
-            q = subtitles.filter(path__startswith=prefix,
-                                 language=language)
-            if q.count() == 1:
-                s = q[0]
-                for data in s.srt(offset):
-                    subtitles_added = True
-                    annotation = Annotation(
-                        item=self,
-                        layer=layer,
-                        start=data['in'],
-                        end=data['out'],
-                        value=data['value'],
-                        user=user
-                    )
-                    annotation.save()
-            #otherwise add empty 5 seconds annotation every minute
-            if not subtitles_added:
-                start = offset and int (offset / 60) * 60 + 60 or 0
-                for i in range(start,
-                               int(offset + f.duration) - 5,
-                               60):
-                    annotation = Annotation(
-                        item=self,
-                        layer=layer,
-                        start=i,
-                        end=i + 5,
-                        value='',
-                        user=user
-                    )
-                    annotation.save()
-            offset += f.duration
+            #loop over all videos
+            for f in self.files.filter(Q(is_audio=True)|Q(is_video=True)) \
+                               .filter(selected=True).order_by('part'):
+                subtitles_added = False
+                prefix = os.path.splitext(f.path)[0]
+                if f.instances.all().count() > 0:
+                    user = f.instances.all()[0].volume.user
+                else:
+                    #FIXME: allow annotations from no user instead?
+                    user = User.objects.all().order_by('id')[0]
+                #if there is a subtitle with the same prefix, import
+                q = subtitles.filter(path__startswith=prefix,
+                                     language=language)
+                if q.count() == 1:
+                    s = q[0]
+                    for data in s.srt(offset):
+                        subtitles_added = True
+                        annotation = Annotation(
+                            item=self,
+                            layer=layer,
+                            start=data['in'],
+                            end=data['out'],
+                            value=data['value'],
+                            user=user
+                        )
+                        annotation.save()
+                #otherwise add empty 5 seconds annotation every minute
+                if not subtitles_added:
+                    start = offset and int (offset / 60) * 60 + 60 or 0
+                    for i in range(start,
+                                   int(offset + f.duration) - 5,
+                                   60):
+                        annotation = Annotation(
+                            item=self,
+                            layer=layer,
+                            start=i,
+                            end=i + 5,
+                            value='',
+                            user=user
+                        )
+                        annotation.save()
+                offset += f.duration
         self.update_find()
 
 def delete_item(sender, **kwargs):
