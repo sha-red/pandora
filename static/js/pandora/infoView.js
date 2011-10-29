@@ -47,7 +47,10 @@ pandora.ui.infoView = function(data) {
             })
             .appendTo($info),
 
-        $icon = Ox.Element('<img>')
+        $icon = Ox.Element({
+                element: '<img>',
+                tooltip: canEdit ? 'Doubleclick to edit' : ''
+            })
             .attr({
                 src: '/' + data.id + '/' + (
                     ui.icons == 'posters'
