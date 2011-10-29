@@ -483,12 +483,12 @@ pandora.getGroupsSizes = function() {
     )
 };
 
-pandora.getInfoHeight = function() {
+pandora.getInfoHeight = function(includeHidden) {
     // fixme: new, check if it can be used more
     var isVideoPreview = pandora.user.ui.item || (
         pandora.user.ui.listSelection.length && !pandora.isClipView()
     );
-    return pandora.user.ui.showInfo * Math.min(
+    return (pandora.user.ui.showInfo || includeHidden) * Math.min(
         isVideoPreview
         ? Math.round(pandora.user.ui.sidebarSize / (16/9)) + 16 
         : pandora.user.ui.sidebarSize,
@@ -747,6 +747,7 @@ pandora.resizeFolders = function() {
         columnWidth = {user: parseInt((width - 96) * 0.4)};
         columnWidth.name = (width - 96) - columnWidth.user;
     }
+    Ox.print('RESIZE FOLDERS', width);
     Ox.forEach(pandora.$ui.folderList, function($list, id) {
         var pos = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id);
         pandora.$ui.folder[pos].css({width: width + 'px'});
@@ -770,8 +771,13 @@ pandora.resizeFolders = function() {
 
 pandora.resizeWindow = function() {
     pandora.resizeFolders();
-    pandora.$ui.leftPanel.size(2, pandora.getInfoHeight());
+    /*
+    var infoHeight = pandora.getInfoHeight(true);
+    pandora.$ui.leftPanel.size(2, infoHeight);
+    !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -infoHeight});
+    pandora.resizeFolders();
     pandora.$ui.info.resizeInfo();
+    */
     if (!pandora.user.ui.item) {
         pandora.resizeGroups(pandora.$ui.rightPanel.width());
         if (pandora.user.ui.listView == 'clips') {

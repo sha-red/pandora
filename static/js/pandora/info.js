@@ -8,8 +8,9 @@ pandora.ui.info = function() {
             .css({overflowX: 'hidden', overflowY: 'auto'})
             .bindEvent({
                 toggle: function(data) {
+                    Ox.print('INFO TOGGLE')
                     pandora.UI.set({showInfo: !data.collapsed});
-                    pandora.resizeFolders();
+                    //pandora.resizeFolders();
                 },
                 pandora_find: function() {
                     if (pandora.user.ui._list != pandora.UI.getPrevious('_list')) {
@@ -42,11 +43,16 @@ pandora.ui.info = function() {
     }
 
     function resizeInfo() {
-        var height = pandora.getInfoHeight();
-        !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -height});
-        pandora.$ui.leftPanel.size(2, height, function() {
+        var height = pandora.getInfoHeight(true);
+        Ox.print('RESIZE INFO', ui.showInfo, height)
+        if (ui.showInfo) {
+            pandora.$ui.leftPanel.size(2, height, function() {
+                pandora.resizeFolders();
+            });
+        } else {
+            pandora.$ui.leftPanel.css({bottom: -height});
             pandora.resizeFolders();
-        });
+        }
     }
 
     function updateInfo() {
@@ -59,7 +65,7 @@ pandora.ui.info = function() {
         } else if (view == 'poster') {
             pandora.api.get({id: id, keys: ['director', 'posterRatio', 'title']}, function(result) {
                 var ratio = result.data.posterRatio,
-                    height = pandora.getInfoHeight();
+                    height = pandora.getInfoHeight(true);
                 that.empty().append(
                     pandora.$ui.posterInfo = pandora.ui.posterInfo(Ox.extend(result.data, {id: id}))
                 );
@@ -75,7 +81,7 @@ pandora.ui.info = function() {
                     pandora.$ui.videoPreview = pandora.ui.videoPreview({
                             duration: result.data.duration,
                             frameRatio: result.data.videoRatio,
-                            height: pandora.getInfoHeight(),
+                            height: pandora.getInfoHeight(true),
                             id: id,
                             width: ui.sidebarSize
                         })
@@ -114,7 +120,7 @@ pandora.ui.info = function() {
             pandora.$ui.posterInfo.resizePoster();
         } else if (view == 'video') {
             pandora.$ui.videoPreview.options({
-                height: pandora.getInfoHeight(),
+                height: pandora.getInfoHeight(true),
                 width: ui.sidebarSize
             });
         }

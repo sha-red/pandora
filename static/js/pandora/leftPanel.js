@@ -23,7 +23,7 @@ pandora.ui.leftPanel = function() {
         .bindEvent({
             resize: function(data) {
                 pandora.user.ui.sidebarSize = data.size;
-                var infoHeight = pandora.getInfoHeight();
+                var infoHeight = pandora.getInfoHeight(true);
                 if (data.size < pandora.site.sectionButtonsWidth && pandora.$ui.sectionButtons) {
                     pandora.$ui.sectionButtons.removeElement();
                     delete pandora.$ui.sectionButtons;
@@ -33,10 +33,10 @@ pandora.ui.leftPanel = function() {
                     delete pandora.$ui.sectionSelect;
                     pandora.$ui.sectionbar.append(pandora.$ui.sectionButtons = pandora.ui.sectionButtons());
                 }
-                !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -infoHeight});
                 pandora.$ui.leftPanel.size(2, infoHeight);
-                pandora.$ui.info.resizeInfo();
+                !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -infoHeight});
                 pandora.resizeFolders();
+                pandora.$ui.info.resizeInfo();                
             },
             resizeend: function(data) {
                 // set to 0 so that UI.set registers a change of the value
@@ -52,7 +52,7 @@ pandora.ui.leftPanel = function() {
                 }
             },
             pandora_showinfo: function(data) {
-                data.value == that.options('elements')[1].collapsed && that.toggle(1);
+                data.value == that.options('elements')[2].collapsed && that.toggle(2);
             }
         });
     return that;
