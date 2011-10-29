@@ -45,14 +45,19 @@ pandora.ui.info = function() {
     function resizeInfo() {
         var height = pandora.getInfoHeight(true);
         Ox.print('RESIZE INFO', ui.showInfo, height)
+        pandora.$ui.leftPanel.size(2, height);
+        pandora.resizeFolders();
+        !ui.showInfo && pandora.$ui.leftPanel.css({bottom: -height + 'px'});
+        /*
         if (ui.showInfo) {
             pandora.$ui.leftPanel.size(2, height, function() {
                 pandora.resizeFolders();
             });
         } else {
-            pandora.$ui.leftPanel.css({bottom: -height});
+            pandora.$ui.leftPanel.css({bottom: -height + 'px'});
             pandora.resizeFolders();
         }
+        */
     }
 
     function updateInfo() {

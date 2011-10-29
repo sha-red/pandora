@@ -467,10 +467,9 @@ pandora.getFoldersHeight = function() {
 
 pandora.getFoldersWidth = function() {
     var width = pandora.user.ui.sidebarSize;
-    // fixme: don't use height(), look up in splitpanels
     if (
         pandora.$ui.appPanel
-        && pandora.getFoldersHeight() > pandora.$ui.leftPanel.height() - 24 - 1 - pandora.$ui.info.height()
+        && pandora.getFoldersHeight() > window.innerHeight - 20 - 24 - 1 - pandora.getInfoHeight()
     ) {
         width -= Ox.UI.SCROLLBAR_SIZE;
     }

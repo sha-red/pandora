@@ -34,7 +34,7 @@ pandora.ui.leftPanel = function() {
                     pandora.$ui.sectionbar.append(pandora.$ui.sectionButtons = pandora.ui.sectionButtons());
                 }
                 pandora.$ui.leftPanel.size(2, infoHeight);
-                !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -infoHeight});
+                !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -infoHeight + 'px'});
                 pandora.resizeFolders();
                 pandora.$ui.info.resizeInfo();                
             },
