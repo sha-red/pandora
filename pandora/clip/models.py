@@ -27,12 +27,11 @@ class Clip(models.Model):
     item = models.ForeignKey('item.Item', related_name='clips')
 
     #seconds
-    start = models.FloatField(default=-1)
+    start = models.FloatField(default=-1, db_index=True)
     end = models.FloatField(default=-1)
-    duration = models.FloatField(default=0)
+    duration = models.FloatField(default=0, db_index=True)
 
     #get from annotation
-    duration = models.FloatField(default=0, db_index=True)
     hue = models.FloatField(default=0, db_index=True)
     saturation = models.FloatField(default=0, db_index=True)
     lightness = models.FloatField(default=0, db_index=True)
