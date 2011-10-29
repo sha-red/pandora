@@ -51,7 +51,8 @@ def reloader_thread():
 def update_static():
     oxjs_build = os.path.join(settings.STATIC_ROOT, 'oxjs/tools/build/build.py')
     if os.path.exists(oxjs_build):
-        os.system(oxjs_build)
+        print 'update oxjs'
+        os.system('%s >/dev/null' % oxjs_build)
 
     data = ''
     js = []
