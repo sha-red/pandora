@@ -42,7 +42,7 @@ def _order_query(qs, sort, prefix='sort__'):
         elif sort[0]['key'] == 'year':
             sort.append({'operator': '+', 'key': 'director'})
             sort.append({'operator': '+', 'key': 'title'})
-        elif not sort[0]['key'] in ('value', 'value_sort'):
+        elif not sort[0]['key'] in ('value', 'sortvalue'):
             sort.append({'operator': '+', 'key': 'director'})
             sort.append({'operator': '-', 'key': 'year'})
             sort.append({'operator': '+', 'key': 'title'})
@@ -69,17 +69,17 @@ def _order_by_group(query):
         if len(query['sort']) == 1 and query['sort'][0]['key'] == 'items':
             order_by = query['sort'][0]['operator'] == '-' and '-items' or 'items'
             if query['group'] == "year":
-                secondary = query['sort'][0]['operator'] == '-' and '-value_sort' or 'value_sort'
+                secondary = query['sort'][0]['operator'] == '-' and '-sortvalue' or 'sortvalue'
                 order_by = (order_by, secondary)
             elif query['group'] != "keyword":
-                order_by = (order_by, 'value_sort')
+                order_by = (order_by, 'sortvalue')
             else:
                 order_by = (order_by,)
         else:
-            order_by = query['sort'][0]['operator'] == '-' and '-value_sort' or 'value_sort'
+            order_by = query['sort'][0]['operator'] == '-' and '-sortvalue' or 'sortvalue'
             order_by = (order_by, 'items')
     else:
-        order_by = ('-value_sort', 'items')
+        order_by = ('-sortvalue', 'items')
     return order_by
 
 def parse_query(data, user):

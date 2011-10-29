@@ -741,10 +741,10 @@ class Item(models.Model):
                 Facet.objects.filter(item=self, key=key, value__in=removed_values).delete()
             for value in current_values:
                 if value not in saved_values:
-                    value_sort = value
+                    sortvalue = value
                     if key in self.person_keys:
-                        value_sort = get_name_sort(value)
-                    Facet.objects.get_or_create(item=self, key=key, value=value, value_sort=value_sort)
+                        sortvalue = get_name_sort(value)
+                    Facet.objects.get_or_create(item=self, key=key, value=value, sortvalue=sortvalue)
 
     def path(self, name=''):
         h = self.itemId
@@ -1204,13 +1204,13 @@ class Facet(models.Model):
     item = models.ForeignKey('Item', related_name='facets')
     key = models.CharField(max_length=200, db_index=True)
     value = models.CharField(max_length=1000, db_index=True)
-    value_sort = models.CharField(max_length=1000, db_index=True)
+    sortvalue = models.CharField(max_length=1000, db_index=True)
 
     def __unicode__(self):
         return u"%s=%s" % (self.key, self.value)
 
     def save(self, *args, **kwargs):
-        if not self.value_sort:
-            self.value_sort = utils.sort_string(self.value)
+        if not self.sortvalue:
+            self.sortvalue = utils.sort_string(self.value)
         super(Facet, self).save(*args, **kwargs)
 

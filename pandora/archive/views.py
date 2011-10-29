@@ -480,14 +480,14 @@ Positions
                 else:
                     order_by = query['sort'][0]['operator'] == '-' and '-items' or 'items'
                 if query['group'] != "keyword":
-                    order_by = (order_by, 'value_sort')
+                    order_by = (order_by, 'sortvalue')
                 else:
                     order_by = (order_by,)
             else:
-                order_by = query['sort'][0]['operator'] == '-' and '-value_sort' or 'value_sort'
+                order_by = query['sort'][0]['operator'] == '-' and '-sortvalue' or 'sortvalue'
                 order_by = (order_by, 'items')
         else:
-            order_by = ('-value_sort', 'items')
+            order_by = ('-sortvalue', 'items')
         response['data']['items'] = []
         items = 'items'
         item_qs = query['qs']
