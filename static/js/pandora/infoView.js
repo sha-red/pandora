@@ -646,8 +646,8 @@ pandora.ui.infoView = function(data) {
                     return image.selected;
                 })[0];
             $list = Ox.IconList({
-                    defaultRatio: ui.icons == 'posters' ? 5/8 : data.stream.aspectRatio,
-                    fixedRatio: ui.icons == 'posters' ? false : data.stream.aspectRatio,
+                    defaultRatio: ui.icons == 'posters' ? 5/8 : data.stream.aspectratio,
+                    fixedRatio: ui.icons == 'posters' ? false : data.stream.aspectratio,
                     item: function(data, sort, size) {
                         var ratio = data.width / data.height;
                         size = size || 128;

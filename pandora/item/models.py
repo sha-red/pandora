@@ -168,6 +168,8 @@ class Item(models.Model):
     objects = managers.ItemManager()
 
     def get(self, key, default=None):
+        if key == 'rightslevel':
+            return self.level
         if self.data and key in self.data:
             return self.data[key]
         if self.external_data and key in self.external_data:
@@ -460,6 +462,7 @@ class Item(models.Model):
         i['parts'] = len(i['durations'])
         if i['parts']:
             i['videoRatio'] = streams[0].aspect_ratio
+            i['resolution'] = (streams[0].file.width, streams[0].file.height)
 
         #only needed by admins
         if keys and 'posters' in keys:
@@ -654,7 +657,7 @@ class Item(models.Model):
         s.published = self.published
         s.rightslevel = self.level
 
-        s.aspectratio = self.get('aspectRatio')
+        s.aspectratio = self.get('aspectratio')
         s.words = sum([len(a.value.split()) for a in self.annotations.exclude(value='')])
         s.clips = self.clips.count()
 

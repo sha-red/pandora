@@ -500,7 +500,7 @@ class Stream(models.Model):
     def json(self):
         return {
             'duration': self.duration,
-            'aspectRatio': self.aspect_ratio,
+            'aspectratio': self.aspect_ratio,
         }
 
 def delete_stream(sender, **kwargs):
