@@ -10,6 +10,7 @@ from ox.django import fields
 import ox
 
 from item import utils
+import item.models
 
 import managers
 
@@ -50,6 +51,10 @@ class Person(models.Model):
         self.sortsortname = utils.sort_string(self.sortname)
         self.numberofnames = len(self.name.split(' '))
         super(Person, self).save(*args, **kwargs)
+        item.models.Facet.objects.filter(
+            key__in=item.models.Item.person_keys, value=self.name
+        ).exclude(value_sort=self.sortname
+        ).update(value_sort=self.sortname)
 
     def get_or_create(model, name, imdbId=None):
         if imdbId:
