@@ -371,6 +371,7 @@
             "title": "Words per Minute",
             "type": "float",
             "columnWidth": 60,
+            "format": {"type": "unit", "args": ["wpm"]},
             "value": {"layer": "subtitles", "type": "wordsperminute"}
         },
         {
