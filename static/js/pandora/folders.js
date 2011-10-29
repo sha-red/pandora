@@ -1,10 +1,11 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.folders = function() {
-    var that = Ox.Element()
-        .css({overflowX: 'hidden', overflowY: 'auto'})
-        .bindEvent({
-            resize: pandora.resizeFolders
-        });
+    var ui = pandora.user.ui,
+        that = Ox.Element()
+            .css({overflowX: 'hidden', overflowY: 'auto'})
+            .bindEvent({
+                resize: pandora.resizeFolders
+            });
     var counter = 0;
     //var $sections = [];
     pandora.$ui.folder = [];
@@ -14,60 +15,68 @@ pandora.ui.folders = function() {
     pandora.$ui.findListSelect = {};
     pandora.$ui.findListInput = {};
     pandora.$ui.manageListsButton = {};
-    if (pandora.user.ui.section == 'items') {
+    if (ui.section == 'items') {
         pandora.site.sectionFolders.items.forEach(function(folder, i) {
-            var extras;
+            var extras, $select;
             if (folder.id == 'personal') {
                 if (pandora.user.level == 'guest') {
-                    extras = [infoButton('Personal Lists', 'To create and share your own lists of movies, please sign up or sign in.')];
+                    extras = [
+                        infoButton('Personal Lists', 'To create and share your own lists of movies, please sign up or sign in.')
+                    ];
                 } else {
-                    extras = [Ox.Select({
-                        items: [
-                            { id: 'newlist', title: 'New List...' },
-                            { id: 'newlistfromselection', title: 'New List from Current Selection...', disabled: true },
-                            {},
-                            { id: 'newsmartlist', title: 'New Smart List...' },
-                            { id: 'newsmartlistfromresults', title: 'New Smart List from Current Results...', disabled: true },
-                            {},
-                            { id: 'duplicate', title: 'Duplicate List' },
-                            { id: 'copyselection', title: 'Copy Selection to List...' },
-                            { id: 'moveselection', title: 'Move Selection to List...' }
-                        ],
-                        max: 0,
-                        min: 0,
-                        selectable: false,
-                        tooltip: 'Manage Personal Lists',
-                        type: 'image'
-                    })
-                    .bindEvent({
-                        click: function(data) {
-                            var $list = pandora.$ui.folderList[folder.id];
-                            // fixme: duplicated
-                            if (data.id == 'new' || data.id == 'newsmart') {
-                                pandora.api.addList({
-                                    name: 'Untitled',
-                                    status: 'private',
-                                    type: data.id == 'new' ? 'static' : 'smart'
-                                }, function(result) {
-                                    var id = result.data.id;
-                                    pandora.UI.set({
-                                        find: {
-                                            conditions: [{key: 'list', value: id, operator: '=='}],
-                                            operator: '&'
-                                        }
-                                    });
-                                    Ox.Request.clearCache('"findLists"');
-                                    $list.reloadList().bindEventOnce({
-                                        load: function(data) {
-                                            $list.gainFocus()
-                                                .options({selected: [id]})
-                                                .editCell(id, 'name');
-                                        }
-                                    });
-                                });
+                    extras = [
+                        pandora.$ui.personalListsSelect = Ox.Select({
+                            items: [
+                                { id: 'newlist', title: 'New List' },
+                                { id: 'newlistfromselection', title: 'New List from Selection...', disabled: ui.listSelection.length == 0 },
+                                { id: 'newsmartlist', title: 'New Smart List' },
+                                { id: 'newsmartlistfromresults', title: 'New Smart List from Results' },
+                                {},
+                                { id: 'duplicatelist', title: 'Duplicate Selected List', disabled: !pandora.user.ui._list },
+                                { id: 'editlist', title: 'Edit Selected List...', disabled: !pandora.user.ui._list },
+                                { id: 'deletelist', title: 'Delete Selected List...', disabled: !pandora.user.ui._list }
+                            ],
+                            max: 0,
+                            min: 0,
+                            selectable: false,
+                            tooltip: 'Manage Personal Lists',
+                            type: 'image'
+                        })
+                        .bindEvent({
+                            click: function(data) {
+                                var $list = pandora.$ui.folderList[folder.id];
+                                // fixme: duplicated
+                                if ([
+                                    'newlist', 'newlistfromselection', 'newsmartlist', 'newsmartlistfromresults'
+                                ].indexOf(data.id) > -1) {
+                                    pandora.addList(data.id.indexOf('smart') > -1, data.id.indexOf('from') > -1);
+                                } else if (data.id == 'duplicatelist') {
+                                    pandora.addList(pandora.user.ui._list);
+                                } else if (data.id == 'editlist') {
+                                    pandora.ui.listDialog().open();
+                                } else if (data.id == 'deletelist') {
+                                    pandora.ui.deleteListDialog().open();
+                                }
+                            },
+                            pandora_find: function() {
+                                /*
+                                var action = ui._list
+                                    && pandora.getListData(ui._list).user == pandora.user.username
+                                    ? 'enableItem' : 'disableItem';
+                                pandora.$ui.personalListsSelect[action]('editlist');
+                                pandora.$ui.personalListsSelect[action]('duplicatelist');
+                                pandora.$ui.personalListsSelect[action]('deletelist');
+                                pandora.$ui.personalListsSelect[ui.listSelection.length ? 'enableItem' : 'disableItem']('newlistfromselection');
+                                */
+                            },
+                            pandora_listselection: function(data) {
+                                /*
+                                Ox.print('pandora_listselection', data.value.length)
+                                pandora.$ui.personalListsSelect[data.value.length ? 'enableItem' : 'disableItem']('newlistfromselection');
+                                */
                             }
-                        }
-                    })];
+                        })
+                    ];
                 }
             } else if (folder.id == 'favorite') {
                 if (pandora.user.level == 'guest') {
@@ -190,7 +199,7 @@ pandora.ui.folders = function() {
             }
             pandora.$ui.folder[i] = Ox.CollapsePanel({
                     id: folder.id,
-                    collapsed: !pandora.user.ui.showFolder.items[folder.id],
+                    collapsed: !ui.showFolder.items[folder.id],
                     extras: extras,
                     size: 16,
                     title: folder.title

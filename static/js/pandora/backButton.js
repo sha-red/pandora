@@ -5,7 +5,7 @@ pandora.ui.backButton = function() {
         width: 96
     }).css({
         float: 'left',
-        margin: '4px'
+        margin: '4px 0 0 4px'
     })
     .bindEvent({
         click: function() {
