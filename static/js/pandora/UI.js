@@ -53,7 +53,7 @@ pandora.UI = (function() {
             if (pandora.$ui.appPanel) {
                 // if we're not on page load,
                 // switch from item view to list view
-                add['item'] = '';
+                args['item'] = '';
             }
             if (!pandora.user.ui.lists[list]) {
                 add['lists.' + that.encode(list)] = {};

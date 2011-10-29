@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 pandora.ui.helpDialog = function() {
-    var content = Ox.Element(),
+    var content = Ox.Element().css({margin: '16px'}),
         that = Ox.Dialog({
         buttons: [
             Ox.Button({
@@ -27,8 +27,9 @@ pandora.ui.helpDialog = function() {
         title: 'Help',
         width: Math.round(window.innerWidth * 0.75)
     });
-    pandora.api.getPage({name: 'help'}, function(response) {
-        content.html(response.data.body);
+    pandora.api.getPage({name: 'help'}, function(result) {
+        //content.html(response.data.body);
+        content.html('Help is coming soon...')
     });
     return that;
   
