@@ -408,7 +408,7 @@ pandora.ui.list = function() {
                     list: pandora.user.ui._list,
                     items: data.ids
                 }, function() {
-                    that.options({selected: []});
+                    pandora.UI.set({listSelection: []});
                     pandora.reloadList();
                 });
             },
@@ -532,6 +532,9 @@ pandora.ui.list = function() {
                 }, function(result) {
                     pandora.$ui.selected.html(pandora.ui.status('selected', result.data));
                 });
+            },
+            pandora_listselection: function(data) {
+                that.options({selected: data.value});
             },
             pandora_listsort: function(data) {
                 that.options({sort: data.value});
