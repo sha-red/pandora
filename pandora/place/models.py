@@ -4,7 +4,7 @@ from __future__ import division, with_statement
 
 import re
 
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import User, Group
 from django.db.models import Q
 import ox
@@ -94,9 +94,10 @@ class Place(models.Model):
             matches = [-1]
         return Annotation.objects.filter(id__in=matches)
 
+    @transaction.commit_on_success
     def update_matches(self):
         matches = self.get_matches()
-        self.matches = matches.count()
+        numberofmatches = matches.count()
         for i in self.annotations.exclude(id__in=matches):
             self.annotations.remove(i)
         for i in matches.exclude(id__in=self.annotations.all()):
@@ -106,7 +107,8 @@ class Place(models.Model):
             self.items.remove(i)
         for i in Item.objects.filter(id__in=ids).exclude(id__in=self.items.all()):
             self.items.add(i)
-        Place.objects.filter(id=self.id).update(matches=self.matches)
+        if self.matches != numberofmatches:
+            Place.objects.filter(id=self.id).update(matches=numberofmatches)
 
     def save(self, *args, **kwargs):
         if not self.name_sort:
