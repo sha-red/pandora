@@ -79,7 +79,16 @@ class Place(models.Model):
         q = Q(value__contains=" " + self.name)|Q(value__startswith=self.name)
         for name in self.alternativeNames:
             q = q|Q(value__contains=" " + name)|Q(value__startswith=name)
-        return Annotation.objects.filter(q)
+        matches = []
+        for a in Annotation.objects.filter(q):
+            words = ox.words(a.value)
+            for name in [self.name] + list(self.alternativeNames):
+                if name in words:
+                    matches.append(a.id)
+                    break
+        if not matches:
+            matches = [-1]
+        return Annotation.objects.filter(id__in=matches)
 
     def update_matches(self):
         matches = self.get_matches()
