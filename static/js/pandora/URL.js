@@ -98,12 +98,13 @@ pandora.URL = (function() {
             if (!pandora.user.ui.item) {
                 state.view = pandora.user.ui.listView;
                 state.sort = pandora.user.ui.listSort;
+                state.find = pandora.user.ui.find;
             } else {
                 state.item = pandora.user.ui.item;
                 state.view = pandora.user.ui.itemView;
                 state.sort = pandora.user.ui.itemSort;
+                state.find = pandora.user.ui.itemFind;
             }
-            state.find = pandora.user.ui.find
         }
         Ox.print('STATE .................... ->', state)
         return state;
@@ -139,9 +140,10 @@ pandora.URL = (function() {
             if (state.page == 'home') {
                 //pandora.$ui.home = pandora.ui.home().showScreen();
                 pandora.$ui.home = pandora.ui.home().fadeInScreen();
-            } else if ([
-                'about', 'contact', 'faq', 'news', 'rights', 'software', 'terms', 'tour'
-            ].indexOf(state.page) > -1) {
+            } else if (
+                Ox.getPositionById(pandora.site.sitePages, state.page) > -1
+                || state.page == 'software'
+            ) {
                 pandora.$ui.siteDialog = pandora.ui.siteDialog(state.page).open();
             } else if (state.page == 'help') {
                 pandora.$ui.helpDialog = pandora.ui.helpDialog().open();
@@ -168,8 +170,7 @@ pandora.URL = (function() {
 
             var set = {
                 section: state.type == pandora.site.itemsSection ? 'items' : state.type,
-                item: state.item,
-                //find: state.find
+                item: state.item
             };
 
             if (state.view) {
@@ -195,6 +196,8 @@ pandora.URL = (function() {
                         set['mapFind'] = state.span.substr(1);
                         set['mapSelection'] = '';
                     }
+                } else if (state.view == 'calendar') {
+                    // ...
                 }
             }
 
@@ -202,17 +205,20 @@ pandora.URL = (function() {
                 set[!state.item ? 'listSort' : 'itemSort'] = state.sort;
             }
 
-            ///*
             if (state.find) {
-                find = state.find;
-                set.find = find;
-            } else {
+                if (!state.item) {
+                    find = state.find;
+                    set.find = state.find;
+                } else if (pandora.isItemFind(state.find)) {
+                    set.itemFind = state.find;
+                }
+            }
+            if (!find) {
                 find = pandora.user.ui.find;
                 pandora.user.ui._list = pandora.getListsState(find)
                 pandora.user.ui._groupsState = pandora.getGroupsState(find);
                 pandora.user.ui._findState = pandora.getFindState(find);
             }
-            //*/
 
             Ox.Request.cancel();
             $('video').each(function() {

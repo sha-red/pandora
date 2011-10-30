@@ -435,6 +435,7 @@ pandora.getClipsItems = function(width) {
 };
 
 pandora.getClipsQuery = function() {
+    // fixme: nice, but not needed
     function addClipsConditions(conditions) {
         conditions.forEach(function(condition) {
             if (condition.conditions) {
@@ -676,6 +677,12 @@ pandora.isClipView = function(view, item) {
     return (
         !item ? ['calendar', 'clip', 'map'] : ['calendar', 'clips', 'map']
     ).indexOf(view) > -1;
+};
+
+pandora.isItemFind = function(find) {
+    return find.conditions.length == 1
+        && Ox.getPositionById(pandora.site.layers, find.conditions[0].key) > -1
+        && find.conditions[0].operator == '=';
 };
 
 pandora.signin = function(data) {

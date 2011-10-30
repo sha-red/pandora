@@ -488,6 +488,7 @@
         {"id": "data", "title": "Data"},
         {"id": "files", "title": "Files"}
     ],
+    // fixme: should be renamed to annotationLayers
     "layers": [
         {
             "id": "privatenotes",
@@ -601,6 +602,7 @@
             "icons": "posters",
             "infoIconSize": 256,
             "item": "",
+            "itemFind": {"conditions": [], "operator": "&"},
             "itemSort": [{"key": "position", "operator": "+"}],
             "itemView": "info",
             "listColumns": ["title", "director", "country", "year", "language", "runtime", "genre"],

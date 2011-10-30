@@ -148,16 +148,13 @@ pandora.ui.item = function() {
             );
 
         } else if (pandora.user.ui.itemView == 'video') {
-            // fixme: duplicated
-            var clipsQuery = pandora.getClipsQuery(),
-                isClipsQuery = !!clipsQuery.conditions.length;
-            // ...
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.player = Ox.VideoPanelPlayer({
                 annotationsSize: pandora.user.ui.annotationsSize,
                 censored: censored,
                 cuts: result.data.cuts || [],
                 duration: result.data.duration,
-                find: isClipsQuery ? clipsQuery.conditions[0].value : '',
+                find: pandora.user.ui.itemFind.conditions[0]
+                    ? pandora.user.ui.itemFind.conditions[0].value : '',
                 getTimelineImageURL: function(i) {
                     return '/' + pandora.user.ui.item + '/timeline64p' + i + '.png';
                 },
@@ -176,6 +173,12 @@ pandora.ui.item = function() {
                 volume: pandora.user.ui.videoVolume,
                 width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             }).bindEvent({
+                find: function(data) {
+                    pandora.UI.set('itemFind', {
+                        conditions: [{key: 'subtitles', value: data.find, operator: '='}],
+                        operator: '&'
+                    });
+                },
                 muted: function(data) {
                     pandora.UI.set('muted', data.muted);
                 },
@@ -203,89 +206,96 @@ pandora.ui.item = function() {
             }));
 
         } else if (pandora.user.ui.itemView == 'timeline') {
-            var clipsQuery = pandora.getClipsQuery(),
-                isClipsQuery = !!clipsQuery.conditions.length;
-            pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.editor = Ox.VideoEditor({
-                annotationsSize: pandora.user.ui.annotationsSize,
-                censored: censored,
-                cuts: result.data.cuts || [],
-                duration: result.data.duration,
-                find: isClipsQuery ? clipsQuery.conditions[0].value : '',
-                getFrameURL: function(position) {
-                    return '/' + pandora.user.ui.item + '/' + Ox.last(pandora.site.video.resolutions) + 'p' + position + '.jpg';
-                },
-                getLargeTimelineImageURL: function(i) {
-                    return '/' + pandora.user.ui.item + '/timeline64p' + i + '.png';
-                },
-                getSmallTimelineImageURL: function(i) {
-                    return '/' + pandora.user.ui.item + '/timeline16p' + i + '.png';
-                },
-                height: pandora.$ui.contentPanel.size(1),
-                id: 'editor',
-                'in': pandora.user.ui.videoPoints[pandora.user.ui.item]['in'],
-                layers: layers,
-                muted: pandora.user.ui.videoMuted,
-                out: pandora.user.ui.videoPoints[pandora.user.ui.item].out,
-                position: pandora.user.ui.videoPoints[pandora.user.ui.item].position,
-                posterFrame: parseInt(video.duration / 2),
-                showAnnotations: pandora.user.ui.showAnnotations,
-                showLargeTimeline: true,
-                subtitles: subtitles,
-                tooltips: true,
-                video: video,
-                videoRatio: result.data.videoRatio,
-                videoSize: pandora.user.ui.videoSize,
-                width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
-            }).bindEvent({
-                points: function(data) {
-                    pandora.UI.set('videoPoints.' + pandora.user.ui.item, {
-                        'in': data['in'],
-                        out: data.out,
-                        position: pandora.user.ui.videoPoints[pandora.user.ui.item].position
-                    });
-                },
-                position: function(data) {
-                    pandora.UI.set('videoPoints.' + pandora.user.ui.item + '.position', data.position);
-                },
-                resize: function(data) {
-                    Ox.print('RESIZE!!', data.size)
-                    pandora.$ui.editor.options({
-                        height: data.size
-                    });
-                },
-                resizeend: function(data) {
-                    pandora.UI.set({annotationsSize: data.size});
-                },
-                togglesize: function(data) {
-                    pandora.UI.set({videoSize: data.size});
-                },
-                addannotation: function(data) {
-                    Ox.print('addAnnotation', data);
-                    data.item = pandora.user.ui.item;
-                    data.value = 'Click to edit';
-                    pandora.api.addAnnotation(data, function(result) {
-                        pandora.$ui.editor.addAnnotation(data.layer, result.data);
-                    });
-                },
-                removeannotations: function(data) {
-                    pandora.api.removeAnnotations(data, function(result) {
-                        //fixme: check for errors
-                        pandora.$ui.editor.removeAnnotations(data.layer, data.ids);
-                    });
-                },
-                toggleannotations: function(data) {
-                    pandora.UI.set('showAnnotations', data.showAnnotations);
-                },
-                updateannotation: function(data) {
-                    //fixme: check that edit was successfull
-                    pandora.api.editAnnotation(data, function(result) {
-                        Ox.print('done updateAnnotation', result);
-                    });
-                },
-                pandora_showannotations: function(data) {
-                    pandora.$ui.editor.options({showAnnotations: data.value});
-                }
-            }));
+            pandora.$ui.contentPanel.replaceElement(1,
+                pandora.$ui.editor = Ox.VideoEditor({
+                    annotationsSize: pandora.user.ui.annotationsSize,
+                    censored: censored,
+                    cuts: result.data.cuts || [],
+                    duration: result.data.duration,
+                    find: pandora.user.ui.itemFind.conditions[0]
+                        ? pandora.user.ui.itemFind.conditions[0].value : '',
+                    getFrameURL: function(position) {
+                        return '/' + pandora.user.ui.item + '/' + Ox.last(pandora.site.video.resolutions) + 'p' + position + '.jpg';
+                    },
+                    getLargeTimelineImageURL: function(i) {
+                        return '/' + pandora.user.ui.item + '/timeline64p' + i + '.png';
+                    },
+                    getSmallTimelineImageURL: function(i) {
+                        return '/' + pandora.user.ui.item + '/timeline16p' + i + '.png';
+                    },
+                    height: pandora.$ui.contentPanel.size(1),
+                    id: 'editor',
+                    'in': pandora.user.ui.videoPoints[pandora.user.ui.item]['in'],
+                    layers: layers,
+                    muted: pandora.user.ui.videoMuted,
+                    out: pandora.user.ui.videoPoints[pandora.user.ui.item].out,
+                    position: pandora.user.ui.videoPoints[pandora.user.ui.item].position,
+                    posterFrame: parseInt(video.duration / 2),
+                    showAnnotations: pandora.user.ui.showAnnotations,
+                    showLargeTimeline: true,
+                    subtitles: subtitles,
+                    tooltips: true,
+                    video: video,
+                    videoRatio: result.data.videoRatio,
+                    videoSize: pandora.user.ui.videoSize,
+                    width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+                }).bindEvent({
+                    find: function(data) {
+                        pandora.UI.set('itemFind', {
+                            conditions: [{key: 'subtitles', value: data.find, operator: '='}],
+                            operator: '&'
+                        });
+                    },
+                    points: function(data) {
+                        pandora.UI.set('videoPoints.' + pandora.user.ui.item, {
+                            'in': data['in'],
+                            out: data.out,
+                            position: pandora.user.ui.videoPoints[pandora.user.ui.item].position
+                        });
+                    },
+                    position: function(data) {
+                        pandora.UI.set('videoPoints.' + pandora.user.ui.item + '.position', data.position);
+                    },
+                    resize: function(data) {
+                        Ox.print('RESIZE!!', data.size)
+                        pandora.$ui.editor.options({
+                            height: data.size
+                        });
+                    },
+                    resizeend: function(data) {
+                        pandora.UI.set({annotationsSize: data.size});
+                    },
+                    togglesize: function(data) {
+                        pandora.UI.set({videoSize: data.size});
+                    },
+                    addannotation: function(data) {
+                        Ox.print('addAnnotation', data);
+                        data.item = pandora.user.ui.item;
+                        data.value = 'Click to edit';
+                        pandora.api.addAnnotation(data, function(result) {
+                            pandora.$ui.editor.addAnnotation(data.layer, result.data);
+                        });
+                    },
+                    removeannotations: function(data) {
+                        pandora.api.removeAnnotations(data, function(result) {
+                            //fixme: check for errors
+                            pandora.$ui.editor.removeAnnotations(data.layer, data.ids);
+                        });
+                    },
+                    toggleannotations: function(data) {
+                        pandora.UI.set('showAnnotations', data.showAnnotations);
+                    },
+                    updateannotation: function(data) {
+                        //fixme: check that edit was successfull
+                        pandora.api.editAnnotation(data, function(result) {
+                            Ox.print('done updateAnnotation', result);
+                        });
+                    },
+                    pandora_showannotations: function(data) {
+                        pandora.$ui.editor.options({showAnnotations: data.value});
+                    }
+                })
+            );
             that.bindEvent('resize', function(data) {
                 //Ox.print('resize item', data)
                 pandora.$ui.editor.options({

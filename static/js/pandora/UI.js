@@ -65,7 +65,9 @@ pandora.UI = (function() {
                 Ox.forEach(listSettings, function(listSetting, setting) {
                     if (!pandora.user.ui.lists[list]) {
                         // add default list setting and copy to settings
-                        add['lists.' + that.encode(list) + '.' + listSetting] = pandora.site.user.ui[setting];
+                        add[
+                            'lists.' + that.encode(list) + '.' + listSetting
+                        ] = pandora.site.user.ui[setting];
                         add[setting] = pandora.site.user.ui[setting];
                     } else {
                         // copy lists setting to settings
@@ -73,12 +75,13 @@ pandora.UI = (function() {
                     }
                 });
             }
+            add.itemFind = pandora.isItemFind(args.find)
+                ? args.find : pandora.site.user.ui.itemFind;
         }
         // it is important to check for find first, so that if find
         // changes list, pandora.user.ui._list is correct here
         var item = args['item'] || pandora.user.ui.item,
             list = pandora.user.ui._list || '';
-        Ox.print('item/list', item, list, '...', args['videoPoints.' + item])
         if (!pandora.user.ui.lists[list]) {
             add['lists.' + that.encode(list)] = {};
         }
