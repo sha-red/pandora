@@ -68,12 +68,23 @@ class Event(models.Model):
         return False
      
     def get_matches(self):
+        super_matches = []
+        q = Q(name_find__contains=" " + self.name)|Q(name_find__contains="|%s"%self.name)
+        for name in self.alternativeNames:
+            q = q|Q(name_find__contains=" " + name)|Q(name_find__contains="|%s"%name)
+        for p in Event.objects.filter(q).exclude(id=self.id):
+            for othername in [p.name] + list(p.alternativeNames):
+                for name in [self.name] + list(self.alternativeNames):
+                    if name in othername:
+                        super_matches.append(othername)
         q = Q(value__icontains=" " + self.name)|Q(value__startswith=self.name)
         for name in self.alternativeNames:
             q = q|Q(value__icontains=" " + name)|Q(value__startswith=name)
         matches = []
         for a in Annotation.objects.filter(q):
             value = a.value.lower()
+            for name in super_matches:
+                value = value.replace(name.lower(), '')
             for name in [self.name] + list(self.alternativeNames):
                 name = name.lower()
                 if name in value and re.compile('((^|\s)%s([\.,;:!?\-\/\s]|$))'%name):
