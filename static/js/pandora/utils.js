@@ -817,7 +817,7 @@ pandora.resizeWindow = function() {
         if (pandora.user.ui.itemView == 'info') {
             pandora.$ui.info.resize();
         } else if (pandora.user.ui.itemView == 'clips') {
-            pandora.$ui.clips.size();
+            pandora.$ui.clipList.size();
         } else if (pandora.user.ui.itemView == 'video') {
             pandora.$ui.player.options({
                // fixme: duplicated

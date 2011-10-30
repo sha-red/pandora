@@ -144,7 +144,7 @@ pandora.ui.item = function() {
 
         } else if (pandora.user.ui.itemView == 'clips') {
             pandora.$ui.contentPanel.replaceElement(1,
-                pandora.$ui.clips = pandora.ui.clipList(result.data.videoRatio)
+                pandora.ui.clipsView(result.data.videoRatio)
             );
 
         } else if (pandora.user.ui.itemView == 'video') {
