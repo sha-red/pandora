@@ -670,7 +670,8 @@ pandora.ui.infoView = function(data) {
                     max: 1,
                     min: 1,
                     orientation: 'both',
-                    selected: [selectedImage['index']],
+                    // fixme: should never be undefined
+                    selected: selectedImage ? [selectedImage['index']] : [],
                     size: 128,
                     sort: [{key: 'index', operator: '+'}],
                     unique: 'index'
