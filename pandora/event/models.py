@@ -76,9 +76,7 @@ class Event(models.Model):
             value = a.value.lower()
             for name in [self.name] + list(self.alternativeNames):
                 name = name.lower()
-                if name in value and (value.startswith(name) or \
-                       value.endswith(name) or \
-                       re.compile('\s%s[\.,;:!?\-\/\s]'%name).findall(value)):
+                if name in value and re.compile('((^|\s)%s([\.,;:!?\-\/\s]|$))'%name):
                     matches.append(a.id)
                     break
         if not matches:
