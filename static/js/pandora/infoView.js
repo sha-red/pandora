@@ -106,7 +106,9 @@ pandora.ui.infoView = function(data) {
             })
             .appendTo($reflection),
 
-        $text = Ox.Element()
+        $text = Ox.Element({
+                tooltip: canEdit && !isEditable ? 'Doubleclick to reload metadata' : ''
+            })
             .css({
                 position: 'absolute',
                 left: margin + (iconSize == 256 ? 256 : iconWidth) + margin + 'px',
@@ -114,6 +116,9 @@ pandora.ui.infoView = function(data) {
                 right: margin + statisticsWidth + margin + 'px',
                 //background: 'green'
             })
+            .bindEvent(canEdit && !isEditable ? {
+                doubleclick: reloadMetadata
+            } : {})
             .appendTo($data.$element),
 
         $statistics = $('<div>')
@@ -141,8 +146,7 @@ pandora.ui.infoView = function(data) {
                     format: function(value) {
                         return formatTitle(value);
                     },
-                    tooltip: isEditable ? 'Doubleclick to edit'
-                        : canEdit ? 'Doubleclick to reload metadata' : '',
+                    tooltip: isEditable ? 'Doubleclick to edit' : '',
                     value: data.title
                 })
                 .css({
@@ -152,13 +156,11 @@ pandora.ui.infoView = function(data) {
                     MozUserSelect: 'text',
                     WebkitUserSelect: 'text'
                 })
-                .bindEvent(Ox.extend({
+                .bindEvent({
                     submit: function(event) {
                         editMetadata('title', event.value);
                     }
-                }, !isEditable && canEdit ? {
-                    doubleclick: reloadMetadata
-                } : {}))
+                })
                 .appendTo($text)
         )
         .appendTo($text);
@@ -179,8 +181,7 @@ pandora.ui.infoView = function(data) {
                                 ? formatValue(value.split(', '), 'name')
                                 : formatLight('Unknown Director');
                         },
-                        tooltip: isEditable ? 'Doubleclick to edit'
-                            : canEdit ? 'Doubleclick to reload metadata' : '',
+                        tooltip: isEditable ? 'Doubleclick to edit' : '',
                         value: data.director ? data.director.join(', ') : 'Unknown Director'
                     })
                     .css({
@@ -190,13 +191,11 @@ pandora.ui.infoView = function(data) {
                         MozUserSelect: 'text',
                         WebkitUserSelect: 'text'
                     })
-                    .bindEvent(Ox.extend({
+                    .bindEvent({
                         submit: function(event) {
                             editMetadata('director', event.value);
                         }
-                    }, !isEditable && canEdit ? {
-                        doubleclick: reloadMetadata
-                    } : {}))
+                    })
             )
             .appendTo($text);
     }
