@@ -226,7 +226,7 @@ pandora.URL = (function() {
             });
 
             if (!pandora.$ui.appPanel && state.item && find) {
-                // on page load, if item is set and there is or was a query,
+                // on page load, if item is set and there was a query,
                 // we have to check if the item actually matches the query,
                 // and otherwise reset find
                 pandora.api.find({

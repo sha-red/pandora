@@ -18,6 +18,19 @@ pandora.ui.toolbar = function() {
     ).append(
         pandora.$ui.orderButton = pandora.ui.orderButton()
     );
+    ui.item && that.append(
+        pandora.$ui.itemTitle = Ox.Label({
+            textAlign: 'center'
+        })
+        .css({
+            position: 'absolute',
+            left: '236px',
+            top: '4px',
+            right: (ui._list ? 324 : 310) + 'px',
+            width: 'auto'
+        })
+        .hide()
+    );
     that.append(
         pandora.$ui.findElement = pandora.ui.findElement()
     );

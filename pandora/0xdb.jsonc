@@ -13,6 +13,7 @@
             for items of a rights level up to and including x
     */
     "capabilities": {
+        // "canClickMap": {"friend": true, "staff": true, "admin": true},
         "canDeleteItems": {"admin": true},
         "canDownloadVideo": {"guest": 0, "member": 0, "friend": 4, "staff": 4, "admin": 4},
         "canEditMetadata": {"staff": true, "admin": true},

@@ -48,12 +48,11 @@ pandora.ui.rightPanel = function() {
                         pandora.$ui.player.options({width: data.size});
                     } else if (pandora.user.ui.itemView == 'timeline') {
                         pandora.$ui.editor.options({width: data.size});
+                    } else if (pandora.user.ui.listView == 'map') {
+                        pandora.$ui.map.resizeMap();
+                    } else if (pandora.user.ui.listView == 'calendar') {
+                        pandora.$ui.calendar.resizeCalendar();
                     }
-                }
-            },
-            pandora_itemview: function(data) {
-                if (pandora.isClipView() != pandora.isClipView(data.previousValue)) {
-                    that.replaceElement(0, pandora.$ui.toolbar = pandora.ui.toolbar());
                 }
             }
         });

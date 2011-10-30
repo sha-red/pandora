@@ -6,9 +6,9 @@ pandora.ui.item = function() {
 
     pandora.api.get({
         id: pandora.user.ui.item,
-        keys: ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1 ?
-              [ 'cuts', 'duration', 'layers', 'parts', 'rendered', 'rightslevel', 'size', 'title', 'videoRatio'] : []
-    }, pandora.user.level == 'admin' && pandora.user.ui.itemView == 'info' ? 0 : -1, function(result) {
+        keys: ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
+            ? [ 'cuts', 'director', 'duration', 'layers', 'parts', 'rendered', 'rightslevel', 'size', 'title', 'videoRatio', 'year'] : []
+    }, pandora.user.ui.itemView == 'info' && pandora.site.capabilities.canEditMetadata[pandora.user.level] ? 0 : -1, function(result) {
 
         if (result.status.code == 200) {
             // fixme: can the history state title get updated too?
@@ -26,6 +26,14 @@ pandora.ui.item = function() {
                     )
             );
         }*/
+
+        pandora.$ui.itemTitle
+            .options({
+                title: '<b>' + result.data.title
+                    + (result.data.director ? ' (' + result.data.director.join(', ') + ')' : '')
+                    + (result.data.year ? ' ' + result.data.year : '') + '</b>'
+            })
+            .show();
 
         if (['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
             // fixme: layers have value, subtitles has text?

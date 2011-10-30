@@ -15,21 +15,25 @@ pandora.ui.navigationView = function(type, videoRatio) {
 
         $element = Ox.Element(),
 
-        $itemIcon = $('<img>')
+        $itemIcon = type == 'map' ? $('<img>')
             .addClass('OxFlag')
             .attr({
-                src: type == 'map'
-                    ? Ox.getImageByGeoname('icon', 16, '')
-                    : '/static/png/icon16.png'
+                src: Ox.getImageByGeoname('icon', 16, '')
             })
-            .css({float: 'left', margin: '4px'}),
+            .css({float: 'left', margin: '2px'}) : '',
 
         $itemLabel = Ox.Label({
                 textAlign: 'center',
                 title: '',
-                width: 96 + Ox.UI.SCROLLBAR_SIZE
+                width: 0 // 76 + Ox.UI.SCROLLBAR_SIZE
             })
-            .css({float: 'left', margin: '4px 0 4px 0'})
+            .css({
+                position: 'absolute',
+                left: 4 + !!ui.item * 20 + (type == 'map') * 20 + 'px',
+                top: '4px',
+                right: '24px',
+                width: 'auto'
+            })
             .bindEvent({
                 singleclick: function() {
                     $element[type == 'map' ? 'panToPlace' : 'panToEvent']();
@@ -43,7 +47,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 title: 'close',
                 type: 'image'
             })
-            .css({float: 'left', margin: '4px'})
+            .css({float: 'right', margin: '2px'})
             .bindEvent({
                 click: function() {
                     $element.options({selected: null});
@@ -52,6 +56,8 @@ pandora.ui.navigationView = function(type, videoRatio) {
             }),
 
         $item = $('<div>')
+            .css({padding: '2px'})
+            .append(ui.item ? pandora.$ui.sortMenu = pandora.ui.sortMenu() : '')
             .append($itemIcon)
             .append($itemLabel)
             .append($itemButton),
@@ -94,9 +100,8 @@ pandora.ui.navigationView = function(type, videoRatio) {
             orientation: 'vertical'
         })
         .bindEvent({
-            resize: function(data) {
-                resizeToolbar(data.size);
-                $list.size();
+            resize: function() {
+                $list.size()
             },
             resizeend: function(data) {
                 var size = data.size;
@@ -113,7 +118,6 @@ pandora.ui.navigationView = function(type, videoRatio) {
                         // finished, causing the list size to be off by one
                         setTimeout(function() {
                             $element['resize' + Ox.toTitleCase(type)]();
-                            resizeToolbar(size);
                             $list.size();
                         }, 0);
                     });
@@ -142,6 +146,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
 
         that.replaceElement(0,
             $element = Ox.Map({
+                // clickable: pandora.site.capabilities.canClickMap[pandora.user.level],
                 find: ui.mapFind,
                 // 20 menu + 24 toolbar + 1 resizebar + 16 statusbar
                 height: window.innerHeight - ui.showGroups * ui.groupsSize - 61,
@@ -218,13 +223,8 @@ pandora.ui.navigationView = function(type, videoRatio) {
 
     }
 
-    resizeToolbar(listSize);
     updateToolbar();
     updateStatusbar();
-
-    function resizeToolbar(width) {
-        $itemLabel.options({width: width - 48});
-    }
 
     function selectItem(data) {
         var id = data.id || '';
