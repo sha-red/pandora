@@ -2,10 +2,11 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
 
-from django.db import models
+import re
+
+from django.db import models, transaction
 from django.contrib.auth.models import User
 from django.db.models import Q
-
 import ox
 from ox.django import fields
 
@@ -72,18 +73,23 @@ class Event(models.Model):
             q = q|Q(value__icontains=" " + name)|Q(value__startswith=name)
         matches = []
         for a in Annotation.objects.filter(q):
-            words = ox.words(a.value)
+            value = a.value.lower()
             for name in [self.name] + list(self.alternativeNames):
-                if name in words:
+                name = name.lower()
+                if name in value and (value.startswith(name) or \
+                       value.endswith(name) or \
+                       re.compile('\s%s[\.,;:!?\-\/\s]'%name).findall(value)):
                     matches.append(a.id)
                     break
         if not matches:
             matches = [-1]
         return Annotation.objects.filter(id__in=matches)
 
+
+    @transaction.commit_on_success
     def update_matches(self):
         matches = self.get_matches()
-        self.matches = matches.count()
+        numberofmatches = matches.count()
         for i in self.annotations.exclude(id__in=matches):
             self.annotations.remove(i)
         for i in matches.exclude(id__in=self.annotations.all()):
@@ -94,7 +100,8 @@ class Event(models.Model):
         for i in Item.objects.filter(id__in=ids).exclude(id__in=self.items.all()):
             self.items.add(i)
         #only update matches, other values might have been changed
-        Event.objects.filter(id=self.id).update(matches=self.matches)
+        if self.matches != numberofmatches:
+            Event.objects.filter(id=self.id).update(matches=numberofmatches)
 
     def set_name_sort(self, value=None):
         if not value:
