@@ -69,9 +69,7 @@ pandora.ui.clipList = function(videoRatio) {
                         conditions:[{key: 'id', value: ui.item, operator: '=='}],
                         operator: '&'
                     };
-                    // fixme: there is currently no way to add a clip query
-                    // we'll need something like itemFind (vs. listFind)
-                    query = {conditions: [], operator: '&'};
+                    query = pandora.user.ui.itemFind;
                 }
                 pandora.api.findClips(Ox.extend({
                     itemsQuery: itemsQuery,
