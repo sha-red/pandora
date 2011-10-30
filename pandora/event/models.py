@@ -2,10 +2,11 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
 
+import re
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Q
-
 import ox
 from ox.django import fields
 
@@ -72,9 +73,12 @@ class Event(models.Model):
             q = q|Q(value__icontains=" " + name)|Q(value__startswith=name)
         matches = []
         for a in Annotation.objects.filter(q):
-            words = ox.words(a.value.lower())
+            value = a.value.lower()
             for name in [self.name] + list(self.alternativeNames):
-                if name.lower() in words:
+                name = name.lower()
+                if name in value and (value.startswith(name) or \
+                       value.endswith(name) or \
+                       re.compile('\s%s[\.!?:\-\s]'%name).findall(value)):
                     matches.append(a.id)
                     break
         if not matches:
