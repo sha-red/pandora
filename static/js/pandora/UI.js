@@ -55,6 +55,7 @@ pandora.UI = (function() {
                 // switch from item view to list view
                 args['item'] = '';
             }
+            add['itemFind'] = pandora.site.user.ui.itemFind;
             if (!pandora.user.ui.lists[list]) {
                 add['lists.' + that.encode(list)] = {};
             }

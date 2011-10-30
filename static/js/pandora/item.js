@@ -174,10 +174,10 @@ pandora.ui.item = function() {
                 width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             }).bindEvent({
                 find: function(data) {
-                    pandora.UI.set('itemFind', {
+                    pandora.UI.set('itemFind', data.find ? {
                         conditions: [{key: 'subtitles', value: data.find, operator: '='}],
                         operator: '&'
-                    });
+                    } : pandora.site.user.ui.itemFind);
                 },
                 muted: function(data) {
                     pandora.UI.set('muted', data.muted);
@@ -241,10 +241,10 @@ pandora.ui.item = function() {
                     width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
                 }).bindEvent({
                     find: function(data) {
-                        pandora.UI.set('itemFind', {
+                        pandora.UI.set('itemFind', data.find ? {
                             conditions: [{key: 'subtitles', value: data.find, operator: '='}],
                             operator: '&'
-                        });
+                        } : pandora.site.user.ui.itemFind);
                     },
                     points: function(data) {
                         pandora.UI.set('videoPoints.' + pandora.user.ui.item, {

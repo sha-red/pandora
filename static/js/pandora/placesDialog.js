@@ -22,6 +22,20 @@ pandora.ui.placesDialog = function() {
                     callback(result);
                 });
             },
+            getMatches: function(names, callback) {
+                // fixme: the results of this are of course
+                // not identical to actual place matches
+                pandora.api.findClips({
+                    query: {
+                        conditions: names.map(function(name) {
+                            return {key: 'subtitles', value: name, operator: '='};
+                        }),
+                        operator: names.length == 1 ? '&' : '|'
+                    }
+                }, function(result) {
+                    callback(result.data.items);
+                });
+            },
             removePlace: function(place, callback) {
                 pandora.api.removePlace(place, function(result) {
                     Ox.Request.clearCache(); // fixme: remove
