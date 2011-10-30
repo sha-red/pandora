@@ -141,7 +141,8 @@ pandora.ui.infoView = function(data) {
                     format: function(value) {
                         return formatTitle(value);
                     },
-                    tooltip: isEditable ? 'Doubleclick to edit' : '',
+                    tooltip: isEditable ? 'Doubleclick to edit'
+                        : canEdit ? 'Doubleclick to reload metadata' : '',
                     value: data.title
                 })
                 .css({
@@ -151,11 +152,13 @@ pandora.ui.infoView = function(data) {
                     MozUserSelect: 'text',
                     WebkitUserSelect: 'text'
                 })
-                .bindEvent({
+                .bindEvent(Ox.extend({
                     submit: function(event) {
                         editMetadata('title', event.value);
                     }
-                })
+                }, !isEditable && canEdit ? {
+                    doubleclick: reloadMetadata
+                } : {}))
                 .appendTo($text)
         )
         .appendTo($text);
@@ -176,7 +179,8 @@ pandora.ui.infoView = function(data) {
                                 ? formatValue(value.split(', '), 'name')
                                 : formatLight('Unknown Director');
                         },
-                        tooltip: isEditable ? 'Doubleclick to edit' : '',
+                        tooltip: isEditable ? 'Doubleclick to edit'
+                            : canEdit ? 'Doubleclick to reload metadata' : '',
                         value: data.director ? data.director.join(', ') : 'Unknown Director'
                     })
                     .css({
@@ -186,11 +190,13 @@ pandora.ui.infoView = function(data) {
                         MozUserSelect: 'text',
                         WebkitUserSelect: 'text'
                     })
-                    .bindEvent({
+                    .bindEvent(Ox.extend({
                         submit: function(event) {
                             editMetadata('director', event.value);
                         }
-                    })
+                    }, !isEditable && canEdit ? {
+                        doubleclick: reloadMetadata
+                    } : {}))
             )
             .appendTo($text);
     }
@@ -562,6 +568,21 @@ pandora.ui.infoView = function(data) {
             data.episodeTitle = split[1].trim();
         }
         return data;
+    }
+
+    function reloadMetadata() {
+        var item = ui.item;
+        // fixme: maybe there's a better method name for this?
+        pandora.api.updateExternalData({
+            id: ui.item
+        }, function(result) {
+            Ox.Request.clearCache(item);
+            if (ui.item == item && ui.itemView == 'info') {
+                pandora.$ui.contentPanel.replaceElement(
+                    1, pandora.$ui.item = pandora.ui.item()
+                );
+            }
+        });
     }
 
     function renderCapabilities(rightsLevel) {

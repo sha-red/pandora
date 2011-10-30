@@ -23,33 +23,6 @@ pandora.ui.toolbar = function() {
             pandora.$ui.orderButton = pandora.ui.orderButton()
         );
     }
-    if (
-        ui.item && ui.itemView == 'info'
-        && pandora.site.capabilities.canReloadMetadata[pandora.user.level]
-    ) {
-        that.append(
-            Ox.Button({
-                title: 'Reload Metadata'
-            })
-            .css({float: 'left', margin: '4px'})
-            .bindEvent({
-                click: function() {
-                    var item = ui.item;
-                    // fixme: maybe there's a better method name for this?
-                    pandora.api.updateExternalData({
-                        id: ui.item
-                    }, function(result) {
-                        Ox.Request.clearCache(item);
-                        if (ui.item == item && ui.itemView == 'info') {
-                            pandora.$ui.contentPanel.replaceElement(
-                                1, pandora.$ui.item = pandora.ui.item()
-                            );
-                        }
-                    });
-                }
-            })
-        );
-    }
     that.append(
         pandora.$ui.findElement = pandora.ui.findElement()
     );
