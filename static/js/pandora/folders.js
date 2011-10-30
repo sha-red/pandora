@@ -308,8 +308,15 @@ pandora.ui.folders = function() {
             }
         });
     }
-    that.toggle = function() {
-        
-    };
+    that.bindEvent({
+        pandora_find: function() {
+            var previousUI = pandora.UI.getPrevious();
+            if (!pandora.user.ui._list && previousUI._list) {
+                Ox.forEach(pandora.$ui.folderList, function($list) {
+                    $list.options({selected: []});
+                });
+            }
+        }
+    })
     return that;
 };

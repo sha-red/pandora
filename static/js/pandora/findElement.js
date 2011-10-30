@@ -77,34 +77,19 @@ pandora.ui.findElement = function() {
                             var findInList = pandora.user.ui._list
                                     && pandora.$ui.findListSelect.value() == 'list',
                                 key = pandora.$ui.findSelect.value(),
-                                conditions = data.value ? [{
-                                    key: key,
-                                    value: data.value,
-                                    operator: '='
-                                }] : [];
-                            if (findInList) {
-                                pandora.UI.set('find', {
-                                    conditions: Ox.merge([{
+                                conditions = Ox.merge(
+                                    findInList ? [{
                                         key: 'list',
                                         value: pandora.user.ui._list,
                                         operator: '=='
-                                    }], conditions),
-                                    operator: '&'
-                                });
-                                // fixme: what was this?
-                                // data.value && findIndex == 0 && pandora.user.ui.find.conditions.reverse();
-                            } else {
-                                if (pandora.user.ui._list) {
-                                    Ox.forEach(pandora.$ui.folderList, function($list) {
-                                        $list.options({selected: []});
-                                    });
-                                    pandora.UI.set({list: ''});
-                                }
-                                pandora.UI.set('find', {
-                                    conditions: conditions,
-                                    operator: '&'
-                                });
-                            }
+                                    }] : [],
+                                    data.value ? [{
+                                        key: key,
+                                        value: data.value,
+                                        operator: '='
+                                    }] : []
+                                );
+                            pandora.UI.set('find', {conditions: conditions, operator: '&'});
                         }
                     })
             ]),

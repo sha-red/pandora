@@ -13,16 +13,11 @@ pandora.ui.toolbar = function() {
     that.append(
         pandora.$ui.viewSelect = pandora.ui.viewSelect()
     );
-    if (!ui.item && pandora.isClipView()) {
-        that.append(
-            pandora.$ui.sortSelect = pandora.ui.sortSelect()
-        );
-    }
-    if (!ui.item && pandora.isClipView()) {
-        that.append(
-            pandora.$ui.orderButton = pandora.ui.orderButton()
-        );
-    }
+    !ui.item && that.append(
+        pandora.$ui.sortSelect = pandora.ui.sortSelect()
+    ).append(
+        pandora.$ui.orderButton = pandora.ui.orderButton()
+    );
     that.append(
         pandora.$ui.findElement = pandora.ui.findElement()
     );

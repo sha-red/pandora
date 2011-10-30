@@ -60,6 +60,7 @@ pandora.UI = (function() {
                 add['lists.' + that.encode(list)] = {};
             }
             if (list != self.previousUI._list) {
+                Ox.print('FIND HAS CHANGED LIST')
                 if (!pandora.user.ui.lists[list]) {
                     add['lists.' + that.encode(list)] = {};
                 }
