@@ -78,7 +78,7 @@ class Event(models.Model):
                 name = name.lower()
                 if name in value and (value.startswith(name) or \
                        value.endswith(name) or \
-                       re.compile('\s%s[\.!?:\-\s]'%name).findall(value)):
+                       re.compile('\s%s[\.,;:!?\-\s]'%name).findall(value)):
                     matches.append(a.id)
                     break
         if not matches:
