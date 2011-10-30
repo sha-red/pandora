@@ -48,11 +48,12 @@ class Person(models.Model):
         if not self.sortname:
             self.sortname = ox.get_sort_name(self.name)
             self.sortname = unicodedata.normalize('NFKD', self.sortname)
+            self.sortname = self.sortname.replace(u'Æ', 'AE').replace(u'Ø', 'O').replace(u'Þ', 'P')
         self.sortsortname = utils.sort_string(self.sortname)
         self.numberofnames = len(self.name.split(' '))
         super(Person, self).save(*args, **kwargs)
         item.models.Facet.objects.filter(
-            key__in=item.models.Item.person_keys,
+            key__in=item.models.Item.person_keys + ['name'],
             value=self.name
         ).exclude(
             sortvalue=self.sortname

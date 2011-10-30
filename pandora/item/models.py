@@ -742,7 +742,7 @@ class Item(models.Model):
             for value in current_values:
                 if value not in saved_values:
                     sortvalue = value
-                    if key in self.person_keys:
+                    if key in self.person_keys + ['name']:
                         sortvalue = get_name_sort(value)
                     Facet.objects.get_or_create(item=self, key=key, value=value, sortvalue=sortvalue)
 
