@@ -78,13 +78,14 @@ class Place(models.Model):
         return j
 
     def get_matches(self):
-        q = Q(value__contains=" " + self.name)|Q(value__startswith=self.name)
+        q = Q(value__icontains=" " + self.name)|Q(value__istartswith=self.name)
         for name in self.alternativeNames:
-            q = q|Q(value__contains=" " + name)|Q(value__startswith=name)
+            q = q|Q(value__icontains=" " + name)|Q(value__istartswith=name)
         matches = []
         for a in Annotation.objects.filter(q):
-            value = a.value
+            value = a.value.lower()
             for name in [self.name] + list(self.alternativeNames):
+                name = name.lower()
                 if name in value and (value.startswith(name) or \
                        value.endswith(name) or \
                        re.compile('\s%s[\.,;:!?\-\/\s]'%name).findall(value)):
