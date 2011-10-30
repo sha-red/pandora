@@ -72,9 +72,9 @@ class Event(models.Model):
             q = q|Q(value__icontains=" " + name)|Q(value__startswith=name)
         matches = []
         for a in Annotation.objects.filter(q):
-            words = ox.words(a.value)
+            words = ox.words(a.value.lower())
             for name in [self.name] + list(self.alternativeNames):
-                if name in words:
+                if name.lower() in words:
                     matches.append(a.id)
                     break
         if not matches:
