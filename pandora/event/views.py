@@ -47,7 +47,7 @@ def addEvent(request):
         response = json_response(status=200, text='created')
         response['data'] = event.json()
     else:
-        response = json_response(status=403, text='name exists')
+        response = json_response(status=409, text='name exists')
         response['data']['names'] = existing_names
     return render_to_json_response(response)
 actions.register(addEvent, cache=False)
@@ -92,7 +92,7 @@ def editEvent(request):
             response = json_response(status=200, text='updated')
             response['data'] = event.json()
         else:
-            response = json_response(status=403, text='Event name conflict')
+            response = json_response(status=409, text='Event name conflict')
             response['data']['names'] = conflict_names
     else:
         response = json_response(status=403, text='permission denied')

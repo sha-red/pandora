@@ -62,7 +62,7 @@ def addPlace(request):
         tasks.update_matches.delay(place.id)
         response = json_response(place.json())
     else:
-        response = json_response(status=403,
+        response = json_response(status=409,
                                  text='%s exists'%(existing_names and 'Name' or 'Geoname'))
         response['data']['names'] = existing_names
         if existing_geoname:
@@ -110,7 +110,7 @@ def editPlace(request):
                 tasks.update_matches.delay(place.id)
             response = json_response(place.json())
         else:
-            response = json_response(status=403,
+            response = json_response(status=409,
                                      text='%s exists'%(conflict_names and 'Name' or 'Geoname'))
             response['data']['names'] = conflict_names 
             if conflict_geoname:
