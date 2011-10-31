@@ -43,13 +43,16 @@ pandora.ui.toolbar = function() {
     that.bindEvent({
         pandora_listview: function(data) {
             var isNavigationView = ['map', 'calendar'].indexOf(data.value) > -1,
-                wasNavigationView = ['map', 'calendar'].indexOf(data.previousValue) > -1;
+                wasNavigationView = ['map', 'calendar'].indexOf(data.previousValue) > -1,
+                action = isNavigationView ? 'hide' : 'show';
+            Ox.print('IS/WAS', isNavigationView, wasNavigationView);
             if (isNavigationView != wasNavigationView) {
-                pandora.$ui.sortSelect[isNavigationView ? 'hide' : 'show']();
+                pandora.$ui.sortSelect[action]();
+                pandora.$ui.orderButton[action]();
             }
             if (pandora.isClipView() != pandora.isClipView(data.previousValue)) {
                 pandora.$ui.sortSelect.replaceWith(
-                    pandora.$ui.sortSelect = pandora.ui.sortSelect()
+                    pandora.$ui.sortSelect = pandora.ui.sortSelect()[action]()
                 );
             }
         }
