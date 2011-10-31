@@ -282,6 +282,7 @@ pandora.ui.mainMenu = function() {
                 if (!!data.value != !!data.previousValue) {
                     that[data.value ? 'disableItem' : 'enableItem']('showgroups');
                     that[data.value ? 'enableItem' : 'disableItem']('showbrowser');
+                    that.replaceMenu('sortMenu', getSortMenu());
                 }
                 if (!data.value) {
                     that.disableItem('showannotations');
@@ -360,17 +361,20 @@ pandora.ui.mainMenu = function() {
         var ui = pandora.user.ui,
             isClipView = pandora.isClipView(ui.listView);
         return { id: 'sortMenu', title: 'Sort', items: [
-            { id: 'sortmovies', title: 'Sort ' + (isClipView ? 'Clips' : pandora.site.itemName.plural) + ' by', items: [
-                { group: 'sortmovies', min: 1, max: 1, items: Ox.merge(isClipView ? Ox.merge(pandora.site.clipKeys.map(function(key) {
-                    return Ox.extend(Ox.clone(key), {
-                        checked: ui.listSort[0].key == key.id,
-                        title: 'Clip ' + key.title
-                    });
-                }), /*{}*/[]) : [], pandora.site.sortKeys.map(function(key) {
-                    return Ox.extend({
-                        checked: ui.listSort[0].key == key.id
-                    }, key);
-                })) }
+            { id: 'sortmovies', title: 'Sort ' + (isClipView || ui.item ? 'Clips' : pandora.site.itemName.plural) + ' by', items: [
+                { group: 'sortmovies', min: 1, max: 1, items: Ox.merge(
+                    isClipView ? pandora.site.clipKeys.map(function(key) {
+                        return Ox.extend(Ox.clone(key), {
+                            checked: ui.listSort[0].key == key.id,
+                            title: 'Clip ' + key.title
+                        });
+                    }) : [],
+                    !ui.item ? pandora.site.sortKeys.map(function(key) {
+                        return Ox.extend({
+                            checked: ui.listSort[0].key == key.id
+                        }, key);
+                    }) : []
+                ) }
             ] },
             { id: 'ordermovies', title: 'Order ' + (isClipView ? 'Clips' : pandora.site.itemName.plural), items: [
                 { group: 'ordermovies', min: 1, max: 1, items: [

@@ -292,9 +292,9 @@ pandora.ui.infoView = function(data) {
             .css(css)
             .appendTo($text);
         html = [];
-        ['genre', 'keywords'].forEach(function(key) {
+        ['genre', 'keyword'].forEach(function(key) {
             data[key] && html.push(
-                formatKey(key)
+                formatKey(key == 'keyword' ? 'keywords' : key)
                 + formatValue(data[key], key)
             );
         });
