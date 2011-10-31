@@ -291,7 +291,7 @@ class Item(models.Model):
             self.itemId = self.oxdbId
             #FIXME: move files to new id here
 
-        if self.poster:
+        if self.poster and os.path.exists(self.poster.path):
             self.poster_height = self.poster.height
             self.poster_width = self.poster.width
         else:
