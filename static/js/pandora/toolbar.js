@@ -2,6 +2,8 @@
 
 pandora.ui.toolbar = function() {
     var ui = pandora.user.ui,
+        isNavigationView = !ui.item
+            && ['map', 'calendar'].indexOf(ui.listView) > -1,
         that = Ox.Bar({
             size: 24
         }).css({
@@ -18,6 +20,10 @@ pandora.ui.toolbar = function() {
     ).append(
         pandora.$ui.orderButton = pandora.ui.orderButton()
     );
+    if (isNavigationView) {
+        pandora.$ui.sortSelect.hide();
+        pandora.$ui.orderButton.hide();
+    }
     ui.item && that.append(
         pandora.$ui.itemTitle = Ox.Label({
             textAlign: 'center'
@@ -36,6 +42,11 @@ pandora.ui.toolbar = function() {
     );
     that.bindEvent({
         pandora_listview: function(data) {
+            var isNavigationView = ['map', 'calendar'].indexOf(data.value) > -1,
+                wasNavigationView = ['map', 'calendar'].indexOf(data.previousValue) > -1;
+            if (isNavigationView != wasNavigationView) {
+                pandora.$ui.sortSelect[isNavigationView ? 'hide' : 'show']();
+            }
             if (pandora.isClipView() != pandora.isClipView(data.previousValue)) {
                 pandora.$ui.sortSelect.replaceWith(
                     pandora.$ui.sortSelect = pandora.ui.sortSelect()

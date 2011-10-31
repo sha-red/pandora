@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
-pandora.ui.orderButton = function() {
+pandora.ui.orderButton = function(isNavigationView) {
     var sortKey = !pandora.user.ui.item ? 'listSort' : 'itemSort',
         that = Ox.Button({
             id: 'orderButton',
@@ -9,8 +9,8 @@ pandora.ui.orderButton = function() {
             type: 'image'
         })
         .css({
-            float: 'left',
-            margin: '4px 0 0 4px'
+            float: isNavigationView ? 'right' : 'left',
+            margin: isNavigationView ? '4px 4px 0 0' : '4px 0 0 4px'
         })
         .bindEvent({
             click: function(data) {

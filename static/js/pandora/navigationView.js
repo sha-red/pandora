@@ -15,55 +15,13 @@ pandora.ui.navigationView = function(type, videoRatio) {
 
         $element = Ox.Element(),
 
-        $itemIcon = type == 'map' ? $('<img>')
-            .addClass('OxFlag')
-            .attr({
-                src: Ox.getImageByGeoname('icon', 16, '')
-            })
-            .css({float: 'left', margin: '2px'}) : '',
-
-        $itemLabel = Ox.Label({
-                textAlign: 'center',
-                title: '',
-                width: 0 // 76 + Ox.UI.SCROLLBAR_SIZE
-            })
-            .css({
-                position: 'absolute',
-                left: 4 + !!ui.item * 20 + (type == 'map') * 20 + 'px',
-                top: '4px',
-                right: '24px',
-                width: 'auto'
-            })
-            .bindEvent({
-                singleclick: function() {
-                    $element[type == 'map' ? 'panToPlace' : 'panToEvent']();
-                },
-                doubleclick: function() {
-                    $element[type == 'map' ? 'zoomToPlace' : 'zoomToEvent']();
-                }
-            }),
-
-        $itemButton = Ox.Button({
-                title: 'close',
-                type: 'image'
-            })
-            .css({float: 'right', margin: '2px'})
-            .bindEvent({
-                click: function() {
-                    $element.options({selected: null});
-                    updateStatusbar(0);
-                }
-            }),
-
-        $item = $('<div>')
-            .css({padding: '2px'})
-            .append(ui.item ? pandora.$ui.sortMenu = pandora.ui.sortMenu() : '')
-            .append($itemIcon)
-            .append($itemLabel)
-            .append($itemButton),
-
         $toolbar = Ox.Bar({size: 24})
-            .append($item),
+            .append(
+                pandora.$ui.navigationViewOrderButton = pandora.ui.orderButton(true)
+            )
+            .append(
+                pandora.$ui.navigationViewSortSelect = pandora.ui.sortSelect(true)
+            ),
 
         $list = pandora.ui.clipList(videoRatio)
             .bindEvent({
@@ -224,12 +182,10 @@ pandora.ui.navigationView = function(type, videoRatio) {
 
     }
 
-    updateToolbar();
     updateStatusbar();
 
     function selectItem(data) {
         var id = data.id || '';
-        updateToolbar(id ? data : null);
         if (id && id[0] != '_') {
             $status.html('loading...');
             $list.options({
@@ -269,16 +225,6 @@ pandora.ui.navigationView = function(type, videoRatio) {
             (items ? Ox.formatNumber(items) : 'No')
             + ' clip' + (items == 1 ? '' : 's')
         );
-    }
-
-    function updateToolbar(item) {
-        type == 'map' && $itemIcon.attr({
-            src: Ox.getImageByGeoname('icon', 16, item ? item.geoname : '')
-        });
-        $itemLabel.options({
-            title: item ? item.name : 'No ' + itemName
-        });
-        $itemButton.options({disabled: !item});
     }
 
     if (type == 'map') {

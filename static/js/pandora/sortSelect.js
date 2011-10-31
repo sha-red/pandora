@@ -1,5 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
-pandora.ui.sortSelect = function() {
+
+pandora.ui.sortSelect = function(isNavigationView) {
     var isClipView = pandora.isClipView(),
         items = [],
         sortKey = !pandora.user.ui.item ? 'listSort' : 'itemSort',
@@ -27,11 +28,11 @@ pandora.ui.sortSelect = function() {
     that = Ox.Select({
         id: 'sortSelect',
         items: items,
-        width: 144
+        width: isNavigationView ? 128 : 144
     })
     .css({
-        float: 'left',
-        margin: '4px 0 0 4px'
+        float: isNavigationView ? 'right' : 'left',
+        margin: isNavigationView ? '4px 4px 0 0' : '4px 0 0 4px'
     })
     .bindEvent({
         change: function(data) {
