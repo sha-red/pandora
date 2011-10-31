@@ -49,7 +49,6 @@ pandora.ui.sortSelect = function(isNavigationView) {
             that.selectItem(data.value[0].key);
         }
     });
-
     return that;
 };
 

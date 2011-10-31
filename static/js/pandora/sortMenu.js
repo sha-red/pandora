@@ -2,6 +2,8 @@
 
 pandora.ui.sortMenu = function() {
 
+    // fixme: unused
+
     var that = Ox.Select({
             items: Ox.merge(
                 pandora.site.clipKeys.map(function(key) {

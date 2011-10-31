@@ -15,15 +15,11 @@ pandora.ui.toolbar = function() {
     that.append(
         pandora.$ui.viewSelect = pandora.ui.viewSelect()
     );
-    !ui.item && that.append(
+    !ui.item && !isNavigationView && that.append(
         pandora.$ui.sortSelect = pandora.ui.sortSelect()
     ).append(
         pandora.$ui.orderButton = pandora.ui.orderButton()
     );
-    if (isNavigationView) {
-        pandora.$ui.sortSelect.hide();
-        pandora.$ui.orderButton.hide();
-    }
     ui.item && that.append(
         pandora.$ui.itemTitle = Ox.Label({
             textAlign: 'center'
@@ -47,12 +43,16 @@ pandora.ui.toolbar = function() {
                 action = isNavigationView ? 'hide' : 'show';
             Ox.print('IS/WAS', isNavigationView, wasNavigationView);
             if (isNavigationView != wasNavigationView) {
-                pandora.$ui.sortSelect[action]();
-                pandora.$ui.orderButton[action]();
-            }
-            if (pandora.isClipView() != pandora.isClipView(data.previousValue)) {
+                if (isNavigationView) {
+                    pandora.$ui.sortSelect.removeElement();
+                    pandora.$ui.orderButton.removeElement();
+                } else {
+                    pandora.$ui.sortSelect = pandora.ui.sortSelect().insertAfter(pandora.$ui.viewSelect);
+                    pandora.$ui.orderButton = pandora.ui.orderButton().insertAfter(pandora.$ui.sortSelect);
+                }
+            } else if ((data.value == 'clip') != data.previousValue == 'clip') {
                 pandora.$ui.sortSelect.replaceWith(
-                    pandora.$ui.sortSelect = pandora.ui.sortSelect()[action]()
+                    pandora.$ui.sortSelect = pandora.ui.sortSelect()
                 );
             }
         }
