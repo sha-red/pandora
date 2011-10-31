@@ -11,7 +11,7 @@ pandora.ui.clipList = function(videoRatio) {
             item: function(data, sort, size) {
                 size = size || 128; // fixme: is this needed?
                 var ratio, width, height,
-                    format, info, sortKey, url;
+                    format, info, sortKey, title, url;
                 if (!ui.item) {
                     ratio = data.videoRatio;
                     width = ratio > fixedRatio ? size : Math.round(size * ratio / fixedRatio);
