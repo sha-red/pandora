@@ -45,8 +45,8 @@ def parseCondition(condition, user):
         else:
             return q
 
-    if k == 'filename' and user.is_anonymous() or \
-        not user.get_profile().capability('canSeeFiles'):
+    if k == 'filename' and (user.is_anonymous() or \
+        not user.get_profile().capability('canSeeFiles')):
         return Q(id=0)
 
     key_type = settings.CONFIG['keys'].get(k, {'type':'string'}).get('type')
