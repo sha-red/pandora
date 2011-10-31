@@ -7,10 +7,10 @@ from django.db.models import Q
 def parseCondition(condition, user):
     k = condition.get('key', 'name')
     k = {
-        'email': 'user__email',
-        'firstseen': 'user__created',
-        'lastseen': 'user__last_login',
-        'user': 'user__username',
+        'firstseen': 'created',
+        'lastseen': 'last_login',
+        'user': 'username',
+        'name': 'username',
     }.get(k, k)
     v = condition['value']
     op = condition.get('operator')
@@ -30,9 +30,9 @@ def parseCondition(condition, user):
 
     key = str(key)
     if exclude:
-        q = ~Q(**{k: v})
+        q = ~Q(**{key: v})
     else:
-        q = Q(**{k: v})
+        q = Q(**{key: v})
     return q
 
 def parseConditions(conditions, operator, user):
