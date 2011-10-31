@@ -941,6 +941,7 @@ class Item(models.Model):
             join_timelines(timelines, self.timeline_prefix)
 
     def make_poster(self, force=False):
+        ox.makedirs(os.path.join(settings.MEDIA_ROOT,self.path()))
         if not self.poster or force:
             self.delete_poster()
             poster = self.make_siteposter()
