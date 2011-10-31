@@ -616,6 +616,7 @@
             "section": "items",
             "showAnnotations": true,
             "showBrowser": true,
+            "showCalendarControls": true, // fixme: should be false
             "showControls": true,
             "showFlags": true,
             "showGroups": true,

@@ -89,6 +89,7 @@ pandora.ui.eventsDialog = function() {
                             callback(result);
                         });
                     },
+                    showControls: pandora.user.ui.showCalendarControls,
                     width: width
                 })
             });

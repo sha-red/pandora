@@ -42,6 +42,8 @@ pandora.ui.placesDialog = function() {
                     callback(result);
                 });
             },
+            showControls: pandora.user.ui.showMapControls,
+            showLabels: pandora.user.ui.showMapLabels,
             showTypes: true,
             width: width
         }),
