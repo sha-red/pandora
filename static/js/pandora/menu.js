@@ -135,7 +135,7 @@ pandora.ui.mainMenu = function() {
                         { id: 'tour', title: 'Manage Tour...', disabled: !isAdmin }*/
                     ] },
                     { id: 'helpMenu', title: 'Help', items: [
-                        { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'shift ?' }
+                        { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'control ?' }
                     ] }
                 ],
                 pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
@@ -150,6 +150,7 @@ pandora.ui.mainMenu = function() {
                     : []
             )
         })
+        .bindKeyboard()
         .bindEvent({
             change: function(data) {
                 var value = data.checked[0] ? data.checked[0].id : null;
@@ -268,6 +269,29 @@ pandora.ui.mainMenu = function() {
 
                     that.setItemTitle('debug', (localStorage.debug ? 'Disable' : 'Enable') + ' Debug Mode');
                 }
+            },
+            key_control_f: function() {
+                if ($('.OxDialog').length == 0 && $('.OxScreen').length == 0) {
+                    pandora.$ui.findInput.focusInput(true);
+                }
+            },
+            key_control_slash: function() {
+                pandora.URL.push('/help');
+            },
+            key_shift_a: function() {
+                pandora.UI.set({showAnnotations: !ui.showAnnotations});
+            },
+            key_shift_b: function() {
+                pandora.UI.set({showBrowser: !ui.showBrowser});
+            },
+            key_shift_g: function() {
+                pandora.UI.set({showGroups: !ui.showGroups});
+            },
+            key_shift_i: function() {
+                pandora.UI.set({showInfo: !ui.showInfo});
+            },
+            key_shift_s: function() {
+                pandora.UI.set({showSidebar: !ui.showSidebar});
             },
             pandora_find: function() {
                 var action = ui._list
