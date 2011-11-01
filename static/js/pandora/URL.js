@@ -146,7 +146,9 @@ pandora.URL = (function() {
             ) {
                 pandora.$ui.siteDialog = pandora.ui.siteDialog(state.page).open();
             } else if (state.page == 'help') {
-                pandora.$ui.helpDialog = pandora.ui.helpDialog().open();
+                (pandora.$ui.helpDialog || (
+                    pandora.$ui.helpDialog = pandora.ui.helpDialog()
+                )).open();
             } else if (['signup', 'signin'].indexOf(state.page) > -1) {
                 if (pandora.user.level == 'guest') {
                     pandora.$ui.accountDialog = pandora.ui.accountDialog(state.page).open();

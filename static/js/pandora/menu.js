@@ -135,7 +135,7 @@ pandora.ui.mainMenu = function() {
                         { id: 'tour', title: 'Manage Tour...', disabled: !isAdmin }*/
                     ] },
                     { id: 'helpMenu', title: 'Help', items: [
-                        { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'control ?' }
+                        { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'shift ?' }
                     ] }
                 ],
                 pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
@@ -236,18 +236,26 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set({showBrowser: !ui.showBrowser});
                 } else if (data.id == 'showannotations') {
                     pandora.UI.set({showAnnotations: !ui.showAnnotations});
-                } else if (data.id == 'names') {
-                    pandora.$ui.namesDialog = pandora.ui.namesDialog().open();
                 } else if (data.id == 'titles') {
-                    pandora.$ui.titlesDialog = pandora.ui.titlesDialog().open();
+                    (pandora.$ui.titlesDialog || (
+                        pandora.$ui.titlesDialog = pandora.ui.titlesDialog()
+                    )).open();
+                } else if (data.id == 'names') {
+                    (pandora.$ui.namesDialog || (
+                        pandora.$ui.namesDialog = pandora.ui.namesDialog()
+                    )).open();
                 } else if (data.id == 'places') {
-                    pandora.$ui.placesDialog = pandora.ui.placesDialog().open();
+                    (pandora.$ui.placesDialog || (
+                        pandora.$ui.placesDialog = pandora.ui.placesDialog()
+                    )).open();
                 } else if (data.id == 'events') {
-                    pandora.$ui.eventsDialog = pandora.ui.eventsDialog().open();
+                    (pandora.$ui.eventsDialog || (
+                        pandora.$ui.eventsDialog = pandora.ui.eventsDialog()
+                    )).open();
                 } else if (data.id == 'users') {
-                    pandora.$ui.eventsDialog = pandora.ui.usersDialog().open();
-                } else if (data.id == 'lists') {
-                    pandora.$ui.eventsDialog = pandora.ui.listsDialog().open();
+                    (pandora.$ui.usersDialog || (
+                        pandora.$ui.usersDialog = pandora.ui.usersDialog())
+                    ).open();
                 } else if (data.id == 'resetgroups') {
                     pandora.UI.set({
                         groups: pandora.site.user.ui.groups
@@ -274,12 +282,9 @@ pandora.ui.mainMenu = function() {
                 }
             },
             key_control_f: function() {
-                if ($('.OxDialog').length == 0 && $('.OxScreen').length == 0) {
+                if ($('.OxDialog:visible').length == 0 && $('.OxScreen').length == 0) {
                     pandora.$ui.findInput.focusInput(true);
                 }
-            },
-            key_control_slash: function() {
-                pandora.URL.push('/help');
             },
             key_shift_a: function() {
                 pandora.UI.set({showAnnotations: !ui.showAnnotations});
@@ -295,6 +300,9 @@ pandora.ui.mainMenu = function() {
             },
             key_shift_s: function() {
                 pandora.UI.set({showSidebar: !ui.showSidebar});
+            },
+            key_shift_slash: function() {
+                pandora.URL.push('/help');
             },
             pandora_find: function() {
                 var action = ui._list

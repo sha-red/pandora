@@ -304,7 +304,7 @@ pandora.ui.item = function() {
                     }
                 })
             );
-            that.bindEvent('resize', function(data) {
+            pandora.$ui.editor.bindEvent('resize', function(data) {
                 //Ox.print('resize item', data)
                 pandora.$ui.editor.options({
                     height: data.size
