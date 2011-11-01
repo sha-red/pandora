@@ -50,7 +50,7 @@ pandora.ui.toolbar = function() {
                     pandora.$ui.sortSelect = pandora.ui.sortSelect().insertAfter(pandora.$ui.viewSelect);
                     pandora.$ui.orderButton = pandora.ui.orderButton().insertAfter(pandora.$ui.sortSelect);
                 }
-            } else if ((data.value == 'clip') != data.previousValue == 'clip') {
+            } else if ((data.value == 'clip') != (data.previousValue == 'clip')) {
                 pandora.$ui.sortSelect.replaceWith(
                     pandora.$ui.sortSelect = pandora.ui.sortSelect()
                 );
