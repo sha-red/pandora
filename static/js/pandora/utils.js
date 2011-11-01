@@ -815,7 +815,7 @@ pandora.resizeWindow = function() {
         //Ox.print('pandora.$ui.window.resize');
         pandora.$ui.browser.scrollToSelection();
         if (pandora.user.ui.itemView == 'info') {
-            pandora.$ui.info.resize();
+            pandora.$ui.item.resize();
         } else if (pandora.user.ui.itemView == 'clips') {
             pandora.$ui.clipList.size();
         } else if (pandora.user.ui.itemView == 'video') {
