@@ -28,9 +28,10 @@ class Command(BaseCommand):
     def handle(self, **options):
         offset = 0
         chunk = options['all'] and 100 or options['items']
-        count = pos = models.Item.objects.count()
+        qs = models.Item.objects.exclude(itemId__startswith='0x')
+        count = pos = qs.count()
         while options['all'] and offset <= count or offset < options['items']:
-            for i in models.Item.objects.all().order_by('modified')[offset:offset+chunk]:
+            for i in qs.order_by('modified')[offset:offset+chunk]:
                 print pos, i.itemId, i.modified
                 i.update_external()
                 pos -= 1

@@ -417,6 +417,7 @@ def order_query(qs, sort):
             'firstseen': 'date_joined',
             'lastseen': 'last_login',
             'username': 'username',
+            'name': 'username',
         }.get(e['key'], 'profile__%s'%e['key'])
         if key == 'profile__numberoflists':
             qs = qs.annotate(numberoflists=Sum('lists'))
@@ -424,7 +425,6 @@ def order_query(qs, sort):
         order = '%s%s' % (operator, key)
         order_by.append(order)
     if order_by:
-        print order_by
         #user table does not support this
         #qs = qs.order_by(*order_by, nulls_last=True)
         qs = qs.order_by(*order_by)
