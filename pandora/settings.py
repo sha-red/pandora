@@ -126,6 +126,7 @@ INSTALLED_APPS = (
 #    'south',
     'djcelery',
     'app',
+    'log',
 
     'annotation',
     'clip',
@@ -151,7 +152,7 @@ LOGGING = {
     'handlers': {
         'errors': {
             'level': 'ERROR',
-            'class': 'pandora.app.log.ErrorHandler'
+            'class': 'pandora.log.utils.ErrorHandler'
         }
     },
     'loggers': {
