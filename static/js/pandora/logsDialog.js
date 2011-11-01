@@ -1,7 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
 pandora.ui.logsDialog = function() {
-
+    Ox.Request.clearCache('findLogs');
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = Math.round(window.innerWidth * 0.9),
         numberOfLogs = 0,
@@ -127,6 +127,7 @@ pandora.ui.logsDialog = function() {
                 'delete': function(data) {
                     pandora.api.removeLogs({ids: data.ids}, function(result) {
                         $list.reloadList();
+                        Ox.Request.clearCache('findLogs');
                     });
                 }
             }),

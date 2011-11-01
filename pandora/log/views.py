@@ -135,4 +135,4 @@ def findLogs(request):
     else:
         response['data']['items'] = qs.count()
     return render_to_json_response(response)
-actions.register(findLogs, cache=False)
+actions.register(findLogs)
