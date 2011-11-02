@@ -1,4 +1,5 @@
-Hi {{sitename}} admin,
-
-someone sent you a message:
+{{name}} <{{email}}> sent a contact message:
 {{message}}
+
+-- 
+{{sitename}}
