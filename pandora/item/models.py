@@ -34,6 +34,7 @@ from data_api import external_data
 
 from archive import extract
 from annotation.models import Annotation
+from clip.models import Clip
 import archive.models
 
 from person.models import get_name_sort
@@ -1103,6 +1104,8 @@ class Item(models.Model):
                         )
                         annotation.save()
                 offset += f.duration
+            #remove left over clips without annotations
+            Clip.objects.filter(item=self, annotations__id=None).delete()
         self.update_find()
 
 def delete_item(sender, **kwargs):
