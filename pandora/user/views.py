@@ -534,21 +534,38 @@ def contact(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    if 'email' in data and 'message' in data:
-        email = data['email']
+    name = data.get('name', '')
+    email = data.get('email', '')
+    if request.user.is_authenticated():
+        if not name:
+            name = request.user.username
+        if not email:
+            email = request.user.email
+    if 'message' in data and data['message'].strip():
+        email_from = settings.CONFIG['site']['email']['system']
+        email_to = [settings.CONFIG['site']['email']['contact'], ]
         template = loader.get_template('contact_email.txt')
         context = RequestContext(request, {
-            'sitename': settings.SITENAME,
             'email': email,
-            'message': data['message'],
+            'message': data['message'].strip(),
+            'name': name,
+            'sitename': settings.SITENAME,
         })
         message = template.render(context)
-        subject = '%s contact: %s' % (settings.SITENAME, data['subject'])
+        subject = (u'[%s Contact] %s' % (settings.SITENAME, data.get('subject', ''))).strip()
         response = json_response(text='message sent')
         try:
-            send_mail(subject, message, email, [settings.DEFAULT_FROM_EMAIL, ])
+            send_mail(subject.strip(), message, email_from, email_to)
         except BadHeaderError:
             response = json_response(status=400, text='invalid data')
+        if request.user.is_authenticated() \
+            and 'receipt' in data \
+            and data['receipt']:
+            message = data['message'].strip()
+            try:
+                send_mail(subject.strip(), message, email_from, [email])
+            except:
+                pass
     else:
         response = json_response(status=400, text='invalid data')
     return render_to_json_response(response)

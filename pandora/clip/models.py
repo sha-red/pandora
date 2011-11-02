@@ -9,37 +9,7 @@ from archive import extract
 import managers
 
 
-class Clip(models.Model):
-    '''
-    CREATE INDEX clip_clip_title_idx ON clip_clip (title ASC NULLS LAST);
-    CREATE INDEX clip_clip_director_idx ON clip_clip (director ASC NULLS LAST);
-    '''
-    class Meta:
-        unique_together = ("item", "start", "end")
-
-    objects = managers.ClipManager()
-
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-    public_id = models.CharField(max_length=128, unique=True)
-    aspect_ratio = models.FloatField(default=0)
-
-    item = models.ForeignKey('item.Item', related_name='clips')
-
-    #seconds
-    start = models.FloatField(default=-1, db_index=True)
-    end = models.FloatField(default=-1)
-    duration = models.FloatField(default=0, db_index=True)
-
-    #get from annotation
-    hue = models.FloatField(default=0, db_index=True)
-    saturation = models.FloatField(default=0, db_index=True)
-    lightness = models.FloatField(default=0, db_index=True)
-    volume = models.FloatField(default=0, null=True, db_index=True)
-
-    director = models.CharField(max_length=1000, db_index=True)
-    title = models.CharField(max_length=1000, db_index=True)
-
+class MetaClip:
     def update_calculated_values(self):
         self.duration = self.end - self.start
         if self.duration > 0:
@@ -60,7 +30,9 @@ class Clip(models.Model):
             streams = self.item.streams()
             if streams:
                 self.aspect_ratio = streams[0].aspect_ratio
-        super(Clip, self).save(*args, **kwargs)
+        for l in self.layers:
+            setattr(self, l, self.annotations.filter(layer__name=l).count()>0)
+        models.Model.save(self, *args, **kwargs)
 
     def json(self, keys=None):
         j = {}
@@ -103,4 +75,41 @@ class Clip(models.Model):
 
     def __unicode__(self):
         return self.public_id
+
+class Meta:
+    unique_together = ("item", "start", "end")
+
+attrs = {
+    '__module__': 'clip.models',
+    'Meta': Meta,
+    'objects': managers.ClipManager(),
+    'created': models.DateTimeField(auto_now_add=True),
+    'modified': models.DateTimeField(auto_now=True),
+    'public_id': models.CharField(max_length=128, unique=True),
+    'aspect_ratio': models.FloatField(default=0),
+
+    'item': models.ForeignKey('item.Item', related_name='clips'),
+
+    #seconds
+    'start': models.FloatField(default=-1, db_index=True),
+    'end': models.FloatField(default=-1),
+    'duration': models.FloatField(default=0, db_index=True),
+
+    #get from annotation
+    'hue': models.FloatField(default=0, db_index=True),
+    'saturation': models.FloatField(default=0, db_index=True),
+    'lightness': models.FloatField(default=0, db_index=True),
+    'volume': models.FloatField(default=0, null=True, db_index=True),
+
+    'director': models.CharField(max_length=1000, db_index=True),
+    'title': models.CharField(max_length=1000, db_index=True),
+}
+public_layers = [l['id']
+                 for l in filter(lambda l: not l.get('private', False),
+                                 settings.CONFIG['layers'])]
+for name in public_layers:
+    attrs[name] = models.BooleanField(default=False, db_index=True)
+
+Clip = type('Clip', (MetaClip,models.Model), attrs)
+Clip.layers = public_layers
 

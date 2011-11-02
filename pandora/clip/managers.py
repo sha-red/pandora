@@ -165,10 +165,6 @@ class ClipManager(Manager):
         if conditions:
             qs = qs.filter(conditions)
         if 'keys' in data:
-            public_layers = [l['id']
-                             for l in filter(lambda l: not l.get('private', False),
-                                             settings.CONFIG['layers'])]
-            filter_layers = filter(lambda k: k in public_layers, data['keys'])
-            if filter_layers:
-                qs = qs.filter(annotations__layer__name__in=filter_layers)
+            for l in filter(lambda k: k in self.model.layers, data['keys']):
+                qs = qs.filter(**{l: True})
         return qs
