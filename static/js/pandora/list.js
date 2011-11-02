@@ -547,18 +547,27 @@ pandora.ui.list = function() {
 
     }
 
-    if (['grid', 'timelines'].indexOf(pandora.user.ui.listView) > -1) {
+    if (['list', 'grid', 'timelines'].indexOf(pandora.user.ui.listView) > -1) {
         that.bindEvent({
             pandora_icons: function(data) {
-                that.options({
+                // fixme: doesn't update title icon, passes useless options
+                hasIcons() && that.options({
                     borderRadius: data.value == 'posters' ? 0 : 16,
                     defaultRatio: data.value == 'posters' ? 5/8 : 1
                 }).reloadList(true);
             },
             pandora_showsiteposter: function() {
-                pandora.user.ui.icons == 'posters' && that.reloadList(true);
+                // fixme: should be disabled if ui.icons != 'posters'
+                hasIcons() && pandora.user.ui.icons == 'posters' && that.reloadList(true);
             }
         });
+    }
+
+    function hasIcons() {
+        return (
+            pandora.user.ui.listView == 'list'
+            && pandora.user.ui.listColumns.indexOf('posterRatio') > -1
+        ) || ['grid', 'timelines'].indexOf(pandora.user.ui.listView) > -1;
     }
 
     return that;
