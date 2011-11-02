@@ -139,6 +139,7 @@ pandora.ui.mainMenu = function() {
                 pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
                     ? [
                         { id: 'debugMenu', title: 'Debug', items: [
+                            { id: 'logs', title: 'View Logs...'},
                             { id: 'clearcache', title: 'Clear Cache'},
                             { id: 'reloadapplication', title: 'Reload Application'},
                             { id: 'resetui', title: 'Reset UI Settings'},
@@ -258,6 +259,10 @@ pandora.ui.mainMenu = function() {
                         groups: pandora.site.user.ui.groups
                     });
                     pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
+                } else if (data.id == 'logs') {
+                    (pandora.$ui.logsDialog || (
+                        pandora.$ui.logsDialog = pandora.ui.logsDialog()
+                    )).open();
                 } else if (data.id == 'clearcache') {
                     Ox.Request.clearCache();
                 } else if (data.id == 'reloadapplication') {
