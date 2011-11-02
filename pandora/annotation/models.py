@@ -4,6 +4,7 @@ from __future__ import division, with_statement
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 import ox
 
 from archive import extract
@@ -58,8 +59,14 @@ class Annotation(models.Model):
         set_public_id = not self.id or not self.public_id
 
         #no clip or update clip
-        if not self.clip and not self.layer.private or \
-            (self.clip and not self.layer.private and \
+        def get_layer(id):
+            for l in settings.CONFIG['layers']:
+                if l['id'] == id:
+                    return l
+            return {}
+        private = get_layer(self.layer).get('private')
+        if not self.clip and not private or \
+            (self.clip and not private and \
                 self.start != self.clip.start or self.end != self.clip.end):
             self.clip, created = Clip.get_or_create(self.item, self.start, self.end)
 
@@ -69,8 +76,8 @@ class Annotation(models.Model):
 
         Clip.objects.filter(**{
             'id': self.clip.id,
-            self.layer.name: False
-        }).update(**{self.layer.name: True})
+            self.layer: False
+        }).update(**{self.layer: True})
 
         #how expensive is this?
         #update_matching_events.delay(self.value)
@@ -81,7 +88,6 @@ class Annotation(models.Model):
             'user': self.user.username,
         }
         for field in ('id', 'in', 'out', 'value', 'created', 'modified'):
-
             j[field] = getattr(self, {
                 'duration': 'clip__duration',
                 'hue': 'clip__hue',
@@ -93,7 +99,7 @@ class Annotation(models.Model):
                 'volume': 'clip__volume',
             }.get(field, field))
         if layer or (keys and 'layer' in keys):
-            j['layer'] = self.layer.name
+            j['layer'] = self.layer
         if keys:
             _j = {}
             for key in keys:
