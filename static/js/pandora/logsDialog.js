@@ -1,7 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
 pandora.ui.logsDialog = function() {
-    Ox.Request.clearCache('findLogs');
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = Math.round(window.innerWidth * 0.9),
         numberOfLogs = 0,
@@ -149,6 +148,7 @@ pandora.ui.logsDialog = function() {
                         width: 48
                     }).bindEvent({
                         click: function() {
+                            Ox.Request.clearCache('findLogs');
                             that.close();
                         }
                     })
