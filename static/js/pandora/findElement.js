@@ -60,6 +60,7 @@ pandora.ui.findElement = function() {
                         autocomplete: autocompleteFunction(),
                         autocompleteSelect: true,
                         autocompleteSelectHighlight: true,
+                        autocompleteSelectMaxWidth: 256,
                         autocompleteSelectSubmit: true,
                         clear: true,
                         id: 'input',

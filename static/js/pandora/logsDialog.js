@@ -8,8 +8,9 @@ pandora.ui.logsDialog = function() {
         $findSelect = Ox.Select({
                 items: [
                     {id: 'all', title: 'Find: All', checked: true},
-                    {id: 'url', title: 'Find: Url'},
-                    {id: 'user', title: 'Find: User'}
+                    {id: 'user', title: 'Find: User'},
+                    {id: 'url', title: 'Find: URL'},
+                    {id: 'text', title: 'Find: Text'}
                 ],
                 overlap: 'right',
                 type: 'image'
