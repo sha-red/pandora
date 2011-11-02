@@ -96,7 +96,7 @@ pandora.ui.mainMenu = function() {
                         ] },
                         {},
                         { id: 'showsidebar', title: (ui.showSidebar ? 'Hide' : 'Show') + ' Sidebar', keyboard: 'shift s' },
-                        { id: 'showinfo', title: (ui.showInfo ? 'Hide' : 'Show') + ' Info', keyboard: 'shift i' },
+                        { id: 'showinfo', title: (ui.showInfo ? 'Hide' : 'Show') + ' Info', disabled: !ui.showSidebar, keyboard: 'shift i' },
                         { id: 'showgroups', title: (ui.showGroups ? 'Hide' : 'Show') + ' Groups', disabled: !!ui.item, keyboard: 'shift g' },
                         { id: 'showbrowser', title: (ui.showBrowser ? 'Hide' : 'Show') + ' ' + pandora.site.itemName.singular + ' Browser', disabled: !ui.item, keyboard: 'shift b' },
                         { id: 'showannotations', title: (ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations', disabled: !ui.item || ['timeline', 'video'].indexOf(ui.itemView) == -1, keyboard: 'shift a' },
@@ -282,16 +282,17 @@ pandora.ui.mainMenu = function() {
                 }
             },
             key_shift_a: function() {
-                pandora.UI.set({showAnnotations: !ui.showAnnotations});
+                ui.item && ['video', 'timeline'].indexOf(ui.view) > -1
+                    && pandora.UI.set({showAnnotations: !ui.showAnnotations});
             },
             key_shift_b: function() {
-                pandora.UI.set({showBrowser: !ui.showBrowser});
+                ui.item && pandora.UI.set({showBrowser: !ui.showBrowser});
             },
             key_shift_g: function() {
-                pandora.UI.set({showGroups: !ui.showGroups});
+                !ui.item && pandora.UI.set({showGroups: !ui.showGroups});
             },
             key_shift_i: function() {
-                pandora.UI.set({showInfo: !ui.showInfo});
+                ui.showSidebar && pandora.UI.set({showInfo: !ui.showInfo});
             },
             key_shift_s: function() {
                 pandora.UI.set({showSidebar: !ui.showSidebar});
@@ -350,6 +351,7 @@ pandora.ui.mainMenu = function() {
             },
             pandora_showsidebar: function(data) {
                 that.setItemTitle('showsidebar', (data.value ? 'Hide' : 'Show') + ' Sidebar');
+                that[data.value ? 'enableItem' : 'disableItem']('showinfo');
             }
         });
 
