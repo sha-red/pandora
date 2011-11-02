@@ -56,47 +56,47 @@ pandora.ui.logsDialog = function() {
                         visible: false,
                     },
                     {
-                        id: 'url',
-                        title: 'URL',
-                        operator: '+',
+                        id: 'user',
+                        title: 'User',
                         visible: true,
-                        width: 420
+                        width: 72
                     },
                     {
-                        id: 'line',
-                        title: 'Line',
-                        operator: '+',
-                        visible: true,
-                        width: 48 
-                    },
-                    {
+                        id: 'created',
+                        title: 'Date',
+                        align: 'right',
                         format: function(value) {
                             return value.replace(/[TZ]/g, ' ');
                         },
-                        align: 'right',
-                        id: 'created',
                         operator: '-',
-                        title: 'Date',
                         visible: true,
-                        width: 128
+                        width: 144
                     },
                     {
-                        id: 'user',
-                        title: 'User',
-                        visible: false,
-                        width: 128
+                        id: 'url',
+                        title: 'URL',
+                        format: function(value, data) {
+                            return value.split('?')[0] + ':' + data.line;
+                        },
+                        operator: '+',
+                        visible: true,
+                        width: 320
                     },
                     {
                         id: 'text',
                         title: 'Text',
-                        visible: false,
-                        width: 300
+                        tooltip: function(data) {
+                            return data.text;
+                        },
+                        visible: true,
+                        width: 640
                     },
                 ],
-                columnsRemovable: true,
+                columnsMovable: true,
+                columnsResizable: true,
                 columnsVisible: true,
                 items: pandora.api.findLogs,
-                keys: ['text'],
+                keys: ['line'],
                 scrollbarVisible: true,
                 sort: [
                     {key: 'created', operator: '-'}
@@ -110,19 +110,6 @@ pandora.ui.logsDialog = function() {
                         + ' log ' + (numberOfLogs == 1 ? 'entry' : 'entries')
                     );
                 },
-                select: function(data) {
-                    var values;
-                    $log.empty();
-                    if (data.ids.length) {
-                        values = $list.value(data.ids[0]);
-                        $logLabel.options({
-                            title: values.url
-                        });
-                        $log.append(renderLog(values));
-                    } else {
-                        $logLabel.options({title: 'No logs selected'});
-                    }
-                },
                 'delete': function(data) {
                     pandora.api.removeLogs({ids: data.ids}, function(result) {
                         $list.reloadList();
@@ -130,15 +117,6 @@ pandora.ui.logsDialog = function() {
                     });
                 }
             }),
-
-        $logLabel = Ox.Label({
-                textAlign: 'center',
-                title: 'No logs selected',
-                width: 604
-            })
-            .css({margin: '4px'}),
-
-        $log = Ox.Element({}),
 
         that = Ox.Dialog({
             buttons: [
@@ -157,41 +135,18 @@ pandora.ui.logsDialog = function() {
             content: Ox.SplitPanel({
                 elements: [
                     {
-                        element: Ox.SplitPanel({
-                            elements: [
-                                {
-                                    element: Ox.Bar({size: 24})
-                                        .append($status)
-                                        .append(
-                                            $findElement
-                                        ),
-                                    size: 24
-                                },
-                                {
-                                    element: $list
-                                }
-                            ],
-                            orientation: 'vertical'
-                        })
+                        element: Ox.Bar({size: 24})
+                            .append($status)
+                            .append(
+                                $findElement
+                            ),
+                        size: 24
                     },
                     {
-                        element: Ox.SplitPanel({
-                            elements: [
-                                {
-                                    element: Ox.Bar({size: 24})
-                                        .append($logLabel),
-                                    size: 24
-                                },
-                                {
-                                    element: $log
-                                }
-                            ],
-                            orientation: 'vertical'
-                        }),
-                        size: 612 
+                        element: $list
                     }
                 ],
-                orientation: 'horizontal'
+                orientation: 'vertical'
             }),
             height: height,
             maximizeButton: true,
