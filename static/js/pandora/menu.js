@@ -4,6 +4,7 @@ pandora.ui.mainMenu = function() {
     var isAdmin = pandora.user.level == 'admin',
         isGuest = pandora.user.level == 'guest',
         ui = pandora.user.ui,
+        findState = pandora.getFindState(ui.find),
         that = Ox.MainMenu({
             extras: [
                 $('<div>').html('beta').css({marginRight: '8px', color: 'rgb(128, 128, 128)'}),
@@ -111,11 +112,8 @@ pandora.ui.mainMenu = function() {
                     { id: 'findMenu', title: 'Find', items: [
                         { id: 'find', title: 'Find', items: [
                             { group: 'find', min: 1, max: 1, items: pandora.site.findKeys.map(function(key, i) {
-                                var index = ui._findState.index;
                                 return Ox.extend({
-                                    checked: index > -1 && ui.find.conditions[index].key
-                                        ? ui.find.conditions[index].key == key.id
-                                        : key.id == 'all'
+                                    checked: key.id == findState.key
                                 }, key);
                             }) }
                         ] },
@@ -144,7 +142,6 @@ pandora.ui.mainMenu = function() {
                             { id: 'clearcache', title: 'Clear Cache'},
                             { id: 'reloadapplication', title: 'Reload Application'},
                             { id: 'resetui', title: 'Reset UI Settings'},
-                            { id: 'logs', title: 'View Logs...'},
                             { id: 'debug', title: (localStorage.debug?'Disable':'Enable')+' Debug Mode'}
                         ] }
                     ]
@@ -261,8 +258,6 @@ pandora.ui.mainMenu = function() {
                         groups: pandora.site.user.ui.groups
                     });
                     pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
-                } else if (data.id == 'logs') {
-                    pandora.$ui.logsDialog = pandora.ui.logsDialog().open();
                 } else if (data.id == 'clearcache') {
                     Ox.Request.clearCache();
                 } else if (data.id == 'reloadapplication') {
