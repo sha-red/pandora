@@ -31,7 +31,6 @@ pandora.ui.folderBrowserList = function(id) {
                     },
                     */
                     id: 'id',
-                    operator: '+',
                     title: $('<img>').attr({
                         src: Ox.UI.getImageURL('symbolIcon')
                     }),

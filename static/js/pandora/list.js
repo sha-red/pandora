@@ -16,7 +16,7 @@ pandora.ui.list = function() {
         Ox.print('$$$$', keys)
         */
         that = Ox.TextList({
-            columns: /*Ox.merge([{
+            columns: Ox.merge([{
                 align: 'center',
                 defaultWidth: 16,
                 format: function(value, data) {
@@ -55,11 +55,14 @@ pandora.ui.list = function() {
                     });
                 },
                 id: 'posterRatio',
-                operator: '+',
-                position: 0,
-                removable: true,
-                title: 'Poster',
-                *//*
+                resizable: false,
+                ///*
+                title: '<img src="' + Ox.UI.getImageURL(
+                    pandora.user.ui.icons == 'posters'
+                    ? 'symbolSetPoster' : 'symbolIcon'
+                ) + '" style="width: 12px; height: 12px; margin: 0 0 0 -2px">',
+                //*/
+                /*
                 title: $('<img>').attr({
                         src: Ox.UI.getImageURL(
                             pandora.user.ui.icons == 'posters'
@@ -69,12 +72,12 @@ pandora.ui.list = function() {
                     .css({
                         width: '12px',
                         height: '12px',
-                        padding: '2px',
+                        margin: '0 0 0 -2px'
                     }),
-                *//*
-                visible: true,
+                */
+                visible: pandora.user.ui.listColumns.indexOf('posterRatio') > -1,
                 width: 16
-            }], */Ox.map(pandora.site.sortKeys, function(key) {
+            }], Ox.map(pandora.site.sortKeys, function(key) {
                 var position = pandora.user.ui.listColumns.indexOf(key.id);
                 return {
                     align: ['string', 'text'].indexOf(
@@ -92,7 +95,7 @@ pandora.ui.list = function() {
                     visible: position > -1,
                     width: pandora.user.ui.listColumnWidth[key.id] || key.columnWidth
                 };
-            })/*)*/,
+            })),
             columnsMovable: true,
             columnsRemovable: true,
             columnsResizable: true,
