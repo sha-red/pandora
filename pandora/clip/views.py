@@ -82,19 +82,21 @@ def findClips(request):
     if 'keys' in data:
         qs = order_query(qs, query['sort'])
         qs = qs[query['range'][0]:query['range'][1]]
-        qs = qs.select_related('item__sort')
-        response['data']['items'] = [p.json(keys=data['keys']) for p in qs]
+        #qs = qs.select_related('item__sort')
+        ids = []
+        keys = filter(lambda k: k not in models.Clip.layers, data['keys'])
+        def add(p):
+            ids.append(p.id)
+            return p.json(keys=keys)
+        response['data']['items'] = [add(p) for p in qs]
 
         keys = data['keys']
-        public_layers = [l['id']
-                         for l in filter(lambda l: not l.get('private', False),
-                                         settings.CONFIG['layers'])]
 
         def add_annotations(layer, qs):
             for a in qs.values('public_id', 'value', 'clip__public_id'):
                 for i in response['data']['items']:
                     if i['id'] == a['clip__public_id']:
-                        if not i[layer]:
+                        if not layer in i:
                             i[layer] = []
                         i[layer].append({
                             'id': a['public_id'],
@@ -103,10 +105,10 @@ def findClips(request):
         if response['data']['items']:
             if 'annotations' in keys:
                 add_annotations('annotations',
-                    Annotation.objects.filter(layer__name__in=public_layers, clip__in=qs))
-            for layer in filter(lambda l: l in keys, public_layers):
+                    Annotation.objects.filter(layer__name__in=models.Clip.layers, clip__in=ids))
+            for layer in filter(lambda l: l in keys, models.Clip.layers):
                 add_annotations(layer,
-                    Annotation.objects.filter(layer__name=layer, clip__in=qs))
+                    Annotation.objects.filter(layer__name=layer, clip__in=ids))
     elif 'position' in query:
         qs = order_query(qs, query['sort'])
         ids = [i.public_id for i in qs]
