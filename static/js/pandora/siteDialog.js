@@ -10,10 +10,9 @@ pandora.ui.siteDialog = function(section) {
             content: function(id) {
                 var $content = Ox.Element().css({padding: '16px', overflowY: 'auto'});
                 if (id == 'contact') {
-                    $content.append(pandora.ui.contactForm());
+                    $content.append(pandora.$ui.contactForm = pandora.ui.contactForm());
                 } else {
                     pandora.api.getPage({name: id}, function(result) {
-                        Ox.print('DATA::', result.data)
                         Ox.Editable({
                                 clickLink: pandora.clickLink,
                                 editable: pandora.site.capabilities.canEditSitePages[pandora.user.level],
@@ -68,26 +67,33 @@ pandora.ui.siteDialog = function(section) {
             }
         });
     var $dialog = Ox.Dialog({
-        buttons: [
-            Ox.Button({
-                id: 'close',
-                title: 'Close'
-            }).bindEvent({
-                click: function() {
-                    $dialog.close();
-                    pandora.URL.update();
+            buttons: [
+                Ox.Button({
+                    id: 'close',
+                    title: 'Close'
+                }).bindEvent({
+                    click: function() {
+                        $dialog.close();
+                        pandora.URL.update();
+                    }
+                })
+            ],
+            //closeButton: true,
+            content: $tabPanel,
+            height: Math.round((window.innerHeight - 24) * 0.75),
+            //maximizeButton: true,
+            minHeight: 256,
+            minWidth: 688, // 16 + 256 + 16 + 384 + 16
+            title: 'About',
+            width: Math.round(window.innerWidth * 0.75),
+        })
+        .bindEvent({
+            resize: function(data) {
+                if ($tabPanel.selected() == 'contact') {
+                    pandora.$ui.contactForm.resize();
                 }
-            })
-        ],
-        //closeButton: true,
-        content: $tabPanel,
-        height: Math.round((window.innerHeight - 24) * 0.75),
-        //maximizeButton: true,
-        minHeight: 256,
-        minWidth: 640,
-        title: 'About',
-        width: Math.round(window.innerWidth * 0.75),
-    });
+            }
+        });
 
     return $dialog;
 
