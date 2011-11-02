@@ -468,6 +468,7 @@ pandora.getFoldersHeight = function() {
 
 pandora.getFoldersWidth = function() {
     var width = pandora.user.ui.sidebarSize;
+    Ox.print('FOLDERS HEIGHT', pandora.getFoldersHeight(), 'INFO HEIGHT', pandora.getInfoHeight())
     if (
         pandora.$ui.appPanel
         && pandora.getFoldersHeight() > window.innerHeight - 20 - 24 - 1 - pandora.getInfoHeight()
@@ -485,15 +486,19 @@ pandora.getGroupsSizes = function() {
 
 pandora.getInfoHeight = function(includeHidden) {
     // fixme: new, check if it can be used more
-    var isVideoPreview = pandora.user.ui.item || (
-        pandora.user.ui.listSelection.length && !pandora.isClipView()
-    );
-    return (pandora.user.ui.showInfo || includeHidden) * Math.min(
-        isVideoPreview
-        ? Math.round(pandora.user.ui.sidebarSize / (16/9)) + 16
-        : pandora.user.ui.sidebarSize,
-        window.innerHeight - 109 // 20 menu + 24 bar + 64 (4 closed folders) + 1 resizebar
-    );
+    var height = 0, isVideoPreview;
+    if (pandora.user.ui.showInfo || includeHidden) {
+        isVideoPreview = pandora.user.ui.item || (
+            pandora.user.ui.listSelection.length && !pandora.isClipView()
+        );
+        height = Math.min(
+            isVideoPreview
+            ? Math.round(pandora.user.ui.sidebarSize / (16/9)) + 16
+            : pandora.user.ui.sidebarSize,
+            window.innerHeight - 109 // 20 menu + 24 bar + 64 (4 closed folders) + 1 resizebar
+        );
+    }
+    return height;
 }
 
 pandora.getItemByIdOrTitle = function(str, callback) {
