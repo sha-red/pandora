@@ -344,6 +344,14 @@ pandora.URL = (function() {
         window.onpopstate = function(e) {
             Ox.Request.cancel();
             self.isPopState = true;
+            if (
+                pandora.user.ui.item
+                && pandora.user.ui.itemView == 'video'
+                && pandora.$ui.player.options('fullscreen')
+            ) {
+                //pandora.$ui.player.options({fullscreen: false});
+                $('body > .OxVideoPlayer').remove();
+            }
             if (!Ox.isEmpty(e.state)) {
                 Ox.print('E.STATE', e.state)
                 document.title = e.state.title;
