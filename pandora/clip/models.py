@@ -30,8 +30,9 @@ class MetaClip:
             streams = self.item.streams()
             if streams:
                 self.aspect_ratio = streams[0].aspect_ratio
-        for l in self.layers:
-            setattr(self, l, self.annotations.filter(layer=l).count()>0)
+        if self.id:
+            for l in self.layers:
+                setattr(self, l, self.annotations.filter(layer=l).count()>0)
         models.Model.save(self, *args, **kwargs)
 
     def json(self, keys=None):
