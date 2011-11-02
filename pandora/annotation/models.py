@@ -126,6 +126,12 @@ class Annotation(models.Model):
         super(Annotation, self).save(*args, **kwargs)
         if set_public_id:
             self.set_public_id()
+
+        Clip.objects.filter(**{
+            'id': self.clip.id,
+            self.layer.name: False
+        }).update(**{self.layer.name: True})
+
         #how expensive is this?
         #update_matching_events.delay(self.value)
         #update_matching_places.delay(self.value)
