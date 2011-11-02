@@ -74,7 +74,6 @@ def init(request):
     else:
         response['data']['user'] = response['data']['site']['user']
         response['data']['user']['ui'] = get_ui(json.loads(request.session.get('ui', '{}')))
-    print request.session, request.session.keys()
     return render_to_json_response(response)
 actions.register(init)
 
