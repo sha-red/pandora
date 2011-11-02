@@ -9,6 +9,8 @@ import time
 import thread
 
 from django.conf import settings
+from django.contrib.auth.models import User
+
 import ox.jsonc
 from ox.utils import json
 
@@ -24,10 +26,11 @@ def load_config():
             config = None
 
     if config:
-        config['site']['id'] = settings.SITEID
-        config['site']['name'] = settings.SITENAME
-        config['site']['sectionName'] = settings.SITENAME
-        config['site']['url'] = settings.URL
+        settings.SITENAME = config['site']['name']
+        settings.URL = config['site']['url']
+        settings.EMAIL_SUBJECT_PREFIX = '[%s]'%settings.SITENAME
+        settings.DEFAULT_FROM_EMAIL = config['site']['email']['system']
+        settings.SERVER_EMAIL = config['site']['email']['system']
         config['site']['videoprefix'] = settings.VIDEO_PREFIX
 
         config['keys'] = {}
@@ -35,6 +38,11 @@ def load_config():
             config['keys'][key['id']] = key
 
         settings.CONFIG = config
+
+        admin = len(settings.CONFIG['userLevels']) - 1
+        settings.ADMIN = tuple([(u.username, u.email)
+                          for u in User.objects.filter(profile__level=admin)])
+        settings.MANAGERS = settings.ADMINS
 
 def reloader_thread():
     _config_mtime = 0

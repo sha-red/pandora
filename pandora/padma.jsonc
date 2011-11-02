@@ -351,10 +351,10 @@
         "importPosterFrames": false 
     },
     "site": {
-        "id": "{{settings.SITEID}}",
-        "name": "{{settings.SITENAME}}",
-        "sectionName": "{{settings.SITENAME}}",
-        "url": "{{settings.URL}}"
+        "id": "padma",
+        "name": "Pad.ma",
+        "url": "pad.ma",
+        "videoprefix": ""
     },
     "sitePages": [
         {"id": "about", "title": "About"},

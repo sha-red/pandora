@@ -21,7 +21,10 @@ def intro(request):
 
 
 def index(request):
-    context = RequestContext(request, {'settings': settings})
+    context = RequestContext(request, {
+        'base_url': request.build_absolute_uri('/'),
+        'settings': settings
+    })
     return render_to_response('index.html', context)
 
 

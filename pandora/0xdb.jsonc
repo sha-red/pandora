@@ -556,10 +556,9 @@
             // E-mail address uses by the system (from)
             "system": "0xdb@0xdb.org"
         },
-        // fixme: there should be no magic applied to this file
-        "id": "{{settings.SITEID}}",
-        "name": "{{settings.SITENAME}}",
-        "url": "{{settings.URL}}",
+        "id": "oxdb",
+        "name": "0xDb",
+        "url": "0xdb.org",
         "videoprefix": ""
     },
     "sitePages": [

@@ -2,52 +2,21 @@
 # vi:si:et:sw=4:sts=4:ts=4
 # Django settings for pan.do/ra project defaults,
 # create local_settings.py to overwrite
+# check pan.do/ra section below for relevant settings
+
 import os
 from os.path import join, normpath
 
-SITENAME = 'Pan.do/ra'
-SITEID =   'pandora'
-URL =      'pan.do/ra'
-
 PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 JSON_DEBUG = True
 
-#with apache x-sendfile or lighttpd set this to True
-XSENDFILE = False
-
-#with nginx X-Accel-Redirect set this to True
-XACCELREDIRECT = False
-
-ADMINS = (
-     #('admin', 'admin@example.com'),
-)
-
-DEFAULT_FROM_EMAIL='system@' + URL.split('/')[0]
-#DEFAULT_FROM_EMAIL='admin@example.com'
-SERVER_EMAIL=DEFAULT_FROM_EMAIL
-
+#this gets set to all users in highest userLevel (app/config.py)
+ADMINS = ()
 MANAGERS = ADMINS
 
-DATABASES = {
-    'default': {
-        'NAME': 'pandora',
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'USER': 'pandora',
-        'PASSWORD': ''
-    }
-}
-
-#rabbitmq connection settings
-CELERY_RESULT_BACKEND = "database"
-BROKER_HOST = "127.0.0.1"
-BROKER_PORT = 5672
-BROKER_USER = "pandora"
-BROKER_PASSWORD = "box"
-BROKER_VHOST = "/pandora"
-SEND_CELERY_ERROR_EMAILS=False
 
 
 # Local time zone for this installation. Choices can be found here:
@@ -74,9 +43,6 @@ APPEND_SLASH = False
 MEDIA_ROOT = normpath(join(PROJECT_ROOT, '..', 'data'))
 STATIC_ROOT = normpath(join(PROJECT_ROOT, '..', 'static'))
 TESTS_ROOT = join(PROJECT_ROOT, 'tests')
-
-#if videos are served from another subdomain
-VIDEO_PREFIX = ''
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -166,18 +132,41 @@ LOGGING = {
 
 AUTH_PROFILE_MODULE = 'user.UserProfile'
 
+#=========================================================================
+#Pan.do/ra related settings settings
+#to customize, create local_settings.py and overwrite keys
+
+DATABASES = {
+    'default': {
+        'NAME': 'pandora',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'USER': 'pandora',
+        'PASSWORD': ''
+    }
+}
+
+#rabbitmq connection settings
+CELERY_RESULT_BACKEND = "database"
+BROKER_HOST = "127.0.0.1"
+BROKER_PORT = 5672
+BROKER_USER = "pandora"
+BROKER_PASSWORD = "box"
+BROKER_VHOST = "/pandora"
+SEND_CELERY_ERROR_EMAILS=False
+
+#with apache x-sendfile or lighttpd set this to True
+XSENDFILE = False
+
+#with nginx X-Accel-Redirect set this to True
+XACCELREDIRECT = False
 
 SITE_CONFIG = join(PROJECT_ROOT, '0xdb.jsonc')
-
-
+#used if CONFIG['video']['download'] is set
 TRACKER_URL="http://url2torrent.net:6970/announce"
-
-
 
 DATA_SERVICE = ''
 POSTER_PRECEDENCE = (
     'piratecinema.org',
-    'local',
     'criterion.com',
     'wikipedia.org',
     'impawards.com',
@@ -187,8 +176,12 @@ POSTER_PRECEDENCE = (
     'other'
 )
 
-#0xdb.org
-USE_IMDB = True
+USE_IMDB = False
+
+#if you set PAROT in VIDEO_PREFIX make sure cookies work accros subsomains
+VIDEO_PREFIX=''
+#VIDEO_PREFIX='videoPART.example.com'
+#SESSION_COOKIE_DOMAIN=*.example.com"
 
 #copy scripts and adjust to customize
 ITEM_POSTER = join('scripts', 'oxdb_poster')
@@ -196,7 +189,11 @@ ITEM_POSTER = join('scripts', 'oxdb_poster')
 ITEM_ICON   = join('scripts', 'item_icon')
 LIST_ICON   = join('scripts', 'list_icon')
 
-#overwrite default settings with local settings
+
+#you can ignore things below this line
+#=========================================================================
+
+#load installation specific settings from local_settings.py
 try:
     from local_settings import *
 except ImportError:
