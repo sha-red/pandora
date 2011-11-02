@@ -126,6 +126,8 @@ def parseCondition(condition, user):
                                             user)
                     else:
                         q = Q(id__in=l.items.all())
+                    if exclude:
+                        q = ~q
             else:
                 q = Q(id=0)
         return q
