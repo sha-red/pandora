@@ -1,0 +1,7 @@
+{{name}},
+thanks for your message, we will get back to you shortly.
+here your message for forther reference
+{{message}}
+
+-- 
+{{sitename}}
