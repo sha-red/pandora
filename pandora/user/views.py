@@ -561,7 +561,14 @@ def contact(request):
         if request.user.is_authenticated() \
             and 'receipt' in data \
             and data['receipt']:
-            message = data['message'].strip()
+            template = loader.get_template('contact_receipt.txt')
+            context = RequestContext(request, {
+                'email': email,
+                'message': data['message'].strip(),
+                'name': name,
+                'sitename': settings.SITENAME,
+            })
+            message = template.render(context)
             try:
                 send_mail(subject.strip(), message, email_from, [email])
             except:

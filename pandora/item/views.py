@@ -38,7 +38,7 @@ def _order_query(qs, sort, prefix='sort__'):
             sort.append({'operator': '+', 'key': 'director'})
         elif sort[0]['key'] == 'director':
             sort.append({'operator': '-', 'key': 'year'})
-            sort.append({'operator': '-', 'key': 'title'})
+            sort.append({'operator': '+', 'key': 'title'})
         elif sort[0]['key'] == 'year':
             sort.append({'operator': '+', 'key': 'director'})
             sort.append({'operator': '+', 'key': 'title'})
@@ -46,7 +46,6 @@ def _order_query(qs, sort, prefix='sort__'):
             sort.append({'operator': '+', 'key': 'director'})
             sort.append({'operator': '-', 'key': 'year'})
             sort.append({'operator': '+', 'key': 'title'})
-
     for e in sort:
         operator = e['operator']
         if operator != '-':
