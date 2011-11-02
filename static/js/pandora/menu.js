@@ -139,7 +139,6 @@ pandora.ui.mainMenu = function() {
                 pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
                     ? [
                         { id: 'debugMenu', title: 'Debug', items: [
-                            { id: 'logs', title: 'View Logs...'}, 
                             { id: 'clearcache', title: 'Clear Cache'},
                             { id: 'reloadapplication', title: 'Reload Application'},
                             { id: 'resetui', title: 'Reset UI Settings'},
@@ -267,10 +266,6 @@ pandora.ui.mainMenu = function() {
                     pandora.api.resetUI({}, function() {
                         pandora.$ui.appPanel.reload();
                     });
-                } else if (data.id == 'logs') {
-                    (pandora.$ui.logsDialog || (
-                        pandora.$ui.logsDialog = pandora.ui.logsDialog())
-                    ).open();
                 } else if (data.id == 'debug') {
                     if(localStorage.debug) {
                         delete localStorage.debug;
@@ -282,7 +277,7 @@ pandora.ui.mainMenu = function() {
                 }
             },
             key_control_f: function() {
-                if ($('.OxDialog:visible').length == 0 && $('.OxScreen').length == 0) {
+                if (pandora.hasNoDialogOrScreen()) {
                     pandora.$ui.findInput.focusInput(true);
                 }
             },
@@ -303,7 +298,7 @@ pandora.ui.mainMenu = function() {
                 pandora.UI.set({showSidebar: !ui.showSidebar});
             },
             key_shift_slash: function() {
-                if ($('.OxDialog').length == 0 && $('.OxScreen').length == 0) {
+                if (pandora.hasNoDialogOrScreen()) {
                     pandora.URL.push('/help');
                 }
             },

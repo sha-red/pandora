@@ -672,6 +672,12 @@ pandora.getVideoPartsAndPoints = function(durations, points) {
     return ret;
 };
 
+pandora.hasNoDialogOrScreen = function() {
+    return $('.OxDialog:visible').length == 0
+        && $('.OxFullscreen').length == 0
+        && $('.OxScreen').length == 0;
+}
+
 pandora.isClipView = function(view, item) {
     if (arguments.length == 0) {
         item = pandora.user.ui.item;
