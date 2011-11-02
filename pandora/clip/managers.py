@@ -41,7 +41,7 @@ def parseCondition(condition, user):
         return parseCondition({'key': 'annotations__value',
                                'value': v,
                                'operator': op}, user) \
-             & parseCondition({'key': 'annotations__layer__name',
+             & parseCondition({'key': 'annotations__layer',
                                'value': k,
                                'operator': '=='}, user)
 

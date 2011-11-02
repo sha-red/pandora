@@ -129,11 +129,10 @@ def addAnnotation(request):
             return render_to_json_response(json_response(status=400,
                                                          text='invalid data'))
 
-    #FIXME: this should be only called starting up server
-    models.load_layers(settings.CONFIG['layers'])
-
     item = get_object_or_404_json(Item, itemId=data['item'])
-    layer = get_object_or_404_json(models.Layer, name=data['layer'])
+    
+    #FIXME: check that layer is a valid layer id
+    layer = data['layer']
 
     annotation = models.Annotation(
         item=item,

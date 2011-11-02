@@ -33,7 +33,7 @@ from .timelines import join_timelines
 from data_api import external_data
 
 from archive import extract
-from annotation.models import Annotation, Layer
+from annotation.models import Annotation
 import archive.models
 
 from person.models import get_name_sort
@@ -414,12 +414,13 @@ class Item(models.Model):
 
     def get_layers(self, user=None):
         layers = {}
-        for l in Layer.objects.all():
-            ll = layers.setdefault(l.name, [])
-            qs = Annotation.objects.filter(layer=l, item=self)
-            if l.name == 'subtitles':
+        for l in settings.CONFIG['layers']:
+            name = l['id']
+            ll = layers.setdefault(name, [])
+            qs = Annotation.objects.filter(layer=name, item=self)
+            if name == 'subtitles':
                 qs = qs.exclude(value='')
-            if l.private:
+            if l.get('private'):
                 if user and user.is_anonymous():
                     user = None
                 qs = qs.filter(user=user)
@@ -530,7 +531,7 @@ class Item(models.Model):
                     save(i,
                         '\n'.join([f.path for f in self.files.all()]))
                 elif key['type'] == 'layer':
-                    qs = Annotation.objects.filter(layer__name=i, item=self).order_by('start')
+                    qs = Annotation.objects.filter(layer=i, item=self).order_by('start')
                     save(i, '\n'.join([l.value for l in qs]))
                 elif i != '*' and i not in self.facet_keys:
                     value = self.get(i)
@@ -1046,7 +1047,7 @@ class Item(models.Model):
 
     def load_subtitles(self):
         with transaction.commit_on_success():
-            layer = Layer.objects.get(name='subtitles')
+            layer = 'subtitles'
             Annotation.objects.filter(layer=layer,item=self).delete()
             offset = 0
             language = ''

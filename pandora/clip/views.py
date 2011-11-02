@@ -105,10 +105,10 @@ def findClips(request):
         if response['data']['items']:
             if 'annotations' in keys:
                 add_annotations('annotations',
-                    Annotation.objects.filter(layer__name__in=models.Clip.layers, clip__in=ids))
+                    Annotation.objects.filter(layer__in=models.Clip.layers, clip__in=ids))
             for layer in filter(lambda l: l in keys, models.Clip.layers):
                 add_annotations(layer,
-                    Annotation.objects.filter(layer__name=layer, clip__in=ids))
+                    Annotation.objects.filter(layer=layer, clip__in=ids))
     elif 'position' in query:
         qs = order_query(qs, query['sort'])
         ids = [i.public_id for i in qs]

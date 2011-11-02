@@ -16,66 +16,6 @@ from tasks import update_matching_events, update_matching_places
 
 
 
-def load_layers(layers):
-    for l in layers:
-        create_or_update_layer(l)
-
-def create_or_update_layer(data):
-    layer, created = Layer.objects.get_or_create(name=data['id'])
-    for key in ('title', 'type', 'overlap', 'overlay', 'private'):
-        if key in data and getattr(layer, key) != data[key]:
-            setattr(layer, key, data[key])
-            created = True
-    if created:
-        layer.save()
-    return layer
-
-class Layer(models.Model):
-
-    #class Meta:
-    #    ordering = ('position', )
-
-    enabled = models.BooleanField(default=True)
-
-    name = models.CharField(null=True, max_length=255, unique=True)
-    title = models.CharField(null=True, max_length=255)
-    #text, string, string from list(fixme), date, place, person, pingback,
-    #What about: smart layers? for date, place, person
-    type = models.CharField(null=True, max_length=255)
-
-    #can this be changed per user?
-    position = models.IntegerField(default=0)
-
-    overlap = models.BooleanField(default=True)
-    overlay = models.BooleanField(default=True)
-    private = models.BooleanField(default=False)   #false=users only see there own bins
-
-    #find/sort integration
-    find = models.BooleanField(default=True) #true part of find all
-    #words / item duration(wpm), total words, cuts per minute, cuts, number of annotations, number of annotations/duration
-    sort = models.CharField(null=True, max_length=255)
-
-    def properties(self):
-        p = {}
-        if self.find:
-            p[self.name] = {'type': 'bin', 'find': True}
-        if self.sort:
-            print 'FIXME: need to add sort stuff'
-        return p
-
-    def json(self):
-        return {
-            'id': self.name,
-            'overlap': self.overlap,
-            'private': self.private,
-            'title': self.title,
-            'type': self.type
-        }
-
-    def __unicode__(self):
-        return self.title
-
-
 class Annotation(models.Model):
     objects = managers.AnnotationManager()
 
@@ -91,7 +31,7 @@ class Annotation(models.Model):
     start = models.FloatField(default=-1, db_index=True)
     end = models.FloatField(default=-1)
 
-    layer = models.ForeignKey(Layer)
+    layer = models.CharField(max_length=255, db_index=True)
     value = models.TextField()
 
     def editable(self, user):
