@@ -205,7 +205,7 @@ pandora.ui.accountForm = function(action, value) {
                 validate: function(value, callback) {
                     callback({
                         message: 'Missing code',
-                        valid: !!value.length
+                        valid: value.length > 0
                     });
                 },
                 width: 320
@@ -216,7 +216,7 @@ pandora.ui.accountForm = function(action, value) {
                 id: 'email',
                 label: 'E-Mail Address',
                 labelWidth: 120,
-                type: 'email',
+                type: 'email', // fixme: ??
                 validate: pandora.validateUser('email'),
                 width: 320
             });

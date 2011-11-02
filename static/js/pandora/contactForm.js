@@ -6,34 +6,31 @@ pandora.ui.contactForm = function() {
 
         width = getWidth(),
 
-        $receiptCheckbox = Ox.Checkbox({
-                checked: true,
-                id: 'receipt',
-                title: 'Send me a receipt',
-                width: width - 136
-            })
-            .bindEvent({
-                change: function(data) {
-                    $receiptCheckbox.options({
-                        title: (data.checked ? 'Send' : 'Don\'t send')
-                            + ' me a receipt'
-                    });
-                }
-            }),
-
         $form = Ox.Form({
             items: [
                 Ox.Input({
                     id: 'name',
                     label: 'Your Name',
                     labelWidth: 128,
+                    validate: function(value, callback) {
+                        callback({valid: true});
+                    },
                     value: pandora.user.username,
                     width: width
                 }),
                 Ox.Input({
+                    autovalidate: pandora.autovalidateEmail,
                     id: 'email',
                     label: 'Your E-Mail Address',
                     labelWidth: 128,
+                    validate: function(value, callback) {
+                        callback({
+                            message: 'Please enter '
+                                + (value.length == 0 ? 'your' : 'a valid')
+                                + ' e-mail address',
+                            valid: Ox.isValidEmail(value)
+                        });
+                    },
                     value: pandora.user.email,
                     width: width
                 }),
@@ -41,64 +38,118 @@ pandora.ui.contactForm = function() {
                     id: 'subject',
                     label: 'Subject',
                     labelWidth: 128,
+                    validate: function(value, callback) {
+                        callback({valid: true});
+                    },
                     value: '',
                     width: width
                 }),
                 Ox.Input({
+                    autovalidate: /.+/,
                     height: 256,
                     id: 'message',
                     placeholder: 'Message',
                     type: 'textarea',
+                    validate: function(value, callback) {
+                        callback({
+                            message: 'Please enter a message',
+                            valid: value.length > 0
+                        });
+                    },
                     value: '',
                     width: width
-                }),
-                $receiptCheckbox
+                })
             ],
-            submit: function(data, callback) {
-                pandora.api.contact({
-                    name: data.name,
-                    email: data.email,
-                    subject: data.subject,
-                    message: data.message,
-                    receipt: data.receipt
-                }, function(result) {
-                    callback && callback(result);
-                });
-            },
-            width: 240
         })
+        .css({width: width + 'px'})
         .bindEvent({
-            change: function(event) {
+            validate: function(data) {
+                $sendButton.options({
+                    disabled: !data.valid
+                });
+            }
+        })
+        .appendTo(that),
+
+    $receiptCheckbox = Ox.Checkbox({
+            checked: pandora.user.level != 'guest',
+            id: 'receipt',
+            title: 'Send a receipt to ' + pandora.user.email,
+            width: width - 136
+        })
+        .css({float: 'left', margin: '8px 4px 8px 0'})
+        .bindEvent({
+            change: function(data) {
+                $receiptCheckbox.options({
+                    title: data.checked
+                        ? 'Send a receipt to ' + pandora.user.email
+                        : 'Don\'t send me a receipt'
+                });
             }
         })
         .appendTo(that),
 
     $sendButton = Ox.Button({
+            disabled: true,
             title: 'Send Message',
             width: 128
         })
-        .css({position: 'absolute', left: width - 112 + 'px', top: '352px'})
+        .css({float: 'left', margin: '8px 0 8px ' + (pandora.user.level == 'guest' ? width - 128 : 4) + 'px'})
         .bindEvent({
             click: function() {
-                $form.submit();
+                var data = $form.values();
+                pandora.api.contact({
+                    name: data.name,
+                    email: data.email,
+                    subject: data.subject,
+                    message: data.message,
+                    receipt: $receiptCheckbox.value()
+                }, function(result) {
+                    var $dialog = Ox.Dialog({
+                            buttons: [
+                                Ox.Button({
+                                    id: 'close',
+                                    title: 'Close'
+                                }).bindEvent({
+                                    click: function() {
+                                        $dialog.close();
+                                    }
+                                })
+                            ],
+                            content: Ox.Element()
+                                .append(
+                                    $('<img>')
+                                        .attr({src: '/static/png/icon64.png'})
+                                        .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
+                                )
+                                .append(
+                                    Ox.Element()
+                                        .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
+                                        .html('Thanks for your message!<br/><br/>We will get back to you as soon as possible.')
+                                ),
+                            fixedSize: true,
+                            height: 128,
+                            keys: {enter: 'close', escape: 'close'},
+                            title: 'Message Sent',
+                            width: 304
+                        })
+                        .open();
+                });
+                
             }
         })
         .appendTo(that);
 
     $text = $('<div>')
-        .css({float: 'left', width: width + 'px'})
+        .css({width: width + 'px'})
         .html(
-            'Alternatively, you can contact us via <a href="mailto:'
+            '&nbsp;Alternatively, you can contact us via <a href="mailto:'
             + pandora.site.site.email.contact + '">'
             + pandora.site.site.email.contact + '</a>'
-        );
- 
-    $('<div>')
-        .css({marginTop: '8px'})
-        .append($text)
-        .append(
         )
         .appendTo(that);
+ 
+    pandora.user.level == 'guest' && $receiptCheckbox.hide();
 
     function getWidth() {
         return Math.min((
@@ -110,11 +161,15 @@ pandora.ui.contactForm = function() {
 
     that.resize = function() {
         var width = getWidth();
+        $form.css({width: width + 'px'});
         $form.options('items').forEach(function($input, i) {
             i < 4 && $input.options({width: width});
         });
-        $receiptCheckbox.options({width: width - 136})
-        $sendButton.css({left: width - 112 + 'px'})
+        if (pandora.user.level == 'guest') {
+            $sendButton.css({marginLeft: width - 128 + 'px'});
+        } else {
+            $receiptCheckbox.options({width: width - 136});
+        }
         $text.css({width: width + 'px'});
     }
 
