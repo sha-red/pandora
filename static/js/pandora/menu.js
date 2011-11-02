@@ -298,7 +298,9 @@ pandora.ui.mainMenu = function() {
                 pandora.UI.set({showSidebar: !ui.showSidebar});
             },
             key_shift_slash: function() {
-                pandora.URL.push('/help');
+                if ($('.OxDialog').length == 0 && $('.OxScreen').length == 0) {
+                    pandora.URL.push('/help');
+                }
             },
             pandora_find: function() {
                 var action = ui._list

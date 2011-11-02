@@ -334,6 +334,7 @@ pandora.ui.list = function() {
                                 return {'in': clip['in'], out: clip.out};
                             }) : [],
                             subtitles: isClipsQuery ? data.clips.map(function(clip) {
+                                Ox.print('CLIP:::::', clip)
                                 return {'in': clip['in'], out: clip.out, text: clip.annotations[0].value};
                             }) : []
                         }

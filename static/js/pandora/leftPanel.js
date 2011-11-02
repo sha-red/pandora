@@ -13,7 +13,7 @@ pandora.ui.leftPanel = function() {
                     collapsed: !pandora.user.ui.showInfo,
                     collapsible: true,
                     element: pandora.$ui.info = pandora.ui.info(),
-                    size: pandora.getInfoHeight(),
+                    size: pandora.getInfoHeight(true),
                     tooltip: 'info'
                 }
             ],

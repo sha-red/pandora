@@ -10,7 +10,6 @@ pandora.ui.info = function() {
                 toggle: function(data) {
                     Ox.print('INFO TOGGLE')
                     pandora.UI.set({showInfo: !data.collapsed});
-                    //pandora.resizeFolders();
                 },
                 pandora_find: function() {
                     if (pandora.user.ui._list != pandora.UI.getPrevious('_list')) {
@@ -19,9 +18,6 @@ pandora.ui.info = function() {
                 },
                 pandora_item: updateInfo,
                 pandora_listselection: updateInfo,
-                pandora_showinfo: function(data) {
-                    pandora.resizeFolders();
-                }
             });
 
     //pandora.$ui.leftPanel && resize();

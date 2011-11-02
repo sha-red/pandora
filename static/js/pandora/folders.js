@@ -4,7 +4,7 @@ pandora.ui.folders = function() {
         that = Ox.Element()
             .css({overflowX: 'hidden', overflowY: 'auto'})
             .bindEvent({
-                resize: pandora.resizeFolders
+                resize: pandora.resizeFolders,
             });
     var counter = 0;
     //var $sections = [];
