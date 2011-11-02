@@ -139,6 +139,7 @@ pandora.ui.mainMenu = function() {
                 pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
                     ? [
                         { id: 'debugMenu', title: 'Debug', items: [
+                            { id: 'logs', title: 'View Logs...'}, 
                             { id: 'clearcache', title: 'Clear Cache'},
                             { id: 'reloadapplication', title: 'Reload Application'},
                             { id: 'resetui', title: 'Reset UI Settings'},
@@ -266,6 +267,10 @@ pandora.ui.mainMenu = function() {
                     pandora.api.resetUI({}, function() {
                         pandora.$ui.appPanel.reload();
                     });
+                } else if (data.id == 'logs') {
+                    (pandora.$ui.logsDialog || (
+                        pandora.$ui.logsDialog = pandora.ui.logsDialog())
+                    ).open();
                 } else if (data.id == 'debug') {
                     if(localStorage.debug) {
                         delete localStorage.debug;
