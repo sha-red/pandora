@@ -30,15 +30,14 @@ urlpatterns = patterns('',
     (r'^robots.txt$', serve_static_file, {'location': os.path.join(settings.STATIC_ROOT, 'robots.txt'), 'content_type': 'text/plain'}),
     (r'^favicon.ico$', serve_static_file, {'location': os.path.join(settings.STATIC_ROOT, 'png/icon.16.png'), 'content_type': 'image/x-icon'}),
 )
-if settings.DEBUG:
-    urlpatterns += patterns('',
-        (r'^data/(?P<path>.*)$', 'django.views.static.serve',
-            {'document_root': settings.MEDIA_ROOT}),
-        (r'^static/(?P<path>.*)$', 'django.views.static.serve',
-            {'document_root': settings.STATIC_ROOT}),
-        (r'^tests/(?P<path>.*)$', 'django.views.static.serve',
-            {'document_root': settings.TESTS_ROOT}),
-    )
+#if settings.DEBUG:
+#sould this not be enabled by default? nginx should handle those
+urlpatterns += patterns('',
+    (r'^data/(?P<path>.*)$', 'django.views.static.serve',
+        {'document_root': settings.MEDIA_ROOT}),
+    (r'^static/(?P<path>.*)$', 'django.views.static.serve',
+        {'document_root': settings.STATIC_ROOT}),
+)
 
 urlpatterns += patterns('',
     (r'^(V[a-z0-9]*)$', 'urlalias.views.padma_video'),
