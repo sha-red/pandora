@@ -143,7 +143,8 @@ pandora.ui.mainMenu = function() {
                             { id: 'clearcache', title: 'Clear Cache'},
                             { id: 'reloadapplication', title: 'Reload Application'},
                             { id: 'resetui', title: 'Reset UI Settings'},
-                            { id: 'debug', title: (localStorage.debug?'Disable':'Enable')+' Debug Mode'}
+                            { id: 'debug', title: (localStorage.debug?'Disable':'Enable')+' Debug Mode'},
+                            { id: 'triggererror', title: 'Trigger JavaScript Error'},
                         ] }
                     ]
                     : []
@@ -277,8 +278,9 @@ pandora.ui.mainMenu = function() {
                     } else {
                         localStorage.debug = 1;
                     }
-
                     that.setItemTitle('debug', (localStorage.debug ? 'Disable' : 'Enable') + ' Debug Mode');
+                } else if (data.id == 'triggererror') {
+                    var e = error;
                 }
             },
             key_control_f: function() {

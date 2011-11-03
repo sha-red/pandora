@@ -77,7 +77,7 @@ pandora.ui.logsDialog = function() {
                         id: 'url',
                         title: 'URL',
                         format: function(value, data) {
-                            return value.split('?')[0] + ':' + data.line;
+                            return formatURL(value, data.line);
                         },
                         operator: '+',
                         visible: true,
@@ -116,6 +116,33 @@ pandora.ui.logsDialog = function() {
                         $list.reloadList();
                         Ox.Request.clearCache('findLogs');
                     });
+                },
+                open: function(data) {
+                    var value = $list.value(Ox.last(data.ids)),
+                        $dialog;
+                    if (/^Traceback/.test(value.text)) {
+                        $dialog = Ox.Dialog({
+                            buttons: [
+                                Ox.Button({
+                                    id: 'close',
+                                    title: 'Close'
+                                })
+                                .bindEvent({
+                                    click: function() {
+                                        $dialog.close();
+                                    }
+                                })
+                            ],
+                            closeButton: true,
+                            content: $('<code>').append($('<pre>').css({margin: '16px'}).html(value.text)),
+                            height: height - 48,
+                            keys: {enter: 'close', escape: 'close'},
+                            maximizeButton: true,
+                            title: formatURL(value.url, value.line),
+                            width: width - 48
+                        })
+                        .open();
+                    }
                 }
             }),
 
@@ -171,6 +198,9 @@ pandora.ui.logsDialog = function() {
             })
             .appendTo(that.$element.find('.OxButtonsbar'));
 
+    function formatURL(url, line) {
+        return url.split('?')[0] + ':' + line;
+    }
 
     function renderLog(logData) {
         var $checkbox;

@@ -1,7 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
-/***
-    Pandora
-***/
+
+// FIXME: this should be named pandora.js
 
 /*
 ---- UI Tree ----
@@ -20,17 +19,17 @@ appPanel
             statusbar
 */
 
-window.onerror = function(error, url, line) {
-    try {
-        pandora.api.log({
-            text: error,
-            url: url,
-            line: line
-        });
-    } catch(e) {}
-};
-
 (function() {
+
+    window.onerror = function(error, url, line) {
+        try {
+            pandora.api.log({
+                text: error,
+                url: url,
+                line: line
+            });
+        } catch(e) {}
+    };
 
     var debug = localStorage && localStorage.debug,
         theme = localStorage && localStorage.theme || 'modern';
