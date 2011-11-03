@@ -48,7 +48,6 @@ class Person(models.Model):
         if not self.sortname:
             self.sortname = ox.get_sort_name(self.name)
             self.sortname = unicodedata.normalize('NFKD', self.sortname)
-            self.sortname = self.sortname.replace(u'Æ', 'AE').replace(u'Ø', 'O').replace(u'Þ', 'P')
         self.sortsortname = utils.sort_string(self.sortname)
         self.numberofnames = len(self.name.split(' '))
         super(Person, self).save(*args, **kwargs)

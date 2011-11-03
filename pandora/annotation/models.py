@@ -10,7 +10,7 @@ import ox
 from archive import extract
 from clip.models import Clip
 
-
+from item.utils import sort_string
 import managers
 import utils
 from tasks import update_matching_events, update_matching_places
@@ -34,6 +34,7 @@ class Annotation(models.Model):
 
     layer = models.CharField(max_length=255, db_index=True)
     value = models.TextField()
+    sortvalue = models.CharField(max_length=1000, null=True, blank=True, db_index=True)
 
     def editable(self, user):
         if user.is_authenticated():
@@ -57,6 +58,9 @@ class Annotation(models.Model):
 
     def save(self, *args, **kwargs):
         set_public_id = not self.id or not self.public_id
+        self.sortvalue = None
+        if self.value.strip():
+            self.sortvalue = sort_string(self.value)[:1000]
 
         #no clip or update clip
         def get_layer(id):

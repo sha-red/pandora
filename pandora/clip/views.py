@@ -35,14 +35,14 @@ def order_query(qs, sort):
         if operator != '-':
             operator = ''
         clip_keys = ('public_id', 'start', 'end', 'hue', 'saturation', 'lightness', 'volume',
-                     'annotations__value', 'videoRatio',
+                     'annotations__sortvalue', 'videoRatio',
                      'director', 'title')
         key = {
             'id': 'public_id',
             'in': 'start',
             'out': 'end',
             'position': 'start',
-            'text': 'annotations__value',
+            'text': 'annotations__sortvalue',
             'videoRatio': 'aspect_ratio',
         }.get(e['key'], e['key'])
         if key.startswith('clip:'):
