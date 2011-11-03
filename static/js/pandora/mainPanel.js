@@ -41,7 +41,6 @@ pandora.ui.mainPanel = function() {
                 }
             },
             pandora_item: function(data) {
-                Ox.print('PANDORA_ITEM', data.value, data.previousValue)
                 if (!data.value || !data.previousValue) {
                     that.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
                 }

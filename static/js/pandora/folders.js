@@ -36,9 +36,8 @@ pandora.ui.folders = function() {
                                 { id: 'editlist', title: 'Edit Selected List...', disabled: !pandora.user.ui._list },
                                 { id: 'deletelist', title: 'Delete Selected List...', disabled: !pandora.user.ui._list }
                             ],
-                            max: 0,
-                            min: 0,
                             selectable: false,
+                            title: 'set', // FIXME: why does this work in VideoEditor, but not here?
                             tooltip: 'Manage Personal Lists',
                             type: 'image'
                         })

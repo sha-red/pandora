@@ -56,25 +56,8 @@ pandora.ui.list = function() {
                 },
                 id: 'posterRatio',
                 resizable: false,
-                ///*
-                title: '<img src="' + Ox.UI.getImageURL(
-                    pandora.user.ui.icons == 'posters'
-                    ? 'symbolSetPoster' : 'symbolIcon'
-                ) + '" style="width: 12px; height: 12px; margin: 0 0 0 -2px">',
-                //*/
-                /*
-                title: $('<img>').attr({
-                        src: Ox.UI.getImageURL(
-                            pandora.user.ui.icons == 'posters'
-                            ? 'symbolSetPoster' : 'symbolIcon'
-                        )
-                    })
-                    .css({
-                        width: '12px',
-                        height: '12px',
-                        margin: '0 0 0 -2px'
-                    }),
-                */
+                title: 'Icon',
+                titleImage: pandora.user.ui.icons == 'posters' ? 'SetPoster' : 'Icon',
                 visible: pandora.user.ui.listColumns.indexOf('posterRatio') > -1,
                 width: 16
             }], Ox.map(pandora.site.sortKeys, function(key) {
@@ -550,11 +533,25 @@ pandora.ui.list = function() {
     if (['list', 'grid', 'timelines'].indexOf(pandora.user.ui.listView) > -1) {
         that.bindEvent({
             pandora_icons: function(data) {
+                var src, previousSrc;
                 // fixme: doesn't update title icon, passes useless options
-                hasIcons() && that.options({
-                    borderRadius: data.value == 'posters' ? 0 : 16,
-                    defaultRatio: data.value == 'posters' ? 5/8 : 1
-                }).reloadList(true);
+                if (hasIcons()) {
+                    if (pandora.user.ui.listView == 'list') {
+                        src = Ox.UI.getImageURL(
+                            data.value == 'posters' ? 'symbolSetPoster' : 'symbolIcon'
+                        );
+                        previousSrc = Ox.UI.getImageURL(
+                            data.previousValue == 'posters' ? 'symbolSetPoster' : 'symbolIcon'
+                        )
+                        that.$element.find('img[src="' + previousSrc + '"]').attr({src: src});
+                    } else {
+                        that.options({
+                            borderRadius: data.value == 'posters' ? 0 : 16,
+                            defaultRatio: data.value == 'posters' ? 5/8 : 1
+                        });
+                    }
+                    that.reloadList(true);
+                }
             },
             pandora_showsiteposter: function() {
                 // fixme: should be disabled if ui.icons != 'posters'

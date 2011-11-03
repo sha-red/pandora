@@ -31,9 +31,7 @@ pandora.ui.folderBrowserList = function(id) {
                     },
                     */
                     id: 'id',
-                    title: $('<img>').attr({
-                        src: Ox.UI.getImageURL('symbolIcon')
-                    }),
+                    titleImage: 'icon',
                     unique: true,
                     visible: true,
                     width: 16
@@ -79,10 +77,7 @@ pandora.ui.folderBrowserList = function(id) {
                     },
                     id: 'type',
                     operator: '+',
-                    title: $('<img>')
-                        .attr({
-                            src: Ox.UI.getImageURL('symbolEdit')
-                        }),
+                    titleImage: 'edit',
                     tooltip: function(data) {
                         return data.type == 'smart'
                             ? (data.user == pandora.user.username ? 'Edit Query' : 'Show Query')
@@ -111,12 +106,7 @@ pandora.ui.folderBrowserList = function(id) {
                     },
                     id: id == 'favorite' ? 'subscribed' : 'status',
                     operator: '+',
-                    title: $('<img>')
-                        .attr({
-                            src: Ox.UI.getImageURL(
-                                'symbol' + (id == 'favorite' ? 'Like' : 'Star')
-                            )
-                        }),
+                    titleImage: id == 'favorite' ? 'like' : 'star',
                     tooltip: function(data) {
                         var checked = id == 'favorite' ? data.subscribed : data.status == 'featured';
                         return (checked ? 'Remove from' : 'Add to')

@@ -752,8 +752,11 @@ pandora.resizeGroups = function(width) {
     pandora.$ui.groupsInnerPanel
         .size(0, pandora.user.ui.groupsSizes[1])
         .size(2, pandora.user.ui.groupsSizes[3]);
-    pandora.$ui.groups.forEach(function(list, i) {
-        list.resizeColumn('name', pandora.user.ui.groupsSizes[i] - 40 - Ox.UI.SCROLLBAR_SIZE);
+    pandora.$ui.groups.forEach(function($list, i) {
+        $list.resizeColumn('name', pandora.user.ui.groupsSizes[i] - 40 - Ox.UI.SCROLLBAR_SIZE);
+        if (pandora.user.ui.showFlags) {
+            $list.find('.flagname').css({width: pandora.user.ui.groupsSizes[i] - 64 - Ox.UI.SCROLLBAR_SIZE})
+        }
     });
 };
 

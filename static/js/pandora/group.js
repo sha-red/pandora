@@ -11,7 +11,7 @@ pandora.ui.group = function(id) {
                     align: 'left',
                     id: 'name',
                     format: function(value) {
-                        return ['country', 'language'].indexOf(id) > -1
+                        return ['country', 'language'].indexOf(id) > -1 && pandora.user.ui.showFlags
                             ? $('<div>')
                                 .append(
                                     $('<img>')
@@ -28,6 +28,7 @@ pandora.ui.group = function(id) {
                                 )
                                 .append(
                                     $('<div>')
+                                        .addClass('flagname')
                                         .css({
                                             float: 'left',
                                             width: pandora.user.ui.groupsSizes[i] - 64 - Ox.UI.SCROLLBAR_SIZE,

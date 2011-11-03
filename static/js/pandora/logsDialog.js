@@ -107,8 +107,8 @@ pandora.ui.logsDialog = function() {
                 init: function(data) {
                     numberOfLogs = data.items;
                     $status.html(
-                        Ox.formatNumber(numberOfLogs)
-                        + ' log ' + (numberOfLogs == 1 ? 'entry' : 'entries')
+                        Ox.formatNumber(numberOfLogs) + ' '
+                        + (numberOfLogs == 1 ? 'entry' : 'entries')
                     );
                 },
                 'delete': function(data) {
@@ -189,8 +189,8 @@ pandora.ui.logsDialog = function() {
             .css({
                 position: 'absolute',
                 top: '4px',
-                left: '4px',
-                right: '256px',
+                left: '128px',
+                right: '128px',
                 bottom: '4px',
                 paddingTop: '2px',
                 fontSize: '9px',
