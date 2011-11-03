@@ -185,7 +185,7 @@ pandora.URL = (function() {
                     set['videoPoints.' + state.item] = {
                         position: state.span[0],
                         'in': state.span[1] || 0,
-                        out: state.span[2] || 0
+                        out: Math.max(state.span[1] || 0, state.span[2] || 0)
                     }
                 } else if (state.view == 'map') {
                     // fixme: this doesn't handle map coordinates
