@@ -1,7 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
-// FIXME: this should be named pandora.js
-
 /*
 ---- UI Tree ----
 appPanel
@@ -179,7 +177,7 @@ appPanel
                     });
             });
         } else {
-            Ox.loadFile(prefix + 'js/pandora.js', callback);
+            Ox.loadFile(prefix + 'js/pandora.min.js', callback);
         }
     }
 
