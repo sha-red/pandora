@@ -1,14 +1,16 @@
 pan.do/ra - open media archive
 
-== DEVELOPMENT ==
-To setup a development instance of pan.do/ra,
-you need python, bazaar, pip and virtualenv and several other python modules:
+== SETUP ==
+To setup pan.do/ra, you need
+python, bazaar, pip and virtualenv and several other python modules:
 
 * Packages
     apt-get install bzr git subversion mercurial \
             python-setuptools python-pip python-virtualenv ipython \
             python-dev python-imaging python-numpy python-psycopg2
 
+* Pan.do/ra
+Get code from bazzar
     bzr branch http://code.0x2620.org/pandora pandora
     cd pandora
     virtualenv .
@@ -16,6 +18,18 @@ you need python, bazaar, pip and virtualenv and several other python modules:
 
     cd static
     bzr branch http://code.0x2620.org/oxjs
+
+create settings_local.py and create site.jsonc
+(use settings.py / 0xdb.jsonc / padma.jsonc as example)
+create db
+    
+    ./manage.py syncdb
+
+create / update static files
+    
+    ./manage.py update_static 
+    ./manage.py compile_pyc
+
 
 * Additional pandora tools:
   You need current versions of oxframe, oxtimeline installed.
@@ -30,10 +44,11 @@ you need python, bazaar, pip and virtualenv and several other python modules:
   (make sure you have the python bindings installed).
 
   create a postgresql database and adjust settings in local_settings.py
-  and run ./manage.py syncdb to populate the database
-  you might want to load example configurations from fixutes.
+  and run ./manage.py syncdb to populate the database.
 
     createdb  -T template0 --locale=C --encoding=UTF8 -O pandora pandora
+
+  (setting locale to C is required to fix a bug in sort if set to UTF8)
 
 * RabbitMQ
   For background tasks we use RabbitMQ, to install rabbitmq:
@@ -48,7 +63,7 @@ you need python, bazaar, pip and virtualenv and several other python modules:
 * H264
     to support h264 videos, install ffmpeg with x264 enabled,
     install qt-faststart from (ffmpeg/tools)
-    set VIDEO_H264 = True in local_settings.py
+    to enable add "mp4" to video.formats in your config.jsonc
 
 Running developer environment:
   in one terminal:
@@ -56,24 +71,36 @@ Running developer environment:
   and in another one:
     ./manage.py celeryd -Q default,encoding -B
 
-Updating database:
- right now database updates are not managed, each time you update to current bzr
- you might have to update db tables too.
- Use
-   ./manage.py sqldiff appname
- to check if changes exist and
-   ./manage.py sqldiff appname | ./manage.py dbshell
- to apply them.
- This has to be done for all installed apps
+=== Updating ===
+To update a pandora installation get the latest version from bzr by running
+    ./update.sh
+this will pull pandora/oxjs/python-ox and list possible upgrades to the db
+
+to update your database tables, use
+   ./manage.py sqldiff -a
+to check if there are changes and
+   ./manage.py sqldiff -a | ./manage.py dbshell
+to apply them.
 
 == DEPLOYMENT ==
+* Install upstart scripts
+check etc/init for upstart scripts, adjust path and user and put into /etc/init
+
 To run pan.do/ra in production, we use nginx, using apache2 is also possible.
 
 * nginx setup
     sudo apt-get install nginx 
 
-* apache2 setup
-    sudo apt-get install apache2-mpm-prefork
-    sudo apt-get install libapache2-mod-xsendfile
+  add this to local_settings.py:
+    XACCELREDIRECT = True
 
+  setup nginx according to etc/nginx/vhost.in
+
+* apache2 setup
+    apt-get install apache2-mpm-prefork libapache2-mod-xsendfile
+
+  add this to local_settings.py:
+    XSENDFILE = True
+
+  setup apache according to etc/apache2/vhost.in
 
