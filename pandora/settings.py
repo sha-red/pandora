@@ -42,7 +42,6 @@ APPEND_SLASH = False
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = normpath(join(PROJECT_ROOT, '..', 'data'))
 STATIC_ROOT = normpath(join(PROJECT_ROOT, '..', 'static'))
-TESTS_ROOT = join(PROJECT_ROOT, 'tests')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -183,11 +182,12 @@ VIDEO_PREFIX=''
 #VIDEO_PREFIX='videoPART.example.com'
 #SESSION_COOKIE_DOMAIN=*.example.com"
 
+SCRIPT_ROOT = normpath(join(PROJECT_ROOT, '..', 'scripts'))
 #copy scripts and adjust to customize
-ITEM_POSTER = join('scripts', 'oxdb_poster')
-#ITEM_POSTER = join('scripts', 'padma_poster')
-ITEM_ICON   = join('scripts', 'item_icon')
-LIST_ICON   = join('scripts', 'list_icon')
+ITEM_POSTER = join(SCRIPT_ROOT, 'oxdb_poster')
+#ITEM_POSTER = join(SCRIPT_ROOT, 'padma_poster')
+ITEM_ICON   = join(SCRIPT_ROOT, 'item_icon')
+LIST_ICON   = join(SCRIPT_ROOT, 'list_icon')
 
 
 #you can ignore things below this line
