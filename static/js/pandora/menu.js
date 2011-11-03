@@ -30,7 +30,7 @@ pandora.ui.mainMenu = function() {
                         { id: 'username', title: 'User: ' + (isGuest ? 'not logged in' : pandora.user.username), disabled: true },
                         {},
                         { id: 'preferences', title: 'Preferences...', disabled: isGuest, keyboard: 'control ,' },
-                        { id: 'archives', title: 'Archives...', disabled: isGuest },
+                        { id: 'archives', title: 'Archives...', disabled: /*isGuest*/ true },
                         {},
                         { id: 'signup', title: 'Sign Up...', disabled: !isGuest },
                         isGuest ? { id: 'signin', title: 'Sign In...' }
@@ -133,7 +133,7 @@ pandora.ui.mainMenu = function() {
                         { id: 'tour', title: 'Manage Tour...', disabled: !isAdmin }*/
                     ] },
                     { id: 'helpMenu', title: 'Help', items: [
-                        { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'shift ?' }
+                        { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'control ?' }
                     ] }
                 ],
                 pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
@@ -283,9 +283,19 @@ pandora.ui.mainMenu = function() {
                     var e = error;
                 }
             },
+            key_control_comma: function() {
+                if (pandora.hasNoDialogOrScreen()) {
+                    pandora.URL.push('/preferences');
+                }
+            },
             key_control_f: function() {
                 if (pandora.hasNoDialogOrScreen()) {
                     pandora.$ui.findInput.focusInput(true);
+                }
+            },
+            key_control_slash: function() {
+                if (pandora.hasNoDialogOrScreen()) {
+                    pandora.URL.push('/help');
                 }
             },
             key_shift_a: function() {
@@ -303,11 +313,6 @@ pandora.ui.mainMenu = function() {
             },
             key_shift_s: function() {
                 pandora.UI.set({showSidebar: !ui.showSidebar});
-            },
-            key_shift_slash: function() {
-                if (pandora.hasNoDialogOrScreen()) {
-                    pandora.URL.push('/help');
-                }
             },
             pandora_find: function() {
                 var action = ui._list
