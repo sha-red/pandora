@@ -58,9 +58,15 @@ class Annotation(models.Model):
 
     def save(self, *args, **kwargs):
         set_public_id = not self.id or not self.public_id
-        self.sortvalue = None
-        if self.value.strip():
-            self.sortvalue = sort_string(self.value)[:1000]
+        if self.value:
+            sortvalue = ox.stripTags(self.value).strip()
+            sortvalue = sort_string(sortvalue)
+            if sortvalue:
+                self.sortvalue = sortvalue[:1000]
+            else:
+                self.sortvalue = None
+        else:
+            self.sortvalue = None
 
         #no clip or update clip
         def get_layer(id):
