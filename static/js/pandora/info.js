@@ -135,7 +135,11 @@ pandora.ui.listInfo = function() {
 
     var list = pandora.user.ui._list,
         that = $('<div>').css({padding: '16px', textAlign: 'center'}),
-        $icon = $('<img>')
+        $icon = Ox.Element({
+                element: '<img>',
+                tooltip: list.split(':')[0] == pandora.user.username
+                    ? 'Doubleclick to edit icon' : '',
+            })
             .attr({
                 src: list
                     ? '/list/' + list + '/icon256.jpg?' + Ox.uid()
@@ -144,32 +148,50 @@ pandora.ui.listInfo = function() {
             .css(getIconCSS())
             .appendTo(that);
 
+    that.append($('<div>').css({height: '16px'}));
+
     //fixme: allow editing
     //pandora.api.editList({id: list, description: 'foobbar'}, callback)
     //pandora.api.editPage({name: 'allItems', body: 'foobar'}, callback)
     if (list) {
         pandora.api.findLists({
             query: { conditions: [{key: 'id', value: list, operator: '=='}] },
-            keys: ['description']
+            keys: ['description', 'name', 'user']
         }, function(result) {
             if (result.data.items.length) {
+                var item = result.data.items[0];
                 that.append(
-                    $('<div>')
-                        .css({paddingTop: '16px', fontWeight: 'bold'})
-                        .html(Ox.encodeHTML(list))
+                    Ox.Editable({
+                            editable: item.user == pandora.user.username,
+                            format: function(value) {
+                                return Ox.encodeHTML(item.user + ':' + value)
+                            },
+                            tooltip: item.user == pandora.user.username
+                                ? 'Doubleclick to edit title' : '',
+                            value: item.name,
+                            width: pandora.user.ui.sidebarSize - 32
+                        })
+                        .css({fontWeight: 'bold', textAlign: 'center'})
                 ).append(
-                    $('<div>')
-                        .css({paddingTop: '16px', textAlign: 'left'})
-                        .html(
-                            result.data.items.length
-                            ? result.data.items[0].description
-                            : 'List not found'
-                        )
+                    $('<div>').css({height: '8px'})
+                ).append(
+                    Ox.Editable({
+                            editable: item.user == pandora.user.username,
+                            format: function(value) {
+                                return Ox.encodeHTML(value)
+                            },
+                            placeholder: '<div style="color: rgb(128, 128, 128); text-align: center">No description</span>',
+                            tooltip: 'Doubleclick to edit description',
+                            type: 'textarea',
+                            value: item.description,
+                            width: pandora.user.ui.sidebarSize - 32
+                        })
+                        .css({textAlign: 'left'})
                 );
             } else {
                 that.append(
                     $('<div>')
-                        .css({paddingTop: '16px',})
+                        .css({paddingTop: '16px'})
                         .html('List not found')
                 );
             }
@@ -187,7 +209,7 @@ pandora.ui.listInfo = function() {
         return {
             width: size + 'px',
             height: size + 'px',
-            borderRadius: Math.round(size / 4) + 'px'
+            borderRadius: Math.round(size / 4) + 'px',
         };
     }
     that.resizeIcon = function() {

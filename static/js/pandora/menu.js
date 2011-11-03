@@ -205,8 +205,15 @@ pandora.ui.mainMenu = function() {
                         set.listSort = pandora.site.user.ui.listSort;
                     }
                     pandora.UI.set(set);
-                } else if (['personallists', 'favoritelists', 'featuredlists'].indexOf(value) > -1) {
-                    pandora.UI.set({list: value.substr(8)});
+                } else if (['personallists', 'favoritelists', 'featuredlists'].indexOf(data.id) > -1) {
+                    pandora.UI.set({
+                        find: {
+                            conditions: value ? [
+                                {key: 'list', value: value.substr(8), operator: '=='}
+                            ] : [],
+                            operator: '&'
+                        }
+                    });
                 }
             },
             click: function(data) {

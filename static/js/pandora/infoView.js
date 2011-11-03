@@ -151,6 +151,7 @@ pandora.ui.infoView = function(data) {
                 })
                 .css({
                     display: 'inline-block',
+                    marginBottom: '-3px',
                     fontWeight: 'bold',
                     fontSize: '13px',
                     MozUserSelect: 'text',
@@ -177,15 +178,15 @@ pandora.ui.infoView = function(data) {
                         clickLink: pandora.clickLink,
                         editable: isEditable,
                         format: function(value) {
-                            return value
-                                ? formatValue(value.split(', '), 'name')
-                                : formatLight('Unknown Director');
+                            formatValue(value.split(', '), 'name')
                         },
+                        placeholder: formatLight('Unknown Director'),
                         tooltip: isEditable ? 'Doubleclick to edit' : '',
                         value: data.director ? data.director.join(', ') : 'Unknown Director'
                     })
                     .css({
                         display: 'inline-block',
+                        marginBottom: '-3px',
                         fontWeight: 'bold',
                         fontSize: '13px',
                         MozUserSelect: 'text',
@@ -214,10 +215,9 @@ pandora.ui.infoView = function(data) {
             Ox.Editable({
                     clickLink: pandora.clickLink,
                     format: function(value) {
-                        return value
-                            ? formatValue(value.split(', '), key)
-                            : formatLight('unknown');
+                        return formatValue(value.split(', '), key)
                     },
+                    placeholder: formatLight('unknown'),
                     tooltip: 'Doubleclick to edit',
                     value: key == 'country'
                         ? (data[key] ? data[key].join(', ') : [''])
@@ -452,9 +452,6 @@ pandora.ui.infoView = function(data) {
             .append(formatKey('Notes', true))
             .append(
                 Ox.Editable({
-                        format: function(value) {
-                            return value || formatLight('No notes');
-                        },
                         height: 128,
                         placeholder: formatLight('No notes'),
                         tooltip: 'Doubleclick to edit',
