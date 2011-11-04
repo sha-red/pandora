@@ -45,10 +45,14 @@ pandora.ui.findElement = function() {
                             change: function(data) {
                                 var key = data.selected[0].id;
                                 if (key == 'advanced') {
-                                    pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
-                                    pandora.$ui.findInput.options({placeholder: 'Edit...'})
+                                    pandora.$ui.findInput.options({
+                                        placeholder: 'Edit Query...',
+                                        value: ''
+                                    });
+                                    (pandora.$ui.filterDialog || (
+                                        pandora.$ui.filterDialog = pandora.ui.filterDialog()
+                                    )).open();
                                 } else {
-                                    pandora.$ui.mainMenu.checkItem('findMenu_find_' + key);
                                     pandora.$ui.findInput.options({
                                         autocomplete: autocompleteFunction(),
                                         placeholder: ''
@@ -64,14 +68,17 @@ pandora.ui.findElement = function() {
                         autocompleteSelectSubmit: true,
                         clear: true,
                         id: 'input',
-                        placeholder: findKey == 'advanced' ? 'Edit...' : '',
+                        placeholder: findKey == 'advanced' ? 'Edit Query...' : '',
                         value: findValue,
                         width: 192
                     })
                     .bindEvent({
                         focus: function(data) {
                             if (pandora.$ui.findSelect.value() == 'advanced') {
-                                pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
+                                pandora.$ui.findInput.blurInput();
+                                (pandora.$ui.filterDialog || (
+                                    pandora.$ui.filterDialog = pandora.ui.filterDialog()
+                                )).open();
                             }
                         },
                         submit: function(data) {

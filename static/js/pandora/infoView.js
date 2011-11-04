@@ -178,7 +178,7 @@ pandora.ui.infoView = function(data) {
                         clickLink: pandora.clickLink,
                         editable: isEditable,
                         format: function(value) {
-                            formatValue(value.split(', '), 'name')
+                            return formatValue(value.split(', '), 'name');
                         },
                         placeholder: formatLight('Unknown Director'),
                         tooltip: isEditable ? 'Doubleclick to edit' : '',
