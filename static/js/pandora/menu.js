@@ -143,7 +143,7 @@ pandora.ui.mainMenu = function() {
                             { id: 'clearcache', title: 'Clear Cache'},
                             { id: 'reloadapplication', title: 'Reload Application'},
                             { id: 'resetui', title: 'Reset UI Settings'},
-                            { id: 'debug', title: (localStorage.debug?'Disable':'Enable')+' Debug Mode'},
+                            { id: 'debug', title: (localStorage.pandoraDebug?'Disable':'Enable')+' Debug Mode'},
                             { id: 'triggererror', title: 'Trigger JavaScript Error'},
                         ] }
                     ]
@@ -176,7 +176,6 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'settheme') {
                     Ox.Theme(value);
                     pandora.UI.set('theme', value);
-                    localStorage.theme = value;
                 } else if (data.id == 'showsiteposter') {
                     pandora.UI.set('showSitePoster', data.checked)
                 } else if (Ox.startsWith(data.id, 'sortgroup')) {
@@ -280,12 +279,12 @@ pandora.ui.mainMenu = function() {
                         pandora.$ui.appPanel.reload();
                     });
                 } else if (data.id == 'debug') {
-                    if(localStorage.debug) {
-                        delete localStorage.debug;
+                    if(localStorage.pandoraDebug) {
+                        delete localStorage.pandoraDebug;
                     } else {
-                        localStorage.debug = 1;
+                        localStorage.pandoraDebug = 1;
                     }
-                    that.setItemTitle('debug', (localStorage.debug ? 'Disable' : 'Enable') + ' Debug Mode');
+                    that.setItemTitle('debug', (localStorage.pandoraDebug ? 'Disable' : 'Enable') + ' Debug Mode');
                 } else if (data.id == 'triggererror') {
                     var e = error;
                 }

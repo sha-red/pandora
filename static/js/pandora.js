@@ -29,8 +29,8 @@ appPanel
         } catch(e) {}
     };
 
-    var debug = localStorage && localStorage.debug,
-        theme = localStorage && localStorage.theme || 'modern';
+    var debug = localStorage && localStorage.pandoraDebug,
+        theme = localStorage && localStorage.OxTheme || 'modern';
 
     loadImages(function(images) {
         loadScreen(images);
@@ -157,7 +157,7 @@ appPanel
 
     function loadPandoraFiles(callback) {
         var prefix = '/static/';
-        if (localStorage && localStorage.debug) {
+        if (localStorage && localStorage.pandoraDebug) {
             Ox.getJSON(prefix + 'json/pandora.json', function(files) {
                 var promises = [];
                 files.forEach(function(file) {
@@ -253,7 +253,7 @@ appPanel
             videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
         });
 
-        if (data.user.level == 'guest' && $.browser.mozilla && !localStorage.theme) {
+        if (data.user.level == 'guest' && $.browser.mozilla && !localStorage.OxTheme) {
             pandora.user.ui.theme = 'classic';
         }
 
@@ -268,7 +268,6 @@ appPanel
             }
 
             Ox.Theme(pandora.user.ui.theme);
-            localStorage.theme = pandora.user.ui.theme;
             pandora.$ui.appPanel = pandora.ui.appPanel().display();
             Ox.Request.requests() && pandora.$ui.loadingIcon.start();
             pandora.$ui.body.ajaxStart(pandora.$ui.loadingIcon.start);
