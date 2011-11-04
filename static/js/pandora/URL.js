@@ -112,9 +112,6 @@ pandora.URL = (function() {
 
     function setState(state, callback) {
 
-        Ox.Log('', 'SET STATE:', state)
-        var find, previousUI = pandora.UI.getPrevious();
-
         pandora.user.ui._list = pandora.getListsState(pandora.user.ui.find);
         pandora.user.ui._groupsState = pandora.getGroupsState(pandora.user.ui.find);
         pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
@@ -123,13 +120,6 @@ pandora.URL = (function() {
 
             if (pandora.user.ui.showHome) {
                 pandora.$ui.home = pandora.ui.home().showScreen();
-            } else {
-                /*
-                pandora.UI.set({
-                    section: 'items',
-                    item: ''
-                });
-                */
             }
             callback && callback();
 
@@ -207,17 +197,10 @@ pandora.URL = (function() {
 
             if (state.find) {
                 if (!state.item) {
-                    find = state.find;
                     set.find = state.find;
                 } else if (pandora.isItemFind(state.find)) {
                     set.itemFind = state.find;
                 }
-            }
-            if (!find) {
-                find = pandora.user.ui.find;
-                pandora.user.ui._list = pandora.getListsState(find)
-                pandora.user.ui._groupsState = pandora.getGroupsState(find);
-                pandora.user.ui._findState = pandora.getFindState(find);
             }
 
             Ox.Request.cancel();

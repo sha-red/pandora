@@ -14,7 +14,7 @@ appPanel
             contentPanel
                 browser <-- should be filters or browser
                 list or item
-            statusbar
+            statusbar <-- make part of content panel
 */
 
 (function() {
@@ -199,8 +199,12 @@ appPanel
                     })
             },
             site: data.site,
-            user: data.user.level == 'guest' ? Ox.clone(data.site.user) : data.user
+            user: data.user
         });
+
+        pandora.user.ui = Ox.extend(
+            Ox.clone(pandora.site.user.ui), pandora.user.ui
+        );
 
         Ox.extend(pandora.site, {
             clipKeys: Ox.map(data.site.clipKeys, function(key) {
