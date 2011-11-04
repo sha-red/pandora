@@ -78,7 +78,7 @@ pandora.ui.info = function() {
                 keys: ['duration', 'rendered', 'videoRatio']
             }, function(result) {
                 if (result.data && result.data.rendered) {
-                    pandora.$ui.videoPreview && pandora.$ui.videoPreview.removeElement();
+                    pandora.$ui.videoPreview && pandora.$ui.videoPreview.remove();
                     pandora.$ui.videoPreview = pandora.ui.videoPreview({
                             duration: result.data.duration,
                             frameRatio: result.data.videoRatio,

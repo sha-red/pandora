@@ -22,7 +22,7 @@ pandora.ui.appPanel = function() {
         return that;
     }
     that.reload = function() {
-        pandora.$ui.appPanel.removeElement();
+        pandora.$ui.appPanel.remove();
         pandora.$ui.appPanel = pandora.ui.appPanel().appendTo(pandora.$ui.body);
         return that;
     }

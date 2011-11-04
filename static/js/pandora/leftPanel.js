@@ -25,11 +25,11 @@ pandora.ui.leftPanel = function() {
                 pandora.user.ui.sidebarSize = data.size;
                 var infoHeight = pandora.getInfoHeight(true);
                 if (data.size < pandora.site.sectionButtonsWidth && pandora.$ui.sectionButtons) {
-                    pandora.$ui.sectionButtons.removeElement();
+                    pandora.$ui.sectionButtons.remove();
                     delete pandora.$ui.sectionButtons;
                     pandora.$ui.sectionbar.append(pandora.$ui.sectionSelect = pandora.ui.sectionSelect());
                 } else if (data.size >= pandora.site.sectionButtonsWidth && pandora.$ui.sectionSelect) {
-                    pandora.$ui.sectionSelect.removeElement();
+                    pandora.$ui.sectionSelect.remove();
                     delete pandora.$ui.sectionSelect;
                     pandora.$ui.sectionbar.append(pandora.$ui.sectionButtons = pandora.ui.sectionButtons());
                 }

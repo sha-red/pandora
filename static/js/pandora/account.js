@@ -23,7 +23,7 @@ pandora.ui.accountDialog = function(action) {
 
 pandora.ui.accountDialogOptions = function(action, value) {
     //Ox.Log('', 'ACTION', action)
-    pandora.$ui.accountForm && pandora.$ui.accountForm.removeElement();
+    pandora.$ui.accountForm && pandora.$ui.accountForm.remove();
     var buttons = {
             signin: ['signup', 'reset'],
             signup: ['signin'],
@@ -120,7 +120,7 @@ pandora.ui.accountForm = function(action, value) {
                 //Ox.Event.unbind('usernameOrEmailInput')
             }
             //Ox.Log('', 'REMOVING ITEM', item.options('id'));
-            item.removeElement();
+            item.remove();
         });
     }
     var items = {

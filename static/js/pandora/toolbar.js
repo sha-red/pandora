@@ -44,8 +44,8 @@ pandora.ui.toolbar = function() {
             Ox.Log('', 'IS/WAS', isNavigationView, wasNavigationView);
             if (isNavigationView != wasNavigationView) {
                 if (isNavigationView) {
-                    pandora.$ui.sortSelect.removeElement();
-                    pandora.$ui.orderButton.removeElement();
+                    pandora.$ui.sortSelect.remove();
+                    pandora.$ui.orderButton.remove();
                 } else {
                     pandora.$ui.sortSelect = pandora.ui.sortSelect().insertAfter(pandora.$ui.viewSelect);
                     pandora.$ui.orderButton = pandora.ui.orderButton().insertAfter(pandora.$ui.sortSelect);

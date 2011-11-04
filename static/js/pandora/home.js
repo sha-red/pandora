@@ -109,11 +109,9 @@ pandora.ui.home = function() {
                     pandora.$ui.findInput.options({value: value});
                     that.fadeOutScreen();
                     pandora.UI.set('find', {
-                        conditions: [{
-                            key: '*',
-                            value: value,
-                            operator: '='
-                        }],
+                        conditions: value === ''
+                            ? []
+                            : [{key: '*', value: value, operator: '='}],
                         operator: '&'
                     });
                 }
