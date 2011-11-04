@@ -249,7 +249,7 @@ appPanel
             videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
         });
 
-        if (data.user.level == 'guest' && $.browser.mozilla) {
+        if (data.user.level == 'guest' && $.browser.mozilla && !localStorage.theme) {
             pandora.user.ui.theme = 'classic';
         }
 
