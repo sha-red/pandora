@@ -94,7 +94,7 @@ pandora.ui.item = function() {
             );
 
         } else if (pandora.user.ui.itemView == 'info') {
-            //Ox.print('result.data', result.data)
+            //Ox.Log('', 'result.data', result.data)
             if (pandora.user.level == 'admin' && false) {
                 var $form,
                     $edit = Ox.Element()
@@ -265,7 +265,7 @@ pandora.ui.item = function() {
                         pandora.UI.set('videoPoints.' + pandora.user.ui.item + '.position', data.position);
                     },
                     resize: function(data) {
-                        Ox.print('RESIZE!!', data.size)
+                        Ox.Log('', 'RESIZE!!', data.size)
                         pandora.$ui.editor.options({
                             height: data.size
                         });
@@ -277,7 +277,7 @@ pandora.ui.item = function() {
                         pandora.UI.set({videoSize: data.size});
                     },
                     addannotation: function(data) {
-                        Ox.print('addAnnotation', data);
+                        Ox.Log('', 'addAnnotation', data);
                         data.item = pandora.user.ui.item;
                         data.value = 'Click to edit';
                         pandora.api.addAnnotation(data, function(result) {
@@ -296,7 +296,7 @@ pandora.ui.item = function() {
                     updateannotation: function(data) {
                         //fixme: check that edit was successfull
                         pandora.api.editAnnotation(data, function(result) {
-                            Ox.print('done updateAnnotation', result);
+                            Ox.Log('', 'done updateAnnotation', result);
                         });
                     },
                     pandora_showannotations: function(data) {
@@ -305,14 +305,14 @@ pandora.ui.item = function() {
                 })
             );
             pandora.$ui.editor.bindEvent('resize', function(data) {
-                //Ox.print('resize item', data)
+                //Ox.Log('', 'resize item', data)
                 pandora.$ui.editor.options({
                     height: data.size
                 });
             });
             /*
             pandora.$ui.rightPanel.bindEvent('resize', function(data) {
-                Ox.print('... rightPanel resize', data, pandora.$ui.timelinePanel.size(1))
+                Ox.Log('', '... rightPanel resize', data, pandora.$ui.timelinePanel.size(1))
                 pandora.$ui.editor.options({
                     width: data - pandora.$ui.timelinePanel.size(1) - 1
                 });

@@ -491,7 +491,7 @@ pandora.ui.mainMenu = function() {
         }, function(result) {
             lists[folder] = result.data.items;
             if (++counter == 3) {
-                Ox.print('--------------------------------------------', lists)
+                Ox.Log('', '--------------------------------------------', lists)
                 pandora.$ui.mainMenu.replaceMenu('listMenu', getListMenu(lists));
             }
         });

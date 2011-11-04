@@ -248,7 +248,7 @@ pandora.ui.listIconPanel = function(listData) {
                 };
             },
             items: function(data, callback) {
-                //Ox.print('data, pandora.Query.toObject', data, pandora.Query.toObject())
+                //Ox.Log('', 'data, pandora.Query.toObject', data, pandora.Query.toObject())
                 pandora.api.find(Ox.extend(data, {
                     query: {
                         conditions: [{key: 'list', value: listData.id, operator: '='}],

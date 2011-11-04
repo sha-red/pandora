@@ -228,7 +228,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
                     !pandora.user.ui.showFolder.items[title] && $bar.trigger('dblclick');
                 }
                 if (!scrollInterval) {
-                    //Ox.print('AT TOP', isAtListsTop(event), 'AT BOTTOM', isAtListsBottom(event))
+                    //Ox.Log('', 'AT TOP', isAtListsTop(event), 'AT BOTTOM', isAtListsBottom(event))
                     scroll = isAtListsTop(event) ? -16
                         : isAtListsBottom(event) ? 16 : 0
                     if (scroll) {
@@ -261,7 +261,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
             }
         },
         draganddropend: function(data) {
-            Ox.print(data, drag, '------------');
+            Ox.Log('', data, drag, '------------');
             canMove && Ox.UI.$window.unbind({
                 keydown: keydown,
                 keyup: keyup
@@ -288,7 +288,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
                             }
                         }, function(result) {
                             var folder = drag.target.status != 'featured' ? 'personal' : 'featured';
-                            //Ox.print(drag.source.status, '//////', drag.target.status)
+                            //Ox.Log('', drag.source.status, '//////', drag.target.status)
                             pandora.$ui.folderList[folder].value(
                                 drag.target.id, 'items',
                                 result.data.items
@@ -468,7 +468,7 @@ pandora.getFoldersHeight = function() {
 
 pandora.getFoldersWidth = function() {
     var width = pandora.user.ui.sidebarSize;
-    Ox.print('FOLDERS HEIGHT', pandora.getFoldersHeight(), 'INFO HEIGHT', pandora.getInfoHeight())
+    Ox.Log('', 'FOLDERS HEIGHT', pandora.getFoldersHeight(), 'INFO HEIGHT', pandora.getInfoHeight())
     if (
         pandora.$ui.appPanel
         && pandora.getFoldersHeight() > window.innerHeight - 20 - 24 - 1 - pandora.getInfoHeight()
@@ -559,7 +559,7 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
     // and checks if it's an annotation/event/place id or an event/place name,
     // and returns the id (or none) and the view (or none)
     // fixme: "subtitles:23" is still missing
-    Ox.print('getMetadataByIdOrName', item, view, str);
+    Ox.Log('', 'getMetadataByIdOrName', item, view, str);
     var isName = str[0] == '@',
         canBeAnnotation = (
             !view || view == 'video' || view == 'timeline'
@@ -569,12 +569,12 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
     str = isName ? str.substr(1) : str;
     getId(canBeAnnotation ? 'annotation' : '', function(id) {
         if (id) {
-            Ox.print('id?', id)
+            Ox.Log('', 'id?', id)
             callback(id, pandora.user.ui.videoView);
         } else {
             getId(canBePlace ? 'place' : '', function(id) {
                 if (id) {
-                    Ox.print('found place id', id)
+                    Ox.Log('', 'found place id', id)
                     callback(id, 'map');
                 } else {
                     getId(canBeEvent ? 'event' : '', function(id) {
@@ -620,7 +620,7 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
 (function() {
     var itemTitles = {};
     pandora.getPageTitle = function(itemTitle) {
-        Ox.print('ITEM TITLES', itemTitles)
+        Ox.Log('', 'ITEM TITLES', itemTitles)
         if (itemTitle) {
             itemTitles[pandora.user.ui.item] = itemTitle
         }
@@ -719,7 +719,7 @@ pandora.signout = function(data) {
 };
 
 pandora.reloadList = function() {
-    Ox.print('reloadList')
+    Ox.Log('', 'reloadList')
     var listData = pandora.getListData();
     Ox.Request.clearCache(); // fixme: remove
     pandora.$ui.groups.forEach(function($group) {
@@ -767,7 +767,7 @@ pandora.resizeFolders = function() {
         columnWidth = {user: parseInt((width - 96) * 0.4)};
         columnWidth.name = (width - 96) - columnWidth.user;
     }
-    Ox.print('RESIZE FOLDERS', width);
+    Ox.Log('', 'RESIZE FOLDERS', width);
     Ox.forEach(pandora.$ui.folderList, function($list, id) {
         var pos = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id);
         pandora.$ui.folder[pos].css({width: width + 'px'});
@@ -826,7 +826,7 @@ pandora.resizeWindow = function() {
             pandora.$ui.list.size();
         }
     } else {
-        //Ox.print('pandora.$ui.window.resize');
+        //Ox.Log('', 'pandora.$ui.window.resize');
         pandora.$ui.browser.scrollToSelection();
         if (pandora.user.ui.itemView == 'info') {
             pandora.$ui.item.resize();
@@ -922,7 +922,7 @@ pandora.unloadWindow = function() {
         // has a findKey as key and "=" as operator (and all other conditions
         // are either list or groups), or if all conditions in an | query have
         // the same group id as key and "==" as operator
-        Ox.print('getFindState', find)
+        Ox.Log('', 'getFindState', find)
         // FIXME: this is still incorrect when you select a lot of group items
         // and reload the page (will be advanced)
         var conditions, indices, state = {index: -1, key: '*', value: ''};

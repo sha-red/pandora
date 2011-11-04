@@ -41,7 +41,7 @@ pandora.ui.toolbar = function() {
             var isNavigationView = ['map', 'calendar'].indexOf(data.value) > -1,
                 wasNavigationView = ['map', 'calendar'].indexOf(data.previousValue) > -1,
                 action = isNavigationView ? 'hide' : 'show';
-            Ox.print('IS/WAS', isNavigationView, wasNavigationView);
+            Ox.Log('', 'IS/WAS', isNavigationView, wasNavigationView);
             if (isNavigationView != wasNavigationView) {
                 if (isNavigationView) {
                     pandora.$ui.sortSelect.removeElement();

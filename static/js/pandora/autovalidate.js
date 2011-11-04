@@ -77,7 +77,7 @@ pandora.validateUser = function(key, existing) {
             operator: '=='
         }, function(result) {
             var valid = existing == !!result.data.users.length;
-            //Ox.print(existing, result.data.users)
+            //Ox.Log('', existing, result.data.users)
             callback({
                 message: existing ?
                     'Unknown ' + string :

@@ -13,7 +13,7 @@ pandora.ui.list = function() {
             }),
             pandora.site.sortKeys
         ));
-        Ox.print('$$$$', keys)
+        Ox.Log('', '$$$$', keys)
         */
         that = Ox.TextList({
             columns: Ox.merge([{
@@ -86,7 +86,7 @@ pandora.ui.list = function() {
             draggable: true,
             id: 'list',
             items: function(data, callback) {
-                //Ox.print('data, pandora.Query.toObject', data, pandora.Query.toObject())
+                //Ox.Log('', 'data, pandora.Query.toObject', data, pandora.Query.toObject())
                 pandora.api.find(Ox.extend(data, {
                     query: pandora.user.ui.find
                 }), callback);
@@ -115,7 +115,7 @@ pandora.ui.list = function() {
                 that.size();
             },
             sort: function(data) {
-                Ox.print('---- SORT ----', data)
+                Ox.Log('', '---- SORT ----', data)
                 pandora.UI.set({
                     listSort: [{key: data.key, operator: data.operator}]
                 });
@@ -320,7 +320,7 @@ pandora.ui.list = function() {
                                 return {'in': clip['in'], out: clip.out};
                             }) : [],
                             subtitles: isClipsQuery ? data.clips.map(function(clip) {
-                                Ox.print('CLIP:::::', clip)
+                                Ox.Log('', 'CLIP:::::', clip)
                                 return {'in': clip['in'], out: clip.out, text: clip.annotations[0].value};
                             }) : []
                         }

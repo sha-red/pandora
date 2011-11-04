@@ -153,7 +153,7 @@ pandora.ui.group = function(id) {
                 //pandora.URL.push();
             },
             sort: function(data) {
-                Ox.print('SORT', data)
+                Ox.Log('', 'SORT', data)
                 var groups = Ox.clone(pandora.user.ui.groups);
                 pandora.$ui.mainMenu.checkItem('sortMenu_sortgroups_sortgroup' + id + '_' + data.key);
                 pandora.$ui.mainMenu.checkItem('sortMenu_ordergroups_ordergroup' + id + '_' + (data.operator == '+' ? 'ascending' : 'descending'));

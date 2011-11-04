@@ -182,7 +182,7 @@ appPanel
 
     function initPandora(data) {
 
-        Ox.print('Ox.App load', data);
+        Ox.Log('', 'Ox.App load', data);
 
         Ox.extend(pandora, {
             $ui: {

@@ -64,7 +64,7 @@ pandora.ui.filesView = function(options, self) {
                         return true;
                     },
                     format: function(value, data) {
-                        Ox.print('File', value, data.wanted, data);
+                        Ox.Log('', 'File', value, data.wanted, data);
                         return $('<img>')
                             .attr({
                                 src: data.wanted ? Ox.UI.getImageURL('symbolStar') :
@@ -404,7 +404,7 @@ pandora.ui.filesView = function(options, self) {
                 Ox.Request.clearCache(); // fixme: remove
                 pandora.UI.set({item: result.data.itemId});
             } else {
-                Ox.print('moved', self.selected, result.data.itemId);
+                Ox.Log('', 'moved', self.selected, result.data.itemId);
                 self.$filesList.reloadList();
                 self.$instancesList.reloadList();
             }

@@ -22,7 +22,7 @@ pandora.ui.accountDialog = function(action) {
 };
 
 pandora.ui.accountDialogOptions = function(action, value) {
-    //Ox.print('ACTION', action)
+    //Ox.Log('', 'ACTION', action)
     pandora.$ui.accountForm && pandora.$ui.accountForm.removeElement();
     var buttons = {
             signin: ['signup', 'reset'],
@@ -114,12 +114,12 @@ pandora.ui.accountForm = function(action, value) {
     if (pandora.$ui.accountForm) {
         pandora.$ui.accountForm.items.forEach(function(item) {
             if (item.options('id') == 'usernameOrEmail') {
-                //Ox.print('REMOVING')
+                //Ox.Log('', 'REMOVING')
                 //Ox.Event.unbind('usernameOrEmailSelect')
                 //Ox.Event.unbind('usernameOrEmailSelectMenu')
                 //Ox.Event.unbind('usernameOrEmailInput')
             }
-            //Ox.print('REMOVING ITEM', item.options('id'));
+            //Ox.Log('', 'REMOVING ITEM', item.options('id'));
             item.removeElement();
         });
     }
@@ -188,7 +188,7 @@ pandora.ui.accountForm = function(action, value) {
         
             },
             validate: function(data) {
-                Ox.print('FORM VALIDATE', data, action, 'submit' + Ox.toTitleCase(action));
+                Ox.Log('', 'FORM VALIDATE', data, action, 'submit' + Ox.toTitleCase(action));
                 pandora.$ui.accountDialog[
                     (data.valid ? 'enable' : 'disable') + 'Button'
                 ]('submit' + Ox.toTitleCase(action));

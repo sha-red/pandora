@@ -70,7 +70,7 @@ pandora.ui.folders = function() {
                             },
                             pandora_listselection: function(data) {
                                 /*
-                                Ox.print('pandora_listselection', data.value.length)
+                                Ox.Log('', 'pandora_listselection', data.value.length)
                                 pandora.$ui.personalListsSelect[data.value.length ? 'enableItem' : 'disableItem']('newlistfromselection');
                                 */
                             }
@@ -142,7 +142,7 @@ pandora.ui.folders = function() {
                                 );
                             } else {
                                 listData = pandora.getListData();
-                                Ox.print('FEATURED', listData)
+                                Ox.Log('', 'FEATURED', listData)
                                 if (
                                     pandora.$ui.folderList.featured.options('selected').length
                                     && listData.status != 'featured'
@@ -243,7 +243,7 @@ pandora.ui.folders = function() {
             pandora.$ui.folderList[folder.id] = pandora.ui.folderList(folder.id)
                 .bindEventOnce({
                     init: function(data) {
-                        Ox.print('init', i, counter)
+                        Ox.Log('', 'init', i, counter)
                         if (++counter == 4) {
                             pandora.$ui.folder.forEach(function($folder) {
                                 that.append($folder);

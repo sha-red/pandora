@@ -23,7 +23,7 @@ pandora.ui.itemClips = function(options) {
     self.height = self.options.ratio > 1 ? Math.round(self.size / self.options.ratio) : self.size;
 
     self.options.clips.forEach(function(clip, i) {
-        Ox.print('CLIP', clip)
+        Ox.Log('', 'CLIP', clip)
         var id = self.options.id + '/' + clip['in'],
             title = Ox.map(clip.annotations, function(annotation) {
                 return annotation.layer == 'subtitles' ? annotation.value : 0

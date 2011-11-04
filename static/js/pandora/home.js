@@ -240,7 +240,7 @@ pandora.ui.home = function() {
     }
 
     that.fadeInScreen = function() {
-        Ox.print('FADE IN SCREEN')
+        Ox.Log('', 'FADE IN SCREEN')
         that.appendTo(Ox.UI.$body).animate({opacity: 1}, 500, function() {
             that.find(':not(#logo)').animate({opacity: 1}, 250, function() {
                 $findInput.focusInput();
@@ -267,7 +267,7 @@ pandora.ui.home = function() {
     };
 
     that.showScreen = function() {
-        Ox.print('SHOW SCREEN')
+        Ox.Log('', 'SHOW SCREEN')
         $logo.css({width: '320px'});
         that.find(':not(#logo)').css({opacity: 1});
         that.css({opacity: 1}).appendTo(Ox.UI.$body);

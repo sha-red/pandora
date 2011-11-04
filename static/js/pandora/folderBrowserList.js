@@ -158,7 +158,7 @@ pandora.ui.folderBrowserList = function(id) {
                         id: data.id,
                         status: that.value(data.id, 'status') == 'featured' ? 'public' : 'featured'
                     }, function(result) {
-                        Ox.print('result', result)
+                        Ox.Log('', 'result', result)
                         if (result.data.user == pandora.user.username || result.data.subscribed) {
                             Ox.Request.clearCache(); // fixme: remove
                             pandora.$ui.folderList[

@@ -225,9 +225,9 @@ pandora.Query = (function() {
         fromString: function(str) {
             var query = Ox.unserialize(str),
                 data = parseFind(query.find || '');
-            Ox.print(Ox.repeat('-', 120));
-            Ox.print('STATE', data);
-            Ox.print(Ox.repeat('-', 120));
+            Ox.Log('', Ox.repeat('-', 120));
+            Ox.Log('', 'STATE', data);
+            Ox.Log('', Ox.repeat('-', 120));
             pandora.UI.set({list: data.list});
             !pandora.user.ui.lists[data.list] && pandora.UI.set(
                 'lists|' + data.list, pandora.site.user.ui.lists['']
@@ -255,7 +255,7 @@ pandora.Query = (function() {
 
         /*
         toObject: function(groupId) {
-            //Ox.print('tO', pandora.user.ui.findQuery.conditions)
+            //Ox.Log('', 'tO', pandora.user.ui.findQuery.conditions)
             // the inner $.merge() creates a clone
             var conditions = $.merge(
                     $.merge([], pandora.user.ui.listQuery.conditions),
@@ -269,7 +269,7 @@ pandora.Query = (function() {
                 }
             }) : []);
             operator = conditions.length < 2 ? '' : ','; // fixme: should be &
-            //Ox.print('>>', groupId, pandora.user.ui.find, conditions);
+            //Ox.Log('', '>>', groupId, pandora.user.ui.find, conditions);
             return {
                 conditions: conditions,
                 operator: operator
@@ -278,7 +278,7 @@ pandora.Query = (function() {
         */
 
         toString: function() {
-            //Ox.print('tS', pandora.user.ui.find)
+            //Ox.Log('', 'tS', pandora.user.ui.find)
             if (!pandora.user.ui.item) {
                 var sort = pandora.user.ui.lists[pandora.user.ui.list].sort[0],
                     key = sort.key,

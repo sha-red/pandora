@@ -5,7 +5,7 @@ pandora.URL = (function() {
     var self = {}, that = {};
 
     function getState(keys) {
-        Ox.print('GET STATE, UI', pandora.user.ui)
+        Ox.Log('', 'GET STATE, UI', pandora.user.ui)
         var state = {};
         /*
         if (keys.indexOf('type') > -1) {
@@ -106,13 +106,13 @@ pandora.URL = (function() {
                 state.find = pandora.user.ui.itemFind;
             }
         }
-        Ox.print('STATE .................... ->', state)
+        Ox.Log('', 'STATE .................... ->', state)
         return state;
     }
 
     function setState(state, callback) {
 
-        Ox.print('SET STATE:', state)
+        Ox.Log('', 'SET STATE:', state)
         var find, previousUI = pandora.UI.getPrevious();
 
         pandora.user.ui._list = pandora.getListsState(pandora.user.ui.find);
@@ -351,7 +351,7 @@ pandora.URL = (function() {
                 $('body > .OxVideoPlayer').remove();
             }
             if (!Ox.isEmpty(e.state)) {
-                Ox.print('E.STATE', e.state)
+                Ox.Log('', 'E.STATE', e.state)
                 document.title = e.state.title;
                 setState(e.state);
             } else {
@@ -404,7 +404,7 @@ pandora.URL = (function() {
     };
 
     that.update = function(keys) {
-        Ox.print('update.........', keys)
+        Ox.Log('', 'update.........', keys)
         // this gets called from pandora.UI
         var action;
         if (!keys) {

@@ -27,7 +27,7 @@ pandora.ui.clipPlayer = function() {
                 range: range,
                 sort: pandora.user.ui.listSort
             } : {}), function(result) {
-                //Ox.print('API findClips range', range, 'result', result.data);
+                //Ox.Log('', 'API findClips range', range, 'result', result.data);
                 if (!range) {
                     callback(result.data.items);
                 } else {
@@ -37,7 +37,7 @@ pandora.ui.clipPlayer = function() {
                     result.data.items.forEach(function(item, i) {
                         var id = item.id.split('/')[0];
                         pandora.api.get({id: id, keys: ['durations']}, function(result) {
-                            //Ox.print('API get item', id, 'result', result.data);
+                            //Ox.Log('', 'API get item', id, 'result', result.data);
                             var points = [item['in'], item.out],
                                 partsAndPoints = pandora.getVideoPartsAndPoints(result.data.durations, points);
                             data[i] = {

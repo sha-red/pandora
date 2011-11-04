@@ -38,7 +38,7 @@ pandora.UI = (function() {
             args = Ox.makeObject([arguments[0], arguments[1]]);
             triggerEvents = Ox.isUndefined(arguments[2]) ? true : arguments[1];
         }
-        Ox.print('UI SET', args)
+        Ox.Log('', 'UI SET', args)
         self.previousUI = Ox.clone(pandora.user.ui, true);
         self.previousUI._list = pandora.getListsState(self.previousUI.find);
         if ('find' in args) {
@@ -60,7 +60,7 @@ pandora.UI = (function() {
                 add['lists.' + that.encode(list)] = {};
             }
             if (list != self.previousUI._list) {
-                Ox.print('FIND HAS CHANGED LIST')
+                Ox.Log('', 'FIND HAS CHANGED LIST')
                 if (!pandora.user.ui.lists[list]) {
                     add['lists.' + that.encode(list)] = {};
                 }
@@ -119,7 +119,7 @@ pandora.UI = (function() {
         });
         [args, add].forEach(function(obj, isAdd) {
             Ox.forEach(obj, function(val, key) {
-                Ox.print('key/val', key, val)
+                Ox.Log('', 'key/val', key, val)
                 // make sure to not split at escaped dots ('\.')
                 var keys = key.replace(/\\\./g, '\n').split('.').map(function(key) {
                         return key.replace(/\n/g, '.')
