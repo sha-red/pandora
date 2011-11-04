@@ -115,7 +115,6 @@ appPanel
         loadingScreen.style.backgroundColor = theme == 'classic'
             ? 'rgb(224, 224, 224)' : 'rgb(32, 32, 32)';
         loadingScreen.style.zIndex = '1001';
-        Ox.print(images)
         loadingScreen.appendChild(images.logo);
         loadingScreen.appendChild(images.reflection);
         loadingScreen.appendChild(gradient);
@@ -138,7 +137,7 @@ appPanel
                 theme: theme
             },
             Geo: {}
-        }, callback)
+        }, callback);
     }
 
     function loadPandora(browserSupported) {
@@ -237,7 +236,6 @@ appPanel
                 }) : null;
             })
         });
-
         pandora.site.listSettings = {};
         Ox.map(pandora.site.user.ui, function(val, key) {
             if (/^list[A-Z]/.test(key)) {
