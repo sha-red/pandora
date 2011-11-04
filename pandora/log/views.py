@@ -47,7 +47,7 @@ def log(request):
         l.save()
     response = json_response()
     return render_to_json_response(response)
-actions.register(log)
+actions.register(log, cache=False)
 
 
 @admin_required_json
