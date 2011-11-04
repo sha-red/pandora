@@ -54,7 +54,7 @@ pandora.ui.accountDialogOptions = function(action, value) {
                 id: 'cancel' + Ox.toTitleCase(action),
                 title: 'Cancel'
             }).bindEvent('click', function() {
-                pandora.$ui.accountDialog.close();
+                pandora.$ui.accountDialog.close().remove();
                 pandora.URL.update();
             });
         } else if (type == 'submit') {
@@ -140,7 +140,7 @@ pandora.ui.accountForm = function(action, value) {
                 if (action == 'signin') {
                     pandora.api.signin(data, function(result) {
                         if (!result.data.errors) {
-                            pandora.$ui.accountDialog.close();
+                            pandora.$ui.accountDialog.close().remove();
                             pandora.signin(result.data);
                         } else {
                             pandora.$ui.accountDialog.enableButtons();
@@ -150,7 +150,7 @@ pandora.ui.accountForm = function(action, value) {
                 } else if (action == 'signup') {
                     pandora.api.signup(data, function(result) {
                         if (!result.data.errors) {
-                            pandora.$ui.accountDialog.close();
+                            pandora.$ui.accountDialog.close().remove();
                             pandora.signin(result.data);
                             pandora.ui.accountWelcomeDialog().open();
                         } else {
@@ -174,7 +174,7 @@ pandora.ui.accountForm = function(action, value) {
                 } else if (action == 'resetAndSignin') {
                     pandora.api.resetPassword(data, function(result) {
                         if (!result.data.errors) {
-                            pandora.$ui.accountDialog.close();
+                            pandora.$ui.accountDialog.close().remove();
                             pandora.signin(result.data);
                         } else {
                             pandora.$ui.accountDialog.enableButtons();
@@ -320,14 +320,14 @@ pandora.ui.accountSignoutDialog = function() {
                 id: 'cancel',
                 title: 'Cancel'
             }).bindEvent('click', function() {
-                that.close();
+                that.close().remove();
                 pandora.URL.update();
             }),
             Ox.Button({
                 id: 'signout',
                 title: 'Sign Out'
             }).bindEvent('click', function() {
-                that.close();
+                that.close().remove();
                 pandora.api.signout({}, function(result) {
                     pandora.signout(result.data);
                 });
@@ -360,7 +360,7 @@ pandora.ui.accountWelcomeDialog = function() {
                     id: 'preferences',
                     title: 'Preferences...'
                 }).bindEvent('click', function() {
-                    that.close();
+                    that.close().remove();
                     pandora.$ui.preferencesDialog = pandora.ui.preferencesDialog().open();
                 }),
                 {},
@@ -368,7 +368,7 @@ pandora.ui.accountWelcomeDialog = function() {
                     id: 'close',
                     title: 'Close'
                 }).bindEvent('click', function() {
-                    that.close();
+                    that.close().remove();
                 })
             ],
             content: Ox.Element()

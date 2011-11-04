@@ -11,6 +11,8 @@ from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
 
+import monkey_patch.models
+
 from api import actions
 actions.autodiscover()
 

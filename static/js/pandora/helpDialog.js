@@ -8,7 +8,7 @@ pandora.ui.helpDialog = function() {
                 title: 'Close'
             }).bindEvent({
                 click: function() {
-                    that.close();
+                    that.close().remove();
                     //fixme: this should be using URL.push / UI.set
                     //but that currenlty causes a reload
                     history.pushState({}, '', '/');

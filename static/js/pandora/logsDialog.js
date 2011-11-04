@@ -86,9 +86,6 @@ pandora.ui.logsDialog = function() {
                     {
                         id: 'text',
                         title: 'Text',
-                        tooltip: function(data) {
-                            return $('<code>').append($('<pre>').append(data.text));
-                        },
                         visible: true,
                         width: 640
                     },

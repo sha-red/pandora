@@ -34,8 +34,8 @@ class List(models.Model):
     icon = models.ImageField(default=None, blank=True,
                              upload_to=lambda i, x: i.path("icon.jpg"))
 
-    view = models.TextField(default=settings.CONFIG['user']['ui']['listView'])
-    sort = TupleField(default=settings.CONFIG['user']['ui']['listSort'], editable=False)
+    view = models.TextField(default=lambda: settings.CONFIG['user']['ui']['listView'])
+    sort = TupleField(default=lambda: settings.CONFIG['user']['ui']['listSort'], editable=False)
 
     poster_frames = TupleField(default=[], editable=False)
 
