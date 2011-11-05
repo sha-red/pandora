@@ -173,7 +173,7 @@ pandora.ui.item = function() {
                 position: pandora.user.ui.videoPoints[pandora.user.ui.item].position,
                 scaleToFill: pandora.user.ui.videoScale == 'fill',
                 showAnnotations: pandora.user.ui.showAnnotations,
-                showControls: pandora.user.ui.showControls,
+                showTimeline: pandora.user.ui.showTimeline,
                 subtitles: subtitles,
                 tooltips: true,
                 timeline: '/' + pandora.user.ui.item + '/timeline16p.png',
@@ -205,14 +205,17 @@ pandora.ui.item = function() {
                 toggleannotations: function(data) {
                     pandora.UI.set('showAnnotations', data.showAnnotations);
                 },
-                togglecontrols: function(data) {
-                    pandora.UI.set('showControls', data.showControls);
+                toggletimeline: function(data) {
+                    pandora.UI.set('showTimeline', data.showTimeline);
                 },
                 volume: function(data) {
                     pandora.UI.set('videoVolume', data.volume);
                 },
                 pandora_showannotations: function(data) {
                     pandora.$ui.player.options({showAnnotations: data.value});
+                },
+                pandora_showtimeline: function(data) {
+                    pandora.$ui.player.options({showTimeline: data.value});
                 }
             }));
 

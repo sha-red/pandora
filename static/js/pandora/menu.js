@@ -100,6 +100,7 @@ pandora.ui.mainMenu = function() {
                         { id: 'showgroups', title: (ui.showGroups ? 'Hide' : 'Show') + ' Groups', disabled: !!ui.item, keyboard: 'shift g' },
                         { id: 'showbrowser', title: (ui.showBrowser ? 'Hide' : 'Show') + ' ' + pandora.site.itemName.singular + ' Browser', disabled: !ui.item, keyboard: 'shift b' },
                         { id: 'showannotations', title: (ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations', disabled: !ui.item || ['timeline', 'video'].indexOf(ui.itemView) == -1, keyboard: 'shift a' },
+                        { id: 'showtimeline', title: (ui.showTimeline ? 'Hide' : 'Show') + ' Timeline', disabled: !ui.item || ui.itemView != 'video', keyboard: 'shift t' },
                         {},
                         { id: 'theme', title: 'Theme', items: [
                             { group: 'settheme', min: 1, max: 1, items: [
@@ -241,6 +242,8 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set({showBrowser: !ui.showBrowser});
                 } else if (data.id == 'showannotations') {
                     pandora.UI.set({showAnnotations: !ui.showAnnotations});
+                } else if (data.id == 'showtimeline') {
+                    pandora.UI.set({showTimeline: !ui.showTimeline});
                 } else if (data.id == 'titles') {
                     (pandora.$ui.titlesDialog || (
                         pandora.$ui.titlesDialog = pandora.ui.titlesDialog()
@@ -305,7 +308,7 @@ pandora.ui.mainMenu = function() {
                 }
             },
             key_shift_a: function() {
-                ui.item && ['video', 'timeline'].indexOf(ui.view) > -1
+                ui.item && ['video', 'timeline'].indexOf(ui.itemView) > -1
                     && pandora.UI.set({showAnnotations: !ui.showAnnotations});
             },
             key_shift_b: function() {
@@ -319,6 +322,10 @@ pandora.ui.mainMenu = function() {
             },
             key_shift_s: function() {
                 pandora.UI.set({showSidebar: !ui.showSidebar});
+            },
+            key_shift_t: function() {
+                ui.item && ui.itemView == 'video'
+                    && pandora.UI.set({showTimeline: !ui.showTimeline});
             },
             pandora_find: function() {
                 var action = ui._list
@@ -350,6 +357,9 @@ pandora.ui.mainMenu = function() {
                 if (isVideoView != wasVideoView) {
                     that[isVideoView ? 'enableItem' : 'disableItem']('showannotations');
                 }
+                if ((data.value == 'video') != (data.previousValue == 'video')) {
+                    that[data.value == 'video' ? 'enableItem' : 'disableItem']('showtimeline');
+                }
             },
             pandora_listselection: function(data) {
                 that[data.value.length ? 'enableItem' : 'disableItem']('newlistfromselection');
@@ -375,6 +385,9 @@ pandora.ui.mainMenu = function() {
             pandora_showsidebar: function(data) {
                 that.setItemTitle('showsidebar', (data.value ? 'Hide' : 'Show') + ' Sidebar');
                 that[data.value ? 'enableItem' : 'disableItem']('showinfo');
+            },
+            pandora_showtimeline: function(data) {
+                that.setItemTitle('showtimeline', (data.value ? 'Hide' : 'Show') + ' Timeline');
             }
         });
 

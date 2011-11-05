@@ -204,9 +204,16 @@ appPanel
             user: data.user
         });
 
+        // make sure all valid ui settings are present
         pandora.user.ui = Ox.extend(
             Ox.clone(pandora.site.user.ui), pandora.user.ui
         );
+        // make sure no invalid ui settings are present
+        Object.keys(pandora.user.ui).forEach(function(key) {
+            if (Ox.isUndefined(pandora.site.user.ui[key])) {
+                delete pandora.user.ui[key];
+            }
+        });
 
         Ox.extend(pandora.site, {
             clipKeys: Ox.map(data.site.clipKeys, function(key) {

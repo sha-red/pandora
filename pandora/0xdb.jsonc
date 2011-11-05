@@ -616,7 +616,6 @@
             "showAnnotations": true,
             "showBrowser": true,
             "showCalendarControls": true, // fixme: should be false
-            "showControls": true,
             "showFlags": true,
             "showGroups": true,
             "showHome": true,
@@ -634,6 +633,7 @@
             },
             "showSidebar": true,
             "showSitePosters": false,
+            "showTimeline": true,
             "sidebarSize": 256,
             "theme": "modern",
             "videoPoints": {},
