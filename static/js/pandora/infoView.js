@@ -132,6 +132,8 @@ pandora.ui.infoView = function(data) {
             })
             .appendTo($data.$element),
 
+        $capabilities,
+
         $browserImages = [];
 
     pandora.createLinks($text);
@@ -761,8 +763,7 @@ pandora.ui.infoView = function(data) {
     }
 
     function renderRightsLevel() {
-        var $capabilities,
-            $rightsLevelElement = getRightsLevelElement(data.rightslevel),
+        var $rightsLevelElement = getRightsLevelElement(data.rightslevel),
             $rightsLevelSelect;
         $rightsLevel.empty();
         if (canEdit) {
