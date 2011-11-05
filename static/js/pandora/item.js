@@ -59,7 +59,7 @@ pandora.ui.item = function() {
                             : Ox.range(0, result.data.duration - 5, 60).map(function(position) {
                                 return {
                                     'in': position + 5,
-                                    out: Math.max(position + 60, result.data.duration)
+                                    out: Math.min(position + 60, result.data.duration)
                                 };
                             })
                     )
