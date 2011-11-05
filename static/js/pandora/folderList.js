@@ -382,7 +382,7 @@ pandora.ui.folderList = function(id) {
                 });
             },
             submit: function(data) {
-                data_ = {id: data.id};
+                var data_ = {id: data.id};
                 data_[data.key] = data.value;
                 pandora.api.editList(data_, function(result) {
                     if (result.data.id != data.id) {

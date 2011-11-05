@@ -29,12 +29,16 @@ pandora.ui.mainPanel = function() {
                     } else {
                         pandora.$ui.list.reloadList();
                     }
+                    // FIXME: why is this being handled _here_?
                     pandora.user.ui._groupsState.forEach(function(data, i) {
                         if (!Ox.isEqual(data.selected, previousUI._groupsState[i].selected)) {
                             pandora.$ui.groups[i].options({selected: data.selected});
                         }
                         if (!Ox.isEqual(data.find, previousUI._groupsState[i].find)) {
+                            Ox.print(i, 'NOT EQUAL', data.find, previousUI._groupsState[i].find)
                             pandora.$ui.groups[i].reloadList();
+                        } else {
+                            Ox.print(i, 'EQUAL', data.find, previousUI._groupsState[i].find)
                         }
                     });
                 } else {

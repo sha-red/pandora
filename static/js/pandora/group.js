@@ -145,13 +145,7 @@ pandora.ui.group = function(id) {
                         }
                     }
                 }
-                /*
-                pandora.Query.updateGroups();
-                pandora.URL.push(pandora.Query.toString());
-                pandora.reloadGroups(i);
-                */
                 pandora.UI.set('find', find);
-                //pandora.URL.push();
             },
             sort: function(data) {
                 Ox.Log('', 'SORT', data)
@@ -175,20 +169,23 @@ pandora.ui.group = function(id) {
             type: 'image'
         })
         .bindEvent('change', function(data) {
-            var groups = Ox.clone(pandora.user.ui.groups),
+            var find,
+                groups = Ox.clone(pandora.user.ui.groups),
                 id_ = data.selected[0].id,
                 i_ = Ox.getPositionById(pandora.user.ui.groups, id_);
             if (i_ == -1) {
                 // new group was not part of old group set
                 if (pandora.user.ui._groupsState[i].selected.length) {
-                    // if group with selection gets replaced, reload
-                    pandora.user.ui.find.conditions.splice(pandora.user.ui._groupsState[i].index, 1);
-                    pandora.Query.updateGroups();
-                    pandora.URL.push(pandora.Query.toString());
-                    pandora.reloadGroups(i);
+                    // if group with selection gets replaced, update find
+                    find = Ox.clone(pandora.user.ui.find, true);
+                    find.conditions.splice(pandora.user.ui._groupsState[i].index, 1);
                 }
                 groups[i] = makeGroup(id_);
-                pandora.UI.set({groups: groups});
+                pandora.UI.set(Ox.extend({
+                    groups: groups
+                }, find ? {
+                    find: find
+                } : {}));
                 replaceGroup(i, id_);
                 // fixme: there is an obscure special case not yet covered:
                 // switching to a new group may change find from advanced to not advanced
@@ -204,9 +201,8 @@ pandora.ui.group = function(id) {
                 replaceGroup(i, id_);
                 replaceGroup(i_, id);
             }
-            //pandora.$ui.mainMenu.replaceMenu('sortMenu', pandora.getSortMenu());
             function makeGroup(id, sort) {
-                // makes user.ui.groups object from site.groups object
+                // makes user.ui._groups object from site.groups object
                 var group = Ox.getObjectById(pandora.site.groups, id);
                 return {
                     id: group.id,
