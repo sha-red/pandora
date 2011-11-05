@@ -188,7 +188,7 @@ pandora.ui.item = function() {
                     } : pandora.site.user.ui.itemFind);
                 },
                 muted: function(data) {
-                    pandora.UI.set('muted', data.muted);
+                    pandora.UI.set('videoMuted', data.muted);
                 },
                 position: function(data) {
                     pandora.UI.set('videoPoints.' + pandora.user.ui.item + '.position', data.position);
@@ -206,7 +206,7 @@ pandora.ui.item = function() {
                     pandora.UI.set('showControls', data.showControls);
                 },
                 volume: function(data) {
-                    pandora.UI.set('volume', data.volume);
+                    pandora.UI.set('videoVolume', data.volume);
                 },
                 pandora_showannotations: function(data) {
                     pandora.$ui.player.options({showAnnotations: data.value});
@@ -246,6 +246,7 @@ pandora.ui.item = function() {
                     video: video,
                     videoRatio: result.data.videoRatio,
                     videoSize: pandora.user.ui.videoSize,
+                    volume: pandora.user.ui.videoVolume,
                     width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
                 }).bindEvent({
                     find: function(data) {
@@ -253,6 +254,9 @@ pandora.ui.item = function() {
                             conditions: [{key: 'subtitles', value: data.find, operator: '='}],
                             operator: '&'
                         } : pandora.site.user.ui.itemFind);
+                    },
+                    muted: function(data) {
+                        pandora.UI.set('videoMuted', data.muted);
                     },
                     points: function(data) {
                         pandora.UI.set('videoPoints.' + pandora.user.ui.item, {
