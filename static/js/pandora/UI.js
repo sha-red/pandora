@@ -1,7 +1,4 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
-
-'use strict';
-
 pandora.UI = (function() {
 
     var self = {}, that = {};
@@ -31,12 +28,12 @@ pandora.UI = (function() {
 
         var add = {},
             args,
-            doNotTriggerEvents,
             item,
             list,
             listSettings = pandora.site.listSettings,
             set = {},
-            trigger = {};
+            trigger = {},
+            triggerEvents;
 
         if (Ox.isObject(arguments[0])) {
             args = arguments[0];

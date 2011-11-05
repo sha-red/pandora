@@ -761,8 +761,8 @@ pandora.ui.infoView = function(data) {
     }
 
     function renderRightsLevel() {
-        var $capabilites,
-            $rightsLevelElement = getRightsLevelElement(data.rightslevel),
+        var $capabilities,
+            $rightsLevelElement,
             $rightsLevelSelect;
         $rightsLevel.empty();
         if (canEdit) {
@@ -793,7 +793,7 @@ pandora.ui.infoView = function(data) {
                 })
                 .appendTo($rightsLevel);
         } else {
-            $rightsLevelElement
+            $rightsLevelElement = getRightsLevelElement(data.rightslevel)
                 .css({
                     marginBottom: '4px'
                 })
