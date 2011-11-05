@@ -99,7 +99,7 @@ pandora.ui.browser = function() {
             pageLength: 32,
             selected: [pandora.user.ui.item],
             size: 64,
-            sort: ['text', 'position'].indexOf(pandora.user.ui.listSort) > -1
+            sort: ['text', 'position'].indexOf(pandora.user.ui.listSort[0].key) > -1
                 ? pandora.site.user.ui.listSort: pandora.user.ui.listSort,
             unique: 'id'
         })
