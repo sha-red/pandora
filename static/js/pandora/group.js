@@ -204,7 +204,7 @@ pandora.ui.group = function(id) {
                 replaceGroup(i, id_);
                 replaceGroup(i_, id);
             }
-            pandora.$ui.mainMenu.replaceMenu('sortMenu', pandora.getSortMenu());
+            //pandora.$ui.mainMenu.replaceMenu('sortMenu', pandora.getSortMenu());
             function makeGroup(id, sort) {
                 // makes user.ui.groups object from site.groups object
                 var group = Ox.getObjectById(pandora.site.groups, id);

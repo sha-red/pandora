@@ -1,5 +1,4 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
-'use strict';
 pandora.ui.mainMenu = function() {
 
     var isAdmin = pandora.user.level == 'admin',
@@ -329,6 +328,9 @@ pandora.ui.mainMenu = function() {
                 that[action]('duplicatelist');
                 that[action]('deletelist');
                 that[ui.listSelection.length ? 'enableItem' : 'disableItem']('newlistfromselection');
+            },
+            pandora_groups: function(data) {
+                that.replaceMenu('sortMenu', getSortMenu());
             },
             pandora_item: function(data) {
                 if (!!data.value != !!data.previousValue) {
