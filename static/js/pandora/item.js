@@ -191,7 +191,10 @@ pandora.ui.item = function() {
                     pandora.UI.set('videoMuted', data.muted);
                 },
                 position: function(data) {
-                    pandora.UI.set('videoPoints.' + pandora.user.ui.item + '.position', data.position);
+                    pandora.UI.set(
+                        'videoPoints.' + pandora.user.ui.item + '.position',
+                        data.position
+                    );
                 },
                 resizeannotations: function(data) {
                     pandora.UI.set('annotationsSize', data.annotationsSize);
@@ -266,10 +269,12 @@ pandora.ui.item = function() {
                         });
                     },
                     position: function(data) {
-                        pandora.UI.set('videoPoints.' + pandora.user.ui.item + '.position', data.position);
+                        pandora.UI.set(
+                            'videoPoints.' + pandora.user.ui.item + '.position',
+                            data.position
+                        );
                     },
                     resize: function(data) {
-                        Ox.Log('', 'RESIZE!!', data.size)
                         pandora.$ui.editor.options({
                             height: data.size
                         });
