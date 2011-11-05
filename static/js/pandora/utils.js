@@ -174,7 +174,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
             drag.source = pandora.getListData(),
             drag.targets = {};
             Ox.forEach(pandora.$ui.folderList, function($list) {
-                $list.addClass('OxDroppable').find('.OxItem').each(function() {
+                $list.addClass('OxDroppable').$element.find('.OxItem').each(function() {
                     var $item = $(this),
                         id = $item.data('id'),
                         data = $list.value(id);
