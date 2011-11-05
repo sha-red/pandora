@@ -5,109 +5,48 @@ pandora.URL = (function() {
     var self = {}, that = {};
 
     function getState(keys) {
-        Ox.Log('', 'GET STATE, UI', pandora.user.ui)
+
+        Ox.Log('GET STATE, UI', pandora.user.ui)
+
         var state = {};
-        /*
-        if (keys.indexOf('type') > -1) {
-            state.type = pandora.user.ui.section == 'items'
-                ? pandora.site.itemsSection
-                : pandora.user.ui.section;
-        }
-        */
+
         state.type = pandora.site.itemsSection;
-        if (!keys || keys.indexOf('item') > -1) {
-            state.item = pandora.user.ui.item;
-            if (pandora.user.ui.item) {
-                state.view = pandora.user.ui.itemView;
-            }
-        }
-        if (!keys || keys.indexOf('listView') > -1 || keys.indexOf('itemView') > -1) {
-            if (!pandora.user.ui.item) {
-                state.view = pandora.user.ui.listView;
-                state.sort = pandora.user.ui.listSort;
-            } else {
-                state.item = pandora.user.ui.item;
-                state.view = pandora.user.ui.itemView;
-                state.sort = pandora.user.ui.itemSort;
-            }
-        }
-        if (!keys || keys.indexOf('mapSelection') > -1) {
-            state.item = pandora.user.ui.item;
-            state.view = 'map';
-            state.span = pandora.user.ui.mapSelection
-                ? '@' + pandora.user.ui.mapSelection : '';
-            state.sort = !pandora.user.ui.item
-                ? pandora.user.ui.listSort : pandora.user.ui.itemSort;
-        }
-        if (!keys || keys.indexOf('mapFind') > -1) {
-            state.item = pandora.user.ui.item;
-            state.view = 'map';
-            state.span = pandora.user.ui.mapFind
-                ? '@' + pandora.user.ui.mapFind : '';
-            state.sort = !pandora.user.ui.item
-                ? pandora.user.ui.listSort : pandora.user.ui.itemSort;
-        }
-        if (!keys || keys.filter(function(key) {
-            return /^videoPoints/.test(key);
-        }).length) {
-            var videoPoints = pandora.user.ui.videoPoints;
-            state.item = pandora.user.ui.item;
-            state.view = pandora.user.ui.itemView;
-            state.span = [];
-            if (
-                pandora.user.ui.item
-                && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
-                && videoPoints[pandora.user.ui.item]
-            ) {
-                videoPoints = videoPoints[pandora.user.ui.item];
-                state.span = Ox.merge(
-                    videoPoints.position
-                        ? videoPoints.position
-                        : [],
-                    videoPoints['in'] || videoPoints.out
-                        ? [videoPoints['in'], videoPoints.out]
-                        : []
-                );
-            }
-        }
-        if (!keys || keys.indexOf('listSort') > -1 || keys.indexOf('itemSort') > -1) {
-            if (!pandora.user.ui.item) {
-                state.view = pandora.user.ui.listView;
-                state.sort = pandora.user.ui.listSort;
-            } else {
-                state.item = pandora.user.ui.item;
-                state.view = pandora.user.ui.itemView;
-                state.sort = pandora.user.ui.itemSort;
-            }
-            if (state.view == 'map') {
-                if (pandora.user.ui.mapSelection) {
-                    state.span = '@' + pandora.user.ui.mapSelection;
-                } else if (pandora.user.ui.mapFind) {
-                    state.span = '@' + pandora.user.ui.mapFind;
-                }
-            }
-            /*
-            : pandora.isClipView(pandora.user.ui.itemView)
-                ? pandora.user.ui.itemSort : [],
-            */
-        }
-        if (!state.item) {
+
+        state.item = pandora.user.ui.item;
+
+        if (!pandora.user.ui.item) {
+            state.view = pandora.user.ui.listView;
+            state.sort = pandora.user.ui.listSort;
             state.find = pandora.user.ui.find;
+        } else {
+            state.view = pandora.user.ui.itemView;
+            state.sort = pandora.user.ui.itemSort;
         }
-        if (!keys || keys.indexOf('find') > -1) {
-            if (!pandora.user.ui.item) {
-                state.view = pandora.user.ui.listView;
-                state.sort = pandora.user.ui.listSort;
-                state.find = pandora.user.ui.find;
-            } else {
-                state.item = pandora.user.ui.item;
-                state.view = pandora.user.ui.itemView;
-                state.sort = pandora.user.ui.itemSort;
-                state.find = pandora.user.ui.itemFind;
-            }
+
+        if (state.view == 'map') {
+            state.span = pandora.user.ui.mapFind
+                ? '@' + pandora.user.ui.mapFind
+                : pandora.user.ui.mapSelection
+                ? '@' + pandora.user.ui.mapSelection
+                : '';
+        } else if (state.view == 'calendar') {
+            // ...
+        } else if (['video', 'timeline'].indexOf(state.view) > -1) {
+            var videoPoints = pandora.user.ui.videoPoints[state.item] || {};
+            state.span = Ox.merge(
+                videoPoints.position
+                    ? videoPoints.position
+                    : [],
+                videoPoints['in'] || videoPoints.out
+                    ? [videoPoints['in'], videoPoints.out]
+                    : []
+            );
         }
-        Ox.Log('', 'STATE .................... ->', state)
+
+        Ox.Log('STATE .................... ->', state)
+
         return state;
+
     }
 
     function setState(state, callback) {
@@ -387,7 +326,7 @@ pandora.URL = (function() {
     that.update = function(keys) {
         Ox.Log('', 'update.........', keys)
         // this gets called from pandora.UI
-        var action;
+        var action, state;
         if (!keys) {
             // may get called from home screen too
             keys = !pandora.user.ui.item
@@ -411,7 +350,8 @@ pandora.URL = (function() {
             } else {
                 action = 'push';
             }
-            self.URL[action](getState(), pandora.getPageTitle(), getState(/*keys*/));
+            state = getState();
+            self.URL[action](state, pandora.getPageTitle(), state);
         }
     };
 
