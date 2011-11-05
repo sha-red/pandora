@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+'use strict';
 pandora.ui.folderBrowserList = function(id) {
     // fixme: user and name are set to the same width here,
     // but resizeFolders will set them to different widths

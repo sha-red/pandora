@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+'use strict';
 pandora.ui.helpDialog = function() {
     var content = Ox.Element().css({margin: '16px'}),
         that = Ox.Dialog({

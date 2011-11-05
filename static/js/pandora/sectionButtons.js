@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+'use strict';
 pandora.ui.sectionButtons = function() {
     var that = Ox.ButtonGroup({
             buttons: [

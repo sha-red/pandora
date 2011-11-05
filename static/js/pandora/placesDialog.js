@@ -1,5 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
+'use strict';
+
 pandora.ui.placesDialog = function() {
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = Math.round(window.innerWidth * 0.9),

@@ -1,5 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
+'use strict';
+
 // fixme: this should be deleted!!
 
 pandora.ui.annotations = function() {

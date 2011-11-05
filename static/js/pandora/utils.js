@@ -1,5 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
+'use strict';
+
 pandora.addList = function() {
     // addList(isSmart, isFrom) or addList(list) [=duplicate]
     var $folderList = pandora.$ui.folderList.personal,

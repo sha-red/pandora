@@ -1,4 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+
+'use strict';
+
 pandora.ui.usersDialog = function() {
 
     var height = Math.round((window.innerHeight - 48) * 0.9),

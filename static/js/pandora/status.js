@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+'use strict';
 pandora.ui.status = function(key, data) {
     var itemName = data.items != 1 ? pandora.site.itemName.plural : pandora.site.itemName.singular,
         segments = [],

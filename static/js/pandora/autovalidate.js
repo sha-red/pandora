@@ -1,5 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
+'use strict';
+
 pandora.autovalidateCode = function(value, blur, callback) {
     value = value.toUpperCase().split('').map(function(v) {
         return /[A-Z]/.test(v) ? v : null;

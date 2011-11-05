@@ -1,3 +1,5 @@
+'use strict';
+
 pandora.ui.infoView = function(data) {
 
     // fixme: given that currently, the info view doesn't scroll into view nicely

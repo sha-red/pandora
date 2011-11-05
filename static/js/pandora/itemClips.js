@@ -1,3 +1,5 @@
+'use strict';
+
 pandora.ui.itemClips = function(options) {
 
     var self = {},

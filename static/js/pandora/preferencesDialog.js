@@ -1,3 +1,5 @@
+'use strict';
+
 pandora.ui.preferencesDialog = function() {
 
     var tabs = [

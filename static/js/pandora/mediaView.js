@@ -1,3 +1,5 @@
+'use strict';
+
 pandora.ui.mediaView = function() {
 
     var item = pandora.user.ui.item,

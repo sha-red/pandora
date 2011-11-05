@@ -1,5 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
+'use strict';
+
 pandora.ui.rightPanel = function() {
     var that;
     if (pandora.user.ui.section == 'items') {

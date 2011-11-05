@@ -1,5 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 
+'use strict';
+
 // fixme: remove
 
 pandora.ui.homePage = function() {

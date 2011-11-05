@@ -1,5 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
-
+'use strict';
 pandora.ui.orderButton = function(isNavigationView) {
     var sortKey = !pandora.user.ui.item ? 'listSort' : 'itemSort',
         that = Ox.Button({

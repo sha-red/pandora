@@ -1,4 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+
+'use strict';
+
 pandora.ui.filter = function(list) {
     var that = Ox.Filter({
             findKeys: Ox.merge(Ox.map(pandora.site.itemKeys, function(key) {

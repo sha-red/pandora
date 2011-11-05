@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+'use strict';
 pandora.ui.contentPanel = function() {
     var that = Ox.SplitPanel({
             elements: !pandora.user.ui.item ? [

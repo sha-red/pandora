@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+'use strict';
 pandora.ui.filterDialog = function(list) {
     var that = Ox.Dialog({
         buttons: [

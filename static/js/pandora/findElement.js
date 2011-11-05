@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+'use strict';
 pandora.ui.findElement = function() {
     var findIndex = pandora.user.ui._findState.index,
         findKey = pandora.user.ui._findState.key,

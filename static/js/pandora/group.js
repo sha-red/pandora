@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+'use strict';
 pandora.ui.group = function(id) {
     var i = Ox.getPositionById(pandora.user.ui.groups, id),
         group = Ox.getObjectById(pandora.site.groups, id),
