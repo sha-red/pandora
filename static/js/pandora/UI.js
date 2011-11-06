@@ -16,8 +16,8 @@ pandora.UI = (function() {
 
     that.reset = function() {
         pandora.user.ui = pandora.site.user.ui;
-        pandora.user.ui._list = pandora.getListsState(pandora.user.ui.find);
-        pandora.user.ui._groupsState = pandora.getGroupsState(pandora.user.ui.find);
+        pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
+        pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
         pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
     };
 
@@ -46,16 +46,16 @@ pandora.UI = (function() {
         Ox.Log('UI', 'SET', args)
 
         self.previousUI = Ox.clone(pandora.user.ui, true);
-        self.previousUI._list = pandora.getListsState(self.previousUI.find);
+        self.previousUI._list = pandora.getListState(self.previousUI.find);
 
         if ('find' in args) {
             // the challenge here is that find may change list,
             // and list may then change listSort and listView,
             // which we don't want to trigger, since find triggers
             // (values we put in add will be changed, but won't trigger)
-            list = pandora.getListsState(args.find);
+            list = pandora.getListState(args.find);
             pandora.user.ui._list = list;
-            pandora.user.ui._groupsState = pandora.getGroupsState(args.find);
+            pandora.user.ui._filterState = pandora.getFilterState(args.find);
             pandora.user.ui._findState = pandora.getFindState(args.find);
             if (pandora.$ui.appPanel) {
                 // if we're not on page load,

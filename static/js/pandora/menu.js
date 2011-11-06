@@ -85,19 +85,19 @@ pandora.ui.mainMenu = function() {
                             }) }
                         ] },
                         {},
-                        { id: 'groups', title: 'Groups', items: [
-                            { group: 'groups', min: 5, max: 5, items: pandora.site.groups.map(function(group) {
+                        { id: 'filters', title: 'Filters', items: [
+                            { group: 'filters', min: 5, max: 5, items: pandora.site.filters.map(function(filter) {
                                 return Ox.extend({
-                                    checked: Ox.getPositionById(ui.groups, group.id) > -1
-                                }, group);
+                                    checked: Ox.getPositionById(ui.filters, filter.id) > -1
+                                }, filter);
                             }) },
                             {},
-                            { id: 'resetgroups', title: 'Reset Groups' }
+                            { id: 'resetfilters', title: 'Reset Filters' }
                         ] },
                         {},
                         { id: 'showsidebar', title: (ui.showSidebar ? 'Hide' : 'Show') + ' Sidebar', keyboard: 'shift s' },
                         { id: 'showinfo', title: (ui.showInfo ? 'Hide' : 'Show') + ' Info', disabled: !ui.showSidebar, keyboard: 'shift i' },
-                        { id: 'showgroups', title: (ui.showGroups ? 'Hide' : 'Show') + ' Groups', disabled: !!ui.item, keyboard: 'shift g' },
+                        { id: 'showfilters', title: (ui.showFilters ? 'Hide' : 'Show') + ' Filters', disabled: !!ui.item, keyboard: 'shift f' },
                         { id: 'showbrowser', title: (ui.showBrowser ? 'Hide' : 'Show') + ' ' + pandora.site.itemName.singular + ' Browser', disabled: !ui.item, keyboard: 'shift b' },
                         { id: 'showannotations', title: (ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations', disabled: !ui.item || ['timeline', 'video'].indexOf(ui.itemView) == -1, keyboard: 'shift a' },
                         { id: 'showtimeline', title: (ui.showTimeline ? 'Hide' : 'Show') + ' Timeline', disabled: !ui.item || ui.itemView != 'video', keyboard: 'shift t' },
@@ -159,17 +159,17 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.findSelect.options({value: value});
                 } else if (data.id == 'itemview') {
                     pandora.UI.set({itemView: value});
-                } else if (Ox.startsWith(data.id, 'ordergroup')) {
-                    var groups = Ox.clone(pandora.user.ui.groups),
-                        id = data.id.replace('ordergroup', ''),
-                        position = Ox.getPositionById(groups, id),
-                        key = groups[position].sort[0].key,
+                } else if (Ox.startsWith(data.id, 'orderfilter')) {
+                    var filters = Ox.clone(pandora.user.ui.filters),
+                        id = data.id.replace('orderfilter', ''),
+                        position = Ox.getPositionById(filters, id),
+                        key = filters[position].sort[0].key,
                         operator = value == 'ascending' ? '+' : '-';
-                    pandora.$ui.groups[position].options({
+                    pandora.$ui.filters[position].options({
                         sort: [{key: key, operator: operator}]
                     });
-                    groups[position].sort[0].operator = operator;
-                    pandora.UI.set({groups: groups});
+                    filters[position].sort[0].operator = operator;
+                    pandora.UI.set({filters: filters});
                 } else if (data.id == 'ordermovies') {
                     var key = pandora.user.ui.listSort[0].key,
                         operator = value == 'ascending' ? '+' : '-';
@@ -179,19 +179,22 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set('theme', value);
                 } else if (data.id == 'showsiteposter') {
                     pandora.UI.set('showSitePoster', data.checked)
-                } else if (Ox.startsWith(data.id, 'sortgroup')) {
-                    var groups = Ox.clone(ui.groups),
-                        id = data.id.replace('sortgroup', ''),
-                        position = Ox.getPositionById(groups, id),
-                        type = Ox.getObjectById(pandora.site.groups, id).type,
+                } else if (Ox.startsWith(data.id, 'sortfilter')) {
+                    var filters = Ox.clone(ui.filters),
+                        id = data.id.replace('sortfilter', ''),
+                        position = Ox.getPositionById(filters, id),
+                        type = Ox.getObjectById(pandora.site.filters, id).type,
                         key = value,
                         operator = key == 'name' && type == 'string' ? '+' : '-';
-                    pandora.$ui.mainMenu.checkItem('sortMenu_ordergroups_ordergroup' + id + '_' + (operator == '+' ? 'ascending' : 'descending'))
-                    pandora.$ui.groups[position].options({
+                    pandora.$ui.mainMenu.checkItem(
+                        'sortMenu_orderfilters_orderfilter' + id + '_'
+                        + (operator == '+' ? 'ascending' : 'descending')
+                    );
+                    pandora.$ui.filters[position].options({
                         sort: [{key: key, operator: operator}]
                     });
-                    groups[position].sort[0].key = key;
-                    pandora.UI.set({groups: groups});
+                    filters[position].sort[0].key = key;
+                    pandora.UI.set({filters: filters});
                 } else if (data.id == 'sortmovies') {
                     pandora.UI.set({listSort: [{key: value, operator: ''}]});
                 } else if (data.id == 'viewicons') {
@@ -236,8 +239,8 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set({showSidebar: !ui.showSidebar});
                 } else if (data.id == 'showinfo') {
                     pandora.UI.set({showInfo: !ui.showInfo});
-                } else if (data.id == 'showgroups') {
-                    pandora.UI.set({showGroups: !ui.showGroups});
+                } else if (data.id == 'showfilters') {
+                    pandora.UI.set({showFilters: !ui.showFilters});
                 } else if (data.id == 'showbrowser') {
                     pandora.UI.set({showBrowser: !ui.showBrowser});
                 } else if (data.id == 'showannotations') {
@@ -264,9 +267,9 @@ pandora.ui.mainMenu = function() {
                     (pandora.$ui.usersDialog || (
                         pandora.$ui.usersDialog = pandora.ui.usersDialog())
                     ).open();
-                } else if (data.id == 'resetgroups') {
+                } else if (data.id == 'resetfilters') {
                     pandora.UI.set({
-                        groups: pandora.site.user.ui.groups
+                        filters: pandora.site.user.ui.filters
                     });
                     pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
                 } else if (data.id == 'logs') {
@@ -314,8 +317,8 @@ pandora.ui.mainMenu = function() {
             key_shift_b: function() {
                 ui.item && pandora.UI.set({showBrowser: !ui.showBrowser});
             },
-            key_shift_g: function() {
-                !ui.item && pandora.UI.set({showGroups: !ui.showGroups});
+            key_shift_f: function() {
+                !ui.item && pandora.UI.set({showFilters: !ui.showFilters});
             },
             key_shift_i: function() {
                 ui.showSidebar && pandora.UI.set({showInfo: !ui.showInfo});
@@ -336,12 +339,12 @@ pandora.ui.mainMenu = function() {
                 that[action]('deletelist');
                 that[ui.listSelection.length ? 'enableItem' : 'disableItem']('newlistfromselection');
             },
-            pandora_groups: function(data) {
+            pandora_filters: function(data) {
                 that.replaceMenu('sortMenu', getSortMenu());
             },
             pandora_item: function(data) {
                 if (!!data.value != !!data.previousValue) {
-                    that[data.value ? 'disableItem' : 'enableItem']('showgroups');
+                    that[data.value ? 'disableItem' : 'enableItem']('showfilters');
                     that[data.value ? 'enableItem' : 'disableItem']('showbrowser');
                     that.replaceMenu('sortMenu', getSortMenu());
                 }
@@ -376,8 +379,8 @@ pandora.ui.mainMenu = function() {
             pandora_showbrowser: function(data) {
                 that.setItemTitle('showbrowser', (data.value ? 'Hide' : 'Show') + ' ' + pandora.site.itemName.singular + ' Browser');
             },
-            pandora_showgroups: function(data) {
-                that.setItemTitle('showgroups', (data.value ? 'Hide' : 'Show') + ' Groups');
+            pandora_showfilters: function(data) {
+                that.setItemTitle('showfilters', (data.value ? 'Hide' : 'Show') + ' Filters');
             },
             pandora_showinfo: function(data) {
                 that.setItemTitle('showinfo', (data.value ? 'Hide' : 'Show') + ' Info');
@@ -452,26 +455,26 @@ pandora.ui.mainMenu = function() {
             ] },
             { id: 'advancedsort', title: 'Advanced Sort...', keyboard: 'shift control s' },
             {},
-            { id: 'sortgroups', title: 'Sort Groups', items: pandora.user.ui.groups.map(function(group) {
+            { id: 'sortfilters', title: 'Sort Filters', items: pandora.user.ui.filters.map(function(filter) {
                 return {
-                    id: 'sortgroup' + group.id,
-                    title: 'Sort ' + Ox.getObjectById(pandora.site.groups, group.id).title + ' Group by',
+                    id: 'sortfilter' + filter.id,
+                    title: 'Sort ' + Ox.getObjectById(pandora.site.filters, filter.id).title + ' Filter by',
                     items: [
-                        { group: 'sortgroup' + group.id, min: 1, max: 1, items: [
-                            { id: 'name', title: 'Name', checked: group.sort[0].key == 'name' },
-                            { id: 'items', title: 'Items', checked: group.sort[0].key == 'items' }
+                        { group: 'sortfilter' + filter.id, min: 1, max: 1, items: [
+                            { id: 'name', title: 'Name', checked: filter.sort[0].key == 'name' },
+                            { id: 'items', title: 'Items', checked: filter.sort[0].key == 'items' }
                         ] }
                     ]
                 }
             }) },
-            { id: 'ordergroups', title: 'Order Groups', items: pandora.user.ui.groups.map(function(group) {
+            { id: 'orderfilters', title: 'Order Filters', items: pandora.user.ui.filters.map(function(filter) {
                 return {
-                    id: 'ordergroup' + group.id,
-                    title: 'Order ' + Ox.getObjectById(pandora.site.groups, group.id).title + ' Group',
+                    id: 'orderfilter' + filter.id,
+                    title: 'Order ' + Ox.getObjectById(pandora.site.filters, filter.id).title + ' Filter',
                     items: [
-                        { group: 'ordergroup' + group.id, min: 1, max: 1, items: [
-                            { id: 'ascending', title: 'Ascending', checked: group.sort[0].operator == '+' },
-                            { id: 'descending', title: 'Descending', checked: group.sort[0].operator == '-' }
+                        { group: 'orderfilter' + filter.id, min: 1, max: 1, items: [
+                            { id: 'ascending', title: 'Ascending', checked: filter.sort[0].operator == '+' },
+                            { id: 'descending', title: 'Descending', checked: filter.sort[0].operator == '-' }
                         ] }
                     ]
                 }

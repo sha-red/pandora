@@ -4,13 +4,13 @@ pandora.ui.contentPanel = function() {
     var that = Ox.SplitPanel({
             elements: !pandora.user.ui.item ? [
                 {
-                    collapsed: !pandora.user.ui.showGroups,
+                    collapsed: !pandora.user.ui.showFilters,
                     collapsible: true,
                     element: pandora.$ui.browser = pandora.ui.browser(),
                     resizable: true,
                     resize: [96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256],
-                    size: pandora.user.ui.groupsSize,
-                    tooltip: 'groups'
+                    size: pandora.user.ui.filtersSize,
+                    tooltip: 'filters'
                 },
                 {
                     element: pandora.$ui.list = pandora.ui.list()
@@ -44,7 +44,7 @@ pandora.ui.contentPanel = function() {
             pandora_showbrowser: function(data) {
                 data.value == that.options('elements')[0].collapsed && that.toggle(0);
             },
-            pandora_showgroups: function(data) {
+            pandora_showfilters: function(data) {
                 data.value == that.options('elements')[0].collapsed && that.toggle(0);
             }
         });

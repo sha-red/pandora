@@ -53,8 +53,8 @@ pandora.URL = (function() {
 
     function setState(state, callback) {
 
-        pandora.user.ui._list = pandora.getListsState(pandora.user.ui.find);
-        pandora.user.ui._groupsState = pandora.getGroupsState(pandora.user.ui.find);
+        pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
+        pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
         pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
 
         if (Ox.isEmpty(state)) {

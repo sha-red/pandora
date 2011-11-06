@@ -3,20 +3,20 @@
 pandora.ui.browser = function() {
     var that;
     if (!pandora.user.ui.item) {
-        pandora.user.ui.groupsSizes = pandora.getGroupsSizes();
-        pandora.$ui.groups = pandora.ui.groups();
+        pandora.user.ui.filterSizes = pandora.getFilterSizes();
+        pandora.$ui.filters = pandora.ui.filters();
         that = Ox.SplitPanel({
             elements: [
                 {
-                    element: pandora.$ui.groups[0],
-                    size: pandora.user.ui.groupsSizes[0]
+                    element: pandora.$ui.filters[0],
+                    size: pandora.user.ui.filterSizes[0]
                 },
                 {
-                    element: pandora.$ui.groupsInnerPanel = pandora.ui.groupsInnerPanel()
+                    element: pandora.$ui.filtersInnerPanel = pandora.ui.filtersInnerPanel()
                 },
                 {
-                    element: pandora.$ui.groups[4],
-                    size: pandora.user.ui.groupsSizes[4]
+                    element: pandora.$ui.filters[4],
+                    size: pandora.user.ui.filterSizes[4]
                 },
             ],
             id: 'browser',
@@ -24,7 +24,7 @@ pandora.ui.browser = function() {
         })
         .bindEvent({
             resize: function(data) {
-                pandora.$ui.groups.forEach(function(list) {
+                pandora.$ui.filters.forEach(function(list) {
                     list.size();
                 });
                 if (pandora.user.ui.listView == 'map') {
@@ -34,11 +34,11 @@ pandora.ui.browser = function() {
                 }
             },
             resizeend: function(data) {
-                pandora.UI.set({groupsSize: data.size});
+                pandora.UI.set({filtersSize: data.size});
             },
             toggle: function(data) {
                 data.collapsed && pandora.$ui.list.gainFocus();
-                pandora.UI.set({showGroups: !data.collapsed});
+                pandora.UI.set({showFilters: !data.collapsed});
                 if (pandora.user.ui.listView == 'map') {
                     pandora.$ui.map.resizeMap();
                 } else if (pandora.user.ui.listView == 'calendar') {

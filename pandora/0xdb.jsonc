@@ -39,8 +39,8 @@
         {"id": "lightness", "title": "Lightness", "type": "float"},
         {"id": "volume", "title": "Volume", "type": "float"}
     ],
-    // fixme: either this, or group: true in itemKeys, but not both
-    "groups": [
+    // fixme: either this, or filter: true in itemKeys, but not both
+    "filters": [
         {"id": "director", "title": "Director", "type": "string"},
         {"id": "country", "title": "Country", "type": "string"},
         {"id": "year", "title": "Year", "type": "integer"},
@@ -65,9 +65,9 @@
             columnRequired: If true, the column can't be removed
             columnWidth: Default column width in px
             find: If true, will appear as a find option
+            filter: if true, one can filter results by this key
             format: {type: "...", args: [...]}, for special formatting
                 (Ox.formatType(args) will be called)
-            group: if true, one can group results by this key
             sort: special sort rule (title, person)
             sortOperator: sort operator (+, -), in case it differs from the
                 default for the key's type (+ for strings, - for numbers)
@@ -99,8 +99,8 @@
             "autocomplete": true,
             "columnRequired": true,
             "columnWidth": 180,
+            "filter": true,
             "find": true,
-            "group": true,
             "sort": "person"
         },
         {
@@ -109,8 +109,8 @@
             "type": ["string"],
             "autocomplete": true,
             "columnWidth": 120,
-            "find": true,
-            "group": true
+            "filter": true,
+            "find": true
         },
         {
             "id": "year",
@@ -118,8 +118,8 @@
             "type": "year", // fixme: do we need this?
             "autocomplete": true,
             "columnWidth": 60,
-            "find": true,
-            "group": true
+            "filter": true,
+            "find": true
         },
         {
             "id": "language",
@@ -128,7 +128,7 @@
             "autocomplete": true,
             "columnWidth": 120,
             "find": true,
-            "group": true
+            "filter": true
         },
         {
             "id": "runtime", 
@@ -143,8 +143,8 @@
             "type": ["string"],
             "autocomplete": true,
             "columnWidth": 180,
+            "filter": true,
             "find": true,
-            "group": true,
             "sort": "person"
         },
         {
@@ -153,8 +153,8 @@
             "type": ["string"],
             "autocomplete": true,
             "columnWidth": 180,
+            "filter": true,
             "find": true,
-            "group": true,
             "sort": "person"
         },
         {
@@ -163,8 +163,8 @@
             "type": ["string"],
             "autocomplete": true,
             "columnWidth": 180,
+            "filter": true,
             "find": true,
-            "group": true,
             "sort": "person"
         },
         {
@@ -173,8 +173,8 @@
             "type": ["string"],
             "autocomplete": true,
             "columnWidth": 180,
+            "filter": true,
             "find": true,
-            "group": true,
             "sort": "person"
         },
         {
@@ -182,8 +182,8 @@
             "title": "Actor",
             "type": ["string"],
             "autocomplete": true,
+            "filter": true,
             "find": true,
-            "group": true,
             "sort": "person"
         },
         {
@@ -214,16 +214,16 @@
             "type": ["string"],
             "autocomplete": true,
             "columnWidth": 120,
-            "find": true,
-            "group": true
+            "filter": true,
+            "find": true
         },
         {
             "id": "keyword", 
             "title": "Keyword",
             "type": ["string"],
             "autocomplete": true,
-            "find": true,
-            "group": true
+            "filter": true,
+            "find": true
         },
         {
             "id": "summary",
@@ -589,15 +589,15 @@
                     "columnWidth": {}
                 }
             },
-            "find": {"conditions": [], "operator": "&"},
-            "groups": [
+            "filters": [
                 {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "country", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "year", "sort": [{"key": "name", "operator": "-"}]},
                 {"id": "language", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "genre", "sort": [{"key": "items", "operator": "-"}]}
             ],
-            "groupsSize": 176,
+            "filtersSize": 176,
+            "find": {"conditions": [], "operator": "&"},
             "icons": "posters",
             "infoIconSize": 256,
             "item": "",
@@ -616,8 +616,8 @@
             "showAnnotations": true,
             "showBrowser": true,
             "showCalendarControls": true, // fixme: should be false
+            "showFilters": true,
             "showFlags": true,
-            "showGroups": true,
             "showHome": true,
             "showIconBrowser": false,
             "showInfo": true,

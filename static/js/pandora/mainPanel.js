@@ -30,15 +30,15 @@ pandora.ui.mainPanel = function() {
                         pandora.$ui.list.reloadList();
                     }
                     // FIXME: why is this being handled _here_?
-                    pandora.user.ui._groupsState.forEach(function(data, i) {
-                        if (!Ox.isEqual(data.selected, previousUI._groupsState[i].selected)) {
-                            pandora.$ui.groups[i].options({selected: data.selected});
+                    pandora.user.ui._filterState.forEach(function(data, i) {
+                        if (!Ox.isEqual(data.selected, previousUI._filterState[i].selected)) {
+                            pandora.$ui.filters[i].options({selected: data.selected});
                         }
-                        if (!Ox.isEqual(data.find, previousUI._groupsState[i].find)) {
-                            Ox.print(i, 'NOT EQUAL', data.find, previousUI._groupsState[i].find)
-                            pandora.$ui.groups[i].reloadList();
+                        if (!Ox.isEqual(data.find, previousUI._filterState[i].find)) {
+                            Ox.print(i, 'NOT EQUAL', data.find, previousUI._filterState[i].find)
+                            pandora.$ui.filters[i].reloadList();
                         } else {
-                            Ox.print(i, 'EQUAL', data.find, previousUI._groupsState[i].find)
+                            Ox.print(i, 'EQUAL', data.find, previousUI._filterState[i].find)
                         }
                     });
                 } else {

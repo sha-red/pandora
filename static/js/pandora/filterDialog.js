@@ -9,7 +9,7 @@ pandora.ui.filterDialog = function(list) {
                 })
                 .bindEvent({
                     click: function() {
-                        alert(JSON.stringify(pandora.$ui.filter.options('query')));
+                        alert(JSON.stringify(pandora.$ui.filterForm.options('query')));
                     }
                 }),
             /*
@@ -33,7 +33,7 @@ pandora.ui.filterDialog = function(list) {
                     }
                 })
         ],
-        content: pandora.$ui.filter = pandora.ui.filter(list),
+        content: pandora.$ui.filterForm = pandora.ui.filterForm(list),
         maxWidth: 648 + Ox.UI.SCROLLBAR_SIZE,
         minHeight: 264,
         minWidth: 648 + Ox.UI.SCROLLBAR_SIZE,

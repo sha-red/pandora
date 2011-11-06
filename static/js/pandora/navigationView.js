@@ -107,7 +107,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 // clickable: pandora.site.capabilities.canClickMap[pandora.user.level],
                 find: ui.mapFind,
                 // 20 menu + 24 toolbar + 1 resizebar + 16 statusbar
-                height: window.innerHeight - ui.showGroups * ui.groupsSize - 61,
+                height: window.innerHeight - ui.showFilters * ui.filtersSize - 61,
                 places: function(data, callback) {
                     var itemsQuery;
                     if (!ui.item) {
@@ -162,7 +162,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
                     date: new Date(0),
                     events: result.data.items,
                     // 20 px menu, 24 px toolbar, 1px resizbar, 16px statusbar
-                    height: window.innerHeight - ui.showGroups * ui.groupsSize - 61,
+                    height: window.innerHeight - ui.showFilters * ui.filtersSize - 61,
                     range: [-5000, 5000],
                     showControls: ui.showCalendarControls,
                     width: window.innerWidth - ui.showSidebar * ui.sidebarSize - listSize - 2,

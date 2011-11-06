@@ -25,7 +25,7 @@ pandora.ui.rightPanel = function() {
         .bindEvent({
             resize: function(data) {
                 if (!pandora.user.ui.item) {
-                    pandora.resizeGroups();
+                    pandora.resizeFilters();
                     pandora.$ui.list.size();
                     if (pandora.user.ui.listView == 'clips') {
                         var clipsItems = pandora.getClipsItems();
