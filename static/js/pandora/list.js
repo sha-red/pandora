@@ -297,7 +297,9 @@ pandora.ui.list = function() {
                         element: Ox.BlockVideoTimeline,
                         events: {
                             position: function(event) {
-                                pandora.$ui.videoPreview.options({
+                                // FIXME: we need a way to set the position
+                                // once the video preview has loaded
+                                pandora.$ui.videoPreview && pandora.$ui.videoPreview.options({
                                     position: event.position
                                 });
                                 if (pandora.user.ui.videoPoints[data.id]) {
