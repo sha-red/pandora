@@ -14,6 +14,10 @@ pandora.ui.contentPanel = function() {
                 },
                 {
                     element: pandora.$ui.list = pandora.ui.list()
+                },
+                {
+                    element: pandora.$ui.statusbar = pandora.ui.statusbar(),
+                    size: 16
                 }
             ] : [
                 {

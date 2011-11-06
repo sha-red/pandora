@@ -13,10 +13,6 @@ pandora.ui.rightPanel = function() {
                 },
                 {
                     element: pandora.$ui.contentPanel = pandora.ui.contentPanel()
-                },
-                {
-                    element: pandora.$ui.statusbar = pandora.ui.statusbar(),
-                    size: 16
                 }
             ],
             id: 'rightPanel',
