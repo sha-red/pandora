@@ -140,7 +140,7 @@ pandora.ui.contactForm = function() {
                 
             }
         })
-        .appendTo(that);
+        .appendTo(that),
 
     $text = $('<div>')
         .css({width: width + 'px'})
