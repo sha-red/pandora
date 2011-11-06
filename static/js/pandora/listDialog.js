@@ -123,7 +123,7 @@ pandora.ui.listGeneralPanel = function(listData) {
         $icon = $('<img>')
             .attr({src: '/list/' + listData.id + '/icon256.jpg?' + Ox.uid()})
             .css({position: 'absolute', left: '16px', top: '16px', width: '128px', height: '128px', borderRadius: '32px'})
-            .appendTo(that);
+            .appendTo(that),
         $nameInput = Ox.Input({
                 label: 'Name',
                 labelWidth: 80,
@@ -131,7 +131,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                 width: 320
             })
             .css({position: 'absolute', left: '160px', top: '16px'})
-            .appendTo(that);
+            .appendTo(that),
         $itemsInput = Ox.Input({
                 disabled: true,
                 label: 'Items',
@@ -140,7 +140,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                 width: 320
             })
             .css({position: 'absolute', left: '160px', top: '40px'})
-            .appendTo(that);
+            .appendTo(that),
         $statusSelect = Ox.Select({
                 items: [
                     {id: 'private', title: 'Private', selected: listData.status == 'private'},
@@ -152,7 +152,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                 width: 320
             })
             .css({position: 'absolute', left: '160px', top: '64px'})
-            .appendTo(that);
+            .appendTo(that),
         $subscribersInput = Ox.Input({
                 disabled: true,
                 label: 'Subscribers',
