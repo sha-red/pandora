@@ -277,10 +277,10 @@ pandora.ui.listInfo = function() {
     that.resizeInfo = function() {
         var width = that.width();
         $icon.css(getIconCSS());
-        $title.options({
+        $title && $title.options({
             width: width
         });
-        $description.options({
+        $description && $description.options({
             height: width,
             width: width
         });
