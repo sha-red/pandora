@@ -16,31 +16,31 @@ pandora.ui.listDialog = function(section) {
         );
     Ox.getObjectById(tabs, section).selected = true;
 
-    var $tabPanel = Ox.TabPanel({
-            content: function(id) {
-                if (id == 'general') {
-                    return pandora.ui.listGeneralPanel(listData);
-                } else if (id == 'icon') {
-                    return pandora.ui.listIconPanel(listData);
-                } else if (id == 'query') {
-                    return pandora.$ui.filter = pandora.ui.filter(listData);
-                }
-            },
-            tabs: tabs
-        })
-        .bindEvent({
-            change: function(data) {
-                var width = getWidth(data.selected);
-                $dialog.options({
-                    maxWidth: width,
-                    minWidth: width,
-                    title: 'Smart List - ' + listData.name + ' - '
-                        + Ox.getObjectById(tabs, data.selected).title
-                });
-                $dialog.setSize(width, 312);
-                $findElement[data.selected == 'icon' ? 'show' : 'hide']();
+    pandora.$ui.listDialogTabPanel = Ox.TabPanel({
+        content: function(id) {
+            if (id == 'general') {
+                return pandora.ui.listGeneralPanel(listData);
+            } else if (id == 'icon') {
+                return pandora.ui.listIconPanel(listData);
+            } else if (id == 'query') {
+                return pandora.$ui.filter = pandora.ui.filter(listData);
             }
-        });
+        },
+        tabs: tabs
+    })
+    .bindEvent({
+        change: function(data) {
+            var width = getWidth(data.selected);
+            $dialog.options({
+                maxWidth: width,
+                minWidth: width,
+                title: 'Smart List - ' + listData.name + ' - '
+                    + Ox.getObjectById(tabs, data.selected).title
+            });
+            $dialog.setSize(width, 312);
+            $findElement[data.selected == 'icon' ? 'show' : 'hide']();
+        }
+    });
 
     var $findElement = Ox.FormElementGroup({
             elements: [
@@ -75,8 +75,7 @@ pandora.ui.listDialog = function(section) {
     if (section != 'icon') {
         $findElement.hide();
     }
-    $findElement.appendTo($tabPanel.children('.OxBar'));
-
+    $findElement.appendTo(pandora.$ui.listDialogTabPanel.children('.OxBar'));
 
     var $dialog = Ox.Dialog({
         buttons: [
@@ -99,13 +98,13 @@ pandora.ui.listDialog = function(section) {
                     }
                 })
         ],
-        content: $tabPanel,
+        content: pandora.$ui.listDialogTabPanel,
         maxWidth: width,
         minHeight: 312,
         minWidth: width,
         height: 312,
         // keys: {enter: 'save', escape: 'cancel'},
-        title: 'Smart List - ' + listData.name,
+        title: 'List - ' + listData.name,
         width: width
     });
 
@@ -119,49 +118,156 @@ pandora.ui.listDialog = function(section) {
 };
 
 pandora.ui.listGeneralPanel = function(listData) {
-    var that = Ox.Element({}),
-        $icon = $('<img>')
-            .attr({src: '/list/' + listData.id + '/icon256.jpg?' + Ox.uid()})
-            .css({position: 'absolute', left: '16px', top: '16px', width: '128px', height: '128px', borderRadius: '32px'})
-            .appendTo(that),
-        $nameInput = Ox.Input({
-                label: 'Name',
-                labelWidth: 80,
-                value: listData.name,
-                width: 320
-            })
-            .css({position: 'absolute', left: '160px', top: '16px'})
-            .appendTo(that),
-        $itemsInput = Ox.Input({
-                disabled: true,
-                label: 'Items',
-                labelWidth: 80,
-                value: listData.items,
-                width: 320
-            })
-            .css({position: 'absolute', left: '160px', top: '40px'})
-            .appendTo(that),
-        $statusSelect = Ox.Select({
-                items: [
-                    {id: 'private', title: 'Private', selected: listData.status == 'private'},
-                    {id: 'public', title: 'Public', selected: listData.status == 'public'},
-                    {id: 'featured', title: 'Featured', selected: listData.status == 'featured'},
-                ],
-                label: 'Status',
-                labelWidth: 80,
-                width: 320
-            })
-            .css({position: 'absolute', left: '160px', top: '64px'})
-            .appendTo(that),
-        $subscribersInput = Ox.Input({
-                disabled: true,
-                label: 'Subscribers',
-                labelWidth: 80,
-                value: 0,
-                width: 320
-            })
-            .css({position: 'absolute', left: '160px', top: '88px'})
-            .appendTo(that);
+    var that = Ox.Element();
+    pandora.api.findLists({
+        query: {conditions: [{key: 'id', value: listData.id, operator: '=='}]},
+        keys: ['description', 'subscribers']
+    }, function(result) {
+        var description = result.data.items[0].description,
+            subscribers = result.data.items[0].subscribers,
+            $icon = Ox.Element({
+                    element: '<img>',
+                    tooltip: 'Doubleclick to edit icon'
+                })
+                .attr({
+                    src: '/list/' + listData.id + '/icon256.jpg?' + Ox.uid()
+                })
+                .css({
+                    position: 'absolute',
+                    left: '16px',
+                    top: '16px',
+                    width: '128px',
+                    height: '128px',
+                    borderRadius: '32px'
+                })
+                .bindEvent({
+                    doubleclick: function() {
+                        pandora.$ui.listDialogTabPanel.select('icon');
+                    }
+                })
+                .appendTo(that),
+            $nameInput = Ox.Input({
+                    label: 'Name',
+                    labelWidth: 80,
+                    value: listData.name,
+                    width: 320
+                })
+                .css({position: 'absolute', left: '160px', top: '16px'})
+                .bindEvent({
+                    blur: editName,
+                    submit: editName
+                })
+                .appendTo(that),
+            $itemsInput = Ox.Input({
+                    disabled: true,
+                    label: 'Items',
+                    labelWidth: 80,
+                    value: listData.items,
+                    width: 320
+                })
+                .css({position: 'absolute', left: '160px', top: '40px'})
+                .appendTo(that),
+            $statusSelect = listData.status == 'featured'
+                ? Ox.Input({
+                    disabled: true,
+                    label: 'Status',
+                    labelWidth: 80,
+                    value: 'Featured',
+                    width: 320
+                })
+                .css({position: 'absolute', left: '160px', top: '64px'})
+                .appendTo(that)
+                : Ox.Select({
+                    items: [
+                        {id: 'private', title: 'Private', checked: listData.status == 'private'},
+                        {id: 'public', title: 'Public', checked: listData.status == 'public'}
+                    ],
+                    label: 'Status',
+                    labelWidth: 80,
+                    width: 320
+                })
+                .css({position: 'absolute', left: '160px', top: '64px'})
+                .bindEvent({
+                    change: editStatus
+                })
+                .appendTo(that),
+            $subscribersInput = Ox.Input({
+                    disabled: true,
+                    label: 'Subscribers',
+                    labelWidth: 80,
+                    value: subscribers,
+                    width: 320
+                })
+                .css({position: 'absolute', left: '160px', top: '88px'})
+                [getSubscribersAction()]()
+                .appendTo(that),
+            $descriptionInput = Ox.Input({
+                    height: getDescriptionHeight(),
+                    placeholder: 'Description',
+                    type: 'textarea',
+                    value: description,
+                    width: 320
+                })
+                .css({position: 'absolute', left: '160px', top: getDescriptionTop() + 'px'})
+                .bindEvent({
+                    blur: editDescription,
+                    submit: editDescription
+                })
+                .appendTo(that);
+        function editDescription(data) {
+            if (data.value != description) {
+                pandora.api.editList({
+                    id: listData.id,
+                    description: data.value
+                }, function(result) {
+                    description = result.data.description;
+                    Ox.Request.clearCache('findLists');
+                    pandora.$ui.info.updateListInfo();
+                });
+            }
+        }
+        function editName(data) {
+            if (data.value != listData.name) {
+                pandora.api.editList({
+                    id: listData.id,
+                    name: data.value
+                }, function(result) {
+                    if (result.data.id != listData.id) {
+                        pandora.renameList(listData.id, result.data.id, result.data.name);
+                        listData.id = result.data.id;
+                        listData.name = result.data.name;
+                        Ox.Request.clearCache('findLists');
+                        pandora.$ui.info.updateListInfo();
+                    }
+                });
+            }
+        }
+        function editStatus(data) {
+            var status = data.selected[0].id;
+            pandora.api.editList({
+                id: listData.id,
+                status: status
+            }, function(result) {
+                listData.status = result.data.status;
+                $subscribersInput[getSubscribersAction()]();
+                $descriptionInput
+                    .options({height: getDescriptionHeight()})
+                    .css({top: getDescriptionTop() + 'px'});
+                pandora.$ui.folderList[listData.folder].value(
+                    result.data.id, 'status', result.data.status
+                );
+            });
+        }
+        function getDescriptionHeight() {
+            return listData.status == 'private' ? 184 : 160;
+        }
+        function getDescriptionTop() {
+            return listData.status == 'private' ? 88 : 112;
+        }
+        function getSubscribersAction() {
+            return listData.status == 'private' ? 'hide' : 'show';
+        }
+    });
     return that;
 };
 
@@ -365,7 +471,6 @@ pandora.ui.listIconPanel = function(listData) {
         $frame.css({borderRadius: 0});
         $frame.css('border-' + quarters[quarter] + '-radius', '128px');
     }
-
 
     return that;
 

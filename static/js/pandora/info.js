@@ -169,7 +169,7 @@ pandora.ui.listInfo = function() {
     //pandora.api.editPage({name: 'allItems', body: 'foobar'}, callback)
     if (list) {
         pandora.api.findLists({
-            query: { conditions: [{key: 'id', value: list, operator: '=='}] },
+            query: {conditions: [{key: 'id', value: list, operator: '=='}]},
             keys: ['description', 'name', 'user']
         }, function(result) {
             if (result.data.items.length) {
@@ -231,7 +231,6 @@ pandora.ui.listInfo = function() {
                                 // scrollbars may appear
                                 setTimeout(function() {
                                     var width = that.width();
-                                    Ox.print('WIDTH', width, $description.options('width'))
                                     $description.options({
                                         height: width,
                                         width: width
@@ -245,6 +244,7 @@ pandora.ui.listInfo = function() {
                                         description: data.value
                                     }, function(result) {
                                         item.description = result.data.description;
+                                        Ox.Request.clearCache('findLists');
                                     });
                                 }
                             }
