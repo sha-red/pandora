@@ -4,6 +4,8 @@
 from django.db.models import Q, Manager
 from ox.django.query import QuerySet
 
+from item.utils import decode_id
+
 
 def parseCondition(condition, user):
     k = condition.get('key', 'name')
@@ -19,6 +21,8 @@ def parseCondition(condition, user):
         exclude = True
     else:
         exclude = False
+    if k == 'id':
+        v = decode_id(v)
 
     key = '%s%s' % (k, {
         '==': '__iexact',

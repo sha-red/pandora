@@ -4,7 +4,14 @@
 from decimal import Decimal
 import re
 import unicodedata
+import ox
 
+def decode_id(id):
+    try:
+        id = ox.from26(id)
+    except:
+        id = 0
+    return id
 
 def parse_decimal(string):
     string = string.replace(':', '/')

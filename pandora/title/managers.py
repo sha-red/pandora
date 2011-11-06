@@ -3,7 +3,9 @@
 import unicodedata
 from django.db.models import Q, Manager
 from ox.django.query import QuerySet
-import ox
+
+from item.utils import decode_id
+
 
 def parseCondition(condition, user):
     '''
@@ -41,7 +43,7 @@ def parseCondition(condition, user):
         else:
             return q
     if k == 'id':
-        v = ox.from26(v)
+        v = decode_id(v)
     elif isinstance(v, unicode):
         v = unicodedata.normalize('NFKD', v)
     if isinstance(v, bool): #featured and public flag

@@ -2,7 +2,9 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from django.db.models import Q, Manager
 from ox.django.query import QuerySet
-import ox
+
+from item.utils import decode_id
+
 
 def parseCondition(condition, user):
     '''
@@ -44,7 +46,7 @@ def parseCondition(condition, user):
         else:
             return q
     if k in ('places__id', 'events__id'):
-        v = ox.from26(v)
+        v = decode_id(v)
     if isinstance(v, bool): #featured and public flag
         key = k
     elif k in ('lat', 'lng', 'area', 'south', 'west', 'north', 'east', 'matches',

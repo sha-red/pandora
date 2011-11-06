@@ -2,7 +2,9 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from django.db.models import Q, Manager
 from ox.django.query import QuerySet
-import ox
+
+from item.utils import decode_id
+
 
 def parseCondition(condition, user):
     k = condition.get('key', 'name')
@@ -28,7 +30,7 @@ def parseCondition(condition, user):
         else:
             return q
     if k == 'id':
-        v = ox.from26(v)
+        v = decode_id(v)
     if isinstance(v, bool): #featured and public flag
         key = k
     elif k in ('id',):
