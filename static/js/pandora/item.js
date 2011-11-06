@@ -360,12 +360,6 @@ pandora.ui.item = function() {
                 })
             );
         }
-
-        if (result.data) {
-            var director = result.data.director ? ' ('+result.data.director.join(', ') + ')' : '';
-            pandora.$ui.total.html(result.data.title + director);
-        }
-
     });
 
     return that;

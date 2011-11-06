@@ -9,7 +9,7 @@ import ox
 import managers
 
 class Log(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True)
     user = models.ForeignKey(User, default=None, blank=True, null=True)
     url = models.CharField(max_length=1000, default='')
