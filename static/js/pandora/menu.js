@@ -305,6 +305,11 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.findInput.focusInput(true);
                 }
             },
+            key_control_shift_w: function() {
+                if (pandora.hasNoDialogOrScreen() || (ui.item || ui._list)) {
+                    pandora.UI.set({find: {conditions: [], operator: '&'}});
+                }
+            },
             key_control_slash: function() {
                 if (pandora.hasNoDialogOrScreen()) {
                     pandora.URL.push('/help');
