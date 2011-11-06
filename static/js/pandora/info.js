@@ -117,15 +117,21 @@ pandora.ui.info = function() {
     that.resizeInfo = function() {
         var view = getView();
         if (view == 'list') {
-            pandora.$ui.listInfo.resizeIcon();
+            pandora.$ui.listInfo.resizeInfo();
         } else if (view == 'poster') {
-            pandora.$ui.posterInfo.resizePoster();
+            pandora.$ui.posterInfo.resizeInfo();
         } else if (view == 'video') {
             pandora.$ui.videoPreview.options({
                 height: pandora.getInfoHeight(true),
                 width: ui.sidebarSize
             });
         }
+    };
+
+    that.updateListInfo = function() {
+        getView() == 'list' && that.empty().append(
+            pandora.$ui.listInfo = pandora.ui.listInfo()
+        );
     };
 
     return that;
@@ -147,7 +153,8 @@ pandora.ui.listInfo = function() {
                     : '/static/png/icon256.png'
             })
             .css(getIconCSS())
-            .appendTo(that);
+            .appendTo(that),
+        $title, $description;
 
     that.append($('<div>').css({height: '16px'}));
 
@@ -162,10 +169,10 @@ pandora.ui.listInfo = function() {
             if (result.data.items.length) {
                 var item = result.data.items[0];
                 that.append(
-                    Ox.Editable({
+                    $title = Ox.Editable({
                             editable: item.user == pandora.user.username,
                             format: function(value) {
-                                return Ox.encodeHTML(item.user + ':' + value)
+                                return Ox.encodeHTML(item.user + ': ' + value)
                             },
                             tooltip: item.user == pandora.user.username
                                 ? 'Doubleclick to edit title' : '',
@@ -173,21 +180,54 @@ pandora.ui.listInfo = function() {
                             width: pandora.user.ui.sidebarSize - 32
                         })
                         .css({fontWeight: 'bold', textAlign: 'center'})
+                        .bindEvent({
+                            submit: function(data) {
+                                if (data.value != item.name) {
+                                    pandora.api.editList({
+                                        id: list,
+                                        name: data.value
+                                    }, function(result) {
+                                        if (result.data.id != list) {
+                                            pandora.renameList(list, result.data.id, result.data.name);
+                                            list = result.data.id;
+                                            item.name = result.data.name;
+                                        }
+                                    });
+                                }
+                            }
+                        })
                 ).append(
                     $('<div>').css({height: '8px'})
                 ).append(
-                    Ox.Editable({
-                            editable: item.user == pandora.user.username,
+                    $description = Ox.Editable({
                             format: function(value) {
-                                return Ox.encodeHTML(value)
+                                return '<div style="color: rgb(128, 128, 128); text-align: center">'
+                                    + value + '</div>';
                             },
-                            placeholder: '<div style="color: rgb(128, 128, 128); text-align: center">No description</span>',
-                            tooltip: 'Doubleclick to edit description',
+                            editable: item.user == pandora.user.username,
+                            height: pandora.user.ui.sidebarSize - 32,
+                            placeholder: item.user == pandora.user.username
+                                ? '<div style="color: rgb(128, 128, 128); text-align: center">No description</span>'
+                                : '',
+                            tooltip: item.user == pandora.user.username
+                                ? 'Doubleclick to edit description' : '',
                             type: 'textarea',
                             value: item.description,
                             width: pandora.user.ui.sidebarSize - 32
                         })
-                        .css({textAlign: 'left'})
+                        .css({textAlign: 'center'})
+                        .bindEvent({
+                            submit: function(data) {
+                                if (data.value != item.description) {
+                                    pandora.api.editList({
+                                        id: list,
+                                        description: data.value
+                                    }, function(result) {
+                                        item.description = result.data.description;
+                                    });
+                                }
+                            }
+                        })
                 );
             } else {
                 that.append(
@@ -200,7 +240,7 @@ pandora.ui.listInfo = function() {
     } else {
         that.append(
             $('<div>')
-                .css({paddingTop: '16px', fontWeight: 'bold'})
+                .css({fontWeight: 'bold'})
                 .html('All ' + pandora.site.itemName.plural)
         );
     }
@@ -213,8 +253,16 @@ pandora.ui.listInfo = function() {
             borderRadius: Math.round(size / 4) + 'px',
         };
     }
-    that.resizeIcon = function() {
+    that.resizeInfo = function() {
         $icon.css(getIconCSS());
+        $title.options({
+            width: that.width()
+            //width: pandora.user.ui.sidebarSize - 32
+        });
+        $description.options({
+            height: that.height(),
+            width: that.width()
+        });
     };
     return that;
 };
@@ -266,7 +314,7 @@ pandora.ui.posterInfo = function(data) {
             return value + 'px';
         });
     }
-    that.resizePoster = function() {
+    that.resizeInfo = function() {
         $poster.css(getPosterCSS());
         $text.css({width: pandora.user.ui.sidebarSize - 8 + 'px'})
     }

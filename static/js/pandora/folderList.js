@@ -30,11 +30,9 @@ pandora.ui.folderList = function(id) {
                     width: 16
                 },
                 {
-                    /*
                     format: function(value) {
-                        return value.split('/').join(': ');
+                        return value.split(':').join(': ');
                     },
-                    */
                     id: 'id',
                     operator: '+',
                     unique: true,
@@ -386,14 +384,8 @@ pandora.ui.folderList = function(id) {
                 data_[data.key] = data.value;
                 pandora.api.editList(data_, function(result) {
                     if (result.data.id != data.id) {
-                        pandora.$ui.folderList[id].value(data.id, 'name', result.data.name);
-                        pandora.$ui.folderList[id].value(data.id, 'id', result.data.id);
-                        pandora.UI.set({
-                            find: {
-                                conditions: [{key: 'list', value: result.data.id, operator: '=='}],
-                                operator: '&'
-                            }
-                        }, false);
+                        pandora.renameList(data.id, result.data.id, result.data.name, id);
+                        pandora.$ui.info.updateListInfo();
                     }
                 });
             }

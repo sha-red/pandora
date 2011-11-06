@@ -495,8 +495,8 @@ pandora.getInfoHeight = function(includeHidden) {
         );
         height = Math.min(
             isVideoPreview
-            ? Math.round(pandora.user.ui.sidebarSize / (16/9)) + 16
-            : pandora.user.ui.sidebarSize,
+                ? Math.round(pandora.user.ui.sidebarSize / (16/9)) + 16
+                : pandora.user.ui.sidebarSize,
             window.innerHeight - 109 // 20 menu + 24 bar + 64 (4 closed folders) + 1 resizebar
         );
     }
@@ -746,6 +746,19 @@ pandora.reloadList = function() {
         .reloadList();
 };
 
+pandora.renameList = function(oldId, newId, newName, folder) {
+    folder = folder || pandora.getListData(oldId).folder;
+    Ox.print('RENAME LIST', oldId, newId, newName, folder)
+    pandora.$ui.folderList[folder].value(oldId, 'name', newName);
+    pandora.$ui.folderList[folder].value(oldId, 'id', newId);
+    pandora.UI.set({
+        find: {
+            conditions: [{key: 'list', value: newId, operator: '=='}],
+            operator: '&'
+        }
+    }, false);
+};
+
 pandora.resizeFilters = function(width) {
     pandora.user.ui.filterSizes = pandora.getFilterSizes();
     pandora.$ui.browser
@@ -792,6 +805,7 @@ pandora.resizeFolders = function() {
 };
 
 pandora.resizeWindow = function() {
+    pandora.$ui.leftPanel.size(2, pandora.getInfoHeight(true));
     pandora.resizeFolders();
     /*
     var infoHeight = pandora.getInfoHeight(true);
@@ -880,6 +894,7 @@ pandora.selectList = function() {
 };
 
 pandora.unloadWindow = function() {
+    /*
     // fixme: ajax request has to have async set to false for this to work
     pandora.user.ui.section == 'items'
         && pandora.user.ui.item
@@ -890,6 +905,7 @@ pandora.unloadWindow = function() {
                 pandora.user.ui.itemView == 'video' ? 'player' : 'editor'
             ].options('position')
         );
+    */
 };
 
 (function() {

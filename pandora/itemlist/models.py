@@ -95,7 +95,7 @@ class List(models.Model):
 
     def json(self, keys=None, user=None):
         if not keys:
-             keys=['id', 'name', 'user', 'type', 'query', 'status', 'subscribed', 'posterFrames']
+             keys=['id', 'name', 'user', 'type', 'query', 'status', 'subscribed', 'posterFrames', 'description']
         response = {}
         for key in keys:
             if key == 'items':
