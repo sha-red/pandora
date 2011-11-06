@@ -45,6 +45,9 @@ def parseCondition(condition, user):
         else:
             return q
 
+    if (not exclude and op == '=' or op in ('$', '^')) and v == '':
+        return Q(True)
+
     if k == 'filename' and (user.is_anonymous() or \
         not user.get_profile().capability('canSeeFiles')):
         return Q(id=0)
@@ -112,7 +115,7 @@ def parseCondition(condition, user):
                 q = Q(**{value_key: v})
         return q
     elif key_type == 'list':
-        q = Q(itemId=False)
+        q = Q(id=0)
         l = v.split(":")
         if len(l) >= 2:
             l = (l[0], ":".join(l[1:]))
@@ -185,7 +188,6 @@ def parseConditions(conditions, operator, user):
                              condition.get('operator', '&'), user)
             if q:
                 conn.append(q)
-            pass
         else:
             conn.append(parseCondition(condition, user))
     if conn:
