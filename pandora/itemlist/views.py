@@ -310,14 +310,14 @@ def editList(request):
                 if value not in list._status:
                     value = list._status[0]
                 if value == 'private':
+                    for user in list.subscribed_users.all():
+                        list.subscribed_users.remove(user)
                     qs = models.Position.objects.filter(user=request.user,
                                                         section='section', list=list)
                     if qs.count() > 1:
                         pos = qs[0]
                         pos.section = 'personal'
                         pos.save()
-                        models.Position.objects.filter(list=list,
-                                                       section='public').delete()
                 elif value == 'featured':
                     if not request.user.is_staff:
                         value = list.status
@@ -377,29 +377,6 @@ def editList(request):
         response = json_response(status=403, text='not allowed')
     return render_to_json_response(response)
 actions.register(editList, cache=False)
-
-@login_required_json
-def removeSubscribers(request):
-    '''
-        param data {
-             list: listId,
-        }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-            }
-        }
-    '''
-    data = json.loads(request.POST['data'])
-    list = get_list_or_404_json(data['list'])
-    response = json_response()
-    if list.editable(request.user):
-        for user in list.subscribed_users.all():
-            list.subscribed_users.remove(user)
-    else:
-        response = json_response(status=403, text='not allowed')
-    return render_to_json_response(response)
-actions.register(removeSubscribers, cache=False)
 
 @login_required_json
 def removeList(request):
