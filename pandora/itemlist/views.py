@@ -378,6 +378,28 @@ def editList(request):
     return render_to_json_response(response)
 actions.register(editList, cache=False)
 
+@login_required_json
+def removeSubscribers(request):
+    '''
+        param data {
+             list: listId,
+        }
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+            }
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    list = get_list_or_404_json(data['list'])
+    response = json_response()
+    if list.editable(request.user):
+        for user in list.subscribed_users.all():
+            list.subscribed_users.remove(user)
+    else:
+        response = json_response(status=403, text='not allowed')
+    return render_to_json_response(response)
+actions.register(removeSubscribers, cache=False)
 
 @login_required_json
 def removeList(request):
