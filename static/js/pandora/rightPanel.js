@@ -20,12 +20,13 @@ pandora.ui.rightPanel = function() {
         })
         .bindEvent({
             resize: function(data) {
+                var clipsItems, previousClipsItems;
                 if (!pandora.user.ui.item) {
                     pandora.resizeFilters();
                     pandora.$ui.list.size();
                     if (pandora.user.ui.listView == 'clips') {
-                        var clipsItems = pandora.getClipsItems();
-                            previousClipsItems = pandora.getClipsItems(pandora.$ui.list.options('width'));
+                        clipsItems = pandora.getClipsItems();
+                        previousClipsItems = pandora.getClipsItems(pandora.$ui.list.options('width'));
                         pandora.$ui.list.options({width: data.size});
                         if (clipsItems != previousClipsItems) {
                             Ox.Request.clearCache(); // fixme

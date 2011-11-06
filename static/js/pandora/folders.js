@@ -270,30 +270,32 @@ pandora.ui.folders = function() {
         }).bindEvent({
             click: function() {
                 var $dialog = Ox.Dialog({
-                    buttons: Ox.merge(
-                        title != 'Featured Lists' ? [
-                            Ox.Button({title: 'Sign Up...'}).bindEvent({
-                                click: function() {
-                                    $dialog.close();
-                                    pandora.$ui.accountDialog = pandora.ui.accountDialog('signup').open();
-                                }
-                            }),
-                            Ox.Button({title: 'Sign In...'}).bindEvent({
-                                click: function() {
-                                    $dialog.close();
-                                    pandora.$ui.accountDialog = pandora.ui.accountDialog('signin').open();
-                                }
-                            }),
-                            {}
-                        ] : [],
-                        [
-                            Ox.Button({title: 'Close'}).bindEvent({
-                                click: function() {
-                                    $dialog.close();
-                                }
-                            })
-                        ]
-                    ),
+                    buttons: title != 'Featured Lists' ? [
+                        Ox.Button({title: 'Sign Up...'}).bindEvent({
+                            click: function() {
+                                $dialog.close();
+                                pandora.$ui.accountDialog = pandora.ui.accountDialog('signup').open();
+                            }
+                        }),
+                        Ox.Button({title: 'Sign In...'}).bindEvent({
+                            click: function() {
+                                $dialog.close();
+                                pandora.$ui.accountDialog = pandora.ui.accountDialog('signin').open();
+                            }
+                        }),
+                        {},
+                        Ox.Button({title: 'Not Now'}).bindEvent({
+                            click: function() {
+                                $dialog.close();
+                            }
+                        })
+                    ] : [
+                        Ox.Button({title: 'Close'}).bindEvent({
+                            click: function() {
+                                $dialog.close();
+                            }
+                        })
+                    ],
                     content: Ox.Element()
                         .append(
                             $('<img>')
