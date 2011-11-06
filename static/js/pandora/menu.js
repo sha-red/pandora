@@ -310,6 +310,15 @@ pandora.ui.mainMenu = function() {
                     pandora.URL.push('/help');
                 }
             },
+            key_control_w: function() {
+                if (pandora.hasNoDialogOrScreen()) {
+                    if (ui.item) {
+                        pandora.UI.set({item: ''});
+                    } else if (ui._list) {
+                        pandora.UI.set({find: {conditions: [], operator: '&'}});
+                    }
+                }
+            },
             key_shift_a: function() {
                 ui.item && ['video', 'timeline'].indexOf(ui.itemView) > -1
                     && pandora.UI.set({showAnnotations: !ui.showAnnotations});
