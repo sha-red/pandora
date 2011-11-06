@@ -91,6 +91,7 @@ pandora.ui.folders = function() {
                     })
                     .bindEvent({
                         change: function(data) {
+                            var listData;
                             Ox.Request.clearCache(); // fixme: remove
                             pandora.site.sectionFolders.items[i].showBrowser = !pandora.site.sectionFolders.items[i].showBrowser;
                             if (pandora.site.sectionFolders.items[i].showBrowser) {
