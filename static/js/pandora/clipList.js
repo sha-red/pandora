@@ -22,7 +22,7 @@ pandora.ui.clipList = function(videoRatio) {
                     width = fixedRatio > 1 ? size : Math.round(size * fixedRatio);
                     height = fixedRatio > 1 ? Math.round(size / fixedRatio) : size;
                 }
-                title = data.subtitles[0].value; //fixme: could be other layer
+                title = data.subtitles ? data.subtitles[0].value : ''; //fixme: could be other layer
                 url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg';
                 sortKey = sort[0].key;
                 if (['text', 'position', 'duration'].indexOf(sortKey) > -1) {

@@ -410,6 +410,7 @@ pandora.ui.mainMenu = function() {
 
     function getListMenu(lists) {
         return { id: 'listMenu', title: 'List', items: Ox.merge(
+                { id: 'allitems', title: 'All ' + pandora.site.itemName.plural, checked: !ui.item && !ui._list, keyboard: 'shift control w' },
             ['personal', 'favorite', 'featured'].map(function(folder) {
                 return {
                     id: folder + 'lists',
