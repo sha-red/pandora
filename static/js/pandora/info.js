@@ -141,11 +141,11 @@ pandora.ui.info = function() {
 pandora.ui.listInfo = function() {
 
     var list = pandora.user.ui._list,
+        editable = list.split(':')[0] == pandora.user.username,
         that = $('<div>').css({padding: '16px', textAlign: 'center'}),
         $icon = Ox.Element({
                 element: '<img>',
-                tooltip: list.split(':')[0] == pandora.user.username
-                    ? 'Doubleclick to edit icon' : '',
+                tooltip: editable ? 'Doubleclick to edit icon' : '',
             })
             .attr({
                 src: list
@@ -155,6 +155,12 @@ pandora.ui.listInfo = function() {
             .css(getIconCSS())
             .appendTo(that),
         $title, $description;
+
+    editable && $icon.bindEvent({
+        doubleclick: function() {
+            pandora.$ui.listDialog = pandora.ui.listDialog('icon').open();
+        }
+    });
 
     that.append($('<div>').css({height: '16px'}));
 
@@ -167,15 +173,15 @@ pandora.ui.listInfo = function() {
             keys: ['description', 'name', 'user']
         }, function(result) {
             if (result.data.items.length) {
-                var item = result.data.items[0];
+                var item = result.data.items[0],
+                    editable = item.user == pandora.user.username;
                 that.append(
                     $title = Ox.Editable({
-                            editable: item.user == pandora.user.username,
+                            editable: editable,
                             format: function(value) {
                                 return Ox.encodeHTML(item.user + ': ' + value)
                             },
-                            tooltip: item.user == pandora.user.username
-                                ? 'Doubleclick to edit title' : '',
+                            tooltip: editable ? 'Doubleclick to edit title' : '',
                             value: item.name,
                             width: pandora.user.ui.sidebarSize - 32
                         })
@@ -209,13 +215,12 @@ pandora.ui.listInfo = function() {
                                 return '<div style="color: rgb(128, 128, 128); text-align: center">'
                                     + value + '</div>';
                             },
-                            editable: item.user == pandora.user.username,
+                            editable: editable,
                             height: pandora.user.ui.sidebarSize - 32,
-                            placeholder: item.user == pandora.user.username
+                            placeholder: editable
                                 ? '<div style="color: rgb(128, 128, 128); text-align: center">No description</span>'
                                 : '',
-                            tooltip: item.user == pandora.user.username
-                                ? 'Doubleclick to edit description' : '',
+                            tooltip: editable ? 'Doubleclick to edit description' : '',
                             type: 'textarea',
                             value: item.description,
                             width: pandora.user.ui.sidebarSize - 32
