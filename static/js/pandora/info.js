@@ -181,6 +181,11 @@ pandora.ui.listInfo = function() {
                         })
                         .css({fontWeight: 'bold', textAlign: 'center'})
                         .bindEvent({
+                            edit: function() {
+                                $title.options({
+                                    width: that.width()
+                                });
+                            },
                             submit: function(data) {
                                 if (data.value != item.name) {
                                     pandora.api.editList({
@@ -217,6 +222,17 @@ pandora.ui.listInfo = function() {
                         })
                         .css({textAlign: 'center'})
                         .bindEvent({
+                            edit: function() {
+                                // scrollbars may appear
+                                setTimeout(function() {
+                                    var width = that.width();
+                                    Ox.print('WIDTH', width, $description.options('width'))
+                                    $description.options({
+                                        height: width,
+                                        width: width
+                                    });
+                                }, 25);
+                            },
                             submit: function(data) {
                                 if (data.value != item.description) {
                                     pandora.api.editList({
@@ -254,14 +270,14 @@ pandora.ui.listInfo = function() {
         };
     }
     that.resizeInfo = function() {
+        var width = that.width();
         $icon.css(getIconCSS());
         $title.options({
-            width: that.width()
-            //width: pandora.user.ui.sidebarSize - 32
+            width: width
         });
         $description.options({
-            height: that.height(),
-            width: that.width()
+            height: width,
+            width: width
         });
     };
     return that;
