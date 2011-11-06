@@ -91,7 +91,7 @@ pandora.ui.clipList = function(videoRatio) {
         .bindEvent({
             init: function(data) {
                 // fixme: status needs an overhaul
-                if (!ui.item) {
+                if (!ui.item && pandora.$ui.total) {
                     pandora.$ui.total.html(pandora.ui.status('total', data));
                 }
             },
