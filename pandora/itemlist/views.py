@@ -31,7 +31,7 @@ def _order_query(qs, sort):
             operator = ''
         key = {
             'subscribed': 'subscribed_users',
-            'items': 'items_sum'
+            'items': 'numberofitems'
         }.get(e['key'], e['key'])
         order = '%s%s' % (operator, key)
         order_by.append(order)

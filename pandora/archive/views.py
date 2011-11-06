@@ -146,6 +146,7 @@ def upload(request):
                 position = float(os.path.splitext(name)[0])
                 fr, created = models.Frame.objects.get_or_create(file=f, position=position)
                 fr.frame.save(name, frame)
+            f.item.select_frame()
         else:
             response = json_response(status=403, text='permissino denied')
     if 'file' in request.FILES:
@@ -469,6 +470,8 @@ Positions
         }
     '''
     data = json.loads(request.POST['data'])
+    if not data.get('sort'):
+        data['sort'] = [{'key': 'path', 'operator': '+'}]
     query = parse_query(data, request.user)
 
     response = json_response({})
