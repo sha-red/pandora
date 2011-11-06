@@ -23,7 +23,7 @@ pandora.ui.listDialog = function(section) {
             } else if (id == 'icon') {
                 return pandora.ui.listIconPanel(listData);
             } else if (id == 'query') {
-                return pandora.$ui.filter = pandora.ui.filter(listData);
+                return pandora.$ui.filterForm = pandora.ui.filterForm(listData);
             }
         },
         tabs: tabs
@@ -244,8 +244,14 @@ pandora.ui.listGeneralPanel = function(listData) {
         }
         function editStatus(data) {
             var status = data.selected[0].id;
+            $statusSelect.value(status == 'private' ? 'public' : 'private');
             pandora.changeListStatus(listData.id, status, function(result) {
                 listData.status = result.data.status;
+                if (result.data.status == 'private') {
+                    subscribers = 0;
+                    $subscribersInput.options({value: 0});
+                }
+                $statusSelect.value(result.data.status);
                 $subscribersInput[getSubscribersAction()]();
                 $descriptionInput
                     .options({height: getDescriptionHeight()})

@@ -2,13 +2,15 @@
 'use strict';
 pandora.ui.folders = function() {
     var ui = pandora.user.ui,
+        counter = 0,
         that = Ox.Element()
             .css({overflowX: 'hidden', overflowY: 'auto'})
             .bindEvent({
                 resize: pandora.resizeFolders,
             });
-    var counter = 0;
     //var $sections = [];
+
+    pandora.$ui.allItems = pandora.ui.allItems().appendTo(that);
     pandora.$ui.folder = [];
     pandora.$ui.folderBrowser = {};
     pandora.$ui.folderList = {};

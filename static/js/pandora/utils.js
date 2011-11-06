@@ -140,12 +140,20 @@ pandora.changeListStatus = function(id, status, callback) {
     if (status == 'private') {
         pandora.api.findLists({
             query: {conditions: [{key: 'id', value: id, operator: '=='}]},
-            keys: ['subscribers']
+            keys: ['name', 'subscribers']
         }, function(result) {
-            var subscribers = result.data.items[0].subscribers;
+            var name = result.data.items[0].name,
+                subscribers = result.data.items[0].subscribers;
             if (subscribers) {
-                pandora.ui.makeListPrivateDialog(subscribers, function(makePrivate) {
-                    makePrivate && changeListStatus();
+                pandora.ui.makeListPrivateDialog(name, subscribers, function(makePrivate) {
+                    if (makePrivate) {
+                        changeListStatus();
+                    } else {
+                        callback({data: {
+                            id: id,
+                            status: 'public'
+                        }});
+                    }
                 }).open();
             } else {
                 changeListStatus();
@@ -156,7 +164,7 @@ pandora.changeListStatus = function(id, status, callback) {
     }
     function changeListStatus() {
         pandora.api.editList({
-            id: is,
+            id: id,
             status: status
         }, callback);
     }
@@ -505,7 +513,7 @@ pandora.getFoldersWidth = function() {
     Ox.Log('', 'FOLDERS HEIGHT', pandora.getFoldersHeight(), 'INFO HEIGHT', pandora.getInfoHeight())
     if (
         pandora.$ui.appPanel
-        && pandora.getFoldersHeight() > window.innerHeight - 20 - 24 - 1 - pandora.getInfoHeight()
+        && pandora.getFoldersHeight() > window.innerHeight - 20 - 24 -16 - 1 - pandora.getInfoHeight()
     ) {
         width -= Ox.UI.SCROLLBAR_SIZE;
     }
@@ -809,6 +817,7 @@ pandora.resizeFolders = function() {
         columnWidth.name = (width - 96) - columnWidth.user;
     }
     Ox.Log('', 'RESIZE FOLDERS', width);
+    pandora.$ui.allItems.resizeElement(width - 104);
     Ox.forEach(pandora.$ui.folderList, function($list, id) {
         var pos = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id);
         pandora.$ui.folder[pos].css({width: width + 'px'});

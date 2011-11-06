@@ -301,6 +301,7 @@ pandora.ui.folderList = function(id) {
                 } else if (data.key == 'status') {
                     var status = that.value(data.id, data.key) == 'private' ? 'public' : 'private';
                     pandora.changeListStatus(data.id, status, function(result) {
+                        Ox.print('cLS', result.data);
                         that.value(result.data.id, 'status', result.data.status);
                     });
                 } else if (data.key == 'path') {
