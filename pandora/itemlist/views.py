@@ -310,13 +310,14 @@ def editList(request):
                 if value not in list._status:
                     value = list._status[0]
                 if value == 'private':
-                    for user in list.subscribed_users.all():
-                        list.subscribed_users.remove(user)
-                    qs = models.Position.objects.filter(user=request.user, section='section', list=list)
+                    qs = models.Position.objects.filter(user=request.user,
+                                                        section='section', list=list)
                     if qs.count() > 1:
                         pos = qs[0]
                         pos.section = 'personal'
                         pos.save()
+                        models.Position.objects.filter(list=list,
+                                                       section='public').delete()
                 elif value == 'featured':
                     if not request.user.is_staff:
                         value = list.status
