@@ -111,7 +111,9 @@ pandora.ui.folders = function() {
                                         pandora.$ui.folderList.featured.options({selected: [listData.id]});
                                     } else {
                                         // and nowhere else
-                                        pandora.URL.set('');
+                                        pandora.UI.set({
+                                            find: pandora.site.user.ui.find
+                                        });
                                     }
                                 }
                                 pandora.$ui.folderBrowser.favorite.replaceWith(
