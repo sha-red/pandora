@@ -9,8 +9,8 @@ pandora.ui.deleteListDialog = function() {
         that = Ox.Dialog({
             buttons: [
                 Ox.Button({
-                    id: 'cancel',
-                    title: 'Cancel'
+                    id: 'keep',
+                    title: 'Keep List'
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -18,7 +18,7 @@ pandora.ui.deleteListDialog = function() {
                 }),
                 Ox.Button({
                     id: 'delete',
-                    title: 'Delete'
+                    title: 'Delete List'
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -42,11 +42,19 @@ pandora.ui.deleteListDialog = function() {
                     }
                 })
             ],
-            content: $('<div>')
-                .css({margin: '16px'})
-                .html('Do you want to delete the list "' + listData.id + '"?'),
+            content: Ox.Element()
+                .append(
+                    $('<img>')
+                        .attr({src: '/static/png/icon64.png'})
+                        .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
+                )
+                .append(
+                    $('<div>')
+                        .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
+                        .html('Are you sure you want to delete the list "' + listData.id + '"?')
+                ),
             height: 128,
-            keys: {enter: 'delete', escape: 'cancel'},
+            keys: {enter: 'delete', escape: 'keep'},
             title: 'Delete List',
             width: 304
         });

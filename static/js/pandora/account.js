@@ -319,8 +319,8 @@ pandora.ui.accountSignoutDialog = function() {
     var that = Ox.Dialog({
         buttons: [
             Ox.Button({
-                id: 'cancel',
-                title: 'Cancel'
+                id: 'stay',
+                title: 'Stay Signed In'
             }).bindEvent('click', function() {
                 that.close().remove();
                 pandora.URL.update();
@@ -348,7 +348,7 @@ pandora.ui.accountSignoutDialog = function() {
             ),
         fixedSize: true,
         height: 128,
-        keys: {enter: 'signout', escape: 'cancel'},
+        keys: {enter: 'signout', escape: 'stay'},
         title: 'Sign Out',
         width: 304
     });

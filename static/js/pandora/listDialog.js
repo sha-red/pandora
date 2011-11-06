@@ -244,10 +244,7 @@ pandora.ui.listGeneralPanel = function(listData) {
         }
         function editStatus(data) {
             var status = data.selected[0].id;
-            pandora.api.editList({
-                id: listData.id,
-                status: status
-            }, function(result) {
+            pandora.changeListStatus(listData.id, status, function(result) {
                 listData.status = result.data.status;
                 $subscribersInput[getSubscribersAction()]();
                 $descriptionInput

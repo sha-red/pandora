@@ -299,10 +299,8 @@ pandora.ui.folderList = function(id) {
                         pandora.$ui.listDialog = pandora.ui.listDialog('query').open();
                     }
                 } else if (data.key == 'status') {
-                    pandora.api.editList({
-                        id: data.id,
-                        status: that.value(data.id, data.key) == 'private' ? 'public' : 'private'
-                    }, function(result) {
+                    var status = that.value(data.id, data.key) == 'private' ? 'public' : 'private';
+                    pandora.changeListStatus(data.id, status, function(result) {
                         that.value(result.data.id, 'status', result.data.status);
                     });
                 } else if (data.key == 'path') {

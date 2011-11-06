@@ -136,6 +136,32 @@ pandora.addList = function() {
     }
 };
 
+pandora.changeListStatus = function(id, status, callback) {
+    if (status == 'private') {
+        pandora.api.findLists({
+            query: {conditions: [{key: 'id', value: id, operator: '=='}]},
+            keys: ['subscribers']
+        }, function(result) {
+            var subscribers = result.data.items[0].subscribers;
+            if (subscribers) {
+                pandora.ui.makeListPrivateDialog(subscribers, function(makePrivate) {
+                    makePrivate && changeListStatus();
+                }).open();
+            } else {
+                changeListStatus();
+            }
+        });
+    } else {
+        changeListStatus();
+    }
+    function changeListStatus() {
+        pandora.api.editList({
+            id: is,
+            status: status
+        }, callback);
+    }
+};
+
 pandora.clickLink = function(e) {
     if (e.target.hostname == document.location.hostname) {
         pandora.URL.push(e.target.pathname);
