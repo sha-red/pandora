@@ -719,11 +719,16 @@ pandora.getVideoPartsAndPoints = function(durations, points) {
     return ret;
 };
 
-pandora.hasNoDialogOrScreen = function() {
-    return $('.OxDialog:visible').length == 0
-        && $('.OxFullscreen').length == 0
-        && $('.OxScreen').length == 0;
-}
+pandora.hasDialogOrScreen = function() {
+    return $('.OxDialog:visible').length
+        || $('.OxFullscreen').length
+        || $('.OxScreen').length;
+};
+
+pandora.hasFocusedInput = function() {
+    var focused = Ox.Focus.focused();
+    return focused && Ox.UI.elements[focused].is('.OxInput');
+};
 
 pandora.isClipView = function(view, item) {
     if (arguments.length == 0) {
@@ -932,8 +937,9 @@ pandora.selectList = function() {
                 );
                 pandora.$ui.folderList[folder]
                     .options({selected: [pandora.user.ui._list]});
-                // Don't steal focus from home screen
-                $('.OxScreen').length == 0 && pandora.$ui.folderList[folder].gainFocus();
+                if (!pandora.hasDialogOrScreen() && !pandora.hasFocusedInput()) {
+                    pandora.$ui.folderList[folder].gainFocus();
+                }
             }
         });
     }

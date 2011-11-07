@@ -302,27 +302,27 @@ pandora.ui.mainMenu = function() {
                 }
             },
             key_control_comma: function() {
-                if (pandora.hasNoDialogOrScreen()) {
+                if (!pandora.hasDialogOrScreen()) {
                     pandora.URL.push('/preferences');
                 }
             },
             key_control_f: function() {
-                if (pandora.hasNoDialogOrScreen()) {
+                if (!pandora.hasDialogOrScreen()) {
                     pandora.$ui.findInput.focusInput(true);
                 }
             },
             key_control_shift_w: function() {
-                if (pandora.hasNoDialogOrScreen() || (ui.item || ui._list)) {
+                if (!pandora.hasDialogOrScreen() || (ui.item || ui._list)) {
                     pandora.UI.set({find: {conditions: [], operator: '&'}});
                 }
             },
             key_control_slash: function() {
-                if (pandora.hasNoDialogOrScreen()) {
+                if (!pandora.hasDialogOrScreen()) {
                     pandora.URL.push('/help');
                 }
             },
             key_control_w: function() {
-                if (pandora.hasNoDialogOrScreen()) {
+                if (!pandora.hasDialogOrScreen()) {
                     if (ui.item) {
                         pandora.UI.set({item: ''});
                     } else if (ui._list) {
