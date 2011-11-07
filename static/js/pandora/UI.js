@@ -89,14 +89,11 @@ pandora.UI = (function() {
         listView = add.listView || args.listView;
 
         if (listView) {
-            Ox.print('XXX')
             if (pandora.isClipView(listView)) {
-                Ox.print('YYY')
                 // when switching to a clip view, clear list selection
                 // (but don't trigger an additional event)
                 add.listSelection = [];
             } else if (['text', 'position'].indexOf(pandora.user.ui.listSort[0].key) > -1) {
-                Ox.print('ZZZ')
                 // when switchin to a non-clip view, with a sort key that
                 // only exists in clip view, reset sort to default
                 args.listSort = pandora.site.user.ui.listSort;
