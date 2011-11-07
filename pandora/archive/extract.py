@@ -317,9 +317,10 @@ def average_color(prefix, start=0, end=0):
 
     if end:
         frames = end - start
-    for i in range(0, len(pixels)):
-        p = np.sum(pixels[i], axis=0) / frames
-        color += p
+    if frames:
+        for i in range(0, len(pixels)):
+            p = np.sum(pixels[i], axis=0) / frames
+            color += p
     color = list(map(float, color))
     return ox.image.getHSL(color)
 

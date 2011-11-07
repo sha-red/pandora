@@ -59,6 +59,9 @@ def parseCondition(condition, user):
             return ~q
         else:
             return q
+    if (not exclude and op == '=' or op in ('$', '^', '>=', '<')) and v == '':
+        return Q(True)
+
     if k.endswith('__id'):
         v = decode_id(v)
     if isinstance(v, bool): #featured and public flag
