@@ -4,7 +4,6 @@ import copy
 from datetime import datetime
 
 from django.contrib.auth.models import User
-from django.contrib.sessions.models import Session
 from django.db import models
 from django.db.models import Max
 from django.conf import settings
@@ -21,7 +20,7 @@ class SessionData(models.Model):
     session_key = models.CharField(max_length=40, primary_key=True)
     user = models.ForeignKey(User, unique=True, null=True, blank=True, related_name='data')
     firstseen = models.DateTimeField(auto_now_add=True, db_index=True)
-    lastseen = models.DateTimeField(auto_now=True, db_index=True)
+    lastseen = models.DateTimeField(default=datetime.now, db_index=True)
     username = models.CharField(max_length=255, null=True, db_index=True)
     level = models.IntegerField(default=0)
 
@@ -67,6 +66,7 @@ class SessionData(models.Model):
         if not data.timesseen:
             data.timesseen = 0
         data.timesseen += 1
+        data.lastseen = datetime.now()
         data.save()
         return data
 
