@@ -79,13 +79,13 @@ pandora.UI = (function() {
             }
             add.itemFind = pandora.isItemFind(args.find)
                 ? args.find : pandora.site.user.ui.itemFind;
+        } else {
+            list = self.previousUI._list;
         }
 
-        // it is important to check for find first, so that if find
-        // changes list, pandora.user.ui._list is correct here
-        item = args['item'] || pandora.user.ui.item,
-        list = pandora.user.ui._list || self.previousUI._list;
-
+        item = args['item'] || pandora.user.ui.item;
+        // it is important to check for find first, so that
+        // if find changes list, list is correct here
         if (!pandora.user.ui.lists[list]) {
             add['lists.' + that.encode(list)] = {};
         }
