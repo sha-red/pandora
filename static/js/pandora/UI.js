@@ -31,6 +31,7 @@ pandora.UI = (function() {
             item,
             list,
             listSettings = pandora.site.listSettings,
+            listView,
             set = {},
             trigger = {},
             triggerEvents;
@@ -85,13 +86,15 @@ pandora.UI = (function() {
         // it is important to check for find first, so that
         // if find changes list, list is correct here
         item = args.item || pandora.user.ui.item;
+        listView = add.listView || args.listView;
 
-        if (args.listView) {
+        if (listView) {
             Ox.print('XXX')
-            if (pandora.isClipView(args.listView)) {
+            if (pandora.isClipView(listView)) {
                 Ox.print('YYY')
                 // when switching to a clip view, clear list selection
-                args.listSelection = [];
+                // (but don't trigger an additional event)
+                add.listSelection = [];
             } else if (['text', 'position'].indexOf(pandora.user.ui.listSort[0].key) > -1) {
                 Ox.print('ZZZ')
                 // when switchin to a non-clip view, with a sort key that
