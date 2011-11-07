@@ -580,8 +580,8 @@ pandora.getListData = function(list) {
             var values = $list.value(list);
             if (!Ox.isEmpty(values)) {
                 data = Ox.extend({
-                    editable: data.user == pandora.user.username
-                        && data.type == 'static',
+                    editable: values.user == pandora.user.username
+                        && values.type == 'static',
                     folder: id
                 }, values);
                 return false;
