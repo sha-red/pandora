@@ -206,11 +206,12 @@ pandora.ui.usersDialog = function() {
             })
             .bindEvent({
                 init: function(data) {
-                    numberOfUsers = data.items;
                     $status.html(
-                        Ox.formatNumber(numberOfUsers)
-                        + ' user' + (numberOfUsers == 1 ? '' : 's')
-                        + ' (' + Ox.formatNumber(numberOfUsers) + ' registered, 0 guests)'
+                        Ox.formatNumber(data.items)
+                        + ' user' + (data.items == 1 ? '' : 's')
+                        + ' (' + Ox.formatNumber(data.users) + ' registered, '
+                        + Ox.formatNumber(data.guests) + ' guest' + (data.guests == 1 ? '' : 's')
+                        + ')'
                     );
                 },
                 select: function(data) {

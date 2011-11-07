@@ -518,7 +518,8 @@ Positions
         response['data']['positions'] = utils.get_positions(ids, data['positions'])
     else:
         response['data']['items'] = qs.count()
-
+        response['data']['users'] = qs.exclude(user=None).count()
+        response['data']['guests'] = response['data']['items'] - response['data']['users']
     return render_to_json_response(response)
 actions.register(findUsers)
 
