@@ -126,8 +126,14 @@ class UserProfile(models.Model):
 
 def user_post_save(sender, instance, **kwargs):
     profile, new = UserProfile.objects.get_or_create(user=instance)
-
+    SessionData.objects.filter(user=instance).update(level=profile.level,
+                                                     username=instance.username)
 models.signals.post_save.connect(user_post_save, sender=User)
+
+def profile_post_save(sender, instance, **kwargs):
+    SessionData.objects.filter(user=instance.user).update(level=instance.level,
+                                                     username=instance.user.username)
+models.signals.post_save.connect(profile_post_save, sender=UserProfile)
 
 def get_ui(user_ui, user=None):
     ui = {}
@@ -200,7 +206,6 @@ def init_user(user, request=None):
         result['ui'] = profile.get_ui()
         result['volumes'] = [v.json() for v in user.volumes.all()] 
     return result
-
 
 def user_json(user, keys=None):
     p = user.get_profile()

@@ -161,7 +161,7 @@ def signup(request):
             user.save()
             #create default user lists:
             for l in settings.CONFIG['personalLists']:
-                list = models.List(name=l['name'], user=user)
+                list = models.List(name=l['id'], user=user)
                 for key in ('query', 'public', 'featured'):
                     if key in l:
                         setattr(list, key, l[key])
@@ -170,7 +170,7 @@ def signup(request):
             user = authenticate(username=data['username'],
                                 password=data['password'])
             login(request, user)
-            user_json = models.init_user(user)
+            user_json = models.init_user(user, request)
             response = json_response({
                 'user': user_json
             }, text='account created')
@@ -219,7 +219,7 @@ def resetPassword(request):
                 user = authenticate(username=user.username, password=data['password'])
                 login(request, user)
 
-                user_json = models.init_user(user)
+                user_json = models.init_user(user, request)
                 response = json_response({
                     'user': user_json
                 }, text='password reset')
