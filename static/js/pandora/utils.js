@@ -572,20 +572,21 @@ pandora.getItemByIdOrTitle = function(str, callback) {
     });
 }
 
-pandora.getListData = function() {
-    var data = {}, folder;
-    if (pandora.user.ui._list) {
-        Ox.forEach(pandora.$ui.folderList, function(list, key) {
-            if (list.options('selected').length) {
-                folder = key;
+pandora.getListData = function(list) {
+    var data = {};
+    list = Ox.isUndefined(list) ? pandora.user.ui._list : list;
+    if (list) {
+        Ox.forEach(pandora.$ui.folderList, function($list, id) {
+            var values = $list.value(list);
+            if (!Ox.isEmpty(values)) {
+                data = Ox.extend({
+                    editable: data.user == pandora.user.username
+                        && data.type == 'static',
+                    folder: id
+                }, values);
                 return false;
             }
         });
-        if (folder) {
-            data = pandora.$ui.folderList[folder].value(pandora.user.ui._list);
-            data.editable = data.user == pandora.user.username && data.type == 'static';
-            data.folder = folder;
-        }
     }
     return data;
 };

@@ -364,11 +364,6 @@ pandora.ui.folderList = function(id) {
             },
             select: function(data) {
                 var list = data.ids.length ? data.ids[0] : '';
-                if (list) {
-                    Ox.forEach(pandora.$ui.folderList, function($list, id_) {
-                        id != id_ && $list.options('selected', []);
-                    });
-                }
                 pandora.UI.set({
                     find: {
                         conditions: list ? [

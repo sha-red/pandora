@@ -155,7 +155,13 @@ pandora.ui.mainMenu = function() {
         .bindEvent({
             change: function(data) {
                 var value = data.checked[0] ? data.checked[0].id : null;
-                if (data.id == 'find') {
+                if (data.id == 'allitems') {
+                    if (data.checked) {
+                        pandora.UI.set('find', {conditions: [], operator: '&'});
+                    } else {
+                        that.checkItem('allitems');
+                    }
+                } else if (data.id == 'find') {
                     pandora.$ui.findSelect.options({value: value});
                 } else if (data.id == 'itemview') {
                     pandora.UI.set({itemView: value});
@@ -208,11 +214,11 @@ pandora.ui.mainMenu = function() {
                         set.listSort = pandora.site.user.ui.listSort;
                     }
                     pandora.UI.set(set);
-                } else if (['personallists', 'favoritelists', 'featuredlists'].indexOf(data.id) > -1) {
+                } else if (data.id.substr(0, 8) == 'viewlist') {
                     pandora.UI.set({
                         find: {
-                            conditions: value ? [
-                                {key: 'list', value: value.substr(8), operator: '=='}
+                            conditions: data.checked ? [
+                                {key: 'list', value: data.id.substr(8), operator: '=='}
                             ] : [],
                             operator: '&'
                         }
@@ -345,9 +351,15 @@ pandora.ui.mainMenu = function() {
                     && pandora.UI.set({showTimeline: !ui.showTimeline});
             },
             pandora_find: function() {
-                var action = ui._list
-                    && pandora.getListData(ui._list).user == pandora.user.username
-                    ? 'enableItem' : 'disableItem';
+                var list = ui._list,
+                    listData = pandora.getListData(),
+                    previousList = pandora.UI.getPrevious()._list,
+                    action = list && listData.user == pandora.user.username
+                        ? 'enableItem' : 'disableItem';
+                if (list != previousList) {
+                    that.uncheckItem(previousList == '' ? 'allitems' : 'viewlist' + previousList);
+                    that.checkItem(list == '' ? 'allitems' : 'viewlist' + list);
+                }
                 that[action]('editlist');
                 that[action]('duplicatelist');
                 that[action]('deletelist');
@@ -415,18 +427,17 @@ pandora.ui.mainMenu = function() {
                 return {
                     id: folder + 'lists',
                     title: Ox.toTitleCase(folder) + ' Lists',
-                    items: [{
-                        group: folder + 'lists',
-                        min: 0,
-                        max: 1,
-                        items: lists ? lists[folder].map(function(list) {
+                    items: Ox.isUndefined(lists)
+                        ? [{id: 'loading', title: 'Loading...', disabled: true}]
+                        : lists[folder].length == 0
+                        ? [{id: 'nolists', title: 'No ' + Ox.toTitleCase(folder) + ' Lists', disabled: true}]
+                        : lists[folder].map(function(list) {
                             return {
                                 id: 'viewlist' + list.id,
                                 title: (folder == 'favorite' ? list.user + ': ' : '') + list.name,
                                 checked: list.id == pandora.user.ui._list
                             };
-                        }) : [{id: 'loading', title: 'Loading...', disabled: true}]
-                    }]
+                        })
                 };
             }),
             [
@@ -497,7 +508,7 @@ pandora.ui.mainMenu = function() {
         ] };
     }
 
-    // fixme: the sidebar makes the same requests.
+    // fixme: the sidebar makes (almost) the same requests.
     // is it ok to make them twice, or should the sidebar trigger the menu replace?
 
     var counter = 0,
@@ -520,7 +531,8 @@ pandora.ui.mainMenu = function() {
     Ox.forEach(queries, function(query, folder) {
         pandora.api.findLists({
             query: query,
-            keys: ['id', 'name', 'user']
+            keys: ['id', 'name', 'user'],
+            sort: [{key: 'position', operator: '+'}]
         }, function(result) {
             lists[folder] = result.data.items;
             if (++counter == 3) {

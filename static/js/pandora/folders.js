@@ -317,12 +317,23 @@ pandora.ui.folders = function() {
     }
     that.bindEvent({
         pandora_find: function() {
-            var previousUI = pandora.UI.getPrevious();
+            var folder = pandora.getListData().folder,
+                list = pandora.user.ui._list,
+                previousList = pandora.UI.getPrevious()._list;
+            if (list != previousList) {
+                Ox.forEach(pandora.$ui.folderList, function($list, id) {
+                    id != folder && $list.options('selected', []);
+                });
+                folder && pandora.$ui.folderList[folder].options({selected: [list]});
+            }
+            /*
             if (!pandora.user.ui._list && previousUI._list) {
+                pandora.$ui.folderList[pandora.getListData(previous)]
                 Ox.forEach(pandora.$ui.folderList, function($list) {
                     $list.options({selected: []});
                 });
             }
+            */
         }
     })
     return that;
