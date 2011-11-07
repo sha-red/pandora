@@ -204,12 +204,7 @@ pandora.ui.accountForm = function(action, value) {
                 id: 'code',
                 label: 'Code',
                 labelWidth: 120,
-                validate: function(value, callback) {
-                    callback({
-                        message: 'Missing code',
-                        valid: value.length > 0
-                    });
-                },
+                validate: pandora.validateCode,
                 width: 320
             });
         } else if (type == 'email') {
@@ -257,12 +252,7 @@ pandora.ui.accountForm = function(action, value) {
                 label: 'Password',
                 labelWidth: 120,
                 type: 'password',
-                validate: function(value, callback) {
-                    callback({
-                        message: 'Missing password',
-                        valid: value.length > 0
-                    });
-                },
+                validate: pandora.validatePassword,
                 width: 320
             });
         } else if (type == 'username') {
@@ -295,7 +285,8 @@ pandora.ui.accountForm = function(action, value) {
                                         ? pandora.autovalidateUsername : pandora.autovalidateEmail,
                                     validate: pandora.validateUser(selected, true),
                                     value: ''
-                                }).focus();
+                                }).focusInput();
+                                //setTimeout(that.submit, 250);
                                 pandora.$ui.accountDialog.disableButton('submitReset');
                             }
                         }),

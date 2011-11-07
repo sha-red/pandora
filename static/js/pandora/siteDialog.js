@@ -64,9 +64,10 @@ pandora.ui.siteDialog = function(section) {
                 $dialog.options({
                     title: Ox.getObjectById(tabs, data.selected).title
                 });
+                pandora.URL.replace('/' + data.selected);
                 //fixme: this should be using URL.push / UI.set
                 //but that currenlty causes another dialog to be opened
-                history.pushState({}, '', '/' + data.selected);
+                //history.pushState({}, '', '/' + data.selected);
             }
         });
     var $dialog = Ox.Dialog({

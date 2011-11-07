@@ -38,11 +38,18 @@ pandora.autovalidateUsername = function(value, blur, callback) {
     callback({valid: !!value.length, value: value});
 };
 
+pandora.validateCode = function(value, callback) {
+    callback({
+        message: '',
+        // message: 'Missing code',
+        valid: value.length > 0
+    });
+};
+
 pandora.validateNewEmail = function(value, callback) {
     value == pandora.user.email ? callback({
         message: '',
-        valid: true,
-        value: value
+        valid: true
     }) : Ox.isValidEmail(value) ? pandora.api.findUser({
         key: 'email',
         value: value,
@@ -50,21 +57,28 @@ pandora.validateNewEmail = function(value, callback) {
     }, function(result) {
         callback({
             message: 'E-mail address already exists',
-            valid: !result.data.users.length,
-            value: value
+            valid: !result.data.users.length
         });
     }) : callback({
-        message: (!value.length ? 'Missing' : 'Invalid') + ' e-mail address',
+        message: value.length ? 'Invalid e-mail address' : '',
+        // message: (!value.length ? 'Missing' : 'Invalid') + ' e-mail address',
         valid: false,
-        value: value
     });
 };
 
 pandora.validateNewPassword = function(value, callback) {
     callback({
-        message: 'Missing password',
-        valid: value.length > 0,
-        value: value
+        message: '',
+        // message: 'Missing password',
+        valid: value.length > 0
+    });
+};
+
+pandora.validatePassword = function(value, callback) {
+    callback({
+        message: '',
+        // message: 'Missing password',
+        valid: value.length > 0
     });
 };
 
@@ -79,7 +93,6 @@ pandora.validateUser = function(key, existing) {
             operator: '=='
         }, function(result) {
             var valid = existing == !!result.data.users.length;
-            //Ox.Log('', existing, result.data.users)
             callback({
                 message: existing ?
                     'Unknown ' + string :
@@ -87,7 +100,8 @@ pandora.validateUser = function(key, existing) {
                 valid: valid
             });
         }) : callback({
-            message: (!value.length ? 'Missing' : 'Invalid') + ' ' + string,
+            message: value.length ? 'Invalid ' + string : '',
+            // message: (!value.length ? 'Missing' : 'Invalid') + ' ' + string,
             valid: false
         });
     };
