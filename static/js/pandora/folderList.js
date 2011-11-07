@@ -338,6 +338,11 @@ pandora.ui.folderList = function(id) {
                     });
                 }
             },
+            /*
+            edit: function() {
+                pandora.ui.listDialog().open();
+            },
+            */
             init: function(data) {
                 pandora.site.sectionFolders[pandora.user.ui.section][i].items = data.items;
                 pandora.$ui.folder[i].$content.css({

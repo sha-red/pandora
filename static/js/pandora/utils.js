@@ -123,7 +123,7 @@ pandora.addList = function() {
         $folderList.bindEventOnce({
             load: function(data) {
                 $folderList.gainFocus()
-                    .options({selected: [list]})
+                    .options({selected: [newList]})
                     .editCell(newList, 'name');
                 pandora.UI.set({
                     find: {
