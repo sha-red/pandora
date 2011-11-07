@@ -19,6 +19,11 @@ pandora.ui.info = function() {
                 },
                 pandora_item: updateInfo,
                 pandora_listselection: updateInfo,
+                pandora_listview: function(data) {
+                    if (!pandora.isClipView(data.value) && pandora.isClipView(data.previousValue)) {
+                        updateInfo();
+                    }
+                }
             });
 
     //pandora.$ui.leftPanel && resize();
