@@ -422,6 +422,7 @@ def order_query(qs, sort):
             'useragent': 'useragent',
             'username': 'username',
             'windowsize': 'windowsize',
+            'level': 'level',
         }.get(e['key'], 'user__profile__%s'%e['key'])
         if key == 'user__profile__numberoflists':
             qs = qs.annotate(numberoflists=Sum('user__lists'))

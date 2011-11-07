@@ -23,6 +23,7 @@ class SessionData(models.Model):
     firstseen = models.DateTimeField(auto_now_add=True, db_index=True)
     lastseen = models.DateTimeField(auto_now=True, db_index=True)
     username = models.CharField(max_length=255, null=True, db_index=True)
+    level = models.IntegerField(default=0)
 
     timesseen = models.IntegerField(default=0)
     ip = models.CharField(default='', max_length=255)
@@ -40,7 +41,10 @@ class SessionData(models.Model):
     def save(self, *args, **kwargs):
         if self.user:
             self.username = self.user.username
+            self.level = self.user.get_profile().level
             self.firstseen = self.user.date_joined
+        else:
+            self.level = 0
         super(SessionData, self).save(*args, **kwargs)
 
     @classmethod
