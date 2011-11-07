@@ -424,7 +424,6 @@ pandora.ui.usersDialog = function() {
                         value: userData.notes,
                         width: 240
                     })
-                    .css({height: '240px'})
                 ],
                 width: 240
             })
