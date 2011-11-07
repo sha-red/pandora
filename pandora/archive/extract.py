@@ -294,7 +294,7 @@ def average_color(prefix, start=0, end=0):
     timelines = sorted(filter(lambda t: t!= '%s%sp.png'%(prefix,height), glob("%s%sp*.png"%(prefix, height))))
     for image in timelines:
         start_offset = 0
-        if start and frames + 1500 < start:
+        if start and frames + 1500 <= start:
             frames += 1500
             continue
         timeline = Image.open(image)
@@ -311,7 +311,6 @@ def average_color(prefix, start=0, end=0):
         p = np.asarray(timeline.convert('RGB'), dtype=np.float32)
         p = np.sum(p, axis=0) / height               #average color per frame
         pixels.append(p)
-
         if end and frames >= end:
             break
 
