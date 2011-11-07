@@ -573,20 +573,30 @@ pandora.getItemByIdOrTitle = function(str, callback) {
 }
 
 pandora.getListData = function(list) {
-    var data = {};
+    var data = {}, folder;
     list = Ox.isUndefined(list) ? pandora.user.ui._list : list;
     if (list) {
         Ox.forEach(pandora.$ui.folderList, function($list, id) {
-            var values = $list.value(list);
-            if (!Ox.isEmpty(values)) {
-                data = Ox.extend({
-                    editable: values.user == pandora.user.username
-                        && values.type == 'static',
-                    folder: id
-                }, values);
-                return false;
-            }
+            var ret = true;
+            // for the current list, we have to check in which
+            // folder it is selected, since for example, a personal
+            // list may appear again in the featured lists browser
+            if (
+                list == pandora.user.ui._list
+                && $list.options('selected').length
+            ) {
+                folder = id;
+                ret = false;
+            } else if (!Ox.isEmpty($list.value(list))) {
+                folder = id
+                ret = false;
+            }            
         });
+        if (folder) {
+            data = pandora.$ui.folderList[folder].value(pandora.user.ui._list);
+            data.editable = data.user == pandora.user.username && data.type == 'static';
+            data.folder = folder;
+        }
     }
     return data;
 };
