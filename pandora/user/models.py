@@ -70,13 +70,16 @@ class SessionData(models.Model):
         data.save()
         return data
 
+    def get_id(self):
+        return self.user and ox.to26(self.user.id) or self.session_key
+
     def json(self, keys=None, user=None):
         j = {
             'disabled': False,
             'email': '',
             'firstseen': self.firstseen,
             'ip': self.ip,
-            'id': self.user and ox.to26(self.user.id) or self.session_key,
+            'id': self.get_id(),
             'lastseen': self.lastseen,
             'level': 'guest',
             'notes': '',
