@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from django.contrib.auth.models import User
-
-from django.db.models import Q
+from django.db.models import Q, Manager
+from ox.django.query import QuerySet
 
 def parseCondition(condition, user):
     k = condition.get('key', 'name')
     k = {
-        'firstseen': 'created',
-        'lastseen': 'last_login',
+        'email': 'user__email',
         'user': 'username',
-        'name': 'username',
     }.get(k, k)
     v = condition['value']
     op = condition.get('operator')
@@ -61,12 +58,40 @@ def parseConditions(conditions, operator, user):
         return q
     return None
 
-def find_user(data, user):
-    qs = User.objects.all()
-    query = data.get('query', {})
-    conditions = parseConditions(query.get('conditions', []),
-                                 query.get('operator', '&'),
-                                 user)
-    if conditions:
-        qs = qs.filter(conditions)
-    return qs
+class SessionDataManager(Manager):
+
+    def get_query_set(self):
+        return QuerySet(self.model)
+
+    def find(self, data, user):
+        '''
+            query: {
+                conditions: [
+                    {
+                        value: "war"
+                    }
+                    {
+                        key: "year",
+                        value: "1970-1980,
+                        operator: "!="
+                    },
+                    {
+                        key: "country",
+                        value: "f",
+                        operator: "^"
+                    }
+                ],
+                operator: "&"
+            }
+        '''
+
+        #join query with operator
+        qs = self.get_query_set()
+        
+        query = data.get('query', {})
+        conditions = parseConditions(query.get('conditions', []),
+                                     query.get('operator', '&'),
+                                     user)
+        if conditions:
+            qs = qs.filter(conditions)
+        return qs

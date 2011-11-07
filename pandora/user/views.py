@@ -340,7 +340,7 @@ def editUser(request):
         user.username = data['username']
     user.save()
     profile.save()
-    response['data'] = models.user_json(user)
+    response['data'] = user.data.get().json()
     return render_to_json_response(response)
 actions.register(editUser, cache=False)
 
@@ -403,7 +403,7 @@ def parse_query(data, user):
     for key in ('keys', 'range', 'sort', 'query'):
         if key in data:
             query[key] = data[key]
-    query['qs'] = managers.find_user(query, user)
+    query['qs'] = models.SessionData.objects.find(query, user)
     return query
 
 def order_query(qs, sort):
@@ -413,21 +413,23 @@ def order_query(qs, sort):
         if operator != '-':
             operator = ''
         key = {
-            'email': 'email',
-            'firstseen': 'date_joined',
-            'lastseen': 'last_login',
+            'email': 'user__email',
+            'firstseen': 'firstseen',
+            'ip': 'ip',
+            'lastseen': 'lastseen',
+            'screensize': 'screensize',
+            'timesseen': 'timesseen',
+            'useragent': 'useragent',
             'username': 'username',
-            'name': 'username',
-        }.get(e['key'], 'profile__%s'%e['key'])
-        if key == 'profile__numberoflists':
-            qs = qs.annotate(numberoflists=Sum('lists'))
+            'windowsize': 'windowsize',
+        }.get(e['key'], 'user__profile__%s'%e['key'])
+        if key == 'user__profile__numberoflists':
+            qs = qs.annotate(numberoflists=Sum('user__lists'))
             key = 'numberoflists'
         order = '%s%s' % (operator, key)
         order_by.append(order)
     if order_by:
-        #user table does not support this
-        #qs = qs.order_by(*order_by, nulls_last=True)
-        qs = qs.order_by(*order_by)
+        qs = qs.order_by(*order_by, nulls_last=True)
     return qs
 
 @admin_required_json
@@ -499,7 +501,7 @@ Positions
     qs = order_query(query['qs'], query['sort'])
     if 'keys' in data:
         qs = qs[query['range'][0]:query['range'][1]]
-        response['data']['items'] = [models.user_json(p, data['keys'], request.user) for p in qs]
+        response['data']['items'] = [p.json(data['keys'], request.user) for p in qs]
     elif 'position' in query:
         ids = [i.get_id() for i in qs]
         data['conditions'] = data['conditions'] + {

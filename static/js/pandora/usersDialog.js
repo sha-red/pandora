@@ -77,9 +77,6 @@ pandora.ui.usersDialog = function() {
                         title: $('<img>').attr({
                             src: Ox.UI.getImageURL('symbolCheck')
                         }),
-                        tooltip: function(data) {
-                            return data.disabled ? 'Enable User' : 'Disable User';
-                        },
                         visible: true,
                         width: 16
                     },
@@ -221,10 +218,14 @@ pandora.ui.usersDialog = function() {
                     $user.empty();
                     if (data.ids.length) {
                         values = $list.value(data.ids[0]);
-                        $userLabel.options({
-                            title: values.username + ' &lt;' + values.email + '&gt;'
-                        });
-                        $user.append(renderUserForm(values))
+                        if(values.level != 'guest') {
+                            $userLabel.options({
+                                title: values.username + ' &lt;' + values.email + '&gt;'
+                            });
+                            $user.append(renderUserForm(values));
+                        } else {
+                            $userLabel.options({title: 'Guest'});
+                        }
                     } else {
                         $userLabel.options({title: 'No user selected'});
                     }
@@ -269,8 +270,10 @@ pandora.ui.usersDialog = function() {
                                             .addClass('OxSelectable')
                                             .css({margin: '16px'})
                                             .html(
-                                                result.data.items.map(function(item) {
-                                                    return item.username + ' &lt;' + item.email + '&gt;'
+                                                result.data.items.filter(function(item) {
+                                                    return item.email;
+                                                }).map(function(item) {
+                                                    return item.username + ' &lt;' + item.email + '&gt;';
                                                 }).join(', ')
                                             ),
                                         title: 'E-Mail Addresses'

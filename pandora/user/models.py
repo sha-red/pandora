@@ -4,6 +4,7 @@ import copy
 from datetime import datetime
 
 from django.contrib.auth.models import User
+from django.contrib.sessions.models import Session
 from django.db import models
 from django.db.models import Max
 from django.conf import settings
@@ -14,6 +15,86 @@ from ox.utils import json
 
 from itemlist.models import List, Position
 
+import managers
+
+class SessionData(models.Model):
+    session_key = models.CharField(max_length=40, primary_key=True)
+    user = models.ForeignKey(User, unique=True, null=True, blank=True, related_name='data')
+    firstseen = models.DateTimeField(auto_now_add=True, db_index=True)
+    lastseen = models.DateTimeField(auto_now=True, db_index=True)
+    username = models.CharField(max_length=255, null=True, db_index=True)
+
+    timesseen = models.IntegerField(default=0)
+    ip = models.CharField(default='', max_length=255)
+    useragent = models.CharField(default='', max_length=255)
+    windowsize = models.CharField(default='', max_length=255)
+    screensize = models.CharField(default='', max_length=255)
+    info = DictField(default={})
+
+
+    objects = managers.SessionDataManager()
+
+    def __unicode__(self):
+        return u"%s" % self.session_key
+
+    def save(self, *args, **kwargs):
+        if self.user:
+            self.username = self.user.username
+            self.firstseen = self.user.date_joined
+        super(SessionData, self).save(*args, **kwargs)
+
+    @classmethod
+    def get_or_create(cls, request):
+        session_key = request.session.session_key
+        if request.user.is_authenticated():
+            cls.objects.filter(user=request.user).update(session_key=session_key)
+        data, created = cls.objects.get_or_create(session_key=session_key)
+        if request.user.is_authenticated():
+            data.user = request.user
+        data.info = json.loads(request.POST.get('data', '{}'))
+        screen = data.info.get('screen', {})
+        if 'height' in screen and 'width' in screen:
+            data.screensize = '%sx%s' % (screen['width'], screen['height'])
+        window = data.info.get('window', {})
+        if 'outerHeight' in window and 'outerWidth' in window:
+            data.windowsize = '%sx%s' % (window['outerWidth'], window['outerHeight'])
+        data.ip = request.META['REMOTE_ADDR']
+        data.useragent = request.META['HTTP_USER_AGENT']
+        if not data.timesseen:
+            data.timesseen = 0
+        data.timesseen += 1
+        data.save()
+        return data
+
+    def json(self, keys=None, user=None):
+        j = {
+            'disabled': False,
+            'email': '',
+            'firstseen': self.firstseen,
+            'ip': self.ip,
+            'id': self.user and ox.to26(self.user.id) or self.session_key,
+            'lastseen': self.lastseen,
+            'level': 'guest',
+            'notes': '',
+            'numberoflists': 0,
+            'screensize': self.screensize,
+            'timesseen': self.timesseen,
+            'username': self.username or '',
+            'useragent': self.useragent,
+            'windowsize': self.windowsize,
+        }
+        if self.user:
+            p = self.user.get_profile()
+            j['disabled'] = not self.user.is_active
+            j['email'] = self.user.email
+            j['level'] = p.get_level()
+            j['notes'] = p.notes
+            j['numberoflists'] = self.user.lists.count()
+        if keys:
+            for key in j.keys():
+                if key not in keys:
+                    del j[key]
+        return j
 
 class UserProfile(models.Model):
     reset_code = models.CharField(max_length=255, blank=True, null=True, unique=True)
@@ -25,12 +106,6 @@ class UserProfile(models.Model):
     ui = DictField(default={})
     preferences = DictField(default={})
 
-    timesseen = models.IntegerField(default=0)
-    ip = models.CharField(default='', max_length=255)
-    useragent = models.CharField(default='', max_length=255)
-    windowsize = models.CharField(default='', max_length=255)
-    screensize = models.CharField(default='', max_length=255)
-    info = DictField(default={})
     notes = models.TextField(default='')
 
     def get_ui(self):
@@ -105,54 +180,39 @@ def get_ui(user_ui, user=None):
             del ui['lists'][i]
     return ui
 
-def user_json(user, keys=None, request_user=None):
+def init_user(user, request=None):
+    data = SessionData.get_or_create(request)
+    if user.is_anonymous():
+        result = settings.CONFIG['user'].copy()
+        result['ui'] = get_ui(json.loads(request.session.get('ui', '{}')))
+    else:
+        profile = user.get_profile()
+        result = {}
+        for key in ('username', ):
+            result[key] = getattr(user, key)
+        result['level'] = profile.get_level()
+        result['groups'] = [g.name for g in user.groups.all()]
+        result['email'] = user.email
+        result['ui'] = profile.get_ui()
+        result['volumes'] = [v.json() for v in user.volumes.all()] 
+    return result
+
+
+def user_json(user, keys=None):
     p = user.get_profile()
     j = {
         'disabled': not user.is_active,
         'email': user.email,
         'firstseen': user.date_joined,
-        'ip': p.ip,
         'id': ox.to26(user.id),
         'lastseen': user.last_login,
         'level': p.get_level(),
         'notes': p.notes,
         'numberoflists': user.lists.count(),
-        'screensize': p.screensize,
-        'timesseen': p.timesseen,
         'username': user.username,
-        'useragent': p.useragent,
-        'windowsize': p.windowsize,
     }
     if keys:
         for key in j.keys():
             if key not in keys:
                 del j[key]
     return j
-
-def init_user(user, request=None):
-    profile = user.get_profile()
-    if request:
-        data = json.loads(request.POST.get('data', '{}'))
-        profile.info = data
-        screen = data.get('screen', {})
-        if 'height' in screen and 'width' in screen:
-            profile.screensize = '%sx%s' % (screen['width'], screen['height'])
-        window = data.get('window', {})
-        if 'outerHeight' in window and 'outerWidth' in window:
-            profile.windowsize = '%sx%s' % (window['outerWidth'], window['outerHeight'])
-        profile.ip = request.META['REMOTE_ADDR']
-        profile.useragent = request.META['HTTP_USER_AGENT']
-        if not profile.timesseen:
-            profile.timesseen = 0
-        profile.timesseen += 1
-        profile.save()
-    result = {}
-    for key in ('username', ):
-        result[key] = getattr(user, key)
-    result['level'] = profile.get_level()
-    result['groups'] = [g.name for g in user.groups.all()]
-    result['email'] = user.email
-    result['ui'] = profile.get_ui()
-    result['volumes'] = [v.json() for v in user.volumes.all()] 
-    return result
-
