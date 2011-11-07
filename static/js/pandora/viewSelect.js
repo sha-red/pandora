@@ -26,22 +26,7 @@ pandora.ui.viewSelect = function() {
         })
         .bindEvent({
             change: function(data) {
-                var key = data.selected[0].id,
-                    set = {};
-                set[viewKey] = key;
-                // FIXME: this may not work on page load, and would then have to be part of UI.js
-                if (!ui.item) {
-                    // when changing the list view ...
-                    if (pandora.isClipView(key)) {
-                        // ... to a clip view, set listSelection to empty
-                        set.listSelection = [];
-                    } else if (['text', 'position'].indexOf(ui.listSort[0].key) > -1) {
-                        // ... to a non-clip view, with a sort key that only exists
-                        // in clip views, reset listSort to the default listSort
-                        set.listSort = pandora.site.user.ui.listSort;
-                    }
-                }
-                pandora.UI.set(set);
+                pandora.UI.set(viewKey, data.selected[0].id);
             },
             pandora_listview: function(data) {
                 that.selectItem(data.value);

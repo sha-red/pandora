@@ -62,7 +62,7 @@ pandora.UI = (function() {
                 // switch from item view to list view
                 args['item'] = '';
             }
-            add['itemFind'] = pandora.site.user.ui.itemFind;
+            add.itemFind = pandora.site.user.ui.itemFind;
             if (list != self.previousUI._list) {
                 Ox.Log('', 'FIND HAS CHANGED LIST')
                 // if find has changed list
@@ -82,10 +82,24 @@ pandora.UI = (function() {
         } else {
             list = self.previousUI._list;
         }
-
-        item = args['item'] || pandora.user.ui.item;
         // it is important to check for find first, so that
         // if find changes list, list is correct here
+        item = args.item || pandora.user.ui.item;
+
+        if (args.listView) {
+            Ox.print('XXX')
+            if (pandora.isClipView(args.listView)) {
+                Ox.print('YYY')
+                // when switching to a clip view, clear list selection
+                args.listSelection = [];
+            } else if (['text', 'position'].indexOf(pandora.user.ui.listSort[0].key) > -1) {
+                Ox.print('ZZZ')
+                // when switchin to a non-clip view, with a sort key that
+                // only exists in clip view, reset sort to default
+                args.listSort = pandora.site.user.ui.listSort;
+            }
+        }
+
         if (!pandora.user.ui.lists[list]) {
             add['lists.' + that.encode(list)] = {};
         }

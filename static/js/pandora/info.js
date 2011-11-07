@@ -50,16 +50,6 @@ pandora.ui.info = function() {
         pandora.$ui.leftPanel.size(2, height);
         pandora.resizeFolders();
         !ui.showInfo && pandora.$ui.leftPanel.css({bottom: -height + 'px'});
-        /*
-        if (ui.showInfo) {
-            pandora.$ui.leftPanel.size(2, height, function() {
-                pandora.resizeFolders();
-            });
-        } else {
-            pandora.$ui.leftPanel.css({bottom: -height + 'px'});
-            pandora.resizeFolders();
-        }
-        */
     }
 
     function updateInfo() {
