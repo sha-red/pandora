@@ -67,12 +67,14 @@ pandora.ui.info = function() {
             previousView = view;
         view = getView();
         if (view == 'list') {
+            pandora.$ui.listInfo && pandora.$ui.listInfo.remove();
             that.empty().append(pandora.$ui.listInfo = pandora.ui.listInfo());
             previousView == 'video' && resizeInfo();
         } else if (view == 'poster') {
             pandora.api.get({id: id, keys: ['director', 'posterRatio', 'title']}, function(result) {
                 var ratio = result.data.posterRatio,
                     height = pandora.getInfoHeight(true);
+                pandora.$ui.posterInfo && pandora.$ui.posterInfo.remove();                
                 that.empty().append(
                     pandora.$ui.posterInfo = pandora.ui.posterInfo(Ox.extend(result.data, {id: id}))
                 );
@@ -85,34 +87,35 @@ pandora.ui.info = function() {
             }, function(result) {
                 if (result.data && result.data.rendered) {
                     pandora.$ui.videoPreview && pandora.$ui.videoPreview.remove();
-                    pandora.$ui.videoPreview = pandora.ui.videoPreview({
-                            duration: result.data.duration,
-                            frameRatio: result.data.videoRatio,
-                            height: pandora.getInfoHeight(true),
-                            id: id,
-                            width: ui.sidebarSize
-                        })
-                        .bindEvent({
-                            click: function(data) {
-                                pandora.UI.set(
-                                    'videoPoints.' + id,
-                                    {'in': 0, out: 0, position: data.position}
-                                );
-                                if (ui.item && ['video', 'timeline'].indexOf(ui.itemView) > -1) {
-                                    pandora.$ui[
-                                        ui.itemView == 'video' ? 'player' : 'editor'
-                                    ].options({
-                                        position: data.position
-                                    });
-                                } else {
-                                    pandora.UI.set({
-                                        item: id,
-                                        itemView: ui.videoView
-                                    });
+                    that.empty().append(
+                        pandora.$ui.videoPreview = pandora.ui.videoPreview({
+                                duration: result.data.duration,
+                                frameRatio: result.data.videoRatio,
+                                height: pandora.getInfoHeight(true),
+                                id: id,
+                                width: ui.sidebarSize
+                            })
+                            .bindEvent({
+                                click: function(data) {
+                                    pandora.UI.set(
+                                        'videoPoints.' + id,
+                                        {'in': 0, out: 0, position: data.position}
+                                    );
+                                    if (ui.item && ['video', 'timeline'].indexOf(ui.itemView) > -1) {
+                                        pandora.$ui[
+                                            ui.itemView == 'video' ? 'player' : 'editor'
+                                        ].options({
+                                            position: data.position
+                                        });
+                                    } else {
+                                        pandora.UI.set({
+                                            item: id,
+                                            itemView: ui.videoView
+                                        });
+                                    }
                                 }
-                            }
-                        })
-                        .appendTo(pandora.$ui.info);
+                            })
+                    );
                     previousView != 'video' && resizeInfo();
                 }
             });
