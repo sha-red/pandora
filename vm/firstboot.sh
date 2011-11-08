@@ -12,11 +12,7 @@ chmod 755 /usr/local/bin/ffmpeg2theora
 #postgresql
 apt-get -y install postgresql
 sudo -u postgres createuser -S -D -R pandora
-sudo -u postgres createdb -O pandora pandora
-
-#do not start systemwide transmission-daemon
-/etc/init.d/transmission-daemon stop
-sed -i "s/ENABLE_DAEMON=1/ENABLE_DAEMON=0/g" /etc/default/transmission-daemon
+sudo -u postgres createdb  -T template0 --locale=C --encoding=UTF8 -O pandora pandora
 
 #rabbitmq
 RABBITPWD=$(pwgen -n 16 -1)
@@ -26,11 +22,16 @@ rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
 
 #pandora
 cat > /srv/pandora/pandora/local_settings.py << EOF
-DATABASE_ENGINE = 'postgresql_psycopg2'
-DATABASE_NAME = 'pandora'
-DATABASE_USER = 'pandora'
+DATABASES = {
+    'default': {
+        'NAME': 'pandora',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'USER': 'pandora',
+        'PASSWORD': '',
+    }
+}
 
-POSTER_SERVICES=['http://data.0xdb.org/poster/']
+DATA_SERVICE='http://data.0xdb.org/api/'
 
 BROKER_PASSWORD = "$RABBITPWD"
 
@@ -40,6 +41,8 @@ EOF
 cd /srv/pandora/pandora
 sudo -u pandora python manage.py syncdb --noinput 
 echo "UPDATE django_site SET domain = 'pandora.local', name = 'pandora.local' WHERE 1=1;" | sudo -u pandora python manage.py dbshell
+
+sudo -u pandora python manage.py update_static
 
 mkdir /srv/pandora/data
 chown -R pandora:pandora /srv/pandora
@@ -51,6 +54,6 @@ service pandora-tasks start
 service pandora start
 
 #nginx
-sed "s/__PREFIX__/\/srv\/pandora/g" "/srv/pandora/nginx/vhost.in" > "/etc/nginx/sites-available/default"
+sed "s/__PREFIX__/\/srv\/pandora/g" "/srv/pandora/etc/nginx/vhost.in" > "/etc/nginx/sites-available/default"
 service nginx restart
 

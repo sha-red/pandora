@@ -161,7 +161,7 @@ def signup(request):
             user.save()
             #create default user lists:
             for l in settings.CONFIG['personalLists']:
-                list = models.List(name=l['id'], user=user)
+                list = models.List(name=l['title'], user=user)
                 for key in ('query', 'public', 'featured'):
                     if key in l:
                         setattr(list, key, l[key])

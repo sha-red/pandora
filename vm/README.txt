@@ -2,13 +2,9 @@ Create virtual disk of pan.do/ra
 
 == ubuntu-vm-builder setup ==
 
-due to https://bugs.launchpad.net/ubuntu/+source/vm-builder/+bug/676132
-we need to use maverick-proposed repository:
+on ubuntu 11.10 you need to install python-vm-builder
 
- echo "deb http://archive.ubuntu.com/ubuntu/ maverick-proposed restricted main multiverse universe" > /etc/apt/sources.list.d/ubunt-proposed.list
- apt-get update
- apt-get -t maverick-proposed install ubuntu-vm-builder
-
+  apt-get install python-vm-builder
 
 due to https://bugs.launchpad.net/vmbuilder/+bug/683614
 building vbox images does not work. install virtualbox_vm.py:
@@ -43,9 +39,7 @@ Pan.do/ra is installed in /srv/pandora and is served with nginx on http://pandor
 == Update ==
 to get the latest version of pan.do/ra
  cd /srv/pandora
- bzr pull
- cd static/oxjs
- bzr pull
+ ./update.sh
 
 you might have to adjust the database at this point. now restart pandora daemons
 

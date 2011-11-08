@@ -129,6 +129,9 @@ class UserProfile(models.Model):
 
 def user_post_save(sender, instance, **kwargs):
     profile, new = UserProfile.objects.get_or_create(user=instance)
+    if new and instance.is_superuser:
+        profile.level = len(settings.CONFIG['userLevels']) - 1
+        profile.save()
     SessionData.objects.filter(user=instance).update(level=profile.level,
                                                      username=instance.username)
 models.signals.post_save.connect(user_post_save, sender=User)
