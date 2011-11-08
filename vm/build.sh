@@ -1,6 +1,6 @@
 #!/bin/sh
 base=$(pwd)
-sudo  vmbuilder vbox ubuntu --suite=maverick \
+sudo  vmbuilder vbox ubuntu --suite=oneiric \
     --verbose --debug \
     --arch i386 \
     --dest $base/pandora \
@@ -11,7 +11,6 @@ sudo  vmbuilder vbox ubuntu --suite=maverick \
     --pass pandora \
     --components main,universe,multiverse \
     --ppa j/pandora \
-    --ppa gstreamer-developers/ppa \
     --addpkg openssh-server \
     --addpkg acpid \
     --addpkg vim \
@@ -33,8 +32,6 @@ sudo  vmbuilder vbox ubuntu --suite=maverick \
     --addpkg python-numpy \
     --addpkg python-psycopg2 \
     --addpkg python-simplejson \
-    --addpkg python-transmissionrpc \
-    --addpkg transmission-daemon \
     --addpkg oxtimeline \
     --addpkg oxframe \
     --addpkg mkvtoolnix \

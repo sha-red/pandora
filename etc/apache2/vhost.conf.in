@@ -12,6 +12,11 @@
         XSendFile on
         XSendFilePath __PREFIX__
     </Location>
+    ProxyRequests Off
+    <Proxy *>
+        Order deny,allow
+        Allow from all
+    </Proxy>
 
     Alias /.bzr        __PREFIX__/.bzr
     Alias /static      __PREFIX__/static

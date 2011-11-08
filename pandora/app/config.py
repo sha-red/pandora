@@ -41,9 +41,10 @@ def load_config():
         settings.CONFIG = config
 
         admin = len(settings.CONFIG['userLevels']) - 1
-        settings.ADMIN = tuple([(u.username, u.email)
-                          for u in User.objects.filter(profile__level=admin)])
-        settings.MANAGERS = settings.ADMINS
+        if not 'syncdb' in sys.argv:
+            settings.ADMIN = tuple([(u.username, u.email)
+                              for u in User.objects.filter(profile__level=admin)])
+            settings.MANAGERS = settings.ADMINS
 
 def reloader_thread():
     _config_mtime = 0
@@ -61,7 +62,11 @@ def update_static():
     oxjs_build = os.path.join(settings.STATIC_ROOT, 'oxjs/tools/build/build.py')
     if os.path.exists(oxjs_build):
         print 'update oxjs'
-        os.system('%s -nogeo >/dev/null' % oxjs_build)
+        if os.path.exists(os.path.join(settings.STATIC_ROOT, 'oxjs/build/Ox.Geo/json/Ox.Geo.json')):
+            geo = '-nogeo'
+        else:
+            geo = ''
+        os.system('%s %s >/dev/null' % (oxjs_build, geo))
 
     data = ''
     js = []
