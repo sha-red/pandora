@@ -65,7 +65,7 @@ pandora.UI = (function() {
             }
             add.itemFind = pandora.site.user.ui.itemFind;
             if (list != self.previousUI._list) {
-                Ox.Log('', 'FIND HAS CHANGED LIST')
+                Ox.Log('UI', 'FIND HAS CHANGED LIST')
                 // if find has changed list
                 Ox.forEach(listSettings, function(listSetting, setting) {
                     // then for each setting that corresponds to a list setting
@@ -94,8 +94,8 @@ pandora.UI = (function() {
                 // (but don't trigger an additional event)
                 add.listSelection = [];
             } else if (['text', 'position'].indexOf(pandora.user.ui.listSort[0].key) > -1) {
-                // when switchin to a non-clip view, with a sort key that
-                // only exists in clip view, reset sort to default
+                // when switchin to a non-clip view, with a sort key
+                // that only exists in clip view, reset sort to default
                 args.listSort = pandora.site.user.ui.listSort;
             }
         }
@@ -127,9 +127,11 @@ pandora.UI = (function() {
                 !args.itemView
                 && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
                 && !pandora.user.ui.videoPoints[item]
+                && !args['videoPoints.' + item]
             ) {
-                // if the item view won't be changed, remains a video view,
-                // and there are no video points yet, add default video points
+                // if the item view doesn't change, remains a video view,
+                // video points don't exist yet, and won't be set,
+                // add default video points
                 add['videoPoints.' + item] = {'in': 0, out: 0, position: 0};
             }
         }
@@ -137,8 +139,12 @@ pandora.UI = (function() {
         if (['video', 'timeline'].indexOf(args.itemView) > -1) {
             // when switching to a video view, add it as default video view
             args.videoView = args.itemView;
-            if (!pandora.user.ui.videoPoints[item]) {
-                // if there are no video points yet, add default video points
+            if (
+                !pandora.user.ui.videoPoints[item]
+                && !args['videoPoints.' + item]
+            ) {
+                // if video points don't exist yet, and won't be set,
+                // add default video points
                 add['videoPoints.' + item] = {'in': 0, out: 0, position: 0};
             }
         }

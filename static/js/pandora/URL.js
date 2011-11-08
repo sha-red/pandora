@@ -45,7 +45,7 @@ pandora.URL = (function() {
             );
         }
 
-        Ox.Log('STATE .................... ->', state)
+        Ox.Log('URL', 'STATE ...', state)
 
         return state;
 
@@ -110,7 +110,7 @@ pandora.URL = (function() {
                 if (['video', 'timeline'].indexOf(state.view) > -1) {
                     // fixme: this doesn't handle annotation ids
                     set['videoPoints.' + state.item] = {
-                        position: state.span[0],
+                        position: state.span[0] || 0,
                         'in': state.span[1] || 0,
                         out: Math.max(state.span[1] || 0, state.span[2] || 0)
                     }
