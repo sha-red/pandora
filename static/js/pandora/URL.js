@@ -266,6 +266,9 @@ pandora.URL = (function() {
         window.onpopstate = function(e) {
             Ox.Request.cancel();
             self.isPopState = true;
+            $('.OxDialog:visible').each(function() {
+                Ox.UI.elements[$(this).data('oxid')].close().remove();
+            });
             if (
                 pandora.user.ui.item
                 && pandora.user.ui.itemView == 'video'
