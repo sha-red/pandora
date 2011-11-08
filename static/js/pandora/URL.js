@@ -67,8 +67,10 @@ pandora.URL = (function() {
         } else if (state.page) {
 
             if (state.page == 'home') {
-                //pandora.$ui.home = pandora.ui.home().showScreen();
-                pandora.$ui.home = pandora.ui.home().fadeInScreen();
+                // if we're on page load, show screen immediately
+                pandora.$ui.home = pandora.ui.home()[
+                    !pandora.$ui.appPanel ? 'showScreen' : 'fadeInScreen'
+                ]();
             } else if (
                 Ox.getPositionById(pandora.site.sitePages, state.page) > -1
                 || state.page == 'software'

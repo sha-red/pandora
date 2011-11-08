@@ -74,6 +74,11 @@ pandora.ui.accountDialogOptions = function(action, value) {
             }).bindEvent('click', function() {
                 pandora.$ui.accountDialog.options(pandora.ui.accountDialogOptions(type));
                 pandora.$ui.accountForm.find('input')[0].focus();
+                if (['signin', 'signup'].indexOf(type) > -1) {
+                    // fixme: similar problem as in siteDialog,
+                    // the URL controller should handle this
+                    history.replaceState({}, '', '/' + type);
+                }
             });
         }
     }
