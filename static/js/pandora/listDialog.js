@@ -94,7 +94,7 @@ pandora.ui.listDialog = function(section) {
                 })
                 .bindEvent({
                     click: function() {
-                        $dialog.close();
+                        $dialog.close().remove();
                     }
                 })
         ],
