@@ -75,7 +75,8 @@ pandora.ui.titlesDialog = function() {
                 open: function(data) {
                     $list.$element
                         .find('.OxItem.OxSelected > .OxCell.OxColumnSorttitle')
-                        .trigger('mousedown');
+                        .trigger('mousedown')
+                        .trigger('mouseup');
                 },
                 select: function(data) {
                     $findButton.options({disabled: !data.ids.length});
