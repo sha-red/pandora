@@ -4,7 +4,6 @@ import copy
 from datetime import datetime
 
 from django.contrib.auth.models import User
-from django.contrib.sessions.models import Session
 from django.db import models
 from django.db.models import Max
 from django.conf import settings
@@ -21,7 +20,7 @@ class SessionData(models.Model):
     session_key = models.CharField(max_length=40, primary_key=True)
     user = models.ForeignKey(User, unique=True, null=True, blank=True, related_name='data')
     firstseen = models.DateTimeField(auto_now_add=True, db_index=True)
-    lastseen = models.DateTimeField(auto_now=True, db_index=True)
+    lastseen = models.DateTimeField(default=datetime.now, db_index=True)
     username = models.CharField(max_length=255, null=True, db_index=True)
     level = models.IntegerField(default=0)
 
@@ -67,8 +66,12 @@ class SessionData(models.Model):
         if not data.timesseen:
             data.timesseen = 0
         data.timesseen += 1
+        data.lastseen = datetime.now()
         data.save()
         return data
+
+    def get_id(self):
+        return self.user and ox.to26(self.user.id) or self.session_key
 
     def json(self, keys=None, user=None):
         j = {
@@ -76,7 +79,7 @@ class SessionData(models.Model):
             'email': '',
             'firstseen': self.firstseen,
             'ip': self.ip,
-            'id': self.user and ox.to26(self.user.id) or self.session_key,
+            'id': self.get_id(),
             'lastseen': self.lastseen,
             'level': 'guest',
             'notes': '',
@@ -126,8 +129,14 @@ class UserProfile(models.Model):
 
 def user_post_save(sender, instance, **kwargs):
     profile, new = UserProfile.objects.get_or_create(user=instance)
-
+    SessionData.objects.filter(user=instance).update(level=profile.level,
+                                                     username=instance.username)
 models.signals.post_save.connect(user_post_save, sender=User)
+
+def profile_post_save(sender, instance, **kwargs):
+    SessionData.objects.filter(user=instance.user).update(level=instance.level,
+                                                     username=instance.user.username)
+models.signals.post_save.connect(profile_post_save, sender=UserProfile)
 
 def get_ui(user_ui, user=None):
     ui = {}
@@ -200,7 +209,6 @@ def init_user(user, request=None):
         result['ui'] = profile.get_ui()
         result['volumes'] = [v.json() for v in user.volumes.all()] 
     return result
-
 
 def user_json(user, keys=None):
     p = user.get_profile()
