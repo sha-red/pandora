@@ -291,7 +291,7 @@ pandora.ui.accountForm = function(action, value) {
                                     validate: pandora.validateUser(selected, true),
                                     value: ''
                                 }).focusInput();
-                                //setTimeout(that.submit, 250);
+                                that.$element.find('.OxFormMessage:visible').html('').hide();
                                 pandora.$ui.accountDialog.disableButton('submitReset');
                             }
                         }),

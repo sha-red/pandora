@@ -8,6 +8,7 @@ pandora.ui.siteDialog = function(section) {
         Ox.clone(pandora.site.sitePages),
         [{id: 'software', title: 'Software'}]
     );
+    Ox.print('SITE DIALOG', section, tabs)
     Ox.getObjectById(tabs, section).selected = true;
     var $tabPanel = Ox.TabPanel({
             content: function(id) {
@@ -67,7 +68,7 @@ pandora.ui.siteDialog = function(section) {
                 //pandora.URL.replace('/' + data.selected);
                 //fixme: this should be using URL.push / UI.set
                 //but that currenlty causes another dialog to be opened
-                history.pushState({}, '', '/' + data.selected);
+                history.pushState({/*page: data.selected*/}, '', '/' + data.selected);
             }
         });
     var $dialog = Ox.Dialog({
@@ -77,7 +78,7 @@ pandora.ui.siteDialog = function(section) {
                     title: 'Close'
                 }).bindEvent({
                     click: function() {
-                        $dialog.close();
+                        $dialog.close().remove();
                         pandora.URL.update();
                     }
                 })
