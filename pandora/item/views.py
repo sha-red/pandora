@@ -324,7 +324,7 @@ def autocomplete(request):
         qs = qs.order_by(order_by, nulls_last=True)
         qs = qs[data['range'][0]:data['range'][1]]
         response = json_response({})
-        response['data']['items'] = [i.get(data['key']) for i in qs]    
+        response['data']['items'] = list(set([i.get(data['key']) for i in qs]))
     else:
         qs = models.Facet.objects.filter(key=data['key'])
         if data['value']:
