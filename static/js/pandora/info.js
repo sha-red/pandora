@@ -155,9 +155,7 @@ pandora.ui.listInfo = function() {
         $title, $description;
 
     editable && $icon.bindEvent({
-        doubleclick: function() {
-            pandora.$ui.listDialog = pandora.ui.listDialog('icon').open();
-        }
+        doubleclick: editIcon
     });
 
     that.append($('<div>').css({height: '16px'}));
@@ -262,6 +260,16 @@ pandora.ui.listInfo = function() {
                 .css({fontWeight: 'bold'})
                 .html('All ' + pandora.site.itemName.plural)
         );
+    }
+
+    function editIcon() {
+        // timeout is needed since if the icon is clicked before the list
+        // folders have loaded, the list dialog cannot get the list data yet.
+        if (pandora.getListData().id) {
+            pandora.$ui.listDialog = pandora.ui.listDialog('icon').open();
+        } else {
+            setTimeout(editIcon, 250);
+        }
     }
 
     function getIconCSS() {
