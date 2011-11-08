@@ -62,12 +62,29 @@ def parseCondition(condition, user):
         'year': 'string',
         'length': 'string',
         'list': 'list',
-        'layer': 'string'
+        'layer': 'string',
     }.get(key_type, key_type)
     if k == 'list':
         key_type = 'list'
+    if k in ('isSeries', ):
+        key_type = 'bool'
 
-    if key_type == "string":
+    if k in ('canPlayVideo', 'canPlayClips'):
+        level = user.is_anonymous() and 'guest' or user.get_profile().get_level()
+        allowed_level = settings.CONFIG['capabilities'][k][level]
+        if v:
+            q = Q(level__lte=allowed_level)
+        else:
+            q = Q(level__gt=allowed_level)
+        if exclude:
+            q = ~q
+        return q
+    elif key_type == 'bool':
+        q = Q(**{'find__key': k, 'find__value': v and '1' or '0'})
+        if exclude:
+            q = ~q
+        return q
+    elif key_type == "string":
         in_find = not k.startswith('itemId')
         if in_find:
             value_key = 'find__value'

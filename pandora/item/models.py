@@ -513,6 +513,8 @@ class Item(models.Model):
         def save(key, value):
             if value not in ('', None):
                 f, created = ItemFind.objects.get_or_create(item=self, key=key)
+                if isinstance(value, bool):
+                    value = value and '1' or '0'
                 if isinstance(value, basestring):
                     value = value.strip()
                 f.value = value
@@ -560,6 +562,12 @@ class Item(models.Model):
                     save(key, '\n'.join(values))
                 else:
                     save(key, values)
+
+            isSeries = self.get('series',
+                                self.get('episodeTitle',
+                                self.get('episode',
+                                self.get('seriesTitle')))) != None
+            save('isSeries', isSeries)
 
     def update_sort(self):
         try:
