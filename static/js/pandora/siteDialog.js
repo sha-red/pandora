@@ -28,6 +28,7 @@ pandora.ui.siteDialog = function(section) {
                     pandora.$ui.contactForm = pandora.ui.contactForm().appendTo($content);
                 } else {
                     pandora.api.getPage({name: id}, function(result) {
+                        var $column, risk;
                         Ox.Editable({
                                 clickLink: pandora.clickLink,
                                 editable: pandora.site.capabilities.canEditSitePages[pandora.user.level],
@@ -35,7 +36,13 @@ pandora.ui.siteDialog = function(section) {
                                 type: 'textarea',
                                 value: result.data.body
                             })
-                            .css({width: '100%'/*, height: '100%'*/})
+                            .css(id == 'rights' ? {
+                                // this will get applied twice,
+                                // total is 144px
+                                marginRight: '72px'
+                            } : {
+                                width: '100%'
+                            })
                             .bindEvent({
                                 submit: function(data) {
                                     Ox.Request.clearCache('getPage');
@@ -45,7 +52,38 @@ pandora.ui.siteDialog = function(section) {
                                     });
                                 }
                             })
-                            .appendTo($content)
+                            .appendTo($content);
+                        if (id == 'rights') {
+                            $column = $('<div>')
+                                .css({position: 'absolute', top: '16px', right: '16px', width: '128px'})
+                                .appendTo($content);
+                            $('<img>')
+                                .attr({src: '/static/png/rights.png'})
+                                .css({width: '128px', height: '128px', marginBottom: '8px'})
+                                .appendTo($column);
+                            risk = ['Unknown', 'Severe', 'High', 'Significant', 'General', 'Low'];
+                            Ox.merge(
+                                ['Unknown'],
+                                pandora.site.rightsLevels.map(function(rightsLevel) {
+                                    return rightsLevel.name;
+                                }).reverse()
+                            ).forEach(function(name, i) {
+                                Ox.Theme.formatColor(330 + 30 * i, 'gradient')
+                                    .css({
+                                        padding: '4px',
+                                        marginTop: '8px',
+                                    })
+                                    .html(
+                                        '<b>' + name + '</b><br/><div style="padding-top: 2px; font-size: 9px; opacity: 0.75">'
+                                        + risk[i] + ' Risk'
+                                        + (i % 3 == 0 ? '<br/> of ' : ' of<br/>')
+                                        + 'Legal Action</div>'
+                                    )
+                                    .appendTo($column);
+                            })
+                            pandora.site.rightsLevels.forEach(function(rightsLevel) {
+                            });
+                        }                        
                     });
                 }
                 return Ox.SplitPanel({
