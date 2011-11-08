@@ -147,12 +147,12 @@ pandora.URL = (function() {
                 $(this).trigger('stop');
             });
 
-            if (!pandora.$ui.appPanel && state.item && find) {
+            if (!pandora.$ui.appPanel && state.item && pandora.user.ui.find) {
                 // on page load, if item is set and there was a query,
                 // we have to check if the item actually matches the query,
                 // and otherwise reset find
                 pandora.api.find({
-                    query: find,
+                    query: pandora.user.ui.find,
                     positions: [state.item],
                     sort: [{key: 'id', operator: ''}]
                 }, function(result) {
