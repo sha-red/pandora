@@ -13,8 +13,19 @@ pandora.ui.siteDialog = function(section) {
     var $tabPanel = Ox.TabPanel({
             content: function(id) {
                 var $content = Ox.Element().css({padding: '16px', overflowY: 'auto'});
-                if (id == 'contact') {
-                    $content.append(pandora.$ui.contactForm = pandora.ui.contactForm());
+                if (id == 'software') {
+                    Ox.Element()
+                        .html(
+                            '<h1><b>Pan.do/ra</b></h1>'
+                            + '<sub>open media archive</sub>'
+                            + '<p><b>' + pandora.site.site.name + '</b> is based on <b>Pan.do/ra</b>, '
+                            + 'a free open source framework for media archives.</p>'
+                            + '<b>Pan.do/ra</b> includes <b>OxJS</b>, a new JavaScript library for web applications.</p>'
+                            + '<p><b>Pan.do/ra</b> and <b>OxJS</b> will be released in 2012. More soon...</p>'
+                        )
+                        .appendTo($content);
+                } else if (id == 'contact') {
+                    pandora.$ui.contactForm = pandora.ui.contactForm().appendTo($content);
                 } else {
                     pandora.api.getPage({name: id}, function(result) {
                         Ox.Editable({
