@@ -468,6 +468,11 @@
             "title": "Can Play Clips",
             "type": "boolean",
             "value": "capability"
+        },
+        {
+            "id": "isSeries",
+            "title": "TV Series",
+            "type": "boolean"
         }
     ],
     /*
