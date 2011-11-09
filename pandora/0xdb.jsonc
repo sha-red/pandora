@@ -617,6 +617,7 @@
             "lists": {},
             "mapFind": "",
             "mapSelection": "",
+            "page": "",
             "section": "items",
             "showAnnotations": true,
             "showBrowser": true,

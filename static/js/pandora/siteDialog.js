@@ -112,8 +112,7 @@ pandora.ui.siteDialog = function(section) {
                 that.options({
                     title: Ox.getObjectById(tabs, data.selected).title
                 });
-                pandora.URL.push({page: data.selected});
-                //history.pushState({page: data.selected}, '', '/' + data.selected);
+                pandora.UI.set({page: data.selected});
             }
         });
 
@@ -125,7 +124,6 @@ pandora.ui.siteDialog = function(section) {
                 }).bindEvent({
                     click: function() {
                         that.close();
-                        pandora.URL.update();
                     }
                 })
             ],
@@ -140,6 +138,9 @@ pandora.ui.siteDialog = function(section) {
             width: Math.round(window.innerWidth * 0.75),
         })
         .bindEvent({
+            close: function(data) {
+                pandora.UI.set({page: ''});
+            },
             resize: function(data) {
                 if ($tabPanel.selected() == 'contact') {
                     pandora.$ui.contactForm.resize();

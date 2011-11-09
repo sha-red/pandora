@@ -58,7 +58,7 @@ pandora.ui.accountDialogOptions = function(action, value) {
                 title: 'Cancel'
             }).bindEvent('click', function() {
                 pandora.$ui.accountDialog.close();
-                pandora.URL.update();
+                pandora.UI.set({page: ''});
             });
         } else if (type == 'submit') {
             return Ox.Button({
@@ -74,7 +74,7 @@ pandora.ui.accountDialogOptions = function(action, value) {
                 title: buttonTitle[type] + '...'
             }).bindEvent('click', function() {
                 if (['signin', 'signup'].indexOf(type) > -1) {
-                    pandora.URL.replace({page: type});
+                    pandora.UI.set({page: type});
                 } else {
                     pandora.$ui.accountDialog.options(pandora.ui.accountDialogOptions(type));
                 }
@@ -319,7 +319,7 @@ pandora.ui.accountSignoutDialog = function() {
                 title: 'Stay Signed In'
             }).bindEvent('click', function() {
                 that.close();
-                pandora.URL.update();
+                pandora.UI({page: ''});
             }),
             Ox.Button({
                 id: 'signout',

@@ -13,6 +13,7 @@ pandora.ui.appPanel = function() {
             ],
             orientation: 'vertical'
         });
+    setPage(pandora.user.ui.page);
     that.display = function() {
         // fixme: move animation into Ox.App
         var animate = $('.OxScreen').length == 0;
@@ -26,6 +27,48 @@ pandora.ui.appPanel = function() {
         pandora.$ui.appPanel.remove();
         pandora.$ui.appPanel = pandora.ui.appPanel().appendTo(pandora.$ui.body);
         return that;
+    }
+    that.bindEvent({
+        pandora_page: function(data) {
+            setPage(data.value);
+        }
+    });
+    function setPage(page) {
+        if (page == 'home') {
+            // if we're on page load, show screen immediately
+            pandora.$ui.home = pandora.ui.home()[
+                !pandora.$ui.appPanel ? 'showScreen' : 'fadeInScreen'
+            ]();
+        } else if (
+            Ox.getPositionById(pandora.site.sitePages, page) > -1
+            || page == 'software'
+        ) {
+            if (pandora.$ui.siteDialog && pandora.$ui.siteDialog.is(':visible')) {
+                pandora.$ui.siteDialog.select(page);
+            } else {
+                pandora.$ui.siteDialog = pandora.ui.siteDialog(page).open();
+            }
+        } else if (page == 'help') {
+            pandora.$ui.helpDialog = pandora.ui.helpDialog().open();
+        } else if (['signup', 'signin'].indexOf(page) > -1) {
+            if (pandora.user.level == 'guest') {
+                if (pandora.$ui.accountDialog && pandora.$ui.accountDialog.is(':visible')) {
+                    pandora.$ui.accountDialog.options(pandora.ui.accountDialogOptions(page));
+                } else {
+                    pandora.$ui.accountDialog = pandora.ui.accountDialog(page).open();
+                }
+            } else {
+                pandora.URL.replace('/');
+            }
+        } else if (['preferences', 'signout'].indexOf(page) > -1) {
+            if (pandora.user.level == 'guest') {
+                pandora.URL.replace('/');
+            } else if (page == 'preferences') {
+                pandora.ui.preferencesDialog().open();
+            } else {
+                pandora.ui.accountSignoutDialog().open();
+            }
+        }
     }
     return that;
 };

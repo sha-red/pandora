@@ -230,7 +230,7 @@ pandora.ui.mainMenu = function() {
                     'home', 'about', 'news', 'tour', 'faq', 'terms', 'rights', 'contact', 'software',
                     'signup', 'signin', 'signout', 'preferences', 'help'
                 ].indexOf(data.id) > -1) {
-                    pandora.URL.push('/' + data.id);
+                    pandora.UI.set({page: data.id});
                 } else if ([
                     'newlist', 'newlistfromselection', 'newsmartlist', 'newsmartlistfromresults'
                 ].indexOf(data.id) > -1) {
