@@ -33,7 +33,8 @@ pandora.ui.siteDialog = function(section) {
                         Ox.Editable({
                                 clickLink: pandora.clickLink,
                                 editable: pandora.site.capabilities.canEditSitePages[pandora.user.level],
-                                tooltip: 'Doubleclick to edit',
+                                tooltip: pandora.site.capabilities.canEditSitePages[pandora.user.level]
+                                    ? 'Doubleclick to edit' : '',
                                 type: 'textarea',
                                 value: result.data.body
                             })
@@ -77,7 +78,7 @@ pandora.ui.siteDialog = function(section) {
                                     .html(
                                         '<b>' + name + '</b><br/><div style="padding-top: 2px; font-size: 9px; opacity: 0.75">'
                                         + risk[i] + ' Risk'
-                                        + (i % 3 == 0 ? '<br/> of ' : ' of<br/>')
+                                        + (risk[i].length > 6 ? '<br/> of ' : ' of<br/>')
                                         + 'Legal Action</div>'
                                     )
                                     .appendTo($column);
