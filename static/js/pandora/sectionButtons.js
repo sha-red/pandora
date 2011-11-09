@@ -4,8 +4,8 @@ pandora.ui.sectionButtons = function() {
     var that = Ox.ButtonGroup({
             buttons: [
                 {id: 'items', selected: pandora.user.ui.section == 'items', title: pandora.site.itemName.plural},
-                {id: 'edits', selected: pandora.user.ui.section == 'edits', title: 'Edits'},
-                {id: 'texts', selected: pandora.user.ui.section == 'texts', title: 'Texts'}
+                {id: 'edits', selected: pandora.user.ui.section == 'edits', title: 'Edits', disabled: true},
+                {id: 'texts', selected: pandora.user.ui.section == 'texts', title: 'Texts', disabled: true}
             ],
             id: 'sectionButtons',
             selectable: true

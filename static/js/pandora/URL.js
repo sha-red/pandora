@@ -75,7 +75,11 @@ pandora.URL = (function() {
                 Ox.getPositionById(pandora.site.sitePages, state.page) > -1
                 || state.page == 'software'
             ) {
-                pandora.$ui.siteDialog = pandora.ui.siteDialog(state.page).open();
+                if (pandora.$ui.siteDialog) {
+                    pandora.$ui.siteDialog.select(state.page);
+                } else {
+                    pandora.$ui.siteDialog = pandora.ui.siteDialog(state.page).open();
+                }
             } else if (state.page == 'help') {
                 pandora.$ui.helpDialog = pandora.ui.helpDialog().open();
             } else if (['signup', 'signin'].indexOf(state.page) > -1) {
@@ -258,7 +262,6 @@ pandora.URL = (function() {
             views: views
         });
 
-        ///*
         window.onhashchange = function() {
             Ox.Request.cancel();
             that.parse();
@@ -285,7 +288,6 @@ pandora.URL = (function() {
                 that.parse();
             }
         };
-        //*/
 
         return that;
 

@@ -8,8 +8,9 @@ pandora.ui.siteDialog = function(section) {
         Ox.clone(pandora.site.sitePages),
         [{id: 'software', title: 'Software'}]
     );
-    Ox.print('SITE DIALOG', section, tabs)
-    Ox.getObjectById(tabs, section).selected = true;
+    //Ox.getObjectById(tabs, section).selected = true;
+    tabs[Ox.getPositionById(tabs, section)].selected = true;
+    //Ox.print('SITE DIALOG', section, Ox.getObjectById(tabs, section), Ox.getObjectById(tabs, section).selected)
     var $tabPanel = Ox.TabPanel({
             content: function(id) {
                 var $content = Ox.Element().css({padding: '16px', overflowY: 'auto'});
@@ -148,6 +149,11 @@ pandora.ui.siteDialog = function(section) {
                 }
             }
         });
+
+    $dialog.select = function(id) {
+        $tabPanel.select(id);
+        return $dialog;
+    };
 
     return $dialog;
 

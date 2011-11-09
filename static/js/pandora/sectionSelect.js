@@ -6,8 +6,8 @@ pandora.ui.sectionSelect = function() {
             id: 'sectionSelect',
             items: [
                 {checked: pandora.user.ui.section == 'items', id: 'items', title: pandora.site.itemName.plural},
-                {checked: pandora.user.ui.section == 'edits', id: 'edits', title: 'Edits'},
-                {checked: pandora.user.ui.section == 'texts', id: 'texts', title: 'Texts'}
+                {checked: pandora.user.ui.section == 'edits', id: 'edits', title: 'Edits', disabled: true},
+                {checked: pandora.user.ui.section == 'texts', id: 'texts', title: 'Texts', disabled: true}
             ]
         }).css({
             float: 'left',
