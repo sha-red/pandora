@@ -115,6 +115,7 @@ pandora.ui.contactForm = function() {
                                 }).bindEvent({
                                     click: function() {
                                         $dialog.close();
+                                        $form.values({subject: '', message: ''});
                                     }
                                 })
                             ],

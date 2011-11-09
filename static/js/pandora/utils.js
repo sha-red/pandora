@@ -492,6 +492,25 @@ pandora.getClipsQuery = function() {
     return clipsQuery;
 };
 
+(function() {
+    var itemTitles = {};
+    pandora.getDocumentTitle = function(itemTitle) {
+        Ox.Log('', 'ITEM TITLES', itemTitles)
+        if (itemTitle) {
+            itemTitles[pandora.user.ui.item] = itemTitle
+        }
+        var parts = [pandora.site.site.name];
+        if (!pandora.user.ui.item) {
+            pandora.user.ui._list && parts.push('List ' + pandora.user.ui._list);
+            parts.push(Ox.toTitleCase(pandora.user.ui.listView) + ' View');
+        } else {
+            parts.push(itemTitles[pandora.user.ui.item] || pandora.user.ui.item);
+            parts.push(Ox.toTitleCase(pandora.user.ui.itemView) + ' View');
+        }
+        return parts.join(' - ');
+    };
+}());
+
 pandora.getFilterSizes = function() {
     return Ox.divideInt(
         window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1, 5
@@ -664,24 +683,26 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
     }
 };
 
-(function() {
-    var itemTitles = {};
-    pandora.getPageTitle = function(itemTitle) {
-        Ox.Log('', 'ITEM TITLES', itemTitles)
-        if (itemTitle) {
-            itemTitles[pandora.user.ui.item] = itemTitle
-        }
-        var parts = [pandora.site.site.name];
-        if (!pandora.user.ui.item) {
-            pandora.user.ui._list && parts.push('List ' + pandora.user.ui._list);
-            parts.push(Ox.toTitleCase(pandora.user.ui.listView) + ' View');
-        } else {
-            parts.push(itemTitles[pandora.user.ui.item] || pandora.user.ui.item);
-            parts.push(Ox.toTitleCase(pandora.user.ui.itemView) + ' View');
-        }
-        return parts.join(' - ');
-    };
-}());
+pandora.getPageTitle = function(stateOrURL) {
+    var pages = Ox.merge([
+            {id: '', title: ''},
+            {id: 'help', title: 'Help'},
+            {id: 'home', title: ''},
+            {id: 'preferences', title: 'Preferences'},
+            {id: 'signin', title: 'Sign In'},
+            {id: 'signout', title: 'Sign Out'},
+            {id: 'signup', title: 'Sign Up'},
+            {id: 'software', title: 'Software'}
+        ], pandora.site.sitePages),
+        page = Ox.getObjectById(
+            pages,
+            Ox.isObject(stateOrURL) ? stateOrURL.page : stateOrURL.substr(1)
+        );
+    return page
+        ? pandora.site.site.name
+        + (page.title ? ' - ' + page.title : '')
+        : null;
+};
 
 pandora.getSortKeyData = function(key) {
     return Ox.getObjectById(pandora.site.itemKeys, key)
@@ -856,15 +877,9 @@ pandora.resizeFolders = function() {
 };
 
 pandora.resizeWindow = function() {
+    // FIXME: a lot of this throws errors on load
     pandora.$ui.leftPanel.size(2, pandora.getInfoHeight(true));
     pandora.resizeFolders();
-    /*
-    var infoHeight = pandora.getInfoHeight(true);
-    pandora.$ui.leftPanel.size(2, infoHeight);
-    !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -infoHeight});
-    pandora.resizeFolders();
-    pandora.$ui.info.resizeInfo();
-    */
     if (!pandora.user.ui.item) {
         pandora.resizeFilters(pandora.$ui.rightPanel.width());
         if (pandora.user.ui.listView == 'clips') {
@@ -893,7 +908,6 @@ pandora.resizeWindow = function() {
             pandora.$ui.list.size();
         }
     } else {
-        //Ox.Log('', 'pandora.$ui.window.resize');
         pandora.$ui.browser.scrollToSelection();
         if (pandora.user.ui.itemView == 'info') {
             pandora.$ui.item.resize();

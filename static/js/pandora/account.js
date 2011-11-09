@@ -7,6 +7,7 @@ pandora.ui.accountDialog = function(action) {
             fixedSize: true,
             height: 192,
             id: 'accountDialog',
+            removeOnClose: true,
             width: 432
         }, pandora.ui.accountDialogOptions(action)))
         .bindEvent({
@@ -56,8 +57,8 @@ pandora.ui.accountDialogOptions = function(action, value) {
                 id: 'cancel' + Ox.toTitleCase(action),
                 title: 'Cancel'
             }).bindEvent('click', function() {
-                pandora.$ui.accountDialog.close().remove();
-                pandora.URL.update();
+                pandora.$ui.accountDialog.close();
+                pandora.UI.set({page: ''});
             });
         } else if (type == 'submit') {
             return Ox.Button({
@@ -72,13 +73,12 @@ pandora.ui.accountDialogOptions = function(action, value) {
                 id: type,
                 title: buttonTitle[type] + '...'
             }).bindEvent('click', function() {
-                pandora.$ui.accountDialog.options(pandora.ui.accountDialogOptions(type));
-                pandora.$ui.accountForm.find('input')[0].focus();
                 if (['signin', 'signup'].indexOf(type) > -1) {
-                    // fixme: similar problem as in siteDialog,
-                    // the URL controller should handle this
-                    history.replaceState({}, '', '/' + type);
+                    pandora.UI.set({page: type});
+                } else {
+                    pandora.$ui.accountDialog.options(pandora.ui.accountDialogOptions(type));
                 }
+                pandora.$ui.accountForm.find('input.OxInput')[0].focus();
             });
         }
     }
@@ -147,7 +147,7 @@ pandora.ui.accountForm = function(action, value) {
                 if (action == 'signin') {
                     pandora.api.signin(data, function(result) {
                         if (!result.data.errors) {
-                            pandora.$ui.accountDialog.close().remove();
+                            pandora.$ui.accountDialog.close();
                             pandora.signin(result.data);
                         } else {
                             pandora.$ui.accountDialog.enableButtons();
@@ -157,7 +157,7 @@ pandora.ui.accountForm = function(action, value) {
                 } else if (action == 'signup') {
                     pandora.api.signup(data, function(result) {
                         if (!result.data.errors) {
-                            pandora.$ui.accountDialog.close().remove();
+                            pandora.$ui.accountDialog.close();
                             pandora.signin(result.data);
                             pandora.ui.accountWelcomeDialog().open();
                         } else {
@@ -181,7 +181,7 @@ pandora.ui.accountForm = function(action, value) {
                 } else if (action == 'resetAndSignin') {
                     pandora.api.resetPassword(data, function(result) {
                         if (!result.data.errors) {
-                            pandora.$ui.accountDialog.close().remove();
+                            pandora.$ui.accountDialog.close();
                             pandora.signin(result.data);
                         } else {
                             pandora.$ui.accountDialog.enableButtons();
@@ -318,14 +318,14 @@ pandora.ui.accountSignoutDialog = function() {
                 id: 'stay',
                 title: 'Stay Signed In'
             }).bindEvent('click', function() {
-                that.close().remove();
-                pandora.URL.update();
+                that.close();
+                pandora.UI({page: ''});
             }),
             Ox.Button({
                 id: 'signout',
                 title: 'Sign Out'
             }).bindEvent('click', function() {
-                that.close().remove();
+                that.close();
                 pandora.api.signout({}, function(result) {
                     pandora.signout(result.data);
                 });
@@ -345,6 +345,7 @@ pandora.ui.accountSignoutDialog = function() {
         fixedSize: true,
         height: 128,
         keys: {enter: 'signout', escape: 'stay'},
+        removeOnClose: true,
         title: 'Sign Out',
         width: 304
     });
@@ -358,7 +359,7 @@ pandora.ui.accountWelcomeDialog = function() {
                     id: 'preferences',
                     title: 'Preferences...'
                 }).bindEvent('click', function() {
-                    that.close().remove();
+                    that.close();
                     pandora.$ui.preferencesDialog = pandora.ui.preferencesDialog().open();
                 }),
                 {},
@@ -366,7 +367,7 @@ pandora.ui.accountWelcomeDialog = function() {
                     id: 'close',
                     title: 'Close'
                 }).bindEvent('click', function() {
-                    that.close().remove();
+                    that.close();
                 })
             ],
             content: Ox.Element()
@@ -383,6 +384,7 @@ pandora.ui.accountWelcomeDialog = function() {
             fixedSize: true,
             height: 128,
             keys: {enter: 'close', escape: 'close'},
+            removeOnClose: true,
             title: 'Welcome to ' + pandora.site.site.name,
             width: 304
         });

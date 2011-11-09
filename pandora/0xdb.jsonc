@@ -569,7 +569,7 @@
     "sitePages": [
         {"id": "about", "title": "About"},
         {"id": "news", "title": "News"},
-        {"id": "tour", "title": "Take a Tour"},
+        // {"id": "tour", "title": "Take a Tour"},
         {"id": "faq", "title": "Frequently Asked Questions"},
         {"id": "terms", "title": "Terms of Service"},
         {"id": "rights", "title": "Rights Management"},
@@ -617,6 +617,7 @@
             "lists": {},
             "mapFind": "",
             "mapSelection": "",
+            "page": "",
             "section": "items",
             "showAnnotations": true,
             "showBrowser": true,

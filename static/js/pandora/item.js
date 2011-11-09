@@ -11,8 +11,10 @@ pandora.ui.item = function() {
     }, pandora.user.ui.itemView == 'info' && pandora.site.capabilities.canEditMetadata[pandora.user.level] ? 0 : -1, function(result) {
 
         if (result.status.code == 200) {
-            // fixme: can the history state title get updated too?
-            document.title = pandora.getPageTitle(result.data.title);
+            // we want to cache the title in any way, so that after closing
+            // a dialog and getting to this item, the title is correct
+            var documentTitle = pandora.getDocumentTitle(result.data.title);
+            document.title = pandora.getPageTitle(document.location.pathname) || documentTitle;
         }
 
         /*if (result.status.code != 200) {

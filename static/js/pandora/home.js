@@ -134,7 +134,7 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
-                    pandora.URL.update();
+                    pandora.UI.set({page: ''});
                     that.fadeOutScreen();
                 }
             })
@@ -154,7 +154,7 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
-                    pandora.URL.push('/signup');
+                    pandora.UI.set({page: 'signup'});
                     that.fadeOutScreen();
                 }
             }),
@@ -173,7 +173,7 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
-                    pandora.URL.push('/signin');
+                    pandora.UI.set({page :'signin'});
                     that.fadeOutScreen();
                 }
             }),
@@ -192,7 +192,7 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
-                    pandora.URL.push('/preferences');
+                    pandora.UI.set({page: 'preferences'});
                     that.fadeOutScreen();
                 }
             }),
@@ -211,7 +211,7 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
-                    pandora.URL.push('/about');
+                    pandora.UI.set({page: 'about'});
                     that.fadeOutScreen();
                 }
             })

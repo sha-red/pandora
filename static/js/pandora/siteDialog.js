@@ -5,12 +5,10 @@
 pandora.ui.siteDialog = function(section) {
 
     var tabs = Ox.merge(
-        Ox.clone(pandora.site.sitePages),
+        Ox.clone(pandora.site.sitePages, true),
         [{id: 'software', title: 'Software'}]
     );
-    //Ox.getObjectById(tabs, section).selected = true;
-    tabs[Ox.getPositionById(tabs, section)].selected = true;
-    //Ox.print('SITE DIALOG', section, Ox.getObjectById(tabs, section), Ox.getObjectById(tabs, section).selected)
+    Ox.getObjectById(tabs, section).selected = true;
     var $tabPanel = Ox.TabPanel({
             content: function(id) {
                 var $content = Ox.Element().css({padding: '16px', overflowY: 'auto'});
@@ -82,8 +80,6 @@ pandora.ui.siteDialog = function(section) {
                                         + 'Legal Action</div>'
                                     )
                                     .appendTo($column);
-                            })
-                            pandora.site.rightsLevels.forEach(function(rightsLevel) {
                             });
                         }                        
                     });
@@ -113,37 +109,38 @@ pandora.ui.siteDialog = function(section) {
         })
         .bindEvent({
             change: function(data) {
-                $dialog.options({
+                that.options({
                     title: Ox.getObjectById(tabs, data.selected).title
                 });
-                //pandora.URL.replace('/' + data.selected);
-                //fixme: this should be using URL.push / UI.set
-                //but that currenlty causes another dialog to be opened
-                history.pushState({/*page: data.selected*/}, '', '/' + data.selected);
+                pandora.UI.set({page: data.selected});
             }
         });
-    var $dialog = Ox.Dialog({
+
+    var that = Ox.Dialog({
             buttons: [
                 Ox.Button({
                     id: 'close',
                     title: 'Close'
                 }).bindEvent({
                     click: function() {
-                        $dialog.close().remove();
-                        pandora.URL.update();
+                        that.close();
                     }
                 })
             ],
-            //closeButton: true,
+            closeButton: true,
             content: $tabPanel,
             height: Math.round((window.innerHeight - 24) * 0.75),
-            //maximizeButton: true,
+            maximizeButton: true,
             minHeight: 256,
             minWidth: 688, // 16 + 256 + 16 + 384 + 16
-            title: 'About',
+            removeOnClose: true,
+            title: Ox.getObjectById(tabs, section).title,
             width: Math.round(window.innerWidth * 0.75),
         })
         .bindEvent({
+            close: function(data) {
+                pandora.UI.set({page: ''});
+            },
             resize: function(data) {
                 if ($tabPanel.selected() == 'contact') {
                     pandora.$ui.contactForm.resize();
@@ -151,11 +148,11 @@ pandora.ui.siteDialog = function(section) {
             }
         });
 
-    $dialog.select = function(id) {
+    that.select = function(id) {
         $tabPanel.select(id);
-        return $dialog;
+        return that;
     };
 
-    return $dialog;
+    return that;
 
 };

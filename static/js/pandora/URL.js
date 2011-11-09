@@ -6,9 +6,13 @@ pandora.URL = (function() {
 
     var self = {}, that = {};
 
-    function getState(keys) {
+    function getState() {
 
-        Ox.Log('GET STATE, UI', pandora.user.ui)
+        Ox.Log('', 'GET STATE, UI', pandora.user.ui)
+
+        if (pandora.user.ui.page) {
+            return {page: pandora.user.ui.page};
+        }
 
         var state = {};
 
@@ -45,7 +49,7 @@ pandora.URL = (function() {
             );
         }
 
-        Ox.Log('URL', 'STATE ...', state)
+        Ox.Log('', 'URL', 'STATE ...', state)
 
         return state;
 
@@ -66,39 +70,7 @@ pandora.URL = (function() {
 
         } else if (state.page) {
 
-            if (state.page == 'home') {
-                // if we're on page load, show screen immediately
-                pandora.$ui.home = pandora.ui.home()[
-                    !pandora.$ui.appPanel ? 'showScreen' : 'fadeInScreen'
-                ]();
-            } else if (
-                Ox.getPositionById(pandora.site.sitePages, state.page) > -1
-                || state.page == 'software'
-            ) {
-                if (pandora.$ui.siteDialog) {
-                    pandora.$ui.siteDialog.select(state.page);
-                } else {
-                    pandora.$ui.siteDialog = pandora.ui.siteDialog(state.page).open();
-                }
-            } else if (state.page == 'help') {
-                pandora.$ui.helpDialog = pandora.ui.helpDialog().open();
-            } else if (['signup', 'signin'].indexOf(state.page) > -1) {
-                if (pandora.user.level == 'guest') {
-                    pandora.$ui.accountDialog = pandora.ui.accountDialog(state.page).open();
-                } else {
-                    pandora.URL.replace('/');
-                }
-            } else if (['preferences', 'signout'].indexOf(state.page) > -1) {
-                if (pandora.user.level == 'guest') {
-                    pandora.URL.replace('/');
-                } else if (state.page == 'preferences') {
-                    pandora.ui.preferencesDialog().open();
-                } else {
-                    pandora.ui.accountSignoutDialog().open();
-                }
-            } else if (state.page == 'api') {
-                document.location.href = '/api/';
-            }
+            pandora.UI.set(state);
             callback && callback();
 
         } else {
@@ -270,17 +242,21 @@ pandora.URL = (function() {
             Ox.Request.cancel();
             self.isPopState = true;
             $('.OxDialog:visible').each(function() {
-                Ox.UI.elements[$(this).data('oxid')].close().remove();
+                Ox.UI.elements[$(this).data('oxid')].close();
             });
+            if (pandora.$ui.home) {
+                pandora.UI.set({page: ''});
+                pandora.$ui.home.fadeOutScreen();
+            }
             if (
                 pandora.user.ui.item
                 && pandora.user.ui.itemView == 'video'
+                && pandora.$ui.player
                 && pandora.$ui.player.options('fullscreen')
             ) {
-                //pandora.$ui.player.options({fullscreen: false});
-                $('body > .OxVideoPlayer').remove();
+                pandora.$ui.player.remove();
             }
-            if (!Ox.isEmpty(e.state)) {
+            if (e.state && !Ox.isEmpty(e.state)) {
                 Ox.Log('', 'E.STATE', e.state)
                 document.title = e.state.title;
                 setState(e.state);
@@ -307,28 +283,36 @@ pandora.URL = (function() {
 
     // sets the URL to the previous URL
     that.pop = function() {
-        self.URL.pop();
+        self.URL.pop() || that.update();
     };
 
     // pushes a new URL (as string or from state)
-    that.push = function(url) {
-        if (url) {
-            self.URL.push(null, pandora.getPageTitle(), url, setState);
+    that.push = function(stateOrURL) {
+        var state,
+            title = pandora.getPageTitle(stateOrURL)
+                || pandora.getDocumentTitle(),
+            url;
+        if (Ox.isObject(stateOrURL)) {
+            state = stateOrURL;
         } else {
-            // fixme
-            //alert('DO YOU REALLY WANT TO CALL PUSH WITHOUT URL?')
-            //self.URL.push(getState());
+            url = stateOrURL;
         }
+        self.URL.push(state, title, url, setState);
         return that;
     };
 
     // replaces the current URL (as string or from state)
-    that.replace = function(url) {
-        if (url) {
-            self.URL.replace(null, pandora.getPageTitle(), url, setState)
+    that.replace = function(stateOrURL, title) {
+        var state,
+            title = pandora.getPageTitle(stateOrURL)
+                || pandora.getDocumentTitle(),
+            url;
+        if (Ox.isObject(stateOrURL)) {
+            state = stateOrURL;
         } else {
-            self.URL.replace(getState());
+            url = stateOrURL;
         }
+        self.URL.replace(state, title, url, setState);
         return that;
     };
 
@@ -360,7 +344,10 @@ pandora.URL = (function() {
                 action = 'push';
             }
             state = getState();
-            self.URL[action](state, pandora.getPageTitle(), state);
+            self.URL[action](
+                state,
+                pandora.getPageTitle(state) || pandora.getDocumentTitle()
+            );
         }
     };
 
