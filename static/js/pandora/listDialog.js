@@ -94,7 +94,7 @@ pandora.ui.listDialog = function(section) {
                 })
                 .bindEvent({
                     click: function() {
-                        $dialog.close().remove();
+                        $dialog.close();
                     }
                 })
         ],
@@ -104,6 +104,7 @@ pandora.ui.listDialog = function(section) {
         minWidth: width,
         height: 312,
         // keys: {enter: 'save', escape: 'cancel'},
+        removeOnClose: true,
         title: 'List - ' + listData.name,
         width: width
     });

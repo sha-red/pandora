@@ -856,15 +856,9 @@ pandora.resizeFolders = function() {
 };
 
 pandora.resizeWindow = function() {
+    // FIXME: a lot of this throws errors on load
     pandora.$ui.leftPanel.size(2, pandora.getInfoHeight(true));
     pandora.resizeFolders();
-    /*
-    var infoHeight = pandora.getInfoHeight(true);
-    pandora.$ui.leftPanel.size(2, infoHeight);
-    !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -infoHeight});
-    pandora.resizeFolders();
-    pandora.$ui.info.resizeInfo();
-    */
     if (!pandora.user.ui.item) {
         pandora.resizeFilters(pandora.$ui.rightPanel.width());
         if (pandora.user.ui.listView == 'clips') {
@@ -893,7 +887,6 @@ pandora.resizeWindow = function() {
             pandora.$ui.list.size();
         }
     } else {
-        //Ox.Log('', 'pandora.$ui.window.resize');
         pandora.$ui.browser.scrollToSelection();
         if (pandora.user.ui.itemView == 'info') {
             pandora.$ui.item.resize();

@@ -75,7 +75,7 @@ pandora.URL = (function() {
                 Ox.getPositionById(pandora.site.sitePages, state.page) > -1
                 || state.page == 'software'
             ) {
-                if (pandora.$ui.siteDialog) {
+                if (pandora.$ui.siteDialog && pandora.$ui.siteDialog.is(':visible')) {
                     pandora.$ui.siteDialog.select(state.page);
                 } else {
                     pandora.$ui.siteDialog = pandora.ui.siteDialog(state.page).open();
@@ -84,7 +84,11 @@ pandora.URL = (function() {
                 pandora.$ui.helpDialog = pandora.ui.helpDialog().open();
             } else if (['signup', 'signin'].indexOf(state.page) > -1) {
                 if (pandora.user.level == 'guest') {
-                    pandora.$ui.accountDialog = pandora.ui.accountDialog(state.page).open();
+                    if (pandora.$ui.accountDialog && pandora.$ui.accountDialog.is(':visible')) {
+                        pandora.$ui.accountDialog.options(pandora.ui.accountDialogOptions(state.page));
+                    } else {
+                        pandora.$ui.accountDialog = pandora.ui.accountDialog(state.page).open();
+                    }
                 } else {
                     pandora.URL.replace('/');
                 }
@@ -270,15 +274,17 @@ pandora.URL = (function() {
             Ox.Request.cancel();
             self.isPopState = true;
             $('.OxDialog:visible').each(function() {
-                Ox.UI.elements[$(this).data('oxid')].close().remove();
+                Ox.UI.elements[$(this).data('oxid')].close();
             });
             if (
                 pandora.user.ui.item
                 && pandora.user.ui.itemView == 'video'
+                && pandora.$ui.player
                 && pandora.$ui.player.options('fullscreen')
             ) {
+                pandora.$ui.player.remove();
                 //pandora.$ui.player.options({fullscreen: false});
-                $('body > .OxVideoPlayer').remove();
+                //$('body > .OxVideoPlayer').remove();
             }
             if (!Ox.isEmpty(e.state)) {
                 Ox.Log('', 'E.STATE', e.state)
@@ -311,24 +317,26 @@ pandora.URL = (function() {
     };
 
     // pushes a new URL (as string or from state)
-    that.push = function(url) {
-        if (url) {
-            self.URL.push(null, pandora.getPageTitle(), url, setState);
+    that.push = function(stateOrURL) {
+        var state, title = pandora.getPageTitle(), url;
+        if (Ox.isObject(stateOrURL)) {
+            state = stateOrURL;
         } else {
-            // fixme
-            //alert('DO YOU REALLY WANT TO CALL PUSH WITHOUT URL?')
-            //self.URL.push(getState());
+            url = stateOrURL;
         }
+        self.URL.push(state, title, url, setState);
         return that;
     };
 
     // replaces the current URL (as string or from state)
-    that.replace = function(url) {
-        if (url) {
-            self.URL.replace(null, pandora.getPageTitle(), url, setState)
+    that.replace = function(stateOrURL) {
+        var state, title = pandora.getPageTitle(), url;
+        if (Ox.isObject(stateOrURL)) {
+            state = stateOrURL;
         } else {
-            self.URL.replace(getState());
+            url = stateOrURL;
         }
+        self.URL.replace(state, title, url, setState);
         return that;
     };
 
@@ -360,7 +368,7 @@ pandora.URL = (function() {
                 action = 'push';
             }
             state = getState();
-            self.URL[action](state, pandora.getPageTitle(), state);
+            self.URL[action](state, pandora.getPageTitle(), '');
         }
     };
 
