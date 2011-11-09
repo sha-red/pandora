@@ -185,11 +185,11 @@ pandora.ui.folders = function() {
                 } else {
                     extras = [Ox.Select({
                         items: [
-                            { id: 'add', title: 'Add Volume...' },
-                            { id: 'scan', title: 'Scan Selected Volume...' },
-                            { id: 'remove', title: 'Remove Selected Volume...' },
+                            { id: 'add', title: 'Add Volume...', disabled: true },
+                            { id: 'scan', title: 'Scan Selected Volume...', disabled: true },
+                            { id: 'remove', title: 'Remove Selected Volume...', disabled: true },
                             {},
-                            { id: 'import', title: 'Import Movies...' }
+                            { id: 'import', title: 'Import Movies...', disabled: true }
                         ],
                         max: 0,
                         min: 0,
