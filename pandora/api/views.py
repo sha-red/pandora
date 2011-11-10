@@ -57,17 +57,6 @@ def init(request):
     config = copy.deepcopy(settings.CONFIG)
     del config['keys'] #is this needed?
 
-    #populate max values for percent requests
-    for key in filter(lambda k: 'format' in k, config['itemKeys']):
-        if key['format']['type'] == 'percent' and key['format']['args'][0] == 'auto':
-            name = key['id']
-            if name == 'popularity':
-                name = 'item__accessed__accessed'
-                value = ItemSort.objects.aggregate(Sum(name))['%s__sum'%name]
-            else:
-                value = ItemSort.objects.aggregate(Max(name))['%s__max'%name]
-            key['format']['args'][0] = value
-
     response['data']['site'] = config
     response['data']['user'] = init_user(request.user, request)
     return render_to_json_response(response)

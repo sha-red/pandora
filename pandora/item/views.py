@@ -242,8 +242,8 @@ Positions
                     r[p] = value.exists() and value[0].v or None
                 elif p  == 'accessed':
                     r[p] = m.a
-                elif p == 'popularity':
-                    r[p] = m.sort.popularity
+                elif p == 'timesaccessed':
+                    r[p] = m.sort.timesaccessed
                 else:
                     r[p] = m.json.get(p, '')
             if 'clip_qs' in query:
@@ -260,11 +260,11 @@ Positions
             return r
         qs = qs[query['range'][0]:query['range'][1]]
         #response['data']['items'] = [m.get_json(_p) for m in qs]
-        if 'popularity' in _p:
-            qs = qs.annotate(popularity=Sum('accessed__accessed'))
+        if 'timesaccessed' in _p:
+            qs = qs.annotate(timesaccessed=Sum('accessed__accessed'))
         if 'accessed' in _p:
             qs = qs.annotate(a=Max('accessed__access'))
-        if 'viewed' in _p or 'popularity' in _p or 'accessed' in _p:
+        if 'viewed' in _p or 'timesaccessed' in _p or 'accessed' in _p:
             qs = qs.select_related()
             response['data']['items'] = [only_p_sums(m) for m in qs]
         else:

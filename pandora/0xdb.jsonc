@@ -253,35 +253,35 @@
             "title": "Budget",
             "type": "integer",
             "columnWidth": 90,
-            "format": {"type": "currency", "args": ["$", 0]}
+            "format": {"type": "unit", "args": ["$"]}
         },
         {
             "id": "gross",
             "title": "Gross",
             "type": "integer",
             "columnWidth": 90,
-            "format": {"type": "currency", "args": ["$", 0]}
+            "format": {"type": "unit", "args": ["$"]}
         },
         {
             "id": "profit",
             "title": "Profit",
             "type": "integer",
             "columnWidth": 90,
-            "format": {"type": "currency", "args": ["$", 0]}
+            "format": {"type": "unit", "args": ["$"]}
         },
         {
             "id": "rating",
             "title": "Rating",
             "type": "float",
             "columnWidth": 60,
-            "format": {"type": "percent", "args": [10, 2]}
+            "format": {"type": "unit", "args": ["%", 2]}
         },
         {
             "id": "votes",
             "title": "Votes",
-            "type": "integer",
+            "type": "float",
             "columnWidth": 60,
-            "format": {"type": "percent", "args": ["auto", 2]}
+            "format": {"type": "unit", "args": ["%", 2]}
         },
         {
             "id": "id",
@@ -418,39 +418,31 @@
             "find": true
         },
         {
-            "id": "published",
-            "title": "Date Published",
+            "id": "created",
+            "title": "Date Created",
             "type": "date",
-            "columnWidth": 90,
+            "columnWidth": 150,
             "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]}
         },
         {
             "id": "modified",
-            "title": "Date Modified",
+            "title": "Last Modified",
             "type": "date",
-            "columnWidth": 90,
+            "columnWidth": 150,
             "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]}
         },
         {
             "id": "accessed",
-            "title": "Date Accessed",
+            "title": "Last Accessed",
             "type": "date",
-            "columnWidth": 90,
+            "columnWidth": 150,
             "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]}
         },
         {
-            "id": "viewed",
-            "title": "Date Viewed",
-            "type": "date",
-            "columnWidth": 90,
-            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]}
-        },
-        {
-            "id": "popularity",
-            "title": "Popularity",
+            "id": "timesaccessed",
+            "title": "Times Accessed",
             "type": "integer",
-            "columnWidth": 60,
-            "format": {"type": "percent", "args": ["auto", 2]}
+            "columnWidth": 60
         },
         {
             "id": "rightslevel",
@@ -460,7 +452,7 @@
             "format": {"type": "ColorLevel", "args": [
                 ["Public", "Relaxed", "Regular", "Restricted", "Private"]
             ]},
-            "list": ["Public", "Relaxed", "Regular", "Restricted", "Private"],
+            "list": ["Public", "Relaxed", "Regular", "Restricted", "Private", "Unknown"],
             "sortOperator": "+"
         },
         {

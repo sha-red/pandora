@@ -65,7 +65,7 @@ pandora.ui.list = function() {
                 return {
                     align: ['string', 'text'].indexOf(
                         Ox.isArray(key.type) ? key.type[0]: key.type
-                    ) > -1 ? 'left' : key.type == 'label' ? 'center' : 'right',
+                    ) > -1 ? 'left' : key.type == 'list' ? 'center' : 'right',
                     defaultWidth: key.columnWidth,
                     format: key.format,
                     id: key.id,

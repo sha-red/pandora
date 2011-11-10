@@ -132,7 +132,6 @@ def get_item(info, user=None, async=False):
 class Item(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    published = models.DateTimeField(default=datetime.now, editable=False)
 
     user = models.ForeignKey(User, null=True, related_name='items')
     groups = models.ManyToManyField(Group, blank=True, related_name='items')
@@ -594,6 +593,7 @@ class Item(models.Model):
             'aspectratio',
             'bitrate',
             'clips',
+            'created',
             'cutsperminute',
             'duration',
             'hue',
@@ -604,8 +604,7 @@ class Item(models.Model):
             'numberoffiles',
             'parts',
             'pixels',
-            'popularity',
-            'published',
+            'timesaccessed',
             'resolution',
             'rightslevel',
             'saturation',
@@ -667,7 +666,7 @@ class Item(models.Model):
         #sort keys based on database, these will always be available
         s.itemId = self.itemId.replace('0x', 'xx')
         s.modified = self.modified
-        s.published = self.published
+        s.created = self.created
         s.rightslevel = self.level
 
         s.aspectratio = self.get('aspectratio')
@@ -714,7 +713,7 @@ class Item(models.Model):
         else:
             s.cutsperminute = None 
             s.wordsperminute = None
-        s.popularity = self.accessed.aggregate(Sum('accessed'))['accessed__sum']
+        s.timesaccessed = self.accessed.aggregate(Sum('accessed'))['accessed__sum']
         s.save()
         #update cached values in clips
         self.clips.all().update(director=s.director, title=s.title)

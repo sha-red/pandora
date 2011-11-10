@@ -4,21 +4,16 @@
 
 pandora.ui.filterForm = function(list) {
     var that = Ox.Filter({
-            findKeys: Ox.merge(Ox.map(pandora.site.itemKeys, function(key) {
-                return {
-                    autocomplete: key.autocomplete,
-                    autocompleteSortKey: key.autocompleteSortKey,
-                    format: key.format,
-                    id: key.id,
-                    title: key.title,
-                    type: key.type == 'layer'
-                        ? Ox.getObjectById(pandora.site.layers, key.id).type
-                        : key.type
-                };
+            findKeys: Ox.merge(Ox.map(pandora.site.itemKeys, function(itemKey) {
+                var key = Ox.clone(itemKey);
+                key.type = key.type == 'layer'
+                    ? Ox.getObjectById(pandora.site.layers, key.id).type
+                    : key.type;
+                return key;
             }), {
                 id: 'list',
                 title: 'List',
-                type: 'list'
+                type: 'string'
             }),
             list: list ? null : {
                 sort: pandora.user.ui.listSort,
