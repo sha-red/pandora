@@ -233,8 +233,8 @@ def addList(request):
         value = data['status']
         if value not in list._status:
             value = list._status[0]
-        if not request.user.is_staff and value == 'featured':
-            value = 'private'
+        if value == 'featured' and request.user.get_profile().capability('canEditFeaturedLists'):
+            value = list.status
         list.status = value
     if 'description' in data:
         list.description = data['description']
@@ -329,20 +329,20 @@ def editList(request):
                             pos.position = qs.aggregate(Max('position'))['position__max'] + 1
                             pos.save()
                         models.Position.objects.filter(list=list).exclude(id=pos.id).delete()
-                else:
-                        models.Position.objects.filter(list=list).delete()
-                        pos, created = models.Position.objects.get_or_create(list=list,
-                                                      user=list.user,section='personal')
-                        qs = models.Position.objects.filter(user=list.user,
-                                                            section='personal')
+                elif list.status == 'featured' and value == 'public':
+                    models.Position.objects.filter(list=list).delete()
+                    pos, created = models.Position.objects.get_or_create(list=list,
+                                                  user=list.user,section='personal')
+                    qs = models.Position.objects.filter(user=list.user,
+                                                        section='personal')
+                    pos.position = qs.aggregate(Max('position'))['position__max'] + 1
+                    pos.save()
+                    for u in list.subscribed_users.all():
+                        pos, created = models.Position.objects.get_or_create(list=list, user=u,
+                                                                             section='public')
+                        qs = models.Position.objects.filter(user=u, section='public')
                         pos.position = qs.aggregate(Max('position'))['position__max'] + 1
                         pos.save()
-                        for u in list.subscribed_users.all():
-                            pos, created = models.Position.objects.get_or_create(list=list, user=u,
-                                                                                 section='public')
-                            qs = models.Position.objects.filter(user=u, section='public')
-                            pos.position = qs.aggregate(Max('position'))['position__max'] + 1
-                            pos.save()
 
                 list.status = value
             elif key == 'name':

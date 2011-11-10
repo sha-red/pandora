@@ -1,6 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
 pandora.ui.folderList = function(id) {
+    // FIXME: use canEditFeaturedLists capability, not 'admin'
     var i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id),
         that;
     if (pandora.user.ui.section == 'items') {
