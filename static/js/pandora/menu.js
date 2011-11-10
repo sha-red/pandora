@@ -303,7 +303,7 @@ pandora.ui.mainMenu = function() {
             },
             key_control_comma: function() {
                 if (!pandora.hasDialogOrScreen()) {
-                    pandora.URL.push('/preferences');
+                    pandora.UI.set({page: 'preferences'});
                 }
             },
             key_control_f: function() {
@@ -318,7 +318,7 @@ pandora.ui.mainMenu = function() {
             },
             key_control_slash: function() {
                 if (!pandora.hasDialogOrScreen()) {
-                    pandora.URL.push('/help');
+                    pandora.UI.set({page: 'help'});
                 }
             },
             key_control_w: function() {
@@ -479,7 +479,7 @@ pandora.ui.mainMenu = function() {
                     { id: 'descending', title: 'Descending', checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '-' }
                 ]}
             ] },
-            { id: 'advancedsort', title: 'Advanced Sort...', keyboard: 'shift control s', disabled: true },
+            { id: 'advancedsort', title: 'Advanced Sort...', keyboard: 'shift control s' },
             {},
             { id: 'sortfilters', title: 'Sort Filters', items: pandora.user.ui.filters.map(function(filter) {
                 return {
