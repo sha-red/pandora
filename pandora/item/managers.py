@@ -46,7 +46,7 @@ def parseCondition(condition, user):
             return q
 
     if (not exclude and op == '=' or op in ('$', '^')) and v == '':
-        return Q(True)
+        return Q()
 
     if k == 'filename' and (user.is_anonymous() or \
         not user.get_profile().capability('canSeeFiles')):
