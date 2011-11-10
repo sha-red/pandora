@@ -319,7 +319,7 @@ pandora.ui.accountSignoutDialog = function() {
                 title: 'Stay Signed In'
             }).bindEvent('click', function() {
                 that.close();
-                pandora.UI({page: ''});
+                pandora.UI.set({page: ''});
             }),
             Ox.Button({
                 id: 'signout',
