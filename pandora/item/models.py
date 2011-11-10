@@ -714,6 +714,8 @@ class Item(models.Model):
             s.cutsperminute = None 
             s.wordsperminute = None
         s.timesaccessed = self.accessed.aggregate(Sum('accessed'))['accessed__sum']
+        if not s.timesaccessed:
+            s.timesaccessed = 0
         s.save()
         #update cached values in clips
         self.clips.all().update(director=s.director, title=s.title)
