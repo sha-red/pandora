@@ -138,11 +138,6 @@
             "format": {"type": "duration", "args": [0, "short"]}
         },
         {
-            "id": "series",
-            "title": "TV Series",
-            "type": "boolean"
-        },
-        {
             "id": "writer",
             "title": "Writer",
             "type": ["string"],
@@ -212,6 +207,11 @@
             "type": ["string"],
             "autocomplete": true,
             "find": true
+        },
+        {
+            "id": "series",
+            "title": "TV Series",
+            "type": "boolean"
         },
         {
             "id": "genre", 
