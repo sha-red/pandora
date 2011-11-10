@@ -1156,7 +1156,7 @@ attrs = {
     'item': models.OneToOneField('Item', related_name='sort', primary_key=True),
     'duration': models.FloatField(null=True, blank=True, db_index=True),
 }
-for key in filter(lambda k: 'columnWidth' in k or k['type'] in ('integer', 'time', 'float', 'data'), settings.CONFIG['itemKeys']):
+for key in filter(lambda k: 'columnWidth' in k or k['type'] in ('integer', 'time', 'float', 'date', 'list'), settings.CONFIG['itemKeys']):
     name = key['id']
     name = {'id': 'itemId'}.get(name, name)
     sort_type = key.get('sort', key['type'])
@@ -1178,7 +1178,7 @@ for key in filter(lambda k: 'columnWidth' in k or k['type'] in ('integer', 'time
         'date': 'date',
         'hue': 'float',
         'time': 'integer',
-        'label': 'integer',
+        'list': 'integer',
     }.get(sort_type, sort_type)]
     attrs[name] = model[0](**model[1])
 

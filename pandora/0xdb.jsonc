@@ -455,11 +455,12 @@
         {
             "id": "rightslevel",
             "title": "Rights Level",
-            "type": "label",
+            "type": "list",
             "columnWidth": 90,
             "format": {"type": "ColorLevel", "args": [
                 ["Public", "Relaxed", "Regular", "Restricted", "Private"]
             ]},
+            "list": ["Public", "Relaxed", "Regular", "Restricted", "Private"],
             "sortOperator": "+"
         },
         {

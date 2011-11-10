@@ -52,7 +52,7 @@ def parseCondition(condition, user):
         'layer': 'string',
     }.get(key_type, key_type)
     if k == 'list':
-        key_type = 'list'
+        key_type = ''
 
     if (not exclude and op == '=' or op in ('$', '^')) and v == '':
         return Q()
@@ -124,7 +124,7 @@ def parseCondition(condition, user):
         if exclude:
             q = ~q
         return q
-    elif key_type == 'list':
+    elif k == 'list':
         q = Q(id=0)
         l = v.split(":")
         if len(l) >= 2:
@@ -164,7 +164,7 @@ def parseCondition(condition, user):
         if exclude:
             q = ~q
         return q
-    else: #numbers
+    else: #integer, float, list, time
         #use sort table here
         if key_type == 'time':
             v = int(utils.parse_time(v))
