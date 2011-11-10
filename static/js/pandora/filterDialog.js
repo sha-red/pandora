@@ -3,15 +3,6 @@
 pandora.ui.filterDialog = function(list) {
     var that = Ox.Dialog({
         buttons: [
-            Ox.Button({
-                    id: 'debug',
-                    title: 'Debug',
-                })
-                .bindEvent({
-                    click: function() {
-                        alert(JSON.stringify(pandora.$ui.filterForm.options('query')));
-                    }
-                }),
             /*
             Ox.Button({
                     id: 'cancel',

@@ -24,7 +24,7 @@ pandora.ui.filterForm = function(list) {
                 sort: pandora.user.ui.listSort,
                 view: pandora.user.ui.listView
             },
-            query: list ? list.query : pandora.user.ui.find,
+            query: Ox.clone(list ? list.query : pandora.user.ui.find, true),
             sortKeys: pandora.site.sortKeys,
             viewKeys: pandora.site.listViews
         })
@@ -51,8 +51,8 @@ pandora.ui.filterForm = function(list) {
                         });
                     });
                 } else {
-                    pandora.UI.set({find: data.query});
-                    //pandora.URL.replace();
+                    Ox.Log('FIND', 'change form', data.query, pandora.user.ui.find)
+                    pandora.UI.set({find: Ox.clone(data.query, true)});
                 }
             }
         });

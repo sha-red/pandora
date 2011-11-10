@@ -21,6 +21,7 @@ pandora.ui.mainPanel = function() {
         .bindEvent({
             pandora_find: function() {
                 var previousUI = pandora.UI.getPrevious();
+                Ox.Log('FIND', 'handled in mainPanel', previousUI.item, previousUI._list)
                 if (!previousUI.item && pandora.user.ui._list == previousUI._list) {
                     if (['map', 'calendar'].indexOf(pandora.user.ui.listView) > -1) {
                         pandora.$ui.contentPanel.replaceElement(1,
