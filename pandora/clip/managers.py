@@ -60,7 +60,7 @@ def parseCondition(condition, user):
         else:
             return q
     if (not exclude and op == '=' or op in ('$', '^', '>=', '<')) and v == '':
-        return Q(True)
+        return Q()
 
     if k.endswith('__id'):
         v = decode_id(v)
