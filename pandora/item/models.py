@@ -606,6 +606,8 @@ class Item(models.Model):
             'pixels',
             'timesaccessed',
             'resolution',
+            'width',
+            'height',
             'rightslevel',
             'saturation',
             'size',
@@ -678,6 +680,8 @@ class Item(models.Model):
             s.duration = sum([v.duration for v in videos])
             v = videos[0]
             s.resolution = v.width * v.height
+            s.width = v.width
+            s.height = v.height
             if not s.aspectratio:
                 s.aspectratio = float(utils.parse_decimal(v.display_aspect_ratio))
             s.pixels = sum([v.pixels for v in videos])
@@ -1156,8 +1160,10 @@ attrs = {
     '__module__': 'item.models',
     'item': models.OneToOneField('Item', related_name='sort', primary_key=True),
     'duration': models.FloatField(null=True, blank=True, db_index=True),
+    'width': models.BigIntegerField(null=True, blank=True, db_index=True),
+    'height': models.BigIntegerField(null=True, blank=True, db_index=True),
 }
-for key in filter(lambda k: 'columnWidth' in k or k['type'] in ('integer', 'time', 'float', 'date', 'list'), settings.CONFIG['itemKeys']):
+for key in filter(lambda k: 'columnWidth' in k or k['type'] in ('integer', 'time', 'float', 'date', 'enum'), settings.CONFIG['itemKeys']):
     name = key['id']
     name = {'id': 'itemId'}.get(name, name)
     sort_type = key.get('sort', key['type'])
@@ -1179,7 +1185,7 @@ for key in filter(lambda k: 'columnWidth' in k or k['type'] in ('integer', 'time
         'date': 'date',
         'hue': 'float',
         'time': 'integer',
-        'list': 'integer',
+        'enum': 'integer',
     }.get(sort_type, sort_type)]
     attrs[name] = model[0](**model[1])
 

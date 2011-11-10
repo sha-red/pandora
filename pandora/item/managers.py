@@ -59,6 +59,12 @@ def parseCondition(condition, user):
     elif k == 'filename' and (user.is_anonymous() or \
         not user.get_profile().capability('canSeeFiles')):
         return Q(id=0)
+    elif k == 'resolution':
+        q = parseCondition({'key': 'width', 'value': v[0], 'operator': op}, user) \
+            & parseCondition({'key': 'height', 'value': v[1], 'operator': op}, user)
+        if exclude:
+            q = ~q
+        return q
     elif isinstance(v, list) and len(v) == 2:
         q = parseCondition({'key': k, 'value': v[0], 'operator': '>='}, user) \
             & parseCondition({'key': k, 'value': v[1], 'operator': '<'}, user)

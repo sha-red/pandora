@@ -306,7 +306,9 @@
             "id": "resolution",
             "title": "Resolution",
             "type": ["integer"],
-            "columnWidth": 90
+            "capability": "canSeeFiles",
+            "columnWidth": 90,
+            "format": {"type": "resolution", "args": ["px"]}
         },
         {
             "id": "aspectratio",
@@ -319,6 +321,7 @@
             "id": "pixels",
             "title": "Pixels",
             "type": "integer",
+            "capability": "canSeeFiles",
             "columnWidth": 90,
             "format": {"type": "value", "args": ["px"]}
         },
@@ -393,7 +396,7 @@
             "type": "integer",
             "capability": "canSeeFiles",
             "columnWidth": 60,
-            "format": {"type": "value", "args": ["bps"]}
+            "format": {"type": "unit", "args": ["kbps", 0, 0.001]}
         },
         {
             "id": "parts",
@@ -447,13 +450,13 @@
         {
             "id": "rightslevel",
             "title": "Rights Level",
-            "type": "list",
+            "type": "enum",
             "columnWidth": 90,
             "format": {"type": "ColorLevel", "args": [
                 ["Public", "Relaxed", "Regular", "Restricted", "Private"]
             ]},
-            "list": ["Public", "Relaxed", "Regular", "Restricted", "Private", "Unknown"],
-            "sortOperator": "+"
+            "sortOperator": "+",
+            "values": ["Public", "Relaxed", "Regular", "Restricted", "Private", "Unknown"]
         },
         {
             "id": "canplayvideo",
