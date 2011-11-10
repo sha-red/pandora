@@ -319,9 +319,7 @@ def editList(request):
                         pos.section = 'personal'
                         pos.save()
                 elif value == 'featured':
-                    if not request.user.is_staff:
-                        value = list.status
-                    else:
+                    if request.user.get_profile().capability('canEditFeaturedLists'):
                         pos, created = models.Position.objects.get_or_create(list=list, user=request.user,
                                                                              section='featured')
                         if created:
@@ -329,6 +327,8 @@ def editList(request):
                             pos.position = qs.aggregate(Max('position'))['position__max'] + 1
                             pos.save()
                         models.Position.objects.filter(list=list).exclude(id=pos.id).delete()
+                    else:
+                        value = list.status
                 elif list.status == 'featured' and value == 'public':
                     models.Position.objects.filter(list=list).delete()
                     pos, created = models.Position.objects.get_or_create(list=list,
@@ -472,7 +472,7 @@ def sortLists(request):
     section = data['section']
     #ids = list(set(data['ids']))
     ids = data['ids']
-    if section == 'featured' and not request.user.is_staff:
+    if section == 'featured' and not request.user.get_profile().capability('canEditFeaturedLists'):
         response = json_response(status=403, text='not allowed')
     else:
         user = request.user
