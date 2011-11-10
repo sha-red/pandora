@@ -20,6 +20,18 @@ def parse_decimal(string):
     d = string.split('/')
     return Decimal(d[0]) / Decimal(d[1])
 
+def parse_time(t):
+    '''
+        parse time string and return seconds as float
+    '''
+    s = 0.0
+    p = t.split(':')
+    for i in range(len(p)):
+        _p = p[i]
+        if _p.endswith('.'):
+            _p =_p[:-1]
+        s = s * 60 + float(_p)
+    return s
 
 def plural_key(term):
     return {

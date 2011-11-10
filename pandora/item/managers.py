@@ -7,8 +7,10 @@ from django.conf import settings
 
 from itemlist.models import List
 import models
+import utils
 
 from ox.django.query import QuerySet
+
 
 def parseCondition(condition, user):
     '''
@@ -143,13 +145,13 @@ def parseCondition(condition, user):
                 q = Q(id=0)
         return q
     elif key_type == 'date':
-        def parseDate(d):
+        def parse_date(d):
             while len(d) < 3:
                 d.append(1)
             return datetime(*[int(i) for i in d])
 
         #using sort here since find only contains strings
-        v = parseDate(v.split('-'))
+        v = parse_date(v.split('-'))
         vk = 'sort__%s%s' % (k, {
             '==': '__exact',
             '>': '__gt',
@@ -157,23 +159,25 @@ def parseCondition(condition, user):
             '<': '__lt',
             '<=': '__lte',
         }.get(op,''))
+        vk = str(vk)
         q = Q(**{vk: v})
         if exclude:
             q = ~q
         return q
-    else: #number
-        vk = 'find__value%s' % ({
+    else: #numbers
+        #use sort table here
+        if key_type == 'time':
+            v = int(utils.parse_time(v))
+
+        vk = 'sort__%s%s' % (k, {
             '==': '__exact',
             '>': '__gt',
             '>=': '__gte',
             '<': '__lt',
             '<=': '__lte',
-            '^': '__istartswith',
-            '$': '__iendswith',
-        }.get(op,'__exact'))
+        }.get(op,''))
         vk = str(vk)
-
-        q = Q(**{'find__key': k, vk: v})
+        q = Q(**{vk: v})
         if exclude:
             q = ~q
         return q

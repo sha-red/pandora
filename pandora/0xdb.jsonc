@@ -133,7 +133,7 @@
         {
             "id": "runtime", 
             "title": "Runtime", 
-            "type": "integer",
+            "type": "time",
             "columnWidth": 60,
             "format": {"type": "duration", "args": [0, "short"]}
         },
