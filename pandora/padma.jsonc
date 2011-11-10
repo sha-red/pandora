@@ -114,8 +114,8 @@
             "value": {"key": "description", "type": "words"}
         },
         {
-            "id": "releasedate",
-            "title": "Release Date",
+            "id": "created",
+            "title": "Date Created",
             "type": "date",
             "columnWidth": 120,
             "format": {"type": "date", "args": ["%a, %b %e, %Y"]}
@@ -263,12 +263,6 @@
             "rightsLevel": 1
         },
         {
-            "id": "published",
-            "title": "Date Published",
-            "type": "date",
-            "columnWidth": 90
-        },
-        {
             "id": "modified",
             "title": "Date Modified",
             "type": "date",
@@ -281,18 +275,11 @@
             "columnWidth": 90
         },
         {
-            "id": "viewed",
-            "title": "Date Viewed",
-            "type": "date",
-            "columnWidth": 90
-        },
-        {
-            "id": "popularity",
-            "title": "Popularity",
+            "id": "timesaccessed",
+            "title": "Times Accessed",
             "type": "integer",
-            "columnWidth": 60,
-            "format": {"type": "percent", "args": ["auto", 2]}
-        }
+            "columnWidth": 60
+        },
     ],
     "itemName": {
         "singular": "Video",
