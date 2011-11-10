@@ -6,7 +6,6 @@ pandora.ui.infoView = function(data) {
     // when collapsing the movies browser, the info view should become a split panel
 
     var ui = pandora.user.ui,
-        borderRadius = ui.icons == 'posters' ? 0 : iconSize / 8,
         canEdit = pandora.site.capabilities.canEditMetadata[pandora.user.level],
         css = {
             marginTop: '4px',
@@ -20,6 +19,7 @@ pandora.ui.infoView = function(data) {
         iconWidth = iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio),
         iconHeight = iconRatio < 1 ? iconSize : Math.round(iconSize / iconRatio),
         iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
+        borderRadius = ui.icons == 'posters' ? 0 : iconSize / 8,
         isEditable = canEdit && data.id.substr(0, 2) == '0x',
         listWidth = 144 + Ox.UI.SCROLLBAR_SIZE,
         margin = 16,
