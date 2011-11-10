@@ -3,24 +3,13 @@
 pandora.ui.filterDialog = function(list) {
     var that = Ox.Dialog({
         buttons: [
-            /*
-            Ox.Button({
-                    id: 'cancel',
-                    title: 'Cancel'
-                })
-                .bindEvent({
-                    click: function() {
-                        pandora.$ui.filterDialog.close();
-                    }
-                }),
-            */
             Ox.Button({
                     id: 'done',
                     title: 'Done'
                 })
                 .bindEvent({
                     click: function() {
-                        pandora.$ui.filterDialog.close();
+                        that.close();
                     }
                 })
         ],
@@ -30,6 +19,7 @@ pandora.ui.filterDialog = function(list) {
         minWidth: 648 + Ox.UI.SCROLLBAR_SIZE,
         height: 264,
         // keys: {enter: 'save', escape: 'cancel'},
+        removeOnClose: true,
         title: list ? 'Smart List - ' + list.name : 'Advanced Find',
         width: 648 + Ox.UI.SCROLLBAR_SIZE
     });

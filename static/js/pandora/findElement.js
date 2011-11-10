@@ -52,9 +52,7 @@ pandora.ui.findElement = function() {
                                         placeholder: 'Edit Query...',
                                         value: ''
                                     });
-                                    (pandora.$ui.filterDialog || (
-                                        pandora.$ui.filterDialog = pandora.ui.filterDialog()
-                                    )).open();
+                                    pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                                 } else {
                                     Ox.Log('FIND', pandora.$ui.findInput.value())
                                     pandora.$ui.findInput.options({
@@ -80,9 +78,7 @@ pandora.ui.findElement = function() {
                         focus: function(data) {
                             if (pandora.$ui.findSelect.value() == 'advanced') {
                                 pandora.$ui.findInput.blurInput();
-                                (pandora.$ui.filterDialog || (
-                                    pandora.$ui.filterDialog = pandora.ui.filterDialog()
-                                )).open();
+                                pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                             }
                         },
                         submit: function(data) {
