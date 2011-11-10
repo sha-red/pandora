@@ -514,7 +514,7 @@ class Item(models.Model):
             if value not in ('', None):
                 f, created = ItemFind.objects.get_or_create(item=self, key=key)
                 if isinstance(value, bool):
-                    value = value and '1' or '0'
+                    value = value and 'true' or 'false'
                 if isinstance(value, basestring):
                     value = value.strip()
                 f.value = value
@@ -567,7 +567,7 @@ class Item(models.Model):
                                 self.get('episodeTitle',
                                 self.get('episode',
                                 self.get('seriesTitle')))) != None
-            save('isSeries', isSeries)
+            save('series', isSeries)
 
     def update_sort(self):
         try:

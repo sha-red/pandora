@@ -138,6 +138,11 @@
             "format": {"type": "duration", "args": [0, "short"]}
         },
         {
+            "id": "series",
+            "title": "TV Series",
+            "type": "boolean"
+        },
+        {
             "id": "writer",
             "title": "Writer",
             "type": ["string"],
@@ -458,21 +463,16 @@
             "sortOperator": "+"
         },
         {
-            "id": "canPlayVideo",
+            "id": "canplayvideo",
             "title": "Can Play Video",
             "type": "boolean",
             "value": "capability"
         },
         {
-            "id": "canPlayClips",
+            "id": "canplayclips",
             "title": "Can Play Clips",
             "type": "boolean",
             "value": "capability"
-        },
-        {
-            "id": "isSeries",
-            "title": "TV Series",
-            "type": "boolean"
         }
     ],
     /*
@@ -540,10 +540,10 @@
         {"id": "favorites", "title": "Favorites"},
         {"id": "most_popular", "title": "Most Popular", "query": {}},
         {"id": "recently_viewed", "title": "Recently Viewed", "query": {}},
-        {"id": "1960s", "title": "1960s", "query": {"conditions": [{"key": "year", "value": "196", "operator": "^"}], "operator": "&"}},
-        {"id": "movies_with_full_video", "title": "Movies with Full Video", "query": {"conditions": [{"key": "canPlayVideo", "value": true, "operator": "="}], "operator": "&"}},
-        {"id": "movies_with_clips", "title": "Movies with Clips", "query": {"conditions": [{"key": "canPlayClips", "value": true, "operator": "="}], "operator": "&"}},
-        {"id": "no_tv_series", "title": "No TV Series", "query": {"conditions": [{"key": "isSeries", "value": false, "operator": "="}], "operator": "&"}}
+        {"id": "1960s", "title": "1960s", "query": {"conditions": [{"key": "year", "value": ["1960", "1970"], "operator": "="}], "operator": "&"}},
+        {"id": "movies_with_full_video", "title": "Movies with Full Video", "query": {"conditions": [{"key": "canplayvideo", "value": true, "operator": "="}], "operator": "&"}},
+        {"id": "movies_with_clips", "title": "Movies with Clips", "query": {"conditions": [{"key": "canplayclips", "value": true, "operator": "="}], "operator": "&"}},
+        {"id": "no_tv_series", "title": "No TV Series", "query": {"conditions": [{"key": "series", "value": false, "operator": "="}], "operator": "&"}}
     ],
     "rightsLevel": {"member": 4, "staff": 3, "admin": 2},
     "rightsLevels": [

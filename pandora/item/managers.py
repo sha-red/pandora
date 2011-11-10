@@ -63,9 +63,12 @@ def parseCondition(condition, user):
         if exclude:
             q = ~q
         return q
-    elif k in ('canPlayVideo', 'canPlayClips'):
+    elif k in ('canplayvideo', 'canplayclips'):
         level = user.is_anonymous() and 'guest' or user.get_profile().get_level()
-        allowed_level = settings.CONFIG['capabilities'][k][level]
+        allowed_level = settings.CONFIG['capabilities'][{
+            'canplayvideo': 'canPlayVideo',
+            'canplayclips': 'canPlayClips'
+        }[k]][level]
         if v:
             q = Q(level__lte=allowed_level)
         else:
@@ -74,7 +77,7 @@ def parseCondition(condition, user):
             q = ~q
         return q
     elif key_type == 'boolean':
-        q = Q(**{'find__key': k, 'find__value': v and '1' or '0'})
+        q = Q(**{'find__key': k, 'find__value': v})
         if exclude:
             q = ~q
         return q
