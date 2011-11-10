@@ -37,21 +37,6 @@ def parseCondition(condition, user):
     else:
         exclude = False
 
-    if isinstance(v, list):
-        q = parseCondition({'key': k, 'value': v[0], 'operator': '>='}, user) \
-            & parseCondition({'key': k, 'value': v[1], 'operator': '<'}, user)
-        if exclude:
-            return ~q
-        else:
-            return q
-
-    if (not exclude and op == '=' or op in ('$', '^')) and v == '':
-        return Q()
-
-    if k == 'filename' and (user.is_anonymous() or \
-        not user.get_profile().capability('canSeeFiles')):
-        return Q(id=0)
-
     key_type = settings.CONFIG['keys'].get(k, {'type':'string'}).get('type')
     if isinstance(key_type, list):
         key_type = key_type[0]
@@ -66,10 +51,19 @@ def parseCondition(condition, user):
     }.get(key_type, key_type)
     if k == 'list':
         key_type = 'list'
-    if k in ('isSeries', ):
-        key_type = 'bool'
 
-    if k in ('canPlayVideo', 'canPlayClips'):
+    if (not exclude and op == '=' or op in ('$', '^')) and v == '':
+        return Q()
+    elif k == 'filename' and (user.is_anonymous() or \
+        not user.get_profile().capability('canSeeFiles')):
+        return Q(id=0)
+    elif isinstance(v, list) and len(v) == 2:
+        q = parseCondition({'key': k, 'value': v[0], 'operator': '>='}, user) \
+            & parseCondition({'key': k, 'value': v[1], 'operator': '<'}, user)
+        if exclude:
+            q = ~q
+        return q
+    elif k in ('canPlayVideo', 'canPlayClips'):
         level = user.is_anonymous() and 'guest' or user.get_profile().get_level()
         allowed_level = settings.CONFIG['capabilities'][k][level]
         if v:
@@ -79,7 +73,7 @@ def parseCondition(condition, user):
         if exclude:
             q = ~q
         return q
-    elif key_type == 'bool':
+    elif key_type == 'boolean':
         q = Q(**{'find__key': k, 'find__value': v and '1' or '0'})
         if exclude:
             q = ~q
@@ -116,20 +110,14 @@ def parseCondition(condition, user):
 
         k = str(k)
         value_key = str(value_key)
-        if exclude:
-            if k == '*':
-                q = ~Q(**{value_key: v})
-            elif in_find:
-                q = ~Q(**{'find__key': k, value_key: v})
-            else:
-                q = ~Q(**{value_key: v})
+        if k == '*':
+            q = Q(**{value_key: v})
+        elif in_find:
+            q = Q(**{'find__key': k, value_key: v})
         else:
-            if k == '*':
-                q = Q(**{value_key: v})
-            elif in_find:
-                q = Q(**{'find__key': k, value_key: v})
-            else:
-                q = Q(**{value_key: v})
+            q = Q(**{value_key: v})
+        if exclude:
+            q = ~q
         return q
     elif key_type == 'list':
         q = Q(id=0)
@@ -151,33 +139,41 @@ def parseCondition(condition, user):
             else:
                 q = Q(id=0)
         return q
-    else: #number or date
-
+    elif key_type == 'date':
         def parseDate(d):
             while len(d) < 3:
                 d.append(1)
             return datetime(*[int(i) for i in d])
 
-        if key_type == "date":
-            v = parseDate(v.split('.'))
-        else:
-            vk = 'value%s' % ({
-                '==': '__exact',
-                '>': '__gt',
-                '>=': '__gte',
-                '<': '__lt',
-                '<=': '__lte',
-                '^': '__istartswith',
-                '$': '__iendswith',
-            }.get(op,'__exact'))
+        #using sort here since find only contains strings
+        v = parseDate(v.split('-'))
+        vk = 'sort__%s%s' % (k, {
+            '==': '__exact',
+            '>': '__gt',
+            '>=': '__gte',
+            '<': '__lt',
+            '<=': '__lte',
+        }.get(op,''))
+        q = Q(**{vk: v})
+        if exclude:
+            q = ~q
+        return q
+    else: #number
+        vk = 'find__value%s' % ({
+            '==': '__exact',
+            '>': '__gt',
+            '>=': '__gte',
+            '<': '__lt',
+            '<=': '__lte',
+            '^': '__istartswith',
+            '$': '__iendswith',
+        }.get(op,'__exact'))
+        vk = str(vk)
 
-        vk = str('find__%s' % vk)
-        
-        if exclude: #!1960
-            return ~Q(**{'find__key': k, vk: v})
-        else: #1960
-            return Q(**{'find__key': k, vk: v})
-
+        q = Q(**{'find__key': k, vk: v})
+        if exclude:
+            q = ~q
+        return q
 
 def parseConditions(conditions, operator, user):
     '''

@@ -115,7 +115,7 @@
         {
             "id": "year",
             "title": "Year",
-            "type": "year", // fixme: do we need this?
+            "type": "year",
             "autocomplete": true,
             "columnWidth": 60,
             "filter": true,
