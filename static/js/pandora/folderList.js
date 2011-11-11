@@ -313,7 +313,7 @@ pandora.ui.folderList = function(id) {
             },
             'delete': function(data) {
                 if (id == 'personal') {
-                    pandora.ui.deleteListDialog().open();
+                    pandora.ui.deleteListDialog(data.ids[0]).open();
                 } else if (id == 'favorite') {
                     that.options({selected: []});
                     pandora.api.unsubscribeFromList({

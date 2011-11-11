@@ -2,9 +2,9 @@
 
 'use strict';
 
-pandora.ui.deleteListDialog = function() {
+pandora.ui.deleteListDialog = function(list) {
 
-    var listData = pandora.getListData(),
+    var listData = pandora.getListData(list),
         $folderList = pandora.$ui.folderList[listData.folder],
         that = Ox.Dialog({
             buttons: [
