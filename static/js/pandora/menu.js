@@ -66,10 +66,10 @@ pandora.ui.mainMenu = function() {
                             { id: 'showsiteposter', title: 'Always Show ' + pandora.site.site.name + ' Poster', checked: ui.showSitePoster }
                         ] },
                         { id: 'columns', title: 'Columns', items: [
-                            { id: 'loadcolumns', title: 'Load Layout...' },
-                            { id: 'savecolumns', title: 'Save Layout...' },
+                            { id: 'loadcolumns', title: 'Load Layout...', disabled: true },
+                            { id: 'savecolumns', title: 'Save Layout...', disabled: true },
                             {},
-                            { id: 'resetcolumns', title: 'Reset Layout' }
+                            { id: 'resetcolumns', title: 'Reset Layout', disabled: true }
                         ]},
                         {},
                         { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], items: [

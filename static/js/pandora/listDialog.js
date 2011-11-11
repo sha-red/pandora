@@ -21,7 +21,7 @@ pandora.ui.listDialog = function(section) {
             if (id == 'general') {
                 return pandora.ui.listGeneralPanel(listData);
             } else if (id == 'icon') {
-                return pandora.ui.listIconPanel(listData);
+                return pandora.$ui.listIconPanel = pandora.ui.listIconPanel(listData);
             } else if (id == 'query') {
                 return pandora.$ui.filterForm = pandora.ui.filterForm(listData);
             }
@@ -41,28 +41,40 @@ pandora.ui.listDialog = function(section) {
             $findElement[data.selected == 'icon' ? 'show' : 'hide']();
         }
     });
+    pandora.$ui.listDialogTabPanel.$element.find('.OxButtonGroup').css({width: '256px'});
 
     var $findElement = Ox.FormElementGroup({
             elements: [
                 pandora.$ui.findIconItemSelect = Ox.Select({
-                    items: pandora.site.findKeys,
+                    items: pandora.site.findKeys.map(function(findKey) {
+                        return {id: findKey.id, title: 'Find: ' + findKey.title};
+                    }),
                     overlap: 'right',
                     type: 'image'
                 })
                 .bindEvent({
                     change: function(data) {
-
+                        pandora.$ui.findIconItemInput.options({
+                            placeholder: data.selected[0].title
+                        });
+                        // fixme: this is a bit weird
+                        setTimeout(function() {
+                            pandora.$ui.findIconItemInput.focusInput();
+                        }, 250);
                     }
                 }),
                 pandora.$ui.findIconItemInput = Ox.Input({
-                    changeOnKeypress: true,
+                    //changeOnKeypress: true,
                     clear: true,
-                    placeholder: 'Find: Foo',
-                    width: 120 + Ox.UI.SCROLLBAR_SIZE
+                    placeholder: 'Find: All',
+                    width: 128 + Ox.UI.SCROLLBAR_SIZE
                 })
                 .bindEvent({
                     change: function(data) {
-
+                        pandora.$ui.listIconPanel.updateQuery(
+                            pandora.$ui.findIconItemSelect.value(),
+                            data.value
+                        );
                     }
                 })
             ],
@@ -79,15 +91,6 @@ pandora.ui.listDialog = function(section) {
 
     var $dialog = Ox.Dialog({
         buttons: [
-            Ox.Button({
-                    id: 'debug',
-                    title: 'Debug',
-                })
-                .bindEvent({
-                    click: function() {
-                        alert(JSON.stringify(pandora.$ui.filter.options('query')));
-                    }
-                }),
             Ox.Button({
                     id: 'done',
                     title: 'Done'
@@ -360,10 +363,9 @@ pandora.ui.listIconPanel = function(listData) {
                 };
             },
             items: function(data, callback) {
-                //Ox.Log('', 'data, pandora.Query.toObject', data, pandora.Query.toObject())
                 pandora.api.find(Ox.extend(data, {
                     query: {
-                        conditions: [{key: 'list', value: listData.id, operator: '='}],
+                        conditions: [{key: 'list', value: listData.id, operator: '=='}],
                         operator: '&'
                     }
                 }), callback);
@@ -475,6 +477,22 @@ pandora.ui.listIconPanel = function(listData) {
         $frame.css({borderRadius: 0});
         $frame.css('border-' + quarters[quarter] + '-radius', '128px');
     }
+
+    that.updateQuery = function(key, value) {
+        $list.options({
+            items: function(data, callback) {
+                pandora.api.find(Ox.extend(data, {
+                    query: {
+                        conditions: [
+                            {key: 'list', value: listData.id, operator: '=='},
+                            {key: key, value: value, operator: '='}
+                        ],
+                        operator: '&'
+                    }
+                }), callback);
+            }
+        });
+    };
 
     return that;
 
