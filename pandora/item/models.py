@@ -14,7 +14,7 @@ import unicodedata
 from urllib import quote
 
 from django.db import models, transaction
-from django.db.models import Count, Q, Sum
+from django.db.models import Count, Q, Sum, Max
 from django.core.files.base import ContentFile
 from django.conf import settings
 from django.contrib.auth.models import User, Group
@@ -605,6 +605,7 @@ class Item(models.Model):
             'parts',
             'pixels',
             'timesaccessed',
+            'accessed',
             'resolution',
             'width',
             'height',
@@ -720,6 +721,7 @@ class Item(models.Model):
         s.timesaccessed = self.accessed.aggregate(Sum('accessed'))['accessed__sum']
         if not s.timesaccessed:
             s.timesaccessed = 0
+        s.accessed = self.accessed.aggregate(Max('access'))['access__max']
         s.save()
         #update cached values in clips
         self.clips.all().update(director=s.director, title=s.title)
@@ -1208,7 +1210,7 @@ class Access(models.Model):
         self.accessed += 1
         super(Access, self).save(*args, **kwargs)
         timesaccessed = Access.objects.filter(item=self.item).aggregate(Sum('accessed'))['accessed__sum']
-        ItemSort.objects.filter(item=self.item).update(timesaccessed=timesaccessed)
+        ItemSort.objects.filter(item=self.item).update(timesaccessed=timesaccessed, accessed=self.access)
 
     def __unicode__(self):
         if self.user:
