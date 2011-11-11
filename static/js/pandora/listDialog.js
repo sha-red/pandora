@@ -64,7 +64,7 @@ pandora.ui.listDialog = function(section) {
                     }
                 }),
                 pandora.$ui.findIconItemInput = Ox.Input({
-                    //changeOnKeypress: true,
+                    changeOnKeypress: true,
                     clear: true,
                     placeholder: 'Find: All',
                     width: 128 + Ox.UI.SCROLLBAR_SIZE
@@ -491,10 +491,10 @@ pandora.ui.listIconPanel = function(listData) {
             items: function(data, callback) {
                 pandora.api.find(Ox.extend(data, {
                     query: {
-                        conditions: [
-                            {key: 'list', value: listData.id, operator: '=='},
-                            {key: key, value: value, operator: '='}
-                        ],
+                        conditions: Ox.merge(
+                            [{key: 'list', value: listData.id, operator: '=='}],
+                            value !== '' ? [{key: key, value: value, operator: '='}] : []
+                        ),
                         operator: '&'
                     }
                 }), callback);
