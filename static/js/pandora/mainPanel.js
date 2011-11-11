@@ -36,10 +36,10 @@ pandora.ui.mainPanel = function() {
                             pandora.$ui.filters[i].options({selected: data.selected});
                         }
                         if (!Ox.isEqual(data.find, previousUI._filterState[i].find)) {
-                            Ox.print(i, 'NOT EQUAL', data.find, previousUI._filterState[i].find)
+                            Ox.Log('FIND', 'NOT EQUAL', data.find, previousUI._filterState[i].find)
                             pandora.$ui.filters[i].reloadList();
                         } else {
-                            Ox.print(i, 'EQUAL', data.find, previousUI._filterState[i].find)
+                            Ox.Log('FIND', 'EQUAL', data.find, previousUI._filterState[i].find)
                         }
                     });
                 } else {

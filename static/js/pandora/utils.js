@@ -974,6 +974,16 @@ pandora.unloadWindow = function() {
     */
 };
 
+pandora.updateFindElement = function() {
+    var findState = pandora.user.ui._findState;
+    pandora.$ui.findSelect.value(findState.key);
+    pandora.$ui.findInput.options(
+        findState.key == 'advanced'
+        ? {placeholder: 'Edit Query...', value: ''}
+        : {placeholder: '', value: findState.value}
+    );
+};
+
 (function() {
 
     // Note: getFindState has to run after getListState and getFilterState

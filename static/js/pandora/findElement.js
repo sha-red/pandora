@@ -48,13 +48,10 @@ pandora.ui.findElement = function() {
                             change: function(data) {
                                 var key = data.selected[0].id;
                                 if (key == 'advanced') {
-                                    pandora.$ui.findInput.options({
-                                        placeholder: 'Edit Query...',
-                                        value: ''
-                                    });
+                                    that.update();
                                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                                 } else {
-                                    Ox.Log('FIND', pandora.$ui.findInput.value())
+                                    Ox.Log('FIND', 'select change', pandora.$ui.findInput.value())
                                     pandora.$ui.findInput.options({
                                         autocomplete: autocompleteFunction(),
                                         placeholder: ''
@@ -136,6 +133,15 @@ pandora.ui.findElement = function() {
             }
         } : null;
     }
+    that.update = function() {
+        var findState = pandora.user.ui._findState;
+        pandora.$ui.findSelect.value(findState.key);
+        pandora.$ui.findInput.options(
+            findState.key == 'advanced'
+            ? {placeholder: 'Edit Query...', value: ''}
+            : {placeholder: '', value: findState.value}
+        );
+    };
     return that;
 };
 
