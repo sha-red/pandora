@@ -690,7 +690,7 @@ def setUI(request):
     else:
         request.session['ui'] = json.dumps(ui)
 
-    if data.get('item', False):
+    if data.get('item'):
         item = get_object_or_404_json(Item, itemId=data['item'])
         if request.user.is_authenticated():
             access, created = Access.objects.get_or_create(item=item, user=request.user)

@@ -3,6 +3,7 @@
 
 import os
 from os.path import join, dirname, basename, splitext, exists
+import time
 
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
@@ -20,11 +21,13 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         offset = 0
-        chunk = 100
+        chunk = 50
         count = pos = models.Item.objects.count()
         while offset <= count:
             for i in models.Item.objects.all().order_by('id')[offset:offset+chunk]:
                 print pos, i.itemId
                 i.save()
+                time.sleep(1) #dont overload db
                 pos -= 1
             offset += chunk
+            time.sleep(30) #dont overload db

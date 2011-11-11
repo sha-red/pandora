@@ -53,7 +53,6 @@ def _order_query(qs, sort, prefix='sort__'):
         key = {
             'id': 'itemId',
             'accessed': 'accessed__access',
-            'viewed': 'accessed__access',
         }.get(e['key'], e['key'])
         if key not in ('accessed__access', 'accessed__accessed'):
             key = "%s%s" % (prefix, key)
@@ -237,13 +236,10 @@ Positions
         def only_p_sums(m):
             r = {}
             for p in _p:
-                if p == 'viewed' and request.user.is_authenticated():
-                    value = m.accessed.filter(user=request.user).annotate(v=Max('access'))
-                    r[p] = value.exists() and value[0].v or None
-                elif p  == 'accessed':
+                if p  == 'accessed':
                     r[p] = m.a
                 elif p == 'timesaccessed':
-                    r[p] = m.sort.timesaccessed
+                    r[p] = m.timesaccessed
                 else:
                     r[p] = m.json.get(p, '')
             if 'clip_qs' in query:
