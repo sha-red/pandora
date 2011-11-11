@@ -14,7 +14,7 @@ pandora.ui.filterForm = function(list) {
         sort: [{key: 'user', operator: '+'}, {key: 'name', operator: '+'}]
     }, function(result) {
         that.append(
-            Ox.Filter({
+            that.$filter = Ox.Filter({
                 findKeys: Ox.merge(Ox.map(pandora.site.itemKeys, function(itemKey) {
                     var key = Ox.clone(itemKey);
                     key.type = key.type == 'layer'

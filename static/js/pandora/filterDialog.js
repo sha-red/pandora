@@ -9,7 +9,32 @@ pandora.ui.filterDialog = function(list) {
                 })
                 .bindEvent({
                     click: function() {
+                        var list = pandora.$ui.filterForm.$filter.getList();
                         that.close();
+                        if (list.save) {
+                            pandora.api.addList({
+                                name: list.name,
+                                query: list.query,
+                                status: 'private',
+                                type: 'smart'
+                            }, function(result) {
+                                var $list = pandora.$ui.folderList.personal,
+                                    id = result.data.id;
+                                pandora.UI.set({
+                                    find: {
+                                        conditions: [{key: 'list', value: id, operator: '=='}],
+                                        operator: '&'
+                                    }
+                                });
+                                Ox.Request.clearCache(); // fixme: remove
+                                $list.reloadList().bindEventOnce({
+                                    load: function(data) {
+                                        $list.gainFocus()
+                                            .options({selected: [id]});
+                                    }
+                                });
+                            });
+                        }
                     }
                 })
         ],
