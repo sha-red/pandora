@@ -1206,6 +1206,8 @@ class Access(models.Model):
             self.accessed = 0
         self.accessed += 1
         super(Access, self).save(*args, **kwargs)
+        timesaccessed = Access.objects.filter(item=self.item).aggregate(Sum('accessed'))['accessed__sum']
+        ItemSort.objects.filter(item=self.item).update(timesaccessed=timesaccessed)
 
     def __unicode__(self):
         if self.user:
