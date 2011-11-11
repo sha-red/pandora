@@ -236,7 +236,7 @@ Positions
             r = {}
             for p in _p:
                 if p  == 'accessed':
-                    r[p] = m.sort.accessed
+                    r[p] = m.sort.accessed or ''
                 elif p == 'timesaccessed':
                     r[p] = m.sort.timesaccessed
                 else:
