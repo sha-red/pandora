@@ -9,7 +9,6 @@ pandora.ui.info = function() {
             .css({overflowX: 'hidden', overflowY: 'auto'})
             .bindEvent({
                 toggle: function(data) {
-                    Ox.Log('', 'INFO TOGGLE')
                     pandora.UI.set({showInfo: !data.collapsed});
                 },
                 pandora_find: function() {
@@ -46,7 +45,6 @@ pandora.ui.info = function() {
 
     function resizeInfo() {
         var height = pandora.getInfoHeight(true);
-        Ox.Log('', 'RESIZE INFO', ui.showInfo, height)
         pandora.$ui.leftPanel.size(2, height);
         pandora.resizeFolders();
         !ui.showInfo && pandora.$ui.leftPanel.css({bottom: -height + 'px'});

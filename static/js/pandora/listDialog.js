@@ -466,7 +466,15 @@ pandora.ui.listIconPanel = function(listData) {
                 id: listData.id,
                 posterFrames: posterFrames
             }, function() {
-                $icon.attr({src: '/list/' + listData.id + '/icon256.jpg?' + Ox.uid()});
+                $icon.attr({
+                    src: '/list/' + listData.id + '/icon256.jpg?' + Ox.uid()
+                });
+                pandora.$ui.folderList[listData.folder].$element
+                    .find('img[src*="/' + listData.id + '/"]')
+                    .attr({
+                        src: '/list/' + listData.id + '/icon16.jpg?' + Ox.uid()
+                    });
+                pandora.$ui.info.updateListInfo();
             });
             $preview.options({position: position});
         }
