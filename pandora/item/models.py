@@ -1162,6 +1162,7 @@ attrs = {
     'duration': models.FloatField(null=True, blank=True, db_index=True),
     'width': models.BigIntegerField(null=True, blank=True, db_index=True),
     'height': models.BigIntegerField(null=True, blank=True, db_index=True),
+    'created': models.DateTimeField(null=True, blank=True, db_index=True),
 }
 for key in filter(lambda k: 'columnWidth' in k or k['type'] in ('integer', 'time', 'float', 'date', 'enum'), settings.CONFIG['itemKeys']):
     name = key['id']

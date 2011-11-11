@@ -696,7 +696,8 @@ def setUI(request):
             access, created = Access.objects.get_or_create(item=item, user=request.user)
         else:
             access, created = Access.objects.get_or_create(item=item, user=None)
-        access.save()
+        if not created:
+            access.save()
 
     response = json_response()
     return render_to_json_response(response)
