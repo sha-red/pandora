@@ -302,7 +302,7 @@ def autocomplete(request):
     data = json.loads(request.POST['data'])
     if not 'range' in data:
         data['range'] = [0, 10]
-    op = data.get('operator', '==')
+    op = data.get('operator', '=')
 
     key = settings.CONFIG['keys'][data['key']]
     order_by = key.get('autocompleteSortKey', False)
@@ -314,7 +314,7 @@ def autocomplete(request):
     if sort_type == 'title':
         qs = parse_query({'query': data.get('query', {})}, request.user)['qs']
         if data['value']:
-            if op == '':
+            if op == '=':
                 qs = qs.filter(find__key=data['key'], find__value__icontains=data['value'])
             elif op == '==':
                 qs = qs.filter(find__key=data['key'], find__value__iexact=data['value'])
