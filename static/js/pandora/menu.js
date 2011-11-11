@@ -492,7 +492,7 @@ pandora.ui.mainMenu = function() {
                     { id: 'descending', title: 'Descending', checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '-' }
                 ]}
             ] },
-            { id: 'advancedsort', title: 'Advanced Sort...', keyboard: 'shift control s' },
+            { id: 'advancedsort', title: 'Advanced Sort...', keyboard: 'shift control s', disabled: true },
             {},
             { id: 'sortfilters', title: 'Sort Filters', items: pandora.user.ui.filters.map(function(filter) {
                 return {
