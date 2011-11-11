@@ -426,7 +426,7 @@ pandora.ui.list = function() {
                                 key: 'id',
                                 value: id,
                                 operator: '=='
-                            }
+                            };
                         }),
                         operator: '|'
                     }

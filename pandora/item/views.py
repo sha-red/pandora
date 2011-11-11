@@ -52,9 +52,8 @@ def _order_query(qs, sort, prefix='sort__'):
             operator = ''
         key = {
             'id': 'itemId',
-            'accessed': 'accessed__access',
         }.get(e['key'], e['key'])
-        if key not in ('accessed__access', 'accessed__accessed'):
+        if key not in ('itemId', ):
             key = "%s%s" % (prefix, key)
         order = '%s%s' % (operator, key)
         order_by.append(order)
@@ -237,9 +236,9 @@ Positions
             r = {}
             for p in _p:
                 if p  == 'accessed':
-                    r[p] = m.a
+                    r[p] = m.sort.accessed or ''
                 elif p == 'timesaccessed':
-                    r[p] = m.timesaccessed
+                    r[p] = m.sort.timesaccessed
                 else:
                     r[p] = m.json.get(p, '')
             if 'clip_qs' in query:
@@ -256,10 +255,6 @@ Positions
             return r
         qs = qs[query['range'][0]:query['range'][1]]
         #response['data']['items'] = [m.get_json(_p) for m in qs]
-        if 'timesaccessed' in _p:
-            qs = qs.annotate(timesaccessed=Sum('accessed__accessed'))
-        if 'accessed' in _p:
-            qs = qs.annotate(a=Max('accessed__access'))
         if 'viewed' in _p or 'timesaccessed' in _p or 'accessed' in _p:
             qs = qs.select_related()
             response['data']['items'] = [only_p_sums(m) for m in qs]
