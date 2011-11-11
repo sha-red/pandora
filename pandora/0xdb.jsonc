@@ -535,7 +535,7 @@
     },
     "personalLists": [
         {"title": "Favorites"},
-        {"title": "1960s", "query": {"conditions": [{"key": "year", "value": ["1960", "1970"], "operator": "="}], "operator": "&"}},
+        {"title": "1960s", "query": {"conditions": [{"key": "year", "value": ["1960", "1970"], "operator": "="}], "operator": "&"}}
         //{"title": "Movies with Video", "query": {"conditions": [{"key": "canplayvideo", "value": "true", "operator": "="}], "operator": "&"}},
         //{"title": "Movies with Clips", "query": {"conditions": [{"key": "canplayclips", "value": "true", "operator": "="}], "operator": "&"}}
     ],
