@@ -652,7 +652,7 @@ pandora.ui.infoView = function(data) {
                 .css({marginLeft: '52px'})
                 .bindEvent({
                     click: function() {
-                        pandora.URL.push('/rights');
+                        pandora.UI.set({page: 'rights'});
                     }
                 })
                 .appendTo($line);
