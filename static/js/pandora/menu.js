@@ -253,6 +253,10 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set({showAnnotations: !ui.showAnnotations});
                 } else if (data.id == 'showtimeline') {
                     pandora.UI.set({showTimeline: !ui.showTimeline});
+                } else if (data.id == 'advancedfind') {
+                    if (!pandora.hasDialogOrScreen()) {
+                        pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
+                    }
                 } else if (data.id == 'titles') {
                     (pandora.$ui.titlesDialog || (
                         pandora.$ui.titlesDialog = pandora.ui.titlesDialog()
@@ -308,7 +312,16 @@ pandora.ui.mainMenu = function() {
             },
             key_control_f: function() {
                 if (!pandora.hasDialogOrScreen()) {
-                    pandora.$ui.findInput.focusInput(true);
+                    if (pandora.user.ui._findState.key != 'advanced') {
+                        pandora.$ui.findInput.focusInput(true);
+                    } else {
+                        pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
+                    }
+                }
+            },
+            key_control_shift_f: function() {
+                if (!pandora.hasDialogOrScreen()) {
+                    pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                 }
             },
             key_control_shift_w: function() {

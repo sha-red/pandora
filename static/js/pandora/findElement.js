@@ -111,6 +111,7 @@ pandora.ui.findElement = function() {
                 findKey = Ox.getObjectById(pandora.site.findKeys, key);
             value === '' && Ox.Log('', 'Warning: autocomplete function should never be called with empty value');
             if (findKey.autocomplete) {
+                Ox.Log('AUTO', '_list/select', pandora.user.ui._list, pandora.$ui.findListSelect.value())
                 pandora.api.autocomplete({
                     key: key,
                     query: {
@@ -120,10 +121,7 @@ pandora.ui.findElement = function() {
                         operator: '&'
                     },
                     range: [0, 20],
-                    sort: [{
-                        key: 'votes',
-                        operator: '-'
-                    }],
+                    sort: [{key: 'votes', operator: '-'}],
                     value: value
                 }, function(result) {
                     callback(result.data.items);
@@ -139,7 +137,11 @@ pandora.ui.findElement = function() {
         pandora.$ui.findInput.options(
             findState.key == 'advanced'
             ? {placeholder: 'Edit Query...', value: ''}
-            : {placeholder: '', value: findState.value}
+            : {
+                autocomplete: autocompleteFunction(),
+                placeholder: '',
+                value: findState.value
+            }
         );
     };
     return that;
