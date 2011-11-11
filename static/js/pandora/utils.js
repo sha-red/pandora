@@ -882,7 +882,7 @@ pandora.resizeWindow = function() {
     if (!pandora.user.ui.item) {
         pandora.resizeFilters(pandora.$ui.rightPanel.width());
         if (pandora.user.ui.listView == 'clips') {
-            var clipsItems = pandora.getClipsItems();
+            var clipsItems = pandora.getClipsItems(),
                 previousClipsItems = pandora.getClipsItems(pandora.$ui.list.options('width'));
             pandora.$ui.list.options({
                 width: window.innerWidth
