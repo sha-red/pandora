@@ -292,14 +292,17 @@ def autocomplete(request):
         param data
             key
             value
-            operator '', '^', '$'
+            operator '=', '==', '^', '$'
+            query
             range
         return 
+
+        query can be an item query to limit results
     '''
     data = json.loads(request.POST['data'])
     if not 'range' in data:
         data['range'] = [0, 10]
-    op = data.get('operator', '')
+    op = data.get('operator', '==')
 
     key = settings.CONFIG['keys'][data['key']]
     order_by = key.get('autocompleteSortKey', False)
@@ -313,6 +316,8 @@ def autocomplete(request):
         if data['value']:
             if op == '':
                 qs = qs.filter(find__key=data['key'], find__value__icontains=data['value'])
+            elif op == '==':
+                qs = qs.filter(find__key=data['key'], find__value__iexact=data['value'])
             elif op == '^':
                 qs = qs.filter(find__key=data['key'], find__value__istartswith=data['value'])
             elif op == '$':
@@ -324,12 +329,17 @@ def autocomplete(request):
     else:
         qs = models.Facet.objects.filter(key=data['key'])
         if data['value']:
-            if op == '':
+            if op == '=':
                 qs = qs.filter(value__icontains=data['value'])
+            elif op == '==':
+                qs = qs.filter(value__iexact=data['value'])
             elif op == '^':
                 qs = qs.filter(value__istartswith=data['value'])
             elif op == '$':
                 qs = qs.filter(value__iendswith=data['value'])
+        if 'query' in data:
+            item_query = parse_query({'query': data.get('query', {})}, request.user)['qs']
+            qs = qs.filter(item__in=item_query)
         qs = qs.values('value').annotate(items=Count('id'))
         qs = qs.order_by(order_by)
         qs = qs[data['range'][0]:data['range'][1]]
