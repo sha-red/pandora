@@ -819,7 +819,6 @@ pandora.reloadList = function() {
 
 pandora.renameList = function(oldId, newId, newName, folder) {
     folder = folder || pandora.getListData(oldId).folder;
-    Ox.print('RENAME LIST', oldId, newId, newName, folder)
     pandora.$ui.folderList[folder].value(oldId, 'name', newName);
     pandora.$ui.folderList[folder].value(oldId, 'id', newId);
     pandora.UI.set({
