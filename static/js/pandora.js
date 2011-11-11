@@ -262,9 +262,11 @@ appPanel
             videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
         });
 
+        /* disabled
         if (data.user.level == 'guest' && $.browser.mozilla && !localStorage.OxTheme) {
             pandora.user.ui.theme = 'classic';
         }
+        */
 
         // set up url controller
 

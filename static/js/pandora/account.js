@@ -326,6 +326,7 @@ pandora.ui.accountSignoutDialog = function() {
                 title: 'Sign Out'
             }).bindEvent('click', function() {
                 that.close();
+                pandora.UI.set({page: ''});
                 pandora.api.signout({}, function(result) {
                     pandora.signout(result.data);
                 });

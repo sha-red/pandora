@@ -103,6 +103,7 @@ pandora.ui.browser = function() {
                 ? pandora.site.user.ui.listSort: pandora.user.ui.listSort,
             unique: 'id'
         })
+        .css({overflowY: 'hidden'}) // this fixes a bug in firefox
         .bindEvent({
             open: function() {
                 that.scrollToSelection();
