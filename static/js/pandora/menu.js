@@ -274,9 +274,7 @@ pandora.ui.mainMenu = function() {
                         pandora.$ui.eventsDialog = pandora.ui.eventsDialog()
                     )).open();
                 } else if (data.id == 'users') {
-                    (pandora.$ui.usersDialog || (
-                        pandora.$ui.usersDialog = pandora.ui.usersDialog())
-                    ).open();
+                    pandora.$ui.usersDialog = pandora.ui.usersDialog().open();
                 } else if (data.id == 'resetfilters') {
                     pandora.UI.set({
                         filters: pandora.site.user.ui.filters

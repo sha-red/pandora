@@ -277,10 +277,11 @@ pandora.ui.usersDialog = function() {
                                                     return item.username + ' &lt;' + item.email + '&gt;';
                                                 }).join(', ')
                                             ),
+                                        removeOnClose: true,
                                         title: 'E-Mail Addresses'
                                     })
-                                    .open()
-                            })
+                                    .open();
+                            });
                         }
                     }),
                 Ox.Button({
@@ -289,6 +290,7 @@ pandora.ui.usersDialog = function() {
                         width: 48
                     }).bindEvent({
                         click: function() {
+                            Ox.Request.clearCache('findUsers');
                             that.close();
                         }
                     })
@@ -338,6 +340,7 @@ pandora.ui.usersDialog = function() {
             minHeight: 256,
             minWidth: 512,
             padding: 0,
+            removeOnClose: true,
             title: 'Manage Users',
             width: width
         }),
