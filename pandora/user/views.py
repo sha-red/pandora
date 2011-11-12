@@ -278,9 +278,9 @@ def requestToken(request):
 
         template = loader.get_template('password_reset_email.txt')
         context = RequestContext(request, {
-            'url': request.build_absolute_uri("/"),
             'code': code,
             'sitename': settings.SITENAME,
+            'url': request.build_absolute_uri('/'),
         })
         message = template.render(context)
         subject = '%s - Reset Password' % settings.SITENAME
@@ -548,18 +548,20 @@ def contact(request):
     if 'message' in data and data['message'].strip():
         email_from = settings.CONFIG['site']['email']['system']
         email_to = [settings.CONFIG['site']['email']['contact'], ]
+        subject = data.get('subject', '').strip()
         template = loader.get_template('contact_email.txt')
         context = RequestContext(request, {
-            'email': email,
-            'message': data['message'].strip(),
             'name': name,
+            'email': email,
+            'subject': subject
+            'message': data['message'].strip(),
             'sitename': settings.SITENAME,
+            'url': request.build_absolute_uri('/'),
         })
         message = template.render(context)
-        subject = (u'[%s Contact] %s' % (settings.SITENAME, data.get('subject', ''))).strip()
         response = json_response(text='message sent')
         try:
-            send_mail(subject.strip(), message, email_from, email_to)
+            send_mail(u'[%s Contact] %s' % (settings.SITENAME, subject), message, email_from, email_to)
         except BadHeaderError:
             response = json_response(status=400, text='invalid data')
         if request.user.is_authenticated() \
@@ -567,14 +569,17 @@ def contact(request):
             and data['receipt']:
             template = loader.get_template('contact_receipt.txt')
             context = RequestContext(request, {
-                'email': email,
-                'message': data['message'].strip(),
                 'name': name,
+                'from': email,
                 'sitename': settings.SITENAME,
+                'to': email_to,
+                'subject': subject,
+                'message': data['message'].strip(),
+                'url': request.build_absolute_uri('/'),
             })
             message = template.render(context)
             try:
-                send_mail(subject.strip(), message, email_from, [email])
+                send_mail('Fwd: %s' % subject, message, email_from, [email])
             except:
                 pass
     else:

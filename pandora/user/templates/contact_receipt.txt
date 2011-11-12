@@ -1,7 +1,8 @@
-{{name}},
-thanks for your message, we will get back to you shortly.
-here your message for forther reference
+From: {{name}} <{{from}}>
+To: {{sitename}} <{{to}}>
+Subject: {{subject}}
+
 {{message}}
 
--- 
-{{sitename}}
+--
+{{sitename}} - {{url}}

@@ -1,5 +1,7 @@
-{{name}} <{{email}}> sent a contact message:
+From: {{name}} <{{email}}>
+Subject: {{subject}}
+
 {{message}}
 
--- 
-{{sitename}}
+--
+{{sitename}} - {{url}}
