@@ -572,7 +572,7 @@ def contact(request):
                 'name': name,
                 'from': email,
                 'sitename': settings.SITENAME,
-                'to': email_to,
+                'to': email_to[0],
                 'subject': subject,
                 'message': data['message'].strip(),
                 'url': request.build_absolute_uri('/'),
