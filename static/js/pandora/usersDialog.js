@@ -13,7 +13,10 @@ pandora.ui.usersDialog = function() {
                 checked: true,
                 title: 'Show Guests'
             })
-            .css({float: 'left', margin: '4px'}),
+            .css({float: 'left', margin: '4px'})
+            .bindEvent({
+                change: updateList
+            }),
 
         $findSelect = Ox.Select({
                 items: [
@@ -26,9 +29,7 @@ pandora.ui.usersDialog = function() {
             })
             .bindEvent({
                 change: function(data) {
-                    var key = data.selected[0].id,
-                        value = $findInput.value();
-                    value && updateList(key, value);
+                    $findInput.value() && updateList();
                     $findInput.options({
                         placeholder: data.selected[0].title
                     });
@@ -42,11 +43,7 @@ pandora.ui.usersDialog = function() {
                 width: 192
             })
             .bindEvent({
-                change: function(data) {
-                    var key = $findSelect.value(),
-                        value = data.value;
-                    updateList(key, value);
-                }
+                change: updateList
             }),
 
         $findElement = Ox.FormElementGroup({
@@ -213,9 +210,14 @@ pandora.ui.usersDialog = function() {
                     $status.html(
                         Ox.formatNumber(data.items)
                         + ' user' + (data.items == 1 ? '' : 's')
-                        + ' (' + Ox.formatNumber(data.users) + ' registered, '
-                        + Ox.formatNumber(data.guests) + ' guest' + (data.guests == 1 ? '' : 's')
-                        + ')'
+                        + (
+                            $guestsCheckbox.value()
+                            ? ' (' + Ox.formatNumber(data.users) + ' registered, '
+                                + Ox.formatNumber(data.guests) + ' guest'
+                                + (data.guests == 1 ? '' : 's')
+                                + ')'
+                            : ''
+                        )
                     );
                 },
                 select: function(data) {
@@ -451,14 +453,20 @@ pandora.ui.usersDialog = function() {
             });
     }
 
-    function updateList(key, value) {
-        var query = {
-                conditions: Ox.merge(
-                    key != 'email' ? [{key: 'username', value: value, operator: '='}] : [],
-                    key != 'username' ? [{key: 'email', value: value, operator: '='}] : []
-                ),
-                operator: key == 'all' ? '|' : '&'
+    function updateList() {
+        var guests = $guestsCheckbox.value(),
+            key = $findSelect.value(),
+            value = $findInput.value(),
+            query = {
+                conditions: value
+                    ? Ox.merge(
+                        key != 'email' ? [{key: 'username', value: value, operator: '='}] : [],
+                        key != 'username' ? [{key: 'email', value: value, operator: '='}] : []
+                    )
+                    : !guests ? [{key: 'level', value: 'guest', operator: '!='}] : [],
+                operator: key == 'all' && value ? '|' : '&'
             };
+        Ox.print('CONDITIONS', query.conditions)
         $list.options({
             items: function(data, callback) {
                 return pandora.api.findUsers(Ox.extend(data, {
