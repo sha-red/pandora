@@ -9,6 +9,12 @@ pandora.ui.usersDialog = function() {
         numberOfUsers = 0,
         userLevels = ['member', 'friend', 'staff', 'admin'],
 
+        $guestsCheckbox = Ox.Checkbox({
+                checked: true,
+                title: 'Show Guests'
+            })
+            .css({float: 'left', margin: '4px'}),
+
         $findSelect = Ox.Select({
                 items: [
                     {id: 'all', title: 'Find: All', checked: true},
@@ -200,9 +206,7 @@ pandora.ui.usersDialog = function() {
                 keys: ['notes'],
                 max: 1,
                 scrollbarVisible: true,
-                sort: [
-                    {key: 'username', operator: '+'}
-                ]
+                sort: [{key: 'lastseen', operator: '-'}]
             })
             .bindEvent({
                 init: function(data) {
@@ -303,10 +307,8 @@ pandora.ui.usersDialog = function() {
                             elements: [
                                 {
                                     element: Ox.Bar({size: 24})
-                                        .append($status)
-                                        .append(
-                                            $findElement
-                                        ),
+                                        .append($guestsCheckbox)
+                                        .append($findElement),
                                     size: 24
                                 },
                                 {
