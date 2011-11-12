@@ -466,7 +466,6 @@ pandora.ui.usersDialog = function() {
                     : !guests ? [{key: 'level', value: 'guest', operator: '!='}] : [],
                 operator: key == 'all' && value ? '|' : '&'
             };
-        Ox.print('CONDITIONS', query.conditions)
         $list.options({
             items: function(data, callback) {
                 return pandora.api.findUsers(Ox.extend(data, {
