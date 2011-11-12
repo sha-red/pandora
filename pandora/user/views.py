@@ -553,7 +553,7 @@ def contact(request):
         context = RequestContext(request, {
             'name': name,
             'email': email,
-            'subject': subject
+            'subject': subject,
             'message': data['message'].strip(),
             'sitename': settings.SITENAME,
             'url': request.build_absolute_uri('/'),
