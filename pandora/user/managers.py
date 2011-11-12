@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from django.db.models import Q, Manager
 from ox.django.query import QuerySet
+from django.conf import settings
 
 def parseCondition(condition, user):
     k = condition.get('key', 'name')
@@ -19,17 +20,28 @@ def parseCondition(condition, user):
     else:
         exclude = False
 
-    key = '%s%s' % (k, {
-        '==': '__iexact',
-        '^': '__istartswith',
-        '$': '__iendswith',
-    }.get(op,'__icontains'))
+    if k == 'level':
+        if v in settings.CONFIG['userLevels']:
+            v = settings.CONFIG['userLevels'].index(v)
+        else:
+            v = 0
+        key = '%s%s' % (k, {
+            '==': '__exact',
+            '<': '__lt',
+            '>': '__gt',
+        }.get(op,''))
+    else:
+        key = '%s%s' % (k, {
+            '==': '__iexact',
+            '^': '__istartswith',
+            '$': '__iendswith',
+        }.get(op,'__icontains'))
 
     key = str(key)
+
+    q = Q(**{key: v})
     if exclude:
-        q = ~Q(**{key: v})
-    else:
-        q = Q(**{key: v})
+        q = ~q
     return q
 
 def parseConditions(conditions, operator, user):
