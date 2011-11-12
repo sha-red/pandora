@@ -4,6 +4,7 @@ from __future__ import division
 import os.path
 from datetime import datetime, timedelta
 import mimetypes
+import random
 
 import Image
 from django.db.models import Count, Sum, Max
@@ -802,3 +803,12 @@ def video(request, id, resolution, format, index=None):
     response = HttpFileResponse(path)
     response['Cache-Control'] = 'public'
     return response
+
+def random_annotation(request):
+    n = models.Item.objects.all().count()
+    pos = random.randint(0, n)
+    item = models.Item.objects.all()[pos]
+    n = item.annotations.all().count()
+    pos = random.randint(0, n)
+    clip = item.annotations.all()[pos]
+    return redirect('/%s'% clip.public_id)

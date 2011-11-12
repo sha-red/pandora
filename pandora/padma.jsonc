@@ -16,7 +16,7 @@
             "title": "Title",
             "type": "string",
             "autocomplete": true,
-            "autocompleteSortKey": "popularity",
+            "autocompleteSortKey": "timesaccessed",
             "columnRequired": true,
             "columnWidth": 180,
             "find": true,

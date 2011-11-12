@@ -27,4 +27,5 @@ urlpatterns = patterns("item.views",
     (r'^(?P<id>[A-Z0-9].+)/poster\.jpg$', 'siteposter'),
     (r'^(?P<id>[A-Z0-9].+)/frameposter(?P<position>\d+).jpg$', 'poster_frame'),
 
+    (r'^random$', 'random_annotation'),
 )
