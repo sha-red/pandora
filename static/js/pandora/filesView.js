@@ -288,7 +288,7 @@ pandora.ui.filesView = function(options, self) {
                     Ox.map(['id', 'title', 'director', 'year'], function(key) {
                         var value = self['$' + key + 'Input'].options('value');
                         if(value.length) {
-                            conditions[key] = value;
+                            conditions[key] = key == 'director' ? value.split(', ') : value;
                         }
                     });
                     pandora.api.findId(conditions, function(result) {
