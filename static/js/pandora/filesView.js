@@ -403,8 +403,8 @@ pandora.ui.filesView = function(options, self) {
         });
         pandora.api.moveFiles(data, function(result) {
             if(pandora.user.ui.item == self.options.id && pandora.user.ui.itemView == 'files') {
+                Ox.Request.clearCache(); // fixme: remove
                 if (self.$checkbox.value()) {
-                    Ox.Request.clearCache(); // fixme: remove
                     pandora.UI.set({item: result.data.itemId});
                 } else {
                     Ox.Log('', 'moved', self.selected, result.data.itemId);
