@@ -11,8 +11,11 @@ import managers
 
 class MetaClip:
     def update_calculated_values(self):
-        start = min(self.start, self.item.sort.duration)
-        end = min(self.end, self.item.sort.duration)
+        start = self.start
+        end = self.end
+        if self.item.sort.duration:
+            start = min(self.start, self.item.sort.duration)
+            end = min(self.end, self.item.sort.duration)
         self.duration = end - start
         if self.duration > 0:
             self.hue, self.saturation, self.lightness = extract.average_color(

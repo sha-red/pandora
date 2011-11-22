@@ -402,13 +402,15 @@ pandora.ui.filesView = function(options, self) {
             data[key] = self['$' + key + 'Input'].value();
         });
         pandora.api.moveFiles(data, function(result) {
-            if (self.$checkbox.value()) {
-                Ox.Request.clearCache(); // fixme: remove
-                pandora.UI.set({item: result.data.itemId});
-            } else {
-                Ox.Log('', 'moved', self.selected, result.data.itemId);
-                self.$filesList.reloadList();
-                self.$instancesList.reloadList();
+            if(pandora.user.ui.item == self.options.id && pandora.user.ui.itemView == 'files') {
+                if (self.$checkbox.value()) {
+                    Ox.Request.clearCache(); // fixme: remove
+                    pandora.UI.set({item: result.data.itemId});
+                } else {
+                    Ox.Log('', 'moved', self.selected, result.data.itemId);
+                    self.$filesList.reloadList();
+                    self.$instancesList.reloadList();
+                }
             }
         });
     }

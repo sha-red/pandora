@@ -290,6 +290,11 @@ class Item(models.Model):
         if settings.USE_IMDB and len(self.itemId) != 7 and self.oxdbId != self.itemId:
             self.itemId = self.oxdbId
             #FIXME: move files to new id here
+        if settings.USE_IMDB and len(self.itemId) == 7:
+            for key in ('title', 'year', 'director', 'season', 'episode',
+                        'seriesTitle', 'episodeTitle'):
+                if key in self.data:
+                    del self.data[key]
 
         if self.poster and os.path.exists(self.poster.path):
             self.poster_height = self.poster.height
