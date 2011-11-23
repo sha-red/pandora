@@ -17,8 +17,8 @@ pandora.ui.filter = function(id) {
                                 .append(
                                     $('<img>')
                                         .attr({src: Ox[
-                                            id == 'country' ? 'getImageByGeoname' : 'getImageByLanguage'
-                                        ]('icon', 16, value)})
+                                            id == 'country' ? 'getFlagByGeoname' : 'getFlagByLanguage'
+                                        ](value, 16)})
                                         .css({
                                             float: 'left',
                                             width: '14px',
