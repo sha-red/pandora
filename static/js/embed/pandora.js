@@ -21,8 +21,10 @@ Ox.load('UI', {
                         var video = {};
                         pandora.site.video.resolutions.forEach(function(resolution) {
                             video[resolution] = Ox.range(result.data.parts).map(function(i) {
-                                return '/' + pandora.user.ui.item + '/'
-                                    + resolution + 'p' + (i + 1) + '.' + pandora.user.videoFormat;
+                                var part = (i + 1),
+                                    prefix = pandora.site.site.videoprefix.replace('PART', part);
+                                return prefix + '/' + item + '/'
+                                    + resolution + 'p' + part + '.' + pandora.user.videoFormat;
                             });
                         });
                         that.append(pandora.player = Ox.VideoPlayer({
