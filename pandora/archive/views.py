@@ -146,6 +146,7 @@ def upload(request):
                 position = float(os.path.splitext(name)[0])
                 fr, created = models.Frame.objects.get_or_create(file=f, position=position)
                 fr.frame.save(name, frame)
+                os.chmod(fr.frame.path, 0644)
             f.item.select_frame()
             f.item.save()
             item.tasks.update_poster.delay(f.item.itemId)
@@ -157,6 +158,7 @@ def upload(request):
                 f.data.delete()
             f.data.save('data.raw', request.FILES['file'])
             f.save()
+            os.chmod(f.data.path, 0644)
             item.tasks.load_subtitles.delay(f.item.itemId)
             response = json_response(text='file saved')
         else:
