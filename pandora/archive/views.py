@@ -147,6 +147,8 @@ def upload(request):
                 fr, created = models.Frame.objects.get_or_create(file=f, position=position)
                 fr.frame.save(name, frame)
             f.item.select_frame()
+            f.item.save()
+            item.tasks.update_poster.delay(f.item.itemId)
         else:
             response = json_response(status=403, text='permissino denied')
     if 'file' in request.FILES:
