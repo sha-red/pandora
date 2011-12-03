@@ -44,9 +44,18 @@ class SessionData(models.Model):
     def parse_data(self):
         if self.useragent:
             self.browser = 'Unknown'
-            for browser in ('Webkit', 'Safari', 'Chrome', 'Firefox', 'Safari Mobile', 'Opera'):
+            for browser in (
+                'Internet Explorer'
+                'Webkit',
+                'Safari',
+                'Chrome',
+                'Firefox',
+                'Safari Mobile',
+                'Opera',
+            ):
                 if {
                     'Safari Mobile': 'Mobile/',
+                    'Internet Explorer': 'MSIE',
 
                 }.get(browser, browser) in self.useragent:
                     self.browser = browser
@@ -54,6 +63,10 @@ class SessionData(models.Model):
                 if {
                 }.get(system, system) in self.useragent:
                     self.system = system
+            if 'Mobile/' in self.useragent and 'Safari' in self.useragent and \
+                ('iPhone' in self.useragent or 'iPad' in self.useragent):
+                self.system = 'iOS'
+
         if self.ip:
             try:
                 g = GeoIP()
