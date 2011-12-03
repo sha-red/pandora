@@ -48,6 +48,8 @@ class SessionData(models.Model):
                 'Internet Explorer'
                 'Webkit',
                 'Safari',
+                'MeeGo',
+                'Android',
                 'Chrome',
                 'Firefox',
                 'Safari Mobile',
@@ -56,10 +58,16 @@ class SessionData(models.Model):
                 if {
                     'Safari Mobile': 'Mobile/',
                     'Internet Explorer': 'MSIE',
-
                 }.get(browser, browser) in self.useragent:
                     self.browser = browser
-            for system in ('Windows', 'Mac OS X', 'Andorid', 'iOS', 'Linux'):
+            for system in (
+                    'Windows',
+                    'Mac OS X',
+                    'iOS',
+                    'Linux',
+                    'Andorid',
+                    'MeeGo',
+            ):
                 if {
                 }.get(system, system) in self.useragent:
                     self.system = system
