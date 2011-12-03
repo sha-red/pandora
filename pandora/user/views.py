@@ -413,16 +413,19 @@ def order_query(qs, sort):
         if operator != '-':
             operator = ''
         key = {
+            'browser': 'browser',
             'email': 'user__email',
             'firstseen': 'firstseen',
             'ip': 'ip',
             'lastseen': 'lastseen',
+            'level': 'level',
+            'location': 'location',
             'screensize': 'screensize',
+            'system': 'system',
             'timesseen': 'timesseen',
             'useragent': 'useragent',
             'username': 'username',
             'windowsize': 'windowsize',
-            'level': 'level',
         }.get(e['key'], 'user__profile__%s'%e['key'])
         if key == 'user__profile__numberoflists':
             qs = qs.annotate(numberoflists=Sum('user__lists'))
