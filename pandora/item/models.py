@@ -118,6 +118,7 @@ def get_item(info, user=None, async=False):
                 except Item.DoesNotExist:
                     item.oxdbId = item.oxdb_id()
                     item.save()
+                    tasks.update_poster.delay(item.itemId)
     else:
         qs = Item.objects.filter(find__key='title', find__value=info['title'])
         if qs.count() == 1:
@@ -127,6 +128,7 @@ def get_item(info, user=None, async=False):
             item.data = item_data
             item.user = user
             item.save()
+            tasks.update_poster.delay(item.itemId)
     return item
 
 class Item(models.Model):
