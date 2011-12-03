@@ -986,7 +986,7 @@ class Item(models.Model):
 
         director = u', '.join(self.get('director', ['Unknown Director']))
         cmd = [settings.ITEM_POSTER,
-               '-t', self.get('title').encode('utf-8'),
+               '-t', self.get('title', '').encode('utf-8'),
                '-d', director.encode('utf-8'),
                '-y', str(self.get('year', '')),
                '-p', poster
