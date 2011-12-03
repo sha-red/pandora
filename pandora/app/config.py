@@ -100,6 +100,14 @@ def update_static():
         if not os.path.exists(image):
             shutil.copyfile(pandora, image)
 
+    #download geo data
+    path = os.path.join(settings.GEOIP_PATH, 'GeoLiteCity.dat')
+    if not os.path.exists(path):
+        url = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz'
+        print 'download', url
+        ox.net.saveUrl(url, "%s.gz"%path)
+        os.system('gunzip "%s.gz"' % path)
+
 def init():    
     load_config()
     thread.start_new_thread(reloader_thread, ())

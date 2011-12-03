@@ -190,6 +190,27 @@ pandora.ui.usersDialog = function() {
                         width: 90
                     },
                     {
+                        id: 'location',
+                        operator: '+',
+                        title: 'Location',
+                        visible: true,
+                        width: 120
+                    },
+                    {
+                        id: 'browser',
+                        operator: '+',
+                        title: 'Browser',
+                        visible: true,
+                        width: 60 
+                    },
+                    {
+                        id: 'system',
+                        operator: '+',
+                        title: 'System',
+                        visible: true,
+                        width: 60
+                    },
+                    {
                         id: 'useragent',
                         operator: '+',
                         title: 'User Agent',

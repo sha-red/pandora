@@ -7,7 +7,8 @@ python, bazaar, pip and virtualenv and several other python modules:
 * Packages
     apt-get install bzr git subversion mercurial \
             python-setuptools python-pip python-virtualenv ipython \
-            python-dev python-imaging python-numpy python-psycopg2
+            python-dev python-imaging python-numpy python-psycopg2 \
+            python-geoip
 
 * Pan.do/ra
 Get code from bazzar

@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Max
 from django.conf import settings
+from django.contrib.gis.utils import GeoIP
 
 import ox
 from ox.django.fields import DictField
@@ -31,12 +32,40 @@ class SessionData(models.Model):
     screensize = models.CharField(default='', max_length=255)
     info = DictField(default={})
 
+    location = models.CharField(default='', max_length=255)
+    system = models.CharField(default='', max_length=255)
+    browser = models.CharField(default='', max_length=255)
 
     objects = managers.SessionDataManager()
 
     def __unicode__(self):
         return u"%s" % self.session_key
 
+    def parse_data(self):
+        if self.useragent:
+            self.browser = 'Unknown'
+            for browser in ('Webkit', 'Safari', 'Chrome', 'Firefox', 'Safari Mobile', 'Opera'):
+                if {
+                    'Safari Mobile': 'Mobile/',
+
+                }.get(browser, browser) in self.useragent:
+                    self.browser = browser
+            for system in ('Windows', 'Mac OS X', 'Andorid', 'iOS', 'Linux'):
+                if {
+                }.get(system, system) in self.useragent:
+                    self.system = system
+        if self.ip:
+            try:
+                g = GeoIP()
+                location = g.city(self.ip)
+                if location:
+                    self.location = u'%s, %s' % (location['city'].decode('latin-1'),
+                                                 location['country_name'].decode('latin-1'))
+                else:
+                    self.location = ''
+            except:
+                self.location = ''
+                pass
     def save(self, *args, **kwargs):
         if self.user:
             self.username = self.user.username
@@ -44,6 +73,7 @@ class SessionData(models.Model):
             self.firstseen = self.user.date_joined
         else:
             self.level = 0
+        self.parse_data()
         super(SessionData, self).save(*args, **kwargs)
 
     @classmethod
@@ -75,6 +105,7 @@ class SessionData(models.Model):
 
     def json(self, keys=None, user=None):
         j = {
+            'browser': self.browser,
             'disabled': False,
             'email': '',
             'firstseen': self.firstseen,
@@ -82,9 +113,11 @@ class SessionData(models.Model):
             'id': self.get_id(),
             'lastseen': self.lastseen,
             'level': 'guest',
+            'location': self.location,
             'notes': '',
             'numberoflists': 0,
             'screensize': self.screensize,
+            'system': self.system,
             'timesseen': self.timesseen,
             'username': self.username or '',
             'useragent': self.useragent,
