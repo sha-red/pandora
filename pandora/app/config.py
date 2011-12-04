@@ -39,9 +39,8 @@ def load_config():
             config['keys'][key['id']] = key
 
         settings.CONFIG = config
-
         admin = len(settings.CONFIG['userLevels']) - 1
-        if not 'syncdb' in sys.argv:
+        if not 'syncdb' in sys.argv and not 'sqldiff' in sys.argv:
             settings.ADMIN = tuple([(u.username, u.email)
                               for u in User.objects.filter(profile__level=admin)])
             settings.MANAGERS = settings.ADMINS

@@ -76,6 +76,9 @@ pandora.addList = function() {
         });
     }
     function getPosterFrames(newList) {
+        var sortKey = Ox.getObjectById(pandora.site.itemKeys, 'votes')
+                      ? 'votes'
+                      : 'timesaccessed';
         if (!isDuplicate) {
             pandora.api.find({
                 query: {
@@ -83,7 +86,7 @@ pandora.addList = function() {
                     operator: '&'
                 },
                 keys: ['id', 'posterFrame'],
-                sort: [{key: 'votes', operator: ''}], // fixme: may not always exist
+                sort: [{key: sortKey, operator: ''}],
                 range: [0, 4]
             }, function(result) {
                 var posterFrames = result.data.items.map(function(item) {
@@ -557,6 +560,9 @@ pandora.getInfoHeight = function(includeHidden) {
 }
 
 pandora.getItemByIdOrTitle = function(str, callback) {
+    var sortKey = Ox.getObjectById(pandora.site.itemKeys, 'votes')
+                  ? 'votes'
+                  : 'timesaccessed';
     pandora.api.get({id: str, keys: ['id']}, function(result) {
         if (result.status.code == 200) {
             callback(result.data.id);
@@ -566,9 +572,9 @@ pandora.getItemByIdOrTitle = function(str, callback) {
                     conditions: [{key: 'title', value: str, operator: '='}],
                     operator: '&'
                 },
-                sort: [{key: 'votes', operator: ''}], // fixme: not all systems have "votes"
+                sort: [{key: sortKey, operator: ''}],
                 range: [0, 100],
-                keys: ['id', 'title', 'votes']
+                keys: ['id', 'title', sortKey]
             }, function(result) {
                 var id = '';
                 if (result.data.items.length) {
@@ -576,7 +582,7 @@ pandora.getItemByIdOrTitle = function(str, callback) {
                         // test if exact match or word match
                         var sort = new RegExp('^' + str + '$', 'i').test(item.title) ? 2000000
                             : new RegExp('\\b' + str + '\\b', 'i').test(item.title) ? 1000000 : 0;
-                        return sort ? {id: item.id, sort: sort + (parseInt(item.votes) || 0)} : null;
+                        return sort ? {id: item.id, sort: sort + (parseInt(item[sortKey]) || 0)} : null;
                         // fixme: remove the (...|| 0) check once the backend sends correct data
                     });
                     if (items.length) {
