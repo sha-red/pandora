@@ -185,8 +185,8 @@ VIDEO_PREFIX=''
 #SESSION_COOKIE_DOMAIN=*.example.com"
 
 SCRIPT_ROOT = normpath(join(PROJECT_ROOT, '..', 'scripts'))
-#copy scripts and adjust to customize
-ITEM_POSTER = join(SCRIPT_ROOT, 'oxdb_poster')
+#change script to customize
+ITEM_POSTER = join(SCRIPT_ROOT, 'poster')
 #ITEM_POSTER = join(SCRIPT_ROOT, 'padma_poster')
 ITEM_ICON   = join(SCRIPT_ROOT, 'item_icon')
 LIST_ICON   = join(SCRIPT_ROOT, 'list_icon')

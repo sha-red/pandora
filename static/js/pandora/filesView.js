@@ -18,7 +18,7 @@ pandora.ui.filesView = function(options, self) {
     self.$toolbar = Ox.Bar({
         size: 24
     });
-
+    /*
     self.$userSelect = Ox.Select({
             items: [
                 {id: 'admin', title: 'Admin', disabled: true},
@@ -36,7 +36,7 @@ pandora.ui.filesView = function(options, self) {
             margin: '4px'
         })
         .appendTo(self.$toolbar);
-
+    */
     self.$ignoreButton = Ox.Button({
             disabled: 'true',
             title: 'Ignore Selected Files...'

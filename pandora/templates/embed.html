@@ -3,6 +3,10 @@
     <head>
         <meta charset="utf-8" />
         <title>{{settings.SITENAME}}</title>
+        <script>
+            if (localStorage && !localStorage.OxTheme)
+                localStorage.OxTheme = '{{settings.CONFIG.user.ui.theme}}';
+        </script>
         <script type="text/javascript" src="/static/oxjs/build/Ox.js"></script>
         <script type="text/javascript" src="/static/js/embed/pandora.js"></script>
     </head>

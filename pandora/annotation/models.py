@@ -74,11 +74,10 @@ class Annotation(models.Model):
                 if l['id'] == id:
                     return l
             return {}
-        private = get_layer(self.layer).get('private')
-        if not self.clip and not private or \
-            (self.clip and not private and \
-                self.start != self.clip.start or self.end != self.clip.end):
-            self.clip, created = Clip.get_or_create(self.item, self.start, self.end)
+        private = get_layer(self.layer).get('private', False)
+        if not private:
+            if not self.clip or self.start != self.clip.start or self.end != self.clip.end:
+                self.clip, created = Clip.get_or_create(self.item, self.start, self.end)
 
         super(Annotation, self).save(*args, **kwargs)
         if set_public_id:

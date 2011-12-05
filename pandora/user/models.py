@@ -222,7 +222,7 @@ def get_ui(user_ui, user=None):
                     pos = Position.objects.get(list=l, section=section)
                     created = False
                 except Position.DoesNotExist:
-                    pos = Position(list=l, section=section, user=user)
+                    pos = Position(list=l, section=section, user=l.user)
                     pos.save()
                     created = True 
             else:

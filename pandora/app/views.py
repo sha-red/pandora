@@ -29,7 +29,9 @@ def index(request):
 
 
 def embed(request, id):
-    context = RequestContext(request, {'settings': settings})
+    context = RequestContext(request, {
+        'settings': settings
+    })
     return render_to_response('embed.html', context)
 
 

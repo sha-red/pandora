@@ -15,16 +15,16 @@
     "capabilities": {
         // "canClickMap": {"friend": true, "staff": true, "admin": true},
         "canDeleteItems": {"admin": true},
-        "canDownloadVideo": {"guest": 0, "member": 0, "friend": 4, "staff": 4, "admin": 4},
+        "canDownloadVideo": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
         "canEditFeaturedLists": {"staff": true, "admin": true},
         "canEditMetadata": {"staff": true, "admin": true},
         "canEditSitePages": {"staff": true, "admin": true},
         "canEditUsers": {"admin": true},
-        "canPlayClips": {"guest": 2, "member": 2, "friend": 4, "staff": 4, "admin": 4},
-        "canPlayVideo": {"guest": 1, "member": 1, "friend": 4, "staff": 4, "admin": 4},
+        "canPlayClips": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
+        "canPlayVideo": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
         "canSeeDebugMenu": {"staff": true, "admin": true},
         "canSeeFiles": {"staff": true, "admin": true},
-        "canSeeItem": {"guest": 3, "member": 3, "friend": 4, "staff": 4, "admin": 4},
+        "canSeeItem": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
         "canSeeExtraItemViews": {"friend": true, "staff": true, "admin": true}
     },
     /*
@@ -43,10 +43,12 @@
     // fixme: either this, or filter: true in itemKeys, but not both
     "filters": [
         {"id": "director", "title": "Director", "type": "string"},
-        {"id": "country", "title": "Country", "type": "string"},
+        {"id": "location", "title": "Location", "type": "string"},
         {"id": "year", "title": "Year", "type": "integer"},
         {"id": "language", "title": "Language", "type": "string"},
         {"id": "source", "title": "Source", "type": "string"},
+        {"id": "collection", "title": "Collection", "type": "string"},
+        {"id": "category", "title": "Category", "type": "string"},
         {"id": "writer", "title": "Writer", "type": "string"},
         {"id": "producer", "title": "Producer", "type": "string"},
         {"id": "cinematographer", "title": "Cinematographer", "type": "string"},
@@ -105,6 +107,13 @@
             "sort": "person"
         },
         {
+            "id": "name",
+            "title": "Name",
+            "type": ["string"],
+            "autocomplete": true,
+            "find": true
+        },
+        {
             "id": "collection",
             "title": "Collection",
             "type": "string",
@@ -141,6 +150,24 @@
         {
             "id": "source",
             "title": "Source",
+            "type": "string",
+            "autocomplete": true,
+            "columnWidth": 180,
+            "filter": true,
+            "find": true
+        },
+        {
+            "id": "category",
+            "title": "Category",
+            "type": ["string"],
+            "autocomplete": true,
+            "columnWidth": 180,
+            "filter": true,
+            "find": true
+        },
+        {
+            "id": "location",
+            "title": "Location",
             "type": "string",
             "autocomplete": true,
             "columnWidth": 180,
@@ -198,25 +225,25 @@
             "columnWidth": 90
         },
         {
-            "id": "location",
+            "id": "locations",
             "title": "Locations",
             "type": "layer",
             "find": true
         },
         {
-            "id": "keyword",
+            "id": "keywords",
             "title": "Keywords",
             "type": "layer",
             "find": true
         },
         {
-            "id": "description",
+            "id": "descriptions",
             "title": "Descriptions",
             "type": "layer",
             "find": true
         },
         {
-            "id": "transcript",
+            "id": "transcripts",
             "title": "Transcripts",
             "type": "layer",
             "find": true
@@ -357,10 +384,10 @@
             "type": "enum",
             "columnWidth": 90,
             "format": {"type": "ColorLevel", "args": [
-                ["Public", "Relaxed", "Regular", "Restricted", "Private"]
+                ["Public", "Restricted", "Private"]
             ]},
             "sortOperator": "+",
-            "values": ["Public", "Relaxed", "Regular", "Restricted", "Private", "Unknown"]
+            "values": ["Public", "Restricted", "Private", "Unknown"]
         }
     ],
     "itemName": {
@@ -379,26 +406,25 @@
     ],
     "layers": [
         {
-            "id": "location",
+            "id": "locations",
             "title": "Locations",
             "type": "location",
-            "overlap": true,
-            "private": true
+            "overlap": true
         },
         {
-            "id": "keyword",
+            "id": "keywords",
             "title": "Keywords",
             "overlap": true,
             "type": "text"
         },
         {
-            "id": "description",
+            "id": "descriptions",
             "title": "Descriptions",
             "type": "text",
             "overlay": true
         },
         {
-            "id": "transcript",
+            "id": "transcripts",
             "title": "Transcripts",
             "type": "text",
             "overlay": true
@@ -467,16 +493,16 @@
             "clipsColumns": 2,
             "columns": {
                 "Colors": {
-                    "columns": ["title", "director", "country", "year", "hue", "saturation", "brightness"],
+                    "columns": ["title", "director", "location", "collection", "hue", "saturation", "brightness"],
                     "columnWidth": {}
                 }
             },
             "filters": [
                 {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
-                {"id": "country", "sort": [{"key": "items", "operator": "-"}]},
-                {"id": "year", "sort": [{"key": "name", "operator": "-"}]},
-                {"id": "language", "sort": [{"key": "items", "operator": "-"}]},
-                {"id": "source", "sort": [{"key": "items", "operator": "-"}]}
+                {"id": "source", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "collection", "sort": [{"key": "name", "operator": "-"}]},
+                {"id": "category", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "location", "sort": [{"key": "items", "operator": "-"}]}
             ],
             "filtersSize": 176,
             "find": {"conditions": [], "operator": "&"},
@@ -486,7 +512,7 @@
             "itemFind": {"conditions": [], "operator": "&"},
             "itemSort": [{"key": "position", "operator": "+"}],
             "itemView": "info",
-            "listColumns": ["title", "director", "country", "year", "language", "duration", "source"],
+            "listColumns": ["title", "director", "location", "collection", "language", "duration", "source"],
             "listColumnWidth": {},
             "listSelection": [],
             "listSort": [{"key": "director", "operator": "+"}],

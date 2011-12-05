@@ -107,6 +107,11 @@ def update_static():
         ox.net.saveUrl(url, "%s.gz"%path)
         os.system('gunzip "%s.gz"' % path)
 
+    #poster script
+    if not os.path.exists(settings.ITEM_POSTER):
+        os.symlink(settings.ITEM_POSTER.replace('poster', 'oxdb_poster'),
+                   settings.ITEM_POSTER)
+    
 def init():    
     load_config()
     thread.start_new_thread(reloader_thread, ())

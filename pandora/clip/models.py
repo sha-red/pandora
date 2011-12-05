@@ -111,7 +111,7 @@ attrs = {
     'lightness': models.FloatField(default=0, db_index=True),
     'volume': models.FloatField(default=0, null=True, db_index=True),
 
-    'director': models.CharField(max_length=1000, db_index=True),
+    'director': models.CharField(max_length=1000, null=True, db_index=True),
     'title': models.CharField(max_length=1000, db_index=True),
 }
 public_layers = [l['id']
