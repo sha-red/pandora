@@ -158,7 +158,7 @@ class Item(models.Model):
     icon = models.ImageField(default=None, blank=True,
                              upload_to=lambda i, x: i.path("icon.jpg"))
 
-    torrent = models.FileField(default=None, blank=True,
+    torrent = models.FileField(default=None, blank=True, max_length=1000,
                                upload_to=lambda i, x: i.path('torrent.torrent'))
     stream_info = fields.DictField(default={}, editable=False)
 
@@ -851,6 +851,9 @@ class Item(models.Model):
                 break
 
     def make_torrent(self):
+        streams = self.streams()
+        if streams.count() == 0:
+            return
         base = self.path('torrent')
         base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, base))
         if os.path.exists(base):
@@ -861,7 +864,6 @@ class Item(models.Model):
         base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, base))
         size = 0
         duration = 0.0
-        streams = self.streams()
         if streams.count() == 1:
             url =  "%s/torrent/%s.webm" % (self.get_absolute_url(),
                                            quote(self.get('title').encode('utf-8')))
@@ -1069,6 +1071,8 @@ class Item(models.Model):
         return icon
 
     def load_subtitles(self):
+        if not filter(lambda l: l['id'] == 'subtitles', settings.CONFIG['layers']):
+            return
         with transaction.commit_on_success():
             layer = 'subtitles'
             Annotation.objects.filter(layer=layer,item=self).delete()

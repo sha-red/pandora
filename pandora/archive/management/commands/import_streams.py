@@ -21,18 +21,25 @@ class Command(BaseCommand):
                 if ext in ('.webm', '.mp4'):
                     oshash = os.path.dirname(f)[-19:].replace('/', '')
                     format = ext[1:]
-                    resolution = int(profile[:-1])
+                    if profile.endswith('p'):
+                        profile = profile[:-1]
+                    resolution = int(profile)
                     qs = models.Stream.objects.filter(file__oshash=oshash, format=format, resolution=resolution)
                     if qs.count() == 0:
                         print 'add', f
                         print oshash, resolution, format
-                        stream = models.Stream()
-                        stream.file = models.File.objects.get(oshash=oshash)
-                        stream.resolution = resolution
-                        stream.format = format
-                        stream.video.name = f[len(settings.MEDIA_ROOT)+1:]
-                        self.available = True
-                        stream.save()
+                        qs = models.File.objects.filter(oshash=oshash)
+                        if qs.count() == 1:
+                            stream = models.Stream()
+                            stream.file = qs[0]
+                            stream.resolution = resolution
+                            stream.format = format
+                            stream.video.name = f[len(settings.MEDIA_ROOT)+1:]
+                            stream.available = True
+                            stream.save()
+                            if not stream.file.info:
+                                stream.file.info = stream.info
+                                stream.file.save()
         #link streams
         resolution = settings.CONFIG['video']['resolutions'][0]
         format = settings.CONFIG['video']['formats'][0]
@@ -42,3 +49,7 @@ class Command(BaseCommand):
         #extract timelines
         for s in models.Stream.objects.filter(source=None):
             s.make_timeline()
+            s.file.selected = True
+            s.file.save()
+            s.file.item.update_timeline()
+

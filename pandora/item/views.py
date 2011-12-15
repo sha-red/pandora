@@ -762,7 +762,7 @@ def video(request, id, resolution, format, index=None):
     # reise Http404
     streams = Stream.objects.filter(file__item__itemId=item.itemId,
                                     resolution=resolution, format=format).order_by('file__part')
-    if index > streams.count():
+    if index + 1 > streams.count():
         raise Http404
     stream = streams[index]
     if not stream.available or not stream.video:
