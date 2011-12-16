@@ -53,4 +53,5 @@ class Command(BaseCommand):
             s.file.selected = True
             s.file.save()
             s.file.item.update_timeline()
-
+            #make sure all derivatives exist
+            s.extract_derivatives()
