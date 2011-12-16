@@ -42,10 +42,10 @@ cd /srv/pandora/pandora
 sudo -u pandora python manage.py syncdb --noinput 
 echo "UPDATE django_site SET domain = 'pandora.local', name = 'pandora.local' WHERE 1=1;" | sudo -u pandora python manage.py dbshell
 
-sudo -u pandora python manage.py update_static
 
 mkdir /srv/pandora/data
 chown -R pandora:pandora /srv/pandora
+sudo -u pandora python manage.py update_static
 
 cp /srv/pandora/etc/init/* /etc/init/
 
