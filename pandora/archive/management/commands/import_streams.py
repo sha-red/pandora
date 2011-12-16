@@ -3,6 +3,7 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
 import os
+from glob import glob
 
 from ... import models
 
@@ -46,9 +47,9 @@ class Command(BaseCommand):
         for s in models.Stream.objects.exclude(format=format, resolution=resolution).filter(source=None):
             s.source = models.Stream.objects.get(file=s.file, resolution=resolution, format=format)
             s.save()
-        #extract timelines
         for s in models.Stream.objects.filter(source=None):
-            s.make_timeline()
+            if not glob("%s*"%s.timeline_prefix):
+                s.make_timeline()
             s.file.selected = True
             s.file.save()
             s.file.item.update_timeline()
