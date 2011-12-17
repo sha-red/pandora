@@ -928,7 +928,7 @@ class Item(models.Model):
             self.data['color'] = ox.image.getHSL(color)
         #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
         self.select_frame()
-        self.make_poster()
+        self.make_poster(True)
         self.make_icon()
         if settings.CONFIG['video']['download']:
             self.make_torrent()
