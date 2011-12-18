@@ -4,5 +4,4 @@ Subject: {{subject}}
 
 {{message}}
 
---
-{{sitename}} - {{url}}
+{{footer}}

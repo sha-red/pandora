@@ -25,7 +25,8 @@
         "canSeeDebugMenu": {"staff": true, "admin": true},
         "canSeeFiles": {"staff": true, "admin": true},
         "canSeeItem": {"guest": 3, "member": 3, "friend": 4, "staff": 4, "admin": 4},
-        "canSeeExtraItemViews": {"friend": true, "staff": true, "admin": true}
+        "canSeeExtraItemViews": {"friend": true, "staff": true, "admin": true},
+        "canSendMail": {"staff": true, "admin": true}
     },
     /*
         clipKeys are the properties that clips can by sorted by.
@@ -549,9 +550,12 @@
     ],
     "sendReferrer": false,
     "site": {
+        // FIXME: "from" and "to" would be more intuitive as keys here
         "email": {
             // E-mail address in contact form (to)
             "contact": "0xdb@0xdb.org",
+            "footer": "-- \n0xDB - http://0xdb.org",
+            "prefix": "0xDB Newsletter -",
             // E-mail address uses by the system (from)
             "system": "0xdb@0xdb.org"
         },

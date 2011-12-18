@@ -135,6 +135,7 @@ class SessionData(models.Model):
             'lastseen': self.lastseen,
             'level': 'guest',
             'location': self.location,
+            'newsletter': False,
             'notes': '',
             'numberoflists': 0,
             'screensize': self.screensize,
@@ -149,6 +150,7 @@ class SessionData(models.Model):
             j['disabled'] = not self.user.is_active
             j['email'] = self.user.email
             j['level'] = p.get_level()
+            j['newsletter'] = p.newsletter
             j['notes'] = p.notes
             j['numberoflists'] = self.user.lists.count()
         if keys:
@@ -263,6 +265,7 @@ def init_user(user, request=None):
         result['level'] = profile.get_level()
         result['groups'] = [g.name for g in user.groups.all()]
         result['email'] = user.email
+        result['newsletter'] = profile.newsletter
         result['ui'] = profile.get_ui()
         result['volumes'] = [v.json() for v in user.volumes.all()] 
     return result
@@ -276,6 +279,7 @@ def user_json(user, keys=None):
         'id': ox.to26(user.id),
         'lastseen': user.last_login,
         'level': p.get_level(),
+        'newsletter': p.newsletter,
         'notes': p.notes,
         'numberoflists': user.lists.count(),
         'username': user.username,

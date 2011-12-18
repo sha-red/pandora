@@ -84,6 +84,28 @@ pandora.ui.preferencesDialog = function() {
                     );
                 } else {
                     $content.append(
+                        Ox.Checkbox({
+                                checked: pandora.user.newsletter,
+                                id: 'newsletter',
+                                label: 'Newsletter',
+                                labelWidth: 80,
+                                title: pandora.user.newsletter ? 'Subscribed' : 'Unsubscribed',
+                                width: 240
+                            })
+                            .bindEvent({
+                                change: function(data) {
+                                    this.options({
+                                        title: this.options('title') == 'Subscribed' ? 'Unsubscribed' : 'Subscribed'
+                                    });
+                                    pandora.user.newsletter = data.checked;
+                                    pandora.api.editPreferences({
+                                        newsletter: pandora.user.newsletter 
+                                    });
+                                }
+                            })
+                            .css({position: 'absolute', left: '96px', top: '16px'})
+                    );
+                    $content.append(
                         Ox.Button({
                             title: 'Reset UI Settings',
                             width: 150
@@ -94,26 +116,8 @@ pandora.ui.preferencesDialog = function() {
                                 pandora.$ui.appPanel.reload();
                             }
                         })
-                        .css({position: 'absolute', left: '96px', top: '16px'})
+                        .css({position: 'absolute', left: '96px', top: '46px'})
                     );
-                    /*
-                    content.append(Ox.FormElementGroup({
-                        elements: [
-                            Ox.Checkbox({
-                                checked: true ,
-                                id: 'showEpisodes',
-                                title: 'Show Episodes',
-                                width: 320
-                            }),
-                            Ox.Checkbox({
-                                checked: true ,
-                                id: 'newsletter',
-                                title: 'Receive Newsletter',
-                                width: 320
-                            })
-                            ]
-                    }));
-                    */
                 }
                 return $content;
             },
@@ -127,7 +131,7 @@ pandora.ui.preferencesDialog = function() {
             }).bindEvent({
                 click: function() {
                     $dialog.close();
-                    pandora.URL.update();
+                    pandora.UI.set({page: ''});
                 }
             })
         ],

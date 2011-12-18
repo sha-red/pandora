@@ -4,12 +4,11 @@ import random
 random.seed()
 import re
 
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext, loader
 from django.utils import simplejson as json
 from django.conf import settings
-from django.core.mail import send_mail, BadHeaderError
+from django.core.mail import send_mail, BadHeaderError, EmailMessage
 from django.db.models import Sum
 from django.shortcuts import redirect
 
@@ -280,6 +279,7 @@ def requestToken(request):
         context = RequestContext(request, {
             'code': code,
             'sitename': settings.SITENAME,
+            'footer': settings.CONFIG['site']['email']['footer'],
             'url': request.build_absolute_uri('/'),
         })
         message = template.render(context)
@@ -333,6 +333,8 @@ def editUser(request):
         profile.set_level(data['level'])
     if 'notes' in data:
         profile.notes = data['notes']
+    if 'newsletter' in data:
+        profile.newsletter = data['newsletter']
     if 'username' in data:
         if models.User.objects.filter(username=data['username']).exclude(id=user.id).count()>0:
             response = json_response(status=403, text='username already in use')
@@ -388,10 +390,10 @@ def findUser(request):
 
     if data['key'] == 'email':
         response['data']['users'] = [models.user_json(u, keys)
-                                     for u in User.objects.filter(email__iexact=data['value'])]
+                                     for u in models.User.objects.filter(email__iexact=data['value'])]
     else:
         response['data']['users'] = [models.user_json(u, keys)
-                                     for u in User.objects.filter(username__iexact=data['value'])]
+                                     for u in models.User.objects.filter(username__iexact=data['value'])]
     return render_to_json_response(response)
 actions.register(findUser)
 
@@ -527,6 +529,71 @@ Positions
     return render_to_json_response(response)
 actions.register(findUsers)
 
+@login_required_json
+def mail(request):
+    '''
+        param data {
+            'to': array of usernames,
+            'subject': string,
+            'message': string
+        }
+
+        message can contain {username} or {email},
+        this will be replace with the user/email
+        the mail is sent to.
+
+        return {
+            'status': {'code': int, 'text': string}
+        }
+    '''
+    response = json_response()
+    data = json.loads(request.POST['data'])
+    p = request.user.get_profile()
+    if p.capability('canSendMail'):
+        email_from = '"%s" <%s>' % (settings.SITENAME, settings.CONFIG['site']['email']['system'])
+        headers = {
+            'Reply-To': settings.CONFIG['site']['email']['contact']
+        }
+        subject = data.get('subject', '').strip()
+        users = [models.User.objects.get(username=username) for username in data['to']]
+        for user in users:
+            if user.email:
+                message = data['message']
+                for key, value in (
+                    ('{username}', user.username),
+                    ('{email}', user.email),
+                ):
+                    message = message.replace(key, value)
+                email_to = '"%s" <%s>' % (user.username, user.email)
+                email = EmailMessage(subject,
+                                     message,
+                                     email_from,
+                                     [email_to],
+                                     headers = headers)
+                email.send(fail_silently=True)
+        if 'receipt' in data \
+            and data['receipt']:
+            template = loader.get_template('mailout_receipt.txt')
+            context = RequestContext(request, {
+                'footer': settings.CONFIG['site']['email']['footer'],
+                'to': ', '.join(['"%s" <%s>' % (u.username, u.email) for u in users]),
+                'subject': subject,
+                'message': data['message'],
+                'url': request.build_absolute_uri('/'),
+            })
+            message = template.render(context)
+            subject = u'Fwd: %s' % subject
+            email_to = '"%s" <%s>' % (request.user.username, request.user.email)
+            receipt = EmailMessage(subject,
+                                   message,
+                                   email_from,
+                                   [email_to])
+            receipt.send(fail_silently=True)
+        response = json_response(text='message sent')
+    else:
+        response = json_response(status=403, text='not allowed to send mail')
+    return render_to_json_response(response)
+actions.register(mail, cache=False)
 
 def contact(request):
     '''
@@ -549,7 +616,7 @@ def contact(request):
         if not email:
             email = request.user.email
     if 'message' in data and data['message'].strip():
-        email_from = settings.CONFIG['site']['email']['system']
+        email_from = '"%s" <%s>' % (settings.SITENAME, settings.CONFIG['site']['email']['system'])
         email_to = [settings.CONFIG['site']['email']['contact'], ]
         subject = data.get('subject', '').strip()
         template = loader.get_template('contact_email.txt')
@@ -559,12 +626,13 @@ def contact(request):
             'subject': subject,
             'message': data['message'].strip(),
             'sitename': settings.SITENAME,
+            'footer': settings.CONFIG['site']['email']['footer'],
             'url': request.build_absolute_uri('/'),
         })
         message = template.render(context)
         response = json_response(text='message sent')
         try:
-            send_mail(u'[%s Contact] %s' % (settings.SITENAME, subject), message, email_from, email_to)
+            send_mail(u'%s Contact - %s' % (settings.SITENAME, subject), message, email_from, email_to)
         except BadHeaderError:
             response = json_response(status=400, text='invalid data')
         if request.user.is_authenticated() \
@@ -575,6 +643,7 @@ def contact(request):
                 'name': name,
                 'from': email,
                 'sitename': settings.SITENAME,
+                'footer': settings.CONFIG['site']['email']['footer'],
                 'to': email_to[0],
                 'subject': subject,
                 'message': data['message'].strip(),
@@ -618,6 +687,10 @@ def editPreferences(request):
         else:
             change = True
             request.user.email = data['email']
+    if 'newsletter' in data:
+        profile = request.user.get_profile()
+        profile.newsletter = data['newsletter']
+        profile.save()
     if 'password' in data:
         change = True
         request.user.set_password(data['password'])
