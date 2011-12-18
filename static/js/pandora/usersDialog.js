@@ -8,7 +8,6 @@ pandora.ui.usersDialog = function() {
         dialogWidth = Math.round(window.innerWidth * 0.9),
         formWidth = 256,
         numberOfUsers = 0,
-        userLevels = ['member', 'friend', 'staff', 'admin'],
 
         $guestsCheckbox = Ox.Checkbox({
                 checked: true,
@@ -495,12 +494,12 @@ pandora.ui.usersDialog = function() {
                     }),
                 Ox.Select({
                     id: 'level',
-                    items: userLevels.map(function(level) {
-                        return {
+                    items: Ox.map(pandora.site.userLevels, function(level, i) {
+                        return i ? {
                             checked: level == user.level,
                             id: level,
                             title: Ox.toTitleCase(level)
-                        };
+                        } : null;
                     }),
                     label: 'Level',
                     labelWidth: 80,
