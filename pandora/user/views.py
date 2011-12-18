@@ -48,15 +48,16 @@ def signin(request):
     data = json.loads(request.POST['data'])
     if 'username' in data and 'password' in data:
         data['username'] = data['username'].strip()
-        data['password'] = data['password'].strip()
-        if models.User.objects.filter(username=data['username']).count() == 0:
+        qs = models.User.objects.filter(username__iexact=data['username'])
+        if qs.count() == 0:
             response = json_response({
                 'errors': {
                     'username': 'Unknown Username'
                 }
             })
         else:
-            user = authenticate(username=data['username'], password=data['password'])
+            username = qs[0].username
+            user = authenticate(username=username, password=data['password'])
             if user is not None:
                 if user.is_active:
                     request.session['ui'] = '{}'
@@ -131,14 +132,13 @@ def signup(request):
     data = json.loads(request.POST['data'])
     if 'username' in data and 'password' in data:
         data['username'] = data['username'].strip()
-        data['password'] = data['password'].strip()
-        if models.User.objects.filter(username=data['username']).count() > 0:
+        if models.User.objects.filter(username__iexact=data['username']).count() > 0:
             response = json_response({
                 'errors': {
                     'username': 'Username already exists'
                 }
             })
-        elif models.User.objects.filter(email=data['email']).count() > 0:
+        elif models.User.objects.filter(email__iexact=data['email']).count() > 0:
             response = json_response({
                 'errors': {
                     'email': 'Email address already exits'
@@ -257,12 +257,12 @@ def requestToken(request):
     user = None
     if 'username' in data:
         try:
-            user = models.User.objects.get(username=data['username'])
+            user = models.User.objects.get(username__iexact=data['username'])
         except models.User.DoesNotExist:
             user = None
     elif 'email' in data:
         try:
-            user = models.User.objects.get(email=data['email'])
+            user = models.User.objects.get(email__iexact=data['email'])
         except models.User.DoesNotExist:
             user = None
     if user:
@@ -325,7 +325,7 @@ def editUser(request):
     if 'disabled' in data:
         user.is_active = not data['disabled']
     if 'email' in data:
-        if models.User.objects.filter(email=data['email']).exclude(id=user.id).count()>0:
+        if models.User.objects.filter(email__iexact=data['email']).exclude(id=user.id).count()>0:
             response = json_response(status=403, text='email already in use')
             return render_to_json_response(response)
         user.email = data['email']
@@ -336,7 +336,8 @@ def editUser(request):
     if 'newsletter' in data:
         profile.newsletter = data['newsletter']
     if 'username' in data:
-        if models.User.objects.filter(username=data['username']).exclude(id=user.id).count()>0:
+        if models.User.objects.filter(
+                username__iexact=data['username']).exclude(id=user.id).count()>0:
             response = json_response(status=403, text='username already in use')
             return render_to_json_response(response)
         user.username = data['username']
