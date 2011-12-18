@@ -242,7 +242,7 @@ pandora.ui.home = function() {
     that.fadeInScreen = function() {
         that.appendTo(Ox.UI.$body).animate({opacity: 1}, 500, function() {
             that.find(':not(#logo)').animate({opacity: 1}, 250, function() {
-                $findInput.focusInput();
+                $findInput.focusInput(true);
             });
         });
         $logo.animate({width: '320px'}, 500);
@@ -269,7 +269,7 @@ pandora.ui.home = function() {
         $logo.css({width: '320px'});
         that.find(':not(#logo)').css({opacity: 1});
         that.css({opacity: 1}).appendTo(Ox.UI.$body);
-        $findInput.focusInput();
+        $findInput.focusInput(true);
         return that;
     };
 

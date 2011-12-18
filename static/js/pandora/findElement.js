@@ -19,7 +19,7 @@ pandora.ui.findElement = function() {
                                 var key = data.selected[0].id;
                                 pandora.$ui.findInput.options({
                                     autocomplete: autocompleteFunction()
-                                }).focusInput();
+                                }).focusInput(true);
                             }
                         }),
                 ] : [], [
@@ -55,7 +55,7 @@ pandora.ui.findElement = function() {
                                     pandora.$ui.findInput.options({
                                         autocomplete: autocompleteFunction(),
                                         placeholder: ''
-                                    }).focusInput();
+                                    }).focusInput(true);
                                 }
                             }
                         }),

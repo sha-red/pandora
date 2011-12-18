@@ -290,7 +290,7 @@ pandora.ui.accountForm = function(action, value) {
                                         ? pandora.autovalidateUsername : pandora.autovalidateEmail,
                                     validate: pandora.validateUser(selected, true),
                                     value: ''
-                                }).focusInput();
+                                }).focusInput(true);
                                 that.$element.find('.OxFormMessage:visible').html('').hide();
                                 pandora.$ui.accountDialog.disableButton('submitReset');
                             }

@@ -59,7 +59,7 @@ pandora.ui.listDialog = function(section) {
                         });
                         // fixme: this is a bit weird
                         setTimeout(function() {
-                            pandora.$ui.findIconItemInput.focusInput();
+                            pandora.$ui.findIconItemInput.focusInput(true);
                         }, 250);
                     }
                 }),
