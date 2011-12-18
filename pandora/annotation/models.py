@@ -45,7 +45,7 @@ class Annotation(models.Model):
         return False
 
     def html(self):
-        if self.layer.type == 'string':
+        if self.layer == 'string':
             return utils.html_parser(self.value)
         else:
             return self.value
@@ -83,10 +83,11 @@ class Annotation(models.Model):
         if set_public_id:
             self.set_public_id()
 
-        Clip.objects.filter(**{
-            'id': self.clip.id,
-            self.layer: False
-        }).update(**{self.layer: True})
+        if self.clip:
+            Clip.objects.filter(**{
+                'id': self.clip.id,
+                self.layer: False
+            }).update(**{self.layer: True})
 
         #how expensive is this?
         #update_matching_events.delay(self.value)
