@@ -267,8 +267,8 @@ def requestToken(request):
             user = None
     if user:
         while True:
-            code = ox.to26(random.randint(ox.from26('BAAAAAAAAAAAAAAA'),
-                                          ox.from26('BAAAAAAAAAAAAAAAA')))
+            code = ox.toAZ(random.randint(ox.fromAZ('AAAAAAAAAAAAAAAA'),
+                                          ox.fromAZ('AAAAAAAAAAAAAAAAA')))
             if models.UserProfile.objects.filter(reset_code=code).count() == 0:
                 break
         user_profile = user.get_profile()
@@ -320,7 +320,7 @@ def editUser(request):
     '''
     response = json_response()
     data = json.loads(request.POST['data'])
-    user = get_object_or_404_json(models.User, pk=ox.from26(data['id']))
+    user = get_object_or_404_json(models.User, pk=ox.fromAZ(data['id']))
     profile = user.get_profile()
     if 'disabled' in data:
         user.is_active = not data['disabled']

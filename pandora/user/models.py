@@ -122,7 +122,7 @@ class SessionData(models.Model):
         return data
 
     def get_id(self):
-        return self.user and ox.to26(self.user.id) or self.session_key
+        return self.user and ox.toAZ(self.user.id) or self.session_key
 
     def json(self, keys=None, user=None):
         j = {
@@ -276,7 +276,7 @@ def user_json(user, keys=None):
         'disabled': not user.is_active,
         'email': user.email,
         'firstseen': user.date_joined,
-        'id': ox.to26(user.id),
+        'id': ox.toAZ(user.id),
         'lastseen': user.last_login,
         'level': p.get_level(),
         'newsletter': p.newsletter,

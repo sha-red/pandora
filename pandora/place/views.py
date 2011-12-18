@@ -82,7 +82,7 @@ def editPlace(request):
         can contain any of the allowed keys for place 
     '''
     data = json.loads(request.POST['data'])
-    place = get_object_or_404_json(models.Place, pk=ox.from26(data['id']))
+    place = get_object_or_404_json(models.Place, pk=ox.fromAZ(data['id']))
     names = data.get('name', [])
     if isinstance(names, basestring):
         names = [names]
@@ -131,7 +131,7 @@ def removePlace(request):
     data = json.loads(request.POST['data'])
     if isinstance(data, dict):
         data = data['id']
-    place = get_object_or_404_json(models.Place, pk=ox.from26(data))
+    place = get_object_or_404_json(models.Place, pk=ox.fromAZ(data))
     if place.editable(request.user):
         place.delete()
         response = json_response(status=200, text='deleted')

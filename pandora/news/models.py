@@ -35,7 +35,7 @@ class News(models.Model):
     def json(self, keys=None):
         j = {
             'user': self.user.username,
-            'id': ox.to26(self.id),
+            'id': ox.toAZ(self.id),
             'title': self.title,
             'content': self.content,
         }

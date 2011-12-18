@@ -25,7 +25,7 @@ def editName(request):
         can contain any of the allowed keys for name 
     '''
     data = json.loads(request.POST['data'])
-    person = get_object_or_404_json(models.Person, pk=ox.from26(data['id']))
+    person = get_object_or_404_json(models.Person, pk=ox.fromAZ(data['id']))
     response = json_response()
     if 'sortname' in data:
         person.sortname = data['sortname']

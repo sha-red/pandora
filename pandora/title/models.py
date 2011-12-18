@@ -61,7 +61,7 @@ class Title(models.Model):
     get_or_create = classmethod(get_or_create)
 
     def get_id(self):
-        return ox.to26(self.id)
+        return ox.toAZ(self.id)
 
     def json(self, keys=None, user=None):
         j = {

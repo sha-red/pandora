@@ -59,7 +59,7 @@ def removeLogs(request):
         can contain any of the allowed keys for place 
     '''
     data = json.loads(request.POST['data'])
-    models.Log.objects.filter(id__in=[ox.from26(i) for i in data['ids']]).delete()
+    models.Log.objects.filter(id__in=[ox.fromAZ(i) for i in data['ids']]).delete()
     response = json_response()
     return render_to_json_response(response)
 actions.register(removeLogs, cache=False)
@@ -130,7 +130,7 @@ def findLogs(request):
         if qs.count() > 0:
             response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
     elif 'positions' in data:
-        ids = [ox.to26(i.id) for i in qs]
+        ids = [ox.toAZ(i.id) for i in qs]
         response['data']['positions'] = utils.get_positions(ids, data['positions'])
     else:
         response['data']['items'] = qs.count()

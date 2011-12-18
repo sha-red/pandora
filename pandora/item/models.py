@@ -264,7 +264,7 @@ class Item(models.Model):
                 self.itemId = str(uuid.uuid1())
             super(Item, self).save(*args, **kwargs)
             if not settings.USE_IMDB:
-                self.itemId = ox.to26(self.id)
+                self.itemId = ox.toAZ(self.id)
 
         #this does not work if another item without imdbid has the same metadata
         oxdbId = self.oxdb_id()

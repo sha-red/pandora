@@ -52,8 +52,8 @@ class Annotation(models.Model):
     
     def set_public_id(self):
         if self.id:
-            public_id = Annotation.objects.filter(item=self.item, id__lt=self.id).count()
-            self.public_id = "%s/%s" % (self.item.itemId, ox.to26(public_id))
+            public_id = Annotation.objects.filter(item=self.item, id__lt=self.id).count() + 1
+            self.public_id = "%s/%s" % (self.item.itemId, ox.toAZ(public_id))
             Annotation.objects.filter(id=self.id).update(public_id=self.public_id)
 
     def save(self, *args, **kwargs):

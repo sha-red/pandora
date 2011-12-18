@@ -24,7 +24,7 @@ class Log(models.Model):
     def json(self, keys=None):
         j = {
             'created': self.created,
-            'id': ox.to26(self.id),
+            'id': ox.toAZ(self.id),
             'line': self.line,
             'modified': self.modified,
             'text': self.text,

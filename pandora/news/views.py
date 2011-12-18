@@ -87,7 +87,7 @@ def findNews(request):
         qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [p.json(keys=data['keys']) for p in qs]
     elif 'position' in query:
-        ids = [ox.to26(i.id) for i in qs]
+        ids = [ox.toAZ(i.id) for i in qs]
         data['conditions'] = data['conditions'] + {
             'value': data['position'],
             'key': query['sort'][0]['key'],
@@ -98,7 +98,7 @@ def findNews(request):
         if qs.count() > 0:
             response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
     elif 'positions' in data:
-        ids = [ox.to26(i.id) for i in qs]
+        ids = [ox.toAZ(i.id) for i in qs]
         response['data']['positions'] = utils.get_positions(ids, data['positions'])
     else:
         response['data']['items'] = qs.count()
@@ -148,7 +148,7 @@ def removeNews(request):
     response = json_response({})
     data = json.loads(request.POST['data'])
     failed = []
-    ids = [ox.from26(i) for i in data['ids']]
+    ids = [ox.fromAZ(i) for i in data['ids']]
     for a in models.News.objects.filter(id__in=ids):
         if a.editable(request.user):
             a.delete()
@@ -156,7 +156,7 @@ def removeNews(request):
             failed.append(a.id)
     if failed:
         response = json_response(status=403, text='permission denied')
-        response['data']['ids'] = [ox.to26(i) for i in failed]
+        response['data']['ids'] = [ox.toAZ(i) for i in failed]
     return render_to_json_response(response)
 actions.register(removeNews, cache=False)
 
@@ -179,7 +179,7 @@ def editNews(request):
     '''
     response = json_response({})
     data = json.loads(request.POST['data'])
-    n = get_object_or_404_json(models.News, id=ox.from26(data['id']))
+    n = get_object_or_404_json(models.News, id=ox.fromAZ(data['id']))
     if n.editable(request.user):
         for key in ('title', 'content', 'public'):
             if key in data:

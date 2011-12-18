@@ -8,7 +8,7 @@ import ox
 
 def decode_id(id):
     try:
-        id = ox.from26(id)
+        id = ox.fromAZ(id)
     except:
         id = 0
     return id

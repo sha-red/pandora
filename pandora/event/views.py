@@ -65,7 +65,7 @@ def editEvent(request):
             update provides keys of event with id
     '''
     data = json.loads(request.POST['data'])
-    event = get_object_or_404_json(models.Event, pk=ox.from26(data['id']))
+    event = get_object_or_404_json(models.Event, pk=ox.fromAZ(data['id']))
     if event.editable(request.user):
         conflict = False
         conflict_names = []
@@ -110,7 +110,7 @@ def removeEvent(request):
 
     '''
     data = json.loads(request.POST['data'])
-    event = get_object_or_404_json(models.Event, pk=ox.from26(data['id']))
+    event = get_object_or_404_json(models.Event, pk=ox.fromAZ(data['id']))
     if event.editable(request.user):
         event.delete()
         response = json_response(status=200, text='removed')

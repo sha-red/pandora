@@ -26,7 +26,7 @@ def editTitle(request):
         can contain any of the allowed keys for title 
     '''
     data = json.loads(request.POST['data'])
-    title = get_object_or_404_json(models.Title, pk=ox.from26(data['id']))
+    title = get_object_or_404_json(models.Title, pk=ox.fromAZ(data['id']))
     response = json_response()
     if 'sorttitle' in data:
         title.sorttitle = data['sorttitle']
