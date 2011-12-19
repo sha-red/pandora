@@ -37,6 +37,8 @@ class Channel(models.Model):
                 self.run += 1
                 self.save()
                 not_played = items
+                if not_played.count() > 1:
+                    not_played = not_played.exclude(id=program[0].id)
                 not_played_count = not_played.count()
             item = not_played[randint(0, not_played_count-1)]
             if program.count() > 0:
