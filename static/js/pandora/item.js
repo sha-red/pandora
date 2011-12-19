@@ -39,47 +39,7 @@ pandora.ui.item = function() {
 
         if (['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
             // fixme: layers have value, subtitles has text?
-            var subtitles = result.data.layers.subtitles
-                    ? result.data.layers.subtitles.map(function(subtitle) {
-                        return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
-                    })
-                    : [],
-                canPlayClips = pandora.site.capabilities.canPlayClips[pandora.user.level] >= result.data.rightslevel,
-                canPlayVideo = pandora.site.capabilities.canPlayVideo[pandora.user.level] >= result.data.rightslevel,
-                censored = canPlayVideo ? []
-                    : canPlayClips ? (
-                        subtitles.length
-                            ? Ox.merge(
-                                subtitles.map(function(subtitle, i) {
-                                    return {
-                                        'in': i == 0 ? 0 : subtitles[i - 1].out,
-                                        out: subtitle['in']
-                                    };
-                                }),
-                                [{'in': Ox.last(subtitles).out, out: result.data.duration}]
-                            )
-                            : Ox.range(0, result.data.duration - 5, 60).map(function(position) {
-                                return {
-                                    'in': position + 5,
-                                    out: Math.min(position + 60, result.data.duration)
-                                };
-                            })
-                    )
-                    : [{'in': 0, out: result.data.duration}],
-                layers = [],
-                video = {};
-
-            pandora.site.layers.forEach(function(layer, i) {
-                layers[i] = Ox.extend({}, layer, {items: result.data.layers[layer.id]});
-            });
-            pandora.site.video.resolutions.forEach(function(resolution) {
-                video[resolution] = Ox.range(result.data.parts).map(function(i) {
-                    var part = (i + 1),
-                        prefix = pandora.site.site.videoprefix.replace('PART', part);
-                    return prefix + '/' + pandora.user.ui.item + '/'
-                        + resolution + 'p' + part + '.' + pandora.user.videoFormat;
-                });
-            });
+            var videoOptions = pandora.getVideoOptions(result.data);
         }
 
         if (!result.data.rendered && [
@@ -160,7 +120,7 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'video') {
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.player = Ox.VideoPanelPlayer({
                 annotationsSize: pandora.user.ui.annotationsSize,
-                censored: censored,
+                censored: videoOptions.censored,
                 cuts: result.data.cuts || [],
                 duration: result.data.duration,
                 find: pandora.user.ui.itemFind.conditions[0]
@@ -176,10 +136,10 @@ pandora.ui.item = function() {
                 scaleToFill: pandora.user.ui.videoScale == 'fill',
                 showAnnotations: pandora.user.ui.showAnnotations,
                 showTimeline: pandora.user.ui.showTimeline,
-                subtitles: subtitles,
+                subtitles: videoOptions.subtitles,
                 tooltips: true,
                 timeline: '/' + pandora.user.ui.item + '/timeline16p.png',
-                video: video,
+                video: videoOptions.video,
                 volume: pandora.user.ui.videoVolume,
                 width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             }).bindEvent({

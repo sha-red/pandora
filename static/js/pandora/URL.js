@@ -226,7 +226,7 @@ pandora.URL = (function() {
             pages: [
                 'about', 'api', 'contact', 'faq', 'help', 'home', 'news',
                 'preferences', 'rights', 'signin', 'signout', 'signup',
-                'software', 'terms', 'tour'
+                'software', 'terms', 'tour', 'tv'
             ],
             sortKeys: sortKeys,
             spanType: spanType,

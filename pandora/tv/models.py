@@ -5,23 +5,27 @@ from datetime import datetime, timedelta
 from random import randint
 
 from django.db import models
+from django.db.models import Max
 
 
 class Channel(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    run = models.IntegerField(default=0)
 
+    run = models.IntegerField(default=0)
     list = models.ForeignKey('itemlist.List', related_name='channel')
+
+    def __unicode__(self):
+        return u"%s %s" % (self.list, self.run)
 
     def json(self, user):
         now = datetime.now()
         items = self.list.get_items().filter(rendered=True)
         if items.count() == 0:
-            return
+            return {}
 
         program = self.program.order_by('-start')
-        while program.count() < 2 or program[0].end < now:
+        while program.count() < 1 or program[0].end < now:
             not_played = items.exclude(program__in=self.program.filter(run=self.run))
             not_played_count = not_played.count()
             if not_played_count == 0:
@@ -31,24 +35,18 @@ class Channel(models.Model):
                 not_played_count = not_played.count()
             item = not_played[randint(0, not_played_count-1)]
             if program.count() > 0:
-                start = program[0].end
+                start = program.aggregate(Max('end'))['end__max']
             else:
                 start = now
-            end = start + timedelta(seconds=item.get_json()['duration'])
             p = Program()
-            p.item=item
-            p.run=self.run
-            p.start=start
-            p.end=end
+            p.item = item
+            p.run = self.run
+            p.start = start
+            p.end = start + timedelta(seconds=item.get_json()['duration'])
             p.channel = self
             p.save()
             program = self.program.order_by('-start')
-            print program.count(), now, p.start, p.end
-        current = program[1]
-        return {
-            'current': current.json(user, now),
-            'next': program[0].json(user)
-        }
+        return program[0].json(user, now)
 
 class Program(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -66,11 +64,13 @@ class Program(models.Model):
         item_json = self.item.get_json()
         r = {
             'item': self.item.itemId,
-            'durations': item_json['durations'],
-            'parts': item_json['parts'],
         }
+        for key in ('title', 'director', 'year', 'durations', 'parts', 'rightslevel'):
+            r[key] = item_json.get(key, '')
         r['layers'] = self.item.get_layers(user)
         if current:
-            r['currentTime'] = (current - self.start).total_seconds()
-
+            #requires python2.7
+            #r['position'] = (current - self.start).total_seconds()
+            td = current - self.start
+            r['position'] = td.seconds + td.days * 24 * 3600 + float(td.microseconds)/10**6
         return r

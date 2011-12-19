@@ -68,6 +68,10 @@ pandora.ui.appPanel = function() {
             } else {
                 pandora.ui.accountSignoutDialog().open();
             }
+        } else if (page == 'tv') {
+            pandora.$ui.tv = pandora.ui.tv()[
+                !pandora.$ui.appPanel ? 'showScreen' : 'fadeInScreen'
+            ]();
         }
     }
     return that;

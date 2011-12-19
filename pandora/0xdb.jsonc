@@ -581,6 +581,9 @@
         {"id": "size", "admin": true},
         {"id": "pixels"}
     ],
+    "tv": {
+        "showLogo": false
+    },
     "user": {
         "level": "guest",
         "ui": {

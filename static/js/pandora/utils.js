@@ -722,6 +722,47 @@ pandora.getSortOperator = function(key) {
     ) > -1 ? '+' : '-';
 };
 
+pandora.getVideoOptions = function(data) {
+    var canPlayClips = pandora.site.capabilities.canPlayClips[pandora.user.level] >= data.rightslevel,
+        canPlayVideo = pandora.site.capabilities.canPlayVideo[pandora.user.level] >= data.rightslevel,
+        options = {};
+    options.subtitles = data.layers.subtitles
+        ? data.layers.subtitles.map(function(subtitle) {
+            return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
+        })
+        : [];
+    options.censored = canPlayVideo ? []
+        : canPlayClips ? (
+            options.subtitles.length
+                ? Ox.merge(
+                    options.subtitles.map(function(subtitle, i) {
+                        return {
+                            'in': i == 0 ? 0 : options.subtitles[i - 1].out,
+                            out: subtitle['in']
+                        };
+                    }),
+                    [{'in': Ox.last(options.subtitles).out, out: data.duration}]
+                )
+                : Ox.range(0, data.duration - 5, 60).map(function(position) {
+                    return {
+                        'in': position + 5,
+                        out: Math.min(position + 60, data.duration)
+                    };
+                })
+        )
+        : [{'in': 0, out: data.duration}];
+    options.video = {};
+    pandora.site.video.resolutions.forEach(function(resolution) {
+        options.video[resolution] = Ox.range(data.parts).map(function(i) {
+            var part = (i + 1),
+                prefix = pandora.site.site.videoprefix.replace('PART', part); // fixme: '{part}' would be more consistent
+            return prefix + '/' + (data.item || pandora.user.ui.item) + '/'
+                + resolution + 'p' + part + '.' + pandora.user.videoFormat;
+        });
+    });
+    return options;
+};
+
 pandora.getVideoPartsAndPoints = function(durations, points) {
     var parts = durations.length,
         offsets = Ox.range(parts).map(function(i) {
