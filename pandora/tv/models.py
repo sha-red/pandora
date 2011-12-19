@@ -7,20 +7,25 @@ from random import randint
 from django.db import models
 from django.db.models import Max
 
+from item.models import Item
+
 
 class Channel(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
     run = models.IntegerField(default=0)
-    list = models.ForeignKey('itemlist.List', related_name='channel')
+    list = models.ForeignKey('itemlist.List', related_name='channel', null=True, unique=True, blank=True)
 
     def __unicode__(self):
         return u"%s %s" % (self.list, self.run)
 
     def json(self, user):
         now = datetime.now()
-        items = self.list.get_items().filter(rendered=True)
+        if self.list:
+            items = self.list.get_items().filter(rendered=True)
+        else:
+            items = Item.objects.filter(rendered=True)
         if items.count() == 0:
             return {}
 
