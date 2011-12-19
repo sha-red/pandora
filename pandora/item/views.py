@@ -405,27 +405,6 @@ def get(request):
     return render_to_json_response(response)
 actions.register(get)
 
-def getItem(request):
-    '''
-        param data
-            string id
-
-        return item array
-    '''
-    response = json_response({})
-    itemId = json.loads(request.POST['data'])
-    item = get_object_or_404_json(models.Item, itemId=itemId)
-    if item.access(request.user):
-        info = item.get_json()
-        info['stream'] = item.get_stream()
-        info['layers'] = item.get_layers(request.user)
-        response['data'] = info
-    else:
-        response = json_response(status=403, text='permission denied')
-    return render_to_json_response(response)
-actions.register(getItem)
-
-
 @login_required_json
 def edit(request):
     '''
