@@ -75,8 +75,11 @@ class List(models.Model):
             l.item = item
             l.save()
 
-    def remove(self, item):
-        ListItem.objects.all().filter(item=item, list=self).delete()
+    def remove(self, item=None, items=None):
+        if item:
+            ListItem.objects.all().filter(item=item, list=self).delete()
+        if items:
+            ListItem.objects.all().filter(item__itemId__in=items, list=self).delete()
 
     def __unicode__(self):
         return self.get_id()

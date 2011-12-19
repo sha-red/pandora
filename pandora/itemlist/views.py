@@ -4,6 +4,7 @@ from __future__ import division
 import os
 
 from django.db.models import Max, Sum
+from django.db import transaction
 from django.http import HttpResponseForbidden, Http404
 from django.conf import settings
 from ox.utils import json
@@ -139,8 +140,9 @@ def addListItems(request):
     list = get_list_or_404_json(data['list'])
     if 'items' in data:
         if list.editable(request.user):
-            for item in Item.objects.filter(itemId__in=data['items']):
-                list.add(item)
+            with transaction.commit_on_success():
+                for item in Item.objects.filter(itemId__in=data['items']):
+                    list.add(item)
             response = json_response(status=200, text='items added')
         else:
             response = json_response(status=403, text='not allowed')
@@ -170,8 +172,7 @@ def removeListItems(request):
     list = get_list_or_404_json(data['list'])
     if 'items' in data:
         if list.editable(request.user):
-            for item in list.items.filter(itemId__in=data['items']):
-                list.remove(item)
+            list.remove(items=data['items'])
             response = json_response(status=200, text='items removed')
         else:
             response = json_response(status=403, text='not allowed')

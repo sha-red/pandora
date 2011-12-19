@@ -497,7 +497,7 @@ pandora.ui.list = function() {
                 }, pandora.reloadList);
             },
             select: function(data) {
-                var $still, $timeline;
+                var query;
                 pandora.UI.set('listSelection', data.ids);
                 if (data.ids.length) {
                     pandora.$ui.mainMenu.enableItem('copy');
@@ -507,8 +507,8 @@ pandora.ui.list = function() {
                     pandora.$ui.mainMenu.disableItem('openmovie');
                 }
                 pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
-                pandora.api.find({
-                    query: {
+                if (Ox.isUndefined(data.rest)) {
+                    query = {
                         conditions: data.ids.map(function(id) {
                             return {
                                 key: 'id',
@@ -517,7 +517,23 @@ pandora.ui.list = function() {
                             }
                         }),
                         operator: '|'
-                    }
+                    };
+                } else {
+                    query = {
+                        conditions: Ox.merge([
+                            pandora.user.ui.find
+                        ], data.rest.map(function(id) {
+                            return {
+                                key: 'id',
+                                value: id,
+                                operator: '!='
+                            };
+                        })),
+                        operator: '&'
+                    };
+                }
+                pandora.api.find({
+                    query: query
                 }, function(result) {
                     pandora.$ui.selected.html(pandora.ui.status('selected', result.data));
                 });
