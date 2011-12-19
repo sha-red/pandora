@@ -18,7 +18,7 @@ class Channel(models.Model):
     list = models.ForeignKey('itemlist.List', related_name='channel', null=True, unique=True, blank=True)
 
     def __unicode__(self):
-        return u"%s %s" % (self.list, self.run)
+        return u"%s %s" % (self.list or 'All', self.run)
 
     def json(self, user):
         now = datetime.now()
