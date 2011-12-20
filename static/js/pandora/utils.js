@@ -760,6 +760,10 @@ pandora.getVideoOptions = function(data) {
                 + resolution + 'p' + part + '.' + pandora.user.videoFormat;
         });
     });
+    options.layers = [];
+    pandora.site.layers.forEach(function(layer, i) { 
+        options.layers[i] = Ox.extend({}, layer, {items: data.layers[layer.id]}); 
+    });
     return options;
 };
 

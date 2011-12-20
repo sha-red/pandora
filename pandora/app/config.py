@@ -75,7 +75,7 @@ def update_static():
         for f in files:
             if f.endswith('.js') and len(f.split('.'))  == 2:
                 f = os.path.join(root, f)
-                fsite = f.replace('.js', '.%s.js' % settings.SITENAME)
+                fsite = f.replace('.js', '.%s.js' % settings.CONFIG['site']['id'])
                 if os.path.exists(fsite):
                     f = fsite
                 js.append(f[len(settings.STATIC_ROOT)+1:])

@@ -203,7 +203,6 @@ appPanel
             site: data.site,
             user: data.user
         });
-
         // make sure all valid ui settings are present
         pandora.user.ui = Ox.extend(
             Ox.clone(pandora.site.user.ui), pandora.user.ui

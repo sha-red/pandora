@@ -644,6 +644,7 @@
             "sidebarSize": 256,
             "theme": "modern",
             "videoPoints": {},
+            "videoResolution": 96,
             "videoScale": "fit",
             "videoMuted": false,
             "videoSize": "small",

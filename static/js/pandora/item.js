@@ -133,6 +133,7 @@ pandora.ui.item = function() {
                 muted: pandora.user.ui.videoMuted,
                 out: pandora.user.ui.videoPoints[pandora.user.ui.item].out,
                 position: pandora.user.ui.videoPoints[pandora.user.ui.item].position,
+                resolution: pandora.user.ui.videoResolution,
                 scaleToFill: pandora.user.ui.videoScale == 'fill',
                 showAnnotations: pandora.user.ui.showAnnotations,
                 showTimeline: pandora.user.ui.showTimeline,
@@ -161,6 +162,9 @@ pandora.ui.item = function() {
                 resizeannotations: function(data) {
                     pandora.UI.set('annotationsSize', data.annotationsSize);
                 },
+                resolution: function(data) {
+                    pandora.UI.set('videoResolution', data.resolution);
+                },
                 scale: function(data) {
                     pandora.UI.set('videoScale', data.scale);
                 },
@@ -185,7 +189,7 @@ pandora.ui.item = function() {
             pandora.$ui.contentPanel.replaceElement(1,
                 pandora.$ui.editor = Ox.VideoEditor({
                     annotationsSize: pandora.user.ui.annotationsSize,
-                    censored: censored,
+                    censored: videoOptions.censored,
                     cuts: result.data.cuts || [],
                     duration: result.data.duration,
                     find: pandora.user.ui.itemFind.conditions[0]
@@ -202,16 +206,17 @@ pandora.ui.item = function() {
                     height: pandora.$ui.contentPanel.size(1),
                     id: 'editor',
                     'in': pandora.user.ui.videoPoints[pandora.user.ui.item]['in'],
-                    layers: layers,
+                    layers: videoOptions.layers,
                     muted: pandora.user.ui.videoMuted,
                     out: pandora.user.ui.videoPoints[pandora.user.ui.item].out,
                     position: pandora.user.ui.videoPoints[pandora.user.ui.item].position,
-                    posterFrame: parseInt(video.duration / 2),
+                    posterFrame: parseInt(videoOptions.video.duration / 2),    
+                    resolution: pandora.user.ui.videoResolution,
                     showAnnotations: pandora.user.ui.showAnnotations,
                     showLargeTimeline: true,
-                    subtitles: subtitles,
+                    subtitles: videoOptions.subtitles,
                     tooltips: true,
-                    video: video,
+                    video: videoOptions.video,
                     videoRatio: result.data.videoRatio,
                     videoSize: pandora.user.ui.videoSize,
                     volume: pandora.user.ui.videoVolume,
@@ -246,6 +251,9 @@ pandora.ui.item = function() {
                     },
                     resizeend: function(data) {
                         pandora.UI.set({annotationsSize: data.size});
+                    },
+                    resolution: function(data) {
+                        pandora.UI.set('videoResolution', data.resolution);
                     },
                     togglesize: function(data) {
                         pandora.UI.set({videoSize: data.size});

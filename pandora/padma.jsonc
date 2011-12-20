@@ -42,12 +42,12 @@
     ],
     // fixme: either this, or filter: true in itemKeys, but not both
     "filters": [
+        {"id": "collection", "title": "Collection", "type": "string"},
+        {"id": "source", "title": "Source", "type": "string"},
         {"id": "director", "title": "Director", "type": "string"},
         {"id": "location", "title": "Location", "type": "string"},
         {"id": "year", "title": "Year", "type": "integer"},
         {"id": "language", "title": "Language", "type": "string"},
-        {"id": "source", "title": "Source", "type": "string"},
-        {"id": "collection", "title": "Collection", "type": "string"},
         {"id": "category", "title": "Category", "type": "string"},
         {"id": "writer", "title": "Writer", "type": "string"},
         {"id": "producer", "title": "Producer", "type": "string"},
@@ -488,6 +488,9 @@
         {"id": "size", "admin": true},
         {"id": "pixels"}
     ],
+    "tv": {
+        "showLogo": false
+    },
     "user": {
         "level": "guest",
         "ui": {
@@ -500,10 +503,10 @@
                 }
             },
             "filters": [
-                {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
-                {"id": "source", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "collection", "sort": [{"key": "name", "operator": "-"}]},
+                {"id": "source", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "category", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "keyword", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "location", "sort": [{"key": "items", "operator": "-"}]}
             ],
             "filtersSize": 176,
@@ -548,6 +551,7 @@
             "sidebarSize": 256,
             "theme": "classic",
             "videoPoints": {},
+            "videoResolution": 96,
             "videoScale": "fit",
             "videoMuted": false,
             "videoSize": "small",

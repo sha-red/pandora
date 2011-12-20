@@ -20,7 +20,7 @@ pandora.ui.tv = function() {
             list: pandora.user.ui._list
         }, function(result) {
             var videoOptions = pandora.getVideoOptions(result.data);
-            $player && player.remove();
+            $player && $player.remove();
             $player = Ox.VideoPlayer({
                     censored: videoOptions.censored,
                     controlsBottom: ['volume', 'scale', 'timeline', 'position', 'resolution'],
@@ -29,6 +29,7 @@ pandora.ui.tv = function() {
                     fullscreen: true,
                     logo: pandora.site.tv.showLogo ? '/static/png/logo256.png' : '',
                     position: result.data.position,
+                    resolution: pandora.user.ui.videoResolution,
                     scaleToFill: pandora.user.ui.videoScale == 'fill',
                     subtitles: videoOptions.subtitles,
                     tooltips: true,
@@ -45,10 +46,11 @@ pandora.ui.tv = function() {
                     volume: pandora.user.ui.videoVolume
                 })
                 .bindEvent({
-                    close: function() {
-                        
-                    },
-                    ended: play
+                    close: that.fadeOutScreen,
+                    ended: play,
+                    resolution: function(data) {
+                        pandora.UI.set('videoResolution', data.resolution);
+                    }
                 })
                 .appendTo(that);
         });
@@ -57,19 +59,27 @@ pandora.ui.tv = function() {
     that.fadeInScreen = function() {
         that.appendTo(Ox.UI.$body).animate({opacity: 1}, 500);
         play();
+        return that;
     };
 
     that.fadeOutScreen = function() {
-        
+        that.animate({opacity: 0}, 500, function() {
+            that.remove();
+        });
+        pandora.UI.set('page', '');
+        return that;
     };
 
     that.hideScreen = function() {
-        
+        that.remove();
+        pandora.UI.set('page', '');
+        return that;
     };
 
     that.showScreen = function() {
         that.css({opacity: 1}).appendTo(Ox.UI.$body);
         play();
+        return that;
     };
 
     return that;
