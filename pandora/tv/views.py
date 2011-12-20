@@ -4,7 +4,7 @@ from __future__ import division
 
 import models
 from ox.utils import json
-from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
+from ox.django.shortcuts import render_to_json_response, json_response
 
 from itemlist.views import get_list_or_404_json
 from api.actions import actions
