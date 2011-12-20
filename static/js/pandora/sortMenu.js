@@ -4,9 +4,9 @@
 
 pandora.ui.sortMenu = function() {
 
-    // fixme: unused
+    // FIXME: unused
 
-    var that = Ox.Select({
+    var that = Ox.MenuButton({
             items: Ox.merge(
                 pandora.site.clipKeys.map(function(key) {
                     return Ox.extend(Ox.clone(key), {
@@ -21,7 +21,6 @@ pandora.ui.sortMenu = function() {
                     {id: 'descending', title: 'Descending', checked: pandora.user.ui.itemSort[0].operator == '-'}
                 ]
             ),
-            selectable: false,
             tooltip: 'Sort clips',
             type: 'image'
         })

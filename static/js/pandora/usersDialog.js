@@ -609,13 +609,12 @@ pandora.ui.usersDialog = function() {
                     .bindEvent({
                         change: setSend
                     }),
-                Ox.Select({
+                Ox.MenuButton({
                         id: 'insert',
                         items: [
                             {id: 'username', title: 'Username'},
                             {id: 'email', title: 'E-Mail address'},
                         ],
-                        selectable: false,
                         title: 'Insert...',
                         width: formWidth - 16
                     })

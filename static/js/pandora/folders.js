@@ -28,7 +28,7 @@ pandora.ui.folders = function() {
                     ];
                 } else {
                     extras = [
-                        pandora.$ui.personalListsSelect = Ox.Select({
+                        pandora.$ui.personalListsSelect = Ox.MenuButton({
                             items: [
                                 { id: 'newlist', title: 'New List' },
                                 { id: 'newlistfromselection', title: 'New List from Selection...', disabled: ui.listSelection.length == 0 },
@@ -39,8 +39,7 @@ pandora.ui.folders = function() {
                                 { id: 'editlist', title: 'Edit Selected List...', disabled: !pandora.user.ui._list },
                                 { id: 'deletelist', title: 'Delete Selected List...', disabled: !pandora.user.ui._list }
                             ],
-                            selectable: false,
-                            title: 'set', // FIXME: why does this work in VideoEditor, but not here?
+                            title: 'set',
                             tooltip: 'Manage Personal Lists',
                             type: 'image'
                         })
@@ -183,7 +182,7 @@ pandora.ui.folders = function() {
                 if (pandora.user.level == 'guest') {
                     extras = [infoButton('Local Volumes', 'To import movies from a local disk, please sign up or sign in.')];
                 } else {
-                    extras = [Ox.Select({
+                    extras = [Ox.MenuButton({
                         items: [
                             { id: 'add', title: 'Add Volume...', disabled: true },
                             { id: 'scan', title: 'Scan Selected Volume...', disabled: true },
@@ -191,9 +190,8 @@ pandora.ui.folders = function() {
                             {},
                             { id: 'import', title: 'Import Movies...', disabled: true }
                         ],
-                        max: 0,
-                        min: 0,
-                        selectable: false,
+                        title: 'set',
+                        tooltip: 'Manage Volumes',
                         type: 'image'
                     })
                     .bindEvent({
