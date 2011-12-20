@@ -113,15 +113,6 @@ actions.register(update, cache=False)
 
 
 @login_required_json
-def encodingProfile(request):
-    config = settings.CONFIG['video']
-    profile = "%sp.%s" % (config['resolutions'][0], config['formats'][0])
-    response = json_response({'profile': profile})
-    return render_to_json_response(response)
-actions.register(encodingProfile)
-
-
-@login_required_json
 def upload(request):
     '''
         id: string
