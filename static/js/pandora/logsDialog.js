@@ -19,11 +19,11 @@ pandora.ui.logsDialog = function() {
             })
             .bindEvent({
                 change: function(data) {
-                    var key = data.selected[0].id,
+                    var key = data.value,
                         value = $findInput.value();
                     value && updateList(key, value);
                     $findInput.options({
-                        placeholder: data.selected[0].title
+                        placeholder: data.title
                     });
                 }
             }),

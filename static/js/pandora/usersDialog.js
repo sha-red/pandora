@@ -31,7 +31,7 @@ pandora.ui.usersDialog = function() {
                 change: function(data) {
                     $findInput.value() && updateList();
                     $findInput.options({
-                        placeholder: data.selected[0].title
+                        placeholder: data.title
                     });
                 }
             }),
@@ -537,11 +537,11 @@ pandora.ui.usersDialog = function() {
             change: function(event) {
                 var data = {id: user.id}, key, value;
                 if (event.id == 'status') {
-                    data.disabled = !event.data.checked;
+                    data.disabled = !event.data.value;
                 } else if (event.id == 'level') {
-                    data.level = event.data.selected[0].id;
+                    data.level = event.data.value;
                 } else if (event.id == 'newsletter') {
-                    data.newsletter = event.data.checked;
+                    data.newsletter = event.data.value;
                 } else {
                     data[event.id] = event.data.value;
                 }
@@ -622,12 +622,12 @@ pandora.ui.usersDialog = function() {
                         click: function(data) {
                             var $input = getFormItemById('message'),
                                 textarea = $input.find('textarea')[0],
-                                value = $input.options('value');
-                            $input.options({
-                                    value: value.substr(0, textarea.selectionStart)
-                                        + '{' + data.id + '}'
-                                        + value.substr(textarea.selectionEnd)
-                                })
+                                value = $input.value();
+                            $input.value(
+                                    value.substr(0, textarea.selectionStart)
+                                    + '{' + data.id + '}'
+                                    + value.substr(textarea.selectionEnd)
+                                )
                                 .focusInput(textarea.selectionStart + data.id.length + 2);                           
                         }
                     }),
@@ -654,7 +654,7 @@ pandora.ui.usersDialog = function() {
 
     function selectForm(data) {
         var selected;
-        if (data.selected[0] == 'edit') {
+        if (data.value == 'edit') {
             $mailForm.detach();
             selected = $list.options('selected');
             if (selected.length == 1 && selected[0].level != 'guest') {
@@ -690,8 +690,8 @@ pandora.ui.usersDialog = function() {
     function sendMail() {
         pandora.api.mail({
             to: getTo(),
-            subject: getFormItemById('subject').options('value'),
-            message: getFormItemById('message').options('value'),
+            subject: getFormItemById('subject').value(),
+            message: getFormItemById('message').value(),
             receipt: getFormItemById('receipt').value()
         }, function(result) {
             var title = result.status.code == 200
@@ -734,7 +734,7 @@ pandora.ui.usersDialog = function() {
     }
 
     function setHeight(data) {
-        var form = $formButton.options('value'),
+        var form = $formButton.value(),
             $item = getFormItemById(form == 'edit' ? 'notes' : 'message');
         Ox.print('$ITEM', $item)
         dialogHeight = data.height;
@@ -759,9 +759,9 @@ pandora.ui.usersDialog = function() {
 
     function setSend() {
         getFormItemById('send').options({
-            disabled: getFormItemById('to').options('value') == 'No recipients'
-                || getFormItemById('subject').options('value') === ''
-                || getFormItemById('message').options('value') === ''
+            disabled: getFormItemById('to').value() == 'No recipients'
+                || getFormItemById('subject').value() === ''
+                || getFormItemById('message').value() === ''
         }); 
     }
 

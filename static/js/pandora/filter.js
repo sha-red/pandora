@@ -171,7 +171,7 @@ pandora.ui.filter = function(id) {
         .bindEvent('change', function(data) {
             var filters = Ox.clone(pandora.user.ui.filters),
                 find,
-                id_ = data.selected[0].id,
+                id_ = data.value,
                 i_ = Ox.getPositionById(pandora.user.ui.filters, id_);
             if (i_ == -1) {
                 // new filter was not part of old filter set

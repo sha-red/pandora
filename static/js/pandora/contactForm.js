@@ -83,7 +83,7 @@ pandora.ui.contactForm = function() {
         .bindEvent({
             change: function(data) {
                 $receiptCheckbox.options({
-                    title: data.checked
+                    title: data.value
                         ? 'Send a receipt to ' + pandora.user.email
                         : 'Don\'t send me a receipt'
                 });

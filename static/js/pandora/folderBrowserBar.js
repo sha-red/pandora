@@ -7,36 +7,36 @@ pandora.ui.folderBrowserBar = function(id) {
     pandora.$ui.findListElement[id] = Ox.FormElementGroup({
             elements: [
                 pandora.$ui.findListSelect[id] = Ox.Select({
-                    items: [
-                        {id: 'user', title: 'Find: User', checked: true},
-                        {id: 'list', title: 'Find: List'}
-                    ],
-                    overlap: 'right',
-                    type: 'image'
-                })
-                .bindEvent({
-                    change: function(data) {
-                        var key = data.selected[0].id == 'user' ? 'user' : 'name',
-                            value = pandora.$ui.findListInput[id].value();
-                        value && updateList(key, value);
-                        pandora.$ui.findListInput[id].options({
-                            placeholder: data.selected[0].title
-                        });
-                    }
-                }),
+                        items: [
+                            {id: 'user', title: 'Find: User', checked: true},
+                            {id: 'list', title: 'Find: List'}
+                        ],
+                        overlap: 'right',
+                        type: 'image'
+                    })
+                    .bindEvent({
+                        change: function(data) {
+                            var key = data.value == 'user' ? 'user' : 'name',
+                                value = pandora.$ui.findListInput[id].value();
+                            value && updateList(key, value);
+                            pandora.$ui.findListInput[id].options({
+                                placeholder: data.title
+                            });
+                        }
+                    }),
                 pandora.$ui.findListInput[id] = Ox.Input({
-                    changeOnKeypress: true,
-                    clear: true,
-                    placeholder: 'Find: User',
-                    width: pandora.getFoldersWidth() - 24
-                })
-                .bindEvent({
-                    change: function(data) {
-                        var key = pandora.$ui.findListSelect[id].value() == 'user' ? 'user' : 'name',
-                            value = data.value;
-                        updateList(key, value);
-                    }
-                })
+                        changeOnKeypress: true,
+                        clear: true,
+                        placeholder: 'Find: User',
+                        width: pandora.getFoldersWidth() - 24
+                    })
+                    .bindEvent({
+                        change: function(data) {
+                            var key = pandora.$ui.findListSelect[id].value() == 'user' ? 'user' : 'name',
+                                value = data.value;
+                            updateList(key, value);
+                        }
+                    })
             ],
         })
         .css({

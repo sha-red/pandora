@@ -15,7 +15,7 @@ pandora.ui.sectionButtons = function() {
         })
         .bindEvent({
             change: function(data) {
-                var section = data.selected[0];
+                var section = data.value;
                 if (section == 'items') {
                     pandora.URL.set(pandora.Query.toString());
                 } else if (section == 'clips') {

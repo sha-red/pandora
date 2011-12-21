@@ -284,11 +284,10 @@ pandora.ui.accountForm = function(action, value) {
                         })
                         .bindEvent({
                             change: function(data) {
-                                var selected = data.selected[0].id;
                                 pandora.$ui.usernameOrEmailInput.options({
-                                    autovalidate: selected == 'username'
+                                    autovalidate: data.value == 'username'
                                         ? pandora.autovalidateUsername : pandora.autovalidateEmail,
-                                    validate: pandora.validateUser(selected, true),
+                                    validate: pandora.validateUser(data.value, true),
                                     value: ''
                                 }).focusInput(true);
                                 that.$element.find('.OxFormMessage:visible').html('').hide();

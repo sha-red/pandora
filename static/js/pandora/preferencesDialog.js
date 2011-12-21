@@ -97,7 +97,7 @@ pandora.ui.preferencesDialog = function() {
                                     this.options({
                                         title: this.options('title') == 'Subscribed' ? 'Unsubscribed' : 'Subscribed'
                                     });
-                                    pandora.user.newsletter = data.checked;
+                                    pandora.user.newsletter = data.value;
                                     pandora.api.editPreferences({
                                         newsletter: pandora.user.newsletter 
                                     });

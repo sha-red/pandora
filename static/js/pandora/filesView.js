@@ -271,7 +271,7 @@ pandora.ui.filesView = function(options, self) {
                         conditions = [{key: 'id', value: data.value, operator: '=='}]
                     } else {
                         conditions = Ox.map(['title', 'director', 'year'], function(key) {
-                            var value = self['$' + key + 'Input'].options('value')
+                            var value = self['$' + key + 'Input'].value()
                             return value.length ? {key: key, value: value, operator: '='} : null;
                         });
                     }
@@ -286,7 +286,7 @@ pandora.ui.filesView = function(options, self) {
                     */
                     conditions = {};
                     Ox.map(['id', 'title', 'director', 'year'], function(key) {
-                        var value = self['$' + key + 'Input'].options('value');
+                        var value = self['$' + key + 'Input'].value();
                         if(value.length) {
                             conditions[key] = key == 'director' ? value.split(', ') : value;
                         }
@@ -295,18 +295,18 @@ pandora.ui.filesView = function(options, self) {
                         var length = result.data.items.length;
                         if (length == 0) {
                             if (key != 'id') {
-                                self.$idInput.options({value: ''});
+                                self.$idInput.value('');
                             }
                         } else if (result.data.items.length == 1) {
                             ['title', 'director', 'year', 'id'].forEach(function(key) {
-                                self['$' + key + 'Input'].options({
-                                    value: key == 'director'
+                                self['$' + key + 'Input'].value(
+                                    key == 'director'
                                         ? result.data.items[0][key].join(', ')
                                         : result.data.items[0][key]
-                                });
+                                );
                             });
                         } else {
-                            self.$idInput.options({value: ''});
+                            self.$idInput.value('');
                         }
                     });
                 }
@@ -343,7 +343,7 @@ pandora.ui.filesView = function(options, self) {
         .bindEvent({
             click: function() {
                 ['title', 'director', 'year', 'id'].forEach(function(key) {
-                    self['$' + key + 'Input'].options({value: ''})
+                    self['$' + key + 'Input'].value('');
                 });
             }
         });
@@ -421,11 +421,11 @@ pandora.ui.filesView = function(options, self) {
         }, function(result) {
             ['title', 'director', 'year'].forEach(function(key) {
                 if (result.data[key]) {
-                    self['$' + key + 'Input'].options({
-                        value: key == 'director'
+                    self['$' + key + 'Input'].value(
+                        key == 'director'
                             ? result.data[key].join(', ')
                             : result.data[key]
-                    });
+                    );
                 }
             });
             updateForm();

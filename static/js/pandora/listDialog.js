@@ -55,7 +55,7 @@ pandora.ui.listDialog = function(section) {
                 .bindEvent({
                     change: function(data) {
                         pandora.$ui.findIconItemInput.options({
-                            placeholder: data.selected[0].title
+                            placeholder: data.title
                         });
                         // fixme: this is a bit weird
                         setTimeout(function() {
@@ -247,13 +247,13 @@ pandora.ui.listGeneralPanel = function(listData) {
             }
         }
         function editStatus(data) {
-            var status = data.selected[0].id;
+            var status = data.value;
             $statusSelect.value(status == 'private' ? 'public' : 'private');
             pandora.changeListStatus(listData.id, status, function(result) {
                 listData.status = result.data.status;
                 if (result.data.status == 'private') {
                     subscribers = 0;
-                    $subscribersInput.options({value: 0});
+                    $subscribersInput.value(0);
                 }
                 $statusSelect.value(result.data.status);
                 $subscribersInput[getSubscribersAction()]();

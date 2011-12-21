@@ -162,7 +162,7 @@ pandora.ui.mainMenu = function() {
                         that.checkItem('allitems');
                     }
                 } else if (data.id == 'find') {
-                    pandora.$ui.findSelect.options({value: value});
+                    pandora.$ui.findSelect.value(value);
                 } else if (data.id == 'itemview') {
                     pandora.UI.set({itemView: value});
                 } else if (Ox.startsWith(data.id, 'orderfilter')) {

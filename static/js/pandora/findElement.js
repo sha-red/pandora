@@ -16,7 +16,6 @@ pandora.ui.findElement = function() {
                         })
                         .bindEvent({
                             change: function(data) {
-                                var key = data.selected[0].id;
                                 pandora.$ui.findInput.options({
                                     autocomplete: autocompleteFunction()
                                 }).focusInput(true);
@@ -46,8 +45,7 @@ pandora.ui.findElement = function() {
                         })
                         .bindEvent({
                             change: function(data) {
-                                var key = data.selected[0].id;
-                                if (key == 'advanced') {
+                                if (data.value == 'advanced') {
                                     that.update();
                                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                                 } else {

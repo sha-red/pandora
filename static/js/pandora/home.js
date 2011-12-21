@@ -107,8 +107,8 @@ pandora.ui.home = function() {
                     var folder = pandora.getListData().folder,
                         value = $findInput.value();
                     folder && pandora.$ui.folderList[folder].options({selected: []});
-                    pandora.$ui.findSelect.options({value: '*'});
-                    pandora.$ui.findInput.options({value: value});
+                    pandora.$ui.findSelect.value('*');
+                    pandora.$ui.findInput.value(value);
                     that.fadeOutScreen();
                     pandora.UI.set('find', {
                         conditions: value === ''

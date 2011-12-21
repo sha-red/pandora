@@ -28,29 +28,29 @@ pandora.ui.sortSelect = function(isNavigationView) {
         }));
     }
     that = Ox.Select({
-        id: 'sortSelect',
-        items: items,
-        width: isNavigationView ? 128 : 144
-    })
-    .css({
-        float: isNavigationView ? 'right' : 'left',
-        margin: isNavigationView ? '4px 4px 0 0' : '4px 0 0 4px'
-    })
-    .bindEvent({
-        change: function(data) {
-            var key = data.selected[0].id;
-            pandora.UI.set(sortKey, [{
-                key: key,
-                operator: pandora.getSortOperator(key)
-            }]);
-        },
-        pandora_listsort: function(data) {
-            that.selectItem(data.value[0].key);
-        },
-        pandora_itemsort: function(data) {
-            that.selectItem(data.value[0].key);
-        }
-    });
+            id: 'sortSelect',
+            items: items,
+            width: isNavigationView ? 128 : 144
+        })
+        .css({
+            float: isNavigationView ? 'right' : 'left',
+            margin: isNavigationView ? '4px 4px 0 0' : '4px 0 0 4px'
+        })
+        .bindEvent({
+            change: function(data) {
+                var key = data.value;
+                pandora.UI.set(sortKey, [{
+                    key: key,
+                    operator: pandora.getSortOperator(key)
+                }]);
+            },
+            pandora_listsort: function(data) {
+                that.selectItem(data.value[0].key);
+            },
+            pandora_itemsort: function(data) {
+                that.selectItem(data.value[0].key);
+            }
+        });
     return that;
 };
 
