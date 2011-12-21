@@ -110,11 +110,14 @@ pandora.ui.home = function() {
                     pandora.$ui.findSelect.value('*');
                     pandora.$ui.findInput.value(value);
                     that.fadeOutScreen();
-                    pandora.UI.set('find', {
-                        conditions: value === ''
-                            ? []
-                            : [{key: '*', value: value, operator: '='}],
-                        operator: '&'
+                    pandora.UI.set({
+                        page: '',
+                        find: {
+                            conditions: value === ''
+                                ? []
+                                : [{key: '*', value: value, operator: '='}],
+                            operator: '&'
+                        }
                     });
                 }
             })
