@@ -23,9 +23,10 @@ pandora.ui.tv = function() {
             $player && $player.remove();
             $player = Ox.VideoPlayer({
                     censored: videoOptions.censored,
-                    controlsBottom: ['volume', 'scale', 'timeline', 'position', 'resolution'],
+                    controlsBottom: ['volume', 'scale', 'timeline', 'position', 'settings'],
                     controlsTop: ['close', 'title'],
                     duration: result.data.duration,
+                    enableSubtitles: pandora.user.ui.videoSubtitles,
                     fullscreen: true,
                     logo: pandora.site.tv.showLogo ? '/static/png/logo256.png' : '',
                     position: result.data.position,
@@ -48,9 +49,23 @@ pandora.ui.tv = function() {
                 .bindEvent({
                     close: that.fadeOutScreen,
                     ended: play,
+                    muted: function(data) {
+                        pandora.UI.set('videoMuted', data.muted);
+                    },
                     resolution: function(data) {
                         pandora.UI.set('videoResolution', data.resolution);
-                    }
+                    },
+                    scale: function(data) {
+                        pandora.UI.set('videoScale', data.scale);
+                    },
+                    subtitles: function(data) {
+                        pandora.UI.set('videoSubtitles', data.subtitles);
+                    },
+                    volume: function(data) {
+                        pandora.UI.set('videoVolume', data.volume);
+                    },
+                    // FIXME: does not work
+                    key_escape: that.fadeOutScreen
                 })
                 .appendTo(that);
         });

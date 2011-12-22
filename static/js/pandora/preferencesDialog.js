@@ -4,7 +4,7 @@ pandora.ui.preferencesDialog = function() {
 
     var tabs = [
         {id: 'account', title: 'Account', selected: true},
-        {id: 'settings', title: 'Settings'}
+        {id: 'advanced', title: 'Advanced'}
     ];
     var $tabPanel = Ox.TabPanel({
             content: function(id) {
@@ -65,50 +65,36 @@ pandora.ui.preferencesDialog = function() {
                                     labelWidth: 120,
                                     value: Ox.toTitleCase(pandora.user.level),
                                     width: 320
-                                })
+                                }),
+                                Ox.Checkbox({
+                                        id: 'newsletter',
+                                        label: 'Newsletter',
+                                        labelWidth: 120,
+                                        title: pandora.user.newsletter ? 'Subscribed' : 'Unsubscribed',
+                                        value: pandora.user.newsletter,
+                                        width: 320
+                                    })
+                                    .bindEvent({
+                                        change: function(data) {
+                                            pandora.user.newsletter = data.value;
+                                            this.options({
+                                                title: pandora.user.newsletter ? 'Subscribed' : 'Unsubscribed'
+                                            });
+                                            pandora.api.editPreferences({
+                                                newsletter: pandora.user.newsletter 
+                                            });
+                                        }
+                                    })
+                                
                             ]
                         })
                         .css({position: 'absolute', left: '96px', top: '16px'})
-                        .bindEvent({
-                            change: function(data) {
-                                return;
-                                var preferences = {};
-                                preferences[data.id] = data.data.value;
-                                pandora.api.editPreferences(preferences, function(result) {
-                                    if (data.id == 'email') {
-                                        pandora.user.email = data.data.value;
-                                    }
-                                });
-                            }
-                        })
                     );
                 } else {
                     $content.append(
-                        Ox.Checkbox({
-                                checked: pandora.user.newsletter,
-                                id: 'newsletter',
-                                label: 'Newsletter',
-                                labelWidth: 80,
-                                title: pandora.user.newsletter ? 'Subscribed' : 'Unsubscribed',
-                                width: 240
-                            })
-                            .bindEvent({
-                                change: function(data) {
-                                    this.options({
-                                        title: this.options('title') == 'Subscribed' ? 'Unsubscribed' : 'Subscribed'
-                                    });
-                                    pandora.user.newsletter = data.value;
-                                    pandora.api.editPreferences({
-                                        newsletter: pandora.user.newsletter 
-                                    });
-                                }
-                            })
-                            .css({position: 'absolute', left: '96px', top: '16px'})
-                    );
-                    $content.append(
                         Ox.Button({
                             title: 'Reset UI Settings',
-                            width: 150
+                            width: 120
                         })
                         .bindEvent({
                             click: function() {
@@ -116,7 +102,7 @@ pandora.ui.preferencesDialog = function() {
                                 pandora.$ui.appPanel.reload();
                             }
                         })
-                        .css({position: 'absolute', left: '96px', top: '46px'})
+                        .css({position: 'absolute', left: '96px', top: '16px'})
                     );
                 }
                 return $content;

@@ -8,15 +8,15 @@ pandora.ui.folderBrowserBar = function(id) {
             elements: [
                 pandora.$ui.findListSelect[id] = Ox.Select({
                         items: [
-                            {id: 'user', title: 'Find: User', checked: true},
-                            {id: 'list', title: 'Find: List'}
+                            {id: 'user', title: 'Find: User'},
+                            {id: 'name', title: 'Find: List'}
                         ],
                         overlap: 'right',
                         type: 'image'
                     })
                     .bindEvent({
                         change: function(data) {
-                            var key = data.value == 'user' ? 'user' : 'name',
+                            var key = data.value,
                                 value = pandora.$ui.findListInput[id].value();
                             value && updateList(key, value);
                             pandora.$ui.findListInput[id].options({
@@ -32,7 +32,7 @@ pandora.ui.folderBrowserBar = function(id) {
                     })
                     .bindEvent({
                         change: function(data) {
-                            var key = pandora.$ui.findListSelect[id].value() == 'user' ? 'user' : 'name',
+                            var key = pandora.$ui.findListSelect[id].value(),
                                 value = data.value;
                             updateList(key, value);
                         }

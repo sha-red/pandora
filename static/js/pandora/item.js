@@ -123,6 +123,7 @@ pandora.ui.item = function() {
                 censored: videoOptions.censored,
                 cuts: result.data.cuts || [],
                 duration: result.data.duration,
+                enableSubtitles: pandora.user.ui.videoSubtitles,
                 find: pandora.user.ui.itemFind.conditions[0]
                     ? pandora.user.ui.itemFind.conditions[0].value : '',
                 getTimelineImageURL: function(i) {
@@ -168,6 +169,9 @@ pandora.ui.item = function() {
                 scale: function(data) {
                     pandora.UI.set('videoScale', data.scale);
                 },
+                subtitles: function(data) {
+                    pandora.UI.set('videoSubtitles', data.subtitles);
+                },
                 toggleannotations: function(data) {
                     pandora.UI.set('showAnnotations', data.showAnnotations);
                 },
@@ -192,6 +196,7 @@ pandora.ui.item = function() {
                     censored: videoOptions.censored,
                     cuts: result.data.cuts || [],
                     duration: result.data.duration,
+                    enableSubtitles: pandora.user.ui.videoSubtitles,
                     find: pandora.user.ui.itemFind.conditions[0]
                         ? pandora.user.ui.itemFind.conditions[0].value : '',
                     getFrameURL: function(position) {
@@ -254,6 +259,9 @@ pandora.ui.item = function() {
                     },
                     resolution: function(data) {
                         pandora.UI.set('videoResolution', data.resolution);
+                    },
+                    subtitles: function(data) {
+                        pandora.UI.set('videoSubtitles', data.subtitles);
                     },
                     togglesize: function(data) {
                         pandora.UI.set({videoSize: data.size});

@@ -228,7 +228,7 @@ pandora.ui.mainMenu = function() {
             click: function(data) {
                 if ([
                     'home', 'about', 'news', 'tour', 'faq', 'terms', 'rights', 'contact', 'software',
-                    'signup', 'signin', 'signout', 'preferences', 'help'
+                    'signup', 'signin', 'signout', 'preferences', 'tv', 'help'
                 ].indexOf(data.id) > -1) {
                     pandora.UI.set({page: data.id});
                 } else if ([
@@ -330,6 +330,11 @@ pandora.ui.mainMenu = function() {
             key_control_slash: function() {
                 if (!pandora.hasDialogOrScreen()) {
                     pandora.UI.set({page: 'help'});
+                }
+            },
+            key_control_space: function() {
+                if (!pandora.hasDialogOrScreen()) {
+                    pandora.UI.set({page: 'tv'});
                 }
             },
             key_control_w: function() {
@@ -461,6 +466,8 @@ pandora.ui.mainMenu = function() {
                 { id: 'duplicatelist', title: 'Duplicate Selected List', disabled: isGuest || !pandora.user.ui._list, keyboard: 'control d' },
                 { id: 'editlist', title: 'Edit Selected List...', disabled: isGuest || !pandora.user.ui._list, keyboard: 'control e' },
                 { id: 'deletelist', title: 'Delete Selected List...', disabled: isGuest || !pandora.user.ui._list, keyboard: 'delete' },
+                {},
+                { id: 'tv', title: 'TV', keyboard: 'control space' }
             ]
         )};
     };

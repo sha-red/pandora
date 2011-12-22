@@ -10,8 +10,8 @@ pandora.ui.usersDialog = function() {
         numberOfUsers = 0,
 
         $guestsCheckbox = Ox.Checkbox({
-                checked: true,
-                title: 'Show Guests'
+                title: 'Show Guests',
+                value: true
             })
             .css({float: 'left', margin: '4px'})
             .bindEvent({
@@ -20,7 +20,7 @@ pandora.ui.usersDialog = function() {
 
         $findSelect = Ox.Select({
                 items: [
-                    {id: 'all', title: 'Find: All', checked: true},
+                    {id: 'all', title: 'Find: All'},
                     {id: 'username', title: 'Find: Username'},
                     {id: 'email', title: 'Find: E-Mail-Address'}
                 ],
@@ -453,11 +453,11 @@ pandora.ui.usersDialog = function() {
         return Ox.Form({
             items: [
                 Ox.Checkbox({
-                        checked: !user.disabled,
                         id: 'status',
                         label: 'Status',
                         labelWidth: 80,
                         title: !user.disabled ? 'Enabled' : 'Disabled',
+                        value: !user.disabled,
                         width: formWidth - 16
                     })
                     .bindEvent({
@@ -496,21 +496,21 @@ pandora.ui.usersDialog = function() {
                     id: 'level',
                     items: Ox.map(pandora.site.userLevels, function(level, i) {
                         return i ? {
-                            checked: level == user.level,
                             id: level,
                             title: Ox.toTitleCase(level)
                         } : null;
                     }),
                     label: 'Level',
                     labelWidth: 80,
+                    value: user.level,
                     width: formWidth - 16
                 }),
                 Ox.Checkbox({
-                        checked: user.newsletter,
                         id: 'newsletter',
                         label: 'Newsletter',
                         labelWidth: 80,
                         title: user.newsletter ? 'Subscribed' : 'Unsubscribed',
+                        value: user.newsletter,
                         width: formWidth - 16
                     })
                     .bindEvent({
@@ -632,9 +632,9 @@ pandora.ui.usersDialog = function() {
                         }
                     }),
                 Ox.Checkbox({
-                    checked: false,
                     id: 'receipt',
                     title: 'Send a receipt to ' + pandora.user.email,
+                    value: false,
                     width: formWidth - 16
                 }),
                 Ox.Button({

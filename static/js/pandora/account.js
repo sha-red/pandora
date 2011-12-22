@@ -73,7 +73,7 @@ pandora.ui.accountDialogOptions = function(action, value) {
                 id: type,
                 title: buttonTitle[type] + '...'
             }).bindEvent('click', function() {
-                if (['signin', 'signup'].indexOf(type) > -1) {
+                if (['signin', 'signup'].indexOf(type) > -1 && type != pandora.user.ui.page) {
                     pandora.UI.set({page: type});
                 } else {
                     pandora.$ui.accountDialog.options(pandora.ui.accountDialogOptions(type));

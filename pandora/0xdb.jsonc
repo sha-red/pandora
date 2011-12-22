@@ -586,6 +586,7 @@
     },
     "user": {
         "level": "guest",
+        "newsletter": true,
         "ui": {
             "annotationsSize": 256,
             "clipsColumns": 2,
@@ -648,6 +649,7 @@
             "videoScale": "fit",
             "videoMuted": false,
             "videoSize": "small",
+            "videoSubtitles": true,
             "videoView": "video",
             "videoVolume": 1
         },
