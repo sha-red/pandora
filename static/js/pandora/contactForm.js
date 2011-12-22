@@ -66,9 +66,7 @@ pandora.ui.contactForm = function() {
         .css({width: width + 'px'})
         .bindEvent({
             validate: function(data) {
-                $sendButton.options({
-                    disabled: !data.valid
-                });
+                $sendButton.options({disabled: !data.valid});
             }
         })
         .appendTo(that),

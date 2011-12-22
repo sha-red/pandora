@@ -3,12 +3,13 @@
 pandora.ui.sectionButtons = function() {
     var that = Ox.ButtonGroup({
             buttons: [
-                {id: 'items', selected: pandora.user.ui.section == 'items', title: pandora.site.itemName.plural},
-                {id: 'edits', selected: pandora.user.ui.section == 'edits', title: 'Edits', disabled: true},
-                {id: 'texts', selected: pandora.user.ui.section == 'texts', title: 'Texts', disabled: true}
+                {id: 'items', title: pandora.site.itemName.plural},
+                {id: 'edits', title: 'Edits', disabled: true},
+                {id: 'texts', title: 'Texts', disabled: true}
             ],
             id: 'sectionButtons',
-            selectable: true
+            selectable: true,
+            value: pandora.user.ui.section
         }).css({
             float: 'left',
             margin: '4px'

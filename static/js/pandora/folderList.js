@@ -279,7 +279,7 @@ pandora.ui.folderList = function(id) {
                 } else if (id == 'favorite' || (id == 'featured' && pandora.user.level == 'admin')) {
                     // this makes the button trigger a change event,
                     // which is already being handled in folders.js
-                    pandora.$ui.manageListsButton[id].options({selected: true});
+                    pandora.$ui.manageListsButton[id].options({value: true});
                     /*
                     if (!pandora.site.sectionFolders.items[i].showBrowser) {
                         pandora.site.sectionFolders.items[i].showBrowser = true;

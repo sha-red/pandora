@@ -3,7 +3,7 @@
 pandora.ui.allItems = function() {
 
     var that = Ox.Element()
-        .addClass('OxSelectable' + (pandora.user.ui._list ? '' : ' OxSelected'))
+        .addClass('OxSelectableElement' + (pandora.user.ui._list ? '' : ' OxSelected'))
         .css({
             height: '16px',
             cursor: 'default',
