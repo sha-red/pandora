@@ -13,11 +13,11 @@ pandora.ui.viewSelect = function() {
                         || ['data', 'files'].indexOf(view.id) == -1
                         || pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level]
                         ? Ox.extend(Ox.clone(view), {
-                            checked: view.id == ui[viewKey],
                             title: 'View ' + view.title
                         })
                         : null;
                 }),
+                value: ui[viewKey],
                 width: !ui.item ? 144 : 128
             })
             .css({
@@ -29,10 +29,10 @@ pandora.ui.viewSelect = function() {
                     pandora.UI.set(viewKey, data.value);
                 },
                 pandora_listview: function(data) {
-                    that.selectItem(data.value);
+                    that.value(data.value);
                 },
                 pandora_itemview: function(data) {
-                    that.selectItem(data.value);
+                    that.value(data.value);
                 }
             });
     return that;

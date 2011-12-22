@@ -21,7 +21,6 @@ pandora.ui.sortSelect = function(isNavigationView) {
         items = Ox.merge(items, Ox.map(pandora.site.sortKeys, function(key) {
             return Ox.getPositionById(items, key.id) == -1
                 ? Ox.extend(Ox.clone(key), {
-                    checked: key.id == pandora.user.ui[sortKey][0].key,
                     title: 'Sort by ' + key.title
                 })
                 : null;
@@ -30,6 +29,7 @@ pandora.ui.sortSelect = function(isNavigationView) {
     that = Ox.Select({
             id: 'sortSelect',
             items: items,
+            value: pandora.user.ui[sortKey][0].key,
             width: isNavigationView ? 128 : 144
         })
         .css({
@@ -45,10 +45,10 @@ pandora.ui.sortSelect = function(isNavigationView) {
                 }]);
             },
             pandora_listsort: function(data) {
-                that.selectItem(data.value[0].key);
+                that.value(data.value[0].key);
             },
             pandora_itemsort: function(data) {
-                that.selectItem(data.value[0].key);
+                that.value(data.value[0].key);
             }
         });
     return that;

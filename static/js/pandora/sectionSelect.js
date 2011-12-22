@@ -5,10 +5,11 @@ pandora.ui.sectionSelect = function() {
     var that = Ox.Select({
             id: 'sectionSelect',
             items: [
-                {checked: pandora.user.ui.section == 'items', id: 'items', title: pandora.site.itemName.plural},
-                {checked: pandora.user.ui.section == 'edits', id: 'edits', title: 'Edits', disabled: true},
-                {checked: pandora.user.ui.section == 'texts', id: 'texts', title: 'Texts', disabled: true}
-            ]
+                {id: 'items', title: pandora.site.itemName.plural},
+                {id: 'edits', title: 'Edits', disabled: true},
+                {id: 'texts', title: 'Texts', disabled: true}
+            ],
+            value: pandora.user.ui.section
         }).css({
             float: 'left',
             margin: '4px'

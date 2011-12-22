@@ -31,7 +31,6 @@ pandora.ui.findElement = function() {
                                     ? {
                                         id: key.id,
                                         title: 'Find: ' + key.title,
-                                        checked: findKey == key.id
                                     } : null;
                                 }),
                                 [{}, {
@@ -41,6 +40,7 @@ pandora.ui.findElement = function() {
                                 }]
                             ),
                             overlap: 'right',
+                            value: findKey,
                             width: 112
                         })
                         .bindEvent({

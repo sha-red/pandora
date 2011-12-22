@@ -39,7 +39,7 @@ pandora.ui.folders = function() {
                                 { id: 'editlist', title: 'Edit Selected List...', disabled: !pandora.user.ui._list },
                                 { id: 'deletelist', title: 'Delete Selected List...', disabled: !pandora.user.ui._list }
                             ],
-                            title: 'set',
+                            title: 'edit',
                             tooltip: 'Manage Personal Lists',
                             type: 'image'
                         })
@@ -190,7 +190,7 @@ pandora.ui.folders = function() {
                             {},
                             { id: 'import', title: 'Import Movies...', disabled: true }
                         ],
-                        title: 'set',
+                        title: 'edit',
                         tooltip: 'Manage Volumes',
                         type: 'image'
                     })
