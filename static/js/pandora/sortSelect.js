@@ -10,7 +10,6 @@ pandora.ui.sortSelect = function(isNavigationView) {
     if (isClipView) {
         items = pandora.site.clipKeys.map(function(key) {
             return Ox.extend(Ox.clone(key), {
-                checked: key.id == pandora.user.ui[sortKey][0].key,
                 title: 'Sort by ' + (!pandora.user.ui.item ? 'Clip ' : '') + key.title
             });
         });

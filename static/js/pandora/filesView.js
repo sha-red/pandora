@@ -315,11 +315,11 @@ pandora.ui.filesView = function(options, self) {
     });
 
     self.$checkbox = Ox.Checkbox({
-        checked: false,
         id: 'go',
         title: 'Switch to this '
             + pandora.site.itemName.singular.toLowerCase()
             + ' after moving files',
+        value: false,
         width: 240
     });
 
@@ -444,15 +444,15 @@ pandora.ui.filesView = function(options, self) {
 
     function updateForm() {
         if (self.selected.length == self.numberOfItems) {
-            self.wasChecked = self.$checkbox.options('checked');
+            self.wasChecked = self.$checkbox.value();
             self.$checkbox.options({
-                checked: true,
-                disabled: true
+                disabled: true,
+                value: true
             });
         } else {
             self.$checkbox.options({
-                checked: self.wasChecked,
-                disabled: false
+                disabled: false,
+                value: self.wasChecked
             });
         }
         self.$moveButton.options({

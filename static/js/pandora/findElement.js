@@ -9,10 +9,11 @@ pandora.ui.findElement = function() {
                     pandora.$ui.findListSelect = Ox.Select({
                             items: [
                                 {id: 'all', title: 'Find: All ' + pandora.site.itemName.plural},
-                                {id: 'list', title: 'Find: This List', checked: true}
+                                {id: 'list', title: 'Find: This List'}
                             ],
                             overlap: 'right',
-                            type: 'image'
+                            type: 'image',
+                            value: 'list'
                         })
                         .bindEvent({
                             change: function(data) {
@@ -36,7 +37,6 @@ pandora.ui.findElement = function() {
                                 [{}, {
                                     id: 'advanced',
                                     title: 'Find: Advanced',
-                                    checked: findKey == 'advanced'
                                 }]
                             ),
                             overlap: 'right',

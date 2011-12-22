@@ -159,14 +159,14 @@ pandora.ui.filter = function(id) {
     Ox.Select({
             items: pandora.site.filters.map(function(filter) {
                 return {
-                    checked: filter.id == id,
                     id: filter.id,
                     title: filter.title
                 }
             }),
             max: 1,
             min: 1,
-            type: 'image'
+            type: 'image',
+            value: id,
         })
         .bindEvent('change', function(data) {
             var filters = Ox.clone(pandora.user.ui.filters),
