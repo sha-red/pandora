@@ -133,11 +133,11 @@ function constructList() {
                              .html(app.actions[id].code[1].replace('/\n/<br>\n/g'))
                              .hide();
                 var $button = new Ox.Button({
-                  title: [
+                  type: "image"
+                  values: [
                     {id: "one", title: "right"},
                     {id: "two", title: "down"},
                   ],
-                  type: "image"
                 })
                 .addClass("margin")
                 .click(function() { $code.toggle()})
