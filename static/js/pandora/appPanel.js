@@ -66,11 +66,11 @@ pandora.ui.appPanel = function() {
                     pandora.$ui.accountDialog = pandora.ui.accountDialog(page).open();
                 }
             } else {
-                pandora.URL.replace('/');
+                pandora.UI.set({page: ''});
             }
         } else if (['preferences', 'signout'].indexOf(page) > -1) {
             if (pandora.user.level == 'guest') {
-                pandora.URL.replace('/');
+                pandora.UI.set({page: ''});
             } else if (page == 'preferences') {
                 pandora.ui.preferencesDialog().open();
             } else {
