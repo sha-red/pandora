@@ -183,11 +183,12 @@ pandora.ui.listGeneralPanel = function(listData) {
                 .appendTo(that)
                 : Ox.Select({
                     items: [
-                        {id: 'private', title: 'Private', checked: listData.status == 'private'},
-                        {id: 'public', title: 'Public', checked: listData.status == 'public'}
+                        {id: 'private', title: 'Private'},
+                        {id: 'public', title: 'Public'}
                     ],
                     label: 'Status',
                     labelWidth: 80,
+                    value: listData.status,
                     width: 320
                 })
                 .css({position: 'absolute', left: '160px', top: '64px'})
