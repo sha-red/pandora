@@ -247,6 +247,9 @@ pandora.URL = (function() {
             if (pandora.$ui.home) {
                 pandora.UI.set({page: ''});
                 pandora.$ui.home.fadeOutScreen();
+            } else if (pandora.$ui.tv) {
+                pandora.UI.set({page: ''});
+                pandora.$ui.home.fadeOutScreen();
             }
             if (
                 pandora.user.ui.item
