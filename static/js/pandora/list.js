@@ -417,9 +417,12 @@ pandora.ui.list = function() {
                 pandora.UI.set(set);
             },
             openpreview: function(data) {
+                if (data.ids.length) {
+                    
+                }
                 pandora.requests.preview && pandora.api.cancel(pandora.requests.preview);
                 pandora.requests.preview = pandora.api.find({
-                    keys: ['director', 'id', 'posterRatio', 'title'],
+                    keys: ['director', 'id', 'posterRatio', 'title', 'year'],
                     query: {
                         conditions: data.ids.map(function(id) {
                             return {
@@ -432,7 +435,7 @@ pandora.ui.list = function() {
                     }
                 }, function(result) {
                     var item = result.data.items[0],
-                        title = item.title + ' (' + item.director + ')',
+                        title = item.title + ' (' + item.director.join(', ') + ') ' + item.year,
                         ratio = item.posterRatio,
                         windowWidth = window.innerWidth * 0.8,
                         windowHeight = window.innerHeight * 0.8,
@@ -472,7 +475,7 @@ pandora.ui.list = function() {
                                 })
                                 .open();
                         } else {
-                                pandora.$ui.previewDialog.options({
+                            pandora.$ui.previewDialog.options({
                                     content: pandora.$ui.previewImage,
                                     height: height,
                                     title: title,
@@ -507,36 +510,40 @@ pandora.ui.list = function() {
                     pandora.$ui.mainMenu.disableItem('openmovie');
                 }
                 pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
-                if (Ox.isUndefined(data.rest)) {
-                    query = {
-                        conditions: data.ids.map(function(id) {
-                            return {
-                                key: 'id',
-                                value: id,
-                                operator: '=='
-                            }
-                        }),
-                        operator: '|'
-                    };
+                if (data.ids.length == 0) {
+                    pandora.$ui.selected.html(pandora.ui.status('selected', {items: 0}));
                 } else {
-                    query = {
-                        conditions: Ox.merge([
-                            pandora.user.ui.find
-                        ], data.rest.map(function(id) {
-                            return {
-                                key: 'id',
-                                value: id,
-                                operator: '!='
-                            };
-                        })),
-                        operator: '&'
-                    };
+                    if (Ox.isUndefined(data.rest)) {
+                        query = {
+                            conditions: data.ids.map(function(id) {
+                                return {
+                                    key: 'id',
+                                    value: id,
+                                    operator: '=='
+                                }
+                            }),
+                            operator: '|'
+                        };
+                    } else {
+                        query = {
+                            conditions: Ox.merge([
+                                pandora.user.ui.find
+                            ], data.rest.map(function(id) {
+                                return {
+                                    key: 'id',
+                                    value: id,
+                                    operator: '!='
+                                };
+                            })),
+                            operator: '&'
+                        };
+                    }
+                    pandora.api.find({
+                        query: query
+                    }, function(result) {
+                        pandora.$ui.selected.html(pandora.ui.status('selected', result.data));
+                    });
                 }
-                pandora.api.find({
-                    query: query
-                }, function(result) {
-                    pandora.$ui.selected.html(pandora.ui.status('selected', result.data));
-                });
             },
             pandora_listselection: function(data) {
                 that.options({selected: data.value});
