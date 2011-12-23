@@ -49,7 +49,6 @@ pandora.ui.findElement = function() {
                                     that.update();
                                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                                 } else {
-                                    Ox.Log('FIND', 'select change', pandora.$ui.findInput.value())
                                     pandora.$ui.findInput.options({
                                         autocomplete: autocompleteFunction(),
                                         placeholder: ''
@@ -109,7 +108,6 @@ pandora.ui.findElement = function() {
                 findKey = Ox.getObjectById(pandora.site.findKeys, key);
             value === '' && Ox.Log('', 'Warning: autocomplete function should never be called with empty value');
             if (findKey.autocomplete) {
-                Ox.Log('AUTO', '_list/select', pandora.user.ui._list, pandora.$ui.findListSelect.value())
                 pandora.api.autocomplete({
                     key: key,
                     query: {

@@ -784,6 +784,7 @@ pandora.ui.infoView = function(data) {
                     change: function(event) {
                         var rightsLevel = event.value
                         $rightsLevelElement = getRightsLevelElement(rightsLevel);
+                        Ox.print(rightsLevel, '...', $rightsLevelElement)
                         $rightsLevelSelect
                             .css({background: $rightsLevelElement.css('background')})
                             .data({OxColor: $rightsLevelElement.data('OxColor')})

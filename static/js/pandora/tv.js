@@ -64,7 +64,6 @@ pandora.ui.tv = function() {
                     volume: function(data) {
                         pandora.UI.set('videoVolume', data.volume);
                     },
-                    // FIXME: does not work
                     key_escape: that.fadeOutScreen
                 })
                 .appendTo(that);
