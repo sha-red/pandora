@@ -6,6 +6,7 @@ from random import randint
 
 from django.db import models
 from django.db.models import Max
+from django.conf import settings
 
 from item.models import Item
 
@@ -22,10 +23,11 @@ class Channel(models.Model):
 
     def json(self, user):
         now = datetime.now()
+        cansee = settings.CONFIG['capabilities']['canSeeItem']['guest']
         if self.list:
-            items = self.list.get_items().filter(rendered=True)
+            items = self.list.get_items(self.list.user).filter(rendered=True, level__lte=cansee)
         else:
-            items = Item.objects.filter(rendered=True)
+            items = Item.objects.filter(rendered=True, level__lte=cansee)
         if items.count() == 0:
             return {}
 
