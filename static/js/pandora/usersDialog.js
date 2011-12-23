@@ -736,7 +736,6 @@ pandora.ui.usersDialog = function() {
     function setHeight(data) {
         var form = $formButton.value(),
             $item = getFormItemById(form == 'edit' ? 'notes' : 'message');
-        Ox.print('$ITEM', $item)
         dialogHeight = data.height;
         $item && $item.options({
             height: dialogHeight - (form == 'edit' ? 160 : 208)
