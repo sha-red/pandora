@@ -53,14 +53,20 @@ pandora.ui.tv = function() {
                         pandora.UI.set('videoMuted', data.muted);
                     },
                     open: function() {
-                        var set = {
-                            item: result.data.item,
-                            itemView: pandora.user.ui.videoView,
-                            page: ''
-                        };
-                        set[
-                            'videoPoints.' + result.data.item + '.position'
-                        ] = $player.options('position');
+                        var item = result.data.item,
+                            position = $player.options('position'),
+                            set = {
+                                item: item,
+                                itemView: pandora.user.ui.videoView,
+                                page: ''
+                            };
+                        if (pandora.user.ui.videoPoints[item]) {
+                            set['videoPoints.' + item + '.position'] = position;
+                        } else {
+                            set['videoPoints.' + item] = {
+                                'in': 0, out: 0, position: position
+                            };
+                        }
                         pandora.UI.set(set);
                     },
                     resolution: function(data) {
