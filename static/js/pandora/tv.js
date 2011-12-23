@@ -24,7 +24,7 @@ pandora.ui.tv = function() {
             $player = Ox.VideoPlayer({
                     censored: videoOptions.censored,
                     controlsBottom: ['volume', 'scale', 'timeline', 'position', 'settings'],
-                    controlsTop: ['close', 'title'],
+                    controlsTop: ['close', 'title', 'open'],
                     duration: result.data.duration,
                     enableSubtitles: pandora.user.ui.videoSubtitles,
                     fullscreen: true,
@@ -51,6 +51,17 @@ pandora.ui.tv = function() {
                     ended: play,
                     muted: function(data) {
                         pandora.UI.set('videoMuted', data.muted);
+                    },
+                    open: function() {
+                        var set = {
+                            item: result.data.item,
+                            itemView: pandora.user.ui.videoView,
+                            page: ''
+                        };
+                        set[
+                            'videoPoints.' + result.data.item + '.position'
+                        ] = $player.options('position');
+                        pandora.UI.set(set);
                     },
                     resolution: function(data) {
                         pandora.UI.set('videoResolution', data.resolution);

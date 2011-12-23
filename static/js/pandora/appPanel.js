@@ -36,7 +36,13 @@ pandora.ui.appPanel = function() {
         }
     });
     function setPage(page) {
-        if (page == 'home') {
+        if (page === '') {
+            if (pandora.$ui.home) {
+                pandora.$ui.home.fadeOutScreen();
+            } else if (pandora.$ui.tv) {
+                pandora.$ui.tv.fadeOutScreen();
+            }
+        } else if (page == 'home') {
             // if we're on page load, show screen immediately
             pandora.$ui.home = pandora.ui.home()[
                 !pandora.$ui.appPanel ? 'showScreen' : 'fadeInScreen'
