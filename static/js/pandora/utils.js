@@ -698,7 +698,8 @@ pandora.getPageTitle = function(stateOrURL) {
             {id: 'signin', title: 'Sign In'},
             {id: 'signout', title: 'Sign Out'},
             {id: 'signup', title: 'Sign Up'},
-            {id: 'software', title: 'Software'}
+            {id: 'software', title: 'Software'},
+            {id: 'tv', title: 'TV'}
         ], pandora.site.sitePages),
         page = Ox.getObjectById(
             pages,
