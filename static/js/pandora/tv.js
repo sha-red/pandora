@@ -13,17 +13,42 @@ pandora.ui.tv = function() {
                 opacity: 0,
                 zIndex: 1000
             }),
-        $player;
+        $player,
+        list = pandora.user.ui._list,
+        lists = [];
+
+    function getList(direction) {
+        lists.length == 0 && getLists();
+        var index = lists.indexOf(list);
+        return lists[
+            direction == -1
+            ? (index == 0 ? lists.length - 1 : index - 1)
+            : (index == lists.length - 1 ? 0 : index + 1)
+        ];
+    }
+
+    function getLists() {
+        var menu = pandora.$ui.mainMenu.options('menus')[2];
+        lists = [''];
+        Ox.loop(3, function(f) {
+            menu.items[f + 1].items.forEach(function(l) {
+                lists.push(l.id.substr(8));
+            });
+        });
+    }
 
     function play() {
         pandora.api.tv({
-            list: pandora.user.ui._list
+            list: list
         }, function(result) {
             var videoOptions = pandora.getVideoOptions(result.data);
             $player && $player.remove();
             $player = Ox.VideoPlayer({
                     censored: videoOptions.censored,
-                    controlsBottom: ['volume', 'scale', 'timeline', 'position', 'settings'],
+                    controlsBottom: [
+                        'zapPrevious', 'zapHome', 'zapNext',
+                        'volume', 'scale', 'timeline', 'position', 'settings'
+                    ],
                     controlsTop: ['close', 'title', 'open'],
                     duration: result.data.duration,
                     enableSubtitles: pandora.user.ui.videoSubtitles,
@@ -36,9 +61,7 @@ pandora.ui.tv = function() {
                     tooltips: true,
                     timeline: '/' + result.data.item + '/timeline16p.png',
                     title: pandora.site.site.name + ' &mdash; ' + (
-                            pandora.user.ui._list
-                            ? pandora.user.ui._list
-                            : 'All ' + pandora.site.itemName.plural
+                            list || 'All ' + pandora.site.itemName.plural
                         ) + ' &mdash; '
                         + result.data.title
                         + ' (' + result.data.director.join(', ') + ') '
@@ -81,7 +104,27 @@ pandora.ui.tv = function() {
                     volume: function(data) {
                         pandora.UI.set('videoVolume', data.volume);
                     },
-                    key_escape: that.fadeOutScreen
+                    zap: function(data) {
+                        if (!(data.direction == 0 && list == '')) {
+                            list = data.direction == 0 ? '' : getList(data.direction);
+                            play();
+                        }
+                    },
+                    key_enter: function() {
+                        $player.triggerEvent('open');
+                    },
+                    key_escape: function() {
+                        $player.triggerEvent('close');
+                    },
+                    key_left: function() {
+                        $player.triggerEvent('zap', {direction: -1});
+                    },
+                    key_right: function() {
+                        $player.triggerEvent('zap', {direction: 1});
+                    },
+                    key_up: function() {
+                        $player.triggerEvent('zap', {direction: 0});
+                    }
                 })
                 .appendTo(that);
         });
