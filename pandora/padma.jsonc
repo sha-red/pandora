@@ -415,7 +415,7 @@
             "id": "keywords",
             "title": "Keywords",
             "overlap": true,
-            "type": "text"
+            "type": "string"
         },
         {
             "id": "descriptions",

@@ -34,6 +34,7 @@ class Annotation(models.Model):
 
     layer = models.CharField(max_length=255, db_index=True)
     value = models.TextField()
+    findvalue = models.TextField()
     sortvalue = models.CharField(max_length=1000, null=True, blank=True, db_index=True)
 
     def editable(self, user):
@@ -44,22 +45,25 @@ class Annotation(models.Model):
                 return True
         return False
 
-    def html(self):
-        if self.layer == 'string':
-            return utils.html_parser(self.value)
-        else:
-            return self.value
-    
     def set_public_id(self):
         if self.id:
             public_id = Annotation.objects.filter(item=self.item, id__lt=self.id).count() + 1
             self.public_id = "%s/%s" % (self.item.itemId, ox.toAZ(public_id))
             Annotation.objects.filter(id=self.id).update(public_id=self.public_id)
 
+    def get_layer(self):
+        for layer in settings.CONFIG['layers']:
+            if layer['id'] == self.layer:
+                return layer
+        return {}
+
     def save(self, *args, **kwargs):
         set_public_id = not self.id or not self.public_id
+        layer = self.get_layer()
         if self.value:
-            sortvalue = ox.stripTags(self.value).strip()
+            self.value = utils.cleanup_value(self.value, self.layer['tyoe'])
+            self.findvalue = ox.stripTags(self.value).strip()
+            sortvalue = self.findvalue
             sortvalue = sort_string(sortvalue)
             if sortvalue:
                 self.sortvalue = sortvalue[:1000]
@@ -69,12 +73,7 @@ class Annotation(models.Model):
             self.sortvalue = None
 
         #no clip or update clip
-        def get_layer(id):
-            for l in settings.CONFIG['layers']:
-                if l['id'] == id:
-                    return l
-            return {}
-        private = get_layer(self.layer).get('private', False)
+        private = layer.get('private', False)
         if not private:
             if not self.clip or self.start != self.clip.start or self.end != self.clip.end:
                 self.clip, created = Clip.get_or_create(self.item, self.start, self.end)
