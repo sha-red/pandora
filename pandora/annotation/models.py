@@ -61,7 +61,7 @@ class Annotation(models.Model):
         set_public_id = not self.id or not self.public_id
         layer = self.get_layer()
         if self.value:
-            self.value = utils.cleanup_value(self.value, self.layer['tyoe'])
+            self.value = utils.cleanup_value(self.value, self.layer['type'])
             self.findvalue = ox.stripTags(self.value).strip()
             sortvalue = self.findvalue
             sortvalue = sort_string(sortvalue)
