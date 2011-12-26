@@ -14,5 +14,5 @@ def cleanup_value(value, layer_type):
     return value
 
 def sanitize_fragment(html):
-    return html5lib.parseFragment(html).toxml()
+    return html5lib.parseFragment(html).toxml().decode('utf-8')
 
