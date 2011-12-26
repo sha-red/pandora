@@ -747,7 +747,7 @@ class Item(models.Model):
                 for value in current_values:
                     if value not in saved_values:
                         sortvalue = value
-                    Facet.objects.get_or_create(item=self, key=key, value=value, sortvalue=sortvalue)
+                        Facet.objects.get_or_create(item=self, key=key, value=value, sortvalue=sortvalue)
 
     def update_facets(self):
         for key in self.facet_keys + ['title']:
