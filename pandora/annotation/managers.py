@@ -26,6 +26,7 @@ def parseCondition(condition, user):
         'in': 'start',
         'out': 'end',
         'id': 'public_id',
+        'value': 'findvalue',
     }.get(k, k)
     if not k:
         k = 'name'

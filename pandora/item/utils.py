@@ -44,7 +44,7 @@ def sort_string(string):
 
     #pad numbered titles
     string = re.sub('(\d+)', lambda x: '%010d' % int(x.group(0)), string)
-    return unicodedata.normalize('NFKD', string).lower()
+    return unicodedata.normalize('NFKD', string)
 
 
 def sort_title(title):

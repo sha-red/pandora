@@ -27,7 +27,7 @@ def parseCondition(condition, user):
         'in': 'start',
         'out': 'end',
         'place': 'annotations__places__id',
-        'text': 'annotations__value',
+        'text': 'annotations__findvalue',
         'user': 'annotations__user__username',
     }.get(k, k)
     if not k:
@@ -40,7 +40,7 @@ def parseCondition(condition, user):
                      for l in filter(lambda l: not l.get('private', False),
                                      settings.CONFIG['layers'])]
     if k in public_layers:
-        return parseCondition({'key': 'annotations__value',
+        return parseCondition({'key': 'annotations__findvalue',
                                'value': v,
                                'operator': op}, user) \
              & parseCondition({'key': 'annotations__layer',

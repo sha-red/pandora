@@ -48,7 +48,7 @@ def order_query(qs, sort):
         if key.startswith('clip:'):
             key = e['key'][len('clip:'):]
             key = {
-                'text': 'annotations__value',
+                'text': 'annotations__sortvalue',
                 'position': 'start',
             }.get(key, key)
         elif key not in clip_keys:
