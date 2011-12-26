@@ -541,7 +541,7 @@ class Item(models.Model):
                         '\n'.join([f.path for f in self.files.all()]))
                 elif key['type'] == 'layer':
                     qs = Annotation.objects.filter(layer=i, item=self).order_by('start')
-                    save(i, '\n'.join([l.findvalue for l in qs]))
+                    save(i, u'\n'.join([l.findvalue for l in qs]))
                 elif i != '*' and i not in self.facet_keys:
                     value = self.get(i)
                     if isinstance(value, list):

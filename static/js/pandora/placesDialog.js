@@ -30,7 +30,10 @@ pandora.ui.placesDialog = function() {
                 pandora.api.findClips({
                     query: {
                         conditions: names.map(function(name) {
-                            return {key: 'subtitles', value: name, operator: '='};
+                            //FIXME: this should be more generic
+                            return Ox.getObjectById(pandora.site.layers, 'subtitles')
+                                ? {key: 'subtitles', value: name, operator: '='}
+                                : {key: 'locations', value: name, operator: '=='};
                         }),
                         operator: names.length == 1 ? '&' : '|'
                     }

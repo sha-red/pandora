@@ -39,6 +39,10 @@ def parseCondition(condition, user):
     else:
         exclude = False
 
+    facet_keys = models.Item.facet_keys + ['title']
+    for f in settings.CONFIG['filters']:
+        if f['id'] not in facet_keys:
+            facet_keys.append(f['id'])
     key_type = settings.CONFIG['keys'].get(k, {'type':'string'}).get('type')
     if isinstance(key_type, list):
         key_type = key_type[0]
@@ -48,8 +52,8 @@ def parseCondition(condition, user):
         'text': 'string',
         'year': 'string',
         'length': 'string',
-        'list': 'list',
         'layer': 'string',
+        'list': 'list',
     }.get(key_type, key_type)
     if k == 'list':
         key_type = ''
@@ -95,7 +99,7 @@ def parseCondition(condition, user):
             value_key = 'find__value'
         else:
             value_key = k
-        if k in models.Item.facet_keys + ['title']:
+        if k in facet_keys:
             in_find = False
             facet_value = 'facets__value%s' % {
                 '==': '__iexact',

@@ -45,7 +45,7 @@
         {"id": "collection", "title": "Collection", "type": "string"},
         {"id": "source", "title": "Source", "type": "string"},
         {"id": "director", "title": "Director", "type": "string"},
-        {"id": "location", "title": "Location", "type": "string"},
+        {"id": "locations", "title": "Location", "type": "string"},
         {"id": "year", "title": "Year", "type": "integer"},
         {"id": "language", "title": "Language", "type": "string"},
         {"id": "category", "title": "Category", "type": "string"},
@@ -478,7 +478,7 @@
                 {"id": "source", "sort": [{"key": "name", "operator": "+"}]},
                 {"id": "category", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "keywords", "sort": [{"key": "items", "operator": "-"}]},
-                {"id": "location", "sort": [{"key": "items", "operator": "-"}]}
+                {"id": "locations", "sort": [{"key": "items", "operator": "-"}]}
             ],
             "filtersSize": 176,
             "find": {"conditions": [], "operator": "&"},
