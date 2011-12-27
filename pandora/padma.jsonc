@@ -45,7 +45,7 @@
         {"id": "collection", "title": "Collection", "type": "string"},
         {"id": "source", "title": "Source", "type": "string"},
         {"id": "director", "title": "Director", "type": "string"},
-        {"id": "locations", "title": "Location", "type": "string"},
+        {"id": "places", "title": "Places", "type": "string"},
         {"id": "year", "title": "Year", "type": "integer"},
         {"id": "language", "title": "Language", "type": "string"},
         {"id": "category", "title": "Category", "type": "string"},
@@ -196,8 +196,8 @@
             "columnWidth": 90
         },
         {
-            "id": "locations",
-            "title": "Locations",
+            "id": "places",
+            "title": "Places",
             "type": "layer",
             "find": true
         },
@@ -377,9 +377,9 @@
     ],
     "layers": [
         {
-            "id": "locations",
-            "title": "Locations",
-            "type": "location",
+            "id": "places",
+            "title": "Places",
+            "type": "place",
             "overlap": true
         },
         {
@@ -478,7 +478,7 @@
                 {"id": "source", "sort": [{"key": "name", "operator": "+"}]},
                 {"id": "category", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "keywords", "sort": [{"key": "items", "operator": "-"}]},
-                {"id": "locations", "sort": [{"key": "items", "operator": "-"}]}
+                {"id": "places", "sort": [{"key": "items", "operator": "-"}]}
             ],
             "filtersSize": 176,
             "find": {"conditions": [], "operator": "&"},

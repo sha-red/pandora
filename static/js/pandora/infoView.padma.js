@@ -165,7 +165,6 @@ pandora.ui.infoView = function(data) {
                         editMetadata('title', event.value);
                     }
                 })
-                .appendTo($text)
         )
         .appendTo($text);
 
@@ -205,7 +204,7 @@ pandora.ui.infoView = function(data) {
     }
 
     // Country, Year, Language, Runtime ----------------------------------------
-
+    /*
     if (isEditable) {
         var $div = $('<div>')
             .css(css)
@@ -249,46 +248,82 @@ pandora.ui.infoView = function(data) {
         });
         $('<div>').css(css).html(html.join('; ')).appendTo($text);
     }
+    */
     $('<div>').html('<br>').appendTo($text);
-    //Categories
-    $('<div>')
-        .css(css)
-        .html(
-            formatKey('categories') + formatValue(data['category'], 'category')
-        )
-        .appendTo($text);
-
     [
+        'language',
         'source',
         'collection',
         'category',
         'user',
         'location',
-    ].forEach(function(key) {
-        $('<div>')
-        .html(
-            formatKey(key=='user'?'contributor':key) + formatValue(data[key], key)
-        )
-        .appendTo($text);
-    });
-    [
         'date',
-        'modified',
-        'accessed',
-        'created',
     ].forEach(function(key) {
+        var $div = $('<div>')
+            .appendTo($text);
         $('<div>')
+            .html(
+                formatKey({
+                    categorty: 'categories',
+                    user: 'contributor'
+                }[key] || key).replace('</span>', '&nbsp;</span>')
+            )
+            .appendTo($div);
+        Ox.Editable({
+            clickLink: pandora.clickLink,
+            format: function(value) {
+                return ['language', 'category'].indexOf(key) >= 0
+                    ? formatValue(value.split(', '), key)
+                    : value;
+            },
+            placeholder: formatLight('unknown'),
+            tooltip: 'Doubleclick to edit',
+            value: ['language', 'category'].indexOf(key) >= 0
+                  ? (data[key] || []).join(', ')
+                  : data[key] || ''
+        })
+        .bindEvent({
+            submit: function(event) {
+                var value = ['language', 'category'].indexOf(key) >= 0
+                        ? event.value.split(', ')
+                        : event.value;
+                editMetadata(key, value);
+            }
+        })
+        .appendTo($div);
+    });
+    $('<div>')
+        .append(formatKey('description'))
+        .append(
+            Ox.Editable({
+                clickLink: pandora.clickLink,
+                placeholder: formatLight('unknown'),
+                tooltip: 'Doubleclick to edit',
+                type: 'textarea',
+                value: data.description || ''
+            })
+            .bindEvent({
+                submit: function(event) {
+                    editMetadata('description', event.value);
+                }
+            })
+        )
+        .appendTo($text);
+
+    $('<div>').css({height: '16px'}).appendTo($text);
+    [
+        'created',
+        'accessed',
+        'modified',
+    ].forEach(function(key) {
+        $('<span>')
+        .css({padding: '4px'})
         .html(
-            formatKey(key=='user'?'contributor':key) + data[key]
+            formatKey(key) + data[key]
         )
         .appendTo($text);
     });
-    data.description && $('<div>')
-        .css(css)
-        .html(
-            formatKey('description') + data.description
-        )
-        .appendTo($text);
+
     $('<div>').css({height: '16px'}).appendTo($text);
 
     // Hue, Saturation, Lightness, Volume --------------------------------------

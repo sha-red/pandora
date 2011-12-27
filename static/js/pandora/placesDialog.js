@@ -33,7 +33,7 @@ pandora.ui.placesDialog = function() {
                             //FIXME: this should be more generic
                             return Ox.getObjectById(pandora.site.layers, 'subtitles')
                                 ? {key: 'subtitles', value: name, operator: '='}
-                                : {key: 'locations', value: name, operator: '=='};
+                                : {key: 'places', value: name, operator: '=='};
                         }),
                         operator: names.length == 1 ? '&' : '|'
                     }
