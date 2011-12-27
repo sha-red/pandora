@@ -56,7 +56,11 @@ class Place(models.Model):
         return self.name
 
     def editable(self, user):
-        if user and user.is_staff or self.user == user:
+        if not user or user.is_anonymous():
+            level = 'guest'
+        else:
+            level = user.get_profile().get_level()
+        if self.user == user or level in ('admin', 'staff'):
             return True
         return False
 

@@ -678,7 +678,6 @@ def poster(request, id, size=None):
         response['Cache-Control'] = 'no-cache'
         return response
 
-
 def icon(request, id, size=None):
     item = get_object_or_404(models.Item, itemId=id)
     if not item.access(request.user):
@@ -686,8 +685,10 @@ def icon(request, id, size=None):
     if item.icon:
         return image_to_response(item.icon, size)
     else:
-        raise Http404
-
+        poster_path = os.path.join(settings.STATIC_ROOT, 'jpg/poster.jpg')
+        response = HttpFileResponse(poster_path, content_type='image/jpeg')
+        response['Cache-Control'] = 'no-cache'
+        return response
 
 def timeline(request, id, size, position):
     item = get_object_or_404(models.Item, itemId=id)
