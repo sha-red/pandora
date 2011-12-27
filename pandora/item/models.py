@@ -141,7 +141,7 @@ class Item(models.Model):
     #while metadata is updated, files are set to rendered=False
     rendered = models.BooleanField(default=False, db_index=True)
     #should be set based on user
-    level = models.IntegerField(default=4, db_index=True)
+    level = models.IntegerField(db_index=True)
 
     itemId = models.CharField(max_length=128, unique=True, blank=True)
     oxdbId = models.CharField(max_length=42, unique=True, blank=True, null=True)
@@ -260,6 +260,8 @@ class Item(models.Model):
         if not self.id:
             if self.user:
                 self.level = settings.CONFIG['rightsLevel'][self.user.get_profile().get_level()]
+            else:
+                self.level = settings.CONFIG['rightsLevel']['member']
             if not self.itemId:
                 self.itemId = str(uuid.uuid1())
             super(Item, self).save(*args, **kwargs)
@@ -441,6 +443,8 @@ class Item(models.Model):
             'rendered': self.rendered,
             'rightslevel': self.level
         }
+        if self.user:
+            i['user'] = self.user.username
         i.update(self.external_data)
         i.update(self.data)
         for k in settings.CONFIG['itemKeys']:

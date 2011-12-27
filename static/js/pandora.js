@@ -152,6 +152,13 @@ appPanel
                 });
                 loadPandoraFiles(function() {
                     initPandora(data);
+                    if (localStorage && localStorage.pandoraLocal) {
+                        window.pandora.local = Ox.API({
+                            'url': localStorage.pandoraLocal + '/api/'
+                        }, function() {
+                            pandora.site.site.videoprefix = localStorage.pandoraLocal;
+                        });
+                    }
                 });
             }
         });

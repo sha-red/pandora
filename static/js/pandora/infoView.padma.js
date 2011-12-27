@@ -20,7 +20,7 @@ pandora.ui.infoView = function(data) {
         iconHeight = iconRatio < 1 ? iconSize : Math.round(iconSize / iconRatio),
         iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
         borderRadius = ui.icons == 'posters' ? 0 : iconSize / 8,
-        isEditable = canEdit && data.id.substr(0, 2) == '0x',
+        isEditable = canEdit,
         listWidth = 144 + Ox.UI.SCROLLBAR_SIZE,
         margin = 16,
         statisticsWidth = 128,
@@ -51,7 +51,6 @@ pandora.ui.infoView = function(data) {
 
         $icon = Ox.Element({
                 element: '<img>',
-                tooltip: canEdit ? 'Doubleclick to edit' : ''
             })
             .attr({
                 src: '/' + data.id + '/' + (
@@ -250,177 +249,46 @@ pandora.ui.infoView = function(data) {
         });
         $('<div>').css(css).html(html.join('; ')).appendTo($text);
     }
-
-    // Alternative Titles ------------------------------------------------------
-
-    data.alternativeTitles && $('<div>')
+    $('<div>').html('<br>').appendTo($text);
+    //Categories
+    $('<div>')
         .css(css)
         .html(
-            formatKey('Alternative Title' + (data.alternativeTitles.length == 1 ? '' : 's'))
-            + data.alternativeTitles.map(function(value) {
-                return value[0] + (value[1] ? ' '
-                    + formatLight('(' + value[1] + ')') : '');
-            }).join(', ')
+            formatKey('categories') + formatValue(data['category'], 'category')
         )
         .appendTo($text);
 
-    // fixme: episodeDirector seems to be always missing
-    if (data.episodeDirector || data.writer || data.producer || data.cinematographer || data.editor) {
-        $div = $('<div>')
-            .css(css)
-            .appendTo($text);
-        html = [];
-        ['episodeDirector', 'writer', 'producer', 'cinematographer', 'editor'].forEach(function(key) {
-            data[key] && html.push(
-                formatKey(key == 'episodeDirector' ? 'director' : key) + formatValue(data[key], 'name')
-            );
-        });
-        $div.html(html.join('; '));
-    }
-
-    data.cast && $('<div>')
-        .css(css)
-        .html(
-            formatKey('cast') + data.cast.map(function(value) {
-                value.character = value.character.replace('(uncredited)', '').trim();
-                return formatValue(value.actor, 'name')
-                    + (value.character ? ' '
-                    + formatLight('(' + formatValue(value.character) + ')')
-                    : '');
-            }).join(', ')
-        )
-        .appendTo($text);
-
-    if (data.genre || data.keyword) {
-        $div = $('<div>')
-            .css(css)
-            .appendTo($text);
-        html = [];
-        ['genre', 'keyword'].forEach(function(key) {
-            data[key] && html.push(
-                formatKey(key == 'keyword' ? 'keywords' : key)
-                + formatValue(data[key], key)
-            );
-        });
-        $div.html(html.join('; '));
-    }
-
-    data.summary && $('<div>')
-        .css(css)
-        .html(
-            formatKey('summary') + data.summary
-        )
-        .appendTo($text);
-
-    data.trivia && data.trivia.forEach(function(value) {
+    [
+        'source',
+        'collection',
+        'category',
+        'user',
+        'location',
+    ].forEach(function(key) {
         $('<div>')
-            .css({
-                display: 'table-row'
-            })
-            .append(
-                $('<div>')
-                    .css({
-                        display: 'table-cell',
-                        width: '12px',
-                        paddingTop: '4px'
-                    })
-                    .html('<span style="font-weight: bold">&bull;</span>')
-            )
-            .append(
-                $('<div>')
-                    .css({
-                        display: 'table-cell',
-                        paddingTop: '4px',
-                        textAlign: 'justify',
-                        MozUserSelect: 'text',
-                        WebkitUserSelect: 'text'
-                    })
-                    .html(value)
-            )
-            .append(
-                $('<div>').css({clear: 'both'})
-            )
-            .appendTo($text);
-    });
-
-    data.filmingLocations && $('<div>')
-        .css(css)
         .html(
-            formatKey('Filming Locations') + data.filmingLocations.map(function(location) {
-                return  '<a href="/map/@' + location + '">' + location + '</a>'
-            }).join(', ')
+            formatKey(key=='user'?'contributor':key) + formatValue(data[key], key)
         )
         .appendTo($text);
-
-    data.releasedate && $('<div>')
-        .css(css)
+    });
+    [
+        'date',
+        'modified',
+        'accessed',
+        'created',
+    ].forEach(function(key) {
+        $('<div>')
         .html(
-            formatKey('Release Date') + Ox.formatDate(data.releasedate, '%A, %B %e, %Y')
+            formatKey(key=='user'?'contributor':key) + data[key]
         )
         .appendTo($text);
-
-    if (data.budget || data.gross || data.profit) {
-        $div = $('<div>')
-            .css(css)
-            .appendTo($text);
-        html = [];
-        ['budget', 'gross', 'profit'].forEach(function(key) {
-            data[key] && html.push(
-                formatKey(key) + Ox.formatCurrency(data[key], '$')
-            );
-        });
-        $div.html(html.join('; '));
-    }
-
-    if (data.rating || data.votes) {
-        $div = $('<div>')
-            .css(css)
-            .appendTo($text);
-        html = [];
-        ['rating', 'votes'].forEach(function(key) {
-            data[key] && html.push(
-                formatKey(key) + Ox.formatNumber(data[key], key == 'rating' ? 0 : 2)
-            );
-        });
-        $div.html(html.join('; '));
-    }
-
-    if (data.connections) {
-        $div = $('<div>')
-            .css(css)
-            .appendTo($text);
-        html = [];
-        [
-            'Edited from', 'Edited into',
-            'Features', 'Featured in',
-            'Follows', 'Followed by',
-            'References', 'Referenced in',
-            'Remake of', 'Remade as',
-            'Spin off from', 'Spin off',
-            'Spoofs', 'Spoofed in'
-        ].forEach(function(key) {
-            data.connections[key] && html.push(
-                formatKey(key) + data.connections[key].map(function(connection) {
-                    return connection.item
-                        ? '<a href="/' + connection.item + '">' + connection.title + '</a>'
-                        : connection.title;
-                }).join(', ')
-            );
-        });
-        $div.html(html.join('; '));
-    }
-
-    ['reviews', 'links'].forEach(function(key) {
-        data[key] && $('<div>')
-            .css(css)
-            .html(
-                formatKey(key) + data[key].map(function(value) {
-                    return '<a href="' + value.url + '">' + value.source + '</a>'
-                }).join(', ')
-            )
-            .appendTo($text);
     });
-
+    data.description && $('<div>')
+        .css(css)
+        .html(
+            formatKey('description') + data.description
+        )
+        .appendTo($text);
     $('<div>').css({height: '16px'}).appendTo($text);
 
     // Hue, Saturation, Lightness, Volume --------------------------------------
@@ -479,18 +347,6 @@ pandora.ui.infoView = function(data) {
     }
 
     $('<div>').css({height: '16px'}).appendTo($statistics);
-
-    if (canEdit) {
-        $icon.bindEvent({
-            doubleclick: function() {
-                pandora.UI.set('showIconBrowser', !ui.showIconBrowser);
-                $info.animate({
-                    left: ui.showIconBrowser ? 0 : -listWidth + 'px'
-                }, 250);
-            }
-        });
-        renderList();
-    }
 
     function editMetadata(key, value) {
         if (value != data[key]) {
@@ -660,108 +516,6 @@ pandora.ui.infoView = function(data) {
         });
     }
 
-    function renderList() {
-        pandora.api.get({
-            id: data.id,
-            keys: [ui.icons == 'posters' ? 'posters' : 'frames']
-        }, 0, function(result) {
-            var images = result.data[ui.icons == 'posters' ? 'posters' : 'frames'],
-                selectedImage = images.filter(function(image) {
-                    return image.selected;
-                })[0];
-            $list = Ox.IconList({
-                    defaultRatio: ui.icons == 'posters' ? 5/8 : data.stream.aspectratio,
-                    fixedRatio: ui.icons == 'posters' ? false : data.stream.aspectratio,
-                    item: function(data, sort, size) {
-                        var ratio = data.width / data.height;
-                        size = size || 128;
-                        return {
-                            height: ratio <= 1 ? size : size / ratio,
-                            id: data['id'],
-                            info: data.width + ' x ' + data.height + ' px',
-                            title: ui.icons == 'posters' ? data.source : Ox.formatDuration(data.position),
-                            url: data.url,
-                            width: ratio >= 1 ? size : size * ratio
-                        }
-                    },
-                    items: images,
-                    keys: ui.icons == 'posters'
-                        ? ['index', 'source', 'width', 'height', 'url']
-                        : ['index', 'position', 'width', 'height', 'url'],
-                    max: 1,
-                    min: 1,
-                    orientation: 'both',
-                    // fixme: should never be undefined
-                    selected: selectedImage ? [selectedImage['index']] : [],
-                    size: 128,
-                    sort: [{key: 'index', operator: '+'}],
-                    unique: 'index'
-                })
-                .css({
-                    display: 'block',
-                    position: 'absolute',
-                    left: 0,
-                    top: 0,
-                    width: listWidth + 'px',
-                    height: pandora.$ui.contentPanel.size(1) + 'px'
-                })
-                .bindEvent({
-                    select: function(event) {
-                        var index = event.ids[0];
-                        selectedImage = images.filter(function(image) {
-                            return image.index == index;
-                        })[0];
-                        var imageRatio = selectedImage.width / selectedImage.height,
-                            src = selectedImage.url;
-                        if ($browserImages.length == 0) {
-                            $browserImages = pandora.$ui.browser.find('img[src*="/' + data.id + '/"]');
-                        }
-                        if (ui.icons == 'posters' && !ui.showSitePoster) {
-                            $browserImages.each(function() {
-                                var $this = $(this),
-                                    size = Math.max($this.width(), $this.height());
-                                $this.attr({src: src});
-                                ui.icons == 'posters' && $this.css(imageRatio < 1 ? {
-                                    width: Math.round(size * imageRatio) + 'px',
-                                    height: size + 'px'
-                                } : {
-                                    width: size + 'px',
-                                    height: Math.round(size / imageRatio) + 'px'
-                                });
-                            });
-                            $icon.attr({src: src});
-                            $reflectionIcon.attr({src: src});
-                            iconRatio = imageRatio;
-                            iconSize = iconSize == 256 ? 512 : 256;
-                            toggleIconSize();
-                        }
-                        pandora.api[ui.icons == 'posters' ? 'setPoster' : 'setPosterFrame'](Ox.extend({
-                            id: data.id
-                        }, ui.icons == 'posters' ? {
-                            source: selectedImage.source
-                        } : {
-                             // fixme: api slightly inconsistent, this shouldn't be "position"
-                            position: selectedImage.index
-                        }), function() {
-                            // fixme: update the info (video preview) frame as well
-                            var src;
-                            if (ui.icons == 'frames') {
-                                src = '/' + data.id + '/icon512.jpg?' + Ox.uid()
-                                $icon.attr({src: src});
-                                $reflectionIcon.attr({src: src});
-                            }
-                            $browserImages.each(function() {
-                                $(this).attr({src: '/' + data.id + '/' + (
-                                    ui.icons == 'posters' ? 'poster' : 'icon'
-                                ) + '128.jpg?' + Ox.uid()});
-                            });
-                        });
-                    }
-                })
-                .appendTo($info);
-        });
-    }
-
     function renderRightsLevel() {
         var $rightsLevelElement = getRightsLevelElement(data.rightslevel),
             $rightsLevelSelect;
@@ -769,10 +523,9 @@ pandora.ui.infoView = function(data) {
         if (canEdit) {
             $rightsLevelSelect = Ox.Select({
                     items: pandora.site.rightsLevels.map(function(rightsLevel, i) {
-                        return {id: i, title: rightsLevel.name};
+                        return {id: i, title: rightsLevel.name, checked: i == data.rightslevel};
                     }),
-                    width: 128,
-                    value: data.rightslevel
+                    width: 128
                 })
                 .addClass('OxColor OxColorGradient')
                 .css({
