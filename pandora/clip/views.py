@@ -48,7 +48,7 @@ def order_query(qs, sort):
         if key.startswith('clip:'):
             key = e['key'][len('clip:'):]
             key = {
-                'text': 'annotations__value',
+                'text': 'annotations__sortvalue',
                 'position': 'start',
             }.get(key, key)
         elif key not in clip_keys:
@@ -111,7 +111,7 @@ def findClips(request):
                     Annotation.objects.filter(layer=layer, clip__in=ids))
     elif 'position' in query:
         qs = order_query(qs, query['sort'])
-        ids = [i.public_id for i in qs]
+        ids = [i['public_id'] for i in qs.values('public_id')]
         data['conditions'] = data['conditions'] + {
             'value': data['position'],
             'key': query['sort'][0]['key'],
@@ -123,7 +123,7 @@ def findClips(request):
             response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
     elif 'positions' in data:
         qs = order_query(qs, query['sort'])
-        ids = [i.public_id for i in qs]
+        ids = [i['public_id'] for i in qs.values('public_id')]
         response['data']['positions'] = utils.get_positions(ids, data['positions'])
     else:
         response['data']['items'] = qs.count()

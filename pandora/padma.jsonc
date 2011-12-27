@@ -45,16 +45,11 @@
         {"id": "collection", "title": "Collection", "type": "string"},
         {"id": "source", "title": "Source", "type": "string"},
         {"id": "director", "title": "Director", "type": "string"},
-        {"id": "location", "title": "Location", "type": "string"},
+        {"id": "locations", "title": "Location", "type": "string"},
         {"id": "year", "title": "Year", "type": "integer"},
         {"id": "language", "title": "Language", "type": "string"},
         {"id": "category", "title": "Category", "type": "string"},
-        {"id": "writer", "title": "Writer", "type": "string"},
-        {"id": "producer", "title": "Producer", "type": "string"},
-        {"id": "cinematographer", "title": "Cinematographer", "type": "string"},
-        {"id": "editor", "title": "Editor", "type": "string"},
-        {"id": "actor", "title": "Actor", "type": "string"},
-        {"id": "keyword", "title": "Keyword", "type": "string"}
+        {"id": "keywords", "title": "Keyword", "type": "string"}
     ],
     /*
         An itemKey must have the following properties:
@@ -173,30 +168,6 @@
             "columnWidth": 180,
             "filter": true,
             "find": true
-        },
-        {
-            "id": "genre", 
-            "title": "Genre",
-            "type": ["string"],
-            "autocomplete": true,
-            "columnWidth": 120,
-            "filter": true,
-            "find": true
-        },
-        {
-            "id": "keyword", 
-            "title": "Keyword",
-            "type": ["string"],
-            "autocomplete": true,
-            "filter": true,
-            "find": true
-        },
-        {
-            "id": "numberofkeywords", 
-            "title": "Number of Keywords", 
-            "type": "integer",
-            "columnWidth": 60,
-            "value": {"key": "keyword", "type": "length"}
         },
         {
             "id": "description",
@@ -415,7 +386,7 @@
             "id": "keywords",
             "title": "Keywords",
             "overlap": true,
-            "type": "text"
+            "type": "string"
         },
         {
             "id": "descriptions",
@@ -503,11 +474,11 @@
                 }
             },
             "filters": [
-                {"id": "collection", "sort": [{"key": "name", "operator": "-"}]},
-                {"id": "source", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "collection", "sort": [{"key": "name", "operator": "+"}]},
+                {"id": "source", "sort": [{"key": "name", "operator": "+"}]},
                 {"id": "category", "sort": [{"key": "items", "operator": "-"}]},
-                {"id": "keyword", "sort": [{"key": "items", "operator": "-"}]},
-                {"id": "location", "sort": [{"key": "items", "operator": "-"}]}
+                {"id": "keywords", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "locations", "sort": [{"key": "items", "operator": "-"}]}
             ],
             "filtersSize": 176,
             "find": {"conditions": [], "operator": "&"},

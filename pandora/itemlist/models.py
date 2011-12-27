@@ -122,7 +122,7 @@ class List(models.Model):
         return response
 
     def path(self, name=''):
-        h = "%06d" % self.id
+        h = "%07d" % self.id
         return os.path.join('lists', h[:2], h[2:4], h[4:6], h[6:], name)
 
     def update_icon(self):

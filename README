@@ -12,7 +12,8 @@ python, bazaar, pip and virtualenv and several other python modules:
     apt-get install bzr git subversion mercurial \
             python-setuptools python-pip python-virtualenv ipython \
             python-dev python-imaging python-numpy python-psycopg2 \
-            python-geoip postgresql rabbitmq-server
+            python-geoip python-html5lib python-lxml \
+            postgresql rabbitmq-server
     apt-get install oxframe oxtimeline 
 
 * Pan.do/ra
