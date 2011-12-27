@@ -1089,7 +1089,10 @@ class Item(models.Model):
         icons = os.path.abspath(os.path.join(settings.MEDIA_ROOT, icon))
         icons = glob(icons.replace('.jpg', '*.jpg'))
         for f in filter(lambda p: not p.endswith('/icon.jpg'), icons):
-            os.unlink(f)
+            try:
+                os.unlink(f)
+            except:
+                pass
         return icon
 
     def load_subtitles(self):

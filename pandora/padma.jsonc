@@ -522,7 +522,7 @@
             "sidebarSize": 256,
             "theme": "classic",
             "videoPoints": {},
-            "videoResolution": 96,
+            "videoResolution": 240,
             "videoScale": "fit",
             "videoMuted": false,
             "videoSize": "small",

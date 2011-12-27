@@ -222,7 +222,7 @@ pandora.ui.infoView = function(data) {
                     placeholder: formatLight('unknown'),
                     tooltip: 'Doubleclick to edit',
                     value: key == 'country'
-                        ? (data[key] ? data[key].join(', ') : [''])
+                        ? (data[key] ? data[key].join(', ') : '')
                         : data[key] || ''
                 })
                 .css({float: 'left'})
@@ -284,10 +284,7 @@ pandora.ui.infoView = function(data) {
         })
         .bindEvent({
             submit: function(event) {
-                var value = ['language', 'category'].indexOf(key) >= 0
-                        ? event.value.split(', ')
-                        : event.value;
-                editMetadata(key, value);
+                editMetadata(key, event.value);
             }
         })
         .appendTo($div);
@@ -388,8 +385,8 @@ pandora.ui.infoView = function(data) {
             var edit = {id: data.id};
             if (key == 'title') {
                 Ox.extend(edit, parseTitle(value));
-            } else if (key == 'director' || key == 'country') {
-                edit[key] = value.split(', ');
+            } else if(['director', 'country', 'language', 'category'].indexOf(key) >= 0) {
+                edit[key] = value ? value.split(', ') : [];
             } else {
                 edit[key] = value;
             }
