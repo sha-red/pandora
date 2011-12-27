@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from datetime import timedelta
 
-from celery.decorators import task, periodic_task
+from celery.task import task, periodic_task
 from celery.task.schedules import crontab
 
 import models

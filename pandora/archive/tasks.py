@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from celery.decorators import task
+from celery.task import task
 import ox
 
 from django.conf import settings

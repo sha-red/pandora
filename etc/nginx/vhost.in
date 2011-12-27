@@ -1,11 +1,15 @@
 server {
+    #make sure to add 
+    #        application/json                        json;
+    #to /etc/nginx/mime.types
+
     #those need to go into /etc/nginx/nginx.conf in the http section
     #gzip  on;
     #gzip_http_version 1.1;
     #gzip_vary on;
     #gzip_comp_level 6;
     #gzip_proxied any;
-    #gzip_types text/plain text/css text/json text/xml application/json application/xml application/xml+rss text/javascript application/javascript;
+    #gzip_types text/plain text/css application/json text/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript text/x-js;
     #gzip_buffers 16 8k;
     #gzip_disable "MSIE [1-6]\.(?!.*SV1)";
 
