@@ -1086,6 +1086,7 @@ class Item(models.Model):
            cmd += ['-f', frame]
         p = subprocess.Popen(cmd)
         p.wait()
+        #remove cached versions
         icons = os.path.abspath(os.path.join(settings.MEDIA_ROOT, icon))
         icons = glob(icons.replace('.jpg', '*.jpg'))
         for f in filter(lambda p: not p.endswith('/icon.jpg'), icons):

@@ -482,7 +482,7 @@
             ],
             "filtersSize": 176,
             "find": {"conditions": [], "operator": "&"},
-            "icons": "posters",
+            "icons": "frames",
             "infoIconSize": 256,
             "item": "",
             "itemFind": {"conditions": [], "operator": "&"},

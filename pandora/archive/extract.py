@@ -61,6 +61,7 @@ def stream(video, target, profile, info):
         H264, should bitrates be a bit lower? other stuff possible?
     '''
     profile, format = profile.split('.')
+    bpp = 0.17
 
     if profile == '1080p':
         height = 1080
@@ -105,7 +106,6 @@ def stream(video, target, profile, info):
         audiobitrate = '22k'
         audiochannels = 1
 
-    bpp = 0.17
     
     if info['video'] and 'display_aspect_ratio' in info['video'][0]:
         fps = AspectRatio(info['video'][0]['framerate'])
