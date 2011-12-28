@@ -132,18 +132,23 @@ function constructList() {
                 var $code = $('<code class="python">')
                              .html(app.actions[id].code[1].replace('/\n/<br>\n/g'))
                              .hide();
-                var $button = new Ox.Button({
-                  type: "image"
-                  values: [
+                /*
+                var $button = Ox.Button({
+                  type: "image",
+                  options: [
                     {id: "one", title: "right"},
                     {id: "two", title: "down"},
                   ],
                 })
                 .addClass("margin")
                 .click(function() { $code.toggle()})
-                .appendTo(info)
+                .appendTo(info);
+                */
                 var f = app.actions[id].code[0];
-                $('<span>').html(' View Source ('+f+')').appendTo(info)
+                $('<span>')
+                    .html(' View Source ('+f+')')
+                    .click(function() { $code.toggle()})
+                    .appendTo(info)
                 $('<pre>').append($code).appendTo(info)
                 hljs.highlightBlock($code[0], '    ');
 
