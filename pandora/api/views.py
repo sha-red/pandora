@@ -14,7 +14,6 @@ from ox.django.shortcuts import render_to_json_response, json_response
 from ox.utils import json
 
 from user.models import init_user
-from item.models import ItemSort
 
 from actions import actions
 
