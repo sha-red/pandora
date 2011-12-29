@@ -40,11 +40,11 @@ class MetaClip:
                 setattr(self, l, self.annotations.filter(layer=l).count()>0)
         models.Model.save(self, *args, **kwargs)
 
+    clip_keys = ('id', 'in', 'out', 'position', 'created', 'modified',
+                 'hue', 'saturation', 'lightness', 'volume', 'videoRatio')
     def json(self, keys=None):
         j = {}
-        clip_keys = ('id', 'in', 'out', 'position', 'created', 'modified',
-                     'hue', 'saturation', 'lightness', 'volume', 'videoRatio')
-        for key in clip_keys:
+        for key in self.clip_keys:
             j[key] = getattr(self, {
                 'id': 'public_id',
                 'in': 'start',
@@ -61,7 +61,7 @@ class MetaClip:
                 j['annotations'] = [a.json(keys=['value', 'id', 'layer'])
                                     for a in self.annotations.filter(layer__in=self.layers)]
             for key in keys:
-                if key not in clip_keys and key not in j:
+                if key not in self.clip_keys and key not in j:
                     value = self.item.get(key)
                     if not value and hasattr(self.item.sort, key):
                         value = getattr(self.item.sort, key)

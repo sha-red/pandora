@@ -35,7 +35,7 @@ def order_query(qs, sort):
         if operator != '-':
             operator = ''
         clip_keys = ('public_id', 'start', 'end', 'hue', 'saturation', 'lightness', 'volume',
-                     'annotations__sortvalue', 'videoRatio',
+                     'duration', 'annotations__sortvalue', 'videoRatio',
                      'director', 'title')
         key = {
             'id': 'public_id',
@@ -82,9 +82,12 @@ def findClips(request):
     if 'keys' in data:
         qs = order_query(qs, query['sort'])
         qs = qs[query['range'][0]:query['range'][1]]
-        #qs = qs.select_related('item__sort')
+
         ids = []
         keys = filter(lambda k: k not in models.Clip.layers, data['keys'])
+        if filter(lambda k: k not in models.Clip.clip_keys, keys):
+            qs = qs.select_related('item__sort')
+
         def add(p):
             ids.append(p.id)
             return p.json(keys=keys)
