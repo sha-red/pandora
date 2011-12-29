@@ -25,7 +25,8 @@
         "canSeeDebugMenu": {"staff": true, "admin": true},
         "canSeeFiles": {"staff": true, "admin": true},
         "canSeeItem": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
-        "canSeeExtraItemViews": {"friend": true, "staff": true, "admin": true}
+        "canSeeExtraItemViews": {"friend": true, "staff": true, "admin": true},
+        "canSendMail": {"staff": true, "admin": true}
     },
     /*
         clipKeys are the properties that clips can by sorted by.
@@ -45,6 +46,7 @@
         {"id": "collection", "title": "Collection", "type": "string"},
         {"id": "source", "title": "Source", "type": "string"},
         {"id": "director", "title": "Director", "type": "string"},
+        {"id": "cinematographer", "title": "Cinematographer", "type": "string"},
         {"id": "places", "title": "Places", "type": "string"},
         {"id": "year", "title": "Year", "type": "integer"},
         {"id": "language", "title": "Language", "type": "string"},
@@ -96,6 +98,16 @@
             "type": ["string"],
             "autocomplete": true,
             "columnRequired": true,
+            "columnWidth": 180,
+            "filter": true,
+            "find": true,
+            "sort": "person"
+        },
+        {
+            "id": "cinematographer",
+            "title": "Cinematographer",
+            "type": ["string"],
+            "autocomplete": true,
             "columnWidth": 180,
             "filter": true,
             "find": true,
@@ -491,7 +503,7 @@
             "listColumns": ["title", "director", "location", "collection", "language", "duration", "source"],
             "listColumnWidth": {},
             "listSelection": [],
-            "listSort": [{"key": "director", "operator": "+"}],
+            "listSort": [{"key": "title", "operator": "+"}],
             "listView": "grid",
             "lists": {},
             "mapFind": "",
