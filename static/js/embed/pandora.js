@@ -28,9 +28,12 @@ Ox.load('UI', {
                             });
                         });
                         that.append(pandora.player = Ox.VideoPlayer({
-                                controlsBottom: ['play', 'playInToOut', 'space', 'position'],
+                                controlsBottom: ['play', 'volume', 'scale', 'timeline', 'position', 'settings'],
                                 enableFind: false,
                                 enableFullscreen: true,
+                                enableKeyboard: true,
+                                enableMouse: true,
+                                enableTimeline: true,
                                 enableVolume: true,
                                 externalControls: false,
                                 height: document.height,
@@ -39,8 +42,9 @@ Ox.load('UI', {
                                 paused: true,
                                 position: inPoint,
                                 poster: '/' + item + '/' + '128p' + inPoint +'.jpg',
-                                showMarkers: true,
-                                showMilliseconds: 2,
+                                showMarkers: false,
+                                showMilliseconds: 0,
+                                timeline: '/' + item + '/' + 'timeline16p.png',
                                 title: result.data.title,
                                 video: video,
                                 width: document.width,
