@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from __future__ import division
+from __future__ import division, with_statement
 
 import os.path
 import re
@@ -243,12 +243,13 @@ class File(models.Model):
                         resolution=config['resolutions'][0],
                         format=config['formats'][0])
             if created:
-                stream.video.save(stream.name(), chunk)
+                stream.video.name = stream.name()
+                with open(stream.video.path, 'w') as f:
+                    f.write(chunk.read())
             else:
-                f = open(stream.video.path, 'a')
-                #FIXME: should check that chunk_id/offset is right
-                f.write(chunk.read())
-                f.close()
+                with open(stream.video.path, 'a') as f:
+                    #FIXME: should check that chunk_id/offset is right
+                    f.write(chunk.read())
             if done:
                 stream.available = True
                 stream.save()

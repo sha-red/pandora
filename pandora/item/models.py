@@ -971,6 +971,12 @@ class Item(models.Model):
         for f in glob(path.replace('.jpg', '*.jpg')):
             os.unlink(f)
 
+    def save_poster(self, data):
+        self.poster.name = self.path('poster.jpg')
+        poster = self.poster.path
+        with open(poster, 'w') as f:
+            f.write(data)
+
     def prefered_poster_url(self):
         external_posters = self.external_data.get('posters', {})
         service = self.poster_source
@@ -996,12 +1002,12 @@ class Item(models.Model):
             url = self.prefered_poster_url()
             if url:
                 data = ox.net.readUrl(url)
-                self.poster.save('poster.jpg', ContentFile(data))
+                self.save_poster(data)
             elif os.path.exists(poster):
                 with open(poster) as f:
                     data = f.read()
                     if data:
-                        self.poster.save('poster.jpg', ContentFile(data))
+                        self.save_poster(data)
 
     def make_siteposter(self):
         poster = self.path('siteposter.jpg')

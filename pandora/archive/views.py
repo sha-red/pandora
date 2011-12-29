@@ -136,6 +136,8 @@ def upload(request):
                 #float required?
                 position = float(os.path.splitext(name)[0])
                 fr, created = models.Frame.objects.get_or_create(file=f, position=position)
+                if fr.frame:
+                    fr.frame.delete()
                 fr.frame.save(name, frame)
                 os.chmod(fr.frame.path, 0644)
             f.item.select_frame()
