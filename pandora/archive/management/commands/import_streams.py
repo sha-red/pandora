@@ -55,3 +55,8 @@ class Command(BaseCommand):
             s.file.item.update_timeline()
             #make sure all derivatives exist
             s.extract_derivatives()
+
+            #update clips
+            for c in s.file.item.clips.all():
+                c.update_calculated_values()
+                c.save()
