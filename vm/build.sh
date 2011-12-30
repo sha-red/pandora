@@ -32,6 +32,8 @@ sudo  vmbuilder vbox ubuntu --suite=oneiric \
     --addpkg python-numpy \
     --addpkg python-psycopg2 \
     --addpkg python-simplejson \
+    --addpkg python-lxml \
+    --addpkg python-html5lib \
     --addpkg oxtimeline \
     --addpkg oxframe \
     --addpkg mkvtoolnix \

@@ -47,6 +47,7 @@ class Command(BaseCommand):
         for s in models.Stream.objects.exclude(format=format, resolution=resolution).filter(source=None):
             s.source = models.Stream.objects.get(file=s.file, resolution=resolution, format=format)
             s.save()
+        print "update streams"
         for s in models.Stream.objects.filter(source=None):
             if not glob("%s*"%s.timeline_prefix):
                 s.make_timeline()

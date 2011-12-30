@@ -31,8 +31,9 @@ appPanel
         } catch(e) {}
     };
 
-    var debug = localStorage && localStorage.pandoraDebug,
-        theme = localStorage && localStorage.OxTheme || 'modern';
+    var debug = localStorage && localStorage['pandora.debug'],
+        theme = localStorage && localStorage['Ox.theme']
+            && JSON.parse(localStorage['Ox.theme']) || 'modern';
 
     loadImages(function(images) {
         loadScreen(images);
@@ -143,7 +144,10 @@ appPanel
     }
 
     function loadPandora(browserSupported) {
-        window.pandora = Ox.App({url: '/api/'}).bindEvent({
+        window.pandora = Ox.App({
+            name: 'pandora',
+            url: '/api/',
+        }).bindEvent({
             load: function(data) {
                 data.browserSupported = browserSupported;
                 Ox.extend(pandora, {
@@ -152,11 +156,12 @@ appPanel
                 });
                 loadPandoraFiles(function() {
                     initPandora(data);
-                    if (localStorage && localStorage.pandoraLocal) {
+                    if (pandora.localStorage('local')) {
+                        var url = pandora.localStorage('local');
                         window.pandora.local = Ox.API({
-                            'url': localStorage.pandoraLocal + '/api/'
+                            'url': url + '/api/'
                         }, function() {
-                            pandora.site.site.videoprefix = localStorage.pandoraLocal;
+                            pandora.site.site.videoprefix = url;
                         });
                     }
                 });
@@ -166,7 +171,7 @@ appPanel
 
     function loadPandoraFiles(callback) {
         var prefix = '/static/';
-        if (localStorage && localStorage.pandoraDebug) {
+        if (localStorage && localStorage['pandora.debug']) {
             Ox.getJSON(prefix + 'json/pandora.json', function(files) {
                 var promises = [];
                 files.forEach(function(file) {
@@ -267,12 +272,6 @@ appPanel
             selectedMovies: [], // fixme: used for what?
             videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
         });
-
-        /* disabled
-        if (data.user.level == 'guest' && $.browser.mozilla && !localStorage.OxTheme) {
-            pandora.user.ui.theme = 'classic';
-        }
-        */
 
         // set up url controller
 
