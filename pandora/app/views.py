@@ -54,7 +54,7 @@ def opensearch_xml(request):
     e = ET.SubElement(osd, 'Url')
     e.attrib['type'] = 'text/html'
     e.attrib['method'] = 'GET'
-    e.attrib['template'] = "%s/{searchTerms}" % request.build_absolute_uri('/')
+    e.attrib['template'] = "%s{searchTerms}" % request.build_absolute_uri('/')
     '''
     e = ET.SubElement(osd, 'Url')
     e.attrib['type'] = 'application/x-suggestions+json'
