@@ -52,6 +52,8 @@ class MetaClip:
                 'position': 'start',
                 'videoRatio': 'aspect_ratio',
             }.get(key, key))
+        if not j['videoRatio']:
+            j['videoRatio'] = 4/3
         if keys:
             for key in j.keys():
                 if key not in keys:
