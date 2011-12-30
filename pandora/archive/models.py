@@ -243,7 +243,7 @@ class File(models.Model):
                         resolution=config['resolutions'][0],
                         format=config['formats'][0])
             if created:
-                stream.video.name = stream.name()
+                stream.video.name = stream.path(stream.name())
                 ox.makedirs(os.path.dirname(stream.video.path))
                 with open(stream.video.path, 'w') as f:
                     f.write(chunk.read())
