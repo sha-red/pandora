@@ -244,6 +244,7 @@ class File(models.Model):
                         format=config['formats'][0])
             if created:
                 stream.video.name = stream.name()
+                ox.makedirs(os.path.dirname(stream.video.path))
                 with open(stream.video.path, 'w') as f:
                     f.write(chunk.read())
             else:
