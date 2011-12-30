@@ -247,6 +247,7 @@ class File(models.Model):
                 ox.makedirs(os.path.dirname(stream.video.path))
                 with open(stream.video.path, 'w') as f:
                     f.write(chunk.read())
+                stream.save()
             else:
                 with open(stream.video.path, 'a') as f:
                     #FIXME: should check that chunk_id/offset is right
