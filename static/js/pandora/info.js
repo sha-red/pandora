@@ -308,7 +308,7 @@ pandora.ui.posterInfo = function(data) {
             })
             .html(
                 data.title + (
-                    data.director ? ' (' + data.director.join(', ') + ')' : ''
+                    Ox.len(data.director) ? ' (' + data.director.join(', ') + ')' : ''
                 )
             ),
         that = Ox.SplitPanel({

@@ -32,7 +32,7 @@ pandora.ui.item = function() {
         pandora.$ui.itemTitle
             .options({
                 title: '<b>' + result.data.title
-                    + (result.data.director && result.data.director.length
+                    + (Ox.len(result.data.director)
                         ? ' (' + result.data.director.join(', ') + ')'
                         : '')
                     + (result.data.year ? ' ' + result.data.year : '') + '</b>'

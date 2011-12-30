@@ -7,7 +7,9 @@ pandora.ui.clipList = function(videoRatio) {
     var ui = pandora.user.ui,
         fixedRatio = !ui.item ? 16/9 : videoRatio,
         isClipView = !ui.item ? ui.listView == 'clip' : ui.itemView == 'clips',
-
+        textKey = Ox.getObjectById(pandora.site.layers, 'subtitles')
+            ? 'subtitles'
+            : 'annotations',
         that = Ox.IconList({
             fixedRatio: fixedRatio,
             item: function(data, sort, size) {
@@ -22,7 +24,7 @@ pandora.ui.clipList = function(videoRatio) {
                     width = fixedRatio > 1 ? size : Math.round(size * fixedRatio);
                     height = fixedRatio > 1 ? Math.round(size / fixedRatio) : size;
                 }
-                title = data.subtitles ? data.subtitles[0].value : ''; //fixme: could be other layer
+                title = data[textKey] ? data[textKey][0].value : '';
                 url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg';
                 sortKey = sort[0].key;
                 if (['text', 'position', 'duration'].indexOf(sortKey) > -1) {
@@ -79,7 +81,7 @@ pandora.ui.clipList = function(videoRatio) {
                 }, data), callback);
             },
             keys: Ox.merge(
-                ['id', 'in', 'out', 'subtitles'], //fixme: could be other layer
+                ['id', 'in', 'out', textKey],
                 !ui.item ? ['videoRatio'] : []
             ),
             max: 1,

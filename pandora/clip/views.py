@@ -84,7 +84,7 @@ def findClips(request):
         qs = qs[query['range'][0]:query['range'][1]]
 
         ids = []
-        keys = filter(lambda k: k not in models.Clip.layers, data['keys'])
+        keys = filter(lambda k: k not in models.Clip.layers + ['annotations'], data['keys'])
         if filter(lambda k: k not in models.Clip.clip_keys, keys):
             qs = qs.select_related('item__sort')
 
@@ -95,20 +95,27 @@ def findClips(request):
 
         keys = data['keys']
 
-        def add_annotations(layer, qs):
-            for a in qs.values('public_id', 'value', 'clip__public_id'):
+        def add_annotations(key, qs, add_layer=False):
+            values = ['public_id', 'value', 'clip__public_id']
+            if add_layer:
+                values.append('layer')
+            for a in qs.values(*values):
                 for i in response['data']['items']:
                     if i['id'] == a['clip__public_id']:
-                        if not layer in i:
-                            i[layer] = []
-                        i[layer].append({
+                        if not key in i:
+                            i[key] = []
+                        l = {
                             'id': a['public_id'],
                             'value': a['value'],
-                        })
+                        }
+                        if add_layer:
+                            l['layer'] = a['layer']
+                        i[key].append(l)
         if response['data']['items']:
             if 'annotations' in keys:
                 add_annotations('annotations',
-                    Annotation.objects.filter(layer__in=models.Clip.layers, clip__in=ids))
+                    Annotation.objects.filter(layer__in=models.Clip.layers, clip__in=ids),
+                    True)
             for layer in filter(lambda l: l in keys, models.Clip.layers):
                 add_annotations(layer,
                     Annotation.objects.filter(layer=layer, clip__in=ids))
