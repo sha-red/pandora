@@ -27,10 +27,11 @@ urlpatterns = patterns('',
     (r'^api$', include('api.urls')),
     (r'^api/$', include('api.urls')),
     (r'^resetUI$', 'user.views.reset_ui'),
-    (r'', include('item.urls')),
     (r'^list/(?P<id>.*?)/icon(?P<size>\d*).jpg$', 'itemlist.views.icon'),
     (r'^robots.txt$', serve_static_file, {'location': os.path.join(settings.STATIC_ROOT, 'robots.txt'), 'content_type': 'text/plain'}),
     (r'^favicon.ico$', serve_static_file, {'location': os.path.join(settings.STATIC_ROOT, 'png/icon.16.png'), 'content_type': 'image/x-icon'}),
+    (r'^opensearch.xml$', 'app.views.opensearch_xml'),
+    (r'', include('item.urls')),
 )
 #if settings.DEBUG:
 #sould this not be enabled by default? nginx should handle those

@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+try:
+    import xml.etree.ElementTree as ET
+except:
+    import elementtree.ElementTree as ET
+
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.conf import settings
@@ -33,6 +38,33 @@ def embed(request, id):
         'settings': settings
     })
     return render_to_response('embed.html', context)
+
+def opensearch_xml(request):
+    osd = ET.Element('OpenSearchDescription')
+    osd.attrib['xmlns']="http://a9.com/-/spec/opensearch/1.1/"
+    e = ET.SubElement(osd, 'ShortName')
+    e.text = settings.SITENAME
+    e = ET.SubElement(osd, 'Description')
+    e.text = settings.SITENAME
+    e = ET.SubElement(osd, 'Image')
+    e.attrib['height'] = '16'
+    e.attrib['width'] = '16'
+    e.attrib['type'] = 'image/x-icon'
+    e.text = request.build_absolute_uri('/favicon.ico')
+    e = ET.SubElement(osd, 'Url')
+    e.attrib['type'] = 'text/html'
+    e.attrib['method'] = 'GET'
+    e.attrib['template'] = "%s/{searchTerms}" % request.build_absolute_uri('/')
+    '''
+    e = ET.SubElement(osd, 'Url')
+    e.attrib['type'] = 'application/x-suggestions+json'
+    e.attrib['method'] = 'GET'
+    e.attrib['template'] = "%s?q={searchTerms}" % request.build_absolute_uri('/opensearch_suggest')
+    '''
+    return HttpResponse(
+        '<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(osd),
+        'application/xml'
+    )
 
 
 def getPage(request):
