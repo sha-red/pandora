@@ -209,8 +209,8 @@ def firefogg_upload(request):
                 f.uploading = True
                 f.save()
                 response = {
-                    #is it possible to no hardcode url here?
                     'uploadUrl': request.build_absolute_uri('/api/upload/?id=%s&profile=%s' % (f.oshash, profile)),
+                    'url': request.build_absolute_uri('/%s/files' % f.item.itemId),
                     'result': 1
                 }
                 return render_to_json_response(response)
