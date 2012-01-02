@@ -5,7 +5,7 @@ from django.conf import settings
 import os
 from glob import glob
 
-from ... import models
+from ... import models, extract
 
 
 class Command(BaseCommand):
@@ -51,6 +51,11 @@ class Command(BaseCommand):
         for s in models.Stream.objects.filter(source=None):
             if not glob("%s*"%s.timeline_prefix):
                 s.make_timeline()
+            if not s.color:
+                s.cuts = tuple(extract.cuts(self.timeline_prefix))
+                s.color = tuple(extract.average_color(self.timeline_prefix))
+                s.save()
+
             s.file.selected = True
             s.file.save()
             s.file.item.update_timeline()

@@ -184,7 +184,7 @@ def firefogg_upload(request):
                 chunk_id = form.cleaned_data['chunkId']
                 response = {
                     'result': 1,
-                    'resultUrl': request.build_absolute_uri('/')
+                    'resultUrl': request.build_absolute_uri('/%s'%f.item.itemId)
                 }
                 if not f.save_chunk(c, chunk_id, form.cleaned_data['done']):
                     response['result'] = -1
@@ -210,7 +210,7 @@ def firefogg_upload(request):
                 f.save()
                 response = {
                     'uploadUrl': request.build_absolute_uri('/api/upload/?id=%s&profile=%s' % (f.oshash, profile)),
-                    'url': request.build_absolute_uri('/%s/files' % f.item.itemId),
+                    'url': request.build_absolute_uri('/%s' % f.item.itemId),
                     'result': 1
                 }
                 return render_to_json_response(response)

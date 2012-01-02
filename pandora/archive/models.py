@@ -97,8 +97,11 @@ class File(models.Model):
                 self.is_audio = False
                 if self.path.endswith('.jpg') or \
                    self.path.endswith('.png') or \
+                   self.path.endswith('.txt') or \
+                   self.video_codec == 'ansi' or \
                    self.duration == 0.04:
                     self.is_video = False
+                    self.video_codec = ''
             else:
                 self.is_video = False
                 self.display_aspect_ratio = "4:3"
