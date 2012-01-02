@@ -204,7 +204,7 @@ pandora.ui.item = function() {
                     find: pandora.user.ui.itemFind.conditions[0]
                         ? pandora.user.ui.itemFind.conditions[0].value : '',
                     getFrameURL: function(position) {
-                        return '/' + pandora.user.ui.item + '/' + Ox.last(pandora.site.video.resolutions) + 'p' + position + '.jpg';
+                        return '/' + pandora.user.ui.item + '/' + pandora.user.ui.videoResolution + 'p' + position + '.jpg';
                     },
                     getLargeTimelineImageURL: function(i) {
                         return '/' + pandora.user.ui.item + '/timeline64p' + i + '.png';
