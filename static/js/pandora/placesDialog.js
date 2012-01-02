@@ -27,13 +27,17 @@ pandora.ui.placesDialog = function() {
             getMatches: function(names, callback) {
                 // fixme: the results of this are of course
                 // not identical to actual place matches
+                var key = pandora.site.layers.filter(function(layer) {
+                        return layer.type == 'place' || layer.hasPlaces;
+                    }).map(function(layer) {
+                        return layer.id;
+                    })[0],
+                    operator = Ox.getObjectById(pandora.site.layers, key).type == 'place' ?
+                        '==' : '=';
                 pandora.api.findClips({
                     query: {
                         conditions: names.map(function(name) {
-                            //FIXME: this should be more generic
-                            return Ox.getObjectById(pandora.site.layers, 'subtitles')
-                                ? {key: 'subtitles', value: name, operator: '='}
-                                : {key: 'places', value: name, operator: '=='};
+                            return {key: key, value: name, operator: operator};
                         }),
                         operator: names.length == 1 ? '&' : '|'
                     }

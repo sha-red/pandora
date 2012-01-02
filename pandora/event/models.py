@@ -7,6 +7,7 @@ import re
 from django.db import models, transaction
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.conf import settings
 import ox
 from ox.django import fields
 
@@ -68,6 +69,8 @@ class Event(models.Model):
         return False
      
     def get_matches(self):
+        layers = filter(lambda l: l['type'] == 'event' or l.get('hasEvents'),
+                        settings.CONFIG['layers'])
         super_matches = []
         q = Q(name_find__contains=" " + self.name)|Q(name_find__contains="|%s"%self.name)
         for name in self.alternativeNames:
@@ -81,7 +84,7 @@ class Event(models.Model):
         for name in self.alternativeNames:
             q = q|Q(value__icontains=" " + name)|Q(value__startswith=name)
         matches = []
-        for a in Annotation.objects.filter(q):
+        for a in Annotation.objects.filter(layer__in=layers).filter(q):
             value = a.value.lower()
             for name in super_matches:
                 value = value.replace(name.lower(), '')
