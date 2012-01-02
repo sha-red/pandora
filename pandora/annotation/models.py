@@ -87,9 +87,12 @@ class Annotation(models.Model):
                 self.layer: False
             }).update(**{self.layer: True})
 
-        #how expensive is this?
-        #update_matching_events.delay(self.value)
-        #update_matching_places.delay(self.value)
+        if filter(lambda l: l['type'] == 'place' or l.get('hasPlaces'),
+                  settings.CONFIG['layers']):
+            update_matching_places.delay(self.id)
+        if filter(lambda l: l['type'] == 'event' or l.get('hasEvents'),
+                  settings.CONFIG['layers']):
+            update_matching_events.delay(self.id)
 
     def json(self, layer=False, keys=None):
         j = {
