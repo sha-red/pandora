@@ -269,7 +269,6 @@ appPanel
 
         Ox.extend(pandora.user, {
             sectionElement: 'buttons',
-            selectedMovies: [], // fixme: used for what?
             videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
         });
 
