@@ -16,6 +16,7 @@
         // "canClickMap": {"friend": true, "staff": true, "admin": true},
         "canDeleteItems": {"admin": true},
         "canDownloadVideo": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
+        "canEditAnnotations": {"staff": true, "admin": true},
         "canEditFeaturedLists": {"staff": true, "admin": true},
         "canEditMetadata": {"staff": true, "admin": true},
         "canEditSitePages": {"staff": true, "admin": true},
@@ -317,9 +318,9 @@
             "id": "size",
             "title": "Size",
             "type": "integer",
+            "capability": "canSeeFiles",
             "columnWidth": 60,
-            "format": {"type": "value", "args": ["B"]},
-            "rightsLevel": 1
+            "format": {"type": "value", "args": ["B"]}
         },
         {
             "id": "bitrate",
@@ -332,16 +333,16 @@
             "id": "numberoffiles",
             "title": "Number of Files",
             "type": "integer",
+            "capability": "canSeeFiles",
             "columnWidth": 60,
-            "value": {"key": "files", "type": "length"},
-            "rightsLevel": 1
+            "value": {"key": "files", "type": "length"}
         },
         {
             "id": "filename",
             "title": "Filename",
             "type": ["string"],
-            "find": true,
-            "rightsLevel": 1
+            "capability": "canSeeFiles",
+            "find": true
         },
         {
             "id": "modified",
@@ -391,26 +392,37 @@
         {
             "id": "places",
             "title": "Places",
-            "type": "place",
-            "overlap": true
+            "canAddAnnotations": {"member": true, "staff": true, "admin": true},
+            "overlap": true,
+            "type": "place"
+        },
+        {
+            "id": "events",
+            "title": "Events",
+            "canAddAnnotations": {"member": true, "staff": true, "admin": true},
+            "overlap": true,
+            "type": "event"
         },
         {
             "id": "keywords",
             "title": "Keywords",
+            "canAddAnnotations": {"member": true, "staff": true, "admin": true},
             "overlap": true,
             "type": "string"
         },
         {
             "id": "descriptions",
             "title": "Descriptions",
-            "type": "text",
-            "overlay": true
+            "canAddAnnotations": {"member": true, "staff": true, "admin": true},
+            "overlay": true,
+            "type": "text"
         },
         {
             "id": "transcripts",
             "title": "Transcripts",
-            "type": "text",
-            "overlay": true
+            "canAddAnnotations": {"member": true, "staff": true, "admin": true},
+            "overlay": true,
+            "type": "text"
         }
     ],
     "listViews": [
@@ -477,6 +489,8 @@
     "user": {
         "level": "guest",
         "ui": {
+            "annotationsFont": "small",
+            "annotationsRange": "all",
             "annotationsSize": 256,
             "clipsColumns": 2,
             "columns": {

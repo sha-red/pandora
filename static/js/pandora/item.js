@@ -194,6 +194,8 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'timeline') {
             pandora.$ui.contentPanel.replaceElement(1,
                 pandora.$ui.editor = Ox.VideoEditor({
+                    annotationsFont: pandora.user.ui.annotationsFont,
+                    annotationsRange: pandora.user.ui.annotationsRange,
                     annotationsSize: pandora.user.ui.annotationsSize,
                     censored: videoOptions.censored,
                     cuts: result.data.cuts || [],
@@ -213,7 +215,11 @@ pandora.ui.item = function() {
                     height: pandora.$ui.contentPanel.size(1),
                     id: 'editor',
                     'in': pandora.user.ui.videoPoints[pandora.user.ui.item]['in'],
-                    layers: videoOptions.layers,
+                    layers: videoOptions.layers.map(function(layer) {
+                        return Ox.extend({
+                            editable: layer.canAddAnnotations[pandora.user.level]
+                        }, layer);
+                    }),
                     muted: pandora.user.ui.videoMuted,
                     out: pandora.user.ui.videoPoints[pandora.user.ui.item].out,
                     position: pandora.user.ui.videoPoints[pandora.user.ui.item].position,
@@ -229,6 +235,15 @@ pandora.ui.item = function() {
                     volume: pandora.user.ui.videoVolume,
                     width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
                 }).bindEvent({
+                    annotationsFont: function(data) {
+                        pandora.UI.set({annotationsFont: data.font});
+                    },
+                    annotationsRange: function(data) {
+                        pandora.UI.set({annotationsRange: data.range});
+                    },
+                    annotationsSize: function(data) {
+                        pandora.UI.set({annotationsSize: data.size});
+                    },
                     find: function(data) {
                         pandora.UI.set('itemFind', data.find ? {
                             conditions: [{key: 'subtitles', value: data.find, operator: '='}],
@@ -256,9 +271,6 @@ pandora.ui.item = function() {
                             height: data.size
                         });
                     },
-                    resizeend: function(data) {
-                        pandora.UI.set({annotationsSize: data.size});
-                    },
                     resolution: function(data) {
                         pandora.UI.set('videoResolution', data.resolution);
                     },
@@ -270,9 +282,13 @@ pandora.ui.item = function() {
                     },
                     addannotation: function(data) {
                         Ox.Log('', 'addAnnotation', data);
-                        data.item = pandora.user.ui.item;
-                        data.value = 'Click to edit';
-                        pandora.api.addAnnotation(data, function(result) {
+                        pandora.api.addAnnotation({
+                            'in': data['in'],
+                            item: pandora.user.ui.item,
+                            layer: data.layer,
+                            out: data.out,
+                            value: 'Click to edit',
+                        }, function(result) {
                             pandora.$ui.editor.addAnnotation(data.layer, result.data);
                         });
                     },
@@ -286,8 +302,14 @@ pandora.ui.item = function() {
                         pandora.UI.set('showAnnotations', data.showAnnotations);
                     },
                     updateannotation: function(data) {
+                        Ox.Log('', 'editAnnotations', data);
                         //fixme: check that edit was successfull
-                        pandora.api.editAnnotation(data, function(result) {
+                        pandora.api.editAnnotation({
+                            id: data.id,
+                            'in': data['in'],
+                            out: data.out,
+                            value: data.value,
+                        }, function(result) {
                             Ox.Log('', 'done updateAnnotation', result);
                         });
                     },
