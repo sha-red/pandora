@@ -39,7 +39,7 @@ class Annotation(models.Model):
 
     def editable(self, user):
         if user.is_authenticated():
-            if user.is_staff or \
+            if user.get_profile().capability('canEditAnnotations') or \
                self.user == user or \
                user.groups.filter(id__in=self.groups.all()).count() > 0:
                 return True

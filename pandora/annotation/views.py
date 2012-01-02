@@ -131,17 +131,19 @@ def addAnnotation(request):
 
     item = get_object_or_404_json(Item, itemId=data['item'])
     
-    #FIXME: check that layer is a valid layer id
-    layer = data['layer']
-
-    annotation = models.Annotation(
-        item=item,
-        layer=layer,
-        user=request.user,
-        start=float(data['in']), end=float(data['out']),
-        value=data['value'])
-    annotation.save()
-    response = json_response(annotation.json())
+    layer_id = data['layer']
+    layer = filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers'])[0]
+    if layer['canAddAnnotations'].get(request.user.get_profile().get_level()):
+        annotation = models.Annotation(
+            item=item,
+            layer=layer_id,
+            user=request.user,
+            start=float(data['in']), end=float(data['out']),
+            value=data['value'])
+        annotation.save()
+        response = json_response(annotation.json())
+    else:
+        response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 actions.register(addAnnotation, cache=False)
 
