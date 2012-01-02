@@ -18,6 +18,9 @@ urlpatterns = patterns("item.views",
     #torrent
     (r'^(?P<id>[A-Z0-9].*)/torrent/(?P<filename>.*?)$', 'torrent'),
 
+    #srt export
+    (r'^(?P<id>[A-Z0-9].*)/(?P<layer>.+)\.srt$', 'srt'),
+
     #icon
     (r'^(?P<id>[A-Z0-9].*)/icon(?P<size>\d*)\.jpg$', 'icon'),
 

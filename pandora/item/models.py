@@ -1166,6 +1166,13 @@ class Item(models.Model):
             Clip.objects.filter(item=self, annotations__id=None).delete()
         self.update_find()
 
+    def srt(self, layer):
+        return ox.srt.encode([{
+            'in': a.start,
+            'out': a.end,
+            'value': a.value
+        } for a in self.annotations.filter(layer=layer).order_by('start')])
+
 def delete_item(sender, **kwargs):
     i = kwargs['instance']
     i.delete_files()

@@ -784,6 +784,18 @@ def video(request, id, resolution, format, index=None):
     response['Cache-Control'] = 'public'
     return response
 
+def srt(request, id, layer, index=None):
+    item = get_object_or_404(models.Item, itemId=id)
+    if not item.access(request.user):
+        response = HttpResponseForbidden()
+    else:
+        response = HttpResponse()
+        filename = "%s.srt" % item.get('title')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+        response['Content-Type'] = 'text/x-srt'
+        response.write(item.srt(layer))
+    return response
+
 def random_annotation(request):
     n = models.Item.objects.all().count()
     pos = random.randint(0, n)
@@ -792,3 +804,4 @@ def random_annotation(request):
     pos = random.randint(0, n)
     clip = item.annotations.all()[pos]
     return redirect('/%s'% clip.public_id)
+

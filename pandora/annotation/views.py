@@ -203,3 +203,4 @@ def editAnnotation(request):
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 actions.register(editAnnotation, cache=False)
+
