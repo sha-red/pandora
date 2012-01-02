@@ -5,8 +5,31 @@ from django.conf import settings
 import os
 from glob import glob
 
+from celery.task import task
+
 from ... import models, extract
 
+
+@task(queue="encoding")
+def update_stream(id):
+    s = models.Stream.objects.get(pk=id)
+    if not glob("%s*"%s.timeline_prefix):
+        s.make_timeline()
+    if not s.color:
+        s.cuts = tuple(extract.cuts(s.timeline_prefix))
+        s.color = tuple(extract.average_color(s.timeline_prefix))
+        s.save()
+
+    s.file.selected = True
+    s.file.save()
+    s.file.item.update_timeline()
+    #make sure all derivatives exist
+    s.extract_derivatives()
+
+    #update clips
+    for c in s.file.item.clips.all():
+        c.update_calculated_values()
+        c.save()
 
 class Command(BaseCommand):
     """
@@ -49,20 +72,4 @@ class Command(BaseCommand):
             s.save()
         print "update streams"
         for s in models.Stream.objects.filter(source=None):
-            if not glob("%s*"%s.timeline_prefix):
-                s.make_timeline()
-            if not s.color:
-                s.cuts = tuple(extract.cuts(self.timeline_prefix))
-                s.color = tuple(extract.average_color(self.timeline_prefix))
-                s.save()
-
-            s.file.selected = True
-            s.file.save()
-            s.file.item.update_timeline()
-            #make sure all derivatives exist
-            s.extract_derivatives()
-
-            #update clips
-            for c in s.file.item.clips.all():
-                c.update_calculated_values()
-                c.save()
+            update_stream.delay(s.id)
