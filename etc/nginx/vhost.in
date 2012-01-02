@@ -5,6 +5,7 @@ server {
 
     #those need to go into /etc/nginx/nginx.conf in the http section
     #gzip  on;
+    #gzip_static  on;
     #gzip_http_version 1.1;
     #gzip_vary on;
     #gzip_comp_level 6;

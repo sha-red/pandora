@@ -91,6 +91,15 @@ def update_static():
     with open(pandora_json, 'w') as f:
         json.dump(sorted(js), f, indent=2)
 
+    for f in (pandora_js, pandora_json):
+        os.system('gzip -9 -c "%s" > "%s.gz"' % (f, f))
+
+    for root, folders, files in os.walk(os.path.join(settings.STATIC_ROOT, 'oxjs/build')):
+            for f in files:
+                if os.path.splitext(f)[-1] in ('.js', '.json'):
+                    f = os.path.join(root, f)
+                    os.system('gzip -9 -c "%s" > "%s.gz"' % (f, f))
+                    
     for size in (16, 64, 256):
         pandora = os.path.join(settings.STATIC_ROOT, 'png/pandora/icon%d.png'%size)
         image = os.path.join(settings.STATIC_ROOT, 'png/icon%d.png'%size)
