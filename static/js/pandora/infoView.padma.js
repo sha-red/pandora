@@ -389,7 +389,7 @@ pandora.ui.infoView = function(data) {
             var edit = {id: data.id};
             if (key == 'title') {
                 Ox.extend(edit, parseTitle(value));
-            } else if(['director', 'country', 'language', 'category'].indexOf(key) >= 0) {
+            } else if(['director', 'country', 'language', 'category'].indexOf(key) > -1) {
                 edit[key] = value ? value.split(', ') : [];
             } else {
                 edit[key] = value;
