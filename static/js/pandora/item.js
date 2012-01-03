@@ -197,6 +197,7 @@ pandora.ui.item = function() {
                     annotationsFont: pandora.user.ui.annotationsFont,
                     annotationsRange: pandora.user.ui.annotationsRange,
                     annotationsSize: pandora.user.ui.annotationsSize,
+                    annotationsSort: pandora.user.ui.annotationsSort,
                     censored: videoOptions.censored,
                     cuts: result.data.cuts || [],
                     duration: result.data.duration,
@@ -244,6 +245,9 @@ pandora.ui.item = function() {
                     annotationsSize: function(data) {
                         pandora.UI.set({annotationsSize: data.size});
                     },
+                    annotationsSort: function(data) {
+                        pandora.UI.set({annotationsSort: data.sort});
+                    },
                     find: function(data) {
                         pandora.UI.set('itemFind', data.find ? {
                             conditions: [{key: 'subtitles', value: data.find, operator: '='}],
@@ -289,6 +293,8 @@ pandora.ui.item = function() {
                             out: data.out,
                             value: data.value,
                         }, function(result) {
+                            result.data.editable = true;
+                            result.data.duration = result.data.out - result.data['in'];
                             pandora.$ui.editor.addAnnotation(data.layer, result.data);
                         });
                     },

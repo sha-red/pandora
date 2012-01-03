@@ -490,8 +490,9 @@
         "level": "guest",
         "ui": {
             "annotationsFont": "small",
-            "annotationsRange": "all",
+            "annotationsRange": "position",
             "annotationsSize": 256,
+            "annotationsSort": "position",
             "clipsColumns": 2,
             "columns": {
                 "Colors": {

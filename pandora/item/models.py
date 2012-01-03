@@ -426,7 +426,8 @@ class Item(models.Model):
         for l in settings.CONFIG['layers']:
             name = l['id']
             ll = layers.setdefault(name, [])
-            qs = Annotation.objects.filter(layer=name, item=self)
+            qs = Annotation.objects.filter(layer=name, item=self).order_by(
+                    'start', 'end', 'sortvalue')
             if name == 'subtitles':
                 qs = qs.exclude(value='')
             if l.get('private'):
@@ -1171,7 +1172,7 @@ class Item(models.Model):
             'in': a.start,
             'out': a.end,
             'value': a.value
-        } for a in self.annotations.filter(layer=layer).order_by('start')])
+        } for a in self.annotations.filter(layer=layer).order_by('start', 'end', 'sortvalue')])
 
 def delete_item(sender, **kwargs):
     i = kwargs['instance']

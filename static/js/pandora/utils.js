@@ -763,7 +763,14 @@ pandora.getVideoOptions = function(data) {
     });
     options.layers = [];
     pandora.site.layers.forEach(function(layer, i) { 
-        options.layers[i] = Ox.extend({}, layer, {items: data.layers[layer.id]}); 
+        options.layers[i] = Ox.extend({}, layer, {
+            items: data.layers[layer.id].map(function(annotation) {
+                annotation.duration = annotation.out - annotation['in'];
+                annotation.editable = annotation.user == pandora.user.username || 
+                    pandora.site.capabilities['canEditAnnotations'][pandora.user.level];
+                return annotation;
+            })
+        });
     });
     return options;
 };
