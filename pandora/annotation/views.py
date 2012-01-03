@@ -118,7 +118,7 @@ def addAnnotation(request):
         }
         return {'status': {'code': int, 'text': string},
                 'data': {
-                    id: 123,
+                    id: 123, //id of new annotation
                     ...
                 }
         }
@@ -149,10 +149,10 @@ actions.register(addAnnotation, cache=False)
 
 
 @login_required_json
-def removeAnnotations(request):
+def removeAnnotation(request):
     '''
         param data {
-            ids: []
+            id: annotationId
         }
         return {'status': {'code': int, 'text': string},
                 'data': {
@@ -161,17 +161,13 @@ def removeAnnotations(request):
     '''
     response = json_response({})
     data = json.loads(request.POST['data'])
-    failed = []
-    for a in models.Annotation.objects.filter(public_id__in=data['ids']):
-        if a.editable(request.user):
-            a.delete()
-        else:
-            failed.append(a.public_id)
-    if failed:
+    a = get_object_or_404_json(models.Annotation, public_id=data['id'])
+    if a.editable(request.user):
+        a.delete()
+    else:
         response = json_response(status=403, text='permission denied')
-        response['data']['ids'] = failed
     return render_to_json_response(response)
-actions.register(removeAnnotations, cache=False)
+actions.register(removeAnnotation, cache=False)
 
 
 @login_required_json

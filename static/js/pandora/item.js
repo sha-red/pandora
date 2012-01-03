@@ -287,22 +287,13 @@ pandora.ui.item = function() {
                             item: pandora.user.ui.item,
                             layer: data.layer,
                             out: data.out,
-                            value: 'Click to edit',
+                            value: data.value,
                         }, function(result) {
                             pandora.$ui.editor.addAnnotation(data.layer, result.data);
                         });
                     },
-                    removeannotations: function(data) {
-                        pandora.api.removeAnnotations(data, function(result) {
-                            //fixme: check for errors
-                            pandora.$ui.editor.removeAnnotations(data.layer, data.ids);
-                        });
-                    },
-                    toggleannotations: function(data) {
-                        pandora.UI.set('showAnnotations', data.showAnnotations);
-                    },
-                    updateannotation: function(data) {
-                        Ox.Log('', 'editAnnotations', data);
+                    editannotation: function(data) {
+                        Ox.Log('', 'editAnnotation', data);
                         //fixme: check that edit was successfull
                         pandora.api.editAnnotation({
                             id: data.id,
@@ -310,8 +301,19 @@ pandora.ui.item = function() {
                             out: data.out,
                             value: data.value,
                         }, function(result) {
-                            Ox.Log('', 'done updateAnnotation', result);
+                            Ox.Log('', 'editAnnotation result', result);
                         });
+                    },
+                    removeannotation: function(data) {
+                        pandora.api.removeAnnotation({
+                            id: data.id
+                        }, function(result) {
+                            //fixme: check for errors
+                            pandora.$ui.editor.removeAnnotation(data.layer, data.id);
+                        });
+                    },
+                    toggleannotations: function(data) {
+                        pandora.UI.set('showAnnotations', data.showAnnotations);
                     },
                     pandora_showannotations: function(data) {
                         pandora.$ui.editor.options({showAnnotations: data.value});
