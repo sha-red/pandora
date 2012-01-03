@@ -108,7 +108,6 @@ INSTALLED_APPS = (
     'edit',
     'news',
     'user',
-    'api',
     'urlalias',
     'tv',
 )

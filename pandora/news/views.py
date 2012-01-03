@@ -11,7 +11,7 @@ from ox.django.shortcuts import render_to_json_response, get_object_or_404_json,
 
 
 from item.models import Item
-from api.actions import actions
+from ox.django.api import actions
 
 from item import utils
 from item.models import Item

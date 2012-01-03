@@ -10,7 +10,7 @@ from ox.utils import json
 from ox.django.decorators import login_required_json, admin_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 
-from api.actions import actions
+from ox.django.api import actions
 from item import utils
 
 import models

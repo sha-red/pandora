@@ -8,7 +8,7 @@ from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 
 import models
-from api.actions import actions
+from ox.django.api import actions
 
 
 def getText(request):

@@ -5,6 +5,8 @@ try:
 except:
     import elementtree.ElementTree as ET
 
+import copy
+
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.conf import settings
@@ -17,8 +19,9 @@ from ox.utils import json
 
 import models
 
-from api.actions import actions
+from user.models import init_user
 
+from ox.django.api import actions
 
 def intro(request):
     context = RequestContext(request, {'settings': settings})
@@ -129,3 +132,16 @@ def redirect_url(request, url):
     else:
         return HttpResponse('<script>document.location.href=%s;</script>'%json.dumps(url))
 
+def init(request):
+    '''
+        return {'status': {'code': int, 'text': string},
+                'data': {user: object}}
+    '''
+    response = json_response({})
+    config = copy.deepcopy(settings.CONFIG)
+    del config['keys']
+
+    response['data']['site'] = config
+    response['data']['user'] = init_user(request.user, request)
+    return render_to_json_response(response)
+actions.register(init)

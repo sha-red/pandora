@@ -19,7 +19,7 @@ from item import utils
 from item.models import get_item, Item
 from item.views import parse_query
 import item.tasks
-from api.actions import actions
+from ox.django.api import actions
 
 import models
 import tasks

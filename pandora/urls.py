@@ -13,8 +13,7 @@ admin.autodiscover()
 
 import monkey_patch.models
 
-from api import actions
-actions.autodiscover()
+import ox.django.api.urls
 
 def serve_static_file(path, location, content_type):
     return HttpFileResponse(location, content_type=content_type)
@@ -24,8 +23,7 @@ urlpatterns = patterns('',
     (r'^api/upload/$', 'archive.views.firefogg_upload'),
     (r'^url=(?P<url>.*)$', 'app.views.redirect_url'),
     (r'^file/(?P<oshash>.*)$', 'archive.views.lookup_file'),
-    (r'^api$', include('api.urls')),
-    (r'^api/$', include('api.urls')),
+    (r'^api/?$', include(ox.django.api.urls)),
     (r'^resetUI$', 'user.views.reset_ui'),
     (r'^list/(?P<id>.*?)/icon(?P<size>\d*).jpg$', 'itemlist.views.icon'),
     (r'^robots.txt$', serve_static_file, {'location': os.path.join(settings.STATIC_ROOT, 'robots.txt'), 'content_type': 'text/plain'}),
