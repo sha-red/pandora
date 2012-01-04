@@ -1,7 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
 pandora.ui.filter = function(id) {
-    var i = Ox.getPositionById(pandora.user.ui.filters, id),
+    var i = Ox.getIndexById(pandora.user.ui.filters, id),
         filter = Ox.getObjectById(pandora.site.filters, id),
         panelWidth = pandora.$ui.document.width() - (pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize) - 1,
         title = Ox.getObjectById(pandora.site.filters, id).title,
@@ -167,7 +167,7 @@ pandora.ui.filter = function(id) {
             var filters = Ox.clone(pandora.user.ui.filters),
                 find,
                 id_ = data.value,
-                i_ = Ox.getPositionById(pandora.user.ui.filters, id_);
+                i_ = Ox.getIndexById(pandora.user.ui.filters, id_);
             if (i_ == -1) {
                 // new filter was not part of old filter set
                 if (pandora.user.ui._filterState[i].selected.length) {

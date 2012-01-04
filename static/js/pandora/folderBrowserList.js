@@ -4,7 +4,7 @@ pandora.ui.folderBrowserList = function(id) {
     // fixme: user and name are set to the same width here,
     // but resizeFolders will set them to different widths
     var columnWidth = (pandora.user.ui.sidebarSize - Ox.UI.SCROLLBAR_SIZE - 96) / 2,
-        i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id),
+        i = Ox.getIndexById(pandora.site.sectionFolders[pandora.user.ui.section], id),
         that = Ox.TextList({
             columns: [
                 {

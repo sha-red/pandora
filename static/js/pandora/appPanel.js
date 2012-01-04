@@ -51,7 +51,7 @@ pandora.ui.appPanel = function() {
                 !pandora.$ui.appPanel ? 'showScreen' : 'fadeInScreen'
             ]();
         } else if (
-            Ox.getPositionById(pandora.site.sitePages, page) > -1
+            Ox.getIndexById(pandora.site.sitePages, page) > -1
             || page == 'software'
         ) {
             if (pandora.$ui.siteDialog && pandora.$ui.siteDialog.is(':visible')) {

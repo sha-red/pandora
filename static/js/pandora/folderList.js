@@ -2,7 +2,7 @@
 'use strict';
 pandora.ui.folderList = function(id) {
     // FIXME: use canEditFeaturedLists capability, not 'admin'
-    var i = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id),
+    var i = Ox.getIndexById(pandora.site.sectionFolders[pandora.user.ui.section], id),
         that;
     if (pandora.user.ui.section == 'items') {
         var columns, items;

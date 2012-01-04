@@ -480,7 +480,7 @@ pandora.getClipsQuery = function() {
             if (condition.conditions) {
                 addClipsConditions(condition.conditions);
             } else if (
-                Ox.getPositionById(pandora.site.layers, condition.key) > -1
+                Ox.getIndexById(pandora.site.layers, condition.key) > -1
                 && condition.operator == '='
             ) {
                 clipsQuery.conditions.push(condition);
@@ -824,7 +824,7 @@ pandora.isClipView = function(view, item) {
 
 pandora.isItemFind = function(find) {
     return find.conditions.length == 1
-        && Ox.getPositionById(pandora.site.layers, find.conditions[0].key) > -1
+        && Ox.getIndexById(pandora.site.layers, find.conditions[0].key) > -1
         && find.conditions[0].operator == '=';
 };
 
@@ -914,7 +914,7 @@ pandora.resizeFolders = function() {
     Ox.Log('', 'RESIZE FOLDERS', width);
     pandora.$ui.allItems.resizeElement(width - 104);
     Ox.forEach(pandora.$ui.folderList, function($list, id) {
-        var pos = Ox.getPositionById(pandora.site.sectionFolders[pandora.user.ui.section], id);
+        var pos = Ox.getIndexById(pandora.site.sectionFolders[pandora.user.ui.section], id);
         pandora.$ui.folder[pos].css({width: width + 'px'});
         $list.css({width: width + 'px'});
         if (pandora.user.ui.section == 'items') {

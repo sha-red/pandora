@@ -18,7 +18,7 @@ pandora.ui.sortSelect = function(isNavigationView) {
     }
     if (!pandora.user.ui.item) {
         items = Ox.merge(items, Ox.map(pandora.site.sortKeys, function(key) {
-            return Ox.getPositionById(items, key.id) == -1
+            return Ox.getIndexById(items, key.id) == -1
                 ? Ox.extend(Ox.clone(key), {
                     title: 'Sort by ' + key.title
                 })

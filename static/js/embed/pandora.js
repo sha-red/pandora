@@ -15,7 +15,7 @@ Ox.load('UI', {
                 user: data.user.level == 'guest' ? Ox.clone(data.site.user) : data.user,
                 ui: {},
                 clip: function(item, inPoint, outPoint) {
-                    Ox.print('!@#!@#!@#', inPoint, outPoint);
+                    //Ox.print('!@#!@#!@#', inPoint, outPoint);
                     var that = Ox.Element();
                     pandora.api.get({id: item, keys: []}, function(result) {
                         var video = {};

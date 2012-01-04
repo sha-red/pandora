@@ -88,7 +88,7 @@ pandora.ui.mainMenu = function() {
                         { id: 'filters', title: 'Filters', items: [
                             { group: 'filters', min: 5, max: 5, items: pandora.site.filters.map(function(filter) {
                                 return Ox.extend({
-                                    checked: Ox.getPositionById(ui.filters, filter.id) > -1
+                                    checked: Ox.getIndexById(ui.filters, filter.id) > -1
                                 }, filter);
                             }) },
                             {},
@@ -168,13 +168,13 @@ pandora.ui.mainMenu = function() {
                 } else if (Ox.startsWith(data.id, 'orderfilter')) {
                     var filters = Ox.clone(pandora.user.ui.filters),
                         id = data.id.replace('orderfilter', ''),
-                        position = Ox.getPositionById(filters, id),
-                        key = filters[position].sort[0].key,
+                        index = Ox.getIndexById(filters, id),
+                        key = filters[index].sort[0].key,
                         operator = value == 'ascending' ? '+' : '-';
-                    pandora.$ui.filters[position].options({
+                    pandora.$ui.filters[index].options({
                         sort: [{key: key, operator: operator}]
                     });
-                    filters[position].sort[0].operator = operator;
+                    filters[index].sort[0].operator = operator;
                     pandora.UI.set({filters: filters});
                 } else if (data.id == 'ordermovies') {
                     var key = pandora.user.ui.listSort[0].key,
@@ -188,7 +188,7 @@ pandora.ui.mainMenu = function() {
                 } else if (Ox.startsWith(data.id, 'sortfilter')) {
                     var filters = Ox.clone(ui.filters),
                         id = data.id.replace('sortfilter', ''),
-                        position = Ox.getPositionById(filters, id),
+                        index = Ox.getIndexById(filters, id),
                         type = Ox.getObjectById(pandora.site.filters, id).type,
                         key = value,
                         operator = key == 'name' && type == 'string' ? '+' : '-';
@@ -196,10 +196,10 @@ pandora.ui.mainMenu = function() {
                         'sortMenu_orderfilters_orderfilter' + id + '_'
                         + (operator == '+' ? 'ascending' : 'descending')
                     );
-                    pandora.$ui.filters[position].options({
+                    pandora.$ui.filters[index].options({
                         sort: [{key: key, operator: operator}]
                     });
-                    filters[position].sort[0].key = key;
+                    filters[index].sort[0].key = key;
                     pandora.UI.set({filters: filters});
                 } else if (data.id == 'sortmovies') {
                     pandora.UI.set({listSort: [{key: value, operator: ''}]});
