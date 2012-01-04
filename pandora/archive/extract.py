@@ -121,11 +121,10 @@ def stream(video, target, profile, info):
             aspect = '%s:%s' % (width, height)
 
         video_settings = [
-            '-vb', '%dk'%bitrate, '-g', '%d' % int(fps*2),
-            '-keyint_min', '%d' % int(fps),
-            '-s', '%dx%d'%(width, height),
+            '-vb', '%dk'%bitrate,
             '-aspect', aspect,
             #'-vf', 'yadif',
+            '-vf', 'hqdn3d,scale=%s:%s'%(width, height),
         ]
 
         if format == 'mp4':
