@@ -125,8 +125,9 @@ def stream(video, target, profile, info):
             '-aspect', aspect,
             #'-vf', 'yadif',
             '-vf', 'hqdn3d,scale=%s:%s'%(width, height),
+            '-g', '%d' % int(fps*5),
+            '-keyint_min', '%d' % int(fps*2),
         ]
-
         if format == 'mp4':
             #quicktime does not support bpyramid
             '''
