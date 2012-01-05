@@ -42,7 +42,7 @@ class MetaClip:
 
     clip_keys = ('id', 'in', 'out', 'position', 'created', 'modified',
                  'hue', 'saturation', 'lightness', 'volume', 'videoRatio')
-    def json(self, keys=None):
+    def json(self, keys=None, qs=None):
         j = {}
         for key in self.clip_keys:
             j[key] = getattr(self, {
@@ -60,8 +60,11 @@ class MetaClip:
                     del j[key]
             #needed here to make item find with clips work
             if 'annotations' in keys:
+                annotations = self.annotations.filter(layer__in=self.layers)
+                if qs:
+                    annotations = annotations.filter(qs)
                 j['annotations'] = [a.json(keys=['value', 'id', 'layer'])
-                                    for a in self.annotations.filter(layer__in=self.layers)]
+                                    for a in annotations]
             for key in keys:
                 if key not in self.clip_keys and key not in j:
                     value = self.item.get(key)

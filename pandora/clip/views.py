@@ -23,6 +23,7 @@ def parse_query(data, user):
         if key in data:
             query[key] = data[key]
     query['qs'] = models.Clip.objects.find(query, user)
+    query['filter'] = models.Clip.objects.filter_annotations(query, user)
     if 'itemsQuery' in data and data['itemsQuery'].get('conditions'):
         item_query = Item.objects.find({'query': data['itemsQuery']}, user)
         query['qs'] = query['qs'].filter(item__in=item_query)
@@ -94,11 +95,12 @@ def findClips(request):
         response['data']['items'] = [add(p) for p in qs]
 
         keys = data['keys']
-
         def add_annotations(key, qs, add_layer=False):
             values = ['public_id', 'value', 'clip__public_id']
             if add_layer:
                 values.append('layer')
+            if query['filter']:
+                qs = qs.filter(query['filter'])
             for a in qs.values(*values):
                 for i in response['data']['items']:
                     if i['id'] == a['clip__public_id']:

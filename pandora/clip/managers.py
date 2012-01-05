@@ -28,6 +28,7 @@ def parseCondition(condition, user):
         'out': 'end',
         'place': 'annotations__places__id',
         'text': 'annotations__findvalue',
+        'annotations': 'annotations__findvalue',
         'user': 'annotations__user__username',
     }.get(k, k)
     if not k:
@@ -138,6 +139,40 @@ class ClipManager(Manager):
 
     def get_query_set(self):
         return QuerySet(self.model)
+
+    def filter_annotations(self, data, user):
+        public_layers = [l['id']
+                         for l in filter(lambda l: not l.get('private', False),
+                         settings.CONFIG['layers'])]
+        keys = public_layers + ['annotations', 'text', '*']
+        conditions = data.get('query', {}).get('conditions', [])
+        conditions = filter(lambda c: c['key'] in keys, conditions)
+        operator = data.get('query', {}).get('operator', '&')
+        def parse(condition):
+            key = "%s%s" % ('findvalue', {
+                '>': '__gt',
+                '>=': '__gte',
+                '<': '__lt',
+                '<=': '__lte',
+                '==': '__iexact',
+                '=': '__icontains',
+                '^': '__istartswith',
+                '$': '__iendswith',
+            }.get(condition.get('opterator', ''), '__icontains'))
+            q = Q(**{key: condition['value']})
+            if condition['key'] in public_layers:
+                q = q & Q(layer=condition['key'])
+            return q
+        conditions = map(parse, conditions)
+        if conditions:
+            q = conditions[0]
+            for c in conditions[1:]:
+                if operator == '|':
+                    q = q | c
+                else:
+                    q = q & c
+            return q
+        return None
 
     def find(self, data, user):
         '''

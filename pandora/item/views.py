@@ -92,6 +92,8 @@ def parse_query(data, user):
     if 'clips' in data:
         query['clip_qs'] = Clip.objects.find({'query': data['clips']['query']},
                                              user).order_by('start')
+        query['clip_filter'] = Clip.objects.find({'query': data['clips']['query']},
+                                             user)
         query['clip_items'] = data['clips'].get('items', 5)
         query['clip_keys'] = data['clips'].get('keys')
         if not query['clip_keys']:
@@ -231,7 +233,7 @@ Positions
                     i += step
             else:
                 clips = qs
-            return [c.json(query['clip_keys']) for c in clips]
+            return [c.json(query['clip_keys'], query['clip_filter']) for c in clips]
 
         def only_p_sums(m):
             r = {}
