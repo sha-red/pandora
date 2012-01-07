@@ -112,14 +112,14 @@ def editPage(request):
             }
         }
     '''
-    if not request.user.is_staff:
+    if request.user.get_profile().capabilities('canEditSitePages'):
+        data = json.loads(request.POST['data'])
+        page, created = models.Page.objects.get_or_create(name=data['name'])
+        page.body = data['body']
+        page.save()
+        response = json_response({'name': page.name, 'page': page.body})
+    else:
         response = json_response(status=403, text='permission denied')
-        return render_to_json_response(response)
-    data = json.loads(request.POST['data'])
-    page, created = models.Page.objects.get_or_create(name=data['name'])
-    page.body = data['body']
-    page.save()
-    response = json_response({'name': page.name, 'page': page.body})
     return render_to_json_response(response)
 actions.register(editPage)
 
