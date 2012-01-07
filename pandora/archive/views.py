@@ -206,6 +206,7 @@ def firefogg_upload(request):
             f = get_object_or_404(models.File, oshash=oshash)
             if f.editable(request.user):
                 f.streams.all().delete()
+                f.delete_frames()
                 f.uploading = True
                 f.save()
                 response = {

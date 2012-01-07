@@ -5,6 +5,7 @@ from __future__ import division, with_statement
 import os.path
 import re
 import time
+import shutil
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -275,6 +276,11 @@ class File(models.Model):
         if instance:
             return instance.path
         return self.path
+
+    def delete_frames(self):
+        frames = os.path.join(settings.MEDIA_ROOT, self.get_path('frames'))
+        if os.path.exists(frames):
+            shutil.rmtree(frames)
 
 def delete_file(sender, **kwargs):
     f = kwargs['instance']

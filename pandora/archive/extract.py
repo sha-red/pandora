@@ -126,8 +126,14 @@ def stream(video, target, profile, info):
             #'-vf', 'yadif',
             '-vf', 'hqdn3d,scale=%s:%s'%(width, height),
             '-g', '%d' % int(fps*5),
-            '-keyint_min', '%d' % int(fps*2),
         ]
+        if format == 'webm':
+            video_settings += [
+                '-deadline', 'good',
+                '-cpu-used', '0',
+                '-lag-in-frames', '16',
+                '-auto-alt-ref', '1',
+            ]
         if format == 'mp4':
             #quicktime does not support bpyramid
             '''
