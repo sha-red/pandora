@@ -83,8 +83,8 @@ class Place(models.Model):
         return j
 
     def get_matches(self):
-        layers = filter(lambda l: l['type'] == 'place' or l.get('hasPlaces'),
-                        settings.CONFIG['layers'])
+        layers = [l['id'] for l in filter(lambda l: l['type'] == 'place' or l.get('hasPlaces'),
+                                          settings.CONFIG['layers'])]
         super_matches = []
         q = Q(name_find__contains=" " + self.name)|Q(name_find__contains="|%s"%self.name)
         for name in self.alternativeNames:

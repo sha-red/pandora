@@ -22,7 +22,6 @@ from item.models import Access, Item
 from item import utils 
 
 import models
-import managers
 
 
 def signin(request):

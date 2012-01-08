@@ -69,8 +69,8 @@ class Event(models.Model):
         return False
      
     def get_matches(self):
-        layers = filter(lambda l: l['type'] == 'event' or l.get('hasEvents'),
-                        settings.CONFIG['layers'])
+        layers = [l['id'] for l in filter(lambda l: l['type'] == 'event' or l.get('hasEvents'),
+                                          settings.CONFIG['layers'])]
         super_matches = []
         q = Q(name_find__contains=" " + self.name)|Q(name_find__contains="|%s"%self.name)
         for name in self.alternativeNames:
