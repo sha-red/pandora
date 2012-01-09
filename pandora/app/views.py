@@ -15,6 +15,7 @@ from django.http import HttpResponse
 from ox.django.shortcuts import json_response, render_to_json_response
 from ox.django.decorators import login_required_json
 
+import ox
 from ox.utils import json
 
 import models
@@ -31,7 +32,7 @@ def intro(request):
 def index(request):
     context = RequestContext(request, {
         'base_url': request.build_absolute_uri('/'),
-        'settings': settings
+        'settings': settings,
     })
     return render_to_response('index.html', context)
 

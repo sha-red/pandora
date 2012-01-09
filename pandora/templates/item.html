@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>{{settings.SITENAME}}</title>
+        <title>{{settings.SITENAME}} - {{title}}</title>
         <link rel="shortcut icon" type="image/png" href="/static/png/icon16.png"/>
         <link rel="icon" href="/static/png/icon64.png" sizes="32x32"/>
         <link rel="icon" href="/static/png/icon64.png" sizes="48x48"/>
@@ -16,19 +16,32 @@
         <script type="text/javascript" src="/static/oxjs/build/Ox.js"></script>
         <script type="text/javascript" src="/static/js/pandora.js"></script>
         <meta name="title" content="{{title}}" />
-        <meta name="description" content="{{settings.CONFIG.site.description|safe}}"/>
+        <meta name="description" content="{{description|safe}}"/>
+        <meta name="keywords" content="{{keywords|safe}}"/>
+        <meta content="{{url}}/{{icon}}128.jpg" name="thumbnail"/>
+        <meta content="{{url}}/{{icon}}128.jpg" name="image_src"/>
         <meta property="og:title" content="{{title}}"/>
-        <meta property="og:type" content="website"/>
-        <meta property="og:url" content="{{base_url}}"/>
-        <meta property="og:image" content="{{base_url}}static/png/icon64.png"/>
+        <meta property="og:type" content="movie"/>
+        <meta property="og:url" content="{{url}}"/>
+        <meta property="og:image" content="{{url}}/{{icon}}128.jpg"/>
         <meta property="og:site_name" content="{{settings.SITENAME}}"/>
-        <meta property="og:description" content="{{settings.CONFIG.site.description|safe}}"/>
+        <meta property="og:description" content="{{description|safe}}"/>
     </head>
     <body>
         <noscript>
-            <h1>{{settings.SITENAME}}</h1>
-            <p>{{settings.CONFIG.site.description|safe}}</p>
-            <p>{{settings.SITENAME}} requires JavaScript</p>
+            <img src="/{{id}}/poster256.jpg" style="float: left; margin-right: 8px">
+            <h1>{{title}}</h1>
+            {% for i in data %}
+                <div>
+                    <b>{{i.key}}</b>: {{i.value|safe}}
+                </div>
+            {% endfor %}
+            {% for c in clips %}
+                <div style="clear:both;padding-top: 4px">
+                    <img src="/{{id}}/96p{{c.in}}.jpg" style="float: left; margin-right: 8px">
+                    {{c.annotations|safe}}
+                </div>
+            {% endfor %}
         </noscript>
     </body>
 </html>

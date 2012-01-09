@@ -146,9 +146,6 @@ pandora.ui.infoView = function(data) {
         .append(
             Ox.Editable({
                     editable: isEditable,
-                    format: function(value) {
-                        return formatTitle(value);
-                    },
                     tooltip: isEditable ? 'Doubleclick to edit' : '',
                     value: data.title
                 })
@@ -267,16 +264,17 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($text);
 
-    var list_keys = ['language', 'category', 'director', 'cinematographer'];
+    var list_keys = ['language', 'category', 'director', 'cinematographer', 'features'];
     $('<div>').html('<br>').appendTo($text);
     [
         'date',
         'location',
         'director',
         'cinematographer',
+        'features',
         'language',
         'source',
-        'collection',
+        'project',
         'category',
         'user',
     ].forEach(function(key) {
@@ -388,7 +386,7 @@ pandora.ui.infoView = function(data) {
         if (value != data[key]) {
             var edit = {id: data.id};
             if (key == 'title') {
-                Ox.extend(edit, parseTitle(value));
+                edit[key] = value;
             } else if(['director', 'country', 'language', 'category'].indexOf(key) > -1) {
                 edit[key] = value ? value.split(', ') : [];
             } else {
@@ -420,17 +418,6 @@ pandora.ui.infoView = function(data) {
         return '<span style="color: rgb(128, 128, 128)">' + str + '</span>';
     }
 
-    function formatTitle(title) {
-        var match = /(\(S\d{2}E\d{2}\))/.exec(title);
-        if (match) {
-            title = title.replace(match[0], formatLight(match[0]));
-        }
-        return title + (
-            data.originalTitle && data.originalTitle != title
-            ? ' ' + formatLight('(' + data.originalTitle + ')') : ''
-        );
-    }
-
     function formatValue(value, key) {
         return (Ox.isArray(value) ? value : [value]).map(function(value) {
             return key ?
@@ -446,20 +433,6 @@ pandora.ui.infoView = function(data) {
                 return rightsLevel.name;
             })
         );
-    }
-
-    function parseTitle(title) {
-        var data = {title: title},
-            match = /(\(S(\d{2})E(\d{2})\))/.exec(title),
-            split;
-        if (match) {
-            data.season = parseInt(match[2], 10);
-            data.episode = parseInt(match[3], 10);
-            split = title.split(match[1]);
-            data.seriesTitle = split[0].trim();
-            data.episodeTitle = split[1].trim();
-        }
-        return data;
     }
 
     function reloadMetadata() {

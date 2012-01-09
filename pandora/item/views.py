@@ -8,8 +8,9 @@ import random
 
 import Image
 from django.db.models import Count, Sum, Max
+from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseForbidden, Http404
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.conf import settings
 
 from ox.utils import json
@@ -806,4 +807,59 @@ def random_annotation(request):
     pos = random.randint(0, n)
     clip = item.annotations.all()[pos]
     return redirect('/%s'% clip.public_id)
+
+def item(request, id):
+    id = id.split('/')[0]
+    template = 'index.html'
+    qs = models.Item.objects.filter(itemId=id)
+    if qs.count() == 0:
+        context = RequestContext(request, {
+            'base_url': request.build_absolute_uri('/'),
+            'settings': settings
+        })
+    else:
+        item = qs[0]
+        template = 'item.html'
+        keys = [
+            'year',
+            'director',
+            'country',
+            'keywords',
+            'summary'
+        ]
+        data = []
+        for key in keys:
+            value = item.get(key)
+            if value:
+                if isinstance(value, list):
+                    value = value = u', '.join([unicode(v) for v in value])
+                data.append({'key': key.capitalize(), 'value': value})
+        clips = []
+        for c in item.clips.all():
+            clip = {
+                'in': c.start,
+                'annotations': '<br />\n'.join([a.value for a in c.annotations.all()])
+            }
+            clips.append(clip)
+        ctx = {
+            'base_url': request.build_absolute_uri('/'),
+            'url': request.build_absolute_uri('/%s' % id),
+            'id': id,
+            'settings': settings,
+            'data': data,
+            'clips': clips,
+            'icon': 'poster',
+
+        }
+        for key in ('title', 'description', 'keywords'):
+            value = item.get({
+                'description': 'summary' in keys and 'summary' or 'description'
+            }.get(key, key))
+            if isinstance(value, list):
+                value = value = ', '.join(value)
+            if value:
+                ctx[key] = ox.stripTags(value)
+
+        context = RequestContext(request, ctx)
+    return render_to_response(template, context)
 

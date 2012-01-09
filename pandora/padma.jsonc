@@ -44,15 +44,16 @@
     ],
     // fixme: either this, or filter: true in itemKeys, but not both
     "filters": [
-        {"id": "collection", "title": "Collection", "type": "string"},
-        {"id": "source", "title": "Source", "type": "string"},
-        {"id": "director", "title": "Director", "type": "string"},
-        {"id": "cinematographer", "title": "Cinematographer", "type": "string"},
+        {"id": "source", "title": "Sources", "type": "string"},
+        {"id": "project", "title": "Projects", "type": "string"},
+        {"id": "topics", "title": "Topics", "type": "string"},
+        {"id": "name", "title": "People", "type": "string"},
+        {"id": "keywords", "title": "Keywords", "type": "string"},
+        {"id": "language", "title": "Languages", "type": "string"},
         {"id": "places", "title": "Places", "type": "string"},
-        {"id": "year", "title": "Year", "type": "integer"},
-        {"id": "language", "title": "Language", "type": "string"},
-        {"id": "category", "title": "Category", "type": "string"},
-        {"id": "keywords", "title": "Keyword", "type": "string"}
+        {"id": "year", "title": "Years", "type": "integer"},
+        {"id": "director", "title": "Directors", "type": "string"},
+        {"id": "cinematographer", "title": "Cinematographers", "type": "string"}
     ],
     /*
         An itemKey must have the following properties:
@@ -115,6 +116,17 @@
             "sort": "person"
         },
         {
+            "id": "features",
+            "title": "Features",
+            "type": ["string"],
+            "autocomplete": true,
+            "columnRequired": true,
+            "columnWidth": 180,
+            "filter": true,
+            "find": true,
+            "sort": "person"
+        },
+        {
             "id": "name",
             "title": "Name",
             "type": ["string"],
@@ -122,8 +134,8 @@
             "find": true
         },
         {
-            "id": "collection",
-            "title": "Collection",
+            "id": "project",
+            "title": "Project",
             "type": "string",
             "autocomplete": true,
             "columnWidth": 120,
@@ -165,8 +177,8 @@
             "find": true
         },
         {
-            "id": "category",
-            "title": "Category",
+            "id": "topic",
+            "title": "Topic",
             "type": ["string"],
             "autocomplete": true,
             "columnWidth": 180,
@@ -432,7 +444,7 @@
         {"id": "clips", "title": "with Clips"},
         {"id": "timelines", "title": "with Timelines"},
         {"id": "maps", "title": "with Maps"},
-        {"id": "calendars", "title": "with Calendars"},
+        //{"id": "calendars", "title": "with Calendars"},
         {"id": "clip", "title": "as Clips"},
         //{"id": "video", "title": "as Video"},
         {"id": "map", "title": "on Map"},
@@ -453,6 +465,7 @@
     ],
     "sendReferrer": true,
     "site": {
+        "description": "Pad.ma is an online archive of densely text-annotated video material, primarily footage and not finished films. The entire collection is searchable and viewable online, and is free to download for non-commercial use.",
         "email": {
             // E-mail address in contact form (to)
             "contact": "pad.ma@pad.ma",
@@ -496,14 +509,15 @@
             "clipsColumns": 2,
             "columns": {
                 "Colors": {
-                    "columns": ["title", "director", "location", "collection", "hue", "saturation", "brightness"],
+                    "columns": ["title", "director", "location", "source", "hue", "saturation", "brightness"],
                     "columnWidth": {}
                 }
             },
             "filters": [
-                {"id": "collection", "sort": [{"key": "name", "operator": "+"}]},
                 {"id": "source", "sort": [{"key": "name", "operator": "+"}]},
-                {"id": "category", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "project", "sort": [{"key": "name", "operator": "+"}]},
+                {"id": "topic", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "people", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "keywords", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "places", "sort": [{"key": "items", "operator": "-"}]}
             ],
@@ -515,7 +529,7 @@
             "itemFind": {"conditions": [], "operator": "&"},
             "itemSort": [{"key": "position", "operator": "+"}],
             "itemView": "info",
-            "listColumns": ["title", "director", "location", "collection", "language", "duration", "source"],
+            "listColumns": ["title", "director", "location", "source", "language", "duration", "source"],
             "listColumnWidth": {},
             "listSelection": [],
             "listSort": [{"key": "title", "operator": "+"}],

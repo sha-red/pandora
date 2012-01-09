@@ -46,7 +46,7 @@ urlpatterns += patterns('',
 )
 urlpatterns += patterns('',
     (r'^(?P<id>[A-Z0-9].+)/embed', 'app.views.embed'),
-    (r'^[A-Z0-9].*$', 'app.views.index'),
+    (r'^(?P<id>[A-Z0-9].*)$', 'item.views.item'),
     (r'^[a-z0-9].+$', 'app.views.index'),
     (r'^$', 'app.views.index'),
     (r'^.*$', 'app.views.index'),

@@ -556,6 +556,7 @@
     ],
     "sendReferrer": false,
     "site": {
+        "description": "0xDB is an experimental - and to some degree imaginary - movie database. It is intended to help re-imagine the future of cinema on the internet, to push the boundaries of web applications, and to serve as a point of reference for individuals and institutions who are dealing with large collections of films.",
         // FIXME: "from" and "to" would be more intuitive as keys here
         "email": {
             // E-mail address in contact form (to)
