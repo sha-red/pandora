@@ -190,9 +190,12 @@ def editAnnotation(request):
     data = json.loads(request.POST['data'])
     a = get_object_or_404_json(models.Annotation, public_id=data['id'])
     if a.editable(request.user):
-        a.value = data['value']
-        a.start = data['in']
-        a.end = data['out']
+        for key in ('value', 'in', 'out'):
+            if key in data:
+                setattr(a, {
+                    'in': 'start',
+                    'out': 'end'
+                }.get(key,key), data[key])
         a.save()
         response['data'] = a.json()
     else:
