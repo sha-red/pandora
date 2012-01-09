@@ -823,9 +823,8 @@ def item(request, id):
         keys = [
             'year',
             'director',
-            'country',
-            'keywords',
-            'summary'
+            'topic',
+            'description'
         ]
         data = []
         for key in keys:
@@ -848,12 +847,13 @@ def item(request, id):
             'settings': settings,
             'data': data,
             'clips': clips,
-            'icon': 'poster',
+            'icon': settings.CONFIG['user']['ui']['icons'] == 'frames' and 'icon' or 'poster',
 
         }
         for key in ('title', 'description', 'keywords'):
             value = item.get({
-                'description': 'summary' in keys and 'summary' or 'description'
+                'description': 'summary' in keys and 'summary' or 'description',
+                'keywords': 'topic' in keys and 'topic' or 'keywords'
             }.get(key, key))
             if isinstance(value, list):
                 value = value = ', '.join(value)

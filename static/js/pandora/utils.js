@@ -631,7 +631,7 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
     // and checks if it's an annotation/event/place id or an event/place name,
     // and returns the id (or none) and the view (or none)
     // fixme: "subtitles:23" is still missing
-    Ox.Log('', 'getMetadataByIdOrName', item, view, str);
+    Ox.Log('URL', 'getMetadataByIdOrName', item, view, str);
     var isName = str[0] == '@',
         canBeAnnotation = (
             !view || view == 'video' || view == 'timeline'
@@ -641,7 +641,7 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
     str = isName ? str.substr(1) : str;
     getId(canBeAnnotation ? 'annotation' : '', function(id) {
         if (id) {
-            Ox.Log('', 'id?', id)
+            Ox.Log('URL', 'id?', id)
             callback(id, pandora.user.ui.videoView);
         } else {
             getId(canBePlace ? 'place' : '', function(id) {
@@ -668,20 +668,35 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
                 query: {
                     conditions: [{
                         key: isName ? 'name' : 'id',
-                        value: type == 'annotation' ? item + '/' + str : str,
+                        value: type != 'annotation' ? str : item + '/' + str,
                         operator: '=='
                     }],
                     operator: '&'
                 },
-                keys: ['id'],
+                keys: type != 'annotation' ? ['id'] : ['id', 'in', 'out'],
                 range: [0, 1]
-            }, item ? {
+            }, item && type != 'annotation' ? {
                 itemQuery: {
                     conditions: [{key: 'id', value: item, operator: '=='}],
                     operator: '&'
                 }
             } : {}), function(result) {
-                callback(result.data.items.length ? result.data.items[0].id : '');
+                var annotation, span;
+                if (result.data.items.length) {
+                    span = result.data.items[0];
+                    annotation = span.id.split('/')[1];
+                    type == 'annotation' && pandora.UI.set('videoPoints.' + item, {
+                        annotation: annotation,
+                        'in': span['in'],
+                        out: span.out,
+                        position: span['in']
+                    });
+                }
+                callback(
+                    !span ? ''
+                    : type != 'annotation' ? span.id
+                    : annotation
+                );
             });
         } else {
             callback();

@@ -226,6 +226,9 @@ pandora.ui.item = function() {
                     position: pandora.user.ui.videoPoints[pandora.user.ui.item].position,
                     posterFrame: parseInt(videoOptions.video.duration / 2),    
                     resolution: pandora.user.ui.videoResolution,
+                    selected: pandora.user.ui.videoPoints[pandora.user.ui.item].annotation
+                        ? pandora.user.ui.item + '/' + pandora.user.ui.videoPoints[pandora.user.ui.item].annotation
+                        : '',
                     showAnnotations: pandora.user.ui.showAnnotations,
                     showLargeTimeline: true,
                     subtitles: videoOptions.subtitles,
@@ -259,6 +262,7 @@ pandora.ui.item = function() {
                     },
                     points: function(data) {
                         pandora.UI.set('videoPoints.' + pandora.user.ui.item, {
+                            annotation: pandora.user.ui.videoPoints[pandora.user.ui.item].annotation,
                             'in': data['in'],
                             out: data.out,
                             position: pandora.user.ui.videoPoints[pandora.user.ui.item].position
@@ -277,6 +281,9 @@ pandora.ui.item = function() {
                     },
                     resolution: function(data) {
                         pandora.UI.set('videoResolution', data.resolution);
+                    },
+                    select: function(data) {
+                        pandora.UI.set('videoPoints.' + pandora.user.ui.item + '.annotation', data.id.split('/')[1]);
                     },
                     subtitles: function(data) {
                         pandora.UI.set('videoSubtitles', data.subtitles);

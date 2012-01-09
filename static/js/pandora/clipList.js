@@ -101,6 +101,7 @@ pandora.ui.clipList = function(videoRatio) {
                 var id = data.ids[0],
                     item = !ui.item ? id.split('/')[0] : ui.item,
                     points = {
+                        annotation: that.value(id, 'annotations')[0].id.split('/')[1],
                         'in': that.value(id, 'in'),
                         out: that.value(id, 'out')
                     },
@@ -198,7 +199,6 @@ pandora.ui.clipList = function(videoRatio) {
                 that.options({sort: data.value});
             }
         });
-
     return that;
 
 }

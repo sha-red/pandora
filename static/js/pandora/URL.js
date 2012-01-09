@@ -39,7 +39,7 @@ pandora.URL = (function() {
             // ...
         } else if (['video', 'timeline'].indexOf(state.view) > -1) {
             var videoPoints = pandora.user.ui.videoPoints[state.item] || {};
-            state.span = Ox.merge(
+            state.span = videoPoints.annotation || Ox.merge(
                 videoPoints.position
                     ? videoPoints.position
                     : [],
@@ -56,6 +56,8 @@ pandora.URL = (function() {
     }
 
     function setState(state, callback) {
+
+        Ox.Log('URL', 'setState:', state);
 
         pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
         pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
@@ -86,11 +88,15 @@ pandora.URL = (function() {
 
             if (state.span) {
                 if (['video', 'timeline'].indexOf(state.view) > -1) {
-                    // fixme: this doesn't handle annotation ids
-                    set['videoPoints.' + state.item] = {
-                        position: state.span[0] || 0,
-                        'in': state.span[1] || 0,
-                        out: Math.max(state.span[1] || 0, state.span[2] || 0)
+                    if (Ox.isArray(state.span)) {
+                        set['videoPoints.' + state.item] = {
+                            annotation: '',
+                            'in': state.span[1] || 0,
+                            out: Math.max(state.span[1] || 0, state.span[2] || 0),
+                            position: state.span[0]
+                        };                       
+                    } else {
+                        set['videoPoints.' + state.item + '.annotation'] = state.span;
                     }
                 } else if (state.view == 'map') {
                     // fixme: this doesn't handle map coordinates
@@ -226,7 +232,7 @@ pandora.URL = (function() {
             pages: [
                 'about', 'api', 'contact', 'faq', 'help', 'home', 'news',
                 'preferences', 'rights', 'signin', 'signout', 'signup',
-                'software', 'terms', 'tour', 'tv'
+                'software', 'terms', 'tour', 'tutorial', 'tv'
             ],
             sortKeys: sortKeys,
             spanType: spanType,

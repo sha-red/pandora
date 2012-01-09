@@ -264,7 +264,7 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($text);
 
-    var list_keys = ['language', 'category', 'director', 'cinematographer', 'features'];
+    var list_keys = ['language', 'topic', 'director', 'cinematographer', 'features'];
     $('<div>').html('<br>').appendTo($text);
     [
         'date',
@@ -275,7 +275,7 @@ pandora.ui.infoView = function(data) {
         'language',
         'source',
         'project',
-        'category',
+        'topic',
         'user',
     ].forEach(function(key) {
         var $div = $('<div>')
@@ -387,14 +387,14 @@ pandora.ui.infoView = function(data) {
             var edit = {id: data.id};
             if (key == 'title') {
                 edit[key] = value;
-            } else if(['director', 'country', 'language', 'category'].indexOf(key) > -1) {
+            } else if(list_keys.indexOf(key) > -1) {
                 edit[key] = value ? value.split(', ') : [];
             } else {
                 edit[key] = value;
             }
             pandora.api.edit(edit, function(result) {
+                Ox.Request.clearCache(); // fixme: too much? can change filter/list etc
                 if (result.data.id != data.id) {
-                    Ox.Request.clearCache(); // fixme: too much
                     pandora.UI.set({item: result.data.id});
                     pandora.$ui.browser.value(data.id, 'id', result.data.id);
                 }

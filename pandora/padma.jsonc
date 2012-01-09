@@ -46,7 +46,7 @@
     "filters": [
         {"id": "source", "title": "Sources", "type": "string"},
         {"id": "project", "title": "Projects", "type": "string"},
-        {"id": "topics", "title": "Topics", "type": "string"},
+        {"id": "topic", "title": "Topics", "type": "string"},
         {"id": "name", "title": "People", "type": "string"},
         {"id": "keywords", "title": "Keywords", "type": "string"},
         {"id": "language", "title": "Languages", "type": "string"},
@@ -517,7 +517,7 @@
                 {"id": "source", "sort": [{"key": "name", "operator": "+"}]},
                 {"id": "project", "sort": [{"key": "name", "operator": "+"}]},
                 {"id": "topic", "sort": [{"key": "items", "operator": "-"}]},
-                {"id": "people", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "name", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "keywords", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "places", "sort": [{"key": "items", "operator": "-"}]}
             ],
@@ -529,7 +529,7 @@
             "itemFind": {"conditions": [], "operator": "&"},
             "itemSort": [{"key": "position", "operator": "+"}],
             "itemView": "info",
-            "listColumns": ["title", "director", "location", "source", "language", "duration", "source"],
+            "listColumns": ["title", "director", "location", "source", "language", "duration"],
             "listColumnWidth": {},
             "listSelection": [],
             "listSort": [{"key": "title", "operator": "+"}],

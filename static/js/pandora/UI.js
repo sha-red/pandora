@@ -132,7 +132,7 @@ pandora.UI = (function() {
                 // if the item view doesn't change, remains a video view,
                 // video points don't exist yet, and won't be set,
                 // add default video points
-                add['videoPoints.' + item] = {'in': 0, out: 0, position: 0};
+                add['videoPoints.' + item] = {annotation: '', 'in': 0, out: 0, position: 0};
             }
         }
 
@@ -145,7 +145,7 @@ pandora.UI = (function() {
             ) {
                 // if video points don't exist yet, and won't be set,
                 // add default video points
-                add['videoPoints.' + item] = {'in': 0, out: 0, position: 0};
+                add['videoPoints.' + item] = {annotation: '', 'in': 0, out: 0, position: 0};
             }
         }
 
