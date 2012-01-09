@@ -49,7 +49,7 @@ pandora.ui.list = function() {
                             border: 0,
                             borderRadius: borderRadius
                             //background: 'transparent'
-                        })
+                        });
                     }).attr({
                         src: '/' + data.id + '/' + icon + '14.jpg'
                     });

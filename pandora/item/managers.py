@@ -5,6 +5,7 @@ from datetime import datetime
 from django.db.models import Q, Manager
 from django.conf import settings
 
+from archive.models import Volume
 from itemlist.models import List
 import models
 import utils
@@ -137,7 +138,12 @@ def parseCondition(condition, user):
     elif k == 'list':
         q = Q(id=0)
         l = v.split(":")
-        if len(l) >= 2:
+        if len(l) == 1:
+            vqs = Volume.objects.filter(name=v, user=user)
+            if vqs.count() == 1:
+                v = vqs[0]
+                q = Q(files__instances__volume__id=v.id)
+        elif len(l) >= 2:
             l = (l[0], ":".join(l[1:]))
             lqs = list(List.objects.filter(name=l[1], user__username=l[0]))
             if len(lqs) == 1 and lqs[0].accessible(user):
