@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-try:
-    import xml.etree.ElementTree as ET
-except:
-    import elementtree.ElementTree as ET
+import re
 
 import copy
 
@@ -16,7 +13,7 @@ from ox.django.shortcuts import json_response, render_to_json_response
 from ox.django.decorators import login_required_json
 
 import ox
-from ox.utils import json
+from ox.utils import json, ET
 
 import models
 
@@ -42,6 +39,15 @@ def embed(request, id):
         'settings': settings
     })
     return render_to_response('embed.html', context)
+
+def redirect_url(request, url):
+    if request.META['QUERY_STRING']:
+        url += "?" + request.META['QUERY_STRING']
+
+    if settings.CONFIG.get('sendReferrer', False):
+        return redirect(url)
+    else:
+        return HttpResponse('<script>document.location.href=%s;</script>'%json.dumps(url))
 
 def opensearch_xml(request):
     osd = ET.Element('OpenSearchDescription')
@@ -124,14 +130,6 @@ def editPage(request):
     return render_to_json_response(response)
 actions.register(editPage)
 
-def redirect_url(request, url):
-    if request.META['QUERY_STRING']:
-        url += "?" + request.META['QUERY_STRING']
-
-    if settings.CONFIG.get('sendReferrer', False):
-        return redirect(url)
-    else:
-        return HttpResponse('<script>document.location.href=%s;</script>'%json.dumps(url))
 
 def init(request):
     '''
@@ -146,3 +144,28 @@ def init(request):
     response['data']['user'] = init_user(request.user, request)
     return render_to_json_response(response)
 actions.register(init)
+
+
+def embedURL(request):
+    '''
+        
+        param data {
+            url
+            maxwidth
+            maxheight
+        }
+        return {
+            status: ...
+            data: {
+                html
+                ...
+            }
+        }
+        return {'status': {'code': int, 'text': string},
+                'data': {user: object}}
+    '''
+    data = json.loads(request.POST['data'])
+    response = json_response({})
+    response['data'] = ox.get_embed_code(data['url'], data.get('maxwidth'), data.get('maxheight'))
+    return render_to_json_response(response)
+actions.register(embedURL)

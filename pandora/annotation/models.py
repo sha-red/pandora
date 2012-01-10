@@ -57,6 +57,14 @@ class Annotation(models.Model):
             self.public_id = "%s/%s" % (self.item.itemId, ox.toAZ(public_id))
             Annotation.objects.filter(id=self.id).update(public_id=self.public_id)
 
+    @classmethod
+    def public_layers(self):
+        layers = []
+        for layer in settings.CONFIG['layers']:
+            if not layer.get('private', False):
+                layers.append(layer['id'])
+        return layers
+
     def get_layer(self):
         for layer in settings.CONFIG['layers']:
             if layer['id'] == self.layer:

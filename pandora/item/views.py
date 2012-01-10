@@ -5,6 +5,7 @@ import os.path
 from datetime import datetime, timedelta
 import mimetypes
 import random
+from urlparse import urlparse
 
 import Image
 from django.db.models import Count, Sum, Max
@@ -13,7 +14,7 @@ from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.conf import settings
 
-from ox.utils import json
+from ox.utils import json, ET
 
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
@@ -808,6 +809,51 @@ def random_annotation(request):
     clip = item.annotations.all()[pos]
     return redirect('/%s'% clip.public_id)
 
+def oembed(request):
+    format = request.GET.get('format', 'json')
+    maxwidth = request.GET.get('maxwidth', 640)
+    maxheight = request.GET.get('maxheight', 480)
+
+    url = request.GET['url']
+    parts = urlparse(url).path.split('/')
+    itemId = parts[1]
+    #fixme: embed should reflect actuall url
+    item = get_object_or_404_json(models.Item, itemId=itemId)
+    embed_url = request.build_absolute_uri('/%s/embed' % item.itemId)
+    oembed = {}
+    oembed['version'] = '1.0'
+    oembed['type'] = 'video'
+    oembed['provider_name'] = settings.SITENAME
+    oembed['provider_url'] = request.build_absolute_uri('/')
+    oembed['title'] = item.get('title')
+    #oembed['author_name'] = item.get('director')
+    #oembed['author_url'] = ??
+    height = 96
+    width = 128
+    if maxheight > height or height > maxheight:
+        height = maxheight
+    if maxwidth > width or width > maxwidth:
+        width = maxwidth
+    oembed['html'] = '<iframe width="%s" height="%s" src="%s" frameborder="0" allowfullscreen></iframe>' % (height, width, embed_url)
+    oembed['width'] = width
+    oembed['height'] = height
+    thumbheight = 96
+    thumbwidth = int(thumbheight * item.sort.aspectratio)
+    thumbwidth -= thumbwidth % 2
+    oembed['thumbnail_height'] = thumbheight
+    oembed['thumbnail_width'] = thumbwidth
+    oembed['thumbnail_url'] = request.build_absolute_uri('/%s/%sp.jpg' % (item.itemId, thumbheight))
+    if format == 'xml':
+        oxml = ET.Element('oembed')
+        for key in oembed:
+            e = ET.SubElement(oxml, key)
+            e.text = unicode(oembed[key])
+        return HttpResponse(
+            '<?xml version="1.0" encoding="utf-8" standalone="yes"?>\n' + ET.tostring(oxml),
+            'application/xml'
+        )
+    return HttpResponse(json.dumps(oembed, indent=2), 'application/json')
+
 def item(request, id):
     id = id.split('/')[0]
     template = 'index.html'
@@ -834,13 +880,17 @@ def item(request, id):
                     value = value = u', '.join([unicode(v) for v in value])
                 data.append({'key': key.capitalize(), 'value': value})
         clips = []
-        for c in item.clips.all():
-            clip = {
-                'in': c.start,
-                'annotations': '<br />\n'.join([a.value for a in c.annotations.all()])
-            }
-            clips.append(clip)
+        clip = {'in': 0, 'annotations': []}
+        for a in item.annotations.filter(
+            layer__in=models.Annotation.public_layers()).order_by('start', 'end', 'sortvalue'):
+            if clip['in'] < a.start:
+                if clip['annotations']:
+                    clip['annotations'] = '<br />\n'.join(clip['annotations'])
+                    clips.append(clip)
+                clip = {'in': a.start, 'annotations': []}
+            clip['annotations'].append(a.value)
         ctx = {
+            'current_url': request.build_absolute_uri(request.get_full_path()),
             'base_url': request.build_absolute_uri('/'),
             'url': request.build_absolute_uri('/%s' % id),
             'id': id,

@@ -8,6 +8,7 @@
         <link rel="icon" href="/static/png/icon64.png" sizes="48x48"/>
         <meta name="application-name" content="{{settings.SITENAME}}"/>
         <meta name="application-url" content="{{base_url}}"/>
+        <link rel="alternate" type="application/json+oembed" href="{{base_url}}oembed?url={{current_url|urlencode}}" title="oEmbed Profile" />
         <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="{{settings.SITENAME}}" />
         <script>
             if (localStorage && !localStorage['Ox.theme'])
