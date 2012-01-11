@@ -113,6 +113,7 @@ def update_sitemap(base_url):
             el = ET.SubElement(video, "video:duration")
             el.text = "%s" % duration
 
+    with open(sitemap[:-3], 'wb') as f:
+        f.write('<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(urlset))
     with gzip.open(sitemap, 'wb') as f:
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(urlset))
-

@@ -31,7 +31,7 @@ urlpatterns = patterns('',
     (r'^opensearch.xml$', 'app.views.opensearch_xml'),
     (r'^oembed$', 'item.views.oembed'),
     (r'^robots.txt$', 'app.views.robots_txt'),
-    (r'^sitemap.xml.gz$', 'item.views.sitemap_xml_gz'),
+    (r'^sitemap.xml$', 'item.views.sitemap_xml'),
     (r'', include('item.urls')),
 )
 #if settings.DEBUG:

@@ -74,7 +74,7 @@ def opensearch_xml(request):
 
 def robots_txt(request, url):
     return HttpResponse(
-        'User-agent: *\nDisallow:\nSitemap: %s\n' % request.build_absolute_uri('/sitemap.xml.gz'),
+        'User-agent: *\nDisallow:\nSitemap: %s\n' % request.build_absolute_uri('/sitemap.xml'),
         'text/plain'
     )
 

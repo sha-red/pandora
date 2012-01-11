@@ -639,6 +639,11 @@
             "showHome": true,
             "showIconBrowser": false,
             "showInfo": true,
+            "showLayers": {
+                "privatenotes": true,
+                "publicnotes": true,
+                "subtitles": true
+            },
             "showMapControls": false,
             "showMapLabels": false,
             "showFolder": {

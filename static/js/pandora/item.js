@@ -231,6 +231,7 @@ pandora.ui.item = function() {
                         : '',
                     showAnnotations: pandora.user.ui.showAnnotations,
                     showLargeTimeline: true,
+                    showLayers: pandora.user.ui.showLayers,
                     subtitles: videoOptions.subtitles,
                     tooltips: true,
                     video: videoOptions.video,
@@ -327,6 +328,9 @@ pandora.ui.item = function() {
                     },
                     toggleannotations: function(data) {
                         pandora.UI.set('showAnnotations', data.showAnnotations);
+                    },
+                    togglelayer: function(data) {
+                        pandora.UI.set('showLayers.' + data.layer, !data.collapsed);
                     },
                     pandora_showannotations: function(data) {
                         pandora.$ui.editor.options({showAnnotations: data.value});
