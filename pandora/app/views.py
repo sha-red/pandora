@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-import re
-
 import copy
 
 from django.shortcuts import render_to_response, redirect
@@ -25,14 +23,12 @@ def intro(request):
     context = RequestContext(request, {'settings': settings})
     return render_to_response('intro.html', context)
 
-
 def index(request):
     context = RequestContext(request, {
         'base_url': request.build_absolute_uri('/'),
         'settings': settings,
     })
     return render_to_response('index.html', context)
-
 
 def embed(request, id):
     context = RequestContext(request, {
@@ -76,6 +72,11 @@ def opensearch_xml(request):
         'application/xml'
     )
 
+def robots_txt(request, url):
+    return HttpResponse(
+        'User-agent: *\nDisallow:\nSitemap: %s\n' % request.build_absolute_uri('/sitemap.xml.gz'),
+        'text/plain'
+    )
 
 def getPage(request):
     '''

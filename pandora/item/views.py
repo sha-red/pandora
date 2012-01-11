@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import mimetypes
 import random
 from urlparse import urlparse
+import time
 
 import Image
 from django.db.models import Count, Sum, Max
@@ -853,6 +854,18 @@ def oembed(request):
             'application/xml'
         )
     return HttpResponse(json.dumps(oembed, indent=2), 'application/json')
+
+def sitemap_xml_gz(request):
+    sitemap = os.path.abspath(os.path.join(settings.MEDIA_ROOT, 'sitemap.xml.gz'))
+    age = time.mktime(time.localtime()) - os.stat(sitemap).st_ctime
+    if not os.path.exists(sitemap):
+        tasks.update_sitemap(request.build_absolute_uri('/'))
+    elif age > 24*60*60:
+        tasks.update_sitemap.delay(request.build_absolute_uri('/'))
+    response = HttpFileResponse(sitemap)
+    response['Content-Type'] = 'application/xml'
+    response['Content-Encoding'] = 'x-gzip'
+    return response
 
 def item(request, id):
     id = id.split('/')[0]

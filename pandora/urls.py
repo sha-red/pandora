@@ -30,6 +30,8 @@ urlpatterns = patterns('',
     (r'^favicon.ico$', serve_static_file, {'location': os.path.join(settings.STATIC_ROOT, 'png/icon.16.png'), 'content_type': 'image/x-icon'}),
     (r'^opensearch.xml$', 'app.views.opensearch_xml'),
     (r'^oembed$', 'item.views.oembed'),
+    (r'^robots.txt$', 'app.views.robots_txt'),
+    (r'^sitemap.xml.gz$', 'item.views.sitemap_xml_gz'),
     (r'', include('item.urls')),
 )
 #if settings.DEBUG:

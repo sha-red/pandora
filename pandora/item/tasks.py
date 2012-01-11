@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from datetime import timedelta
+import os
+from datetime import timedelta, datetime
+import gzip
 
+
+from django.conf import settings
+from ox.utils import ET
 from celery.task import task, periodic_task
 
 import models
@@ -33,4 +38,81 @@ def update_timeline(itemId):
 def load_subtitles(itemId):
     item = models.Item.objects.get(itemId=itemId)
     item.load_subtitles()
+
+@task(ignore_resulsts=True, queue='default')
+def update_sitemap(base_url):
+    sitemap = os.path.abspath(os.path.join(settings.MEDIA_ROOT, 'sitemap.xml.gz'))
+
+    def absolute_url(url):
+        return base_url + url
+
+    urlset = ET.Element('urlset')
+    urlset.attrib['xmlns'] = "http://www.sitemaps.org/schemas/sitemap/0.9"
+    urlset.attrib['xmlns:xsi'] = "http://www.w3.org/2001/XMLSchema-instance"
+    urlset.attrib['xsi:schemaLocation'] = "http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
+    urlset.attrib['xmlns:video']= "http://www.google.com/schemas/sitemap-video/1.0"
+
+    url = ET.SubElement(urlset, "url")
+    loc = ET.SubElement(url, "loc")
+    loc.text = absolute_url('') 
+    # always, hourly, daily, weekly, monthly, yearly, never
+    changefreq = ET.SubElement(url, "changefreq")
+    changefreq.text = 'daily'
+    # This date should be in W3C Datetime format, can be %Y-%m-%d
+    lastmod = ET.SubElement(url, "lastmod")
+    lastmod.text = datetime.now().strftime("%Y-%m-%d")
+     # priority of page on site values 0.1 - 1.0
+    priority = ET.SubElement(url, "priority")
+    priority.text = '1.0'
+
+    for page in [s['id'] for s in settings.CONFIG['sitePages']]:
+        url = ET.SubElement(urlset, "url")
+        loc = ET.SubElement(url, "loc")
+        loc.text = absolute_url(page)
+        # always, hourly, daily, weekly, monthly, yearly, never
+        changefreq = ET.SubElement(url, "changefreq")
+        changefreq.text = 'monthly'
+        # priority of page on site values 0.1 - 1.0
+        priority = ET.SubElement(url, "priority")
+        priority.text = '1.0'
+
+    allowed_level = settings.CONFIG['capabilities']['canSeeItem']['guest']
+    for i in models.Item.objects.filter(level__lte=allowed_level):
+        url = ET.SubElement(urlset, "url")
+        # URL of the page. This URL must begin with the protocol (such as http)
+        loc = ET.SubElement(url, "loc")
+        loc.text = absolute_url("%s" % i.itemId)
+        # This date should be in W3C Datetime format, can be %Y-%m-%d
+        lastmod = ET.SubElement(url, "lastmod")
+        lastmod.text = i.modified.strftime("%Y-%m-%d")
+        # always, hourly, daily, weekly, monthly, yearly, never
+        changefreq = ET.SubElement(url, "changefreq")
+        changefreq.text = 'monthly'
+        # priority of page on site values 0.1 - 1.0
+        priority = ET.SubElement(url, "priority")
+        priority.text = '1.0'
+        video = ET.SubElement(url, "video:video")
+        #el = ET.SubElement(video, "video:content_loc")
+        #el.text = absolute_url("%s/video" % i.itemId)
+        el = ET.SubElement(video, "video:player_loc")
+        el.attrib['allow_embed'] = 'no'
+        el.text = absolute_url("%s/video" % i.itemId)
+        el = ET.SubElement(video, "video:title")
+        el.text = i.get('title')
+        el = ET.SubElement(video, "video:thumbnail_loc")
+        icon = settings.CONFIG['user']['ui']['icons'] == 'frames' and 'icon' or 'poster'
+        el.text = absolute_url("%s/%s128.jpg" %(i.itemId, icon))
+        description = i.get('description', i.get('summary', ''))
+        if description:
+            el = ET.SubElement(video, "video:description")
+            el.text = i.get('description', i.get('summary', ''))
+        el = ET.SubElement(video, "video:family_friendly")
+        el.text = 'Yes'
+        duration = i.get('duration')
+        if duration:
+            el = ET.SubElement(video, "video:duration")
+            el.text = "%s" % duration
+
+    with gzip.open(sitemap, 'wb') as f:
+        f.write('<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(urlset))
 
