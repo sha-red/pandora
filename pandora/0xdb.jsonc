@@ -498,6 +498,7 @@
             "id": "privatenotes",
             "title": "Private Notes",
             "canAddAnnotations": {"member": true, "friend": true, "staff": true, "admin": true},
+            "item": "Note",
             "overlap": true,
             "private": true,
             "type": "text"
@@ -506,6 +507,7 @@
             "id": "publicnotes",
             "title": "Public Notes",
             "canAddAnnotations": {"member": true, "friend": true, "staff": true, "admin": true},
+            "item": "Note",
             "overlap": true,
             "type": "text"
         },
@@ -515,6 +517,7 @@
             "canAddAnnotations": {"staff": true, "admin": true},
             "hasEvents": true,
             "hasPlaces": true,
+            "item": "Subtitle",
             "overlay": true,
             "sort": [
                 {"id": "words", "title": "Words", "type": "words"},

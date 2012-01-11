@@ -101,17 +101,17 @@ def update_sitemap(base_url):
         el.text = i.get('title')
         el = ET.SubElement(video, "video:thumbnail_loc")
         icon = settings.CONFIG['user']['ui']['icons'] == 'frames' and 'icon' or 'poster'
-        el.text = absolute_url("%s/%s128.jpg" %(i.itemId, icon))
+        el.text = absolute_url("%s/%s256.jpg" %(i.itemId, icon))
         description = i.get('description', i.get('summary', ''))
         if description:
             el = ET.SubElement(video, "video:description")
             el.text = i.get('description', i.get('summary', ''))
         el = ET.SubElement(video, "video:family_friendly")
         el.text = 'Yes'
-        duration = i.get('duration')
-        if duration:
+        duration = i.sort.duration
+        if duration > 0:
             el = ET.SubElement(video, "video:duration")
-            el.text = "%s" % duration
+            el.text = "%s" % int(duration)
 
     with open(sitemap[:-3], 'wb') as f:
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(urlset))

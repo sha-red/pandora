@@ -405,6 +405,7 @@
             "id": "places",
             "title": "Places",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
+            "item": "Place",
             "overlap": true,
             "type": "place"
         },
@@ -412,6 +413,7 @@
             "id": "events",
             "title": "Events",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
+            "item": "Event",
             "overlap": true,
             "type": "event"
         },
@@ -419,6 +421,7 @@
             "id": "keywords",
             "title": "Keywords",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
+            "item": "Keyword",
             "overlap": true,
             "type": "string"
         },
@@ -426,6 +429,7 @@
             "id": "descriptions",
             "title": "Descriptions",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
+            "item": "Description",
             "overlay": true,
             "type": "text"
         },
@@ -433,6 +437,7 @@
             "id": "transcripts",
             "title": "Transcripts",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
+            "item": "Transcript",
             "overlay": true,
             "type": "text"
         }
