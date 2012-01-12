@@ -121,7 +121,10 @@ pandora.ui.item = function() {
 
         } else if (pandora.user.ui.itemView == 'video') {
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.player = Ox.VideoPanel({
+                annotationsFont: pandora.user.ui.annotationsFont,
+                annotationsRange: pandora.user.ui.annotationsRange,
                 annotationsSize: pandora.user.ui.annotationsSize,
+                annotationsSort: pandora.user.ui.annotationsSort,
                 censored: videoOptions.censored,
                 cuts: result.data.cuts || [],
                 duration: result.data.duration,
@@ -133,12 +136,14 @@ pandora.ui.item = function() {
                 },
                 height: pandora.$ui.contentPanel.size(1),
                 'in': pandora.user.ui.videoPoints[pandora.user.ui.item]['in'],
+                layers: videoOptions.layers,
                 muted: pandora.user.ui.videoMuted,
                 out: pandora.user.ui.videoPoints[pandora.user.ui.item].out,
                 position: pandora.user.ui.videoPoints[pandora.user.ui.item].position,
                 resolution: pandora.user.ui.videoResolution,
                 scaleToFill: pandora.user.ui.videoScale == 'fill',
                 showAnnotations: pandora.user.ui.showAnnotations,
+                showLayers: pandora.user.ui.showLayers,
                 showTimeline: pandora.user.ui.showTimeline,
                 showUsers: pandora.site.annotations.showUsers,
                 subtitles: videoOptions.subtitles,
@@ -148,9 +153,24 @@ pandora.ui.item = function() {
                 volume: pandora.user.ui.videoVolume,
                 width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             }).bindEvent({
+                annotationsfont: function(data) {
+                    pandora.UI.set({annotationsFont: data.font});
+                },
+                annotationsrange: function(data) {
+                    pandora.UI.set({annotationsRange: data.range});
+                },
+                annotationssize: function(data) {
+                    pandora.UI.set({annotationsSize: data.size});
+                },
+                annotationssort: function(data) {
+                    pandora.UI.set({annotationsSort: data.sort});
+                },
                 find: function(data) {
+                    var textKey = Ox.getObjectById(pandora.site.layers, 'subtitles')
+                        ? 'subtitles'
+                        : 'annotations';
                     pandora.UI.set('itemFind', data.find ? {
-                        conditions: [{key: 'subtitles', value: data.find, operator: '='}],
+                        conditions: [{key: textKey, value: data.find, operator: '='}],
                         operator: '&'
                     } : pandora.site.user.ui.itemFind);
                 },
@@ -177,6 +197,9 @@ pandora.ui.item = function() {
                 },
                 toggleannotations: function(data) {
                     pandora.UI.set('showAnnotations', data.showAnnotations);
+                },
+                togglelayer: function(data) {
+                    pandora.UI.set('showLayers.' + data.layer, !data.collapsed);
                 },
                 toggletimeline: function(data) {
                     pandora.UI.set('showTimeline', data.showTimeline);
@@ -255,8 +278,11 @@ pandora.ui.item = function() {
                         pandora.UI.set({annotationsSort: data.sort});
                     },
                     find: function(data) {
+                        var textKey = Ox.getObjectById(pandora.site.layers, 'subtitles')
+                            ? 'subtitles'
+                            : 'annotations';
                         pandora.UI.set('itemFind', data.find ? {
-                            conditions: [{key: 'subtitles', value: data.find, operator: '='}],
+                            conditions: [{key: textKey, value: data.find, operator: '='}],
                             operator: '&'
                         } : pandora.site.user.ui.itemFind);
                     },
