@@ -48,13 +48,16 @@ def load_config():
 def reloader_thread():
     _config_mtime = 0
     while RUN_RELOADER:
-        stat = os.stat(settings.SITE_CONFIG)
-        mtime = stat.st_mtime
-        if _win:
-            mtime -= stat.st_ctime
-        if mtime > _config_mtime:
-            load_config()
-            _config_mtime = mtime
+        try:
+            stat = os.stat(settings.SITE_CONFIG)
+            mtime = stat.st_mtime
+            if _win:
+                mtime -= stat.st_ctime
+            if mtime > _config_mtime:
+                load_config()
+                _config_mtime = mtime
+        except:
+            print "reloading config failed"
         time.sleep(1)
 
 def update_static():

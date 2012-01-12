@@ -4,6 +4,9 @@
     You can edit this file.
 */
 {
+    "annotations": {
+        "showUsers": true
+    },
     /*
         Capabilities are per user level.
         They can either be general:
@@ -501,6 +504,7 @@
             "item": "Note",
             "overlap": true,
             "private": true,
+            "showInfo": true,
             "type": "text"
         },
         {
@@ -509,6 +513,7 @@
             "canAddAnnotations": {"member": true, "friend": true, "staff": true, "admin": true},
             "item": "Note",
             "overlap": true,
+            "showInfo": true,
             "type": "text"
         },
         {

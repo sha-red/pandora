@@ -120,7 +120,7 @@ pandora.ui.item = function() {
             );
 
         } else if (pandora.user.ui.itemView == 'video') {
-            pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.player = Ox.VideoPanelPlayer({
+            pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.player = Ox.VideoPanel({
                 annotationsSize: pandora.user.ui.annotationsSize,
                 censored: videoOptions.censored,
                 cuts: result.data.cuts || [],
@@ -140,6 +140,7 @@ pandora.ui.item = function() {
                 scaleToFill: pandora.user.ui.videoScale == 'fill',
                 showAnnotations: pandora.user.ui.showAnnotations,
                 showTimeline: pandora.user.ui.showTimeline,
+                showUsers: pandora.site.annotations.showUsers,
                 subtitles: videoOptions.subtitles,
                 tooltips: true,
                 timeline: '/' + pandora.user.ui.item + '/timeline16p.png',
@@ -232,6 +233,7 @@ pandora.ui.item = function() {
                     showAnnotations: pandora.user.ui.showAnnotations,
                     showLargeTimeline: true,
                     showLayers: pandora.user.ui.showLayers,
+                    showUsers: pandora.site.annotations.showUsers,
                     subtitles: videoOptions.subtitles,
                     tooltips: true,
                     video: videoOptions.video,
@@ -240,16 +242,16 @@ pandora.ui.item = function() {
                     volume: pandora.user.ui.videoVolume,
                     width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
                 }).bindEvent({
-                    annotationsFont: function(data) {
+                    annotationsfont: function(data) {
                         pandora.UI.set({annotationsFont: data.font});
                     },
-                    annotationsRange: function(data) {
+                    annotationsrange: function(data) {
                         pandora.UI.set({annotationsRange: data.range});
                     },
-                    annotationsSize: function(data) {
+                    annotationssize: function(data) {
                         pandora.UI.set({annotationsSize: data.size});
                     },
-                    annotationsSort: function(data) {
+                    annotationssort: function(data) {
                         pandora.UI.set({annotationsSort: data.sort});
                     },
                     find: function(data) {
@@ -323,7 +325,7 @@ pandora.ui.item = function() {
                             id: data.id
                         }, function(result) {
                             //fixme: check for errors
-                            pandora.$ui.editor.removeAnnotation(data.layer, data.id);
+                            //pandora.$ui.editor.removeAnnotation(data.layer, data.id);
                         });
                     },
                     toggleannotations: function(data) {
