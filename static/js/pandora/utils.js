@@ -839,7 +839,8 @@ pandora.isClipView = function(view, item) {
 
 pandora.isItemFind = function(find) {
     return find.conditions.length == 1
-        && Ox.getIndexById(pandora.site.layers, find.conditions[0].key) > -1
+        && (find.conditions[0].key == 'annotations'
+            ||Ox.getIndexById(pandora.site.layers, find.conditions[0].key) > -1)
         && find.conditions[0].operator == '=';
 };
 

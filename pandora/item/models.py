@@ -435,7 +435,7 @@ class Item(models.Model):
                     user = None
                 qs = qs.filter(user=user)
             for a in qs.order_by('start'):
-                ll.append(a.json())
+                ll.append(a.json(user=user))
         return layers
 
     def get_json(self, keys=None):
@@ -545,7 +545,12 @@ class Item(models.Model):
                     save(i,
                         '\n'.join([f.path for f in self.files.all()]))
                 elif key['type'] == 'layer':
-                    qs = Annotation.objects.filter(layer=i, item=self).order_by('start')
+                    qs = Annotation.objects.filter(item=self)
+                    if i == 'annotations':
+                        qs = qs.filter(layer__in=Annotation.public_layers())
+                    else:
+                        qs = qs.filter(layer=i)
+                    qs = qs.order_by('start')
                     save(i, u'\n'.join([l.findvalue for l in qs]))
                 elif i != '*' and i not in self.facet_keys:
                     value = self.get(i)

@@ -64,8 +64,9 @@ class Event(models.Model):
         return self.name
 
     def editable(self, user):
-        if self.user == user or user.is_staff:
-            return True
+        if user and not user.is_anonymous() \
+            and (self.user == user or user.get_profile().capability('canEditEvents')):
+                return True
         return False
      
     def get_matches(self):
@@ -137,6 +138,7 @@ class Event(models.Model):
     def json(self, user=None):
         j = {
             'id': self.get_id(),
+            'editable': self.editable(user)
         }
         if self.user:
             j['user'] = self.user.username

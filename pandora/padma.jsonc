@@ -20,8 +20,10 @@
         "canDeleteItems": {"admin": true},
         "canDownloadVideo": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
         "canEditAnnotations": {"staff": true, "admin": true},
+        "canEditEvents": {"staff": true, "admin": true},
         "canEditFeaturedLists": {"staff": true, "admin": true},
         "canEditMetadata": {"staff": true, "admin": true},
+        "canEditPlaces": {"staff": true, "admin": true},
         "canEditSitePages": {"staff": true, "admin": true},
         "canEditUsers": {"admin": true},
         "canPlayClips": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
@@ -98,42 +100,12 @@
             "sort": "title"
         },
         {
-            "id": "director",
-            "title": "Director",
-            "type": ["string"],
-            "autocomplete": true,
-            "columnRequired": true,
-            "columnWidth": 180,
-            "filter": true,
-            "find": true,
-            "sort": "person"
-        },
-        {
-            "id": "cinematographer",
-            "title": "Cinematographer",
-            "type": ["string"],
+            "id": "source",
+            "title": "Source",
+            "type": "string",
             "autocomplete": true,
             "columnWidth": 180,
             "filter": true,
-            "find": true,
-            "sort": "person"
-        },
-        {
-            "id": "features",
-            "title": "Features",
-            "type": ["string"],
-            "autocomplete": true,
-            "columnRequired": true,
-            "columnWidth": 180,
-            "filter": true,
-            "find": true,
-            "sort": "person"
-        },
-        {
-            "id": "name",
-            "title": "Name",
-            "type": ["string"],
-            "autocomplete": true,
             "find": true
         },
         {
@@ -146,13 +118,69 @@
             "find": true
         },
         {
+            "id": "topic",
+            "title": "Topic",
+            "type": ["string"],
+            "autocomplete": true,
+            "columnWidth": 180,
+            "filter": true,
+            "find": true
+        },
+        {
+            "id": "name",
+            "title": "People",
+            "type": ["string"],
+            "autocomplete": true,
+            "find": true
+        },
+        {
+            "id": "annotations",
+            "title": "Annotation",
+            "type": "string",
+            "find": true
+        },
+        {
+            "id": "keywords",
+            "title": "Keywords",
+            "type": "layer"
+        },
+        {
+            "id": "director",
+            "title": "Director",
+            "type": ["string"],
+            "autocomplete": true,
+            "columnRequired": true,
+            "columnWidth": 180,
+            "filter": true,
+            "sort": "person"
+        },
+        {
+            "id": "cinematographer",
+            "title": "Cinematographer",
+            "type": ["string"],
+            "autocomplete": true,
+            "columnWidth": 180,
+            "filter": true,
+            "sort": "person"
+        },
+        {
+            "id": "features",
+            "title": "Features",
+            "type": ["string"],
+            "autocomplete": true,
+            "columnRequired": true,
+            "columnWidth": 180,
+            "filter": true,
+            "sort": "person"
+        },
+        {
             "id": "year",
             "title": "Year",
             "type": "year",
             "autocomplete": true,
             "columnWidth": 60,
-            "filter": true,
-            "find": true
+            "filter": true
+            //"find": true
         },
         {
             "id": "language",
@@ -169,24 +197,6 @@
             "type": "time",
             "columnWidth": 60,
             "format": {"type": "duration", "args": [0, "medium"]}
-        },
-        {
-            "id": "source",
-            "title": "Source",
-            "type": "string",
-            "autocomplete": true,
-            "columnWidth": 180,
-            "filter": true,
-            "find": true
-        },
-        {
-            "id": "topic",
-            "title": "Topic",
-            "type": ["string"],
-            "autocomplete": true,
-            "columnWidth": 180,
-            "filter": true,
-            "find": true
         },
         {
             "id": "location",
@@ -226,26 +236,22 @@
         {
             "id": "places",
             "title": "Places",
-            "type": "layer",
-            "find": true
+            "type": "layer"
         },
         {
-            "id": "keywords",
-            "title": "Keywords",
-            "type": "layer",
-            "find": true
+            "id": "events",
+            "title": "Events",
+            "type": "layer"
         },
         {
             "id": "descriptions",
             "title": "Descriptions",
-            "type": "layer",
-            "find": true
+            "type": "layer"
         },
         {
             "id": "transcripts",
             "title": "Transcripts",
-            "type": "layer",
-            "find": true
+            "type": "layer"
         },
         {
             "id": "duration",

@@ -108,12 +108,12 @@ class Annotation(models.Model):
                   settings.CONFIG['layers']):
             update_matching_events.delay(self.id)
 
-    def json(self, layer=False, keys=None):
+    def json(self, layer=False, keys=None, user=None):
         j = {
             'user': self.user.username,
         }
-        for field in ('id', 'in', 'out', 'value', 'created', 'modified'):
-            j[field] = getattr(self, {
+        for key in ('id', 'in', 'out', 'value', 'created', 'modified'):
+            j[key] = getattr(self, {
                 'duration': 'clip__duration',
                 'hue': 'clip__hue',
                 'id': 'public_id',
@@ -122,7 +122,18 @@ class Annotation(models.Model):
                 'out': 'end',
                 'saturation': 'clip__saturation',
                 'volume': 'clip__volume',
-            }.get(field, field))
+            }.get(key, key))
+
+        l = self.get_layer()
+        if l['type'] == 'place':
+            qs = self.places.all()
+            if qs.count() > 0:
+                j['place'] = qs[0].json(user=user)
+        elif l['type'] == 'event':
+            qs = self.events.all()
+            if qs.count() > 0:
+                j['event'] = qs[0].json(user=user)
+
         if layer or (keys and 'layer' in keys):
             j['layer'] = self.layer
         if keys:

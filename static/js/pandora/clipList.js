@@ -64,7 +64,8 @@ pandora.ui.clipList = function(videoRatio) {
                     // if the item query contains a layer condition,
                     // then this condition is added to the clip query
                     itemsQuery.conditions.forEach(function(condition) {
-                        if (Ox.getIndexById(pandora.site.layers, condition.key) > -1) {
+                        if (condition.key == 'annotations'
+                            || Ox.getIndexById(pandora.site.layers, condition.key) > -1) {
                             query.conditions.push(condition);
                         }
                     });

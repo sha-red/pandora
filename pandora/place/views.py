@@ -90,7 +90,11 @@ def editPlace(request):
         conflict = False
         conflict_names = []
         conflict_geoname = ''
-        for name in names + data.get('alternativeNames', []):
+        alternative_names = data.get('alternativeNames', [])
+        if alternative_names:
+            alternative_names = filter(lambda n: n.strip(), alternative_names)
+            data['alternativeNames'] = alternative_names
+        for name in names + alternative_names:
             if models.Place.objects.filter(name_find__icontains=u'|%s|'%name).exclude(id=place.id).count() != 0:
                 conflict = True
                 conflict_names.append(name)

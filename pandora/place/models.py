@@ -57,12 +57,9 @@ class Place(models.Model):
         return self.name
 
     def editable(self, user):
-        if not user or user.is_anonymous():
-            level = 'guest'
-        else:
-            level = user.get_profile().get_level()
-        if self.user == user or level in ('admin', 'staff'):
-            return True
+        if user and not user.is_anonymous() \
+            and (self.user == user or user.get_profile().capability('canEditPlaces')):
+                return True
         return False
 
     def get_id(self):
@@ -83,8 +80,6 @@ class Place(models.Model):
         return j
 
     def get_matches(self):
-        layers = [l['id'] for l in filter(lambda l: l['type'] == 'place' or l.get('hasPlaces'),
-                                          settings.CONFIG['layers'])]
         super_matches = []
         q = Q(name_find__contains=" " + self.name)|Q(name_find__contains="|%s"%self.name)
         for name in self.alternativeNames:
@@ -94,11 +89,30 @@ class Place(models.Model):
                 for name in [self.name] + list(self.alternativeNames):
                     if name in othername:
                         super_matches.append(othername)
-        q = Q(value__icontains=" " + self.name)|Q(value__istartswith=self.name)
-        for name in self.alternativeNames:
-            q = q|Q(value__icontains=" " + name)|Q(value__istartswith=name)
+
+
+        exact = [l['id'] for l in filter(lambda l: l['type'] == 'place', settings.CONFIG['layers'])]
+        if exact:
+            q = Q(value__iexact=self.name)
+            for name in self.alternativeNames:
+                q = q|Q(value__iexact=name)
+            f = q&Q(layer__in=exact)
+        else:
+            f = None
+
+        contains = [l['id'] for l in filter(lambda l: l.get('hasPlaces'), settings.CONFIG['layers'])]
+        if contains:
+            q = Q(value__icontains=" " + self.name)|Q(value__istartswith=self.name)
+            for name in self.alternativeNames:
+                q = q|Q(value__icontains=" " + name)|Q(value__istartswith=name)
+            contains_matches = q&Q(layer__in=contains)
+            if f:
+                f = contains_matches | f
+            else:
+                f = contains_matches
+
         matches = []
-        for a in Annotation.objects.filter(layer__in=layers).filter(q):
+        for a in Annotation.objects.filter(f):
             value = a.value.lower()
             for name in super_matches:
                 value = value.replace(name.lower(), '')
@@ -125,7 +139,11 @@ class Place(models.Model):
         for i in Item.objects.filter(id__in=ids).exclude(id__in=self.items.all()):
             self.items.add(i)
         if self.matches != numberofmatches:
-            Place.objects.filter(id=self.id).update(matches=numberofmatches)
+            if numberofmatches:
+                Place.objects.filter(id=self.id).update(matches=numberofmatches)
+            else:
+                self.matches = numberofmatches
+                self.save()
 
     def save(self, *args, **kwargs):
         if not self.name_sort:
