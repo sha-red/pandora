@@ -264,7 +264,7 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($text);
 
-    var list_keys = ['language', 'topic', 'director', 'cinematographer', 'features'];
+    var list_keys = ['language', 'topic', 'director', 'cinematographer', 'features', 'groups'];
     $('<div>').html('<br>').appendTo($text);
     [
         'date',
@@ -284,7 +284,6 @@ pandora.ui.infoView = function(data) {
             .html(
                 formatKey({
                     categorty: 'categories',
-                    user: 'contributor'
                 }[key] || key).replace('</span>', '&nbsp;</span>')
             )
             .appendTo($div);
@@ -352,6 +351,22 @@ pandora.ui.infoView = function(data) {
     // Notes -------------------------------------------------------------------
 
     if (canEdit) {
+        $('<div>')
+            .css({marginBottom: '4px'})
+            .append(formatKey('Groups', true))
+            .append(
+                Ox.Editable({
+                        placeholder: formatLight('No Groups'),
+                        tooltip: 'Doubleclick to edit',
+                        value: data.groups.join(', '),
+                    })
+                    .bindEvent({
+                        submit: function(event) {
+                            editMetadata('groups', event.value);
+                        }
+                    })
+            )
+            .appendTo($statistics);
 
         $('<div>')
             .css({marginBottom: '4px'})
@@ -367,12 +382,7 @@ pandora.ui.infoView = function(data) {
                     })
                     .bindEvent({
                         submit: function(event) {
-                            pandora.api.edit({
-                                id: data.id,
-                                notes: event.value
-                            }, function(result) {
-                                // ...
-                            });
+                            editMetadata('notes', event.value);
                         }
                     })
             )

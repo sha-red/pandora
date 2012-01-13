@@ -209,10 +209,13 @@ class Item(models.Model):
             del data['id']
         if 'groups' in data:
             groups = data.pop('groups')
-            self.groups.exclude(name__in=groups).delete()
-            for g in groups:
-                group, created = Group.objects.get_or_create(name=g) 
-                self.groups.add(group)
+            if isinstance(groups, list):
+                groups = filter(lambda g: g.strip(), groups)
+                self.groups.exclude(name__in=groups).delete()
+                current_groups = [g.name for g in self.groups.all()]
+                for g in filter(lambda g: g not in current_groups, groups):
+                    group, created = Group.objects.get_or_create(name=g)
+                    self.groups.add(group)
         for key in data:
             self.data[key] = data[key]
         return self.save()

@@ -240,7 +240,7 @@ pandora.ui.usersDialog = function() {
                 columnsRemovable: true,
                 columnsVisible: true,
                 items: pandora.api.findUsers,
-                keys: ['notes'],
+                keys: ['notes', 'groups'],
                 max: -1,
                 scrollbarVisible: true,
                 sort: [{key: 'lastseen', operator: '-'}]
@@ -492,6 +492,18 @@ pandora.ui.usersDialog = function() {
 
                         }
                     }),
+                Ox.Input({
+                        id: 'groups',
+                        label: 'Groups',
+                        labelWidth: 80,
+                        value: user.groups.join(', '),
+                        width: formWidth - 16
+                    })
+                    .bindEvent({
+                        submit: function(data) {
+
+                        }
+                    }),
                 Ox.Select({
                     id: 'level',
                     items: Ox.map(pandora.site.userLevels, function(level, i) {
@@ -542,6 +554,8 @@ pandora.ui.usersDialog = function() {
                     data.level = event.data.value;
                 } else if (event.id == 'newsletter') {
                     data.newsletter = event.data.value;
+                } else if (event.id == 'groups') {
+                    data.groups = event.data.value.split(', ');
                 } else {
                     data[event.id] = event.data.value;
                 }

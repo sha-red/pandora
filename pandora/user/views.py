@@ -334,6 +334,15 @@ def editUser(request):
         profile.notes = data['notes']
     if 'newsletter' in data:
         profile.newsletter = data['newsletter']
+    if 'groups' in data:
+        groups = data['groups']
+        if isinstance(groups, list):
+            groups = filter(lambda g: g.strip(), groups)
+            user.groups.exclude(name__in=groups).delete()
+            current_groups = [g.name for g in user.groups.all()]
+            for g in filter(lambda g: g not in current_groups, groups):
+                group, created = models.Group.objects.get_or_create(name=g) 
+                user.groups.add(group)
     if 'username' in data:
         if models.User.objects.filter(
                 username__iexact=data['username']).exclude(id=user.id).count()>0:

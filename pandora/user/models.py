@@ -3,7 +3,7 @@
 import copy
 from datetime import datetime
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.db import models
 from django.db.models import Max
 from django.conf import settings
@@ -149,6 +149,7 @@ class SessionData(models.Model):
             p = self.user.get_profile()
             j['disabled'] = not self.user.is_active
             j['email'] = self.user.email
+            j['groups'] = [g.name for g in self.user.groups.all()]
             j['level'] = p.get_level()
             j['newsletter'] = p.newsletter
             j['notes'] = p.notes
