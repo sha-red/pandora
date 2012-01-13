@@ -292,14 +292,14 @@
             "title": "Saturation",
             "type": "float",
             "columnWidth": 90,
-            "format": {"type": "color", "args": ["greyscale"]}
+            "format": {"type": "color", "args": ["saturation"]}
         },
         {
             "id": "lightness",
             "title": "Lightness",
             "type": "float",
             "columnWidth": 90,
-            "format": {"type": "color", "args": ["greyscale"]}
+            "format": {"type": "color", "args": ["lightness"]}
         },
         {
             "id": "volume",

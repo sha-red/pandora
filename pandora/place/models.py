@@ -132,12 +132,15 @@ class Place(models.Model):
         for i in self.annotations.exclude(id__in=matches):
             self.annotations.remove(i)
         for i in matches.exclude(id__in=self.annotations.all()):
-            self.annotations.add(i)
+            #need to check again since editEvent might have been called again
+            if self.annotations.filter(id=i.id).count() == 0:
+                self.annotations.add(i)
         ids = list(set([a.item.id for a in matches]))
         for i in self.items.exclude(id__in=ids):
             self.items.remove(i)
         for i in Item.objects.filter(id__in=ids).exclude(id__in=self.items.all()):
-            self.items.add(i)
+            if self.items.filter(id=i.id).count() == 0:
+                self.items.add(i)
         if self.matches != numberofmatches:
             if numberofmatches:
                 Place.objects.filter(id=self.id).update(matches=numberofmatches)
