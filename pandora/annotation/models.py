@@ -103,10 +103,14 @@ class Annotation(models.Model):
 
         if filter(lambda l: l['type'] == 'place' or l.get('hasPlaces'),
                   settings.CONFIG['layers']):
-            update_matching_places.delay(self.id)
+            #update_matching_places.delay(self.id)
+            #editAnnotations needs to be in snyc
+            update_matching_places(self.id)
         if filter(lambda l: l['type'] == 'event' or l.get('hasEvents'),
                   settings.CONFIG['layers']):
-            update_matching_events.delay(self.id)
+            #update_matching_events.delay(self.id)
+            #editAnnotations needs to be in snyc
+            update_matching_events(self.id)
 
     def json(self, layer=False, keys=None, user=None):
         j = {

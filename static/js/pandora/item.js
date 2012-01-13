@@ -218,7 +218,9 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'timeline') {
             pandora.$ui.contentPanel.replaceElement(1,
                 pandora.$ui.editor = Ox.VideoEditor({
+                    annotationsCalendarSize: pandora.user.ui.annotationsCalendarSize,
                     annotationsFont: pandora.user.ui.annotationsFont,
+                    annotationsMapSize: pandora.user.ui.annotationsMapSize,
                     annotationsRange: pandora.user.ui.annotationsRange,
                     annotationsSize: pandora.user.ui.annotationsSize,
                     annotationsSort: pandora.user.ui.annotationsSort,
@@ -254,6 +256,8 @@ pandora.ui.item = function() {
                         ? pandora.user.ui.item + '/' + pandora.user.ui.videoPoints[pandora.user.ui.item].annotation
                         : '',
                     showAnnotations: pandora.user.ui.showAnnotations,
+                    showAnnotationsCalendar: pandora.user.ui.showAnnotationsCalendar,
+                    showAnnotationsMap: pandora.user.ui.showAnnotationsMap,
                     showLargeTimeline: true,
                     showLayers: pandora.user.ui.showLayers,
                     showUsers: pandora.site.annotations.showUsers,
@@ -344,6 +348,8 @@ pandora.ui.item = function() {
                             value: data.value,
                         }, function(result) {
                             Ox.Log('', 'editAnnotation result', result);
+                            result.data.duration = result.data.out - result.data['in'];
+                            pandora.$ui.editor.updateAnnotation(data.layer, result.data);
                         });
                     },
                     removeannotation: function(data) {

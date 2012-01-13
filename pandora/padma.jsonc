@@ -517,7 +517,9 @@
     "user": {
         "level": "guest",
         "ui": {
+            "annotationsCalendarSize": 256,
             "annotationsFont": "small",
+            "annotationsMapSize": 256,
             "annotationsRange": "position",
             "annotationsSize": 256,
             "annotationsSort": "position",
@@ -555,6 +557,8 @@
             "page": "",
             "section": "items",
             "showAnnotations": true,
+            "showAnnotationsCalendar": true,
+            "showAnnotationsMap": true,
             "showBrowser": true,
             "showCalendarControls": true, // fixme: should be false
             "showFilters": true,
