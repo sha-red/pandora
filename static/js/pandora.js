@@ -172,7 +172,7 @@ appPanel
     function loadPandoraFiles(callback) {
         var prefix = '/static/';
         if (localStorage && localStorage['pandora.debug']) {
-            Ox.getJSON(prefix + 'json/pandora.json', function(files) {
+            Ox.getJSON(prefix + 'json/pandora.json?' + Ox.random(1000), function(files) {
                 var promises = [];
                 files.forEach(function(file) {
                     var dfd = new $.Deferred();
@@ -287,7 +287,9 @@ appPanel
             Ox.Request.requests() && pandora.$ui.loadingIcon.start();
             pandora.$ui.body.ajaxStart(pandora.$ui.loadingIcon.start);
             pandora.$ui.body.ajaxStop(pandora.$ui.loadingIcon.stop);
-
+            Ox.Request.bindEvent({
+                error: pandora.ui.errorDialog
+            });
             pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
 
         });

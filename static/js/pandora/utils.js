@@ -1034,6 +1034,8 @@ pandora.selectList = function() {
 };
 
 pandora.unloadWindow = function() {
+    //prevent errors on unload
+    pandora.isUnloading = true;
     /*
     // fixme: ajax request has to have async set to false for this to work
     pandora.user.ui.section == 'items'
