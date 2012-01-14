@@ -2,7 +2,8 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 
-from django.db.models import Max, Min
+from django.db.models import Max, Min, Count
+from django.conf import settings
 
 import ox
 from ox.utils import json
@@ -278,3 +279,32 @@ Positions
         )
     return render_to_json_response(response)
 actions.register(findPlaces)
+
+def getPlaceNames(request):
+    '''
+        param data {
+        }
+        return {
+                status: {
+                    code: int,
+                    text: string
+                },
+                data: {
+                    items: [
+                        {name:, matches}
+                    ]
+                }
+        }
+    '''
+    response = json_response({})
+    layers = [l['id'] for l in filter(lambda l: l['type'] == 'place',
+                                      settings.CONFIG['layers'])]
+    items = models.Annotation.objects.filter(layer__in=layers,
+                                             places__id=None).order_by('value')
+    items = items.values('value').annotate(Count('value'))
+    response['data']['items'] = [{
+        'name': i['value'],
+        'matches': i['value__count']
+    } for i in items]
+    return render_to_json_response(response)
+actions.register(getPlaceNames)
