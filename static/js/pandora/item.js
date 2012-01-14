@@ -269,6 +269,20 @@ pandora.ui.item = function() {
                     volume: pandora.user.ui.videoVolume,
                     width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
                 }).bindEvent({
+                    addannotation: function(data) {
+                        Ox.Log('', 'addAnnotation', data);
+                        pandora.api.addAnnotation({
+                            'in': data['in'],
+                            item: pandora.user.ui.item,
+                            layer: data.layer,
+                            out: data.out,
+                            value: data.value,
+                        }, function(result) {
+                            result.data.editable = true;
+                            result.data.duration = result.data.out - result.data['in'];
+                            pandora.$ui.editor.addAnnotation(data.layer, result.data);
+                        });
+                    },
                     annotationsfont: function(data) {
                         pandora.UI.set({annotationsFont: data.font});
                     },
@@ -280,6 +294,20 @@ pandora.ui.item = function() {
                     },
                     annotationssort: function(data) {
                         pandora.UI.set({annotationsSort: data.sort});
+                    },
+                    editannotation: function(data) {
+                        Ox.Log('', 'editAnnotation', data);
+                        //fixme: check that edit was successfull
+                        pandora.api.editAnnotation({
+                            id: data.id,
+                            'in': data['in'],
+                            out: data.out,
+                            value: data.value,
+                        }, function(result) {
+                            Ox.Log('', 'editAnnotation result', result);
+                            result.data.duration = result.data.out - result.data['in'];
+                            pandora.$ui.editor.updateAnnotation(data.layer, result.data);
+                        });
                     },
                     find: function(data) {
                         var textKey = Ox.getObjectById(pandora.site.layers, 'subtitles')
@@ -307,10 +335,24 @@ pandora.ui.item = function() {
                             data.position
                         );
                     },
+                    removeannotation: function(data) {
+                        pandora.api.removeAnnotation({
+                            id: data.id
+                        }, function(result) {
+                            //fixme: check for errors
+                            //pandora.$ui.editor.removeAnnotation(data.layer, data.id);
+                        });
+                    },
                     resize: function(data) {
                         pandora.$ui.editor.options({
                             height: data.size
                         });
+                    },
+                    resizecalendar: function(data) {
+                        pandora.UI.set('annotationsCalendarSize', data.size);
+                    },
+                    resizemap: function(data) {
+                        pandora.UI.set('annotationsMapSize', data.size);
                     },
                     resolution: function(data) {
                         pandora.UI.set('videoResolution', data.resolution);
@@ -321,44 +363,14 @@ pandora.ui.item = function() {
                     subtitles: function(data) {
                         pandora.UI.set('videoSubtitles', data.subtitles);
                     },
+                    togglecalendar: function(data) {
+                        pandora.UI.set('showAnnotationsCalendar', !data.collapsed);
+                    },
+                    togglemap: function(data) {
+                        pandora.UI.set('showAnnotationsMap', !data.collapsed);
+                    },
                     togglesize: function(data) {
                         pandora.UI.set({videoSize: data.size});
-                    },
-                    addannotation: function(data) {
-                        Ox.Log('', 'addAnnotation', data);
-                        pandora.api.addAnnotation({
-                            'in': data['in'],
-                            item: pandora.user.ui.item,
-                            layer: data.layer,
-                            out: data.out,
-                            value: data.value,
-                        }, function(result) {
-                            result.data.editable = true;
-                            result.data.duration = result.data.out - result.data['in'];
-                            pandora.$ui.editor.addAnnotation(data.layer, result.data);
-                        });
-                    },
-                    editannotation: function(data) {
-                        Ox.Log('', 'editAnnotation', data);
-                        //fixme: check that edit was successfull
-                        pandora.api.editAnnotation({
-                            id: data.id,
-                            'in': data['in'],
-                            out: data.out,
-                            value: data.value,
-                        }, function(result) {
-                            Ox.Log('', 'editAnnotation result', result);
-                            result.data.duration = result.data.out - result.data['in'];
-                            pandora.$ui.editor.updateAnnotation(data.layer, result.data);
-                        });
-                    },
-                    removeannotation: function(data) {
-                        pandora.api.removeAnnotation({
-                            id: data.id
-                        }, function(result) {
-                            //fixme: check for errors
-                            //pandora.$ui.editor.removeAnnotation(data.layer, data.id);
-                        });
                     },
                     toggleannotations: function(data) {
                         pandora.UI.set('showAnnotations', data.showAnnotations);
