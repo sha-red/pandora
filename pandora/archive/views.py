@@ -364,6 +364,17 @@ def editFile(request):
     return render_to_json_response(response)
 actions.register(editFile, cache=False)
 
+@login_required_json
+def removeFiles(request):
+    data = json.loads(request.POST['data'])
+    response = json_response()
+    if request.user.get_profile().get_level() == 'admin':
+        models.File.objects.filter(oshash__in=data['ids'], instances__id=None).delete()
+    else:
+        response = json_response(status=403, text='permissino denied')
+    return render_to_json_response(response)
+actions.register(removeFiles, cache=False)
+
 
 def lookup_file(request, oshash):
     f = get_object_or_404(models.File, oshash=oshash)

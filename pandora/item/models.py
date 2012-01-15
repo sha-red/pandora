@@ -216,6 +216,15 @@ class Item(models.Model):
                 for g in filter(lambda g: g not in current_groups, groups):
                     group, created = Group.objects.get_or_create(name=g)
                     self.groups.add(group)
+        keys = [k['id'] for k in
+                filter(lambda i: i.get('description'), settings.CONFIG['itemKeys'])]
+        for k in keys:
+            key = '%sdescription' % k
+            if key in data:
+                value = data.get(k, self.get(k, ''))
+                d, created = Description.objects.get_or_create(key=k, value=value)
+                d.description = data.pop(key)
+                d.save()
         for key in data:
             self.data[key] = data[key]
         return self.save()
@@ -495,6 +504,17 @@ class Item(models.Model):
             i['posterFrame'] = selected_frame[0]['position']
         elif self.poster_frame != -1.0:
             i['posterFrame'] = self.poster_frame
+
+        dkeys = [k['id'] for k in
+                filter(lambda i: i.get('description'), settings.CONFIG['itemKeys'])]
+        if keys:
+            dkeys = filter(lambda k: k in keys, dkeys)
+        for key in dkeys:
+            qs = Description.objects.filter(key=key, value=self.get(key, ''))
+            if qs.count() == 0:
+                i['%sdescription'%key] = ''
+            else:
+                i['%sdescription'%key] = qs[0].description
 
         if keys:
             info = {}
@@ -1298,4 +1318,14 @@ class Facet(models.Model):
         if not self.sortvalue:
             self.sortvalue = utils.sort_string(self.value)
         super(Facet, self).save(*args, **kwargs)
+
+class Description(models.Model):
+    '''
+        shared itemkey descriptions
+    '''
+    class Meta:
+        unique_together = ("key", "value")
+    key = models.CharField(max_length=200, db_index=True)
+    value = models.CharField(max_length=1000, db_index=True)
+    description = models.TextField()
 

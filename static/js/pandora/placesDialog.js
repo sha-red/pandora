@@ -2,16 +2,12 @@
 
 'use strict';
 
-pandora.ui.placesDialog = function() {
+pandora.ui.placesDialog = function(options) {
+    // options can be {id: '...'} or {name: '...'}
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = Math.round(window.innerWidth * 0.9),
         $content = Ox.ListMap({
             height: height - 48,
-            places: function(data, callback) {
-                return pandora.api.findPlaces(Ox.extend({
-                    query: {conditions: [], operator: ''}
-                }, data), callback);
-            },
             addPlace: function(place, callback) {
                 pandora.api.addPlace(place, function(result) {
                     Ox.Request.clearCache(); // fixme: remove
@@ -45,12 +41,23 @@ pandora.ui.placesDialog = function() {
                     callback(result.data.items);
                 });
             },
+            names: pandora.hasPlacesLayer ? function(callback) {
+                pandora.api.getPlaceNames(function(result) {
+                    callback(result.data.items);
+                });
+            } : null,
+            places: function(data, callback) {
+                return pandora.api.findPlaces(Ox.extend({
+                    query: {conditions: [], operator: ''}
+                }, data), callback);
+            },
             removePlace: function(place, callback) {
                 pandora.api.removePlace(place, function(result) {
                     Ox.Request.clearCache(); // fixme: remove
                     callback(result);
                 });
             },
+            selected: options ? options.id : void 0,
             showControls: pandora.user.ui.showMapControls,
             showLabels: pandora.user.ui.showMapLabels,
             showTypes: true,

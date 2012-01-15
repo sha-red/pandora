@@ -278,8 +278,9 @@ pandora.ui.item = function() {
                             out: data.out,
                             value: data.value,
                         }, function(result) {
-                            result.data.editable = true;
+                            // fixme: both should come from backend
                             result.data.duration = result.data.out - result.data['in'];
+                            result.data.editable = true;
                             pandora.$ui.editor.addAnnotation(data.layer, result.data);
                         });
                     },
@@ -295,6 +296,10 @@ pandora.ui.item = function() {
                     annotationssort: function(data) {
                         pandora.UI.set({annotationsSort: data.sort});
                     },
+                    define: function(data) {
+                        pandora.$ui.placesDialog && pandora.$ui.placesDialog.remove();
+                        pandora.$ui.placesDialog = pandora.ui.placesDialog(data).open();
+                    },
                     editannotation: function(data) {
                         Ox.Log('', 'editAnnotation', data);
                         //fixme: check that edit was successfull
@@ -304,9 +309,11 @@ pandora.ui.item = function() {
                             out: data.out,
                             value: data.value,
                         }, function(result) {
-                            Ox.Log('', 'editAnnotation result', result);
+                            Ox.print('', 'editAnnotation result', result);
+                            // fixme: both should come from backend
                             result.data.duration = result.data.out - result.data['in'];
-                            pandora.$ui.editor.updateAnnotation(data.layer, result.data);
+                            result.data.editable = true;
+                            pandora.$ui.editor.updateAnnotation(result.data);
                         });
                     },
                     find: function(data) {

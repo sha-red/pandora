@@ -56,7 +56,8 @@
         {"id": "keywords", "title": "Keywords", "type": "string"},
         {"id": "language", "title": "Languages", "type": "string"},
         {"id": "places", "title": "Places", "type": "string"},
-        {"id": "year", "title": "Years", "type": "integer"},
+        //{"id": "year", "title": "Years", "type": "integer"},
+        {"id": "features", "title": "Features", "type": "string"},
         {"id": "director", "title": "Directors", "type": "string"},
         {"id": "cinematographer", "title": "Cinematographers", "type": "string"}
     ],
@@ -104,6 +105,7 @@
             "title": "Source",
             "type": "string",
             "autocomplete": true,
+            "description": true,
             "columnWidth": 180,
             "filter": true,
             "find": true
@@ -113,6 +115,7 @@
             "title": "Project",
             "type": "string",
             "autocomplete": true,
+            "description": true,
             "columnWidth": 120,
             "filter": true,
             "find": true
@@ -562,7 +565,7 @@
             "showBrowser": true,
             "showCalendarControls": true, // fixme: should be false
             "showFilters": true,
-            "showFlags": true,
+            "showFlags": false,
             "showHome": true,
             "showIconBrowser": false,
             "showInfo": true,

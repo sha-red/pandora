@@ -4,9 +4,7 @@
 
 pandora.ui.clipsView = function(videoRatio) {
 
-    var textKey = Ox.getObjectById(pandora.site.layers, 'subtitles')
-            ? 'subtitles'
-            : 'annotations',
+    var textKey = pandora.getClipTextKey(),
         that = Ox.SplitPanel({
             elements: [
                 {

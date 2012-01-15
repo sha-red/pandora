@@ -118,7 +118,6 @@ class Annotation(models.Model):
         }
         for key in ('id', 'in', 'out', 'value', 'created', 'modified'):
             j[key] = getattr(self, {
-                'duration': 'clip__duration',
                 'hue': 'clip__hue',
                 'id': 'public_id',
                 'in': 'start',
@@ -127,6 +126,7 @@ class Annotation(models.Model):
                 'saturation': 'clip__saturation',
                 'volume': 'clip__volume',
             }.get(key, key))
+        j['duration'] = j['out'] - j['in']
 
         l = self.get_layer()
         if l['type'] == 'place':

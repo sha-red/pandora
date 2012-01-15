@@ -404,7 +404,11 @@ def get(request):
         if not data['keys'] or 'notes' in data['keys'] \
            and request.user.get_profile().capability('canEditMetadata'):
             info['notes'] = item.notes
+        if not data['keys'] or 'groups' in data['keys'] \
+           and request.user.get_profile().capability('canEditMetadata'):
             info['groups'] = [g.name for g in item.groups.all()]
+
+        info['editable'] = item.editable(request.user)
         response['data'] = info
     else:
         response = json_response(status=403, text='permission denied')

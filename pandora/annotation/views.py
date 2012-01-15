@@ -142,6 +142,7 @@ def addAnnotation(request):
             value=data['value'])
         annotation.save()
         response = json_response(annotation.json())
+        response['data']['editable'] = True
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
@@ -198,6 +199,7 @@ def editAnnotation(request):
                 }.get(key,key), data[key])
         a.save()
         response['data'] = a.json()
+        response['data']['editable'] = True
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)

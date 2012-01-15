@@ -495,6 +495,12 @@ pandora.getClipsQuery = function() {
     return clipsQuery;
 };
 
+pandora.getClipTextKey = function() {
+    return Ox.getObjectById(pandora.site.layers, 'subtitles')
+        ? 'subtitles'
+        : 'annotations';
+};
+
 (function() {
     var itemTitles = {};
     pandora.getDocumentTitle = function(itemTitle) {
@@ -820,9 +826,21 @@ pandora.hasDialogOrScreen = function() {
         || $('.OxScreen').length;
 };
 
+pandora.hasEventsLayer = function() {
+    return pandora.site.layers.some(function(layer) {
+        return layer.type == 'event';
+    });
+};
+
 pandora.hasFocusedInput = function() {
     var focused = Ox.Focus.focused();
     return focused && Ox.UI.elements[focused].is('.OxInput');
+};
+
+pandora.hasPlacesLayer = function() {
+    return pandora.site.layers.some(function(layer) {
+        return layer.type == 'place';
+    });
 };
 
 pandora.isClipView = function(view, item) {

@@ -7,9 +7,7 @@ pandora.ui.clipList = function(videoRatio) {
     var ui = pandora.user.ui,
         fixedRatio = !ui.item ? 16/9 : videoRatio,
         isClipView = !ui.item ? ui.listView == 'clip' : ui.itemView == 'clips',
-        textKey = Ox.getObjectById(pandora.site.layers, 'subtitles')
-            ? 'subtitles'
-            : 'annotations',
+        textKey = pandora.getClipTextKey(),
         that = Ox.IconList({
             fixedRatio: fixedRatio,
             item: function(data, sort, size) {

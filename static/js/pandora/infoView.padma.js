@@ -6,7 +6,8 @@ pandora.ui.infoView = function(data) {
     // when collapsing the movies browser, the info view should become a split panel
 
     var ui = pandora.user.ui,
-        canEdit = pandora.site.capabilities.canEditMetadata[pandora.user.level],
+        descriptions = [],
+        canEdit = pandora.site.capabilities.canEditMetadata[pandora.user.level] || data.editable,
         css = {
             marginTop: '4px',
             textAlign: 'justify',
@@ -108,7 +109,6 @@ pandora.ui.infoView = function(data) {
             .appendTo($reflection),
 
         $text = Ox.Element({
-                tooltip: canEdit && !isEditable ? 'Doubleclick to reload metadata' : ''
             })
             .css({
                 position: 'absolute',
@@ -117,9 +117,6 @@ pandora.ui.infoView = function(data) {
                 right: margin + statisticsWidth + margin + 'px',
                 //background: 'green'
             })
-            .bindEvent(canEdit && !isEditable ? {
-                doubleclick: reloadMetadata
-            } : {})
             .appendTo($data.$element),
 
         $statistics = $('<div>')
@@ -252,7 +249,8 @@ pandora.ui.infoView = function(data) {
             Ox.Editable({
                 clickLink: pandora.clickLink,
                 placeholder: formatLight('unknown'),
-                tooltip: 'Doubleclick to edit',
+                editable: isEditable,
+                tooltip: isEditable ? 'Doubleclick to edit' : '',
                 type: 'textarea',
                 value: data.description || ''
             })
@@ -267,14 +265,14 @@ pandora.ui.infoView = function(data) {
     var list_keys = ['language', 'topic', 'director', 'cinematographer', 'features', 'groups'];
     $('<div>').html('<br>').appendTo($text);
     [
+        'source',
+        'project',
         'date',
         'location',
         'director',
         'cinematographer',
         'features',
         'language',
-        'source',
-        'project',
         'topic',
         'user',
     ].forEach(function(key) {
@@ -291,11 +289,16 @@ pandora.ui.infoView = function(data) {
             clickLink: pandora.clickLink,
             format: function(value) {
                 return list_keys.indexOf(key) >= 0
-                    ? formatValue(value.split(', '), key)
+                    ? formatValue(value.split(', '), {
+                        'director': 'name',
+                        'cinematographer': 'name',
+                        'features': 'name',
+                    }[key] || key)
                     : value;
             },
             placeholder: formatLight('unknown'),
-            tooltip: 'Doubleclick to edit',
+            editable: isEditable,
+            tooltip: isEditable ? 'Doubleclick to edit' : '',
             value: list_keys.indexOf(key) >= 0
                   ? (data[key] || []).join(', ')
                   : data[key] || ''
@@ -306,6 +309,31 @@ pandora.ui.infoView = function(data) {
             }
         })
         .appendTo($div);
+        if(pandora.site.itemKeys.filter(function(item) {
+            if (item.id == key)
+                return item.description
+            }).length > 0) {
+            $('<div>')
+                .append(
+                    descriptions[key] = Ox.Editable({
+                        clickLink: pandora.clickLink,
+                        placeholder: formatLight(Ox.toTitleCase(key) + ' Description'),
+                        editable: isEditable,
+                        tooltip: isEditable ? 'Doubleclick to edit' : '',
+                        type: 'textarea',
+                        value: data[key + 'description']|| ''
+                    })
+                    .bindEvent({
+                        submit: function(event) {
+                            editMetadata(key + 'description', event.value);
+                        }
+                    })
+                ).css({
+                    'padding-top': '4px',
+                    'padding-bottom': '4px'
+                })
+                .appendTo($div);
+        }
     });
 
     $('<div>').css({height: '16px'}).appendTo($text);
@@ -348,9 +376,10 @@ pandora.ui.infoView = function(data) {
         .appendTo($statistics);
     renderRightsLevel();
 
-    // Notes -------------------------------------------------------------------
+    // Groups, Notes ---------------------------------------------------------
 
     if (canEdit) {
+
         $('<div>')
             .css({marginBottom: '4px'})
             .append(formatKey('Groups', true))
@@ -403,6 +432,11 @@ pandora.ui.infoView = function(data) {
                 edit[key] = value;
             }
             pandora.api.edit(edit, function(result) {
+                data[key] = value;
+                descriptions[key] && descriptions[key].options({
+                    value: result.data[key+'description']
+                });
+
                 Ox.Request.clearCache(); // fixme: too much? can change filter/list etc
                 if (result.data.id != data.id) {
                     pandora.UI.set({item: result.data.id});
@@ -443,21 +477,6 @@ pandora.ui.infoView = function(data) {
                 return rightsLevel.name;
             })
         );
-    }
-
-    function reloadMetadata() {
-        var item = ui.item;
-        // fixme: maybe there's a better method name for this?
-        pandora.api.updateExternalData({
-            id: ui.item
-        }, function(result) {
-            Ox.Request.clearCache(item);
-            if (ui.item == item && ui.itemView == 'info') {
-                pandora.$ui.contentPanel.replaceElement(
-                    1, pandora.$ui.item = pandora.ui.item()
-                );
-            }
-        });
     }
 
     function renderCapabilities(rightsLevel) {

@@ -203,6 +203,20 @@ pandora.ui.filesView = function(options, self) {
                     });
                 }
             },
+            'delete': function(data) {
+                var ids = data.ids.filter(function(id) {
+                    return self.$filesList.value(id, 'instances').length == 0;
+                });
+                if(ids.length>0 && pandora.user.level == 'admin') {
+                    Ox.print('delete', ids);
+                    pandora.api.removeFiles({
+                        ids: ids
+                    }, function(result) {
+                        Ox.Request.clearCache();
+                        self.$filesList.reloadList();
+                    });
+                }
+            },
             init: function(data) {
                 self.numberOfItems = data.items;
             },
