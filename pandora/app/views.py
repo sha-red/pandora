@@ -24,9 +24,23 @@ def intro(request):
     return render_to_response('intro.html', context)
 
 def index(request):
+    title = settings.SITENAME
+    text = settings.CONFIG['site']['description']
+    page = request.path.split('/')
+    if len(page) == 2:
+        page = page[1]
+    else:
+        page = ''
+    for p in settings.CONFIG['sitePages']:
+        if p['id'] == page:
+            title += ' - ' + p['title']
+            text, created = models.Page.objects.get_or_create(name=page)
+            text = text.body
     context = RequestContext(request, {
         'base_url': request.build_absolute_uri('/'),
         'settings': settings,
+        'text': text,
+        'title': title,
     })
     return render_to_response('index.html', context)
 

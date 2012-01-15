@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>{{settings.SITENAME}}</title>
+        <title>{{title}}</title>
         <link rel="shortcut icon" type="image/png" href="/static/png/icon16.png"/>
         <link rel="icon" href="/static/png/icon64.png" sizes="32x32"/>
         <link rel="icon" href="/static/png/icon64.png" sizes="48x48"/>
@@ -27,8 +27,8 @@
     </head>
     <body>
         <noscript>
-            <h1>{{settings.SITENAME}}</h1>
-            <p>{{settings.CONFIG.site.description|safe}}</p>
+            <h1>{{title}}</h1>
+            <p>{{text|safe}}</p>
             <p>{{settings.SITENAME}} requires JavaScript</p>
         </noscript>
     </body>
