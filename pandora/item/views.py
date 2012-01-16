@@ -411,7 +411,8 @@ def get(request):
         info['editable'] = item.editable(request.user)
         response['data'] = info
     else:
-        response = json_response(status=403, text='permission denied')
+        #response = json_response(status=403, text='permission denied')
+        response = json_response(status=404, text='not found')
     return render_to_json_response(response)
 actions.register(get)
 
@@ -835,7 +836,10 @@ def atom_xml(request):
     '''
     el = ET.SubElement(feed, 'id')
     el.text = atom_link
-    level = 5
+
+    level = settings.CONFIG['capabilities']['canSeeItem']['guest']
+    if not request.user.is_anonymous():
+        level = request.user.get_profile().level
     for item in models.Item.objects.filter(level__lte=level, rendered=True).order_by('-created')[:7]:
         page_link = request.build_absolute_uri('/%s' % item.itemId)
 
@@ -986,7 +990,10 @@ def sitemap_xml(request):
 def item(request, id):
     id = id.split('/')[0]
     template = 'index.html'
-    qs = models.Item.objects.filter(itemId=id)
+    level = settings.CONFIG['capabilities']['canSeeItem']['guest']
+    if not request.user.is_anonymous():
+        level = request.user.get_profile().level
+    qs = models.Item.objects.filter(itemId=id, level__lte=level)
     if qs.count() == 0:
         context = RequestContext(request, {
             'base_url': request.build_absolute_uri('/'),
