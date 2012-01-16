@@ -936,7 +936,7 @@ class Item(models.Model):
             video = base
 
         torrent = '%s.torrent' % base
-        url = "http://%s%s" % (Site.objects.get_current().domain, url)
+        url = "http://%s%s" % (settings.CONFIG['site']['url'], url)
         meta = {
             'target': torrent,
             'url-list': url,
