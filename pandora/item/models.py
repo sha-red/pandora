@@ -1063,7 +1063,7 @@ class Item(models.Model):
         if settings.USE_IMDB:
             if len(self.itemId) == 7:
                 cmd += ['-i', self.itemId]
-            oxdbId = self.oxdbId or self.oxdb_id() or self.ItemId
+            oxdbId = self.oxdbId or self.oxdb_id() or self.itemId
             cmd += ['-o', oxdbId]
         else:
             cmd += ['-i', self.itemId]

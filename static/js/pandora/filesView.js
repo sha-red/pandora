@@ -66,7 +66,6 @@ pandora.ui.filesView = function(options, self) {
                         return true;
                     },
                     format: function(value, data) {
-                        Ox.Log('', 'File', value, data.wanted, data);
                         return $('<img>')
                             .attr({
                                 src: data.wanted ? Ox.UI.getImageURL('symbolStar') :
@@ -81,9 +80,8 @@ pandora.ui.filesView = function(options, self) {
                     },
                     id: 'selected',
                     operator: '-',
-                    title: $('<img>').attr({
-                        src: Ox.UI.getImageURL('symbolCheck')
-                    }),
+                    title: 'Status',
+                    titleImage: 'check',
                     tooltip: function (data) {
                         return data.instances.filter(function(i) {return i.ignore; }).length > 0
                             ? 'Use this file'
