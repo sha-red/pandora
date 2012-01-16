@@ -815,6 +815,119 @@ def random_annotation(request):
     clip = item.annotations.all()[pos]
     return redirect('/%s'% clip.public_id)
 
+def atom_xml(request):
+    feed = ET.Element("feed")
+    feed.attrib['xmlns'] = 'http://www.w3.org/2005/Atom'
+    feed.attrib['xmlns:media'] = 'http://search.yahoo.com/mrss'
+    feed.attrib['xml:lang'] = 'en'
+    title = ET.SubElement(feed, "title")
+    title.text = settings.SITENAME
+    title.attrib['type'] = 'text'
+    link = ET.SubElement(feed, "link")
+    link.attrib['rel'] = 'self'
+    link.attrib['type'] = 'application/atom+xml'
+    atom_link = request.build_absolute_uri('/atom.xml')
+    link.attrib['href'] = atom_link
+    '''
+    rights = ET.SubElement(feed, 'rights')
+    rights.attrib['type'] = 'text'
+    rights.text = "PGL"
+    '''
+    el = ET.SubElement(feed, 'id')
+    el.text = atom_link
+    level = 5
+    for item in models.Item.objects.filter(level__lte=level, rendered=True).order_by('-created')[:7]:
+        page_link = request.build_absolute_uri('/%s' % item.itemId)
+
+        entry = ET.Element("entry")
+        title = ET.SubElement(entry, "title")
+        title.text = item.get('title')
+        link = ET.SubElement(entry, "link")
+        link.attrib['rel'] = 'alternate'
+        link.attrib['href'] = "%s/info" % page_link
+        updated = ET.SubElement(entry, "updated")
+        updated.text = item.modified.strftime("%Y-%m-%dT%H:%M:%SZ")
+        published = ET.SubElement(entry, "published")
+        published.text = item.created.strftime("%Y-%m-%dT%H:%M:%SZ")
+        el = ET.SubElement(entry, "id")
+        el.text = page_link
+
+        if item.get('director'):
+            el = ET.SubElement(entry, "author")
+            name = ET.SubElement(el, "name")
+            name.text = u', '.join(item.get('director'))
+        for topic in item.get('topics', []):
+          el = ET.SubElement(entry, "category")
+          el.attrib['term'] = topic
+
+        '''
+        el = ET.SubElement(entry, "rights")
+        el.text = "PGL"
+        el = ET.SubElement(entry, "link")
+        el.attrib['rel'] = "license"
+        el.attrib['type'] = "text/html"
+        el.attrib['href'] = item.licenseUrl
+        '''
+        '''
+        el = ET.SubElement(entry, "contributor")
+        name = ET.SubElement(el, "name")
+        name.text = item.user.username
+        '''
+
+        description = item.get('description', item.get('summary'))
+        if description:
+            content = ET.SubElement(entry, "content")
+            content.attrib['type'] = 'html'
+            content.text = description
+
+        format = ET.SubElement(entry, "format")
+        format.attrib['xmlns'] = 'http://transmission.cc/FileFormat'
+        stream = item.streams().filter(source=None).order_by('-id')[0]
+        for key in ('size', 'duration', 'video_codec',
+                    'framerate', 'width', 'height',
+                    'audio_codec', 'samplerate', 'channels'):
+            value = stream.info.get(key)
+            if not value and stream.info.get('video'):
+                value = stream.info['video'][0].get({
+                    'video_codec': 'codec'
+                }.get(key, key))
+            if not value and stream.info.get('audio'):
+                value = stream.info['audio'][0].get({
+                    'audio_codec': 'codec'
+                }.get(key, key))
+            if value and value !=  -1:
+                el = ET.SubElement(format, key)
+                el.text = unicode(value)
+        el = ET.SubElement(format, 'pixel_aspect_ratio')
+        el.text = u"1:1"
+
+        if settings.CONFIG['video'].get('download'):
+            #FIXME: loop over streams
+            for s in item.streams().filter(source=None):
+                el = ET.SubElement(entry, "link")
+                el.attrib['rel'] = 'enclosure'
+                el.attrib['type'] = 'video/%s' % s.format
+                el.attrib['href'] = '%s/%sp.%s' % (page_link, s.resolution, s.format)
+                el.attrib['length'] = '%s'%s.video.size
+            el = ET.SubElement(entry, "link")
+            el.attrib['rel'] = 'enclosure'
+            el.attrib['type'] = 'application/x-bittorrent'
+            el.attrib['href'] = '%s/torrent/' % page_link
+            #el.attrib['length'] = unicode(item.size)
+
+        el = ET.SubElement(entry, "media:thumbnail")
+        thumbheight = 96
+        thumbwidth = int(thumbheight * item.stream_aspect)
+        thumbwidth -= thumbwidth % 2
+        el.attrib['url'] = '%s/%sp.jpg' % (page_link, thumbheight)
+        el.attrib['width'] = str(thumbwidth)
+        el.attrib['height'] = str(thumbheight)
+        feed.append(entry)     
+    return HttpResponse(
+        '<?xml version="1.0" encoding="utf-8" standalone="yes"?>\n' + ET.tostring(feed),
+        'application/atom+xml'
+    )
+
 def oembed(request):
     format = request.GET.get('format', 'json')
     maxwidth = request.GET.get('maxwidth', 640)
@@ -844,7 +957,7 @@ def oembed(request):
     oembed['width'] = width
     oembed['height'] = height
     thumbheight = 96
-    thumbwidth = int(thumbheight * item.sort.aspectratio)
+    thumbwidth = int(thumbheight * item.stream_aspect)
     thumbwidth -= thumbwidth % 2
     oembed['thumbnail_height'] = thumbheight
     oembed['thumbnail_width'] = thumbwidth
