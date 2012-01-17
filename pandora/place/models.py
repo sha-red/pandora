@@ -12,7 +12,7 @@ import ox
 from ox.django import fields
 
 import managers
-from annotation.models import Annotation
+from annotation.models import Annotation, get_matches
 from item.models import Item
 
 
@@ -80,50 +80,7 @@ class Place(models.Model):
         return j
 
     def get_matches(self):
-        super_matches = []
-        q = Q(name_find__contains=" " + self.name)|Q(name_find__contains="|%s"%self.name)
-        for name in self.alternativeNames:
-            q = q|Q(name_find__contains=" " + name)|Q(name_find__contains="|%s"%name)
-        for p in Place.objects.filter(q).exclude(id=self.id):
-            for othername in [p.name] + list(p.alternativeNames):
-                for name in [self.name] + list(self.alternativeNames):
-                    if name in othername:
-                        super_matches.append(othername)
-
-
-        exact = [l['id'] for l in filter(lambda l: l['type'] == 'place', settings.CONFIG['layers'])]
-        if exact:
-            q = Q(value__iexact=self.name)
-            for name in self.alternativeNames:
-                q = q|Q(value__iexact=name)
-            f = q&Q(layer__in=exact)
-        else:
-            f = None
-
-        contains = [l['id'] for l in filter(lambda l: l.get('hasPlaces'), settings.CONFIG['layers'])]
-        if contains:
-            q = Q(value__icontains=" " + self.name)|Q(value__istartswith=self.name)
-            for name in self.alternativeNames:
-                q = q|Q(value__icontains=" " + name)|Q(value__istartswith=name)
-            contains_matches = q&Q(layer__in=contains)
-            if f:
-                f = contains_matches | f
-            else:
-                f = contains_matches
-
-        matches = []
-        for a in Annotation.objects.filter(f):
-            value = a.value.lower()
-            for name in super_matches:
-                value = value.replace(name.lower(), '')
-            for name in [self.name] + list(self.alternativeNames):
-                name = name.lower()
-                if name in value and re.compile('((^|\s)%s([\.,;:!?\-\/\s]|$))'%name).findall(value):
-                    matches.append(a.id)
-                    break
-        if not matches:
-            matches = [-1]
-        return Annotation.objects.filter(id__in=matches)
+        return get_matches(self, Place, 'place')
 
     @transaction.commit_on_success
     def update_matches(self):

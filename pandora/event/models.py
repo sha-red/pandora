@@ -11,7 +11,7 @@ from django.conf import settings
 import ox
 from ox.django import fields
 
-from annotation.models import Annotation
+from annotation.models import Annotation, get_matches
 from item.models import Item
 from item import utils
 from person.models import get_name_sort
@@ -70,33 +70,7 @@ class Event(models.Model):
         return False
      
     def get_matches(self):
-        layers = [l['id'] for l in filter(lambda l: l['type'] == 'event' or l.get('hasEvents'),
-                                          settings.CONFIG['layers'])]
-        super_matches = []
-        q = Q(name_find__contains=" " + self.name)|Q(name_find__contains="|%s"%self.name)
-        for name in self.alternativeNames:
-            q = q|Q(name_find__contains=" " + name)|Q(name_find__contains="|%s"%name)
-        for p in Event.objects.filter(q).exclude(id=self.id):
-            for othername in [p.name] + list(p.alternativeNames):
-                for name in [self.name] + list(self.alternativeNames):
-                    if name in othername:
-                        super_matches.append(othername)
-        q = Q(value__icontains=" " + self.name)|Q(value__startswith=self.name)
-        for name in self.alternativeNames:
-            q = q|Q(value__icontains=" " + name)|Q(value__startswith=name)
-        matches = []
-        for a in Annotation.objects.filter(layer__in=layers).filter(q):
-            value = a.value.lower()
-            for name in super_matches:
-                value = value.replace(name.lower(), '')
-            for name in [self.name] + list(self.alternativeNames):
-                name = name.lower()
-                if name in value and re.compile('((^|\s)%s([\.,;:!?\-\/\s]|$))'%name).findall(value):
-                    matches.append(a.id)
-                    break
-        if not matches:
-            matches = [-1]
-        return Annotation.objects.filter(id__in=matches)
+        return get_matches(self, Event, 'event')
 
     @transaction.commit_on_success
     def update_matches(self):

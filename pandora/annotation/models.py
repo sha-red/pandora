@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
+import re
 
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth.models import User
 from django.conf import settings
 import ox
@@ -16,6 +18,52 @@ import utils
 from tasks import update_matching_events, update_matching_places
 
 
+def get_matches(obj, model, layer_type):
+    super_matches = []
+    q = Q(name_find__contains=" " + obj.name)|Q(name_find__contains="|%s"%obj.name)
+    for name in obj.alternativeNames:
+        q = q|Q(name_find__contains=" " + name)|Q(name_find__contains="|%s"%name)
+    for p in model.objects.filter(q).exclude(id=obj.id):
+        for othername in [p.name] + list(p.alternativeNames):
+            for name in [obj.name] + list(obj.alternativeNames):
+                if name in othername:
+                    super_matches.append(othername)
+
+
+    exact = [l['id'] for l in filter(lambda l: l['type'] == layer_type, settings.CONFIG['layers'])]
+    if exact:
+        q = Q(value__iexact=obj.name)
+        for name in obj.alternativeNames:
+            q = q|Q(value__iexact=name)
+        f = q&Q(layer__in=exact)
+    else:
+        f = None
+
+    has_type = 'has%ss' % layer_type.capitalize()
+    contains = [l['id'] for l in filter(lambda l: l.get(has_type), settings.CONFIG['layers'])]
+    if contains:
+        q = Q(value__icontains=" " + obj.name)|Q(value__istartswith=obj.name)
+        for name in obj.alternativeNames:
+            q = q|Q(value__icontains=" " + name)|Q(value__istartswith=name)
+        contains_matches = q&Q(layer__in=contains)
+        if f:
+            f = contains_matches | f
+        else:
+            f = contains_matches
+
+    matches = []
+    for a in Annotation.objects.filter(f):
+        value = a.value.lower()
+        for name in super_matches:
+            value = value.replace(name.lower(), '')
+        for name in [obj.name] + list(obj.alternativeNames):
+            name = name.lower()
+            if name in value and re.compile('((^|\s)%s([\.,;:!?\-\/\s]|$))'%name).findall(value):
+                matches.append(a.id)
+                break
+    if not matches:
+        matches = [-1]
+    return Annotation.objects.filter(id__in=matches)
 
 class Annotation(models.Model):
     objects = managers.AnnotationManager()
