@@ -132,7 +132,7 @@ pandora.ui.infoView = function(data) {
 
         $browserImages = [];
 
-    pandora.createLinks($text);
+    //pandora.createLinks($text);
 
     // Title -------------------------------------------------------------------
 

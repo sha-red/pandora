@@ -529,7 +529,7 @@
             "clipsColumns": 2,
             "columns": {
                 "Colors": {
-                    "columns": ["title", "director", "location", "source", "hue", "saturation", "brightness"],
+                    "columns": ["title", "source", "project", "language", "hue", "saturation", "brightness"],
                     "columnWidth": {}
                 }
             },
@@ -549,7 +549,7 @@
             "itemFind": {"conditions": [], "operator": "&"},
             "itemSort": [{"key": "position", "operator": "+"}],
             "itemView": "info",
-            "listColumns": ["title", "director", "location", "source", "language", "duration"],
+            "listColumns": ["title", "source", "project", "director", "language", "duration"],
             "listColumnWidth": {},
             "listSelection": [],
             "listSort": [{"key": "title", "operator": "+"}],

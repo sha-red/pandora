@@ -177,7 +177,7 @@ pandora.clickLink = function(e) {
     if (e.target.hostname == document.location.hostname) {
         pandora.URL.push(e.target.pathname);
     } else {
-        document.location.href = '/url=' + encodeURIComponent(e.target.href);
+        window.open('/url=' + encodeURIComponent(e.target.href), '_blank');
     }
 };
 
