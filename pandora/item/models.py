@@ -919,13 +919,14 @@ class Item(models.Model):
             shutil.rmtree(base)
         ox.makedirs(base)
 
-        base = self.path('torrent/%s' % self.get('title'))
+        filename = utils.sefe_filename(self.get('title'))
+        base = self.path('torrent/%s' % filename)
         base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, base))
         size = 0
         duration = 0.0
         if streams.count() == 1:
             url =  "%s/torrent/%s.webm" % (self.get_absolute_url(),
-                                           quote(self.get('title').encode('utf-8')))
+                                           quote(filename.encode('utf-8')))
             video = "%s.webm" % base
             v = streams[0]
             os.symlink(v.video.path, video)
@@ -936,7 +937,7 @@ class Item(models.Model):
             part = 1
             os.makedirs(base)
             for v in streams:
-                video = "%s/%s.Part %d.webm" % (base, self.get('title'), part)
+                video = "%s/%s.Part %d.webm" % (base, filename, part)
                 part += 1
                 os.symlink(v.video.path, video)
                 size += v.video.size

@@ -6,6 +6,14 @@ import re
 import unicodedata
 import ox
 
+def safe_filename(filename):
+    filename = filename.replace('_ ', ': ')
+    filename = filename.replace('/', '_')
+    filename = filename.replace('\\', '_')
+    if filename.endswith('.'):
+        filename = filename[:-1] + '_'
+    return filename
+
 def decode_id(id):
     try:
         id = ox.fromAZ(id)

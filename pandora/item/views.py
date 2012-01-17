@@ -725,7 +725,7 @@ def torrent(request, id, filename=None):
     if not filename or filename.endswith('.torrent'):
         response = HttpResponse(item.get_torrent(request),
                                 content_type='application/x-bittorrent')
-        filename = "%s.torrent" % item.get('title')
+        filename = utils.safe_filename("%s.torrent" % item.get('title'))
         response['Content-Disposition'] = 'attachment; filename="%s"' % filename.encode('utf-8')
         return response
     while filename.startswith('/'):
