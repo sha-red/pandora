@@ -919,7 +919,7 @@ class Item(models.Model):
             shutil.rmtree(base)
         ox.makedirs(base)
 
-        filename = utils.sefe_filename(self.get('title'))
+        filename = utils.safe_filename(self.get('title'))
         base = self.path('torrent/%s' % filename)
         base = os.path.abspath(os.path.join(settings.MEDIA_ROOT, base))
         size = 0
