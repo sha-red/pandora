@@ -15,7 +15,7 @@ def update_matching_events(id):
     for i in ids:
         e = Event.objects.get(pk=i)
         for name in [e.name] + list(e.alternativeNames):
-            if name in annotation.value:
+            if name.lower() in annotation.value.lower():
                 e.update_matches()
                 break
 
@@ -29,6 +29,6 @@ def update_matching_places(id):
     for i in ids:
         e = Place.objects.get(pk=i)
         for name in [e.name] + list(e.alternativeNames):
-            if name in annotation.value:
+            if name.lower() in annotation.value.lower():
                 e.update_matches()
                 break

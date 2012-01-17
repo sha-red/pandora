@@ -723,8 +723,8 @@ def torrent(request, id, filename=None):
     if not item.torrent:
         raise Http404
     if not filename or filename.endswith('.torrent'):
-        response = HttpFileResponse(item.torrent.path,
-                                    content_type='application/x-bittorrent')
+        response = HttpResponse(item.get_torrent(request),
+                                content_type='application/x-bittorrent')
         filename = "%s.torrent" % item.get('title')
         response['Content-Disposition'] = 'attachment; filename="%s"' % filename.encode('utf-8')
         return response
@@ -906,18 +906,20 @@ def atom_xml(request):
         el.text = u"1:1"
 
         if settings.CONFIG['video'].get('download'):
+            if item.torrent:
+                el = ET.SubElement(entry, "link")
+                el.attrib['rel'] = 'enclosure'
+                el.attrib['type'] = 'application/x-bittorrent'
+                el.attrib['href'] = '%s/torrent/' % page_link
+                el.attrib['length'] = '%s' % ox.getTorrentSize(item.torrent.path)
             #FIXME: loop over streams
+            #for s in item.streams().filter(resolution=max(settings.CONFIG['video']['resolutions'])):
             for s in item.streams().filter(source=None):
                 el = ET.SubElement(entry, "link")
                 el.attrib['rel'] = 'enclosure'
                 el.attrib['type'] = 'video/%s' % s.format
                 el.attrib['href'] = '%s/%sp.%s' % (page_link, s.resolution, s.format)
                 el.attrib['length'] = '%s'%s.video.size
-            el = ET.SubElement(entry, "link")
-            el.attrib['rel'] = 'enclosure'
-            el.attrib['type'] = 'application/x-bittorrent'
-            el.attrib['href'] = '%s/torrent/' % page_link
-            #el.attrib['length'] = unicode(item.size)
 
         el = ET.SubElement(entry, "media:thumbnail")
         thumbheight = 96

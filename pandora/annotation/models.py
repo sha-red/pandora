@@ -29,7 +29,6 @@ def get_matches(obj, model, layer_type):
                 if name in othername:
                     super_matches.append(othername)
 
-
     exact = [l['id'] for l in filter(lambda l: l['type'] == layer_type, settings.CONFIG['layers'])]
     if exact:
         q = Q(value__iexact=obj.name)
