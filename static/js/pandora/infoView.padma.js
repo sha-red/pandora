@@ -162,111 +162,32 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($text);
 
-    // Director ----------------------------------------------------------------
-/*
-    if (data.director || isEditable) {
+    if(data.description || isEditable) {
         $('<div>')
-            .css({
-                marginTop: '2px'
-            })
             .append(
                 Ox.Editable({
-                        clickLink: pandora.clickLink,
-                        editable: isEditable,
-                        format: function(value) {
-                            return formatValue(value.split(', '), 'name');
-                        },
-                        placeholder: formatLight('Unknown Director'),
-                        tooltip: isEditable ? 'Doubleclick to edit' : '',
-                        value: data.director ? data.director.join(', ') : 'Unknown Director'
-                    })
-                    .css({
-                        display: 'inline-block',
-                        marginBottom: '-3px',
-                        fontWeight: 'bold',
-                        fontSize: '13px',
-                        MozUserSelect: 'text',
-                        WebkitUserSelect: 'text'
-                    })
-                    .bindEvent({
-                        submit: function(event) {
-                            editMetadata('director', event.value);
-                        }
-                    })
+                    clickLink: pandora.clickLink,
+                    placeholder: formatLight('unknown'),
+                    editable: isEditable,
+                    tooltip: isEditable ? 'Doubleclick to edit' : '',
+                    type: 'textarea',
+                    value: data.description || ''
+                })
+                .bindEvent({
+                    submit: function(event) {
+                        editMetadata('description', event.value);
+                    }
+                })
             )
             .appendTo($text);
     }
-*/
-
-    // Country, Year, Language, Runtime ----------------------------------------
-    /*
-    if (isEditable) {
-        var $div = $('<div>')
-            .css(css)
-            .appendTo($text);
-        ['country', 'year'].forEach(function(key) {
-            $('<div>')
-                .css({float: 'left'})
-                .html(formatKey(key).replace('</span>', '&nbsp;</span>'))
-                .appendTo($div);
-            Ox.Editable({
-                    clickLink: pandora.clickLink,
-                    format: function(value) {
-                        return formatValue(value.split(', '), key)
-                    },
-                    placeholder: formatLight('unknown'),
-                    tooltip: 'Doubleclick to edit',
-                    value: key == 'country'
-                        ? (data[key] ? data[key].join(', ') : '')
-                        : data[key] || ''
-                })
-                .css({float: 'left'})
-                .bindEvent({
-                    submit: function(event) {
-                        editMetadata(key, event.value);
-                    }
-                })
-                .appendTo($div);
-            key == 'country' && $('<div>').css({float: 'left'}).html(';&nbsp;').appendTo($div);
-        });
-    } else if (data.country || data.year || data.language || data.runtime) {
-        var html = [];
-        ['country', 'year', 'language', 'runtime'].forEach(function(key) {
-            if (data[key]) {
-                html.push(
-                    formatKey(key)
-                    + (key == 'runtime'
-                        ? Math.round(data[key] / 60) + ' min'
-                        : formatValue(data[key], key))
-                )
-            }
-        });
-        $('<div>').css(css).html(html.join('; ')).appendTo($text);
-    }
-    */
-    $('<div>')
-        .append(
-            Ox.Editable({
-                clickLink: pandora.clickLink,
-                placeholder: formatLight('unknown'),
-                editable: isEditable,
-                tooltip: isEditable ? 'Doubleclick to edit' : '',
-                type: 'textarea',
-                value: data.description || ''
-            })
-            .bindEvent({
-                submit: function(event) {
-                    editMetadata('description', event.value);
-                }
-            })
-        )
-        .appendTo($text);
 
     var list_keys = ['language', 'topic', 'director', 'cinematographer', 'features', 'groups'];
     $('<div>').html('<br>').appendTo($text);
     [
         'source',
         'project',
+        'year',
         'date',
         'location',
         'director',
@@ -276,63 +197,70 @@ pandora.ui.infoView = function(data) {
         'topic',
         'user',
     ].forEach(function(key) {
+
         var $div = $('<div>')
-            .appendTo($text);
-        $('<div>')
-            .html(
-                formatKey({
-                    categorty: 'categories',
-                }[key] || key).replace('</span>', '&nbsp;</span>')
-            )
-            .appendTo($div);
-        Ox.Editable({
-            clickLink: pandora.clickLink,
-            format: function(value) {
-                return list_keys.indexOf(key) >= 0
-                    ? formatValue(value.split(', '), {
-                        'director': 'name',
-                        'cinematographer': 'name',
-                        'features': 'name',
-                    }[key] || key)
-                    : value;
-            },
-            placeholder: formatLight('unknown'),
-            editable: isEditable,
-            tooltip: isEditable ? 'Doubleclick to edit' : '',
-            value: list_keys.indexOf(key) >= 0
-                  ? (data[key] || []).join(', ')
-                  : data[key] || ''
-        })
-        .bindEvent({
-            submit: function(event) {
-                editMetadata(key, event.value);
-            }
-        })
-        .appendTo($div);
-        if(pandora.site.itemKeys.filter(function(item) {
-            if (item.id == key)
-                return item.description
-            }).length > 0) {
+            .appendTo($text),
+            value = list_keys.indexOf(key) >= 0
+                          ? (data[key] || []).join(', ')
+                          : data[key] || '';
+        if(isEditable || value) {
             $('<div>')
-                .append(
-                    descriptions[key] = Ox.Editable({
-                        clickLink: pandora.clickLink,
-                        placeholder: formatLight(Ox.toTitleCase(key) + ' Description'),
-                        editable: isEditable,
-                        tooltip: isEditable ? 'Doubleclick to edit' : '',
-                        type: 'textarea',
-                        value: data[key + 'description']|| ''
-                    })
-                    .bindEvent({
-                        submit: function(event) {
-                            editMetadata(key + 'description', event.value);
-                        }
-                    })
-                ).css({
-                    'padding-top': '4px',
-                    'padding-bottom': '4px'
-                })
+                .html(
+                    formatKey({
+                        categorty: 'categories',
+                    }[key] || key).replace('</span>', '&nbsp;</span>')
+                )
                 .appendTo($div);
+            Ox.Editable({
+                clickLink: pandora.clickLink,
+                format: function(value) {
+                    return list_keys.indexOf(key) >= 0
+                        ? formatValue(value.split(', '), {
+                            'director': 'name',
+                            'cinematographer': 'name',
+                            'features': 'name',
+                        }[key] || key)
+                        : value;
+                },
+                placeholder: formatLight('unknown'),
+                editable: isEditable,
+                tooltip: isEditable ? 'Doubleclick to edit' : '',
+                value: list_keys.indexOf(key) >= 0
+                      ? (data[key] || []).join(', ')
+                      : data[key] || ''
+            })
+            .bindEvent({
+                submit: function(event) {
+                    editMetadata(key, event.value);
+                }
+            })
+            .appendTo($div);
+            if(pandora.site.itemKeys.filter(function(item) {
+                if (item.id == key)
+                    return item.description
+                }).length > 0
+                && (isEditable || data[key + 'description'])) {
+                $('<div>')
+                    .append(
+                        descriptions[key] = Ox.Editable({
+                            clickLink: pandora.clickLink,
+                            placeholder: formatLight(Ox.toTitleCase(key) + ' Description'),
+                            editable: isEditable,
+                            tooltip: isEditable ? 'Doubleclick to edit' : '',
+                            type: 'textarea',
+                            value: data[key + 'description']|| ''
+                        })
+                        .bindEvent({
+                            submit: function(event) {
+                                editMetadata(key + 'description', event.value);
+                            }
+                        })
+                    ).css({
+                        'padding-top': '4px',
+                        'padding-bottom': '4px'
+                    })
+                    .appendTo($div);
+            }
         }
     });
 
@@ -447,6 +375,14 @@ pandora.ui.infoView = function(data) {
                 pandora.$ui.browser.value(result.data.id, 'director', result.data.director);
                 pandora.$ui.browser.value(result.data.id, 'country', result.data.country);
                 pandora.$ui.browser.value(result.data.id, 'year', result.data.year);
+                pandora.$ui.itemTitle
+                    .options({
+                        title: '<b>' + result.data.title
+                            + (Ox.len(result.data.director)
+                                ? ' (' + result.data.director.join(', ') + ')'
+                                : '')
+                            + (result.data.year ? ' ' + result.data.year : '') + '</b>'
+                    });
                 //pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
             });
         }
