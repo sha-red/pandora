@@ -4,8 +4,8 @@
 -e bzr+http://code.0x2620.org/oxtimeline/#egg=oxtimeline
 simplejson
 chardet
-celery>2.4.2
-django-celery>2.4.2
+celery>=2.4.2
+django-celery>=2.4.2
 #django_extensions
 #-e git+https://github.com/django-extensions/django-extensions.git#egg=django_extensions
 #use fork fixing some postgresql issues
