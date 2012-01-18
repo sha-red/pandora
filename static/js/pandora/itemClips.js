@@ -3,6 +3,7 @@
 pandora.ui.itemClips = function(options) {
 
     var self = {},
+        textKey = pandora.getClipTextKey(),
         that = Ox.Element()
             .css({
                 height: '192px',
@@ -28,7 +29,10 @@ pandora.ui.itemClips = function(options) {
         Ox.Log('', 'CLIP', clip)
         var id = self.options.id + '/' + clip['in'],
             title = Ox.map(clip.annotations, function(annotation) {
-                return annotation.layer == 'subtitles' ? annotation.value : 0
+                if(textKey == 'subtitles') {
+                    return annotation.layer == 'subtitles' ? annotation.value : 0;
+                }
+                return annotation.value;
             }),
             url = '/' + self.options.id + '/' + self.height + 'p' + clip['in'] + '.jpg',
             $item = Ox.IconItem({

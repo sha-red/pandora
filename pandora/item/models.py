@@ -567,12 +567,14 @@ class Item(models.Model):
                 elif i == 'filename':
                     save(i,
                         '\n'.join([f.path for f in self.files.all()]))
+                elif key['id'] == 'annotations':
+                    qs = Annotation.objects.filter(item=self)
+                    qs = qs.filter(layer__in=Annotation.public_layers())
+                    qs = qs.order_by('start')
+                    save(i, u'\n'.join([l.findvalue for l in qs]))
                 elif key['type'] == 'layer':
                     qs = Annotation.objects.filter(item=self)
-                    if i == 'annotations':
-                        qs = qs.filter(layer__in=Annotation.public_layers())
-                    else:
-                        qs = qs.filter(layer=i)
+                    qs = qs.filter(layer=i)
                     qs = qs.order_by('start')
                     save(i, u'\n'.join([l.findvalue for l in qs]))
                 elif i != '*' and i not in self.facet_keys:

@@ -91,12 +91,11 @@ def parse_query(data, user):
         if key in data:
             query[key] = data[key]
     query['qs'] = models.Item.objects.find(data, user)
-
     if 'clips' in data:
-        query['clip_qs'] = Clip.objects.find({'query': data['clips']['query']},
-                                             user).order_by('start')
-        query['clip_filter'] = Clip.objects.find({'query': data['clips']['query']},
-                                             user)
+        conditions = {'query': data['clips']['query']}
+        query['clip_qs'] = Clip.objects.find(conditions, user).order_by('start')
+        conditions = {'query': data['query']}
+        query['clip_filter'] = models.Clip.objects.filter_annotations(conditions, user)
         query['clip_items'] = data['clips'].get('items', 5)
         query['clip_keys'] = data['clips'].get('keys')
         if not query['clip_keys']:

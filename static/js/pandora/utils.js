@@ -480,7 +480,8 @@ pandora.getClipsQuery = function() {
             if (condition.conditions) {
                 addClipsConditions(condition.conditions);
             } else if (
-                Ox.getIndexById(pandora.site.layers, condition.key) > -1
+                (condition.key == 'annotations'
+                ||Ox.getIndexById(pandora.site.layers, condition.key) > -1)
                 && condition.operator == '='
             ) {
                 clipsQuery.conditions.push(condition);
