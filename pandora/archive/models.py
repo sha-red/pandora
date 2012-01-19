@@ -207,9 +207,6 @@ class File(models.Model):
         return False
 
     def json(self, keys=None, user=None):
-        #FIXME: why?
-        if keys and not 'instances' in keys:
-            keys.append('instances')
         resolution = (self.width, self.height)
         if resolution == (0, 0):
             resolution = None

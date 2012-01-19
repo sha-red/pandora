@@ -183,7 +183,7 @@ pandora.ui.filesView = function(options, self) {
                     }
                 }), callback);
             },
-            keys: ['wanted'],
+            keys: ['wanted', 'instances'],
             scrollbarVisible: true,
             sort: [{key: 'path', operator: '+'}]
         })

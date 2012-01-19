@@ -167,8 +167,8 @@ pandora.ui.infoView = function(data) {
             .append(
                 Ox.Editable({
                     clickLink: pandora.clickLink,
-                    placeholder: formatLight('unknown'),
                     editable: isEditable,
+                    placeholder: formatLight('unknown'),
                     tooltip: isEditable ? 'Doubleclick to edit' : '',
                     type: 'textarea',
                     value: data.description || ''
