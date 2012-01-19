@@ -168,21 +168,25 @@ pandora.ui.infoView = function(data) {
                 Ox.Editable({
                     clickLink: pandora.clickLink,
                     editable: isEditable,
-                    placeholder: formatLight('unknown'),
+                    maxHeight: Infinity,
+                    placeholder: formatLight('No description'),
                     tooltip: isEditable ? 'Doubleclick to edit' : '',
                     type: 'textarea',
-                    value: data.description || ''
+                    value: data.description || '',
+                    //width: 300
                 })
                 .bindEvent({
                     submit: function(event) {
                         editMetadata('description', event.value);
                     }
                 })
+                .css(css)
             )
             .appendTo($text);
     }
 
-    var list_keys = ['language', 'topic', 'director', 'cinematographer', 'features', 'groups'];
+    var listKeys = ['language', 'topic', 'director', 'cinematographer', 'features', 'groups',
+                    'license'];
     $('<div>').html('<br>').appendTo($text);
     [
         'source',
@@ -195,15 +199,15 @@ pandora.ui.infoView = function(data) {
         'features',
         'language',
         'topic',
+        'license',
         'user',
     ].forEach(function(key) {
 
-        var $div = $('<div>')
-            .appendTo($text),
-            value = list_keys.indexOf(key) >= 0
+        var $div = $('<div>').appendTo($text),
+            value = listKeys.indexOf(key) >= 0
                           ? (data[key] || []).join(', ')
                           : data[key] || '';
-        if(isEditable || value) {
+        if (isEditable || value) {
             $('<div>')
                 .html(
                     formatKey({
@@ -214,7 +218,7 @@ pandora.ui.infoView = function(data) {
             Ox.Editable({
                 clickLink: pandora.clickLink,
                 format: function(value) {
-                    return list_keys.indexOf(key) >= 0
+                    return listKeys.indexOf(key) >= 0
                         ? formatValue(value.split(', '), {
                             'director': 'name',
                             'cinematographer': 'name',
@@ -225,7 +229,7 @@ pandora.ui.infoView = function(data) {
                 placeholder: formatLight('unknown'),
                 editable: isEditable,
                 tooltip: isEditable ? 'Doubleclick to edit' : '',
-                value: list_keys.indexOf(key) >= 0
+                value: listKeys.indexOf(key) >= 0
                       ? (data[key] || []).join(', ')
                       : data[key] || ''
             })
@@ -234,6 +238,7 @@ pandora.ui.infoView = function(data) {
                     editMetadata(key, event.value);
                 }
             })
+            .css(css)
             .appendTo($div);
             if(pandora.site.itemKeys.filter(function(item) {
                 if (item.id == key)
@@ -244,7 +249,7 @@ pandora.ui.infoView = function(data) {
                     .append(
                         descriptions[key] = Ox.Editable({
                             clickLink: pandora.clickLink,
-                            placeholder: formatLight(Ox.toTitleCase(key) + ' Description'),
+                            placeholder: formatLight('No ' + Ox.toTitleCase(key) + ' Description'),
                             editable: isEditable,
                             tooltip: isEditable ? 'Doubleclick to edit' : '',
                             type: 'textarea',
@@ -255,6 +260,7 @@ pandora.ui.infoView = function(data) {
                                 editMetadata(key + 'description', event.value);
                             }
                         })
+                        .css(css)
                     ).css({
                         'padding-top': '4px',
                         'padding-bottom': '4px'
@@ -354,7 +360,7 @@ pandora.ui.infoView = function(data) {
             var edit = {id: data.id};
             if (key == 'title') {
                 edit[key] = value;
-            } else if(list_keys.indexOf(key) > -1) {
+            } else if(listKeys.indexOf(key) > -1) {
                 edit[key] = value ? value.split(', ') : [];
             } else {
                 edit[key] = value;

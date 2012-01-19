@@ -427,6 +427,7 @@ def order_query(qs, sort):
             'browser': 'browser',
             'email': 'user__email',
             'firstseen': 'firstseen',
+            'groups': 'groupssort',
             'ip': 'ip',
             'lastseen': 'lastseen',
             'level': 'level',

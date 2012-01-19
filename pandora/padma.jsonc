@@ -59,7 +59,8 @@
         //{"id": "year", "title": "Years", "type": "integer"},
         {"id": "features", "title": "Features", "type": "string"},
         {"id": "director", "title": "Directors", "type": "string"},
-        {"id": "cinematographer", "title": "Cinematographers", "type": "string"}
+        {"id": "cinematographer", "title": "Cinematographers", "type": "string"},
+        {"id": "license", "title": "License", "type": "string"}
     ],
     /*
         An itemKey must have the following properties:
@@ -385,6 +386,14 @@
             "title": "Times Accessed",
             "type": "integer",
             "columnWidth": 60
+        },
+        {
+            "id": "license",
+            "title": "License",
+            "type": ["string"],
+            "columnWidth": 120,
+            "autocomplete": true,
+            "filter": true
         },
         {
             "id": "rightslevel",

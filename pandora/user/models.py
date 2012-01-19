@@ -38,6 +38,8 @@ class SessionData(models.Model):
 
     objects = managers.SessionDataManager()
 
+    groupssort = models.CharField(default=None,blank=True,null=True, max_length=255)
+
     def __unicode__(self):
         return u"%s" % self.session_key
 
@@ -92,8 +94,10 @@ class SessionData(models.Model):
             self.username = self.user.username
             self.level = self.user.get_profile().level
             self.firstseen = self.user.date_joined
+            self.groupssort = ''.join([g.name for g in self.user.groups.all()])
         else:
             self.level = 0
+            self.groupssort = None
         self.parse_data()
         super(SessionData, self).save(*args, **kwargs)
 

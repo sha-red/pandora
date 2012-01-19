@@ -126,6 +126,13 @@ pandora.ui.usersDialog = function() {
                         width: 60
                     },
                     {
+                        id: 'groups',
+                        operator: '+',
+                        title: 'Groups',
+                        visible: true,
+                        width: 90
+                    },
+                    {
                         format: function(value) {
                             return $('<img>')
                                 .attr({
@@ -492,18 +499,6 @@ pandora.ui.usersDialog = function() {
 
                         }
                     }),
-                Ox.Input({
-                        id: 'groups',
-                        label: 'Groups',
-                        labelWidth: 80,
-                        value: user.groups.join(', '),
-                        width: formWidth - 16
-                    })
-                    .bindEvent({
-                        submit: function(data) {
-
-                        }
-                    }),
                 Ox.Select({
                     id: 'level',
                     items: Ox.map(pandora.site.userLevels, function(level, i) {
@@ -517,6 +512,18 @@ pandora.ui.usersDialog = function() {
                     value: user.level,
                     width: formWidth - 16
                 }),
+                Ox.Input({
+                        id: 'groups',
+                        label: 'Groups',
+                        labelWidth: 80,
+                        value: user.groups.join(', '),
+                        width: formWidth - 16
+                    })
+                    .bindEvent({
+                        submit: function(data) {
+
+                        }
+                    }),
                 Ox.Checkbox({
                         id: 'newsletter',
                         label: 'Newsletter',
@@ -534,7 +541,7 @@ pandora.ui.usersDialog = function() {
                         }
                     }),
                 Ox.Input({
-                    height: dialogHeight - 160,
+                    height: dialogHeight - 184,
                     id: 'notes',
                     placeholder: 'Notes',
                     type: 'textarea',
