@@ -638,9 +638,10 @@ pandora.ui.infoView = function(data) {
         if (canEdit) {
             $rightsLevelSelect = Ox.Select({
                     items: pandora.site.rightsLevels.map(function(rightsLevel, i) {
-                        return {id: i, title: rightsLevel.name, checked: i == data.rightslevel};
+                        return {id: i, title: rightsLevel.name};
                     }),
-                    width: 128
+                    width: 128,
+                    value: data.rightslevel
                 })
                 .addClass('OxColor OxColorGradient')
                 .css({
