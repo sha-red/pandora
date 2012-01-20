@@ -48,41 +48,44 @@ pandora.ui.errorDialog = function(data) {
 
         // on window unload, pending request will time out, so
         // in order to keep the dialog from appearing, delay it
-
-        that = Ox.Dialog({
-            buttons: [
-                Ox.Button({
-                        id: 'close',
-                        title: 'Close'
-                    })
-                    .bindEvent({
-                        click: function() {
-                            that.close();
-                        }
-                    })
-            ],
-            content: Ox.Element()
-                .append(
-                    $('<img>')
-                        .attr({src: Ox.UI.PATH + 'png/icon128.png'})
-                        .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
-                )
-                .append(
-                    Ox.Element()
-                        .css({position: 'absolute', left: '96px', top: '16px', width: '256px'})
-                        .html(
-                            'Sorry, a server ' + error
-                            + ' occured while handling your request. To help us find out what went wrong, you may want to report this error to an administrator. Otherwise, please try again later.'
+        setTimeout(function() {
+            if ($('.OxErrorDialog').length ==0 && !pandora.isUnloading) {
+                that = Ox.Dialog({
+                    buttons: [
+                        Ox.Button({
+                                id: 'close',
+                                title: 'Close'
+                            })
+                            .bindEvent({
+                                click: function() {
+                                    that.close();
+                                }
+                            })
+                    ],
+                    content: Ox.Element()
+                        .append(
+                            $('<img>')
+                                .attr({src: Ox.UI.PATH + 'png/icon128.png'})
+                                .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
                         )
-                ),
-            fixedSize: true,
-            height: 192,
-            keys: {enter: 'close', escape: 'close'},
-            removeOnClose: true,
-            title: 'Server ' + Ox.toTitleCase(error),
-            width: 368
-        })
-        .open();
+                        .append(
+                            Ox.Element()
+                                .css({position: 'absolute', left: '96px', top: '16px', width: '256px'})
+                                .html(
+                                    'Sorry, a server ' + error
+                                    + ' occured while handling your request. To help us find out what went wrong, you may want to report this error to an administrator. Otherwise, please try again later.'
+                                )
+                        ),
+                    fixedSize: true,
+                    height: 192,
+                    keys: {enter: 'close', escape: 'close'},
+                    removeOnClose: true,
+                    title: 'Server ' + Ox.toTitleCase(error),
+                    width: 368
+                })
+                .open();
+            }
+        }, 250);
     }
     that.addClass('OxErrorDialog');
 };
