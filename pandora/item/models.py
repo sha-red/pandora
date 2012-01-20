@@ -40,7 +40,6 @@ import archive.models
 from person.models import get_name_sort
 from title.models import get_title_sort
 
-
 def get_id(info):
     q = Item.objects.all()
     for key in ('title', 'director', 'year'):
@@ -325,9 +324,6 @@ class Item(models.Model):
             if self.poster_frame == -1 and self.sort.duration:
                 self.poster_frame = self.sort.duration/2
                 update_poster = True
-            if not self.get('runtime') and self.sort.duration:
-                self.data['runtime'] = self.sort.duration
-                self.update_sort()
         self.json = self.get_json()
         super(Item, self).save(*args, **kwargs)
         if update_ids:
@@ -1143,7 +1139,7 @@ class Item(models.Model):
         return icon
 
     def load_subtitles(self):
-        if not filter(lambda l: l['id'] == 'subtitles', settings.CONFIG['layers']):
+        if not utils.get_by_id(settings.CONFIG['layers'], 'subtitles'):
             return
         with transaction.commit_on_success():
             layer = 'subtitles'
@@ -1220,7 +1216,8 @@ pre_delete.connect(delete_item, sender=Item)
 
 Item.facet_keys = []
 for key in settings.CONFIG['itemKeys']:
-    if 'autocomplete' in key and not 'autocompleteSortKey' in key:
+    if 'autocomplete' in key and not 'autocompleteSortKey' in key or \
+            key.get('filter'):
         Item.facet_keys.append(key['id'])
 
 Item.person_keys = []

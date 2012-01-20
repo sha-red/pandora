@@ -4,6 +4,9 @@
     You can edit this file.
 */
 {
+    "additionalSort": [
+        {"key": "title", "operator": "+"}
+    ],
     "annotations": {
         "showUsers": true
     },
@@ -47,20 +50,23 @@
         {"id": "lightness", "title": "Lightness", "type": "float"},
         {"id": "volume", "title": "Volume", "type": "float"}
     ],
+    /*
+        clipLayers is the ordered list of public layers that will appear as the
+        text of clips. Excluding a layer from this list means it will not be
+        included in find annotations.
+    */
+    "clipLayers": ["transcripts", "keywords", "places", "events", "descriptions"],
     // fixme: either this, or filter: true in itemKeys, but not both
     "filters": [
         {"id": "source", "title": "Sources", "type": "string"},
         {"id": "project", "title": "Projects", "type": "string"},
         {"id": "topic", "title": "Topics", "type": "string"},
         {"id": "name", "title": "People", "type": "string"},
-        {"id": "keywords", "title": "Keywords", "type": "string"},
         {"id": "language", "title": "Languages", "type": "string"},
+        {"id": "license", "title": "License", "type": "string"},
         {"id": "places", "title": "Places", "type": "string"},
-        //{"id": "year", "title": "Years", "type": "integer"},
-        {"id": "features", "title": "Features", "type": "string"},
-        {"id": "director", "title": "Directors", "type": "string"},
-        {"id": "cinematographer", "title": "Cinematographers", "type": "string"},
-        {"id": "license", "title": "License", "type": "string"}
+        {"id": "events", "title": "Events", "type": "string"},
+        {"id": "keywords", "title": "Keywords", "type": "string"}
     ],
     /*
         An itemKey must have the following properties:
@@ -138,12 +144,6 @@
             "find": true
         },
         {
-            "id": "annotations",
-            "title": "Annotation",
-            "type": "string",
-            "find": true
-        },
-        {
             "id": "keywords",
             "title": "Keywords",
             "type": "layer"
@@ -155,7 +155,6 @@
             "autocomplete": true,
             "columnRequired": true,
             "columnWidth": 180,
-            "filter": true,
             "sort": "person"
         },
         {
@@ -164,27 +163,17 @@
             "type": ["string"],
             "autocomplete": true,
             "columnWidth": 180,
-            "filter": true,
             "sort": "person"
         },
         {
-            "id": "features",
-            "title": "Features",
+            "id": "featuring",
+            "title": "Featuring",
             "type": ["string"],
             "autocomplete": true,
             "columnRequired": true,
             "columnWidth": 180,
             "filter": true,
             "sort": "person"
-        },
-        {
-            "id": "year",
-            "title": "Year",
-            "type": "year",
-            "autocomplete": true,
-            "columnWidth": 60,
-            "filter": true
-            //"find": true
         },
         {
             "id": "language",
@@ -196,13 +185,6 @@
             "find": true
         },
         {
-            "id": "runtime", 
-            "title": "Runtime", 
-            "type": "time",
-            "columnWidth": 60,
-            "format": {"type": "duration", "args": [0, "medium"]}
-        },
-        {
             "id": "location",
             "title": "Location",
             "type": "string",
@@ -212,17 +194,17 @@
             "find": true
         },
         {
+            "id": "date",
+            "title": "Date",
+            "type": "string",
+            "columnWidth": 120
+            //"format": {"type": "date", "args": ["%a, %b %e, %Y"]}
+        },
+        {
             "id": "description",
             "title": "Description",
             "type": "text",
             "find": true
-        },
-        {
-            "id": "wordsinsummary",
-            "title": "Words in Summary",
-            "type": "integer",
-            "columnWidth": 60,
-            "value": {"key": "description", "type": "words"}
         },
         {
             "id": "created",
@@ -236,6 +218,12 @@
             "title": "ID",
             "type": "string",
             "columnWidth": 90
+        },
+        {
+            "id": "annotations",
+            "title": "Annotation",
+            "type": "string",
+            "find": true
         },
         {
             "id": "places",
@@ -268,7 +256,8 @@
             "id": "resolution",
             "title": "Resolution",
             "type": ["integer"],
-            "columnWidth": 90
+            "columnWidth": 90,
+            "format": {"type": "resolution", "args": ["px"]}
         },
         {
             "id": "aspectratio",
@@ -392,7 +381,6 @@
             "title": "License",
             "type": ["string"],
             "columnWidth": 120,
-            "autocomplete": true,
             "filter": true
         },
         {
@@ -517,7 +505,6 @@
     ],
     "totals": [
         {"id": "items"},
-        {"id": "runtime"},
         {"id": "files", "admin": true},
         {"id": "duration", "admin": true},
         {"id": "size", "admin": true},
@@ -558,7 +545,7 @@
             "itemFind": {"conditions": [], "operator": "&"},
             "itemSort": [{"key": "position", "operator": "+"}],
             "itemView": "info",
-            "listColumns": ["title", "source", "project", "director", "language", "duration"],
+            "listColumns": ["title", "source", "project", "topics", "language", "duration"],
             "listColumnWidth": {},
             "listSelection": [],
             "listSort": [{"key": "title", "operator": "+"}],

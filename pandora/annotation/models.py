@@ -133,10 +133,11 @@ class Annotation(models.Model):
             self.sortvalue = None
 
         #no clip or update clip
-        private = layer.get('private', False)
-        if not private:
+        if self.layer in settings.CONFIG['clipLayers']:
             if not self.clip or self.start != self.clip.start or self.end != self.clip.end:
                 self.clip, created = Clip.get_or_create(self.item, self.start, self.end)
+        elif self.clip:
+            self.clip = None
 
         super(Annotation, self).save(*args, **kwargs)
         if set_public_id:
@@ -147,6 +148,8 @@ class Annotation(models.Model):
                 'id': self.clip.id,
                 self.layer: False
             }).update(**{self.layer: True})
+            #update clip.findvalue
+            self.clip.save()
 
         if filter(lambda l: l['type'] == 'place' or l.get('hasPlaces'),
                   settings.CONFIG['layers']):

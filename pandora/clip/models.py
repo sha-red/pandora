@@ -35,8 +35,19 @@ class MetaClip:
             streams = self.item.streams()
             if streams:
                 self.aspect_ratio = streams[0].aspect_ratio
+        sortvalue = ''
+        findvalue = ''
+        for l in settings.CONFIG['clipLayers']:
+            sortvalue += ''.join(filter(lambda s: s,
+                                 [a.sortvalue
+                                  for a in self.annotations.filter(layer=l).order_by('sortvalue')]))
+        if sortvalue:
+            self.sortvalue = sortvalue[:1000]
+        else:
+            self.sortvalue = None
+        self.findvalue = '\n'.join([a.findvalue for a in self.annotations.all()])
         if self.id:
-            for l in self.layers:
+            for l in settings.CONFIG['clipLayers']:
                 setattr(self, l, self.annotations.filter(layer=l).count()>0)
         models.Model.save(self, *args, **kwargs)
 
@@ -60,7 +71,7 @@ class MetaClip:
                     del j[key]
             #needed here to make item find with clips work
             if 'annotations' in keys:
-                annotations = self.annotations.filter(layer__in=self.layers)
+                annotations = self.annotations.filter(layer__in=settings.CONFIG['clipLayers'])
                 if qs:
                     annotations = annotations.filter(qs)
                 j['annotations'] = [a.json(keys=['value', 'id', 'layer'])
@@ -118,13 +129,11 @@ attrs = {
 
     'director': models.CharField(max_length=1000, null=True, db_index=True),
     'title': models.CharField(max_length=1000, db_index=True),
+    'sortvalue': models.CharField(max_length=1000, null=True, db_index=True),
+    'findvalue': models.TextField(),
 }
-public_layers = [l['id']
-                 for l in filter(lambda l: not l.get('private', False),
-                                 settings.CONFIG['layers'])]
-for name in public_layers:
+for name in settings.CONFIG['clipLayers']:
     attrs[name] = models.BooleanField(default=False, db_index=True)
 
 Clip = type('Clip', (MetaClip,models.Model), attrs)
-Clip.layers = public_layers
 

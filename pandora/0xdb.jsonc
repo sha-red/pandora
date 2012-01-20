@@ -4,6 +4,11 @@
     You can edit this file.
 */
 {
+    "additionalSort": [
+        {"key": "director", "operator": "+"},
+        {"key": "year", "operator": "-"},
+        {"key": "title", "operator": "+"}
+    ],
     "annotations": {
         "showUsers": true
     },
@@ -47,6 +52,12 @@
         {"id": "lightness", "title": "Lightness", "type": "float"},
         {"id": "volume", "title": "Volume", "type": "float"}
     ],
+    /*
+        clipLayers is the ordered list of public layers that will appear as the
+        text of clips. Excluding a layer from this list means it will not be
+        included in find annotations.
+    */
+    "clipLayers": ["subtitles"],
     // fixme: either this, or filter: true in itemKeys, but not both
     "filters": [
         {"id": "director", "title": "Director", "type": "string"},
@@ -93,6 +104,7 @@
             "id": "title",
             "title": "Title",
             "type": "string",
+            "additionalSort": [{"key": "year", "operator": "-"}, {"key": "director", "operator": "+"}],
             "autocomplete": true,
             "autocompleteSortKey": "votes",
             "columnRequired": true,
@@ -104,6 +116,7 @@
             "id": "director",
             "title": "Director",
             "type": ["string"],
+            "additionalSort": [{"key": "year", "operator": "-"}, {"key": "title", "operator": "-"}],
             "autocomplete": true,
             "columnRequired": true,
             "columnWidth": 180,
@@ -124,6 +137,7 @@
             "id": "year",
             "title": "Year",
             "type": "year",
+            "additionalSort": [{"key": "director", "operator": "+"}, {"key": "title", "operator": "+"}],
             "autocomplete": true,
             "columnWidth": 60,
             "filter": true,

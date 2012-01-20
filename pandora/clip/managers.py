@@ -27,8 +27,8 @@ def parseCondition(condition, user):
         'in': 'start',
         'out': 'end',
         'place': 'annotations__places__id',
-        'text': 'annotations__findvalue',
-        'annotations': 'annotations__findvalue',
+        'text': 'findvalue',
+        'annotations': 'findvalue',
         'user': 'annotations__user__username',
     }.get(k, k)
     if not k:
@@ -37,10 +37,7 @@ def parseCondition(condition, user):
     op = condition.get('operator')
     if not op:
         op = ''
-    public_layers = [l['id']
-                     for l in filter(lambda l: not l.get('private', False),
-                                     settings.CONFIG['layers'])]
-    if k in public_layers:
+    if k in settings.CONFIG['clipLayers']:
         return parseCondition({'key': 'annotations__findvalue',
                                'value': v,
                                'operator': op}, user) \
@@ -141,10 +138,7 @@ class ClipManager(Manager):
         return QuerySet(self.model)
 
     def filter_annotations(self, data, user):
-        public_layers = [l['id']
-                         for l in filter(lambda l: not l.get('private', False),
-                         settings.CONFIG['layers'])]
-        keys = public_layers + ['annotations', 'text', '*']
+        keys = settings.CONFIG['clipLayers'] + ['annotations', 'text', '*']
         conditions = data.get('query', {}).get('conditions', [])
         conditions = filter(lambda c: c['key'] in keys, conditions)
         operator = data.get('query', {}).get('operator', '&')
@@ -160,7 +154,7 @@ class ClipManager(Manager):
                 '$': '__iendswith',
             }.get(condition.get('opterator', ''), '__icontains'))
             q = Q(**{key: condition['value']})
-            if condition['key'] in public_layers:
+            if condition['key'] in settings.CONFIG['clipLayers']:
                 q = q & Q(layer=condition['key'])
             return q
         conditions = map(parse, conditions)
@@ -205,6 +199,6 @@ class ClipManager(Manager):
         if conditions:
             qs = qs.filter(conditions)
         if 'keys' in data:
-            for l in filter(lambda k: k in self.model.layers, data['keys']):
+            for l in filter(lambda k: k in settings.CONFIG['clipLayers'], data['keys']):
                 qs = qs.filter(**{l: True})
         return qs

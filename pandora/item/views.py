@@ -33,23 +33,15 @@ from clip.models import Clip
 
 from ox.django.api import actions
 
+import utils
+
 
 def _order_query(qs, sort, prefix='sort__'):
     order_by = []
     if len(sort) == 1:
-        if sort[0]['key'] == 'title':
-            sort.append({'operator': '-', 'key': 'year'})
-            sort.append({'operator': '+', 'key': 'director'})
-        elif sort[0]['key'] == 'director':
-            sort.append({'operator': '-', 'key': 'year'})
-            sort.append({'operator': '-', 'key': 'title'})
-        elif sort[0]['key'] == 'year':
-            sort.append({'operator': '+', 'key': 'director'})
-            sort.append({'operator': '+', 'key': 'title'})
-        elif not sort[0]['key'] in ('value', 'sortvalue'):
-            sort.append({'operator': '+', 'key': 'director'})
-            sort.append({'operator': '-', 'key': 'year'})
-            sort.append({'operator': '+', 'key': 'title'})
+        key = utils.get_by_id(settings.CONFIG['itemKeys'], sort[0]['key'])
+        for s in key.get('additionalSort', settings.CONFIG.get('additionalSort', [])):
+            sort.append(s)
     for e in sort:
         operator = e['operator']
         if operator != '-':
@@ -273,14 +265,21 @@ Positions
             Sum('pixels'),
             Sum('size')
         )
-        response['data']['duration'] = r['duration__sum']
-        response['data']['files'] = files.count()
-        response['data']['items'] = items.count()
-        response['data']['pixels'] = r['pixels__sum']
-        response['data']['runtime'] = items.aggregate(Sum('sort__runtime'))['sort__runtime__sum']
-        response['data']['size'] = r['size__sum']
+        totals = [i['id'] for i in settings.CONFIG['totals']]
+        if 'duration' in totals:
+            response['data']['duration'] = r['duration__sum']
+        if 'files' in totals:
+            response['data']['files'] = files.count()
+        if 'items' in totals:
+            response['data']['items'] = items.count()
+        if 'pixels' in totals:
+            response['data']['pixels'] = r['pixels__sum']
+        if 'runtime' in totals:
+            response['data']['runtime'] = items.aggregate(Sum('sort__runtime'))['sort__runtime__sum'] or 0
+        if 'size' in totals:
+            response['data']['size'] = r['size__sum']
         for key in ('runtime', 'duration', 'pixels', 'size'):
-            if response['data'][key] == None:
+            if key in totals and response['data'][key] == None:
                 response['data'][key] = 0 
     return render_to_json_response(response)
 actions.register(find)
@@ -769,8 +768,8 @@ def video(request, id, resolution, format, index=None):
             response = HttpResponse(extract.chop(path, t[0], t[1]), content_type=content_type)
             filename = "Clip of %s - %s-%s - %s %s%s" % (
                 item.get('title'),
-                ox.formatDuration(t[0] * 1000),
-                ox.formatDuration(t[1] * 1000),
+                ox.formatDuration(t[0] * 1000).replace(':', '.')[:-4],
+                ox.formatDuration(t[1] * 1000).replace(':', '.')[:-4],
                 settings.SITENAME,
                 item.itemId,
                 ext

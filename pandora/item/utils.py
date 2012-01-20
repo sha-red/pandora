@@ -78,3 +78,7 @@ def get_positions(ids, pos):
         except:                         
             pass                                    
     return positions
+
+def get_by_id(objects, id):
+    obj = filter(lambda o: o['id'] == id, objects)
+    return obj and obj[0] or None

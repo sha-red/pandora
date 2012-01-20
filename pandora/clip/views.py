@@ -36,20 +36,20 @@ def order_query(qs, sort):
         if operator != '-':
             operator = ''
         clip_keys = ('public_id', 'start', 'end', 'hue', 'saturation', 'lightness', 'volume',
-                     'duration', 'annotations__sortvalue', 'videoRatio',
+                     'duration', 'sortvalue', 'videoRatio',
                      'director', 'title')
         key = {
             'id': 'public_id',
             'in': 'start',
             'out': 'end',
             'position': 'start',
-            'text': 'annotations__sortvalue',
+            'text': 'sortvalue',
             'videoRatio': 'aspect_ratio',
         }.get(e['key'], e['key'])
         if key.startswith('clip:'):
             key = e['key'][len('clip:'):]
             key = {
-                'text': 'annotations__sortvalue',
+                'text': 'sortvalue',
                 'position': 'start',
             }.get(key, key)
         elif key not in clip_keys:
@@ -85,7 +85,8 @@ def findClips(request):
         qs = qs[query['range'][0]:query['range'][1]]
 
         ids = []
-        keys = filter(lambda k: k not in models.Clip.layers + ['annotations'], data['keys'])
+        keys = filter(lambda k: k not in settings.CONFIG['clipLayers'] + ['annotations'],
+                      data['keys'])
         if filter(lambda k: k not in models.Clip.clip_keys, keys):
             qs = qs.select_related('item__sort')
 
@@ -116,9 +117,9 @@ def findClips(request):
         if response['data']['items']:
             if 'annotations' in keys:
                 add_annotations('annotations',
-                    Annotation.objects.filter(layer__in=models.Clip.layers, clip__in=ids),
-                    True)
-            for layer in filter(lambda l: l in keys, models.Clip.layers):
+                    Annotation.objects.filter(layer__in=settings.CONFIG['clipLayers'],
+                                              clip__in=ids), True)
+            for layer in filter(lambda l: l in keys, settings.CONFIG['clipLayers']):
                 add_annotations(layer,
                     Annotation.objects.filter(layer=layer, clip__in=ids))
     elif 'position' in query:
