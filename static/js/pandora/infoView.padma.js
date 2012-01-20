@@ -139,11 +139,11 @@ pandora.ui.infoView = function(data) {
 
     // Source & Project --------------------------------------------------------
 
+    var count = 0;
     ['source', 'project'].forEach(function(key) {
-
-        var $div = $('<div>').appendTo($data),
-            value = data[key] || '';
-        if (canEdit || value) {
+        var $div = $('<div>').appendTo($data)
+        if (canEdit || data[key]) {
+            count && $('<br>').appendTo($div);
             $('<div>')
                 .css({float: 'left'})
                 .html(
@@ -200,6 +200,7 @@ pandora.ui.infoView = function(data) {
                     })
                     .appendTo($div);
             }
+            count++;
         }
     });
 
