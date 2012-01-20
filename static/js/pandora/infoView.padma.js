@@ -390,7 +390,7 @@ pandora.ui.infoView = function(data) {
         Ox.Editable({
             placeholder: formatLight('No License'),
             tooltip: 'Doubleclick to edit',
-            value: data.license.join(', '),
+            value: (data.license || []).join(', ')
         })
         .bindEvent({
             submit: function(event) {
@@ -401,7 +401,7 @@ pandora.ui.infoView = function(data) {
     } else if(data.license) {
         $div.html(
             formatKey('License')
-            + data.license.join(', ')
+            + (data.license || []).join(', ')
         );
     }
 
