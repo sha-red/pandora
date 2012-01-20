@@ -558,3 +558,36 @@ def parsePath(request): #parse path and return info
     response = json_response(ox.parse_movie_path(path))
     return render_to_json_response(response)
 actions.register(parsePath)
+
+def getFileInfo(request):
+    '''
+        param data {
+            id: oshash of stream file
+        }
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+                item: itemId,
+                file: oshash of source file
+            }
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    f = None
+    qs = models.Stream.objects.filter(oshash=data['id'])
+    if qs.count() > 0:
+        s = qs[0]
+        f = s.file
+    else:
+        qs = models.File.objects.filter(oshash=data['id'])
+        if qs.count() > 0:
+            f = qs[0]
+    response = json_response()
+    if f:
+        response['data'] = {
+            'file': f.oshash,
+            'item': f.item.itemId
+        }
+    return render_to_json_response(response)
+actions.register(getFileInfo)
+

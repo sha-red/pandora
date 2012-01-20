@@ -386,6 +386,7 @@ class Stream(models.Model):
     video = models.FileField(default=None, blank=True, upload_to=lambda f, x: f.path(x))
     source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True)
     available = models.BooleanField(default=False)
+    oshash = models.CharField(max_length=16, null=True, db_index=True)
     info = fields.DictField(default={})
     duration = models.FloatField(default=0)
     aspect_ratio = models.FloatField(default=0)
@@ -442,6 +443,7 @@ class Stream(models.Model):
     def save(self, *args, **kwargs):
         if self.video and not self.info:
             self.info = ox.avinfo(self.video.path)
+        self.oshash = self.info.get('oshash')
         self.duration = self.info.get('duration', 0)
         if 'video' in self.info and self.info['video']:
             self.aspect_ratio = self.info['video'][0]['width'] / self.info['video'][0]['height']
