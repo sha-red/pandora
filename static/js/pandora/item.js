@@ -167,11 +167,8 @@ pandora.ui.item = function() {
                     pandora.UI.set({annotationsSort: data.sort});
                 },
                 find: function(data) {
-                    var textKey = Ox.getObjectById(pandora.site.layers, 'subtitles')
-                        ? 'subtitles'
-                        : 'annotations';
                     pandora.UI.set('itemFind', data.find ? {
-                        conditions: [{key: textKey, value: data.find, operator: '='}],
+                        conditions: [{key: 'annotations', value: data.find, operator: '='}],
                         operator: '&'
                     } : pandora.site.user.ui.itemFind);
                 },
@@ -319,11 +316,8 @@ pandora.ui.item = function() {
                         });
                     },
                     find: function(data) {
-                        var textKey = Ox.getObjectById(pandora.site.layers, 'subtitles')
-                            ? 'subtitles'
-                            : 'annotations';
                         pandora.UI.set('itemFind', data.find ? {
-                            conditions: [{key: textKey, value: data.find, operator: '='}],
+                            conditions: [{key: 'annotations', value: data.find, operator: '='}],
                             operator: '&'
                         } : pandora.site.user.ui.itemFind);
                     },

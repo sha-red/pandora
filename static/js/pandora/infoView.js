@@ -88,7 +88,8 @@ pandora.ui.infoView = function(data) {
         $reflectionIcon = $('<img>')
             .attr({
                 src: '/' + data.id + '/' + (
-                    ui.icons == 'posters' ? 'poster' : 'icon'
+                    ui.icons == 'posters'
+                    ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
                 ) + '512.jpg?' + uid
             })
             .css({
@@ -116,7 +117,6 @@ pandora.ui.infoView = function(data) {
                 left: margin + (iconSize == 256 ? 256 : iconWidth) + margin + 'px',
                 top: margin + 'px',
                 right: margin + statisticsWidth + margin + 'px',
-                //background: 'green'
             })
             .bindEvent(canEdit && !isEditable ? {
                 doubleclick: reloadMetadata
@@ -136,7 +136,7 @@ pandora.ui.infoView = function(data) {
 
         $browserImages = [];
 
-    pandora.createLinks($text);
+    pandora.createLinks($text); // FIXME: this is wrong for editables that already have clickLink
 
     // Title -------------------------------------------------------------------
 
@@ -211,7 +211,8 @@ pandora.ui.infoView = function(data) {
         var $div = $('<div>')
             .css(css)
             .appendTo($text);
-        ['country', 'year'].forEach(function(key) {
+        ['country', 'year'].forEach(function(key, i) {
+            i && $('<div>').css({float: 'left'}).html(';&nbsp;').appendTo($div);
             $('<div>')
                 .css({float: 'left'})
                 .html(formatKey(key).replace('</span>', '&nbsp;</span>'))
@@ -234,7 +235,6 @@ pandora.ui.infoView = function(data) {
                     }
                 })
                 .appendTo($div);
-            key == 'country' && $('<div>').css({float: 'left'}).html(';&nbsp;').appendTo($div);
         });
     } else if (data.country || data.year || data.language || data.runtime) {
         var html = [];

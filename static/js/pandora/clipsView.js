@@ -4,8 +4,7 @@
 
 pandora.ui.clipsView = function(videoRatio) {
 
-    var textKey = pandora.getClipTextKey(),
-        that = Ox.SplitPanel({
+    var that = Ox.SplitPanel({
             elements: [
                 {
                     element: Ox.Bar({size: 24})
@@ -27,7 +26,7 @@ pandora.ui.clipsView = function(videoRatio) {
                                 .bindEvent({
                                     submit: function(data) {
                                         pandora.UI.set('itemFind', data.value ? {
-                                            conditions: [{key: textKey, value: data.value, operator: '='}],
+                                            conditions: [{key: 'annotations', value: data.value, operator: '='}],
                                             operator: '&'
                                         } : pandora.site.user.ui.itemFind);
                                         // since this is the only way itemFind can change,

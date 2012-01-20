@@ -226,10 +226,13 @@ pandora.ui.mainMenu = function() {
                 }
             },
             click: function(data) {
-                if ([
-                    'home', 'about', 'news', 'tour', 'faq', 'terms', 'rights', 'contact', 'software',
-                    'signup', 'signin', 'signout', 'preferences', 'tv', 'help'
-                ].indexOf(data.id) > -1) {
+                if (Ox.merge(
+                    ['home', 'software'],
+                    pandora.site.sitePages.map(function(page) {
+                        return page.id;
+                    }),
+                    ['signup', 'signin', 'signout', 'preferences', 'tv', 'help']
+                ).indexOf(data.id) > 1) {
                     pandora.UI.set({page: data.id});
                 } else if ([
                     'newlist', 'newlistfromselection', 'newsmartlist', 'newsmartlistfromresults'

@@ -247,7 +247,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
         },
         draganddroppause: function(data) {
             var event = data._event, scroll,
-                $parent, $grandparent, $panel, $bar, title;
+                $parent, $grandparent, $panel, title;
             // fixme: should be named showLists in the user ui prefs!
             if (!pandora.user.ui.showSidebar) {
                 if (event.clientX < 16 && event.clientY >= 44
@@ -261,10 +261,12 @@ pandora.enableDragAndDrop = function($list, canMove) {
                 $panel = $parent.is('.OxCollapsePanel') ? $parent
                     : $grandparent.is('.OxCollapsePanel') ? $grandparent : null;
                 if ($panel) {
-                    $bar = $panel.children('.OxBar');
-                    title = $bar.children('.OxTitle')
+                    title = $panel.children('.OxBar').children('.OxTitle')
                         .html().split(' ')[0].toLowerCase();
-                    !pandora.user.ui.showFolder.items[title] && $bar.trigger('dblclick');
+                    // !pandora.user.ui.showFolder.items[title] && $bar.trigger('dblclick');
+                    if (!pandora.user.ui.showFolder.items[title]) {
+                        Ox.UI.elements[$panel.data('oxid')].options({collapsed: false});
+                    }
                 }
                 if (!scrollInterval) {
                     //Ox.Log('', 'AT TOP', isAtListsTop(event), 'AT BOTTOM', isAtListsBottom(event))
@@ -494,12 +496,6 @@ pandora.getClipsQuery = function() {
     addClipsConditions(pandora.user.ui.find.conditions);
     clipsQuery.operator = clipsQuery.conditions.length ? '|' : '&';
     return clipsQuery;
-};
-
-pandora.getClipTextKey = function() {
-    return Ox.getObjectById(pandora.site.layers, 'subtitles')
-        ? 'subtitles'
-        : 'annotations';
 };
 
 (function() {

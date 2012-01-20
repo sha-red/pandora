@@ -7,7 +7,6 @@ pandora.ui.clipList = function(videoRatio) {
     var ui = pandora.user.ui,
         fixedRatio = !ui.item ? 16/9 : videoRatio,
         isClipView = !ui.item ? ui.listView == 'clip' : ui.itemView == 'clips',
-        textKey = pandora.getClipTextKey(),
         that = Ox.IconList({
             fixedRatio: fixedRatio,
             item: function(data, sort, size) {
@@ -22,7 +21,9 @@ pandora.ui.clipList = function(videoRatio) {
                     width = fixedRatio > 1 ? size : Math.round(size * fixedRatio);
                     height = fixedRatio > 1 ? Math.round(size / fixedRatio) : size;
                 }
-                title = data[textKey] ? data[textKey][0].value : '';
+                title = data.annotations ? data.annotations.map(function(annotation) {
+                    return Ox.stripTags(annotation.value);
+                }).join('; ') : '',
                 url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg';
                 sortKey = sort[0].key;
                 if (['text', 'position', 'duration'].indexOf(sortKey) > -1) {
@@ -80,7 +81,7 @@ pandora.ui.clipList = function(videoRatio) {
                 }, data), callback);
             },
             keys: Ox.merge(
-                ['id', 'in', 'out', textKey],
+                ['annotations', 'id', 'in', 'out'],
                 !ui.item ? ['videoRatio'] : []
             ),
             max: 1,
@@ -102,7 +103,8 @@ pandora.ui.clipList = function(videoRatio) {
                     points = {
                         annotation: that.value(id, 'annotations')[0].id.split('/')[1],
                         'in': that.value(id, 'in'),
-                        out: that.value(id, 'out')
+                        out: that.value(id, 'out'),
+                        position: that.value(id, 'in')
                     },
                     set = {
                         item: item,

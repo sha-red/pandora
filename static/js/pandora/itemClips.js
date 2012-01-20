@@ -3,7 +3,6 @@
 pandora.ui.itemClips = function(options) {
 
     var self = {},
-        textKey = pandora.getClipTextKey(),
         that = Ox.Element()
             .css({
                 height: '192px',
@@ -27,20 +26,24 @@ pandora.ui.itemClips = function(options) {
 
     self.options.clips.forEach(function(clip, i) {
         Ox.Log('', 'CLIP', clip)
-        var id = self.options.id + '/' + clip['in'],
-            title = Ox.map(clip.annotations, function(annotation) {
-                if(textKey == 'subtitles') {
-                    return annotation.layer == 'subtitles' ? annotation.value : 0;
-                }
-                return annotation.value;
+        var annotations = clip.annotations.sort(function(a, b) {
+                var layerA = pandora.site.clipLayers.indexOf(a.layer),
+                    layerB = pandora.site.clipLayers.indexOf(b.layer);
+                return layerA < layerB ? -1
+                    : layerA > layerB ? 1
+                    : a.value < b.value ? -1
+                    : a.value > b.value ? 1
+                    : 0;
             }),
             url = '/' + self.options.id + '/' + self.height + 'p' + clip['in'] + '.jpg',
             $item = Ox.IconItem({
                 imageHeight: self.height,
                 imageWidth: self.width,
-                id: id,
+                id: clip.id,
                 info: Ox.formatDuration(clip['in']) + ' - ' + Ox.formatDuration(clip.out),
-                title: title[0] || '',
+                title: annotations.map(function(annotation) {
+                    return Ox.stripTags(annotation.value);
+                }).join('; '),
                 url: url,
             })
             .addClass('OxInfoIcon')
@@ -50,13 +53,15 @@ pandora.ui.itemClips = function(options) {
                     : i == self.options.clips.length - 1 ? '2px -2px 2px 2px'
                     : '2px'
             })
-            .data({'in': clip['in'], out: clip.out});
+            .data(Ox.extend(annotations.length ? {
+                annotation: annotations[0].id.split('/')[1],
+            } : {}, {'in': clip['in'], out: clip.out}));
         $item.$element.find('.OxTarget').addClass('OxSpecialTarget');
         that.append($item);
     });
 
     function doubleclick(data) {
-        var $item, $target = $(data.target), item, points, set;
+        var $item, $target = $(data.target), annotation, item, points, set;
         if ($target.parent().parent().is('.OxSpecialTarget')) {
             // for videos, the click registers deeper inside
             $target = $target.parent().parent();
@@ -64,13 +69,16 @@ pandora.ui.itemClips = function(options) {
         if ($target.is('.OxSpecialTarget')) {
             $item = $target.parent().parent();
             item = self.options.id;
+            annotation = $item.data('annotation');
             points = [$item.data('in'), $item.data('out')];
             set = {};
-            set['videoPoints.' + item] = {
+            set['videoPoints.' + item] = Ox.extend(annotation ? {
+                annotation: annotation
+            } : {}, {
                 'in': points[0],
                 out: points[1],
                 position: points[0]
-            };
+            });
             pandora.UI.set(set);
         }
     }
