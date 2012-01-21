@@ -308,7 +308,7 @@ pandora.ui.infoView = function(data) {
     } else if (data.director || data.cinematographer || data.featuring) {
         var html = [];
         ['director', 'cinematographer', 'featuring'].forEach(function(key) {
-            if (data[key].length) {
+            if (data[key] && data[key].length) {
                 html.push(
                     formatKey(key)
                     + formatValue(data[key], key)
