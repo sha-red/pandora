@@ -714,7 +714,7 @@ class Item(models.Model):
         s.words = sum([len(a.value.split()) for a in self.annotations.exclude(value='')])
         s.clips = self.clips.count()
 
-        videos = self.files.filter(selected=True, is_video=True)
+        videos = self.files.filter(selected=True).filter(Q(is_video=True)|Q(is_audio=True))
         if videos.count() > 0:
             s.duration = sum([v.duration for v in videos])
             v = videos[0]
@@ -962,8 +962,9 @@ class Item(models.Model):
         self.save()
 
     def streams(self):
-        return archive.models.Stream.objects.filter(source=None, available=True,
-            file__item=self, file__is_video=True, file__selected=True).order_by('file__part')
+        return archive.models.Stream.objects.filter(
+            source=None, available=True, file__item=self, file__selected=True
+        ).filter(Q(file__is_audio=True)|Q(file__is_video=True)).order_by('file__part')
 
     def update_timeline(self, force=False):
         streams = self.streams()
