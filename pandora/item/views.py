@@ -629,7 +629,8 @@ def frame(request, id, size, position=None):
         frame = item.frame(position, int(size))
 
     if not frame:
-        raise Http404
+        frame = os.path.join(settings.STATIC_ROOT, 'jpg/list256.jpg')
+        #raise Http404
     return HttpFileResponse(frame, content_type='image/jpeg')
 
 def poster_frame(request, id, position):
