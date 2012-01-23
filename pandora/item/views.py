@@ -389,6 +389,7 @@ def get(request):
     '''
     response = json_response({})
     data = json.loads(request.POST['data'])
+    data['keys'] = data.get('keys', [])
     item = get_object_or_404_json(models.Item, itemId=data['id'])
     if item.access(request.user):
         info = item.get_json(data['keys'])
