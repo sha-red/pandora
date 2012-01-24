@@ -768,7 +768,7 @@ def video(request, id, resolution, format, index=None):
         content_type = mimetypes.guess_type(path)[0]
         if len(t) == 2 and t[1] > t[0] and stream.info['duration']>=t[1]:
             response = HttpResponse(extract.chop(path, t[0], t[1]), content_type=content_type)
-            filename = "Clip of %s - %s-%s - %s %s%s" % (
+            filename = u"Clip of %s - %s-%s - %s %s%s" % (
                 item.get('title'),
                 ox.formatDuration(t[0] * 1000).replace(':', '.')[:-4],
                 ox.formatDuration(t[1] * 1000).replace(':', '.')[:-4],
@@ -776,6 +776,7 @@ def video(request, id, resolution, format, index=None):
                 item.itemId,
                 ext
             )
+            filename = filename.encode('utf8')
             response['Content-Disposition'] = 'attachment; filename="%s"' % filename
             return response
         else:
@@ -786,6 +787,7 @@ def video(request, id, resolution, format, index=None):
                 ext
             )
             response = HttpFileResponse(path, content_type=content_type)
+            filename = filename.encode('utf8')
             response['Content-Disposition'] = 'attachment; filename="%s"' % filename
             return response
     if not settings.XSENDFILE and not settings.XACCELREDIRECT:
