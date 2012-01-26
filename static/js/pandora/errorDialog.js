@@ -41,6 +41,7 @@ pandora.ui.errorDialog = function(data) {
             title: Ox.toTitleCase(data.status.text),
             width: 368
         })
+        .addClass('OxErrorDialog');
         .open();
     } else  {
         // 0 (timeout) or 500 (error)
@@ -49,7 +50,7 @@ pandora.ui.errorDialog = function(data) {
         // on window unload, pending request will time out, so
         // in order to keep the dialog from appearing, delay it
         setTimeout(function() {
-            if ($('.OxErrorDialog').length ==0 && !pandora.isUnloading) {
+            if ($('.OxErrorDialog').length == 0 && !pandora.isUnloading) {
                 that = Ox.Dialog({
                     buttons: [
                         Ox.Button({
@@ -83,9 +84,9 @@ pandora.ui.errorDialog = function(data) {
                     title: 'Server ' + Ox.toTitleCase(error),
                     width: 368
                 })
+                .addClass('OxErrorDialog');
                 .open();
             }
         }, 250);
     }
-    that.addClass('OxErrorDialog');
 };
