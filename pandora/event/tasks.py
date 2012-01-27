@@ -3,7 +3,7 @@
 from datetime import timedelta
 
 from celery.task import task, periodic_task
-from celery.task.schedules import crontab
+from celery.schedules import crontab
 
 
 from models import Event

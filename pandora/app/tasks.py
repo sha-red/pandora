@@ -3,7 +3,7 @@
 import datetime
 
 from celery.task import task, periodic_task
-from celery.task.schedules import crontab
+from celery.schedules import crontab
 
 
 @periodic_task(run_every=crontab(hour=6, minute=0), queue='encoding')
