@@ -718,9 +718,14 @@ class Item(models.Model):
         if videos.count() > 0:
             s.duration = sum([v.duration for v in videos])
             v = videos[0]
-            s.resolution = v.width * v.height
-            s.width = v.width
-            s.height = v.height
+            if v.is_audio:
+                s.resolution = None
+                s.width = None
+                s.height = None
+            else:
+                s.resolution = v.width * v.height
+                s.width = v.width
+                s.height = v.height
             if not s.aspectratio:
                 s.aspectratio = float(utils.parse_decimal(v.display_aspect_ratio))
             s.pixels = sum([v.pixels for v in videos])

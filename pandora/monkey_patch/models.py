@@ -13,12 +13,13 @@ NEW_LENGTH = {
 
 def monkey_patch_username():
     for field in NEW_LENGTH:
-        f= User._meta.get_field(field)
+        f = User._meta.get_field(field)
         f.max_length = NEW_LENGTH[field]
         for v in f.validators:
             if isinstance(v, MaxLengthValidator):
                 v.limit_value = NEW_LENGTH[field]
-    f= Group._meta.get_field('name')
+
+    f = Group._meta.get_field('name')
     f.max_length = 255
     for v in f.validators:
         if isinstance(v, MaxLengthValidator):
