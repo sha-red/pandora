@@ -122,6 +122,7 @@ pandora.addList = function() {
         });
     }
     function reloadFolder(newList) {
+        pandora.$ui.folder[0].options({collapsed: false});
         Ox.Request.clearCache('findLists');
         $folderList.bindEventOnce({
             load: function(data) {
