@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.core.validators import MaxLengthValidator
 
 #load config from json
@@ -18,5 +18,10 @@ def monkey_patch_username():
         for v in f.validators:
             if isinstance(v, MaxLengthValidator):
                 v.limit_value = NEW_LENGTH[field]
+    f= Group._meta.get_field('name')
+    f.max_length = 255
+    for v in f.validators:
+        if isinstance(v, MaxLengthValidator):
+            v.limit_value = 255
 
 monkey_patch_username()
