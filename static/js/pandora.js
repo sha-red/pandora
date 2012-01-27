@@ -288,7 +288,12 @@ appPanel
             pandora.$ui.body.ajaxStart(pandora.$ui.loadingIcon.start);
             pandora.$ui.body.ajaxStop(pandora.$ui.loadingIcon.stop);
             Ox.Request.bindEvent({
-                error: pandora.ui.errorDialog
+                error: pandora.ui.errorDialog,
+                request: function(data) {
+                    pandora.$ui.loadingIcon.options({
+                        tooltip: data.requests + ' request' + (data.requests == 1 ? '' : 's')
+                    });
+                }
             });
             pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
 

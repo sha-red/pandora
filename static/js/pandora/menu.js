@@ -7,7 +7,6 @@ pandora.ui.mainMenu = function() {
         findState = pandora.getFindState(ui.find),
         that = Ox.MainMenu({
             extras: [
-                $('<div>').html('beta').css({marginRight: '8px', color: 'rgb(128, 128, 128)'}),
                 pandora.$ui.loadingIcon = Ox.LoadingIcon({
                     size: 'medium'
                 })

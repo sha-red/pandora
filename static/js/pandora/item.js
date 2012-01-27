@@ -321,6 +321,9 @@ pandora.ui.item = function() {
                             operator: '&'
                         } : pandora.site.user.ui.itemFind);
                     },
+                    info: function(data) {
+                        pandora.ui.annotationDialog(data.layer).open();
+                    },
                     muted: function(data) {
                         pandora.UI.set('videoMuted', data.muted);
                     },

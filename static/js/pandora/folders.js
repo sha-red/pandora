@@ -307,6 +307,7 @@ pandora.ui.folders = function() {
                         ),
                     fixedSize: true,
                     height: 128,
+                    removeOnClose: true,
                     width: 304,
                     title: title
                 }).open();

@@ -26,7 +26,7 @@ pandora.ui.errorDialog = function(data) {
             content: Ox.Element()
                 .append(
                     $('<img>')
-                        .attr({src: Ox.UI.PATH + 'png/icon128.png'})
+                        .attr({src: '/static/png/icon64.png'})
                         .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
                 )
                 .append(
@@ -41,7 +41,7 @@ pandora.ui.errorDialog = function(data) {
             title: Ox.toTitleCase(data.status.text),
             width: 368
         })
-        .addClass('OxErrorDialog');
+        .addClass('OxErrorDialog')
         .open();
     } else  {
         // 0 (timeout) or 500 (error)
@@ -84,7 +84,7 @@ pandora.ui.errorDialog = function(data) {
                     title: 'Server ' + Ox.toTitleCase(error),
                     width: 368
                 })
-                .addClass('OxErrorDialog');
+                .addClass('OxErrorDialog')
                 .open();
             }
         }, 250);
