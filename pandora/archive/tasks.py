@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from glob import glob
+
 from celery.task import task
 import ox
 
@@ -9,7 +11,7 @@ from item.models import get_item, Item
 import item.tasks
 
 import models
-
+import extract
 
 _INSTANCE_KEYS = ('mtime', 'path')
 
@@ -99,3 +101,24 @@ def process_stream(fileId):
     if not file.item.rendered:
         file.item.update_timeline()
     return True
+
+@task(queue="encoding")
+def update_stream(id):
+    s = models.Stream.objects.get(pk=id)
+    if not glob("%s*"%s.timeline_prefix):
+        s.make_timeline()
+    if not s.color:
+        s.cuts = tuple(extract.cuts(s.timeline_prefix))
+        s.color = tuple(extract.average_color(s.timeline_prefix))
+        s.save()
+
+    s.file.selected = True
+    s.file.save()
+    s.file.item.update_timeline()
+    #make sure all derivatives exist
+    s.extract_derivatives()
+
+    #update clips
+    for c in s.file.item.clips.all():
+        c.update_calculated_values()
+        c.save()
