@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+
 pandora.UI = (function() {
 
     var self = {}, that = {};
@@ -94,7 +95,7 @@ pandora.UI = (function() {
                 // (but don't trigger an additional event)
                 add.listSelection = [];
             } else if (['text', 'position'].indexOf(pandora.user.ui.listSort[0].key) > -1) {
-                // when switchin to a non-clip view, with a sort key
+                // when switching to a non-clip view, with a sort key
                 // that only exists in clip view, reset sort to default
                 args.listSort = pandora.site.user.ui.listSort;
             }
@@ -149,6 +150,7 @@ pandora.UI = (function() {
             }
         }
 
+        // items in args trigger events, items in add do not
         [args, add].forEach(function(obj, isAdd) {
             Ox.forEach(obj, function(val, key) {
                 Ox.Log('', 'key/val', key, val)
@@ -186,6 +188,7 @@ pandora.UI = (function() {
         pandora.URL.update(Object.keys(
             !pandora.$ui.appPanel ? args : trigger
         ));
+
     };
 
     return that;

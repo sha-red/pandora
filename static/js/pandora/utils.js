@@ -1004,13 +1004,13 @@ pandora.resizeWindow = function() {
         } else if (pandora.user.ui.itemView == 'clips') {
             pandora.$ui.clipList.size();
         } else if (pandora.user.ui.itemView == 'video') {
-            pandora.$ui.player.options({
+            pandora.$ui.player && pandora.$ui.player.options({
                // fixme: duplicated
                height: pandora.$ui.contentPanel.size(1),
                width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             });
         } else if (pandora.user.ui.itemView == 'timeline') {
-            pandora.$ui.editor.options({
+            pandora.$ui.editor && pandora.$ui.editor.options({
                 // fixme: duplicated
                 height: pandora.$ui.contentPanel.size(1),
                 width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1

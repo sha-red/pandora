@@ -6,9 +6,12 @@ pandora.ui.videoPreview = function(data) {
     var that = Ox.VideoPreview({
             duration: data.duration,
             getFrame: function(position) {
-                var resolution = Ox.filter(pandora.site.video.resolutions, function(resolution, i) {
-                        return resolution >= data.height || i == pandora.site.video.resolutions.length - 1;
-                    })[0];
+                var resolutions = Ox.filter(pandora.site.video.resolutions, function(resolution, i) {
+                        return resolution >= data.height;
+                    }),
+                    resolution = resolutions.length
+                        ? Math.min(resolutions)
+                        : Math.max(pandora.site.video.resolutions);
                 return '/' + data.id + '/' + resolution + 'p' + (
                     Ox.isUndefined(position) ? '' : position
                 ) + '.jpg';
