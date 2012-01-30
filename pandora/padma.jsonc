@@ -602,6 +602,7 @@
     "video": {
         "download": true,
         "formats": ["webm", "mp4"],
+        "previewRatio": 1.3333333333,
         "resolutions": [480, 240, 96]
     }
 }

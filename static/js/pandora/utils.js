@@ -555,7 +555,7 @@ pandora.getInfoHeight = function(includeHidden) {
         );
         height = Math.min(
             isVideoPreview
-                ? Math.round(pandora.user.ui.sidebarSize / (16/9)) + 16
+                ? Math.round(pandora.user.ui.sidebarSize / pandora.site.video.previewRatio) + 16
                 : pandora.user.ui.sidebarSize,
             window.innerHeight - 109 // 20 menu + 24 bar + 64 (4 closed folders) + 1 resizebar
         );

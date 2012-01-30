@@ -10,8 +10,8 @@ pandora.ui.videoPreview = function(data) {
                         return resolution >= data.height;
                     }),
                     resolution = resolutions.length
-                        ? Math.min(resolutions)
-                        : Math.max(pandora.site.video.resolutions);
+                        ? Ox.min(resolutions)
+                        : Ox.max(pandora.site.video.resolutions);
                 return '/' + data.id + '/' + resolution + 'p' + (
                     Ox.isUndefined(position) ? '' : position
                 ) + '.jpg';
