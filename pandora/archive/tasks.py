@@ -78,13 +78,15 @@ def update_files(user, volume, files):
     for f in files:
         if len(f['path'].split('/')) == folder_depth:
             all_files.append(f['oshash'])
-            update_or_create_instance(volume, f)
 
     #remove deleted files
     removed = models.Instance.objects.filter(volume=volume).exclude(file__oshash__in=all_files)
     ids = [i['itemId'] for i in Item.objects.filter(
            files__instances__in=removed.filter(file__selected=True)).distinct().values('itemId')]
     removed.delete()
+    for f in files:
+        if f['oshash'] in all_files:
+            update_or_create_instance(volume, f)
     for i in ids:
         i = Item.objects.get(itemId=i)
         i.update_selected()
