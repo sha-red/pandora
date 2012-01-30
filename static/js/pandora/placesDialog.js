@@ -97,8 +97,7 @@ pandora.ui.placesDialog = function(options) {
         })
         .bindEvent({
             resize: function(data) {
-                // data is {width: ..., height: ...}
-                $content.options(data);
+                $content.options({width: width, height: height});
             }
         });
     return that;

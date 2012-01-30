@@ -226,7 +226,7 @@ pandora.ui.item = function() {
                     clickLink: pandora.clickLink,
                     cuts: result.data.cuts || [],
                     duration: result.data.duration,
-                    download: pandora.site.video.download,
+                    enableDownload: pandora.site.capabilities.canDownloadVideo[pandora.user.level] >= result.data.rightslevel,
                     enableSubtitles: pandora.user.ui.videoSubtitles,
                     find: pandora.user.ui.itemFind.conditions[0]
                         ? pandora.user.ui.itemFind.conditions[0].value : '',
@@ -300,11 +300,20 @@ pandora.ui.item = function() {
                         pandora.$ui.placesDialog && pandora.$ui.placesDialog.remove();
                         pandora.$ui.placesDialog = pandora.ui.placesDialog(data).open();
                     },
-                    download: function(data) {
-                        Ox.print('download', data);
-                        document.location.href = '/' + pandora.user.ui.item + '/download';
+                    downloadVideo: function(data) {
+                        document.location.href = '/' + pandora.user.ui.item + '/torrent/';
                     },
                     downloadSelection: function(data) {
+                        document.location.href = [
+                            '/',
+                            pandora.user.ui.item,
+                            '/',
+                            Ox.max(pandora.site.video.resolutions),
+                            'p.webm?t=',
+                            data['in'],
+                            ',',
+                            data.out
+                        ].join('');
                     },
                     editannotation: function(data) {
                         Ox.Log('', 'editAnnotation', data);
