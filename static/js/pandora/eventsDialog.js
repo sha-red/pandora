@@ -55,7 +55,8 @@ pandora.ui.eventsDialog = function() {
                 $content && $content.options({height: data.height});
             },
             resizeend: function(data) {
-                $content && $content.options(data);
+                Ox.print('RESIZEEND', data)
+                $content && $content.options({height: data.height, width: data.width});
             }
         }),
         $content;

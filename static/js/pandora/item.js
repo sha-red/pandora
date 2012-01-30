@@ -226,6 +226,7 @@ pandora.ui.item = function() {
                     clickLink: pandora.clickLink,
                     cuts: result.data.cuts || [],
                     duration: result.data.duration,
+                    download: pandora.site.video.download,
                     enableSubtitles: pandora.user.ui.videoSubtitles,
                     find: pandora.user.ui.itemFind.conditions[0]
                         ? pandora.user.ui.itemFind.conditions[0].value : '',
@@ -299,6 +300,12 @@ pandora.ui.item = function() {
                         pandora.$ui.placesDialog && pandora.$ui.placesDialog.remove();
                         pandora.$ui.placesDialog = pandora.ui.placesDialog(data).open();
                     },
+                    download: function(data) {
+                        Ox.print('download', data);
+                        document.location.href = '/' + pandora.user.ui.item + '/download';
+                    },
+                    downloadSelection: function(data) {
+                    },
                     editannotation: function(data) {
                         Ox.Log('', 'editAnnotation', data);
                         //fixme: check that edit was successfull
@@ -314,6 +321,10 @@ pandora.ui.item = function() {
                             result.data.editable = true;
                             pandora.$ui.editor.updateAnnotation(result.data);
                         });
+                    },
+                    embedSelection: function(data) {
+                        pandora.$ui.embedDialog && pandora.$ui.embedDialog.remove();
+                        pandora.$ui.embedDialog = pandora.ui.embedDialog(data).open();
                     },
                     find: function(data) {
                         pandora.UI.set('itemFind', data.find ? {
