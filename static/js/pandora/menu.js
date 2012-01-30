@@ -231,7 +231,7 @@ pandora.ui.mainMenu = function() {
                         return page.id;
                     }),
                     ['signup', 'signin', 'signout', 'preferences', 'tv', 'help']
-                ).indexOf(data.id) > 1) {
+                ).indexOf(data.id) > -1) {
                     pandora.UI.set({page: data.id});
                 } else if ([
                     'newlist', 'newlistfromselection', 'newsmartlist', 'newsmartlistfromresults'

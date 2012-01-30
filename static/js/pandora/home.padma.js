@@ -220,7 +220,7 @@ pandora.ui.home = function() {
             })
             .appendTo(that),
         $text = $('<div>')
-            .html('A Movie Database. \u2620 2007-2012 0x2620. All Open Source.')
+            .html('Pad.ma is an online archive of densely text-annotated video material, primarily footage and not finished films. The entire collection is searchable and viewable online, and is free to download for non-commercial use.')
             .css({
                 position: 'absolute',
                 left: 0,
