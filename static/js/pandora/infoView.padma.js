@@ -278,7 +278,7 @@ pandora.ui.infoView = function(data) {
     // Director, Cinematographer and Featuring ---------------------------------
 
     if (canEdit) {
-        var $div = $('<div>').css(css).appendTo($center);
+        var $div = $('<div>').css(css).css('clear', 'both').appendTo($center);
         ['director', 'cinematographer', 'featuring'].forEach(function(key, i) {
             i && $('<div>').css({float: 'left'}).html(';&nbsp;').appendTo($div);
             $('<div>')
@@ -321,7 +321,7 @@ pandora.ui.infoView = function(data) {
     // Topic -------------------------------------------------------------------
 
     if (canEdit) {
-        var $div = $('<div>').css(css).appendTo($center),
+        var $div = $('<div>').css(css).css('clear', 'both').appendTo($center),
             key = 'topic';
         $('<div>')
             .css({float: 'left'})
