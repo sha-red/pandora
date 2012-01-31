@@ -67,7 +67,7 @@ def _order_by_group(query):
             elif query['group'] != "keyword":
                 order_by = (order_by, 'sortvalue')
             else:
-                order_by = (order_by,)
+                order_by = (order_by, 'value')
         else:
             order_by = query['sort'][0]['operator'] == '-' and '-sortvalue' or 'sortvalue'
             order_by = (order_by, 'items')

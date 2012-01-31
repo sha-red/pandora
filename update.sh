@@ -33,5 +33,5 @@ if [ $current -ne $new ]; then
   cd pandora
   ./manage.py update_static
   ./manage.py compile_pyc
-  ./manage.py sqldiff -a | grep -v BEGIN | grep -v COMMIT
+  ./manage.py sqldiff -a | grep -v BEGIN | grep -v COMMIT | grep -v "\-\- No differences"
 fi
