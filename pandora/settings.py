@@ -99,6 +99,7 @@ INSTALLED_APPS = (
     'clip',
     'archive',
     'event',
+    'changelog',
     'item',
     'itemlist',
     'person',

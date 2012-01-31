@@ -164,6 +164,7 @@ def removeAnnotation(request):
     data = json.loads(request.POST['data'])
     a = get_object_or_404_json(models.Annotation, public_id=data['id'])
     if a.editable(request.user):
+        a.log()
         a.delete()
         if a.clip.annotations.count() == 0:
             a.clip.delete()
@@ -193,6 +194,7 @@ def editAnnotation(request):
     data = json.loads(request.POST['data'])
     a = get_object_or_404_json(models.Annotation, public_id=data['id'])
     if a.editable(request.user):
+        a.log()
         for key in ('value', 'in', 'out'):
             if key in data:
                 setattr(a, {

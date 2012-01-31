@@ -35,6 +35,7 @@ from data_api import external_data
 from archive import extract
 from annotation.models import Annotation
 from clip.models import Clip
+from changelog.models import Changelog
 import archive.models
 
 from person.models import get_name_sort
@@ -227,6 +228,11 @@ class Item(models.Model):
         for key in data:
             self.data[key] = data[key]
         return self.save()
+
+    def log(self):
+        c = Changelog(type='item')
+        c.value = self.json
+        c.save()
 
     def update_external(self):
         if settings.DATA_SERVICE and not self.itemId.startswith('0x'):
@@ -572,7 +578,7 @@ class Item(models.Model):
                     qs = Annotation.objects.filter(item=self)
                     qs = qs.filter(layer=i)
                     qs = qs.order_by('start')
-                    save(i, u'\n'.join([l.findvalue for l in qs]))
+                    save(i, u'\n'.join(filter(None, [l.findvalue for l in qs])))
                 elif i != '*' and i not in self.facet_keys:
                     value = self.get(i)
                     if isinstance(value, list):

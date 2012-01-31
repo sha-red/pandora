@@ -11,6 +11,7 @@ import ox
 
 from archive import extract
 from clip.models import Clip
+from changelog.models import Changelog
 
 from item.utils import sort_string
 import managers
@@ -201,6 +202,11 @@ class Annotation(models.Model):
                 if streams:
                     j['videoRatio'] = streams[0].aspect_ratio
         return j
+
+    def log(self):
+        c = Changelog(type='annotation')
+        c.value = self.json()
+        c.save()
 
     def __unicode__(self):
         return u"%s %s-%s" %(self.public_id, self.start, self.end)

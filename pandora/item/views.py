@@ -429,6 +429,7 @@ def edit(request):
     data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Item, itemId=data['id'])
     if item.editable(request.user):
+        item.log()
         response = json_response(status=200, text='ok')
         if 'notes' in data:
             if request.user.get_profile().capability('canEditMetadata'):
@@ -459,6 +460,7 @@ def remove(request):
     data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Item, itemId=data['id'])
     if item.editable(request.user):
+        item.log()
         #FIXME: is this cascading enough or do we end up with orphan files etc.
         item.delete()
         response = json_response(status=200, text='removed')

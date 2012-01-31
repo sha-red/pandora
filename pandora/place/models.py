@@ -14,6 +14,7 @@ from ox.django import fields
 import managers
 from annotation.models import Annotation, get_matches
 from item.models import Item
+from changelog.models import Changelog
 
 
 class Place(models.Model):
@@ -119,3 +120,8 @@ class Place(models.Model):
         #self.area= ox.location.area(self.south, self.west, self.north, self.east)
 
         super(Place, self).save(*args, **kwargs)
+
+    def log(self):
+        c = Changelog(type='place')
+        c.value = self.json()
+        c.save()
