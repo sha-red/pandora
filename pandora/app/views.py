@@ -137,6 +137,8 @@ def editPage(request):
     if request.user.get_profile().capability('canEditSitePages'):
         data = json.loads(request.POST['data'])
         page, created = models.Page.objects.get_or_create(name=data['name'])
+        if not created:
+            page.log()
         page.body = data['body']
         page.save()
         response = json_response({'name': page.name, 'page': page.body})
