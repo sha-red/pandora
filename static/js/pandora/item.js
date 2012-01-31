@@ -271,17 +271,16 @@ pandora.ui.item = function() {
                 }).bindEvent({
                     addannotation: function(data) {
                         Ox.Log('', 'addAnnotation', data);
-                        pandora.api.addAnnotation({
-                            'in': data['in'],
-                            item: pandora.user.ui.item,
-                            layer: data.layer,
-                            out: data.out,
-                            value: data.value,
-                        }, function(result) {
-                            // fixme: both should come from backend
-                            result.data.duration = result.data.out - result.data['in'];
-                            result.data.editable = true;
-                            pandora.$ui.editor.addAnnotation(data.layer, result.data);
+                        //async to not capture keyboard input
+                        setTimeout(function() {
+                            pandora.$ui.editor.addAnnotation(data.layer, {
+                                duration: data.out - data['in'],
+                                editable: true,
+                                id: '_' + Ox.uid(),
+                                'in': data['in'],
+                                out: data.out,
+                                value: '',
+                            });
                         });
                     },
                     annotationsfont: function(data) {
@@ -317,19 +316,26 @@ pandora.ui.item = function() {
                     },
                     editannotation: function(data) {
                         Ox.Log('', 'editAnnotation', data);
-                        //fixme: check that edit was successfull
-                        pandora.api.editAnnotation({
-                            id: data.id,
-                            'in': data['in'],
-                            out: data.out,
-                            value: data.value,
-                        }, function(result) {
-                            Ox.print('', 'editAnnotation result', result);
-                            // fixme: both should come from backend
-                            result.data.duration = result.data.out - result.data['in'];
-                            result.data.editable = true;
-                            pandora.$ui.editor.updateAnnotation(result.data);
-                        });
+                        function callback(result) {
+                            Ox.Log('', 'editAnnotation result', result);
+                            pandora.$ui.editor.updateAnnotation(data.id, result.data);
+                        };
+                        if (data.id[0] == '_') {
+                            pandora.api.addAnnotation({
+                                'in': data['in'],
+                                item: pandora.user.ui.item,
+                                layer: data.layer,
+                                out: data.out,
+                                value: data.value
+                            }, callback);
+                        } else {
+                            pandora.api.editAnnotation({
+                                id: data.id,
+                                'in': data['in'],
+                                out: data.out,
+                                value: data.value
+                            }, callback);
+                        }
                     },
                     embedSelection: function(data) {
                         pandora.$ui.embedDialog && pandora.$ui.embedDialog.remove();

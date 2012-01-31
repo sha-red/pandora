@@ -516,9 +516,9 @@
     "user": {
         "level": "guest",
         "ui": {
-            "annotationsCalendarSize": 192,
+            "annotationsCalendarSize": 128,
             "annotationsFont": "small",
-            "annotationsMapSize": 192,
+            "annotationsMapSize": 128,
             "annotationsRange": "position",
             "annotationsSize": 256,
             "annotationsSort": "position",
