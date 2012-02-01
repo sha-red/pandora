@@ -121,11 +121,13 @@ pandora.ui.item = function() {
 
         } else if (pandora.user.ui.itemView == 'video') {
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.player = Ox.VideoPanel({
+                annotationsCalendarSize: pandora.user.ui.annotationsCalendarSize,
                 annotationsFont: pandora.user.ui.annotationsFont,
+                annotationsMapSize: pandora.user.ui.annotationsMapSize,
                 annotationsRange: pandora.user.ui.annotationsRange,
                 annotationsSize: pandora.user.ui.annotationsSize,
                 annotationsSort: pandora.user.ui.annotationsSort,
-                censored: videoOptions.censored,        
+                censored: videoOptions.censored,
                 clickLink: pandora.clickLink,
                 cuts: result.data.cuts || [],
                 duration: result.data.duration,
@@ -144,7 +146,10 @@ pandora.ui.item = function() {
                 resolution: pandora.user.ui.videoResolution,
                 scaleToFill: pandora.user.ui.videoScale == 'fill',
                 showAnnotations: pandora.user.ui.showAnnotations,
+                showAnnotationsCalendar: pandora.user.ui.showAnnotationsCalendar,
+                showAnnotationsMap: pandora.user.ui.showAnnotationsMap,
                 showLayers: pandora.user.ui.showLayers,
+                showUsers: pandora.site.annotations.showUsers,
                 showTimeline: pandora.user.ui.showTimeline,
                 showUsers: pandora.site.annotations.showUsers,
                 subtitles: videoOptions.subtitles,
@@ -184,6 +189,12 @@ pandora.ui.item = function() {
                 resizeannotations: function(data) {
                     pandora.UI.set('annotationsSize', data.annotationsSize);
                 },
+                resizecalendar: function(data) {
+                    pandora.UI.set('annotationsCalendarSize', data.size);
+                },
+                resizemap: function(data) {
+                    pandora.UI.set('annotationsMapSize', data.size);
+                },
                 resolution: function(data) {
                     pandora.UI.set('videoResolution', data.resolution);
                 },
@@ -192,6 +203,12 @@ pandora.ui.item = function() {
                 },
                 subtitles: function(data) {
                     pandora.UI.set('videoSubtitles', data.subtitles);
+                },
+                togglemap: function(data) {
+                    pandora.UI.set('showAnnotationsMap', !data.collapsed);
+                },
+                togglesize: function(data) {
+                    pandora.UI.set({videoSize: data.size});
                 },
                 toggleannotations: function(data) {
                     pandora.UI.set('showAnnotations', data.showAnnotations);
@@ -299,10 +316,10 @@ pandora.ui.item = function() {
                         pandora.$ui.placesDialog && pandora.$ui.placesDialog.remove();
                         pandora.$ui.placesDialog = pandora.ui.placesDialog(data).open();
                     },
-                    downloadVideo: function(data) {
+                    downloadvideo: function(data) {
                         document.location.href = '/' + pandora.user.ui.item + '/torrent/';
                     },
-                    downloadSelection: function(data) {
+                    downloadselection: function(data) {
                         document.location.href = [
                             '/',
                             pandora.user.ui.item,
@@ -337,7 +354,7 @@ pandora.ui.item = function() {
                             }, callback);
                         }
                     },
-                    embedSelection: function(data) {
+                    embedselection: function(data) {
                         pandora.$ui.embedDialog && pandora.$ui.embedDialog.remove();
                         pandora.$ui.embedDialog = pandora.ui.embedDialog(data).open();
                     },

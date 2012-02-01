@@ -175,7 +175,8 @@ pandora.changeListStatus = function(id, status, callback) {
 };
 
 pandora.clickLink = function(e) {
-    if (e.target.hostname == document.location.hostname) {
+    if (e.target.hostname == document.location.hostname
+        && !Ox.starts(e.target.pathname, '/static')) {
         pandora.URL.push(e.target.pathname);
     } else {
         window.open('/url=' + encodeURIComponent(e.target.href), '_blank');
