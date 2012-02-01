@@ -19,7 +19,6 @@ import tasks
 
 @login_required_json
 def addPlace(request):
-    #FIXME: require admin
     '''
         param data {
             name: "",
@@ -36,20 +35,24 @@ def addPlace(request):
             type: ""
         }
     '''
+    #FIXME: check permissions
     data = json.loads(request.POST['data'])
     exists = False
     existing_names = []
     existing_geoname = ''
     names = data.pop('name')
     for name in [names] + data.get('alternativeNames', []):
-        if models.Place.objects.filter(name_find__icontains=u'|%s|'%name).count() != 0:
+        if models.Place.objects.filter(defined=True,
+                                       name_find__icontains=u'|%s|'%name).count() != 0:
             exists = True
             existing_names.append(name)
     if 'geoname' in data: 
-        if models.Place.objects.filter(geoname=data['geoname']).count() > 0:
+        if models.Place.objects.filter(defined=True,
+                                       geoname=data['geoname']).count() > 0:
             exists = True
             existing_geoname = data['geoname']
     if not exists:
+        models.Place.objects.filter(defined=False, name__in=names).delete()
         place = models.Place()
         place.user = request.user
         place.name = names
@@ -96,14 +99,17 @@ def editPlace(request):
             alternative_names = filter(lambda n: n.strip(), alternative_names)
             data['alternativeNames'] = alternative_names
         for name in names + alternative_names:
-            if models.Place.objects.filter(name_find__icontains=u'|%s|'%name).exclude(id=place.id).count() != 0:
+            if models.Place.objects.filter(defined=True,
+                    name_find__icontains=u'|%s|'%name).exclude(id=place.id).count() != 0:
                 conflict = True
                 conflict_names.append(name)
         if 'geoname' in data:
-            if models.Place.objects.filter(geoname=data['geoname']).exclude(id=place.id).count() != 0:
+            if models.Place.objects.filter(defined=True,
+                        geoname=data['geoname']).exclude(id=place.id).count() != 0:
                 conflict = True
                 conflict_geoname = data['geoname']
         if not conflict:
+            models.Place.objects.filter(defined=False, name__in=names+alternative_names).delete()
             for key in data:
                 if key != 'id':
                     value = data[key]

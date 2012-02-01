@@ -32,6 +32,7 @@ class Event(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    defined = models.BooleanField(default=False)
 
     user = models.ForeignKey(User, null=True, related_name='events')
 
@@ -46,14 +47,14 @@ class Event(models.Model):
 
     #start yyyy-mm-dd|mm-dd|dow 00:00|00:00
     start = models.CharField(default='', max_length=255)
-    startTime = models.BigIntegerField(default=0)
+    startTime = models.BigIntegerField(default=None, null=True)
     
     #end   yyyy-mm-dd|mm-dd|dow 00:00|00:01
     end = models.CharField(default='', max_length=255)
-    endTime = models.BigIntegerField(default=0)
+    endTime = models.BigIntegerField(default=None, null=True)
 
     duration = models.CharField(default='', max_length=255)
-    durationTime = models.BigIntegerField(default=0)
+    durationTime = models.BigIntegerField(default=None, null=True)
 
     type = models.CharField(default='', max_length=255)
 
@@ -64,9 +65,21 @@ class Event(models.Model):
     def __unicode__(self):
         return self.name
 
+    @classmethod
+    def get_or_create(model, name):
+        qs = model.objects.filter(name_find__icontains=u'|%s|'%name)
+        if qs.count() == 0:
+            instance = model(name=name)
+            instance.save()
+        else:
+            instance = qs[0]
+        return instance
+
     def editable(self, user):
         if user and not user.is_anonymous() \
-            and (self.user == user or user.get_profile().capability('canEditEvents')):
+            and (not self.user or \
+                 self.user == user or \
+                 user.get_profile().capability('canEditEvents')):
                 return True
         return False
      
@@ -109,8 +122,18 @@ class Event(models.Model):
         if not self.name_sort:
             self.set_name_sort()
         self.name_find = '||' + self.name + '||'.join(self.alternativeNames) + '||'
-        self.durationTime = self.endTime - self.startTime
+        self.defined = len(filter(None, [getattr(self, key)
+                             for key in ('start', 'end', 'startTime', 'endTime')])) > 0
+        if self.defined:
+            self.durationTime = self.endTime - self.startTime
+
         super(Event, self).save(*args, **kwargs)
+
+    def make_undefined(self):
+        self.defined = False
+        self.start = ''
+        self.end = ''
+        self.durationTime = self.endTime = self.startTime = None
 
     def get_id(self):
         return ox.toAZ(self.id)

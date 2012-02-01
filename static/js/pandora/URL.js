@@ -121,8 +121,6 @@ pandora.URL = (function() {
             if (state.find) {
                 if (!state.item) {
                     set.find = state.find;
-                } else if (pandora.isItemFind(state.find)) {
-                    set.itemFind = state.find;
                 }
             }
 

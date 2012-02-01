@@ -7,6 +7,8 @@ from django.db import models
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.db.models.signals import pre_delete
+
 import ox
 
 from archive import extract
@@ -152,16 +154,22 @@ class Annotation(models.Model):
             #update clip.findvalue
             self.clip.save()
 
-        if filter(lambda l: l['type'] == 'place' or l.get('hasPlaces'),
-                  settings.CONFIG['layers']):
-            #update_matching_places.delay(self.id)
-            #editAnnotations needs to be in snyc
+        #editAnnotations needs to be in snyc
+        if layer.get('type') == 'place' or layer.get('hasPlace'):
             update_matching_places(self.id)
-        if filter(lambda l: l['type'] == 'event' or l.get('hasEvents'),
-                  settings.CONFIG['layers']):
-            #update_matching_events.delay(self.id)
-            #editAnnotations needs to be in snyc
+        if layer.get('type') == 'event' or layer.get('hasEvents'):
             update_matching_events(self.id)
+
+    def cleanup_undefined_relations(self):
+        layer = self.get_layer()
+        if layer.get('type') == 'place':
+            for p in self.places.filter(defined=False):
+                if p.annotations.exclude(id=self.id).count() == 0:
+                    p.delete()
+        elif layer.get('type') == 'event':
+            for e in self.events.filter(defined=False):
+                if e.annotations.exclude(id=self.id).count() == 0:
+                    e.delete()
 
     def json(self, layer=False, keys=None, user=None):
         j = {
@@ -181,11 +189,11 @@ class Annotation(models.Model):
 
         l = self.get_layer()
         if l['type'] == 'place':
-            qs = self.places.all()
+            qs = self.places.filter(defined=True)
             if qs.count() > 0:
                 j['place'] = qs[0].json(user=user)
         elif l['type'] == 'event':
-            qs = self.events.all()
+            qs = self.events.filter(defined=True)
             if qs.count() > 0:
                 j['event'] = qs[0].json(user=user)
 
@@ -211,3 +219,6 @@ class Annotation(models.Model):
     def __unicode__(self):
         return u"%s %s-%s" %(self.public_id, self.start, self.end)
 
+def cleanup_related(sender, **kwargs):
+    kwargs['instance'].cleanup_undefined_relations()
+pre_delete.connect(cleanup_related, sender=Annotation)

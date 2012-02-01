@@ -23,6 +23,8 @@ class Place(models.Model):
     '''
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    defined = models.BooleanField(default=True)
+
     user = models.ForeignKey(User, null=True, related_name='places')
 
     name = models.CharField(max_length=1024)
@@ -30,20 +32,20 @@ class Place(models.Model):
     name_sort = models.CharField(max_length=200)
     name_find = models.TextField(default='', editable=False)
 
-    geoname = models.CharField(max_length=1024, unique=True)
-    geoname_sort = models.CharField(max_length=1024, unique=True)
+    geoname = models.CharField(max_length=1024, unique=True, null=True)
+    geoname_sort = models.CharField(max_length=1024, unique=True, null=True)
     countryCode = models.CharField(max_length=16, default='')
 
     wikipediaId = models.CharField(max_length=1000, blank=True)
     type = models.CharField(max_length=1000, default='')
 
-    south = models.FloatField(default=0)
-    west = models.FloatField(default=0)
-    north = models.FloatField(default=0)
-    east = models.FloatField(default=0)
-    lat = models.FloatField(default=0)
-    lng = models.FloatField(default=0)
-    area = models.FloatField(default=0)
+    south = models.FloatField(default=None, null=True)
+    west = models.FloatField(default=None, null=True)
+    north = models.FloatField(default=None, null=True)
+    east = models.FloatField(default=None, null=True)
+    lat = models.FloatField(default=None, null=True)
+    lng = models.FloatField(default=None, null=True)
+    area = models.FloatField(default=None, null=True)
 
     matches = models.IntegerField(default=0)
     items = models.ManyToManyField(Item, blank=True, related_name='places')
@@ -57,9 +59,21 @@ class Place(models.Model):
     def __unicode__(self):
         return self.name
 
+    @classmethod
+    def get_or_create(model, name):
+        qs = model.objects.filter(name_find__icontains=u'|%s|'%name)
+        if qs.count() == 0:
+            instance = model(name=name)
+            instance.save()
+        else:
+            instance = qs[0]
+        return instance
+
     def editable(self, user):
         if user and not user.is_anonymous() \
-            and (self.user == user or user.get_profile().capability('canEditPlaces')):
+            and (not self.user or \
+                 self.user == user or \
+                 user.get_profile().capability('canEditPlaces')):
                 return True
         return False
 
@@ -69,9 +83,10 @@ class Place(models.Model):
     def json(self, keys=None, user=None):
         j = {
             'id': self.get_id(),
-            'user': self.user.username,
             'editable': self.editable(user)
         }
+        if self.user:
+            j['user'] = self.user.username
         for key in ('created', 'modified',
                     'name', 'alternativeNames', 'geoname', 'countryCode',
                     'south', 'west', 'north', 'east',
@@ -106,18 +121,25 @@ class Place(models.Model):
                 self.matches = numberofmatches
                 self.save()
 
+    def make_undefined(self):
+        self.defined = False
+        self.south = None
+        self.west = None
+        self.north = None
+        self.east = None
+        self.lat = None
+        self.lng = None
+        self.area = None
+
     def save(self, *args, **kwargs):
         if not self.name_sort:
             self.name_sort = self.name #', '.join(self.name)
-        self.geoname_sort = ', '.join(reversed(self.geoname.split(', ')))
+        if self.geoname:
+            self.geoname_sort = ', '.join(reversed(self.geoname.split(', ')))
         self.name_find = '|%s|'%'|'.join([self.name]+list(self.alternativeNames))
 
-        #update center
-        #self.lat = ox.location.center(self.south, self.north)
-        #self.lng = ox.location.center(self.east, self.west)
-
-        #update area
-        #self.area= ox.location.area(self.south, self.west, self.north, self.east)
+        self.defined = len(filter(None, [getattr(self, key)
+                             for key in ('south', 'west', 'north', 'east')])) > 0
 
         super(Place, self).save(*args, **kwargs)
 

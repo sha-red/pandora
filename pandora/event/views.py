@@ -30,11 +30,14 @@ def addEvent(request):
     data = json.loads(request.POST['data'])
     existing_names = []
     exists = False
-    for name in [data['name']] + data.get('alternativeNames', []):
-        if models.Event.objects.filter(name_find__icontains=u'|%s|'%name).count() != 0:
+    names = [data['name']] + data.get('alternativeNames', [])
+    for name in names:
+        if models.Event.objects.filter(defined=True,
+                name_find__icontains=u'|%s|'%name).count() != 0:
             exists = True
             existing_names.append(name)
     if not exists:
+        models.Event.objects.filter(defined=False, name__in=names).delete()
         event = models.Event(name = data['name'])
         for key in ('start', 'startTime', 'end', 'endTime', 'duration', 'durationTime',
                     'type', 'alternativeNames'):
@@ -74,10 +77,12 @@ def editEvent(request):
         conflict_names = []
         names = [data.get('name', event.name)] + data.get('alternativeNames', [])
         for name in names:
-            if models.Event.objects.filter(name_find__icontains=u'|%s|'%name).exclude(id=event.id).count() != 0:
+            if models.Event.objects.filter(defined=True,
+                    name_find__icontains=u'|%s|'%name).exclude(id=event.id).count() != 0:
                 conflict = True
                 conflict_names.append(name)
         if not conflict:
+            models.Event.objects.filter(defined=False, name__in=names).delete()
             if 'name' in data:
                 event.set_name_sort(data['name'])
             for key in ('name', 'start', 'startTime', 'end', 'endTime', 'duration', 'durationTime',
