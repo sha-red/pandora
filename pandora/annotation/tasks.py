@@ -14,7 +14,7 @@ def update_matching_events(id):
             e.delete()
     if annotation.get_layer().get('type') == 'event' \
         and annotation.events.count() == 0:
-            annotations.events.add(Event.get_or_create(annotation.value))
+            annotation.events.add(Event.get_or_create(annotation.value))
     for e in annotation.events.all():
         e.update_matches()
     ids = [e['id'] for e in Event.objects.all().values('id')]
