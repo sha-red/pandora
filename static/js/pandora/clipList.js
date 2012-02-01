@@ -4,10 +4,13 @@
 
 pandora.ui.clipList = function(videoRatio) {
 
+    Ox.print('CLIP LIST FIND', !pandora.user.ui.item ? pandora.getItemFind(pandora.user.ui.find) : pandora.user.ui.itemFind);
+
     var ui = pandora.user.ui,
         fixedRatio = !ui.item ? 16/9 : videoRatio,
         isClipView = !ui.item ? ui.listView == 'clip' : ui.itemView == 'clips',
         that = Ox.IconList({
+            find: !ui.item ? pandora.getItemFind(ui.find) : ui.itemFind,
             fixedRatio: fixedRatio,
             item: function(data, sort, size) {
                 size = size || 128; // fixme: is this needed?
@@ -21,9 +24,17 @@ pandora.ui.clipList = function(videoRatio) {
                     width = fixedRatio > 1 ? size : Math.round(size * fixedRatio);
                     height = fixedRatio > 1 ? Math.round(size / fixedRatio) : size;
                 }
-                title = data.annotations ? data.annotations.map(function(annotation) {
+                title = data.annotations ? data.annotations.sort(function(a, b) {
+                    var layerA = pandora.site.clipLayers.indexOf(a.layer),
+                        layerB = pandora.site.clipLayers.indexOf(b.layer);
+                    return layerA < layerB ? -1
+                        : layerA > layerB ? 1
+                        : a.value < b.value ? -1
+                        : a.value > b.value ? 1
+                        : 0;
+                }).map(function(annotation) {
                     return Ox.stripTags(annotation.value);
-                }).join('; ') : '',
+                }).join('; ') : '';
                 url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg';
                 sortKey = sort[0].key;
                 if (['text', 'position', 'duration'].indexOf(sortKey) > -1) {
@@ -73,7 +84,14 @@ pandora.ui.clipList = function(videoRatio) {
                         conditions:[{key: 'id', value: ui.item, operator: '=='}],
                         operator: '&'
                     };
-                    query = pandora.user.ui.itemFind;
+                    query = {
+                        conditions: ui.itemFind === '' ? [] : [{
+                            key: 'annotations',
+                            value: ui.itemFind,
+                            operator: '='
+                        }],
+                        operator: '&'
+                    };
                 }
                 pandora.api.findClips(Ox.extend({
                     itemsQuery: itemsQuery,

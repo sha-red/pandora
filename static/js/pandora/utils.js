@@ -602,6 +602,24 @@ pandora.getItemByIdOrTitle = function(str, callback) {
     });
 }
 
+pandora.getItemFind = function(find) {
+    var itemFind = '';
+    Ox.forEach(find.conditions, function(condition) {
+        if (
+            (
+                condition.key == '*' || condition.key == 'annotations'
+                || Ox.getIndexById(pandora.site.layers, condition.key) > -1
+            )
+            && condition.value.length
+            && ['=', '=='].indexOf(condition.operator) > -1
+        ) {
+            itemFind = condition.value;
+            return false;
+        }
+    })
+    return itemFind;
+};
+
 pandora.getListData = function(list) {
     var data = {}, folder;
     list = Ox.isUndefined(list) ? pandora.user.ui._list : list;
@@ -852,13 +870,6 @@ pandora.isClipView = function(view, item) {
     return (
         !item ? ['calendar', 'clip', 'map'] : ['calendar', 'clips', 'map']
     ).indexOf(view) > -1;
-};
-
-pandora.isItemFind = function(find) {
-    return find.conditions.length == 1
-        && (find.conditions[0].key == 'annotations'
-            ||Ox.getIndexById(pandora.site.layers, find.conditions[0].key) > -1)
-        && find.conditions[0].operator == '=';
 };
 
 pandora.signin = function(data) {

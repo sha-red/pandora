@@ -642,7 +642,7 @@
             "icons": "posters",
             "infoIconSize": 256,
             "item": "",
-            "itemFind": {"conditions": [], "operator": "&"},
+            "itemFind": "",
             "itemSort": [{"key": "position", "operator": "+"}],
             "itemView": "info",
             "listColumns": ["title", "director", "country", "year", "language", "runtime", "genre"],

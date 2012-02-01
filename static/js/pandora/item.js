@@ -132,8 +132,7 @@ pandora.ui.item = function() {
                 cuts: result.data.cuts || [],
                 duration: result.data.duration,
                 enableSubtitles: pandora.user.ui.videoSubtitles,
-                find: pandora.user.ui.itemFind.conditions[0]
-                    ? pandora.user.ui.itemFind.conditions[0].value : '',
+                find: pandora.user.ui.itemFind,
                 getTimelineImageURL: function(i) {
                     return '/' + pandora.user.ui.item + '/timeline64p' + i + '.png';
                 },
@@ -172,10 +171,7 @@ pandora.ui.item = function() {
                     pandora.UI.set({annotationsSort: data.sort});
                 },
                 find: function(data) {
-                    pandora.UI.set('itemFind', data.find ? {
-                        conditions: [{key: 'annotations', value: data.find, operator: '='}],
-                        operator: '&'
-                    } : pandora.site.user.ui.itemFind);
+                    pandora.UI.set('itemFind', data.find);
                 },
                 muted: function(data) {
                     pandora.UI.set('videoMuted', data.muted);
@@ -245,8 +241,7 @@ pandora.ui.item = function() {
                     duration: result.data.duration,
                     enableDownload: pandora.site.capabilities.canDownloadVideo[pandora.user.level] >= result.data.rightslevel,
                     enableSubtitles: pandora.user.ui.videoSubtitles,
-                    find: pandora.user.ui.itemFind.conditions[0]
-                        ? pandora.user.ui.itemFind.conditions[0].value : '',
+                    find: pandora.user.ui.itemFind,
                     getFrameURL: function(position) {
                         return '/' + pandora.user.ui.item + '/' + pandora.user.ui.videoResolution + 'p' + position + '.jpg';
                     },
@@ -359,10 +354,7 @@ pandora.ui.item = function() {
                         pandora.$ui.embedDialog = pandora.ui.embedDialog(data).open();
                     },
                     find: function(data) {
-                        pandora.UI.set('itemFind', data.find ? {
-                            conditions: [{key: 'annotations', value: data.find, operator: '='}],
-                            operator: '&'
-                        } : pandora.site.user.ui.itemFind);
+                        pandora.UI.set('itemFind', data.find);
                     },
                     info: function(data) {
                         pandora.ui.annotationDialog(data.layer).open();

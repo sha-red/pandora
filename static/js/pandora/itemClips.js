@@ -37,6 +37,7 @@ pandora.ui.itemClips = function(options) {
             }),
             url = '/' + self.options.id + '/' + self.height + 'p' + clip['in'] + '.jpg',
             $item = Ox.IconItem({
+                find: pandora.user.ui.itemFind,
                 imageHeight: self.height,
                 imageWidth: self.width,
                 id: clip.id,

@@ -53,7 +53,7 @@
     /*
         clipLayers is the ordered list of public layers that will appear as the
         text of clips. Excluding a layer from this list means it will not be
-        included in find annotations.
+        included in find annotations. // FIXME: the last bit is not implemented.
     */
     "clipLayers": ["transcripts", "keywords", "places", "events", "descriptions"],
     // fixme: either this, or filter: true in itemKeys, but not both
@@ -221,7 +221,7 @@
         },
         {
             "id": "annotations",
-            "title": "Annotation",
+            "title": "Annotations",
             "type": "string",
             "find": true
         },

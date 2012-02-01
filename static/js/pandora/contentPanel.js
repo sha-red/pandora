@@ -34,9 +34,6 @@ pandora.ui.contentPanel = function() {
             orientation: 'vertical'
         })
         .bindEvent({
-            pandora_listview: function() {
-                that.replaceElement(1, pandora.$ui.list = pandora.ui.list());
-            },
             pandora_item: function(data) {
                 if (data.value && data.previousValue) {
                     that.replaceElement(1, pandora.$ui.item = pandora.ui.item());
@@ -44,6 +41,9 @@ pandora.ui.contentPanel = function() {
             },
             pandora_itemview: function() {
                 that.replaceElement(1, pandora.$ui.item = pandora.ui.item());
+            },
+            pandora_listview: function() {
+                that.replaceElement(1, pandora.$ui.list = pandora.ui.list());
             },
             pandora_showbrowser: function(data) {
                 data.value == that.options('elements')[0].collapsed && that.toggle(0);

@@ -64,7 +64,6 @@ pandora.UI = (function() {
                 // switch from item view to list view
                 args['item'] = '';
             }
-            add.itemFind = pandora.site.user.ui.itemFind;
             if (list != self.previousUI._list) {
                 Ox.Log('UI', 'FIND HAS CHANGED LIST')
                 // if find has changed list
@@ -79,8 +78,7 @@ pandora.UI = (function() {
                     }
                 });
             }
-            add.itemFind = pandora.isItemFind(args.find)
-                ? args.find : pandora.site.user.ui.itemFind;
+            add.itemFind = pandora.getItemFind(args.find);
         } else {
             list = self.previousUI._list;
         }

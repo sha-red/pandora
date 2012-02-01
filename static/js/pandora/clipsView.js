@@ -18,17 +18,13 @@ pandora.ui.clipsView = function(videoRatio) {
                             Ox.Input({
                                     clear: true,
                                     placeholder: 'Find Clips',
-                                    value: pandora.user.ui.itemFind.conditions[0]
-                                        ? pandora.user.ui.itemFind.conditions[0].value : '',
+                                    value: pandora.user.ui.itemFind,
                                     width: 192
                                 })
                                 .css({float: 'right', margin: '4px'})
                                 .bindEvent({
                                     submit: function(data) {
-                                        pandora.UI.set('itemFind', data.value ? {
-                                            conditions: [{key: 'annotations', value: data.value, operator: '='}],
-                                            operator: '&'
-                                        } : pandora.site.user.ui.itemFind);
+                                        pandora.UI.set('itemFind', data.value);
                                         // since this is the only way itemFind can change,
                                         // there's no need for an event handler
                                         that.replaceElement(1,

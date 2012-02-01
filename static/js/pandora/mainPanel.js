@@ -28,6 +28,10 @@ pandora.ui.mainPanel = function() {
                             pandora.ui.navigationView(pandora.user.ui.listView)
                         );
                     } else {
+                        if (['clips', 'clip'].indexOf(pandora.user.ui.listView) > -1) {
+                            Ox.print('HELLO????', pandora.user.ui.itemFind)
+                            pandora.$ui.list.options({find: pandora.user.ui.itemFind});
+                        }
                         pandora.$ui.list.reloadList();
                     }
                     // FIXME: why is this being handled _here_?

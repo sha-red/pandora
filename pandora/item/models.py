@@ -552,7 +552,7 @@ class Item(models.Model):
                 if isinstance(value, bool):
                     value = value and 'true' or 'false'
                 if isinstance(value, basestring):
-                    value = value.strip()
+                    value = ox.decodeHtml(ox.stripTags(value.strip()))
                 f.value = value
                 f.save()
             else:
