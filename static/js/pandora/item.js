@@ -285,14 +285,21 @@ pandora.ui.item = function() {
                         Ox.Log('', 'addAnnotation', data);
                         //async to not capture keyboard input
                         setTimeout(function() {
-                            pandora.$ui.editor.addAnnotation(data.layer, {
+                            pandora.$ui.editor.addAnnotation(data.layer, Ox.extend({
                                 duration: data.out - data['in'],
                                 editable: true,
                                 id: '_' + Ox.uid(),
                                 'in': data['in'],
                                 out: data.out,
-                                value: '',
-                            });
+                                value: ''
+                            },
+                            Ox.getObjectById(pandora.site.layers, data.layer).type == 'place' ? {
+                                place: {defined: false}
+                            } : {},
+                            Ox.getObjectById(pandora.site.layers, data.layer).type == 'event' ? {
+                                event: {defined: false}
+                            } : {}
+                            ));
                         });
                     },
                     annotationsfont: function(data) {
