@@ -384,6 +384,7 @@ pandora.ui.item = function() {
                         );
                     },
                     removeannotation: function(data) {
+                        pandora.UI.set('videoPoints.' + pandora.user.ui.item + '.annotation', null);
                         pandora.api.removeAnnotation({
                             id: data.id
                         }, function(result) {
