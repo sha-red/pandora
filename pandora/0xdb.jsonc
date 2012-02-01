@@ -659,7 +659,7 @@
             "showBrowser": true,
             "showCalendarControls": true, // fixme: should be false
             "showFilters": true,
-            "showFlags": true,
+            "showFlags": true, // fixme: this should be a site preference
             "showHome": true,
             "showIconBrowser": false,
             "showInfo": true,
