@@ -12,7 +12,7 @@ pandora.ui.filter = function(id) {
                     align: 'left',
                     id: 'name',
                     format: function(value) {
-                        return ['country', 'language'].indexOf(id) > -1 && pandora.user.ui.showFlags
+                        return pandora.user.ui.showFlags && ['country', 'language'].indexOf(id) > -1
                             ? $('<div>')
                                 .append(
                                     $('<img>')
