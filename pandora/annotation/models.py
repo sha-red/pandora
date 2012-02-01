@@ -189,11 +189,11 @@ class Annotation(models.Model):
 
         l = self.get_layer()
         if l['type'] == 'place':
-            qs = self.places.filter(defined=True)
+            qs = self.places.all()
             if qs.count() > 0:
                 j['place'] = qs[0].json(user=user)
         elif l['type'] == 'event':
-            qs = self.events.filter(defined=True)
+            qs = self.events.all()
             if qs.count() > 0:
                 j['event'] = qs[0].json(user=user)
 

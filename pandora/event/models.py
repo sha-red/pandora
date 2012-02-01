@@ -141,6 +141,7 @@ class Event(models.Model):
     def json(self, user=None):
         j = {
             'id': self.get_id(),
+            'defined': self.defined,
             'editable': self.editable(user)
         }
         if self.user:
