@@ -7,7 +7,7 @@ pandora.ui.item = function() {
     pandora.api.get({
         id: pandora.user.ui.item,
         keys: ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
-            ? [ 'cuts', 'director', 'duration', 'layers', 'parts', 'rendered', 'rightslevel', 'size', 'title', 'videoRatio', 'year'] : []
+            ? [ 'cuts', 'director', 'duration', 'layers', 'parts', 'posterFrame', 'rendered', 'rightslevel', 'size', 'title', 'videoRatio', 'year'] : []
     }, pandora.user.ui.itemView == 'info' && pandora.site.capabilities.canEditMetadata[pandora.user.level] ? 0 : -1, function(result) {
 
         if (result.status.code == 200) {
@@ -262,7 +262,8 @@ pandora.ui.item = function() {
                     muted: pandora.user.ui.videoMuted,
                     out: pandora.user.ui.videoPoints[pandora.user.ui.item].out,
                     position: pandora.user.ui.videoPoints[pandora.user.ui.item].position,
-                    posterFrame: parseInt(videoOptions.video.duration / 2),    
+                    posterFrame: result.data.posterFrame,
+                    posterFrameControls: !pandora.site.media.importPosterFrames,
                     resolution: pandora.user.ui.videoResolution,
                     selected: pandora.user.ui.videoPoints[pandora.user.ui.item].annotation
                         ? pandora.user.ui.item + '/' + pandora.user.ui.videoPoints[pandora.user.ui.item].annotation
@@ -294,10 +295,10 @@ pandora.ui.item = function() {
                                 value: ''
                             },
                             Ox.getObjectById(pandora.site.layers, data.layer).type == 'place' ? {
-                                place: {defined: false}
+                                place: {lat: null, lng: null}
                             } : {},
                             Ox.getObjectById(pandora.site.layers, data.layer).type == 'event' ? {
-                                event: {defined: false}
+                                event: {start: '', end: ''}
                             } : {}
                             ));
                         });
@@ -382,6 +383,12 @@ pandora.ui.item = function() {
                             'videoPoints.' + pandora.user.ui.item + '.position',
                             data.position
                         );
+                    },
+                    posterframe: function(data) {
+                        pandora.api.setPosterFrame({
+                            id: pandora.user.ui.item,
+                            position: data.position
+                        });
                     },
                     removeannotation: function(data) {
                         pandora.UI.set('videoPoints.' + pandora.user.ui.item + '.annotation', null);
