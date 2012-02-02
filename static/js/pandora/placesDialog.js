@@ -7,7 +7,6 @@ pandora.ui.placesDialog = function(options) {
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = Math.round(window.innerWidth * 0.9),
         $content = Ox.ListMap({
-            height: height - 48,
             addPlace: function(place, callback) {
                 pandora.api.addPlace(place, function(result) {
                     Ox.Request.clearCache(); // fixme: remove
@@ -41,6 +40,8 @@ pandora.ui.placesDialog = function(options) {
                     callback(result.data.items);
                 });
             },
+            height: height - 48,
+            mode: pandora.site.map == 'auto' ? 'add' : 'define',
             names: pandora.hasPlacesLayer ? function(callback) {
                 pandora.api.getPlaceNames(function(result) {
                     callback(result.data.items);
