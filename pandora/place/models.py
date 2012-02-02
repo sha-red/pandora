@@ -83,7 +83,6 @@ class Place(models.Model):
     def json(self, keys=None, user=None):
         j = {
             'id': self.get_id(),
-            'defined': self.defined,
             'editable': self.editable(user)
         }
         if self.user:

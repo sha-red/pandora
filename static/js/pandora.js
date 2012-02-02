@@ -227,6 +227,11 @@ appPanel
         });
 
         Ox.extend(pandora.site, {
+            calendar: data.site.layers.some(function(layer) {
+                return layer.type == 'event'
+            }) ? 'manual' : data.site.layers.some(function(layer) {
+                return layer.hasEvents;
+            }) ? 'auto' : 'none',
             clipKeys: Ox.map(data.site.clipKeys, function(key) {
                 return Ox.extend(key, {
                     operator: pandora.getSortOperator(key.id)
@@ -236,6 +241,11 @@ appPanel
                 return key.find ? key : null;
             }),
             itemsSection: pandora.site.itemName.plural.toLowerCase(),
+            map: data.site.layers.some(function(layer) {
+                return layer.type == 'place'
+            }) ? 'manual' : data.site.layers.some(function(layer) {
+                return layer.hasPlaces;
+            }) ? 'auto' : 'none',
             sectionFolders: {
                 items: [
                     {id: 'personal', title: 'Personal Lists'},

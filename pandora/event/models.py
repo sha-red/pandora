@@ -131,8 +131,7 @@ class Event(models.Model):
 
     def make_undefined(self):
         self.defined = False
-        self.start = ''
-        self.end = ''
+        self.start = self.end = ''
         self.durationTime = self.endTime = self.startTime = None
 
     def get_id(self):
@@ -141,7 +140,6 @@ class Event(models.Model):
     def json(self, user=None):
         j = {
             'id': self.get_id(),
-            'defined': self.defined,
             'editable': self.editable(user)
         }
         if self.user:

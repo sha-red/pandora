@@ -154,7 +154,9 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 operator: '&'
             },
             keys: ['id', 'name', 'start', 'end'],
-            query: {},
+            query: {
+                conditions: [{key: 'start', value: '', operator: '!='}]
+            },
             range: [0, 1000000]
         }, function(result) {
             that.replaceElement(0,
