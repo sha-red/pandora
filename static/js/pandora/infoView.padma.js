@@ -2,9 +2,6 @@
 
 pandora.ui.infoView = function(data) {
 
-    // fixme: given that currently, the info view doesn't scroll into view nicely
-    // when collapsing the movies browser, the info view should become a split panel
-
     var ui = pandora.user.ui,
         descriptions = [],
         canEdit = pandora.site.capabilities.canEditMetadata[pandora.user.level] || data.editable,
@@ -232,11 +229,11 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($center);
 
-    // Location, Date & Language -----------------------------------------------
+    // Location, Date, Language and Duration -----------------------------------
 
     if (canEdit) {
         var $div = $('<div>').css(css).css({marginTop: '12px'}).appendTo($center);
-        ['location', 'date', 'language'].forEach(function(key, i) {
+        ['location', 'date', 'language', 'duration'].forEach(function(key, i) {
             i && $('<div>').css({float: 'left'}).html(';&nbsp;').appendTo($div);
             $('<div>')
                 .css({float: 'left'})
@@ -245,7 +242,9 @@ pandora.ui.infoView = function(data) {
             Ox.Editable({
                     clickLink: pandora.clickLink,
                     format: function(value) {
-                        return formatValue(value.split(', '), key)
+                        return key != 'duration' ? formatValue(value.split(', '), key)
+                            : value < 60 ? Math.round(value) + ' sec'
+                            : Math.round(value / 60) + ' min';
                     },
                     placeholder: formatLight('unknown'),
                     tooltip: 'Doubleclick to edit',
