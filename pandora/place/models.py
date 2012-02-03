@@ -32,8 +32,8 @@ class Place(models.Model):
     name_sort = models.CharField(max_length=200)
     name_find = models.TextField(default='', editable=False)
 
-    geoname = models.CharField(max_length=1024, unique=True, null=True)
-    geoname_sort = models.CharField(max_length=1024, unique=True, null=True)
+    geoname = models.CharField(max_length=1024, null=True)
+    geoname_sort = models.CharField(max_length=1024, null=True)
     countryCode = models.CharField(max_length=16, default='')
 
     wikipediaId = models.CharField(max_length=1000, blank=True)

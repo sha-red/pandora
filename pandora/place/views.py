@@ -46,11 +46,13 @@ def addPlace(request):
                                        name_find__icontains=u'|%s|'%name).count() != 0:
             exists = True
             existing_names.append(name)
+    '''
     if 'geoname' in data: 
         if models.Place.objects.filter(defined=True,
                                        geoname=data['geoname']).count() > 0:
             exists = True
             existing_geoname = data['geoname']
+    '''
     if not exists:
         models.Place.objects.filter(defined=False, name__in=names).delete()
         place = models.Place()
@@ -103,11 +105,13 @@ def editPlace(request):
                     name_find__icontains=u'|%s|'%name).exclude(id=place.id).count() != 0:
                 conflict = True
                 conflict_names.append(name)
+        '''
         if 'geoname' in data:
             if models.Place.objects.filter(defined=True,
                         geoname=data['geoname']).exclude(id=place.id).count() != 0:
                 conflict = True
                 conflict_geoname = data['geoname']
+        '''
         if not conflict:
             models.Place.objects.filter(defined=False, name__in=names+alternative_names).delete()
             for key in data:

@@ -241,10 +241,11 @@ pandora.ui.infoView = function(data) {
         ['country', 'year', 'language', 'runtime'].forEach(function(key) {
             if (data[key]) {
                 html.push(
-                    formatKey(key)
-                    + (key == 'runtime'
-                        ? Math.round(data[key] / 60) + ' min'
-                        : formatValue(data[key], key))
+                    formatKey(key) + (
+                        key != 'runtime' ? formatValue(data[key], key)
+                        : data[key] < 60 ? Math.round(data[key]) + ' sec'
+                        : Math.round(data[key] / 60) + ' min'
+                    )
                 )
             }
         });
