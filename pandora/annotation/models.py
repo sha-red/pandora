@@ -60,7 +60,7 @@ def get_matches(obj, model, layer_type):
             value = value.replace(name.lower(), '')
         for name in [obj.name] + list(obj.alternativeNames):
             name = name.lower()
-            if name in value and re.compile('((^|\s)%s([\.,;:!?\-\/\s]|$))'%name).findall(value):
+            if name in value and (exact or re.compile('((^|\s)%s([\.,;:!?\-\/\s]|$))'%name).findall(value)):
                 matches.append(a.id)
                 break
     if not matches:

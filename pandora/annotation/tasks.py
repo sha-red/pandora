@@ -14,6 +14,9 @@ def update_matching_events(id):
         if e.annotations.exclude(id=id).count() == 0:
             e.delete()
     '''
+    if a.get_layer().get('type') == 'event' \
+        and a.events.count() == 0:
+            a.events.add(Event.get_or_create(a.value))
     for e in a.events.all():
         e.update_matches()
     ids = [e['id'] for e in Event.objects.all().values('id')]
@@ -23,9 +26,6 @@ def update_matching_events(id):
             if name.lower() in a.value.lower():
                 e.update_matches()
                 break
-    if a.get_layer().get('type') == 'event' \
-        and a.events.count() == 0:
-            a.events.add(Event.get_or_create(a.value))
 
 @task(ignore_resulsts=True, queue='default')
 def update_matching_places(id):
@@ -36,6 +36,9 @@ def update_matching_places(id):
         if p.annotations.exclude(id=id).count() == 0:
             p.delete()
     '''
+    if a.get_layer().get('type') == 'place' \
+        and a.places.count() == 0:
+            a.places.add(Place.get_or_create(a.value))
     for p in a.places.all():
         p.update_matches()
     ids = [e['id'] for e in Place.objects.all().values('id')]
@@ -45,6 +48,3 @@ def update_matching_places(id):
             if name.lower() in a.value.lower():
                 e.update_matches()
                 break
-    if a.get_layer().get('type') == 'place' \
-        and a.places.count() == 0:
-            a.places.add(Place.get_or_create(a.value))
