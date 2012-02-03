@@ -150,7 +150,6 @@ pandora.ui.item = function() {
                 showLayers: pandora.user.ui.showLayers,
                 showUsers: pandora.site.annotations.showUsers,
                 showTimeline: pandora.user.ui.showTimeline,
-                showUsers: pandora.site.annotations.showUsers,
                 subtitles: videoOptions.subtitles,
                 tooltips: true,
                 timeline: '/' + pandora.user.ui.item + '/timeline16p.png',
