@@ -9,11 +9,9 @@ import models
 def update_matching_events(id):
     from event.models import Event
     a = models.Annotation.objects.get(pk=id)
-    '''
-    for e in a.events.filter(defined=False):
+    for e in a.events.filter(defined=False).exclude(name=a.value):
         if e.annotations.exclude(id=id).count() == 0:
             e.delete()
-    '''
     if a.get_layer().get('type') == 'event' \
         and a.events.count() == 0:
             a.events.add(Event.get_or_create(a.value))
@@ -31,11 +29,9 @@ def update_matching_events(id):
 def update_matching_places(id):
     from place.models import Place
     a = models.Annotation.objects.get(pk=id)
-    '''
-    for p in a.places.filter(defined=False):
+    for p in a.places.filter(defined=False).exclude(name=a.value):
         if p.annotations.exclude(id=id).count() == 0:
             p.delete()
-    '''
     if a.get_layer().get('type') == 'place' \
         and a.places.count() == 0:
             a.places.add(Place.get_or_create(a.value))
