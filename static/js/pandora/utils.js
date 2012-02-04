@@ -1003,11 +1003,11 @@ pandora.resizeWindow = function() {
                     - Ox.UI.SCROLLBAR_SIZE
             });
         } else if (pandora.user.ui.listView == 'map') {
-            pandora.$ui.map.resizeMap();
+            pandora.$ui.map && pandora.$ui.map.resizeMap();
         } else if (pandora.user.ui.listView == 'calendar') {
-            pandora.$ui.calendar.resizeCalendar();
+            pandora.$ui.calendar && pandora.$ui.calendar.resizeCalendar();
         } else {
-            pandora.$ui.list.size();
+            pandora.$ui.list && pandora.$ui.list.size();
         }
     } else {
         pandora.$ui.browser.scrollToSelection();
