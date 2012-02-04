@@ -48,6 +48,7 @@ pandora.ui.placesDialog = function(options) {
                 });
             } : null,
             places: function(data, callback) {
+                data.keys && data.keys.push('matches');
                 return pandora.api.findPlaces(Ox.extend({
                     query: {conditions: [], operator: ''}
                 }, data), callback);

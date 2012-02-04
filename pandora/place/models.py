@@ -130,6 +130,9 @@ class Place(models.Model):
         self.lat = None
         self.lng = None
         self.area = None
+        self.type = ''
+        self.geoname = None
+        self.geoname_sort = None
 
     def save(self, *args, **kwargs):
         if not self.name_sort:
