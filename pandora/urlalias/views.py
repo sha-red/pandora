@@ -12,8 +12,15 @@ def padma_video(request, url):
         view = url[1]
         if len(url) > 2:
             layer = url[2]
-    alias = get_object_or_404(models.IDAlias, old=hid)
-    url = '/%s' % alias.new
+        elif view.startswith('L'):
+            layer = view
+            view = None
+    if layer:
+        alias = get_object_or_404(models.LayerAlias, old=layer)
+        url = '/%s' % alias.new
+    else:
+        alias = get_object_or_404(models.IDAlias, old=hid)
+        url = '/%s' % alias.new
     if view:
         url += '/' + {
             'editor': 'timeline',
