@@ -11,7 +11,7 @@ pandora.ui.usersDialog = function() {
 
         $guestsCheckbox = Ox.Checkbox({
                 title: 'Show Guests',
-                value: true
+                value: false
             })
             .css({float: 'left', margin: '4px'})
             .bindEvent({
@@ -246,7 +246,14 @@ pandora.ui.usersDialog = function() {
                 ],
                 columnsRemovable: true,
                 columnsVisible: true,
-                items: pandora.api.findUsers,
+                items: function(data, callback) {
+                    pandora.api.findUsers(Ox.extend(data, {
+                        query: {
+                            conditions: [{key: 'level', value: 'guest', operator: '!='}],
+                            operator: '&'
+                        }
+                    }), callback);
+                },
                 keys: ['notes', 'groups'],
                 max: -1,
                 scrollbarVisible: true,
