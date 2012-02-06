@@ -91,8 +91,11 @@ class List(models.Model):
         return self.user == user or self.status in ('public', 'featured')
 
     def editable(self, user):
-        #FIXME: make permissions work
-        if self.user == user or user.is_staff:
+        if user.is_anonymous():
+            return False
+        if self.user == user or \
+           user.is_staff or \
+           user.get_profile().capability('canEditFeaturedLists') == True:
             return True
         return False
 

@@ -1041,6 +1041,10 @@ class Item(models.Model):
         if streams.count() > 1:
             timelines = [s.timeline_prefix for s in self.streams()]
             join_timelines(timelines, self.timeline_prefix)
+        else:
+            #remove joined timeline if it was created at some point
+            for f in glob(os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline*.png')):
+                os.unlink(f)
 
     def make_poster(self, force=False):
         ox.makedirs(os.path.join(settings.MEDIA_ROOT,self.path()))
