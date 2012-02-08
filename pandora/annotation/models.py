@@ -186,6 +186,8 @@ class Annotation(models.Model):
                 'volume': 'clip__volume',
             }.get(key, key))
         j['duration'] = j['out'] - j['in']
+        if user:
+            j['editable'] = self.editable(user)
 
         l = self.get_layer()
         if l['type'] == 'place':
