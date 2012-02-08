@@ -91,7 +91,7 @@ class Annotation(models.Model):
         if user.is_authenticated():
             if user.get_profile().capability('canEditAnnotations') or \
                self.user == user or \
-               user.groups.filter(id__in=self.groups.all()).count() > 0:
+               user.groups.filter(id__in=self.item.groups.all()).count() > 0:
                 return True
         return False
 
