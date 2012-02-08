@@ -804,8 +804,9 @@ pandora.getVideoOptions = function(data) {
         options.layers[i] = Ox.extend({}, layer, {
             items: data.layers[layer.id].map(function(annotation) {
                 annotation.duration = annotation.out - annotation['in'];
-                annotation.editable = annotation.user == pandora.user.username || 
-                    pandora.site.capabilities['canEditAnnotations'][pandora.user.level];
+                annotation.editable = annotation.editable
+                    || annotation.user == pandora.user.username
+                    || pandora.site.capabilities['canEditAnnotations'][pandora.user.level];
                 return annotation;
             })
         });
