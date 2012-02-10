@@ -268,7 +268,7 @@ pandora.ui.infoView = function(data) {
                 html.push(
                     formatKey(key)
                     + formatValue(data[key], key)
-                )
+                );
             }
         });
         $('<div>').css(css).html(html.join('; ')).appendTo($center);
@@ -311,7 +311,7 @@ pandora.ui.infoView = function(data) {
                 html.push(
                     formatKey(key)
                     + formatValue(data[key], key)
-                )
+                );
             }
         });
         $('<div>').css(css).html(html.join('; ')).appendTo($center);
@@ -408,13 +408,38 @@ pandora.ui.infoView = function(data) {
 
     $div = $('<div>').css(css).css({marginTop: '16px'}).appendTo($center);
     html = [];
-    ['user', 'created', 'modified'].forEach(function(key) {
-        data[key] && html.push(
-            formatKey(key == 'modified' ? 'Last Modified' : key)
-            + (key == 'user' ? data.user : Ox.formatDate(data[key], '%F %T'))
-        );
-    });
-    $div.html(html.join('; '));
+    if (['admin', 'staff'].indexOf(pandora.user.level) > -1) {
+        $('<div>')
+            .css({float: 'left'})
+            .html(formatKey('user').replace('</span>', '&nbsp;</span>'))
+            .appendTo($div);
+        Ox.Editable({
+            placeholder: formatLight('No User'),
+            tooltip: 'Doubleclick to edit',
+            value: data.user
+        })
+        .bindEvent({
+            submit: function(event) {
+                editMetadata('user', event.value);
+            }
+        })
+        .appendTo($div);
+        ['created', 'modified'].forEach(function(key) {
+            data[key] && html.push(
+                formatKey(key == 'modified' ? 'Last Modified' : key)
+                + (key == 'user' ? data.user : Ox.formatDate(data[key], '%F %T'))
+            );
+        });
+        $div.append(html.join('; '));
+    } else {
+        ['user', 'created', 'modified'].forEach(function(key) {
+            data[key] && html.push(
+                formatKey(key == 'modified' ? 'Last Modified' : key)
+                + (key == 'user' ? data.user : Ox.formatDate(data[key], '%F %T'))
+            );
+        });
+        $div.html(html.join('; '));
+    }
 
     $('<div>').css({height: '16px'}).appendTo($center);
 

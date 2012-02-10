@@ -438,6 +438,10 @@ def edit(request):
         if 'rightslevel' in data:
             item.level = data['rightslevel']
             del data['rightslevel']
+        if 'user' in data:
+            if request.user.get_profile().get_level() in ('admin', 'staff'):
+                item.user = models.User.objects.get(username=data['user'])
+            del data['user']
         r = item.edit(data)
         if r:
             r.wait()
