@@ -11,6 +11,7 @@ pandora.ui.infoView = function(data) {
             MozUserSelect: 'text',
             WebkitUserSelect: 'text'
         },
+        html,
         iconRatio = ui.icons == 'posters' ? data.posterRatio : 1,
         iconSize = ui.infoIconSize,
         iconWidth = iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio),
@@ -23,6 +24,7 @@ pandora.ui.infoView = function(data) {
 
         that = Ox.Element(),
 
+        $div,
         $list,
 
         $info = Ox.Element()
@@ -138,7 +140,7 @@ pandora.ui.infoView = function(data) {
 
     var count = 0;
     ['source', 'project'].forEach(function(key) {
-        var $div = $('<div>').appendTo($data)
+        $div = $('<div>').appendTo($data);
         if (canEdit || data[key]) {
             count && $('<br>').appendTo($div);
             $('<div>')
@@ -232,7 +234,7 @@ pandora.ui.infoView = function(data) {
     // Location, Date, Language and Duration -----------------------------------
 
     if (canEdit) {
-        var $div = $('<div>').css(css).css({marginTop: '12px'}).appendTo($center);
+        $div = $('<div>').css(css).css({marginTop: '12px'}).appendTo($center);
         ['location', 'date', 'language', 'duration'].forEach(function(key, i) {
             i && $('<div>').css({float: 'left'}).html(';&nbsp;').appendTo($div);
             $('<div>')
@@ -262,7 +264,7 @@ pandora.ui.infoView = function(data) {
         });
         $('<br>').appendTo($center);
     } else if (data.location || data.date || data.language) {
-        var html = [];
+        html = [];
         ['location', 'date', 'language'].forEach(function(key) {
             if (data[key]) {
                 html.push(
@@ -277,7 +279,7 @@ pandora.ui.infoView = function(data) {
     // Director, Cinematographer and Featuring ---------------------------------
 
     if (canEdit) {
-        var $div = $('<div>').css(css).css('clear', 'both').appendTo($center);
+        $div = $('<div>').css(css).css('clear', 'both').appendTo($center);
         ['director', 'cinematographer', 'featuring'].forEach(function(key, i) {
             i && $('<div>').css({float: 'left'}).html(';&nbsp;').appendTo($div);
             $('<div>')
@@ -287,7 +289,7 @@ pandora.ui.infoView = function(data) {
             Ox.Editable({
                     clickLink: pandora.clickLink,
                     format: function(value) {
-                        return formatValue(value.split(', '), 'name')
+                        return formatValue(value.split(', '), 'name');
                     },
                     placeholder: formatLight('unknown'),
                     tooltip: 'Doubleclick to edit',
@@ -305,7 +307,7 @@ pandora.ui.infoView = function(data) {
         });
         $('<br>').appendTo($center);
     } else if (data.director || data.cinematographer || data.featuring) {
-        var html = [];
+        html = [];
         ['director', 'cinematographer', 'featuring'].forEach(function(key) {
             if (data[key] && data[key].length) {
                 html.push(
@@ -320,8 +322,8 @@ pandora.ui.infoView = function(data) {
     // Topic -------------------------------------------------------------------
 
     if (canEdit) {
-        var $div = $('<div>').css(css).css('clear', 'both').appendTo($center),
-            key = 'topic';
+        var key = 'topic';
+        $div = $('<div>').css(css).css('clear', 'both').appendTo($center);
         $('<div>')
             .css({float: 'left'})
             .html(formatKey('Topics').replace('</span>', '&nbsp;</span>'))
@@ -329,7 +331,7 @@ pandora.ui.infoView = function(data) {
         Ox.Editable({
                 clickLink: pandora.clickLink,
                 format: function(value) {
-                    return formatValue(value.split(', '), key)
+                    return formatValue(value.split(', '), key);
                 },
                 placeholder: formatLight('unknown'),
                 tooltip: 'Doubleclick to edit',
@@ -347,7 +349,7 @@ pandora.ui.infoView = function(data) {
         $('<br>').appendTo($center);
         
     } else if (data.topic) {
-        var html = formatKey('topics') + formatValue(data.topic, 'topic');
+        html = formatKey('topics') + formatValue(data.topic, 'topic');
         $('<div>').css(css).html(html).appendTo($center);
     }
 
@@ -424,6 +426,7 @@ pandora.ui.infoView = function(data) {
             }
         })
         .appendTo($div);
+        $div.append('; ');
         ['created', 'modified'].forEach(function(key) {
             data[key] && html.push(
                 formatKey(key == 'modified' ? 'Last Modified' : key)
