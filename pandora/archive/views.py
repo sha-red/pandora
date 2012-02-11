@@ -369,7 +369,11 @@ def removeFiles(request):
     data = json.loads(request.POST['data'])
     response = json_response()
     if request.user.get_profile().get_level() == 'admin':
-        models.File.objects.filter(oshash__in=data['ids'], instances__id=None).delete()
+        qs = models.File.objects.filter(oshash__in=data['ids'], instances__id=None)
+        for f in qs:
+            f.item.sort.numberoffiles -= 1
+            f.item.sort.save()
+        qs.delete()
     else:
         response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
