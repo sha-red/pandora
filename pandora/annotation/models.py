@@ -160,6 +160,10 @@ class Annotation(models.Model):
         if layer.get('type') == 'event' or layer.get('hasEvents'):
             update_matching_events(self.id)
 
+        #update facets if needed
+        if filter(lambda f: f['id'] == self.layer, settings.CONFIG['filters']):
+            self.update_layer_facet(self.layer)
+
     def cleanup_undefined_relations(self):
         layer = self.get_layer()
         if layer.get('type') == 'place':

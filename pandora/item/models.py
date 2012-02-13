@@ -779,21 +779,23 @@ class Item(models.Model):
         #update cached values in clips
         self.clips.all().update(director=s.director, title=s.title)
 
+    def update_layer_facet(self, key):
+        current_values = [a['value']
+            for a in self.annotations.filter(layer=key).distinct().values('value')]
+        saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
+        removed_values = filter(lambda i: i not in current_values, saved_values)
+        if removed_values:
+            Facet.objects.filter(item=self, key=key, value__in=removed_values).delete()
+        for value in current_values:
+            if value not in saved_values:
+                sortvalue = value
+                Facet.objects.get_or_create(item=self, key=key, value=value, sortvalue=sortvalue)
+
     def update_layer_facets(self):
         filters = [f['id'] for f in settings.CONFIG['filters']]
         for layer in settings.CONFIG['layers']:
             if layer['id'] in filters:
-                key = layer['id']
-                current_values = [a['value']
-                    for a in self.annotations.filter(layer=key).distinct().values('value')]
-                saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
-                removed_values = filter(lambda i: i not in current_values, saved_values)
-                if removed_values:
-                    Facet.objects.filter(item=self, key=key, value__in=removed_values).delete()
-                for value in current_values:
-                    if value not in saved_values:
-                        sortvalue = value
-                        Facet.objects.get_or_create(item=self, key=key, value=value, sortvalue=sortvalue)
+                self.update_layer_facet(layer['id'])
 
     def update_facets(self):
         for key in self.facet_keys + ['title']:
