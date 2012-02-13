@@ -226,7 +226,11 @@ class Item(models.Model):
                 d.description = data.pop(key)
                 d.save()
         for key in data:
-            self.data[key] = data[key]
+            if data[key] == None:
+                if key in self.data:
+                    del self.data[key]
+            else:
+                self.data[key] = data[key]
         return self.save()
 
     def log(self):
