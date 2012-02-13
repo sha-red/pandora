@@ -525,7 +525,7 @@ pandora.ui.infoView = function(data) {
             } else if (listKeys.indexOf(key) > -1) {
                 edit[key] = value ? value.split(', ') : [];
             } else {
-                edit[key] = value;
+                edit[key] = value ? value : null;
             }
             pandora.api.edit(edit, function(result) {
                 data[key] = value;
