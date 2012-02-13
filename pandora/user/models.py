@@ -16,6 +16,7 @@ from ox.utils import json
 from itemlist.models import List, Position
 
 import managers
+import tasks
 
 class SessionData(models.Model):
     session_key = models.CharField(max_length=40, primary_key=True)
@@ -89,6 +90,8 @@ class SessionData(models.Model):
             except:
                 self.location = ''
                 pass
+        super(SessionData, self).save()
+
     def save(self, *args, **kwargs):
         if self.user:
             self.username = self.user.username
@@ -98,8 +101,8 @@ class SessionData(models.Model):
         else:
             self.level = 0
             self.groupssort = None
-        self.parse_data()
         super(SessionData, self).save(*args, **kwargs)
+        tasks.parse_data.delay(self.session_key)
 
     @classmethod
     def get_or_create(cls, request):
@@ -207,17 +210,17 @@ def get_ui(user_ui, user=None):
     ui = {}
     config = copy.deepcopy(settings.CONFIG)
     ui.update(config['user']['ui'])
-    def updateUI(ui, new):
+    def update_ui(ui, new):
         '''
             only update set keys in dicts
         '''
         for key in new:
             if isinstance(new[key], dict) and key in ui:
-                ui[key] = updateUI(ui[key], new[key])
+                ui[key] = update_ui(ui[key], new[key])
             elif isinstance(ui, dict):
                 ui[key] = new[key]
         return ui
-    ui = updateUI(ui, user_ui)
+    ui = update_ui(ui, user_ui)
     if not 'lists' in ui:
         ui['lists'] = {}
 
