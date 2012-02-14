@@ -162,7 +162,7 @@ class Annotation(models.Model):
 
         #update facets if needed
         if filter(lambda f: f['id'] == self.layer, settings.CONFIG['filters']):
-            self.update_layer_facet(self.layer)
+            self.item.update_layer_facet(self.layer)
 
     def cleanup_undefined_relations(self):
         layer = self.get_layer()
