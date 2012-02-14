@@ -1,6 +1,8 @@
 # Create your views here.
-from django.shortcuts import get_object_or_404, redirect
 from urllib import quote
+import re
+
+from django.shortcuts import get_object_or_404, redirect
 
 import models
 
@@ -50,6 +52,10 @@ def padma_video(request, url):
     else:
         alias = get_object_or_404(models.IDAlias, old=hid)
         url = '/%s' % alias.new
+    timecodes = re.compile('(\d{2}:\d{2}:\d{2}\.\d{3})-(\d{2}:\d{2}:\d{2}\.\d{3})').findall(view)
+    if timecodes:
+        timecodes = [t[:-4] for t in timecodes[0]]
+        view = ','.join(timecodes)
     if view:
         url += '/' + {
             'editor': 'timeline',
