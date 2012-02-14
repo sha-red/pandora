@@ -178,7 +178,7 @@ pandora.ui.infoView = function(data) {
                 })
                 .appendTo($div);
             if (canEdit || data[key + 'description']) {
-                $('<br>').appendTo($div);
+                $('<br>').css({'clear': 'both'}).appendTo($div);
                 $('<div>')
                     .append(
                         descriptions[key] = Ox.Editable({
