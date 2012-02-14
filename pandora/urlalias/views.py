@@ -52,9 +52,10 @@ def padma_video(request, url):
     else:
         alias = get_object_or_404(models.IDAlias, old=hid)
         url = '/%s' % alias.new
-    timecodes = re.compile('(\d{2}:\d{2}:\d{2}\.\d{3})-(\d{2}:\d{2}:\d{2}\.\d{3})').findall(view)
-    if timecodes:
-        view = ','.join(timecodes[0])
+    if view:
+        timecodes = re.compile('(\d{2}:\d{2}:\d{2}\.\d{3})-(\d{2}:\d{2}:\d{2}\.\d{3})').findall(view)
+        if timecodes:
+            view = ','.join(timecodes[0])
     if view:
         url += '/' + {
             'editor': 'timeline',

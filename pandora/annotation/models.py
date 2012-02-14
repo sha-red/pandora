@@ -129,7 +129,7 @@ class Annotation(models.Model):
             self.findvalue = ox.decodeHtml(ox.stripTags(self.value).strip())
             sortvalue = sort_string(self.findvalue)
             if sortvalue:
-                self.sortvalue = sortvalue[:1000]
+                self.sortvalue = sortvalue[:900]
             else:
                 self.sortvalue = None
         else:

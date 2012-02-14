@@ -41,7 +41,7 @@ class MetaClip:
                                  [a.sortvalue
                                   for a in self.annotations.filter(layer=l).order_by('sortvalue')]))
         if sortvalue:
-            self.sortvalue = sortvalue[:1000]
+            self.sortvalue = sortvalue[:900]
         else:
             self.sortvalue = None
         self.findvalue = '\n'.join(filter(None, [a.findvalue for a in self.annotations.all()]))
