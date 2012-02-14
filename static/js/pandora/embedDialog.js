@@ -3,8 +3,8 @@
 
 pandora.ui.embedDialog = function(data) {
     var content = Ox.Element().css({margin: '16px'}),
-        height = 240,
-        width = 320,
+        height = 360,
+        width = 640,
         that = Ox.Dialog({
             buttons: [
                 Ox.Button({
@@ -18,15 +18,15 @@ pandora.ui.embedDialog = function(data) {
             ],
             closeButton: true,
             content: content,
-            height: Math.round((window.innerHeight - 24) * 0.75),
+            height: height,
             keys: {
                 'escape': 'close'
             },
             maximizeButton: true,
-            minHeight: 256,
-            minWidth: 640,
+            minHeight: height,
+            minWidth: width,
             title: 'Embed Video',
-            width: Math.round(window.innerWidth * 0.75)
+            width: width
         })
         .bindEvent({
             close: function(data) {
