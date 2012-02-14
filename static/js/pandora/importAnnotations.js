@@ -1,7 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
 
-pandora.ui.importSubtitles = function(data) {
+pandora.ui.importAnnotations = function(data) {
     var content = Ox.Element().css({margin: '16px'}),
         file,
         height = 240,
@@ -26,7 +26,7 @@ pandora.ui.importSubtitles = function(data) {
             height: height,
             removeOnClose: true,
             width: width,
-            title: 'Import Subtitles',
+            title: 'Import Annotations',
         })
         .bindEvent({
             close: function(data) {

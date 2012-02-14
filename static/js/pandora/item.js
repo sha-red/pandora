@@ -368,6 +368,9 @@ pandora.ui.item = function() {
                     find: function(data) {
                         pandora.UI.set('itemFind', data.find);
                     },
+                    importannotations: function(data) {
+                        pandora.ui.importAnnotations().open();
+                    },
                     info: function(data) {
                         pandora.ui.annotationDialog(data.layer).open();
                     },
