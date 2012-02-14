@@ -1,7 +1,36 @@
 # Create your views here.
 from django.shortcuts import get_object_or_404, redirect
+from urllib import quote
 
 import models
+
+def padma_find(request):
+    url = '/'
+    l = request.GET.get('l', None)
+    q = request.GET.get('q', None)
+    f = request.GET.get('f', '')
+    s = request.GET.get('s', None)
+    v = request.GET.get('v', None)
+    if l:
+        alias = get_object_or_404(models.ListAlias, old=l)
+        if alias:
+            url = '/list=%s' % alias.new
+    if f:
+        f = {
+            'transcript': 'transcripts',
+            'location': 'places',
+            'description': 'descriptions',
+            'keyword': 'keywords',
+        }.get(f, f)
+    if v != 'map':
+        v = 'grid'
+    if q:
+        url = '/%s=%s' % (f, quote(q))
+    if s:
+        url = '/%s%s' % (s, url)
+    if url != '/':
+        url = '/%s%s' % (v, url)
+    return redirect(url, permanent=True)
 
 def padma_video(request, url):
     url = url.split('/')
@@ -27,5 +56,5 @@ def padma_video(request, url):
         }.get(view, view)
     #FIXME: reqrite layer urls
     #FIXME: rewrite timerange urls
-    return redirect(url)
+    return redirect(url, permanent=True)
 
