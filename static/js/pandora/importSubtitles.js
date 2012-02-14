@@ -24,6 +24,7 @@ pandora.ui.importSubtitles = function(data) {
             },
             maximizeButton: true,
             height: height,
+            removeOnClose: true,
             width: width,
             title: 'Import Subtitles',
         })
@@ -68,7 +69,6 @@ pandora.ui.importSubtitles = function(data) {
                                             layer: layer
                                         }, function(result) {
                                             if (result.status.code == 200) {
-                                                pandora.$ui.editor && pandora.$ui.editor.addAnnotation(layer, result.data);
                                                 addAnnotation();
                                             } else {
                                                 content.html('Failed');
@@ -76,8 +76,10 @@ pandora.ui.importSubtitles = function(data) {
                                         });
                                     } else {
                                         content.html('Done');
-                                        Ox.Request.clearCache();
-                                        //fixme, somehow reload timeline view here
+                                        Ox.Request.clearCache(pandora.user.ui.item);
+                                        pandora.$ui.contentPanel.replaceElement(
+                                            1, pandora.$ui.item = pandora.ui.item()
+                                        );
                                     }
                                 }
                                 addAnnotation();
