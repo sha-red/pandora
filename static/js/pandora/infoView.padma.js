@@ -102,7 +102,8 @@ pandora.ui.infoView = function(data) {
             .css({
                 position: 'absolute',
                 left: margin + 'px',
-                top: margin + iconHeight + margin + 'px'
+                top: margin + iconHeight + margin + 'px',
+                width: iconSize + 'px',
             })
             .appendTo($left),
 
@@ -729,7 +730,8 @@ pandora.ui.infoView = function(data) {
             height: iconSize / 2 + 'px'
         }, 250);
         $data.animate({
-            top: margin + iconHeight + margin + 'px'
+            top: margin + iconHeight + margin + 'px',
+            width: iconSize + 'px',
         }, 250);
         $center.animate({
             left: margin + (iconSize == 256 ? 256 : iconWidth) + margin + 'px',
