@@ -269,7 +269,7 @@ class ItemManager(Manager):
                         qs = qs.filter(id__in=lqs[0].items.all())
         return qs
 
-    def find(self, data, user):
+    def find(self, data, user=None):
         '''
             query: {
                 conditions: [
@@ -301,7 +301,7 @@ class ItemManager(Manager):
         qs = qs.distinct()
         
         #anonymous can only see public items
-        if user.is_anonymous():
+        if not user or user.is_anonymous():
             allowed_level = settings.CONFIG['capabilities']['canSeeItem']['guest']
             qs = qs.filter(level__lte=allowed_level)
         #users can see public items, there own items and items of there groups
