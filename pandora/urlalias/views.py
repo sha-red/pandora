@@ -54,8 +54,7 @@ def padma_video(request, url):
         url = '/%s' % alias.new
     timecodes = re.compile('(\d{2}:\d{2}:\d{2}\.\d{3})-(\d{2}:\d{2}:\d{2}\.\d{3})').findall(view)
     if timecodes:
-        timecodes = [t[:-4] for t in timecodes[0]]
-        view = ','.join(timecodes)
+        view = ','.join(timecodes[0])
     if view:
         url += '/' + {
             'editor': 'timeline',
