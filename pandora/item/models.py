@@ -222,8 +222,11 @@ class Item(models.Model):
             key = '%sdescription' % k
             if key in data:
                 value = data.get(k, self.get(k, ''))
+                description = data.pop(key)
+                if not description:
+                    description = ''
                 d, created = Description.objects.get_or_create(key=k, value=value)
-                d.description = data.pop(key)
+                d.description = description
                 d.save()
         for key in data:
             if data[key] == None:
