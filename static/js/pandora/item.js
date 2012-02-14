@@ -286,13 +286,17 @@ pandora.ui.item = function() {
                         Ox.Log('', 'addAnnotation', data);
                         //async to not capture keyboard input
                         setTimeout(function() {
+                            var now = Ox.formatDate(Date(), '%Y-%m-%dT%H:%M:%SZ');
                             pandora.$ui.editor.addAnnotation(data.layer, Ox.extend({
+                                created: now,
                                 duration: data.out - data['in'],
                                 editable: true,
                                 id: '_' + Ox.uid(),
                                 'in': data['in'],
+                                modified: now,
                                 out: data.out,
-                                value: ''
+                                user: pandora.user.username,
+                                value: '',
                             },
                             Ox.getObjectById(pandora.site.layers, data.layer).type == 'place' ? {
                                 place: {lat: null, lng: null}
