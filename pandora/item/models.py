@@ -788,7 +788,7 @@ class Item(models.Model):
             Facet.objects.filter(item=self, key=key, value__in=removed_values).delete()
         for value in current_values:
             if value not in saved_values:
-                sortvalue = value
+                sortvalue = value.lower()
                 Facet.objects.get_or_create(item=self, key=key, value=value, sortvalue=sortvalue)
 
     def update_layer_facets(self):
@@ -832,6 +832,7 @@ class Item(models.Model):
                     sortvalue = value
                     if key in self.person_keys + ['name']:
                         sortvalue = get_name_sort(value)
+                    sortvalue = sortvalue.lower()
                     Facet.objects.get_or_create(item=self, key=key, value=value, sortvalue=sortvalue)
         self.update_layer_facets()
 
