@@ -244,6 +244,7 @@ pandora.ui.infoView = function(data) {
                 .appendTo($div);
             Ox.Editable({
                     clickLink: pandora.clickLink,
+                    editable: key != 'duration',
                     format: function(value) {
                         return key != 'duration' ? formatValue(value.split(', '), key)
                             : value < 60 ? Math.round(value) + ' sec'
@@ -264,13 +265,16 @@ pandora.ui.infoView = function(data) {
                 .appendTo($div);
         });
         $('<br>').appendTo($center);
-    } else if (data.location || data.date || data.language) {
+    } else {
         html = [];
-        ['location', 'date', 'language'].forEach(function(key) {
+        ['location', 'date', 'language', 'duration'].forEach(function(key) {
             if (data[key]) {
                 html.push(
-                    formatKey(key)
-                    + formatValue(data[key], key)
+                    formatKey(key) + (
+                        key != 'duration' ? formatValue(data[key], key)
+                            : data[key] < 60 ? Math.round(data[key]) + ' sec'
+                            : Math.round(data[key] / 60) + ' min'
+                    )
                 );
             }
         });
@@ -382,7 +386,8 @@ pandora.ui.infoView = function(data) {
         $('<div>').css(css).html(data.description).appendTo($center);
     }
 
-    // License ---------------------------------------------------------------
+    // License -----------------------------------------------------------------
+
     $div = $('<div>').css(css).css({marginTop: '16px'}).appendTo($center);
     if (canEdit) {
         $('<div>')
@@ -407,46 +412,6 @@ pandora.ui.infoView = function(data) {
         );
     }
 
-    // User, Created & Modified ------------------------------------------------
-
-    $div = $('<div>').css(css).css({marginTop: '16px'}).appendTo($center);
-    html = [];
-    if (['admin', 'staff'].indexOf(pandora.user.level) > -1) {
-        $('<div>')
-            .css({float: 'left'})
-            .html(formatKey('user').replace('</span>', '&nbsp;</span>'))
-            .appendTo($div);
-        Ox.Editable({
-            placeholder: formatLight('No User'),
-            tooltip: 'Doubleclick to edit',
-            value: data.user
-        })
-        .bindEvent({
-            submit: function(event) {
-                editMetadata('user', event.value);
-            }
-        })
-        .appendTo($div);
-        $div.append('; ');
-        ['created', 'modified'].forEach(function(key) {
-            data[key] && html.push(
-                formatKey(key == 'modified' ? 'Last Modified' : key)
-                + (key == 'user' ? data.user : Ox.formatDate(data[key], '%F %T'))
-            );
-        });
-        $div.append(html.join('; '));
-    } else {
-        ['user', 'created', 'modified'].forEach(function(key) {
-            data[key] && html.push(
-                formatKey(key == 'modified' ? 'Last Modified' : key)
-                + (key == 'user' ? data.user : Ox.formatDate(data[key], '%F %T'))
-            );
-        });
-        $div.html(html.join('; '));
-    }
-
-    $('<div>').css({height: '16px'}).appendTo($center);
-
     // Hue, Saturation, Lightness, Volume --------------------------------------
 
     ['hue', 'saturation', 'lightness', 'volume'].forEach(function(key) {
@@ -457,6 +422,44 @@ pandora.ui.infoView = function(data) {
                 Ox.Theme.formatColor(
                     data[key] || 0, key == 'volume' ? 'lightness' : key
                 ).css({textAlign: 'right'})
+            )
+            .appendTo($right);
+    });
+
+    // User and Groups ---------------------------------------------------------
+
+    ['user', 'groups'].forEach(function(key) {
+        $('<div>')
+            .css({marginBottom: '4px'})
+            .append(formatKey(key, true))
+            .append(
+                $('<div>')
+                    .css({margin: '2px 0 0 -1px'}) // fixme: weird
+                    .append(
+                        Ox.Editable({
+                            placeholder: key == 'groups' ? formatLight('No Groups') : '',
+                            editable: canEdit,
+                            tooltip: canEdit ? 'Doubleclick to edit' : '',
+                            value: key == 'user' ? data[key] : data[key].join(', ')
+                        })
+                        .bindEvent({
+                            submit: function(event) {
+                                editMetadata(key, event.value);
+                            }
+                        })
+                    )
+            )
+            .appendTo($right);
+    });
+    
+    // Created and Modified ----------------------------------------------------
+
+    ['created', 'modified'].forEach(function(key) {
+        $('<div>')
+            .css({marginBottom: '4px'})
+            .append(formatKey(key, true))
+            .append(
+                $('<div>').html(Ox.formatDate(data[key], '%F %T'))
             )
             .appendTo($right);
     });
@@ -473,26 +476,9 @@ pandora.ui.infoView = function(data) {
         renderRightsLevel();
     }
 
-    // Groups, Notes ---------------------------------------------------------
+    // Notes --------------------------------------------------------------------
 
     if (canEdit) {
-
-        $('<div>')
-            .css({marginBottom: '4px'})
-            .append(formatKey('Groups', true))
-            .append(
-                Ox.Editable({
-                        placeholder: formatLight('No Groups'),
-                        tooltip: 'Doubleclick to edit',
-                        value: data.groups.join(', '),
-                    })
-                    .bindEvent({
-                        submit: function(event) {
-                            editMetadata('groups', event.value);
-                        }
-                    })
-            )
-            .appendTo($right);
 
         $('<div>')
             .css({marginBottom: '4px'})
