@@ -655,6 +655,7 @@ class Item(models.Model):
             'numberoffiles',
             'parts',
             'pixels',
+            'random',
             'timesaccessed',
             'accessed',
             'resolution',
