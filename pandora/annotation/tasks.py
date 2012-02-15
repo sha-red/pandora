@@ -54,6 +54,7 @@ def update_item(id):
     if filter(lambda f: f['id'] == a.layer, settings.CONFIG['filters']):
         a.item.update_layer_facet(a.layer)
     Item.objects.filter(id=a.item.id).update(modified=a.modified)
+    a.item.modified = a.modified
     a.item.update_find()
     a.item.update_sort()
     a.item.update_facets()
