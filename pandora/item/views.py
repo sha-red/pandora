@@ -1005,10 +1005,9 @@ def item_json(request, id):
         response = json_response(status=404, text='not found')
     else:
         item = qs[0]
-        j = item.get_json()
-        j['layers'] = item.get_layers(request.user)
-        response = render_to_json_response(j)
-    return response
+        response = item.get_json()
+        response['layers'] = item.get_layers(request.user)
+    return render_to_json_response(response)
 
 def item_xml(request, id):
     level = settings.CONFIG['capabilities']['canSeeItem']['guest']
@@ -1017,6 +1016,7 @@ def item_xml(request, id):
     qs = models.Item.objects.filter(itemId=id, level__lte=level)
     if qs.count() == 0:
         response = json_response(status=404, text='not found')
+        response = render_to_json_response(response)
     else:
         item = qs[0]
         j = item.get_json()
@@ -1025,8 +1025,9 @@ def item_xml(request, id):
         def xmltree(root, key, data):
             if isinstance(data, list) or \
                 isinstance(data, tuple):
+                e = ET.SubElement(root, key)
                 for value in data:
-                    xmltree(root, key, value)
+                    xmltree(e, key, value)
             elif isinstance(data, dict):
                 for k in data:
                     if data[k]:
