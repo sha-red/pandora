@@ -130,6 +130,17 @@ class List(models.Model):
 
     def update_icon(self):
         frames = []
+        if not self.poster_frames:
+            items = self.get_items(self.user).filter(rendered=True)
+            if items.count():
+                poster_frames = []
+                for i in range(0, items.count(), min(1, int(items.count()/4))):
+                    poster_frames.append({
+                        'item': items[int(i)].itemId,
+                        'position': items[int(i)].poster_frame
+                    })
+                self.poster_frames = tuple(poster_frames)
+                self.save()
         for i in self.poster_frames:
             from item.models import Item
             qs = Item.objects.filter(itemId=i['item'])
