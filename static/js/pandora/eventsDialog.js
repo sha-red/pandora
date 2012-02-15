@@ -84,7 +84,7 @@ pandora.ui.eventsDialog = function() {
                         });
                     },
                     events: result.data.items,
-                    height: height - 48,
+                    height: height,
                     removeEvent: function(event, callback) {
                         pandora.api.removeEvent(event, function(result) {
                             Ox.Request.clearCache(); // fixme: remove
