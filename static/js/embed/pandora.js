@@ -41,6 +41,7 @@ Ox.load('UI', {
                                 paused: options.paused,
                                 position: options['in'],
                                 poster: '/' + options.item + '/' + '128p' + options['in'] +'.jpg',
+                                resolution: pandora.user.ui.videoResolution,
                                 showMarkers: false,
                                 showMilliseconds: 0,
                                 timeline: '/' + options.item + '/' + 'timeline16p.png',
@@ -49,20 +50,26 @@ Ox.load('UI', {
                                 width: document.width
                             })
                             .bindEvent({
-                                position: function(data) {
-                                    if(data.position<options['in']
-                                       || data.position > options.out) {
-                                        if(!pandora.player.options('paused')) {
-                                            pandora.player.togglePaused();
-                                        }
-                                        pandora.player.options({
-                                            position: options['in'],
-                                        });
-                                    }
-                                }
+                                playing: checkRange,
+                                position: checkRange,
+                                resolution: function(data) {
+                                    pandora.api.setUI({'videoResolution': data.resolution});
+                                },
                             })
                         );
                         Ox.UI.hideLoadingScreen();
+
+                        function checkRange(data) {
+                            if(data.position < options['in']
+                               || data.position > options.out) {
+                                if(!pandora.player.options('paused')) {
+                                    pandora.player.togglePaused();
+                                }
+                                pandora.player.options({
+                                    position: options['in'],
+                                });
+                            }
+                        }
                     });
                     return that;
                 }
