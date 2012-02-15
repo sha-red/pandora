@@ -164,7 +164,8 @@ pandora.ui.navigationView = function(type, videoRatio) {
                     date: new Date(0),
                     events: result.data.items,
                     // 20 px menu, 24 px toolbar, 1px resizbar, 16px statusbar
-                    height: window.innerHeight - ui.showFilters * ui.filtersSize - 61,
+                    height: window.innerHeight - ui.showFilters * ui.filtersSize
+                        - 45 - (ui.item ? 0 : 16),
                     range: [-5000, 5000],
                     showControls: ui.showCalendarControls,
                     showToolbar: true,
