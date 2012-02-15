@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+from django.conf import settings
 from celery.task import task
 
 import models
@@ -44,3 +45,15 @@ def update_matching_places(id):
             if name.lower() in a.value.lower():
                 e.update_matches()
                 break
+
+@task(ignore_resulsts=True, queue='default')
+def update_item(id):
+    from item.models import Item
+    a = models.Annotation.objects.get(pk=id)
+    #update facets if needed
+    if filter(lambda f: f['id'] == a.layer, settings.CONFIG['filters']):
+        a.item.update_layer_facet(a.layer)
+    Item.objects.filter(id=a.item.id).update(modified=a.modified)
+    a.item.update_find()
+    a.item.update_sort()
+    a.item.update_facets()
