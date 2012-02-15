@@ -104,10 +104,14 @@ def update(request):
         response['data']['data'] += [f.file.oshash for f in files.filter(file__is_audio=True,
                                                                          file__available=False,
                                                                          file__wanted=True)]
-        response['data']['file'] = [f.file.oshash for f in files.filter(file__is_subtitle=True,
-                                                                        file__available=False,
-                                                                        path__endswith='.srt')]
 
+        if filter(lambda l: l['id'] == 'subtitles', settings.CONFIG['layers']):
+            response['data']['file'] = [f.file.oshash
+                                        for f in files.filter(file__is_subtitle=True,
+                                                              file__available=False,
+                                                              path__endswith='.srt')]
+        else:
+            response['data']['file'] = []
     return render_to_json_response(response)
 actions.register(update, cache=False)
 
