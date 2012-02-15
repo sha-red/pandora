@@ -128,7 +128,7 @@ pandora.addList = function() {
             load: function(data) {
                 $folderList.gainFocus()
                     .options({selected: [newList]})
-                    .editCell(newList, 'name');
+                    .editCell(newList, 'name', true);
                 pandora.UI.set({
                     find: {
                         conditions: [{key: 'list', value: newList, operator: '=='}],
