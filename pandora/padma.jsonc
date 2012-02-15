@@ -207,13 +207,6 @@
             "find": true
         },
         {
-            "id": "created",
-            "title": "Date Created",
-            "type": "date",
-            "columnWidth": 120,
-            "format": {"type": "date", "args": ["%a, %b %e, %Y"]}
-        },
-        {
             "id": "id",
             "title": "ID",
             "type": "string",
@@ -357,6 +350,13 @@
             "type": ["string"],
             "capability": "canSeeFiles",
             "find": true
+        },
+        {
+            "id": "created",
+            "title": "Date Created",
+            "type": "date",
+            "columnWidth": 120,
+            "format": {"type": "date", "args": ["%a, %b %e, %Y"]}
         },
         {
             "id": "modified",
