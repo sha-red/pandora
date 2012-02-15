@@ -137,7 +137,8 @@ pandora.ui.info = function() {
 pandora.ui.listInfo = function() {
 
     var list = pandora.user.ui._list,
-        editable = list.split(':')[0] == pandora.user.username,
+        canEditFeaturedLists = pandora.site.capabilities.canEditFeaturedLists[pandora.user.level],
+        editable = list.split(':')[0] == pandora.user.username || canEditFeaturedLists,
         that = $('<div>').css({padding: '16px', textAlign: 'center'}),
         $icon = Ox.Element({
                 element: '<img>',
@@ -164,16 +165,17 @@ pandora.ui.listInfo = function() {
     if (list) {
         pandora.api.findLists({
             query: {conditions: [{key: 'id', value: list, operator: '=='}]},
-            keys: ['description', 'name', 'user']
+            keys: ['description', 'status', 'name', 'user']
         }, function(result) {
             if (result.data.items.length) {
                 var item = result.data.items[0],
-                    editable = item.user == pandora.user.username;
+                    editable = item.user == pandora.user.username
+                    || (item.status == 'featured' && canEditFeaturedLists);
                 that.append(
                     $title = Ox.Editable({
                             editable: editable,
                             format: function(value) {
-                                return Ox.encodeHTML(item.user + ': ' + value)
+                                return Ox.encodeHTML(editable ? value : item.user + ': ' + value)
                             },
                             tooltip: editable ? 'Doubleclick to edit title' : '',
                             value: item.name,
