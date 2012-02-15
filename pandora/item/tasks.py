@@ -3,7 +3,8 @@
 import os
 from datetime import timedelta, datetime
 import gzip
-
+import random
+random
 
 from django.conf import settings
 from ox.utils import ET
@@ -14,8 +15,17 @@ import models
 
 @periodic_task(run_every=timedelta(days=1))
 def cronjob(**kwargs):
-    print "do some cleanup stuff once a day"
+    update_random_sort()
 
+def update_random_sort():
+    if filter(lambda f: f['id'] == 'random', settings.CONFIG['itemKeys']):
+        random.seed()
+        ids = [f['item'] for f in models.ItemSort.objects.values('item')]
+        random.shuffle(ids)
+        n = 0
+        for i in ids:
+            models.ItemSort.objects.filter(pk=i).update(random=n)
+            n += 1
 
 @task(ignore_resulsts=True, queue='default')
 def update_poster(itemId):

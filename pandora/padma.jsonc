@@ -352,6 +352,12 @@
             "find": true
         },
         {
+            "id": "random",
+            "title": "Random",
+            "type": "integer",
+            "columnWidth": 60
+        },
+        {
             "id": "created",
             "title": "Date Created",
             "type": "date",
