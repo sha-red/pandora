@@ -4,7 +4,7 @@
 pandora.ui.importAnnotations = function(data) {
     var content = Ox.Element().css({margin: '16px'}),
         file,
-        height = 240,
+        height = 180,
         width = 640,
         that = Ox.Dialog({
             buttons: [

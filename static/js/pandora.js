@@ -52,42 +52,45 @@ appPanel
         var images = {};
         images.logo = document.createElement('img');
         images.logo.onload = function() {
+            var ratio = images.logo.width / images.logo.height,
+                width = 320,
+                height = width / ratio;
+            images.logo.style.position = 'absolute';
+            images.logo.style.left = 0;
+            images.logo.style.top = 0;
+            images.logo.style.right = 0;
+            images.logo.style.bottom = height + 'px';
+            images.logo.style.width = width + 'px';
+            images.logo.style.height = height + 'px';
+            images.logo.style.margin = 'auto';
+            images.reflection = document.createElement('img');
+            images.reflection.style.position = 'absolute';
+            images.reflection.style.left = 0;
+            images.reflection.style.top = height + 'px';
+            images.reflection.style.right = 0;
+            images.reflection.style.bottom = 0;
+            images.reflection.style.width = width + 'px';
+            images.reflection.style.height = height + 'px';
+            images.reflection.style.margin = 'auto';
+            images.reflection.style.MozTransform = 'scaleY(-1)';
+            images.reflection.style.OTransform = 'scaleY(-1)';
+            images.reflection.style.WebkitTransform = 'scaleY(-1)';
+            images.reflection.src = '/static/png/logo256.png';
+            images.loadingIcon = document.createElement('img');
+            images.loadingIcon.setAttribute('id', 'loadingIcon');
+            images.loadingIcon.style.position = 'absolute';
+            images.loadingIcon.style.left = 0;
+            images.loadingIcon.style.top = '80px';
+            images.loadingIcon.style.right = 0;
+            images.loadingIcon.style.bottom = 0;
+            images.loadingIcon.style.width = '32px';
+            images.loadingIcon.style.height = '32px';
+            images.loadingIcon.style.margin = 'auto';
+            images.loadingIcon.src = '/static/oxjs/' + (debug ? 'dev' : 'build')
+                + '/Ox.UI/themes/' + theme + '/svg/symbolLoadingAnimated.svg';
             callback(images);
         };
-        images.logo.style.position = 'absolute';
-        images.logo.style.left = 0;
-        images.logo.style.top = 0;
-        images.logo.style.right = 0;
-        images.logo.style.bottom = '160px';
-        images.logo.style.width = '320px';
-        images.logo.style.height = '160px';
-        images.logo.style.margin = 'auto';
         images.logo.src = '/static/png/logo256.png';
-        images.reflection = document.createElement('img');
-        images.reflection.style.position = 'absolute';
-        images.reflection.style.left = 0;
-        images.reflection.style.top = '160px';
-        images.reflection.style.right = 0;
-        images.reflection.style.bottom = 0;
-        images.reflection.style.width = '320px';
-        images.reflection.style.height = '160px';
-        images.reflection.style.margin = 'auto';
-        images.reflection.style.MozTransform = 'scaleY(-1)';
-        images.reflection.style.OTransform = 'scaleY(-1)';
-        images.reflection.style.WebkitTransform = 'scaleY(-1)';
-        images.reflection.src = '/static/png/logo256.png';
-        images.loadingIcon = document.createElement('img');
-        images.loadingIcon.setAttribute('id', 'loadingIcon');
-        images.loadingIcon.style.position = 'absolute';
-        images.loadingIcon.style.left = 0;
-        images.loadingIcon.style.top = '80px';
-        images.loadingIcon.style.right = 0;
-        images.loadingIcon.style.bottom = 0;
-        images.loadingIcon.style.width = '32px';
-        images.loadingIcon.style.height = '32px';
-        images.loadingIcon.style.margin = 'auto';
-        images.loadingIcon.src = '/static/oxjs/' + (debug ? 'dev' : 'build')
-            + '/Ox.UI/themes/' + theme + '/svg/symbolLoadingAnimated.svg';
     }
 
     function loadScreen(images) {
@@ -136,9 +139,7 @@ appPanel
 
     function loadOxUI(callback) {
         Ox.load({
-            UI: {
-                theme: theme
-            },
+            UI: {theme: theme},
             Geo: {}
         }, callback);
     }

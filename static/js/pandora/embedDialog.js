@@ -18,15 +18,14 @@ pandora.ui.embedDialog = function(data) {
             ],
             closeButton: true,
             content: content,
-            height: height,
+            height: 120,
             keys: {
                 'escape': 'close'
             },
             maximizeButton: true,
-            minHeight: height,
-            minWidth: width,
+            removeOnClose: true,
             title: 'Embed Video',
-            width: width
+            width: 600 
         })
         .bindEvent({
             close: function(data) {
@@ -45,7 +44,24 @@ pandora.ui.embedDialog = function(data) {
         });
         return url + query.join('&');
     }
-    content.html('To embed this video you need unicorns... or try this code:<br>');
-    content.append($('<textarea>').css({width:"100%", height:"100%"}).val('<iframe width="'+width+'" height="'+height+'" src="'+constructUrl(data)+'" frameborder="0" allowfullscreen></iframe>'));
+    content.html('To embed this video use this code on your page:<br>');
+    content.append(
+            $('<textarea>')
+                .css({
+                    width: '520px',
+                    margin: '16px',
+                    height: '100%'
+                }).val(
+                    '<iframe width="' + width
+                    + '" height="' + height
+                    + '" src="' + constructUrl(data)
+                    + '" frameborder="0" allowfullscreen></iframe>'
+                ).bind({
+                    click: function() {
+                        this.focus();
+                        this.select();
+                    }
+                })
+            );
     return that;
 };

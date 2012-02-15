@@ -95,7 +95,7 @@ def findLists(request):
     def is_featured_condition(x):
         return x['key'] == 'status' and \
                x['value'] == 'featured' and \
-               x['operator'] == '='
+               x['operator'] in ('=', '==')
     is_featured = len(filter(is_featured_condition, data['query'].get('conditions', []))) > 0 
 
     if is_section_request:
