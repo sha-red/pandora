@@ -134,7 +134,7 @@ class List(models.Model):
             items = self.get_items(self.user).filter(rendered=True)
             if items.count():
                 poster_frames = []
-                for i in range(0, items.count(), min(1, int(items.count()/4))):
+                for i in range(0, items.count(), max(1, int(items.count()/4))):
                     poster_frames.append({
                         'item': items[int(i)].itemId,
                         'position': items[int(i)].poster_frame
