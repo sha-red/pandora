@@ -91,8 +91,11 @@ pandora.URL = (function() {
                     if (Ox.isArray(state.span)) {
                         set['videoPoints.' + state.item] = {
                             annotation: '',
-                            'in': state.span[1] || 0,
-                            out: Math.max(state.span[1] || 0, state.span[2] || 0),
+                            'in': state.span[state.span.length - 2] || 0,
+                            out: state.span.length == 1 ? 0 : Math.max(
+                                state.span[state.span.length - 2],
+                                state.span[state.span.length - 1]
+                            ),
                             position: state.span[0]
                         };                       
                     } else {
