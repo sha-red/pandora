@@ -443,12 +443,6 @@
             "find": true
         },
         {
-            "id": "random",
-            "title": "Random",
-            "type": "integer",
-            "columnWidth": 60
-        },
-        {
             "id": "created",
             "title": "Date Created",
             "type": "date",
@@ -497,6 +491,12 @@
             "title": "Can Play Clips",
             "type": "boolean",
             "value": "capability"
+        },
+        {
+            "id": "random",
+            "title": "Random",
+            "type": "integer",
+            "columnWidth": 60
         }
     ],
     /*
