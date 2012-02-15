@@ -31,9 +31,21 @@ pandora.ui.embedDialog = function(data) {
         .bindEvent({
             close: function(data) {
             }
-        }),
-        url = document.location.origin + '/' + pandora.user.ui.item + '/embed';
+        });
+
+    data.view = 'video';
+
+    function constructUrl(data) {
+        var url = document.location.origin + '/' + pandora.user.ui.item + '/embed?',
+            query = [];
+        Ox.forEach(data, function(value, key) {
+            if(key[0] != '_') {
+                query.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+            }
+        });
+        return url + query.join('&');
+    }
     content.html('To embed this video you need unicorns... or try this code:<br>');
-    content.append($('<textarea>').css({width:"100%", height:"100%"}).val('<iframe width="'+width+'" height="'+height+'" src="'+url+'" frameborder="0" allowfullscreen></iframe>'));
+    content.append($('<textarea>').css({width:"100%", height:"100%"}).val('<iframe width="'+width+'" height="'+height+'" src="'+constructUrl(data)+'" frameborder="0" allowfullscreen></iframe>'));
     return that;
 };

@@ -1,6 +1,6 @@
-/***
-    Pandora embed
-***/
+// vim: et:ts=4:sw=4:sts=4:ft=javascript
+'use strict';
+
 Ox.load('UI', {
     debug: false,
     hideScreen: false,
@@ -14,16 +14,15 @@ Ox.load('UI', {
                 site: data.site,
                 user: data.user.level == 'guest' ? Ox.clone(data.site.user) : data.user,
                 ui: {},
-                clip: function(item, inPoint, outPoint) {
-                    //Ox.print('!@#!@#!@#', inPoint, outPoint);
+                clip: function(options) {
                     var that = Ox.Element();
-                    pandora.api.get({id: item, keys: []}, function(result) {
+                    pandora.api.get({id: options.item, keys: []}, function(result) {
                         var video = {};
                         pandora.site.video.resolutions.forEach(function(resolution) {
                             video[resolution] = Ox.range(result.data.parts).map(function(i) {
                                 var part = (i + 1),
                                     prefix = pandora.site.site.videoprefix.replace('PART', part);
-                                return prefix + '/' + item + '/'
+                                return prefix + '/' + options.item + '/'
                                     + resolution + 'p' + part + '.' + pandora.user.videoFormat;
                             });
                         });
@@ -37,25 +36,27 @@ Ox.load('UI', {
                                 enableVolume: true,
                                 externalControls: false,
                                 height: document.height,
-                                'in': inPoint,
-                                out: outPoint,
-                                paused: true,
-                                position: inPoint,
-                                poster: '/' + item + '/' + '128p' + inPoint +'.jpg',
+                                'in': options['in'],
+                                out: options.out,
+                                paused: options.paused,
+                                position: options['in'],
+                                poster: '/' + options.item + '/' + '128p' + options['in'] +'.jpg',
                                 showMarkers: false,
                                 showMilliseconds: 0,
-                                timeline: '/' + item + '/' + 'timeline16p.png',
+                                timeline: '/' + options.item + '/' + 'timeline16p.png',
                                 title: result.data.title,
                                 video: video,
-                                width: document.width,
+                                width: document.width
                             })
                             .bindEvent({
                                 position: function(data) {
-                                    if(data.position<inPoint || data.position>outPoint) {
-                                        if(!pandora.player.options('paused'))
+                                    if(data.position<options['in']
+                                       || data.position > options.out) {
+                                        if(!pandora.player.options('paused')) {
                                             pandora.player.togglePaused();
+                                        }
                                         pandora.player.options({
-                                            position: inPoint,
+                                            position: options['in'],
                                         });
                                     }
                                 }
@@ -64,17 +65,39 @@ Ox.load('UI', {
                         Ox.UI.hideLoadingScreen();
                     });
                     return that;
-                },
+                }
             });
             Ox.extend(pandora.user, {
                 videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
             });
-            var item = document.location.pathname.split('/')[1],
-                inPoint = 10,
-                outPoint = 15;
-            pandora.ui.info = pandora.clip(item, inPoint, outPoint)
-                                     .css({width: '100%', height: '100%'})
-                                     .appendTo(document.body);
+
+            function parseQuery() {
+                var vars = window.location.search.length
+                        ? window.location.search.substring(1).split('&')
+                        : [],
+                    query = {
+                        item: window.location.pathname.substring(1).split('/')[0]
+                    },
+                    defaults = {
+                        view: 'video',
+                        'in': 0,
+                        out: 10,
+                        paused: true,
+                        item: ''
+                    };
+                vars.forEach(function(v) {
+                    v= v.split('=');
+                    query[v[0]] = decodeURIComponent(v[1]);
+                });
+                 
+                return Ox.extend({}, defaults, query);
+            }
+            var options = parseQuery();
+            if (options.view == 'video') {
+                pandora.ui.info = pandora.clip(options)
+                    .css({width: '100%', height: '100%'})
+                    .appendTo(document.body);
+            }
         }
     });
 });
