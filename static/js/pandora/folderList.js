@@ -1,8 +1,8 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
 pandora.ui.folderList = function(id) {
-    // FIXME: use canEditFeaturedLists capability, not 'admin'
     var i = Ox.getIndexById(pandora.site.sectionFolders[pandora.user.ui.section], id),
+        canEditFeaturedLists = pandora.site.capabilities.canEditFeaturedLists[pandora.user.level],
         that;
     if (pandora.user.ui.section == 'items') {
         var columns, items;
@@ -10,7 +10,7 @@ pandora.ui.folderList = function(id) {
             columns = [
                 {
                     clickable: function(data) {
-                        return data.user == pandora.user.username;
+                        return data.user == pandora.user.username || (id == 'featured' && canEditFeaturedLists);
                     },
                     format: function(value, data) {
                         return $('<img>').attr({
@@ -25,7 +25,10 @@ pandora.ui.folderList = function(id) {
                     id: 'user',
                     operator: '+',
                     tooltip: function(data) {
-                        return data.user == pandora.user.username ? 'Edit Icon' : '';
+                        return data.user == pandora.user.username
+                            || (id == 'featured' && canEditFeaturedLists)
+                            ? 'Edit Icon'
+                            : '';
                     },
                     visible: true,
                     width: 16
@@ -104,7 +107,7 @@ pandora.ui.folderList = function(id) {
                                 height: '10px',
                                 padding: '3px',
                                 opacity: value == 'private' ? 0.25 : 1
-                            })
+                            });
                     },
                     id: 'status',
                     operator: '+',
@@ -240,7 +243,7 @@ pandora.ui.folderList = function(id) {
             pageLength: 1000,
             //selected: pandora.getListData().folder == id ? [pandora.user.ui._list] : [],
             sort: [{key: 'position', operator: '+'}],
-            sortable: id != 'featured' || pandora.user.level == 'admin'
+            sortable: id != 'featured' || canEditFeaturedLists
         })
         .css({
             left: 0,
@@ -276,7 +279,7 @@ pandora.ui.folderList = function(id) {
                             });
                         });
                     }
-                } else if (id == 'favorite' || (id == 'featured' && pandora.user.level == 'admin')) {
+                } else if (id == 'favorite' || (id == 'featured' && canEditFeaturedLists)) {
                     // this makes the button trigger a change event,
                     // which is already being handled in folders.js
                     pandora.$ui.manageListsButton[id].options({value: true});
@@ -321,7 +324,7 @@ pandora.ui.folderList = function(id) {
                         Ox.Request.clearCache(); // fixme: remove
                         that.reloadList();
                     });
-                } else if (id == 'featured' && pandora.user.level == 'admin') {
+                } else if (id == 'featured' && canEditFeaturedLists) {
                     that.options({selected: []});
                     pandora.api.editList({
                         id: data.ids[0],

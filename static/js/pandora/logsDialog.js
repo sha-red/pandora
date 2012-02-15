@@ -134,7 +134,11 @@ pandora.ui.logsDialog = function() {
                                 })
                             ],
                             closeButton: true,
-                            content: $('<code>').append($('<pre>').css({margin: '16px'}).html(value.text)),
+                            content: $('<code>').append($('<pre>').css({
+                                margin: '16px',
+                                MozUserSelect: 'text',
+                                WebkitUserSelect: 'text'
+                            }).html(value.text)),
                             height: height - 48,
                             keys: {enter: 'close', escape: 'close'},
                             maximizeButton: true,
