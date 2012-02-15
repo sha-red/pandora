@@ -540,10 +540,6 @@
             "hasPlaces": true,
             "item": "Subtitle",
             "overlay": true,
-            "sort": [
-                {"id": "words", "title": "Words", "type": "words"},
-                {"id": "wordsperminute", "title": "Words per Minute", "type": "wordsperminute"}
-            ],
             "type": "text"
         }
     ],

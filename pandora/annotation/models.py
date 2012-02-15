@@ -188,7 +188,7 @@ class Annotation(models.Model):
                 'saturation': 'clip__saturation',
                 'volume': 'clip__volume',
             }.get(key, key))
-        j['duration'] = j['out'] - j['in']
+        j['duration'] = abs(j['out'] - j['in'])
         if user:
             j['editable'] = self.editable(user)
 
