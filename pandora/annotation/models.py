@@ -18,7 +18,7 @@ from changelog.models import Changelog
 from item.utils import sort_string
 import managers
 import utils
-from tasks import update_matching_events, update_matching_places
+from tasks import update_matching_events, update_matching_places, update_item
 
 
 def get_matches(obj, model, layer_type):
@@ -160,9 +160,8 @@ class Annotation(models.Model):
         if layer.get('type') == 'event' or layer.get('hasEvents'):
             update_matching_events(self.id)
 
-        #update facets if needed
-        if filter(lambda f: f['id'] == self.layer, settings.CONFIG['filters']):
-            self.item.update_layer_facet(self.layer)
+        #update sort/find tables async
+        update_item.delay(self.id)
 
     def cleanup_undefined_relations(self):
         layer = self.get_layer()
