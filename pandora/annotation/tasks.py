@@ -49,7 +49,10 @@ def update_matching_places(id):
 @task(ignore_resulsts=True, queue='default')
 def update_item(id):
     from item.models import Item
+    from clip.models import Clip
     a = models.Annotation.objects.get(pk=id)
+    #cleanup orphaned clips
+    Clip.objects.filter(annotations__id=None).delete()
     #update facets if needed
     if filter(lambda f: f['id'] == a.layer, settings.CONFIG['filters']):
         a.item.update_layer_facet(a.layer)
