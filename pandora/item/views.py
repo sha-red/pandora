@@ -996,6 +996,53 @@ def sitemap_xml(request):
     response['Content-Type'] = 'application/xml'
     return response
 
+def item_json(request, id):
+    level = settings.CONFIG['capabilities']['canSeeItem']['guest']
+    if not request.user.is_anonymous():
+        level = request.user.get_profile().level
+    qs = models.Item.objects.filter(itemId=id, level__lte=level)
+    if qs.count() == 0:
+        response = json_response(status=404, text='not found')
+    else:
+        item = qs[0]
+        j = item.get_json()
+        j['layers'] = item.get_layers(request.user)
+        response = render_to_json_response(j)
+    return response
+
+def item_xml(request, id):
+    level = settings.CONFIG['capabilities']['canSeeItem']['guest']
+    if not request.user.is_anonymous():
+        level = request.user.get_profile().level
+    qs = models.Item.objects.filter(itemId=id, level__lte=level)
+    if qs.count() == 0:
+        response = json_response(status=404, text='not found')
+    else:
+        item = qs[0]
+        j = item.get_json()
+        j['layers'] = item.get_layers(request.user)
+        j['resolution'] = {'width': j['resolution'][0], 'height':j['resolution'][1]}
+        def xmltree(root, key, data):
+            if isinstance(data, list) or \
+                isinstance(data, tuple):
+                for value in data:
+                    xmltree(root, key, value)
+            elif isinstance(data, dict):
+                for k in data:
+                    if data[k]:
+                        xmltree(root, k, data[k])
+            else:
+                e = ET.SubElement(root, key)
+                e.text = unicode(data)
+
+        oxml = ET.Element('item')
+        xmltree(oxml, 'item', j)
+        response = HttpResponse(
+            '<?xml version="1.0" encoding="utf-8" standalone="yes"?>\n' + ET.tostring(oxml),
+            'application/xml'
+        )
+    return response
+
 def item(request, id):
     id = id.split('/')[0]
     template = 'index.html'
