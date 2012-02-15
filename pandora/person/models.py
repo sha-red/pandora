@@ -13,7 +13,7 @@ from item import utils
 import item.models
 
 import managers
-
+import tasks
 
 def get_name_sort(name):
     name = unicodedata.normalize('NFKD', name).strip()
@@ -51,6 +51,9 @@ class Person(models.Model):
         self.sortsortname = utils.sort_string(self.sortname)
         self.numberofnames = len(self.name.split(' '))
         super(Person, self).save(*args, **kwargs)
+        tasks.update_itemsort.delay(self.id)
+
+    def update_itemsort(self):
         item.models.Facet.objects.filter(
             key__in=item.models.Item.person_keys + ['name'],
             value=self.name
@@ -59,6 +62,11 @@ class Person(models.Model):
         ).update(
             sortvalue=self.sortname
         )
+        for i in item.models.Item.objects.filter(facets__in=item.models.Facet.objects.filter(
+            key__in=item.models.Item.person_keys + ['name'],
+            value=self.name)
+        ).distinct():
+            i.update_sort()
 
     def get_or_create(model, name, imdbId=None):
         if imdbId:
