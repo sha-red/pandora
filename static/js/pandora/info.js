@@ -207,6 +207,7 @@ pandora.ui.listInfo = function() {
                     $('<div>').css({height: '8px'})
                 ).append(
                     $description = Ox.Editable({
+                            clickLink: pandora.clickLink,
                             format: function(value) {
                                 return '<div style="color: rgb(128, 128, 128); text-align: center">'
                                     + value + '</div>';

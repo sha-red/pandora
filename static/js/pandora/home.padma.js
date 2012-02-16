@@ -305,6 +305,7 @@ pandora.ui.home = function() {
                         + lists[selected].description
                     )
                     .appendTo($lists);
+                pandora.createLinks($text);
                 $icon = Ox.Element({
                         element: '<img>',
                         tooltip: 'View List'
@@ -435,7 +436,7 @@ pandora.ui.home = function() {
                                     selectList(lists.length - 1);
                                 }
                             }
-                        }
+                        };
                         Ox.$document.bind({keydown: self.keydown});
                     }
                     lists.forEach(function(list, i) {
