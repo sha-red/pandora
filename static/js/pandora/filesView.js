@@ -37,6 +37,20 @@ pandora.ui.filesView = function(options, self) {
         })
         .appendTo(self.$toolbar);
     */
+    self.$deleteButton = Ox.Button({
+            disabled: false,
+            title: 'Delete ' + pandora.site.itemName.singular,
+            width: 116
+        })
+        .css({
+            float: 'right',
+            margin: '4px'
+        })
+        .appendTo(self.$toolbar)
+        .bindEvent({
+            click: deleteItem 
+        });
+
     self.$ignoreButton = Ox.Button({
             disabled: 'true',
             title: 'Ignore Selected Files...'
@@ -369,6 +383,7 @@ pandora.ui.filesView = function(options, self) {
         .bindEvent({
             click: moveFiles
         });
+    
 
     self.$moviePanel = Ox.Element()
         .append(self.$movieLabel)
@@ -404,6 +419,15 @@ pandora.ui.filesView = function(options, self) {
             ],
             orientation: 'horizontal'
         });
+
+    function deleteItem(data) {
+        pandora.api.get({
+            id: pandora.user.ui.item,
+            keys: ['id', 'title']
+        },function(result) {
+            pandora.ui.deleteItemDialog(result.data).open();
+        });
+    }
 
     function moveFiles(data) {
         var data = {
