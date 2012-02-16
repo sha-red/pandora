@@ -459,7 +459,7 @@ pandora.ui.infoView = function(data) {
             .css({marginBottom: '4px'})
             .append(formatKey(key, true))
             .append(
-                $('<div>').html(Ox.formatDate(data[key], '%F %T'))
+                $('<div>').html(Ox.formatDate(data[key], '%B %e, %Y'))
             )
             .appendTo($right);
     });

@@ -29,7 +29,6 @@ pandora.ui.mainPanel = function() {
                         );
                     } else {
                         if (['clips', 'clip'].indexOf(pandora.user.ui.listView) > -1) {
-                            Ox.print('HELLO????', pandora.user.ui.itemFind)
                             pandora.$ui.list.options({find: pandora.user.ui.itemFind});
                         }
                         pandora.$ui.list.reloadList();

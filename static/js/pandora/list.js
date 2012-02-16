@@ -7,15 +7,6 @@ pandora.ui.list = function() {
         preview = false;
 
     if (view == 'list') {
-        /*
-        keys = Ox.unique(Ox.merge(
-            $.map(pandora.user.ui.lists[pandora.user.ui.list].columns, function(id) {
-                return Ox.getObjectById(pandora.site.sortKeys, id);
-            }),
-            pandora.site.sortKeys
-        ));
-        Ox.Log('', '$$$$', keys)
-        */
         that = Ox.TextList({
             columns: Ox.merge([{
                 align: 'center',
@@ -365,14 +356,6 @@ pandora.ui.list = function() {
         that = pandora.ui.clipPlayer();
     } else if (['map', 'calendar'].indexOf(view) > -1) {
         that = pandora.ui.navigationView(view);
-    } else {
-        // fixme: ???
-        $list = Ox.Element('<div>')
-            .css({
-                width: '100px',
-                height: '100px',
-                background: 'red'
-            });
     }
 
     if (['list', 'grid', 'clips', 'timelines'].indexOf(view) > -1) {
