@@ -144,11 +144,6 @@
             "find": true
         },
         {
-            "id": "keywords",
-            "title": "Keywords",
-            "type": "layer"
-        },
-        {
             "id": "director",
             "title": "Director",
             "type": ["string"],
@@ -201,8 +196,8 @@
             //"format": {"type": "date", "args": ["%a, %b %e, %Y"]}
         },
         {
-            "id": "description",
-            "title": "Description",
+            "id": "summary",
+            "title": "Summary",
             "type": "text",
             "find": true
         },
@@ -221,22 +216,32 @@
         {
             "id": "places",
             "title": "Places",
-            "type": "layer"
+            "type": "layer",
+            "find": true
         },
         {
             "id": "events",
             "title": "Events",
-            "type": "layer"
+            "type": "layer",
+            "find": true
+        },
+        {
+            "id": "keywords",
+            "title": "Keywords",
+            "type": "layer",
+            "find": true
         },
         {
             "id": "descriptions",
             "title": "Descriptions",
-            "type": "layer"
+            "type": "layer",
+            "find": true
         },
         {
             "id": "transcripts",
             "title": "Transcripts",
-            "type": "layer"
+            "type": "layer",
+            "find": true
         },
         {
             "id": "duration",

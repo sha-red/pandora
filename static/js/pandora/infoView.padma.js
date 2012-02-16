@@ -358,7 +358,7 @@ pandora.ui.infoView = function(data) {
         $('<div>').css(css).html(html).appendTo($center);
     }
 
-    // Description -------------------------------------------------------------
+    // Summary -------------------------------------------------------------
 
     if (canEdit) {
         $('<div>')
@@ -368,22 +368,22 @@ pandora.ui.infoView = function(data) {
                     clickLink: pandora.clickLink,
                     editable: canEdit,
                     maxHeight: Infinity,
-                    placeholder: formatLight('No description'),
+                    placeholder: formatLight('No Summary'),
                     tooltip: canEdit ? 'Doubleclick to edit' : '',
                     type: 'textarea',
-                    value: data.description || '',
+                    value: data.summary || '',
                     //width: 300
                 })
                 .bindEvent({
                     submit: function(event) {
-                        editMetadata('description', event.value);
+                        editMetadata('summary', event.value);
                     }
                 })
                 .css(css)
             )
             .appendTo($center);
-    } else if(data.description) {
-        $('<div>').css(css).html(data.description).appendTo($center);
+    } else if(data.summary) {
+        $('<div>').css(css).html(data.summary).appendTo($center);
     }
 
     // License -----------------------------------------------------------------
