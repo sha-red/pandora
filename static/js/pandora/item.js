@@ -371,7 +371,7 @@ pandora.ui.item = function() {
                     find: function(data) {
                         pandora.UI.set('itemFind', data.find);
                     },
-                    findannotation: function(data) {
+                    findannotations: function(data) {
                         pandora.UI.set({
                             item: '',
                             find: {
