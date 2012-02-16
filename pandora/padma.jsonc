@@ -564,7 +564,7 @@
             "itemFind": {"conditions": [], "operator": "&"},
             "itemSort": [{"key": "position", "operator": "+"}],
             "itemView": "info",
-            "listColumns": ["title", "source", "project", "topics", "language", "duration"],
+            "listColumns": ["title", "source", "project", "topic", "language", "duration"],
             "listColumnWidth": {},
             "listSelection": [],
             "listSort": [{"key": "title", "operator": "+"}],
