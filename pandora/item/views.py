@@ -1064,7 +1064,7 @@ def item(request, id):
             'year',
             'director',
             'topic',
-            'description'
+            'summary'
         ]
         data = []
         for key in keys:
@@ -1096,7 +1096,7 @@ def item(request, id):
         }
         for key in ('title', 'description', 'keywords'):
             value = item.get({
-                'description': 'summary' in keys and 'summary' or 'description',
+                'description': 'summary',
                 'keywords': 'topic' in keys and 'topic' or 'keywords'
             }.get(key, key))
             if isinstance(value, list):
