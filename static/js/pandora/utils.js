@@ -1159,7 +1159,7 @@ pandora.unloadWindow = function() {
         // has a findKey as key and "=" as operator (and all other conditions
         // are either list or filters), or if all conditions in an | query have
         // the same filter id as key and "==" as operator
-        Ox.Log('', 'getFindState', find)
+        Ox.Log('Find', 'getFindState', find)
         // FIXME: this is still incorrect when you select a lot of filter items
         // and reload the page (will be advanced)
         var conditions, indices, state = {index: -1, key: '*', value: ''};

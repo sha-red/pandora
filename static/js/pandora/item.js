@@ -371,6 +371,16 @@ pandora.ui.item = function() {
                     find: function(data) {
                         pandora.UI.set('itemFind', data.find);
                     },
+                    findannotation: function(data) {
+                        pandora.UI.set({
+                            item: '',
+                            find: {
+                                conditions: [{key: data.key, value: data.value, operator: '='}],
+                                operator: '&'
+                            },
+                            listView: 'clip'
+                        });
+                    },
                     importannotations: function(data) {
                         pandora.ui.importAnnotations().open();
                     },
