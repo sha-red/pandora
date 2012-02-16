@@ -84,7 +84,9 @@ def update_static():
                 js.append(f[len(settings.STATIC_ROOT)+1:])
                 with open(f) as j:
                     data += j.read() + '\n'
-
+    js += [
+        'png/icon64.png',
+    ]
     print 'write', pandora_js
     with open(pandora_js, 'w') as f:
         data = ox.js.minify(data)
