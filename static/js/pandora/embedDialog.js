@@ -22,7 +22,6 @@ pandora.ui.embedDialog = function(data) {
             keys: {
                 'escape': 'close'
             },
-            maximizeButton: true,
             removeOnClose: true,
             title: 'Embed Video',
             width: 600 
