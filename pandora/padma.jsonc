@@ -350,6 +350,13 @@
             "value": {"key": "files", "type": "length"}
         },
         {
+            "id": "user",
+            "title": "User",
+            "type": "string",
+            "capability": "canSeeFiles",
+            "find": true
+        },
+        {
             "id": "filename",
             "title": "Filename",
             "type": ["string"],

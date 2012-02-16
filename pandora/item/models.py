@@ -576,6 +576,8 @@ class Item(models.Model):
                 elif i == 'filename':
                     save(i,
                         '\n'.join([f.path for f in self.files.all()]))
+                elif i == 'user':
+                    save(i, self.user.username)
                 elif key['id'] == 'annotations':
                     qs = Annotation.objects.filter(item=self)
                     qs = qs.filter(layer__in=Annotation.public_layers())
