@@ -794,7 +794,7 @@ pandora.getVideoOptions = function(data) {
     pandora.site.video.resolutions.forEach(function(resolution) {
         options.video[resolution] = Ox.range(data.parts).map(function(i) {
             var part = (i + 1),
-                prefix = pandora.site.site.videoprefix.replace('PART', part); // fixme: '{part}' would be more consistent
+                prefix = pandora.site.site.videoprefix.replace('{part}', part);
             return prefix + '/' + (data.item || pandora.user.ui.item) + '/'
                 + resolution + 'p' + part + '.' + pandora.user.videoFormat;
         });

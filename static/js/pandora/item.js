@@ -3,7 +3,8 @@
 
 pandora.ui.item = function() {
 
-    var that = Ox.Element();
+    var that = Ox.Element(),
+        videoOptions;
 
     pandora.api.get({
         id: pandora.user.ui.item,
@@ -42,7 +43,7 @@ pandora.ui.item = function() {
 
         if (['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
             // fixme: layers have value, subtitles has text?
-            var videoOptions = pandora.getVideoOptions(result.data);
+            videoOptions = pandora.getVideoOptions(result.data);
         }
 
         if (!result.data.rendered && [
@@ -240,6 +241,7 @@ pandora.ui.item = function() {
                     cuts: result.data.cuts || [],
                     duration: result.data.duration,
                     enableDownload: pandora.site.capabilities.canDownloadVideo[pandora.user.level] >= result.data.rightslevel,
+                    enableImport: pandora.site.capabilities.canImportAnnotations[pandora.user.level],
                     enableSubtitles: pandora.user.ui.videoSubtitles,
                     find: pandora.user.ui.itemFind,
                     getFrameURL: function(position) {

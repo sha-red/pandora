@@ -850,7 +850,7 @@ class Item(models.Model):
     '''
         Video related functions
     '''
-    def frame(self, position, height=128):
+    def frame(self, position, height=None):
         offset = 0
         streams = self.streams()
         for stream in streams:
@@ -858,7 +858,10 @@ class Item(models.Model):
                 offset += stream.duration
             else:
                 position = position - offset
-                height = min(height, stream.resolution)
+                if not height:
+                    height = stream.resolution
+                else:
+                    height = min(height, stream.resolution)
                 path = os.path.join(settings.MEDIA_ROOT, stream.path(),
                                     'frames', "%dp"%height, "%s.jpg"%position)
                 if not os.path.exists(path) and stream.video:

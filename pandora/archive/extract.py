@@ -241,7 +241,7 @@ def frame(videoFile, frame, position, height=128, redo=False):
             videoFile input
             frame     output
             position as float in seconds
-            width of frame
+            height of frame
             redo boolean to extract file even if it exists
     '''
     if exists(videoFile):
