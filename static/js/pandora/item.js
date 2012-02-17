@@ -3,7 +3,8 @@
 
 pandora.ui.item = function() {
 
-    var that = Ox.Element();
+    var that = Ox.Element(),
+        videoOptions;
 
     pandora.api.get({
         id: pandora.user.ui.item,
@@ -42,7 +43,7 @@ pandora.ui.item = function() {
 
         if (['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
             // fixme: layers have value, subtitles has text?
-            var videoOptions = pandora.getVideoOptions(result.data);
+            videoOptions = pandora.getVideoOptions(result.data);
         }
 
         if (!result.data.rendered && [
