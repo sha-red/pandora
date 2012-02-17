@@ -175,8 +175,10 @@ pandora.changeListStatus = function(id, status, callback) {
 };
 
 pandora.clickLink = function(e) {
-    if (e.target.hostname == document.location.hostname
-        && !Ox.starts(e.target.pathname, '/static')) {
+    if (
+        e.target.hostname == document.location.hostname
+        && !Ox.starts(e.target.pathname, '/static')
+    ) {
         pandora.URL.push(e.target.pathname);
     } else {
         window.open('/url=' + encodeURIComponent(e.target.href), '_blank');
@@ -687,6 +689,25 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
     });
     function getId(type, callback) {
         if (type) {
+            Ox.print('getId',
+                Ox.extend({
+                    query: {
+                        conditions: [{
+                            key: isName ? 'name' : 'id',
+                            value: type != 'annotation' ? str : item + '/' + str,
+                            operator: '=='
+                        }],
+                        operator: '&'
+                    },
+                    keys: type != 'annotation' ? ['id'] : ['id', 'in', 'out'],
+                    range: [0, 1]
+                }, item && type != 'annotation' ? {
+                    itemQuery: {
+                        conditions: [{key: 'id', value: item, operator: '=='}],
+                        operator: '&'
+                    }
+                } : {})
+            );
             pandora.api['find' + Ox.toTitleCase(type + 's')](Ox.extend({
                 query: {
                     conditions: [{
@@ -704,10 +725,17 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
                     operator: '&'
                 }
             } : {}), function(result) {
+                Ox.print('RESULT::::::', result)
                 var annotation, span;
                 if (result.data.items.length) {
                     span = result.data.items[0];
                     annotation = span.id.split('/')[1];
+                    Ox.print("SETTING::::", {
+                        annotation: annotation,
+                        'in': span['in'],
+                        out: span.out,
+                        position: span['in']
+                    });
                     type == 'annotation' && pandora.UI.set('videoPoints.' + item, {
                         annotation: annotation,
                         'in': span['in'],

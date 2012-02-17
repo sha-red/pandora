@@ -46,7 +46,7 @@ pandora.UI = (function() {
             triggerEvents = Ox.isUndefined(arguments[2]) ? true : arguments[1];
         }
 
-        Ox.Log('UI', 'SET', args)
+        Ox.Log('UI', 'SET', JSON.stringify(args));
 
         self.previousUI = Ox.clone(pandora.user.ui, true);
         self.previousUI._list = pandora.getListState(self.previousUI.find);

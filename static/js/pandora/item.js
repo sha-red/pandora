@@ -117,11 +117,13 @@ pandora.ui.item = function() {
             }
 
         } else if (pandora.user.ui.itemView == 'clips') {
+
             pandora.$ui.contentPanel.replaceElement(1,
                 pandora.ui.clipsView(result.data.videoRatio)
             );
 
         } else if (pandora.user.ui.itemView == 'video') {
+
             pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.player = Ox.VideoPanel({
                 annotationsCalendarSize: pandora.user.ui.annotationsCalendarSize,
                 annotationsFont: pandora.user.ui.annotationsFont,
@@ -146,6 +148,9 @@ pandora.ui.item = function() {
                 position: pandora.user.ui.videoPoints[pandora.user.ui.item].position,
                 resolution: pandora.user.ui.videoResolution,
                 scaleToFill: pandora.user.ui.videoScale == 'fill',
+                selected: pandora.user.ui.videoPoints[pandora.user.ui.item].annotation
+                    ? pandora.user.ui.item + '/' + pandora.user.ui.videoPoints[pandora.user.ui.item].annotation
+                    : '',
                 showAnnotations: pandora.user.ui.showAnnotations,
                 showAnnotationsCalendar: pandora.user.ui.showAnnotationsCalendar,
                 showAnnotationsMap: pandora.user.ui.showAnnotationsMap,
@@ -228,6 +233,7 @@ pandora.ui.item = function() {
             }));
 
         } else if (pandora.user.ui.itemView == 'timeline') {
+
             pandora.$ui.contentPanel.replaceElement(1,
                 pandora.$ui.editor = Ox.VideoEditor({
                     annotationsCalendarSize: pandora.user.ui.annotationsCalendarSize,
@@ -290,25 +296,26 @@ pandora.ui.item = function() {
                         setTimeout(function() {
                             var d = new Date(),
                                 created = Ox.formatDate(d, '%Y-%m-%dT%H:%M:%SZ'),
-                                date = Ox.formatDate(d, '%B %e, %Y');
-                            pandora.$ui.editor.addAnnotation(data.layer, Ox.extend({
-                                created: created,
-                                date: date,
-                                duration: data.out - data['in'],
-                                editable: true,
-                                id: '_' + Ox.uid(),
-                                'in': data['in'],
-                                modified: created,
-                                out: data.out,
-                                user: pandora.user.username,
-                                value: '',
-                            },
-                            Ox.getObjectById(pandora.site.layers, data.layer).type == 'place' ? {
-                                place: {lat: null, lng: null}
-                            } : {},
-                            Ox.getObjectById(pandora.site.layers, data.layer).type == 'event' ? {
-                                event: {start: '', end: ''}
-                            } : {}
+                                date = Ox.formatDate(d, '%B %e, %Y'),
+                                type = Ox.getObjectById(pandora.site.layers, data.layer).type;
+                            pandora.$ui.editor.addAnnotation(data.layer, Ox.extend(
+                                {
+                                    created: created,
+                                    date: date,
+                                    duration: data.out - data['in'],
+                                    editable: true,
+                                    id: '_' + Ox.uid(),
+                                    'in': data['in'],
+                                    modified: created,
+                                    out: data.out,
+                                    user: pandora.user.username,
+                                    value: '',
+                                },
+                                type == 'place' ? {
+                                    place: {lat: null, lng: null}
+                                } : type == 'event' ? {
+                                    event: {start: '', end: ''}
+                                } : {}
                             ));
                         });
                     },
@@ -461,27 +468,17 @@ pandora.ui.item = function() {
                     }
                 })
             );
-            pandora.$ui.editor.bindEvent('resize', function(data) {
-                //Ox.Log('', 'resize item', data)
-                pandora.$ui.editor.options({
-                    height: data.size
-                });
-            });
-            /*
-            pandora.$ui.rightPanel.bindEvent('resize', function(data) {
-                Ox.Log('', '... rightPanel resize', data, pandora.$ui.timelinePanel.size(1))
-                pandora.$ui.editor.options({
-                    width: data - pandora.$ui.timelinePanel.size(1) - 1
-                });
-            });
-            */
+
         } else if (pandora.user.ui.itemView == 'map') {
+
             pandora.$ui.contentPanel.replaceElement(1, pandora.ui.navigationView('map', result.data.videoRatio));
 
         } else if (pandora.user.ui.itemView == 'calendar') {
+
             pandora.$ui.contentPanel.replaceElement(1, pandora.ui.navigationView('calendar', result.data.videoRatio));
 
         } else if (pandora.user.ui.itemView == 'data') {
+
             var stats = Ox.Container();
             Ox.TreeList({
                 data: result.data,
@@ -490,6 +487,7 @@ pandora.ui.item = function() {
             pandora.$ui.contentPanel.replaceElement(1, stats);
 
         } else if (pandora.user.ui.itemView == 'files') {
+
             pandora.$ui.contentPanel.replaceElement(1,
                 pandora.$ui.item = pandora.ui.filesView({
                     id: result.data.id
@@ -497,6 +495,7 @@ pandora.ui.item = function() {
             );
 
         } else if (pandora.user.ui.itemView == 'frames' || pandora.user.ui.itemView == 'posters') {
+
             pandora.$ui.contentPanel.replaceElement(1,
                 pandora.$ui.item = pandora.ui.mediaView().bindEvent({
                     resize: function() {
@@ -504,7 +503,31 @@ pandora.ui.item = function() {
                     }
                 })
             );
+
         }
+
+        if (['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
+            // handle links in annotations
+            var widget = pandora.user.ui.itemView == 'video' ? 'player' : 'editor';
+            pandora.$ui[widget].bindEvent('pandora_videopoints.' + pandora.user.ui.item.toLowerCase(), function(data) {
+                Ox.print('DATA.VALUE', JSON.stringify(data.value));
+                var options = {};
+                if (data.value.annotation) {
+                    options.selected = pandora.user.ui.item + '/' + data.value.annotation;
+                } else {
+                    // if annotation got set to something other than '',
+                    // points and position will be set in consequence,
+                    // so lets try to keep events from looping
+                    ['annotation', 'in', 'out', 'position'].forEach(function(key) {
+                        if (!Ox.isUndefined(data.value[key])) {
+                            options[key == 'annotation' ? 'selected' : key] = data.value[key];
+                        }
+                    });
+                }
+                pandora.$ui[widget].options(options);
+            });
+        }
+
     });
 
     return that;
