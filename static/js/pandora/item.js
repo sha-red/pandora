@@ -203,6 +203,9 @@ pandora.ui.item = function() {
                 scale: function(data) {
                     pandora.UI.set('videoScale', data.scale);
                 },
+                select: function(data) {
+                    pandora.UI.set('videoPoints.' + pandora.user.ui.item + '.annotation', data.id.split('/')[1]);
+                },
                 subtitles: function(data) {
                     pandora.UI.set('videoSubtitles', data.subtitles);
                 },
@@ -339,16 +342,9 @@ pandora.ui.item = function() {
                         document.location.href = '/' + pandora.user.ui.item + '/torrent/';
                     },
                     downloadselection: function(data) {
-                        document.location.href = [
-                            '/',
-                            pandora.user.ui.item,
-                            '/',
-                            Ox.max(pandora.site.video.resolutions),
-                            'p.webm?t=',
-                            data['in'],
-                            ',',
-                            data.out
-                        ].join('');
+                        document.location.href = '/' + pandora.user.ui.item
+                            + '/' + Ox.max(pandora.site.video.resolutions)
+                            + 'p.webm?t=' + data['in'] + ',' + data.out;
                     },
                     editannotation: function(data) {
                         Ox.Log('', 'editAnnotation', data);
