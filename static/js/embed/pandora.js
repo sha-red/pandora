@@ -16,12 +16,10 @@ Ox.load('UI', {
                 ui: {},
                 clip: function(options) {
                     var that = Ox.Element(),
-                        keys = [ 'cuts', 'director', 'duration', 'layers', 'parts', 'posterFrame', 'rendered', 'rightslevel', 'size', 'title', 'videoRatio', 'year'];
+                        keys = [ 'duration', 'layers', 'parts', 'posterFrame', 'rightslevel', 'size', 'title', 'videoRatio' ];
+                    pandora.user.ui.item = options.item;
                     pandora.api.get({id: options.item, keys: keys}, function(result) {
-                        var video = {},
-                            videoOptions = getVideoOptions(result.data);
-                        Ox.print(videoOptions);
-                        Ox.print('/' + options.item + '/' + 'timeline16p.png');
+                        var videoOptions = getVideoOptions(result.data);
                         that.append(pandora.player = Ox.VideoPlayer({
                                 censored: videoOptions.censored,
                                 controlsBottom: ['play', 'volume', 'scale', 'timeline', 'position', 'settings'],
@@ -58,13 +56,13 @@ Ox.load('UI', {
                         Ox.UI.hideLoadingScreen();
 
                         function checkRange(data) {
-                            if(data.position < options['in']
+                            if(data.position < options['in'] - 0.04
                                || data.position > options.out) {
                                 if(!pandora.player.options('paused')) {
                                     pandora.player.togglePaused();
                                 }
                                 pandora.player.options({
-                                    position: options['in'],
+                                    position: options['in']
                                 });
                             }
                         }
@@ -75,28 +73,6 @@ Ox.load('UI', {
             Ox.extend(pandora.user, {
                 videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
             });
-
-            function parseQuery() {
-                var vars = window.location.search.length
-                        ? window.location.search.substring(1).split('&')
-                        : [],
-                    query = {
-                        item: window.location.pathname.substring(1).split('/')[0]
-                    },
-                    defaults = {
-                        view: 'video',
-                        'in': 0,
-                        out: 10,
-                        paused: true,
-                        item: ''
-                    };
-                vars.forEach(function(v) {
-                    v= v.split('=');
-                    query[v[0]] = decodeURIComponent(v[1]);
-                });
-                 
-                return Ox.extend({}, defaults, query);
-            }
             var options = parseQuery();
             if (options.view == 'video') {
                 pandora.ui.info = pandora.clip(options)
@@ -105,6 +81,7 @@ Ox.load('UI', {
             }
         }
     });
+
     function getVideoOptions(data) {
         var canPlayClips = data.editable || pandora.site.capabilities.canPlayClips[pandora.user.level] >= data.rightslevel,
             canPlayVideo = data.editable || pandora.site.capabilities.canPlayVideo[pandora.user.level] >= data.rightslevel,
@@ -156,5 +133,27 @@ Ox.load('UI', {
             });
         });
         return options;
+    }
+
+    function parseQuery() {
+        var vars = window.location.search.length
+                ? window.location.search.substring(1).split('&')
+                : [],
+            query = {
+                item: window.location.pathname.substring(1).split('/')[0]
+            },
+            defaults = {
+                view: 'video',
+                'in': 0,
+                out: 10,
+                paused: true,
+                item: ''
+            };
+        vars.forEach(function(v) {
+            v= v.split('=');
+            query[v[0]] = decodeURIComponent(v[1]);
+        });
+         
+        return Ox.extend({}, defaults, query);
     }
 });
