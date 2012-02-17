@@ -248,10 +248,6 @@ pandora.ui.home = function() {
         $preferencesButton.appendTo($box);
     }
 
-    function hideLists() {
-        $lists.empty();
-    }
-
     function showLists() {
         pandora.api.findLists({
             query: {
@@ -457,7 +453,6 @@ pandora.ui.home = function() {
                                 padding: '2px',
                                 margin: '2px',
                                 borderRadius: '16px',
-                                //background: i == selected ? color : 'transparent',
                                 boxShadow: '0 0 2px ' + (i == selected ? color : 'transparent')
                             })
                             .appendTo($listsContent);
@@ -573,33 +568,22 @@ pandora.ui.home = function() {
     };
 
     that.fadeOutScreen = function() {
-        hideLists();
-        that.find('*').hide();
-        that.animate({opacity: 0}, 250, function() {
+        that.animate({opacity: 0}, 500, function() {
             that.remove();
         });
         self.keydown && Ox.$document.unbind({keydown: self.keydown});
         return that;
     };
 
-    that.hideScreen = function() {
-        hideLists();
-        that.hide().remove();
-        that.find('*').css({opacity: 0});
-        $logo.css({width: window.innerWidth + 'px'});
-        self.keydown && Ox.$document.unbind({keydown: self.keydown});
-        return that;
-    };
-
     that.showScreen = function() {
         that.css({opacity: 1}).appendTo(Ox.UI.$body);
-        $box.animate({
-            marginTop: '80px'
-        }, 250, function() {
-            that.find(':not(#lists)').animate({opacity: 1}, 250);
-            $findInput.focusInput(true);
-            showLists();
-        });
+        $box.animate({marginTop: '80px'}, 500);
+        setTimeout(function() {
+            that.find('*').animate({opacity: 1}, 250, function() {
+                $findInput.focusInput(true);
+                showLists();
+            });
+        }, 250);
         return that;
     };
 
