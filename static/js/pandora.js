@@ -130,11 +130,12 @@ appPanel
     }
 
     function loadOxJS(callback) {
-        var script = document.createElement('script');
+        var head = document.head || document.getElementsByTagName( "head" )[0] || document.documentElement,
+            script = document.createElement('script');
         script.onload = callback;
         script.src = '/static/oxjs/dev/Ox.js';
         script.type = 'text/javascript';
-        document.head.appendChild(script);
+        head.appendChild(script);
     }
 
     function loadOxUI(callback) {
@@ -150,6 +151,7 @@ appPanel
             url: '/api/',
         }).bindEvent({
             load: function(data) {
+                Ox.print('browser', browserSupported);
                 data.browserSupported = browserSupported;
                 Ox.extend(pandora, {
                     requests: {},

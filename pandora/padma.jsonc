@@ -381,7 +381,8 @@
             "id": "accessed",
             "title": "Date Accessed",
             "type": "date",
-            "columnWidth": 90
+            "columnWidth": 90,
+            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]}
         },
         {
             "id": "timesaccessed",

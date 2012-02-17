@@ -18,6 +18,9 @@ pandora.ui.backButton = function() {
             so we'd have to cancel with a function -- and
             it's unclear if the best place for that is here
             */
+            if (['accessed', 'timesaccessed'].indexOf(pandora.user.ui.listSort[0].key) > -1) {
+                Ox.Request.clearCache('find');
+            }
             pandora.UI.set({item: ''});
         }
     });

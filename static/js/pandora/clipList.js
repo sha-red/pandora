@@ -4,7 +4,7 @@
 
 pandora.ui.clipList = function(videoRatio) {
 
-    Ox.print('CLIP LIST FIND', !pandora.user.ui.item ? pandora.getItemFind(pandora.user.ui.find) : pandora.user.ui.itemFind);
+    //Ox.print('CLIP LIST FIND', !pandora.user.ui.item ? pandora.getItemFind(pandora.user.ui.find) : pandora.user.ui.itemFind);
 
     var ui = pandora.user.ui,
         fixedRatio = !ui.item ? 16/9 : videoRatio,
@@ -131,6 +131,9 @@ pandora.ui.clipList = function(videoRatio) {
                 set['videoPoints.' + item] = Ox.extend(points, {
                     position: points['in']
                 });
+                if (['accessed', 'timesaccessed'].indexOf(ui.listSort[0].key) > -1) {
+                    Ox.Request.clearCache('find');
+                }
                 pandora.UI.set(set);
             },
             openpreview: function(data) {

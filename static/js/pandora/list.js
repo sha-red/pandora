@@ -398,6 +398,9 @@ pandora.ui.list = function() {
                 if (data.isSpecialTarget) {
                     set.itemView = pandora.user.ui.videoView;
                 }
+                if (['accessed', 'timesaccessed'].indexOf(pandora.user.ui.listSort[0].key) > -1) {
+                    Ox.Request.clearCache('find');
+                }
                 pandora.UI.set(set);
             },
             openpreview: function(data) {
