@@ -104,8 +104,8 @@ pandora.ui.mainMenu = function() {
                         {},
                         { id: 'theme', title: 'Theme', items: [
                             { group: 'settheme', min: 1, max: 1, items: [
-                                { id: 'classic', title: 'Classic', checked: ui.theme == 'classic'},
-                                { id: 'modern', title: 'Modern', checked: ui.theme == 'modern' }
+                                { id: 'classic', title: 'Light', checked: ui.theme == 'classic'},
+                                { id: 'modern', title: 'Dark', checked: ui.theme == 'modern' }
                             ]}
                         ] }
                     ]},
