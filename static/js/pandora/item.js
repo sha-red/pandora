@@ -241,6 +241,7 @@ pandora.ui.item = function() {
                     cuts: result.data.cuts || [],
                     duration: result.data.duration,
                     enableDownload: pandora.site.capabilities.canDownloadVideo[pandora.user.level] >= result.data.rightslevel,
+                    enableImport: pandora.site.capabilities.canImportAnnotations[pandora.user.level],
                     enableSubtitles: pandora.user.ui.videoSubtitles,
                     find: pandora.user.ui.itemFind,
                     getFrameURL: function(position) {
