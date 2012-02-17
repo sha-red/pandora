@@ -261,6 +261,7 @@ pandora.ui.usersDialog = function() {
             })
             .bindEvent({
                 init: function(data) {
+                    numberOfUsers = data.users;
                     $status.html(
                         Ox.formatNumber(data.items)
                         + ' user' + (data.items == 1 ? '' : 's')
