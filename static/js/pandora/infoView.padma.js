@@ -246,7 +246,8 @@ pandora.ui.infoView = function(data) {
                     clickLink: pandora.clickLink,
                     editable: key != 'duration',
                     format: function(value) {
-                        return key != 'duration' ? formatValue(value, key)
+                        return key != 'duration' ? formatValue(listKeys.indexOf(key) >= 0
+                                                               ? value.split(', ') : value, key)
                             : value < 60 ? Math.round(value) + ' sec'
                             : Math.round(value / 60) + ' min';
                     },
@@ -509,7 +510,7 @@ pandora.ui.infoView = function(data) {
             var edit = {id: data.id};
             if (key == 'title') {
                 edit[key] = value;
-            } else if (listKeys.indexOf(key) > -1) {
+            } else if (listKeys.indexOf(key) >= 0) {
                 edit[key] = value ? value.split(', ') : [];
             } else {
                 edit[key] = value ? value : null;
