@@ -151,7 +151,6 @@ appPanel
             url: '/api/',
         }).bindEvent({
             load: function(data) {
-                Ox.print('browser', browserSupported);
                 data.browserSupported = browserSupported;
                 Ox.extend(pandora, {
                     requests: {},
@@ -375,7 +374,7 @@ appPanel
                             .attr({
                                 src: Ox.PATH + 'Ox.UI/png/browser' + browser.name.replace(' ', '') + '128.png'
                             })
-                            .css({width: '32px', height: '32px', margin: '4px'})
+                            .css({border: 0, width: '32px', height: '32px', margin: '4px'})
                     )
                     .appendTo($images);
             });
