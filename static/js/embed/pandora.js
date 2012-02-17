@@ -15,18 +15,15 @@ Ox.load('UI', {
                 user: data.user.level == 'guest' ? Ox.clone(data.site.user) : data.user,
                 ui: {},
                 clip: function(options) {
-                    var that = Ox.Element();
-                    pandora.api.get({id: options.item, keys: []}, function(result) {
-                        var video = {};
-                        pandora.site.video.resolutions.forEach(function(resolution) {
-                            video[resolution] = Ox.range(result.data.parts).map(function(i) {
-                                var part = (i + 1),
-                                    prefix = pandora.site.site.videoprefix.replace('PART', part);
-                                return prefix + '/' + options.item + '/'
-                                    + resolution + 'p' + part + '.' + pandora.user.videoFormat;
-                            });
-                        });
+                    var that = Ox.Element(),
+                        keys = [ 'cuts', 'director', 'duration', 'layers', 'parts', 'posterFrame', 'rendered', 'rightslevel', 'size', 'title', 'videoRatio', 'year'];
+                    pandora.api.get({id: options.item, keys: keys}, function(result) {
+                        var video = {},
+                            videoOptions = getVideoOptions(result.data);
+                        Ox.print(videoOptions);
+                        Ox.print('/' + options.item + '/' + 'timeline16p.png');
                         that.append(pandora.player = Ox.VideoPlayer({
+                                censored: videoOptions.censored,
                                 controlsBottom: ['play', 'volume', 'scale', 'timeline', 'position', 'settings'],
                                 enableFind: false,
                                 enableFullscreen: true,
@@ -40,13 +37,14 @@ Ox.load('UI', {
                                 out: options.out,
                                 paused: options.paused,
                                 position: options['in'],
-                                poster: '/' + options.item + '/' + '128p' + options['in'] +'.jpg',
+                                poster: '/' + options.item + '/' + '96p' + options['in'] +'.jpg',
                                 resolution: pandora.user.ui.videoResolution,
                                 showMarkers: false,
                                 showMilliseconds: 0,
+                                subtitles: videoOptions.subtitles,
                                 timeline: '/' + options.item + '/' + 'timeline16p.png',
                                 title: result.data.title,
-                                video: video,
+                                video: videoOptions.video,
                                 width: document.width
                             })
                             .bindEvent({
@@ -107,4 +105,56 @@ Ox.load('UI', {
             }
         }
     });
+    function getVideoOptions(data) {
+        var canPlayClips = data.editable || pandora.site.capabilities.canPlayClips[pandora.user.level] >= data.rightslevel,
+            canPlayVideo = data.editable || pandora.site.capabilities.canPlayVideo[pandora.user.level] >= data.rightslevel,
+            options = {};
+        options.subtitles = data.layers.subtitles
+            ? data.layers.subtitles.map(function(subtitle) {
+                return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
+            })
+            : [];
+        options.censored = canPlayVideo ? []
+            : canPlayClips ? (
+                options.subtitles.length
+                    ? Ox.merge(
+                        options.subtitles.map(function(subtitle, i) {
+                            return {
+                                'in': i == 0 ? 0 : options.subtitles[i - 1].out,
+                                out: subtitle['in']
+                            };
+                        }),
+                        [{'in': Ox.last(options.subtitles).out, out: data.duration}]
+                    )
+                    : Ox.range(0, data.duration - 5, 60).map(function(position) {
+                        return {
+                            'in': position + 5,
+                            out: Math.min(position + 60, data.duration)
+                        };
+                    })
+            )
+            : [{'in': 0, out: data.duration}];
+        options.video = {};
+        pandora.site.video.resolutions.forEach(function(resolution) {
+            options.video[resolution] = Ox.range(data.parts).map(function(i) {
+                var part = (i + 1),
+                    prefix = pandora.site.site.videoprefix.replace('{part}', part);
+                return prefix + '/' + (data.item || pandora.user.ui.item) + '/'
+                    + resolution + 'p' + part + '.' + pandora.user.videoFormat;
+            });
+        });
+        options.layers = [];
+        pandora.site.layers.forEach(function(layer, i) { 
+            options.layers[i] = Ox.extend({}, layer, {
+                items: data.layers[layer.id].map(function(annotation) {
+                    annotation.duration = Math.abs(annotation.out - annotation['in']);
+                    annotation.editable = annotation.editable
+                        || annotation.user == pandora.user.username
+                        || pandora.site.capabilities['canEditAnnotations'][pandora.user.level];
+                    return annotation;
+                })
+            });
+        });
+        return options;
+    }
 });

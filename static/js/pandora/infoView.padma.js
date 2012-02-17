@@ -246,7 +246,7 @@ pandora.ui.infoView = function(data) {
                     clickLink: pandora.clickLink,
                     editable: key != 'duration',
                     format: function(value) {
-                        return key != 'duration' ? formatValue(value.split(', '), key)
+                        return key != 'duration' ? formatValue(value, key)
                             : value < 60 ? Math.round(value) + ' sec'
                             : Math.round(value / 60) + ' min';
                     },

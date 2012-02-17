@@ -262,12 +262,14 @@ pandora.ui.home = function() {
             sort: [{key: 'position', operator: '+'}]
         }, function(result) {
             var lists = result.data.items,
-                items = 8, mouse = false, position = 0, selected = 0,
+                counter = 0, items = 8, mouse = false, position = 0, selected = 0,
                 color = Ox.Theme() == 'classic'
-                    ? 'rgb(0, 0, 0)' : 'rgb(255, 255, 255)',
+                    ? 'rgb(32, 32, 32)' : 'rgb(224, 224, 224)',
                 $label, $icon, $text,
-                $listsBox, $listsContainer, $listsContent, $list = [],
+                $listsBox, $listsContainer, $listsContent,
+                $listBox = [], $listIcon = [],
                 $previousButton, $nextButton;
+            $lists.empty();
             if (lists.length) {
                 $label = Ox.Label({
                         textAlign: 'center',
@@ -396,10 +398,13 @@ pandora.ui.home = function() {
                             .hide()
                             .bindEvent({
                                 mousedown: function() {
+                                    counter = 0;
                                     scrollToPosition(position + 1, true);
                                 },
                                 mouserepeat: function() {
-                                    scrollToPosition(position + 1, false);
+                                    if (counter++ % 10 == 0) {
+                                        scrollToPosition(position + 1, false);
+                                    }
                                 }
                             })
                             .appendTo($listsBox);
@@ -417,6 +422,10 @@ pandora.ui.home = function() {
                                 }, 250, function() {
                                     $(this).hide();
                                 });
+                            },
+                            mousewheel: function(e, delta, deltaX, deltaY) {
+                                Ox.print('mwd', deltaX)
+                                scrollToPosition(position + Math.round(deltaX), true);
                             }
                         });
                         self.keydown = function(e) {
@@ -440,7 +449,19 @@ pandora.ui.home = function() {
                         Ox.$document.bind({keydown: self.keydown});
                     }
                     lists.forEach(function(list, i) {
-                        $list[i] = Ox.Element({
+                        $listBox[i] = $('<div>')
+                            .css({
+                                float: 'left',
+                                width: '57px',
+                                height: '57px',
+                                padding: '2px',
+                                margin: '2px',
+                                borderRadius: '16px',
+                                //background: i == selected ? color : 'transparent',
+                                boxShadow: '0 0 2px ' + (i == selected ? color : 'transparent')
+                            })
+                            .appendTo($listsContent);
+                        $listIcon[i] = Ox.Element({
                                 element: '<img>',
                                 tooltip: list.name
                             })
@@ -449,13 +470,9 @@ pandora.ui.home = function() {
                                     + list.name + '/icon256.jpg'
                             })
                             .css({
-                                float: 'left',
                                 width: '57px',
                                 height: '57px',
                                 borderRadius: '16px',
-                                margin: '4px',
-                                boxShadow: i == selected
-                                    ? '0 0 2px ' + color : '',
                                 cursor: 'pointer'
                             })
                             .bindEvent({
@@ -466,7 +483,7 @@ pandora.ui.home = function() {
                                     selectList(i);
                                 }
                             })
-                            .appendTo($listsContent);
+                            .appendTo($listBox[i]);
                     });
                 }
                 $lists.animate({opacity: 1}, 250);
@@ -506,7 +523,7 @@ pandora.ui.home = function() {
                                 opacity: 0
                             }, 250, function() {
                                 $nextButton.hide();
-                            });;
+                            });
                         } else {
                             $nextButton.addClass('visible');
                         }
@@ -518,11 +535,11 @@ pandora.ui.home = function() {
             }
             function selectList(i) {
                 if (i >= 0 && i <= lists.length - 1 && i != selected) {
-                    $list[selected].css({
+                    $listBox[selected].css({
                         boxShadow: 'none'
                     });
                     selected = i;
-                    $list[selected].css({
+                    $listBox[selected].css({
                         boxShadow: '0 0 2px ' + color
                     });
                     if (selected < position) {
