@@ -32,8 +32,13 @@ def getNews(request):
     '''
     data = json.loads(request.POST['data'])
     response = json_response()
-    qs = models.News.objects.all().order_by('-date')
-    response['data']['items'] = [p.json() for p in qs]
+    if 'id' in data:
+        news = models.News.objects.get(pk=ox.fromAZ(data['id']))
+        response['data'] = news.json()
+    else:
+        qs = models.News.objects.all().order_by('-date')
+        response['data']['items'] = [p.json() for p in qs]
+    return render_to_json_response(response)
 actions.register(getNews)
 
 @login_required_json
@@ -62,7 +67,6 @@ def addNews(request):
     return render_to_json_response(response)
 actions.register(addNews, cache=False)
 
-
 @login_required_json
 def removeNews(request):
     '''
@@ -74,18 +78,14 @@ def removeNews(request):
                 }
         }
     '''
-    response = json_response({})
     data = json.loads(request.POST['data'])
-    failed = []
-    ids = [ox.fromAZ(i) for i in data['ids']]
-    for a in models.News.objects.filter(id__in=ids):
-        if a.editable(request.user):
-            a.delete()
-        else:
-            failed.append(a.id)
-    if failed:
+    response = json_response({})
+    news = models.News.objects.get(id=ox.fromAZ(data['id']))
+    if news.editable(request.user):
+        news.delete()
+        response = json_response(status=200, text='news removed')
+    else:
         response = json_response(status=403, text='permission denied')
-        response['data']['ids'] = [ox.toAZ(i) for i in failed]
     return render_to_json_response(response)
 actions.register(removeNews, cache=False)
 
