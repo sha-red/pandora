@@ -145,7 +145,7 @@ pandora.ui.home = function() {
             })
             .bindEvent({
                 click: function() {
-                    pandora.UI.set({page: ''});
+                    pandora.UI.set({page: pandora.user.ui.page});
                     that.fadeOutScreen();
                 }
             })

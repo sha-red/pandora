@@ -79,7 +79,8 @@ pandora.URL = (function() {
 
             var set = {
                 section: state.type == pandora.site.itemsSection ? 'items' : state.type,
-                item: state.item
+                item: state.item,
+                page: ''
             };
 
             if (state.view) {
@@ -132,6 +133,7 @@ pandora.URL = (function() {
                 $(this).trigger('stop');
             });
 
+            Ox.Log('URL', 'UI.set', set)
             if (!pandora.$ui.appPanel && state.item && pandora.user.ui.find) {
                 // on page load, if item is set and there was a query,
                 // we have to check if the item actually matches the query,

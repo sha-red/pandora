@@ -37,11 +37,9 @@ pandora.ui.appPanel = function() {
     });
     function setPage(page) {
         if (page === '') {
-            /*
-            if (pandora.$ui.home) {
-                pandora.$ui.home.fadeOutScreen();
-            } else 
-            */
+            ['site', 'account', 'preferences', 'help'].forEach(function(dialog) {
+                pandora.$ui[dialog + 'Dialog'] && pandora.$ui[dialog + 'Dialog'].close();
+            });
             if (pandora.$ui.tv) {
                 pandora.$ui.tv.fadeOutScreen();
             }
