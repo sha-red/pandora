@@ -1,6 +1,6 @@
 'use strict';
 
-pandora.ui.news = function(width) {
+pandora.ui.news = function(width, height) {
 
     var that = Ox.Element(),
         $left = $('<div>')
@@ -26,7 +26,7 @@ pandora.ui.news = function(width) {
         pandora.api.addNews({
             title: 'Untitled',
             date: Ox.formatDate(new Date(), '%Y-%m-%d'),
-            text: 'Text'
+            text: ''
         }, function(result) {
             items.splice(0, 0, result.data);
             selected = result.data.id;
@@ -50,12 +50,12 @@ pandora.ui.news = function(width) {
     function removeItem() {
         var index = Ox.getIndexById(items, selected);
         items.splice(index, 1);
-        selected = items[0].id;
-        renderItem();
-        renderList();
         pandora.api.removeNews({id: selected}, function(result) {
             // ...
         });
+        selected = items[0].id;
+        renderItem();
+        renderList();
     }
 
     function renderItem() {
@@ -91,7 +91,9 @@ pandora.ui.news = function(width) {
             })
             .css({
                 display: 'inline-block',
-                fontSize: '9px'
+                fontSize: '9px',
+                MozUserSelect: 'text',
+                WebkitUserSelect: 'text'
             })
             .bindEvent({
                 submit: function(data) {
@@ -103,10 +105,16 @@ pandora.ui.news = function(width) {
         $text = Ox.Editable({
                 clickLink: pandora.clickLink,
                 editable: isEditable,
+                maxHeight: height - 96,
+                placeholder: 'No text',
                 tooltip: isEditable ? 'Doubleclick to edit' : '',
                 type: 'textarea',
                 value: items[index].text,
-                width: width - 512
+                width: width - 512,
+            })
+            .css({
+                MozUserSelect: 'text',
+                WebkitUserSelect: 'text'
             })
             .bindEvent({
                 submit: function(data) {
@@ -149,10 +157,10 @@ pandora.ui.news = function(width) {
             Ox.Element()
                 .addClass('item')
                 .css({
-                    width: '176px',
+                    width: '172px',
                     padding: '4px 8px 5px 8px',
                     borderRadius: '8px',
-                    marginBottom: '2px',
+                    margin: '2px',
                     boxShadow: item.id == selected ? '0 0 2px ' + color : '',
                     cursor: 'pointer'
                 })
