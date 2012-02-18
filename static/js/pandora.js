@@ -130,11 +130,14 @@ appPanel
     }
 
     function loadOxJS(callback) {
-        var script = document.createElement('script');
+        var head = document.head
+                || document.getElementsByTagName('head')[0]
+                || document.documentElement, 
+            script = document.createElement('script');
         script.onload = callback;
         script.src = '/static/oxjs/dev/Ox.js';
         script.type = 'text/javascript';
-        document.head.appendChild(script);
+        head.appendChild(script);
     }
 
     function loadOxUI(callback) {
@@ -373,7 +376,7 @@ appPanel
                             .attr({
                                 src: Ox.PATH + 'Ox.UI/png/browser' + browser.name.replace(' ', '') + '128.png'
                             })
-                            .css({width: '32px', height: '32px', margin: '4px'})
+                            .css({width: '32px', height: '32px', border: 0, margin: '4px'})
                     )
                     .appendTo($images);
             });
