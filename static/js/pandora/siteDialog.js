@@ -4,15 +4,21 @@
 
 pandora.ui.siteDialog = function(section) {
 
-    var tabs = Ox.merge(
-        Ox.clone(pandora.site.sitePages, true),
-        [{id: 'software', title: 'Software'}]
-    );
+    var dialogWidth = Math.round(window.innerWidth * 0.75),
+        isEditable = pandora.site.capabilities.canEditSitePages[pandora.user.level],
+        tabs = Ox.merge(
+            Ox.clone(pandora.site.sitePages, true),
+            [{id: 'software', title: 'Software'}]
+        );
     Ox.getObjectById(tabs, section).selected = true;
     var $tabPanel = Ox.TabPanel({
             content: function(id) {
                 var $content = Ox.Element().css({padding: '16px', overflowY: 'auto'});
-                if (id == 'software') {
+                if (id == 'contact') {
+                    pandora.$ui.contactForm = pandora.ui.contactForm().appendTo($content);
+                } else if (id == 'news') {
+                    pandora.$ui.news = pandora.ui.news(dialogWidth).appendTo($content);
+                } else if (id == 'software') {
                     Ox.Element()
                         .html(
                             '<h1><b>Pan.do/ra</b></h1>'
@@ -23,18 +29,15 @@ pandora.ui.siteDialog = function(section) {
                             + '<p><b>Pan.do/ra</b> and <b>OxJS</b> will be released in 2012. More soon...</p>'
                         )
                         .appendTo($content);
-                } else if (id == 'contact') {
-                    pandora.$ui.contactForm = pandora.ui.contactForm().appendTo($content);
                 } else {
                     pandora.api.getPage({name: id}, function(result) {
-                        var $column, risk;
+                        var $right, risk;
                         Ox.Editable({
                                 clickLink: pandora.clickLink,
-                                editable: pandora.site.capabilities.canEditSitePages[pandora.user.level],
-                                tooltip: pandora.site.capabilities.canEditSitePages[pandora.user.level]
-                                    ? 'Doubleclick to edit' : '',
+                                editable: isEditable,
+                                tooltip: isEditable ? 'Doubleclick to edit' : '',
                                 type: 'textarea',
-                                value: result.data.body
+                                value: result.data.text
                             })
                             .css(id == 'rights' ? {
                                 // this will get applied twice,
@@ -48,19 +51,19 @@ pandora.ui.siteDialog = function(section) {
                                     Ox.Request.clearCache('getPage');
                                     pandora.api.editPage({
                                         name: id,
-                                        body: data.value
+                                        text: data.value
                                     });
                                 }
                             })
                             .appendTo($content);
                         if (id == 'rights') {
-                            $column = $('<div>')
+                            $right = $('<div>')
                                 .css({position: 'absolute', top: '16px', right: '16px', width: '128px'})
                                 .appendTo($content);
                             $('<img>')
                                 .attr({src: '/static/png/rights.png'})
                                 .css({width: '128px', height: '128px', marginBottom: '8px'})
-                                .appendTo($column);
+                                .appendTo($right);
                             risk = ['Unknown', 'Severe', 'High', 'Significant', 'General', 'Low'];
                             Ox.merge(
                                 ['Unknown'],
@@ -79,7 +82,7 @@ pandora.ui.siteDialog = function(section) {
                                         + (risk[i].length > 6 ? '<br/> of ' : ' of<br/>')
                                         + 'Legal Action</div>'
                                     )
-                                    .appendTo($column);
+                                    .appendTo($right);
                             });
                         }                        
                     });
@@ -135,15 +138,18 @@ pandora.ui.siteDialog = function(section) {
             minWidth: 688, // 16 + 256 + 16 + 384 + 16
             removeOnClose: true,
             title: Ox.getObjectById(tabs, section).title,
-            width: Math.round(window.innerWidth * 0.75),
+            width: dialogWidth
         })
         .bindEvent({
             close: function(data) {
                 pandora.UI.set({page: ''});
             },
             resize: function(data) {
-                if ($tabPanel.selected() == 'contact') {
+                var selected = $tabPanel.selected();
+                if (selected == 'contact') {
                     pandora.$ui.contactForm.resize();
+                } else if (selected == 'news') {
+                    
                 }
             }
         });
