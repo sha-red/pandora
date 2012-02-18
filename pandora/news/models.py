@@ -6,6 +6,7 @@ from django.db import models
 from django.contrib.auth.models import User
 import ox
 
+from changelog.models import Changelog
 import managers
 
 
@@ -22,10 +23,14 @@ class News(models.Model):
     def editable(self, user):
         return user.is_authenticated() and user.get_profile().capability("canEditSitePages")
 
-    '''
     def save(self, *args, **kwargs):
         super(News, self).save(*args, **kwargs)
-    '''
+        self.log()
+
+    def log(self):
+        c = Changelog(type='news')
+        c.value = self.json()
+        c.save()
 
     def json(self, keys=None):
         j = {
