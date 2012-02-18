@@ -197,10 +197,14 @@ class Annotation(models.Model):
             qs = self.places.all()
             if qs.count() > 0:
                 j['place'] = qs[0].json(user=user)
+            else:
+                j['place'] = {}
         elif l['type'] == 'event':
             qs = self.events.all()
             if qs.count() > 0:
                 j['event'] = qs[0].json(user=user)
+            else:
+                j['event'] = {}
 
         if layer or (keys and 'layer' in keys):
             j['layer'] = self.layer

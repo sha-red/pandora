@@ -350,6 +350,8 @@ pandora.ui.item = function() {
                         Ox.Log('', 'editAnnotation', data);
                         function callback(result) {
                             Ox.Log('', 'editAnnotation result', result);
+                            result.data.date = Ox.formatDate(result.data.modified.substr(0, 10),
+                                                             '%B %e, %Y');
                             pandora.$ui.editor.updateAnnotation(data.id, result.data);
                         };
                         if (data.id[0] == '_') {

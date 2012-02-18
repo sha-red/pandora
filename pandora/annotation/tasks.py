@@ -13,11 +13,12 @@ def update_matching_events(id):
     for e in a.events.filter(defined=False).exclude(name=a.value):
         if e.annotations.exclude(id=id).count() == 0:
             e.delete()
-    if a.get_layer().get('type') == 'event' \
-        and a.events.count() == 0:
-            a.events.add(Event.get_or_create(a.value))
     for e in a.events.all():
         e.update_matches()
+    if a.get_layer().get('type') == 'event' and a.events.count() == 0:
+        a.events.add(Event.get_or_create(a.value))
+        for e in a.events.all():
+            e.update_matches()
     ids = [e['id'] for e in Event.objects.all().values('id')]
     for i in ids:
         e = Event.objects.get(pk=i)
@@ -33,11 +34,12 @@ def update_matching_places(id):
     for p in a.places.filter(defined=False).exclude(name=a.value):
         if p.annotations.exclude(id=id).count() == 0:
             p.delete()
-    if a.get_layer().get('type') == 'place' \
-        and a.places.count() == 0:
-            a.places.add(Place.get_or_create(a.value))
     for p in a.places.all():
         p.update_matches()
+    if a.get_layer().get('type') == 'place' and a.places.count() == 0:
+        a.places.add(Place.get_or_create(a.value))
+        for p in a.places.all():
+            p.update_matches()
     ids = [e['id'] for e in Place.objects.all().values('id')]
     for i in ids:
         e = Place.objects.get(pk=i)
