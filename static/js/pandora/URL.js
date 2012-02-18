@@ -232,11 +232,13 @@ pandora.URL = (function() {
             findKeys: findKeys,
             getItem: pandora.getItemByIdOrTitle,
             getSpan: pandora.getMetadataByIdOrName,
-            pages: [
-                'about', 'api', 'contact', 'faq', 'help', 'home', 'news',
-                'preferences', 'rights', 'signin', 'signout', 'signup',
-                'software', 'terms', 'tour', 'tutorial', 'tv'
-            ],
+            pages: Ox.merge(
+                ['home', 'software', 'api', 'help', 'tv'],
+                pandora.site.sitePages.map(function(page) {
+                    return page.id;
+                }),
+                ['preferences', 'signup', 'signin', 'signout']
+            ),
             sortKeys: sortKeys,
             spanType: spanType,
             types: [pandora.site.itemName.plural.toLowerCase(), 'edits', 'texts'],

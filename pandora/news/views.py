@@ -33,7 +33,7 @@ def getNews(request):
     data = json.loads(request.POST['data'])
     response = json_response()
     if 'id' in data:
-        news = models.News.objects.get(pk=ox.fromAZ(data['id']))
+        news = get_object_or_404_json(models.News, id=ox.fromAZ(data['id']))
         response['data'] = news.json()
     else:
         qs = models.News.objects.all().order_by('-date')
@@ -80,7 +80,7 @@ def removeNews(request):
     '''
     data = json.loads(request.POST['data'])
     response = json_response({})
-    news = models.News.objects.get(id=ox.fromAZ(data['id']))
+    news = get_object_or_404_json(models.News, id=ox.fromAZ(data['id']))
     if news.editable(request.user):
         news.delete()
         response = json_response(status=200, text='news removed')
