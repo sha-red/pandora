@@ -246,10 +246,8 @@ pandora.ui.infoView = function(data) {
                     clickLink: pandora.clickLink,
                     editable: key != 'duration',
                     format: function(value) {
-                        return key != 'duration' ? formatValue(listKeys.indexOf(key) >= 0
-                                                               ? value.split(', ') : value, key)
-                            : value < 60 ? Math.round(value) + ' sec'
-                            : Math.round(value / 60) + ' min';
+                        return formatValue(listKeys.indexOf(key) >= 0
+                                           ? value.split(', ') : value, key);
                     },
                     placeholder: formatLight('unknown'),
                     tooltip: 'Doubleclick to edit',
@@ -270,13 +268,7 @@ pandora.ui.infoView = function(data) {
         html = [];
         ['location', 'date', 'language', 'duration'].forEach(function(key) {
             if (data[key]) {
-                html.push(
-                    formatKey(key) + (
-                        key != 'duration' ? formatValue(data[key], key)
-                            : data[key] < 60 ? Math.round(data[key]) + ' sec'
-                            : Math.round(data[key] / 60) + ' min'
-                    )
-                );
+                html.push(formatKey(key) + formatValue(data[key], key));
             }
         });
         $('<div>').css(css).html(html.join('; ')).appendTo($center);
@@ -555,6 +547,12 @@ pandora.ui.infoView = function(data) {
     }
 
     function formatValue(value, key) {
+        if(key == 'date') {
+            return value ? Ox.formatDate(value,
+                ['', '%Y', '%B, %Y', '%B %e, %Y'][value.split('-').length]) : '';
+        } else if(key == 'duration') {
+            return value < 60 ? Math.round(value) + ' sec' : Math.round(value / 60) + ' min';
+        }
         return (Ox.isArray(value) ? value : [value]).map(function(value) {
             return key ?
                 '<a href="/' + key + '==' + value + '">' + value + '</a>'
