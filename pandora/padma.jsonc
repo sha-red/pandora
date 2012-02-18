@@ -587,8 +587,8 @@
             "showIconBrowser": false,
             "showInfo": true,
             "showLayers": {
-                "places": true,
-                "events": true,
+                "places": false,
+                "events": false,
                 "keywords": true,
                 "descriptions": true,
                 "transcripts": true
@@ -612,7 +612,7 @@
             "videoResolution": 240,
             "videoScale": "fit",
             "videoMuted": false,
-            "videoSize": "small",
+            "videoSize": "large",
             "videoView": "video",
             "videoVolume": 1
         },
