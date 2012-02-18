@@ -506,7 +506,7 @@
             // E-mail address in contact form (to)
             "contact": "pad.ma@pad.ma",
             "footer": "-- \nPad.ma - http://pad.ma",
-            "prefix": "Pad.ma Newsletter -",
+            "prefix": "Pad.ma News -",
             // E-mail address uses by the system (from)
             "system": "system@pad.ma"
         },
