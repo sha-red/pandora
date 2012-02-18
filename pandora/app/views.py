@@ -35,7 +35,7 @@ def index(request):
         if p['id'] == page:
             title += ' - ' + p['title']
             text, created = models.Page.objects.get_or_create(name=page)
-            text = text.body
+            text = text.text
     context = RequestContext(request, {
         'base_url': request.build_absolute_uri('/'),
         'settings': settings,
@@ -101,7 +101,7 @@ def getPage(request):
             status: ...
             data: {
                 name:
-                body:
+                text:
             }
         }
     '''
@@ -112,9 +112,9 @@ def getPage(request):
         name = data['name']
     page, created = models.Page.objects.get_or_create(name=name)
     if created:
-        page.body = 'Insert text here'
+        page.text= 'Insert text here'
         page.save()
-    response = json_response({'name': page.name, 'body': page.body})
+    response = json_response({'name': page.name, 'text': page.text})
     return render_to_json_response(response)
 actions.register(getPage)
 
@@ -124,13 +124,13 @@ def editPage(request):
     '''
         param data {
             name: pagename
-            body: text
+            text: text
         }
         return {
             status: ...
             data: {
                 name:
-                body:
+                text:
             }
         }
     '''
@@ -139,9 +139,9 @@ def editPage(request):
         page, created = models.Page.objects.get_or_create(name=data['name'])
         if not created:
             page.log()
-        page.body = data['body']
+        page.text = data['text']
         page.save()
-        response = json_response({'name': page.name, 'page': page.body})
+        response = json_response({'name': page.name, 'text': page.text})
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)

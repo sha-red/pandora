@@ -10,7 +10,7 @@ class Page(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=1024, unique=True)
-    body = models.TextField(blank=True)
+    text = models.TextField(blank=True)
 
     def __unicode__(self):
         return self.name
@@ -19,6 +19,6 @@ class Page(models.Model):
         c = Changelog(type='page')
         c.value = {
             'name': self.name,
-            'body': self.body,
+            'text': self.text,
         }
         c.save()
