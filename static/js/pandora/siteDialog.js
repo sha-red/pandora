@@ -4,7 +4,8 @@
 
 pandora.ui.siteDialog = function(section) {
 
-    var dialogWidth = Math.round(window.innerWidth * 0.75),
+    var dialogHeight = Math.round((window.innerHeight - 48) * 0.75),
+        dialogWidth = Math.round(window.innerWidth * 0.75),
         isEditable = pandora.site.capabilities.canEditSitePages[pandora.user.level],
         tabs = Ox.merge(
             Ox.clone(pandora.site.sitePages, true),
@@ -17,7 +18,7 @@ pandora.ui.siteDialog = function(section) {
                 if (id == 'contact') {
                     pandora.$ui.contactForm = pandora.ui.contactForm().appendTo($content);
                 } else if (id == 'news') {
-                    pandora.$ui.news = pandora.ui.news(dialogWidth).appendTo($content);
+                    pandora.$ui.news = pandora.ui.news(dialogWidth, dialogHeight).appendTo($content);
                 } else if (id == 'software') {
                     Ox.Element()
                         .html(
@@ -132,7 +133,7 @@ pandora.ui.siteDialog = function(section) {
             ],
             closeButton: true,
             content: $tabPanel,
-            height: Math.round((window.innerHeight - 24) * 0.75),
+            height: dialogHeight,
             maximizeButton: true,
             minHeight: 256,
             minWidth: 688, // 16 + 256 + 16 + 384 + 16
