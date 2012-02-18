@@ -18,101 +18,31 @@ from item.models import Item
 
 import models
 
-
-def parse_query(data, user):
-    query = {}
-    query['range'] = [0, 100]
-    query['sort'] = [{'key':'in', 'operator':'+'}]
-    for key in ('keys', 'group', 'range', 'sort', 'query'):
-        if key in data:
-            query[key] = data[key]
-    query['qs'] = models.News.objects.find(query, user)
-    if 'itemsQuery' in data:
-        item_query = Item.objects.find({'query': data['itemsQuery']}, user)
-        query['qs'] = query['qs'].filter(item__in=item_query)
-    return query
-
-def news_sort_key(key):
-    return {
-        'text': 'value',
-        'position': 'start',
-    }.get(key, key)
-
-def order_query(qs, sort):
-    order_by = []
-    print sort
-    for e in sort:
-        operator = e['operator']
-        if operator != '-':
-            operator = ''
-        key = {
-            'duration': 'clip__duration',
-            'in': 'start',
-            'lightness': 'clip__lightness',
-            'out': 'end',
-            'saturation': 'clip__saturation',
-            'volume': 'clip__volume',
-        }.get(e['key'], e['key'])
-        if key.startswith('clip:'):
-            key = news_sort_key(e['key'][len('clip:'):])
-        elif key not in ('start', 'end', 'value') and not key.startswith('clip__'):
-            #key mgith need to be changed, see order_sort in item/views.py
-            key = "item__sort__%s" % key
-        order = '%s%s' % (operator, key)
-        order_by.append(order)
-    if order_by:
-        qs = qs.order_by(*order_by, nulls_last=True)
-    return qs
-
-def findNews(request):
+def getNews(request):
     '''
         param data {
-            query: ...
-            itemsQuery: ...
         }
 
         return {
             'status': {'code': int, 'text': string}
             'data': {
-                newss = [{..}, {...}, ...]
+                items = [{..}, {...}, ...]
             }
         }
     '''
     data = json.loads(request.POST['data'])
     response = json_response()
-
-    query = parse_query(data, request.user)
-    qs = order_query(query['qs'], query['sort'])
-    if 'keys' in data:
-        qs = qs[query['range'][0]:query['range'][1]]
-        response['data']['items'] = [p.json(keys=data['keys']) for p in qs]
-    elif 'position' in query:
-        ids = [ox.toAZ(i.id) for i in qs]
-        data['conditions'] = data['conditions'] + {
-            'value': data['position'],
-            'key': query['sort'][0]['key'],
-            'operator': '^'
-        }
-        query = parse_query(data, request.user)
-        qs = order_query(query['qs'], query['sort'])
-        if qs.count() > 0:
-            response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
-    elif 'positions' in data:
-        ids = [ox.toAZ(i.id) for i in qs]
-        response['data']['positions'] = utils.get_positions(ids, data['positions'])
-    else:
-        response['data']['items'] = qs.count()
-    return render_to_json_response(response)
-actions.register(findNews)
-
+    qs = models.News.objects.all().order_by('-date')
+    response['data']['items'] = [p.json() for p in qs]
+actions.register(getNews)
 
 @login_required_json
 def addNews(request):
     '''
         param data {
             title: string,
-            content: text,
-            public: boolean
+            date: string,
+            text: text,
         }
         return {'status': {'code': int, 'text': string},
                 'data': {
@@ -123,11 +53,10 @@ def addNews(request):
     '''
     data = json.loads(request.POST['data'])
 
-    news = models.News(
-        user=request.user,
-        title=data['title'],
-        content=data['content'],
-        public=data['content'])
+    news = models.News()
+    for key in ('title', 'text', 'date'):
+        if key in data:
+            setattr(news, key, data[key])
     news.save()
     response = json_response(news.json())
     return render_to_json_response(response)
@@ -160,15 +89,14 @@ def removeNews(request):
     return render_to_json_response(response)
 actions.register(removeNews, cache=False)
 
-
 @login_required_json
 def editNews(request):
     '''
         param data {
             id:,
             title:
-            content:
-            public:
+            text:
+            date:
         }
         return {'status': {'code': int, 'text': string},
                 'data': {
@@ -181,7 +109,7 @@ def editNews(request):
     data = json.loads(request.POST['data'])
     n = get_object_or_404_json(models.News, id=ox.fromAZ(data['id']))
     if n.editable(request.user):
-        for key in ('title', 'content', 'public'):
+        for key in ('title', 'text', 'date'):
             if key in data:
                 setattr(n, key, data[key])
         n.save()

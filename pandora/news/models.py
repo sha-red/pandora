@@ -14,18 +14,13 @@ class News(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, related_name='news')
 
     title = models.TextField()
-    content = models.TextField()
+    date = models.TextField()
+    text = models.TextField()
 
     def editable(self, user):
-        if user.is_authenticated():
-            if user.get_profile().get_level() in ('staff', 'admin') or \
-               self.user == user or \
-               user.groups.filter(id__in=self.groups.all()).count() > 0:
-                return True
-        return False
+        return user.is_authenticated() and user.get_profile().capability("canEditSitePages")
 
     '''
     def save(self, *args, **kwargs):
@@ -34,10 +29,10 @@ class News(models.Model):
 
     def json(self, keys=None):
         j = {
-            'user': self.user.username,
             'id': ox.toAZ(self.id),
+            'date': self.date,
             'title': self.title,
-            'content': self.content,
+            'text': self.text,
         }
         if keys:
             for key in j.keys():
@@ -46,5 +41,5 @@ class News(models.Model):
         return j
 
     def __unicode__(self):
-        return u"%s/%s" %(self.created, self.title)
+        return u"%s/%s" %(self.date, self.title)
 

@@ -31,7 +31,7 @@
         "canEditPlaces": {"staff": true, "admin": true},
         "canEditSitePages": {"staff": true, "admin": true},
         "canEditUsers": {"admin": true},
-        "canImportAnnotations": {"staff": true, "admin": true},
+        "canImportAnnotations": {},
         "canPlayClips": {"guest": 2, "member": 2, "friend": 4, "staff": 4, "admin": 4},
         "canPlayVideo": {"guest": 1, "member": 1, "friend": 4, "staff": 4, "admin": 4},
         "canSeeDebugMenu": {"staff": true, "admin": true},
