@@ -1075,14 +1075,16 @@ def item(request, id):
                 data.append({'key': key.capitalize(), 'value': value})
         clips = []
         clip = {'in': 0, 'annotations': []}
-        for a in item.annotations.filter(
-            layer__in=models.Annotation.public_layers()).order_by('start', 'end', 'sortvalue'):
-            if clip['in'] < a.start:
-                if clip['annotations']:
-                    clip['annotations'] = '<br />\n'.join(clip['annotations'])
-                    clips.append(clip)
-                clip = {'in': a.start, 'annotations': []}
-            clip['annotations'].append(a.value)
+        #logged in users should have javascript. not adding annotations makes load faster
+        if request.user.is_anonymous():
+            for a in item.annotations.filter(
+                layer__in=models.Annotation.public_layers()).order_by('start', 'end', 'sortvalue'):
+                if clip['in'] < a.start:
+                    if clip['annotations']:
+                        clip['annotations'] = '<br />\n'.join(clip['annotations'])
+                        clips.append(clip)
+                    clip = {'in': a.start, 'annotations': []}
+                clip['annotations'].append(a.value)
         ctx = {
             'current_url': request.build_absolute_uri(request.get_full_path()),
             'base_url': request.build_absolute_uri('/'),

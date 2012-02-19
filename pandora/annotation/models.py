@@ -80,7 +80,7 @@ class Annotation(models.Model):
     public_id = models.CharField(max_length=128, unique=True, null=True)
     #seconds
     start = models.FloatField(default=-1, db_index=True)
-    end = models.FloatField(default=-1)
+    end = models.FloatField(default=-1, db_index=True)
 
     layer = models.CharField(max_length=255, db_index=True)
     value = models.TextField()
