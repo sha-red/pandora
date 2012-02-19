@@ -58,13 +58,15 @@ pandora.ui.mainMenu = function() {
                                 }, view);
                             }) },
                         ]},
-                        { id: 'icons', title: 'Icons', items: [
-                            { group: 'viewicons', min: 1, max: 1, items: ['posters', 'frames'].map(function(icons) {
-                                return {id: icons, title: Ox.toTitleCase(icons), checked: ui.icons == icons};
-                            }) },
-                            {},
-                            { id: 'showsiteposter', title: 'Always Show ' + pandora.site.site.name + ' Poster', checked: ui.showSitePoster }
-                        ] },
+                        { id: 'icons', title: 'Icons', items: Ox.merge([
+                                { group: 'viewicons', min: 1, max: 1, items: ['posters', 'frames'].map(function(icons) {
+                                    return {id: icons, title: Ox.toTitleCase(icons), checked: ui.icons == icons};
+                                }) }
+                            ], pandora.site.media.importPosters ? [
+                                {},
+                                { id: 'showsiteposter', title: 'Always Show ' + pandora.site.site.name + ' Poster', checked: ui.showSitePoster }
+                            ] : []
+                        ) },
                         { id: 'columns', title: 'Columns', items: [
                             { id: 'loadcolumns', title: 'Load Layout...', disabled: true },
                             { id: 'savecolumns', title: 'Save Layout...', disabled: true },

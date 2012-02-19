@@ -274,7 +274,7 @@ pandora.ui.item = function() {
                     out: pandora.user.ui.videoPoints[pandora.user.ui.item].out,
                     position: pandora.user.ui.videoPoints[pandora.user.ui.item].position,
                     posterFrame: result.data.posterFrame,
-                    posterFrameControls: !pandora.site.media.importPosterFrames,
+                    posterFrameControls: !pandora.site.media.importFrames,
                     resolution: pandora.user.ui.videoResolution,
                     selected: pandora.user.ui.videoPoints[pandora.user.ui.item].annotation
                         ? pandora.user.ui.item + '/' + pandora.user.ui.videoPoints[pandora.user.ui.item].annotation

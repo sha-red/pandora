@@ -734,7 +734,6 @@ pandora.ui.infoView = function(data) {
         iconRatio = ui.icons == 'posters'
             ? (ui.showSitePoster ? 5/8 : data.posterRatio) : 1;
         toggleIconSize();
-        pandora.user.level == 'admin' && $list.replaceWith($list = renderList());
     };
 
     that.resize = function() {

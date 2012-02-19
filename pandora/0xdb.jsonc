@@ -545,7 +545,7 @@
             "canAddAnnotations": {"staff": true, "admin": true},
             "hasEvents": true,
             "hasPlaces": true,
-            "isSubtitle": true,
+            "isSubtitles": true,
             "item": "Subtitle",
             "type": "text"
         }
@@ -564,8 +564,8 @@
         {"id": "calendar", "title": "on Calendar"}
     ],
     "media": {
-        "importMoviePosters": true,
-        "importPosterFrames": true
+        "importPosters": true,
+        "importFrames": true
     },
     "personalLists": [
         {"title": "Favorites"},

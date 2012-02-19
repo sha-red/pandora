@@ -489,6 +489,7 @@ pandora.ui.home = function() {
                 that.fadeOutScreen();
                 pandora.UI.set({
                     page: '',
+                    item: '',
                     find: {
                         conditions: [{
                             key: 'list',

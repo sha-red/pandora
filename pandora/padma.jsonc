@@ -435,6 +435,7 @@
             "title": "Places",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
             "item": "Place",
+            "overlap": true,
             "type": "place"
         },
         {
@@ -442,6 +443,7 @@
             "title": "Events",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
             "item": "Event",
+            "overlap": true,
             "type": "event"
         },
         {
@@ -449,6 +451,7 @@
             "title": "Keywords",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
             "item": "Keyword",
+            "overlap": true,
             "type": "string"
         },
         {
@@ -482,8 +485,8 @@
         {"id": "calendar", "title": "on Calendar"}
     ],
     "media": {
-        "importMoviePosters": false,
-        "importPosterFrames": false 
+        "importPosters": false,
+        "importFrames": false 
     },
     "personalLists": [
         {"title": "Favorites"}

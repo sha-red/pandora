@@ -271,9 +271,11 @@ pandora.URL = (function() {
                 pandora.$ui.player.remove();
             }
             if (e.state && !Ox.isEmpty(e.state)) {
-                Ox.Log('', 'E.STATE', e.state)
+                Ox.Log('URL', 'E.STATE', e.state)
                 document.title = e.state.title;
                 setState(e.state);
+            } else if (window.location.pathname == '/') {
+                pandora.$ui.home = pandora.ui.home().fadeInScreen();
             } else {
                 that.parse();
             }

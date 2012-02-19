@@ -179,6 +179,9 @@ pandora.clickLink = function(e) {
         e.target.hostname == document.location.hostname
         && !Ox.starts(e.target.pathname, '/static')
     ) {
+        if (pandora.$ui.home && e.target.pathname != '/home') {
+            pandora.$ui.home.fadeOutScreen();
+        }
         pandora.URL.push(e.target.pathname);
     } else {
         window.open('/url=' + encodeURIComponent(e.target.href), '_blank');
