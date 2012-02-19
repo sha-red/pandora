@@ -793,8 +793,8 @@ pandora.getVideoOptions = function(data) {
     var canPlayClips = data.editable || pandora.site.capabilities.canPlayClips[pandora.user.level] >= data.rightslevel,
         canPlayVideo = data.editable || pandora.site.capabilities.canPlayVideo[pandora.user.level] >= data.rightslevel,
         options = {},
-        subtitlesLayer = Ox.getObject(pandora.site.layers, 'isSubtitle', true).id;
-    options.subtitles = subtitlesLayer ? data.layers[subtitlesLayer].items.map(function(subtitle) {
+        subtitlesLayer = Ox.getObject(pandora.site.layers, 'isSubtitle', true);
+    options.subtitles = subtitlesLayer ? data.layers[subtitlesLayer.id].items.map(function(subtitle) {
         return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
     }) : [];
     options.censored = canPlayVideo ? []
