@@ -126,6 +126,12 @@ pandora.URL = (function() {
                 if (!state.item) {
                     set.find = state.find;
                 }
+            } else {
+                if (!pandora.$ui.appPanel) {
+                    // on page load without find, clear find, so that
+                    // removing query and reloading works as expected
+                    set.find = pandora.site.user.ui.find;
+                }
             }
 
             Ox.Request.cancel();

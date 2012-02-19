@@ -379,7 +379,8 @@ pandora.ui.home = function() {
                                     scrollToPosition(position - 1, true);
                                 },
                                 mouserepeat: function() {
-                                    if (counter++ % 10 == 0) {
+                                    // fixme: arbitrary
+                                    if (counter++ % 5 == 0) {
                                         scrollToPosition(position - 1, false);
                                     }
                                 }
@@ -403,9 +404,8 @@ pandora.ui.home = function() {
                                     scrollToPosition(position + 1, true);
                                 },
                                 mouserepeat: function() {
-                                    Ox.print('---------------------------')
-                                    if (counter++ % 10 == 0) {
-                                        Ox.print('YES')
+                                    // fixme: arbitrary
+                                    if (counter++ % 5 == 0) {
                                         scrollToPosition(position + 1, false);
                                     }
                                 }
@@ -427,7 +427,8 @@ pandora.ui.home = function() {
                                 });
                             },
                             mousewheel: function(e, delta, deltaX, deltaY) {
-                                Ox.print('mwd', deltaX)
+                                Ox.print('mwd', deltaX);
+                                // fixme: arbitrary
                                 scrollToPosition(position + Math.round(deltaX * 2), true);
                             }
                         });
