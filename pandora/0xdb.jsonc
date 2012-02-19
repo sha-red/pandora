@@ -10,7 +10,7 @@
         {"key": "title", "operator": "+"}
     ],
     "annotations": {
-        "showUsers": true
+        "showUsers": false
     },
     /*
         Capabilities are per user level.
