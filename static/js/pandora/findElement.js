@@ -3,7 +3,8 @@
 pandora.ui.findElement = function() {
     var findIndex = pandora.user.ui._findState.index,
         findKey = pandora.user.ui._findState.key,
-        findValue = pandora.user.ui._findState.value;
+        findValue = pandora.user.ui._findState.value,
+        hasPressedClear = false;
     var that = Ox.FormElementGroup({
             elements: Ox.merge(pandora.user.ui._list ? [
                     pandora.$ui.findListSelect = Ox.Select({
@@ -69,8 +70,16 @@ pandora.ui.findElement = function() {
                         width: 192
                     })
                     .bindEvent({
+                        clear: function() {
+                            hasPressedClear = true;
+                        },
                         focus: function(data) {
                             if (pandora.$ui.findSelect.value() == 'advanced') {
+                                if (hasPressedClear) {
+                                    pandora.UI.set({find: pandora.site.user.ui.find});
+                                    that.update();
+                                    hasPressedClear = false;
+                                }
                                 pandora.$ui.findInput.blurInput();
                                 pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                             }
