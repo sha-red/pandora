@@ -545,7 +545,7 @@
             "canAddAnnotations": {"staff": true, "admin": true},
             "hasEvents": true,
             "hasPlaces": true,
-            "isSubtitles": true,
+            "isSubtitle": true,
             "item": "Subtitle",
             "type": "text"
         }

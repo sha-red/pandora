@@ -449,7 +449,6 @@
             "title": "Keywords",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
             "item": "Keyword",
-            "isSubtitle": true,
             "type": "string"
         },
         {
