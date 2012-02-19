@@ -12,7 +12,9 @@ pandora.ui.status = function(key, data) {
         segments.push(Ox.formatDuration(data.runtime, 'short'));
     if (data.files)
         segments.push(data.files + ' file' + (data.files != 1 ? 's' : ''));
-    if (data.duration)
+    if (!data.runtime && data.duration)
+        segments.push(Ox.formatDuration(data.duration, 'short'));
+    else if (data.duration)
         segments.push(Ox.formatDuration(data.duration));
     if (data.size)
         segments.push(Ox.formatValue(data.size, 'B'));
