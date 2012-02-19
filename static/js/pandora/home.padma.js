@@ -375,10 +375,13 @@ pandora.ui.home = function() {
                             .hide()
                             .bindEvent({
                                 mousedown: function() {
+                                    counter = 0;
                                     scrollToPosition(position - 1, true);
                                 },
                                 mouserepeat: function() {
-                                    scrollToPosition(position - 1, false);
+                                    if (counter++ % 10 == 0) {
+                                        scrollToPosition(position - 1, false);
+                                    }
                                 }
                             })
                             .appendTo($listsBox);
@@ -400,7 +403,9 @@ pandora.ui.home = function() {
                                     scrollToPosition(position + 1, true);
                                 },
                                 mouserepeat: function() {
+                                    Ox.print('---------------------------')
                                     if (counter++ % 10 == 0) {
+                                        Ox.print('YES')
                                         scrollToPosition(position + 1, false);
                                     }
                                 }
@@ -423,29 +428,29 @@ pandora.ui.home = function() {
                             },
                             mousewheel: function(e, delta, deltaX, deltaY) {
                                 Ox.print('mwd', deltaX)
-                                scrollToPosition(position + Math.round(deltaX), true);
+                                scrollToPosition(position + Math.round(deltaX * 2), true);
                             }
                         });
-                        self.keydown = function(e) {
-                            var focused = Ox.Focus.focused(),
-                                key = Ox.KEYS[e.keyCode];
-                            if (
-                                focused === null
-                                || !Ox.UI.elements[focused].hasClass('OxInput')
-                            ) {
-                                if (key == 'left' && selected > 0) {
-                                    selectList(selected - 1);
-                                } else if (key == 'up' && selected > 0) {
-                                    selectList(0);
-                                } else if (key == 'right' && selected < lists.length - 1) {
-                                    selectList(selected + 1);
-                                } else if (key == 'down' && selected < lists.length - 1) {
-                                    selectList(lists.length - 1);
-                                }
-                            }
-                        };
-                        Ox.$document.bind({keydown: self.keydown});
                     }
+                    self.keydown = function(e) {
+                        var focused = Ox.Focus.focused(),
+                            key = Ox.KEYS[e.keyCode];
+                        if (
+                            focused === null
+                            || !Ox.UI.elements[focused].hasClass('OxInput')
+                        ) {
+                            if (key == 'left' && selected > 0) {
+                                selectList(selected - 1);
+                            } else if (key == 'up' && selected > 0) {
+                                selectList(0);
+                            } else if (key == 'right' && selected < lists.length - 1) {
+                                selectList(selected + 1);
+                            } else if (key == 'down' && selected < lists.length - 1) {
+                                selectList(lists.length - 1);
+                            }
+                        }
+                    };
+                    Ox.$document.bind({keydown: self.keydown});
                     lists.forEach(function(list, i) {
                         $listBox[i] = $('<div>')
                             .css({
