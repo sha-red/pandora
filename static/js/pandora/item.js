@@ -135,6 +135,7 @@ pandora.ui.item = function() {
                 clickLink: pandora.clickLink,
                 cuts: result.data.cuts || [],
                 duration: result.data.duration,
+                enableDownload: pandora.site.capabilities.canDownloadVideo[pandora.user.level] >= result.data.rightslevel,
                 enableSubtitles: pandora.user.ui.videoSubtitles,
                 find: pandora.user.ui.itemFind,
                 getTimelineImageURL: function(i) {
@@ -175,6 +176,9 @@ pandora.ui.item = function() {
                 },
                 annotationssort: function(data) {
                     pandora.UI.set({annotationsSort: data.sort});
+                },
+                downloadvideo: function(data) {
+                    document.location.href = '/' + pandora.user.ui.item + '/torrent/';
                 },
                 find: function(data) {
                     pandora.UI.set('itemFind', data.find);
