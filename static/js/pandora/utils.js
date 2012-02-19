@@ -793,11 +793,9 @@ pandora.getVideoOptions = function(data) {
     var canPlayClips = data.editable || pandora.site.capabilities.canPlayClips[pandora.user.level] >= data.rightslevel,
         canPlayVideo = data.editable || pandora.site.capabilities.canPlayVideo[pandora.user.level] >= data.rightslevel,
         options = {};
-    options.subtitles = data.layers.subtitles
-        ? data.layers.subtitles.map(function(subtitle) {
-            return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
-        })
-        : [];
+    options.subtitles = Ox.getObject(data.layers, 'isSubtitle', true) || []).map(function(subtitle) {
+        return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
+    });
     options.censored = canPlayVideo ? []
         : canPlayClips ? (
             options.subtitles.length

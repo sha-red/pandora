@@ -459,7 +459,6 @@
             "title": "Descriptions",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
             "item": "Description",
-            "overlay": true,
             "showInfo": true,
             "type": "text"
         },
@@ -468,7 +467,6 @@
             "title": "Transcripts",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
             "item": "Transcript",
-            "overlay": true,
             "showInfo": true,
             "type": "text"
         }
