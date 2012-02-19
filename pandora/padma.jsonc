@@ -435,7 +435,6 @@
             "title": "Places",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
             "item": "Place",
-            "overlap": true,
             "type": "place"
         },
         {
@@ -443,7 +442,6 @@
             "title": "Events",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
             "item": "Event",
-            "overlap": true,
             "type": "event"
         },
         {
@@ -451,7 +449,7 @@
             "title": "Keywords",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
             "item": "Keyword",
-            "overlap": true,
+            "isSubtitle": true,
             "type": "string"
         },
         {
