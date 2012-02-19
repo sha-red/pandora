@@ -12,7 +12,7 @@ pandora.ui.home = function() {
                 width: '100%',
                 height: '100%',
                 opacity: 0,
-                zIndex: 1000
+                zIndex: 1001
             }),
         $box = $('<div>')
             .css({
@@ -573,6 +573,7 @@ pandora.ui.home = function() {
         that.animate({opacity: 0}, 500, function() {
             that.remove();
         });
+        pandora.$ui.tv && pandora.$ui.tv.unmute();
         self.keydown && Ox.$document.unbind({keydown: self.keydown});
         return that;
     };

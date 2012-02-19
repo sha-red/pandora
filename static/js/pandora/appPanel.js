@@ -37,6 +37,10 @@ pandora.ui.appPanel = function() {
     });
     function setPage(page) {
         if (page === '') {
+            if (pandora.$ui.home && pandora.$ui.appPanel) {
+                // unless we're on page load, remove home screen
+                pandora.$ui.home.fadeOutScreen();
+            }
             ['site', 'account', 'preferences', 'help'].forEach(function(dialog) {
                 pandora.$ui[dialog + 'Dialog'] && pandora.$ui[dialog + 'Dialog'].close();
             });
@@ -81,6 +85,7 @@ pandora.ui.appPanel = function() {
             pandora.$ui.tv = pandora.ui.tv()[
                 !pandora.$ui.appPanel ? 'showScreen' : 'fadeInScreen'
             ]();
+            pandora.$ui.home && pandora.$ui.tv.mute();
         }
     }
     return that;

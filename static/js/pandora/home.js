@@ -11,7 +11,7 @@ pandora.ui.home = function() {
                 width: '100%',
                 height: '100%',
                 opacity: 0,
-                zIndex: 1000
+                zIndex: 1001
             }),
         $reflectionImage = $('<img>')
             .attr({src: '/static/png/logo256.png'})
@@ -260,6 +260,7 @@ pandora.ui.home = function() {
         that.animate({opacity: 0}, 500, function() {
             that.remove();
         });
+        pandora.$ui.tv && pandora.$ui.tv.unmute();
         return that;
     };
 

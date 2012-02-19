@@ -15,7 +15,8 @@ pandora.ui.tv = function() {
             }),
         $player,
         list = pandora.user.ui._list,
-        lists = [];
+        lists = [],
+        muted;
 
     function getList(direction) {
         lists.length == 0 && getLists();
@@ -54,6 +55,7 @@ pandora.ui.tv = function() {
                     enableSubtitles: pandora.user.ui.videoSubtitles,
                     fullscreen: true,
                     logo: pandora.site.tv.showLogo ? '/static/png/logo256.png' : '',
+                    muted: muted || pandora.user.ui.videoMuted,
                     position: result.data.position,
                     resolution: pandora.user.ui.videoResolution,
                     scaleToFill: pandora.user.ui.videoScale == 'fill',
@@ -73,7 +75,8 @@ pandora.ui.tv = function() {
                     close: that.fadeOutScreen,
                     ended: play,
                     muted: function(data) {
-                        pandora.UI.set('videoMuted', data.muted);
+                        Ox.print('!MUTED', !muted)
+                        !muted && pandora.UI.set('videoMuted', data.muted);
                     },
                     open: function() {
                         var item = result.data.item,
@@ -150,10 +153,20 @@ pandora.ui.tv = function() {
         return that;
     };
 
+    that.mute = function() {
+        muted = true;
+        $player && $player.options({muted: muted});
+    };
+
     that.showScreen = function() {
         that.css({opacity: 1}).appendTo(Ox.UI.$body);
         play();
         return that;
+    };
+
+    that.unmute = function() {
+        $player && $player.options({muted: pandora.user.ui.videoMuted});
+        muted = false;
     };
 
     return that;

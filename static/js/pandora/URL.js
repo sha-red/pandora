@@ -260,7 +260,7 @@ pandora.URL = (function() {
                 pandora.$ui.home.fadeOutScreen();
             } else if (pandora.$ui.tv) {
                 pandora.UI.set({page: ''});
-                pandora.$ui.home.fadeOutScreen();
+                pandora.$ui.tv.fadeOutScreen();
             }
             if (
                 pandora.user.ui.item
