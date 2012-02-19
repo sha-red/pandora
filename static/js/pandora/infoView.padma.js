@@ -549,7 +549,8 @@ pandora.ui.infoView = function(data) {
     function formatValue(value, key) {
         if(key == 'date') {
             return value ? Ox.formatDate(value,
-                ['', '%Y', '%B, %Y', '%B %e, %Y'][value.split('-').length]) : '';
+                ['', '%Y', '%B %Y', '%B %e, %Y'][value.split('-').length]
+            ) : '';
         } else if(key == 'duration') {
             return value < 60 ? Math.round(value) + ' sec' : Math.round(value / 60) + ' min';
         }
