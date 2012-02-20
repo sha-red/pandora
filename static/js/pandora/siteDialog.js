@@ -44,11 +44,13 @@ pandora.ui.siteDialog = function(section) {
                             .css(id == 'rights' ? {
                                 // this will get applied twice,
                                 // total is 144px
-                                marginRight: '72px',
-                                MozUserSelect: 'text',
-                                WebkitUserSelect: 'text'
+                                marginRight: '72px'
                             } : {
                                 width: '100%'
+                            })
+                            .css({
+                                MozUserSelect: 'text',
+                                WebkitUserSelect: 'text'
                             })
                             .bindEvent({
                                 submit: function(data) {
