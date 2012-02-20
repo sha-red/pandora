@@ -155,7 +155,7 @@ pandora.ui.item = function() {
                 showAnnotations: pandora.user.ui.showAnnotations,
                 showAnnotationsCalendar: pandora.user.ui.showAnnotationsCalendar,
                 showAnnotationsMap: pandora.user.ui.showAnnotationsMap,
-                showLayers: pandora.user.ui.showLayers,
+                showLayers: Ox.clone(pandora.user.ui.showLayers),
                 showUsers: pandora.site.annotations.showUsers,
                 showTimeline: pandora.user.ui.showTimeline,
                 subtitles: videoOptions.subtitles,
