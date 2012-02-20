@@ -15,8 +15,8 @@ class Text(models.Model):
 
     user = models.ForeignKey(User)
     slug = models.SlugField()
-    title = models.CharField(null=True, max_length=255)
-    body = models.TextField(default='')
+    title = models.CharField(null=True, max_length=1000)
+    text = models.TextField(default='')
 
     def __unicode__(self):
         return u"%s <%s>" % (self.title, self.slug)
