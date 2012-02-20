@@ -524,7 +524,7 @@ pandora.ui.usersDialog = function() {
                         id: 'groups',
                         label: 'Groups',
                         labelWidth: 80,
-                        value: user.groups.join(', '),
+                        value: user.groups ? user.groups.join(', ') : '',
                         width: formWidth - 16
                     })
                     .bindEvent({
