@@ -84,7 +84,9 @@ pandora.ui.eventsDialog = function() {
                         });
                     },
                     events: result.data.items,
+                    hasMatches: true,
                     height: height,
+                    mode: pandora.site.calendar == 'auto' ? 'add' : 'define',
                     removeEvent: function(event, callback) {
                         pandora.api.removeEvent(event, function(result) {
                             Ox.Request.clearCache(); // fixme: remove

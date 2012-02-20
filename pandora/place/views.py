@@ -40,6 +40,17 @@ def addPlace(request):
     existing_names = []
     existing_geoname = ''
     name = data.pop('name')
+    if name == '':
+        _exists = True
+        name = 'Untitled'
+        n = 0
+        while _exists:
+            _exists = models.Place.objects.filter(defined=True,
+                                name_find__icontains=u'|%s|'%name).count() > 0
+            if _exists:
+                name = 'Untitled [%s]' %n
+            n += 1
+
     names = [name] + data.get('alternativeNames', [])
     for name in names:
         if models.Place.objects.filter(defined=True,

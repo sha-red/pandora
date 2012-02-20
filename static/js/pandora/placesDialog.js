@@ -22,6 +22,7 @@ pandora.ui.placesDialog = function(options) {
             getMatches: function(names, callback) {
                 // fixme: the results of this are of course
                 // not identical to actual place matches
+                names.length == 0 && callback(0);
                 var key = pandora.site.layers.filter(function(layer) {
                         return layer.type == 'place' || layer.hasPlaces;
                     }).map(function(layer) {
@@ -40,6 +41,7 @@ pandora.ui.placesDialog = function(options) {
                     callback(result.data.items);
                 });
             },
+            hasMatches: true, // FIXME: getMatches is enough
             height: height - 48,
             mode: pandora.site.map == 'auto' ? 'add' : 'define',
             names: pandora.hasPlacesLayer ? function(callback) {
@@ -59,7 +61,7 @@ pandora.ui.placesDialog = function(options) {
                     callback(result);
                 });
             },
-            selected: options ? options.id : void 0,
+            selected: options ? options.id : '',
             showControls: pandora.user.ui.showMapControls,
             showLabels: pandora.user.ui.showMapLabels,
             showTypes: true,
