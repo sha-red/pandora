@@ -48,10 +48,6 @@ pandora.ui.siteDialog = function(section) {
                             } : {
                                 width: '100%'
                             })
-                            .css({
-                                MozUserSelect: 'text',
-                                WebkitUserSelect: 'text'
-                            })
                             .bindEvent({
                                 submit: function(data) {
                                     Ox.Request.clearCache('getPage');
