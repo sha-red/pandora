@@ -21,11 +21,14 @@ def update_matching_events(id):
             e.update_matches()
     ids = [e['id'] for e in Event.objects.all().values('id')]
     for i in ids:
-        e = Event.objects.get(pk=i)
-        for name in [e.name] + list(e.alternativeNames):
-            if name.lower() in a.value.lower():
-                e.update_matches()
-                break
+        try:
+            e = Event.objects.get(pk=i)
+            for name in [e.name] + list(e.alternativeNames):
+                if name.lower() in a.value.lower():
+                    e.update_matches()
+                    break
+        except Event.DoesNotExist:
+                pass
 
 @task(ignore_resulsts=True, queue='default')
 def update_matching_places(id):
@@ -42,11 +45,14 @@ def update_matching_places(id):
             p.update_matches()
     ids = [e['id'] for e in Place.objects.all().values('id')]
     for i in ids:
-        e = Place.objects.get(pk=i)
-        for name in [e.name] + list(e.alternativeNames):
-            if name.lower() in a.value.lower():
-                e.update_matches()
-                break
+        try:
+            e = Place.objects.get(pk=i)
+            for name in [e.name] + list(e.alternativeNames):
+                if name.lower() in a.value.lower():
+                    e.update_matches()
+                    break
+        except Place.DoesNotExist:
+                pass
 
 @task(ignore_resulsts=True, queue='default')
 def update_item(id):
