@@ -287,7 +287,7 @@ pandora.ui.item = function() {
                     showAnnotationsCalendar: pandora.user.ui.showAnnotationsCalendar,
                     showAnnotationsMap: pandora.user.ui.showAnnotationsMap,
                     showLargeTimeline: true,
-                    showLayers: pandora.user.ui.showLayers,
+                    showLayers: Ox.clone(pandora.user.ui.showLayers),
                     showUsers: pandora.site.annotations.showUsers,
                     subtitles: videoOptions.subtitles,
                     tooltips: true,
