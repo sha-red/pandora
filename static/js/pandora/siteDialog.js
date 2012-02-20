@@ -38,6 +38,7 @@ pandora.ui.siteDialog = function(section) {
                                 editable: isEditable,
                                 tooltip: isEditable ? 'Doubleclick to edit' : '',
                                 type: 'textarea',
+                                placeholder: isEditable ? 'Doubleclick to insert text' : '',
                                 value: result.data.text
                             })
                             .css(id == 'rights' ? {
