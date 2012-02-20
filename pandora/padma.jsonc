@@ -245,6 +245,12 @@
             "find": true
         },
         {
+            "id": "numberofannotations",
+            "title": "Annotations",
+            "type": "integer",
+            "columnWidth": 60
+        },
+        {
             "id": "duration",
             "title": "Duration",
             "type": "float",

@@ -654,6 +654,7 @@ class Item(models.Model):
             'id',
             'lightness',
             'modified',
+            'numberofannotations',
             'numberofcuts',
             'numberoffiles',
             'parts',
@@ -771,6 +772,7 @@ class Item(models.Model):
             s.hue = None
             s.saturation = None
             s.brighness = None
+        s.numberofannotations = self.annotations.all().count()
         s.numberofcuts = len(self.data.get('cuts', []))
         if s.duration:
             s.cutsperminute = s.numberofcuts / (s.duration/60)

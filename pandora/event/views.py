@@ -49,7 +49,7 @@ def addEvent(request):
             event.set_name_sort(data['nameSort'])
         event.matches = 0
         event.save()
-        event.update_matches.()
+        event.update_matches()
         response = json_response(status=200, text='created')
         response['data'] = event.json()
     else:
