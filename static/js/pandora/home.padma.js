@@ -587,6 +587,11 @@ pandora.ui.home = function() {
 
     that.showScreen = function() {
         that.css({opacity: 1}).appendTo(Ox.UI.$body);
+        $box.css({marginTop: '80px'});
+        that.find('*').css({opacity: 1});
+        $findInput.focusInput(true);
+        showLists();
+        /*
         $box.animate({marginTop: '80px'}, 500);
         setTimeout(function() {
             that.find('*').animate({opacity: 1}, 250, function() {
@@ -594,6 +599,7 @@ pandora.ui.home = function() {
                 showLists();
             });
         }, 250);
+        */
         return that;
     };
 
