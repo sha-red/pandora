@@ -39,8 +39,9 @@ def addPlace(request):
     exists = False
     existing_names = []
     existing_geoname = ''
-    names = data.pop('name')
-    for name in [names] + data.get('alternativeNames', []):
+    name = data.pop('name')
+    names = [name] + data.get('alternativeNames', [])
+    for name in names:
         if models.Place.objects.filter(defined=True,
                                        name_find__icontains=u'|%s|'%name).count() != 0:
             exists = True
@@ -56,7 +57,7 @@ def addPlace(request):
         models.Place.objects.filter(defined=False, name__in=names).delete()
         place = models.Place()
         place.user = request.user
-        place.name = names
+        place.name = name
         place.alternativeNames = tuple(data.pop('alternativeNames', []))
         for key in data:
             value = data[key]
