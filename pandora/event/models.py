@@ -124,7 +124,7 @@ class Event(models.Model):
         self.name_find = '||' + self.name + '||'.join(self.alternativeNames) + '||'
         self.defined = len(filter(None, [getattr(self, key)
                              for key in ('start', 'end', 'startTime', 'endTime')])) > 0
-        if self.defined:
+        if self.endTime and self.startTime:
             self.durationTime = self.endTime - self.startTime
 
         super(Event, self).save(*args, **kwargs)
