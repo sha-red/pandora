@@ -13,7 +13,8 @@ pandora.ui.news = function(width, height) {
             ? 'rgb(32, 32, 32)' : 'rgb(224, 224, 224)',        
         isEditable = pandora.site.capabilities.canEditSitePages[pandora.user.level],
         items = [],
-        selected;
+        selected,
+        $text;
 
     pandora.api.getNews({}, function(result) {
         items = result.data.items;
@@ -60,7 +61,7 @@ pandora.ui.news = function(width, height) {
 
     function renderItem() {
         $left.empty();
-        var $title, $date, $text,
+        var $title, $date,
             index = Ox.getIndexById(items, selected);
         $title = Ox.Editable({
                 editable: isEditable,
@@ -182,8 +183,11 @@ pandora.ui.news = function(width, height) {
         });
     }
 
-    that.resize = function() {
-        
+    that.resize = function(data) {
+        width = data.width;
+        height = data.height;
+        $left.css({width: width - 512});
+        $text.css({width: width - 512});
     };
 
     return that;

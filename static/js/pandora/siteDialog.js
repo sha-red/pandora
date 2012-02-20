@@ -151,7 +151,7 @@ pandora.ui.siteDialog = function(section) {
                 if (selected == 'contact') {
                     pandora.$ui.contactForm.resize();
                 } else if (selected == 'news') {
-                    
+                    pandora.$ui.news.resize(data);
                 }
             }
         });
