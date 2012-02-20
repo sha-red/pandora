@@ -13,6 +13,7 @@ from ox.django import fields
 
 import managers
 from annotation.models import Annotation, get_matches
+from annotation.tasks import update_matching_places
 from item.models import Item
 from changelog.models import Changelog
 
@@ -102,8 +103,13 @@ class Place(models.Model):
     def update_matches(self):
         matches = self.get_matches()
         numberofmatches = matches.count()
-        for i in self.annotations.exclude(id__in=matches):
-            self.annotations.remove(i)
+        for a in self.annotations.exclude(id__in=matches):
+            self.annotations.remove(a)
+            #annotations of type place always need a place
+            if a.get_layer().get('type') == 'place' and a.places.count() == 0:
+                a.places.add(Place.get_or_create(a.value))
+                for p in a.places.all():
+                    p.update_matches()
         for i in matches.exclude(id__in=self.annotations.all()):
             #need to check again since editEvent might have been called again
             if self.annotations.filter(id=i.id).count() == 0:
@@ -115,10 +121,10 @@ class Place(models.Model):
             if self.items.filter(id=i.id).count() == 0:
                 self.items.add(i)
         if self.matches != numberofmatches:
+            self.matches = numberofmatches
             if numberofmatches:
                 Place.objects.filter(id=self.id).update(matches=numberofmatches)
             else:
-                self.matches = numberofmatches
                 self.save()
 
     def make_undefined(self):

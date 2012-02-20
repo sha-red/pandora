@@ -90,8 +90,13 @@ class Event(models.Model):
     def update_matches(self):
         matches = self.get_matches()
         numberofmatches = matches.count()
-        for i in self.annotations.exclude(id__in=matches):
-            self.annotations.remove(i)
+        for a in self.annotations.exclude(id__in=matches):
+            self.annotations.remove(a)
+            #annotations of type event always need an event
+            if a.get_layer().get('type') == 'event' and a.events.count() == 0:
+                a.events.add(Event.get_or_create(a.value))
+                for e in a.events.all():
+                    e.update_matches()
         for i in matches.exclude(id__in=self.annotations.all()):
             #need to check again since editEvent might have been called again
             if self.annotations.filter(id=i.id).count() == 0:
@@ -103,10 +108,10 @@ class Event(models.Model):
             if self.items.filter(id=i.id).count() == 0:
                 self.items.add(i)
         if self.matches != numberofmatches:
+            self.matches = numberofmatches
             if numberofmatches:
                 Event.objects.filter(id=self.id).update(matches=numberofmatches)
             else:
-                self.matches = numberofmatches
                 self.save()
 
     def set_name_sort(self, value=None):
@@ -123,7 +128,7 @@ class Event(models.Model):
             self.set_name_sort()
         self.name_find = '||' + self.name + '||'.join(self.alternativeNames) + '||'
         self.defined = len(filter(None, [getattr(self, key)
-                             for key in ('start', 'end', 'startTime', 'endTime')])) > 0
+                             for key in ('start', 'end')])) > 0
         if self.endTime and self.startTime:
             self.durationTime = self.endTime - self.startTime
 

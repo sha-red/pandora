@@ -14,7 +14,6 @@ from ox.django.api import actions
 from item import utils
 
 import models
-import tasks
 
 @login_required_json
 def addEvent(request):
@@ -48,8 +47,9 @@ def addEvent(request):
                 setattr(event, key, value)
         if 'nameSort' in data:
             event.set_name_sort(data['nameSort'])
+        event.matches = 0
         event.save()
-        tasks.update_matches.delay(event.id)
+        event.update_matches.()
         response = json_response(status=200, text='created')
         response['data'] = event.json()
     else:
@@ -96,7 +96,7 @@ def editEvent(request):
                 event.set_name_sort(data['nameSort'])
             event.save()
             if 'name' in data or 'alternativeNames' in data:
-                tasks.update_matches.delay(event.id)
+                event.update_matches()
             response = json_response(status=200, text='updated')
             response['data'] = event.json()
         else:

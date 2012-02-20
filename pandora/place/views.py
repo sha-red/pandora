@@ -15,7 +15,6 @@ from ox.django.api import actions
 from item import utils
 
 import models
-import tasks
 
 @login_required_json
 def addPlace(request):
@@ -64,8 +63,9 @@ def addPlace(request):
             if isinstance(value, list):
                 value = tuple(value)
             setattr(place, key, value)
+        place.matches = 0
         place.save()
-        tasks.update_matches.delay(place.id)
+        place.update_matches()
         response = json_response(place.json())
     else:
         response = json_response(status=409,
@@ -122,7 +122,7 @@ def editPlace(request):
                     setattr(place, key, value)
             place.save()
             if 'name' in data or 'alternativeNames' in data:
-                tasks.update_matches.delay(place.id)
+                place.update_matches()
             response = json_response(place.json())
         else:
             response = json_response(status=409,
