@@ -31,22 +31,27 @@ def addEvent(request):
     exists = False
     names = [data['name']] + data.get('alternativeNames', [])
     for name in names:
+        name = ox.decodeHtml(name)
         if models.Event.objects.filter(defined=True,
                 name_find__icontains=u'|%s|'%name).count() != 0:
             exists = True
             existing_names.append(name)
     if not exists:
         models.Event.objects.filter(defined=False, name__in=names).delete()
-        event = models.Event(name = data['name'])
+        data['name'] = ox.escape_html(data['name'])
+        event = models.Event(name=data['name'])
         for key in ('start', 'startTime', 'end', 'endTime', 'duration', 'durationTime',
                     'type', 'alternativeNames'):
             if key in data and data[key]:
                 value = data[key]
+                if isinstance(value, basestring):
+                    value = ox.escape_html(value)
                 if key == 'alternativeNames':
-                    value = tuple(value)
+                    value = tuple([ox.escape_html(v) for v in value])
                 setattr(event, key, value)
         if 'nameSort' in data:
-            event.set_name_sort(data['nameSort'])
+            value = ox.escape_html(data['nameSort'])
+            event.set_name_sort(value)
         event.matches = 0
         event.save()
         event.update_matches()
@@ -83,17 +88,19 @@ def editEvent(request):
                 conflict_names.append(name)
         if not conflict:
             models.Event.objects.filter(defined=False, name__in=names).delete()
-            if 'name' in data:
-                event.set_name_sort(data['name'])
             for key in ('name', 'start', 'startTime', 'end', 'endTime', 'duration', 'durationTime',
                         'type', 'alternativeNames'):
                 if key in data:
                     value = data[key]
+                    if isinstance(value, basestring):
+                        value = ox.escape_html(value)
                     if key == 'alternativeNames':
-                        value = tuple(value)
+                        value = tuple([ox.escape_html(v) for v in value])
                     setattr(event, key, value)
+            if 'name' in data:
+                event.set_name_sort(ox.escape_html(data['name']))
             if 'nameSort' in data:
-                event.set_name_sort(data['nameSort'])
+                event.set_name_sort(ox.escape_html(data['nameSort']))
             event.save()
             if 'name' in data or 'alternativeNames' in data:
                 event.update_matches()

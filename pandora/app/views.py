@@ -139,7 +139,7 @@ def editPage(request):
         page, created = models.Page.objects.get_or_create(name=data['name'])
         if not created:
             page.log()
-        page.text = data['text']
+        page.text = ox.parse_html(data['text'])
         page.save()
         response = json_response({'name': page.name, 'text': page.text})
     else:

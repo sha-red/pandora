@@ -226,14 +226,20 @@ class Item(models.Model):
                 if not description:
                     description = ''
                 d, created = Description.objects.get_or_create(key=k, value=value)
-                d.description = description
+                d.description = ox.parse_html(description)
                 d.save()
         for key in data:
             if data[key] == None:
                 if key in self.data:
                     del self.data[key]
             else:
-                self.data[key] = data[key]
+                k = filter(lambda i: i['id'] == key, settings.CONFIG['itemKeys'])
+                if k and k.get('type') == 'text': 
+                    self.data[key] = ox.parse_html(data[key])
+                elif isinstance(data[key], basestring):
+                    self.data[key] = ox.escape_html(data[key])
+                else:
+                    self.data[key] = ox.escape_html(data[key])
         return self.save()
 
     def log(self):

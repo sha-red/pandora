@@ -50,13 +50,16 @@ def addPlace(request):
             if _exists:
                 name = 'Untitled [%s]' %n
             n += 1
-
     names = [name] + data.get('alternativeNames', [])
-    for name in names:
+    data['alternativveNames'] = [ox.escape_html(n)
+            for n in data.get('alternativeNames', [])]
+    name = ox.escape_html(name)
+    for n in names:
+        n = ox.decodeHtml(name)
         if models.Place.objects.filter(defined=True,
-                                       name_find__icontains=u'|%s|'%name).count() != 0:
+                                       name_find__icontains=u'|%s|'%n).count() != 0:
             exists = True
-            existing_names.append(name)
+            existing_names.append(n)
     '''
     if 'geoname' in data: 
         if models.Place.objects.filter(defined=True,
@@ -104,15 +107,17 @@ def editPlace(request):
     names = data.get('name', [])
     if isinstance(names, basestring):
         names = [names]
+    names = [ox.escape_html(n) for n in names]
+    alternative_names = [ox.escape_html(n) for n in data.get('alternativeNames', [])]
+    alternative_names = filter(lambda n: n.strip(), alternative_names)
     if place.editable(request.user):
         conflict = False
         conflict_names = []
         conflict_geoname = ''
-        alternative_names = data.get('alternativeNames', [])
         if alternative_names:
-            alternative_names = filter(lambda n: n.strip(), alternative_names)
             data['alternativeNames'] = alternative_names
         for name in names + alternative_names:
+            name = ox.decodeHtml(name)
             if models.Place.objects.filter(defined=True,
                     name_find__icontains=u'|%s|'%name).exclude(id=place.id).count() != 0:
                 conflict = True
@@ -129,6 +134,8 @@ def editPlace(request):
             for key in data:
                 if key != 'id':
                     value = data[key]
+                    if isinstance(value, basestring):
+                        value = ox.escape_html(value)
                     if isinstance(value, list):
                         value = tuple(value)
                     setattr(place, key, value)

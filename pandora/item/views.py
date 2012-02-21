@@ -433,10 +433,10 @@ def edit(request):
         response = json_response(status=200, text='ok')
         if 'notes' in data:
             if request.user.get_profile().capability('canEditMetadata'):
-                item.notes = data['notes']
+                item.notes = ox.parse_html(data['notes'])
             del data['notes']
         if 'rightslevel' in data:
-            item.level = data['rightslevel']
+            item.level = int(data['rightslevel'])
             del data['rightslevel']
         if 'user' in data:
             if request.user.get_profile().get_level() in ('admin', 'staff') and \
