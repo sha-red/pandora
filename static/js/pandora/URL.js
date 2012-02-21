@@ -66,6 +66,7 @@ pandora.URL = (function() {
         if (Ox.isEmpty(state)) {
 
             if (pandora.user.ui.showHome) {
+                Ox.print('*** showScreen via URL')
                 pandora.$ui.home = pandora.ui.home().showScreen();
             }
             callback && callback();

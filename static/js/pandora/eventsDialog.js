@@ -2,7 +2,8 @@
 
 'use strict';
 
-pandora.ui.eventsDialog = function() {
+pandora.ui.eventsDialog = function(options) {
+    // options can be {id: '...'} or {name: '...'}
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = Math.round(window.innerWidth * 0.9),
         that = Ox.Dialog({
@@ -93,6 +94,7 @@ pandora.ui.eventsDialog = function() {
                             callback(result);
                         });
                     },
+                    selected: options ? options.id : '',
                     showControls: pandora.user.ui.showCalendarControls,
                     width: width
                 })

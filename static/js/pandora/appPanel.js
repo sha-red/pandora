@@ -49,6 +49,7 @@ pandora.ui.appPanel = function() {
             }
         } else if (page == 'home') {
             // if we're on page load, show screen immediately
+            Ox.print('*** ' + (!pandora.$ui.appPanel ? 'showScreen' : 'fadeInScreen') + ' via appPanel')
             pandora.$ui.home = pandora.ui.home()[
                 !pandora.$ui.appPanel ? 'showScreen' : 'fadeInScreen'
             ]();

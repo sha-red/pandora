@@ -4,6 +4,7 @@
 
 pandora.ui.placesDialog = function(options) {
     // options can be {id: '...'} or {name: '...'}
+    Ox.print('placesDialog', options);
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = Math.round(window.innerWidth * 0.9),
         $content = Ox.ListMap({

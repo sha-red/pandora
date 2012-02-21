@@ -585,7 +585,7 @@ pandora.ui.home = function() {
         return that;
     };
 
-    that.showScreen = function() {
+    that.showScreen = function(callback) {
         that.css({opacity: 1}).appendTo(Ox.UI.$body);
         $box.css({marginTop: '80px'});
         that.find('*').css({opacity: 1});
@@ -600,6 +600,7 @@ pandora.ui.home = function() {
             });
         }, 250);
         */
+        callback && callback();
         return that;
     };
 

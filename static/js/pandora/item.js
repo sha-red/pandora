@@ -339,8 +339,9 @@ pandora.ui.item = function() {
                         pandora.UI.set({annotationsSort: data.sort});
                     },
                     define: function(data) {
-                        pandora.$ui.placesDialog && pandora.$ui.placesDialog.remove();
-                        pandora.$ui.placesDialog = pandora.ui.placesDialog(data).open();
+                        var dialog = data.type + 'sDialog';
+                        pandora.$ui[dialog] && pandora.$ui[dialog].remove();
+                        pandora.$ui[dialog] = pandora.ui[dialog](data).open();
                     },
                     downloadvideo: function(data) {
                         document.location.href = '/' + pandora.user.ui.item + '/torrent/';
