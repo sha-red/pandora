@@ -422,7 +422,11 @@ pandora.ui.list = function() {
                     }
                 }, function(result) {
                     var item = result.data.items[0],
-                        title = item.title + ' (' + item.director.join(', ') + ') ' + item.year,
+                        title = item.title + (
+                            item.director ? ' (' + item.director.join(', ') + ')' : ''
+                        ) + (
+                            item.year ? ' ' + item.year : ''
+                        ),
                         ratio = item.posterRatio,
                         windowWidth = window.innerWidth * 0.8,
                         windowHeight = window.innerHeight * 0.8,
