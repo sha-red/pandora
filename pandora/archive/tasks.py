@@ -119,6 +119,7 @@ def update_stream(id):
     s.file.item.update_timeline()
     #make sure all derivatives exist
     s.extract_derivatives()
+    s.file.item.update_sort()
 
     #update clips
     for c in s.file.item.clips.all():

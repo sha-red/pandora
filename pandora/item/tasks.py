@@ -22,7 +22,7 @@ def update_random_sort():
         random.seed()
         ids = [f['item'] for f in models.ItemSort.objects.values('item')]
         random.shuffle(ids)
-        n = 0
+        n = 1
         for i in ids:
             models.ItemSort.objects.filter(pk=i).update(random=n)
             n += 1
