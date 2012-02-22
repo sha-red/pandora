@@ -658,7 +658,7 @@ class Item(models.Model):
             if not value:
                 value = None
             if isinstance(value, basestring):
-                value = value.lower()
+                value = ox.decodeHtml(value.lower())
             setattr(s, name, value)
 
         base_keys = (
