@@ -301,7 +301,7 @@ pandora.ui.home = function() {
                         whiteSpace: 'normal'
                     })
                     .html(
-                        '<b>' + lists[selected].name + '</b><br><br>'
+                        '<b>' + Ox.encodeHTMLEntities(lists[selected].name) + '</b><br><br>'
                         + lists[selected].description
                     )
                     .appendTo($lists);
