@@ -38,6 +38,9 @@ pandora.ui.folderBrowserList = function(id) {
                     width: 16
                 },
                 {
+                    format: function(value) {
+                        return Ox.encodeHTMLEntities(value);
+                    },
                     id: 'user',
                     operator: '+',
                     title: 'User',
@@ -45,6 +48,9 @@ pandora.ui.folderBrowserList = function(id) {
                     width: Math.floor(columnWidth)
                 },
                 {
+                    format: function(value) {
+                        return Ox.encodeHTMLEntities(value);
+                    },
                     id: 'name',
                     operator: '+',
                     title: 'List',

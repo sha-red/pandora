@@ -86,7 +86,7 @@ pandora.ui.usersDialog = function() {
                         format: function(value, data) {
                             return '<span style="opacity: ' + (
                                 data.disabled ? 0.5 : 1
-                            ) + '">' + value + '</span>';
+                            ) + '">' + Ox.encodeHTMLEntities(value) + '</span>';
                         },
                         id: 'username',
                         operator: '+',
@@ -389,7 +389,8 @@ pandora.ui.usersDialog = function() {
                                                     result.data.items.filter(function(item) {
                                                         return item.email;
                                                     }).map(function(item) {
-                                                        return item.username + ' &lt;' + item.email + '&gt;';
+                                                        return Ox.encodeHTMLEntities(item.username)
+                                                            + ' &lt;' + item.email + '&gt;';
                                                     }).join(', ')
                                                 ),
                                             removeOnClose: true,
@@ -779,7 +780,8 @@ pandora.ui.usersDialog = function() {
                 : users.length == 1 ? (
                     users[0].level == 'guest'
                     ? 'Guest'
-                    : users[0].username + ' &lt;' + users[0].email + '&gt;'
+                    : Ox.encodeHTMLEntities(users[0].username)
+                        + ' &lt;' + users[0].email + '&gt;'
                 )
                 : users.length + ' users selected';
         $formLabel.options({title: title});

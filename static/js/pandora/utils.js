@@ -389,7 +389,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
                 ].toLowerCase()
             ) + '</br> to ' + (
                 drag.target && !drag.target.selected
-                ? 'the list "' + drag.target.name + '"'
+                ? 'the list "' + Ox.encodeHTMLEntities(drag.target.name) + '"'
                 : 'another list'
             );
         }

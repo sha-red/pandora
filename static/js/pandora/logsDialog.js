@@ -60,34 +60,42 @@ pandora.ui.logsDialog = function() {
                         visible: false,
                     },
                     {
+                        format: function(value) {
+                            return Ox.encodeHTMLEntities(value);
+                        },
                         id: 'user',
+                        operator: '+',
                         title: 'User',
                         visible: true,
                         width: 72
                     },
                     {
-                        id: 'created',
-                        title: 'Date',
                         align: 'right',
                         format: function(value) {
                             return value.replace(/[TZ]/g, ' ');
                         },
+                        id: 'created',
                         operator: '-',
+                        title: 'Date',
                         visible: true,
                         width: 144
                     },
                     {
-                        id: 'url',
-                        title: 'URL',
-                        format: function(value, data) {
+                        format: function(value) {
                             return formatURL(value, data.line);
                         },
+                        id: 'url',
                         operator: '+',
+                        title: 'URL',
                         visible: true,
                         width: 320
                     },
                     {
+                        format: function(value) {
+                            return Ox.encodeHTMLEntities(value);
+                        },
                         id: 'text',
+                        operator: '+',
                         title: 'Text',
                         visible: true,
                         width: 640
@@ -138,7 +146,7 @@ pandora.ui.logsDialog = function() {
                                 margin: '16px',
                                 MozUserSelect: 'text',
                                 WebkitUserSelect: 'text'
-                            }).html(value.text)),
+                            }).text(value.text)),
                             height: height - 48,
                             keys: {enter: 'close', escape: 'close'},
                             maximizeButton: true,
@@ -203,7 +211,7 @@ pandora.ui.logsDialog = function() {
             .appendTo(that.$element.find('.OxButtonsbar'));
 
     function formatURL(url, line) {
-        return url.split('?')[0] + ':' + line;
+        return Ox.encodeHTMLEntities(url.split('?')[0]) + ':' + line;
     }
 
     function renderLog(logData) {

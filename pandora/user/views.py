@@ -131,6 +131,8 @@ def signup(request):
     data = json.loads(request.POST['data'])
     if 'username' in data and 'password' in data:
         data['username'] = data['username'].strip()
+        if 'email' in data:
+            data['email'] = ox.escape_html(data['email'])
         if models.User.objects.filter(username__iexact=data['username']).count() > 0:
             response = json_response({
                 'errors': {
@@ -324,6 +326,8 @@ def editUser(request):
     if 'disabled' in data:
         user.is_active = not data['disabled']
     if 'email' in data:
+        if 'email' in data:
+            data['email'] = ox.escape_html(data['email'])
         if models.User.objects.filter(email__iexact=data['email']).exclude(id=user.id).count()>0:
             response = json_response(status=403, text='email already in use')
             return render_to_json_response(response)
@@ -338,6 +342,7 @@ def editUser(request):
         groups = data['groups']
         if isinstance(groups, list):
             groups = filter(lambda g: g.strip(), groups)
+            groups = [ox.escape_html(g) for g in groups]
             user.groups.exclude(name__in=groups).delete()
             current_groups = [g.name for g in user.groups.all()]
             for g in filter(lambda g: g not in current_groups, groups):
@@ -696,7 +701,7 @@ def editPreferences(request):
             errors['email'] = 'Email address already in use'
         else:
             change = True
-            request.user.email = data['email']
+            request.user.email = ox.escape_html(data['email'])
     if 'newsletter' in data:
         profile = request.user.get_profile()
         profile.newsletter = data['newsletter']

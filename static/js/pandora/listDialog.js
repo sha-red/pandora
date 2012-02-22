@@ -108,7 +108,7 @@ pandora.ui.listDialog = function(section) {
         height: 312,
         // keys: {enter: 'save', escape: 'cancel'},
         removeOnClose: true,
-        title: 'List - ' + listData.name,
+        title: 'List - ' + Ox.encodeHTMLEntities(listData.name),
         width: width
     });
 
@@ -243,6 +243,9 @@ pandora.ui.listGeneralPanel = function(listData) {
                         listData.name = result.data.name;
                         Ox.Request.clearCache('findLists');
                         pandora.$ui.info.updateListInfo();
+                        pandora.$ui.listDialog.options({
+                            title: 'List - ' + Ox.encodeHTMLEntities(listData.name) + ' - General'
+                        });
                     }
                 });
             }

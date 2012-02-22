@@ -466,7 +466,7 @@ pandora.ui.home = function() {
                             .appendTo($listsContent);
                         $listIcon[i] = Ox.Element({
                                 element: '<img>',
-                                tooltip: list.name
+                                tooltip: Ox.encodeHTMLEntities(list.name)
                             })
                             .attr({
                                 src: '/list/' + list.user + ':'
@@ -556,7 +556,7 @@ pandora.ui.home = function() {
                             + lists[selected].name + '/icon256.jpg'
                     });
                     $text.html(
-                        '<b>' + lists[selected].name + '</b><br><br>'
+                        '<b>' + Ox.encodeHTMLEntities(lists[selected].name) + '</b><br><br>'
                         + lists[selected].description
                     );
                 }

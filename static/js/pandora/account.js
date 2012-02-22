@@ -379,7 +379,10 @@ pandora.ui.accountWelcomeDialog = function() {
                 .append(
                     Ox.Element()
                         .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
-                        .html('Welcome, ' + pandora.user.username + '!<br/><br/>Your account has been created.')
+                        .html(
+                            'Welcome, ' + Ox.encodeHTMLEntities(pandora.user.username)
+                            + '!<br/><br/>Your account has been created.'
+                        )
                 ),
             fixedSize: true,
             height: 128,

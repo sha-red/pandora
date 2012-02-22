@@ -35,7 +35,7 @@ pandora.ui.folderList = function(id) {
                 },
                 {
                     format: function(value) {
-                        return value.split(':').join(': ');
+                        return Ox.encodeHTMLEntities(value.split(':').join(': '));
                     },
                     id: 'id',
                     operator: '+',
@@ -49,12 +49,18 @@ pandora.ui.folderList = function(id) {
                     editable: function(data) {
                         return data.user == pandora.user.username;
                     },
+                    format: function(value) {
+                        return Ox.encodeHTMLEntities(value);
+                    },
                     id: 'name',
                     input: {
                         autovalidate: pandora.ui.autovalidateListname
                     },
                     operator: '+',
                     tooltip: id == 'personal' ? 'Edit Title' : '',
+                    unformat: function(value) {
+                        return Ox.decodeHTMLEntities(value);
+                    },
                     visible: id != 'favorite',
                     width: pandora.user.ui.sidebarWidth - 96
                 },

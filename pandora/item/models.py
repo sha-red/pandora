@@ -211,6 +211,7 @@ class Item(models.Model):
             groups = data.pop('groups')
             if isinstance(groups, list):
                 groups = filter(lambda g: g.strip(), groups)
+                groups = [ox.escape_html(g) for g in groups]
                 self.groups.exclude(name__in=groups).delete()
                 current_groups = [g.name for g in self.groups.all()]
                 for g in filter(lambda g: g not in current_groups, groups):
@@ -234,10 +235,21 @@ class Item(models.Model):
                     del self.data[key]
             else:
                 k = filter(lambda i: i['id'] == key, settings.CONFIG['itemKeys'])
-                if k and k.get('type') == 'text': 
+                ktype = k and k[0].get('type') or ''
+                if ktype == 'text': 
                     self.data[key] = ox.parse_html(data[key])
+                elif ktype == '[text]': 
+                    self.data[key] = [ox.parse_html(t) for t in data[key]]
+                elif ktype == '[string]': 
+                    self.data[key] = [ox.escape_html(t) for t in data[key]]
                 elif isinstance(data[key], basestring):
                     self.data[key] = ox.escape_html(data[key])
+                elif isinstance(data[key], list):
+                    def cleanup(i):
+                        if isinstance(i, basestring):
+                            i = ox.escape_html(i)
+                        return i
+                    self.data[key] = [cleanup(i) for i in data[key]]
                 else:
                     self.data[key] = ox.escape_html(data[key])
         return self.save()

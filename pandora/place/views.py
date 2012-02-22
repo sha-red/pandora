@@ -51,7 +51,7 @@ def addPlace(request):
                 name = 'Untitled [%s]' %n
             n += 1
     names = [name] + data.get('alternativeNames', [])
-    data['alternativveNames'] = [ox.escape_html(n)
+    data['alternativeNames'] = [ox.escape_html(n)
             for n in data.get('alternativeNames', [])]
     name = ox.escape_html(name)
     for n in names:

@@ -27,7 +27,7 @@ pandora.ui.mainMenu = function() {
                         ]
                     ) },
                     { id: 'userMenu', title: 'User', items: [
-                        { id: 'username', title: 'User: ' + (isGuest ? 'not logged in' : pandora.user.username), disabled: true },
+                        { id: 'username', title: 'User: ' + (isGuest ? 'not logged in' : Ox.encodeHTMLEntities(pandora.user.username)), disabled: true },
                         {},
                         { id: 'preferences', title: 'Preferences...', disabled: isGuest, keyboard: 'control ,' },
                         { id: 'archives', title: 'Archives...', disabled: /*isGuest*/ true },
@@ -455,7 +455,9 @@ pandora.ui.mainMenu = function() {
                         : lists[folder].map(function(list) {
                             return {
                                 id: 'viewlist' + list.id,
-                                title: (folder == 'favorite' ? list.user + ': ' : '') + list.name,
+                                title: Ox.encodeHTMLEntities((
+                                    folder == 'favorite' ? list.user + ': ' : ''
+                                ) + list.name),
                                 checked: list.id == pandora.user.ui._list
                             };
                         })
