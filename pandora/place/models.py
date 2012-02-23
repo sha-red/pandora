@@ -30,25 +30,25 @@ class Place(models.Model):
 
     name = models.CharField(max_length=1024)
     alternativeNames = fields.TupleField(default=[])
-    name_sort = models.CharField(max_length=200)
+    name_sort = models.CharField(max_length=200, db_index=True)
     name_find = models.TextField(default='', editable=False)
 
     geoname = models.CharField(max_length=1024, null=True)
-    geoname_sort = models.CharField(max_length=1024, null=True)
-    countryCode = models.CharField(max_length=16, default='')
+    geoname_sort = models.CharField(max_length=1024, null=True, db_index=True)
+    countryCode = models.CharField(max_length=16, default='', db_index=True)
 
     wikipediaId = models.CharField(max_length=1000, blank=True)
     type = models.CharField(max_length=1000, default='')
 
-    south = models.FloatField(default=None, null=True)
-    west = models.FloatField(default=None, null=True)
-    north = models.FloatField(default=None, null=True)
-    east = models.FloatField(default=None, null=True)
-    lat = models.FloatField(default=None, null=True)
-    lng = models.FloatField(default=None, null=True)
-    area = models.FloatField(default=None, null=True)
+    south = models.FloatField(default=None, null=True, db_index=True)
+    west = models.FloatField(default=None, null=True, db_index=True)
+    north = models.FloatField(default=None, null=True, db_index=True)
+    east = models.FloatField(default=None, null=True, db_index=True)
+    lat = models.FloatField(default=None, null=True, db_index=True)
+    lng = models.FloatField(default=None, null=True, db_index=True)
+    area = models.FloatField(default=None, null=True, db_index=True)
 
-    matches = models.IntegerField(default=0)
+    matches = models.IntegerField(default=0, db_index=True)
     items = models.ManyToManyField(Item, blank=True, related_name='places')
     annotations = models.ManyToManyField(Annotation, blank=True, related_name='places')
 
