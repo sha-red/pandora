@@ -12,6 +12,9 @@
         XSendFile on
         XSendFilePath __PREFIX__
     </Location>
+
+    AddType video/webm webm
+
     ProxyRequests Off
     <Proxy *>
         Order deny,allow
