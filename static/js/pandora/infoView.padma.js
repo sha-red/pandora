@@ -422,7 +422,7 @@ pandora.ui.infoView = function(data) {
     // User and Groups ---------------------------------------------------------
 
     ['user', 'groups'].forEach(function(key) {
-        $('<div>')
+        (canEdit || data[key]) && $('<div>')
             .css({marginBottom: '4px'})
             .append(formatKey(key, true))
             .append(
