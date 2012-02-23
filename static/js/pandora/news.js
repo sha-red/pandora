@@ -18,9 +18,13 @@ pandora.ui.news = function(width, height) {
 
     pandora.api.getNews({}, function(result) {
         items = result.data.items;
-        selected = items[0].id;
-        renderItem();
-        renderList();
+        if(items.length) {
+            selected = items[0].id;
+            renderItem();
+            renderList();
+        } else if (isEditable) {
+            addItem();
+        }
     });
 
     function addItem() {
