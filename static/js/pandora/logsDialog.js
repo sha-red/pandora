@@ -81,7 +81,7 @@ pandora.ui.logsDialog = function() {
                         width: 144
                     },
                     {
-                        format: function(value) {
+                        format: function(value, data) {
                             return formatURL(value, data.line);
                         },
                         id: 'url',
