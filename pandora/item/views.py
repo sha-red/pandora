@@ -825,9 +825,10 @@ def random_annotation(request):
     return redirect('/%s'% clip.public_id)
 
 def atom_xml(request):
+    add_updated = True
     feed = ET.Element("feed")
     feed.attrib['xmlns'] = 'http://www.w3.org/2005/Atom'
-    feed.attrib['xmlns:media'] = 'http://search.yahoo.com/mrss'
+    feed.attrib['xmlns:media'] = 'http://search.yahoo.com/mrss/'
     feed.attrib['xml:lang'] = 'en'
     title = ET.SubElement(feed, "title")
     title.text = settings.SITENAME
@@ -849,6 +850,11 @@ def atom_xml(request):
     if not request.user.is_anonymous():
         level = request.user.get_profile().level
     for item in models.Item.objects.filter(level__lte=level, rendered=True).order_by('-created')[:7]:
+        if add_updated:
+            updated = ET.SubElement(feed, "updated")
+            updated.text = item.modified.strftime("%Y-%m-%dT%H:%M:%SZ")
+            add_updated = False
+
         page_link = request.build_absolute_uri('/%s' % item.itemId)
 
         entry = ET.Element("entry")
@@ -868,6 +874,11 @@ def atom_xml(request):
             el = ET.SubElement(entry, "author")
             name = ET.SubElement(el, "name")
             name.text = u', '.join(item.get('director'))
+        elif item.user:
+            el = ET.SubElement(entry, "author")
+            name = ET.SubElement(el, "name")
+            name.text = item.user.username
+
         for topic in item.get('topics', []):
           el = ET.SubElement(entry, "category")
           el.attrib['term'] = topic
