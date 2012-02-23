@@ -173,6 +173,7 @@ pandora.ui.accountForm = function(action, value) {
                     pandora.api.requestToken(data, function(result) {
                         if (!result.data.errors) {
                             pandora.$ui.accountDialog.options(pandora.ui.accountDialogOptions('resetAndSignin', result.data.username));
+                            pandora.$ui.accountDialog.enableButtons();
                         } else {
                             pandora.$ui.accountDialog.enableButtons();
                             callback([{id: 'usernameOrEmail', message: 'Unknown ' + (key == 'username' ? 'username' : 'e-mail address')}])
