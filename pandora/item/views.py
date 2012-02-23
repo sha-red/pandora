@@ -938,7 +938,7 @@ def atom_xml(request):
         el.attrib['height'] = str(thumbheight)
         feed.append(entry)     
     return HttpResponse(
-        '<?xml version="1.0" encoding="utf-8" standalone="yes"?>\n' + ET.tostring(feed),
+        '<?xml version="1.0" encoding="utf-8" ?>\n' + ET.tostring(feed),
         'application/atom+xml'
     )
 
