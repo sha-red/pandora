@@ -18,6 +18,8 @@ pandora.ui.findElement = function() {
                         })
                         .bindEvent({
                             change: function(data) {
+                                Ox.print(data);
+                                //pandora.$ui.mainMenu.checkItem('findMenu_find_' + ...);
                                 pandora.$ui.findInput.options({
                                     autocomplete: autocompleteFunction()
                                 }).focusInput(true);

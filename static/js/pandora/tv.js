@@ -66,8 +66,11 @@ pandora.ui.tv = function() {
                             list || 'All ' + pandora.site.itemName.plural
                         ) + ' &mdash; '
                         + result.data.title
-                        + ' (' + result.data.director.join(', ') + ') '
-                        + result.data.year,
+                        + (
+                            result.data.director
+                            ? ' (' + result.data.director.join(', ') + ') '
+                            : ''
+                        ) + result.data.year,
                     video: videoOptions.video,
                     volume: pandora.user.ui.videoVolume
                 })
