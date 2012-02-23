@@ -38,7 +38,7 @@ class Place(models.Model):
     countryCode = models.CharField(max_length=16, default='', db_index=True)
 
     wikipediaId = models.CharField(max_length=1000, blank=True)
-    type = models.CharField(max_length=1000, default='')
+    type = models.CharField(max_length=1000, default='', db_index=True)
 
     south = models.FloatField(default=None, null=True, db_index=True)
     west = models.FloatField(default=None, null=True, db_index=True)
