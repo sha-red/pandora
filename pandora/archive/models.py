@@ -126,9 +126,9 @@ class File(models.Model):
                 self.pixels = int(self.width * self.height * float(utils.parse_decimal(self.framerate)) * self.duration)
 
         else:
-            self.is_video = os.path.splitext(self.path)[-1] in ('.avi', '.mkv', '.dv', '.ogv', '.mpeg', '.mov', '.webm', '.mp4', '.mpg', '.wmv')
-            self.is_audio = os.path.splitext(self.path)[-1] in ('.mp3', '.wav', '.ogg', '.flac', '.oga', '.wma')
-            self.is_subtitle = os.path.splitext(self.path)[-1] in ('.srt', )
+            self.is_video = os.path.splitext(self.path)[-1].lower() in ('.avi', '.mkv', '.dv', '.ogv', '.mpeg', '.mov', '.webm', '.mp4', '.mpg', '.wmv', '.mts')
+            self.is_audio = os.path.splitext(self.path)[-1].lower() in ('.mp3', '.wav', '.ogg', '.flac', '.oga', '.wma')
+            self.is_subtitle = os.path.splitext(self.path)[-1].lower() in ('.srt', )
 
         if self.path.endswith('.srt'):
             self.is_subtitle = True
