@@ -1226,12 +1226,13 @@ class Item(models.Model):
                     s = q[0]
                     for data in s.srt(offset):
                         subtitles_added = True
+                        value = data['value'].replace('\n', '<br>\n').replace('<br><br>\n', '<br>\n')
                         annotation = Annotation(
                             item=self,
                             layer=layer,
                             start=data['in'],
                             end=data['out'],
-                            value=data['value'],
+                            value=value,
                             user=user
                         )
                         annotation.save()
