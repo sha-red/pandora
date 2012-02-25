@@ -798,7 +798,12 @@ pandora.getVideoOptions = function(data) {
         options = {},
         subtitlesLayer = Ox.getObject(pandora.site.layers, 'isSubtitles', true);
     options.subtitles = subtitlesLayer ? data.layers[subtitlesLayer.id].map(function(subtitle) {
-        return {id: subtitle.id, 'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
+        return {
+            id: subtitle.id,
+            'in': subtitle['in'],
+            out: subtitle.out,
+            text: subtitle.value.replace(/\n/g, ' ').replace(/<br\/?>/g, '\n')
+        };
     }) : [];
     options.censored = canPlayVideo ? []
         : canPlayClips ? (
