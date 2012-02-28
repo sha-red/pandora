@@ -163,6 +163,14 @@ class Annotation(models.Model):
         #update sort/find tables async
         update_item.delay(self.id)
 
+    def delete(self, *args, **kwargs):
+        super(Annotation, self).delete(*args, **kwargs)
+        if self.clip.annotations.count() == 0:
+            self.clip.delete()
+        self.item.update_find()
+        self.item.update_sort()
+        self.item.update_facets()
+
     def cleanup_undefined_relations(self):
         layer = self.get_layer()
         if layer.get('type') == 'place':

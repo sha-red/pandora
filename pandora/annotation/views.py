@@ -166,8 +166,6 @@ def removeAnnotation(request):
     if a.editable(request.user):
         a.log()
         a.delete()
-        if a.clip.annotations.count() == 0:
-            a.clip.delete()
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
