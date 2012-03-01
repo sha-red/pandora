@@ -31,6 +31,10 @@ def parse_query(data, user):
 
 def order_query(qs, sort):
     order_by = []
+    sort += [
+        {'key': 'position', 'operator': '+'},
+        {'key': 'text', 'operator': '-'}
+    ]
     for e in sort:
         operator = e['operator']
         if operator != '-':
