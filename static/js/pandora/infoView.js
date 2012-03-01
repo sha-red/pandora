@@ -577,7 +577,8 @@ pandora.ui.infoView = function(data) {
         pandora.api.updateExternalData({
             id: ui.item
         }, function(result) {
-            Ox.Request.clearCache(item);
+            //reloading metadata might change results too(i.e. genre)
+            Ox.Request.clearCache();
             if (ui.item == item && ui.itemView == 'info') {
                 pandora.$ui.contentPanel.replaceElement(
                     1, pandora.$ui.item = pandora.ui.item()
