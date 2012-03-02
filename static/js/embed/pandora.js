@@ -22,7 +22,8 @@ Ox.load('UI', {
                         var videoOptions = getVideoOptions(result.data);
                         that.append(pandora.player = Ox.VideoPlayer({
                                 censored: videoOptions.censored,
-                                controlsBottom: ['play', 'volume', 'scale', 'timeline', 'position', 'settings'],
+                                controlsBottom: ['play', 'volume', 'scale', 'timeline', 'settings'],
+                                duration: result.data.duration,
                                 enableFind: false,
                                 enableFullscreen: true,
                                 enableKeyboard: true,
@@ -30,7 +31,7 @@ Ox.load('UI', {
                                 enableTimeline: true,
                                 enableVolume: true,
                                 externalControls: false,
-                                height: document.height,
+                                height: window.innerHeight,
                                 'in': options['in'],
                                 out: options.out,
                                 paused: options.paused,
@@ -43,7 +44,7 @@ Ox.load('UI', {
                                 timeline: '/' + options.item + '/' + 'timeline16p.png',
                                 title: result.data.title,
                                 video: videoOptions.video,
-                                width: document.width
+                                width: window.innerWidth
                             })
                             .bindEvent({
                                 playing: checkRange,
