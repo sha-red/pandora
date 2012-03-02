@@ -34,7 +34,9 @@ pandora.ui.embedDialog = function(data) {
     data.view = 'video';
 
     function constructUrl(data) {
-        var url = document.location.origin + '/' + pandora.user.ui.item + '/embed?',
+        var url = document.location.protocol
+                + '//' + document.location.host
+                + '/' + pandora.user.ui.item + '/embed?',
             query = [];
         Ox.forEach(data, function(value, key) {
             if(key[0] != '_') {
