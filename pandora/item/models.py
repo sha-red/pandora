@@ -1260,7 +1260,7 @@ class Item(models.Model):
         return ox.srt.encode([{
             'in': a.start,
             'out': a.end,
-            'value': a.value
+            'value': a.value.replace('<br/>', '<br>').replace('<br>\n', '\n').replace('<br>', '\n')
         } for a in self.annotations.filter(layer=layer).order_by('start', 'end', 'sortvalue')])
 
 def delete_item(sender, **kwargs):
