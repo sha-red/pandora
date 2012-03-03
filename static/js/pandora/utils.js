@@ -792,6 +792,13 @@ pandora.getSortOperator = function(key) {
     ) > -1 ? '+' : '-';
 };
 
+pandora.getVideoUrl = function(id, resolution, part) {
+    var pandora.site.site.videoprefix
+        .replace('{uid}', Ox.uid())
+        .replace('{part}', part);
+    return prefix + '/' + id + '/' + resolution + 'p' + part + '.' + pandora.user.videoFormat;
+}
+
 pandora.getVideoOptions = function(data) {
     var canPlayClips = data.editable || pandora.site.capabilities.canPlayClips[pandora.user.level] >= data.rightslevel,
         canPlayVideo = data.editable || pandora.site.capabilities.canPlayVideo[pandora.user.level] >= data.rightslevel,
@@ -828,10 +835,7 @@ pandora.getVideoOptions = function(data) {
     options.video = {};
     pandora.site.video.resolutions.forEach(function(resolution) {
         options.video[resolution] = Ox.range(data.parts).map(function(i) {
-            var part = (i + 1),
-                prefix = pandora.site.site.videoprefix.replace('{part}', part);
-            return prefix + '/' + (data.item || pandora.user.ui.item) + '/'
-                + resolution + 'p' + part + '.' + pandora.user.videoFormat;
+            return pandora.getVideoUrl(data.item || pandora.user.ui.item, resolution, i + 1);
         });
     });
     options.layers = [];

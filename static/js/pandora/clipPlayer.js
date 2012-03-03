@@ -43,9 +43,7 @@ pandora.ui.clipPlayer = function() {
                                 partsAndPoints = pandora.getVideoPartsAndPoints(result.data.durations, points);
                             data[i] = {
                                 parts: partsAndPoints.parts.map(function(i) {
-                                    var part = (i + 1),
-                                        prefix = pandora.site.site.videoprefix.replace('{part}', part);
-                                    return prefix + '/' + id + '/96p' + part + '.' + pandora.user.videoFormat;
+                                    return pandora.getVideoUrl(item, 96, i + 1);
                                 }),
                                 points: partsAndPoints.points
                             };
