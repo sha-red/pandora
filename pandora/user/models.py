@@ -57,10 +57,14 @@ class SessionData(models.Model):
                 'Firefox',
                 'Safari Mobile',
                 'Opera',
+                'Googlebot',
+                'bingbot',
             ):
                 if {
                     'Safari Mobile': 'Mobile/',
                     'Internet Explorer': 'MSIE',
+                    'Bing': 'bingbot',
+                    'Google': 'Googlebot',
                 }.get(browser, browser) in self.useragent:
                     self.browser = browser
             for system in (
@@ -110,8 +114,13 @@ class SessionData(models.Model):
         if request.user.is_authenticated():
             cls.objects.filter(user=request.user).update(session_key=session_key)
         data, created = cls.objects.get_or_create(session_key=session_key)
+        if created:
+            data.save()
+            data = cls.objects.get(session_key=session_key)
         if request.user.is_authenticated():
             data.user = request.user
+        data.ip = request.META['REMOTE_ADDR']
+        data.useragent = request.META['HTTP_USER_AGENT']
         data.info = json.loads(request.POST.get('data', '{}'))
         screen = data.info.get('screen', {})
         if 'height' in screen and 'width' in screen:
@@ -119,8 +128,6 @@ class SessionData(models.Model):
         window = data.info.get('window', {})
         if 'outerHeight' in window and 'outerWidth' in window:
             data.windowsize = '%sx%s' % (window['outerWidth'], window['outerHeight'])
-        data.ip = request.META['REMOTE_ADDR']
-        data.useragent = request.META['HTTP_USER_AGENT']
         if not data.timesseen:
             data.timesseen = 0
         data.timesseen += 1
@@ -262,7 +269,8 @@ def get_ui(user_ui, user=None):
     return ui
 
 def init_user(user, request=None):
-    data = SessionData.get_or_create(request)
+    if request:
+        data = SessionData.get_or_create(request)
     if user.is_anonymous():
         result = settings.CONFIG['user'].copy()
         result['ui'] = get_ui(json.loads(request.session.get('ui', '{}')))
