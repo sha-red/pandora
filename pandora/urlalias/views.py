@@ -26,6 +26,8 @@ def padma_find(request):
         }.get(f, f)
     if v != 'map':
         v = 'grid'
+    if not f:
+        f = '*'
     if q:
         url = '/%s=%s' % (f, quote(q))
     if s:
