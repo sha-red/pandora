@@ -48,7 +48,7 @@ class SessionData(models.Model):
         if self.useragent:
             self.browser = 'Unknown'
             for browser in (
-                'Internet Explorer'
+                'Internet Explorer',
                 'Webkit',
                 'Safari',
                 'MeeGo',
@@ -68,12 +68,12 @@ class SessionData(models.Model):
                 }.get(browser, browser) in self.useragent:
                     self.browser = browser
             for system in (
-                    'Windows',
-                    'Mac OS X',
-                    'iOS',
-                    'Linux',
-                    'Andorid',
-                    'MeeGo',
+                'Windows',
+                'Mac OS X',
+                'iOS',
+                'Linux',
+                'Andorid',
+                'MeeGo',
             ):
                 if {
                 }.get(system, system) in self.useragent:
