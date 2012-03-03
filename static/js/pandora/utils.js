@@ -793,7 +793,7 @@ pandora.getSortOperator = function(key) {
 };
 
 pandora.getVideoUrl = function(id, resolution, part) {
-    var pandora.site.site.videoprefix
+    var prefix = pandora.site.site.videoprefix
         .replace('{uid}', Ox.uid())
         .replace('{part}', part);
     return prefix + '/' + id + '/' + resolution + 'p' + part + '.' + pandora.user.videoFormat;
