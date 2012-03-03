@@ -180,7 +180,7 @@ pandora.ui.clipList = function(videoRatio) {
                                     rewind: true,
                                     video: partsAndPoints.parts.map(function(i) {
                                         var part = (i + 1),
-                                            prefix = pandora.site.site.videoprefix.replace('PART', part);
+                                            prefix = pandora.site.site.videoprefix.replace('{part}', part);
                                         return prefix + '/' + item + '/96p' + part + '.' + pandora.user.videoFormat;
                                     }),
                                     width: width

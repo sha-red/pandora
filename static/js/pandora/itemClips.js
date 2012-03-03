@@ -108,7 +108,7 @@ pandora.ui.itemClips = function(options) {
                             rewind: true,
                             video: partsAndPoints.parts.map(function(i) {
                                 var part = (i + 1),
-                                    prefix = pandora.site.site.videoprefix.replace('PART', part);
+                                    prefix = pandora.site.site.videoprefix.replace('{part}', part);
                                 return prefix + '/' + self.options.id + '/96p' + part + '.' + pandora.user.videoFormat;
                             }),
                             width: self.width
