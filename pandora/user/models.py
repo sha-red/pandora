@@ -112,9 +112,6 @@ class SessionData(models.Model):
         if request.user.is_authenticated():
             cls.objects.filter(user=request.user).update(session_key=session_key)
         data, created = cls.objects.get_or_create(session_key=session_key)
-        if created:
-            data.save()
-            data = cls.objects.get(session_key=session_key)
         if request.user.is_authenticated():
             data.user = request.user
         data.ip = request.META['REMOTE_ADDR']
