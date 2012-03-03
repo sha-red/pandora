@@ -94,7 +94,6 @@ class SessionData(models.Model):
             except:
                 self.location = ''
                 pass
-        super(SessionData, self).save()
 
     def save(self, *args, **kwargs):
         if self.user:
@@ -106,7 +105,6 @@ class SessionData(models.Model):
             self.level = 0
             self.groupssort = None
         super(SessionData, self).save(*args, **kwargs)
-        tasks.parse_data.delay(self.session_key)
 
     @classmethod
     def get_or_create(cls, request):
@@ -133,6 +131,7 @@ class SessionData(models.Model):
         data.timesseen += 1
         data.lastseen = datetime.now()
         data.save()
+        tasks.parse_data.delay(data.session_key)
         return data
 
     def get_id(self):

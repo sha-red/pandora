@@ -15,3 +15,4 @@ import models
 def parse_data(key):
     session_data = models.SessionData.objects.get(session_key=key)
     session_data.parse_data()
+    session_data.save()
