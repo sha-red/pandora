@@ -116,20 +116,23 @@ def update_static():
         image = os.path.join(settings.STATIC_ROOT, 'png/logo%d.png'%size)
         if not os.path.exists(image):
             shutil.copyfile(pandora, image)
-
     #download geo data
-    path = os.path.join(settings.GEOIP_PATH, 'GeoLiteCity.dat')
-    if not os.path.exists(path):
-        url = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz'
-        print 'download', url
-        ox.net.saveUrl(url, "%s.gz"%path)
-        os.system('gunzip "%s.gz"' % path)
-
+    update_geoip()
     #poster script
     if not os.path.exists(settings.ITEM_POSTER):
         os.symlink(settings.ITEM_POSTER.replace('poster', 'oxdb_poster'),
                    settings.ITEM_POSTER)
-    
+
+def update_geoip(force=False):
+    path = os.path.join(settings.GEOIP_PATH, 'GeoLiteCity.dat')
+    if not os.path.exists(path) or force:
+        url = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz'
+        print 'download', url
+        ox.net.saveUrl(url, "%s.gz"%path)
+        if os.path.exists(path):
+            os.unlink(path)
+        os.system('gunzip "%s.gz"' % path)
+
 def init():    
     load_config()
     thread.start_new_thread(reloader_thread, ())
