@@ -334,7 +334,7 @@ def average_volume(prefix, start=0, end=0):
     return 0
 
 def get_distance(rgb0, rgb1):
-    dst = math.sqrt(pow(rgb0[0] - rgb1[0], 2) + pow(rgb0[0] - rgb1[0], 2) + pow(rgb0[0] - rgb1[0], 2))
+    dst = math.sqrt(pow(rgb0[0] - rgb1[0], 2) + pow(rgb0[1] - rgb1[1], 2) + pow(rgb0[2] - rgb1[2], 2))
     return dst / math.sqrt(3 * pow(255, 2))
 
 
