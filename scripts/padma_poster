@@ -59,6 +59,7 @@ def render_poster(id, title, frame, timeline, poster):
 
 def main():
     parser = OptionParser()
+    parser.add_option('-o', '--oxdbid', dest='oxdb_id', help='0xDB Id')
     parser.add_option('-i', '--id', dest='id', help='Pad.ma Id')
     parser.add_option('-t', '--title', dest='title', help='Title', default='')
     parser.add_option('-d', '--director', dest='director', help='Director', default='')
@@ -67,6 +68,8 @@ def main():
     parser.add_option('-l', '--timeline', dest='timeline', help='Timeline (image file to be read)')
     parser.add_option('-p', '--poster', dest='poster', help='Poster (image file to be written)')
     (options, args) = parser.parse_args()
+    if options.oxdb_id and not options.id:
+        options.id = options.oxdb_id
     if None in (options.id, options.poster):
         parser.print_help()
         sys.exit()
