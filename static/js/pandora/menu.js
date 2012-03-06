@@ -67,12 +67,17 @@ pandora.ui.mainMenu = function() {
                                 { id: 'showsiteposter', title: 'Always Show ' + pandora.site.site.name + ' Poster', checked: ui.showSitePoster }
                             ] : []
                         ) },
+                        { id: 'timelines', title: 'Timelines', items: [
+                            { group: 'viewtimelines', min: 1, max: 1, items: ['average', 'center', 'full'].map(function(timelines) {
+                                return {id: timelines, title: Ox.tiTitleCase(timelines), checked: ui.videoTimeline = timelines};
+                            }) }
+                        ]},
                         { id: 'columns', title: 'Columns', items: [
                             { id: 'loadcolumns', title: 'Load Layout...', disabled: true },
                             { id: 'savecolumns', title: 'Save Layout...', disabled: true },
                             {},
                             { id: 'resetcolumns', title: 'Reset Layout', disabled: true }
-                        ]},
+                        ] },
                         {},
                         { id: 'openmovie', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], items: [
                             { group: 'itemview', min: 1, max: 1, items: pandora.site.itemViews.map(function(view) {
@@ -80,7 +85,7 @@ pandora.ui.mainMenu = function() {
                                     checked: ui.itemView == view.id,
                                 }, view);
                             }) },
-                        ]},
+                        ] },
                         { id: 'openvideo', title: 'Open Video Links', items: [
                             { group: 'videoview', min: 1, max: 1, items: ['player', 'editor'].map(function(view) {
                                 return {id: view, title: Ox.toTitleCase(view), checked: ui.videoView == view};
@@ -225,6 +230,8 @@ pandora.ui.mainMenu = function() {
                             operator: '&'
                         }
                     });
+                } else if (data.id == 'viewtimelines') {
+                    pandora.UI.set({videoTimeline: value});
                 }
             },
             click: function(data) {
