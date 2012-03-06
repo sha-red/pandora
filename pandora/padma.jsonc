@@ -612,11 +612,12 @@
             "showTimeline": true,
             "sidebarSize": 256,
             "theme": "classic",
+            "videoMuted": false,
             "videoPoints": {},
             "videoResolution": 240,
             "videoScale": "fit",
-            "videoMuted": false,
             "videoSize": "large",
+            "videoTimeline": "average",
             "videoView": "video",
             "videoVolume": 1
         },
