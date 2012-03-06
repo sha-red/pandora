@@ -20,6 +20,7 @@ import ox.image
 img_extension='jpg'
 
 FFMPEG2THEORA = 'ffmpeg2theora'
+MAX_DISTANCE = math.sqrt(3 * pow(255, 2))
 
 
 class AspectRatio(fractions.Fraction):
@@ -338,7 +339,7 @@ def average_volume(prefix, start=0, end=0):
 def get_distance(rgb0, rgb1):
     # rgb distance, normalized so that black/white equals 1
     dst = math.sqrt(pow(rgb0[0] - rgb1[0], 2) + pow(rgb0[1] - rgb1[1], 2) + pow(rgb0[2] - rgb1[2], 2))
-    return dst / math.sqrt(3 * pow(255, 2))
+    return dst / MAX_DISTANCE
 
 
 def cuts(prefix):
@@ -364,8 +365,7 @@ def cuts(prefix):
             rgb1 = pixels[image1][x, y]
             distance += get_distance(rgb0, rgb1)
         distances.append(distance / height)
-    for frame in range(1, frames):
-        if distances[frame] >= 0.025 and abs(distances[frame] - distances[frame - 1]) >= 0.05:
+        if distance >= 0.025 and abs(distance - distances[frame - 1]) >= 0.05:
             cuts.append(frame / fps)
     return cuts
 
