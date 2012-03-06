@@ -329,17 +329,21 @@ def average_color(prefix, start=0, end=0):
     color = list(map(float, color))
     return ox.image.getHSL(color)
 
+
 def average_volume(prefix, start=0, end=0):
     #FIXME: actually compute volume
     return 0
 
+
 def get_distance(rgb0, rgb1):
+    # rgb distance, normalized so that black/white equals 1
     dst = math.sqrt(pow(rgb0[0] - rgb1[0], 2) + pow(rgb0[1] - rgb1[1], 2) + pow(rgb0[2] - rgb1[2], 2))
     return dst / math.sqrt(3 * pow(255, 2))
 
 
 def cuts(prefix):
     cuts = []
+    distances = [0]
     fps = 25
     frames = 0
     height = 64
@@ -350,19 +354,19 @@ def cuts(prefix):
         timeline = Image.open(image)
         frames += timeline.size[0]
         pixels.append(timeline.load())
-    for frame in range(0, frames):
+    for frame in range(1, frames):
         x = frame % width
-        if frame > 0:
-            dst = 0
-            image0 = int((frame - 1) / width)
-            image1 = int(frame / width)
-            for y in range(0, height):
-                rgb0 = pixels[image0][(x - 1) % width, y]
-                rgb1 = pixels[image1][x, y]
-                dst += get_distance(rgb0, rgb1) / height
-            #print frame / fps, dst
-            if dst > 0.1:
-                cuts.append(frame / fps)
+        distance = 0
+        image0 = int((frame - 1) / width)
+        image1 = int(frame / width)
+        for y in range(height):
+            rgb0 = pixels[image0][(x - 1) % width, y]
+            rgb1 = pixels[image1][x, y]
+            distance += get_distance(rgb0, rgb1)
+        distances.append(distance / height)
+    for frame in range(1, frames):
+        if distances[frame] >= 0.025 and abs(distances[frame] - distances[frame - 1]) >= 0.05:
+            cuts.append(frame / fps)
     return cuts
 
 
