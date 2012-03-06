@@ -69,7 +69,7 @@ pandora.ui.mainMenu = function() {
                         ) },
                         { id: 'timelines', title: 'Timelines', items: [
                             { group: 'viewtimelines', min: 1, max: 1, items: ['average', 'center', 'full'].map(function(timelines) {
-                                return {id: timelines, title: Ox.tiTitleCase(timelines), checked: ui.videoTimeline = timelines};
+                                return {id: timelines, title: Ox.toTitleCase(timelines), checked: ui.videoTimeline = timelines};
                             }) }
                         ]},
                         { id: 'columns', title: 'Columns', items: [
