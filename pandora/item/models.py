@@ -74,8 +74,9 @@ def get_item(info, user=None, async=False):
     item_data = {
         'title': info.get('title', ''),
         'director': info.get('director', []),
-        'year': info.get('year', '')
     }
+    if filter(lambda k: k['id'] == 'year', settings.CONFIG['itemKeys']):
+        item_data['year'] =info.get('year', '')
     for key in ('episodeTitle', 'episodeDirector', 'episodeYear',
                 'season', 'episode', 'seriesTitle'):
         if key in info and info[key]:

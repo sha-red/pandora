@@ -84,15 +84,15 @@ def update(request):
     if 'info' in data:
         for oshash in data['info']:
             info = data['info'][oshash]
-            instance = models.Instance.objects.filter(file__oshash=oshash, volume__user=user)
-            if instance.count()>0:
-                instance = instance[0]
-                if not instance.file.info:
+            f = models.File.objects(oshash=oshash)
+            if f.count()>0:
+                f = f[0]
+                if not f.info:
                     for key in ('atime', 'mtime', 'ctime'):
                         if key in info:
                             del info[key]
-                    instance.file.info = info
-                    instance.file.save()
+                    f.info = info
+                    f.save()
     if not upload_only:
         files = models.Instance.objects.filter(volume__user=user, file__available=False)
         if volume:
@@ -169,13 +169,49 @@ class VideoChunkForm(forms.Form):
     chunkId = forms.IntegerField(required=False)
     done = forms.IntegerField(required=False)
 
+@login_required_json
+def addFile(request):
+    '''
+        id: oshash
+        title: 
+        info: {}
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+                item: id,
+             }
+        }
+    '''
+    response = json_response({})
+    data = json.loads(request.POST['data'])
+    oshash = data.pop('id')
+    if not request.user.get_profile().capability('canUploadVideo'):
+        response = json_response(status=403, text='permissino denied')
+    elif models.File.objects.filter(oshash=oshash).count() > 0:
+        response = json_response(status=200, text='file exists')
+        f = models.File.objects.get(oshash=oshash)
+        response['data']['item'] = f.item.itemId
+    else:
+        i = Item()
+        i.data = {
+            'title': data.get('title', ''),
+            'director': data.get('director', []),
+        }
+        i.user = request.user
+        i.save()
+        f = models.File(oshash=oshash, item=i)
+        f.info = data['info']
+        f.save()
+        response['data']['item'] = i.itemId
+    return render_to_json_response(response)
+actions.register(addFile, cache=False)
 
 @login_required_json
 def firefogg_upload(request):
     profile = request.GET['profile']
     oshash = request.GET['id']
     config = settings.CONFIG['video']
-    video_profile = "%sp.%s" % (config['resolutions'][0], config['formats'][0])
+    video_profile = "%sp.%s" % (max(config['resolutions']), config['formats'][0])
 
     #handle video upload
     if request.method == 'POST':

@@ -38,7 +38,8 @@
         "canSeeFiles": {"staff": true, "admin": true},
         "canSeeItem": {"guest": 3, "member": 3, "friend": 4, "staff": 4, "admin": 4},
         "canSeeExtraItemViews": {"friend": true, "staff": true, "admin": true},
-        "canSendMail": {"staff": true, "admin": true}
+        "canSendMail": {"staff": true, "admin": true},
+        "canUploadVideo": {"guest": false, "member": false, "staff": true, "admin": true}
     },
     /*
         clipKeys are the properties that clips can by sorted by.
