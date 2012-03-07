@@ -271,7 +271,7 @@ pandora.ui.home = function() {
             if (lists.length) {
                 $label = Ox.Label({
                         textAlign: 'center',
-                        title: '<b>Featured List' + (lists.length >= items ? 's' : '') + '</b>',
+                        title: '<b>Featured List' + (lists.length > 1 ? 's' : '') + '</b>',
                         width: 512
                     })
                     .css({
@@ -331,7 +331,7 @@ pandora.ui.home = function() {
                         }
                     })
                     .appendTo($lists);
-                if (lists.length >= items) {
+                if (lists.length > 1) {
                     $listsBox = $('<div>')
                         .css({
                             position: 'absolute',
@@ -357,7 +357,10 @@ pandora.ui.home = function() {
                         .css({
                             position: 'absolute',
                             width: lists.length * 65 + 'px',
-                            height: '65px'
+                            height: '65px',
+                            marginLeft: lists.length < items
+                                ? (items - lists.length) * 65 / 2 + 'px'
+                                : 0
                         })
                         .appendTo($listsContainer);
                     if (lists.length > items) {
