@@ -397,7 +397,7 @@ pandora.ui.item = function() {
                         pandora.ui.importAnnotations().open();
                     },
                     info: function(data) {
-                        pandora.ui.annotationDialog(data.layer).open();
+                        pandora.ui.annotationDialog(Ox.getObjectById(pandora.site.layers, data.layer).title).open();
                     },
                     muted: function(data) {
                         pandora.UI.set('videoMuted', data.muted);
