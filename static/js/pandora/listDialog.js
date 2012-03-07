@@ -101,6 +101,7 @@ pandora.ui.listDialog = function(section) {
                     }
                 })
         ],
+        closeButton: true,
         content: pandora.$ui.listDialogTabPanel,
         maxWidth: width,
         minHeight: 312,
