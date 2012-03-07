@@ -326,8 +326,6 @@ pandora.ui.listIconPanel = function(listData) {
         keys: ['posterFrames']
     }, function(result) {
 
-        Ox.print('----/----', result.data)
-
         var posterFrames = result.data.items[0].posterFrames,
             posterFrame = posterFrames[quarter],
 
