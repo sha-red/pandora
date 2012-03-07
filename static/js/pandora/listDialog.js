@@ -325,6 +325,8 @@ pandora.ui.listIconPanel = function(listData) {
         keys: ['posterFrames']
     }, function(result) {
 
+        Ox.print('----/----', result.data)
+
         var posterFrames = result.data.items[0].posterFrames,
             posterFrame = posterFrames[quarter],
 
@@ -401,7 +403,7 @@ pandora.ui.listIconPanel = function(listData) {
                 } else {
                     itemData = $list.value(posterFrame.item);
                 }
-                renderPreview(itemData);
+                posterFrames.length && renderPreview(itemData);
             }
         })
         .gainFocus();
@@ -411,7 +413,7 @@ pandora.ui.listIconPanel = function(listData) {
         function clickIcon(e, isDoubleClick) {
             quarter = quarters.indexOf($(e.target).attr('id'));
             renderQuarters();
-            if (isDoubleClick) {
+            if (isDoubleClick && posterFrames.length) {
                 var item = posterFrames[quarter].item;
                 $list.options({selected: [item]});
                 renderPreview($list.value(item), posterFrames[quarter].position);
