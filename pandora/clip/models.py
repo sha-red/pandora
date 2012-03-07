@@ -35,17 +35,18 @@ class MetaClip:
             streams = self.item.streams()
             if streams:
                 self.aspect_ratio = streams[0].aspect_ratio
-        sortvalue = ''
-        for l in settings.CONFIG['clipLayers']:
-            sortvalue += ''.join(filter(lambda s: s,
-                                 [a.sortvalue
-                                  for a in self.annotations.filter(layer=l).order_by('sortvalue')]))
-        if sortvalue:
-            self.sortvalue = sortvalue[:900]
-        else:
-            self.sortvalue = None
-        self.findvalue = '\n'.join(filter(None, [a.findvalue for a in self.annotations.all()]))
         if self.id:
+            sortvalue = ''
+            if self.id:
+                for l in settings.CONFIG['clipLayers']:
+                    sortvalue += ''.join(filter(lambda s: s,
+                         [a.sortvalue
+                          for a in self.annotations.filter(layer=l).order_by('sortvalue')]))
+            if sortvalue:
+                self.sortvalue = sortvalue[:900]
+            else:
+                self.sortvalue = None
+            self.findvalue = '\n'.join(filter(None, [a.findvalue for a in self.annotations.all()]))
             for l in settings.CONFIG['clipLayers']:
                 setattr(self, l, self.annotations.filter(layer=l).count()>0)
         models.Model.save(self, *args, **kwargs)

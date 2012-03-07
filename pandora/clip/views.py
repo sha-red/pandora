@@ -97,9 +97,10 @@ def findClips(request):
         def add(p):
             ids.append(p.id)
             return p.json(keys=keys)
-        response['data']['items'] = [add(p) for p in qs]
 
+        response['data']['items'] = [add(p) for p in qs]
         keys = data['keys']
+
         def add_annotations(key, qs, add_layer=False):
             values = ['public_id', 'value', 'clip__public_id']
             if add_layer:
@@ -120,12 +121,12 @@ def findClips(request):
                         i[key].append(l)
         if response['data']['items']:
             if 'annotations' in keys:
-                add_annotations('annotations',
-                    Annotation.objects.filter(layer__in=settings.CONFIG['clipLayers'],
-                                              clip__in=ids), True)
+                aqs = Annotation.objects.filter(layer__in=settings.CONFIG['clipLayers'],
+                                                clip__in=ids)
+                add_annotations('annotations',aqs , True)
             for layer in filter(lambda l: l in keys, settings.CONFIG['clipLayers']):
-                add_annotations(layer,
-                    Annotation.objects.filter(layer=layer, clip__in=ids))
+                aqs = Annotation.objects.filter(layer=layer, clip__in=ids)
+                add_annotations(layer, aqs)
     elif 'position' in query:
         qs = order_query(qs, query['sort'])
         ids = [i['public_id'] for i in qs.values('public_id')]
