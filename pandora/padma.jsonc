@@ -342,6 +342,7 @@
             "title": "Cuts per Minute",
             "type": "float",
             "columnWidth": 60,
+            "format": {"type": "number", "args": [3]},
             "sort": true,
             "value": {"key": "cuts", "type": "lengthperminute"}
         },
@@ -359,6 +360,7 @@
             "title": "Words per Minute",
             "type": "float",
             "columnWidth": 60,
+            "format": {"type": "number", "args": [3]},
             "sort": true,
             "value": {"layer": "subtitles", "type": "wordsperminute"}
         },
