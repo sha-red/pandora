@@ -41,7 +41,8 @@ def order_query(qs, sort):
             operator = ''
         clip_keys = ('public_id', 'start', 'end', 'hue', 'saturation', 'lightness', 'volume',
                      'duration', 'sortvalue', 'videoRatio',
-                     'director', 'title')
+                     'director', 'title',
+                     'random')
         key = {
             'id': 'public_id',
             'in': 'start',

@@ -115,12 +115,14 @@ attrs = {
     'aspect_ratio': models.FloatField(default=0),
 
     'item': models.ForeignKey('item.Item', related_name='clips'),
+    'random': models.BigIntegerField(default=0, db_index=True),
 
     #seconds
     'start': models.FloatField(default=-1, db_index=True),
     'end': models.FloatField(default=-1),
     'duration': models.FloatField(default=0, db_index=True),
 
+    
     #get from annotation
     'hue': models.FloatField(default=0, db_index=True),
     'saturation': models.FloatField(default=0, db_index=True),
@@ -130,7 +132,7 @@ attrs = {
     'director': models.CharField(max_length=1000, null=True, db_index=True),
     'title': models.CharField(max_length=1000, db_index=True),
     'sortvalue': models.CharField(max_length=1000, null=True, db_index=True),
-    'findvalue': models.TextField(),
+    'findvalue': models.TextField(null=True),
 }
 for name in settings.CONFIG['clipLayers']:
     attrs[name] = models.BooleanField(default=False, db_index=True)

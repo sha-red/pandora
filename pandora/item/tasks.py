@@ -27,6 +27,17 @@ def update_random_sort():
             models.ItemSort.objects.filter(pk=i).update(random=n)
             n += 1
 
+def update_random_clip_sort():
+    if filter(lambda f: f['id'] == 'random', settings.CONFIG['itemKeys']):
+        random.seed()
+        from clip.models import Clip
+        ids = [f['id'] for f in Clip.objects.values('id')]
+        random.shuffle(ids)
+        n = 1
+        for i in ids:
+            Clip.objects.filter(pk=i).update(random=n)
+            n += 1
+
 @task(ignore_resulsts=True, queue='default')
 def update_poster(itemId):
     item = models.Item.objects.get(itemId=itemId)

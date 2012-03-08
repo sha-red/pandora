@@ -84,7 +84,7 @@ class Annotation(models.Model):
 
     layer = models.CharField(max_length=255, db_index=True)
     value = models.TextField()
-    findvalue = models.TextField()
+    findvalue = models.TextField(null=True)
     sortvalue = models.CharField(max_length=1000, null=True, blank=True, db_index=True)
 
     def editable(self, user):
@@ -133,6 +133,7 @@ class Annotation(models.Model):
             else:
                 self.sortvalue = None
         else:
+            self.findvalue = None
             self.sortvalue = None
 
         #no clip or update clip
