@@ -426,7 +426,7 @@
         },
         {
             "id": "parts",
-            "title": "Parts",
+            "title": "Number of Parts",
             "type": "integer",
             "capability": "canSeeFiles",
             "columnWidth": 60
@@ -499,8 +499,7 @@
         {
             "id": "random",
             "title": "Random",
-            "type": "integer",
-            "columnWidth": 60
+            "type": "integer"
         }
     ],
     /*
