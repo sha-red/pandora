@@ -191,6 +191,7 @@ pandora.ui.listInfo = function() {
                                 });
                             },
                             submit: function(data) {
+                                data.value = Ox.decodeHTML(data.value);
                                 if (data.value != item.name) {
                                     pandora.api.editList({
                                         id: list,
