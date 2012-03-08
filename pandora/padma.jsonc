@@ -81,13 +81,14 @@
             capability: A capability required to see this key
             columnRequired: If true, the column can't be removed
             columnWidth: Default column width in px
-            find: If true, will appear as a find option
             filter: if true, one can filter results by this key
+            find: If true, this key will appear as a find option
             format: {type: "...", args: [...]}, for special formatting
                 (Ox.formatType(args) will be called)
-            sort: special sort rule (title, person)
+            sort: If true, one can sort results by this key
             sortOperator: sort operator (+, -), in case it differs from the
                 default for the key's type (+ for strings, - for numbers)
+            sortType: special sort type (title, person)
             value: {key: "...", type: "..."}, for keys that are derived
                 from other keys (like number of actors), or "capability"
     */
@@ -107,7 +108,8 @@
             "columnRequired": true,
             "columnWidth": 180,
             "find": true,
-            "sort": "title"
+            "sort": true,
+            "sortType": "title"
         },
         {
             "id": "source",
@@ -117,7 +119,8 @@
             "description": true,
             "columnWidth": 180,
             "filter": true,
-            "find": true
+            "find": true,
+            "sort": true
         },
         {
             "id": "project",
@@ -127,7 +130,8 @@
             "description": true,
             "columnWidth": 120,
             "filter": true,
-            "find": true
+            "find": true,
+            "sort": true
         },
         {
             "id": "topic",
@@ -136,7 +140,8 @@
             "autocomplete": true,
             "columnWidth": 180,
             "filter": true,
-            "find": true
+            "find": true,
+            "sort": true
         },
         {
             "id": "name",
@@ -152,7 +157,8 @@
             "autocomplete": true,
             "columnRequired": true,
             "columnWidth": 180,
-            "sort": "person"
+            "sort": true,
+            "sortType": "person"
         },
         {
             "id": "cinematographer",
@@ -160,7 +166,8 @@
             "type": ["string"],
             "autocomplete": true,
             "columnWidth": 180,
-            "sort": "person"
+            "sort": true,
+            "sortType": "person"
         },
         {
             "id": "featuring",
@@ -170,7 +177,8 @@
             "columnRequired": true,
             "columnWidth": 180,
             "filter": true,
-            "sort": "person"
+            "sort": true,
+            "sortType": "person"
         },
         {
             "id": "language",
@@ -179,7 +187,8 @@
             "autocomplete": true,
             "columnWidth": 120,
             "filter": true,
-            "find": true
+            "find": true,
+            "sort": true
         },
         {
             "id": "location",
@@ -188,14 +197,16 @@
             "autocomplete": true,
             "columnWidth": 180,
             "filter": true,
-            "find": true
+            "find": true,
+            "sort": true
         },
         {
             "id": "date",
             "title": "Date",
             "type": "string",
-            "columnWidth": 120
-            //"format": {"type": "date", "args": ["%a, %b %e, %Y"]}
+            "columnWidth": 120,
+            //"format": {"type": "date", "args": ["%a, %b %e, %Y"]},
+            "sort": true
         },
         {
             "id": "summary",
@@ -207,7 +218,8 @@
             "id": "id",
             "title": "ID",
             "type": "string",
-            "columnWidth": 90
+            "columnWidth": 90,
+            "sort": true
         },
         {
             "id": "annotations",
@@ -249,62 +261,72 @@
             "id": "numberofannotations",
             "title": "Annotations",
             "type": "integer",
-            "columnWidth": 60
+            "columnWidth": 60,
+            "sort": true
         },
         {
             "id": "duration",
             "title": "Duration",
             "type": "float",
             "columnWidth": 90,
-            "format": {"type": "duration", "args": [0, "short"]}
+            "format": {"type": "duration", "args": [0, "short"]},
+            "sort": true
         },
         {
             "id": "resolution",
             "title": "Resolution",
             "type": ["integer"],
             "columnWidth": 90,
-            "format": {"type": "resolution", "args": ["px"]}
+            "format": {"type": "resolution", "args": ["px"]},
+            "sort": true
         },
         {
             "id": "aspectratio",
             "title": "Aspect Ratio",
             "type": "float",
             "columnWidth": 90,
-            "format": {"type": "unit", "args": [":1"]}
+            "format": {"type": "unit", "args": [":1"]},
+            "sort": true
         },
         {
             "id": "pixels",
             "title": "Pixels",
             "type": "integer",
             "columnWidth": 90,
-            "format": {"type": "value", "args": ["px"]}
+            "format": {"type": "value", "args": ["px"]},
+            "sort": true
         },
         {
             "id": "hue",
             "title": "Hue",
             "type": "hue",
             "columnWidth": 90,
-            "format": {"type": "color", "args": ["hue"]}
+            "format": {"type": "color", "args": ["hue"]},
+            "sort": true,
+            "sortOperator": "+"
         },
         {
             "id": "saturation",
             "title": "Saturation",
             "type": "float",
             "columnWidth": 90,
-            "format": {"type": "color", "args": ["saturation"]}
+            "format": {"type": "color", "args": ["saturation"]},
+            "sort": true
         },
         {
             "id": "lightness",
             "title": "Lightness",
             "type": "float",
             "columnWidth": 90,
-            "format": {"type": "color", "args": ["lightness"]}
+            "format": {"type": "color", "args": ["lightness"]},
+            "sort": true
         },
         {
             "id": "volume",
             "title": "Volume",
             "type": "float",
-            "columnWidth": 60
+            "columnWidth": 60,
+            "sort": true
         },
         {
             "id": "numberofcuts",
@@ -312,6 +334,7 @@
             "type": "integer",
             "columnWidth": 60,
             "format": {"type": "number", "args": []},
+            "sort": true,
             "value": {"key": "cuts", "type": "length"}
         },
         {
@@ -319,6 +342,7 @@
             "title": "Cuts per Minute",
             "type": "float",
             "columnWidth": 60,
+            "sort": true,
             "value": {"key": "cuts", "type": "lengthperminute"}
         },
         {
@@ -327,6 +351,7 @@
             "type": "integer",
             "columnWidth": 60,
             "format": {"type": "number", "args": []},
+            "sort": true,
             "value": {"layer": "subtitles", "type": "words"}
         },
         {
@@ -334,6 +359,7 @@
             "title": "Words per Minute",
             "type": "float",
             "columnWidth": 60,
+            "sort": true,
             "value": {"layer": "subtitles", "type": "wordsperminute"}
         },
         {
@@ -342,14 +368,16 @@
             "type": "integer",
             "capability": "canSeeFiles",
             "columnWidth": 60,
-            "format": {"type": "value", "args": ["B"]}
+            "format": {"type": "value", "args": ["B"]},
+            "sort": true
         },
         {
             "id": "bitrate",
             "title": "Bitrate",
             "type": "integer",
             "columnWidth": 60,
-            "format": {"type": "unit", "args": ["kbps"]}
+            "format": {"type": "unit", "args": ["kbps"]},
+            "sort": true
         },
         {
             "id": "numberoffiles",
@@ -357,6 +385,7 @@
             "type": "integer",
             "capability": "canSeeFiles",
             "columnWidth": 60,
+            "sort": true,
             "value": {"key": "files", "type": "length"}
         },
         {
@@ -378,33 +407,38 @@
             "title": "Date Created",
             "type": "date",
             "columnWidth": 120,
-            "format": {"type": "date", "args": ["%a, %b %e, %Y"]}
+            "format": {"type": "date", "args": ["%a, %b %e, %Y"]},
+            "sort": true
         },
         {
             "id": "modified",
             "title": "Date Modified",
             "type": "date",
-            "columnWidth": 90
+            "columnWidth": 90,
+            "sort": true
         },
         {
             "id": "accessed",
             "title": "Date Accessed",
             "type": "date",
             "columnWidth": 90,
-            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]}
+            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]},
+            "sort": true
         },
         {
             "id": "timesaccessed",
             "title": "Times Accessed",
             "type": "integer",
-            "columnWidth": 60
+            "columnWidth": 60,
+            "sort": true
         },
         {
             "id": "license",
             "title": "License",
             "type": ["string"],
             "columnWidth": 120,
-            "filter": true
+            "filter": true,
+            "sort": true
         },
         {
             "id": "rightslevel",
@@ -414,6 +448,7 @@
             "format": {"type": "ColorLevel", "args": [
                 ["Public", "Restricted", "Private"]
             ]},
+            "sort": true,
             "sortOperator": "+",
             "values": ["Public", "Restricted", "Private", "Unknown"]
         },
@@ -421,7 +456,7 @@
             "id": "random",
             "title": "Random",
             "type": "integer",
-            "columnWidth": 60
+            "sort": true
         }
     ],
     "itemName": {

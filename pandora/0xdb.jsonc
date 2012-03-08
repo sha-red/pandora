@@ -85,13 +85,14 @@
             capability: A capability required to see this key
             columnRequired: If true, the column can't be removed
             columnWidth: Default column width in px
-            find: If true, will appear as a find option
-            filter: if true, one can filter results by this key
+            filter: If true, one can filter results by this key
+            find: If true, this key will appear as a find option
             format: {type: "...", args: [...]}, for special formatting
                 (Ox.formatType(args) will be called)
-            sort: special sort rule (title, person)
+            sort: If true, one can sort results by this key
             sortOperator: sort operator (+, -), in case it differs from the
                 default for the key's type (+ for strings, - for numbers)
+            sortType: special sort type (title, person)
             value: {key: "...", type: "..."}, for keys that are derived
                 from other keys (like number of actors), or "capability"
     */
@@ -112,7 +113,8 @@
             "columnRequired": true,
             "columnWidth": 180,
             "find": true,
-            "sort": "title"
+            "sort": true,
+            "sortType": "title"
         },
         {
             "id": "director",
@@ -124,7 +126,8 @@
             "columnWidth": 180,
             "filter": true,
             "find": true,
-            "sort": "person"
+            "sort": true,
+            "sortType": "person"
         },
         {
             "id": "country",
@@ -133,7 +136,8 @@
             "autocomplete": true,
             "columnWidth": 120,
             "filter": true,
-            "find": true
+            "find": true,
+            "sort": true
         },
         {
             "id": "year",
@@ -143,7 +147,8 @@
             "autocomplete": true,
             "columnWidth": 60,
             "filter": true,
-            "find": true
+            "find": true,
+            "sort": true
         },
         {
             "id": "language",
@@ -151,15 +156,17 @@
             "type": ["string"],
             "autocomplete": true,
             "columnWidth": 120,
+            "filter": true,
             "find": true,
-            "filter": true
+            "sort": true
         },
         {
             "id": "runtime", 
             "title": "Runtime", 
             "type": "time",
             "columnWidth": 60,
-            "format": {"type": "duration", "args": [0, "short"]}
+            "format": {"type": "duration", "args": [0, "short"]},
+            "sort": true
         },
         {
             "id": "writer",
@@ -169,7 +176,8 @@
             "columnWidth": 180,
             "filter": true,
             "find": true,
-            "sort": "person"
+            "sort": true,
+            "sortType": "person"
         },
         {
             "id": "producer",
@@ -179,7 +187,8 @@
             "columnWidth": 180,
             "filter": true,
             "find": true,
-            "sort": "person"
+            "sort": true,
+            "sortType": "person"
         },
         {
             "id": "cinematographer",
@@ -189,7 +198,8 @@
             "columnWidth": 180,
             "filter": true,
             "find": true,
-            "sort": "person"
+            "sort": true,
+            "sortType": "person"
         },
         {
             "id": "editor",
@@ -199,7 +209,8 @@
             "columnWidth": 180,
             "filter": true,
             "find": true,
-            "sort": "person"
+            "sort": true,
+            "sortType": "person"
         },
         {
             "id": "actor",
@@ -208,13 +219,14 @@
             "autocomplete": true,
             "filter": true,
             "find": true,
-            "sort": "person"
+            "sortType": "person"
         },
         {
             "id": "numberofactors",
             "title": "Number of Actors",
             "type": "integer",
             "columnWidth": 60,
+            "sort": true,
             "value": {"key": "actor", "type": "length"}
         },
         {
@@ -223,7 +235,7 @@
             "type": ["string"],
             "autocomplete": true,
             "find": true,
-            "sort": "string"
+            "sortType": "string"
         },
         {
             "id": "name",
@@ -244,7 +256,8 @@
             "autocomplete": true,
             "columnWidth": 120,
             "filter": true,
-            "find": true
+            "find": true,
+            "sort": true
         },
         {
             "id": "keyword", 
@@ -270,48 +283,55 @@
             "title": "Release Date",
             "type": "date",
             "columnWidth": 120,
-            "format": {"type": "date", "args": ["%a, %b %e, %Y"]}
+            "format": {"type": "date", "args": ["%a, %b %e, %Y"]},
+            "sort": true
         },
         {
             "id": "budget",
             "title": "Budget",
             "type": "integer",
             "columnWidth": 90,
-            "format": {"type": "unit", "args": ["$"]}
+            "format": {"type": "unit", "args": ["$"]},
+            "sort": true
         },
         {
             "id": "gross",
             "title": "Gross",
             "type": "integer",
             "columnWidth": 90,
-            "format": {"type": "unit", "args": ["$"]}
+            "format": {"type": "unit", "args": ["$"]},
+            "sort": true
         },
         {
             "id": "profit",
             "title": "Profit",
             "type": "integer",
             "columnWidth": 90,
-            "format": {"type": "unit", "args": ["$"]}
+            "format": {"type": "unit", "args": ["$"]},
+            "sort": true
         },
         {
             "id": "rating",
             "title": "Rating",
             "type": "float",
             "columnWidth": 60,
-            "format": {"type": "unit", "args": ["%", 0]}
+            "format": {"type": "unit", "args": ["%", 0]},
+            "sort": true
         },
         {
             "id": "votes",
             "title": "Votes",
             "type": "float",
             "columnWidth": 60,
-            "format": {"type": "unit", "args": ["%", 2]}
+            "format": {"type": "unit", "args": ["%", 2]},
+            "sort": true
         },
         {
             "id": "id",
             "title": "ID",
             "type": "string",
-            "columnWidth": 90
+            "columnWidth": 90,
+            "sort": true
         },
         {
             "id": "subtitles",
@@ -324,7 +344,8 @@
             "title": "Duration",
             "type": "float",
             "columnWidth": 90,
-            "format": {"type": "duration", "args": []}
+            "format": {"type": "duration", "args": []},
+            "sort": true
         },
         {
             "id": "resolution",
@@ -332,14 +353,16 @@
             "type": ["integer"],
             "capability": "canSeeFiles",
             "columnWidth": 90,
-            "format": {"type": "resolution", "args": ["px"]}
+            "format": {"type": "resolution", "args": ["px"]},
+            "sort": true
         },
         {
             "id": "aspectratio",
             "title": "Aspect Ratio",
             "type": "float",
             "columnWidth": 90,
-            "format": {"type": "unit", "args": [":1"]}
+            "format": {"type": "unit", "args": [":1"]},
+            "sort": true
         },
         {
             "id": "pixels",
@@ -347,7 +370,8 @@
             "type": "integer",
             "capability": "canSeeFiles",
             "columnWidth": 90,
-            "format": {"type": "value", "args": ["px"]}
+            "format": {"type": "value", "args": ["px"]},
+            "sort": true
         },
         {
             "id": "hue",
@@ -355,6 +379,7 @@
             "type": "float",
             "columnWidth": 90,
             "format": {"type": "color", "args": ["hue"]},
+            "sort": true,
             "sortOperator": "+"
         },
         {
@@ -362,20 +387,23 @@
             "title": "Saturation",
             "type": "float",
             "columnWidth": 90,
-            "format": {"type": "color", "args": ["saturation"]}
+            "format": {"type": "color", "args": ["saturation"]},
+            "sort": true
         },
         {
             "id": "lightness",
             "title": "Lightness",
             "type": "float",
             "columnWidth": 90,
-            "format": {"type": "color", "args": ["lightness"]}
+            "format": {"type": "color", "args": ["lightness"]},
+            "sort": true
         },
         {
             "id": "volume",
             "title": "Volume",
             "type": "float",
-            "columnWidth": 60
+            "columnWidth": 60,
+            "sort": true
         },
         {
             "id": "numberofcuts",
@@ -383,6 +411,7 @@
             "type": "integer",
             "columnWidth": 60,
             "format": {"type": "number", "args": []},
+            "sort": true,
             "value": {"key": "cuts", "type": "length"}
         },
         {
@@ -390,6 +419,7 @@
             "title": "Cuts per Minute",
             "type": "float",
             "columnWidth": 60,
+            "sort": true,
             "value": {"key": "cuts", "type": "lengthperminute"}
         },
         {
@@ -398,6 +428,7 @@
             "type": "integer",
             "columnWidth": 60,
             "format": {"type": "number", "args": []},
+            "sort": true,
             "value": {"layer": "subtitles", "type": "words"}
         },
         {
@@ -406,6 +437,7 @@
             "type": "float",
             "columnWidth": 60,
             "format": {"type": "unit", "args": ["wpm"]},
+            "sort": true,
             "value": {"layer": "subtitles", "type": "wordsperminute"}
         },
         {
@@ -414,7 +446,8 @@
             "type": "integer",
             "capability": "canSeeFiles",
             "columnWidth": 60,
-            "format": {"type": "value", "args": ["B"]}
+            "format": {"type": "value", "args": ["B"]},
+            "sort": true
         },
         {
             "id": "bitrate",
@@ -422,14 +455,16 @@
             "type": "integer",
             "capability": "canSeeFiles",
             "columnWidth": 60,
-            "format": {"type": "unit", "args": ["kbps", 0, 0.001]}
+            "format": {"type": "unit", "args": ["kbps", 0, 0.001]},
+            "sort": true
         },
         {
             "id": "parts",
             "title": "Number of Parts",
             "type": "integer",
             "capability": "canSeeFiles",
-            "columnWidth": 60
+            "columnWidth": 60,
+            "sort": true
         },
         {
             "id": "numberoffiles",
@@ -437,6 +472,7 @@
             "type": "integer",
             "capability": "canSeeFiles",
             "columnWidth": 60,
+            "sort": true,
             "value": {"key": "files", "type": "length"}
         },
         {
@@ -451,27 +487,31 @@
             "title": "Date Created",
             "type": "date",
             "columnWidth": 150,
-            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]}
+            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]},
+            "sort": true
         },
         {
             "id": "modified",
             "title": "Last Modified",
             "type": "date",
             "columnWidth": 150,
-            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]}
+            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]},
+            "sort": true
         },
         {
             "id": "accessed",
             "title": "Last Accessed",
             "type": "date",
             "columnWidth": 150,
-            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]}
+            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]},
+            "sort": true
         },
         {
             "id": "timesaccessed",
             "title": "Times Accessed",
             "type": "integer",
-            "columnWidth": 60
+            "columnWidth": 60,
+            "sort": true
         },
         {
             "id": "rightslevel",
@@ -481,6 +521,7 @@
             "format": {"type": "ColorLevel", "args": [
                 ["Public", "Relaxed", "Regular", "Restricted", "Private"]
             ]},
+            "sort": true,
             "sortOperator": "+",
             "values": ["Public", "Relaxed", "Regular", "Restricted", "Private", "Unknown"]
         },
@@ -499,7 +540,8 @@
         {
             "id": "random",
             "title": "Random",
-            "type": "integer"
+            "type": "integer",
+            "sort": true
         }
     ],
     /*

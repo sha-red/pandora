@@ -269,7 +269,7 @@ appPanel
                 ]
             },
             sortKeys: Ox.map(pandora.site.itemKeys, function(key) {
-                return key.columnWidth ? Ox.extend(key, {
+                return key.sort ? Ox.extend(key, {
                     operator: pandora.getSortOperator(key.id)
                 }) : null;
             })
