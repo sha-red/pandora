@@ -63,7 +63,7 @@ pandora.ui.browser = function() {
                         ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
                     ) + '128.jpg',
                     format, info, sortKey = sort[0].key;
-                if (['title', 'director'].indexOf(sortKey) > -1) {
+                if (['title', 'director', 'random'].indexOf(sortKey) > -1) {
                     info = data['year'];
                 } else {
                     // fixme: this is duplicated many times
