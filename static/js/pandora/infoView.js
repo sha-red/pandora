@@ -380,7 +380,7 @@ pandora.ui.infoView = function(data) {
         html = [];
         ['rating', 'votes'].forEach(function(key) {
             data[key] && html.push(
-                formatKey(key) + Ox.formatNumber(data[key], key == 'rating' ? 0 : 2)
+                formatKey(key) + Ox.formatNumber(data[key], key == 'rating' ? 0 : 2) + '%'
             );
         });
         $div.html(html.join('; '));
