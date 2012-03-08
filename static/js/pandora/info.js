@@ -174,10 +174,10 @@ pandora.ui.listInfo = function() {
                     $title = Ox.Editable({
                             editable: editable,
                             format: function(value) {
-                                return Ox.encodeHTML(
+                                return Ox.encodeHTML(Ox.decodeHTML(
                                     item.status == 'featured' || editable
                                     ? value
-                                    : item.user + ': ' + value)
+                                    : item.user + ': ' + value))
                             },
                             tooltip: editable ? 'Doubleclick to edit title' : '',
                             value: item.name,
