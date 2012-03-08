@@ -37,7 +37,7 @@ pandora.ui.clipList = function(videoRatio) {
                 }).join('; ') : '';
                 url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg';
                 sortKey = sort[0].key;
-                if (['text', 'position', 'duration'].indexOf(sortKey) > -1) {
+                if (['text', 'position', 'duration', 'random'].indexOf(sortKey) > -1) {
                     info = Ox.formatDuration(data['in']) + ' - '
                         + Ox.formatDuration(data.out);
                 } else {
