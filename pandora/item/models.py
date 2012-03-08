@@ -624,7 +624,7 @@ class Item(models.Model):
                 elif key == 'name':
                     values = []
                     for k in map(lambda x: x['id'],
-                                   filter(lambda x: x.get('sort') == 'person',
+                                   filter(lambda x: x.get('sortType') == 'person',
                                           settings.CONFIG['itemKeys'])):
                         values += self.get(k, [])
                     values = list(set(values))
@@ -692,10 +692,10 @@ class Item(models.Model):
             'wordsperminute',
         )
 
-        for key in filter(lambda k: 'columnWidth' in k, settings.CONFIG['itemKeys']):
+        for key in filter(lambda k: k.get('sort', False), settings.CONFIG['itemKeys']):
             name = key['id']
             source = name
-            sort_type = key.get('sort', key['type'])
+            sort_type = key.get('sortType', key['type'])
             if 'value' in key:
                 if 'layer' in key['value']:
                    continue 
@@ -845,7 +845,7 @@ class Item(models.Model):
                 current_values = []
                 #FIXME: is there a better way to build name collection?
                 for k in map(lambda x: x['id'],
-                               filter(lambda x: x.get('sort') == 'person',
+                               filter(lambda x: x.get('sortType') == 'person',
                                       settings.CONFIG['itemKeys'])):
                     current_values += self.get(k, [])
             if not isinstance(current_values, list):
@@ -1277,7 +1277,7 @@ for key in settings.CONFIG['itemKeys']:
 
 Item.person_keys = []
 for key in settings.CONFIG['itemKeys']:
-    if 'sort' in key and key['sort'] == 'person':
+    if key.get('sortType') == 'person':
         Item.person_keys.append(key['id'])
 
 class ItemFind(models.Model):
@@ -1308,10 +1308,10 @@ attrs = {
     'height': models.BigIntegerField(null=True, blank=True, db_index=True),
     'created': models.DateTimeField(null=True, blank=True, db_index=True),
 }
-for key in filter(lambda k: 'columnWidth' in k or k['type'] in ('integer', 'time', 'float', 'date', 'enum'), settings.CONFIG['itemKeys']):
+for key in filter(lambda k: k.get('sort', False) or k['type'] in ('integer', 'time', 'float', 'date', 'enum'), settings.CONFIG['itemKeys']):
     name = key['id']
     name = {'id': 'itemId'}.get(name, name)
-    sort_type = key.get('sort', key['type'])
+    sort_type = key.get('sortType', key['type'])
     if isinstance(sort_type, list):
         sort_type = sort_type[0]
     model = {
