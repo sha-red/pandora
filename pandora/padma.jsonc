@@ -311,6 +311,7 @@
             "title": "Number of Cuts",
             "type": "integer",
             "columnWidth": 60,
+            "format": {"type": "number", "args": []},
             "value": {"key": "cuts", "type": "length"}
         },
         {
@@ -322,9 +323,10 @@
         },
         {
             "id": "words",
-            "title": "Words",
+            "title": "Number of Words",
             "type": "integer",
             "columnWidth": 60,
+            "format": {"type": "number", "args": []},
             "value": {"layer": "subtitles", "type": "words"}
         },
         {
