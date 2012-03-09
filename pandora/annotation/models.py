@@ -130,7 +130,7 @@ class Annotation(models.Model):
         layer = self.get_layer()
         if self.value:
             self.value = utils.cleanup_value(self.value, layer['type'])
-            self.findvalue = ox.decodeHtml(ox.stripTags(self.value).strip())
+            self.findvalue = ox.decodeHtml(ox.stripTags(self.value).strip()).replace('\n ', ' ')
             sortvalue = sort_string(self.findvalue)
             if sortvalue:
                 self.sortvalue = sortvalue[:900]

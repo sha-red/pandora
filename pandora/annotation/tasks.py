@@ -27,7 +27,7 @@ def update_matching_events(id):
     for n in Event.objects.all().values('id', 'name', 'alternativeNames'):
         names[n['id']] = [ox.decodeHtml(n) for n in [n['name']] + json.loads(n['alternativeNames'])]
 
-    value = a.findvalue.lower()
+    value = a.findvalue.lower().replace('\n', ' ')
     update = []
     for i in names:
         for name in names[i]:
