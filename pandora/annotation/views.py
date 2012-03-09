@@ -17,7 +17,7 @@ from item import utils
 from item.models import Item
 
 import models
-
+from tasks import update_item
 
 def parse_query(data, user):
     query = {}
@@ -200,6 +200,8 @@ def editAnnotation(request):
                     'out': 'end'
                 }.get(key,key), data[key])
         a.save()
+        #update sort/find tables async
+        update_item.delay(a.id)
         response['data'] = a.json()
         response['data']['editable'] = True
     else:

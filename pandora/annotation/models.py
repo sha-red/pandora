@@ -161,9 +161,6 @@ class Annotation(models.Model):
         if layer.get('type') == 'event' or layer.get('hasEvents'):
             update_matching_events(self.id)
 
-        #update sort/find tables async
-        update_item.delay(self.id)
-
     def delete(self, *args, **kwargs):
         super(Annotation, self).delete(*args, **kwargs)
         if self.clip.annotations.count() == 0:

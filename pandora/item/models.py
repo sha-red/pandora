@@ -1255,7 +1255,6 @@ class Item(models.Model):
                 offset += f.duration
             #remove left over clips without annotations
             Clip.objects.filter(item=self, annotations__id=None).delete()
-        self.update_find()
 
     def srt(self, layer):
         return ox.srt.encode([{

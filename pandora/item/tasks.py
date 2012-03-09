@@ -59,6 +59,9 @@ def update_timeline(itemId):
 def load_subtitles(itemId):
     item = models.Item.objects.get(itemId=itemId)
     item.load_subtitles()
+    item.update_find()
+    item.update_sort()
+    item.update_facets()
 
 @task(ignore_resulsts=True, queue='default')
 def update_sitemap(base_url):
