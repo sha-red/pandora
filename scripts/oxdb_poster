@@ -103,7 +103,8 @@ def render_poster(title, director, year, series, oxdb_id, imdb_id, frame, timeli
     offset_top += size[1] - font_size['small'] + text_margin / 2
     if year:
         drawText(poster_image, (text_margin, offset_top), year, font_file, font_size['small'], font_color)
-    drawText(poster_image, (text_margin, text_bottom - text_margin - font_size['large'] + 2), oxdb_id, font_file, font_size['large'], font_color)
+    item_id = imdb_id or oxdb_id
+    drawText(poster_image, (text_margin, text_bottom - text_margin - font_size['large'] + 2), item_id, font_file, font_size['large'], font_color)
 
     # logo
     logo_height = 32
