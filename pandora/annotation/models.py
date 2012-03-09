@@ -160,7 +160,7 @@ class Annotation(models.Model):
             self.clip.save()
 
         #editAnnotations needs to be in snyc
-        if layer.get('type') == 'place' or layer.get('hasPlace'):
+        if layer.get('type') == 'place' or layer.get('hasPlaces'):
             update_matching_places(self.id)
         if layer.get('type') == 'event' or layer.get('hasEvents'):
             update_matching_events(self.id)
