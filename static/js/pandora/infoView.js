@@ -682,7 +682,7 @@ pandora.ui.infoView = function(data) {
                             id: data['id'],
                             info: data.width + ' x ' + data.height + ' px',
                             title: ui.icons == 'posters' ? data.source : Ox.formatDuration(data.position),
-                            url: data.url,
+                            url: data.url.replace('http://', '//'),
                             width: ratio >= 1 ? size : size * ratio
                         }
                     },
@@ -714,7 +714,7 @@ pandora.ui.infoView = function(data) {
                             return image.index == index;
                         })[0];
                         var imageRatio = selectedImage.width / selectedImage.height,
-                            src = selectedImage.url;
+                            src = selectedImage.url.replace('http://', '//');
                         if ($browserImages.length == 0) {
                             $browserImages = pandora.$ui.browser.find('img[src*="/' + data.id + '/"]');
                         }
