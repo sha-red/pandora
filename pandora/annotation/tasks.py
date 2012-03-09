@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 import json
+import ox
 
 from django.conf import settings
 from celery.task import task
@@ -24,8 +25,9 @@ def update_matching_events(id):
 
     names = {}
     for n in Event.objects.all().values('id', 'name', 'alternativeNames'):
-        names[n['id']] = [n['name']] + json.loads(n['alternativeNames'])
-    value = a.value.lower()
+        names[n['id']] = [ox.decodeHtml(n) for n in [n['name']] + json.loads(n['alternativeNames'])]
+
+    value = a.findvalue.lower()
     update = []
     for i in names:
         for name in names[i]:

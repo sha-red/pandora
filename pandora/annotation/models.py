@@ -44,8 +44,10 @@ def get_matches(obj, model, layer_type):
     has_type = 'has%ss' % layer_type.capitalize()
     contains = [l['id'] for l in filter(lambda l: l.get(has_type), settings.CONFIG['layers'])]
     if contains:
-        q = Q(value__icontains=" " + obj.name)|Q(value__istartswith=obj.name)
+        name = ox.decodeHtml(obj.name)
+        q = Q(findvalue__icontains=" " + name)|Q(findvalue__istartswith=name)
         for name in obj.alternativeNames:
+            name = ox.decodeHtml(name)
             q = q|Q(value__icontains=" " + name)|Q(value__istartswith=name)
         contains_matches = q&Q(layer__in=contains)
         if f:
@@ -55,11 +57,13 @@ def get_matches(obj, model, layer_type):
 
     matches = []
     for a in Annotation.objects.filter(f):
-        value = a.value.lower()
+        value = a.findvalue.lower()
         for name in super_matches:
+            name = ox.decodeHtml(name)
             value = value.replace(name.lower(), '')
         for name in [obj.name] + list(obj.alternativeNames):
             name = name.lower()
+            name = ox.decodeHtml(name)
             if name in value and (exact or re.compile('((^|\s)%s([\.,;:!?\-\/\s]|$))'%name).findall(value)):
                 matches.append(a.id)
                 break
