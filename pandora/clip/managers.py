@@ -201,4 +201,13 @@ class ClipManager(Manager):
         if 'keys' in data:
             for l in filter(lambda k: k in settings.CONFIG['clipLayers'], data['keys']):
                 qs = qs.filter(**{l: True})
+        #anonymous can only see public clips
+        if not user or user.is_anonymous():
+            allowed_level = settings.CONFIG['capabilities']['canSeeItem']['guest']
+            qs = qs.filter(item__level__lte=allowed_level)
+        #users can see public clips, there own clips and clips of there groups
+        else:
+            allowed_level = settings.CONFIG['capabilities']['canSeeItem'][user.get_profile().get_level()]
+            qs = qs.filter(Q(item__level__lte=allowed_level)|Q(item__user=user)|Q(item__groups__in=user.groups.all()))
+        #admins can see all available clips
         return qs
