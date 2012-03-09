@@ -11,7 +11,7 @@ PROJECT_ROOT = os.path.normpath(os.path.dirname(__file__))
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
-JSON_DEBUG = True
+JSON_DEBUG = False
 
 #this gets set to all users in highest userLevel (app/config.py)
 ADMINS = ()
