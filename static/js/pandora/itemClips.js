@@ -43,7 +43,7 @@ pandora.ui.itemClips = function(options) {
                 id: clip.id,
                 info: Ox.formatDuration(clip['in']) + ' - ' + Ox.formatDuration(clip.out),
                 title: annotations.map(function(annotation) {
-                    return Ox.stripTags(annotation.value);
+                    return Ox.stripTags(annotation.value.replace(/\n/g, ' '));
                 }).join('; '),
                 url: url,
             })

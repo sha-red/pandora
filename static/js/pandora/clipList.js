@@ -33,7 +33,7 @@ pandora.ui.clipList = function(videoRatio) {
                         : a.value > b.value ? 1
                         : 0;
                 }).map(function(annotation) {
-                    return Ox.stripTags(annotation.value).replace(/\n/g, ' ');
+                    return Ox.stripTags(annotation.value.replace(/\n/g, ' '));
                 }).join('; ') : '';
                 url = '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg';
                 sortKey = sort[0].key;
