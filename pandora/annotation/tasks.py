@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+import json
+
 from django.conf import settings
 from celery.task import task
 
@@ -19,16 +21,20 @@ def update_matching_events(id):
         a.events.add(Event.get_or_create(a.value))
         for e in a.events.all():
             e.update_matches()
-    ids = [e['id'] for e in Event.objects.all().values('id')]
-    for i in ids:
-        try:
-            e = Event.objects.get(pk=i)
-            for name in [e.name] + list(e.alternativeNames):
-                if name.lower() in a.value.lower():
-                    e.update_matches()
-                    break
-        except Event.DoesNotExist:
-                pass
+
+    names = {}
+    for n in Event.objects.all().values('id', 'name', 'alternativeNames'):
+        names[n['id']] = [n['name']] + json.loads(n['alternativeNames'])
+    value = a.value.lower()
+    update = []
+    for i in names:
+        for name in names[i]:
+            if name.lower() in value:
+                update.append(i)
+                break
+    if update:
+        for e in Event.objects.filter(id__in=update):
+            e.update_matches()
 
 @task(ignore_resulsts=True, queue='default')
 def update_matching_places(id):
@@ -43,16 +49,20 @@ def update_matching_places(id):
         a.places.add(Place.get_or_create(a.value))
         for p in a.places.all():
             p.update_matches()
-    ids = [e['id'] for e in Place.objects.all().values('id')]
-    for i in ids:
-        try:
-            e = Place.objects.get(pk=i)
-            for name in [e.name] + list(e.alternativeNames):
-                if name.lower() in a.value.lower():
-                    e.update_matches()
-                    break
-        except Place.DoesNotExist:
-                pass
+    
+    names = {}
+    for n in Place.objects.all().values('id', 'name', 'alternativeNames'):
+        names[n['id']] = [n['name']] + json.loads(n['alternativeNames'])
+    value = a.value.lower()
+    update = []
+    for i in names:
+        for name in names[i]:
+            if name.lower() in value:
+                update.append(i)
+                break
+    if update:
+        for e in Place.objects.filter(id__in=update):
+            e.update_matches()
 
 @task(ignore_resulsts=True, queue='default')
 def update_item(id):
