@@ -917,6 +917,10 @@ pandora.isClipView = function(view, item) {
 
 pandora.signin = function(data) {
     pandora.user = data.user;
+    Ox.extend(pandora.user, {
+        sectionElement: 'buttons',
+        videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
+    });
     pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
     pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
     pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
