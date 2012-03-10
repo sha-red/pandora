@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 import os
+import re
 
 import ox
 
@@ -210,7 +211,8 @@ def addList(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    name = data['name'].strip()
+    data['name'] = re.sub(' \[\d+\]$', '', data['name']).strip()
+    name = data['name']
     if not name:
         name = "Untitled"
     num = 1
@@ -349,13 +351,14 @@ def editList(request):
 
                 list.status = value
             elif key == 'name':
-                name = data['name'].strip()
+                data['name'] = re.sub(' \[\d+\]$', '', data['name']).strip()
+                name = data['name']
                 if not name:
                     name = "Untitled"
                 num = 1
                 while models.List.objects.filter(name=name, user=list.user).exclude(id=list.id).count()>0:
                     num += 1
-                    name = data['name'] + ' (%d)' % num
+                    name = data['name'] + ' [%d]' % num
                 list.name = name
             elif key == 'description':
                 list.description = ox.parse_html(data['description'])

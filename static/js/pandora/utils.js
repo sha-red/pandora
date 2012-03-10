@@ -46,17 +46,18 @@ pandora.addList = function() {
                 pandora.api.find({
                     query: query,
                     keys: ['id'],
-                    sort: [{key: 'id', operator: ''}]
+                    sort: [{key: 'id', operator: ''}],
+                    range: [0, result.data.items]
                 }, function(result) {
                     var items = result.data.items.map(function(item) {
                         return item.id;
                     });
                     addList(items);
-                })
+                });
             } else {
                 addList();
             }
-        })
+        });
     } else {
         addList();
     }
@@ -69,7 +70,7 @@ pandora.addList = function() {
                     items: items
                 }, function() {
                     getPosterFrames(newList);
-                })
+                });
             } else {
                 getPosterFrames(newList);
             }
