@@ -23,20 +23,21 @@ def update_matching_events(id):
         for e in a.events.all():
             e.update_matches()
 
-    names = {}
-    for n in Event.objects.all().values('id', 'name', 'alternativeNames'):
-        names[n['id']] = [ox.decodeHtml(x) for x in [n['name']] + json.loads(n['alternativeNames'])]
+    if a.findvalue:
+        names = {}
+        for n in Event.objects.all().values('id', 'name', 'alternativeNames'):
+            names[n['id']] = [ox.decodeHtml(x) for x in [n['name']] + json.loads(n['alternativeNames'])]
 
-    value = a.findvalue.lower()
-    update = []
-    for i in names:
-        for name in names[i]:
-            if name.lower() in value:
-                update.append(i)
-                break
-    if update:
-        for e in Event.objects.filter(id__in=update):
-            e.update_matches()
+        value = a.findvalue.lower()
+        update = []
+        for i in names:
+            for name in names[i]:
+                if name.lower() in value:
+                    update.append(i)
+                    break
+        if update:
+            for e in Event.objects.filter(id__in=update):
+                e.update_matches()
 
 @task(ignore_resulsts=True, queue='default')
 def update_matching_places(id):
@@ -52,19 +53,20 @@ def update_matching_places(id):
         for p in a.places.all():
             p.update_matches()
     
-    names = {}
-    for n in Place.objects.all().values('id', 'name', 'alternativeNames'):
-        names[n['id']] = [ox.decodeHtml(x) for x in [n['name']] + json.loads(n['alternativeNames'])]
-    value = a.findvalue.lower()
-    update = []
-    for i in names:
-        for name in names[i]:
-            if name.lower() in value:
-                update.append(i)
-                break
-    if update:
-        for e in Place.objects.filter(id__in=update):
-            e.update_matches()
+    if a.findvalue:
+        names = {}
+        for n in Place.objects.all().values('id', 'name', 'alternativeNames'):
+            names[n['id']] = [ox.decodeHtml(x) for x in [n['name']] + json.loads(n['alternativeNames'])]
+        value = a.findvalue.lower()
+        update = []
+        for i in names:
+            for name in names[i]:
+                if name.lower() in value:
+                    update.append(i)
+                    break
+        if update:
+            for e in Place.objects.filter(id__in=update):
+                e.update_matches()
 
 @task(ignore_resulsts=True, queue='default')
 def update_item(id):
