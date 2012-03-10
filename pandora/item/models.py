@@ -290,8 +290,10 @@ class Item(models.Model):
     def __unicode__(self):
         year = self.get('year')
         if year:
-            return u'%s (%s)' % (self.get('title', 'Untitled'), self.get('year'))
-        return self.get('title', u'Untitled')
+            string = u'%s (%s)' % (self.get('title', 'Untitled'), self.get('year'))
+        else:
+            string = self.get('title', u'Untitled')
+        return u'[%s] %s' % (self.itemId,string)
 
     def get_absolute_url(self):
         return '/%s' % self.itemId
