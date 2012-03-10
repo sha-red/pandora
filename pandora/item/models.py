@@ -105,7 +105,6 @@ def get_item(info, user=None, async=False):
                     info['imdbId'] = itemId
                     item = get_item(info)
                 return item
-
             try:
                 item = Item.objects.get(itemId=info.get('oxdbId'))
             except Item.DoesNotExist:

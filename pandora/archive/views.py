@@ -289,6 +289,7 @@ def moveFiles(request):
     if Item.objects.filter(itemId=data['itemId']).count() == 1:
         i = Item.objects.get(itemId=data['itemId'])
     else:
+        data['itemId'] = data['itemId'].strip()
         if len(data['itemId']) != 7:
             del data['itemId']
             if 'director' in data and isinstance(data['director'], basestring):
