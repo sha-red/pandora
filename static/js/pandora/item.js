@@ -509,7 +509,8 @@ pandora.ui.item = function() {
 
         }
 
-        if (['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
+        if (result.data.rendered
+            && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
             // handle links in annotations
             var widget = pandora.user.ui.itemView == 'video' ? 'player' : 'editor';
             pandora.$ui[widget].bindEvent('pandora_videopoints.' + pandora.user.ui.item.toLowerCase(), function(data) {
