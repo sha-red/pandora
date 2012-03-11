@@ -84,7 +84,7 @@ def update(request):
     if 'info' in data:
         for oshash in data['info']:
             info = data['info'][oshash]
-            f = models.File.objects(oshash=oshash)
+            f = models.File.objects.get(oshash=oshash)
             if f.count()>0:
                 f = f[0]
                 if not f.info:
