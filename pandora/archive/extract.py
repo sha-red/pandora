@@ -364,7 +364,8 @@ def cuts(prefix):
             rgb0 = pixels[image0][(x - 1) % width, y]
             rgb1 = pixels[image1][x, y]
             distance += get_distance(rgb0, rgb1)
-        distances.append(distance / height)
+        distance = distance / height
+        distances.append(distance)
         if distance >= 0.025 and abs(distance - distances[frame - 1]) >= 0.05:
             cuts.append(frame / fps)
     return cuts
