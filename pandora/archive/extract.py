@@ -193,7 +193,7 @@ def stream(video, target, profile, info):
         audio_settings = ['-an']
 
     ffmpeg = FFMPEG2THEORA.replace('2theora', '')
-    cmd = [ffmpeg, '-y', '-i', video] \
+    cmd = [ffmpeg, '-y', '-i', video, '-threads', '4'] \
           + audio_settings \
           + video_settings
 
