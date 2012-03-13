@@ -308,7 +308,7 @@ def autocomplete(request):
         order_by = '-sort__%s' % order_by
     else:
         order_by = '-items'
-    sort_type = key.get('sort', key.get('type', 'string'))
+    sort_type = key.get('sortType', key.get('type', 'string'))
     if sort_type == 'title':
         qs = parse_query({'query': data.get('query', {})}, request.user)['qs']
         if data['value']:
