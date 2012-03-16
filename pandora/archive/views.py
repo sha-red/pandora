@@ -188,21 +188,27 @@ def addFile(request):
     if not request.user.get_profile().capability('canUploadVideo'):
         response = json_response(status=403, text='permissino denied')
     elif models.File.objects.filter(oshash=oshash).count() > 0:
-        response = json_response(status=200, text='file exists')
         f = models.File.objects.get(oshash=oshash)
+        if f.available:
+            response['status']['text'] = 'file exists'
         response['data']['item'] = f.item.itemId
+        response['data']['itemUrl'] = request.build_absolute_uri('/%s' % f.item.itemId)
     else:
+        title = ox.parse_movie_path(os.path.splitext(data['filename'])[0])['title']
         i = Item()
         i.data = {
-            'title': data.get('title', ''),
+            'title': title,
             'director': data.get('director', []),
         }
         i.user = request.user
         i.save()
         f = models.File(oshash=oshash, item=i)
+        f.path = data.get('filename', 'Untitled')
+        f.selected = True
         f.info = data['info']
         f.save()
         response['data']['item'] = i.itemId
+        response['data']['itemUrl'] = request.build_absolute_uri('/%s' % i.itemId)
     return render_to_json_response(response)
 actions.register(addFile, cache=False)
 
