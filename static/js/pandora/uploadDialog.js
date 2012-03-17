@@ -34,6 +34,7 @@ pandora.ui.uploadDialog = function(data) {
                             pandora.firefogg && pandora.firefogg.cancel();
                             pandora.$ui.upload && pandora.$ui.upload.abort();
                             actionButton.options('title', 'Select Video');
+                            closeButton.show();
                         } else {
                             actionButton.options('title', 'Cancel');
                             closeButton.hide();
