@@ -281,7 +281,7 @@ pandora.ui.uploadDialog = function(data) {
         options.noUpscaling = true;
 
         if((!info.video.length || (info.video[0].codec == options.videoCodec
-                && info.video[0].height == options.height))
+                && info.video[0].height <= options.height))
             && (!info.audio.length || info.audio[0].codec == options.audioCodec)) {
             options = {
                 passthrough: true

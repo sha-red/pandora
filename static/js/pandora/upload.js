@@ -43,6 +43,9 @@ pandora.ui.upload = function(oshash, file) {
                 maxRetry = response.maxRetry;
             }
             chunkUrl = response.uploadUrl;
+            if (document.location.protocol == 'https:') {
+                chunkUrl = chunkUrl.replace(/http:\/\//, 'https://');
+            }
             if (chunkUrl) {
                 that.status = 'uploading';
                 that.progress = 0.0;
