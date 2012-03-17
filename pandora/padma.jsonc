@@ -568,6 +568,12 @@
         {"id": "license", "title": "License"},
         {"id": "contact", "title": "Contact"}
     ],
+    "timelines": [
+        {"id": "antialias", "title": "Anti-Alias"},
+        {"id": "slitscan", "title": "Slit-Scan"},
+        {"id": "keyframes", "title": "Key Frames"},
+        {"id": "audio", "title": "Audio"}
+    ],
     "totals": [
         {"id": "items"},
         {"id": "files", "admin": true},
@@ -657,7 +663,7 @@
             "videoResolution": 240,
             "videoScale": "fit",
             "videoSize": "large",
-            "videoTimeline": "average",
+            "videoTimeline": "antialias",
             "videoView": "video",
             "videoVolume": 1
         },
