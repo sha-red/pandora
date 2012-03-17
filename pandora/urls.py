@@ -20,7 +20,7 @@ def serve_static_file(path, location, content_type):
 
 urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
-    (r'^api/upload/$', 'archive.views.firefogg_upload'),
+    (r'^api/upload/?$', 'archive.views.firefogg_upload'),
     (r'^url=(?P<url>.*)$', 'app.views.redirect_url'),
     (r'^file/(?P<oshash>.*)$', 'archive.views.lookup_file'),
     (r'^api/?$', include(ox.django.api.urls)),

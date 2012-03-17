@@ -208,12 +208,11 @@ appPanel
                 document: $(document),
                 window: $(window)
                     .bind({
+                        beforeunload: pandora.beforeunloadWindow,
                         resize: function() {
                             pandora.resizeWindow();
                         },
-                        unload: function() {
-                            pandora.unloadWindow();
-                        }
+                        unload: pandora.unloadWindow
                     })
             },
             site: data.site,

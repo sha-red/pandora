@@ -1109,6 +1109,11 @@ pandora.selectList = function() {
     }
 };
 
+pandora.beforeunloadWindow = function() {
+    if (pandora.firefogg)
+        return "Encoding is currently running\nDo you want to leave this page?";
+}
+
 pandora.unloadWindow = function() {
     //prevent errors on unload
     pandora.isUnloading = true;

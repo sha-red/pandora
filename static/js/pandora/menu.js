@@ -31,6 +31,8 @@ pandora.ui.mainMenu = function() {
                         {},
                         { id: 'preferences', title: 'Preferences...', disabled: isGuest, keyboard: 'control ,' },
                         { id: 'archives', title: 'Archives...', disabled: /*isGuest*/ true },
+                        { id: 'upload', title: 'Upload...',
+                          disabled: !pandora.site.capabilities.canUploadVideo[pandora.user.level]},
                         {},
                         { id: 'signup', title: 'Sign Up...', disabled: !isGuest },
                         isGuest ? { id: 'signin', title: 'Sign In...' }
@@ -243,6 +245,8 @@ pandora.ui.mainMenu = function() {
                     ['signup', 'signin', 'signout', 'preferences', 'tv', 'help']
                 ).indexOf(data.id) > -1) {
                     pandora.UI.set({page: data.id});
+                } else if (data.id == 'upload') {
+                    pandora.$ui.uploadDialog = pandora.ui.uploadDialog().open();
                 } else if ([
                     'newlist', 'newlistfromselection', 'newsmartlist', 'newsmartlistfromresults'
                 ].indexOf(data.id) > -1) {
