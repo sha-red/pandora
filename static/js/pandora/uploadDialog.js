@@ -202,7 +202,7 @@ pandora.ui.uploadDialog = function(data) {
 
     function getEncodingOptions(info) {
         var format = pandora.site.video.formats[0],
-            resolution = Math.max(pandora.site.video.resolutions),
+            resolution = Ox.max(pandora.site.video.resolutions),
             bpp = 0.17,
             fps,
             dar,
