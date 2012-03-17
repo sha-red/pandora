@@ -7,7 +7,7 @@ pandora.ui.upload = function(oshash, file) {
         chunkUrl,
         format = pandora.site.video.formats[0],
         maxRetry = -1,
-        resolution = Math.max(pandora.site.video.resolutions),
+        resolution = Ox.max(pandora.site.video.resolutions),
         retries = 0,
         that = Ox.Element(),
         uploadData = {},
