@@ -121,8 +121,8 @@ pandora.ui.logsDialog = function() {
                 },
                 'delete': function(data) {
                     pandora.api.removeLogs({ids: data.ids}, function(result) {
-                        $list.reloadList();
                         Ox.Request.clearCache('findLogs');
+                        $list.reloadList();
                     });
                 },
                 open: function(data) {
@@ -150,6 +150,7 @@ pandora.ui.logsDialog = function() {
                             height: height - 48,
                             keys: {enter: 'close', escape: 'close'},
                             maximizeButton: true,
+                            removeOnClose: true,
                             title: formatURL(value.url, value.line),
                             width: width - 48
                         })
@@ -193,6 +194,7 @@ pandora.ui.logsDialog = function() {
             minHeight: 256,
             minWidth: 512,
             padding: 0,
+            removeOnClose: true,
             title: 'Manage Logs',
             width: width
         }),
