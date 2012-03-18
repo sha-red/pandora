@@ -40,10 +40,10 @@ pandora.ui.contentPanel = function() {
                 }
             },
             pandora_itemview: function() {
-                that.replaceElement(1, pandora.$ui.item = pandora.ui.item());
+                pandora.user.ui.item && that.replaceElement(1, pandora.$ui.item = pandora.ui.item());
             },
             pandora_listview: function() {
-                that.replaceElement(1, pandora.$ui.list = pandora.ui.list());
+                !pandora.user.ui.item && that.replaceElement(1, pandora.$ui.list = pandora.ui.list());
             },
             pandora_showbrowser: function(data) {
                 data.value == that.options('elements')[0].collapsed && that.toggle(0);

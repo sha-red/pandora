@@ -29,10 +29,10 @@ pandora.ui.viewSelect = function() {
                     pandora.UI.set(viewKey, data.value);
                 },
                 pandora_listview: function(data) {
-                    that.value(data.value);
+                    !ui.item && that.value(data.value);
                 },
                 pandora_itemview: function(data) {
-                    that.value(data.value);
+                    ui.item && that.value(data.value);
                 }
             });
     return that;

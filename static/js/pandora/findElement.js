@@ -18,8 +18,6 @@ pandora.ui.findElement = function() {
                         })
                         .bindEvent({
                             change: function(data) {
-                                Ox.print(data);
-                                //pandora.$ui.mainMenu.checkItem('findMenu_find_' + ...);
                                 pandora.$ui.findInput.options({
                                     autocomplete: autocompleteFunction()
                                 }).focusInput(true);
@@ -50,8 +48,10 @@ pandora.ui.findElement = function() {
                             change: function(data) {
                                 if (data.value == 'advanced') {
                                     that.update();
+                                    // fixme: uncheck menu item!
                                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                                 } else {
+                                    pandora.$ui.mainMenu.checkItem('findMenu_find_' + data.value);
                                     pandora.$ui.findInput.options({
                                         autocomplete: autocompleteFunction(),
                                         placeholder: ''
