@@ -632,15 +632,15 @@
         // FIXME: "from" and "to" would be more intuitive as keys here
         "email": {
             // E-mail address in contact form (to)
-            "contact": "0xdb@0xdb.org",
-            "footer": "-- \n0xDB - http://0xdb.org",
+            "contact": "0xDB@0xDB.org",
+            "footer": "-- \n0xDB - https://0xDB.org",
             "prefix": "0xDB Newsletter -",
             // E-mail address uses by the system (from)
-            "system": "0xdb@0xdb.org"
+            "system": "0xDB@0xDB.org"
         },
         "id": "oxdb",
         "name": "0xDB",
-        "url": "0xdb.org",
+        "url": "0xDB.org",
         "videoprefix": ""
     },
     "sitePages": [
