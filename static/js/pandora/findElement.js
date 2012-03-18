@@ -4,7 +4,8 @@ pandora.ui.findElement = function() {
     var findIndex = pandora.user.ui._findState.index,
         findKey = pandora.user.ui._findState.key,
         findValue = pandora.user.ui._findState.value,
-        hasPressedClear = false;
+        hasPressedClear = false,
+        previousFindKey = findKey;
     var that = Ox.FormElementGroup({
             elements: Ox.merge(pandora.user.ui._list ? [
                     pandora.$ui.findListSelect = Ox.Select({
@@ -48,7 +49,7 @@ pandora.ui.findElement = function() {
                             change: function(data) {
                                 if (data.value == 'advanced') {
                                     that.update();
-                                    // fixme: uncheck menu item!
+                                    pandora.$ui.mainMenu.checkItem('findMenu_find_' + previousFindKey);
                                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                                 } else {
                                     pandora.$ui.mainMenu.checkItem('findMenu_find_' + data.value);
@@ -56,6 +57,7 @@ pandora.ui.findElement = function() {
                                         autocomplete: autocompleteFunction(),
                                         placeholder: ''
                                     }).focusInput(true);
+                                    previousFindKey = data.value;
                                 }
                             }
                         }),

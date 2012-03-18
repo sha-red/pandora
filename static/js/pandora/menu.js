@@ -175,9 +175,14 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'find') {
                     if (value) {
                         pandora.$ui.findSelect.value(value);
+                        if (pandora.user.ui._findState.key == 'advanced') {
+                            // fixme: autocomplete function doesn't get updated
+                            pandora.$ui.findInput.options({placeholder: ''});
+                        }
                     } else {
                         that.checkItem('findMenu_find_' + pandora.$ui.findSelect.value());
                     }
+                    pandora.$ui.findInput.focusInput(true);
                 } else if (data.id == 'itemview') {
                     pandora.UI.set({itemView: value});
                 } else if (data.id == 'listview') {
@@ -235,7 +240,6 @@ pandora.ui.mainMenu = function() {
                     ) {
                         set.itemView = value;
                     }
-                    Ox.print('SET', set)
                     pandora.UI.set(set);
                 } else if (data.id == 'viewicons') {
                     pandora.UI.set({icons: value});
