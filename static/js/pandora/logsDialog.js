@@ -167,7 +167,6 @@ pandora.ui.logsDialog = function() {
                         width: 48
                     }).bindEvent({
                         click: function() {
-                            Ox.Request.clearCache('findLogs');
                             that.close();
                         }
                     })
@@ -211,6 +210,12 @@ pandora.ui.logsDialog = function() {
                 textAlign: 'center',
             })
             .appendTo(that.$element.find('.OxButtonsbar'));
+
+    that.superClose = that.close;
+    that.close = function() {
+        Ox.Request.clearCache('findLogs');
+        that.superClose();
+    };
 
     function formatURL(url, line) {
         return Ox.encodeHTMLEntities(url.split('?')[0]) + ':' + line;

@@ -406,7 +406,6 @@ pandora.ui.usersDialog = function() {
                             width: 48
                         }).bindEvent({
                             click: function() {
-                                Ox.Request.clearCache('findUsers');
                                 that.close();
                             }
                         })
@@ -438,6 +437,12 @@ pandora.ui.usersDialog = function() {
                 textAlign: 'center',
             })
             .appendTo(that.$element.find('.OxButtonsbar'));
+
+    that.superClose = that.close;
+    that.close = function() {
+        Ox.Request.clearCache('findUsers');
+        that.superClose();
+    };
 
     function getFormItemById(id) {
         var ret;
