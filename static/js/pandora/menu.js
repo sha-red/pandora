@@ -317,9 +317,7 @@ pandora.ui.mainMenu = function() {
                     });
                     pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
                 } else if (data.id == 'logs') {
-                    (pandora.$ui.logsDialog || (
-                        pandora.$ui.logsDialog = pandora.ui.logsDialog()
-                    )).open();
+                    pandora.$ui.logsDialog = pandora.ui.logsDialog().open();
                 } else if (data.id == 'clearcache') {
                     Ox.Request.clearCache();
                 } else if (data.id == 'reloadapplication') {
