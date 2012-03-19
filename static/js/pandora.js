@@ -120,7 +120,7 @@ appPanel
         loadingScreen.style.height = '100%';
         loadingScreen.style.backgroundColor = theme == 'classic'
             ? 'rgb(224, 224, 224)' : 'rgb(32, 32, 32)';
-        loadingScreen.style.zIndex = '1001';
+        loadingScreen.style.zIndex = '1002';
         loadingScreen.appendChild(images.logo);
         loadingScreen.appendChild(images.reflection);
         loadingScreen.appendChild(gradient);
