@@ -198,7 +198,7 @@ def user_post_save(sender, instance, **kwargs):
     profile, new = UserProfile.objects.get_or_create(user=instance)
     if new and instance.is_superuser:
         profile.level = len(settings.CONFIG['userLevels']) - 1
-        profile.newsletter = settings.CONFIG['user']['newsletter']
+        profile.newsletter = True
         profile.save()
     SessionData.objects.filter(user=instance).update(level=profile.level,
                                                      username=instance.username)
