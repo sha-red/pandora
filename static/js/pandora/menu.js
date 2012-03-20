@@ -71,7 +71,7 @@ pandora.ui.mainMenu = function() {
                         ) },
                         { id: 'timelines', title: 'Timelines', items: [
                             { group: 'viewtimelines', min: 1, max: 1, items: pandora.site.timelines.map(function(mode) {
-                                return {id: mode.id, title: mode.title, checked: ui.videoTimeline == mode.id};
+                                return {id: mode.id, title: mode.title, checked: ui.videoTimeline == mode.id, disabled: true};
                             }) }
                         ]},
                         { id: 'columns', title: 'Columns', items: [
