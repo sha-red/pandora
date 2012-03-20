@@ -166,7 +166,7 @@ class SessionData(models.Model):
             j['level'] = p.get_level()
             j['newsletter'] = p.newsletter
             j['notes'] = p.notes
-            j['numberoflists'] = p.numberoflists
+            j['numberoflists'] = self.numberoflists
         if keys:
             for key in j.keys():
                 if key not in keys:
@@ -297,7 +297,7 @@ def user_json(user, keys=None):
         'level': p.get_level(),
         'newsletter': p.newsletter,
         'notes': p.notes,
-        'numberoflists': p.numberoflists,
+        'numberoflists': user.lists.count(),
         'username': user.username,
     }
     if keys:
