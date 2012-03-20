@@ -141,7 +141,7 @@ pandora.ui.browser = function() {
             pandora_item: function(data) {
                 that.options({selected: [data.value]});
             },
-            pandora_showsiteposter: function() {
+            pandora_showsiteposters: function() {
                 pandora.user.ui.icons == 'posters' && that.reloadList(true);
             }
         });

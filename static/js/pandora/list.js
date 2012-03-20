@@ -569,7 +569,7 @@ pandora.ui.list = function() {
                     that.reloadList(true);
                 }
             },
-            pandora_showsiteposter: function() {
+            pandora_showsiteposters: function() {
                 // fixme: should be disabled if ui.icons != 'posters'
                 hasIcons() && pandora.user.ui.icons == 'posters' && that.reloadList(true);
             }
