@@ -57,10 +57,10 @@ pandora.ui.browser = function() {
                 size = size || 64;
                 var ui = pandora.user.ui,
                     ratio = ui.icons == 'posters'
-                        ? (ui.showSitePoster ? 5/8 : data.posterRatio) : 1,
+                        ? (ui.showSitePosters ? 5/8 : data.posterRatio) : 1,
                     url = '/' + data.id + '/' + (
                         ui.icons == 'posters'
-                        ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
+                        ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
                     ) + '128.jpg',
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director', 'random'].indexOf(sortKey) > -1) {

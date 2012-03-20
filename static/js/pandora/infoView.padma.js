@@ -733,7 +733,7 @@ pandora.ui.infoView = function(data) {
         $reflectionIcon.attr({src: src});
         iconSize = iconSize == 256 ? 512 : 256;
         iconRatio = ui.icons == 'posters'
-            ? (ui.showSitePoster ? 5/8 : data.posterRatio) : 1;
+            ? (ui.showSitePosters ? 5/8 : data.posterRatio) : 1;
         toggleIconSize();
     };
 

@@ -122,10 +122,10 @@ pandora.ui.list = function() {
             item: function(data, sort, size) {
                 var ui = pandora.user.ui,
                     ratio = ui.icons == 'posters'
-                        ? (ui.showSitePoster ? 5/8 : data.posterRatio) : 1,
+                        ? (ui.showSitePosters ? 5/8 : data.posterRatio) : 1,
                     url = '/' + data.id + '/' + (
                         ui.icons == 'posters'
-                        ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
+                        ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
                     ) + size + '.jpg',
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director', 'random'].indexOf(sortKey) > -1) {
@@ -175,10 +175,10 @@ pandora.ui.list = function() {
                 size = 128;
                 var ui = pandora.user.ui,
                     ratio = ui.icons == 'posters'
-                        ? (ui.showSitePoster ? 5/8 : data.posterRatio) : 1,
+                        ? (ui.showSitePosters ? 5/8 : data.posterRatio) : 1,
                     url = '/' + data.id + '/' + (
                         ui.icons == 'posters'
-                        ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
+                        ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
                     ) + size + '.jpg',
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director'].indexOf(sortKey) > -1) {
@@ -255,10 +255,10 @@ pandora.ui.list = function() {
                     isClipsQuery = !!clipsQuery.conditions.length,
                     ui = pandora.user.ui,
                     ratio = ui.icons == 'posters'
-                        ? (ui.showSitePoster ? 5/8 : data.posterRatio) : 1,
+                        ? (ui.showSitePosters ? 5/8 : data.posterRatio) : 1,
                     url = '/' + data.id + '/' + (
                         ui.icons == 'posters'
-                        ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
+                        ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
                     ) + size + '.jpg',
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director'].indexOf(sortKey) > -1) {

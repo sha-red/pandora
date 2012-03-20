@@ -14,7 +14,7 @@ pandora.ui.infoView = function(data) {
             WebkitUserSelect: 'text'
         },
         iconRatio = ui.icons == 'posters'
-            ? (ui.showSitePoster ? 5/8 : data.posterRatio) : 1,
+            ? (ui.showSitePosters ? 5/8 : data.posterRatio) : 1,
         iconSize = ui.infoIconSize,
         iconWidth = iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio),
         iconHeight = iconRatio < 1 ? iconSize : Math.round(iconSize / iconRatio),
@@ -60,7 +60,7 @@ pandora.ui.infoView = function(data) {
             .attr({
                 src: '/' + data.id + '/' + (
                     ui.icons == 'posters'
-                    ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
+                    ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
                 ) + '512.jpg?' + uid
             })
             .css({
@@ -93,7 +93,7 @@ pandora.ui.infoView = function(data) {
             .attr({
                 src: '/' + data.id + '/' + (
                     ui.icons == 'posters'
-                    ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
+                    ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
                 ) + '512.jpg?' + uid
             })
             .css({
@@ -727,7 +727,7 @@ pandora.ui.infoView = function(data) {
                         if ($browserImages.length == 0) {
                             $browserImages = pandora.$ui.browser.find('img[src*="/' + data.id + '/"]');
                         }
-                        if (ui.icons == 'posters' && !ui.showSitePoster) {
+                        if (ui.icons == 'posters' && !ui.showSitePosters) {
                             $browserImages.each(function() {
                                 var $this = $(this),
                                     size = Math.max($this.width(), $this.height());
@@ -852,13 +852,13 @@ pandora.ui.infoView = function(data) {
     that.reload = function() {
         var src = src = '/' + data.id + '/' + (
             ui.icons == 'posters'
-            ? (ui.showSitePoster ? 'siteposter' : 'poster') : 'icon'
+            ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
         ) + '512.jpg?' + Ox.uid()
         $icon.attr({src: src});
         $reflectionIcon.attr({src: src});
         iconSize = iconSize == 256 ? 512 : 256;
         iconRatio = ui.icons == 'posters'
-            ? (ui.showSitePoster ? 5/8 : data.posterRatio) : 1;
+            ? (ui.showSitePosters ? 5/8 : data.posterRatio) : 1;
         toggleIconSize();
         pandora.user.level == 'admin' && $list.replaceWith($list = renderList());
     };
