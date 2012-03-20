@@ -442,11 +442,9 @@ def order_query(qs, sort):
             'timesseen': 'timesseen',
             'useragent': 'useragent',
             'username': 'username',
+            'numberoflists': 'numberoflists',
             'windowsize': 'windowsize',
         }.get(e['key'], 'user__profile__%s'%e['key'])
-        if key == 'user__profile__numberoflists':
-            qs = qs.annotate(numberoflists=Sum('user__lists'))
-            key = 'numberoflists'
         order = '%s%s' % (operator, key)
         order_by.append(order)
     if order_by:

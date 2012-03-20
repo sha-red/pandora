@@ -37,6 +37,8 @@ class SessionData(models.Model):
     system = models.CharField(default='', max_length=255)
     browser = models.CharField(default='', max_length=255)
 
+    numberoflists = models.IntegerField(default=0)
+
     objects = managers.SessionDataManager()
 
     groupssort = models.CharField(default=None,blank=True,null=True, max_length=255)
@@ -101,6 +103,7 @@ class SessionData(models.Model):
             self.level = self.user.get_profile().level
             self.firstseen = self.user.date_joined
             self.groupssort = ''.join([g.name for g in self.user.groups.all()])
+            self.numberoflists = self.user.lists.count()
         else:
             self.level = 0
             self.groupssort = None
@@ -163,7 +166,7 @@ class SessionData(models.Model):
             j['level'] = p.get_level()
             j['newsletter'] = p.newsletter
             j['notes'] = p.notes
-            j['numberoflists'] = self.user.lists.count()
+            j['numberoflists'] = p.numberoflists
         if keys:
             for key in j.keys():
                 if key not in keys:
@@ -294,7 +297,7 @@ def user_json(user, keys=None):
         'level': p.get_level(),
         'newsletter': p.newsletter,
         'notes': p.notes,
-        'numberoflists': user.lists.count(),
+        'numberoflists': p.numberoflists,
         'username': user.username,
     }
     if keys:

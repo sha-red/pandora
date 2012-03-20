@@ -20,6 +20,7 @@ import models
 from ox.django.api import actions
 from item import utils
 from item.models import Item
+from user.tasks import update_numberoflists
 
 def get_list_or_404_json(id):
     id = id.split(':')
@@ -251,6 +252,7 @@ def addList(request):
         list.poster_frames = tuple(data['posterFrames'])
 
     list.save()
+    update_numberoflists.delay(request.user.username)
 
     if 'items' in data:
         for item in Item.objects.filter(itemId__in=data['items']):
@@ -401,6 +403,7 @@ def removeList(request):
     response = json_response()
     if list.editable(request.user):
         list.delete()
+        update_numberoflists.delay(request.user.username)
     else:
         response = json_response(status=403, text='not allowed')
     return render_to_json_response(response)
