@@ -83,7 +83,7 @@ pandora.ui.toolbar = function() {
     }
     function getListTitleLeft() {
         return 320 - (
-            ['map', 'calendar'].indexOf(pandora.user.ui.listView) > -1 ? 148 : 0
+            ['map', 'calendar'].indexOf(pandora.user.ui.listView) > -1 ? 168 : 0
         );
     }
     return that;
