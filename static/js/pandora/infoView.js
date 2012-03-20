@@ -51,7 +51,11 @@ pandora.ui.infoView = function(data) {
 
         $icon = Ox.Element({
                 element: '<img>',
-                tooltip: canEdit ? 'Doubleclick to edit' : ''
+                tooltip: canEdit ? (
+                    !ui.showIconBrowser
+                        ? 'Doubleclick to edit icon'
+                        : 'Doubleclick to hide icons'
+                ) : ''
             })
             .attr({
                 src: '/' + data.id + '/' + (
@@ -488,6 +492,11 @@ pandora.ui.infoView = function(data) {
                 $info.animate({
                     left: ui.showIconBrowser ? 0 : -listWidth + 'px'
                 }, 250);
+                $icon.options({
+                    tooltip: !pandora.user.ui.showIconBrowser
+                        ? 'Doubleclick to edit icon'
+                        : 'Doubleclick to hide icons'
+                });
             }
         });
         renderList();
