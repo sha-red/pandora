@@ -40,22 +40,23 @@ pandora.ui.toolbar = function() {
     );
     that.bindEvent({
         pandora_listview: function(data) {
-            var isNavigationView = ['map', 'calendar'].indexOf(data.value) > -1,
-                wasNavigationView = ['map', 'calendar'].indexOf(data.previousValue) > -1,
-                action = isNavigationView ? 'hide' : 'show';
-            Ox.Log('', 'IS/WAS', isNavigationView, wasNavigationView);
-            if (isNavigationView != wasNavigationView) {
-                if (isNavigationView) {
-                    pandora.$ui.sortSelect.remove();
-                    pandora.$ui.orderButton.remove();
-                } else {
-                    pandora.$ui.sortSelect = pandora.ui.sortSelect().insertAfter(pandora.$ui.viewSelect);
-                    pandora.$ui.orderButton = pandora.ui.orderButton().insertAfter(pandora.$ui.sortSelect);
+            var isNavigationView, wasNavigationView;
+            if (!pandora.user.ui.item) {
+                isNavigationView = ['map', 'calendar'].indexOf(data.value) > -1;
+                wasNavigationView = ['map', 'calendar'].indexOf(data.previousValue) > -1;
+                if (isNavigationView != wasNavigationView) {
+                    if (isNavigationView) {
+                        pandora.$ui.sortSelect.remove();
+                        pandora.$ui.orderButton.remove();
+                    } else {
+                        pandora.$ui.sortSelect = pandora.ui.sortSelect().insertAfter(pandora.$ui.viewSelect);
+                        pandora.$ui.orderButton = pandora.ui.orderButton().insertAfter(pandora.$ui.sortSelect);
+                    }
+                } else if ((data.value == 'clip') != (data.previousValue == 'clip')) {
+                    pandora.$ui.sortSelect.replaceWith(
+                        pandora.$ui.sortSelect = pandora.ui.sortSelect()
+                    );
                 }
-            } else if ((data.value == 'clip') != (data.previousValue == 'clip')) {
-                pandora.$ui.sortSelect.replaceWith(
-                    pandora.$ui.sortSelect = pandora.ui.sortSelect()
-                );
             }
         }
     })
