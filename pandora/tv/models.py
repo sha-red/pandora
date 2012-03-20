@@ -32,16 +32,18 @@ class Channel(models.Model):
             return {}
 
         program = self.program.order_by('-start')
+        changed = False
         while program.count() < 1 or program[0].end < now:
             not_played = items.exclude(program__in=self.program.filter(run=self.run))
             not_played_count = not_played.count()
             if not_played_count == 0:
                 self.run += 1
-                self.save()
+                changed = True
                 not_played = items
-                if not_played.count() > 1:
-                    not_played = not_played.exclude(id=program[0].id)
                 not_played_count = not_played.count()
+                if not_played_count > 1:
+                    not_played = not_played.exclude(id=program[0].id)
+                    not_played_count = not_played.count()
             item = not_played[randint(0, not_played_count-1)]
             if program.count() > 0:
                 start = program.aggregate(Max('end'))['end__max']
@@ -55,6 +57,8 @@ class Channel(models.Model):
             p.channel = self
             p.save()
             program = self.program.order_by('-start')
+        if changed:
+            self.save()
         return program[0].json(user, now)
 
 class Program(models.Model):
