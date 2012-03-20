@@ -9,11 +9,23 @@ pandora.ui.usersDialog = function() {
         formWidth = 256,
         numberOfUsers = 0,
 
+        $reloadButton = Ox.Button({
+                title: 'redo',
+                tooltip: 'Reload',
+                type: 'image'
+            })
+            .css({float: 'left', margin: '4px 2px 4px 4px'})
+            .bindEvent({
+                click: function() {
+                    $list.reloadList(true);
+                }
+            }),
+
         $guestsCheckbox = Ox.Checkbox({
                 title: 'Show Guests',
                 value: false
             })
-            .css({float: 'left', margin: '4px'})
+            .css({float: 'left', margin: '4px 4px 4px 2px'})
             .bindEvent({
                 change: updateList
             }),
@@ -320,6 +332,7 @@ pandora.ui.usersDialog = function() {
                         elements: [
                             {
                                 element: Ox.Bar({size: 24})
+                                    .append($reloadButton)
                                     .append($guestsCheckbox)
                                     .append($findElement),
                                 size: 24
