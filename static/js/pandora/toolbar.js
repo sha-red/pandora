@@ -22,18 +22,33 @@ pandora.ui.toolbar = function() {
     ).append(
         pandora.$ui.orderButton = pandora.ui.orderButton()
     );
+    that.append(
+        !ui.item
+        ? pandora.$ui.listTitle = Ox.Label({
+                textAlign: 'center',
+                title: '<b>' + getListName() + '</b>'
+            })
+            .css({
+                position: 'absolute',
+                left: getListTitleLeft() + 'px',
+                top: '4px',
+                right: (ui._list ? 324 : 310) + 'px',
+                width: 'auto'
+            })
+        : pandora.$ui.itemTitle = Ox.Label({
+                textAlign: 'center'
+            })
+            .css({
+                position: 'absolute',
+                left: '236px',
+                top: '4px',
+                right: (ui._list ? 324 : 310) + 'px',
+                width: 'auto'
+            })
+            .hide()
+    );
     ui.item && that.append(
-        pandora.$ui.itemTitle = Ox.Label({
-            textAlign: 'center'
-        })
-        .css({
-            position: 'absolute',
-            left: '236px',
-            top: '4px',
-            right: (ui._list ? 324 : 310) + 'px',
-            width: 'auto'
-        })
-        .hide()
+        
     );
     that.append(
         pandora.$ui.findElement = pandora.ui.findElement()
@@ -52,6 +67,7 @@ pandora.ui.toolbar = function() {
                         pandora.$ui.sortSelect = pandora.ui.sortSelect().insertAfter(pandora.$ui.viewSelect);
                         pandora.$ui.orderButton = pandora.ui.orderButton().insertAfter(pandora.$ui.sortSelect);
                     }
+                    pandora.$ui.listTitle.css({left: getListTitleLeft() + 'px'});
                 } else if ((data.value == 'clip') != (data.previousValue == 'clip')) {
                     pandora.$ui.sortSelect.replaceWith(
                         pandora.$ui.sortSelect = pandora.ui.sortSelect()
@@ -59,7 +75,17 @@ pandora.ui.toolbar = function() {
                 }
             }
         }
-    })
+    });
+    function getListName() {
+        return pandora.user.ui._list == ''
+            ? 'All ' + pandora.site.itemName.plural
+            : pandora.user.ui._list.substr(pandora.user.ui._list.indexOf(':') + 1);
+    }
+    function getListTitleLeft() {
+        return 300 - (
+            ['map', 'calendar'].indexOf(pandora.user.ui.listView) > -1 ? 148 : 0
+        );
+    }
     return that;
 };
 
