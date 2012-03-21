@@ -6,7 +6,7 @@ sudo  vmbuilder vbox ubuntu --suite=oneiric \
     --dest $base/pandora \
     --hostname pandora \
     --swapsize 512 \
-    --rootsize 65536 \
+    --rootsize 1048576 \
     --user pandora \
     --pass pandora \
     --components main,universe,multiverse \

@@ -31,7 +31,10 @@ DATABASES = {
     }
 }
 
-DATA_SERVICE='http://data.0xdb.org/api/'
+DEBUG = False
+
+DATA_SERVICE = ""
+SITE_CONFIG = '/srv/pandora/pandora/pandora.jsonc'
 
 BROKER_PASSWORD = "$RABBITPWD"
 
@@ -39,8 +42,9 @@ XACCELREDIRECT = True
 EOF
 
 cd /srv/pandora/pandora
-sudo -u pandora python manage.py syncdb --noinput 
-echo "UPDATE django_site SET domain = 'pandora.local', name = 'pandora.local' WHERE 1=1;" | sudo -u pandora python manage.py dbshell
+sudo -u pandora python manage.py syncdb --noinput
+HOST=$(hostname -s)
+echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 1=1;" | sudo -u pandora python manage.py dbshell
 
 
 mkdir /srv/pandora/data
