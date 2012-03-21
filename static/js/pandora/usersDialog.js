@@ -172,8 +172,8 @@ pandora.ui.usersDialog = function() {
                         width: 16
                     },
                     {
-                        format: function(value) {
-                            return value ? Ox.Element({
+                        format: function(value, data) {
+                            return Ox.Element({
                                     element: '<img>',
                                     tooltip: value
                                 })
@@ -186,12 +186,43 @@ pandora.ui.usersDialog = function() {
                                     borderRadius: '4px',
                                     marginLeft: '-3px',
                                     marginTop: 0
-                                }) : '';
+                                });
                         },
                         id: 'location',
                         operator: '+',
                         title: 'Location',
                         titleImage: 'flag',
+                        visible: true,
+                        width: 16
+                    },
+                    {
+                        format: function(value) {
+                            var system;
+                            Ox.forEach(systems, function(s) {
+                                if (new RegExp('^' + s).test(value)) {
+                                    system = s;
+                                    return false;
+                                }
+                            });
+                            return system ? Ox.Element({
+                                    element: '<img>',
+                                    tooltip: value
+                                })
+                                .attr({
+                                    src: Ox.UI.PATH + 'png/system'
+                                        + system.replace(/ /g, '') + '128.png'
+                                })
+                                .css({
+                                    width: '14px',
+                                    height: '14px',
+                                    marginLeft: '-3px',
+                                    marginTop: 0
+                                }) : '';
+                        },
+                        id: 'system',
+                        operator: '+',
+                        title: 'System',
+                        titleImage: 'icon',
                         visible: true,
                         width: 16
                     },
@@ -225,37 +256,6 @@ pandora.ui.usersDialog = function() {
                         titleImage: 'icon',
                         visible: true,
                         width: 16 
-                    },
-                    {
-                        format: function(value) {
-                            var system;
-                            Ox.forEach(systems, function(s) {
-                                if (new RegExp('^' + s).test(value)) {
-                                    system = s;
-                                    return false;
-                                }
-                            });
-                            return system ? Ox.Element({
-                                    element: '<img>',
-                                    tooltip: value
-                                })
-                                .attr({
-                                    src: Ox.UI.PATH + 'png/system'
-                                        + system.replace(/ /g, '') + '128.png'
-                                })
-                                .css({
-                                    width: '14px',
-                                    height: '14px',
-                                    marginLeft: '-3px',
-                                    marginTop: 0
-                                }) : '';
-                        },
-                        id: 'system',
-                        operator: '+',
-                        title: 'System',
-                        titleImage: 'icon',
-                        visible: true,
-                        width: 16
                     },
                     {
                         align: 'right',
