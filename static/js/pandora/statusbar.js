@@ -36,18 +36,17 @@ pandora.ui.statusbar = function() {
                 : (pandora.site.itemName[data.items == 1 ? 'singular' : 'plural']),
             parts = [];
         parts.push(Ox.formatNumber(data.items) + ' '+ itemName);
-        if (data.runtime)
+        if (data.runtime) {
             parts.push(Ox.formatDuration(data.runtime, 'short'));
-        if (data.files)
-            parts.push(data.files + ' file' + (data.files == 1 ? '' : 's'));
-        if (!data.runtime && data.duration)
+        } else if (data.duration) {
             parts.push(Ox.formatDuration(data.duration, 'short'));
-        else if (data.duration)
-            parts.push(Ox.formatDuration(data.duration));
-        if (data.size)
-            parts.push(Ox.formatValue(data.size, 'B'));
-        if (data.pixels)
-            parts.push(Ox.formatValue(data.pixels, 'px'));
+        }
+        if (pandora.site.capabilities.canSeeFiles[pandora.user.level]) {
+            data.files && parts.push(data.files + ' file' + (data.files == 1 ? '' : 's'));
+            data.duration && parts.push(Ox.formatDuration(data.duration));
+            data.size && parts.push(Ox.formatValue(data.size, 'B'));
+            data.pixels && parts.push(Ox.formatValue(data.pixels, 'px'));
+        }
         return parts.join(', ');
     }
 

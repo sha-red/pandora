@@ -520,21 +520,25 @@ pandora.ui.mainMenu = function() {
 
     function getSortMenu() {
         var ui = pandora.user.ui,
-            isClipView = pandora.isClipView(ui.listView);
+            isClipView = pandora.isClipView(ui.listView),
+            items = isClipView ? pandora.site.clipKeys.map(function(key) {
+                return Ox.extend(Ox.clone(key), {
+                    checked: ui.listSort[0].key == key.id,
+                    title: 'Clip ' + key.title
+                });
+            }) : [];
         return { id: 'sortMenu', title: 'Sort', items: [
             { id: 'sortitems', title: 'Sort ' + (isClipView || ui.item ? 'Clips' : pandora.site.itemName.plural) + ' by', items: [
                 { group: 'listsort', min: 1, max: 1, items: Ox.merge(
-                    isClipView ? pandora.site.clipKeys.map(function(key) {
-                        return Ox.extend(Ox.clone(key), {
-                            checked: ui.listSort[0].key == key.id,
-                            title: 'Clip ' + key.title
-                        });
-                    }) : [],
-                    !ui.item ? pandora.site.sortKeys.map(function(key) {
-                        return Ox.extend({
+                    items,
+                    Ox.map(pandora.site.sortKeys, function(key) {
+                        return Ox.getIndexById(items, key.id) == -1 && (
+                            !key.capability
+                            || pandora.site.capabilities[key.capability][pandora.user.level]
+                        ) ? Ox.extend({
                             checked: ui.listSort[0].key == key.id
-                        }, key);
-                    }) : []
+                        }, key) : null;
+                    })
                 ) }
             ] },
             { id: 'orderitems', title: 'Order ' + (isClipView ? 'Clips' : pandora.site.itemName.plural), items: [

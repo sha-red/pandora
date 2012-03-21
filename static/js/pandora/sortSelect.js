@@ -4,26 +4,26 @@
 
 pandora.ui.sortSelect = function(isNavigationView) {
     var isClipView = pandora.isClipView(),
-        items = [],
-        sortKey = !pandora.user.ui.item ? 'listSort' : 'itemSort',
-        that;
-    if (isClipView) {
-        items = pandora.site.clipKeys.map(function(key) {
+        items = isClipView ? pandora.site.clipKeys.map(function(key) {
             return Ox.extend(Ox.clone(key), {
                 title: 'Sort by ' + (!pandora.user.ui.item ? 'Clip ' : '') + key.title
             });
-        });
+        }) : [],
         // fixme: a separator would be good
-        // !pandora.user.ui.item && items.push({});
-    }
+        sortKey = !pandora.user.ui.item ? 'listSort' : 'itemSort',
+        that;
     if (!pandora.user.ui.item) {
-        items = Ox.merge(items, Ox.map(pandora.site.sortKeys, function(key) {
-            return Ox.getIndexById(items, key.id) == -1
-                ? Ox.extend(Ox.clone(key), {
+        items = Ox.merge(
+            items,
+            Ox.map(pandora.site.sortKeys, function(key) {
+                return Ox.getIndexById(items, key.id) == -1 && (
+                    !key.capability
+                    || pandora.site.capabilities[key.capability][pandora.user.level]
+                ) ? Ox.extend(Ox.clone(key), {
                     title: 'Sort by ' + key.title
-                })
-                : null;
-        }));
+                }) : null;
+            })
+        );
     }
     that = Ox.Select({
             id: 'sortSelect',
