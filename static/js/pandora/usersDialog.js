@@ -200,7 +200,7 @@ pandora.ui.usersDialog = function() {
                             var browser;
                             Ox.forEach(browsers, function(b) {
                                 if (new RegExp('^' + b).test(value)) {
-                                    browser = value;
+                                    browser = b;
                                     return false;
                                 }
                             });
@@ -231,7 +231,7 @@ pandora.ui.usersDialog = function() {
                             var system;
                             Ox.forEach(systems, function(s) {
                                 if (new RegExp('^' + s).test(value)) {
-                                    system = value;
+                                    system = s;
                                     return false;
                                 }
                             });
