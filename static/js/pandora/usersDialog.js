@@ -323,6 +323,16 @@ pandora.ui.usersDialog = function() {
 
         $editForm,
 
+        $sendButton = Ox.Button({
+                disabled: true,
+                id: 'send',
+                title: 'Send',
+                width: 64
+            })
+            .bindEvent({
+                click: sendMail
+            }),
+
         $mailForm = renderMailForm(),
 
         $content = Ox.SplitPanel({
@@ -685,15 +695,7 @@ pandora.ui.usersDialog = function() {
                     value: false,
                     width: formWidth - 16
                 }),
-                Ox.Button({
-                        disabled: true,
-                        id: 'send',
-                        title: 'Send',
-                        width: 64
-                    })
-                    .bindEvent({
-                        click: sendMail
-                    })
+                $sendButton
             ],
             width: formWidth - 16
         })
@@ -736,6 +738,7 @@ pandora.ui.usersDialog = function() {
     }
 
     function sendMail() {
+        $sendButton.options({title: 'Sending', disabled: true});
         pandora.api.mail({
             to: getTo(),
             subject: getFormItemById('subject').value(),
@@ -778,6 +781,7 @@ pandora.ui.usersDialog = function() {
                     title: title,
                     width: 304
                 }).open();
+            $sendButton.options({title: 'Send', disabled: false});
         });
     }
 
