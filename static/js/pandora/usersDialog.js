@@ -4,10 +4,17 @@
 
 pandora.ui.usersDialog = function() {
 
-    var dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
+    var browsers = [
+            'Chrome', 'Chrome Frame', 'Firefox',
+            'Internet Explorer', 'Opera', 'Safari'
+        ],
+        dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
         formWidth = 256,
         numberOfUsers = 0,
+        systems = [
+            'Android', 'iOS', 'Linux', 'Mac OS X', 'Windows'
+        ],
         userLevels = Ox.merge(
             pandora.site.userLevels.map(function(userLevel) {
                 return Ox.toTitleCase(userLevel);
@@ -101,6 +108,93 @@ pandora.ui.usersDialog = function() {
                         visible: true,
                         width: 16
                     },
+                    {
+                        format: function(value) {
+                            return Ox.Element({
+                                    element: '<img>',
+                                    tooltip: value
+                                })
+                                .attr({
+                                    src: Ox.getFlagByGeoname(value, 16)
+                                })
+                                .css({
+                                    width: '14px',
+                                    height: '14px',
+                                    borderRadius: '4px',
+                                    marginLeft: '-3px',
+                                    marginTop: 0
+                                });
+                        },
+                        id: 'location',
+                        operator: '+',
+                        title: 'Location',
+                        titleImage: 'flag',
+                        visible: true,
+                        width: 16
+                    },
+                    {
+                        format: function(value) {
+                            var browser;
+                            Ox.forEach(browsers, function(b) {
+                                if (new RegExp('^' + b).test(value)) {
+                                    browser = value;
+                                    return false;
+                                }
+                            });
+                            return browser ? Ox.Element({
+                                    element: '<img>',
+                                    tooltip: value
+                                })
+                                .attr({
+                                    src: Ox.UI.PATH + 'png/browser'
+                                        + browser.replace(/ /g, '') + '128.png'
+                                })
+                                .css({
+                                    width: '14px',
+                                    height: '14px',
+                                    marginLeft: '-3px',
+                                    marginTop: 0
+                                }) : '';
+                        },
+                        id: 'browser',
+                        operator: '+',
+                        title: 'Browser',
+                        titleImage: 'icon',
+                        visible: true,
+                        width: 16 
+                    },
+                    {
+                        format: function(value) {
+                            var system;
+                            Ox.forEach(systems, function(s) {
+                                if (new RegExp('^' + s).test(value)) {
+                                    system = value;
+                                    return false;
+                                }
+                            });
+                            return system ? Ox.Element({
+                                    element: '<img>',
+                                    tooltip: value
+                                })
+                                .attr({
+                                    src: Ox.UI.PATH + 'png/system'
+                                        + system.replace(/ /g, '') + '128.png'
+                                })
+                                .css({
+                                    width: '14px',
+                                    height: '14px',
+                                    marginLeft: '-3px',
+                                    marginTop: 0
+                                }) : '';
+                        },
+                        id: 'system',
+                        operator: '+',
+                        title: 'System',
+                        titleImage: 'icon',
+                        visible: true,
+                        width: 16
+                    },
+                    
                     {
                         format: function(value, data) {
                             return '<span style="opacity: ' + (
@@ -211,14 +305,6 @@ pandora.ui.usersDialog = function() {
                         width: 150
                     },
                     {
-                        align: 'right',
-                        id: 'ip',
-                        operator: '+',
-                        title: 'IP Address',
-                        visible: true,
-                        width: 120
-                    },
-                    {
                         id: 'screensize',
                         align: 'right',
                         operator: '-',
@@ -235,31 +321,12 @@ pandora.ui.usersDialog = function() {
                         width: 90
                     },
                     {
-                        id: 'location',
+                        align: 'right',
+                        id: 'ip',
                         operator: '+',
-                        title: 'Location',
+                        title: 'IP Address',
                         visible: true,
-                        width: 160
-                    },
-                    {
-                        format: function(value, data) {
-                            return Ox.parseUserAgent(data.useragent).browser.string;
-                        },
-                        id: 'browser',
-                        operator: '+',
-                        title: 'Browser',
-                        visible: true,
-                        width: 160 
-                    },
-                    {
-                        format: function(value, data) {
-                            return Ox.parseUserAgent(data.useragent).system.string;
-                        },
-                        id: 'system',
-                        operator: '+',
-                        title: 'System',
-                        visible: true,
-                        width: 160
+                        width: 120
                     },
                     {
                         id: 'useragent',

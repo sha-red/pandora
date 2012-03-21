@@ -44,7 +44,9 @@ pandora.ui.statusbar = function() {
             parts.push(Ox.formatDuration(data.duration, 'short'));
         }
         if (canSeeFiles) {
-            data.files && parts.push(data.files + ' file' + (data.files == 1 ? '' : 's'));
+            data.files && parts.push(
+                Ox.formatNumber(data.files) + ' file' + (data.files == 1 ? '' : 's')
+            );
             data.duration && parts.push(Ox.formatDuration(data.duration));
         }
         if (canSeeListSize) {
