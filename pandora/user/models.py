@@ -61,10 +61,13 @@ class SessionData(models.Model):
                 g = GeoIP()
                 location = g.city(self.ip)
                 if location:
-                    city = location['city'].decode('latin-1')
                     country = ox.get_country_name(location['country_code'])
-                    self.location = u'%s, %s' % (city, country)
-                    self.location_sort = u'%s, %s' % (country, city)
+                    if location['city']:
+                        city = location['city'].decode('latin-1')
+                        self.location = u'%s, %s' % (city, country)
+                        self.location_sort = u'%s, %s' % (country, city)
+                    else:
+                        self.location_sort = self.location = country
                 else:
                     self.location_sort = self.location = None
             except:
