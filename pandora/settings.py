@@ -162,21 +162,12 @@ XSENDFILE = False
 #with nginx X-Accel-Redirect set this to True
 XACCELREDIRECT = False
 
-SITE_CONFIG = join(PROJECT_ROOT, '0xdb.jsonc')
+SITE_CONFIG = join(PROJECT_ROOT, 'pandora.jsonc')
 #used if CONFIG['video']['download'] is set
 TRACKER_URL="http://url2torrent.net:6970/announce"
 
 DATA_SERVICE = ''
-POSTER_PRECEDENCE = (
-    'piratecinema.org',
-    'criterion.com',
-    'wikipedia.org',
-    'impawards.com',
-    'movieposterdb.com',
-    'imdb.com',
-    'allmovie.com',
-    'other'
-)
+POSTER_PRECEDENCE = ()
 
 USE_IMDB = False
 
