@@ -32,7 +32,7 @@ pandora.ui.statusbar = function() {
     function getText(data) {
         var ui = pandora.user.ui,
             canSeeFiles = pandora.site.capabilities.canSeeFiles[pandora.user.level],
-            canSeeListSize = pandora.site.capabilities.canSeeListSize[pandora.user.level],
+            canSeeSize = pandora.site.capabilities.canSeeSize[pandora.user.level],
             itemName = ui.listView == 'clip'
                 ? (data.items == 1 ? 'Clip' : 'Clips')
                 : (pandora.site.itemName[data.items == 1 ? 'singular' : 'plural']),
@@ -49,7 +49,7 @@ pandora.ui.statusbar = function() {
             );
             data.duration && parts.push(Ox.formatDuration(data.duration));
         }
-        if (canSeeListSize) {
+        if (canSeeSize) {
             data.size && parts.push(Ox.formatValue(data.size, 'B'));
         }
         if (canSeeFiles) {

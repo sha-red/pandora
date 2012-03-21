@@ -38,7 +38,7 @@
         "canSeeExtraItemViews": {"staff": true, "admin": true},
         "canSeeFiles": {"staff": true, "admin": true},
         "canSeeItem": {"guest": 3, "member": 3, "friend": 4, "staff": 4, "admin": 4},
-        "canSeeListSize": {"friend": true, "staff": true, "admin": true},
+        "canSeeSize": {"friend": true, "staff": true, "admin": true},
         "canSendMail": {"staff": true, "admin": true},
         "canUploadVideo": {"guest": false, "member": false, "staff": true, "admin": true}
     },
@@ -446,7 +446,7 @@
             "id": "size",
             "title": "Size",
             "type": "integer",
-            "capability": "canSeeFiles",
+            "capability": "canSeeSize",
             "columnWidth": 60,
             "format": {"type": "value", "args": ["B"]},
             "sort": true

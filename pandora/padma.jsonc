@@ -36,7 +36,7 @@
         "canSeeExtraItemViews": {"staff": true, "admin": true},
         "canSeeFiles": {"staff": true, "admin": true},
         "canSeeItem": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
-        "canSeeListSize": {"friend": true, "staff": true, "admin": true},
+        "canSeeSize": {"staff": true, "admin": true},
         "canSendMail": {"staff": true, "admin": true},
         "canUploadVideo": {"guest": false, "member": true, "staff": true, "admin": true}
     },
