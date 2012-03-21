@@ -173,7 +173,7 @@ pandora.ui.usersDialog = function() {
                     },
                     {
                         format: function(value) {
-                            return Ox.Element({
+                            return value ? Ox.Element({
                                     element: '<img>',
                                     tooltip: value
                                 })
@@ -186,7 +186,7 @@ pandora.ui.usersDialog = function() {
                                     borderRadius: '4px',
                                     marginLeft: '-3px',
                                     marginTop: 0
-                                });
+                                }) : '';
                         },
                         id: 'location',
                         operator: '+',
