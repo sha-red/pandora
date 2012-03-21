@@ -10,7 +10,8 @@ pandora.ui.clipsView = function(videoRatio) {
                 marginTop: '2px',
                 fontSize: '9px',
                 textAlign: 'center'
-            }),
+            })
+            .html('Loading...'),
 
         that = Ox.SplitPanel({
             elements: [
@@ -32,6 +33,7 @@ pandora.ui.clipsView = function(videoRatio) {
                                 .css({float: 'right', margin: '4px'})
                                 .bindEvent({
                                     submit: function(data) {
+                                        $status.html('Loading...');
                                         pandora.UI.set('itemFind', data.value);
                                         // since this is the only way itemFind can change,
                                         // there's no need for an event handler
