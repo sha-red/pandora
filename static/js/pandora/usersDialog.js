@@ -270,9 +270,8 @@ pandora.ui.usersDialog = function() {
                     },
                     {
                         align: 'right',
-                        // fixme: there should be a better option for dates
                         format: function(value) {
-                            return value.replace(/[TZ]/g, ' ')
+                            return Ox.formatDate(value, "%Y-%m-%d %H:%M:%S");
                         },
                         id: 'firstseen',
                         operator: '-',
@@ -283,7 +282,7 @@ pandora.ui.usersDialog = function() {
                     {
                         align: 'right',
                         format: function(value) {
-                            return value.replace(/[TZ]/g, ' ')
+                            return Ox.formatDate(value, "%Y-%m-%d %H:%M:%S");
                         },
                         id: 'lastseen',
                         operator: '-',
