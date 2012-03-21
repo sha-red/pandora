@@ -27,17 +27,17 @@ class SessionData(models.Model):
     level = models.IntegerField(default=0)
 
     timesseen = models.IntegerField(default=0)
-    ip = models.CharField(default='', max_length=255)
-    useragent = models.CharField(default='', max_length=255)
-    windowsize = models.CharField(default='', max_length=255)
-    screensize = models.CharField(default='', max_length=255)
+    ip = models.CharField(max_length=255, null=True)
+    useragent = models.CharField(max_length=255, null=True)
+    windowsize = models.CharField(max_length=255, null=True)
+    screensize = models.CharField(max_length=255, null=True)
     info = DictField(default={})
 
-    location = models.CharField(default='', max_length=255)
-    system = models.CharField(default='', max_length=255)
-    browser = models.CharField(default='', max_length=255)
+    location = models.CharField(max_length=255, null=True)
+    system = models.CharField(max_length=255, null=True)
+    browser = models.CharField(max_length=255, null=True)
 
-    numberoflists = models.IntegerField(default=0)
+    numberoflists = models.IntegerField(default=0, null=True)
 
     objects = managers.SessionDataManager()
 
@@ -48,42 +48,13 @@ class SessionData(models.Model):
 
     def parse_data(self):
         if self.useragent:
-            self.browser = 'Unknown'
-            for browser in (
-                'Internet Explorer',
-                'Webkit',
-                'Safari',
-                'MeeGo',
-                'Android',
-                'Chrome',
-                'Firefox',
-                'Safari Mobile',
-                'Opera',
-                'Googlebot',
-                'bingbot',
-            ):
-                if {
-                    'Safari Mobile': 'Mobile/',
-                    'Internet Explorer': 'MSIE',
-                    'Bing': 'bingbot',
-                    'Google': 'Googlebot',
-                }.get(browser, browser) in self.useragent:
-                    self.browser = browser
-            for system in (
-                'Windows',
-                'Mac OS X',
-                'iOS',
-                'Linux',
-                'Andorid',
-                'MeeGo',
-            ):
-                if {
-                }.get(system, system) in self.useragent:
-                    self.system = system
-            if 'Mobile/' in self.useragent and 'Safari' in self.useragent and \
-                ('iPhone' in self.useragent or 'iPad' in self.useragent):
-                self.system = 'iOS'
-
+            ua = ox.parse_useragent(self.useragent)
+            self.browser= ua['browser']['string']
+            self.system = ua['system']['string']
+            if not self.browser:
+                self.browser = None
+            if not self.system:
+                self.system = None
         if self.ip:
             try:
                 g = GeoIP()
@@ -92,9 +63,9 @@ class SessionData(models.Model):
                     self.location = u'%s, %s' % (location['city'].decode('latin-1'),
                                                  location['country_name'].decode('latin-1'))
                 else:
-                    self.location = ''
+                    self.location = None
             except:
-                self.location = ''
+                self.location = None
                 pass
 
     def save(self, *args, **kwargs):
