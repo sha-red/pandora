@@ -72,7 +72,7 @@ pandora.ui.logsDialog = function() {
                     {
                         align: 'right',
                         format: function(value) {
-                            return value.replace(/[TZ]/g, ' ');
+                            return Ox.formatDate(value, "%Y-%m-%d %H:%M:%S");
                         },
                         id: 'created',
                         operator: '-',
