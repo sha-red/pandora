@@ -16,7 +16,7 @@ def update_all_matches(**kwargs):
         e = Event.objects.get(pk=i)
         e.update_matches()
 
-@task(ignore_resulsts=True, queue='default')
+@task(ignore_results=True, queue='default')
 def update_matches(eventId):
     event = Event.objects.get(pk=eventId)
     event.update_matches()

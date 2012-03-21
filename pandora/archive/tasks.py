@@ -66,7 +66,7 @@ def update_or_create_instance(volume, f):
         instance.file.item.update_wanted()
     return instance
 
-@task(ignore_resulsts=True, queue='default')
+@task(ignore_results=True, queue='default')
 def update_files(user, volume, files):
     user = models.User.objects.get(username=user)
     volume, created = models.Volume.objects.get_or_create(user=user, name=volume)

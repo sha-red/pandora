@@ -15,7 +15,7 @@ def update_all_matches(**kwargs):
         p = models.Place.objects.get(pk=i)
         p.update_matches()
 
-@task(ignore_resulsts=True, queue='default')
+@task(ignore_results=True, queue='default')
 def update_matches(id):
     place = models.Place.objects.get(pk=id)
     place.update_matches()

@@ -38,7 +38,7 @@ def update_random_clip_sort():
             Clip.objects.filter(pk=i).update(random=n)
             n += 1
 
-@task(ignore_resulsts=True, queue='default')
+@task(ignore_results=True, queue='default')
 def update_poster(itemId):
     item = models.Item.objects.get(itemId=itemId)
     item.make_poster(True)
@@ -48,7 +48,7 @@ def update_poster(itemId):
         icon=item.icon.name
     )
 
-@task(ignore_resulsts=True, queue='default')
+@task(ignore_results=True, queue='default')
 def update_external(itemId):
     item = models.Item.objects.get(itemId=itemId)
     item.update_external()
@@ -66,7 +66,7 @@ def load_subtitles(itemId):
     item.update_sort()
     item.update_facets()
 
-@task(ignore_resulsts=True, queue='default')
+@task(ignore_results=True, queue='default')
 def update_sitemap(base_url):
     sitemap = os.path.abspath(os.path.join(settings.MEDIA_ROOT, 'sitemap.xml.gz'))
 

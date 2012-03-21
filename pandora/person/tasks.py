@@ -5,7 +5,7 @@ from celery.task import task
 import models
 
 
-@task(ignore_resulsts=True, queue='default')
+@task(ignore_results=True, queue='default')
 def update_itemsort(id):
     p = models.Person.objects.get(pk=id)
     p.update_itemsort()

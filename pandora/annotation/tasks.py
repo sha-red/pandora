@@ -9,7 +9,7 @@ from celery.task import task
 import models
 
 
-@task(ignore_resulsts=True, queue='default')
+@task(ignore_results=True, queue='default')
 def update_matching_events(id):
     from event.models import Event
     a = models.Annotation.objects.get(pk=id)
@@ -39,7 +39,7 @@ def update_matching_events(id):
             for e in Event.objects.filter(id__in=update):
                 e.update_matches()
 
-@task(ignore_resulsts=True, queue='default')
+@task(ignore_results=True, queue='default')
 def update_matching_places(id):
     from place.models import Place
     a = models.Annotation.objects.get(pk=id)
@@ -68,7 +68,7 @@ def update_matching_places(id):
             for e in Place.objects.filter(id__in=update):
                 e.update_matches()
 
-@task(ignore_resulsts=True, queue='default')
+@task(ignore_results=True, queue='default')
 def update_item(id):
     from item.models import Item
     from clip.models import Clip
