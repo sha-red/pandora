@@ -129,9 +129,10 @@ pandora.ui.usersDialog = function() {
                     {
                         align: 'center',
                         format: function(value, data) {
+                            var userLevel = data.useragent.indexOf('Googlebot') > -1
+                                ? 'Robot' : value;
                             return Ox.Theme.formatColorLevel(
-                                data.useragent.indexOf('Googlebot') > -1 || data.username == 'rlx'
-                                    ? 5 : pandora.site.userLevels.indexOf(value),
+                                userLevels.indexOf(userLevel),
                                 userLevels,
                                 [0, 300]
                             );
