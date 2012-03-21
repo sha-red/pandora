@@ -115,7 +115,7 @@ attrs = {
     'aspect_ratio': models.FloatField(default=0),
 
     'item': models.ForeignKey('item.Item', related_name='clips'),
-    'random': models.BigIntegerField(default=0, db_index=True),
+    'random': models.BigIntegerField(default=0, db_index=True, null=True),
 
     #seconds
     'start': models.FloatField(default=-1, db_index=True),
