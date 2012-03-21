@@ -8,6 +8,12 @@ pandora.ui.usersDialog = function() {
         dialogWidth = Math.round(window.innerWidth * 0.9),
         formWidth = 256,
         numberOfUsers = 0,
+        userLevels = Ox.merge(
+            pandora.site.userLevels.map(function(userLevel) {
+                return Ox.toTitleCase(userLevel);
+            }),
+            ['Robot']
+        ),
 
         $reloadButton = Ox.Button({
                 title: 'redo',
@@ -17,6 +23,7 @@ pandora.ui.usersDialog = function() {
             .css({float: 'left', margin: '4px 2px 4px 4px'})
             .bindEvent({
                 click: function() {
+                    Ox.Request.clearCache('findUsers');
                     $list.reloadList(true);
                 }
             }),
@@ -121,13 +128,12 @@ pandora.ui.usersDialog = function() {
                     },
                     {
                         align: 'center',
-                        format: function(value) {
+                        format: function(value, data) {
                             return Ox.Theme.formatColorLevel(
-                                pandora.site.userLevels.indexOf(value),
-                                pandora.site.userLevels.map(function(userLevel) {
-                                    return Ox.toTitleCase(userLevel);
-                                }),
-                                [0, 240]
+                                data.useragent.indexOf('Googlebot') > -1 || data.username == 'rlx'
+                                    ? 5 : pandora.site.userLevels.indexOf(value),
+                                userLevels,
+                                [0, 300]
                             );
                         },
                         id: 'level',
@@ -235,18 +241,24 @@ pandora.ui.usersDialog = function() {
                         width: 160
                     },
                     {
+                        format: function(value, data) {
+                            return Ox.parseUserAgent(data.useragent).browser.string;
+                        },
                         id: 'browser',
                         operator: '+',
                         title: 'Browser',
                         visible: true,
-                        width: 80 
+                        width: 160 
                     },
                     {
+                        format: function(value, data) {
+                            return Ox.parseUserAgent(data.useragent).system.string;
+                        },
                         id: 'system',
                         operator: '+',
                         title: 'System',
                         visible: true,
-                        width: 80
+                        width: 160
                     },
                     {
                         id: 'useragent',
