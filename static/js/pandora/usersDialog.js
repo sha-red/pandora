@@ -109,6 +109,69 @@ pandora.ui.usersDialog = function() {
                         width: 16
                     },
                     {
+                        format: function(value, data) {
+                            return '<span style="opacity: ' + (
+                                data.disabled ? 0.5 : 1
+                            ) + '">' + Ox.encodeHTMLEntities(value) + '</span>';
+                        },
+                        id: 'username',
+                        operator: '+',
+                        removable: false,
+                        title: 'Username',
+                        visible: true,
+                        width: 120
+                    },
+                    {
+                        format: function(value, data) {
+                            return '<span style="opacity: ' + (
+                                data.disabled ? 0.5 : 1
+                            ) + '">' + value + '</span>';
+                        },
+                        id: 'email',
+                        operator: '+',
+                        title: 'E-Mail Address',
+                        visible: true,
+                        width: 180
+                    },
+                    {
+                        align: 'center',
+                        format: function(value, data) {
+                            var userLevel = data.useragent.indexOf('Googlebot') > -1
+                                ? 'Robot' : Ox.toTitleCase(value);
+                            return Ox.Theme.formatColorLevel(
+                                userLevels.indexOf(userLevel),
+                                userLevels,
+                                [0, 300]
+                            );
+                        },
+                        id: 'level',
+                        operator: '-',
+                        title: 'Level',
+                        type: 'label',
+                        visible: true,
+                        width: 60
+                    },
+                    {
+                        format: function(value) {
+                            return $('<img>')
+                                .attr({
+                                    src: Ox.UI.getImageURL('symbolMail')
+                                })
+                                .css({
+                                    width: '10px',
+                                    height: '10px',
+                                    padding: '3px',
+                                    opacity: +value
+                                });
+                        },
+                        id: 'newsletter',
+                        title: 'Newsletter',
+                        titleImage: 'mail',
+                        operator: '-',
+                        visible: true,
+                        width: 16
+                    },
+                    {
                         format: function(value) {
                             return Ox.Element({
                                     element: '<img>',
@@ -194,87 +257,11 @@ pandora.ui.usersDialog = function() {
                         visible: true,
                         width: 16
                     },
-                    
                     {
-                        format: function(value, data) {
-                            return '<span style="opacity: ' + (
-                                data.disabled ? 0.5 : 1
-                            ) + '">' + Ox.encodeHTMLEntities(value) + '</span>';
-                        },
-                        id: 'username',
-                        operator: '+',
-                        removable: false,
-                        title: 'Username',
-                        visible: true,
-                        width: 120
-                    },
-                    {
-                        format: function(value, data) {
-                            return '<span style="opacity: ' + (
-                                data.disabled ? 0.5 : 1
-                            ) + '">' + value + '</span>';
-                        },
-                        id: 'email',
-                        operator: '+',
-                        title: 'E-Mail Address',
-                        visible: true,
-                        width: 180
-                    },
-                    {
-                        align: 'center',
-                        format: function(value, data) {
-                            var userLevel = data.useragent.indexOf('Googlebot') > -1
-                                ? 'Robot' : Ox.toTitleCase(value);
-                            return Ox.Theme.formatColorLevel(
-                                userLevels.indexOf(userLevel),
-                                userLevels,
-                                [0, 300]
-                            );
-                        },
-                        id: 'level',
-                        operator: '-',
-                        title: 'Level',
-                        type: 'label',
-                        visible: true,
-                        width: 60
-                    },
-                    {
-                        id: 'groups',
-                        operator: '+',
-                        title: 'Groups',
-                        visible: true,
-                        width: 90
-                    },
-                    {
+                        align: 'right',
                         format: function(value) {
-                            return $('<img>')
-                                .attr({
-                                    src: Ox.UI.getImageURL('symbolMail')
-                                })
-                                .css({
-                                    width: '10px',
-                                    height: '10px',
-                                    padding: '3px',
-                                    opacity: +value
-                                });
+                            return Ox.formatNumber(value);
                         },
-                        id: 'newsletter',
-                        title: 'Newsletter',
-                        titleImage: 'mail',
-                        operator: '-',
-                        visible: true,
-                        width: 16
-                    },
-                    {
-                        id: 'numberoflists',
-                        align: 'right',
-                        operator: '-',
-                        title: 'Lists',
-                        visible: true,
-                        width: 60
-                    },
-                    {
-                        align: 'right',
                         id: 'timesseen',
                         operator: '-',
                         title: 'Times Seen',
@@ -303,6 +290,21 @@ pandora.ui.usersDialog = function() {
                         title: 'Last Seen',
                         visible: true,
                         width: 150
+                    },
+                    {
+                        id: 'numberoflists',
+                        align: 'right',
+                        operator: '-',
+                        title: 'Lists',
+                        visible: true,
+                        width: 60
+                    },
+                    {
+                        id: 'groups',
+                        operator: '+',
+                        title: 'Groups',
+                        visible: true,
+                        width: 90
                     },
                     {
                         id: 'screensize',
@@ -629,18 +631,6 @@ pandora.ui.usersDialog = function() {
                     value: user.level,
                     width: formWidth - 16
                 }),
-                Ox.Input({
-                        id: 'groups',
-                        label: 'Groups',
-                        labelWidth: 80,
-                        value: user.groups ? user.groups.join(', ') : '',
-                        width: formWidth - 16
-                    })
-                    .bindEvent({
-                        submit: function(data) {
-
-                        }
-                    }),
                 Ox.Checkbox({
                         id: 'newsletter',
                         label: 'Newsletter',
@@ -655,6 +645,18 @@ pandora.ui.usersDialog = function() {
                                 title: this.options('title') == 'Subscribed'
                                     ? 'Unsubscribed' : 'Subscribed'
                             });
+                        }
+                    }),
+                Ox.Input({
+                        id: 'groups',
+                        label: 'Groups',
+                        labelWidth: 80,
+                        value: user.groups ? user.groups.join(', ') : '',
+                        width: formWidth - 16
+                    })
+                    .bindEvent({
+                        submit: function(data) {
+
                         }
                     }),
                 Ox.Input({
