@@ -51,7 +51,7 @@ pandora.ui.deleteListDialog = function(list) {
                 .append(
                     $('<div>')
                         .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
-                        .html('Are you sure you want to delete the list "' + listData.id + '"?')
+                        .html('Are you sure you want to delete the list "' + listData.name + '"?')
                 ),
             height: 128,
             keys: {enter: 'delete', escape: 'keep'},
