@@ -34,6 +34,7 @@ class SessionData(models.Model):
     info = DictField(default={})
 
     location = models.CharField(max_length=255, null=True)
+    location_sort = models.CharField(max_length=255, null=True)
     system = models.CharField(max_length=255, null=True)
     browser = models.CharField(max_length=255, null=True)
 
@@ -49,8 +50,8 @@ class SessionData(models.Model):
     def parse_data(self):
         if self.useragent:
             ua = ox.parse_useragent(self.useragent)
-            self.browser= ua['browser']['string']
-            self.system = ua['system']['string']
+            self.browser = ua['browser']['string'].lower()
+            self.system = ua['system']['string'].lower()
             if not self.browser:
                 self.browser = None
             if not self.system:
@@ -60,12 +61,14 @@ class SessionData(models.Model):
                 g = GeoIP()
                 location = g.city(self.ip)
                 if location:
-                    self.location = u'%s, %s' % (location['city'].decode('latin-1'),
-                                                 location['country_name'].decode('latin-1'))
+                    city = location['city'].decode('latin-1')
+                    country = ox.get_country_name(location['country_code'])
+                    self.location = u'%s, %s' % (city, country)
+                    self.location_sort = u'%s, %s' % (country, city)
                 else:
-                    self.location = None
+                    self.location_sort = self.location = None
             except:
-                self.location = None
+                self.location_sort = self.location = None
                 pass
 
     def save(self, *args, **kwargs):
@@ -109,8 +112,9 @@ class SessionData(models.Model):
         return self.user and ox.toAZ(self.user.id) or self.session_key
 
     def json(self, keys=None, user=None):
+        ua = ox.parse_useragent(self.useragent or '')
         j = {
-            'browser': self.browser,
+            'browser': ua['browser']['string'],
             'disabled': False,
             'email': '',
             'firstseen': self.firstseen,
@@ -123,7 +127,7 @@ class SessionData(models.Model):
             'notes': '',
             'numberoflists': 0,
             'screensize': self.screensize,
-            'system': self.system,
+            'system': ua['system']['string'],
             'timesseen': self.timesseen,
             'username': self.username or '',
             'useragent': self.useragent,

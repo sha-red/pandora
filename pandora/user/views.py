@@ -436,7 +436,7 @@ def order_query(qs, sort):
             'ip': 'ip',
             'lastseen': 'lastseen',
             'level': 'level',
-            'location': 'location',
+            'location': 'location_sort',
             'screensize': 'screensize',
             'system': 'system',
             'timesseen': 'timesseen',
