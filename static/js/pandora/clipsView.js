@@ -63,7 +63,7 @@ pandora.ui.clipsView = function(videoRatio) {
                     var items = data.items;
                     $status.html(
                         (items ? Ox.formatNumber(items) : 'No')
-                        + ' clip' + (items == 1 ? '' : 's')
+                        + ' Clip' + (items == 1 ? '' : 's')
                     );
                 }
             });

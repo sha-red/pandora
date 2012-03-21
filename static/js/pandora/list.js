@@ -386,12 +386,12 @@ pandora.ui.list = function() {
                 });
             },
             init: function(data) {
-                pandora.$ui.total.html(pandora.ui.status('total', data));
+                pandora.$ui.statusbar.set('total', data);
                 data = [];
                 pandora.site.totals.forEach(function(v) {
                     data[v.id] = 0;
                 });
-                pandora.$ui.selected.html(pandora.ui.status('selected', data));
+                pandora.$ui.statusbar.set('selected', data);
             },
             open: function(data) {
                 var set = {item: data.ids[0]};
@@ -502,7 +502,7 @@ pandora.ui.list = function() {
                 }
                 pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
                 if (data.ids.length == 0) {
-                    pandora.$ui.selected.html(pandora.ui.status('selected', {items: 0}));
+                    pandora.$ui.statusbar.set('selected', {items: 0});
                 } else {
                     if (Ox.isUndefined(data.rest)) {
                         query = {
@@ -532,7 +532,7 @@ pandora.ui.list = function() {
                     pandora.api.find({
                         query: query
                     }, function(result) {
-                        pandora.$ui.selected.html(pandora.ui.status('selected', result.data));
+                        pandora.$ui.statusbar.set('selected', result.data);
                     });
                 }
             },

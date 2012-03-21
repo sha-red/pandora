@@ -230,7 +230,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
     function updateStatusbar(items) {
         $status.html(
             (items ? Ox.formatNumber(items) : 'No')
-            + ' clip' + (items == 1 ? '' : 's')
+            + ' Clip' + (items == 1 ? '' : 's')
         );
     }
 
