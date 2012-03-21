@@ -60,7 +60,7 @@ pandora.ui.item = function() {
             );
 
         } else if (pandora.user.ui.itemView == 'info') {
-            //Ox.Log('', 'result.data', result.data)
+
             if (pandora.user.level == 'admin' && false) {
                 var $form,
                     $edit = Ox.Element()

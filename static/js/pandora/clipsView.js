@@ -4,7 +4,15 @@
 
 pandora.ui.clipsView = function(videoRatio) {
 
-    var that = Ox.SplitPanel({
+    var $status = $('<div>')
+            .css({
+                width: '100%',
+                marginTop: '2px',
+                fontSize: '9px',
+                textAlign: 'center'
+            }),
+
+        that = Ox.SplitPanel({
             elements: [
                 {
                     element: Ox.Bar({size: 24})
@@ -28,7 +36,7 @@ pandora.ui.clipsView = function(videoRatio) {
                                         // since this is the only way itemFind can change,
                                         // there's no need for an event handler
                                         that.replaceElement(1,
-                                            pandora.$ui.clipList = pandora.ui.clipList(videoRatio)
+                                            pandora.$ui.clipList = getClipList()
                                         );
                                     }
                                 })
@@ -36,11 +44,28 @@ pandora.ui.clipsView = function(videoRatio) {
                     size: 24
                 },
                 {
-                    element: pandora.$ui.clipList = pandora.ui.clipList(videoRatio)
+                    element: pandora.$ui.clipList = getClipList()
+                },
+                {
+                    element: Ox.Bar({size: 16})
+                        .append($status)
                 }
             ],
             orientation: 'vertical'
         });
+
+    function getClipList() {
+        return pandora.ui.clipList(videoRatio)
+            .bindEvent({
+                init: function(data) {
+                    var items = data.items;
+                    $status.html(
+                        (items ? Ox.formatNumber(items) : 'No')
+                        + ' clip' + (items == 1 ? '' : 's')
+                    );
+                }
+            });
+    }
 
     return that;
   

@@ -1,5 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+
 'use strict';
+
 pandora.ui.navigationView = function(type, videoRatio) {
 
     var ui = pandora.user.ui,
@@ -192,7 +194,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
     function selectItem(data) {
         var id = data.id || '';
         if (id && id[0] != '_') {
-            $status.html('loading...');
+            $status.html('Loading...');
             $list.options({
                 items: function(data, callback) {
                     var itemsQuery;
