@@ -35,9 +35,10 @@
         "canPlayClips": {"guest": 2, "member": 2, "friend": 4, "staff": 4, "admin": 4},
         "canPlayVideo": {"guest": 1, "member": 1, "friend": 4, "staff": 4, "admin": 4},
         "canSeeDebugMenu": {"staff": true, "admin": true},
+        "canSeeExtraItemViews": {"staff": true, "admin": true},
         "canSeeFiles": {"staff": true, "admin": true},
         "canSeeItem": {"guest": 3, "member": 3, "friend": 4, "staff": 4, "admin": 4},
-        "canSeeExtraItemViews": {"friend": true, "staff": true, "admin": true},
+        "canSeeListSize": {"friend": true, "staff": true, "admin": true},
         "canSendMail": {"staff": true, "admin": true},
         "canUploadVideo": {"guest": false, "member": false, "staff": true, "admin": true}
     },

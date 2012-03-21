@@ -31,6 +31,8 @@ pandora.ui.statusbar = function() {
 
     function getText(data) {
         var ui = pandora.user.ui,
+            canSeeFiles = pandora.site.capabilities.canSeeFiles[pandora.user.level],
+            canSeeListSize = pandora.site.capabilities.canSeeListSize[pandora.user.level],
             itemName = ui.listView == 'clip'
                 ? (data.items == 1 ? 'Clip' : 'Clips')
                 : (pandora.site.itemName[data.items == 1 ? 'singular' : 'plural']),
@@ -41,10 +43,14 @@ pandora.ui.statusbar = function() {
         } else if (data.duration) {
             parts.push(Ox.formatDuration(data.duration, 'short'));
         }
-        if (pandora.site.capabilities.canSeeFiles[pandora.user.level]) {
+        if (canSeeFiles) {
             data.files && parts.push(data.files + ' file' + (data.files == 1 ? '' : 's'));
             data.duration && parts.push(Ox.formatDuration(data.duration));
+        }
+        if (canSeeListSize) {
             data.size && parts.push(Ox.formatValue(data.size, 'B'));
+        }
+        if (canSeeFiles) {
             data.pixels && parts.push(Ox.formatValue(data.pixels, 'px'));
         }
         return parts.join(', ');
