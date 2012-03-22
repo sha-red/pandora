@@ -46,6 +46,7 @@ pandora.ui.statisticsDialog = function() {
             closeButton: true,
             content: Ox.Element(),
             height: dialogHeight,
+            maximizeButton: true,
             minHeight: 256,
             minWidth: 512,
             removeOnClose: true,
