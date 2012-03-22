@@ -115,7 +115,6 @@ attrs = {
     'aspect_ratio': models.FloatField(default=0),
 
     'item': models.ForeignKey('item.Item', related_name='clips'),
-    'random': models.BigIntegerField(default=0, db_index=True, null=True),
 
     #seconds
     'start': models.FloatField(default=-1, db_index=True),
@@ -138,4 +137,8 @@ for name in settings.CONFIG['clipLayers']:
     attrs[name] = models.BooleanField(default=False, db_index=True)
 
 Clip = type('Clip', (MetaClip,models.Model), attrs)
+
+class Random(models.Model):
+    clip = models.ForeignKey(Clip, primary_key=True)
+    random = models.BigIntegerField(db_index=True, null=True)
 

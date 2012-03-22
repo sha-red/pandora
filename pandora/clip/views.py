@@ -42,7 +42,7 @@ def order_query(qs, sort):
         clip_keys = ('public_id', 'start', 'end', 'hue', 'saturation', 'lightness', 'volume',
                      'duration', 'sortvalue', 'videoRatio',
                      'director', 'title',
-                     'random')
+                     'random__random')
         key = {
             'id': 'public_id',
             'in': 'start',
@@ -50,6 +50,7 @@ def order_query(qs, sort):
             'position': 'start',
             'text': 'sortvalue',
             'videoRatio': 'aspect_ratio',
+            'random': 'random__random',
         }.get(e['key'], e['key'])
         if key.startswith('clip:'):
             key = e['key'][len('clip:'):]
