@@ -409,7 +409,7 @@ pandora.ui.statisticsDialog = function() {
                                 },
                                 keyWidth: 192,
                                 sort: {key: 'value', operator: '-'},
-                                title: 'Operating Systems / Browsers',
+                                title: 'Operating Systems and Browsers',
                                 width: chartWidth
                             })
                             .css({
