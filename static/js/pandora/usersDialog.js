@@ -36,7 +36,7 @@ pandora.ui.usersDialog = function() {
             }),
 
         $guestsCheckbox = Ox.Checkbox({
-                title: 'Show Guests',
+                title: 'Include Guests',
                 value: false
             })
             .css({float: 'left', margin: '4px 4px 4px 2px'})

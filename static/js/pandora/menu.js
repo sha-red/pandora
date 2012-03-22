@@ -138,11 +138,8 @@ pandora.ui.mainMenu = function() {
                         { id: 'places', title: 'Manage Places...', disabled: isGuest },
                         { id: 'events', title: 'Manage Events...', disabled: isGuest },
                         {},
-                        { id: 'users', title: 'Manage Users...', disabled: !isAdmin }/*,
-                        { id: 'lists', title: 'Manage Lists...', disabled: !isAdmin },
-                        {},
-                        { id: 'news', title: 'Manage News...', disabled: !isAdmin },
-                        { id: 'tour', title: 'Manage Tour...', disabled: !isAdmin }*/
+                        { id: 'users', title: 'Manage Users...', disabled: !isAdmin },
+                        { id: 'statistics', title: 'Statistics...', disabled: !isAdmin }
                     ] },
                     { id: 'helpMenu', title: 'Help', items: [
                         { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'control ?' }
@@ -311,6 +308,8 @@ pandora.ui.mainMenu = function() {
                     )).open();
                 } else if (data.id == 'users') {
                     pandora.$ui.usersDialog = pandora.ui.usersDialog().open();
+                } else if (data.id == 'statistics') {
+                    pandora.$ui.statisticsDialog = pandora.ui.statisticsDialog().open();
                 } else if (data.id == 'resetfilters') {
                     pandora.UI.set({
                         filters: pandora.site.user.ui.filters
