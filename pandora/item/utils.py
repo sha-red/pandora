@@ -7,7 +7,7 @@ import unicodedata
 import ox
 
 def safe_filename(filename):
-    filename = filename.replace('_ ', ': ')
+    filename = filename.replace(': ', '_ ')
     filename = filename.replace('/', '_')
     filename = filename.replace('\\', '_')
     if filename.endswith('.'):
@@ -54,6 +54,8 @@ def sort_string(string):
     string = re.sub('(\d+)', lambda x: '%010d' % int(x.group(0)), string)
     return unicodedata.normalize('NFKD', string)
 
+def sorted_strings(strings):
+    return sorted(strings, cmp=lambda a, b: cmp(sort_string(a), sort_string(b)))
 
 def sort_title(title):
 

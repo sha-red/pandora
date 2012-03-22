@@ -7,6 +7,7 @@ import random
 random
 
 from django.conf import settings
+from django.db import connection, transaction
 from ox.utils import ET
 from celery.task import task, periodic_task
 
@@ -16,6 +17,7 @@ import models
 @periodic_task(run_every=timedelta(days=1))
 def cronjob(**kwargs):
     update_random_sort()
+    update_random_clip_sort()
 
 def update_random_sort():
     if filter(lambda f: f['id'] == 'random', settings.CONFIG['itemKeys']):
@@ -29,14 +31,13 @@ def update_random_sort():
 
 def update_random_clip_sort():
     if filter(lambda f: f['id'] == 'random', settings.CONFIG['itemKeys']):
-        from django.db import connection, transaction
-        cursor = connection.cursor()
-        cursor.execute('DROP TABLE clip_random;')
-        cursor.execute('CREATE TABLE "clip_random" AS SELECT id AS clip_id, row_number() OVER (ORDER BY random()) AS random FROM "clip_clip"')
-        cursor.execute('ALTER TABLE "clip_random" ADD UNIQUE ("clip_id")')
-        cursor.execute('CREATE INDEX "clip_random_clip_id_idx" ON "clip_random" ("clip_id")')
-        cursor.execute('CREATE INDEX "clip_random_random_idx" ON "clip_random" ("random")')
-        transaction.commit_unless_managed()
+        with transaction.commit_on_success():
+            cursor = connection.cursor()
+            cursor.execute('DROP TABLE clip_random;')
+            cursor.execute('CREATE TABLE "clip_random" AS SELECT id AS clip_id, row_number() OVER (ORDER BY random()) AS random FROM "clip_clip"')
+            cursor.execute('ALTER TABLE "clip_random" ADD UNIQUE ("clip_id")')
+            cursor.execute('CREATE INDEX "clip_random_clip_id_idx" ON "clip_random" ("clip_id")')
+            cursor.execute('CREATE INDEX "clip_random_random_idx" ON "clip_random" ("random")')
 
 @task(ignore_results=True, queue='default')
 def update_poster(itemId):

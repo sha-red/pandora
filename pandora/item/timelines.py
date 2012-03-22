@@ -7,10 +7,12 @@ from glob import glob
 import Image
 
 import ox
+from utils import sorted_strings
+
 
 def getTiles(timeline_prefix, height=64):
     files = glob('%s%sp*.png' % (timeline_prefix, height))
-    return sorted(filter(lambda f: f!='%s%sp.png' % (timeline_prefix, height), files))
+    return sorted_strings(filter(lambda f: f!='%s%sp.png' % (timeline_prefix, height), files))
     
 def loadTimeline(timeline_prefix, height=64):
     files = getTiles(timeline_prefix, height)
@@ -35,7 +37,7 @@ def makeTiles(timeline_prefix, height=16, width=3600):
     timeline = Image.new("RGB", (width, height))
 
     pos = 0
-    for f in sorted(files):
+    for f in sorted_strings(files):
         part = Image.open(f)
         part_width = int(part.size[0] / fps) 
         part = part.resize((part_width, height), Image.ANTIALIAS)
