@@ -426,6 +426,7 @@ def edit(request):
             data: {}
         }
     '''
+    update_clips = False
     data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Item, itemId=data['id'])
     if item.editable(request.user):
@@ -441,11 +442,16 @@ def edit(request):
         if 'user' in data:
             if request.user.get_profile().get_level() in ('admin', 'staff') and \
                 models.User.objects.filter(username=data['user']).exists():
-                item.user = models.User.objects.get(username=data['user'])
+                new_user = models.User.objects.get(username=data['user'])
+                if new_user != item.user:
+                    item.user = new_user
+                    update_clips = True
             del data['user']
         r = item.edit(data)
         if r:
             r.wait()
+        if update_clips:
+            tasks.update_clips.delay(item.itemId)
         response['data'] = item.get_json()
     else:
         response = json_response(status=403, text='permissino denied')

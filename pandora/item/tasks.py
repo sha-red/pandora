@@ -40,6 +40,11 @@ def update_random_clip_sort():
             cursor.execute('CREATE INDEX "clip_random_random_idx" ON "clip_random" ("random")')
 
 @task(ignore_results=True, queue='default')
+def update_clips(itemId):
+    item = models.Item.objects.get(itemId=itemId)
+    item.clips.all().update(user=item.user.id)
+
+@task(ignore_results=True, queue='default')
 def update_poster(itemId):
     item = models.Item.objects.get(itemId=itemId)
     item.make_poster(True)

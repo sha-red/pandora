@@ -805,8 +805,6 @@ class Item(models.Model):
             s.timesaccessed = 0
         s.accessed = self.accessed.aggregate(Max('access'))['access__max']
         s.save()
-        #update cached values in clips
-        self.clips.all().update(director=s.director, title=s.title)
 
     def update_layer_facet(self, key):
         current_values = [a['value']

@@ -41,7 +41,6 @@ def order_query(qs, sort):
             operator = ''
         clip_keys = ('public_id', 'start', 'end', 'hue', 'saturation', 'lightness', 'volume',
                      'duration', 'sortvalue', 'videoRatio',
-                     'director', 'title',
                      'random__random')
         key = {
             'id': 'public_id',
@@ -60,7 +59,7 @@ def order_query(qs, sort):
             }.get(key, key)
         elif key not in clip_keys:
             #key mgith need to be changed, see order_sort in item/views.py
-            key = "item__sort__%s" % key
+            key = "sort__%s" % key
         order = '%s%s' % (operator, key)
         order_by.append(order)
     if order_by:
@@ -94,7 +93,7 @@ def findClips(request):
         keys = filter(lambda k: k not in settings.CONFIG['clipLayers'] + ['annotations'],
                       data['keys'])
         if filter(lambda k: k not in models.Clip.clip_keys, keys):
-            qs = qs.select_related('item__sort')
+            qs = qs.select_related('sort')
 
         def add(p):
             ids.append(p.id)

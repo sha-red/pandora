@@ -24,8 +24,6 @@ class MetaClip:
         else:
             self.hue = self.saturation = self.lightness = 0
             self.volume = 0
-        self.director = self.item.sort.director
-        self.title = self.item.sort.title
   
     def save(self, *args, **kwargs):
         self.public_id = u"%s/%s-%s" %(self.item.itemId, float(self.start), float(self.end))
@@ -35,6 +33,9 @@ class MetaClip:
             streams = self.item.streams()
             if streams:
                 self.aspect_ratio = streams[0].aspect_ratio
+        if self.item:
+            self.user = self.item.user and self.item.user.id
+            self.sort = self.item.sort
         if self.id:
             sortvalue = ''
             if self.id:
@@ -115,6 +116,8 @@ attrs = {
     'aspect_ratio': models.FloatField(default=0),
 
     'item': models.ForeignKey('item.Item', related_name='clips'),
+    'sort': models.ForeignKey('item.ItemSort', related_name='clips'),
+    'user': models.IntegerField(db_index=True, null=True),
 
     #seconds
     'start': models.FloatField(default=-1, db_index=True),
@@ -128,8 +131,6 @@ attrs = {
     'lightness': models.FloatField(default=0, db_index=True),
     'volume': models.FloatField(default=0, null=True, db_index=True),
 
-    'director': models.CharField(max_length=1000, null=True, db_index=True),
-    'title': models.CharField(max_length=1000, db_index=True),
     'sortvalue': models.CharField(max_length=1000, null=True, db_index=True),
     'findvalue': models.TextField(null=True),
 }

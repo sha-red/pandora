@@ -204,10 +204,13 @@ class ClipManager(Manager):
         #anonymous can only see public clips
         if not user or user.is_anonymous():
             allowed_level = settings.CONFIG['capabilities']['canSeeItem']['guest']
-            qs = qs.filter(item__level__lte=allowed_level)
+            qs = qs.filter(sort__rightslevel__lte=allowed_level)
         #users can see public clips, there own clips and clips of there groups
         else:
             allowed_level = settings.CONFIG['capabilities']['canSeeItem'][user.get_profile().get_level()]
-            qs = qs.filter(Q(item__level__lte=allowed_level)|Q(item__user=user)|Q(item__groups__in=user.groups.all()))
+            q = Q(sort__rightslevel__lte=allowed_level)|Q(user=user.id)
+            if user.groups.count():
+                q |= Q(item__groups__in=user.groups.all())
+            qs = qs.filter(q)
         #admins can see all available clips
         return qs
