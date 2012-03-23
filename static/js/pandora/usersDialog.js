@@ -469,7 +469,8 @@ pandora.ui.usersDialog = function() {
                         title: 'Statistics...'
                     }).bindEvent({
                         click: function() {
-                            // ...
+                            that.close();
+                            pandora.$ui.statisticsDialog = pandora.ui.statisticsDialog().open();
                         }
                     }),
                     {},

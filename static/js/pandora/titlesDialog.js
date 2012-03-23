@@ -114,7 +114,10 @@ pandora.ui.titlesDialog = function() {
                     title: 'Manage Names...'
                 }).bindEvent({
                     click: function() {
-                        // ...
+                        that.close();
+                        (pandora.$ui.namesDialog || (
+                            pandora.$ui.namesDialog = pandora.ui.namesDialog()
+                        )).open();
                     }
                 }),
                 {},

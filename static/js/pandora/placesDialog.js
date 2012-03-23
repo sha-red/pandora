@@ -74,7 +74,10 @@ pandora.ui.placesDialog = function(options) {
                     title: 'Manage Events...'
                 }).bindEvent({
                     click: function() {
-                        // ...
+                        that.close();
+                        (pandora.$ui.eventsDialog || (
+                            pandora.$ui.eventsDialog = pandora.ui.eventsDialog()
+                        )).open();
                     }
                 }),
                 {},
