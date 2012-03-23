@@ -35,6 +35,15 @@ pandora.ui.statisticsDialog = function() {
         $dialog = Ox.Dialog({
             buttons: [
                 Ox.Button({
+                    id: 'manageUsers',
+                    title: 'Manage Users...'
+                }).bindEvent({
+                    click: function() {
+                        // ...
+                    }
+                }),
+                {},
+                Ox.Button({
                     id: 'close',
                     title: 'Close'
                 }).bindEvent({

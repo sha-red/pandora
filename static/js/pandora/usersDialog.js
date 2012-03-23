@@ -465,6 +465,15 @@ pandora.ui.usersDialog = function() {
         that = Ox.Dialog({
                 buttons: [
                     Ox.Button({
+                        id: 'statistics',
+                        title: 'Statistics...'
+                    }).bindEvent({
+                        click: function() {
+                            // ...
+                        }
+                    }),
+                    {},
+                    Ox.Button({
                             title: 'Export E-Mail Addresses'
                         })
                         .css({margin: '4px 4px 4px 0'})
@@ -534,12 +543,12 @@ pandora.ui.usersDialog = function() {
             .css({
                 position: 'absolute',
                 top: '4px',
-                left: '4px',
-                right: '256px',
+                left: '128px',
+                right: '384px',
                 bottom: '4px',
                 paddingTop: '2px',
                 fontSize: '9px',
-                textAlign: 'center',
+                textAlign: 'center'
             })
             .appendTo(that.$element.find('.OxButtonsbar'));
 
@@ -907,15 +916,15 @@ pandora.ui.usersDialog = function() {
     }
 
     function setWidth() {
+        var $form = $formButton.value() == 'edit' ? $editForm : $mailForm;
         formWidth = $content.size(1);
         $formLabel.options({width: formWidth - 44});
-        (
-            $formButton.value() == 'edit' ? $editForm : $mailForm
-        ).options('items').forEach(function($item) {
+        $form && $form.options('items').forEach(function($item) {
             if ($item.options('id') != 'send') {
                 $item.options({width: formWidth - 16});
             }
         });
+        $status.css({right: formWidth + 128 + 'px'});
     }
 
     function updateList() {
