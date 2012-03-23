@@ -24,10 +24,10 @@ pandora.ui.siteDialog = function(section) {
                         .html(
                             '<h1><b>Pan.do/ra</b></h1>'
                             + '<sub>open media archive</sub>'
-                            + '<p><b>' + pandora.site.site.name + '</b> is based on <b>Pan.do/ra</b>, '
+                            + '<p><b>' + pandora.site.site.name + '</b> is based on <p><b>Pan.do/ra</b>, '
                             + 'a free open source framework for media archives.</p>'
-                            + '<b>Pan.do/ra</b> includes <b>OxJS</b>, a new JavaScript library for web applications.</p>'
-                            + '<p><b>Pan.do/ra</b> and <b>OxJS</b> will be released in 2012. More soon...</p>'
+                            + '<b>Pan.do/ra</b> includes OxJS, a new JavaScript library for web applications.</p>'
+                            + '<a href="http://pan.do/ra"><b>Pan.do/ra</b></a> and <a href="http://oxjs.org"><b>OxJS</b></a> will be released in 2012. More soon...</p>'
                         )
                         .appendTo($content);
                 } else {
