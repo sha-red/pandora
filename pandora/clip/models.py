@@ -116,7 +116,7 @@ attrs = {
     'aspect_ratio': models.FloatField(default=0),
 
     'item': models.ForeignKey('item.Item', related_name='clips'),
-    'sort': models.ForeignKey('item.ItemSort', related_name='clips'),
+    'sort': models.ForeignKey('item.ItemSort', related_name='matching_clips'),
     'user': models.IntegerField(db_index=True, null=True),
 
     #seconds

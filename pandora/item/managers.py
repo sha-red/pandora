@@ -307,6 +307,9 @@ class ItemManager(Manager):
         #users can see public items, there own items and items of there groups
         else:
             allowed_level = settings.CONFIG['capabilities']['canSeeItem'][user.get_profile().get_level()]
-            qs = qs.filter(Q(level__lte=allowed_level)|Q(user=user)|Q(groups__in=user.groups.all()))
+            q = Q(level__lte=allowed_level)|Q(user=user)
+            if user.groups.count():
+                q |= Q(groups__in=user.groups.all())
+            qs = qs.filter(q)
         #admins can see all available items
         return qs
