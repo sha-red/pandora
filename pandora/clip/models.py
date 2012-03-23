@@ -132,7 +132,8 @@ attrs = {
     'volume': models.FloatField(default=0, null=True, db_index=True),
 
     'sortvalue': models.CharField(max_length=1000, null=True, db_index=True),
-    'findvalue': models.TextField(null=True),
+    #run this CREATE INDEX clip_clip_findvalue_idx ON clip_clip USING gin (findvalue gin_trgm_ops);
+    'findvalue': models.TextField(null=True, db_index=True),
 }
 for name in settings.CONFIG['clipLayers']:
     attrs[name] = models.BooleanField(default=False, db_index=True)
