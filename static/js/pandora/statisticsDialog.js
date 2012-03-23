@@ -56,7 +56,7 @@ pandora.ui.statisticsDialog = function() {
 
     //Ox.getJSON('/static/json/deleteme.json', function(result) {
     pandora.api.findUsers({
-        keys: ['browser', 'firstseen', 'lastseen', 'location', 'system'],
+        keys: ['browser', 'firstseen', 'lastseen', 'level', 'location', 'system'],
         range: [0, 1000000],
         sort: [{key: 'username', operator: '+'}]
     }, function(result) {
