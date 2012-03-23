@@ -75,7 +75,18 @@ pandora.ui.statisticsDialog = function() {
             removeOnClose: true,
             title: 'Statistics',
             width: dialogWidth
-        });
+        })
+        .bindEvent({
+            resizeend: function(data) {
+                dialogWidth = data.width;
+                Ox.print('WIDTH:::', dialogWidth)
+                $tabPanel.$element.replaceElement(1,
+                    $tabPanel.options('content')($tabPanel.selected())
+                );
+            }
+        }),
+
+        $tabPanel;
 
     //Ox.getJSON('/static/json/deleteme.json', function(result) {
     pandora.api.findUsers({
@@ -84,11 +95,9 @@ pandora.ui.statisticsDialog = function() {
         sort: [{key: 'username', operator: '+'}]
     }, function(result) {
 
-        var chartWidth = dialogWidth - 32 - Ox.UI.SCROLLBAR_SIZE,
-            data = {},
+        var data = {},
             flagCountry = {},
-            $guestsCheckbox,
-            $tabPanel;
+            $guestsCheckbox;
 
         ['all', 'registered'].forEach(function(mode) {
 
@@ -226,7 +235,8 @@ pandora.ui.statisticsDialog = function() {
 
         $tabPanel = Ox.TabPanel({
             content: function(id) {
-                var mode = $guestsCheckbox.options('value') ? 'all' : 'registered',
+                var chartWidth = dialogWidth - 32 - Ox.UI.SCROLLBAR_SIZE,
+                    mode = $guestsCheckbox.options('value') ? 'all' : 'registered',
                     top = 16,
                     $content = Ox.Element()
                         .css({
