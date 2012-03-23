@@ -19,16 +19,16 @@ with that installed build image:
 this will create a vdi image in pandora/
 
 == VirtualBox Usage ==
-Now you can create a new VirtualBox machine, use vdi image as existing hard disk.
-Before starting up you have to adjust some settings:
- In System -> Processor enable PAE/NX
- In Storage remove disk from SATA Controller
-            add disk to IDE Controler and enable "Use host I/O cache"
-    
+Now you can create a new VirtualBox machine,
+select Linux/Ubuntu and use vdi image as existing hard disk.
+
+Before starting up:
  In Network -> Adpater 1 set to Bridged Adapter with your connected controller
 
 == Use for development ==
 Login via ssh or in terminal as pandora with password pandora
+
+  ssh pandora@pandora.local
 
 Adjust your bzr configuration with bzr whoami:
  bzr whoami "Pando the Panda <pan.do@pan.do>"

@@ -13,7 +13,8 @@ python, bazaar, pip and virtualenv and several other python modules:
             python-setuptools python-pip python-virtualenv ipython \
             python-dev python-imaging python-numpy python-psycopg2 \
             python-geoip python-html5lib python-lxml \
-            postgresql rabbitmq-server
+            postgresql postgresql-contrib rabbitmq-server
+
     apt-get install oxframe oxtimeline 
 
 * Pan.do/ra
@@ -27,7 +28,10 @@ Get code from bazzar
     bzr branch http://code.0x2620.org/oxjs
 
 create settings_local.py and create site.jsonc
-(use settings.py / 0xdb.jsonc / padma.jsonc as example)
+do noy copy settings.py but only overwrite your changes in settings_local.py
+(check https://wiki.0x2620.org/wiki/pandora/configuration
+ and use settings.py / 0xdb.jsonc / padma.jsonc as example)
+
 create db
     
     ./manage.py syncdb
@@ -36,7 +40,6 @@ create / update static files
     
     ./manage.py update_static 
     ./manage.py compile_pyc
-
 
 * Database
   We use postgresql but other databases might also work
@@ -64,24 +67,7 @@ create / update static files
     install qt-faststart from (ffmpeg/tools)
     to enable add "mp4" to video.formats in your config.jsonc
 
-Running developer environment:
-  in one terminal:
-    ./manage.py runserver
-  and in another one:
-    ./manage.py celeryd -Q default,encoding -B
-
-=== Updating ===
-To update a pandora installation get the latest version from bzr by running
-    ./update.sh
-this will pull pandora/oxjs/python-ox and list possible upgrades to the db
-
-to update your database tables, use
-   ./manage.py sqldiff -a
-to check if there are changes and
-   ./manage.py sqldiff -a | ./manage.py dbshell
-to apply them.
-
-== DEPLOYMENT ==
+== Deployment ==
 * Install upstart scripts
 check etc/init for upstart scripts, adjust path and user and put into /etc/init
 
@@ -103,3 +89,18 @@ To run pan.do/ra in production, we use nginx, using apache2 is also possible.
 
   setup apache according to etc/apache2/vhost.in
 
+=== Updating ===
+To update a pandora installation get the latest version from bzr by running
+    ./update.sh
+
+this will update pandora/oxjs/python-ox and list possible upgrades to the db
+
+to update your database tables, use
+   ./manage.py sqldiff -a
+to check if there are changes and
+   ./manage.py sqldiff -a | ./manage.py dbshell
+to apply them.
+
+=== Development ===
+  in one terminal:
+    ./manage.py runserver

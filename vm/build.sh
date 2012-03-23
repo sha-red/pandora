@@ -3,6 +3,7 @@ base=$(pwd)
 sudo  vmbuilder vbox ubuntu --suite=oneiric \
     --verbose --debug \
     --arch i386 \
+    --flavour generic \
     --dest $base/pandora \
     --hostname pandora \
     --swapsize 512 \
