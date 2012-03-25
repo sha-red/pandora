@@ -7,6 +7,8 @@ pandora.ui.statisticsDialog = function() {
     var colors = {
             firstseen: [64, 192, 64],
             lastseen: [64, 64, 192],
+            day: [64, 192, 192],
+            hour: [64, 192, 192],
             continent: [64, 192, 64],
             region: [64, 192, 192],
             country: [64, 64, 192],
@@ -79,7 +81,6 @@ pandora.ui.statisticsDialog = function() {
         .bindEvent({
             resizeend: function(data) {
                 dialogWidth = data.width;
-                Ox.print('WIDTH:::', dialogWidth)
                 $tabPanel.$element.replaceElement(1,
                     $tabPanel.options('content')($tabPanel.selected())
                 );
@@ -88,12 +89,14 @@ pandora.ui.statisticsDialog = function() {
 
         $tabPanel;
 
-    //Ox.getJSON('/static/json/deleteme.json', function(result) {
+    Ox.getJSON('/static/json/deleteme.json', function(result) {
+    /*
     pandora.api.findUsers({
         keys: ['browser', 'firstseen', 'lastseen', 'level', 'location', 'system'],
         range: [0, 1000000],
         sort: [{key: 'username', operator: '+'}]
     }, function(result) {
+    */
 
         var data = {},
             flagCountry = {},
@@ -104,6 +107,8 @@ pandora.ui.statisticsDialog = function() {
             data[mode] = {
                 year: {},
                 month: {},
+                day: {},
+                hour: {},
                 continent: {},
                 region: {},
                 country: {},
@@ -117,13 +122,17 @@ pandora.ui.statisticsDialog = function() {
             };
 
             result.data.items.forEach(function(item) {
-                var city, continent, country, name = {}, region, split;
+                var city, continent, country, countryData, name = {}, region, split;
                 if (mode == 'all' || item.level != 'guest') {
                     ['firstseen', 'lastseen'].forEach(function(key, i) {
                         var year = item[key].substr(0, 4) + '-' + key,
-                            month = item[key].substr(0, 7) + '-' + key;
+                            month = item[key].substr(0, 7) + '-' + key,
+                            day = Ox.formatDate(item[key], '%u'),
+                            hour = item[key].substr(11, 2);
                         data[mode].year[year] = (data[mode].year[year] || 0) + 1;                
-                        data[mode].month[month] = (data[mode].month[month] || 0) + 1;                
+                        data[mode].month[month] = (data[mode].month[month] || 0) + 1;
+                        data[mode].day[day] = (data[mode].day[day] || 0) + 1;           
+                        data[mode].hour[hour] = (data[mode].hour[hour] || 0) + 1;           
                     });
                     if (item.location) {
                         split = item.location.split(', ')
@@ -131,14 +140,19 @@ pandora.ui.statisticsDialog = function() {
                             country = item.location;
                         } else {
                             country = split[1];
-                            city = [split[1], split[0]].join(', ');
+                            city = split[0];
+                        }
+                        countryData = Ox.getCountryByName(country);
+                        continent = countryData.continent;
+                        region = [continent, countryData.region].join(', ');
+                        country = [region, country].join(', ')
+                        city = city ? [country, city].join(', ') : '';
+                        data[mode].continent[continent] = (data[mode].continent[continent] || 0) + 1;
+                        data[mode].region[region] = (data[mode].region[region] || 0) + 1;
+                        data[mode].country[country] = (data[mode].country[country] || 0) + 1;
+                        if (city) {
                             data[mode].city[city] = (data[mode].city[city] || 0) + 1;
                         }
-                        data[mode].country[country] = (data[mode].country[country] || 0) + 1;
-                        region = Ox.getCountryByName(country).region;
-                        data[mode].region[region] = (data[mode].region[region] || 0) + 1;
-                        continent = Ox.getCountryByName(country).continent;
-                        data[mode].continent[continent] = (data[mode].continent[continent] || 0) + 1;
                     }
                     ['system', 'browser'].forEach(function(key) {
                         var version = item[key];
@@ -197,10 +211,12 @@ pandora.ui.statisticsDialog = function() {
             ['continent', 'region'].forEach(function(key) {
                 flagCountry[mode][key] = {};
                 Ox.forEach(data[mode][key], function(regionValue, regionKey) {
+                    regionKey = regionKey.split(', ').pop();
                     var max = 0;
                     Ox.forEach(data[mode].country, function(countryValue, countryKey) {
+                        countryKey = countryKey.split(', ').pop();
                         if (
-                            Ox.getCountryByGeoname(countryKey)[key] == regionKey
+                            Ox.getCountryByName(countryKey)[key] == regionKey
                             && countryValue > max
                         ) {
                             flagCountry[mode][key][regionKey] = countryKey;
@@ -212,10 +228,10 @@ pandora.ui.statisticsDialog = function() {
 
         });
 
-        data.all.city['Other, Other'] = 0;
+        data.all.city['Antarctica, Antarctica, Neutral Zone, Other'] = 0;
         Ox.forEach(data.all.city, function(value, key) {
             if (value < 2) {
-                data.all.city['Other, Other']++;
+                data.all.city['Antarctica, Antarctica, Neutral Zone, Other']++;
                 delete data.all.city[key];
             }
         });
@@ -247,23 +263,34 @@ pandora.ui.statisticsDialog = function() {
                                 : 'rgb(16, 16, 16)' 
                         });
                 if (id == 'seen') {
-                    ['year', 'month'].forEach(function(key) {
+                    ['year', 'month', 'day', 'hour'].forEach(function(key) {
+                        var isYearOrMonth = ['year', 'month'].indexOf(key) > -1;
                         Ox.Chart({
-                                color: function(key) {
-                                    return colors[key.split('-').pop()];
-                                },
+                                color: isYearOrMonth
+                                    ? function(value) {
+                                        return colors[value.split('-').pop()];
+                                    }
+                                    : colors[key],
                                 data: data[mode][key],
                                 formatKey: function(value) {
-                                    var split = value.split('-');
-                                    return (split.pop() == 'firstseen' ? 'First' : 'Last') + ': '
-                                        + (key == 'year' ? '' : Ox.MONTHS[parseInt(split[1], 10) - 1])
-                                        + ' ' + split[0];
+                                    var ret, split;
+                                    if (isYearOrMonth) {
+                                        split = value.split('-');
+                                        ret = (split.pop() == 'firstseen' ? 'First' : 'Last') + ': '
+                                            + (key == 'year' ? '' : Ox.MONTHS[parseInt(split[1], 10) - 1])
+                                            + ' ' + split[0];
+                                    } else {
+                                        ret = key == 'day'
+                                            ? Ox.WEEKDAYS[parseInt(value) - 1]
+                                            : value + ':00';
+                                    }
+                                    return ret;
                                 },
                                 keyAlign: 'right',
                                 keyWidth: 128,
-                                rows: 2,
-                                sort: {key: 'key', operator: '-'},
-                                title: key == 'year' ? 'Years' : 'Months',
+                                rows: isYearOrMonth ? 2 : 1,
+                                sort: {key: 'key', operator: isYearOrMonth ? '-' : '+'},
+                                title: Ox.toTitleCase(key) + 's',
                                 width: chartWidth
                             })
                             .css({
@@ -280,13 +307,12 @@ pandora.ui.statisticsDialog = function() {
                                 color: colors[key],
                                 data: data[mode][key],
                                 formatKey: function(value) {
-                                    var city, country, split;
-                                    if (key == 'city' || key == 'country') {
-                                        split = value.split(', ');
-                                        city = split.length == 2 ? split[1] : ''
-                                        country = split[0];
+                                    var city, country, split = value.split(', ');
+                                    if (key == 'continent' || key == 'region') {
+                                        country = flagCountry[mode][key][Ox.last(split)];
                                     } else {
-                                        country = flagCountry[mode][key][value];
+                                        country = split[2];
+                                        city = key == 'city' ? split[3] : ''
                                     }
                                     return $('<div>')
                                         .append(
@@ -301,13 +327,32 @@ pandora.ui.statisticsDialog = function() {
                                                     textOverflow: 'ellipsis'
                                                 })
                                                 .html(
-                                                    key == 'city' ? city
-                                                    : key == 'country' ? country
-                                                    : value.replace('ern A', ' A')
+                                                    Ox.last(split).replace('ern A', ' A')
                                                 )
                                         )
                                         .append(
-                                            $('<img>')
+                                            Ox.Element({
+                                                    element: '<img>',
+                                                    tooltip: mode == 'all' && (key == 'continent' || key == 'region')
+                                                        ? Ox.wordwrap(
+                                                            Ox.map(Ox.COUNTRIES, function(country) {
+                                                                return country[key] == split[key == 'continent' ? 0 : 1]
+                                                                    && country.code.length == 2
+                                                                    && ['EU', 'UK'].indexOf(country.code) == -1
+                                                                    && !country.disputed
+                                                                    && !country.dissolved
+                                                                    ? country.name : null;
+                                                            }).sort().join(', '),
+                                                            64, '<br>', true
+                                                        ).split(', ').map(function(country) {
+                                                            return Ox.values(Ox.map(data.all.country, function(value, key) {
+                                                                    return key.split(', ').pop()
+                                                                })).indexOf(country.replace(/<br>/g, '')) > -1
+                                                                ? '<span class="OxBright">' + country + '</span>'
+                                                                : country
+                                                        }).join(', ')
+                                                        : ''
+                                                })
                                                 .attr({
                                                     src: Ox.getFlagByGeoname(country, 16)
                                                 })
