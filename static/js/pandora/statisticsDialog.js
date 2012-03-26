@@ -147,7 +147,7 @@ pandora.ui.statisticsDialog = function() {
                             country = split[1];
                             city = split[0];
                         }
-                        countryData = Ox.getCountryByName(country);
+                        countryData = Ox.getCountryByName(country) || {continent: '', region: ''};
                         continent = countryData.continent;
                         region = [continent, countryData.region].join(', ');
                         country = [region, country].join(', ')
