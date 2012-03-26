@@ -147,7 +147,7 @@ pandora.ui.statisticsDialog = function() {
                             country = split[1];
                             city = split[0];
                         }
-                        countryData = Ox.getCountryByName(country) || {continent: '', region: ''};
+                        countryData = Ox.getCountryByName(country);
                         continent = countryData.continent;
                         region = [continent, countryData.region].join(', ');
                         country = [region, country].join(', ')
@@ -221,7 +221,7 @@ pandora.ui.statisticsDialog = function() {
                     Ox.forEach(data[mode].country, function(countryValue, countryKey) {
                         countryKey = countryKey.split(', ').pop();
                         if (
-                            Ox.getCountryByName(countryKey)[key] == regionKey
+                            (Ox.getCountryByName(countryKey) || {})[key] == regionKey
                             && countryValue > max
                         ) {
                             flagCountry[mode][key][regionKey] = countryKey;
