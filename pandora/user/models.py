@@ -56,6 +56,8 @@ class SessionData(models.Model):
                 self.browser = None
             if not self.system:
                 self.system = None
+            if ua.get('robot'):
+                self.level = -1
         if self.ip:
             try:
                 g = GeoIP()
@@ -82,7 +84,6 @@ class SessionData(models.Model):
             self.groupssort = ''.join([g.name for g in self.user.groups.all()])
             self.numberoflists = self.user.lists.count()
         else:
-            self.level = 0
             self.groupssort = None
         super(SessionData, self).save(*args, **kwargs)
 
@@ -124,7 +125,7 @@ class SessionData(models.Model):
             'ip': self.ip,
             'id': self.get_id(),
             'lastseen': self.lastseen,
-            'level': 'guest',
+            'level': ua.get('robot') and 'robot' or 'guest',
             'location': self.location,
             'newsletter': False,
             'notes': '',

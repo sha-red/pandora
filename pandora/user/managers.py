@@ -21,8 +21,9 @@ def parseCondition(condition, user):
         exclude = False
 
     if k == 'level':
-        if v in settings.CONFIG['userLevels']:
-            v = settings.CONFIG['userLevels'].index(v)
+        levels = ['robot'] + settings.CONFIG['userLevels']
+        if v in levels:
+            v = levels.index(v) - 1
         else:
             v = 0
         key = '%s%s' % (k, {
