@@ -93,14 +93,14 @@ pandora.ui.statisticsDialog = function() {
 
         $tabPanel;
 
-    Ox.getJSON('/static/json/deleteme.json', function(result) {
-    /*
+    //Ox.getJSON('/static/json/deleteme.json', function(result) {
+    ///*
     pandora.api.findUsers({
         keys: ['browser', 'email', 'firstseen', 'lastseen', 'level', 'location', 'system'],
         range: [0, 1000000],
         sort: [{key: 'username', operator: '+'}]
     }, function(result) {    
-    */
+    //*/
 
         var data = {},
             flagCountry = {},
