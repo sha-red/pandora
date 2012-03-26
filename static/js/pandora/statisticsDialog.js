@@ -97,6 +97,10 @@ pandora.ui.statisticsDialog = function() {
     ///*
     pandora.api.findUsers({
         keys: ['browser', 'email', 'firstseen', 'lastseen', 'level', 'location', 'system'],
+        query: {
+            conditions: [{key: 'level', value: 'robot', operator: '!='}],
+            operator: '&'
+        },
         range: [0, 1000000],
         sort: [{key: 'username', operator: '+'}]
     }, function(result) {    
