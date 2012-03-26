@@ -5,17 +5,21 @@
 pandora.ui.statisticsDialog = function() {
 
     var colors = {
-            firstseen: [64, 192, 64],
-            lastseen: [64, 64, 192],
-            day: [64, 192, 192],
-            hour: [64, 192, 192],
-            continent: [64, 192, 64],
-            region: [64, 192, 192],
-            country: [64, 64, 192],
-            city: [192, 64, 64],
-            system: [64, 192, 64],
-            browser: [64, 64, 192],
-            systemandbrowser: [64, 192, 192]
+            system: {
+                'Android': [0, 255, 0],
+                'iOS': [0, 128, 255],
+                'Linux': [255, 128, 0],
+                'Mac OS X': [0, 255, 255],
+                'Windows': [0, 0, 255]
+            },
+            browser: {
+                'Chrome Frame': [255, 255, 0],
+                'Chrome': [0, 255, 0],
+                'Firefox': [255, 128, 8],
+                'Internet Explorer': [0, 0, 255],
+                'Opera': [255, 0, 0],
+                'Safari': [0, 255, 255]
+            }
         },
         dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
@@ -89,14 +93,14 @@ pandora.ui.statisticsDialog = function() {
 
         $tabPanel;
 
-    //Ox.getJSON('/static/json/deleteme.json', function(result) {
-    ///*
+    Ox.getJSON('/static/json/deleteme.json', function(result) {
+    /*
     pandora.api.findUsers({
         keys: ['browser', 'email', 'firstseen', 'lastseen', 'level', 'location', 'system'],
         range: [0, 1000000],
         sort: [{key: 'username', operator: '+'}]
     }, function(result) {    
-    //*/
+    */
 
         var data = {},
             flagCountry = {},
@@ -129,9 +133,11 @@ pandora.ui.statisticsDialog = function() {
                             month = item[key].substr(0, 7) + '-' + key,
                             day = Ox.formatDate(item[key], '%u'),
                             hour = item[key].substr(11, 2);
-                        data[mode].year[year] = (data[mode].year[year] || 0) + 1;                
+                        data[mode].year[year] = data[mode].year[year] || {};
+                        data[mode].year[year][month] = (data[mode].year[year][month] || 0) + 1;                
                         data[mode].month[month] = (data[mode].month[month] || 0) + 1;
-                        data[mode].day[day] = (data[mode].day[day] || 0) + 1;           
+                        data[mode].day[day] = data[mode].day[day] || {};
+                        data[mode].day[day][hour] = (data[mode].day[day][hour] || 0) + 1;           
                         data[mode].hour[hour] = (data[mode].hour[hour] || 0) + 1;           
                     });
                     if (!item.location) {
@@ -271,11 +277,14 @@ pandora.ui.statisticsDialog = function() {
                     ['year', 'month', 'day', 'hour'].forEach(function(key) {
                         var isYearOrMonth = ['year', 'month'].indexOf(key) > -1;
                         Ox.Chart({
-                                color: isYearOrMonth
-                                    ? function(value) {
-                                        return colors[value.split('-').pop()];
-                                    }
-                                    : colors[key],
+                                color: function(value) {
+                                        var split = value.split('-');
+                                        return isYearOrMonth ? Ox.rgb(
+                                                Ox.mod(8 - parseInt(split[1], 10), 12) * 30, 1, 0.5
+                                            ).map(Math.round) : Ox.rgb(
+                                                (Math.abs(11.5 - parseInt(split[0], 10)) - 0.5) * -11, 1, 0.5
+                                            ).map(Math.round);
+                                    },
                                 data: data[mode][key],
                                 formatKey: function(value) {
                                     var ret, split;
@@ -309,7 +318,11 @@ pandora.ui.statisticsDialog = function() {
                 } else if (id == 'locations') {
                     ['continent', 'region', 'country', 'city'].forEach(function(key) {
                         Ox.Chart({
-                                color: colors[key],
+                                color: function(value) {
+                                    return Ox.getGeoColor(
+                                        key == 'continent' ? value : value.split(', ')[1]
+                                    );
+                                },
                                 data: data[mode][key],
                                 formatKey: function(value) {
                                     var city, country, split = value.split(', ');
@@ -343,7 +356,7 @@ pandora.ui.statisticsDialog = function() {
                                                             Ox.map(Ox.COUNTRIES, function(country) {
                                                                 return country[key] == split[key == 'continent' ? 0 : 1]
                                                                     && country.code.length == 2
-                                                                    && ['EU', 'UK'].indexOf(country.code) == -1
+                                                                    && ['AC', 'CP', 'DG', 'EA', 'EU', 'IC', 'TA', 'UK'].indexOf(country.code) == -1
                                                                     && !country.disputed
                                                                     && !country.dissolved
                                                                     ? country.name : null;
@@ -390,7 +403,18 @@ pandora.ui.statisticsDialog = function() {
                     ['', 'version'].forEach(function(version, i) {
                         ['system', 'browser'].forEach(function(key) {
                             Ox.Chart({
-                                    color: colors[key],
+                                    color: function(value) {
+                                        var name = value;
+                                        if (version) {
+                                            Ox.forEach(names[key], function(v) {
+                                                if (new RegExp('^' + v).test(value)) {
+                                                    name = v;
+                                                    return false;
+                                                }
+                                            });
+                                        }
+                                        return colors[key][name];
+                                    },
                                     data: data[mode][key + version],
                                     formatKey: function(value) {
                                         var index,
@@ -457,7 +481,13 @@ pandora.ui.statisticsDialog = function() {
                         });
                         if (i == 0) {
                             Ox.Chart({
-                                color: [64, 192, 192],
+                                color: function(value) {
+                                    return Ox.zip(value.split(' / ').map(function(v, i) {
+                                        return colors[i == 0 ? 'system' : 'browser'][v];
+                                    })).map(function(c) {
+                                        return Math.round(Ox.sum(c) / 2);
+                                    })
+                                },
                                 data: data[mode].systemandbrowser,
                                 formatKey: function(value) {
                                     var $element = $('<div>')

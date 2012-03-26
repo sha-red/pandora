@@ -136,11 +136,8 @@ pandora.ui.usersDialog = function() {
                     {
                         align: 'center',
                         format: function(value, data) {
-                            var userLevel = data.useragent.indexOf('Googlebot') > -1
-                                || data.useragent.indexOf('BingPreview') > -1
-                                ? 'Robot' : Ox.toTitleCase(value);
                             return Ox.Theme.formatColorLevel(
-                                userLevels.indexOf(userLevel),
+                                userLevels.indexOf(Ox.toTitleCase(value)),
                                 userLevels,
                                 [0, 300]
                             );
@@ -349,7 +346,10 @@ pandora.ui.usersDialog = function() {
                 items: function(data, callback) {
                     pandora.api.findUsers(Ox.extend(data, {
                         query: {
-                            conditions: [{key: 'level', value: 'guest', operator: '!='}],
+                            conditions: [
+                                {key: 'level', value: 'guest', operator: '!='},
+                                {key: 'level', value: 'robot', operator: '!='}
+                            ],
                             operator: '&'
                         }
                     }), callback);
@@ -582,7 +582,7 @@ pandora.ui.usersDialog = function() {
         return $list.options('selected').map(function(id) {
             return $list.value(id);
         }).filter(function(user) {
-            return user.level != 'guest' && (
+            return ['guest', 'robot'].indexOf(user.level) == -1 && (
                 $mailForm.values().include == 'users' || user.newsletter
             );
         }).map(function(user) {
@@ -805,7 +805,7 @@ pandora.ui.usersDialog = function() {
         if (data.value == 'edit') {
             $mailForm.detach();
             selected = $list.options('selected');
-            if (selected.length == 1 && selected[0].level != 'guest') {
+            if (selected.length == 1 && ['guest', 'robot'].indexOf(selected[0].level) == -1) {
                 $form.append($editForm = renderEditForm());
             }
         } else {
@@ -825,7 +825,7 @@ pandora.ui.usersDialog = function() {
         if ($formButton.value() == 'edit') {
             $form.empty();
             if (data.ids.length == 1) {
-                if (users[0].level != 'guest') {
+                if (['guest', 'robot'].indexOf(users[0].level) == -1) {
                     $form.append($editForm = renderEditForm());
                 }
             }
@@ -898,8 +898,8 @@ pandora.ui.usersDialog = function() {
             }),
             title = users.length == 0 ? 'No user selected'
                 : users.length == 1 ? (
-                    users[0].level == 'guest'
-                    ? 'Guest'
+                    ['guest', 'robot'].indexOf(users[0].level) > -1
+                    ? Ox.toTitleCase(users[0].level)
                     : Ox.encodeHTMLEntities(users[0].username)
                         + ' &lt;' + users[0].email + '&gt;'
                 )
@@ -944,7 +944,10 @@ pandora.ui.usersDialog = function() {
                         key != 'email' ? [{key: 'username', value: value, operator: '='}] : [],
                         key != 'username' ? [{key: 'email', value: value, operator: '='}] : []
                     )
-                    : !guests ? [{key: 'level', value: 'guest', operator: '!='}] : [],
+                    : !guests ? [
+                        {key: 'level', value: 'guest', operator: '!='},
+                        {key: 'level', value: 'robot', operator: '!='}
+                    ] : [],
                 operator: key == 'all' && value ? '|' : '&'
             };
         $list.options({
