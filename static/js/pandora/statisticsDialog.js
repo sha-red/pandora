@@ -33,9 +33,9 @@ pandora.ui.statisticsDialog = function() {
             ]
         },
         tabs = [
-            {id: 'seen', title: 'First Seen and Last Seen', selected: true},
+            {id: 'seen', title: 'First Seen & Last Seen', selected: true},
             {id: 'locations', title: 'Locations'},
-            {id: 'systems', title: 'Operating Systems and Browsers'}
+            {id: 'systems', title: 'Operating Systems & Browsers'}
         ],
 
         $dialog = Ox.Dialog({
@@ -527,7 +527,7 @@ pandora.ui.statisticsDialog = function() {
                                 },
                                 keyWidth: 192,
                                 sort: {key: 'value', operator: '-'},
-                                title: 'Operating Systems and Browsers',
+                                title: 'Operating Systems & Browsers',
                                 width: chartWidth
                             })
                             .css({
