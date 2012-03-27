@@ -93,10 +93,10 @@ pandora.ui.statisticsDialog = function() {
 
         $tabPanel;
 
-    Ox.getJSON('/static/json/deleteme.json', function(result) {
-    /*
+    //Ox.getJSON('/static/json/deleteme.json', function(result) {
+    ///*
     pandora.api.findUsers({
-        keys: ['browser', 'email', 'firstseen', 'lastseen', 'level', 'location', 'system'],
+        keys: ['browser', 'firstseen', 'lastseen', 'level', 'location', 'system'],
         query: {
             conditions: [{key: 'level', value: 'robot', operator: '!='}],
             operator: '&'
@@ -104,7 +104,7 @@ pandora.ui.statisticsDialog = function() {
         range: [0, 1000000],
         sort: [{key: 'username', operator: '+'}]
     }, function(result) {    
-    */
+    //*/
 
         var data = {},
             flagCountry = {},
@@ -144,11 +144,6 @@ pandora.ui.statisticsDialog = function() {
                         data[mode].day[day][hour] = (data[mode].day[day][hour] || 0) + 1;           
                         data[mode].hour[hour] = (data[mode].hour[hour] || 0) + 1;           
                     });
-                    if (!item.location) {
-                        item.location = (Ox.getCountryByCode(
-                            item.email.split('.').pop().replace(/(edu|gov|mil)/i, 'us')
-                        ) || {}).name || '';
-                    }
                     if (item.location) {
                         split = item.location.split(', ')
                         if (split.length == 1) {

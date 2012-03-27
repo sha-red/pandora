@@ -170,10 +170,7 @@ pandora.ui.usersDialog = function() {
                         width: 16
                     },
                     {
-                        format: function(value, data) {
-                            value = value || (Ox.getCountryByCode(
-                                data.email.split('.').pop().replace(/(edu|gov|mil)/i, 'us')
-                            ) || {}).name || '';
+                        format: function(value) {
                             return Ox.Element({
                                     element: '<img>',
                                     tooltip: value
