@@ -418,14 +418,14 @@
         },
         {
             "id": "modified",
-            "title": "Date Modified",
+            "title": "Last Modified",
             "type": "date",
             "columnWidth": 90,
             "sort": true
         },
         {
             "id": "accessed",
-            "title": "Date Accessed",
+            "title": "Last Accessed",
             "type": "date",
             "columnWidth": 90,
             "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]},
