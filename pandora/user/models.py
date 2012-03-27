@@ -56,7 +56,7 @@ class SessionData(models.Model):
                 self.browser = None
             if not self.system:
                 self.system = None
-            if ua.get('robot'):
+            if ua['robot']['name']:
                 self.level = -1
         if self.ip:
             try:
@@ -132,7 +132,7 @@ class SessionData(models.Model):
             'ip': self.ip,
             'id': self.get_id(),
             'lastseen': self.lastseen,
-            'level': ua.get('robot') and 'robot' or 'guest',
+            'level': 'robot' if ua['robot']['name'] else 'guest',
             'location': self.location,
             'newsletter': False,
             'notes': '',

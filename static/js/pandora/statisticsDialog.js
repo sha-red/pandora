@@ -17,10 +17,11 @@ pandora.ui.statisticsDialog = function() {
             browser: {
                 'Chrome Frame': [255, 255, 0],
                 'Chrome': [0, 255, 0],
-                'Firefox': [255, 128, 8],
+                'Firefox': [255, 128, 0],
                 'Internet Explorer': [0, 0, 255],
                 'Opera': [255, 0, 0],
-                'Safari': [0, 255, 255]
+                'Safari': [0, 255, 255],
+                'WebKit': [0, 255, 128]
             }
         },
         dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
