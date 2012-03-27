@@ -2,8 +2,7 @@
 'use strict';
 pandora.ui.mainMenu = function() {
 
-    var isAdmin = pandora.user.level == 'admin',
-        isGuest = pandora.user.level == 'guest',
+    var isGuest = pandora.user.level == 'guest',
         ui = pandora.user.ui,
         findState = pandora.getFindState(ui.find),
         that = Ox.MainMenu({
@@ -31,8 +30,7 @@ pandora.ui.mainMenu = function() {
                         {},
                         { id: 'preferences', title: 'Preferences...', disabled: isGuest, keyboard: 'control ,' },
                         { id: 'archives', title: 'Archives...', disabled: /*isGuest*/ true },
-                        { id: 'upload', title: 'Upload...',
-                          disabled: !pandora.site.capabilities.canUploadVideo[pandora.user.level]},
+                        { id: 'upload', title: 'Upload...', disabled: !pandora.site.capabilities.canUploadVideo[pandora.user.level]},
                         {},
                         { id: 'signup', title: 'Sign Up...', disabled: !isGuest },
                         isGuest ? { id: 'signin', title: 'Sign In...' }
@@ -134,14 +132,14 @@ pandora.ui.mainMenu = function() {
                         { id: 'findsimilar', title: 'Find Similar Clips...', disabled: true}
                     ] },
                     { id: 'dataMenu', title: 'Data', items: [
-                        { id: 'titles', title: 'Manage Titles...', disabled: !isAdmin },
-                        { id: 'names', title: 'Manage Names...', disabled: !isAdmin },
+                        { id: 'titles', title: 'Manage Titles...', disabled: !pandora.site.capabilities.canManageTitlesAndNames[pandora.user.level] },
+                        { id: 'names', title: 'Manage Names...', disabled: !pandora.site.capabilities.canManageTitlesAndNames[pandora.user.level] },
                         {},
-                        { id: 'places', title: 'Manage Places...', disabled: isGuest },
-                        { id: 'events', title: 'Manage Events...', disabled: isGuest },
+                        { id: 'places', title: 'Manage Places...', disabled: !pandora.site.capabilities.canManagePlacesAndEvents[pandora.user.level] },
+                        { id: 'events', title: 'Manage Events...', disabled: !pandora.site.capabilities.canManagePlacesAndEvents[pandora.user.level] },
                         {},
-                        { id: 'users', title: 'Manage Users...', disabled: !isAdmin },
-                        { id: 'statistics', title: 'Statistics...', disabled: !isAdmin }
+                        { id: 'users', title: 'Manage Users...', disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] },
+                        { id: 'statistics', title: 'Statistics...', disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] }
                     ] },
                     { id: 'helpMenu', title: 'Help', items: [
                         { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'control ?' }

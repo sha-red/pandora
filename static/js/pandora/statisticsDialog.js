@@ -93,8 +93,8 @@ pandora.ui.statisticsDialog = function() {
 
         $tabPanel;
 
-    //Ox.getJSON('/static/json/deleteme.json', function(result) {
-    ///*
+    Ox.getJSON('/static/json/deleteme.json', function(result) {
+    /*
     pandora.api.findUsers({
         keys: ['browser', 'email', 'firstseen', 'lastseen', 'level', 'location', 'system'],
         query: {
@@ -104,7 +104,7 @@ pandora.ui.statisticsDialog = function() {
         range: [0, 1000000],
         sort: [{key: 'username', operator: '+'}]
     }, function(result) {    
-    //*/
+    */
 
         var data = {},
             flagCountry = {},
@@ -273,7 +273,7 @@ pandora.ui.statisticsDialog = function() {
                         .css({
                             padding: '16px',
                             overflowY: 'auto',
-                            background: Ox.Theme() == 'classic'
+                            background: pandora.user.ui.theme == 'classic'
                                 ? 'rgb(240, 240, 240)'
                                 : 'rgb(16, 16, 16)' 
                         });
@@ -282,12 +282,18 @@ pandora.ui.statisticsDialog = function() {
                         var isYearOrMonth = ['year', 'month'].indexOf(key) > -1;
                         Ox.Chart({
                                 color: function(value) {
-                                        var split = value.split('-');
-                                        return isYearOrMonth ? Ox.rgb(
-                                                Ox.mod(8 - parseInt(split[1], 10), 12) * 30, 1, 0.5
-                                            ).map(Math.round) : Ox.rgb(
-                                                (Math.abs(11.5 - parseInt(split[0], 10)) - 0.5) * -11, 1, 0.5
-                                            ).map(Math.round);
+                                        var split = value.split('-'),
+                                            color = isYearOrMonth ? Ox.rgb(
+                                                    Ox.mod(8 - parseInt(split[1], 10), 12) * 30, 1, 0.5
+                                                ).map(Math.round) : Ox.rgb(
+                                                    (Math.abs(11.5 - parseInt(split[0], 10)) - 0.5) * -11, 1, 0.5
+                                                ).map(Math.round);
+                                        if (pandora.user.ui.theme == 'classic') {
+                                            color = color.map(function(c) {
+                                                return c - 64;
+                                            });
+                                        }
+                                        return color;
                                     },
                                 data: data[mode][key],
                                 formatKey: function(value) {
@@ -323,9 +329,15 @@ pandora.ui.statisticsDialog = function() {
                     ['continent', 'region', 'country', 'city'].forEach(function(key) {
                         Ox.Chart({
                                 color: function(value) {
-                                    return Ox.getGeoColor(
+                                    var color = Ox.getGeoColor(
                                         key == 'continent' ? value : value.split(', ')[1]
                                     );
+                                    if (pandora.user.ui.theme == 'classic') {
+                                        color = color.map(function(c) {
+                                            return c - 64;
+                                        });
+                                    }
+                                    return color;
                                 },
                                 data: data[mode][key],
                                 formatKey: function(value) {
@@ -408,7 +420,7 @@ pandora.ui.statisticsDialog = function() {
                         ['system', 'browser'].forEach(function(key) {
                             Ox.Chart({
                                     color: function(value) {
-                                        var name = value;
+                                        var color, name = value;
                                         if (version) {
                                             Ox.forEach(names[key], function(v) {
                                                 if (new RegExp('^' + v).test(value)) {
@@ -417,7 +429,13 @@ pandora.ui.statisticsDialog = function() {
                                                 }
                                             });
                                         }
-                                        return colors[key][name];
+                                        color = colors[key][name];
+                                        if (pandora.user.ui.theme == 'classic') {
+                                            color = color.map(function(c) {
+                                                return c - 64;
+                                            });
+                                        }
+                                        return color;
                                     },
                                     data: data[mode][key + version],
                                     formatKey: function(value) {
@@ -486,11 +504,17 @@ pandora.ui.statisticsDialog = function() {
                         if (i == 0) {
                             Ox.Chart({
                                 color: function(value) {
-                                    return Ox.zip(value.split(' / ').map(function(v, i) {
+                                    var color = Ox.zip(value.split(' / ').map(function(v, i) {
                                         return colors[i == 0 ? 'system' : 'browser'][v];
                                     })).map(function(c) {
                                         return Math.round(Ox.sum(c) / 2);
-                                    })
+                                    });
+                                    if (pandora.user.ui.theme == 'classic') {
+                                        color = color.map(function(c) {
+                                            return c - 64;
+                                        });
+                                    }
+                                    return color;
                                 },
                                 data: data[mode].systemandbrowser,
                                 formatKey: function(value) {

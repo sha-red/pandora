@@ -171,18 +171,15 @@ pandora.ui.usersDialog = function() {
                     },
                     {
                         format: function(value, data) {
-                            var country;                            
-                            if (!value) {
-                                country = (Ox.getCountryByCode(
-                                    data.email.split('.').pop().replace(/(edu|gov|mil)/i, 'us')
-                                ) || {}).name || '';
-                            }
+                            value = value || (Ox.getCountryByCode(
+                                data.email.split('.').pop().replace(/(edu|gov|mil)/i, 'us')
+                            ) || {}).name || '';
                             return Ox.Element({
                                     element: '<img>',
                                     tooltip: value
                                 })
                                 .attr({
-                                    src: Ox.getFlagByGeoname(value || country, 16)
+                                    src: Ox.getFlagByGeoname(value, 16)
                                 })
                                 .css({
                                     width: '14px',
