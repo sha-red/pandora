@@ -848,7 +848,10 @@ class Item(models.Model):
                                       settings.CONFIG['itemKeys'])):
                     current_values += self.get(k, [])
             if not isinstance(current_values, list):
-                current_values = [unicode(current_values)]
+                if not current_values:
+                    current_values = []
+                else:
+                    current_values = [unicode(current_values)]
             current_values = list(set(current_values))
             saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
             removed_values = filter(lambda i: i not in current_values, saved_values)

@@ -102,7 +102,7 @@ class Person(models.Model):
 
 def update_sort_name():
     for p in Person.objects.all():
-        _sortname = ox.get_sort_name(p.name)
+        _sortname = ox.get_sort_name(p.name).lower()
         _sortname = unicodedata.normalize('NFKD', _sortname)
         if (not p.edited and _sortname != p.sortname) or \
            (p.edited and _sortname == p.sortname):
