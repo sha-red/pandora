@@ -183,6 +183,7 @@ ITEM_POSTER = join(SCRIPT_ROOT, 'poster')
 ITEM_ICON   = join(SCRIPT_ROOT, 'item_icon')
 LIST_ICON   = join(SCRIPT_ROOT, 'list_icon')
 
+DB_GIN_TRGM = False
 
 #you can ignore things below this line
 #=========================================================================

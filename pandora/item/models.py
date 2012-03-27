@@ -1295,7 +1295,7 @@ class ItemFind(models.Model):
     item = models.ForeignKey('Item', related_name='find', db_index=True)
     key = models.CharField(max_length=200, db_index=True)
     #CREATE INDEX item_itemfind_value_idx ON item_itemfind USING gin (value gin_trgm_ops);
-    value = models.TextField(blank=True, db_index=True)
+    value = models.TextField(blank=True, db_index=settings.DB_GIN_TRGM)
 
     def __unicode__(self):
         return u"%s=%s" % (self.key, self.value)
