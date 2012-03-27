@@ -206,6 +206,10 @@ pandora.ui.usersDialog = function() {
                             return system ? Ox.Element({
                                     element: '<img>',
                                     tooltip: value
+                                        .replace(/BSD \((.+)\)/, '$1')
+                                        .replace(/Linux \((.+)\)/, '$1')
+                                        .replace(/Unix \((.+)\)/, '$1')
+                                        .replace(/Windows (NT \d+\.\d+) \((.+)\)/, 'Windows $2 ($1)')
                                 })
                                 .attr({
                                     src: Ox.UI.PATH + 'png/system'
