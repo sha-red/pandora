@@ -7,9 +7,11 @@ pandora.ui.statisticsDialog = function() {
     var colors = {
             system: {
                 'Android': [0, 255, 0],
+                'BSD': [255, 0, 0],
                 'iOS': [0, 128, 255],
                 'Linux': [255, 128, 0],
                 'Mac OS X': [0, 255, 255],
+                'UNIX': [255, 255, 0],
                 'Windows': [0, 0, 255]
             },
             browser: {
@@ -23,15 +25,7 @@ pandora.ui.statisticsDialog = function() {
         },
         dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
-        names = {
-            system: [
-                'Android', 'iOS', 'Linux', 'Mac OS X', 'Windows'
-            ],
-            browser: [
-                'Chrome Frame', 'Chrome', 'Firefox',
-                'Internet Explorer', 'Opera', 'Safari'
-            ]
-        },
+        names = Ox.merge(Object.keys(colors.system), Object.keys(colors.browser)),
         tabs = [
             {id: 'seen', title: 'First Seen & Last Seen', selected: true},
             {id: 'locations', title: 'Locations'},
@@ -167,25 +161,19 @@ pandora.ui.statisticsDialog = function() {
                     ['system', 'browser'].forEach(function(key) {
                         var version = item[key];
                         if (version) {
-                            name[key] = '';
-                            Ox.forEach(names[key], function(v) {
-                                if (new RegExp('^' + v).test(version)) {
-                                    name[key] = v;
-                                    return false;
-                                }
-                            });
+                            name[key] = getName(version);
                             if (name[key]) {
                                 data[mode][key][name[key]] = (data[mode][key][name[key]] || 0) + 1; 
                                 key = key + 'version';
                                 data[mode][key][version] = (data[mode][key][version] || 0) + 1;
-                            }/* else {
-                                Ox.print("^^^^^^", version)
-                            }*/
+                            }
                         }
                     });
                     if (name.system && name.browser) {
                         name = name.system + ' / ' + name.browser;
                         data[mode].systemandbrowser[name] = (data[mode].systemandbrowser[name] || 0) + 1;
+                        name = item.system + ' / ' + item.browser;
+                        data[mode].systemandbrowserversion[name] = (data[mode].systemandbrowserversion[name] || 0) + 1;
                     }
                 }
             });
@@ -415,16 +403,8 @@ pandora.ui.statisticsDialog = function() {
                         ['system', 'browser'].forEach(function(key) {
                             Ox.Chart({
                                     color: function(value) {
-                                        var color, name = value;
-                                        if (version) {
-                                            Ox.forEach(names[key], function(v) {
-                                                if (new RegExp('^' + v).test(value)) {
-                                                    name = v;
-                                                    return false;
-                                                }
-                                            });
-                                        }
-                                        color = colors[key][name];
+                                        var name = version ? getName(value) : value,
+                                            color = colors[key][name];
                                         if (pandora.user.ui.theme == 'classic') {
                                             color = color.map(function(c) {
                                                 return c - 64;
@@ -434,24 +414,8 @@ pandora.ui.statisticsDialog = function() {
                                     },
                                     data: data[mode][key + version],
                                     formatKey: function(value) {
-                                        var index,
-                                            name = value,
+                                        var name = version ? getName(value) : value,
                                             $element = $('<div>');
-                                        if (version) {
-                                            Ox.forEach(names[key], function(v) {
-                                                if (new RegExp('^' + v).test(value)) {
-                                                    name = v;
-                                                    return false;
-                                                }
-                                            });
-                                            /*
-                                            text = value.substr(name.length + 1);
-                                            index = text.indexOf('(')
-                                            if (index > -1) {
-                                                text = Ox.sub(text, index + 1, -1);
-                                            }
-                                            */
-                                        }
                                         $element.append(
                                             $('<div>')
                                                 .css({
@@ -463,7 +427,13 @@ pandora.ui.statisticsDialog = function() {
                                                     overflow: 'hidden',
                                                     textOverflow: 'ellipsis'
                                                 })
-                                                .html(value.replace('(Windows ', '('))
+                                                .html(
+                                                    value
+                                                        .replace(/BSD \((.+)\)/, '$1')
+                                                        .replace(/Linux \((.+)\)/, '$1')
+                                                        .replace(/UNIX \((.+)\)/, '$1')
+                                                        .replace(/Windows (NT \d+\.\d+) \((.+)\)/, 'Windows $2 ($1)')
+                                                )
                                         ).append(
                                             $('<img>')
                                                 .attr({
@@ -496,67 +466,82 @@ pandora.ui.statisticsDialog = function() {
                                 .appendTo($content);
                             top += Ox.len(data[mode][key + version]) * 16 + 32;
                         });
-                        if (i == 0) {
-                            Ox.Chart({
-                                color: function(value) {
-                                    var color = Ox.zip(value.split(' / ').map(function(v, i) {
+                        Ox.Chart({
+                            color: function(value) {
+                                var color = Ox.zip(value.split(' / ').map(function(v, i) {
+                                        v = version ? getName(v) : v;
                                         return colors[i == 0 ? 'system' : 'browser'][v];
                                     })).map(function(c) {
                                         return Math.round(Ox.sum(c) / 2);
                                     });
-                                    if (pandora.user.ui.theme == 'classic') {
-                                        color = color.map(function(c) {
-                                            return c - 64;
-                                        });
-                                    }
-                                    return color;
-                                },
-                                data: data[mode].systemandbrowser,
-                                formatKey: function(value) {
-                                    var $element = $('<div>')
-                                        .append(
-                                            $('<div>')
-                                                .css({
-                                                    float: 'left',
-                                                    width: '152px',
-                                                    height: '14px',
-                                                    marginLeft: '-4px',
-                                                    marginRight: '4px',
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis'
-                                                })
-                                                .html(value)
-                                        );
-                                    value.split(' / ').forEach(function(value, i) {
-                                        $element.append(
-                                            $('<img>')
-                                                .attr({
-                                                    src: Ox.UI.PATH + 'png/'
-                                                        + (i == 0 ? 'system' : 'browser')
-                                                        + value.replace(/ /g, '') + '128.png'
-                                                })
-                                                .css({
-                                                    width: '14px',
-                                                    height: '14px',
-                                                    margin: '0 1px 0 1px'
-                                                })
-                                        );
+                                if (pandora.user.ui.theme == 'classic') {
+                                    color = color.map(function(c) {
+                                        return c - 64;
                                     });
-                                    return $element;
-                                },
-                                keyWidth: 192,
-                                sort: {key: 'value', operator: '-'},
-                                title: 'Operating Systems & Browsers',
-                                width: chartWidth
-                            })
-                            .css({
-                                position: 'absolute',
-                                left: '16px',
-                                top: top + 'px'
-                            })
-                            .appendTo($content);
-                            top += Ox.len(data[mode].systemandbrowser) * 16 + 32;
-                        }
+                                }
+                                return color;
+                            },
+                            data: data[mode]['systemandbrowser' + version],
+                            formatKey: function(value) {
+                                var $element = $('<div>')
+                                    .append(
+                                        $('<div>')
+                                            .css({
+                                                float: 'left',
+                                                width: '152px',
+                                                height: '14px',
+                                                marginLeft: '-4px',
+                                                marginRight: '4px',
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis'
+                                            })
+                                            .html(
+                                                version
+                                                ? value
+                                                    .replace(/BSD \((.+)\)/, '$1')
+                                                    .replace(/Linux \((.+)\)/, '$1')
+                                                    .replace(/(Mac OS X \d+\.\d+) \(.+\)/, '$1')
+                                                    .replace(/UNIX \((.+)\)/, '$1')
+                                                    .replace(/Windows NT \d+\.\d+ \((.+)\)/, 'Windows $1')
+                                                    .replace(/Chrome Frame/, 'CF')
+                                                    .replace(/Internet Explorer/, 'IE')
+                                                : value
+                                            )
+                                    );
+                                value.split(' / ').forEach(function(value, i) {
+                                    value = version ? getName(value) : value;
+                                    $element.append(
+                                        $('<img>')
+                                            .attr({
+                                                src: Ox.UI.PATH + 'png/'
+                                                    + (i == 0 ? 'system' : 'browser')
+                                                    + value.replace(/ /g, '') + '128.png'
+                                            })
+                                            .css({
+                                                width: '14px',
+                                                height: '14px',
+                                                margin: '0 1px 0 1px'
+                                            })
+                                    );
+                                });
+                                return $element;
+                            },
+                            keyWidth: 192,
+                            sort: version == ''
+                                ? {key: 'value', operator: '-'}
+                                : {key: 'key', operator: '+'},
+                            title: version == ''
+                                ? 'Operating Systems & Browsers'
+                                : 'Operating System & Browser Versions',
+                            width: chartWidth
+                        })
+                        .css({
+                            position: 'absolute',
+                            left: '16px',
+                            top: top + 'px'
+                        })
+                        .appendTo($content);
+                        top += Ox.len(data[mode]['systemandbrowser' + version]) * 16 + 32;
                     });
                 }
                 $('<div>')
@@ -578,6 +563,17 @@ pandora.ui.statisticsDialog = function() {
         $dialog.options({content: $tabPanel});
 
     });
+
+    function getName(version) {
+        var name = '';
+        Ox.forEach(names, function(v) {
+            if (new RegExp('^' + v).test(version)) {
+                name = v;
+                return false;
+            }
+        });
+        return name;        
+    }
 
     return $dialog;
 

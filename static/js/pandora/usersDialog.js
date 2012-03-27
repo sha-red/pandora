@@ -13,7 +13,8 @@ pandora.ui.usersDialog = function() {
         formWidth = 256,
         numberOfUsers = 0,
         systems = [
-            'Android', 'iOS', 'Linux', 'Mac OS X', 'Windows'
+            'Android', 'BSD', 'iOS', 'Linux',
+            'Mac OS X', 'UNIX', 'Windows'
         ],
         userLevels = Ox.merge(
             pandora.site.userLevels.map(function(userLevel) {
@@ -355,6 +356,7 @@ pandora.ui.usersDialog = function() {
             })
             .bindEvent({
                 init: function(data) {
+                    Ox.print('DATA::P::', data)
                     numberOfUsers = data.users;
                     $status.html(
                         Ox.formatNumber(data.items)
@@ -363,7 +365,9 @@ pandora.ui.usersDialog = function() {
                             $guestsCheckbox.value()
                             ? ' (' + Ox.formatNumber(data.users) + ' registered, '
                                 + Ox.formatNumber(data.guests) + ' guest'
-                                + (data.guests == 1 ? '' : 's')
+                                + (data.guests == 1 ? '' : 's') + ', '
+                                + Ox.formatNumber(data.robots) + ' robot'
+                                + (data.robots == 1 ? '' : 's')
                                 + ')'
                             : ''
                         )
