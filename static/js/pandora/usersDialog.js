@@ -14,7 +14,7 @@ pandora.ui.usersDialog = function() {
         numberOfUsers = 0,
         systems = [
             'Android', 'BSD', 'iOS', 'Linux',
-            'Mac OS X', 'UNIX', 'Windows'
+            'Mac OS X', 'Unix', 'Windows'
         ],
         userLevels = Ox.merge(
             pandora.site.userLevels.map(function(userLevel) {

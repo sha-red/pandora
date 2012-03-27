@@ -11,7 +11,7 @@ pandora.ui.statisticsDialog = function() {
                 'iOS': [0, 128, 255],
                 'Linux': [255, 128, 0],
                 'Mac OS X': [0, 255, 255],
-                'UNIX': [255, 255, 0],
+                'Unix': [255, 255, 0],
                 'Windows': [0, 0, 255]
             },
             browser: {
@@ -431,7 +431,7 @@ pandora.ui.statisticsDialog = function() {
                                                     value
                                                         .replace(/BSD \((.+)\)/, '$1')
                                                         .replace(/Linux \((.+)\)/, '$1')
-                                                        .replace(/UNIX \((.+)\)/, '$1')
+                                                        .replace(/Unix \((.+)\)/, '$1')
                                                         .replace(/Windows (NT \d+\.\d+) \((.+)\)/, 'Windows $2 ($1)')
                                                 )
                                         ).append(
@@ -501,7 +501,7 @@ pandora.ui.statisticsDialog = function() {
                                                     .replace(/BSD \((.+)\)/, '$1')
                                                     .replace(/Linux \((.+)\)/, '$1')
                                                     .replace(/(Mac OS X \d+\.\d+) \(.+\)/, '$1')
-                                                    .replace(/UNIX \((.+)\)/, '$1')
+                                                    .replace(/Unix \((.+)\)/, '$1')
                                                     .replace(/Windows NT \d+\.\d+ \((.+)\)/, 'Windows $1')
                                                     .replace(/Chrome Frame/, 'CF')
                                                     .replace(/Internet Explorer/, 'IE')
