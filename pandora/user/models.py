@@ -69,19 +69,12 @@ class SessionData(models.Model):
                         self.location = u'%s, %s' % (city, country)
                         self.location_sort = u'%s, %s' % (country, city)
                     else:
-                        self.location_sort = self.location = country                    
+                        self.location_sort = self.location = country
                 else:
                     self.location_sort = self.location = None
             except:
                 self.location_sort = self.location = None
                 pass
-        if self.location == None and self.user and self.user.email:
-            tld = self.user.email.split('.')[-1]
-            if tld in ['edu', 'gov', 'mil']:
-                tld = 'us'
-            country = ox.get_country_name(tld)
-            if country:
-                self.location_sort = self.location = country            
 
     def save(self, *args, **kwargs):
         if self.user:
