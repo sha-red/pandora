@@ -41,19 +41,38 @@ create / update static files
     ./manage.py update_static 
     ./manage.py compile_pyc
 
+
 * Database
   We use postgresql but other databases might also work
   (make sure you have the python bindings installed).
 
-  create a postgresql database and adjust settings in local_settings.py
-  and run ./manage.py syncdb to populate the database.
+  create a postgresql database
 
-    createdb  -T template0 --locale=C --encoding=UTF8 -O pandora pandora
+    sudo -u postgres createdb  -T template0 --locale=C --encoding=UTF8 -O pandora pandora
 
   (setting locale to C is required to fix a bug in sort if set to UTF8)
 
+  now add settings to local_settings.py:
+    DATABASES = {
+        'default': {
+            'NAME': 'pandora',
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'USER': 'pandora',
+        }
+    }
+
+  and run ./manage.py syncdb to populate the database.
+
+  Optionaly use pg_trgm to improve find speed (requires postgres 9.1 and postgresql-contrib)
+
+    echo "CREATE EXTENSION pg_trgm;" | sudo -u postgres psql pandora
+    ./manage.py sqlfindindex | ./manage.py dbshell
+    echo "DB_GIN_TRGM = True" >> local_settings.py
+
+
 * RabbitMQ
-  For background tasks we use RabbitMQ, to install rabbitmq:
+  For background tasks RabbitMQ is required, to install rabbitmq:
+
     sudo apt-get install rabbitmq-server
 
   and create permissions according to BROKER_* in local_settings.py i.e.:
@@ -62,10 +81,12 @@ create / update static files
     sudo rabbitmqctl add_vhost /pandora
     sudo rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
 
+
 * H264
-    to support h264 videos, install ffmpeg with x264 enabled,
-    install qt-faststart from (ffmpeg/tools)
-    to enable add "mp4" to video.formats in your config.jsonc
+    for h264 videos, you need to compile ffmpeg with x264 and libfaac enabled,
+    you also need to install qt-faststart (from ffmpeg/tools)
+    to enable h264 derivatives add "mp4" to video.formats in your config.jsonc
+
 
 == Deployment ==
 * Install upstart scripts
@@ -104,3 +125,7 @@ to apply them.
 === Development ===
   in one terminal:
     ./manage.py runserver
+
+  and background task in another:
+    ./manage.py celeryd -B -Q default,encoding
+
