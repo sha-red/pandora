@@ -538,7 +538,8 @@ Positions
     else:
         response['data']['items'] = qs.count()
         response['data']['users'] = qs.exclude(user=None).count()
-        response['data']['guests'] = response['data']['items'] - response['data']['users']
+        response['data']['robots'] = qs.filter(level=-1).count()
+        response['data']['guests'] = qs.filter(level=0).count()
     return render_to_json_response(response)
 actions.register(findUsers)
 
