@@ -72,7 +72,7 @@ def parseCondition(condition, user):
         if exclude:
             q = ~q
         return q
-    elif isinstance(v, list) and len(v) == 2:
+    elif isinstance(v, list) and len(v) == 2 and op == '=':
         q = parseCondition({'key': k, 'value': v[0], 'operator': '>='}, user) \
             & parseCondition({'key': k, 'value': v[1], 'operator': '<'}, user)
         if exclude:

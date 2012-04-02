@@ -34,13 +34,12 @@ def parseCondition(condition, user):
         exclude = True
     else:
         exclude = False
-    if op == '-':
+    if isinstance(v, list) and len(v) == 2 and op == '=':
         q = parseCondition({'key': k, 'value': v[0], 'operator': '>='}, user) \
             & parseCondition({'key': k, 'value': v[1], 'operator': '<'}, user)
         if exclude:
-            return ~q
-        else:
-            return q
+            q = ~q
+        return q
     if k == 'id':
         v = decode_id(v)
     if isinstance(v, bool): #featured and public flag
