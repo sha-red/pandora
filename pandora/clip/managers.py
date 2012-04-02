@@ -37,7 +37,7 @@ def parseCondition(condition, user):
     op = condition.get('operator')
     if not op:
         op = ''
-    if k in settings.CONFIG['clipLayers']:
+    if k in settings.CONFIG.get('clipLayers', []):
         return parseCondition({'key': 'annotations__findvalue',
                                'value': v,
                                'operator': op}, user) \

@@ -39,7 +39,7 @@ class MetaClip:
         if self.id:
             sortvalue = ''
             if self.id:
-                for l in settings.CONFIG['clipLayers']:
+                for l in settings.CONFIG.get('clipLayers', []):
                     sortvalue += ''.join(filter(lambda s: s,
                          [a.sortvalue
                           for a in self.annotations.filter(layer=l).order_by('sortvalue')]))
