@@ -298,7 +298,8 @@ class ItemManager(Manager):
                                      data.get('query', {}).get('operator', '&'),
                                      user)
         qs = qs.filter(conditions)
-        qs = qs.distinct()
+        #FIXME: why was this in?
+        #qs = qs.distinct()
         
         #anonymous can only see public items
         if not user or user.is_anonymous():
