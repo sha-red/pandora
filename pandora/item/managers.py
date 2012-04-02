@@ -298,8 +298,8 @@ class ItemManager(Manager):
                                      data.get('query', {}).get('operator', '&'),
                                      user)
         qs = qs.filter(conditions)
-        #FIXME: why was this in?
-        #qs = qs.distinct()
+        #FIXME: can this be avoided? needed for grid/accessed/foo
+        qs = qs.distinct()
         
         #anonymous can only see public items
         if not user or user.is_anonymous():
