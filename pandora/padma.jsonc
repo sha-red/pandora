@@ -413,7 +413,7 @@
             "title": "Date Created",
             "type": "date",
             "columnWidth": 120,
-            "format": {"type": "date", "args": ["%a, %b %e, %Y"]},
+            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]},
             "sort": true
         },
         {
@@ -421,6 +421,7 @@
             "title": "Last Modified",
             "type": "date",
             "columnWidth": 90,
+            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]},
             "sort": true
         },
         {
@@ -436,6 +437,7 @@
             "title": "Times Accessed",
             "type": "integer",
             "columnWidth": 60,
+            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]},
             "sort": true
         },
         {
