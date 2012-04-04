@@ -99,6 +99,7 @@ pandora.ui.infoView = function(data) {
             .css({
                 position: 'absolute',
                 left: iconLeft + 'px',
+                bottom: 0,
                 width: iconWidth + 'px',
                 height: iconHeight + 'px',
                 borderRadius: borderRadius + 'px'
