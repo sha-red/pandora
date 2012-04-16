@@ -225,7 +225,7 @@ pandora.ui.usersDialog = function() {
                         id: 'system',
                         operator: '+',
                         title: 'System',
-                        titleImage: 'icon',
+                        titleImage: 'square',
                         visible: true,
                         width: 16
                     },
@@ -256,7 +256,7 @@ pandora.ui.usersDialog = function() {
                         id: 'browser',
                         operator: '+',
                         title: 'Browser',
-                        titleImage: 'icon',
+                        titleImage: 'circle',
                         visible: true,
                         width: 16 
                     },
