@@ -90,7 +90,7 @@ pandora.ui.usersDialog = function() {
                         visible: false,
                     },
                     {
-                        format: function(value) {
+                        format: function(value, data) {
                             return $('<img>')
                                 .attr({
                                     src: Ox.UI.getImageURL('symbolCheck')
@@ -99,7 +99,9 @@ pandora.ui.usersDialog = function() {
                                     width: '10px',
                                     height: '10px',
                                     padding: '3px',
-                                    opacity: value ? 0 : 1
+                                    opacity: value || [
+                                        'guest', 'robot'
+                                    ].indexOf(data.level) > 1 ? 0 : 1
                                 });
                         },
                         id: 'disabled',
