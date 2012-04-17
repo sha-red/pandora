@@ -841,9 +841,9 @@ pandora.getVideoOptions = function(data) {
             return pandora.getVideoUrl(data.item || pandora.user.ui.item, resolution, i + 1);
         });
     });
-    options.layers = [];
+    options.annotations = [];
     pandora.site.layers.forEach(function(layer, i) { 
-        options.layers[i] = Ox.extend({}, layer, {
+        options.annotations[i] = Ox.extend({}, layer, {
             items: data.layers[layer.id].map(function(annotation) {
                 annotation.date = Ox.formatDate(annotation.modified.substr(0, 10), '%B %e, %Y');
                 annotation.duration = Math.abs(annotation.out - annotation['in']);
