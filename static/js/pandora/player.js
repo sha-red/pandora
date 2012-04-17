@@ -4,6 +4,8 @@
 
 pandora.ui.player = function(data) {
 
+    // fixme: var ui = pandora.user.ui;
+
     return Ox.VideoPanel({
         annotationsCalendarSize: pandora.user.ui.annotationsCalendarSize,
         annotationsFont: pandora.user.ui.annotationsFont,
@@ -93,17 +95,17 @@ pandora.ui.player = function(data) {
         subtitles: function(data) {
             pandora.UI.set('videoSubtitles', data.subtitles);
         },
-        togglemap: function(data) {
-            pandora.UI.set('showAnnotationsMap', !data.collapsed);
-        },
-        togglesize: function(data) {
-            pandora.UI.set({videoSize: data.size});
-        },
         toggleannotations: function(data) {
             pandora.UI.set('showAnnotations', data.showAnnotations);
         },
         togglelayer: function(data) {
             pandora.UI.set('showLayers.' + data.layer, !data.collapsed);
+        },
+        togglemap: function(data) {
+            pandora.UI.set('showAnnotationsMap', !data.collapsed);
+        },
+        togglesize: function(data) {
+            pandora.UI.set({videoSize: data.size});
         },
         toggletimeline: function(data) {
             pandora.UI.set('showTimeline', data.showTimeline);

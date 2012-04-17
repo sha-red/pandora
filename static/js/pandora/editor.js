@@ -4,6 +4,8 @@
 
 pandora.ui.editor = function(data) {
 
+    // fixme: var ui = pandora.user.ui;
+
     return Ox.VideoEditor({
         annotationsCalendarSize: pandora.user.ui.annotationsCalendarSize,
         annotationsFont: pandora.user.ui.annotationsFont,
