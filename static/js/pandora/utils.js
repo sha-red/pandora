@@ -663,7 +663,7 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
     Ox.Log('URL', 'getMetadataByIdOrName', item, view, str);
     var isName = str[0] == '@',
         canBeAnnotation = (
-            !view || view == 'timeline' || view == 'player' || view == 'editor'
+            !view || view == 'video' || view == 'timeline'
         ) && item && !isName,
         canBeEvent = !view || view == 'calendar',
         canBePlace = !view || view == 'map';
@@ -1063,17 +1063,17 @@ pandora.resizeWindow = function() {
             pandora.$ui.item.resize();
         } else if (pandora.user.ui.itemView == 'clips') {
             pandora.$ui.clipList.size();
-        } else if (pandora.user.ui.itemView == 'timeline') {
+        } else if (pandora.user.ui.itemVide == 'timeline') {
             pandora.$ui.timeline && pandora.$ui.timeline.options({
-                // fixme: duplicated
-                height: pandora.$ui.contentPanel.size(1),
-                width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+               // fixme: duplicated
+               height: pandora.$ui.contentPanel.size(1),
+               width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             });
         } else if (pandora.user.ui.itemView == 'player') {
             pandora.$ui.player && pandora.$ui.player.options({
-                // fixme: duplicated
-                height: pandora.$ui.contentPanel.size(1),
-                width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+               // fixme: duplicated
+               height: pandora.$ui.contentPanel.size(1),
+               width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             });
         } else if (pandora.user.ui.itemView == 'editor') {
             pandora.$ui.editor && pandora.$ui.editor.options({
@@ -1127,10 +1127,12 @@ pandora.unloadWindow = function() {
     // fixme: ajax request has to have async set to false for this to work
     pandora.user.ui.section == 'items'
         && pandora.user.ui.item
-        && ['timeline', 'player', 'editor'].indexOf(pandora.user.ui.itemView) > -1
+        && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
         && pandora.UI.set(
             'videoPosition.' + pandora.user.ui.item,
-            pandora.$ui[pandora.user.ui.itemView].options('position')
+            pandora.$ui[
+                pandora.user.ui.itemView == 'video' ? 'player' : 'editor'
+            ].options('position')
         );
     */
 };
