@@ -4,7 +4,9 @@
 pandora.ui.item = function() {
 
     var that = Ox.Element(),
-        isVideoView = ['player', 'editor'].indexOf(pandora.user.ui.itemView) > -1;
+        isVideoView = [
+            'timeline', 'player', 'editor'
+        ].indexOf(pandora.user.ui.itemView) > -1;
 
     pandora.api.get({
         id: pandora.user.ui.item,
@@ -50,7 +52,7 @@ pandora.ui.item = function() {
         }
 
         if (!result.data.rendered && [
-            'clips', 'map', 'player', 'editor'
+            'clips', 'timeline', 'player', 'editor', 'map', 'calendar'
         ].indexOf(pandora.user.ui.itemView) > -1) {
             pandora.$ui.contentPanel.replaceElement(1,
                 Ox.Element()
@@ -123,6 +125,12 @@ pandora.ui.item = function() {
 
             pandora.$ui.contentPanel.replaceElement(1,
                 pandora.ui.clipsView(result.data.videoRatio)
+            );
+
+        } else if (pandora.user.ui.itemView == 'timeline') {
+
+            pandora.$ui.contentPanel.replaceElement(1,
+                pandora.$ui.editor = pandora.ui.timeline(result.data)
             );
 
         } else if (pandora.user.ui.itemView == 'player') {

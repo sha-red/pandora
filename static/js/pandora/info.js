@@ -89,7 +89,7 @@ pandora.ui.info = function() {
                                         'videoPoints.' + id,
                                         {'in': 0, out: 0, position: data.position}
                                     );
-                                    if (ui.item && ['player', 'editor'].indexOf(ui.itemView) > -1) {
+                                    if (ui.item && ['timeline', 'player', 'editor'].indexOf(ui.itemView) > -1) {
                                         pandora.$ui[ui.itemView].options({
                                             position: data.position
                                         });

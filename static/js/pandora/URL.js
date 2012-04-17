@@ -37,7 +37,7 @@ pandora.URL = (function() {
                 : '';
         } else if (state.view == 'calendar') {
             // ...
-        } else if (['player', 'editor'].indexOf(state.view) > -1) {
+        } else if (['timeline', 'player', 'editor'].indexOf(state.view) > -1) {
             var videoPoints = pandora.user.ui.videoPoints[state.item] || {};
             state.span = videoPoints.annotation || Ox.merge(
                 videoPoints.position
@@ -89,7 +89,7 @@ pandora.URL = (function() {
             }
 
             if (state.span) {
-                if (['player', 'editor'].indexOf(state.view) > -1) {
+                if (['timeline', 'player', 'editor'].indexOf(state.view) > -1) {
                     if (Ox.isArray(state.span)) {
                         set['videoPoints.' + state.item] = {
                             annotation: '',
@@ -226,6 +226,7 @@ pandora.URL = (function() {
                 calendar: 'date'
             },
             item: {
+                timeline: 'duration',
                 player: 'duration',
                 editor: 'duration',
                 map: 'location',

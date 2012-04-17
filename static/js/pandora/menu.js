@@ -87,7 +87,7 @@ pandora.ui.mainMenu = function() {
                             }) },
                         ] },
                         { id: 'clips', title: 'Open Clips', items: [
-                            { group: 'videoview', min: 1, max: 1, items: ['player', 'editor'].map(function(view) {
+                            { group: 'videoview', min: 1, max: 1, items: ['timeline', 'player', 'editor'].map(function(view) {
                                 return {id: view, title: Ox.toTitleCase(view), checked: ui.videoView == view};
                             }) }
                         ] },
@@ -442,8 +442,8 @@ pandora.ui.mainMenu = function() {
             },
             pandora_itemview: function(data) {
                 var action,
-                    isVideoView = ['player', 'editor'].indexOf(data.value) > -1,
-                    wasVideoView = ['player', 'editor'].indexOf(data.previousValue) > -1;
+                    isVideoView = ['timeline', 'player', 'editor'].indexOf(data.value) > -1,
+                    wasVideoView = ['timeline', 'player', 'editor'].indexOf(data.previousValue) > -1;
                 that.checkItem('viewMenu_item_' + data.value);
                 if (isVideoView) {
                     that.checkItem('viewMenu_clips_' + data.value);
@@ -451,7 +451,7 @@ pandora.ui.mainMenu = function() {
                 if (isVideoView != wasVideoView) {
                     that[isVideoView ? 'enableItem' : 'disableItem']('showannotations');
                 }
-                if ((data.value == 'video') != (data.previousValue == 'video')) {
+                if ((data.value == 'player') != (data.previousValue == 'player')) {
                     action = data.value == 'player' ? 'enableItem' : 'disableItem';
                     that[action]('showtimeline');
                     that[action]('fullscreen');

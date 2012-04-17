@@ -43,6 +43,8 @@ pandora.ui.rightPanel = function() {
                     pandora.$ui.browser.scrollToSelection();
                     if (pandora.user.ui.itemView == 'clips') {
                         pandora.$ui.clipList.size();
+                    } else if (pandora.user.ui.itemView == 'timeline') {
+                        pandora.$ui.timeline.options({width: data.size});
                     } else if (pandora.user.ui.itemView == 'player') {
                         pandora.$ui.player.options({width: data.size});
                     } else if (pandora.user.ui.itemView == 'editor') {

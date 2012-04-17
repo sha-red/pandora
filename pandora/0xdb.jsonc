@@ -560,6 +560,7 @@
     "itemViews": [
         {"id": "info", "title": "Info"},
         {"id": "clips", "title": "Clips"},
+        {"id": "timeline", "title": "Timeline"},
         {"id": "player", "title": "Player"},
         {"id": "editor", "title": "Editor"},
         {"id": "map", "title": "Map"},
