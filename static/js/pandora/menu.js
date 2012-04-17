@@ -106,7 +106,7 @@ pandora.ui.mainMenu = function() {
                         { id: 'showinfo', title: (ui.showInfo ? 'Hide' : 'Show') + ' Info', disabled: !ui.showSidebar, keyboard: 'shift i' },
                         { id: 'showfilters', title: (ui.showFilters ? 'Hide' : 'Show') + ' Filters', disabled: !!ui.item, keyboard: 'shift f' },
                         { id: 'showbrowser', title: (ui.showBrowser ? 'Hide' : 'Show') + ' ' + pandora.site.itemName.singular + ' Browser', disabled: !ui.item, keyboard: 'shift b' },
-                        { id: 'showannotations', title: (ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations', disabled: !ui.item || ['player', 'editor'].indexOf(ui.itemView) == -1, keyboard: 'shift a' },
+                        { id: 'showannotations', title: (ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations', disabled: !ui.item || ['timeline', 'player', 'editor'].indexOf(ui.itemView) == -1, keyboard: 'shift a' },
                         { id: 'showtimeline', title: (ui.showTimeline ? 'Hide' : 'Show') + ' Timeline', disabled: !ui.item || ui.itemView != 'player', keyboard: 'shift t' },
                         {},
                         { id: 'fullscreen', title: 'Enter Fullscreen', disabled: !ui.item || ui.itemView != 'video' },
@@ -232,8 +232,9 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'videoview') {
                     var set = {videoView: value};
                     if (
-                        (value == 'player' && ui.itemView == 'editor')
-                        || (value == 'editor' && ui.itemView == 'player')
+                        (value == 'timeline' && ['player', 'editor'].indexOf(ui.itemView) > -1)
+                        || (value == 'player' && ['timeline', 'editor'].indexOf(ui.itemView) > -1)
+                        || (value == 'editor' && ['timeline', 'player'].indexOf(ui.itemView) > -1)
                     ) {
                         set.itemView = value;
                     }
@@ -383,7 +384,7 @@ pandora.ui.mainMenu = function() {
                 }
             },
             key_shift_a: function() {
-                ui.item && ['player', 'editor'].indexOf(ui.itemView) > -1
+                ui.item && ['timeline', 'player', 'editor'].indexOf(ui.itemView) > -1
                     && pandora.UI.set({showAnnotations: !ui.showAnnotations});
             },
             key_shift_b: function() {
@@ -431,7 +432,7 @@ pandora.ui.mainMenu = function() {
                     that.disableItem('showtimeline');
                     that.disableItem('fullscreen');
                 } else {
-                    if (['player', 'editor'].indexOf(ui.itemView) > -1) {
+                    if (['timeline', 'player', 'editor'].indexOf(ui.itemView) > -1) {
                         that.enableItem('showannotations');
                     }
                     if (ui.itemView == 'player') {
