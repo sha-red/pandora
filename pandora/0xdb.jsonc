@@ -698,6 +698,7 @@
             ],
             "filtersSize": 176,
             "find": {"conditions": [], "operator": "&"},
+            "followPlayer": true,
             "icons": "posters",
             "infoIconSize": 256,
             "item": "",
