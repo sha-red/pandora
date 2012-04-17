@@ -4,12 +4,15 @@
 pandora.ui.item = function() {
 
     var that = Ox.Element(),
-        videoOptions;
+        isVideoView = ['player', 'editor'].indexOf(pandora.user.ui.itemView) > -1;
 
     pandora.api.get({
         id: pandora.user.ui.item,
-        keys: ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
-            ? [ 'cuts', 'director', 'duration', 'layers', 'parts', 'posterFrame', 'rendered', 'rightslevel', 'size', 'title', 'videoRatio', 'year'] : []
+        keys: isVideoView ? [
+            'cuts', 'director', 'duration', 'layers',
+            'parts', 'posterFrame', 'rendered', 'rightslevel',
+            'size', 'title', 'videoRatio', 'year'
+        ] : []
     }, pandora.user.ui.itemView == 'info' && pandora.site.capabilities.canEditMetadata[pandora.user.level] ? 0 : -1, function(result) {
 
         if (result.status.code == 200) {
@@ -41,13 +44,13 @@ pandora.ui.item = function() {
             })
             .show();
 
-        if (['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
+        if (isVideoView) {
             // fixme: layers have value, subtitles has text?
             Ox.extend(result.data, pandora.getVideoOptions(result.data));
         }
 
         if (!result.data.rendered && [
-            'clips', 'map', 'video', 'timeline'
+            'clips', 'map', 'player', 'editor'
         ].indexOf(pandora.user.ui.itemView) > -1) {
             pandora.$ui.contentPanel.replaceElement(1,
                 Ox.Element()
@@ -122,13 +125,13 @@ pandora.ui.item = function() {
                 pandora.ui.clipsView(result.data.videoRatio)
             );
 
-        } else if (pandora.user.ui.itemView == 'video') {
+        } else if (pandora.user.ui.itemView == 'player') {
 
             pandora.$ui.contentPanel.replaceElement(1,
                 pandora.$ui.player = pandora.ui.player(result.data)
             );
 
-        } else if (pandora.user.ui.itemView == 'timeline') {
+        } else if (pandora.user.ui.itemView == 'editor') {
 
             pandora.$ui.contentPanel.replaceElement(1,
                 pandora.$ui.editor = pandora.ui.editor(result.data)
@@ -175,27 +178,28 @@ pandora.ui.item = function() {
 
         }
 
-        if (result.data.rendered
-            && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1) {
+        if (isVideoView && result.data.rendered) {
             // handle links in annotations
-            var widget = pandora.user.ui.itemView == 'video' ? 'player' : 'editor';
-            pandora.$ui[widget].bindEvent('pandora_videopoints.' + pandora.user.ui.item.toLowerCase(), function(data) {
-                Ox.print('DATA.VALUE', JSON.stringify(data.value));
-                var options = {};
-                if (data.value.annotation) {
-                    options.selected = pandora.user.ui.item + '/' + data.value.annotation;
-                } else {
-                    // if annotation got set to something other than '',
-                    // points and position will be set in consequence,
-                    // so lets try to keep events from looping
-                    ['annotation', 'in', 'out', 'position'].forEach(function(key) {
-                        if (!Ox.isUndefined(data.value[key])) {
-                            options[key == 'annotation' ? 'selected' : key] = data.value[key];
-                        }
-                    });
+            pandora.$ui[pandora.user.ui.itemView].bindEvent(
+                'pandora_videopoints.' + pandora.user.ui.item.toLowerCase(),
+                function(data) {
+                    //Ox.print('DATA.VALUE', JSON.stringify(data.value));
+                    var options = {};
+                    if (data.value.annotation) {
+                        options.selected = pandora.user.ui.item + '/' + data.value.annotation;
+                    } else {
+                        // if annotation got set to something other than '',
+                        // points and position will be set in consequence,
+                        // so lets try to keep events from looping
+                        ['annotation', 'in', 'out', 'position'].forEach(function(key) {
+                            if (!Ox.isUndefined(data.value[key])) {
+                                options[key == 'annotation' ? 'selected' : key] = data.value[key];
+                            }
+                        });
+                    }
+                    pandora.$ui[pandora.user.ui.itemView].options(options);
                 }
-                pandora.$ui[widget].options(options);
-            });
+            );
         }
 
     });

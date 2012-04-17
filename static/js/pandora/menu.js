@@ -87,8 +87,8 @@ pandora.ui.mainMenu = function() {
                             }) },
                         ] },
                         { id: 'clips', title: 'Open Clips', items: [
-                            { group: 'videoview', min: 1, max: 1, items: ['video', 'timeline'].map(function(view) {
-                                return {id: view, title: view == 'video' ? 'Player' : 'Editor', checked: ui.videoView == view};
+                            { group: 'videoview', min: 1, max: 1, items: ['player', 'editor'].map(function(view) {
+                                return {id: view, title: Ox.toTitleCase(view), checked: ui.videoView == view};
                             }) }
                         ] },
                         {},
@@ -106,8 +106,8 @@ pandora.ui.mainMenu = function() {
                         { id: 'showinfo', title: (ui.showInfo ? 'Hide' : 'Show') + ' Info', disabled: !ui.showSidebar, keyboard: 'shift i' },
                         { id: 'showfilters', title: (ui.showFilters ? 'Hide' : 'Show') + ' Filters', disabled: !!ui.item, keyboard: 'shift f' },
                         { id: 'showbrowser', title: (ui.showBrowser ? 'Hide' : 'Show') + ' ' + pandora.site.itemName.singular + ' Browser', disabled: !ui.item, keyboard: 'shift b' },
-                        { id: 'showannotations', title: (ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations', disabled: !ui.item || ['timeline', 'video'].indexOf(ui.itemView) == -1, keyboard: 'shift a' },
-                        { id: 'showtimeline', title: (ui.showTimeline ? 'Hide' : 'Show') + ' Timeline', disabled: !ui.item || ui.itemView != 'video', keyboard: 'shift t' },
+                        { id: 'showannotations', title: (ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations', disabled: !ui.item || ['player', 'editor'].indexOf(ui.itemView) == -1, keyboard: 'shift a' },
+                        { id: 'showtimeline', title: (ui.showTimeline ? 'Hide' : 'Show') + ' Timeline', disabled: !ui.item || ui.itemView != 'player', keyboard: 'shift t' },
                         {},
                         { id: 'fullscreen', title: 'Enter Fullscreen', disabled: !ui.item || ui.itemView != 'video' },
                         {},
@@ -232,8 +232,8 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'videoview') {
                     var set = {videoView: value};
                     if (
-                        value == 'video' && ui.itemView == 'timeline'
-                        || value == 'timeline' && ui.itemView == 'video'
+                        (value == 'player' && ui.itemView == 'editor')
+                        || (value == 'editor' && ui.itemView == 'player')
                     ) {
                         set.itemView = value;
                     }
@@ -383,7 +383,7 @@ pandora.ui.mainMenu = function() {
                 }
             },
             key_shift_a: function() {
-                ui.item && ['video', 'timeline'].indexOf(ui.itemView) > -1
+                ui.item && ['player', 'editor'].indexOf(ui.itemView) > -1
                     && pandora.UI.set({showAnnotations: !ui.showAnnotations});
             },
             key_shift_b: function() {
@@ -431,10 +431,10 @@ pandora.ui.mainMenu = function() {
                     that.disableItem('showtimeline');
                     that.disableItem('fullscreen');
                 } else {
-                    if (['video', 'timeline'].indexOf(ui.itemView) > -1) {
+                    if (['player', 'editor'].indexOf(ui.itemView) > -1) {
                         that.enableItem('showannotations');
                     }
-                    if (ui.itemView == 'video') {
+                    if (ui.itemView == 'player') {
                         that.enableItem('showtimeline');
                         that.enableItem('fullscreen');
                     }
@@ -442,8 +442,8 @@ pandora.ui.mainMenu = function() {
             },
             pandora_itemview: function(data) {
                 var action,
-                    isVideoView = ['video', 'timeline'].indexOf(data.value) > -1,
-                    wasVideoView = ['video', 'timeline'].indexOf(data.previousValue) > -1;
+                    isVideoView = ['player', 'editor'].indexOf(data.value) > -1,
+                    wasVideoView = ['player', 'editor'].indexOf(data.previousValue) > -1;
                 that.checkItem('viewMenu_item_' + data.value);
                 if (isVideoView) {
                     that.checkItem('viewMenu_clips_' + data.value);
@@ -452,7 +452,7 @@ pandora.ui.mainMenu = function() {
                     that[isVideoView ? 'enableItem' : 'disableItem']('showannotations');
                 }
                 if ((data.value == 'video') != (data.previousValue == 'video')) {
-                    action = data.value == 'video' ? 'enableItem' : 'disableItem';
+                    action = data.value == 'player' ? 'enableItem' : 'disableItem';
                     that[action]('showtimeline');
                     that[action]('fullscreen');
                 }

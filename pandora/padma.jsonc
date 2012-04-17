@@ -474,8 +474,8 @@
     "itemViews": [
         {"id": "info", "title": "Info"},
         {"id": "clips", "title": "Clips"},
-        {"id": "video", "title": "Video"},
-        {"id": "timeline", "title": "Timeline"},
+        {"id": "player", "title": "Player"},
+        {"id": "editor", "title": "Editor"},
         {"id": "map", "title": "Map"},
         {"id": "calendar", "title": "Calendar"},
         {"id": "data", "title": "Data"},
@@ -670,7 +670,7 @@
             "videoScale": "fit",
             "videoSize": "large",
             "videoTimeline": "antialias",
-            "videoView": "video",
+            "videoView": "player",
             "videoVolume": 1
         },
         "username": "",

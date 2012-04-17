@@ -228,6 +228,10 @@ appPanel
                 delete pandora.user.ui[key];
             }
         });
+        // patch itemView ... this can be removed at a later point
+        if (pandora.user.ui.itemView == 'video') {
+            pandora.user.ui.itemView = 'player';
+        }
 
         Ox.extend(pandora.site, {
             calendar: data.site.layers.some(function(layer) {

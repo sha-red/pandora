@@ -122,7 +122,7 @@ pandora.ui.browser = function() {
             toggle: function(data) {
                 pandora.UI.set({showBrowser: !data.collapsed});
                 if (data.collapsed) {
-                    if (pandora.user.ui.itemView == 'timeline') {
+                    if (pandora.user.ui.itemView == 'editor') {
                         pandora.$ui.editor.gainFocus();
                     }
                 }

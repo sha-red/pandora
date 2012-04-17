@@ -125,7 +125,7 @@ pandora.UI = (function() {
             add['lists.' + that.encode(list) + '.selection'] = [args.item];
             if (
                 !args.itemView
-                && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
+                && ['player', 'editor'].indexOf(pandora.user.ui.itemView) > -1
                 && !pandora.user.ui.videoPoints[item]
                 && !args['videoPoints.' + item]
             ) {
@@ -136,7 +136,7 @@ pandora.UI = (function() {
             }
         }
 
-        if (['video', 'timeline'].indexOf(args.itemView) > -1) {
+        if (['player', 'editor'].indexOf(args.itemView) > -1) {
             // when switching to a video view, add it as default video view
             args.videoView = args.itemView;
             if (

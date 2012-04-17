@@ -663,7 +663,7 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
     Ox.Log('URL', 'getMetadataByIdOrName', item, view, str);
     var isName = str[0] == '@',
         canBeAnnotation = (
-            !view || view == 'video' || view == 'timeline'
+            !view || view == 'player' || view == 'editor'
         ) && item && !isName,
         canBeEvent = !view || view == 'calendar',
         canBePlace = !view || view == 'map';
@@ -1063,13 +1063,13 @@ pandora.resizeWindow = function() {
             pandora.$ui.item.resize();
         } else if (pandora.user.ui.itemView == 'clips') {
             pandora.$ui.clipList.size();
-        } else if (pandora.user.ui.itemView == 'video') {
+        } else if (pandora.user.ui.itemView == 'player') {
             pandora.$ui.player && pandora.$ui.player.options({
                // fixme: duplicated
                height: pandora.$ui.contentPanel.size(1),
                width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
             });
-        } else if (pandora.user.ui.itemView == 'timeline') {
+        } else if (pandora.user.ui.itemView == 'editor') {
             pandora.$ui.editor && pandora.$ui.editor.options({
                 // fixme: duplicated
                 height: pandora.$ui.contentPanel.size(1),
@@ -1121,7 +1121,7 @@ pandora.unloadWindow = function() {
     // fixme: ajax request has to have async set to false for this to work
     pandora.user.ui.section == 'items'
         && pandora.user.ui.item
-        && ['video', 'timeline'].indexOf(pandora.user.ui.itemView) > -1
+        && ['player', 'editor'].indexOf(pandora.user.ui.itemView) > -1
         && pandora.UI.set(
             'videoPosition.' + pandora.user.ui.item,
             pandora.$ui[
