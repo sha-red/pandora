@@ -107,13 +107,6 @@ pandora.ui.browser = function() {
             open: function() {
                 that.scrollToSelection();
             },
-            resize: function(data) {
-                if (pandora.user.ui.itemView == 'map') {
-                    pandora.ui.$map.resizeMap();
-                } else if (pandora.user.ui.itemView == 'calendar') {
-                    pandora.ui.$calendar.resizeCalendar();
-                }
-            },
             select: function(data) {
                 data.ids.length && pandora.UI.set({
                     'item': data.ids[0]
@@ -122,11 +115,16 @@ pandora.ui.browser = function() {
             toggle: function(data) {
                 pandora.UI.set({showBrowser: !data.collapsed});
                 if (data.collapsed) {
+                    // fixme: can we do this for timeline and player too?
                     if (pandora.user.ui.itemView == 'editor') {
                         pandora.$ui.editor.gainFocus();
                     }
                 }
-                if (pandora.user.ui.itemView == 'map') {
+                if (pandora.user.ui.itemView == 'timeline') {
+                    pandora.$ui.timeline.options({
+                        height: pandora.$ui.contentPanel.size(1)
+                    });
+                } else if (pandora.user.ui.itemView == 'map') {
                     pandora.$ui.map.resizeMap();
                 } else if (pandora.user.ui.itemView == 'calendar') {
                     pandora.$ui.calendar.resizeCalendar();

@@ -58,6 +58,9 @@ pandora.ui.timeline = function(data) {
         annotationssort: function(data) {
             pandora.UI.set({annotationsSort: data.sort});
         },
+        follow: function(data) {
+            pandora.UI.set('followPlayer', data.follow);
+        },
         muted: function(data) {
             pandora.UI.set('videoMuted', data.muted);
         },
