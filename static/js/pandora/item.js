@@ -46,10 +46,8 @@ pandora.ui.item = function() {
             })
             .show();
 
-        if (isVideoView) {
-            // fixme: layers have value, subtitles has text?
-            Ox.extend(result.data, pandora.getVideoOptions(result.data));
-        }
+        // fixme: layers have value, subtitles has text?
+        isVideoView && Ox.extend(result.data, pandora.getVideoOptions(result.data));
 
         if (!result.data.rendered && [
             'clips', 'timeline', 'player', 'editor', 'map', 'calendar'
@@ -130,7 +128,7 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'timeline') {
 
             pandora.$ui.contentPanel.replaceElement(1,
-                pandora.$ui.editor = pandora.ui.timeline(result.data)
+                pandora.$ui.timeline = pandora.ui.timeline(result.data)
             );
 
         } else if (pandora.user.ui.itemView == 'player') {
