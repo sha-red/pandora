@@ -23,7 +23,7 @@
     "capabilities": {
         // "canClickMap": {"friend": true, "staff": true, "admin": true},
         "canDeleteItems": {"admin": true},
-        "canDownloadVideo": {"guest": 0, "member": 0, "friend": 4, "staff": 4, "admin": 4},
+        "canDownloadVideo": {"guest": -1, "member": -1, "friend": -1, "staff": -1, "admin": -1},
         "canEditAnnotations": {"staff": true, "admin": true},
         "canEditEvents": {"staff": true, "admin": true},
         "canEditFeaturedLists": {"staff": true, "admin": true},
