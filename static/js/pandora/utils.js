@@ -729,17 +729,19 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
                     operator: '&'
                 }
             } : {}), function(result) {
-                Ox.print('RESULT::::::', result)
+                //Ox.print('RESULT::::::', result)
                 var annotation, span;
                 if (result.data.items.length) {
                     span = result.data.items[0];
                     annotation = span.id.split('/')[1];
+                    /*
                     Ox.print("SETTING::::", {
                         annotation: annotation,
                         'in': span['in'],
                         out: span.out,
                         position: span['in']
                     });
+                    */
                     type == 'annotation' && pandora.UI.set('videoPoints.' + item, {
                         annotation: annotation,
                         'in': span['in'],
