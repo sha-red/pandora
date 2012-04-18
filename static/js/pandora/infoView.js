@@ -679,7 +679,7 @@ pandora.ui.infoView = function(data) {
         pandora.api.get({
             id: data.id,
             keys: [ui.icons == 'posters' ? 'posters' : 'frames']
-        }, function(result) {
+        }, 0, function(result) {
             var images = result.data[ui.icons == 'posters' ? 'posters' : 'frames'],
                 selectedImage = images.filter(function(image) {
                     return image.selected;
@@ -774,6 +774,7 @@ pandora.ui.infoView = function(data) {
                     }
                 })
                 .appendTo($info);
+            $list.size();
         });
     }
 
