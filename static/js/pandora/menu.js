@@ -87,7 +87,7 @@ pandora.ui.mainMenu = function() {
                             }) },
                         ] },
                         { id: 'clips', title: 'Open Clips', items: [
-                            { group: 'videoview', min: 1, max: 1, items: ['timeline', 'player', 'editor'].map(function(view) {
+                            { group: 'videoview', min: 1, max: 1, items: ['player', 'editor', 'timeline'].map(function(view) {
                                 return {id: view, title: Ox.toTitleCase(view), checked: ui.videoView == view};
                             }) }
                         ] },
