@@ -645,7 +645,10 @@ pandora.ui.infoView = function(data) {
                             + (hasCapability ? 'can' : 'can\'t') + ' '
                             + Ox.map(Ox.toSlashes(capability.name).split('/'), function(word, i) {
                                 return i == 0 ? null : word.toLowerCase();
-                            }).join(' '),
+                            }).join(' ')
+                                .replace('see item', 'see the item')
+                                .replace('play video', 'play the full video')
+                                .replace('download video', 'download the video'),
                         title: capability.symbol,
                         type: 'image'
                     })
