@@ -1065,7 +1065,7 @@ pandora.resizeWindow = function() {
             pandora.$ui.item.resize();
         } else if (pandora.user.ui.itemView == 'clips') {
             pandora.$ui.clipList.size();
-        } else if (pandora.user.ui.itemVide == 'timeline') {
+        } else if (pandora.user.ui.itemView == 'timeline') {
             pandora.$ui.timeline && pandora.$ui.timeline.options({
                // fixme: duplicated
                height: pandora.$ui.contentPanel.size(1),
