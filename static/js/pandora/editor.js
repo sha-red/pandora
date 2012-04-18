@@ -24,11 +24,13 @@ pandora.ui.editor = function(data) {
         getFrameURL: function(position) {
             return '/' + pandora.user.ui.item + '/' + pandora.user.ui.videoResolution + 'p' + position + '.jpg';
         },
-        getLargeTimelineImageURL: function(i) {
-            return '/' + pandora.user.ui.item + '/timeline64p' + i + '.png';
+        getLargeTimelineURL: function(type, i) {
+            type = '';
+            return '/' + pandora.user.ui.item + '/timeline' + type + '64p' + i + '.png';
         },
-        getSmallTimelineImageURL: function(i) {
-            return '/' + pandora.user.ui.item + '/timeline16p' + i + '.png';
+        getSmallTimelineURL: function(type, i) {
+            type = '';
+            return '/' + pandora.user.ui.item + '/timeline' + type + '16p' + i + '.png';
         },
         height: pandora.$ui.contentPanel.size(1),
         id: 'editor',
@@ -54,6 +56,8 @@ pandora.ui.editor = function(data) {
         showLayers: Ox.clone(pandora.user.ui.showLayers),
         showUsers: pandora.site.annotations.showUsers,
         subtitles: data.subtitles,
+        timeline: pandora.user.ui.videoTimeline,
+        timelines: pandora.site.timelines,
         tooltips: true,
         video: data.video,
         videoRatio: data.videoRatio,
@@ -215,6 +219,9 @@ pandora.ui.editor = function(data) {
         },
         subtitles: function(data) {
             pandora.UI.set('videoSubtitles', data.subtitles);
+        },
+        timeline: function(data) {
+            pandora.UI.set('videoTimeline', data.timeline);
         },
         togglecalendar: function(data) {
             pandora.UI.set('showAnnotationsCalendar', !data.collapsed);

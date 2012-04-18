@@ -305,8 +305,9 @@ pandora.ui.list = function() {
                         options: {
                             duration: data.duration,
                             find: isClipsQuery ? clipsQuery.conditions[0].value : '',
-                            getImageURL: function(i) {
-                                return '/' + data.id + '/timeline16p' + i + '.png';
+                            getImageURL: function(type, i) {
+                                type = '';
+                                return '/' + data.id + '/timeline' + type + '16p' + i + '.png';
                             },
                             position: pandora.user.ui.videoPoints[data.id]
                                 ? pandora.user.ui.videoPoints[data.id].position : 0,
@@ -314,9 +315,9 @@ pandora.ui.list = function() {
                                 return {'in': clip['in'], out: clip.out};
                             }) : [],
                             subtitles: isClipsQuery ? data.clips.map(function(clip) {
-                                Ox.Log('', 'CLIP:::::', clip)
                                 return {'in': clip['in'], out: clip.out, text: clip.annotations[0].value};
-                            }) : []
+                            }) : [],
+                            type: pandora.user.ui.videoTimeline
                         }
                     }
                 };

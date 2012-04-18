@@ -20,8 +20,9 @@ pandora.ui.player = function(data) {
         enableDownload: pandora.site.capabilities.canDownloadVideo[pandora.user.level] >= data.rightslevel,
         enableSubtitles: pandora.user.ui.videoSubtitles,
         find: pandora.user.ui.itemFind,
-        getTimelineImageURL: function(i) {
-            return '/' + pandora.user.ui.item + '/timeline64p' + i + '.png';
+        getLargeTimelineURL: function(type, i) {
+            type = '';
+            return '/' + pandora.user.ui.item + '/timeline' + type + '64p' + i + '.png';
         },
         height: pandora.$ui.contentPanel.size(1),
         'in': pandora.user.ui.videoPoints[pandora.user.ui.item]['in'],
@@ -40,9 +41,10 @@ pandora.ui.player = function(data) {
         showLayers: Ox.clone(pandora.user.ui.showLayers),
         showUsers: pandora.site.annotations.showUsers,
         showTimeline: pandora.user.ui.showTimeline,
+        smallTimelineURL: '/' + pandora.user.ui.item + '/timeline16p.png',
         subtitles: data.subtitles,
+        timeline: pandora.user.ui.videoTimeline,
         tooltips: true,
-        timeline: '/' + pandora.user.ui.item + '/timeline16p.png',
         video: data.video,
         volume: pandora.user.ui.videoVolume,
         width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1

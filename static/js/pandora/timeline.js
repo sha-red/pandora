@@ -21,8 +21,9 @@ pandora.ui.timeline = function(data) {
         getFrameURL: function(position) {
             return '/' + ui.item + '/' + ui.videoResolution + 'p' + position + '.jpg';
         },
-        getTimelineImageURL: function(i) {
-            return '/' + ui.item + '/timeline64p' + i + '.png';
+        getLargeTimelineURL: function(type, i) {
+            type = '';
+            return '/' + ui.item + '/timeline' + type + '64p' + i + '.png';
         },
         height: pandora.$ui.contentPanel.size(1),
         layers: data.annotations,
@@ -37,8 +38,8 @@ pandora.ui.timeline = function(data) {
         showAnnotationsMap: ui.showAnnotationsMap,
         showLayers: Ox.clone(ui.showLayers),
         showUsers: pandora.site.annotations.showUsers,
+        smallTimelineURL: '/' + ui.item + '/timeline16p.png',
         timeline: ui.videoTimeline,
-        timelineImageURL: '/' + ui.item + '/timeline16p.png',
         timelines: pandora.site.timelines,
         video: data.video,
         videoRatio: data.videoRatio,
@@ -81,6 +82,9 @@ pandora.ui.timeline = function(data) {
         },
         select: function(data) {
             pandora.UI.set('videoPoints.' + pandora.user.ui.item + '.annotation', data.id.split('/')[1]);
+        },
+        timeline: function(data) {
+            pandora.UI.set('videoTimeline', data.timeline);
         },
         toggleannotations: function(data) {
             pandora.UI.set('showAnnotations', data.showAnnotations);
