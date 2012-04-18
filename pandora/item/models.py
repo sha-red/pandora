@@ -1009,7 +1009,7 @@ class Item(models.Model):
         meta['piece_size_pow2'] = piece_size_pow2
 
         ox.torrent.createTorrent(video, settings.TRACKER_URL, meta)
-        self.torrent.name = self.path('torrent/%s.torrent' % self.get('title'))
+        self.torrent.name = torrent[len(settings.MEDIA_ROOT)+1:]
         self.save()
 
     def streams(self):

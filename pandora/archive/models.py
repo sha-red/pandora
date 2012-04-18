@@ -149,7 +149,7 @@ class File(models.Model):
     def save(self, *args, **kwargs):
         if self.auto:
             self.set_state()
-        self.sort_path= utils.sort_string(self.path)
+        self.sort_path = utils.sort_string(self.path)
         if self.is_subtitle:
             self.available = self.data and True or False
         else:

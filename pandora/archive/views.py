@@ -255,6 +255,8 @@ def firefogg_upload(request):
                 f.delete_frames()
                 f.uploading = True
                 f.save()
+                if f.item.rendered and f.selected:
+                    Item.objects.filter(id=f.item.id).update(rendered=False)
                 response = {
                     'uploadUrl': request.build_absolute_uri('/api/upload/?id=%s&profile=%s' % (f.oshash, profile)),
                     'url': request.build_absolute_uri('/%s' % f.item.itemId),
