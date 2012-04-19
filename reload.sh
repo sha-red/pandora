@@ -1,1 +1,3 @@
-kill -HUP `cat /var/run/oxdata/oxdata.pid`
+service pandora reload
+service pandora-tasks reload
+service pandora-encoding reload
