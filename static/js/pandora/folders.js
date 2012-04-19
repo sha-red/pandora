@@ -28,10 +28,10 @@ pandora.ui.folders = function() {
                     ];
                 } else {
                     extras = [
-                        pandora.$ui.personalListsSelect = Ox.MenuButton({
+                        pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [
                                 { id: 'newlist', title: 'New List' },
-                                { id: 'newlistfromselection', title: 'New List from Selection...', disabled: ui.listSelection.length == 0 },
+                                { id: 'newlistfromselection', title: 'New List from Selection', disabled: ui.listSelection.length == 0 },
                                 { id: 'newsmartlist', title: 'New Smart List' },
                                 { id: 'newsmartlistfromresults', title: 'New Smart List from Results' },
                                 {},
@@ -60,21 +60,21 @@ pandora.ui.folders = function() {
                                 }
                             },
                             pandora_find: function() {
-                                /*
                                 var action = ui._list
                                     && pandora.getListData(ui._list).user == pandora.user.username
                                     ? 'enableItem' : 'disableItem';
-                                pandora.$ui.personalListsSelect[action]('editlist');
-                                pandora.$ui.personalListsSelect[action]('duplicatelist');
-                                pandora.$ui.personalListsSelect[action]('deletelist');
-                                pandora.$ui.personalListsSelect[ui.listSelection.length ? 'enableItem' : 'disableItem']('newlistfromselection');
-                                */
+                                // fixme: duplicated
+                                pandora.$ui.personalListsMenu[action]('editlist');
+                                pandora.$ui.personalListsMenu[action]('duplicatelist');
+                                pandora.$ui.personalListsMenu[action]('deletelist');
+                                pandora.$ui.personalListsMenu[
+                                    ui.listSelection.length ? 'enableItem' : 'disableItem'
+                                ]('newlistfromselection');
                             },
                             pandora_listselection: function(data) {
-                                /*
-                                Ox.Log('', 'pandora_listselection', data.value.length)
-                                pandora.$ui.personalListsSelect[data.value.length ? 'enableItem' : 'disableItem']('newlistfromselection');
-                                */
+                                pandora.$ui.personalListsMenu[
+                                    data.value.length ? 'enableItem' : 'disableItem'
+                                ]('newlistfromselection');
                             }
                         })
                     ];
