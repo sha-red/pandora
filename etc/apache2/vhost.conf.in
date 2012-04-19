@@ -38,6 +38,10 @@
     ProxyPass        / http://127.0.0.1:2620/
     ProxyPassReverse / http://127.0.0.1:2620/
 
+    LogLevel warn
+    ErrorLog /var/log/apache2/pandora_error.log
+    CustomLog /var/log/apache2/pandora_access.log combined
+
     ServerSignature Off
 </VirtualHost>
 

@@ -85,11 +85,25 @@ def stream(video, target, profile, info):
         audioquality = 2
         audiobitrate = None
         audiochannels = 2
+    elif profile == '432p':
+        height = 432
+        audiorate = 44100
+        audioquality = 2
+        audiobitrate = None
+        audiochannels = 2
+
     elif profile == '360p':
         height = 360
 
         audiorate = 44100
         audioquality = 1
+        audiobitrate = None
+        audiochannels = 1
+    elif profile == '288p':
+        height = 288
+
+        audiorate = 44100
+        audioquality = 0
         audiobitrate = None
         audiochannels = 1
     elif profile == '240p':
@@ -98,6 +112,13 @@ def stream(video, target, profile, info):
         audiorate = 44100
         audioquality = 0
         audiobitrate = None
+        audiochannels = 1
+    elif profile == '144p':
+        height = 144
+
+        audiorate = 22050
+        audioquality = -1
+        audiobitrate = '22k'
         audiochannels = 1
     else:
         height = 96
