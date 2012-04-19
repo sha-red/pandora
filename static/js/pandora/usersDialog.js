@@ -37,10 +37,25 @@ pandora.ui.usersDialog = function() {
             }),
 
         $guestsCheckbox = Ox.Checkbox({
-                title: 'Include Guests & Robots',
+                title: 'Include Guests',
                 value: false
             })
-            .css({float: 'left', margin: '4px 4px 4px 2px'})
+            .css({float: 'left', margin: '4px 2px 4px 2px'})
+            .bindEvent({
+                change: function(data) {
+                    data.value
+                        ? $robotsCheckbox.show()
+                        : $robotsCheckbox.hide().options({value: false});
+                    updateList();
+                }
+            }),
+
+        $robotsCheckbox = Ox.Checkbox({
+                title: 'Include Robots',
+                value: false
+            })
+            .css({float: 'left', margin: '4px 2px 4px 2px'})
+            .hide()
             .bindEvent({
                 change: updateList
             }),
@@ -435,6 +450,7 @@ pandora.ui.usersDialog = function() {
                                 element: Ox.Bar({size: 24})
                                     .append($reloadButton)
                                     .append($guestsCheckbox)
+                                    .append($robotsCheckbox)
                                     .append($findElement),
                                 size: 24
                             },
@@ -939,6 +955,7 @@ pandora.ui.usersDialog = function() {
 
     function updateList() {
         var guests = $guestsCheckbox.value(),
+            robots = $robotsCheckbox.value(),
             key = $findSelect.value(),
             value = $findInput.value(),
             query = {
@@ -947,10 +964,10 @@ pandora.ui.usersDialog = function() {
                         key != 'email' ? [{key: 'username', value: value, operator: '='}] : [],
                         key != 'username' ? [{key: 'email', value: value, operator: '='}] : []
                     )
-                    : !guests ? [
-                        {key: 'level', value: 'guest', operator: '!='},
-                        {key: 'level', value: 'robot', operator: '!='}
-                    ] : [],
+                    : Ox.merge(
+                        !guests ? [{key: 'level', value: 'guest', operator: '!='}] : [],
+                        !robots ? [{key: 'level', value: 'robot', operator: '!='}] : []
+                    ),
                 operator: key == 'all' && value ? '|' : '&'
             };
         $list.options({
