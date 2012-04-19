@@ -828,7 +828,10 @@ pandora.getVideoOptions = function(data) {
                         };
                     }),
                     [{'in': Ox.last(options.subtitles).out, out: data.duration}]
-                )
+                ).filter(function(censored) {
+                    // don't include gaps shorter than one second
+                    return censored.out - censored['in'] >= 1;
+                })
                 : Ox.range(0, data.duration - 5, 60).map(function(position) {
                     return {
                         'in': position + 5,
