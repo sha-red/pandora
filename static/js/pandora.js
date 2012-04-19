@@ -177,21 +177,9 @@ appPanel
         var prefix = '/static/';
         if (localStorage && localStorage['pandora.debug']) {
             Ox.getJSON(prefix + 'json/pandora.json?' + Ox.random(1000), function(files) {
-                var promises = [];
-                files.forEach(function(file) {
-                    var dfd = new $.Deferred();
-                    promises.push(dfd.promise());
-                    Ox.loadFile(prefix + file, function() {
-                        dfd.resolve();
-                    });
-                });
-                $.when.apply(null, promises)
-                    .done(function() {
-                        callback();
-                    })
-                    .fail(function() {
-                        throw new Error('File not found.');
-                    });
+                Ox.loadFiles(Ox.map(files, function(file) {
+                    return prefix + file;
+                }), callback);
             });
         } else {
             Ox.loadFile(prefix + 'js/pandora.min.js', callback);
