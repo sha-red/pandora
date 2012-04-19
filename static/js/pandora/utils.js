@@ -34,28 +34,38 @@ pandora.addList = function() {
             data.query = listData.query;
         }
     }
-    if (isDuplicate && listData.type == 'static') {
-        var query = {
-            conditions: [{key: 'list', value: list, operator: '=='}],
-            operator: '&'
-        };
-        pandora.api.find({
-            query: query
+    if (isDuplicate) {
+        pandora.api.findLists({
+            query: {conditions: [{key: 'id', value: list, operator: '=='}]},
+            keys: ['description']
         }, function(result) {
-            if (result.data.items) {
+            data.description = result.data.items[0].description;
+            if (data.type == 'static') {
+                var query = {
+                    conditions: [{key: 'list', value: list, operator: '=='}],
+                    operator: '&'
+                };
                 pandora.api.find({
-                    query: query,
-                    keys: ['id'],
-                    sort: [{key: 'id', operator: ''}],
-                    range: [0, result.data.items]
+                    query: query
                 }, function(result) {
-                    var items = result.data.items.map(function(item) {
-                        return item.id;
-                    });
-                    addList(items);
+                    if (result.data.items) {
+                        pandora.api.find({
+                            query: query,
+                            keys: ['id'],
+                            sort: [{key: 'id', operator: ''}],
+                            range: [0, result.data.items]
+                        }, function(result) {
+                            var items = result.data.items.map(function(item) {
+                                return item.id;
+                            });
+                            addList(items);
+                        });
+                    } else {
+                        addList();
+                    }
                 });
             } else {
-                addList();
+                addList()
             }
         });
     } else {
