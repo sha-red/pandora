@@ -362,7 +362,7 @@ pandora.ui.usersDialog = function() {
             })
             .bindEvent({
                 init: function(data) {
-                    Ox.print('DATA::P::', data)
+                    //Ox.print('DATA::P::', data)
                     numberOfUsers = data.users;
                     $status.html(
                         Ox.formatNumber(data.items)
