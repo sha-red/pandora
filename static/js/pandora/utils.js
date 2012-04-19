@@ -22,6 +22,7 @@ pandora.addList = function() {
                 data.query = pandora.user.ui.find;
             }
         }
+        addList();
     } else {
         list = arguments[0];
         listData = pandora.getListData();
@@ -33,8 +34,6 @@ pandora.addList = function() {
         if (data.type == 'smart') {
             data.query = listData.query;
         }
-    }
-    if (isDuplicate) {
         pandora.api.findLists({
             query: {conditions: [{key: 'id', value: list, operator: '=='}]},
             keys: ['description']
@@ -68,8 +67,6 @@ pandora.addList = function() {
                 addList()
             }
         });
-    } else {
-        addList();
     }
     function addList(items) {
         pandora.api.addList(data, function(result) {
