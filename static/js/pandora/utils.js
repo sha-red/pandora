@@ -398,7 +398,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
             ) + '</br> to ' + (
                 drag.target && !drag.target.selected
                 ? 'the list "' + Ox.encodeHTMLEntities(drag.target.name) + '"'
-                : 'another list'
+                : (pandora.user.ui._list ? 'another' : 'a') + ' list'
             );
         }
         return $('<div>')
