@@ -50,6 +50,11 @@ pandora.ui.tv = function() {
                         'zapPrevious', 'zapHome', 'zapNext',
                         'volume', 'scale', 'timeline', 'position', 'settings'
                     ],
+                    controlsTooltips: {
+                        open: 'Open in ' + Ox.getObjectById(
+                            pandora.site.itemViews, pandora.user.ui.videoView
+                        ).title + ' View',
+                    },
                     controlsTop: ['close', 'title', 'open'],
                     duration: result.data.duration,
                     enableSubtitles: pandora.user.ui.videoSubtitles,
