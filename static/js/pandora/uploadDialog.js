@@ -226,15 +226,31 @@ pandora.ui.uploadDialog = function(data) {
             options.samplerate = 44100;
             options.audioQuality = 3;
             options.channels = 2;
+        } else if (resolution == 432) {
+            options.height = 432;
+            options.samplerate = 44100;
+            options.audioQuality = 3;
+            options.channels = 2;
         } else if (resolution == 360) {
             options.height = 320;
             options.samplerate = 44100;
             options.audioQuality = 1;
             options.channels = 1;
+        } else if (resolution == 288) {
+            options.height = 288;
+            options.samplerate = 44100;
+            options.audioQuality = 0;
+            options.channels = 1;
         } else if (resolution == 240) {
             options.height = 240;
             options.samplerate = 44100;
             options.audioQuality = 0;
+            options.channels = 1;
+        } else if (resolution == 144) {
+            options.height = 144;
+            options.samplerate = 22050;
+            options.audioQuality = -1;
+            options.audioBitrate = 22;
             options.channels = 1;
         } else if (resolution == 96) {
             options.height = 96;
