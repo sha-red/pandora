@@ -127,6 +127,26 @@ pandora.ui.usersDialog = function() {
                         width: 16
                     },
                     {
+                        format: function(value) {
+                            return $('<img>')
+                                .attr({
+                                    src: Ox.UI.getImageURL('symbolMail')
+                                })
+                                .css({
+                                    width: '10px',
+                                    height: '10px',
+                                    padding: '3px',
+                                    opacity: +value
+                                });
+                        },
+                        id: 'newsletter',
+                        title: 'Newsletter',
+                        titleImage: 'mail',
+                        operator: '-',
+                        visible: true,
+                        width: 16
+                    },
+                    {
                         format: function(value, data) {
                             return '<span style="opacity: ' + (
                                 data.disabled ? 0.5 : 1
@@ -166,26 +186,6 @@ pandora.ui.usersDialog = function() {
                         type: 'label',
                         visible: true,
                         width: 60
-                    },
-                    {
-                        format: function(value) {
-                            return $('<img>')
-                                .attr({
-                                    src: Ox.UI.getImageURL('symbolMail')
-                                })
-                                .css({
-                                    width: '10px',
-                                    height: '10px',
-                                    padding: '3px',
-                                    opacity: +value
-                                });
-                        },
-                        id: 'newsletter',
-                        title: 'Newsletter',
-                        titleImage: 'mail',
-                        operator: '-',
-                        visible: true,
-                        width: 16
                     },
                     {
                         format: function(value) {
