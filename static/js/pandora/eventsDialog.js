@@ -56,10 +56,14 @@ pandora.ui.eventsDialog = function(options) {
         .bindEvent({
             resize: function(data) {
                 // setting width would cause an expensive calendar redraw
-                $content && $content.options({height: data.height});
+                $content && $content.options({
+                    height: data.height
+                });
             },
             resizeend: function(data) {
-                $content && $content.options({height: data.height, width: data.width});
+                $content && $content.options({
+                    height: data.height, width: data.width
+                });
             }
         }),
         $content;
