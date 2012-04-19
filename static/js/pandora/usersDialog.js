@@ -173,7 +173,7 @@ pandora.ui.usersDialog = function() {
                     },
                     {
                         align: 'center',
-                        format: function(value, data) {
+                        format: function(value) {
                             return Ox.Theme.formatColorLevel(
                                 userLevels.indexOf(Ox.toTitleCase(value)),
                                 userLevels,
@@ -311,8 +311,12 @@ pandora.ui.usersDialog = function() {
                         width: 150
                     },
                     {
-                        id: 'numberoflists',
                         align: 'right',
+                        format: function(value, data) {
+                            return ['guest', 'robot'].indexOf(data.level) > -1
+                                ? '' : value;
+                        },
+                        id: 'numberoflists',
                         operator: '-',
                         title: 'Lists',
                         visible: true,
