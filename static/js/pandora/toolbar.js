@@ -26,7 +26,7 @@ pandora.ui.toolbar = function() {
         !ui.item
         ? pandora.$ui.listTitle = Ox.Label({
                 textAlign: 'center',
-                title: '<b>' + getListName() + '</b>'
+                title: getListName(pandora.user.ui._list)
             })
             .css({
                 position: 'absolute',
@@ -46,9 +46,6 @@ pandora.ui.toolbar = function() {
                 width: 'auto'
             })
             .hide()
-    );
-    ui.item && that.append(
-        
     );
     that.append(
         pandora.$ui.findElement = pandora.ui.findElement()
@@ -76,16 +73,21 @@ pandora.ui.toolbar = function() {
             }
         }
     });
-    function getListName() {
-        return pandora.user.ui._list == ''
-            ? 'All ' + pandora.site.itemName.plural
-            : pandora.user.ui._list.substr(pandora.user.ui._list.indexOf(':') + 1);
+    function getListName(listId) {
+        return '<b>' + (
+            listId == ''
+                ? 'All ' + pandora.site.itemName.plural
+                : Ox.encodeHTMLEntities(listId.substr(listId.indexOf(':') + 1))
+        ) + '</b>';
     }
     function getListTitleLeft() {
         return 320 - (
             ['map', 'calendar'].indexOf(pandora.user.ui.listView) > -1 ? 168 : 0
         );
     }
+    that.updateListName = function(listId) {
+        pandora.$ui.listTitle.options({title: getListName(listId)});
+    };
     return that;
 };
 

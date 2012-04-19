@@ -977,6 +977,7 @@ pandora.renameList = function(oldId, newId, newName, folder) {
     folder = folder || pandora.getListData(oldId).folder;
     pandora.$ui.folderList[folder].value(oldId, 'name', newName);
     pandora.$ui.folderList[folder].value(oldId, 'id', newId);
+    pandora.$ui.toolbar.updateListName(newId);
     pandora.UI.set({
         find: {
             conditions: [{key: 'list', value: newId, operator: '=='}],

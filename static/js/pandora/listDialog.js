@@ -17,30 +17,28 @@ pandora.ui.listDialog = function(section) {
     Ox.getObjectById(tabs, section).selected = true;
 
     pandora.$ui.listDialogTabPanel = Ox.TabPanel({
-        content: function(id) {
-            if (id == 'general') {
-                return pandora.ui.listGeneralPanel(listData);
-            } else if (id == 'icon') {
-                return pandora.$ui.listIconPanel = pandora.ui.listIconPanel(listData);
-            } else if (id == 'query') {
-                return pandora.$ui.filterForm = pandora.ui.filterForm(listData);
+            content: function(id) {
+                if (id == 'general') {
+                    return pandora.ui.listGeneralPanel(listData);
+                } else if (id == 'icon') {
+                    return pandora.$ui.listIconPanel = pandora.ui.listIconPanel(listData);
+                } else if (id == 'query') {
+                    return pandora.$ui.filterForm = pandora.ui.filterForm(listData);
+                }
+            },
+            tabs: tabs
+        })
+        .bindEvent({
+            change: function(data) {
+                var width = getWidth(data.selected);
+                $dialog.options({
+                    maxWidth: width,
+                    minWidth: width
+                });
+                $dialog.setSize(width, 312);
+                $findElement[data.selected == 'icon' ? 'show' : 'hide']();
             }
-        },
-        tabs: tabs
-    })
-    .bindEvent({
-        change: function(data) {
-            var width = getWidth(data.selected);
-            $dialog.options({
-                maxWidth: width,
-                minWidth: width,
-                title: 'Smart List - ' + listData.name + ' - '
-                    + Ox.getObjectById(tabs, data.selected).title
-            });
-            $dialog.setSize(width, 312);
-            $findElement[data.selected == 'icon' ? 'show' : 'hide']();
-        }
-    });
+        });
     pandora.$ui.listDialogTabPanel.$element.find('.OxButtonGroup').css({width: '256px'});
 
     var $findElement = Ox.FormElementGroup({
@@ -109,7 +107,7 @@ pandora.ui.listDialog = function(section) {
         height: 312,
         // keys: {enter: 'save', escape: 'cancel'},
         removeOnClose: true,
-        title: 'List - ' + Ox.encodeHTMLEntities(listData.name),
+        title: 'List &mdash; ' + Ox.encodeHTMLEntities(listData.name),
         width: width
     });
 
@@ -245,7 +243,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                         Ox.Request.clearCache('findLists');
                         pandora.$ui.info.updateListInfo();
                         pandora.$ui.listDialog.options({
-                            title: 'List - ' + Ox.encodeHTMLEntities(listData.name) + ' - General'
+                            title: 'List &mdash; ' + Ox.encodeHTMLEntities(listData.name)
                         });
                     }
                 });
