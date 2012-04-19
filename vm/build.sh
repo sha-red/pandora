@@ -1,6 +1,6 @@
 #!/bin/sh
 base=$(pwd)
-sudo  vmbuilder vbox ubuntu --suite=oneiric \
+sudo  vmbuilder vbox ubuntu --suite=precise \
     --verbose --debug \
     --arch i386 \
     --flavour generic \
@@ -37,8 +37,9 @@ sudo  vmbuilder vbox ubuntu --suite=oneiric \
     --addpkg python-html5lib \
     --addpkg oxtimeline \
     --addpkg oxframe \
+    --addpkg ffmpeg \
+    --addpkg ffmpeg2theora \
     --addpkg mkvtoolnix \
     --execscript=$base/install.sh \
     --firstboot=$base/firstboot.sh
 
-#kvm-img  convert -O vdi pandora/*.qcow2 pandora.vdi

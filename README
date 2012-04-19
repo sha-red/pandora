@@ -1,24 +1,32 @@
 pan.do/ra - open media archive
 
 == SETUP ==
-To setup pan.do/ra, you need
-python, bazaar, pip and virtualenv and several other python modules:
+pan.do/ra is known to work with Ubuntu 12.04, older versions of
+Ubuntu or other distributions should work
+if the dependencies are up to date.
+
+To setup pan.do/ra, you need python, bazaar, pip and virtualenv
+and several other python modules:
 
 * Packages
+(add pandora ppa to get all packages in the required version)
+
     apt-get install python-software-properties
     add-apt-repository ppa:j/pandora
     apt-get update
 
+(install dependencies)
     apt-get install bzr git subversion mercurial \
             python-setuptools python-pip python-virtualenv ipython \
             python-dev python-imaging python-numpy python-psycopg2 \
             python-geoip python-html5lib python-lxml \
-            postgresql postgresql-contrib rabbitmq-server
-
-    apt-get install oxframe oxtimeline 
+            postgresql postgresql-contrib rabbitmq-server \
+            ffmpeg2theora ffmpeg \
+            python-ox oxframe oxtimeline
 
 * Pan.do/ra
 Get code from bazzar
+    cd /srv/
     bzr branch http://code.0x2620.org/pandora pandora
     cd pandora
     virtualenv .
@@ -27,20 +35,18 @@ Get code from bazzar
     cd static
     bzr branch http://code.0x2620.org/oxjs
 
-create local_settings.py and create site.jsonc
-do noy copy settings.py but only overwrite your changes in local_settings.py
+create local_settings.py and create site.jsonc in /srv/pandora/pandora
+do noy copy settings.py but only add your changes to local_settings.py
 (check https://wiki.0x2620.org/wiki/pandora/configuration
  and use settings.py / 0xdb.jsonc / padma.jsonc as example)
 
-create db
-    
-    ./manage.py syncdb
+create and configure database as described below
+after that
 
 create / update static files
     
     ./manage.py update_static 
     ./manage.py compile_pyc
-
 
 * Database
   We use postgresql but other databases might also work
@@ -70,6 +76,7 @@ create / update static files
     echo "DB_GIN_TRGM = True" >> local_settings.py
 
 
+
 * RabbitMQ
   For background tasks RabbitMQ is required, to install rabbitmq:
 
@@ -83,8 +90,9 @@ create / update static files
 
 
 * H264
-    for h264 videos, you need to compile ffmpeg with x264 and libfaac enabled,
+    for h264 videos, you need ffmpeg with x264 and libfaac enabled,
     you also need to install qt-faststart (from ffmpeg/tools)
+    (you can use medibuntu.org packages or compile ffmpeg yourself)
     to enable h264 derivatives add "mp4" to video.formats in your config.jsonc
 
 
@@ -109,6 +117,11 @@ To run pan.do/ra in production, we use nginx, using apache2 is also possible.
     XSENDFILE = True
 
   setup apache according to etc/apache2/vhost.in
+
+now you can start pandora services:
+  service pandora start
+  service pandora-tasks start
+  service pandora-encoding start
 
 === Updating ===
 To update a pandora installation get the latest version from bzr by running

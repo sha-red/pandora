@@ -2,12 +2,11 @@
 #fails in bootstrap
 apt-get -y install ipython ntp
 
-#ffmpeg
-wget http://firefogg.org/nightly/ffmpeg.linux -O /usr/local/bin/ffmpeg
-chmod 755 /usr/local/bin/ffmpeg
-
-wget http://firefogg.org/nightly/ffmpeg2theora.linux -O /usr/local/bin/ffmpeg2theora
-chmod 755 /usr/local/bin/ffmpeg2theora
+#ffmpeg installed as apt package
+#wget http://firefogg.org/nightly/ffmpeg.linux -O /usr/local/bin/ffmpeg
+#chmod 755 /usr/local/bin/ffmpeg
+#wget http://firefogg.org/nightly/ffmpeg2theora.linux -O /usr/local/bin/ffmpeg2theora
+#chmod 755 /usr/local/bin/ffmpeg2theora
 
 #postgresql
 apt-get -y install postgresql postgresql-contrib
