@@ -19,7 +19,6 @@
             for items of a rights level up to and including x
     */
     "capabilities": {
-        // "canClickMap": {"friend": true, "staff": true, "admin": true},
         "canDeleteItems": {"admin": true},
         "canDownloadVideo": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
         "canEditAnnotations": {"staff": true, "admin": true},
@@ -35,6 +34,7 @@
         "canManageUsers": {"staff": true, "admin": true},
         "canPlayClips": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
         "canPlayVideo": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
+        "canSeeAccessed": {"staff": true, "admin": true},
         "canSeeDebugMenu": {"staff": true, "admin": true},
         "canSeeExtraItemViews": {"staff": true, "admin": true},
         "canSeeFiles": {"staff": true, "admin": true},
@@ -428,6 +428,7 @@
             "id": "accessed",
             "title": "Last Accessed",
             "type": "date",
+            "capability": "canSeeAccessed",
             "columnWidth": 90,
             "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]},
             "sort": true
@@ -436,6 +437,7 @@
             "id": "timesaccessed",
             "title": "Times Accessed",
             "type": "integer",
+            "capability": "canSeeAccessed",
             "columnWidth": 60,
             "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]},
             "sort": true
