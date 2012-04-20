@@ -7,3 +7,4 @@ bin
 static/json/pandora.json
 static/js/pandora.min.js
 static/png/*.png
+config.jsonc

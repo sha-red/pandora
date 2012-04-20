@@ -32,7 +32,7 @@ pandora.ui.homePage = function() {
             .html('right')
             .appendTo(that.$element),
         $logo = $('<img>')
-            .attr({src: '/static/png/logo256.png'})
+            .attr({src: '/static/png/logo.png'})
             .appendTo($center);
         // fixme: duplicated
         $select = Ox.Select({

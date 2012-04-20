@@ -26,7 +26,7 @@ pandora.ui.errorDialog = function(data) {
             content: Ox.Element()
                 .append(
                     $('<img>')
-                        .attr({src: '/static/png/icon64.png'})
+                        .attr({src: '/static/png/icon.png'})
                         .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
                 )
                 .append(
@@ -66,7 +66,7 @@ pandora.ui.errorDialog = function(data) {
                     content: Ox.Element()
                         .append(
                             $('<img>')
-                                .attr({src: '/static/png/icon64.png'})
+                                .attr({src: '/static/png/icon.png'})
                                 .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
                         )
                         .append(

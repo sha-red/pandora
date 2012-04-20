@@ -162,9 +162,10 @@ XSENDFILE = False
 #with nginx X-Accel-Redirect set this to True
 XACCELREDIRECT = False
 
-SITE_CONFIG = join(PROJECT_ROOT, 'pandora.jsonc')
+SITE_CONFIG = join(PROJECT_ROOT, 'config.jsonc')
+
 #used if CONFIG['video']['download'] is set
-TRACKER_URL="http://url2torrent.net:6970/announce"
+TRACKER_URL="udp://tracker.openbittorrent.com:80"
 
 DATA_SERVICE = ''
 POSTER_PRECEDENCE = ()
@@ -178,10 +179,10 @@ VIDEO_PREFIX=''
 
 SCRIPT_ROOT = normpath(join(PROJECT_ROOT, '..', 'scripts'))
 #change script to customize
-ITEM_POSTER = join(SCRIPT_ROOT, 'poster')
+ITEM_POSTER = join(SCRIPT_ROOT, 'poster.py')
 #ITEM_POSTER = join(SCRIPT_ROOT, 'padma_poster')
-ITEM_ICON   = join(SCRIPT_ROOT, 'item_icon')
-LIST_ICON   = join(SCRIPT_ROOT, 'list_icon')
+ITEM_ICON   = join(SCRIPT_ROOT, 'item_icon.py')
+LIST_ICON   = join(SCRIPT_ROOT, 'list_icon.py')
 
 DB_GIN_TRGM = False
 

@@ -22,8 +22,11 @@ rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
 
 #pandora
 HOST=$(hostname -s)
-SITE_CONFIG="/srv/pandora/pandora/$HOST.jsonc"
-test -e $SITE_CONFIG || cp /srv/pandora/pandora/0xdb.jsonc $SITE_CONFIG
+HOST_CONFIG="/srv/pandora/pandora/config.$HOST.jsonc"
+SITE_CONFIG="/srv/pandora/pandora/config.jsonc"
+test -e $HOST_CONFIG && cp $HOST_CONFIG $SITE_CONFIG
+test -e $SITE_CONFIG || cp /srv/pandora/pandora/config.pandora.jsonc $SITE_CONFIG
+
 cat > /srv/pandora/pandora/local_settings.py << EOF
 DATABASES = {
     'default': {
@@ -33,12 +36,13 @@ DATABASES = {
         'PASSWORD': '',
     }
 }
-DEBUG = False
-DATA_SERVICE = ""
-SITE_CONFIG = '$SITE_CONFIG'
 BROKER_PASSWORD = "$RABBITPWD"
 XACCELREDIRECT = True
 DB_GIN_TRGM = True
+
+DEBUG = False
+TEMPLATE_DEBUG = DEBUG
+JSON_DEBUG = False
 EOF
 
 cd /srv/pandora/pandora

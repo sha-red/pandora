@@ -475,7 +475,7 @@ pandora.ui.listIconPanel = function(listData) {
                 pandora.$ui.folderList[listData.folder].$element
                     .find('img[src*="/' + listData.id + '/"]')
                     .attr({
-                        src: '/list/' + listData.id + '/icon16.jpg?' + Ox.uid()
+                        src: '/list/' + listData.id + '/icon.jpg?' + Ox.uid()
                     });
                 pandora.$ui.info.updateListInfo();
             });

@@ -90,7 +90,7 @@ def update_static():
                 with open(f) as j:
                     data += j.read() + '\n'
     js += [
-        'png/icon64.png',
+        'png/icon.png',
     ]
     print 'write', pandora_js
     with open(pandora_js, 'w') as f:
@@ -109,24 +109,29 @@ def update_static():
                 if os.path.splitext(f)[-1] in ('.js', '.json'):
                     f = os.path.join(root, f)
                     os.system('gzip -9 -c "%s" > "%s.gz"' % (f, f))
-                    
-    for size in (16, 64, 256):
-        pandora = os.path.join(settings.STATIC_ROOT, 'png/pandora/icon%d.png'%size)
-        image = os.path.join(settings.STATIC_ROOT, 'png/icon%d.png'%size)
+    
+    for name in ('logo', 'icon'):
+        site = os.path.join(settings.STATIC_ROOT, 'png/%s.%s.png'%(name, settings.CONFIG['site']['id']))
+        pandora = os.path.join(settings.STATIC_ROOT, 'png/%s.pandora.png'%name)
+        image = os.path.join(settings.STATIC_ROOT, 'png/%s.png'%name)
         if not os.path.exists(image):
-            shutil.copyfile(pandora, image)
+            if os.path.exists(site):
+                shutil.copyfile(site, image)
+            else:
+                shutil.copyfile(pandora, image)
 
-    for size in (256, ):
-        pandora = os.path.join(settings.STATIC_ROOT, 'png/pandora/logo%d.png'%size)
-        image = os.path.join(settings.STATIC_ROOT, 'png/logo%d.png'%size)
-        if not os.path.exists(image):
-            shutil.copyfile(pandora, image)
     #download geo data
     update_geoip()
-    #poster script
-    if not os.path.exists(settings.ITEM_POSTER):
-        os.symlink(settings.ITEM_POSTER.replace('poster', 'oxdb_poster'),
-                   settings.ITEM_POSTER)
+
+    #scripts
+    for script in (settings.ITEM_POSTER, settings.ITEM_ICON, settings.LIST_ICON):
+        if not os.path.exists(script):
+            site_script = script.replace('.py', '.%s.py' % settings.CONFIG['site']['id'])
+            default_script = script.replace('.py', '.pandora.py')
+            if os.path.exists(site_script):
+                os.symlink(site_script, script)
+            else:
+                os.symlink(default_script, script)
 
 def update_geoip(force=False):
     path = os.path.join(settings.GEOIP_PATH, 'GeoLiteCity.dat')
@@ -138,6 +143,6 @@ def update_geoip(force=False):
             os.unlink(path)
         os.system('gunzip "%s.gz"' % path)
 
-def init():    
+def init():
     load_config()
     thread.start_new_thread(reloader_thread, ())

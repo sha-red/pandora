@@ -26,7 +26,7 @@ pandora.ui.home = function() {
             })
             .appendTo(that),
         $reflectionImage = $('<img>')
-            .attr({src: '/static/png/logo256.png'})
+            .attr({src: '/static/png/logo.png'})
             .css({
                 position: 'absolute',
                 left: 0,
@@ -55,7 +55,7 @@ pandora.ui.home = function() {
         $logo = $('<img>')
             .attr({
                 id: 'logo',
-                src: '/static/png/logo256.png'
+                src: '/static/png/logo.png'
             })
             .css({
                 position: 'absolute',

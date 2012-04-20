@@ -60,7 +60,7 @@ def render_poster(id, title, frame, timeline, poster):
 def main():
     parser = OptionParser()
     parser.add_option('-o', '--oxdbid', dest='oxdb_id', help='0xDB Id')
-    parser.add_option('-i', '--id', dest='id', help='Pad.ma Id')
+    parser.add_option('-i', '--id', dest='id', help='Item Id')
     parser.add_option('-t', '--title', dest='title', help='Title', default='')
     parser.add_option('-d', '--director', dest='director', help='Director', default='')
     parser.add_option('-y', '--year', dest='year', help='Year', default='')

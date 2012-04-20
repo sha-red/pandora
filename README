@@ -38,7 +38,7 @@ Get code from bazzar
 create local_settings.py and create site.jsonc in /srv/pandora/pandora
 do noy copy settings.py but only add your changes to local_settings.py
 (check https://wiki.0x2620.org/wiki/pandora/configuration
- and use settings.py / 0xdb.jsonc / padma.jsonc as example)
+ and use settings.py / config.jsonc / config.*.jsonc as example)
 
 create and configure database as described below
 after that

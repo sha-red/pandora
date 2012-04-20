@@ -59,7 +59,7 @@ pandora.ui.tv = function() {
                     duration: result.data.duration,
                     enableSubtitles: pandora.user.ui.videoSubtitles,
                     fullscreen: true,
-                    logo: pandora.site.tv.showLogo ? '/static/png/logo256.png' : '',
+                    logo: pandora.site.tv.showLogo ? '/static/png/logo.png' : '',
                     muted: muted || pandora.user.ui.videoMuted,
                     position: result.data.position,
                     resolution: pandora.user.ui.videoResolution,

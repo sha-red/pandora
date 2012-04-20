@@ -14,7 +14,7 @@ pandora.ui.folderList = function(id) {
                     },
                     format: function(value, data) {
                         return $('<img>').attr({
-                                src: '/list/' + data.id + '/icon16.jpg'
+                                src: '/list/' + data.id + '/icon.jpg'
                             }).css({
                                 width: '14px',
                                 height: '14px',

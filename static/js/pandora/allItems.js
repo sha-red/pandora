@@ -21,7 +21,7 @@ pandora.ui.allItems = function() {
             }
         }),
     $icon = $('<img>')
-        .attr({src: '/static/png/icon16.png'})
+        .attr({src: '/static/png/icon.png'})
         .css({float: 'left', width: '14px', height: '14px', margin: '1px'})
         .appendTo(that),
     $name = $('<div>')

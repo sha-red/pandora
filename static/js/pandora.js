@@ -75,7 +75,7 @@ appPanel
             images.reflection.style.MozTransform = 'scaleY(-1)';
             images.reflection.style.OTransform = 'scaleY(-1)';
             images.reflection.style.WebkitTransform = 'scaleY(-1)';
-            images.reflection.src = '/static/png/logo256.png';
+            images.reflection.src = '/static/png/logo.png';
             images.loadingIcon = document.createElement('img');
             images.loadingIcon.setAttribute('id', 'loadingIcon');
             images.loadingIcon.style.position = 'absolute';
@@ -90,7 +90,7 @@ appPanel
                 + '/Ox.UI/themes/' + theme + '/svg/symbolLoadingAnimated.svg';
             callback(images);
         };
-        images.logo.src = '/static/png/logo256.png';
+        images.logo.src = '/static/png/logo.png';
     }
 
     function loadScreen(images) {

@@ -12,7 +12,7 @@ pandora.ui.preferencesDialog = function() {
                     .css({overflowY: 'auto'})
                     .append(
                         $('<img>')
-                            .attr({src: '/static/png/icon64.png'})
+                            .attr({src: '/static/png/icon.png'})
                             .css({position: 'absolute', left: '16px', top: '16px'})
                     );
                 if (id == 'account') {

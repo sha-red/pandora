@@ -18,4 +18,8 @@ except ImportError:
     sys.exit(1)
 
 if __name__ == "__main__":
+    if not os.path.exists(settings.SITE_CONFIG):
+        import sys
+        sys.stderr.write("Error: Can't find '%s'.\nBefore you run pan.do/ra you must create it\n" % settings.SITE_CONFIG)
+        sys.exit(1)
     execute_manager(settings)

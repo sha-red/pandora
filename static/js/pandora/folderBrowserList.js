@@ -11,7 +11,7 @@ pandora.ui.folderBrowserList = function(id) {
                     clickable: true,
                     format: function(value) {
                         return $('<img>').attr({
-                                src: '/list/' + value + '/icon16.jpg'
+                                src: '/list/' + value + '/icon.jpg'
                             }).css({
                                 width: '14px',
                                 height: '14px',
