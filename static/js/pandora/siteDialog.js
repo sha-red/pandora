@@ -26,8 +26,11 @@ pandora.ui.siteDialog = function(section) {
                             + '<sub>open media archive</sub>'
                             + '<p><b>' + pandora.site.site.name + '</b> is based on <b>pan.do/ra</b>, '
                             + 'a free open source framework for media archives.</p>'
-                            + '<b>pan.do/ra</b> includes OxJS, a new JavaScript library for web applications.</p>'
-                            + '<a href="https://pan.do/ra"><b>pan.do/ra</b></a> and <a href="https://oxjs.org"><b>OxJS</b></a> will be released in 2012. More soon...</p>'
+                            + '<b>pan.do/ra</b> includes <b>OxJS</b>, '
+                            + 'a new JavaScript library for web applications.</p>'
+                            + 'Both <a href="https://pan.do/ra"><b>pan.do/ra</b></a> '
+                            + 'and <a href="https://oxjs.org"><b>OxJS</b></a> '
+                            + 'will be released in 2012. More soon...'
                         )
                         .appendTo($content);
                 } else {
@@ -97,8 +100,8 @@ pandora.ui.siteDialog = function(section) {
                                 .append(
                                     $('<img>')
                                         .attr({src: '/static/png/' + (
-                                            id == 'software' ? 'software.png' : 'logo.png'
-                                        )})
+                                            id == 'software' ? 'software' : 'logo'
+                                        ) + '.png'})
                                         .css({width: '256px'})
                                 ),
                             size: 272
