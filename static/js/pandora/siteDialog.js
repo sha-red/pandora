@@ -22,12 +22,12 @@ pandora.ui.siteDialog = function(section) {
                 } else if (id == 'software') {
                     Ox.Element()
                         .html(
-                            '<h1><b>Pan.do/ra</b></h1>'
+                            '<h1><b>pan.do/ra</b></h1>'
                             + '<sub>open media archive</sub>'
-                            + '<p><b>' + pandora.site.site.name + '</b> is based on <b>Pan.do/ra</b>, '
+                            + '<p><b>' + pandora.site.site.name + '</b> is based on <b>pan.do/ra</b>, '
                             + 'a free open source framework for media archives.</p>'
-                            + '<b>Pan.do/ra</b> includes OxJS, a new JavaScript library for web applications.</p>'
-                            + '<a href="http://pan.do/ra"><b>Pan.do/ra</b></a> and <a href="http://oxjs.org"><b>OxJS</b></a> will be released in 2012. More soon...</p>'
+                            + '<b>pan.do/ra</b> includes OxJS, a new JavaScript library for web applications.</p>'
+                            + '<a href="https://pan.do/ra"><b>pan.do/ra</b></a> and <a href="https://oxjs.org"><b>OxJS</b></a> will be released in 2012. More soon...</p>'
                         )
                         .appendTo($content);
                 } else {
