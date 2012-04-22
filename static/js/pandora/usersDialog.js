@@ -724,7 +724,11 @@ pandora.ui.usersDialog = function() {
                 } else {
                     data[event.id] = event.data.value;
                 }
-                $list.value(user.id, event.id, data[event.id]);
+                if (event.id == 'status') {
+                    $list.value(user.id, 'disabled', data.disabled);
+                } else {
+                    $list.value(user.id, event.id, data[event.id]);
+                }
                 pandora.api.editUser(data, function(result) {
                     Ox.Request.clearCache('findUsers');
                 });
