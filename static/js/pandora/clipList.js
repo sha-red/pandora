@@ -170,6 +170,8 @@ pandora.ui.clipList = function(videoRatio) {
                                     censored: pandora.site.capabilities.canPlayClips[pandora.user.level] < result.data.rightslevel
                                         ? [{'in': partsAndPoints.points[0], out: partsAndPoints.points[1]}]
                                         : [],
+                                    censoredIcon: pandora.site.cantPlay.icon,
+                                    censoredTooltip: pandora.site.cantPlay.text,
                                     height: height,
                                     'in': partsAndPoints.points[0],
                                     out: partsAndPoints.points[1],
@@ -184,9 +186,17 @@ pandora.ui.clipList = function(videoRatio) {
                                 })
                                 .addClass('OxTarget')
                                 .bindEvent({
+                                    censored: function() {
+                                        pandora.URL.push(pandora.site.cantPlay.link);
+                                    },
                                     // doubleclick opens item
-                                    singleclick: function() {
-                                        $player.$element.is('.OxSelectedVideo') && $player.togglePaused();
+                                    singleclick: function(e) {
+                                        if (
+                                            $player.$element.is('.OxSelectedVideo')
+                                            && !$(e.target).is('.OxCensoredIcon')
+                                        ) {
+                                            $player.togglePaused();
+                                        }
                                     }
                                 });
                             $img.replaceWith($player.$element);
