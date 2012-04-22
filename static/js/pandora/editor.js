@@ -14,6 +14,8 @@ pandora.ui.editor = function(data) {
         annotationsSize: pandora.user.ui.annotationsSize,
         annotationsSort: pandora.user.ui.annotationsSort,
         censored: data.censored,
+        censoredIcon: pandora.site.cantPlay.icon,
+        censoredTooltip: pandora.site.cantPlay.text,
         clickLink: pandora.clickLink,
         cuts: data.cuts || [],
         duration: data.duration,
@@ -105,6 +107,9 @@ pandora.ui.editor = function(data) {
         },
         annotationssort: function(data) {
             pandora.UI.set({annotationsSort: data.sort});
+        },
+        censored: function() {
+            pandora.URL.push(pandora.site.cantPlay.link);
         },
         define: function(data) {
             var dialog = data.type + 'sDialog';

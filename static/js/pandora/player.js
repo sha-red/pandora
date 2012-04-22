@@ -14,6 +14,8 @@ pandora.ui.player = function(data) {
         annotationsSize: pandora.user.ui.annotationsSize,
         annotationsSort: pandora.user.ui.annotationsSort,
         censored: data.censored,
+        censoredIcon: pandora.site.cantPlay.icon,
+        censoredTooltip: pandora.site.cantPlay.text,
         clickLink: pandora.clickLink,
         cuts: data.cuts || [],
         duration: data.duration,
@@ -60,6 +62,12 @@ pandora.ui.player = function(data) {
         },
         annotationssort: function(data) {
             pandora.UI.set({annotationsSort: data.sort});
+        },
+        censored: function() {
+            pandora.$ui.player.options('fullscreen') && pandora.$ui.player.options({
+                fullscreen: false
+            });
+            pandora.URL.push(pandora.site.cantPlay.link);
         },
         downloadvideo: function(data) {
             document.location.href = '/' + pandora.user.ui.item + '/torrent/';

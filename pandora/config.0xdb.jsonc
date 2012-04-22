@@ -12,6 +12,11 @@
     "annotations": {
         "showUsers": false
     },
+    "cantPlay": {
+        "icon": "NoCopyright",
+        "link": "/rights",
+        "text": "This part of this video is not available in<br/>your part of your country. Sorry for that."
+    },
     /*
         Capabilities are per user level.
         They can either be general:

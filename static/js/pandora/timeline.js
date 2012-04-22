@@ -14,6 +14,8 @@ pandora.ui.timeline = function(data) {
         annotationsSize: ui.annotationsSize,
         annotationsSort: ui.annotationsSort,
         censored: data.censored,
+        censoredIcon: pandora.site.cantPlay.icon,
+        censoredTooltip: pandora.site.cantPlay.text,
         clickLink: pandora.clickLink,
         cuts: data.cuts || [],
         duration: data.duration,
@@ -58,6 +60,9 @@ pandora.ui.timeline = function(data) {
         },
         annotationssort: function(data) {
             pandora.UI.set({annotationsSort: data.sort});
+        },
+        censored: function() {
+            pandora.URL.push(pandora.site.cantPlay.link);
         },
         follow: function(data) {
             pandora.UI.set('followPlayer', data.follow);
