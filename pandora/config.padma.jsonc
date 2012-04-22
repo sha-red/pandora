@@ -10,6 +10,11 @@
     "annotations": {
         "showUsers": true
     },
+    "cantPlay": {
+        "icon": "",
+        "link": "",
+        "text": ""
+    },
     /*
         Capabilities are per user level.
         They can either be general:
