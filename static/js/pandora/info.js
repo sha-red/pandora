@@ -141,7 +141,7 @@ pandora.ui.listInfo = function() {
             .attr({
                 src: list
                     ? '/list/' + list + '/icon256.jpg?' + Ox.uid()
-                    : '/static/png/icon256.png'
+                    : '/static/png/icon.png'
             })
             .css(getIconCSS())
             .appendTo(that),
