@@ -35,7 +35,7 @@ Get code from bazzar
     cd static
     bzr branch http://code.0x2620.org/oxjs
 
-create local_settings.py and create site.jsonc in /srv/pandora/pandora
+create local_settings.py and create config.jsonc in /srv/pandora/pandora
 do noy copy settings.py but only add your changes to local_settings.py
 (check https://wiki.0x2620.org/wiki/pandora/configuration
  and use settings.py / config.jsonc / config.*.jsonc as example)
