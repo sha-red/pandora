@@ -176,7 +176,7 @@ pandora.ui.editor = function(data) {
                 annotation: pandora.user.ui.videoPoints[pandora.user.ui.item].annotation,
                 'in': data['in'],
                 out: data.out,
-                position: pandora.user.ui.videoPoints[pandora.user.ui.item].position
+                position: data.position
             });
         },
         position: function(data) {
