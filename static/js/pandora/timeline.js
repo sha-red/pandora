@@ -67,6 +67,11 @@ pandora.ui.timeline = function(data) {
         follow: function(data) {
             pandora.UI.set('followPlayer', data.follow);
         },
+        info: function(data) {
+            pandora.ui.annotationDialog(
+                Ox.getObjectById(pandora.site.layers, data.layer).title
+            ).open();
+        },
         muted: function(data) {
             pandora.UI.set('videoMuted', data.muted);
         },

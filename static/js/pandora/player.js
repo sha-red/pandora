@@ -75,6 +75,11 @@ pandora.ui.player = function(data) {
         find: function(data) {
             pandora.UI.set('itemFind', data.find);
         },
+        info: function(data) {
+            pandora.ui.annotationDialog(
+                Ox.getObjectById(pandora.site.layers, data.layer).title
+            ).open();
+        },
         muted: function(data) {
             pandora.UI.set('videoMuted', data.muted);
         },
