@@ -39,6 +39,13 @@ pandora.ui.browser = function() {
             toggle: function(data) {
                 data.collapsed && pandora.$ui.list.gainFocus();
                 pandora.UI.set({showFilters: !data.collapsed});
+                if (!data.collapsed) {
+                    pandora.$ui.filters.forEach(function($filter) {
+                        if ($filter.options('_reload')) {
+                            $filter.options({_reload: false}).reloadList();
+                        }
+                    });
+                }
                 if (pandora.user.ui.listView == 'map') {
                     pandora.$ui.map.resizeMap();
                 } else if (pandora.user.ui.listView == 'calendar') {

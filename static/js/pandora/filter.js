@@ -7,6 +7,7 @@ pandora.ui.filter = function(id) {
         title = Ox.getObjectById(pandora.site.filters, id).title,
         //width = pandora.getFilterWidth(i, panelWidth),
         that = Ox.TextList({
+            _reload: !pandora.user.ui.showFilters,
             columns: [
                 {
                     align: 'left',
@@ -58,15 +59,15 @@ pandora.ui.filter = function(id) {
             columnsVisible: true,
             id: 'filter_' + id,
             items: function(data, callback) {
-                //if (pandora.user.ui.showFilters) {
+                if (pandora.user.ui.showFilters) {
                     delete data.keys;
                     return pandora.api.find(Ox.extend(data, {
                         group: id,
                         query: pandora.user.ui._filterState[i].find
                     }), callback);
-                //} else {
-                //    callback({data: {items: data.keys ? [] : 0}});
-                //}
+                } else {
+                    callback({data: {items: data.keys ? [] : 0}});
+                }
             },
             scrollbarVisible: true,
             selected: pandora.user.ui._filterState[i].selected,

@@ -36,13 +36,20 @@ pandora.ui.mainPanel = function() {
                     // FIXME: why is this being handled _here_?
                     pandora.user.ui._filterState.forEach(function(data, i) {
                         if (!Ox.isEqual(data.selected, previousUI._filterState[i].selected)) {
-                            pandora.$ui.filters[i].options({selected: data.selected});
+                            if (pandora.user.ui.showFilters) {
+                                pandora.$ui.filters[i].options({selected: data.selected});
+                            } else {
+                                pandora.$ui.filters[i].options({_reload: true, selected: []});
+                            }
                         }
                         if (!Ox.isEqual(data.find, previousUI._filterState[i].find)) {
-                            Ox.Log('FIND', 'NOT EQUAL', data.find, previousUI._filterState[i].find)
-                            pandora.$ui.filters[i].reloadList();
-                        } else {
-                            Ox.Log('FIND', 'EQUAL', data.find, previousUI._filterState[i].find)
+                            if (pandora.user.ui.showFilters) {
+                                pandora.$ui.filters[i].reloadList();
+                            } else {
+                                // we can call reloadList here, since the items function
+                                // handles the hidden filters case without making requests
+                                pandora.$ui.filters[i].options({_reload: true}).reloadList();
+                            }
                         }
                     });
                 } else {
