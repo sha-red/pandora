@@ -108,8 +108,10 @@ pandora.ui.navigationView = function(type, videoRatio) {
             $element = Ox.Map({
                 // clickable: pandora.site.capabilities.canClickMap[pandora.user.level],
                 find: ui.mapFind,
-                // 20 menu + 24 toolbar + 1 resizebar + 16 statusbar
-                height: window.innerHeight - ui.showFilters * ui.filtersSize - 61,
+                // 20 px menu + 24 px toolbar + 1px resizbar + 16px statusbar (if !item)
+                height: !ui.item
+                    ? window.innerHeight - ui.showFilters * ui.filtersSize - 61
+                    : window.innerHeight - ui.showBrowser * (112 + Ox.UI.SCROLLBAR_SIZE) - 45,
                 places: function(data, callback) {
                     var itemsQuery;
                     if (!ui.item) {
@@ -165,9 +167,10 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 $element = Ox.Calendar({
                     date: new Date(0),
                     events: result.data.items,
-                    // 20 px menu, 24 px toolbar, 1px resizbar, 16px statusbar
-                    height: window.innerHeight - ui.showFilters * ui.filtersSize
-                        - 45 - (ui.item ? 0 : 16),
+                    // 20 px menu + 24 px toolbar + 1px resizbar + 16px statusbar (if !item)
+                    height: !ui.item
+                        ? window.innerHeight - ui.showFilters * ui.filtersSize - 61
+                        : window.innerHeight - ui.showBrowser * (112 + Ox.UI.SCROLLBAR_SIZE) - 45,
                     range: [-5000, 5000],
                     showControls: ui.showCalendarControls,
                     showToolbar: true,
