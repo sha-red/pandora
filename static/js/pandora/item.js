@@ -11,7 +11,7 @@ pandora.ui.item = function() {
     pandora.api.get({
         id: pandora.user.ui.item,
         keys: isVideoView ? [
-            'cuts', 'director', 'duration', 'layers',
+            'cuts', 'director', 'duration', 'editable', 'layers',
             'parts', 'posterFrame', 'rendered', 'rightslevel',
             'size', 'title', 'videoRatio', 'year'
         ] : []
@@ -64,7 +64,7 @@ pandora.ui.item = function() {
 
         } else if (pandora.user.ui.itemView == 'info') {
 
-            if (pandora.user.level == 'admin' && false) {
+            if (pandora.user.level == 'admin' && false) { // FIXME!!
                 var $form,
                     $edit = Ox.Element()
                     .append($form = Ox.FormElementGroup({

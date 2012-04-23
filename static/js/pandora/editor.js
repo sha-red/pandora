@@ -21,6 +21,7 @@ pandora.ui.editor = function(data) {
         duration: data.duration,
         enableDownload: pandora.site.capabilities.canDownloadVideo[pandora.user.level] >= data.rightslevel,
         enableImport: pandora.site.capabilities.canImportAnnotations[pandora.user.level],
+        enableSetPosterFrame: !pandora.site.media.importFrames && data.editable,
         enableSubtitles: pandora.user.ui.videoSubtitles,
         find: pandora.user.ui.itemFind,
         getFrameURL: function(position) {
@@ -46,7 +47,6 @@ pandora.ui.editor = function(data) {
         out: pandora.user.ui.videoPoints[pandora.user.ui.item].out,
         position: pandora.user.ui.videoPoints[pandora.user.ui.item].position,
         posterFrame: data.posterFrame,
-        posterFrameControls: !pandora.site.media.importFrames,
         resolution: pandora.user.ui.videoResolution,
         selected: pandora.user.ui.videoPoints[pandora.user.ui.item].annotation
             ? pandora.user.ui.item + '/' + pandora.user.ui.videoPoints[pandora.user.ui.item].annotation
