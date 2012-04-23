@@ -10,7 +10,8 @@ pandora.ui.contentPanel = function() {
                     resizable: true,
                     resize: [96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256],
                     size: pandora.user.ui.filtersSize,
-                    tooltip: 'filters'
+                    tooltip: 'filters <span class="OxBright">'
+                        + Ox.SYMBOLS.SHIFT + 'F</span>'
                 },
                 {
                     element: pandora.$ui.list = pandora.ui.list()
@@ -25,7 +26,9 @@ pandora.ui.contentPanel = function() {
                     collapsible: true,
                     element: pandora.$ui.browser = pandora.ui.browser(),
                     size: 112 + Ox.UI.SCROLLBAR_SIZE,
-                    tooltip: pandora.site.itemName.singular.toLowerCase() + ' browser'
+                    tooltip: pandora.site.itemName.singular.toLowerCase()
+                        + ' browser <span class="OxBright">'
+                        + Ox.SYMBOLS.SHIFT + 'B</span>'
                 },
                 {
                     element: pandora.$ui.item = pandora.ui.item()
