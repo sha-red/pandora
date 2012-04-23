@@ -39,10 +39,20 @@ pandora.ui.tv = function() {
     }
 
     function play() {
+        var $loading = $('<img>')
+                .attr({src: Ox.UI.getImageURL('symbolLoadingAnimated')})
+                .css({
+                    position: 'absolute',
+                    left: 0, top: 0, right: 0, bottom: 0,
+                    width: '32px', height: '32px',
+                    margin: 'auto'
+                })
+                .appendTo(that);
         pandora.api.tv({
             list: list
         }, function(result) {
             var videoOptions = pandora.getVideoOptions(result.data);
+            $loading.remove();
             $player && $player.remove();
             $player = Ox.VideoPlayer({
                     censored: videoOptions.censored,
