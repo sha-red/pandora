@@ -63,61 +63,15 @@ pandora.ui.item = function() {
             );
 
         } else if (pandora.user.ui.itemView == 'info') {
-
-            if (pandora.user.level == 'admin' && false) { // FIXME!!
-                var $form,
-                    $edit = Ox.Element()
-                    .append($form = Ox.FormElementGroup({
-                        elements: Ox.map(pandora.site.sortKeys, function(key) {
-                            return Ox.Input({
-                                id: key.id,
-                                label: key.title,
-                                labelWidth: 100,
-                                value: result.data[key.id],
-                                type: 'text',
-                                width: 500
-                            });
-                        }),
-                        separators: [
-                            {title: '', width: 0}
-                        ]
-                    }))
-                    .append(Ox.Button({
-                        title: 'Save',
-                        type: 'text'
-                    }).bindEvent({
-                        click: function(data) {
-                            // fixme: cleanup
-                            var values = $form.value();
-                            var changed = {};
-                            Ox.map(pandora.site.itemKeys, function(key, i) {
-                                if(values[i] && values[i] != ''+result.data[key.id]) {
-                                    if(Ox.isArray(key.type) && key.type[0] == 'string') {
-                                        changed[key.id] = values[i].split(', ');
-                                    } else {
-                                        changed[key.id] = values[i];
-                                    }
-                                }
-                            });
-                            if(changed) {
-                                pandora.api.edit(Ox.extend(changed, {id: pandora.user.ui.item}), function(result) {
-                                    //fixme just reload parts that need reloading
-                                    window.location.reload();
-                                });
-                            }
+            
+            pandora.$ui.contentPanel.replaceElement(1,
+                pandora.$ui.item = pandora.ui.infoView(result.data)
+                    .bindEvent({
+                        resize: function() {
+                            pandora.$ui.item.resize();
                         }
-                    }));
-                pandora.$ui.contentPanel.replaceElement(1, pandora.$ui.item = $edit);
-            } else {
-                pandora.$ui.contentPanel.replaceElement(1,
-                    pandora.$ui.item = pandora.ui.infoView(result.data)
-                        .bindEvent({
-                            resize: function() {
-                                pandora.$ui.item.resize();
-                            }
-                        })
-                );
-            }
+                    })
+            );
 
         } else if (pandora.user.ui.itemView == 'clips') {
 
@@ -157,12 +111,13 @@ pandora.ui.item = function() {
 
         } else if (pandora.user.ui.itemView == 'data') {
 
-            var stats = Ox.Container();
-            Ox.TreeList({
+            pandora.$ui.item = Ox.TreeList({
                 data: result.data,
                 width: pandora.$ui.mainPanel.size(1) - Ox.UI.SCROLLBAR_SIZE
-            }).appendTo(stats);
-            pandora.$ui.contentPanel.replaceElement(1, stats);
+            });
+            pandora.$ui.contentPanel.replaceElement(1,
+                Ox.Container().append(pandora.$ui.item)
+            );
 
         } else if (pandora.user.ui.itemView == 'files') {
 
