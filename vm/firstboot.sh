@@ -76,7 +76,7 @@ chmod +x /usr/local/bin/fixtime
 cat > /usr/local/bin/genissue <<EOF
 #!/bin/bash
 HOST=\$(rgrep .local /var/log/syslog | grep "Host name is" | tail -n 1 | awk '{print \$12}' | sed 's/\.$//')
-echo Welcome to pan.do/ra - connect via one of those urls:
+echo Welcome to pan.do/ra. Connect via one of these URLs:
 echo 
 echo "  http://\$HOST/"
 for ip in \$(ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print \$1 }'); do
