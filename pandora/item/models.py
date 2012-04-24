@@ -853,6 +853,7 @@ class Item(models.Model):
                 else:
                     current_values = [unicode(current_values)]
             current_values = list(set(current_values))
+            current_values = [ox.decodeHtml(v) for v in current_values]
             saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
             removed_values = filter(lambda i: i not in current_values, saved_values)
             if removed_values:
