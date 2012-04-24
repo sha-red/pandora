@@ -7,7 +7,9 @@ pandora.ui.filter = function(id) {
         title = Ox.getObjectById(pandora.site.filters, id).title,
         //width = pandora.getFilterWidth(i, panelWidth),
         that = Ox.TextList({
-            _reload: !pandora.user.ui.showFilters,
+            _selected: !pandora.user.ui.showFilters
+                ? pandora.user.ui._filterState[i].selected
+                : false,
             columns: [
                 {
                     align: 'left',
@@ -70,7 +72,9 @@ pandora.ui.filter = function(id) {
                 }
             },
             scrollbarVisible: true,
-            selected: pandora.user.ui._filterState[i].selected,
+            selected: pandora.user.ui.showFilters
+                ? pandora.user.ui._filterState[i].selected
+                : [],
             sort: [{
                 key: pandora.user.ui.filters[i].sort[0].key,
                 operator: pandora.user.ui.filters[i].sort[0].operator

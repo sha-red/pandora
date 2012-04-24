@@ -41,8 +41,16 @@ pandora.ui.browser = function() {
                 pandora.UI.set({showFilters: !data.collapsed});
                 if (!data.collapsed) {
                     pandora.$ui.filters.forEach(function($filter) {
-                        if ($filter.options('_reload')) {
-                            $filter.options({_reload: false}).reloadList();
+                        var selected = $filter.options('_selected');
+                        if (selected) {
+                            $filter.bindEventOnce({
+                                load: function() {
+                                    $filter.options({
+                                        _selected: false,
+                                        selected: selected
+                                    });
+                                }
+                            }).reloadList();                            
                         }
                     });
                 }
