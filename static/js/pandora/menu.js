@@ -340,6 +340,9 @@ pandora.ui.mainMenu = function() {
                     var e = error;
                 }
             },
+            key_backtick: function() {
+                changeFocus(1);
+            },
             key_control_comma: function() {
                 if (!pandora.hasDialogOrScreen()) {
                     pandora.UI.set({page: 'preferences'});
@@ -389,6 +392,9 @@ pandora.ui.mainMenu = function() {
             },
             key_shift_b: function() {
                 ui.item && pandora.UI.set({showBrowser: !ui.showBrowser});
+            },
+            key_shift_backtick: function() {
+                changeFocus(-1);
             },
             key_shift_f: function() {
                 !ui.item && pandora.UI.set({showFilters: !ui.showFilters});
@@ -493,6 +499,57 @@ pandora.ui.mainMenu = function() {
                 that.setItemTitle('showtimeline', (data.value ? 'Hide' : 'Show') + ' Timeline');
             }
         });
+
+    function changeFocus(direction) {
+        var elements = [],
+            index,
+            listData = pandora.getListData();
+        elements[0] = !listData.folder ? pandora.$ui.allItems
+            : pandora.$ui.folderList[listData.folder];
+        if (!ui.item && ui.showFilters) {
+            pandora.$ui.filters.forEach(function($filter) {
+                if ($filter.options('selected').length) {
+                    elements.push($filter);
+                }
+            });
+        } else if (ui.item && ui.showBrowser) {
+            elements.push(pandora.$ui.browser);
+        }
+        if (!ui.item) {
+            if (['map', 'calendar'].indexOf(ui.listView) > -1) {
+                elements.push(pandora.$ui[ui.listView]);
+                if (pandora.$ui.clipList.options('selected').length) {
+                    elements.push(pandora.$ui.clipList);
+                }
+            } else if (pandora.$ui.list.options('selected').length) {
+                elements.push(pandora.$ui.list);
+            }
+        } else {
+            if (['player', 'editor', 'timeline', 'map', 'calendar'].indexOf(ui.itemView) > -1) {
+                elements.push(pandora.$ui[ui.itemView]);
+            }
+            if (
+                ['clips', 'map', 'calendar'].indexOf(ui.itemView) > -1
+                && pandora.$ui.clipList.options('selected').length
+            ) {
+                elements.push(pandora.$ui.clipList);
+            }
+            if (
+                ui.itemView == 'data'
+                && pandora.$ui.item.options('selected').length
+            ) {
+                elements.push(pandora.$ui.item);
+            }
+        }
+        index = direction == 1 ? -1 : elements.length;
+        Ox.forEach(elements, function(element, i) {
+            if (element.hasFocus()) {
+                index = i;
+                return false;
+            }
+        });
+        elements[Ox.mod((index + direction), elements.length)].gainFocus();
+    }
 
     function getListMenu(lists) {
         return { id: 'listMenu', title: 'List', items: Ox.merge(
