@@ -122,6 +122,12 @@ pandora.ui.browser = function() {
             open: function() {
                 that.scrollToSelection();
             },
+            openpreview: function() {
+                var itemView = pandora.user.ui.itemView;
+                if (['player', 'editor', 'timeline'].indexOf(itemView) > -1) {
+                    pandora.$ui[itemView].gainFocus().triggerEvent('key_space');
+                }
+            },
             select: function(data) {
                 data.ids.length && pandora.UI.set({
                     'item': data.ids[0]
@@ -156,6 +162,18 @@ pandora.ui.browser = function() {
             },
             pandora_showsiteposters: function() {
                 pandora.user.ui.icons == 'posters' && that.reloadList(true);
+            }
+        })
+        .bindEventOnce({
+            load: function() {
+                // gain focus if we're on page load or if we've just switched
+                // to an item and the not-yet-garbage-collected list still has
+                // focus
+                if (Ox.Focus.focused() === null || (
+                    pandora.$ui.list && pandora.$ui.list.hasFocus()
+                )) {
+                    that.gainFocus();
+                }
             }
         });
         that.css({overflowY: 'hidden'}); // this fixes a bug in firefox
