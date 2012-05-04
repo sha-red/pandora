@@ -25,7 +25,7 @@
     */
     "capabilities": {
         "canDeleteItems": {"admin": true},
-        "canDownloadVideo": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
+        "canDownloadVideo": {"guest": 0, "member": 0, "staff": 4, "admin": 4},
         "canEditAnnotations": {"staff": true, "admin": true},
         "canEditEvents": {"staff": true, "admin": true},
         "canEditFeaturedLists": {"staff": true, "admin": true},
