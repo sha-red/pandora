@@ -5,6 +5,7 @@ from decimal import Decimal
 import re
 import unicodedata
 import ox
+from ox import sorted_strings, sort_string
 
 def safe_filename(filename):
     filename = filename.replace(': ', '_ ')
@@ -45,17 +46,6 @@ def plural_key(term):
     return {
         'country': 'countries',
     }.get(term, term + 's')
-
-
-def sort_string(string):
-    string = string.replace(u'Æ', 'AE').replace(u'Ø', 'O').replace(u'Þ', 'Th')
-
-    #pad numbered titles
-    string = re.sub('(\d+)', lambda x: '%010d' % int(x.group(0)), string)
-    return unicodedata.normalize('NFKD', string)
-
-def sorted_strings(strings):
-    return sorted(strings, cmp=lambda a, b: cmp(sort_string(a), sort_string(b)))
 
 def sort_title(title):
 
