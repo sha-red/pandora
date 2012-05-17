@@ -309,8 +309,7 @@ pandora.ui.list = function() {
                             duration: data.duration,
                             find: isClipsQuery ? clipsQuery.conditions[0].value : '',
                             getImageURL: function(type, i) {
-                                type = '';
-                                return '/' + data.id + '/timeline' + type + '16p' + i + '.png';
+                                return '/' + data.id + '/timeline' + type + '16p' + i + '.jpg';
                             },
                             position: pandora.user.ui.videoPoints[data.id]
                                 ? pandora.user.ui.videoPoints[data.id].position : 0,

@@ -16,6 +16,7 @@ import numpy as np
 import Image
 import ox
 import ox.image
+from ox.utils import json
 
 img_extension='jpg'
 
@@ -303,13 +304,27 @@ def resize_image(image_source, image_output, width=None, size=None):
         output.save(image_output)
 
 
-def timeline(video, prefix):
-    cmd = ['oxtimeline', '-i', video, '-o', prefix]
-    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+def timeline(
+        video, prefix,
+        modes=['antialias', 'slitscan', 'keyframes', 'audio', 'data'],
+        #modes=['antialias', 'slitscan', 'audio', 'data'],
+        size=[64, 16]
+    ):
+    if isinstance(video, basestring):
+        video = [video]
+    cmd = ['../bin/oxtimelines',
+        '-s', ','.join(map(str, reversed(sorted(size)))),
+        '-m', ','.join(modes),
+        '-o', prefix,
+        '-c', os.path.join(prefix, 'cuts.json'),
+    ] + video
+    #p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    print cmd
+    p = subprocess.Popen(cmd)
     p.wait()
 
 
-def average_color(prefix, start=0, end=0):
+def average_color(prefix, start=0, end=0, mode='antialias'):
     height = 64
     frames = 0
     pixels = []
@@ -318,7 +333,9 @@ def average_color(prefix, start=0, end=0):
     if end:
         start = int(start * 25)
         end = int(end * 25)
-    timelines = sorted(filter(lambda t: t!= '%s%sp.png'%(prefix,height), glob("%s%sp*.png"%(prefix, height))))
+    mode = 'timeline' + mode
+    timelines = sorted(filter(lambda t: t!= '%s%s%sp.jpg'%(prefix, mode, height),
+                              glob("%s%s%sp*.jpg"%(prefix, mode, height))))
     for image in timelines:
         start_offset = 0
         if start and frames + 1500 <= start:
@@ -352,8 +369,7 @@ def average_color(prefix, start=0, end=0):
 
 
 def average_volume(prefix, start=0, end=0):
-    #FIXME: actually compute volume
-    return 0
+    return average_color(prefix, start, end, 'audio')[2]
 
 
 def get_distance(rgb0, rgb1):
@@ -363,31 +379,11 @@ def get_distance(rgb0, rgb1):
 
 
 def cuts(prefix):
-    cuts = []
-    distances = [0]
-    fps = 25
-    frames = 0
-    height = 64
-    width = 1500
-    pixels = []
-    timelines = sorted(filter(lambda t: t!= '%s%sp.png'%(prefix,height), glob("%s%sp*.png"%(prefix, height))))
-    for image in timelines:
-        timeline = Image.open(image)
-        frames += timeline.size[0]
-        pixels.append(timeline.load())
-    for frame in range(1, frames):
-        x = frame % width
-        distance = 0
-        image0 = int((frame - 1) / width)
-        image1 = int(frame / width)
-        for y in range(height):
-            rgb0 = pixels[image0][(x - 1) % width, y]
-            rgb1 = pixels[image1][x, y]
-            distance += get_distance(rgb0, rgb1)
-        distance = distance / height
-        distances.append(distance)
-        if distance >= 0.025 and abs(distance - distances[frame - 1]) >= 0.05:
-            cuts.append(frame / fps)
+    fname = os.path.join(prefix, 'cuts.json')
+    if not os.path.exists(fname):
+        return []
+    with open(fname) as f:
+        cuts = json.load(f)
     return cuts
 
 

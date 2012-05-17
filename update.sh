@@ -2,6 +2,7 @@
 pandora_repos=http://code.0x2620.org/pandora/
 oxjs_repos=http://code.0x2620.org/oxjs/
 python_ox_repos=http://code.0x2620.org/python-ox/
+oxtimelines_repos=http://code.0x2620.org/oxtimelines/
 
 cd `dirname $0`
 base=`pwd`
@@ -27,6 +28,11 @@ if [ -e src/python-ox ]; then
   current=$current`bzr revno`
   bzr pull $python_ox_repos
   new=$new`bzr revno`
+fi
+cd $base
+if [ -e src/oxtimelines ]; then
+  cd src/oxtimelines
+  bzr pull $oxtimelines_repos
 fi
 cd $base
 if [ $current -ne $new ]; then

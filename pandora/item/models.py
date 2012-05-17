@@ -29,7 +29,7 @@ import ox.image
 import managers
 import utils
 import tasks
-from .timelines import join_timelines
+from .timelines import join_tiles
 from data_api import external_data
 
 from archive import extract
@@ -900,8 +900,8 @@ class Item(models.Model):
     def timeline_prefix(self):
         videos = self.streams()
         if len(videos) == 1:
-            return os.path.join(settings.MEDIA_ROOT, videos[0].path('timeline'))
-        return os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline')
+            return os.path.join(settings.MEDIA_ROOT, videos[0].path(''))
+        return os.path.join(settings.MEDIA_ROOT, self.path())
 
     def get_files(self, user):
         files = self.files.all().select_related()
@@ -1025,19 +1025,20 @@ class Item(models.Model):
         if streams.count() == 1:
             self.data['color'] = streams[0].color
             self.data['cuts'] = streams[0].cuts
+            self.data['volume'] = streams[0].volume
         else:
             #self.data['color'] = extract.average_color(self.timeline_prefix)
-            #self.data['cuts'] = extract.cuts(self.timeline_prefix)
-            self.data['cuts'] = []
+            self.data['cuts'] = extract.cuts(self.timeline_prefix)
+            self.data['volume'] = 0
             offset = 0
             color = [0, 0, 0]
             n = streams.count()
             for s in streams:
-                for c in s.cuts:
-                    self.data['cuts'].append(c+offset)
+                self.data['volume'] = s.volume * s.duration
                 color = map(lambda a,b: (a+b)/n, color,ox.image.getRGB(s.color))
                 offset += s.duration
             self.data['color'] = ox.image.getHSL(color)
+            self.data['volume'] /= offset
         #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
         self.select_frame()
         self.make_poster(True)
@@ -1082,7 +1083,7 @@ class Item(models.Model):
         streams = self.streams()
         if streams.count() > 1:
             timelines = [s.timeline_prefix for s in self.streams()]
-            join_timelines(timelines, self.timeline_prefix)
+            join_tiles(timelines, self.timeline_prefix)
         else:
             #remove joined timeline if it was created at some point
             for f in glob(os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline*.png')):

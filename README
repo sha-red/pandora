@@ -29,7 +29,7 @@ Get code from bazzar
     cd /srv/
     bzr branch http://code.0x2620.org/pandora pandora
     cd pandora
-    virtualenv .
+    virtualenv --system-site-packages .
     pip -E . install -r requirements.txt
 
     cd static

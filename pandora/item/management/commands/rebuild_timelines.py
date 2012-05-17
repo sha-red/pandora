@@ -14,10 +14,9 @@ from ... import models
 
 class Command(BaseCommand):
     """
-    rebuild sort/search cache for all items.
+    rebuild timeline for all items.
     """
-    help = 'rebuild sort/search cache for all items.'
-    """
+    help = 'rebuild all timeines(use after updating oxtimelines)'
     args = ''
 
     def handle(self, **options):
@@ -27,8 +26,9 @@ class Command(BaseCommand):
         while offset <= count:
             for i in models.Item.objects.all().order_by('id')[offset:offset+chunk]:
                 print pos, i.itemId
-                i.save()
-                time.sleep(1) #dont overload db
+                for s in i.streams():
+                    s.make_timeline()
+                i.update_timeline()
                 pos -= 1
             offset += chunk
-            time.sleep(30) #dont overload db
+            time.sleep(30) #keep load down

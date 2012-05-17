@@ -9,8 +9,8 @@ urlpatterns = patterns("item.views",
     (r'^(?P<id>[A-Z0-9].*)/(?P<size>\d+)p(?P<position>[\d\.]*)\.jpg$', 'frame'),
 
     #timelines
-    (r'^(?P<id>[A-Z0-9].*)/timeline(?P<size>\d+)p(?P<position>\d+)\.png$', 'timeline'),
-    (r'^(?P<id>[A-Z0-9].*)/timeline(?P<size>\d+)p\.png$', 'timeline_overview'),
+    (r'^(?P<id>[A-Z0-9].*)/timeline(?P<mode>[a-z]*)(?P<size>\d+)p(?P<position>\d+)\.(?P<format>png|jpg)$', 'timeline'),
+    (r'^(?P<id>[A-Z0-9].*)/timeline(?P<mode>[a-z]*)(?P<size>\d+)p\.(?P<format>png|jpg)$', 'timeline'),
 
     #video
     (r'^(?P<id>[A-Z0-9].*)/(?P<resolution>\d+)p(?P<index>\d*)\.(?P<format>webm|ogv|mp4)$', 'video'),

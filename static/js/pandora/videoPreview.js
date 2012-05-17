@@ -21,7 +21,7 @@ pandora.ui.videoPreview = function(data) {
             height: data.height,
             position: data.position,
             scaleToFill: true,
-            timeline: '/' + data.id + '/timeline16p.png',
+            timeline: '/' + data.id + '/timeline16p.jpg',
             width: data.width
         });
     return that;

@@ -76,7 +76,7 @@ pandora.ui.tv = function() {
                     scaleToFill: pandora.user.ui.videoScale == 'fill',
                     subtitles: videoOptions.subtitles,
                     tooltips: true,
-                    timeline: '/' + result.data.item + '/timeline16p.png',
+                    timeline: '/' + result.data.item + '/timeline16p.jpg',
                     title: pandora.site.site.name + ' &mdash; ' + (
                             list || 'All ' + pandora.site.itemName.plural
                         ) + ' &mdash; '

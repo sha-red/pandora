@@ -393,9 +393,11 @@ class Stream(models.Model):
 
     cuts = fields.TupleField(default=[])
     color = fields.TupleField(default=[])
+    volume = models.FloatField(default=0)
 
     @property
     def timeline_prefix(self):
+        return os.path.join(settings.MEDIA_ROOT, self.path())
         return os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline')
 
     def name(self):
@@ -438,6 +440,7 @@ class Stream(models.Model):
             extract.timeline(self.video.path, self.timeline_prefix)
             self.cuts = tuple(extract.cuts(self.timeline_prefix))
             self.color = tuple(extract.average_color(self.timeline_prefix))
+            self.volume= extract.average_volume(self.timeline_prefix)
             self.save()
 
     def save(self, *args, **kwargs):

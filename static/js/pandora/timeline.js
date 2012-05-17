@@ -24,8 +24,7 @@ pandora.ui.timeline = function(data) {
             return '/' + ui.item + '/' + ui.videoResolution + 'p' + position + '.jpg';
         },
         getLargeTimelineURL: function(type, i) {
-            type = '';
-            return '/' + ui.item + '/timeline' + type + '64p' + i + '.png';
+            return '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg';
         },
         height: pandora.$ui.contentPanel.size(1),
         layers: data.annotations,
@@ -40,7 +39,7 @@ pandora.ui.timeline = function(data) {
         showAnnotationsMap: ui.showAnnotationsMap,
         showLayers: Ox.clone(ui.showLayers),
         showUsers: pandora.site.annotations.showUsers,
-        smallTimelineURL: '/' + ui.item + '/timeline16p.png',
+        smallTimelineURL: '/' + ui.item + '/timeline16p.jpg',
         timeline: ui.videoTimeline,
         timelines: pandora.site.timelines,
         video: data.video,

@@ -713,20 +713,30 @@ def icon(request, id, size=None):
         response['Cache-Control'] = 'no-cache'
         return response
 
-def timeline(request, id, size, position):
+def timeline(request, id, size, position=-1, format='jpg', mode=None):
     item = get_object_or_404(models.Item, itemId=id)
     if not item.access(request.user):
         return HttpResponseForbidden()
-    timeline = '%s%sp%04d.png' %(item.timeline_prefix, size, int(position))
-    return HttpFileResponse(timeline, content_type='image/png')
 
+    if not mode:
+        mode = 'antialias'
+    modes = [t['id'] for t in settings.CONFIG['timelines']]
+    if mode not in modes:
+        raise Http404
+    modes.pop(modes.index(mode))
 
-def timeline_overview(request, id, size):
-    item = get_object_or_404(models.Item, itemId=id)
-    if not item.access(request.user):
-        return HttpResponseForbidden()
-    timeline = '%s%sp.png' %(item.timeline_prefix, size)
-    return HttpFileResponse(timeline, content_type='image/png')
+    prefix = os.path.join(item.timeline_prefix, 'timeline')
+    def timeline():
+        timeline = '%s%s%sp' % (prefix, mode, size) 
+        if position > -1:
+            timeline += '%d' % int(position)
+        return timeline + '.jpg'
+
+    path = timeline()
+    while modes and not os.path.exists(path):
+        mode = modes.pop()
+        path = timeline()
+    return HttpFileResponse(path, content_type='image/jpeg')
 
 def torrent(request, id, filename=None):
     item = get_object_or_404(models.Item, itemId=id)

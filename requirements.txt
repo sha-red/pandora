@@ -1,7 +1,7 @@
 -e svn+http://code.djangoproject.com/svn/django/branches/releases/1.3.X#egg=django
 #South
 -e bzr+http://code.0x2620.org/python-ox/#egg=python-ox
--e bzr+http://code.0x2620.org/oxtimeline/#egg=oxtimeline
+-e bzr+http://code.0x2620.org/oxtimelines/#egg=oxtimelines
 simplejson
 chardet
 celery>=2.4.2

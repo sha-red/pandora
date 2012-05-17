@@ -28,12 +28,10 @@ pandora.ui.editor = function(data) {
             return '/' + pandora.user.ui.item + '/' + pandora.user.ui.videoResolution + 'p' + position + '.jpg';
         },
         getLargeTimelineURL: function(type, i) {
-            type = '';
-            return '/' + pandora.user.ui.item + '/timeline' + type + '64p' + i + '.png';
+            return '/' + pandora.user.ui.item + '/timeline' + type + '64p' + i + '.jpg';
         },
         getSmallTimelineURL: function(type, i) {
-            type = '';
-            return '/' + pandora.user.ui.item + '/timeline' + type + '16p' + i + '.png';
+            return '/' + pandora.user.ui.item + '/timeline' + type + '16p' + i + '.jpg';
         },
         height: pandora.$ui.contentPanel.size(1),
         id: 'editor',
