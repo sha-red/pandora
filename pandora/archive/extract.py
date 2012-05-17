@@ -318,9 +318,9 @@ def timeline(
         '-o', prefix,
         '-c', os.path.join(prefix, 'cuts.json'),
     ] + video
-    #p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    print cmd
-    p = subprocess.Popen(cmd)
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    #print cmd
+    #p = subprocess.Popen(cmd)
     p.wait()
 
 
