@@ -17,7 +17,6 @@ class Command(BaseCommand):
     rebuild sort/search cache for all items.
     """
     help = 'rebuild sort/search cache for all items.'
-    """
     args = ''
 
     def handle(self, **options):
