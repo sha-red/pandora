@@ -287,7 +287,7 @@ pandora.ui.list = function() {
                         url: url,
                         width: Math.round(ratio >= 1 ? size : size * ratio)
                     },
-                    info: {
+                    info: data.rendered ? {
                         css: {marginTop: '2px'},
                         element: Ox.BlockVideoTimeline,
                         events: {
@@ -321,6 +321,11 @@ pandora.ui.list = function() {
                             }) : [],
                             type: pandora.user.ui.videoTimeline
                         }
+                    } : {
+                        css: {marginTop: '2px'},
+                        element: Ox.Element,
+                        id: data.id,
+                        options: {}
                     }
                 };
             },
@@ -335,7 +340,7 @@ pandora.ui.list = function() {
                     keys: []
                 }} : {})), callback);
             },
-            keys: ['clips', 'director', 'duration', 'id', 'posterRatio', 'title', 'year'],
+            keys: ['clips', 'director', 'duration', 'id', 'posterRatio', 'rendered', 'title', 'year'],
             selected: pandora.user.ui.listSelection,
             size: 192,
             sort: pandora.user.ui.listSort,
