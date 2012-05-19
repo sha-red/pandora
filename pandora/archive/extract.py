@@ -307,7 +307,6 @@ def resize_image(image_source, image_output, width=None, size=None):
 def timeline(
         video, prefix,
         modes=['antialias', 'slitscan', 'keyframes', 'audio', 'data'],
-        #modes=['antialias', 'slitscan', 'audio', 'data'],
         size=[64, 16]
     ):
     if isinstance(video, basestring):

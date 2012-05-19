@@ -96,6 +96,8 @@ class SessionData(models.Model):
         if request.user.is_authenticated():
             data.user = request.user
         data.ip = request.META['REMOTE_ADDR']
+        if data.ip.startswith('::ffff:'):
+            data.ip = data.ip[len('::ffff:'):]
         data.useragent = request.META['HTTP_USER_AGENT']
         data.info = json.loads(request.POST.get('data', '{}'))
         screen = data.info.get('screen', {})
