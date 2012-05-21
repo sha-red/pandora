@@ -304,11 +304,11 @@ def resize_image(image_source, image_output, width=None, size=None):
         output.save(image_output)
 
 
-def timeline(
-        video, prefix,
-        modes=['antialias', 'slitscan', 'keyframes', 'audio', 'data'],
+def timeline(video, prefix, modes=None, size=None):
+    if modes is None:
+        modes = ['antialias', 'slitscan', 'keyframes', 'audio', 'data']
+    if size is None:
         size=[64, 16]
-    ):
     if isinstance(video, basestring):
         video = [video]
     cmd = ['../bin/oxtimelines',
