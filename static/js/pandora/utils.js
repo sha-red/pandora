@@ -815,7 +815,9 @@ pandora.getVideoOptions = function(data) {
     var canPlayClips = data.editable || pandora.site.capabilities.canPlayClips[pandora.user.level] >= data.rightslevel,
         canPlayVideo = data.editable || pandora.site.capabilities.canPlayVideo[pandora.user.level] >= data.rightslevel,
         options = {},
-        subtitlesLayer = Ox.getObject(pandora.site.layers, 'isSubtitles', true);
+        subtitlesLayer = pandora.site.layers.filter(function(layer) {
+            return layer.isSubtitles;
+        })[0];
     options.subtitles = subtitlesLayer ? data.layers[subtitlesLayer.id].map(function(subtitle) {
         return {
             id: subtitle.id,
