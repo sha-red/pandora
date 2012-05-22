@@ -13,7 +13,13 @@ pandora.ui.preferencesDialog = function() {
                     .append(
                         $('<img>')
                             .attr({src: '/static/png/icon.png'})
-                            .css({position: 'absolute', left: '16px', top: '16px'})
+                            .css({
+                                position: 'absolute',
+                                left: '16px',
+                                top: '16px',
+                                width: '64px',
+                                height: '64px'
+                            })
                     );
                 if (id == 'account') {
                     $content.append(
