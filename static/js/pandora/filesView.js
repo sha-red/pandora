@@ -311,9 +311,9 @@ pandora.ui.filesView = function(options, self) {
                     }, function(result) {
                     */
                     conditions = {};
-                    Ox.map(['id', 'title', 'director', 'year'], function(key) {
+                    ['id', 'title', 'director', 'year'].map(function(key) {
                         var value = self['$' + key + 'Input'].value();
-                        if(value.length) {
+                        if (value.length) {
                             conditions[key] = key == 'director' ? value.split(', ') : value;
                         }
                     });

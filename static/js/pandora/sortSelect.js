@@ -15,13 +15,14 @@ pandora.ui.sortSelect = function(isNavigationView) {
     if (!pandora.user.ui.item) {
         items = Ox.merge(
             items,
-            Ox.map(pandora.site.sortKeys, function(key) {
+            pandora.site.sortKeys.filter(function(key) {
                 return Ox.getIndexById(items, key.id) == -1 && (
                     !key.capability
-                    || pandora.site.capabilities[key.capability][pandora.user.level]
-                ) ? Ox.extend(Ox.clone(key), {
+                    || pandora.site.capabilities[key.capability][pandora.user.level];
+            }).map(function(key) {
+                return Ox.extend(Ox.clone(key), {
                     title: 'Sort by ' + key.title
-                }) : null;
+                });
             })
         );
     }

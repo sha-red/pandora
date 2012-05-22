@@ -596,13 +596,13 @@ pandora.getItemByIdOrTitle = function(str, callback) {
             }, function(result) {
                 var id = '';
                 if (result.data.items.length) {
-                    var items = Ox.map(result.data.items, function(item) {
+                    var items = Ox.filter(Ox.map(result.data.items, function(item) {
                         // test if exact match or word match
                         var sort = new RegExp('^' + str + '$', 'i').test(item.title) ? 2000000
                             : new RegExp('\\b' + str + '\\b', 'i').test(item.title) ? 1000000 : 0;
                         return sort ? {id: item.id, sort: sort + (parseInt(item[sortKey]) || 0)} : null;
                         // fixme: remove the (...|| 0) check once the backend sends correct data
-                    });
+                    }));
                     if (items.length) {
                         id = items.sort(function(a, b) {
                             return b.sort - a.sort;
@@ -1170,12 +1170,12 @@ pandora.unloadWindow = function() {
         // If exactly one condition has the given key and operator
         // (including or excluding conditions where all subconditions match)
         // returns the corresponding index, otherwise returns -1
-        var indices = Ox.map(conditions, function(condition, i) {
+        var indices = Ox.indicesOf(conditions, function(condition) {
             return (
                 condition.conditions
                 ? includeSubconditions && everyCondition(condition.conditions, key, operator)
                 : condition.key == key && condition.operator == operator
-            ) ? i : null;
+            );
         });
         return indices.length == 1 ? indices[0] : -1;
     }
@@ -1245,9 +1245,9 @@ pandora.unloadWindow = function() {
                     return filter.index > -1;
                 }).length;
             // indices of non-advanced find queries
-            indices = Ox.map(pandora.site.findKeys, function(findKey) {
+            indices = Ox.indicesOf(pandora.site.findKeys, function(findKey) {
                 var index = oneCondition(find.conditions, findKey.id, '=');
-                return index > -1 ? index : null;
+                return index > -1;
             });
             state = conditions == 1 && indices.length == 1 ? {
                 index: indices[0],

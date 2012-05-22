@@ -176,18 +176,22 @@ pandora.URL = (function() {
             list: Ox.merge(
                 // listView is the default view
                 [pandora.user.ui.listView],
-                Ox.map(pandora.site.listViews, function(view) {
-                    return view.id == pandora.user.ui.listView ? null : view.id;
+                pandora.site.listViews.filter(function(view) {
+                    return view.id == pandora.user.ui.listView
+                }).map(function(view) {
+                    return view.id;
                 })
             ),
             item: Ox.merge(
                 // itemView is the default view,
                 // videoView is the default view if there is a duration
                 [pandora.user.ui.itemView, pandora.user.ui.videoView],
-                Ox.map(pandora.site.itemViews, function(view) {
+                pandora.site.itemViews.filter(function(view) {
                     return [
                         pandora.user.ui.itemView, pandora.user.ui.videoView
-                    ].indexOf(view.id) > -1 ? null : view.id;
+                    ].indexOf(view.id) > -1;
+                }).map(function(view) {
+                     return view.id;
                 })
             )
         };
@@ -200,11 +204,11 @@ pandora.URL = (function() {
                     || pandora.isClipView(view)
                         && Ox.getObjectById(pandora.site.clipKeys, pandora.user.ui.listSort[0].key)
                     || [],
-                pandora.isClipView(view) ? Ox.map(pandora.site.clipKeys, function(key) {
-                    return key.id == pandora.user.ui.listSort[0].key ? null : key;
+                pandora.isClipView(view) ? pandora.site.clipKeys.filter(function(key) {
+                    return key.id == pandora.user.ui.listSort[0].key;
                 }) : [],
-                Ox.map(pandora.site.sortKeys, function(key) {
-                    return key.id == pandora.user.ui.listSort[0].key ? null : key;
+                pandora.site.sortKeys.filter(function(key) {
+                    return key.id == pandora.user.ui.listSort[0].key;
                 })
             );
         });
@@ -213,8 +217,8 @@ pandora.URL = (function() {
                 sortKeys[itemsSection].item[view] = Ox.merge(
                     // itemSort[0].key is the default sort key
                     [Ox.getObjectById(pandora.site.clipKeys, pandora.user.ui.itemSort[0].key)],
-                    Ox.map(pandora.site.clipKeys, function(key) {
-                        return key.id == pandora.user.ui.itemSort[0].key ? null : key;
+                    pandora.site.clipKeys.filter(function(key) {
+                        return key.id == pandora.user.ui.itemSort[0].key;
                     })
                 );
             }

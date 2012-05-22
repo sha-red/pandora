@@ -52,27 +52,27 @@ pandora.ui.list = function() {
                 titleImage: pandora.user.ui.icons == 'posters' ? 'SetPoster' : 'Icon',
                 visible: pandora.user.ui.listColumns.indexOf('posterRatio') > -1,
                 width: 16
-            }], Ox.map(pandora.site.sortKeys, function(key) {
-                var position = pandora.user.ui.listColumns.indexOf(key.id);
+            }], pandora.site.sortKeys.filter(function(key) {
                 return !key.capability
-                    || pandora.site.capabilities[key.capability][pandora.user.level]
-                    ? {
-                        align: ['string', 'text'].indexOf(
-                            Ox.isArray(key.type) ? key.type[0]: key.type
-                        ) > -1 ? 'left' : key.type == 'list' ? 'center' : 'right',
-                        defaultWidth: key.columnWidth,
-                        format: key.format,
-                        id: key.id,
-                        operator: pandora.getSortOperator(key.id),
-                        position: position,
-                        removable: !key.columnRequired,
-                        title: key.title,
-                        type: key.type,
-                        unique: key.id == 'id',
-                        visible: position > -1,
-                        width: pandora.user.ui.listColumnWidth[key.id] || key.columnWidth
-                    }
-                    : null;
+                    || pandora.site.capabilities[key.capability][pandora.user.level];
+            }).map(function(key) {
+                var position = pandora.user.ui.listColumns.indexOf(key.id);
+                return {
+                    align: ['string', 'text'].indexOf(
+                        Ox.isArray(key.type) ? key.type[0]: key.type
+                    ) > -1 ? 'left' : key.type == 'list' ? 'center' : 'right',
+                    defaultWidth: key.columnWidth,
+                    format: key.format,
+                    id: key.id,
+                    operator: pandora.getSortOperator(key.id),
+                    position: position,
+                    removable: !key.columnRequired,
+                    title: key.title,
+                    type: key.type,
+                    unique: key.id == 'id',
+                    visible: position > -1,
+                    width: pandora.user.ui.listColumnWidth[key.id] || key.columnWidth
+                };
             })),
             columnsMovable: true,
             columnsRemovable: true,

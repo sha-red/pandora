@@ -177,7 +177,7 @@ appPanel
         var prefix = '/static/';
         if (localStorage && localStorage['pandora.debug']) {
             Ox.getJSON(prefix + 'json/pandora.json?' + Ox.random(1000), function(files) {
-                Ox.loadFiles(Ox.map(files, function(file) {
+                Ox.loadFiles(files.map(function(file) {
                     return prefix + file;
                 }), callback);
             });
@@ -227,13 +227,13 @@ appPanel
             }) ? 'manual' : data.site.layers.some(function(layer) {
                 return layer.hasEvents;
             }) ? 'auto' : 'none',
-            clipKeys: Ox.map(data.site.clipKeys, function(key) {
+            clipKeys: data.site.clipKeys.map(function(key) {
                 return Ox.extend(key, {
                     operator: pandora.getSortOperator(key.id)
                 });
             }),
-            findKeys: Ox.map(data.site.itemKeys, function(key) {
-                return key.find ? key : null;
+            findKeys: data.site.itemKeys.filter(function(key) {
+                return key.find;
             }),
             itemsSection: pandora.site.itemName.plural.toLowerCase(),
             map: data.site.layers.some(function(layer) {
@@ -259,14 +259,16 @@ appPanel
                     {id: 'featured', title: 'Featured Texts', showBrowser: false}
                 ]
             },
-            sortKeys: Ox.map(pandora.site.itemKeys, function(key) {
-                return key.sort ? Ox.extend(key, {
+            sortKeys: pandora.site.itemKeys.filter(function(key) {
+                return key.sort;
+            }).map(function(key) {
+                return Ox.extend(key, {
                     operator: pandora.getSortOperator(key.id)
-                }) : null;
+                });
             })
         });
         pandora.site.listSettings = {};
-        Ox.map(pandora.site.user.ui, function(val, key) {
+        Ox.forEach(pandora.site.user.ui, function(val, key) {
             if (/^list[A-Z]/.test(key)) {
                 pandora.site.listSettings[key] = key[4].toLowerCase() + key.substr(5);
             }

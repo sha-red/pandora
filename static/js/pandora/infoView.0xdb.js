@@ -643,9 +643,9 @@ pandora.ui.infoView = function(data) {
                 Ox.Button({
                         tooltip: (canEdit ? Ox.toTitleCase(userLevel) : 'You') + ' '
                             + (hasCapability ? 'can' : 'can\'t') + ' '
-                            + Ox.map(Ox.toSlashes(capability.name).split('/'), function(word, i) {
-                                return i == 0 ? null : word.toLowerCase();
-                            }).join(' ')
+                            + Ox.toSlashes(capability.name)
+                                .split('/').slice(1).join(' ')
+                                .toLowerCase()
                                 .replace('see item', 'see the item')
                                 .replace('play video', 'play the full video')
                                 .replace('download video', 'download the video'),

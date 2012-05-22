@@ -6,7 +6,7 @@ pandora.ui.videoPreview = function(data) {
     var that = Ox.VideoPreview({
             duration: data.duration,
             getFrame: function(position) {
-                var resolutions = Ox.filter(pandora.site.video.resolutions, function(resolution, i) {
+                var resolutions = pandora.site.video.resolutions.filter(function(resolution, i) {
                         return resolution >= data.height;
                     }),
                     resolution = resolutions.length

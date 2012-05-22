@@ -28,13 +28,14 @@ pandora.ui.findElement = function() {
                     pandora.$ui.findSelect = Ox.Select({
                             id: 'select',
                             items: Ox.merge(
-                                Ox.map(pandora.site.findKeys, function(key, i) {
+                                pandora.site.findKeys.filter(function(key, i) {
                                     return !key.capability
-                                        || pandora.site.capabilities[key.capability][pandora.user.level]
-                                    ? {
+                                        || pandora.site.capabilities[key.capability][pandora.user.level];
+                                }).map(function(key) {
+                                    return {
                                         id: key.id,
                                         title: 'Find: ' + key.title,
-                                    } : null;
+                                    };
                                 }),
                                 [{}, {
                                     id: 'advanced',

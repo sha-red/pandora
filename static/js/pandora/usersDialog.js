@@ -659,11 +659,11 @@ pandora.ui.usersDialog = function() {
                     }),
                 Ox.Select({
                     id: 'level',
-                    items: Ox.map(pandora.site.userLevels, function(level, i) {
-                        return i ? {
+                    items: pandora.site.userLevels.slice(1).map(function(level) {
+                        return {
                             id: level,
                             title: Ox.toTitleCase(level)
-                        } : null;
+                        };
                     }),
                     label: 'Level',
                     labelWidth: 80,

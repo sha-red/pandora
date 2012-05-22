@@ -353,13 +353,14 @@ pandora.ui.statisticsDialog = function() {
                                                     element: '<img>',
                                                     tooltip: mode == 'all' && (key == 'continent' || key == 'region')
                                                         ? Ox.wordwrap(
-                                                            Ox.map(Ox.COUNTRIES, function(country) {
+                                                            Ox.COUNTRIES.filter(function(country) {
                                                                 return country[key] == split[key == 'continent' ? 0 : 1]
                                                                     && country.code.length == 2
-                                                                    && ['AC', 'CP', 'DG', 'EA', 'EU', 'IC', 'TA', 'UK'].indexOf(country.code) == -1
+                                                                    && !country.exception
                                                                     && !country.disputed
-                                                                    && !country.dissolved
-                                                                    ? country.name : null;
+                                                                    && !country.dissolved;
+                                                            }).map(function(country) {
+                                                                return country.name;
                                                             }).sort().join(', '),
                                                             64, '<br>', true
                                                         ).split(', ').map(function(country) {

@@ -6,10 +6,10 @@ pandora.ui.viewSelect = function() {
     var ui = pandora.user.ui,
         sortKey = !ui.item ? 'listSort' : 'itemSort',
         viewKey = !ui.item ? 'listView' : 'itemView',
-        items = Ox.map(pandora.site[viewKey + 's'], function(view) {
-            return ['data', 'files'].indexOf(view.id) == -1
-                ? {id: view.id, title: 'View ' + view.title}
-                : null;
+        items = pandora.site[viewKey + 's'].filter(function(view) {
+            return ['data', 'files'].indexOf(view.id) == -1;
+        }).map(function(view) {
+            return {id: view.id, title: 'View ' + view.title};
         }),
         that;
     if (

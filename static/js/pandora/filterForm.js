@@ -15,7 +15,7 @@ pandora.ui.filterForm = function(list) {
     }, function(result) {
         that.append(
             that.$filter = Ox.Filter({
-                findKeys: Ox.merge(Ox.map(pandora.site.itemKeys, function(itemKey) {
+                findKeys: Ox.merge(pandora.site.itemKeys.map(function(itemKey) {
                     var key = Ox.clone(itemKey);
                     key.type = key.type == 'layer'
                         ? Ox.getObjectById(pandora.site.layers, key.id).type
