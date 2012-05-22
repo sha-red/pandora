@@ -73,8 +73,7 @@ pandora.ui.titlesDialog = function() {
                     );
                 },
                 open: function(data) {
-                    $list.$element
-                        .find('.OxItem.OxSelected > .OxCell.OxColumnSorttitle')
+                    $list.find('.OxItem.OxSelected > .OxCell.OxColumnSorttitle')
                         .trigger('mousedown')
                         .trigger('mouseup');
                 },
@@ -168,7 +167,7 @@ pandora.ui.titlesDialog = function() {
                 fontSize: '9px',
                 textAlign: 'center',
             })
-            .appendTo(that.$element.find('.OxButtonsbar'));
+            .appendTo(that.find('.OxButtonsbar'));
 
     return that;
 

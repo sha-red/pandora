@@ -387,7 +387,7 @@ pandora.ui.statisticsDialog = function() {
                                 keyWidth: 128,
                                 sort: {key: 'value', operator: '-'},
                                 title: Ox.endsWith(key, 'y')
-                                    ? Ox.sub(Ox.toTitleCase(key), 0, -1) + 'ies'
+                                    ? Ox.toTitleCase(key).slice(0, -1) + 'ies'
                                     : Ox.toTitleCase(key) + 's',
                                 width: chartWidth
                             })
@@ -558,7 +558,7 @@ pandora.ui.statisticsDialog = function() {
             tabs: tabs
         });
 
-        $tabPanel.$element.find('.OxButtonGroup').css({width: '512px'});
+        $tabPanel.find('.OxButtonGroup').css({width: '512px'});
         $guestsCheckbox.appendTo($tabPanel.children('.OxBar'));
 
         $dialog.options({content: $tabPanel});

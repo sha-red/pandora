@@ -566,8 +566,8 @@ pandora.ui.list = function() {
                         );
                         previousSrc = Ox.UI.getImageURL(
                             data.previousValue == 'posters' ? 'symbolSetPoster' : 'symbolIcon'
-                        )
-                        that.$element.find('img[src="' + previousSrc + '"]').attr({src: src});
+                        );
+                        that.find('img[src="' + previousSrc + '"]').attr({src: src});
                     } else {
                         that.options({
                             borderRadius: data.value == 'posters' ? 0 : 16,

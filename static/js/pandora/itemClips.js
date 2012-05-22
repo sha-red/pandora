@@ -57,7 +57,7 @@ pandora.ui.itemClips = function(options) {
             .data(Ox.extend(annotations.length ? {
                 annotation: annotations[0].id.split('/')[1],
             } : {}, {'in': clip['in'], out: clip.out}));
-        $item.$element.find('.OxTarget').addClass('OxSpecialTarget');
+        $item.find('.OxTarget').addClass('OxSpecialTarget');
         that.append($item);
     });
 

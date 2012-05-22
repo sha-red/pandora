@@ -39,7 +39,7 @@ pandora.ui.listDialog = function(section) {
                 $findElement[data.selected == 'icon' ? 'show' : 'hide']();
             }
         });
-    pandora.$ui.listDialogTabPanel.$element.find('.OxButtonGroup').css({width: '256px'});
+    pandora.$ui.listDialogTabPanel.find('.OxButtonGroup').css({width: '256px'});
 
     var $findElement = Ox.FormElementGroup({
             elements: [

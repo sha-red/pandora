@@ -228,7 +228,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
             drag.source = pandora.getListData(),
             drag.targets = {};
             Ox.forEach(pandora.$ui.folderList, function($list) {
-                $list.addClass('OxDroppable').$element.find('.OxItem').each(function() {
+                $list.addClass('OxDroppable').find('.OxItem').each(function() {
                     var $item = $(this),
                         id = $item.data('id'),
                         data = $list.value(id);
@@ -289,8 +289,8 @@ pandora.enableDragAndDrop = function($list, canMove) {
                         : isAtListsBottom(event) ? 16 : 0
                     if (scroll) {
                         scrollInterval = setInterval(function() {
-                            pandora.$ui.folders.$element.scrollTop(
-                                pandora.$ui.folders.$element.scrollTop() + scroll
+                            pandora.$ui.folders.scrollTop(
+                                pandora.$ui.folders.scrollTop() + scroll
                             );
                         }, 100);
                     }
@@ -875,7 +875,7 @@ pandora.getVideoOptions = function(data) {
 pandora.getVideoPartsAndPoints = function(durations, points) {
     var parts = durations.length,
         offsets = Ox.range(parts).map(function(i) {
-            return Ox.sum(Ox.sub(durations, 0, i));
+            return Ox.sum(durations.slice(0, i));
         }),
         ret = {
             parts: [],

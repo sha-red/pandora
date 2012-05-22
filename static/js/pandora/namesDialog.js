@@ -84,8 +84,7 @@ pandora.ui.namesDialog = function() {
                     );
                 },
                 open: function(data) {
-                    $list.$element
-                        .find('.OxItem.OxSelected > .OxCell.OxColumnSortname')
+                    $list.find('.OxItem.OxSelected > .OxCell.OxColumnSortname')
                         .trigger('mousedown')
                         .trigger('mouseup');
                 },
@@ -179,7 +178,7 @@ pandora.ui.namesDialog = function() {
             fontSize: '9px',
             textAlign: 'center',
         })
-        .appendTo(that.$element.find('.OxButtonsbar'));
+        .appendTo(that.find('.OxButtonsbar'));
 
     return that;
 

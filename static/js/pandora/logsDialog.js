@@ -209,7 +209,7 @@ pandora.ui.logsDialog = function() {
                 fontSize: '9px',
                 textAlign: 'center',
             })
-            .appendTo(that.$element.find('.OxButtonsbar'));
+            .appendTo(that.find('.OxButtonsbar'));
 
     that.superClose = that.close;
     that.close = function() {
