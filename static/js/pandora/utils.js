@@ -1245,8 +1245,8 @@ pandora.unloadWindow = function() {
                     return filter.index > -1;
                 }).length;
             // indices of non-advanced find queries
-            indices = find.conditions.map(function(condition) {
-                return oneCondition(find.conditions, condition.key, '=');
+            indices = pandora.site.findKeys.map(function(findKey) {
+                return oneCondition(find.conditions, findKey.id, '=');
             }).filter(function(index) {
                 return index > -1;
             });
