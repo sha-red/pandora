@@ -177,7 +177,7 @@ appPanel
         var prefix = '/static/';
         if (localStorage && localStorage['pandora.debug']) {
             Ox.getJSON(prefix + 'json/pandora.json?' + Ox.random(1000), function(files) {
-                Ox.loadFiles(files.map(function(file) {
+                Ox.loadFile(files.map(function(file) {
                     return prefix + file;
                 }), callback);
             });
