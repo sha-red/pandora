@@ -28,14 +28,14 @@ pandora.ui.upload = function(oshash, file) {
         that.status = 'requesting chunk upload';
         that.progress = 0;
         self.req = new XMLHttpRequest();
-        self.req.addEventListener("load", function (evt) {
+        self.req.addEventListener('load', function (evt) {
             var response = {};
             that.responseText = evt.target.responseText;
             try {
                 response = JSON.parse(evt.target.responseText);
             } catch(e) {
                 response = {};
-                that.status = "failed to parse response";
+                that.status = 'failed to parse response';
                 that.progress = -1;
                 done();
             }
@@ -57,13 +57,13 @@ pandora.ui.upload = function(oshash, file) {
                 done();
             }
         }, false);
-        self.req.addEventListener("error", function (evt) {
+        self.req.addEventListener('error', function (evt) {
             that.status = 'uplaod failed';
             that.progress = -1;
             that.responseText = evt.target.responseText;
             that.triggerEvent('done', tat);
         }, false);
-        self.req.addEventListener("abort", function (evt) {
+        self.req.addEventListener('abort', function (evt) {
             that.status = 'aborted';
             that.progress = -1;
             that.triggerEvent('done', tat);
@@ -72,7 +72,7 @@ pandora.ui.upload = function(oshash, file) {
         Ox.forEach(uploadData, function(value, key) {
             formData.append(key, value);
         });
-        self.req.open("POST", uploadUrl);
+        self.req.open('POST', uploadUrl);
         self.req.send(formData);
     }
 
@@ -97,7 +97,7 @@ pandora.ui.upload = function(oshash, file) {
         progress(parseFloat(chunkOffset)/bytesAvailable);
 
         self.req = new XMLHttpRequest();
-        self.req.addEventListener("load", function (evt) {
+        self.req.addEventListener('load', function (evt) {
             var response;
             that.responseText = evt.target.responseText;
             try {
@@ -130,7 +130,7 @@ pandora.ui.upload = function(oshash, file) {
                 }
             }
         }, false);
-        self.req.addEventListener("error", function (evt) {
+        self.req.addEventListener('error', function (evt) {
             //failed to upload, try again in 3 second
             retries++;
             if (maxRetry > 0 && retries > maxRetry) {
@@ -143,12 +143,12 @@ pandora.ui.upload = function(oshash, file) {
                 }, 3000);
             }
         }, false);
-        self.req.upload.addEventListener("progress", function (evt) {
+        self.req.upload.addEventListener('progress', function (evt) {
             if (evt.lengthComputable) {
                 progress(parseFloat(chunkOffset + evt.loaded) / bytesAvailable);
             }
         }, false);
-        self.req.addEventListener("abort", function (evt) {
+        self.req.addEventListener('abort', function (evt) {
             that.status = 'aborted';
             that.progress = -1;
             done();
@@ -160,7 +160,7 @@ pandora.ui.upload = function(oshash, file) {
             formData.append('done', 1);
         }
         formData.append('chunk', chunk);
-        self.req.open("POST", chunkUrl, true);
+        self.req.open('POST', chunkUrl, true);
         self.req.send(formData);
     }
 
