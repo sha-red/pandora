@@ -18,7 +18,8 @@ pandora.ui.sortSelect = function(isNavigationView) {
             pandora.site.sortKeys.filter(function(key) {
                 return Ox.getIndexById(items, key.id) == -1 && (
                     !key.capability
-                    || pandora.site.capabilities[key.capability][pandora.user.level];
+                    || pandora.site.capabilities[key.capability][pandora.user.level]
+                );
             }).map(function(key) {
                 return Ox.extend(Ox.clone(key), {
                     title: 'Sort by ' + key.title
