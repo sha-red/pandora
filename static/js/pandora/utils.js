@@ -627,7 +627,7 @@ pandora.getItemFind = function(find) {
             && ['=', '=='].indexOf(condition.operator) > -1
         ) {
             itemFind = condition.value;
-            return false;
+            Ox.break();
         }
     })
     return itemFind;
@@ -651,7 +651,8 @@ pandora.getListData = function(list) {
             } else if (!Ox.isEmpty($list.value(list))) {
                 folder = id
                 ret = false;
-            }            
+            }
+            // FIXME: Is there a `return ret` statement missing here?
         });
         if (folder) {
             data = pandora.$ui.folderList[folder].value(pandora.user.ui._list);
@@ -1266,7 +1267,7 @@ pandora.unloadWindow = function() {
             Ox.forEach(pandora.user.ui.filters, function(key) {
                 if (everyCondition(find.conditions, key, '==')) {
                     state.key = '*';
-                    return false;
+                    Ox.break();
                 }
             });
         }

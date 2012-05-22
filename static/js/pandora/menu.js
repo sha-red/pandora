@@ -545,7 +545,7 @@ pandora.ui.mainMenu = function() {
         Ox.forEach(elements, function(element, i) {
             if (element.hasFocus()) {
                 index = i;
-                return false;
+                Ox.break();
             }
         });
         elements[Ox.mod((index + direction), elements.length)].gainFocus();
@@ -675,7 +675,6 @@ pandora.ui.mainMenu = function() {
         }, function(result) {
             lists[folder] = result.data.items;
             if (++counter == 3) {
-                Ox.Log('', '--------------------------------------------', lists)
                 pandora.$ui.mainMenu.replaceMenu('listMenu', getListMenu(lists));
             }
         });

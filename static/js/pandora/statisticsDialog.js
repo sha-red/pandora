@@ -570,7 +570,7 @@ pandora.ui.statisticsDialog = function() {
         Ox.forEach(names, function(v) {
             if (new RegExp('^' + v).test(version)) {
                 name = v;
-                return false;
+                Ox.break();
             }
         });
         return name;        
