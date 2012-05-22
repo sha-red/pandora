@@ -177,7 +177,7 @@ pandora.UI = (function() {
         Ox.len(set) && pandora.api.setUI(set);
         triggerEvents && Ox.forEach(trigger, function(val, key) {
             Ox.forEach(pandora.$ui, function(element) {
-                element.ox && element.triggerEvent('pandora_' + key.toLowerCase(), {
+                Ox.UI.isElement(element) && element.triggerEvent('pandora_' + key.toLowerCase(), {
                     value: val,
                     previousValue: self.previousUI[key]
                 });
