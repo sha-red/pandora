@@ -885,7 +885,7 @@ pandora.getVideoPartsAndPoints = function(durations, points) {
         Ox.loop(parts - 1, -1, -1, function(i) {
             if (offsets[i] <= point) {
                 ret.parts[i] = i;
-                return false;
+                Ox.break();
             }
         });
     });
