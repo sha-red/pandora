@@ -7,7 +7,7 @@ pandora.ui.viewSelect = function() {
         sortKey = !ui.item ? 'listSort' : 'itemSort',
         viewKey = !ui.item ? 'listView' : 'itemView',
         items = pandora.site[viewKey + 's'].filter(function(view) {
-            return ['data', 'files'].indexOf(view.id) == -1;
+            return view.id != 'data' && view.id != 'files';
         }).map(function(view) {
             return {id: view.id, title: 'View ' + view.title};
         }),
