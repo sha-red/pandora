@@ -20,6 +20,8 @@ def serve_static_file(path, location, content_type):
     return HttpFileResponse(location, content_type=content_type)
 
 urlpatterns = patterns('',
+    # Uncomment the admin/doc line below to enable admin documentation:
+    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
     (r'^api/upload/?$', 'archive.views.firefogg_upload'),
     (r'^url=(?P<url>.*)$', 'app.views.redirect_url'),

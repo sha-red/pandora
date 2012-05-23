@@ -1,4 +1,4 @@
--e svn+http://code.djangoproject.com/svn/django/branches/releases/1.3.X#egg=django
+-e git+https://github.com/django/django.git@stable/1.4.x#egg=django
 #South
 -e bzr+http://code.0x2620.org/python-ox/#egg=python-ox
 -e bzr+http://code.0x2620.org/oxtimelines/#egg=oxtimelines
@@ -11,5 +11,5 @@ django-celery>=2.4.2
 #use fork fixing some postgresql issues
 -e git://github.com/bit/django-extensions.git#egg=django_extensions
 -e git+git://github.com/dcramer/django-devserver#egg=django_devserver
-gunicorn
+gunicorn>=0.14.3
 html5lib

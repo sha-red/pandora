@@ -20,14 +20,14 @@ server {
     access_log  /var/log/nginx/pandora.access.log;
     error_log   /var/log/nginx/pandora.error.log;
 
-    location /admin/media {
-        root __PREFIX__/src/django/django/contrib;
-        autoindex on;
-    }
     location /favicon.ico {
         root   __PREFIX__/static;
     }
 
+    location /static/admin/ {
+        root __PREFIX__/django/django/contrib/admin;
+        autoindex on;
+    }
     location /static/ {
         root   __PREFIX__;
         autoindex on;
