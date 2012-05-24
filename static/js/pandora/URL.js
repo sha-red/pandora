@@ -66,7 +66,7 @@ pandora.URL = (function() {
         if (Ox.isEmpty(state)) {
 
             if (pandora.user.ui.showHome) {
-                Ox.print('*** showScreen via URL')
+                //Ox.print('*** showScreen via URL')
                 pandora.$ui.home = pandora.ui.home().showScreen();
             }
             callback && callback();
@@ -176,7 +176,7 @@ pandora.URL = (function() {
             // listView is the default view
             list: [pandora.user.ui.listView].concat(
                 pandora.site.listViews.filter(function(view) {
-                    return view.id == pandora.user.ui.listView
+                    return view.id != pandora.user.ui.listView
                 }).map(function(view) {
                     return view.id;
                 })
@@ -203,10 +203,10 @@ pandora.URL = (function() {
                         && Ox.getObjectById(pandora.site.clipKeys, pandora.user.ui.listSort[0].key)
                     || [],
                 pandora.isClipView(view) ? pandora.site.clipKeys.filter(function(key) {
-                    return key.id == pandora.user.ui.listSort[0].key;
+                    return key.id != pandora.user.ui.listSort[0].key;
                 }) : [],
                 pandora.site.sortKeys.filter(function(key) {
-                    return key.id == pandora.user.ui.listSort[0].key;
+                    return key.id != pandora.user.ui.listSort[0].key;
                 })
             );
         });
@@ -220,7 +220,7 @@ pandora.URL = (function() {
                     )
                 ].concat(
                     pandora.site.clipKeys.filter(function(key) {
-                        return key.id == pandora.user.ui.itemSort[0].key;
+                        return key.id != pandora.user.ui.itemSort[0].key;
                     })
                 );
             }
