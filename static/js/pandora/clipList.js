@@ -98,7 +98,7 @@ pandora.ui.clipList = function(videoRatio) {
                     query: query
                 }, data), callback);
             },
-            keys = ['annotations', 'id', 'in', 'out'].concat(
+            keys: ['annotations', 'id', 'in', 'out'].concat(
                 !ui.item ? ['videoRatio'] : []
             ),
             max: 1,
