@@ -1,4 +1,5 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
+// FIXME: this should be mainMenu.js!
 'use strict';
 pandora.ui.mainMenu = function() {
 
