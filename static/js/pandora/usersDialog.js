@@ -214,7 +214,7 @@ pandora.ui.usersDialog = function() {
                             Ox.forEach(systems, function(s) {
                                 if (new RegExp('^' + s).test(value)) {
                                     system = s;
-                                    Ox.break();
+                                    Ox.Break();
                                 }
                             });
                             return system ? Ox.Element({
@@ -249,7 +249,7 @@ pandora.ui.usersDialog = function() {
                             Ox.forEach(browsers, function(b) {
                                 if (new RegExp('^' + b).test(value)) {
                                     browser = b;
-                                    Ox.break();
+                                    Ox.Break();
                                 }
                             });
                             return browser ? Ox.Element({
@@ -592,7 +592,7 @@ pandora.ui.usersDialog = function() {
         ).options('items'), function($item) {
             if ($item.options('id') == id) {
                 ret = $item;
-                Ox.break();
+                Ox.Break();
             }
         });
         return ret;

@@ -627,7 +627,7 @@ pandora.getItemFind = function(find) {
             && ['=', '=='].indexOf(condition.operator) > -1
         ) {
             itemFind = condition.value;
-            Ox.break();
+            Ox.Break();
         }
     })
     return itemFind;
@@ -865,7 +865,7 @@ pandora.getVideoPartsAndPoints = function(durations, points) {
         Ox.loop(parts - 1, -1, -1, function(i) {
             if (offsets[i] <= point) {
                 ret.parts[i] = i;
-                Ox.break();
+                Ox.Break();
             }
         });
     });
@@ -1248,7 +1248,7 @@ pandora.unloadWindow = function() {
             Ox.forEach(pandora.user.ui.filters, function(key) {
                 if (everyCondition(find.conditions, key, '==')) {
                     state.key = '*';
-                    Ox.break();
+                    Ox.Break();
                 }
             });
         }
