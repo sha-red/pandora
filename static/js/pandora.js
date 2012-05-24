@@ -311,7 +311,7 @@ appPanel
     function loadBrowserMessage() {
 
         var isMSIE = $.browser.msie,
-            browsers = Ox.merge(
+            browsers = [].concat(
                 isMSIE ? [{name: 'Chrome Frame', url: 'http://google.com/chromeframe/'}] : [],
                 [
                     {name: 'Chrome', url: 'http://google.com/chrome/'},

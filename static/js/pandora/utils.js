@@ -770,7 +770,7 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
 };
 
 pandora.getPageTitle = function(stateOrURL) {
-    var pages = Ox.merge([
+    var pages = [
             {id: '', title: ''},
             {id: 'help', title: 'Help'},
             {id: 'home', title: ''},
@@ -780,7 +780,7 @@ pandora.getPageTitle = function(stateOrURL) {
             {id: 'signup', title: 'Sign Up'},
             {id: 'software', title: 'Software'},
             {id: 'tv', title: 'TV'}
-        ], pandora.site.sitePages),
+        ].concat(pandora.site.sitePages),
         page = Ox.getObjectById(
             pages,
             Ox.isObject(stateOrURL) ? stateOrURL.page : stateOrURL.substr(1)
@@ -830,13 +830,12 @@ pandora.getVideoOptions = function(data) {
     options.censored = canPlayVideo ? []
         : canPlayClips ? (
             options.subtitles.length
-                ? Ox.merge(
-                    options.subtitles.map(function(subtitle, i) {
-                        return {
-                            'in': i == 0 ? 0 : options.subtitles[i - 1].out,
-                            out: subtitle['in']
-                        };
-                    }),
+                ? options.subtitles.map(function(subtitle, i) {
+                    return {
+                        'in': i == 0 ? 0 : options.subtitles[i - 1].out,
+                        out: subtitle['in']
+                    };
+                }).concat(
                     [{'in': Ox.last(options.subtitles).out, out: data.duration}]
                 ).filter(function(censored) {
                     // don't include gaps shorter than one second

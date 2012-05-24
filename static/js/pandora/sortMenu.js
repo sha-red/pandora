@@ -7,7 +7,7 @@ pandora.ui.sortMenu = function() {
     // FIXME: unused
 
     var that = Ox.MenuButton({
-            items: Ox.merge(
+            items: [].concat(
                 pandora.site.clipKeys.map(function(key) {
                     return Ox.extend(Ox.clone(key), {
                         checked: key.id == pandora.user.ui.itemSort[0].key,

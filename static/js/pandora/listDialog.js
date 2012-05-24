@@ -7,7 +7,7 @@ pandora.ui.listDialog = function(section) {
     section = section || 'general';
     var width = getWidth(section);
     var listData = pandora.getListData(),
-        tabs = Ox.merge([
+        tabs = [].concat([
             {id: 'general', title: 'General'},
             {id: 'icon', title: 'Icon'}
         ], listData.type == 'smart'
@@ -494,8 +494,7 @@ pandora.ui.listIconPanel = function(listData) {
             items: function(data, callback) {
                 pandora.api.find(Ox.extend(data, {
                     query: {
-                        conditions: Ox.merge(
-                            [{key: 'list', value: listData.id, operator: '=='}],
+                        conditions: [{key: 'list', value: listData.id, operator: '=='}].concat(
                             value !== '' ? [{key: key, value: value, operator: '='}] : []
                         ),
                         operator: '&'

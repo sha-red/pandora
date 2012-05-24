@@ -46,7 +46,7 @@ pandora.ui.clipList = function(videoRatio) {
                         info = (
                             /^color/.test(format.type.toLowerCase()) ? Ox.Theme : Ox
                         )['format' + Ox.toTitleCase(format.type)].apply(
-                            this, Ox.merge([data[sortKey]], format.args || [])
+                            this, [data[sortKey]].concat(format.args || [])
                         );
                     } else {
                         info = data[sortKey];
@@ -98,8 +98,7 @@ pandora.ui.clipList = function(videoRatio) {
                     query: query
                 }, data), callback);
             },
-            keys: Ox.merge(
-                ['annotations', 'id', 'in', 'out'],
+            keys = ['annotations', 'id', 'in', 'out'].concat(
                 !ui.item ? ['videoRatio'] : []
             ),
             max: 1,

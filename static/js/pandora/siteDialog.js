@@ -7,10 +7,7 @@ pandora.ui.siteDialog = function(section) {
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.75),
         dialogWidth = Math.round(window.innerWidth * 0.75),
         isEditable = pandora.site.capabilities.canEditSitePages[pandora.user.level],
-        tabs = Ox.merge(
-            Ox.clone(pandora.site.sitePages, true),
-            [{id: 'software', title: 'Software'}]
-        );
+        tabs = pandora.site.sitePages.concat([{id: 'software', title: 'Software'}]);
     Ox.getObjectById(tabs, section).selected = true;
     var $tabPanel = Ox.TabPanel({
             content: function(id) {
@@ -70,7 +67,7 @@ pandora.ui.siteDialog = function(section) {
                                 .css({width: '128px', height: '128px', marginBottom: '8px'})
                                 .appendTo($right);
                             risk = ['Unknown', 'Severe', 'High', 'Significant', 'General', 'Low'];
-                            Ox.merge(
+                            [].concat(
                                 ['Unknown'],
                                 pandora.site.rightsLevels.map(function(rightsLevel) {
                                     return rightsLevel.name;

@@ -39,7 +39,7 @@ pandora.URL = (function() {
             // ...
         } else if (['timeline', 'player', 'editor'].indexOf(state.view) > -1) {
             var videoPoints = pandora.user.ui.videoPoints[state.item] || {};
-            state.span = videoPoints.annotation || Ox.merge(
+            state.span = videoPoints.annotation || [].concat(
                 videoPoints.position
                     ? videoPoints.position
                     : [],
@@ -173,19 +173,17 @@ pandora.URL = (function() {
             findKeys, sortKeys = {}, spanType = {}, views = {};
 
         views[itemsSection] = {
-            list: Ox.merge(
-                // listView is the default view
-                [pandora.user.ui.listView],
+            // listView is the default view
+            list: [pandora.user.ui.listView].concat(
                 pandora.site.listViews.filter(function(view) {
                     return view.id == pandora.user.ui.listView
                 }).map(function(view) {
                     return view.id;
                 })
             ),
-            item: Ox.merge(
-                // itemView is the default view,
-                // videoView is the default view if there is a duration
-                [pandora.user.ui.itemView, pandora.user.ui.videoView],
+            // itemView is the default view,
+            // videoView is the default view if there is a duration
+            item: [pandora.user.ui.itemView, pandora.user.ui.videoView].concat(
                 pandora.site.itemViews.filter(function(view) {
                     return [
                         pandora.user.ui.itemView, pandora.user.ui.videoView
@@ -198,7 +196,7 @@ pandora.URL = (function() {
 
         sortKeys[itemsSection] = {list: {}, item: {}};
         views[itemsSection].list.forEach(function(view) {
-            sortKeys[itemsSection].list[view] = Ox.merge(
+            sortKeys[itemsSection].list[view] = [].concat(
                 // listSort[0].key is the default sort key
                 Ox.getObjectById(pandora.site.sortKeys, pandora.user.ui.listSort[0].key)
                     || pandora.isClipView(view)
@@ -214,9 +212,13 @@ pandora.URL = (function() {
         });
         views[itemsSection].item.forEach(function(view) {
             if (pandora.isClipView(view, true)) {
-                sortKeys[itemsSection].item[view] = Ox.merge(
-                    // itemSort[0].key is the default sort key
-                    [Ox.getObjectById(pandora.site.clipKeys, pandora.user.ui.itemSort[0].key)],
+                // itemSort[0].key is the default sort key
+                sortKeys[itemsSection].item[view] = [
+                    Ox.getObjectById(
+                        pandora.site.clipKeys,
+                        pandora.user.ui.itemSort[0].key
+                    )
+                ].concat(
                     pandora.site.clipKeys.filter(function(key) {
                         return key.id == pandora.user.ui.itemSort[0].key;
                     })
@@ -238,13 +240,13 @@ pandora.URL = (function() {
             }
         };
 
-        findKeys = Ox.merge([{id: 'list', type: 'string'}], pandora.site.itemKeys);
+        findKeys = [{id: 'list', type: 'string'}].concat(pandora.site.itemKeys);
 
         self.URL = Ox.URL({
             findKeys: findKeys,
             getItem: pandora.getItemByIdOrTitle,
             getSpan: pandora.getMetadataByIdOrName,
-            pages: Ox.merge(
+            pages: [].concat(
                 ['home', 'software', 'api', 'help', 'tv'],
                 pandora.site.sitePages.map(function(page) {
                     return page.id;

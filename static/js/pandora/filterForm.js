@@ -15,20 +15,20 @@ pandora.ui.filterForm = function(list) {
     }, function(result) {
         that.append(
             that.$filter = Ox.Filter({
-                findKeys: Ox.merge(pandora.site.itemKeys.map(function(itemKey) {
+                findKeys: pandora.site.itemKeys.map(function(itemKey) {
                     var key = Ox.clone(itemKey);
                     key.type = key.type == 'layer'
                         ? Ox.getObjectById(pandora.site.layers, key.id).type
                         : key.type;
                     return key;
-                }), {
+                }).concat([{
                     id: 'list',
                     title: 'List',
                     type: 'list',
                     values: result.data.items.map(function(item) {
                         return item.id;
                     })
-                }),
+                }]),
                 list: list ? null : {
                     sort: pandora.user.ui.listSort,
                     view: pandora.user.ui.listView

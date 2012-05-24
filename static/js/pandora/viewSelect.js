@@ -16,7 +16,7 @@ pandora.ui.viewSelect = function() {
         viewKey == 'itemView'
         && pandora.site.capabilities.canSeeExtraItemViews[pandora.user.level]
     ) {
-        Ox.merge(items, [
+        items = items.concat([
             {},
             {id: 'data', title: 'View Data'},
             {id: 'files', title: 'View Files'}

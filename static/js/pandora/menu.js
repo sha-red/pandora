@@ -12,9 +12,9 @@ pandora.ui.mainMenu = function() {
                 })
             ],
             id: 'mainMenu',
-            menus: Ox.merge(
+            menus: [].concat(
                 [
-                    { id: pandora.site.site.id + 'Menu', title: pandora.site.site.name, items: Ox.merge(
+                    { id: pandora.site.site.id + 'Menu', title: pandora.site.site.name, items: [].concat(
                         [
                             { id: 'home', title: 'Home' },
                             {}
@@ -58,7 +58,7 @@ pandora.ui.mainMenu = function() {
                                 }, view);
                             }) },
                         ]},
-                        { id: 'icons', title: 'Icons', items: Ox.merge([
+                        { id: 'icons', title: 'Icons', items: [].concat([
                                 { group: 'viewicons', min: 1, max: 1, items: ['posters', 'frames'].map(function(icons) {
                                     return {id: icons, title: Ox.toTitleCase(icons), checked: ui.icons == icons};
                                 }) }
@@ -255,7 +255,7 @@ pandora.ui.mainMenu = function() {
                 }
             },
             click: function(data) {
-                if (Ox.merge(
+                if ([].concat(
                     ['home', 'software'],
                     pandora.site.sitePages.map(function(page) {
                         return page.id;
@@ -552,7 +552,7 @@ pandora.ui.mainMenu = function() {
     }
 
     function getListMenu(lists) {
-        return { id: 'listMenu', title: 'List', items: Ox.merge(
+        return { id: 'listMenu', title: 'List', items: [].concat(
             { id: 'allitems', title: 'All ' + pandora.site.itemName.plural, checked: !ui.item && !ui._list, keyboard: 'shift control w' },
             ['personal', 'favorite', 'featured'].map(function(folder) {
                 return {
@@ -600,7 +600,7 @@ pandora.ui.mainMenu = function() {
             }) : [];
         return { id: 'sortMenu', title: 'Sort', items: [
             { id: 'sortitems', title: 'Sort ' + (isClipView || ui.item ? 'Clips' : pandora.site.itemName.plural) + ' by', items: [
-                { group: 'listsort', min: 1, max: 1, items: Ox.merge(
+                { group: 'listsort', min: 1, max: 1, items: [].concat(
                     items,
                     pandora.site.sortKeys.filter(function(key) {
                         return Ox.getIndexById(items, key.id) == -1 && (

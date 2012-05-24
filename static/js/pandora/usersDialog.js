@@ -16,12 +16,9 @@ pandora.ui.usersDialog = function() {
             'Android', 'BSD', 'iOS', 'Linux',
             'Mac OS X', 'Unix', 'Windows'
         ],
-        userLevels = Ox.merge(
-            pandora.site.userLevels.map(function(userLevel) {
-                return Ox.toTitleCase(userLevel);
-            }),
-            ['Robot']
-        ),
+        userLevels = pandora.site.userLevels.map(function(userLevel) {
+            return Ox.toTitleCase(userLevel);
+        }).concat(['Robot']),
 
         $reloadButton = Ox.Button({
                 title: 'redo',
@@ -968,11 +965,11 @@ pandora.ui.usersDialog = function() {
             value = $findInput.value(),
             query = {
                 conditions: value
-                    ? Ox.merge(
+                    ? [].concat(
                         key != 'email' ? [{key: 'username', value: value, operator: '='}] : [],
                         key != 'username' ? [{key: 'email', value: value, operator: '='}] : []
                     )
-                    : Ox.merge(
+                    : [].concat(
                         !guests ? [{key: 'level', value: 'guest', operator: '!='}] : [],
                         !robots ? [{key: 'level', value: 'robot', operator: '!='}] : []
                     ),

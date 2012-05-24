@@ -8,7 +8,7 @@ pandora.ui.list = function() {
 
     if (view == 'list') {
         that = Ox.TextList({
-            columns: Ox.merge([{
+            columns: [].concat([{
                 align: 'center',
                 defaultWidth: 16,
                 format: function(value, data) {
@@ -139,7 +139,7 @@ pandora.ui.list = function() {
                         info = (
                             /^color/.test(format.type.toLowerCase()) ? Ox.Theme : Ox
                         )['format' + Ox.toTitleCase(format.type)].apply(
-                            this, Ox.merge([data[sortKey]], format.args || [])
+                            this, [data[sortKey]].concat(format.args || [])
                         );
                     } else {
                         info = data[sortKey];
@@ -192,7 +192,7 @@ pandora.ui.list = function() {
                         info = (
                             /^color/.test(format.type.toLowerCase()) ? Ox.Theme : Ox
                         )['format' + Ox.toTitleCase(format.type)].apply(
-                            this, Ox.merge([data[sortKey]], format.args || [])
+                            this, [data[sortKey]].concat(format.args || [])
                         );
                     } else {
                         info = data[sortKey];
@@ -272,7 +272,7 @@ pandora.ui.list = function() {
                         info = (
                             /^color/.test(format.type.toLowerCase()) ? Ox.Theme : Ox
                         )['format' + Ox.toTitleCase(format.type)].apply(
-                            this, Ox.merge([data[sortKey]], format.args || [])
+                            this, [data[sortKey]].concat(format.args || [])
                         );
                     } else {
                         info = data[sortKey];
@@ -525,15 +525,15 @@ pandora.ui.list = function() {
                         };
                     } else {
                         query = {
-                            conditions: Ox.merge([
-                                pandora.user.ui.find
-                            ], data.rest.map(function(id) {
-                                return {
-                                    key: 'id',
-                                    value: id,
-                                    operator: '!='
-                                };
-                            })),
+                            conditions: [pandora.user.ui.find].concat(
+                                data.rest.map(function(id) {
+                                    return {
+                                        key: 'id',
+                                        value: id,
+                                        operator: '!='
+                                    };
+                                })
+                            ),
                             operator: '&'
                         };
                     }

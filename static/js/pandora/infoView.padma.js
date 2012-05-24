@@ -571,7 +571,7 @@ pandora.ui.infoView = function(data) {
     }
 
     function renderCapabilities(rightsLevel) {
-        var capabilities = Ox.merge(
+        var capabilities = [].concat(
                 canEdit ? [{name: 'canSeeItem', symbol: 'Find'}] : [],
                 [
                     {name: 'canPlayClips', symbol: 'PlayInToOut'},

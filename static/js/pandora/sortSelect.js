@@ -13,7 +13,7 @@ pandora.ui.sortSelect = function(isNavigationView) {
         sortKey = !pandora.user.ui.item ? 'listSort' : 'itemSort',
         that;
     if (!pandora.user.ui.item) {
-        items = Ox.merge(
+        items = [].concat(
             items,
             pandora.site.sortKeys.filter(function(key) {
                 return Ox.getIndexById(items, key.id) == -1 && (

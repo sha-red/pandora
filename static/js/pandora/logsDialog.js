@@ -232,7 +232,7 @@ pandora.ui.logsDialog = function() {
 
     function updateList(key, value) {
         var query = {
-                conditions: Ox.merge(
+                conditions: [].concat(
                     key != 'url' ? [{key: 'user', value: value, operator: '='}] : [],
                     key != 'user' ? [{key: 'url', value: value, operator: '='}] : []
                 ),

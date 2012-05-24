@@ -84,7 +84,7 @@ pandora.ui.accountDialogOptions = function(action, value) {
     }
 
     return {
-        buttons: Ox.merge(
+        buttons: [].concat(
             buttons[action].map(function(type) {
                 return button(type);
             }),

@@ -103,15 +103,17 @@ Ox.load('UI', {
         options.censored = canPlayVideo ? []
             : canPlayClips ? (
                 options.subtitles.length
-                    ? Ox.merge(
-                        options.subtitles.map(function(subtitle, i) {
-                            return {
-                                'in': i == 0 ? 0 : options.subtitles[i - 1].out,
-                                out: subtitle['in']
-                            };
-                        }),
+                    ? options.subtitles.map(function(subtitle, i) {
+                        return {
+                            'in': i == 0 ? 0 : options.subtitles[i - 1].out,
+                            out: subtitle['in']
+                        };
+                    }).concat(
                         [{'in': Ox.last(options.subtitles).out, out: data.duration}]
-                    )
+                    ).filter(function(censored) {
+                        // don't include gaps shorter than one second
+                        return censored.out - censored['in'] >= 1;
+                    })
                     : Ox.range(0, data.duration - 5, 60).map(function(position) {
                         return {
                             'in': position + 5,

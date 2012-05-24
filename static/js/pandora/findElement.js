@@ -5,9 +5,9 @@ pandora.ui.findElement = function() {
         findKey = pandora.user.ui._findState.key,
         findValue = pandora.user.ui._findState.value,
         hasPressedClear = false,
-        previousFindKey = findKey;
-    var that = Ox.FormElementGroup({
-            elements: Ox.merge(pandora.user.ui._list ? [
+        previousFindKey = findKey,
+        that = Ox.FormElementGroup({
+            elements: [].concat(pandora.user.ui._list ? [
                     pandora.$ui.findListSelect = Ox.Select({
                             items: [
                                 {id: 'all', title: 'Find: All ' + pandora.site.itemName.plural},
@@ -27,7 +27,7 @@ pandora.ui.findElement = function() {
                 ] : [], [
                     pandora.$ui.findSelect = Ox.Select({
                             id: 'select',
-                            items: Ox.merge(
+                            items: [].concat(
                                 pandora.site.findKeys.filter(function(key, i) {
                                     return !key.capability
                                         || pandora.site.capabilities[key.capability][pandora.user.level];
@@ -93,7 +93,7 @@ pandora.ui.findElement = function() {
                             var findInList = pandora.user.ui._list
                                     && pandora.$ui.findListSelect.value() == 'list',
                                 key = pandora.$ui.findSelect.value(),
-                                conditions = Ox.merge(
+                                conditions = [].concat(
                                     findInList ? [{
                                         key: 'list',
                                         value: pandora.user.ui._list,

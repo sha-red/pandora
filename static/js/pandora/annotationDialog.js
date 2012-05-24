@@ -4,7 +4,7 @@
 pandora.ui.annotationDialog = function(layer) {
     var isEditor = pandora.user.ui.itemView == 'editor',
         $dialog = Ox.Dialog({
-            buttons: Ox.merge(
+            buttons: [].concat(
                 isEditor ? [
                     Ox.Button({title: 'Sign Up...'}).bindEvent({
                         click: function() {

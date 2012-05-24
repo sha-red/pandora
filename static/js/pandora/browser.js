@@ -87,7 +87,7 @@ pandora.ui.browser = function() {
                         info = (
                             /^color/.test(format.type.toLowerCase()) ? Ox.Theme : Ox
                         )['format' + Ox.toTitleCase(format.type)].apply(
-                            this, Ox.merge([data[sortKey]], format.args || [])
+                            this, [data[sortKey]].concat(format.args || [])
                         );
                     } else {
                         info = data[sortKey];

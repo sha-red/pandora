@@ -26,7 +26,7 @@ pandora.ui.statisticsDialog = function() {
         },
         dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
-        names = Ox.merge(Object.keys(colors.system), Object.keys(colors.browser)),
+        names = Object.keys(colors.system).concat(Object.keys(colors.browser)),
         tabs = [
             {id: 'seen', title: 'First Seen & Last Seen', selected: true},
             {id: 'locations', title: 'Locations'},
