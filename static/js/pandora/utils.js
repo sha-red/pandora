@@ -701,25 +701,6 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
     });
     function getId(type, callback) {
         if (type) {
-            Ox.print('getId',
-                Ox.extend({
-                    query: {
-                        conditions: [{
-                            key: isName ? 'name' : 'id',
-                            value: type != 'annotation' ? str : item + '/' + str,
-                            operator: '=='
-                        }],
-                        operator: '&'
-                    },
-                    keys: type != 'annotation' ? ['id'] : ['id', 'in', 'out'],
-                    range: [0, 1]
-                }, item && type != 'annotation' ? {
-                    itemQuery: {
-                        conditions: [{key: 'id', value: item, operator: '=='}],
-                        operator: '&'
-                    }
-                } : {})
-            );
             pandora.api['find' + Ox.toTitleCase(type + 's')](Ox.extend({
                 query: {
                     conditions: [{
