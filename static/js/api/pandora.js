@@ -157,7 +157,7 @@ function constructList() {
             else
               info.html(app.site.default_info);
 
-            document.location.hash = hash.substring(0, hash.length-1);
+            document.location.hash = hash.slice(0, -1);
             app.$ui.actionInfo.html(info);
        }
     });

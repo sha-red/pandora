@@ -128,10 +128,10 @@ pandora.ui.statisticsDialog = function() {
                 var city, continent, country, countryData, name = {}, region, split;
                 if (mode == 'all' || item.level != 'guest') {
                     ['firstseen', 'lastseen'].forEach(function(key, i) {
-                        var year = item[key].substr(0, 4) + '-' + key,
-                            month = item[key].substr(0, 7) + '-' + key,
+                        var year = item[key].slice(0, 4) + '-' + key,
+                            month = item[key].slice(0, 7) + '-' + key,
                             day = Ox.formatDate(item[key], '%u'),
-                            hour = item[key].substr(11, 2);
+                            hour = item[key].slice(11, 13);
                         data[mode].year[year] = data[mode].year[year] || {};
                         data[mode].year[year][month] = (data[mode].year[year][month] || 0) + 1;                
                         data[mode].month[month] = (data[mode].month[month] || 0) + 1;
@@ -181,7 +181,7 @@ pandora.ui.statisticsDialog = function() {
 
             var keys, firstKey, lastKey;
             keys = Object.keys(data[mode].month).map(function(key) {
-                return key.substr(0, 7)
+                return key.slice(0, 7);
             }).sort();
             firstKey = keys[0].split('-').map(function(str) {
                 return parseInt(str, 10);

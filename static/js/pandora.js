@@ -270,7 +270,7 @@ appPanel
         pandora.site.listSettings = {};
         Ox.forEach(pandora.site.user.ui, function(val, key) {
             if (/^list[A-Z]/.test(key)) {
-                pandora.site.listSettings[key] = key[4].toLowerCase() + key.substr(5);
+                pandora.site.listSettings[key] = key[4].toLowerCase() + key.slice(5);
             }
         });
 

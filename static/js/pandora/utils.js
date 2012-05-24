@@ -675,7 +675,7 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
         ) && item && !isName,
         canBeEvent = !view || view == 'calendar',
         canBePlace = !view || view == 'map';
-    str = isName ? str.substr(1) : str;
+    str = isName ? str.slice(1) : str;
     getId(canBeAnnotation ? 'annotation' : '', function(id) {
         if (id) {
             Ox.Log('URL', 'id?', id)
@@ -764,7 +764,7 @@ pandora.getPageTitle = function(stateOrURL) {
         ].concat(pandora.site.sitePages),
         page = Ox.getObjectById(
             pages,
-            Ox.isObject(stateOrURL) ? stateOrURL.page : stateOrURL.substr(1)
+            Ox.isObject(stateOrURL) ? stateOrURL.page : stateOrURL.slice(1)
         );
     return page
         ? pandora.site.site.name
@@ -840,7 +840,7 @@ pandora.getVideoOptions = function(data) {
     pandora.site.layers.forEach(function(layer, i) { 
         options.annotations[i] = Ox.extend({}, layer, {
             items: data.layers[layer.id].map(function(annotation) {
-                annotation.date = Ox.formatDate(annotation.modified.substr(0, 10), '%B %e, %Y');
+                annotation.date = Ox.formatDate(annotation.modified.slice(0, 10), '%B %e, %Y');
                 annotation.duration = Math.abs(annotation.out - annotation['in']);
                 annotation.editable = annotation.editable
                     || annotation.user == pandora.user.username

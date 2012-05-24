@@ -804,9 +804,9 @@ pandora.ui.usersDialog = function() {
                                 textarea = $input.find('textarea')[0],
                                 value = $input.value();
                             $input.value(
-                                    value.substr(0, textarea.selectionStart)
+                                    value.slice(0, textarea.selectionStart)
                                     + '{' + data.id + '}'
-                                    + value.substr(textarea.selectionEnd)
+                                    + value.slice(textarea.selectionEnd)
                                 )
                                 .focusInput(textarea.selectionStart + data.id.length + 2);                           
                         }

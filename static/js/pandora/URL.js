@@ -110,8 +110,8 @@ pandora.URL = (function() {
                         set['mapSelection'] = state.span;
                         set['mapFind'] = '';
                     } else {
-                        //pandora.user.ui.mapFind = state.span.substr(1);
-                        set['mapFind'] = state.span.substr(1);
+                        //pandora.user.ui.mapFind = state.span.slice(1);
+                        set['mapFind'] = state.span.slice(1);
                         set['mapSelection'] = '';
                     }
                 } else if (state.view == 'calendar') {
@@ -301,8 +301,8 @@ pandora.URL = (function() {
 
     // on page load, this sets the state from the URL
     that.parse = function(callback) {
-        if (document.location.pathname.substr(0, 4) == 'url=') {
-            document.location.href = decodeURI(document.location.pathname.substr(4));
+        if (document.location.pathname.slice(0, 4) == 'url=') {
+            document.location.href = decodeURI(document.location.pathname.slice(4));
         } else {
             self.URL.parse(function(state) {
                 setState(state, callback); // setState -> UI.set -> URL.update

@@ -5,14 +5,14 @@
 pandora.autovalidateCode = function(value, blur, callback) {
     value = value.toUpperCase().split('').map(function(v) {
         return /[A-Z]/.test(v) ? v : null;
-    }).join('').substr(0, 16);
+    }).join('').slice(0, 16);
     callback({valid: value.length == 16, value: value});
 };
 
 pandora.autovalidateEmail = function(value, blur, callback) {
     value = value.toLowerCase().split('').map(function(v, i) {
         return /[0-9a-z\.\+\-_@]/.test(v) ? v : null;
-    }).join('').substr(0, 255);
+    }).join('').slice(0, 255);
     callback({valid: Ox.isValidEmail(value), value: value});
 };
 
@@ -23,7 +23,7 @@ pandora.autovalidateListname = function(value, blur, callback) {
     value = value.toLowerCase().split('').map(function(v, i) {
         return /\s/.test(v) && (i == 0 || (i == length - 1 && blur)) ? null : v;
     }).join('');
-    value = value.replace(/\s+/g, ' ').substr(0, 255);
+    value = value.replace(/\s+/g, ' ').slice(0, 255);
     callback({valid: !!value.length, value: value});
 };
 
@@ -34,7 +34,7 @@ pandora.autovalidateUsername = function(value, blur, callback) {
     value = value.toLowerCase().split('').map(function(v, i) {
         return /\s/.test(v) && (i == 0 || (i == length - 1 && blur)) ? null : v;
     }).join('');
-    value = value.replace(/\s+/g, ' ').substr(0, 255);
+    value = value.replace(/\s+/g, ' ').slice(0, 255);
     callback({valid: !!value.length, value: value});
 };
 
@@ -96,7 +96,7 @@ pandora.validateUser = function(key, existing) {
             callback({
                 message: existing ?
                     'Unknown ' + string :
-                    string[0].toUpperCase() + string.substr(1) + ' already exists',
+                    string[0].toUpperCase() + string.slice(1) + ' already exists',
                 valid: valid
             });
         }) : callback({

@@ -77,7 +77,7 @@ pandora.ui.toolbar = function() {
         return '<b>' + (
             listId == ''
                 ? 'All ' + pandora.site.itemName.plural
-                : Ox.encodeHTMLEntities(listId.substr(listId.indexOf(':') + 1))
+                : Ox.encodeHTMLEntities(listId.slice(listId.indexOf(':') + 1))
         ) + '</b>';
     }
     function getListTitleLeft() {

@@ -33,7 +33,7 @@ pandora.ui.tv = function() {
         lists = [''];
         Ox.loop(3, function(f) {
             menu.items[f + 1].items.forEach(function(l) {
-                lists.push(l.id.substr(8));
+                lists.push(l.id.slice(8));
             });
         });
     }

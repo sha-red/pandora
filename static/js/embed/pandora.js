@@ -145,10 +145,10 @@ Ox.load('UI', {
 
     function parseQuery() {
         var vars = window.location.search.length
-                ? window.location.search.substring(1).split('&')
+                ? window.location.search.slice(1).split('&')
                 : [],
             query = {
-                item: window.location.pathname.substring(1).split('/')[0]
+                item: window.location.pathname.slice(1).split('/')[0]
             },
             defaults = {
                 view: 'video',
@@ -158,7 +158,7 @@ Ox.load('UI', {
                 item: ''
             };
         vars.forEach(function(v) {
-            v= v.split('=');
+            v = v.split('=');
             query[v[0]] = decodeURIComponent(v[1]);
         });
          

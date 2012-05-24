@@ -241,11 +241,11 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set(set);
                 } else if (data.id == 'viewicons') {
                     pandora.UI.set({icons: value});
-                } else if (data.id.substr(0, 8) == 'viewlist') {
+                } else if (data.id.slice(0, 8) == 'viewlist') {
                     pandora.UI.set({
                         find: {
                             conditions: data.checked ? [
-                                {key: 'list', value: data.id.substr(8), operator: '=='}
+                                {key: 'list', value: data.id.slice(8), operator: '=='}
                             ] : [],
                             operator: '&'
                         }
