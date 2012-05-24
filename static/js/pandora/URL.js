@@ -66,7 +66,6 @@ pandora.URL = (function() {
         if (Ox.isEmpty(state)) {
 
             if (pandora.user.ui.showHome) {
-                //Ox.print('*** showScreen via URL')
                 pandora.$ui.home = pandora.ui.home().showScreen();
             }
             callback && callback();
@@ -123,14 +122,12 @@ pandora.URL = (function() {
                 set[!state.item ? 'listSort' : 'itemSort'] = state.sort;
             }
 
-            if (state.find) {
-                if (!state.item) {
+            if (!state.item) {
+                if (state.find) {
                     set.find = state.find;
-                }
-            } else {
-                if (!pandora.$ui.appPanel) {
-                    // on page load without find, clear find, so that
-                    // removing query and reloading works as expected
+                } else if (!pandora.$ui.appPanel) {
+                    // when loading results without find, clear find, so that
+                    // removing a query and reloading works as expected
                     set.find = pandora.site.user.ui.find;
                 }
             }
