@@ -414,8 +414,8 @@ appPanel
             previousTime = currentTime;
             deg = Math.round((deg + delta * 360) % 360 / 30) * 30;
             css = 'rotate(' + deg + 'deg)';
-            loadingIcon.style.OTransform = css;
             loadingIcon.style.MozTransform = css;
+            loadingIcon.style.OTransform = css;
             loadingIcon.style.WebkitTransform = css;
         }, 83);
     }
