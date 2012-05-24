@@ -89,7 +89,11 @@ class SessionData(models.Model):
 
     @classmethod
     def get_or_create(cls, request):
+        if not request.session.session_key:
+            request.session.save()
+            request.session.modified = True
         session_key = request.session.session_key
+        assert session_key
         if request.user.is_authenticated():
             cls.objects.filter(user=request.user).update(session_key=session_key)
         data, created = cls.objects.get_or_create(session_key=session_key)
