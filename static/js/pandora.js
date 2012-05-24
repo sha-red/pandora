@@ -31,7 +31,8 @@ appPanel
         } catch(e) {}
     };
 
-    var debug = localStorage && localStorage['pandora.debug'],
+    var animationInterval,
+        debug = localStorage && localStorage['pandora.debug'],
         theme = localStorage && localStorage['Ox.theme']
             && JSON.parse(localStorage['Ox.theme']) || 'modern';
 
@@ -87,7 +88,7 @@ appPanel
             images.loadingIcon.style.height = '32px';
             images.loadingIcon.style.margin = 'auto';
             images.loadingIcon.src = '/static/oxjs/' + (debug ? 'dev' : 'build')
-                + '/Ox.UI/themes/' + theme + '/svg/symbolLoadingAnimated.svg';
+                + '/Ox.UI/themes/' + theme + '/svg/symbolLoading.svg';
             callback(images);
         };
         images.logo.src = '/static/png/logo.png';
@@ -127,6 +128,7 @@ appPanel
         loadingScreen.appendChild(images.loadingIcon);
         document.body.style.margin = 0;
         document.body.appendChild(loadingScreen);
+        startAnimation();
     }
 
     function loadOxJS(callback) {
@@ -284,6 +286,7 @@ appPanel
         pandora.URL.init().parse(function() {
 
             if (data.browserSupported) {
+                stopAnimation();
                 $('#loadingScreen').remove();
             } else {
                 loadBrowserMessage();
@@ -356,6 +359,7 @@ appPanel
                         textAlign: 'center'
                     })
                     .appendTo($message);
+            stopAnimation();
             $('#loadingIcon').remove();
             $message.appendTo($loadingScreen);
             browsers.forEach(function(browser) {
@@ -399,6 +403,25 @@ appPanel
             });
         }
 
+    }
+
+    function startAnimation() {
+        var css, deg = 0, loadingIcon = document.getElementById('loadingIcon'),
+            previousTime = +new Date();
+        animationInterval = setInterval(function() {
+            var currentTime = +new Date(),
+                delta = (currentTime - previousTime) / 1000;
+            previousTime = currentTime;
+            deg = Math.round((deg + delta * 360) % 360 / 30) * 30;
+            css = 'rotate(' + deg + 'deg)';
+            loadingIcon.style.OTransform = css;
+            loadingIcon.style.MozTransform = css;
+            loadingIcon.style.WebkitTransform = css;
+        }, 83);
+    }
+
+    function stopAnimation() {
+        clearInterval(animationInterval);
     }
 
 }());
