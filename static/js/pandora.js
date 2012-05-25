@@ -171,7 +171,7 @@ appPanel
     function loadPandora(browserSupported) {
         window.pandora = Ox.App({
             name: 'pandora',
-            url: '/api/',
+            url: '/api/'
         }).bindEvent({
             load: function(data) {
                 data.browserSupported = browserSupported;
