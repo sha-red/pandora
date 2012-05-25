@@ -332,7 +332,7 @@ pandora.ui.mainMenu = function() {
                     });
                 } else if (data.id == 'debug') {
                     if(pandora.localStorage('debug')) {
-                        pandora.localStorage.delete('debug');
+                        pandora.localStorage['delete']('debug');
                     } else {
                         pandora.localStorage('debug', true);
                     }

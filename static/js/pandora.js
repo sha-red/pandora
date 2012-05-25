@@ -33,6 +33,7 @@ appPanel
 
     var animationInterval,
         debug = localStorage && localStorage['pandora.debug'],
+        isMSIE = /MSIE/.test(navigator.userAgent),
         theme = localStorage && localStorage['Ox.theme']
             && JSON.parse(localStorage['Ox.theme']) || 'modern';
 
@@ -64,19 +65,22 @@ appPanel
             images.logo.style.width = width + 'px';
             images.logo.style.height = height + 'px';
             images.logo.style.margin = 'auto';
-            images.reflection = document.createElement('img');
-            images.reflection.style.position = 'absolute';
-            images.reflection.style.left = 0;
-            images.reflection.style.top = height + 'px';
-            images.reflection.style.right = 0;
-            images.reflection.style.bottom = 0;
-            images.reflection.style.width = width + 'px';
-            images.reflection.style.height = height + 'px';
-            images.reflection.style.margin = 'auto';
-            images.reflection.style.MozTransform = 'scaleY(-1)';
-            images.reflection.style.OTransform = 'scaleY(-1)';
-            images.reflection.style.WebkitTransform = 'scaleY(-1)';
-            images.reflection.src = '/static/png/logo.png';
+            if (!isMSIE) {
+                images.reflection = document.createElement('img');
+                images.reflection.style.position = 'absolute';
+                images.reflection.style.left = 0;
+                images.reflection.style.top = height + 'px';
+                images.reflection.style.right = 0;
+                images.reflection.style.bottom = 0;
+                images.reflection.style.width = width + 'px';
+                images.reflection.style.height = height + 'px';
+                images.reflection.style.margin = 'auto';
+                images.reflection.style.MozTransform = 'scaleY(-1)';
+                images.reflection.style.MSTransform = 'scaleY(-1)';
+                images.reflection.style.OTransform = 'scaleY(-1)';
+                images.reflection.style.WebkitTransform = 'scaleY(-1)';
+                images.reflection.src = '/static/png/logo.png';
+            }
             images.loadingIcon = document.createElement('img');
             images.loadingIcon.setAttribute('id', 'loadingIcon');
             images.loadingIcon.style.position = 'absolute';
@@ -95,24 +99,27 @@ appPanel
     }
 
     function loadScreen(images) {
-        var gradient = document.createElement('div');
-        gradient.style.position = 'absolute';
-        gradient.style.left = 0;
-        gradient.style.top = '160px';
-        gradient.style.right = 0;
-        gradient.style.bottom = 0;
-        gradient.style.width = '320px';
-        gradient.style.height = '160px';
-        gradient.style.margin = 'auto';
-        gradient.style.background = theme == 'classic'
-            ? '-moz-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
-            : '-moz-linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
-        gradient.style.background = theme == 'classic'
-            ? '-o-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
-            : '-o-linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
-        gradient.style.background = theme == 'classic'
-            ? '-webkit-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
-            : '-webkit-linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
+        
+        if (!isMSIE) {
+            var gradient = document.createElement('div');
+            gradient.style.position = 'absolute';
+            gradient.style.left = 0;
+            gradient.style.top = '160px';
+            gradient.style.right = 0;
+            gradient.style.bottom = 0;
+            gradient.style.width = '320px';
+            gradient.style.height = '160px';
+            gradient.style.margin = 'auto';
+            gradient.style.background = theme == 'classic'
+                ? '-moz-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
+                : '-moz-linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
+            gradient.style.background = theme == 'classic'
+                ? '-o-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
+                : '-o-linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
+            gradient.style.background = theme == 'classic'
+                ? '-webkit-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
+                : '-webkit-linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
+        }
         var loadingScreen = document.createElement('div');
         loadingScreen.setAttribute('id', 'loadingScreen');
         loadingScreen.className = 'OxScreen';
@@ -123,12 +130,19 @@ appPanel
             ? 'rgb(224, 224, 224)' : 'rgb(32, 32, 32)';
         loadingScreen.style.zIndex = '1002';
         loadingScreen.appendChild(images.logo);
-        loadingScreen.appendChild(images.reflection);
-        loadingScreen.appendChild(gradient);
+        images.reflection && loadingScreen.appendChild(images.reflection);
+        gradient && loadingScreen.appendChild(gradient);
         loadingScreen.appendChild(images.loadingIcon);
-        document.body.style.margin = 0;
-        document.body.appendChild(loadingScreen);
-        startAnimation();
+
+        //FF3.6 document.body can be undefined here
+        window.onload = function() {
+            document.body.style.margin = 0;
+            document.body.appendChild(loadingScreen);
+            startAnimation();
+        };
+        //IE8 does not call onload if already loaded before set
+        document.body && window.onload();
+
     }
 
     function loadOxJS(callback) {
@@ -136,7 +150,12 @@ appPanel
                 || document.getElementsByTagName('head')[0]
                 || document.documentElement, 
             script = document.createElement('script');
-        script.onload = callback;
+        if (isMSIE) {
+            // fixme: find a way to check if css/js have loaded in msie
+            setTimeout(callback, 2500);
+        } else {
+            script.onload = callback;
+        }
         script.src = '/static/oxjs/dev/Ox.js';
         script.type = 'text/javascript';
         head.appendChild(script);
@@ -177,7 +196,7 @@ appPanel
 
     function loadPandoraFiles(callback) {
         var prefix = '/static/';
-        if (localStorage && localStorage['pandora.debug']) {
+        if (debug) {
             Ox.getJSON(prefix + 'json/pandora.json?' + Ox.random(1000), function(files) {
                 Ox.loadFile(files.map(function(file) {
                     return prefix + file;
@@ -312,9 +331,7 @@ appPanel
     }
 
     function loadBrowserMessage() {
-
-        var isMSIE = $.browser.msie,
-            browsers = [].concat(
+        var browsers = [].concat(
                 isMSIE ? [{name: 'Chrome Frame', url: 'http://google.com/chromeframe/'}] : [],
                 [
                     {name: 'Chrome', url: 'http://google.com/chrome/'},
@@ -326,8 +343,7 @@ appPanel
                 return Ox.PATH + 'Ox.UI/png/browser' + browser.name.replace(' ', '') + '128.png';
             }),
             $loadingScreen = $('#loadingScreen');
-
-        loadImages(images, function() {
+        Ox.loadFile(images, function() {
             var html = pandora.site.site.name
                     + ' requires an up-to-date web browser. Please take a moment to '
                     + (
@@ -385,16 +401,6 @@ appPanel
                 .appendTo($message);
         });
 
-        function loadImages(images, callback) {
-            Ox.loadFile(images.shift(), function() {
-                if (images.length) {
-                    loadImages(images, callback);
-                } else {
-                    callback();
-                }
-            });
-        }
-
         pandora.proceed = function() {
             $loadingScreen.animate({
                 opacity: 0
@@ -415,6 +421,7 @@ appPanel
             deg = Math.round((deg + delta * 360) % 360 / 30) * 30;
             css = 'rotate(' + deg + 'deg)';
             loadingIcon.style.MozTransform = css;
+            loadingIcon.style.MSTransform = css;
             loadingIcon.style.OTransform = css;
             loadingIcon.style.WebkitTransform = css;
         }, 83);
