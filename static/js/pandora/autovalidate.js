@@ -62,7 +62,7 @@ pandora.validateNewEmail = function(value, callback) {
     }) : callback({
         message: value.length ? 'Invalid e-mail address' : '',
         // message: (!value.length ? 'Missing' : 'Invalid') + ' e-mail address',
-        valid: false,
+        valid: false
     });
 };
 

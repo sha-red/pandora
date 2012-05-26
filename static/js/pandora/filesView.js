@@ -233,7 +233,7 @@ pandora.ui.filesView = function(options, self) {
                 self.numberOfItems = data.items;
             },
             open: openFiles,
-            select: selectFiles,
+            select: selectFiles
         });
 
     self.$instancesList = Ox.TextList({

@@ -28,7 +28,7 @@ pandora.ui.importAnnotations = function(data) {
                 importButton = Ox.Button({
                     disabled: true,
                     id: 'import',
-                    title: 'Import',
+                    title: 'Import'
                 }).bindEvent({
                     click: function() {
                         importButton.hide();
@@ -46,7 +46,7 @@ pandora.ui.importAnnotations = function(data) {
             height: height,
             removeOnClose: true,
             width: width,
-            title: 'Import Annotations',
+            title: 'Import Annotations'
         })
         .bindEvent({
             close: function(data) {
@@ -95,7 +95,7 @@ pandora.ui.importAnnotations = function(data) {
     selectLayer = Ox.Select({
             items: layers,
             value: layer,
-            label: 'Layer',
+            label: 'Layer'
         })
         .bindEvent({
             change: function(data) {

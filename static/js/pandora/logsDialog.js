@@ -57,7 +57,7 @@ pandora.ui.logsDialog = function() {
                         id: 'id',
                         title: 'ID',
                         unique: true,
-                        visible: false,
+                        visible: false
                     },
                     {
                         format: function(value) {
@@ -207,7 +207,7 @@ pandora.ui.logsDialog = function() {
                 bottom: '4px',
                 paddingTop: '2px',
                 fontSize: '9px',
-                textAlign: 'center',
+                textAlign: 'center'
             })
             .appendTo(that.find('.OxButtonsbar'));
 

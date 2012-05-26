@@ -84,7 +84,7 @@ pandora.ui.editor = function(data) {
                         modified: created,
                         out: data.out,
                         user: pandora.user.username,
-                        value: '',
+                        value: ''
                     },
                     type == 'place' ? {
                         place: {lat: null, lng: null}

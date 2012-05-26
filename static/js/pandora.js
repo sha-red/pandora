@@ -20,10 +20,9 @@ appPanel
 */
 
 (function() {
-
     window.onerror = function(error, url, line) {
         try {
-            pandora.api.log({
+            !isMSIE && pandora.api.log({
                 text: error,
                 url: url,
                 line: line
@@ -210,7 +209,6 @@ appPanel
     function initPandora(data) {
 
         Ox.Log('', 'Ox.App load', data);
-
         Ox.extend(pandora, {
             $ui: {
                 body: $('body'),

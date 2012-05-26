@@ -238,7 +238,7 @@ pandora.ui.filtersInnerPanel = function() {
                 size: pandora.user.ui.filterSizes[1]
             },
             {
-                element: pandora.$ui.filters[2],
+                element: pandora.$ui.filters[2]
             },
             {
                 element: pandora.$ui.filters[3],

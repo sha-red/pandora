@@ -56,7 +56,7 @@ pandora.ui.homePage = function() {
                 }
             });
         $findElement = Ox.FormElementGroup({
-                elements: [$select, $input],
+                elements: [$select, $input]
             })
             .css({marginTop: '16px'})
             .appendTo($center);

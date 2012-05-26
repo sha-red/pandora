@@ -37,7 +37,7 @@ pandora.ui.folderBrowserBar = function(id) {
                             updateList(key, value);
                         }
                     })
-            ],
+            ]
         })
         .css({
             float: 'right',

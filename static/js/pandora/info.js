@@ -279,7 +279,7 @@ pandora.ui.listInfo = function() {
         return {
             width: size + 'px',
             height: size + 'px',
-            borderRadius: Math.round(size / 4) + 'px',
+            borderRadius: Math.round(size / 4) + 'px'
         };
     }
     that.resizeInfo = function() {

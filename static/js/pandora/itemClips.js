@@ -45,7 +45,7 @@ pandora.ui.itemClips = function(options) {
                 title: annotations.map(function(annotation) {
                     return Ox.stripTags(annotation.value.replace(/\n/g, ' '));
                 }).join('; '),
-                url: url,
+                url: url
             })
             .addClass('OxInfoIcon')
             .css({
@@ -55,7 +55,7 @@ pandora.ui.itemClips = function(options) {
                     : '2px'
             })
             .data(Ox.extend(annotations.length ? {
-                annotation: annotations[0].id.split('/')[1],
+                annotation: annotations[0].id.split('/')[1]
             } : {}, {'in': clip['in'], out: clip.out}));
         $item.find('.OxTarget').addClass('OxSpecialTarget');
         that.append($item);

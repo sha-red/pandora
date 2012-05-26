@@ -76,7 +76,7 @@ pandora.ui.siteDialog = function(section) {
                                 Ox.Theme.formatColor(330 + 30 * i, 'gradient')
                                     .css({
                                         padding: '4px',
-                                        marginTop: '8px',
+                                        marginTop: '8px'
                                     })
                                     .html(
                                         '<b>' + name + '</b><br/><div style="padding-top: 2px; font-size: 9px; opacity: 0.75">'

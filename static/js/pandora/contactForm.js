@@ -61,7 +61,7 @@ pandora.ui.contactForm = function() {
                     value: '',
                     width: width
                 })
-            ],
+            ]
         })
         .css({width: width + 'px'})
         .bindEvent({

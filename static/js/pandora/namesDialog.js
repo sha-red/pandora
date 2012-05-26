@@ -103,7 +103,7 @@ pandora.ui.namesDialog = function() {
         $findButton = Ox.Button({
                 disabled: true,
                 title: 'Find',
-                width: 48,
+                width: 48
             }).bindEvent({
                 click: function() {
                     that.close();
@@ -176,7 +176,7 @@ pandora.ui.namesDialog = function() {
             bottom: '4px',
             paddingTop: '2px',
             fontSize: '9px',
-            textAlign: 'center',
+            textAlign: 'center'
         })
         .appendTo(that.find('.OxButtonsbar'));
 

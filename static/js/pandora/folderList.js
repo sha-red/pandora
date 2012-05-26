@@ -254,7 +254,7 @@ pandora.ui.folderList = function(id) {
         .css({
             left: 0,
             top: 0,
-            width: pandora.user.ui.sidebarWidth + 'px',
+            width: pandora.user.ui.sidebarWidth + 'px'
         })
         .bindEvent({
             add: function(event) {

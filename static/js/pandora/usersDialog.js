@@ -99,7 +99,7 @@ pandora.ui.usersDialog = function() {
                         id: 'id',
                         title: 'ID',
                         unique: true,
-                        visible: false,
+                        visible: false
                     },
                     {
                         format: function(value, data) {

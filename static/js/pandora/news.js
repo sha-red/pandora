@@ -115,7 +115,7 @@ pandora.ui.news = function(width, height) {
                 tooltip: isEditable ? 'Doubleclick to edit' : '',
                 type: 'textarea',
                 value: items[index].text,
-                width: width - 512,
+                width: width - 512
             })
             .css({
                 MozUserSelect: 'text',

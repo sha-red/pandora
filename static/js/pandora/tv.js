@@ -63,7 +63,7 @@ pandora.ui.tv = function() {
                     controlsTooltips: {
                         open: 'Open in ' + Ox.getObjectById(
                             pandora.site.itemViews, pandora.user.ui.videoView
-                        ).title + ' View',
+                        ).title + ' View'
                     },
                     controlsTop: ['close', 'title', 'open'],
                     duration: result.data.duration,

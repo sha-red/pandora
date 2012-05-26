@@ -47,7 +47,7 @@ pandora.ui.uploadDialog = function(data) {
             height: 128,
             removeOnClose: true,
             width: 368,
-            title: 'Upload Video',
+            title: 'Upload Video'
         })
         .bindEvent({
             close: function(data) {

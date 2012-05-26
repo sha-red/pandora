@@ -486,7 +486,7 @@ pandora.ui.list = function() {
                     } else {
                         pandora.$ui.previewDialog.options({
                                 content: pandora.$ui.previewImage,
-                                title: title,
+                                title: title
                             })
                             .setSize(width, height);
                     }

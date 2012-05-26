@@ -38,7 +38,7 @@ pandora.ui.titlesDialog = function() {
                         id: 'id',
                         title: 'ID',
                         unique: true,
-                        visible: false,
+                        visible: false
                     },
                     {
                         id: 'title',
@@ -92,7 +92,7 @@ pandora.ui.titlesDialog = function() {
         $findButton = Ox.Button({
                 disabled: true,
                 title: 'Find',
-                width: 48,
+                width: 48
             }).bindEvent({
                 click: function() {
                     that.close();
@@ -165,7 +165,7 @@ pandora.ui.titlesDialog = function() {
                 bottom: '4px',
                 paddingTop: '2px',
                 fontSize: '9px',
-                textAlign: 'center',
+                textAlign: 'center'
             })
             .appendTo(that.find('.OxButtonsbar'));
 

@@ -35,7 +35,7 @@ pandora.ui.infoView = function(data) {
                 position: 'absolute',
                 left: canEdit && !ui.showIconBrowser ? -listWidth + 'px' : 0,
                 top: 0,
-                right: 0,
+                right: 0
             })
             .appendTo(that.$element),
 
@@ -121,7 +121,7 @@ pandora.ui.infoView = function(data) {
                 position: 'absolute',
                 left: margin + (iconSize == 256 ? 256 : iconWidth) + margin + 'px',
                 top: margin + 'px',
-                right: margin + statisticsWidth + margin + 'px',
+                right: margin + statisticsWidth + margin + 'px'
             })
             .bindEvent(canEdit && !isEditable ? {
                 doubleclick: reloadMetadata
@@ -849,7 +849,7 @@ pandora.ui.infoView = function(data) {
             height: iconSize / 2 + 'px'
         }, 250);
         $text.animate({
-            left: margin + (iconSize == 256 ? 256 : iconWidth) + margin + 'px',
+            left: margin + (iconSize == 256 ? 256 : iconWidth) + margin + 'px'
         }, 250);
         pandora.UI.set({infoIconSize: iconSize});
     }

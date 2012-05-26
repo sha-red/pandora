@@ -89,7 +89,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
         that = Ox.SplitPanel({
             elements: [
                 {
-                    element: $element,
+                    element: $element
                 },
                 {
                     element: $listPanel,
@@ -214,7 +214,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
                         query: {
                             conditions: [{key: itemName, value: id, operator:'=='}],
                             operator: '&'
-                        },
+                        }
                     }, data), callback);
                 }
             });

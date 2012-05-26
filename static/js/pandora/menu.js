@@ -55,7 +55,7 @@ pandora.ui.mainMenu = function() {
                         { id: 'items', title: 'View ' + pandora.site.itemName.plural, items: [
                             { group: 'listview', min: 1, max: 1, items: pandora.site.listViews.map(function(view) {
                                 return Ox.extend({
-                                    checked: ui.listView == view.id,
+                                    checked: ui.listView == view.id
                                 }, view);
                             }) },
                         ]},
@@ -83,7 +83,7 @@ pandora.ui.mainMenu = function() {
                         { id: 'item', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], items: [
                             { group: 'itemview', min: 1, max: 1, items: pandora.site.itemViews.map(function(view) {
                                 return Ox.extend({
-                                    checked: ui.itemView == view.id,
+                                    checked: ui.itemView == view.id
                                 }, view);
                             }) },
                         ] },

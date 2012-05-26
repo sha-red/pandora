@@ -116,7 +116,7 @@ pandora.ui.mediaView = function() {
                     left: imageLeft + 'px',
                     top: imageTop + 'px',
                     width: imageWidth + 'px',
-                    height: imageHeight + 'px',
+                    height: imageHeight + 'px'
                 })
         );
         if (view == 'frames') {

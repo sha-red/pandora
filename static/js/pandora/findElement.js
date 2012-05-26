@@ -34,12 +34,12 @@ pandora.ui.findElement = function() {
                                 }).map(function(key) {
                                     return {
                                         id: key.id,
-                                        title: 'Find: ' + key.title,
+                                        title: 'Find: ' + key.title
                                     };
                                 }),
                                 [{}, {
                                     id: 'advanced',
-                                    title: 'Find: Advanced',
+                                    title: 'Find: Advanced'
                                 }]
                             ),
                             overlap: 'right',

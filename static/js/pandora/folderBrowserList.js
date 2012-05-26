@@ -156,7 +156,7 @@ pandora.ui.folderBrowserList = function(id) {
                 } else if (data.key == 'subscribed') {
                     var subscribed = that.value(data.id, 'subscribed');
                     pandora.api[subscribed ? 'unsubscribeFromList' : 'subscribeToList']({
-                        id: data.id,
+                        id: data.id
                     }, function(result) {
                         that.value(data.id, 'subscribed', !subscribed);
                     });

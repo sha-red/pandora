@@ -75,7 +75,7 @@ pandora.ui.listDialog = function(section) {
                         );
                     }
                 })
-            ],
+            ]
         })
         .css({
             float: 'right',

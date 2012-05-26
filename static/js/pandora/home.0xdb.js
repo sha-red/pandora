@@ -39,7 +39,7 @@ pandora.ui.home = function() {
                 bottom: 0,
                 width: '320px',
                 height: '160px',
-                margin: 'auto',
+                margin: 'auto'
             })
             .appendTo(that),
         $logo = $('<img>')
