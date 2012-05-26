@@ -149,13 +149,13 @@ pandora.ui.mainMenu = function() {
                 pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
                     ? [
                         { id: 'debugMenu', title: 'Debug', items: [
-                            { id: 'onload', title: 'Run on load...'},
                             { id: 'logs', title: 'View Logs...'},
                             { id: 'clearcache', title: 'Clear Cache'},
                             { id: 'reloadapplication', title: 'Reload Application'},
                             { id: 'resetui', title: 'Reset UI Settings'},
                             { id: 'debug', title: (pandora.localStorage('debug')?'Disable':'Enable')+' Debug Mode'},
                             { id: 'triggererror', title: 'Trigger JavaScript Error'},
+                            { id: 'onload', title: 'Edit onload script...'}
                         ] }
                     ]
                     : []
