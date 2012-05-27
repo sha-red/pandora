@@ -10,63 +10,58 @@ import models
 
 
 @task(ignore_results=True, queue='default')
-def update_matching_events(id):
-    from event.models import Event
+def update_matches(id, type):
+    if type == 'place':
+        from place.models import Place as Model
+    elif type == 'event':
+        from event.models import Event as Model
+
     a = models.Annotation.objects.get(pk=id)
-    for e in a.events.filter(defined=False).exclude(name=a.value):
-        if e.annotations.exclude(id=id).count() == 0:
-            e.delete()
-    for e in a.events.all():
-        e.update_matches()
-    if a.get_layer().get('type') == 'event' and a.events.count() == 0:
-        a.events.add(Event.get_or_create(a.value))
-        for e in a.events.all():
-            e.update_matches()
+    a_matches = getattr(a, type == 'place' and 'places' or 'events')
 
-    if a.findvalue:
-        names = {}
-        for n in Event.objects.all().values('id', 'name', 'alternativeNames'):
-            names[n['id']] = [ox.decode_html(x) for x in [n['name']] + json.loads(n['alternativeNames'])]
-
-        value = a.findvalue.lower()
-        update = []
-        for i in names:
-            for name in names[i]:
-                if name.lower() in value:
-                    update.append(i)
-                    break
-        if update:
-            for e in Event.objects.filter(id__in=update):
-                e.update_matches()
-
-@task(ignore_results=True, queue='default')
-def update_matching_places(id):
-    from place.models import Place
-    a = models.Annotation.objects.get(pk=id)
-    for p in a.places.filter(defined=False).exclude(name=a.value):
+    #remove undefined matches that only have this annotation
+    for p in a_matches.filter(defined=False).exclude(name=a.value):
         if p.annotations.exclude(id=id).count() == 0:
             p.delete()
-    for p in a.places.all():
-        p.update_matches()
-    if a.get_layer().get('type') == 'place' and a.places.count() == 0:
-        a.places.add(Place.get_or_create(a.value))
-        for p in a.places.all():
+    if a.get_layer().get('type') == type and a_matches.count() == 0:
+        a.places.add(Model.get_or_create(a.value))
+        for p in a_matches.all():
             p.update_matches()
     
     if a.findvalue:
         names = {}
-        for n in Place.objects.all().values('id', 'name', 'alternativeNames'):
-            names[n['id']] = [ox.decode_html(x) for x in [n['name']] + json.loads(n['alternativeNames'])]
+        for n in Model.objects.all().values('id', 'name', 'alternativeNames'):
+            names[n['id']] = [ox.decode_html(x)
+                for x in [n['name']] + json.loads(n['alternativeNames'])]
         value = a.findvalue.lower()
-        update = []
+
+        current = [p.id for p in a_matches.all()]
+        matches = []
+        name_matches = []
         for i in names:
             for name in names[i]:
                 if name.lower() in value:
-                    update.append(i)
+                    matches.append(i)
+                    name_matches.append(name.lower())
                     break
+        new = []
+        for i in matches: 
+            p = Model.objects.get(pk=i)
+            #only add places/events that did not get added as a super match
+            #i.e. only add The Paris Region and not Paris
+            if not filter(lambda n: n in name_matches,
+                          [n.lower() for n in p.get_super_matches()]):
+                new.append(i)
+        removed = filter(lambda p: p not in new, current)
+        added = filter(lambda p: p not in current, new)
+        update = removed + added
         if update:
-            for e in Place.objects.filter(id__in=update):
-                e.update_matches()
+            for e in Model.objects.filter(id__in=update):
+                e.update_matches(models.Annotation.objects.filter(pk=a.id))
+    else:
+        #annotation has no value, remove all exisint matches
+        for e in a_matches.all():
+            e.update_matches(models.Annotation.objects.filter(pk=a.id))
 
 @task(ignore_results=True, queue='default')
 def update_item(id):

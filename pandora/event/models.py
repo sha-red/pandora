@@ -11,7 +11,7 @@ from django.conf import settings
 import ox
 from ox.django import fields
 
-from annotation.models import Annotation, get_matches
+from annotation.models import Annotation, get_matches, get_super_matches
 from item.models import Item
 from item import utils
 from person.models import get_name_sort
@@ -86,27 +86,36 @@ class Event(models.Model):
     def get_matches(self):
         return get_matches(self, Event, 'event')
 
+    def get_super_matches(self):
+        return get_super_matches(self, Event)
+
     @transaction.commit_on_success
-    def update_matches(self):
-        matches = self.get_matches()
-        numberofmatches = matches.count()
-        for a in self.annotations.exclude(id__in=matches):
+    def update_matches(self, annotations=None):
+        matches = self.get_matches(annotations)
+        if not annotations:
+            numberofmatches = matches.count()
+            annotations = self.annotations.all()
+        else:
+            numberofmatches = -1
+        for a in annotations.exclude(id__in=matches):
             self.annotations.remove(a)
             #annotations of type event always need an event
             if a.get_layer().get('type') == 'event' and a.events.count() == 0:
                 a.events.add(Event.get_or_create(a.value))
                 for e in a.events.all():
                     e.update_matches()
-        for i in matches.exclude(id__in=self.annotations.all()):
+        for a in matches.exclude(id__in=self.annotations.all()):
             #need to check again since editEvent might have been called again
-            if self.annotations.filter(id=i.id).count() == 0:
-                self.annotations.add(i)
-        ids = list(set([a.item.id for a in matches]))
+            if self.annotations.filter(id=a.id).count() == 0:
+                self.annotations.add(a)
+        ids = list(set([a['item_id'] for a in self.annotations.all().values('item_id')]))
         for i in self.items.exclude(id__in=ids):
             self.items.remove(i)
         for i in Item.objects.filter(id__in=ids).exclude(id__in=self.items.all()):
             if self.items.filter(id=i.id).count() == 0:
                 self.items.add(i)
+        if numberofmatches < 0:
+            numberofmatches = self.annotations.all().count()
         if self.matches != numberofmatches:
             self.matches = numberofmatches
             if numberofmatches:

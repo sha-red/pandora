@@ -18,10 +18,10 @@ from changelog.models import Changelog
 from item.utils import sort_string
 import managers
 import utils
-from tasks import update_matching_events, update_matching_places, update_item
+from tasks import update_matches, update_matches, update_item
 
 
-def get_matches(obj, model, layer_type):
+def get_super_matches(obj, model):
     super_matches = []
     q = Q(name_find__contains=" " + obj.name)|Q(name_find__contains="|%s"%obj.name)
     for name in obj.alternativeNames:
@@ -31,7 +31,10 @@ def get_matches(obj, model, layer_type):
             for name in [obj.name] + list(obj.alternativeNames):
                 if name in othername:
                     super_matches.append(othername)
+    return super_matches
 
+def get_matches(obj, model, layer_type, qs=None):
+    super_matches = obj.get_super_matches()
     exact = [l['id'] for l in filter(lambda l: l['type'] == layer_type, settings.CONFIG['layers'])]
     if exact:
         q = Q(value__iexact=obj.name)
@@ -56,7 +59,9 @@ def get_matches(obj, model, layer_type):
             f = contains_matches
 
     matches = []
-    for a in Annotation.objects.filter(f):
+    if not qs:
+        qs = Annotation.objects.all()
+    for a in qs.filter(f):
         value = a.findvalue.lower()
         for name in super_matches:
             name = ox.decode_html(name)
@@ -130,7 +135,7 @@ class Annotation(models.Model):
         layer = self.get_layer()
         if self.value:
             self.value = utils.cleanup_value(self.value, layer['type'])
-            self.findvalue = ox.decode_html(ox.strip_tags(self.value).strip()).replace('\n', ' ')
+            self.findvalue = ox.decode_html(ox.strip_tags(re.sub('<br */?>', ' ', self.value))).replace('\n', ' ')
             sortvalue = sort_string(self.findvalue)
             if sortvalue:
                 self.sortvalue = sortvalue[:900]
@@ -161,9 +166,9 @@ class Annotation(models.Model):
 
         #editAnnotations needs to be in snyc
         if layer.get('type') == 'place' or layer.get('hasPlaces'):
-            update_matching_places(self.id)
+            update_matches(self.id, 'place')
         if layer.get('type') == 'event' or layer.get('hasEvents'):
-            update_matching_events(self.id)
+            update_matches(self.id, 'event')
 
     def delete(self, *args, **kwargs):
         super(Annotation, self).delete(*args, **kwargs)
