@@ -69,7 +69,7 @@ def update_item(id):
     from clip.models import Clip
     a = models.Annotation.objects.get(pk=id)
     #cleanup orphaned clips
-    Clip.objects.filter(annotations__id=None).delete()
+    Clip.objects.filter(item__id=a.item.id, annotations__id=None).delete()
     #update facets if needed
     if filter(lambda f: f['id'] == a.layer, settings.CONFIG['filters']):
         a.item.update_layer_facet(a.layer)
