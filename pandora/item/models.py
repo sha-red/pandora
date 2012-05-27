@@ -227,7 +227,7 @@ class Item(models.Model):
                 if not description:
                     description = ''
                 d, created = Description.objects.get_or_create(key=k, value=value)
-                d.description = ox.parse_html(description)
+                d.description = ox.sanitize_html(description)
                 d.save()
         for key in data:
             if data[key] == None:
@@ -237,9 +237,9 @@ class Item(models.Model):
                 k = filter(lambda i: i['id'] == key, settings.CONFIG['itemKeys'])
                 ktype = k and k[0].get('type') or ''
                 if ktype == 'text': 
-                    self.data[key] = ox.parse_html(data[key])
+                    self.data[key] = ox.sanitize_html(data[key])
                 elif ktype == '[text]': 
-                    self.data[key] = [ox.parse_html(t) for t in data[key]]
+                    self.data[key] = [ox.sanitize_html(t) for t in data[key]]
                 elif ktype == '[string]': 
                     self.data[key] = [ox.escape_html(t) for t in data[key]]
                 elif isinstance(data[key], basestring):
@@ -579,7 +579,7 @@ class Item(models.Model):
                 if isinstance(value, bool):
                     value = value and 'true' or 'false'
                 if isinstance(value, basestring):
-                    value = ox.decodeHtml(ox.stripTags(value.strip()))
+                    value = ox.decode_html(ox.strip_tags(value.strip()))
                 f.value = value
                 f.save()
             else:
@@ -660,7 +660,7 @@ class Item(models.Model):
             if not value:
                 value = None
             if isinstance(value, basestring):
-                value = ox.decodeHtml(value.lower())
+                value = ox.decode_html(value.lower())
             setattr(s, name, value)
 
         base_keys = (
@@ -809,7 +809,7 @@ class Item(models.Model):
     def update_layer_facet(self, key):
         current_values = [a['value']
             for a in self.annotations.filter(layer=key).distinct().values('value')]
-        current_values = [ox.decodeHtml(v) for v in current_values]
+        current_values = [ox.decode_html(v) for v in current_values]
         saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
         removed_values = filter(lambda i: i not in current_values, saved_values)
         if removed_values:
@@ -854,7 +854,7 @@ class Item(models.Model):
                 else:
                     current_values = [unicode(current_values)]
             current_values = list(set(current_values))
-            current_values = [ox.decodeHtml(v) for v in current_values]
+            current_values = [ox.decode_html(v) for v in current_values]
             saved_values = [i.value for i in Facet.objects.filter(item=self, key=key)]
             removed_values = filter(lambda i: i not in current_values, saved_values)
             if removed_values:

@@ -243,7 +243,7 @@ def addList(request):
             value = list.status
         list.status = value
     if 'description' in data:
-        list.description = ox.parse_html(data['description'])
+        list.description = ox.sanitize_html(data['description'])
     if 'view' in data:
         list.view = data['view']
     if 'sort' in data:
@@ -363,7 +363,7 @@ def editList(request):
                     name = data['name'] + ' [%d]' % num
                 list.name = name
             elif key == 'description':
-                list.description = ox.parse_html(data['description'])
+                list.description = ox.sanitize_html(data['description'])
 
         if 'position' in data:
             pos, created = models.Position.objects.get_or_create(list=list, user=request.user)

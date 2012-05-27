@@ -44,10 +44,10 @@ def get_matches(obj, model, layer_type):
     has_type = 'has%ss' % layer_type.capitalize()
     contains = [l['id'] for l in filter(lambda l: l.get(has_type), settings.CONFIG['layers'])]
     if contains:
-        name = ox.decodeHtml(obj.name)
+        name = ox.decode_html(obj.name)
         q = Q(findvalue__icontains=" " + name)|Q(findvalue__istartswith=name)
         for name in obj.alternativeNames:
-            name = ox.decodeHtml(name)
+            name = ox.decode_html(name)
             q = q|Q(value__icontains=" " + name)|Q(value__istartswith=name)
         contains_matches = q&Q(layer__in=contains)
         if f:
@@ -59,11 +59,11 @@ def get_matches(obj, model, layer_type):
     for a in Annotation.objects.filter(f):
         value = a.findvalue.lower()
         for name in super_matches:
-            name = ox.decodeHtml(name)
+            name = ox.decode_html(name)
             value = value.replace(name.lower(), '')
         for name in [obj.name] + list(obj.alternativeNames):
             name = name.lower()
-            name = ox.decodeHtml(name)
+            name = ox.decode_html(name)
             if name in value and (exact or re.compile('((^|\s)%s([\.,;:!?\-\/\s]|$))'%name).findall(value)):
                 matches.append(a.id)
                 break
@@ -130,7 +130,7 @@ class Annotation(models.Model):
         layer = self.get_layer()
         if self.value:
             self.value = utils.cleanup_value(self.value, layer['type'])
-            self.findvalue = ox.decodeHtml(ox.stripTags(self.value).strip()).replace('\n', ' ')
+            self.findvalue = ox.decode_html(ox.strip_tags(self.value).strip()).replace('\n', ' ')
             sortvalue = sort_string(self.findvalue)
             if sortvalue:
                 self.sortvalue = sortvalue[:900]

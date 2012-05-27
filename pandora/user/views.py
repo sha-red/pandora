@@ -643,8 +643,8 @@ def contact(request):
             'footer': settings.CONFIG['site']['email']['footer'],
             'url': request.build_absolute_uri('/'),
         })
-        subject = ox.decodeHtml(subject)
-        message = ox.decodeHtml(template.render(context))
+        subject = ox.decode_html(subject)
+        message = ox.decode_html(template.render(context))
         response = json_response(text='message sent')
         try:
             send_mail(u'%s Contact - %s' % (settings.SITENAME, subject), message, email_from, email_to)

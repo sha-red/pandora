@@ -434,7 +434,7 @@ def edit(request):
         response = json_response(status=200, text='ok')
         if 'notes' in data:
             if request.user.get_profile().capability('canEditMetadata'):
-                item.notes = ox.parse_html(data['notes'])
+                item.notes = ox.sanitize_html(data['notes'])
             del data['notes']
         if 'rightslevel' in data:
             item.level = int(data['rightslevel'])
@@ -1131,7 +1131,7 @@ def item(request, id):
             if isinstance(value, list):
                 value = value = ', '.join(value)
             if value:
-                ctx[key] = ox.stripTags(value)
+                ctx[key] = ox.strip_tags(value)
 
         context = RequestContext(request, ctx)
     return render_to_response(template, context)

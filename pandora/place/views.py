@@ -55,7 +55,7 @@ def addPlace(request):
             for n in data.get('alternativeNames', [])]
     name = ox.escape_html(name)
     for n in names:
-        n = ox.decodeHtml(name)
+        n = ox.decode_html(name)
         if models.Place.objects.filter(defined=True,
                                        name_find__icontains=u'|%s|'%n).count() != 0:
             exists = True
@@ -117,7 +117,7 @@ def editPlace(request):
         if alternative_names:
             data['alternativeNames'] = alternative_names
         for name in names + alternative_names:
-            name = ox.decodeHtml(name)
+            name = ox.decode_html(name)
             if models.Place.objects.filter(defined=True,
                     name_find__icontains=u'|%s|'%name).exclude(id=place.id).count() != 0:
                 conflict = True

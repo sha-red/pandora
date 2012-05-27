@@ -26,7 +26,7 @@ def update_matching_events(id):
     if a.findvalue:
         names = {}
         for n in Event.objects.all().values('id', 'name', 'alternativeNames'):
-            names[n['id']] = [ox.decodeHtml(x) for x in [n['name']] + json.loads(n['alternativeNames'])]
+            names[n['id']] = [ox.decode_html(x) for x in [n['name']] + json.loads(n['alternativeNames'])]
 
         value = a.findvalue.lower()
         update = []
@@ -56,7 +56,7 @@ def update_matching_places(id):
     if a.findvalue:
         names = {}
         for n in Place.objects.all().values('id', 'name', 'alternativeNames'):
-            names[n['id']] = [ox.decodeHtml(x) for x in [n['name']] + json.loads(n['alternativeNames'])]
+            names[n['id']] = [ox.decode_html(x) for x in [n['name']] + json.loads(n['alternativeNames'])]
         value = a.findvalue.lower()
         update = []
         for i in names:

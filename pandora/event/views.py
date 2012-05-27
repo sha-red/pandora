@@ -31,7 +31,7 @@ def addEvent(request):
     exists = False
     names = [data['name']] + data.get('alternativeNames', [])
     for name in names:
-        name = ox.decodeHtml(name)
+        name = ox.decode_html(name)
         if models.Event.objects.filter(defined=True,
                 name_find__icontains=u'|%s|'%name).count() != 0:
             exists = True
