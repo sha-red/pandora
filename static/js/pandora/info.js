@@ -172,10 +172,14 @@ pandora.ui.listInfo = function() {
                     $title = Ox.Editable({
                             editable: editable,
                             format: function(value) {
-                                return Ox.encodeHTML(Ox.decodeHTML(
-                                    item.status == 'featured' || editable
-                                    ? value
-                                    : item.user + ': ' + value))
+                                // FIXME: document what we're trying to do here!
+                                return Ox.encodeHTMLEntities(
+                                    Ox.decodeHTMLEntities(
+                                        item.status == 'featured' || editable
+                                            ? value
+                                            : item.user + ': ' + value
+                                    )
+                                )
                             },
                             tooltip: editable ? 'Doubleclick to edit title' : '',
                             value: item.name,
@@ -189,7 +193,7 @@ pandora.ui.listInfo = function() {
                                 });
                             },
                             submit: function(data) {
-                                data.value = Ox.decodeHTML(data.value);
+                                data.value = Ox.decodeHTMLEntities(data.value);
                                 if (data.value != item.name) {
                                     pandora.api.editList({
                                         id: list,

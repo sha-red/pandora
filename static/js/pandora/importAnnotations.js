@@ -60,7 +60,7 @@ pandora.ui.importAnnotations = function(data) {
     function addAnnotation() {
         if(srt.length>0) {
             var data = srt.shift();
-            data.text = Ox.parseHTML(data.text)
+            data.text = Ox.sanitizeHTML(data.text)
                 .replace(/<br[ /]*?>\n/g, '\n')
                 .replace(/\n\n/g, '<br>\n')
                 .replace(/\n/g, '<br>\n');
