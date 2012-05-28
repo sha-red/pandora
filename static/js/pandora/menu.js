@@ -154,6 +154,7 @@ pandora.ui.mainMenu = function() {
                             { id: 'reloadapplication', title: 'Reload Application'},
                             { id: 'resetui', title: 'Reset UI Settings'},
                             { id: 'debug', title: (pandora.localStorage('debug')?'Disable':'Enable')+' Debug Mode'},
+                            { id: 'tests', title: 'Run Tests'},
                             { id: 'triggererror', title: 'Trigger JavaScript Error'}
                         ] }
                     ]
@@ -337,6 +338,8 @@ pandora.ui.mainMenu = function() {
                         pandora.localStorage('debug', true);
                     }
                     that.setItemTitle('debug', (pandora.localStorage('debug') ? 'Disable' : 'Enable') + ' Debug Mode');
+                } else if (data.id == 'tests') {
+                    pandora.tests();
                 } else if (data.id == 'triggererror') {
                     var e = error;
                 }
