@@ -242,16 +242,14 @@ pandora.enableDragAndDrop = function($list, canMove) {
                     }
                 });
             });
-            $tooltip.options({
-                title: getTitle(data._event)
-            }).show(data._event);
+            $tooltip.options({title: getTitle()}).show(data.event);
             canMove && Ox.UI.$window.bind({
                 keydown: keydown,
                 keyup: keyup
             });
         },
         draganddrop: function(data) {
-            var event = data._event;
+            var event = data.event;
             $tooltip.options({
                 title: getTitle(event)
             }).show(event);
@@ -261,7 +259,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
             }
         },
         draganddroppause: function(data) {
-            var event = data._event, scroll,
+            var event = data.event, scroll,
                 $parent, $grandparent, $panel, title;
             // fixme: should be named showLists in the user ui prefs!
             if (!pandora.user.ui.showSidebar) {
@@ -298,7 +296,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
             }
         },
         draganddropenter: function(data) {
-            var $parent = $(data._event.target).parent(),
+            var $parent = $(data.event.target).parent(),
                 $item = $parent.is('.OxItem') ? $parent : $parent.parent(),
                 $list = $item.parent().parent().parent().parent();
             if ($list.is('.OxDroppable')) {
@@ -309,7 +307,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
             }
         },
         draganddropleave: function(data) {
-            var $parent = $(data._event.target).parent(),
+            var $parent = $(data.event.target).parent(),
                 $item = $parent.is('.OxItem') ? $parent : $parent.parent();
             if ($item.is('.OxDroppable')) {
                 $item.removeClass('OxDrop');
@@ -369,7 +367,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
         }
     });
 
-    function getTitle(e) {
+    function getTitle() {
         var image, text;
         if (drag.action == 'move' && drag.source.user != pandora.user.username) {
             image = 'symbolClose'
