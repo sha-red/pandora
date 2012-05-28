@@ -100,7 +100,7 @@ pandora.ui.preferencesDialog = function() {
                     $content.append(
                         Ox.Button({
                             title: 'Reset UI Settings',
-                            width: 120
+                            width: 128
                         })
                         .bindEvent({
                             click: function() {
@@ -109,6 +109,18 @@ pandora.ui.preferencesDialog = function() {
                             }
                         })
                         .css({position: 'absolute', left: '96px', top: '16px'})
+                    );
+                    $content.append(
+                        Ox.Button({
+                            title: 'Run Script on Load',
+                            width: 128
+                        })
+                        .bindEvent({
+                            click: function() {
+                                pandora.$ui.onloadDialog = pandora.ui.onloadDialog().open();
+                            }
+                        })
+                        .css({position: 'absolute', left: '96px', top: '40px'})
                     );
                 }
                 return $content;

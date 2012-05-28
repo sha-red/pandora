@@ -154,8 +154,7 @@ pandora.ui.mainMenu = function() {
                             { id: 'reloadapplication', title: 'Reload Application'},
                             { id: 'resetui', title: 'Reset UI Settings'},
                             { id: 'debug', title: (pandora.localStorage('debug')?'Disable':'Enable')+' Debug Mode'},
-                            { id: 'triggererror', title: 'Trigger JavaScript Error'},
-                            { id: 'onload', title: 'Edit onload script...'}
+                            { id: 'triggererror', title: 'Trigger JavaScript Error'}
                         ] }
                     ]
                     : []
@@ -320,8 +319,6 @@ pandora.ui.mainMenu = function() {
                         filters: pandora.site.user.ui.filters
                     });
                     pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
-                } else if (data.id == 'onload') {
-                    pandora.$ui.onloadDialog = pandora.ui.onloadDialog().open();
                 } else if (data.id == 'logs') {
                     pandora.$ui.logsDialog = pandora.ui.logsDialog().open();
                 } else if (data.id == 'clearcache') {

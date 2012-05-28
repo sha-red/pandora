@@ -10,7 +10,8 @@ pandora.ui.onloadDialog = function() {
         $text = Ox.Input({
             height: dialogHeight - 8,
             id: 'onload',
-            placeholder: 'Paste onload code here',
+            placeholder: '/*\nAny JavaScript you paste here will run on load.\n'
+                +'You can also manually change or remove it by setting localStorage["pandora.onload"] in the console.\n*/',
             type: 'textarea',
             value: localStorage['pandora.onload'] || '',
             width: dialogWidth - 8
@@ -45,7 +46,7 @@ pandora.ui.onloadDialog = function() {
                 minWidth: 512,
                 padding: 0,
                 removeOnClose: true,
-                title: 'Manage on load hook',
+                title: 'Run Script on Load',
                 width: dialogWidth
             })
             .bindEvent({
