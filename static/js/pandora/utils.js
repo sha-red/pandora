@@ -1015,7 +1015,7 @@ pandora.resizeFolders = function() {
             }
         }
         if (!pandora.user.ui.showFolder[pandora.user.ui.section][id]) {
-            pandora.$ui.folder[pos].update();
+            pandora.$ui.folder[pos].updatePanel();
         }
     });
 };

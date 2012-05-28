@@ -49,7 +49,7 @@ pandora.ui.findElement = function() {
                         .bindEvent({
                             change: function(data) {
                                 if (data.value == 'advanced') {
-                                    that.update();
+                                    that.updateElement();
                                     pandora.$ui.mainMenu.checkItem('findMenu_find_' + previousFindKey);
                                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                                 } else {
@@ -82,7 +82,7 @@ pandora.ui.findElement = function() {
                             if (pandora.$ui.findSelect.value() == 'advanced') {
                                 if (hasPressedClear) {
                                     pandora.UI.set({find: pandora.site.user.ui.find});
-                                    that.update();
+                                    that.updateElement();
                                     hasPressedClear = false;
                                 }
                                 pandora.$ui.findInput.blurInput();
@@ -141,7 +141,7 @@ pandora.ui.findElement = function() {
             }
         } : null;
     }
-    that.update = function() {
+    that.updateElement = function() {
         var findState = pandora.user.ui._findState;
         pandora.$ui.findSelect.value(findState.key);
         pandora.$ui.findInput.options(

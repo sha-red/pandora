@@ -62,7 +62,7 @@ pandora.ui.filterForm = function(list) {
                     } else {
                         Ox.Log('FIND', 'change form', data.query, pandora.user.ui.find)
                         pandora.UI.set({find: Ox.clone(data.query, true)});
-                        pandora.$ui.findElement.update();
+                        pandora.$ui.findElement.updateElement();
                     }
                 }
             })
