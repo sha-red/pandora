@@ -45,7 +45,7 @@ pandora.ui.onloadDialog = function() {
                 minWidth: 512,
                 padding: 0,
                 removeOnClose: true,
-                title: 'Manage Users',
+                title: 'Manage on load hook',
                 width: dialogWidth
             })
             .bindEvent({
