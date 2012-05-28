@@ -9,7 +9,7 @@ pandora.ui.allItems = function() {
             cursor: 'default',
             overflow: 'hidden'
         })
-        .bind({
+        .on({
             click: function() {
                 that.gainFocus();
                 pandora.user.ui._list && pandora.UI.set('find', {conditions: [], operator: '&'});

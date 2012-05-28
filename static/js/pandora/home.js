@@ -57,7 +57,7 @@ pandora.ui.home = function() {
                 margin: 'auto',
                 cursor: 'pointer'
             })
-            .bind({
+            .on({
                 click: function() {
                     $browseButton.triggerEvent('click');
                 }

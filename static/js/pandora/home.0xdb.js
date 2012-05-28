@@ -39,7 +39,7 @@ pandora.ui.home = function() {
                 bottom: 0,
                 width: '320px',
                 height: '160px',
-                margin: 'auto'
+                margin: 'auto',
             })
             .appendTo(that),
         $logo = $('<img>')
@@ -57,7 +57,7 @@ pandora.ui.home = function() {
                 margin: 'auto',
                 cursor: 'pointer'
             })
-            .bind({
+            .on({
                 click: function() {
                     $browseButton.triggerEvent('click');
                 }

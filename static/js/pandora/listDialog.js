@@ -75,7 +75,7 @@ pandora.ui.listDialog = function(section) {
                         );
                     }
                 })
-            ]
+            ],
         })
         .css({
             float: 'right',
@@ -340,7 +340,7 @@ pandora.ui.listIconPanel = function(listData) {
                     marginTop: '16px',
                     cursor: 'pointer'
                 })
-                .bind({
+                .on({
                     click: function(e) {
                         clickIcon(e);
                     },

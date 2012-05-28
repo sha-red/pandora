@@ -65,7 +65,7 @@ pandora.ui.home = function() {
                 margin: '0 auto 0 auto',
                 cursor: 'pointer'
             })
-            .bind({
+            .on({
                 click: function() {
                     $browseButton.triggerEvent('click');
                 }
@@ -414,7 +414,7 @@ pandora.ui.home = function() {
                                 }
                             })
                             .appendTo($listsBox);
-                        $listsBox.bind({
+                        $listsBox.on({
                             mouseenter: function() {
                                 mouse = true;
                                 $('.visible').show().stop().animate({
@@ -454,7 +454,7 @@ pandora.ui.home = function() {
                             }
                         }
                     };
-                    Ox.$document.bind({keydown: self.keydown});
+                    Ox.$document.on({keydown: self.keydown});
                     lists.forEach(function(list, i) {
                         $listBox[i] = $('<div>')
                             .css({
@@ -584,7 +584,7 @@ pandora.ui.home = function() {
             that.remove();
         });
         pandora.$ui.tv && pandora.$ui.tv.unmute();
-        self.keydown && Ox.$document.unbind({keydown: self.keydown});
+        self.keydown && Ox.$document.off({keydown: self.keydown});
         return that;
     };
 

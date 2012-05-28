@@ -111,7 +111,7 @@ pandora.ui.importAnnotations = function(data) {
         .css({
             padding: '8px'
         })
-        .bind({
+        .on({
             change: function(event) {
                 if(this.files.length) {
                     file = this.files[0];

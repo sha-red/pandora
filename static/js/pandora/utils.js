@@ -198,7 +198,7 @@ pandora.clickLink = function(e) {
 
 pandora.createLinks = function($element) {
     $element
-        .bind({
+        .on({
             click: function() {
                 return false;
             }
@@ -243,7 +243,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
                 });
             });
             $tooltip.options({title: getTitle()}).show(data.event);
-            canMove && Ox.UI.$window.bind({
+            canMove && Ox.UI.$window.on({
                 keydown: keydown,
                 keyup: keyup
             });
@@ -316,7 +316,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
         },
         draganddropend: function(data) {
             Ox.Log('', data, drag, '------------');
-            canMove && Ox.UI.$window.unbind({
+            canMove && Ox.UI.$window.off({
                 keydown: keydown,
                 keyup: keyup
             });

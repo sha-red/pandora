@@ -210,7 +210,7 @@ appPanel
                 body: $('body'),
                 document: $(document),
                 window: $(window)
-                    .bind({
+                    .on({
                         beforeunload: pandora.beforeunloadWindow,
                         resize: function() {
                             pandora.resizeWindow();
