@@ -38,13 +38,9 @@ appPanel
 
     loadImages(function(images) {
         loadScreen(images);
-        if (debug) {
-            loadOxJS(function() {
-                loadOxUI(loadPandora);
-            });
-        } else {
+        loadOxJS(function() {
             loadOxUI(loadPandora);
-        }
+        });
     });
 
     function loadImages(callback) {
@@ -155,7 +151,7 @@ appPanel
         } else {
             script.onload = callback;
         }
-        script.src = '/static/oxjs/dev/Ox.js';
+        script.src = '/static/oxjs/' + (debug ? 'dev' : 'build') + '/Ox.js';
         script.type = 'text/javascript';
         head.appendChild(script);
     }
