@@ -685,6 +685,7 @@ class Item(models.Model):
             'resolution',
             'width',
             'height',
+            'rendered',
             'rightslevel',
             'saturation',
             'size',
