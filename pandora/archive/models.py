@@ -409,7 +409,7 @@ class Stream(models.Model):
     def path(self, name=''):
         return self.file.get_path(name)
 
-    def extract_derivatives(self):
+    def extract_derivatives(self, rebuild=False):
         config = settings.CONFIG['video']
         for resolution in config['resolutions']:
             for f in config['formats']:
@@ -422,6 +422,8 @@ class Stream(models.Model):
                     derivative.video.name = os.path.join(os.path.dirname(self.video.name), name)
                     derivative.encode()
                     derivative.save()
+                else if rebuild or not derivative.available:
+                    derivative.encode()
         return True
 
     def encode(self):
@@ -440,7 +442,7 @@ class Stream(models.Model):
             extract.timeline(self.video.path, self.timeline_prefix)
             self.cuts = tuple(extract.cuts(self.timeline_prefix))
             self.color = tuple(extract.average_color(self.timeline_prefix))
-            self.volume= extract.average_volume(self.timeline_prefix)
+            self.volume = extract.average_volume(self.timeline_prefix)
             self.save()
 
     def save(self, *args, **kwargs):

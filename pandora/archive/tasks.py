@@ -105,6 +105,14 @@ def process_stream(fileId):
     return True
 
 @task(queue="encoding")
+def extract_derivatives(fileId, rebuild=False):
+    file = models.File.objects.get(id=fileId)
+    streams = file.streams.filter(source=None)
+    if streams.count() > 0:
+        stream[0].extract_derivatives(rebuild)
+    return True
+
+@task(queue="encoding")
 def update_stream(id):
     s = models.Stream.objects.get(pk=id)
     if not glob("%s*"%s.timeline_prefix):
