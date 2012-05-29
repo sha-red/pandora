@@ -422,7 +422,7 @@ class Stream(models.Model):
                     derivative.video.name = os.path.join(os.path.dirname(self.video.name), name)
                     derivative.encode()
                     derivative.save()
-                else if rebuild or not derivative.available:
+                elif rebuild or not derivative.available:
                     derivative.encode()
         return True
 
