@@ -391,7 +391,7 @@ pandora.ui.filesView = function(options, self) {
         .append(self.$clearButton)
         .append(self.$moveButton);
 
-    that.$element = Ox.SplitPanel({
+    that.setElement(Ox.SplitPanel({
             elements: [
                 {
                     element: Ox.SplitPanel({
@@ -418,7 +418,8 @@ pandora.ui.filesView = function(options, self) {
                 }
             ],
             orientation: 'horizontal'
-        });
+        })
+    );
 
     function deleteItem(data) {
         pandora.api.get({
