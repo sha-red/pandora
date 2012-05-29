@@ -4,12 +4,12 @@
 pandora.tests = function() {
     var tests = [];
     pandora.api.find({
-        query: {conditions: [], operator: '&'},
+        query: {conditions: [{key: 'rendered', value: true, operator: '='}], operator: '&'},
         sort: [{key: 'random', operator:'+'}],
-        keys: ['id', 'rendered', 'duration'],
+        keys: ['id', 'duration'],
         range: [0, 10]
     }, function(result) {
-        var item = result.data.items.filter(function(item) { return item.rendered && item.duration > 300; })[0],
+        var item = result.data.items.filter(function(item) { return item.duration > 300; })[0],
             position = 60;
         pandora.UI.set('videoPoints.' + item.id, {
             annotation: '',
