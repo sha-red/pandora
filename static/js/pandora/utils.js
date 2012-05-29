@@ -1112,11 +1112,11 @@ pandora.selectList = function() {
 pandora.beforeunloadWindow = function() {
     if (pandora.firefogg)
         return "Encoding is currently running\nDo you want to leave this page?";
+    //prevent error dialogs on unload
+    pandora.isUnloading = true;
 }
 
 pandora.unloadWindow = function() {
-    //prevent errors on unload
-    pandora.isUnloading = true;
     /*
     // fixme: ajax request has to have async set to false for this to work
     pandora.user.ui.section == 'items'
