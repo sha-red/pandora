@@ -125,33 +125,44 @@ function constructList() {
                hash = '#';
            if(data.ids.length)
               data.ids.forEach(function(id) {
-                info.append($("<h2>").html(id));
-                var $doc =$('<pre>')
-                           .html(app.actions[id].doc.replace('/\n/<br>\n/g'))
-                           .appendTo(info);
-                var $code = $('<code class="python">')
-                             .html(app.actions[id].code[1].replace('/\n/<br>\n/g'))
-                             .hide();
-                /*
-                var $button = Ox.Button({
-                  type: "image",
-                  options: [
-                    {id: "one", title: "right"},
-                    {id: "two", title: "down"},
-                  ],
-                })
-                .addClass("margin")
-                .click(function() { $code.toggle()})
-                .appendTo(info);
-                */
-                var f = app.actions[id].code[0];
-                $('<span>')
-                    .html(' View Source ('+f+')')
-                    .click(function() { $code.toggle()})
-                    .appendTo(info)
-                $('<pre>').append($code).appendTo(info)
-                hljs.highlightBlock($code[0], '    ');
+                info.append(
+                    $("<h2>")
+                        .html(id)
+                        .css({
+                            marginBottom: '8px'
+                        })
+                );
+                var code = app.actions[id].code[1],
+                    f = app.actions[id].code[0],
+                    line = Math.round(Ox.last(f.split(':')) || 0),
+                    doc = app.actions[id].doc.replace('/\n/<br>\n/g'),
+                    $code, $doc;
 
+                $doc = Ox.SyntaxHighlighter({
+                        source: doc,
+                    })
+                    .appendTo(info);
+
+                Ox.Button({
+                        title: 'View Source (' + f + ')',
+                    }).bindEvent({
+                        click: function() {
+                            $code.toggle();
+                        }
+                    })
+                    .css({
+                        margin: '4px'
+                    })
+                    .appendTo(info);
+                $code = Ox.SyntaxHighlighter({
+                    showLineNumbers: true,
+                    source: code,
+                    offset: line
+                })
+                .css({
+                    borderWidth: '1px',
+                }).appendTo(info).hide();
+                Ox.print(code);
                 hash += id + ','
               });
             else
