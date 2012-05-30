@@ -1087,7 +1087,7 @@ class Item(models.Model):
             join_tiles(timelines, self.timeline_prefix)
         else:
             #remove joined timeline if it was created at some point
-            for f in glob(os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline*.png')):
+            for f in glob(os.path.join(settings.MEDIA_ROOT, self.path(), 'timeline*.jpg')):
                 os.unlink(f)
 
     def make_poster(self, force=False):
@@ -1110,7 +1110,7 @@ class Item(models.Model):
         poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
 
         frame = self.get_poster_frame_path()
-        timeline = '%s64p.png' % self.timeline_prefix
+        timeline = '%stimelineantialias64p.jpg' % self.timeline_prefix
 
         director = u', '.join(self.get('director', ['Unknown Director']))
         cmd = [settings.ITEM_POSTER,
@@ -1178,7 +1178,7 @@ class Item(models.Model):
         frame = self.get_poster_frame_path()
         icon = self.path('icon.jpg')
         self.icon.name = icon
-        timeline = '%s64p.png' % self.timeline_prefix
+        timeline = '%stimelineantialias64p.jpg' % self.timeline_prefix
         cmd = [settings.ITEM_ICON,
            '-i', self.icon.path
         ]
