@@ -175,8 +175,20 @@ class UserProfile(models.Model):
 
     def set_level(self, level):
         self.level = settings.CONFIG['userLevels'].index(level)
+        if self.level == len(settings.CONFIG['userLevels']) - 1:
+            if not self.user.is_superuser:
+                self.user.is_superuser = True
+                self.user.save()
+        elif self.user.is_superuser:
+            self.user.is_superuser = False
+            self.user.save()
 
     def get_level(self):
+        #django superuser should always be admin
+        if self.user.is_superuser:
+            if self.level != len(settings.CONFIG['userLevels']) - 1:
+                self.level = len(settings.CONFIG['userLevels']) - 1
+                self.save()
         return settings.CONFIG['userLevels'][self.level]
 
     def capability(self, capability):
