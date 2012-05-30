@@ -172,7 +172,7 @@ class Annotation(models.Model):
 
     def delete(self, *args, **kwargs):
         super(Annotation, self).delete(*args, **kwargs)
-        if self.clip.annotations.count() == 0:
+        if self.clip and self.clip.annotations.count() == 0:
             self.clip.delete()
         self.item.update_find()
         self.item.update_sort()
