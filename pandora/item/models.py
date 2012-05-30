@@ -103,7 +103,7 @@ def get_item(info, user=None, async=False):
                     item = Item.objects.get(itemId=itemId)
                 except Item.DoesNotExist:
                     info['imdbId'] = itemId
-                    item = get_item(info)
+                    item = get_item(info, user)
                 return item
             try:
                 item = Item.objects.get(itemId=info.get('oxdbId'))
