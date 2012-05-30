@@ -184,7 +184,7 @@ pandora.URL = (function() {
                 pandora.site.itemViews.filter(function(view) {
                     return [
                         pandora.user.ui.itemView, pandora.user.ui.videoView
-                    ].indexOf(view.id) > -1;
+                    ].indexOf(view.id) == -1;
                 }).map(function(view) {
                      return view.id;
                 })
