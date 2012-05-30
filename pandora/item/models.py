@@ -1039,7 +1039,8 @@ class Item(models.Model):
                 color = map(lambda a,b: (a+b)/n, color,ox.image.getRGB(s.color))
                 offset += s.duration
             self.data['color'] = ox.image.getHSL(color)
-            self.data['volume'] /= offset
+            if offset:
+                self.data['volume'] /= offset
         #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
         self.select_frame()
         self.make_poster(True)
