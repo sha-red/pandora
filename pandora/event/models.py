@@ -83,8 +83,8 @@ class Event(models.Model):
                 return True
         return False
      
-    def get_matches(self):
-        return get_matches(self, Event, 'event')
+    def get_matches(self, qs=None):
+        return get_matches(self, Event, 'event', qs)
 
     def get_super_matches(self):
         return get_super_matches(self, Event)
