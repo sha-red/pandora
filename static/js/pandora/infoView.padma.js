@@ -46,7 +46,7 @@ pandora.ui.infoView = function(data) {
                 getFrame: function(position) {
                     var resolutions = pandora.site.video.resolutions.filter(
                         function(resolution, i) {
-                            return resolution >= data.height;
+                            return resolution >= iconHeight;
                         }),
                         resolution = resolutions.length
                             ? Ox.min(resolutions)
