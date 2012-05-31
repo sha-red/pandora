@@ -16,7 +16,6 @@ pandora.ui.videoPreview = function(data) {
                     Ox.isUndefined(position) ? '' : position
                 ) + '.jpg';
             },
-            frameCSS: data.frameCSS,
             frameRatio: data.frameRatio,
             height: data.height,
             position: data.position,

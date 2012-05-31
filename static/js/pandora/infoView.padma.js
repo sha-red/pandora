@@ -41,6 +41,56 @@ pandora.ui.infoView = function(data) {
         $left = Ox.Element()
             .appendTo($info),
 
+        $preview = Ox.VideoPreview({
+                duration: data.duration,
+                getFrame: function(position) {
+                    var resolutions = pandora.site.video.resolutions.filter(
+                        function(resolution, i) {
+                            return resolution >= data.height;
+                        }),
+                        resolution = resolutions.length
+                            ? Ox.min(resolutions)
+                            : Ox.max(pandora.site.video.resolutions);
+                    return '/' + data.id + '/' + resolution + 'p'
+                        + (Ox.isUndefined(position) ? '' : position) + '.jpg';
+                },
+                frameRatio: data.videoRatio,
+                height: iconHeight,
+                width: iconWidth
+            })
+            .css({
+                position: 'absolute',
+                left: margin + iconLeft + 'px',
+                top: margin + 'px',
+                width: iconWidth + 'px',
+                height: iconHeight + 'px',
+                borderRadius: borderRadius + 'px',
+                background: 'rgb(0,0,0)'
+            })
+            .bind({
+                mouseleave: function() {
+                    $icon.show();
+                }
+            })
+            .bindEvent({
+                click: function(click) {
+                    pandora.UI.set(
+                        'videoPoints.' + data.id,
+                        {'in': 0, out: 0, position: click.position}
+                    );
+                    if (ui.item && ['timeline', 'player', 'editor'].indexOf(ui.itemView) > -1) {
+                        pandora.$ui[ui.itemView].options({
+                            position: click.position
+                        });
+                    } else {
+                        pandora.UI.set({
+                            item: data.id,
+                            itemView: ui.videoView
+                        });
+                    }
+                }
+            })
+            .appendTo($left),
         $icon = Ox.Element({
                 element: '<img>',
             })
@@ -58,11 +108,12 @@ pandora.ui.infoView = function(data) {
                 borderRadius: borderRadius + 'px',
                 cursor: 'pointer'
             })
-            .bindEvent({
-                singleclick: toggleIconSize
+            .bind({
+                mouseenter: function() {
+                    $icon.hide();
+                }
             })
             .appendTo($left),
-
         $reflection = $('<div>')
             .addClass('OxReflection')
             .css({
