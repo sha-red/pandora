@@ -734,7 +734,7 @@ def timeline(request, id, size, position=-1, format='jpg', mode=None):
 
     path = timeline()
     while modes and not os.path.exists(path):
-        mode = modes.pop()
+        mode = modes.pop(0)
         path = timeline()
     return HttpFileResponse(path, content_type='image/jpeg')
 
