@@ -177,7 +177,7 @@ def join_tiles(source_paths, target_path):
     offset = 0
     for i, path in enumerate(source_paths):
         p = os.path.join(path, 'cuts.json')
-        if os.path.exists(p)
+        if os.path.exists(p):
             with open(p, 'r') as f:
                 path_cuts = json.load(f)
         else:
