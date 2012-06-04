@@ -324,7 +324,7 @@
             "title": "Rating",
             "type": "float",
             "columnWidth": 60,
-            "format": {"type": "unit", "args": ["%", 0]},
+            "format": {"type": "unit", "args": ["%"]},
             "sort": true
         },
         {
