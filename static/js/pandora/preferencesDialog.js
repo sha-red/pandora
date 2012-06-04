@@ -99,21 +99,20 @@ pandora.ui.preferencesDialog = function() {
                 } else {
                     $content.append(
                         Ox.Button({
-                            title: 'Reset UI Settings',
-                            width: 128
+                            title: 'Reset UI Settings...',
+                            width: 160
                         })
                         .bindEvent({
                             click: function() {
-                                pandora.UI.reset();
-                                pandora.$ui.appPanel.reload();
+                                pandora.$ui.resetUIDialog = pandora.ui.resetUIDialog().open();
                             }
                         })
                         .css({position: 'absolute', left: '96px', top: '16px'})
                     );
                     $content.append(
                         Ox.Button({
-                            title: 'Run Script on Load',
-                            width: 128
+                            title: 'Run Script on Load...',
+                            width: 160
                         })
                         .bindEvent({
                             click: function() {
