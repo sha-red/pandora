@@ -65,7 +65,9 @@ class SessionData(models.Model):
                 if location:
                     country = ox.get_country_name(location['country_code'])
                     if location['city']:
-                        city = location['city'].decode('latin-1')
+                        city = location['city']
+                        if type(city) != unicode:
+                            city = city.decode('latin-1')
                         self.location = u'%s, %s' % (city, country)
                         self.location_sort = u'%s, %s' % (country, city)
                     else:
