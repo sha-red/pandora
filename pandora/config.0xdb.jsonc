@@ -465,7 +465,7 @@
             "type": "integer",
             "capability": "canSeeFiles",
             "columnWidth": 60,
-            "format": {"type": "unit", "args": ["kbps", 0, 0.001]},
+            "format": {"type": "value", "args": ["bps"]},
             "sort": true
         },
         {

@@ -387,7 +387,7 @@
             "title": "Bitrate",
             "type": "integer",
             "columnWidth": 60,
-            "format": {"type": "unit", "args": ["kbps"]},
+            "format": {"type": "value", "args": ["bps"]},
             "sort": true
         },
         {
