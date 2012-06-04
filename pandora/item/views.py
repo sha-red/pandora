@@ -994,7 +994,7 @@ def oembed(request):
         height = maxheight
     if maxwidth > width or width > maxwidth:
         width = maxwidth
-    oembed['html'] = '<iframe width="%s" height="%s" src="%s" frameborder="0" allowfullscreen></iframe>' % (height, width, embed_url)
+    oembed['html'] = '<iframe width="%s" height="%s" src="%s" frameborder="0" allowfullscreen></iframe>' % (width, height, embed_url)
     oembed['width'] = width
     oembed['height'] = height
     thumbheight = 96
