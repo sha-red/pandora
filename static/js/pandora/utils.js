@@ -185,7 +185,7 @@ pandora.changeListStatus = function(id, status, callback) {
 pandora.clickLink = function(e) {
     if (
         e.target.hostname == document.location.hostname
-        && !Ox.starts(e.target.pathname, '/static')
+        && !Ox.startsWith(e.target.pathname, '/static')
     ) {
         if (pandora.$ui.home && e.target.pathname != '/home') {
             pandora.$ui.home.fadeOutScreen();
