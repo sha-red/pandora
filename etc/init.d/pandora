@@ -19,7 +19,7 @@ PANDORA_BASE=/srv/pandora
 DAEMON_USER="pandora"
 DAEMON_NAME=bin/gunicorn_django
 DAEMON="$PANDORA_BASE/$DAEMON_NAME"
-DAEMON_ARGS="--bind 127.0.0.1:2620 --timeout 90 --log-level info --log-file /var/log/pandora/pandora.log --workers 5 $PANDORA_BASE/pandora/settings.py"
+DAEMON_ARGS="--bind 127.0.0.1:2620 --timeout 90 --log-level info --log-file /var/log/pandora/pandora.log --workers 5"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
@@ -51,7 +51,8 @@ do_start()
     start-stop-daemon --start --quiet --pidfile $PIDFILE -c $DAEMON_USER \
 	                                  --exec $DAEMON --test > /dev/null \
 		|| return 1
-    start-stop-daemon --start --quiet --pidfile $PIDFILE -c $DAEMON_USER --startas $DAEMON \
+    start-stop-daemon --start --quiet --pidfile $PIDFILE -c $DAEMON_USER \
+           -d $PANDORA_BASE/pandora --startas $DAEMON \
            --make-pidfile --background --exec $DAEMON -- $DAEMON_ARGS \
 		|| return 2
 }
