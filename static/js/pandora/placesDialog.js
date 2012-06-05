@@ -22,24 +22,29 @@ pandora.ui.placesDialog = function(options) {
             getMatches: function(names, callback) {
                 // fixme: the results of this are of course
                 // not identical to actual place matches
-                names.length == 0 && callback(0);
-                var key = pandora.site.layers.filter(function(layer) {
+                var key, operator;
+                if (names.length == 0) {
+                    callback(0);
+                } else {
+                    key = pandora.site.layers.filter(function(layer) {
                         return layer.type == 'place' || layer.hasPlaces;
                     }).map(function(layer) {
                         return layer.id;
                     })[0],
-                    operator = Ox.getObjectById(pandora.site.layers, key).type == 'place' ?
-                        '==' : '=';
-                pandora.api.findClips({
-                    query: {
-                        conditions: names.map(function(name) {
-                            return {key: key, value: name, operator: operator};
-                        }),
-                        operator: names.length == 1 ? '&' : '|'
-                    }
-                }, function(result) {
-                    callback(result.data.items);
-                });
+                    operator = Ox.getObjectById(
+                        pandora.site.layers, key
+                    ).type == 'place' ? '==' : '=';
+                    pandora.api.findClips({
+                        query: {
+                            conditions: names.map(function(name) {
+                                return {key: key, value: name, operator: operator};
+                            }),
+                            operator: names.length == 1 ? '&' : '|'
+                        }
+                    }, function(result) {
+                        callback(result.data.items);
+                    });
+                }
             },
             hasMatches: true, // FIXME: getMatches is enough
             height: height - 48,
