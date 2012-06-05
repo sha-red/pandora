@@ -296,7 +296,7 @@ pandora.ui.accountForm = function(action, value) {
                     {title: '', width: 0}
                 ],
                 validate: function(value, callback) {
-                    callback(!Ox.isEmpty(value[1]));
+                    pandora.validateUser(value[0], true)(value[1], callback);
                 }
             });
         }
