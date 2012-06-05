@@ -78,7 +78,7 @@ pandora.ui.eventsDialog = function(options) {
             sort: [{key: 'name', operator: '+'}]
         }, function(result) {
             that.options({
-                content: $content = Ox.ListCalendar({
+                content: $content = Ox.CalendarEditor({
                     addEvent: function(event, callback) {
                         pandora.api.addEvent(event, function(result) {
                             Ox.Request.clearCache(); // fixme: remove
