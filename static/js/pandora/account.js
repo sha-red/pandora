@@ -160,7 +160,7 @@ pandora.ui.accountForm = function(action, value) {
                         }
                     });
                 } else if (action == 'reset') {
-                    var usernameOrEmail = data.usernameOrEmail,
+                    var usernameOrEmail = data.values.usernameOrEmail,
                         key = usernameOrEmail[0];
                     data = {};
                     data[key] = usernameOrEmail[1];
@@ -294,7 +294,10 @@ pandora.ui.accountForm = function(action, value) {
                 ],
                 separators: [
                     {title: '', width: 0}
-                ]
+                ],
+                validate: function(value, callback) {
+                    callback(!Ox.isEmpty(value[1]));
+                }
             });
         }
     }
