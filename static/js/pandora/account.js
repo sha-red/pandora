@@ -120,13 +120,6 @@ pandora.ui.accountDialogOptions = function(action, value) {
 pandora.ui.accountForm = function(action, value) {
     if (pandora.$ui.accountForm) {
         pandora.$ui.accountForm.items.forEach(function(item) {
-            if (item.options('id') == 'usernameOrEmail') {
-                //Ox.Log('', 'REMOVING')
-                //Ox.Event.unbind('usernameOrEmailSelect')
-                //Ox.Event.unbind('usernameOrEmailSelectMenu')
-                //Ox.Event.unbind('usernameOrEmailInput')
-            }
-            //Ox.Log('', 'REMOVING ITEM', item.options('id'));
             item.remove();
         });
     }
@@ -141,28 +134,29 @@ pandora.ui.accountForm = function(action, value) {
         }),
         that = Ox.Form({
             id: 'accountForm' + Ox.toTitleCase(action),
-            items: $items,
-            submit: function(data, callback) {
+            items: $items
+        }).bindEvent({
+            submit: function(data) {
                 pandora.$ui.accountDialog.disableButtons();
                 if (action == 'signin') {
-                    pandora.api.signin(data, function(result) {
+                    pandora.api.signin(data.values, function(result) {
                         if (!result.data.errors) {
                             pandora.$ui.accountDialog.close();
                             pandora.signin(result.data);
                         } else {
                             pandora.$ui.accountDialog.enableButtons();
-                            callback([{id: 'password', message: 'Incorrect password'}]);
+                            that.setMessages([{id: 'password', message: 'Incorrect password'}]);
                         }
                     });
                 } else if (action == 'signup') {
-                    pandora.api.signup(data, function(result) {
+                    pandora.api.signup(data.values, function(result) {
                         if (!result.data.errors) {
                             pandora.$ui.accountDialog.close();
                             pandora.signin(result.data);
                             pandora.ui.accountWelcomeDialog().open();
                         } else {
                             pandora.$ui.accountDialog.enableButtons();
-                            callback([{id: 'password', message: result.data.errors.toString()}]); // fixme
+                            that.setMessages([{id: 'password', message: result.data.errors.toString()}]); // fixme
                         }
                     });
                 } else if (action == 'reset') {
@@ -176,27 +170,23 @@ pandora.ui.accountForm = function(action, value) {
                             pandora.$ui.accountDialog.enableButtons();
                         } else {
                             pandora.$ui.accountDialog.enableButtons();
-                            callback([{id: 'usernameOrEmail', message: 'Unknown ' + (key == 'username' ? 'username' : 'e-mail address')}])
+                            that.setMessages([{id: 'usernameOrEmail', message: 'Unknown ' + (key == 'username' ? 'username' : 'e-mail address')}])
                         }
                     });
                 } else if (action == 'resetAndSignin') {
-                    pandora.api.resetPassword(data, function(result) {
+                    pandora.api.resetPassword(data.values, function(result) {
                         if (!result.data.errors) {
                             pandora.$ui.accountDialog.close();
                             pandora.signin(result.data);
                         } else {
                             pandora.$ui.accountDialog.enableButtons();
-                            callback([{id: 'code', message: 'Incorrect code'}]);
+                            that.setMessages([{id: 'code', message: 'Incorrect code'}]);
                         }
                     });
                 }
-            }
-        }).bindEvent({
-            submit: function(data) {
-        
+                
             },
             validate: function(data) {
-                Ox.Log('', 'FORM VALIDATE', data, action, 'submit' + Ox.toTitleCase(action));
                 pandora.$ui.accountDialog[
                     (data.valid ? 'enable' : 'disable') + 'Button'
                 ]('submit' + Ox.toTitleCase(action));
