@@ -138,7 +138,7 @@ pandora.ui.browser = function() {
                 if (data.collapsed) {
                     // fixme: can we do this for timeline and player too?
                     if (pandora.user.ui.itemView == 'editor') {
-                        pandora.$ui.editor.gainFocus();
+                        pandora.$ui.editor && pandora.$ui.editor.gainFocus();
                     }
                 }
                 if (pandora.user.ui.itemView == 'timeline') {
