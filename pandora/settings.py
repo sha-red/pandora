@@ -109,6 +109,7 @@ INSTALLED_APPS = (
 
     'annotation',
     'clip',
+    'sequence',
     'archive',
     'event',
     'changelog',

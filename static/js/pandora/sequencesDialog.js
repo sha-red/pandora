@@ -25,7 +25,7 @@ pandora.ui.sequencesDialog = function(id, position) {
                 pandora.api.getSequence({id: id, mode: mode, position: position}, function(result) {
                     // result.data: {hash, in, out}
                     var fixedRatio = 16/9,
-                        hash = result.data.hash;
+                        hash = result.data.hash,
                         $sidebar = Ox.Element(), // add video player
                         $list = Ox.IconList({
                                 fixedRatio: fixedRatio,
@@ -45,7 +45,10 @@ pandora.ui.sequencesDialog = function(id, position) {
                                 items: function(data, callback) {
                                     pandora.api.findSequences(Ox.extend(data, {
                                         query: {
-                                            conditions: [{key: mode, value: hash, operator: '=='}],
+                                            conditions: [
+                                                {key: 'mode', value: mode, operator: '=='},
+                                                {key: 'hash', value: hash, operator: '=='}
+                                            ],
                                             operator: '&'
                                         }
                                     }), callback);
@@ -68,13 +71,14 @@ pandora.ui.sequencesDialog = function(id, position) {
                                     // ...
                                 }
                             });
-                    $splitPanel.replaceElements([$sidebar, $list]);
+                    $splitPanel.replaceElement(0, $sidebar);
+                    $splitPanel.replaceElement(1, $list);
                 });
                 return $splitPanel;                
             },
             tabs: [
-                {id: 'shapes', title: 'Similar Shapes'},
-                {id: 'colors', title: 'Similar Colors'}
+                {id: 'shape', title: 'Similar Shapes'},
+                {id: 'color', title: 'Similar Colors'}
             ]
         }),
 
@@ -85,7 +89,7 @@ pandora.ui.sequencesDialog = function(id, position) {
                     title: 'Close'
                 }).bindEvent({
                     click: function() {
-                        $dialog.close;
+                        $dialog.close();
                     }
                 })
             ],
