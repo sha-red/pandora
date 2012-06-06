@@ -4,13 +4,14 @@
 import os
 from os.path import join, dirname, basename, splitext, exists
 import time
+from glob import glob
 
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
 import monkey_patch.models
 from ... import models
-
+from ... import tasks
 
 class Command(BaseCommand):
     """
@@ -21,14 +22,12 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         offset = 0
-        chunk = 50
+        chunk = 100
         count = pos = models.Item.objects.count()
         while offset <= count:
             for i in models.Item.objects.all().order_by('id')[offset:offset+chunk]:
-                print pos, i.itemId
-                for s in i.streams():
-                    s.make_timeline()
-                i.update_timeline()
-                pos -= 1
+                if not os.path.exists(os.path.join(i.timeline_prefix, 'cuts.json')) or \
+                   not glob('%s/timelinekeyframes16p0.jpg'%i.timeline_prefix):
+                    print i.itemId
+                    tasks.rebuild_timeline.delay(i.itemId)
             offset += chunk
-            time.sleep(30) #keep load down

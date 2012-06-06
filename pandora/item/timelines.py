@@ -82,7 +82,7 @@ def join_tiles(source_paths, target_path):
                         target_path, small_mode, small_tile_h, small_tile_i
                     )
                     data['target_images']['small'].save(image_file)
-                    print image_file
+                    #print image_file
             if mode == 'antialias':
                 # render full tile
                 resized = data['target_images']['large'].resize((
