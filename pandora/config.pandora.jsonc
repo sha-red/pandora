@@ -641,6 +641,8 @@
             "mapSelection": "",
             "page": "",
             "section": "items",
+            "sequenceMode": "shape",
+            "sequenceSort": [{"key": "director", "operator": "+"}],
             "showAnnotations": true,
             "showAnnotationsCalendar": true,
             "showAnnotationsMap": true,

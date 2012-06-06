@@ -722,6 +722,8 @@
             "mapSelection": "",
             "page": "",
             "section": "items",
+            "sequenceMode": "shape",
+            "sequenceSort": [{"key": "director", "operator": "+"}],
             "showAnnotations": true,
             "showBrowser": true,
             "showCalendarControls": true, // fixme: should be false
