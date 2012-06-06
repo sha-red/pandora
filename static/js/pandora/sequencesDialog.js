@@ -28,7 +28,7 @@ pandora.ui.sequencesDialog = function(id, position) {
                         hash = result.data.hash;
                         $sidebar = Ox.Element(), // add video player
                         $list = Ox.IconList({
-                                fixedRatio: fixedRatio
+                                fixedRatio: fixedRatio,
                                 item: function(data, sort, size) {
                                     var ratio = data.videoRatio,
                                         width = ratio > fixedRatio ? size : Math.round(size * ratio / fixedRatio),
@@ -38,7 +38,7 @@ pandora.ui.sequencesDialog = function(id, position) {
                                         id: data.id,
                                         info: Ox.formatDuration(data['in']) + ' - ' + Ox.formatDuration(data.out),
                                         title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
-                                        url: '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg';
+                                        url: '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg',
                                         width: width
                                     };
                                 },
