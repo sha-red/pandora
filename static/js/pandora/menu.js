@@ -130,7 +130,7 @@ pandora.ui.mainMenu = function() {
                         ] },
                         { id: 'advancedfind', title: 'Advanced Find...', keyboard: 'shift control f' },
                         {},
-                        { id: 'findsimilar', title: 'Find Similar Clips...', disabled: true}
+                        { id: 'findsimilar', title: 'Find Similar Clips...', disabled: true, keyboard: 'alt control f'}
                     ] },
                     { id: 'dataMenu', title: 'Data', items: [
                         { id: 'titles', title: 'Manage Titles...', disabled: !pandora.site.capabilities.canManageTitlesAndNames[pandora.user.level] },
@@ -343,6 +343,9 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'triggererror') {
                     var e = error;
                 }
+            },
+            key_alt_control_f: function() {
+                // ...
             },
             key_backtick: function() {
                 changeFocus(1);
