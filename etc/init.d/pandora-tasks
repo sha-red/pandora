@@ -19,7 +19,7 @@ PANDORA_BASE=/srv/pandora
 DAEMON_USER="pandora"
 DAEMON_NAME=pandora/manage.py
 DAEMON="$PANDORA_BASE/$DAEMON_NAME"
-DAEMON_ARGS="celeryd -Q default -n pandora-tasks -f /var/log/pandora/pandora-tasks.log -l INFO"
+DAEMON_ARGS="celeryd -Q default,celery -n pandora-tasks -f /var/log/pandora/pandora-tasks.log -l INFO"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 

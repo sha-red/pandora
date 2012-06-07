@@ -14,7 +14,7 @@ from celery.task import task, periodic_task
 import models
 
 
-@periodic_task(run_every=timedelta(days=1))
+@periodic_task(run_every=timedelta(days=1), queue='encoding')
 def cronjob(**kwargs):
     update_random_sort()
     update_random_clip_sort()
