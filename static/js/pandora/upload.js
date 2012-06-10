@@ -61,12 +61,12 @@ pandora.ui.upload = function(oshash, file) {
             that.status = 'uplaod failed';
             that.progress = -1;
             that.responseText = evt.target.responseText;
-            that.triggerEvent('done', tat);
+            done();
         }, false);
         self.req.addEventListener('abort', function (evt) {
             that.status = 'aborted';
             that.progress = -1;
-            that.triggerEvent('done', tat);
+            done();
         }, false);
         var formData = new FormData();
         Ox.forEach(uploadData, function(value, key) {
