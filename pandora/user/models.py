@@ -110,7 +110,7 @@ class SessionData(models.Model):
         if screen and 'height' in screen and 'width' in screen:
             data.screensize = '%sx%s' % (screen['width'], screen['height'])
         window = data.info.get('window', {})
-        if window 'outerHeight' in window and 'outerWidth' in window:
+        if window and 'outerHeight' in window and 'outerWidth' in window:
             data.windowsize = '%sx%s' % (window['outerWidth'], window['outerHeight'])
         if not data.timesseen:
             data.timesseen = 0
