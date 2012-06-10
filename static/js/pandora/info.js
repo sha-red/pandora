@@ -81,6 +81,9 @@ pandora.ui.info = function() {
                                 frameRatio: result.data.videoRatio,
                                 height: pandora.getInfoHeight(true),
                                 id: id,
+                                position: !ui.item && ui.listView == 'timelines'
+                                    ? (ui.videoPoints[id] ? ui.videoPoints[id].position : 0)
+                                    : void 0,
                                 width: ui.sidebarSize
                             })
                             .bindEvent({
@@ -286,6 +289,7 @@ pandora.ui.listInfo = function() {
             borderRadius: Math.round(size / 4) + 'px'
         };
     }
+
     that.resizeInfo = function() {
         var width = that.width();
         $icon.css(getIconCSS());
@@ -297,7 +301,9 @@ pandora.ui.listInfo = function() {
             width: width
         });
     };
+
     return that;
+
 };
 
 pandora.ui.posterInfo = function(data) {

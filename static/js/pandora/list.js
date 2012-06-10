@@ -292,16 +292,16 @@ pandora.ui.list = function() {
                         element: Ox.BlockVideoTimeline,
                         events: {
                             position: function(event) {
-                                // FIXME: we need a way to set the position
-                                // once the video preview has loaded
-                                pandora.$ui.videoPreview && pandora.$ui.videoPreview.options({
-                                    position: event.position
-                                });
                                 if (pandora.user.ui.videoPoints[data.id]) {
                                     pandora.UI.set('videoPoints.' + data.id + '.position', event.position);
                                 } else {
                                     pandora.UI.set('videoPoints.' + data.id, {'in': 0, out: 0, position: event.position});
                                 }
+                                // FIXME: we need a way to set the position
+                                // once the video preview has loaded
+                                pandora.$ui.videoPreview && pandora.$ui.videoPreview.options({
+                                    position: event.position
+                                });
                             }
                         },
                         id: data.id,
