@@ -88,9 +88,9 @@ pandora.ui.upload = function(oshash, file) {
             chunk,
             chunkOffset = chunkId * chunkSize;
 
-        if(file.mozSlice) {
+        if (file.mozSlice) {
             chunk = file.mozSlice(chunkOffset, chunkOffset+chunkSize, file.type);
-        } else if(file.webkitSlice) {
+        } else if (file.webkitSlice) {
             chunk = file.webkitSlice(chunkOffset, chunkOffset+chunkSize, file.type);
         }
 

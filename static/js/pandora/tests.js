@@ -21,7 +21,7 @@ pandora.tests = function() {
         test('set item', pandora.user.ui.item, item.id);
         startPlayback();
         function startPlayback() {
-            if(pandora.$ui.player) {
+            if (pandora.$ui.player) {
                 pandora.$ui.player.options({paused: false});
                 setTimeout(function() {
                     pandora.$ui.player.options({paused: true});

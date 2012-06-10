@@ -3,7 +3,7 @@
 
 pandora.ui.uploadDialog = function(data) {
     var content = Ox.Element().css({margin: '16px'}),
-        canceled = false,
+        cancelled = false,
         file,
         closeButton,
         actionButton,
@@ -23,14 +23,14 @@ pandora.ui.uploadDialog = function(data) {
                     title: 'Select Video'
                 }).bindEvent({
                     click: function() {
-                        if(actionButton.options('title') == 'Select Video') {
-                            if(selectVideo()) {
+                        if (actionButton.options('title') == 'Select Video') {
+                            if (selectVideo()) {
                                 actionButton.options('title', 'Upload');
                             }
-                        } else if(actionButton.options('title') == 'Close') {
+                        } else if (actionButton.options('title') == 'Close') {
                             that.close();
-                        } else if(actionButton.options('title') == 'Cancel') {
-                            canceled = true;
+                        } else if (actionButton.options('title') == 'Cancel') {
+                            cancelled = true;
                             pandora.firefogg && pandora.firefogg.cancel();
                             pandora.$ui.upload && pandora.$ui.upload.abort();
                             actionButton.options('title', 'Select Video');
@@ -70,7 +70,7 @@ pandora.ui.uploadDialog = function(data) {
 
     pandora._status = $status;
     pandora._info = $info;
-    if(typeof(Firefogg) == 'undefined') {
+    if (typeof(Firefogg) == 'undefined') {
         /*
         selectFile = $('<input>')
             .attr({
@@ -81,9 +81,9 @@ pandora.ui.uploadDialog = function(data) {
             })
             .on({
                 change: function(event) {
-                    if(this.files.length) {
+                    if (this.files.length) {
                         file = this.files[0];
-                        if(file.type == 'video/webm') {
+                        if (file.type == 'video/webm') {
                             $status.html('');
                             uploadButton.options({
                                 disabled: false
@@ -122,7 +122,7 @@ pandora.ui.uploadDialog = function(data) {
             denominator;
         ratio = ratio.split(':');
         numerator = ratio[0];
-        if(ratio.length == 2) {
+        if (ratio.length == 2) {
             denominator = ratio[1];
         }
         if (Math.abs(numerator/denominator - 4/3) < 0.03) {
@@ -166,8 +166,8 @@ pandora.ui.uploadDialog = function(data) {
                 function(result, file) {
                     result = JSON.parse(result);
                     if (result.progress != 1) {
-                        if(canceled) {
-                            $status.html('Encoding canceled.');
+                        if (cancelled) {
+                            $status.html('Encoding cancelled.');
                         } else {
                             $status.html('Encoding failed.');
                         }
@@ -209,7 +209,7 @@ pandora.ui.uploadDialog = function(data) {
             dar,
             options = {};
 
-        if(format == 'webm') {
+        if (format == 'webm') {
             options.videoCodec = 'vp8';
             options.audioCodec = 'vorbis';
         } else if (format == 'ogv') {
@@ -296,12 +296,14 @@ pandora.ui.uploadDialog = function(data) {
 
         options.noUpscaling = true;
 
-        if((!info.video.length || (info.video[0].codec == options.videoCodec
-                && info.video[0].height <= options.height))
-            && (!info.audio.length || info.audio[0].codec == options.audioCodec)) {
-            options = {
-                passthrough: true
-            };
+        if (
+            (!info.video.length || (
+                info.video[0].codec == options.videoCodec
+                && info.video[0].height <= options.height
+            ))
+            && (!info.audio.length || info.audio[0].codec == options.audioCodec)
+        ) {
+            options = {passthrough: true};
         }
         return JSON.stringify(options);
     }
@@ -310,14 +312,17 @@ pandora.ui.uploadDialog = function(data) {
         var html = '';
         html += '<b>' + info.path + '</b>';
         html += '<br />';
-        if(info.video && info.video.length>0) {
+        if (info.video && info.video.length > 0) {
             var video = info.video[0];
             html += video.width + 'x' + video.height  + ' (' + video.codec + ')';
         }
-        if(info.video && info.video.length>0 && info.audio && info.audio.length>0) {
+        if (
+            info.video && info.video.length > 0
+            && info.audio && info.audio.length > 0
+        ) {
             html += ' / ';
         }
-        if(info.audio && info.audio.length>0) {
+        if (info.audio && info.audio.length > 0) {
             var audio= info.audio[0];
             html += '' + {
                 1: 'mono',
@@ -335,10 +340,10 @@ pandora.ui.uploadDialog = function(data) {
     }
 
     function selectVideo() {
-        canceled = false;
+        cancelled = false;
         pandora.firefogg = new Firefogg();
         pandora.firefogg.setFormat(pandora.site.video.formats[0]);
-        if(pandora.firefogg.selectVideo()) {
+        if (pandora.firefogg.selectVideo()) {
             var info = JSON.parse(pandora.firefogg.sourceInfo),
                 options = JSON.parse(getEncodingOptions(info)),
                 oshash = info.oshash,
@@ -350,7 +355,9 @@ pandora.ui.uploadDialog = function(data) {
                 },
                 keys: ['id', 'available']
             }, function(result) {
-                if(result.data.items.length === 0 || !result.data.items[0].available) {
+                if (
+                    result.data.items.length === 0 || !result.data.items[0].available
+                ) {
                     $info.html(formatInfo(info));
                     $status.html(
                         options.passthrough

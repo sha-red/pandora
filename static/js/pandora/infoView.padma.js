@@ -426,7 +426,7 @@ pandora.ui.infoView = function(data) {
                 .css(css)
             )
             .appendTo($center);
-    } else if(data.summary) {
+    } else if (data.summary) {
         $('<div>').css(css).html(data.summary).appendTo($center);
     }
 
@@ -449,7 +449,7 @@ pandora.ui.infoView = function(data) {
             }
         })
         .appendTo($div);
-    } else if(data.license) {
+    } else if (data.license) {
         $div.html(
             formatKey('License')
             + (data.license || []).join(', ')
@@ -598,11 +598,11 @@ pandora.ui.infoView = function(data) {
     }
 
     function formatValue(value, key) {
-        if(key == 'date') {
+        if (key == 'date') {
             return value ? Ox.formatDate(value,
                 ['', '%Y', '%B %Y', '%B %e, %Y'][value.split('-').length]
             ) : '';
-        } else if(key == 'duration') {
+        } else if (key == 'duration') {
             return value < 60 ? Math.round(value) + ' sec' : Math.round(value / 60) + ' min';
         }
         return (Ox.isArray(value) ? value : [value]).map(function(value) {

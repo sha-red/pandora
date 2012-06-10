@@ -18,7 +18,7 @@ pandora.ui.news = function(width, height) {
 
     pandora.api.getNews({}, function(result) {
         items = result.data.items;
-        if(items.length) {
+        if (items.length) {
             selected = items[0].id;
             renderItem();
             renderList();

@@ -58,15 +58,16 @@ pandora.ui.importAnnotations = function(data) {
         });
 
     function addAnnotation() {
-        if(srt.length>0) {
+        if (srt.length > 0) {
             var data = srt.shift();
             data.text = Ox.sanitizeHTML(data.text)
                 .replace(/<br[ /]*?>\n/g, '\n')
                 .replace(/\n\n/g, '<br>\n')
                 .replace(/\n/g, '<br>\n');
-            $status.html(Ox.formatDuration(data['in'])
-                + ' to ' + Ox.formatDuration(data.out) + '<br>\n'
-                + data.text);
+            $status.html(
+                Ox.formatDuration(data['in']) + ' to '
+                + Ox.formatDuration(data.out) + '<br>\n' + data.text
+            );
             pandora.api.addAnnotation({
                 'in': data['in'],
                 out: data.out,
@@ -113,18 +114,17 @@ pandora.ui.importAnnotations = function(data) {
         })
         .on({
             change: function(event) {
-                if(this.files.length) {
+                if (this.files.length) {
                     file = this.files[0];
                     var reader = new FileReader();
                     reader.onloadend = function(event) {
                         srt = Ox.parseSRT(this.result);
                         total = srt.length;
-                        if(total) {
-                            importButton.options({
-                                disabled: false
-                            });
-                        }
-                        $status.html('File contains '+ total + ' annotations.');
+                        total && importButton.options({disabled: false});
+                        $status.html(
+                            'File contains ' + total + ' annotation'
+                            + (total == 1 ? '' : 's') + '.'
+                        );
                     };
                     reader.readAsText(file);
                 } else {

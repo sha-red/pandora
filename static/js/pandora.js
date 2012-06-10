@@ -320,12 +320,12 @@ appPanel
             });
             pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
 
-            if(localStorage && localStorage['pandora.onload']) {
+            if (localStorage && localStorage['pandora.onload']) {
                 try {
                     eval(localStorage['pandora.onload'])
-                } catch(e) {
-                }
+                } catch(e) {}
             }
+
         });
 
     }

@@ -508,7 +508,7 @@ pandora.ui.infoView = function(data) {
             var edit = {id: data.id};
             if (key == 'title') {
                 Ox.extend(edit, parseTitle(value));
-            } else if(['director', 'country'].indexOf(key) > -1) {
+            } else if (['director', 'country'].indexOf(key) > -1) {
                 edit[key] = value ? value.split(', ') : [];
             } else {
                 edit[key] = value;

@@ -26,9 +26,10 @@ var app = new Ox.App({
 
     app.api.api({docs: true, code: true}, function(results) {
         app.actions = results.data.actions;
-
-        if(document.location.hash) {
-            app.$ui.actionList.triggerEvent('select', {ids: document.location.hash.substring(1).split(',')});
+        if (document.location.hash) {
+            app.$ui.actionList.triggerEvent('select', {
+                ids: document.location.hash.substring(1).split(',')
+            });
         }
     });
 
@@ -84,11 +85,7 @@ function constructList() {
         id: 'actionList',
         items: function(data, callback) {
             function _sort(a, b) {
-                if(a.name > b.name)
-                    return 1;
-                else if(a.name == b.name)
-                    return 0;
-                return -1;
+                return a.name > b.name ? 1 : a.name == b.name ? 0 : -1;
             }
             if (!data.keys) {
                 app.api.api(function(results) {
@@ -123,10 +120,10 @@ function constructList() {
        select: function(data) {
            var info = $('<div>').addClass('OxSelectable'),
                hash = '#';
-           if(data.ids.length)
+           if (data.ids.length)
               data.ids.forEach(function(id) {
                 info.append(
-                    $("<h2>")
+                    $('<h2>')
                         .html(id)
                         .css({
                             marginBottom: '8px'

@@ -219,8 +219,7 @@ pandora.ui.filesView = function(options, self) {
                 var ids = data.ids.filter(function(id) {
                     return self.$filesList.value(id, 'instances').length == 0;
                 });
-                if(ids.length>0 && pandora.user.level == 'admin') {
-                    Ox.print('delete', ids);
+                if (ids.length > 0 && pandora.user.level == 'admin') {
                     pandora.api.removeFiles({
                         ids: ids
                     }, function(result) {
@@ -439,7 +438,10 @@ pandora.ui.filesView = function(options, self) {
             data[key] = self['$' + key + 'Input'].value();
         });
         pandora.api.moveFiles(data, function(result) {
-            if(pandora.user.ui.item == self.options.id && pandora.user.ui.itemView == 'files') {
+            if (
+                pandora.user.ui.item == self.options.id
+                && pandora.user.ui.itemView == 'files'
+            ) {
                 Ox.Request.clearCache(); // fixme: remove
                 if (self.$checkbox.value()) {
                     pandora.UI.set({item: result.data.itemId});

@@ -57,9 +57,11 @@ Ox.load('UI', {
                         Ox.UI.hideLoadingScreen();
 
                         function checkRange(data) {
-                            if(data.position < options['in'] - 0.04
-                               || data.position > options.out) {
-                                if(!pandora.player.options('paused')) {
+                            if (
+                                data.position < options['in'] - 0.04
+                                || data.position > options.out
+                            ) {
+                                if (!pandora.player.options('paused')) {
                                     pandora.player.togglePaused();
                                 }
                                 pandora.player.options({

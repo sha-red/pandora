@@ -2,6 +2,7 @@
 'use strict';
 
 pandora.ui.embedDialog = function(data) {
+
     var content = Ox.Element().css({margin: '16px'}),
         height = 360,
         width = 640,
@@ -33,36 +34,41 @@ pandora.ui.embedDialog = function(data) {
 
     data.view = 'video';
 
-    function constructUrl(data) {
+    content.html('To embed this video use this code on your page:<br>');
+    content.append(
+        $('<textarea>')
+            .css({
+                width: '520px',
+                margin: '16px',
+                height: '100%'
+            }).val(
+                '<iframe width="' + width
+                + '" height="' + height
+                + '" src="' + constructURL(data)
+                + '" frameborder="0" allowfullscreen></iframe>'
+            ).on({
+                click: function() {
+                    this.focus();
+                    this.select();
+                }
+            })
+    );
+
+    function constructURL(data) {
         var url = document.location.protocol
                 + '//' + document.location.host
                 + '/' + pandora.user.ui.item + '/embed?',
             query = [];
         Ox.forEach(data, function(value, key) {
-            if(key[0] != '_') {
-                query.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+            if (key[0] != '_') {
+                query.push(
+                    encodeURIComponent(key) + '=' + encodeURIComponent(value)
+                );
             }
         });
         return url + query.join('&');
     }
-    content.html('To embed this video use this code on your page:<br>');
-    content.append(
-            $('<textarea>')
-                .css({
-                    width: '520px',
-                    margin: '16px',
-                    height: '100%'
-                }).val(
-                    '<iframe width="' + width
-                    + '" height="' + height
-                    + '" src="' + constructUrl(data)
-                    + '" frameborder="0" allowfullscreen></iframe>'
-                ).on({
-                    click: function() {
-                        this.focus();
-                        this.select();
-                    }
-                })
-            );
+
     return that;
+
 };

@@ -71,7 +71,7 @@ pandora.ui.onloadDialog = function() {
     that.superClose = that.close;
     that.close = function() {
         var value = $text.value();
-        if(value) {
+        if (value) {
             localStorage['pandora.onload'] = value;
         } else {
             delete localStorage['pandora.onload'];
