@@ -134,7 +134,7 @@ pandora.ui.folderList = function(id) {
                 } else if (id == 'favorite') {
                     query = {conditions: [
                         {key: 'subscribed', value: true, operator: '='},
-                        {key: 'status', value: 'featured', operator: '!='},
+                        {key: 'status', value: 'featured', operator: '!='}
                     ], operator: '&'};
                 } else if (id == 'featured') {
                     query = {conditions: [
