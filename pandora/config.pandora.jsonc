@@ -335,6 +335,7 @@
             "title": "Volume",
             "type": "float",
             "columnWidth": 60,
+            "format": {"type": "color", "args": ["lightness"]},
             "sort": true
         },
         {
