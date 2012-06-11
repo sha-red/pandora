@@ -3,10 +3,10 @@
 pandora.ui.preferencesDialog = function() {
 
     var tabs = [
-        {id: 'account', title: 'Account', selected: true},
-        {id: 'advanced', title: 'Advanced'}
-    ];
-    var $tabPanel = Ox.TabPanel({
+            {id: 'account', title: 'Account', selected: true},
+            {id: 'advanced', title: 'Advanced'}
+        ],
+        $tabPanel = Ox.TabPanel({
             content: function(id) {
                 var $content = Ox.Element()
                     .css({overflowY: 'auto'})
@@ -125,27 +125,32 @@ pandora.ui.preferencesDialog = function() {
                 return $content;
             },
             tabs: tabs
-        });
-    var $dialog = Ox.Dialog({
-        buttons: [
-            Ox.Button({
-                id: 'done',
-                title: 'Done'
-            }).bindEvent({
-                click: function() {
-                    $dialog.close();
-                    pandora.UI.set({page: ''});
-                }
-            })
-        ],
-        closeButton: true,
-        content: $tabPanel,
-        height: 192,
-        minHeight: 192,
-        minWidth: 432,
-        title: 'Preferences',
-        width: 432
-    });
+        }),
+        $dialog = Ox.Dialog({
+            buttons: [
+                Ox.Button({
+                    id: 'done',
+                    title: 'Done'
+                }).bindEvent({
+                    click: function() {
+                        $dialog.close();
+                    }
+                })
+            ],
+            closeButton: true,
+            content: $tabPanel,
+            height: 192,
+            minHeight: 192,
+            minWidth: 432,
+            title: 'Preferences',
+            width: 432
+        }),
+        closeDialog = $dialog.close;
+
+    $dialog.close = function() {
+        closeDialog();
+        pandora.UI.set({page: ''});
+    };
 
     return $dialog;
 
