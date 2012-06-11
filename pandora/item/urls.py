@@ -29,10 +29,10 @@ urlpatterns = patterns("item.views",
     (r'^(?P<id>[A-Z0-9].*)/icon(?P<size>\d*)\.jpg$', 'icon'),
 
     #poster
+    (r'^(?P<id>[A-Z0-9].*)/posterframe(?P<position>\d+).jpg$', 'poster_frame'),
     (r'^(?P<id>[A-Z0-9].*)/poster(?P<size>\d+)\.jpg$', 'poster'),
     (r'^(?P<id>[A-Z0-9].*)/siteposter(?P<size>\d*)\.jpg$', 'siteposter'),
     (r'^(?P<id>[A-Z0-9].*)/poster\.jpg$', 'siteposter'),
-    (r'^(?P<id>[A-Z0-9].*)/frameposter(?P<position>\d+).jpg$', 'poster_frame'),
 
     (r'^random$', 'random_annotation'),
 )

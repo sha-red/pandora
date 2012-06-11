@@ -451,7 +451,7 @@ class Item(models.Model):
                     'index': p,
                     'position': f['position'],
                     'selected': p == pos,
-                    'url': '/%s/frameposter%d.jpg' %(self.itemId, p),
+                    'url': '/%s/posterframe%d.jpg' %(self.itemId, p),
                     'height': f['height'],
                     'width': f['width'] 
                 })
