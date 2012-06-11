@@ -2,8 +2,7 @@ pan.do/ra - open media archive
 
 == SETUP ==
 pan.do/ra is known to work with Ubuntu 12.04, older versions of
-Ubuntu or other distributions should work
-if the dependencies are up to date.
+Ubuntu or other distributions should also work.
 
 To setup pan.do/ra, you need python, bazaar, pip and virtualenv
 and several other python modules:
@@ -20,9 +19,10 @@ and several other python modules:
             python-setuptools python-pip python-virtualenv ipython \
             python-dev python-imaging python-numpy python-psycopg2 \
             python-geoip python-html5lib python-lxml \
+            python-gst0.10 gstreamer0.10-plugins-good gstreamer0.10-plugins-bad \ 
             postgresql postgresql-contrib rabbitmq-server \
             ffmpeg2theora ffmpeg \
-            python-ox oxframe oxtimeline
+            python-ox oxframe
 
 * Pan.do/ra
 Get code from bazzar
@@ -45,6 +45,7 @@ after that
 
 create / update static files
     
+    ./manage.py collectstatic -l --noinput
     ./manage.py update_static 
     ./manage.py compile_pyc
 
@@ -140,5 +141,5 @@ to apply them.
     ./manage.py runserver
 
   and background task in another:
-    ./manage.py celeryd -B -Q default,encoding
+    ./manage.py celeryd -B -Q celery,default,encoding
 

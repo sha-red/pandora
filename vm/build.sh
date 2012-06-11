@@ -35,7 +35,10 @@ sudo  vmbuilder vbox ubuntu --suite=precise \
     --addpkg python-simplejson \
     --addpkg python-lxml \
     --addpkg python-html5lib \
-    --addpkg oxtimeline \
+    --addpkg python-ox \
+    --addpkg python-gst0.10 \
+    --addpkg gstreamer0.10-plugins-good \
+    --addpkg gstreamer0.10-plugins-bad \
     --addpkg oxframe \
     --addpkg ffmpeg \
     --addpkg ffmpeg2theora \
