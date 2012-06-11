@@ -4,19 +4,19 @@
 
 pandora.ui.onloadDialog = function() {
 
-    var 
-        dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
-        dialogWidth = Math.round(window.innerWidth * 0.9),
-        $text = Ox.Input({
-            height: dialogHeight - 8,
-            id: 'onload',
-            placeholder: '/*\nAny JavaScript you paste here will run on load.\n'
-                +'You can also manually change or remove it by setting localStorage["pandora.onload"] in the console.\n*/',
-            type: 'textarea',
-            value: localStorage['pandora.onload'] || '',
-            width: dialogWidth - 8
-        }),
-
+    var dialogHeight = Math.round((window.innerHeight - 48) * 0.75),
+        dialogWidth = Math.round(window.innerWidth * 0.75),
+        $input = Ox.Input({
+                height: dialogHeight - 32,
+                id: 'onload',
+                placeholder: '/*\nAny JavaScript you paste here will run on load.\n'
+                    + 'If you ever need to manually change or remove it, '
+                    + 'you can do so by setting localStorage["pandora.onload"] in the console.\n*/',
+                type: 'textarea',
+                value: localStorage['pandora.onload'] || '',
+                width: dialogWidth - 32
+            })
+            .css({margin: '16px'}),
         that = Ox.Dialog({
                 buttons: [
                     Ox.Button({
@@ -39,12 +39,11 @@ pandora.ui.onloadDialog = function() {
                         })
                 ],
                 closeButton: true,
-                content: $text,
+                content: $input,
                 height: dialogHeight,
                 maximizeButton: true,
                 minHeight: 256,
                 minWidth: 512,
-                padding: 0,
                 removeOnClose: true,
                 title: 'Run Script on Load',
                 width: dialogWidth
@@ -56,21 +55,20 @@ pandora.ui.onloadDialog = function() {
     function resize(data) {
         dialogHeight = data.height;
         dialogWidth = data.width;
-        $text.options({
-            height: dialogHeight - 8,
-            width: dialogWidth - 8 
+        $input.options({
+            height: dialogHeight - 32,
+            width: dialogWidth - 32
         });
     }
 
     function clear() {
         delete localStorage['pandora.onload'];
-        $text.options({value: ''});
-        
+        $input.options({value: ''});
     }
 
     that.superClose = that.close;
     that.close = function() {
-        var value = $text.value();
+        var value = $input.value();
         if (value) {
             localStorage['pandora.onload'] = value;
         } else {

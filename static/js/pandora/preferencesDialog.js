@@ -138,10 +138,9 @@ pandora.ui.preferencesDialog = function() {
                 }
             })
         ],
-        //closeButton: true,
+        closeButton: true,
         content: $tabPanel,
         height: 192,
-        //maximizeButton: true,
         minHeight: 192,
         minWidth: 432,
         title: 'Preferences',
