@@ -32,6 +32,7 @@ pandora.ui.siteDialog = function(section) {
                         .appendTo($content);
                 } else {
                     pandora.api.getPage({name: id}, function(result) {
+                        var $right, risk;
                         Ox.Editable({
                                 clickLink: pandora.clickLink,
                                 editable: isEditable,
@@ -40,7 +41,11 @@ pandora.ui.siteDialog = function(section) {
                                 placeholder: isEditable ? 'Doubleclick to insert text' : '',
                                 value: result.data.text
                             })
-                            .css({
+                            .css(id == 'rights' ? {
+                                // this will get applied twice,
+                                // total is 144px
+                                marginRight: '72px'
+                            } : {
                                 width: '100%'
                             })
                             .bindEvent({
@@ -53,6 +58,36 @@ pandora.ui.siteDialog = function(section) {
                                 }
                             })
                             .appendTo($content);
+                        if (id == 'rights') {
+                            $right = $('<div>')
+                                .css({position: 'absolute', top: '16px', right: '16px', width: '128px'})
+                                .appendTo($content);
+                            $('<img>')
+                                .attr({src: '/static/png/rights.png'})
+                                .css({width: '128px', height: '128px', marginBottom: '8px'})
+                                .appendTo($right);
+                            risk = ['Unknown', 'Severe', 'High', 'Significant', 'General', 'Low'];
+                            [].concat(
+                                ['Unknown'],
+                                pandora.site.rightsLevels.map(function(rightsLevel) {
+                                    return rightsLevel.name;
+                                }).reverse()
+                            ).forEach(function(name, i) {
+                                Ox.Theme.formatColor(330 + 30 * i, 'gradient')
+                                    .css({
+                                        padding: '4px',
+                                        marginTop: '8px'
+                                    })
+                                    .html(
+                                        '<b>' + name + '</b><br/><div style="padding-top: 2px; font-size: 9px; opacity: 0.75">'
+                                        + risk[i] + ' Risk'
+                                        + (risk[i].length > 6 ? '<br/> of ' : ' of<br/>')
+                                        + 'Legal Action</div>'
+                                    )
+                                    .appendTo($right);
+                            });
+                        }                        
+                    });
                 }
                 return Ox.SplitPanel({
                     elements: [
