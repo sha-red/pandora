@@ -114,7 +114,8 @@ pandora.ui.namesDialog = function() {
                             operator: '='
                         }],
                         operator: '&'
-                    })
+                    });
+                    pandora.$ui.findElement.updateElement();
                 }
             }),
 

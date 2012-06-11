@@ -103,7 +103,8 @@ pandora.ui.titlesDialog = function() {
                             operator: '='
                         }],
                         operator: '&'
-                    })
+                    });
+                    pandora.$ui.findElement.updateElement();
                 }
             }),
 
