@@ -25,9 +25,9 @@ pandora.ui.siteDialog = function(section) {
                             + 'a free open source framework for media archives.</p>'
                             + '<b>pan.do/ra</b> includes <b>OxJS</b>, '
                             + 'a new JavaScript library for web applications.</p>'
-                            + 'Both <a href="https://pan.do/ra"><b>pan.do/ra</b></a> '
-                            + 'and <a href="https://oxjs.org"><b>OxJS</b></a> '
-                            + 'will be released in 2012. More soon...'
+                            + '<p>To learn more about <b>pan.do/ra</b> and <b>OxJS</b>, '
+                            + 'please visit <a href="https://pan.do/ra">pan.do/ra</a> '
+                            + 'and <a href="https://oxjs.org">oxjs.org</a>.</p>'
                         )
                         .appendTo($content);
                 } else {
