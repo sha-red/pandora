@@ -53,6 +53,7 @@ pandora.ui.siteDialog = function(section) {
                                 }
                             })
                             .appendTo($content);
+                    });
                 }
                 return Ox.SplitPanel({
                     elements: [
