@@ -27,7 +27,7 @@ pandora.ui.siteDialog = function(section) {
                             + 'a new JavaScript library for web applications.</p>'
                             + '<p>To learn more about <b>pan.do/ra</b> and <b>OxJS</b>, '
                             + 'please visit <a href="https://pan.do/ra">pan.do/ra</a> '
-                            + 'and <a href="https://oxjs.org">oxjs.org</a> '
+                            + 'and <a href="https://oxjs.org">oxjs.org</a>.</p>'
                         )
                         .appendTo($content);
                 } else {
