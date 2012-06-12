@@ -865,7 +865,7 @@ class Item(models.Model):
                     sortvalue = value
                     if key in self.person_keys + ['name']:
                         sortvalue = get_name_sort(value)
-                    sortvalue = utils.sort_string(value).lower()[:900]
+                    sortvalue = utils.sort_string(sortvalue).lower()[:900]
                     Facet.objects.get_or_create(item=self, key=key, value=value, sortvalue=sortvalue)
         self.update_layer_facets()
 
