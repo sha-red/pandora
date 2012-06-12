@@ -23,7 +23,6 @@
     ProxyPass /static !
     ProxyPass /favicon.ico !
     ProxyPass /robots.txt !
-    ProxyPass /admin/media !
     ProxyPass /data !
     ProxyPass /.bzr !
 
@@ -32,7 +31,6 @@
     Alias /static      __PREFIX__/static
     Alias /favicon.ico __PREFIX__/static/favicon.ico
     Alias /data       __PREFIX__/data
-    Alias /static/admin __PREFIX__/django/django/contrib/admin
 
     ProxyPreserveHost On
     ProxyPass        / http://127.0.0.1:2620/

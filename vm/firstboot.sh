@@ -54,6 +54,7 @@ echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 
 mkdir /srv/pandora/data
 chown -R pandora:pandora /srv/pandora
 sudo -u pandora python manage.py update_static
+sudo -u pandora python manage.py collectstatic -l --noinput
 
 cp /srv/pandora/etc/init/* /etc/init/
 
