@@ -314,7 +314,10 @@ class Item(models.Model):
 
         #this does not work if another item without imdbid has the same metadata
         oxdbId = self.oxdb_id()
-        if oxdbId:
+        if not settings.USE_IMDB:
+            update_poster = self.oxdbId != oxdbId
+            self.oxdbId = oxdbId
+        elif oxdbId:
             if self.oxdbId != oxdbId:
                 q = Item.objects.filter(oxdbId=oxdbId).exclude(id=self.id)
                 if q.count() != 0:
@@ -554,10 +557,8 @@ class Item(models.Model):
         return i
 
     def oxdb_id(self):
-        if not settings.USE_IMDB:
-            return self.itemId
         if not self.get('title') and not self.get('director'):
-            return None
+            return self.itemId
         return ox.get_oxid(self.get('seriesTitle', self.get('title', '')),
                            self.get('director', []),
                            self.get('seriesYear', self.get('year', '')),
@@ -1128,13 +1129,10 @@ class Item(models.Model):
             cmd += [
                '-l', timeline,
             ]
-        if settings.USE_IMDB:
-            if len(self.itemId) == 7:
-                cmd += ['-i', self.itemId]
-            oxdbId = self.oxdbId or self.oxdb_id() or self.itemId
-            cmd += ['-o', oxdbId]
-        else:
-            cmd += ['-i', self.itemId]
+        cmd += [
+            '-i', self.itemId,
+            '-o', self.oxdbId or self.oxdb_id() or self.itemId
+        ]
         ox.makedirs(os.path.join(settings.MEDIA_ROOT,self.path()))
         p = subprocess.Popen(cmd)
         p.wait()

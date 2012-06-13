@@ -38,7 +38,6 @@ DATABASES = {
 }
 BROKER_PASSWORD = "$RABBITPWD"
 XACCELREDIRECT = True
-DB_GIN_TRGM = True
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -49,7 +48,7 @@ cd /srv/pandora/pandora
 sudo -u pandora python manage.py syncdb --noinput
 sudo -u pandora python manage.py sqlfindindex | sudo -u pandora python manage.py dbshell
 echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 1=1;" | sudo -u pandora python manage.py dbshell
-
+echo "DB_GIN_TRGM = True" >> /srv/pandora/pandora/local_settings.py
 
 mkdir /srv/pandora/data
 chown -R pandora:pandora /srv/pandora

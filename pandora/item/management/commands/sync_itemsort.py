@@ -34,7 +34,7 @@ class Command(BaseCommand):
         for f in models.ItemSort._meta.fields:
             if not f.primary_key:
                 name = f.name
-                col_type = f.db_type()
+                col_type = f.db_type(connection)
                 if name not in db_fields:
                     sql = 'ALTER TABLE "%s" ADD COLUMN "%s" %s' % (table_name, name, col_type)
                     changes.append(sql)

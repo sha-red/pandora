@@ -8,7 +8,7 @@
         {"key": "title", "operator": "+"}
     ],
     "annotations": {
-        "showUsers": true
+        "showUsers": false
     },
     "cantPlay": {
         "icon": "",
@@ -66,17 +66,14 @@
         text of clips. Excluding a layer from this list means it will not be
         included in find annotations. // FIXME: the last bit is not implemented.
     */
-    "clipLayers": ["transcripts", "keywords", "places", "events", "descriptions"],
+    "clipLayers": ["publicnotes", "keywords", "subtitles"],
     // fixme: either this, or filter: true in itemKeys, but not both
     "filters": [
-        {"id": "source", "title": "Sources", "type": "string"},
-        {"id": "project", "title": "Projects", "type": "string"},
-        {"id": "topic", "title": "Topics", "type": "string"},
-        {"id": "name", "title": "People", "type": "string"},
+        {"id": "director", "title": "Director", "type": "string"},
+        {"id": "country", "title": "Country", "type": "string"},
+        {"id": "year", "title": "Year", "type": "integer"},
         {"id": "language", "title": "Languages", "type": "string"},
-        {"id": "license", "title": "License", "type": "string"},
-        {"id": "places", "title": "Places", "type": "string"},
-        {"id": "events", "title": "Events", "type": "string"},
+        {"id": "featuring", "title": "Featuring", "type": "string"},
         {"id": "keywords", "title": "Keywords", "type": "string"}
     ],
     /*
@@ -121,40 +118,8 @@
             "sortType": "title"
         },
         {
-            "id": "source",
-            "title": "Source",
-            "type": "string",
-            "autocomplete": true,
-            "description": true,
-            "columnWidth": 180,
-            "filter": true,
-            "find": true,
-            "sort": true
-        },
-        {
-            "id": "project",
-            "title": "Project",
-            "type": "string",
-            "autocomplete": true,
-            "description": true,
-            "columnWidth": 120,
-            "filter": true,
-            "find": true,
-            "sort": true
-        },
-        {
-            "id": "topic",
-            "title": "Topic",
-            "type": ["string"],
-            "autocomplete": true,
-            "columnWidth": 180,
-            "filter": true,
-            "find": true,
-            "sort": true
-        },
-        {
             "id": "name",
-            "title": "People",
+            "title": "Name",
             "type": ["string"],
             "autocomplete": true,
             "find": true
@@ -165,15 +130,6 @@
             "type": ["string"],
             "autocomplete": true,
             "columnRequired": true,
-            "columnWidth": 180,
-            "sort": true,
-            "sortType": "person"
-        },
-        {
-            "id": "cinematographer",
-            "title": "Cinematographer",
-            "type": ["string"],
-            "autocomplete": true,
             "columnWidth": 180,
             "sort": true,
             "sortType": "person"
@@ -200,8 +156,8 @@
             "sort": true
         },
         {
-            "id": "location",
-            "title": "Location",
+            "id": "country",
+            "title": "Contry",
             "type": "string",
             "autocomplete": true,
             "columnWidth": 180,
@@ -210,11 +166,14 @@
             "sort": true
         },
         {
-            "id": "date",
-            "title": "Date",
-            "type": "string",
-            "columnWidth": 120,
-            //"format": {"type": "date", "args": ["%a, %b %e, %Y"]},
+            "id": "year",
+            "title": "Year",
+            "type": "year",
+            "additionalSort": [{"key": "director", "operator": "+"}, {"key": "title", "operator": "+"}],
+            "autocomplete": true,
+            "columnWidth": 60,
+            "filter": true,
+            "find": true,
             "sort": true
         },
         {
@@ -231,38 +190,20 @@
             "sort": true
         },
         {
-            "id": "annotations",
-            "title": "Annotations",
-            "type": "string",
-            "find": true
-        },
-        {
-            "id": "places",
-            "title": "Places",
-            "type": "layer",
-            "find": true
-        },
-        {
-            "id": "events",
-            "title": "Events",
-            "type": "layer",
-            "find": true
-        },
-        {
             "id": "keywords",
             "title": "Keywords",
             "type": "layer",
             "find": true
         },
         {
-            "id": "descriptions",
-            "title": "Descriptions",
+            "id": "subtitles",
+            "title": "Subtitles",
             "type": "layer",
             "find": true
         },
         {
-            "id": "transcripts",
-            "title": "Transcripts",
+            "id": "publicnotes",
+            "title": "Notes",
             "type": "layer",
             "find": true
         },
@@ -405,14 +346,7 @@
             "title": "User",
             "type": "string",
             "capability": "canSeeFiles",
-            "find": true
-        },
-        {
-            "id": "filename",
-            "title": "Filename",
-            "type": ["string"],
-            "capability": "canSeeFiles",
-            "find": true
+            "find": false
         },
         {
             "id": "created",
@@ -446,14 +380,6 @@
             "capability": "canSeeAccessed",
             "columnWidth": 60,
             "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]},
-            "sort": true
-        },
-        {
-            "id": "license",
-            "title": "License",
-            "type": ["string"],
-            "columnWidth": 120,
-            "filter": true,
             "sort": true
         },
         {
@@ -492,43 +418,44 @@
     ],
     "layers": [
         {
-            "id": "places",
-            "title": "Places",
+            "id": "privatenotes",
+            "title": "Private Notes",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
-            "item": "Place",
+            "item": "Note",
             "overlap": true,
-            "type": "place"
+            "private": true,
+            "showInfo": true,
+            "type": "text"
         },
         {
-            "id": "events",
-            "title": "Events",
+            "id": "publicnotes",
+            "title": "Notes",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
-            "item": "Event",
+            "hasEvents": true,
+            "hasPlaces": true,
+            "item": "Note",
             "overlap": true,
-            "type": "event"
+            "showInfo": true,
+            "type": "text"
         },
         {
             "id": "keywords",
             "title": "Keywords",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
+            "hasEvents": true,
+            "hasPlaces": true,
             "item": "Keyword",
             "overlap": true,
             "type": "string"
         },
         {
-            "id": "descriptions",
-            "title": "Descriptions",
-            "canAddAnnotations": {"member": true, "staff": true, "admin": true},
-            "item": "Description",
-            "showInfo": true,
-            "type": "text"
-        },
-        {
-            "id": "transcripts",
-            "title": "Transcripts",
-            "canAddAnnotations": {"member": true, "staff": true, "admin": true},
-            "item": "Transcript",
-            "showInfo": true,
+            "id": "subtitles",
+            "title": "Subtitles",
+            "canAddAnnotations": {"staff": true, "admin": true},
+            "hasEvents": true,
+            "hasPlaces": true,
+            "isSubtitles": true,
+            "item": "Subtitle",
             "type": "text"
         }
     ],
@@ -570,7 +497,7 @@
             "system": "system@pandora.local"
         },
         "id": "pandora",
-        "name": "pan.do/ra",
+        "name": "Demo",
         "url": "pandora.local",
         "videoprefix": ""
     },
@@ -605,34 +532,33 @@
             "annotationsCalendarSize": 128,
             "annotationsFont": "small",
             "annotationsMapSize": 128,
-            "annotationsRange": "position",
+            "annotationsRange": "all",
             "annotationsSize": 256,
             "annotationsSort": "position",
             "clipsColumns": 2,
             "columns": {
                 "Colors": {
-                    "columns": ["title", "source", "project", "language", "hue", "saturation", "brightness"],
+                    "columns": ["title", "director", "language", "hue", "saturation", "brightness"],
                     "columnWidth": {}
                 }
             },
             "filters": [
-                {"id": "source", "sort": [{"key": "name", "operator": "+"}]},
-                {"id": "project", "sort": [{"key": "name", "operator": "+"}]},
-                {"id": "topic", "sort": [{"key": "items", "operator": "-"}]},
-                {"id": "name", "sort": [{"key": "items", "operator": "-"}]},
-                {"id": "keywords", "sort": [{"key": "items", "operator": "-"}]},
-                {"id": "places", "sort": [{"key": "items", "operator": "-"}]}
+                {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "country", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "year", "sort": [{"key": "name", "operator": "+"}]},
+                {"id": "featuring", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "keywords", "sort": [{"key": "items", "operator": "-"}]}
             ],
             "filtersSize": 176,
             "find": {"conditions": [], "operator": "&"},
             "followPlayer": true,
-            "icons": "frames",
+            "icons": "posters",
             "infoIconSize": 256,
             "item": "",
             "itemFind": "",
             "itemSort": [{"key": "position", "operator": "+"}],
             "itemView": "info",
-            "listColumns": ["title", "source", "project", "topic", "language", "duration"],
+            "listColumns": ["title", "director", "year", "language", "duration"],
             "listColumnWidth": {},
             "listSelection": [],
             "listSort": [{"key": "title", "operator": "+"}],
@@ -655,11 +581,10 @@
             "showIconBrowser": false,
             "showInfo": true,
             "showLayers": {
-                "places": false,
-                "events": false,
                 "keywords": true,
-                "descriptions": true,
-                "transcripts": true
+                "privatenotes": true,
+                "publicnotes": true,
+                "subtitles": true
             },
             "showMapControls": false,
             "showMapLabels": false,

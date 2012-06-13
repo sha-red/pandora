@@ -133,76 +133,9 @@ pandora.ui.infoView = function(data) {
     }
 
     var listKeys = [
-        'language', 'topic', 'director', 'cinematographer', 'featuring',
-        'groups', 'license'
+        'country', 'language', 'director', 'featuring',
+        'groups'
     ];
-
-    // Source & Project --------------------------------------------------------
-
-    var count = 0;
-    ['source', 'project'].forEach(function(key) {
-        $div = $('<div>').appendTo($data);
-        if (canEdit || data[key]) {
-            count && $('<br>').appendTo($div);
-            $('<div>')
-                .css({float: 'left'})
-                .html(
-                    formatKey({
-                        category: 'categories',
-                    }[key] || key).replace('</span>', '&nbsp;</span>')
-                )
-                .appendTo($div);
-            Ox.Editable({
-                    clickLink: pandora.clickLink,
-                    format: function(value) {
-                        return listKeys.indexOf(key) >= 0
-                            ? formatValue(value.split(', '), {
-                                'director': 'name',
-                                'cinematographer': 'name',
-                                'features': 'name',
-                            }[key] || key)
-                            : value;
-                    },
-                    placeholder: formatLight('unknown'),
-                    editable: canEdit,
-                    tooltip: canEdit ? 'Doubleclick to edit' : '',
-                    value: listKeys.indexOf(key) >= 0
-                          ? (data[key] || []).join(', ')
-                          : data[key] || ''
-                })
-                .css({float: 'left'})
-                .bindEvent({
-                    submit: function(event) {
-                        editMetadata(key, event.value);
-                    }
-                })
-                .appendTo($div);
-            if (canEdit || data[key + 'description']) {
-                $('<br>').css({'clear': 'both'}).appendTo($div);
-                $('<div>')
-                    .append(
-                        descriptions[key] = Ox.Editable({
-                            clickLink: pandora.clickLink,
-                            placeholder: formatLight('No ' + Ox.toTitleCase(key) + ' Description'),
-                            editable: canEdit,
-                            tooltip: canEdit ? 'Doubleclick to edit' : '',
-                            type: 'textarea',
-                            value: data[key + 'description'] || ''
-                        })
-                        .bindEvent({
-                            submit: function(event) {
-                                editMetadata(key + 'description', event.value);
-                            }
-                        })
-                        .css(css)
-                    ).css({
-                        'margin-top': '8px',
-                    })
-                    .appendTo($div);
-            }
-            count++;
-        }
-    });
 
     // Title -------------------------------------------------------------------
 
@@ -232,11 +165,11 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($center);
 
-    // Location, Date, Language and Duration -----------------------------------
+    // Year, Country, Language and Duration -----------------------------------
 
     if (canEdit) {
         $div = $('<div>').css(css).css({marginTop: '12px'}).appendTo($center);
-        ['location', 'date', 'language', 'duration'].forEach(function(key, i) {
+        ['year', 'country', 'language', 'duration'].forEach(function(key, i) {
             i && $('<div>').css({float: 'left'}).html(';&nbsp;').appendTo($div);
             $('<div>')
                 .css({float: 'left'})
@@ -266,7 +199,7 @@ pandora.ui.infoView = function(data) {
         $('<br>').appendTo($center);
     } else {
         html = [];
-        ['location', 'date', 'language', 'duration'].forEach(function(key) {
+        ['year', 'country', 'language', 'duration'].forEach(function(key) {
             if (data[key]) {
                 html.push(formatKey(key) + formatValue(data[key], key));
             }
@@ -278,7 +211,7 @@ pandora.ui.infoView = function(data) {
 
     if (canEdit) {
         $div = $('<div>').css(css).css('clear', 'both').appendTo($center);
-        ['director', 'cinematographer', 'featuring'].forEach(function(key, i) {
+        ['director', 'featuring'].forEach(function(key, i) {
             i && $('<div>').css({float: 'left'}).html(';&nbsp;').appendTo($div);
             $('<div>')
                 .css({float: 'left'})
@@ -306,7 +239,7 @@ pandora.ui.infoView = function(data) {
         $('<br>').appendTo($center);
     } else if (data.director || data.cinematographer || data.featuring) {
         html = [];
-        ['director', 'cinematographer', 'featuring'].forEach(function(key) {
+        ['director', 'featuring'].forEach(function(key) {
             if (data[key] && data[key].length) {
                 html.push(
                     formatKey(key)
@@ -315,40 +248,6 @@ pandora.ui.infoView = function(data) {
             }
         });
         $('<div>').css(css).html(html.join('; ')).appendTo($center);
-    }
-
-    // Topic -------------------------------------------------------------------
-
-    if (canEdit) {
-        var key = 'topic';
-        $div = $('<div>').css(css).css('clear', 'both').appendTo($center);
-        $('<div>')
-            .css({float: 'left'})
-            .html(formatKey('Topics').replace('</span>', '&nbsp;</span>'))
-            .appendTo($div);
-        Ox.Editable({
-                clickLink: pandora.clickLink,
-                format: function(value) {
-                    return formatValue(value.split(', '), key);
-                },
-                placeholder: formatLight('unknown'),
-                tooltip: 'Doubleclick to edit',
-                value: listKeys.indexOf(key) >= 0
-                      ? (data[key] || []).join(', ')
-                      : data[key] || ''
-            })
-            .css({float: 'left'})
-            .bindEvent({
-                submit: function(event) {
-                    editMetadata(key, event.value);
-                }
-            })
-            .appendTo($div);
-        $('<br>').appendTo($center);
-        
-    } else if (data.topic) {
-        html = formatKey('topics') + formatValue(data.topic, 'topic');
-        $('<div>').css(css).html(html).appendTo($center);
     }
 
     // Summary -------------------------------------------------------------
@@ -377,32 +276,6 @@ pandora.ui.infoView = function(data) {
             .appendTo($center);
     } else if (data.summary) {
         $('<div>').css(css).html(data.summary).appendTo($center);
-    }
-
-    // License -----------------------------------------------------------------
-
-    $div = $('<div>').css(css).css({marginTop: '16px'}).appendTo($center);
-    if (canEdit) {
-        $('<div>')
-            .css({float: 'left'})
-            .html(formatKey('license').replace('</span>', '&nbsp;</span>'))
-            .appendTo($div);
-        Ox.Editable({
-            placeholder: formatLight('No License'),
-            tooltip: 'Doubleclick to edit',
-            value: (data.license || []).join(', ')
-        })
-        .bindEvent({
-            submit: function(event) {
-                editMetadata('license', event.value);
-            }
-        })
-        .appendTo($div);
-    } else if (data.license) {
-        $div.html(
-            formatKey('License')
-            + (data.license || []).join(', ')
-        );
     }
 
     // Hue, Saturation, Lightness, Volume --------------------------------------
