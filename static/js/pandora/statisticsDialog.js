@@ -289,7 +289,7 @@ pandora.ui.statisticsDialog = function() {
                                             + ' ' + split[0];
                                     } else {
                                         ret = key == 'day'
-                                            ? Ox.WEEKDAYS[parseInt(value) - 1]
+                                            ? Ox.WEEKDAYS[parseInt(value, 10) - 1]
                                             : value + ':00';
                                     }
                                     return ret;
