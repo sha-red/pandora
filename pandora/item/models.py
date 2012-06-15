@@ -40,6 +40,7 @@ import archive.models
 
 from person.models import get_name_sort
 from title.models import get_title_sort
+from sequence.task import get_sequences, update_sequence_ids
 
 def get_id(info):
     q = Item.objects.all()
@@ -368,6 +369,7 @@ class Item(models.Model):
                 public_id = a.public_id.split('/')[1]
                 a.public_id = "%s/%s" % ( self.itemId, public_id)
                 a.save()
+            update_sequence_ids.delay(self.itemId)
         if update_poster:
             return tasks.update_poster.delay(self.itemId)
 
@@ -1049,6 +1051,7 @@ class Item(models.Model):
         if settings.CONFIG['video']['download']:
             self.make_torrent()
         tasks.load_subtitles.delay(self.itemId)
+        get_sequences.delay(self.itemId)
         self.rendered = streams.count() > 0
         self.save()
 
