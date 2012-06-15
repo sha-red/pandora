@@ -634,10 +634,10 @@ pandora.getItemFind = function(find) {
 pandora.getItemIdAndPosition = function() {
     var selected, ret, ui = pandora.user.ui;
     function getIdAndPositionByClipId(clipId) {
-        var fps = 25, split = clipId.replace('-', '/').split('/');
+        var split = clipId.replace('-', '/').split('/');
         return {
             id: split[0],
-            position: Math.ceil(parseFloat(split[1]) * fps) / fps
+            position: parseFloat(split[1])
         };
     }
     function getIdAndPositionByItemId(itemId) {
