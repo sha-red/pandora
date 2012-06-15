@@ -121,9 +121,9 @@ def join_tiles(source_paths, target_path):
                 durations[i] += width / fps
                 frame_n += width
     large_tile_n = int(math.ceil(frame_n / large_tile_w)) 
-    large_tile_last_w = frame_n % large_tile_w
+    large_tile_last_w = frame_n % large_tile_w or 60
     small_tile_n = int(math.ceil(frame_n / fps / small_tile_w)) 
-    small_tile_last_w = int(math.ceil(frame_n / fps)) % small_tile_w
+    small_tile_last_w = int(math.ceil(frame_n / fps)) % small_tile_w or small_tile_w
 
     # open full timeline
     if large_tile_n == 1:
