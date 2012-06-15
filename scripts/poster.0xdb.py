@@ -129,7 +129,7 @@ def render_poster(title, director, year, series, oxdb_id, imdb_id, frame, timeli
 def main():
     parser = OptionParser()
     parser.add_option('-o', '--oxdbid', dest='oxdb_id', help='0xDB Id')
-    parser.add_option('-i', '--id', dest='item_id', help='Item Id')
+    parser.add_option('-i', '--id', dest='imdb_id', help='Item Id')
     parser.add_option('-t', '--title', dest='title', help='Title')
     parser.add_option('-d', '--director', dest='director', help='Director(s)', default='')
     parser.add_option('-y', '--year', dest='year', help='Year')
@@ -144,7 +144,7 @@ def main():
         sys.exit()
 
     opt = {}
-    for key in ('oxdb_id', 'item_id', 'title', 'director', 'year', 'series', 'frame', 'timeline', 'poster'):
+    for key in ('oxdb_id', 'imdb_id', 'title', 'director', 'year', 'series', 'frame', 'timeline', 'poster'):
         opt[key] = getattr(options, key)
         
     opt['title'] = opt['title'].decode('utf-8')
