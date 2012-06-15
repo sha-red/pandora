@@ -70,7 +70,7 @@ pandora.ui.mainMenu = function() {
                         ) },
                         { id: 'timelines', title: 'Timelines', items: [
                             { group: 'viewtimelines', min: 1, max: 1, items: pandora.site.timelines.map(function(mode) {
-                                return {id: mode.id, title: mode.title, checked: ui.videoTimeline == mode.id, disabled: true};
+                                return {id: mode.id, title: mode.title, checked: ui.videoTimeline == mode.id};
                             }) }
                         ]},
                         { id: 'columns', title: 'Columns', items: [
@@ -504,6 +504,9 @@ pandora.ui.mainMenu = function() {
             },
             pandora_showtimeline: function(data) {
                 that.setItemTitle('showtimeline', (data.value ? 'Hide' : 'Show') + ' Timeline');
+            },
+            pandora_videotimeline: function(data) {
+                that.checkItem('viewMenu_timelines_' + data.value);
             }
         });
 
