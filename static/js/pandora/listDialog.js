@@ -77,11 +77,7 @@ pandora.ui.listDialog = function(section) {
                 })
             ],
         })
-        .css({
-            float: 'right',
-            margin: '4px',
-            align: 'right'
-        });
+        .css({float: 'right', margin: '4px', align: 'right'});
     if (section != 'icon') {
         $findElement.hide();
     }

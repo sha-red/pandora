@@ -14,7 +14,7 @@ pandora.ui.orderButton = function(isNavigationView) {
             margin: isNavigationView ? '4px 4px 0 0' : '4px 0 0 4px'
         })
         .bindEvent({
-            click: function(data) {
+            click: function() {
                 pandora.UI.set(sortKey, [{
                     key: pandora.user.ui[sortKey][0].key,
                     operator: pandora.user.ui[sortKey][0].operator == '+' ? '-' : '+'

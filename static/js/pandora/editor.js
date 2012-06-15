@@ -252,6 +252,3 @@ pandora.ui.editor = function(data) {
     return that;
 
 };
-
-
-
