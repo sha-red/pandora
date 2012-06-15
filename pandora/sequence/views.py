@@ -55,6 +55,8 @@ def findSequences(request):
             itemsQuery: ...
         }
 
+        one of your conditions has to be key: 'mode', value: [shape,color], operator: '=='
+
         return {
             'status': {'code': int, 'text': string}
             'data': {

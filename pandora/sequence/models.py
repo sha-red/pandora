@@ -18,12 +18,15 @@ from changelog.models import Changelog
 from django.db import models
 
 class Sequence(models.Model):
-    public_id = models.CharField(max_length=128, unique=True)
+    class Meta:
+        unique_together = ("public_id", "mode")
+
+    mode = models.CharField(max_length=128)
+    public_id = models.CharField(max_length=128)
     item = models.ForeignKey(Item, null=True, related_name='sequences')
     sort = models.ForeignKey(ItemSort, null=True, related_name='sequences')
     user = models.IntegerField(db_index=True, null=True)
 
-    mode = models.CharField(max_length=255)
     hash = models.CharField(db_index=True, max_length=16, default='')
     start = models.FloatField(default=-1, db_index=True)
     end = models.FloatField(default=-1)
@@ -31,8 +34,8 @@ class Sequence(models.Model):
     objects = managers.SequenceManager()
 
     def save(self, *args, **kwargs):
-        self.public_id = u"%s/%s/%s-%s" % (
-            self.item.itemId, self.mode, float(self.start), float(self.end)
+        self.public_id = u"%s/%s-%s" % (
+            self.item.itemId, float(self.start), float(self.end)
         )
         if self.item:
             self.user = self.item.user and self.item.user.id
