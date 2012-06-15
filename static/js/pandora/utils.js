@@ -631,6 +631,48 @@ pandora.getItemFind = function(find) {
     return itemFind;
 };
 
+pandora.getItemIdAndPosition = function() {
+    var selected, ret, ui = pandora.user.ui;
+    function getIdAndPositionByClipId(clipId) {
+        var fps = 25, split = clipId.replace('-', '/').split('/');
+        return {
+            id: split[0],
+            position: Math.ceil(parseFloat(split[1]) * fps) / fps
+        };
+    }
+    function getIdAndPositionByItemId(itemId) {
+        return {
+            id: itemId,
+            position: ui.videoPoints[itemId] ? ui.videoPoints[itemId].position : 0
+        };
+    }
+    if (!ui.item) {
+        if (
+            ui.listView == 'timelines'
+            && (selected = ui.listSelection).length == 1
+        ) {
+            ret = getIdAndPositionByItemId(selected[0]);
+        } else if (
+            ['clip', 'map', 'calendar'].indexOf(ui.listView) > -1
+            && pandora.$ui.clipList
+            && (selected = pandora.$ui.clipList.options('selected')).length == 1
+        ) {
+            ret = getIdAndPositionByClipId(selected[0]);
+        }
+    } else {
+        if (['player', 'editor', 'timeline'].indexOf(ui.itemView) > -1) {
+            ret = getIdAndPositionByItemId(ui.item);
+        } else if (
+            ['clips', 'map', 'calendar'].indexOf(ui.itemView) > -1
+            && pandora.$ui.clipList
+            && (selected = pandora.$ui.clipList.options('selected')).length == 1
+        ) {
+            ret = getIdAndPositionByClipId(selected[0]);
+        }
+    }
+    return ret;
+}
+
 pandora.getListData = function(list) {
     var data = {}, folder;
     list = Ox.isUndefined(list) ? pandora.user.ui._list : list;

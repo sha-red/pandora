@@ -2,9 +2,10 @@
 
 'use strict';
 
-pandora.ui.sequencesDialog = function(id, position) {
+pandora.ui.sequencesDialog = function() {
 
-    var dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
+    var data = pandora.getItemIdAndPosition(),
+        dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
         mode = pandora.user.ui.sequenceMode,
         sidebarWidth = 144,
@@ -22,7 +23,7 @@ pandora.ui.sequencesDialog = function(id, position) {
                         ],
                         orientation: 'horizontal'
                     });
-                pandora.api.getSequence({id: id, mode: mode, position: position}, function(result) {
+                pandora.api.getSequence({id: data.id, mode: mode, position: data.position}, function(result) {
                     // result.data: {hash, in, out}
                     var fixedRatio = 16/9,
                         hash = result.data.hash,

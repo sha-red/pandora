@@ -215,9 +215,11 @@ pandora.ui.clipList = function(videoRatio) {
                         //*/
                     }
                     !ui.item && pandora.UI.set('listSelection', [item]);
+                    pandora.$ui.mainMenu.enableItem('findsimilar');
                 } else {
                     $('.OxSelectedVideo').removeClass('OxSelectedVideo');
                     !ui.item && pandora.UI.set('listSelection', []);
+                    pandora.$ui.mainMenu.disableItem('findsimilar');
                 }
             },
             pandora_itemsort: function(data) {

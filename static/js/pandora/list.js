@@ -359,7 +359,7 @@ pandora.ui.list = function() {
     } else if (view == 'calendars') {
         that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
     } else if (view == 'clip') {
-        that = pandora.ui.clipList();
+        that = pandora.$ui.clipList = pandora.ui.clipList();
     } else if (view == 'video') {
         that = pandora.ui.clipPlayer();
     } else if (['map', 'calendar'].indexOf(view) > -1) {

@@ -130,7 +130,7 @@ pandora.ui.mainMenu = function() {
                         ] },
                         { id: 'advancedfind', title: 'Advanced Find...', keyboard: 'shift control f' },
                         {},
-                        { id: 'findsimilar', title: 'Find Similar Clips...', disabled: true, keyboard: 'alt control f'}
+                        { id: 'findsimilar', title: 'Find Similar Clips...', keyboard: 'alt control f', disabled: !pandora.getItemIdAndPosition() }
                     ] },
                     { id: 'dataMenu', title: 'Data', items: [
                         { id: 'titles', title: 'Manage Titles...', disabled: !pandora.site.capabilities.canManageTitlesAndNames[pandora.user.level] },
@@ -257,12 +257,13 @@ pandora.ui.mainMenu = function() {
                 }
             },
             click: function(data) {
-                if ([].concat(
-                    ['home', 'software'],
+                if ([
+                    'home', 'software', 'signup', 'signin', 'signout',
+                    'preferences', 'tv', 'help'
+                ].concat(
                     pandora.site.sitePages.map(function(page) {
                         return page.id;
-                    }),
-                    ['signup', 'signin', 'signout', 'preferences', 'tv', 'help']
+                    })
                 ).indexOf(data.id) > -1) {
                     pandora.UI.set({page: data.id});
                 } else if (data.id == 'upload') {
@@ -292,9 +293,9 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'fullscreen') {
                     pandora.$ui.player.options({fullscreen: true});
                 } else if (data.id == 'advancedfind') {
-                    if (!pandora.hasDialogOrScreen()) {
-                        pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
-                    }
+                    pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
+                } else if (data.id == 'findsimilar') {
+                    pandora.$ui.sequencesDialog = pandora.ui.sequencesDialog().open();
                 } else if (data.id == 'titles') {
                     (pandora.$ui.titlesDialog || (
                         pandora.$ui.titlesDialog = pandora.ui.titlesDialog()
@@ -345,7 +346,9 @@ pandora.ui.mainMenu = function() {
                 }
             },
             key_alt_control_f: function() {
-                // ...
+                if (!pandora.hasDialogOrScreen() && pandora.getItemIdAndPosition()) {
+                    pandora.$ui.sequencesDialog = pandora.ui.sequencesDialog().open();
+                }
             },
             key_backtick: function() {
                 changeFocus(1);
@@ -470,9 +473,17 @@ pandora.ui.mainMenu = function() {
                     that[action]('showtimeline');
                     that[action]('fullscreen');
                 }
+                that[
+                    pandora.getItemIdAndPosition() ? 'enableItem' : 'disableItem'
+                ]('findsimilar');
             },
             pandora_listselection: function(data) {
-                that[data.value.length ? 'enableItem' : 'disableItem']('newlistfromselection');
+                that[
+                    data.value.length ? 'enableItem' : 'disableItem'
+                ]('newlistfromselection');
+                that[
+                    pandora.getItemIdAndPosition() ? 'enableItem' : 'disableItem'
+                ]('findsimilar');
             },
             pandora_listsort: function(data) {
                 that.checkItem('sortMenu_sortitems_' + data.value[0].key);
@@ -485,6 +496,9 @@ pandora.ui.mainMenu = function() {
                 if (pandora.isClipView() != pandora.isClipView(data.previousValue)) {
                     that.replaceMenu('sortMenu', getSortMenu());
                 }
+                that[
+                    pandora.getItemIdAndPosition() ? 'enableItem' : 'disableItem'
+                ]('findsimilar');
             },
             pandora_showannotations: function(data) {
                 that.setItemTitle('showannotations', (data.value ? 'Hide' : 'Show') + ' Annotations');
