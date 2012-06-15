@@ -554,7 +554,7 @@ pandora.ui.list = function() {
 
     }
 
-    if (['list', 'grid', 'timelines'].indexOf(pandora.user.ui.listView) > -1) {
+    if (['list', 'grid', 'timelines'].indexOf(view) > -1) {
         that.bindEvent({
             pandora_icons: function(data) {
                 var src, previousSrc;
@@ -580,6 +580,14 @@ pandora.ui.list = function() {
             pandora_showsiteposters: function() {
                 // fixme: should be disabled if ui.icons != 'posters'
                 hasIcons() && pandora.user.ui.icons == 'posters' && that.reloadList(true);
+            }
+        });
+    }
+
+    if (view == 'timelines') {
+        that.bindEvent({
+            pandora_videotimeline: function(data) {
+                that.reloadList(true);
             }
         });
     }
