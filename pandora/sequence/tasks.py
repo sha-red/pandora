@@ -14,18 +14,25 @@ from celery.task import task, periodic_task
 import models
 import extract
 
-@task(ignore_results=True, queue='default')
+@task(ignore_results=True, queue='encoding')
 def get_sequences(itemId):
     i = models.Item.objects.get(itemId=itemId)
     models.Sequence.objects.filter(item=i).delete()
-    data = extract.get_sequences(i.timeline_prefix)
-    with transaction.commit_on_success():
-        for mode in data:
-            for seq in data[mode]:
-                s = models.Sequence()
-                s.item = i
-                s.mode = mode
-                s.start = seq['in']
-                s.end = seq['out']
-                s.hash = seq['hash']
-                s.save()
+    position = 0
+    for stream in i.streams():
+        data, position = extract.get_sequences(stream.timeline_prefix, position)
+        with transaction.commit_on_success():
+            for mode in data:
+                for seq in data[mode]:
+                    s = models.Sequence()
+                    s.item = i
+                    s.mode = mode
+                    s.start = seq['in']
+                    s.end = seq['out']
+                    s.hash = seq['hash']
+                    s.save()
+
+@task(ignore_results=True, queue='encoding')
+def update_sequence_ids(itemId):
+    for s in models.Sequence.objects.filter(item__itemId=itemId):
+        s.save()

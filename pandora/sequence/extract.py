@@ -50,13 +50,12 @@ def get_hash(image, mode, debug=False):
     if h.endswith('L'): h = h[:-1]
     return '0' * (16-len(h)) + h
 
-def get_sequences(path):
+def get_sequences(path, position=0):
     modes = ['color', 'shape']
     sequences = {}
     for mode in modes:
         sequences[mode] = []
     fps = 25
-    position = 0
     file_names = filter(lambda x: 'timelinedata8p' in x, os.listdir(path))
     file_names = sorted(file_names, key=lambda x: int(x[14:-4]))
     file_names = map(lambda x: path + x, file_names)
@@ -75,5 +74,5 @@ def get_sequences(path):
     for mode in modes:
         if sequences[mode]:
             sequences[mode][-1]['out'] = position
-    return sequences
+    return sequences, position
 
