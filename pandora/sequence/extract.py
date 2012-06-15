@@ -55,6 +55,7 @@ def get_sequences(path, position=0):
     sequences = {}
     for mode in modes:
         sequences[mode] = []
+    position_start = position
     fps = 25
     file_names = filter(lambda x: 'timelinedata8p' in x, os.listdir(path))
     file_names = sorted(file_names, key=lambda x: int(x[14:-4]))
@@ -66,8 +67,8 @@ def get_sequences(path, position=0):
             frame_image = timeline_image.crop((x, 0, x + 8, 8))
             for mode in modes:
                 frame_hash = get_hash(frame_image, mode)
-                if position == 0 or frame_hash != sequences[mode][-1]['hash']:
-                    if position > 0:
+                if position == position_start or frame_hash != sequences[mode][-1]['hash']:
+                    if position > position_start:
                         sequences[mode][-1]['out'] = position
                     sequences[mode].append({'in': position, 'hash': frame_hash})
             position += 1 / fps
