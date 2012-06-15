@@ -11,85 +11,94 @@ pandora.ui.sequencesDialog = function() {
         sidebarWidth = 144,
         $list,
         $tabPanel = Ox.TabPanel({
-            content: function(mode) {
-                var $splitPanel = Ox.SplitPanel({
-                        elements: [
-                            {
-                                element: Ox.Element(),
-                                size: sidebarWidth
-                            },
-                            {
-                                element: Ox.Element()
-                            }
-                        ],
-                        orientation: 'horizontal'
-                    });
-                pandora.api.getSequence({
-                    id: data.id,
-                    mode: mode,
-                    position: data.position
-                }, function(result) {
-                    // result.data: {hash, in, out}
-                    var fixedRatio = 16/9,
-                        hash = result.data.hash,
-                        $sidebar = Ox.Element(); // add video player
-                    $list = Ox.IconList({
-                            fixedRatio: fixedRatio,
-                            item: function(data, sort, size) {
-                                var ratio = data.videoRatio,
-                                    width = ratio > fixedRatio ? size : Math.round(size * ratio / fixedRatio),
-                                    height = Math.round(width / ratio);
-                                return {
-                                    height: height,
-                                    id: data.id,
-                                    info: Ox.formatDuration(data['in']) + ' - ' + Ox.formatDuration(data.out),
-                                    title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
-                                    url: '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg',
-                                    width: width
-                                };
-                            },
-                            items: function(data, callback) {
-                                pandora.api.findSequences(Ox.extend(data, {
-                                    query: {
-                                        conditions: [
-                                            {key: 'mode', value: mode, operator: '=='},
-                                            {key: 'hash', value: hash, operator: '=='}
-                                        ],
-                                        operator: '&'
-                                    }
-                                }), callback);
-                            },
-                            keys: ['director', 'id', 'title', 'videoRatio'],
-                            max: 1,
-                            orientation: 'both',
-                            size: 128,
-                            sort: pandora.user.ui.sequenceSort,
-                            unique: 'id'
-                        })
-                        .bindEvent({
-                            init: function(data) {
-                                $status.html(
-                                    Ox.formatNumber(data.items) + ' Clip'
-                                    + (data.items == 1 ? '' : 's')
-                                );
-                            },
-                            open: openClip,
-                            select: function(data) {
-                                $dialog[
-                                    data.ids.length ? 'enableButton' : 'disableButton'
-                                ]('open');
-                            }
+                content: function(mode) {
+                    var $splitPanel = Ox.SplitPanel({
+                            elements: [
+                                {
+                                    element: Ox.Element(),
+                                    size: sidebarWidth
+                                },
+                                {
+                                    element: Ox.Element()
+                                }
+                            ],
+                            orientation: 'horizontal'
                         });
-                    $splitPanel.replaceElement(0, $sidebar);
-                    $splitPanel.replaceElement(1, $list);
-                });
-                return $splitPanel;                
-            },
-            tabs: [
-                {id: 'shape', title: 'Similar Shapes'},
-                {id: 'color', title: 'Similar Colors'}
-            ]
-        }),
+                    pandora.api.getSequence({
+                        id: data.id,
+                        mode: mode,
+                        position: data.position
+                    }, function(result) {
+                        // result.data: {hash, in, out}
+                        var fixedRatio = 16/9,
+                            hash = result.data.hash,
+                            $sidebar = Ox.Element(); // add video player
+                        $list = Ox.IconList({
+                                fixedRatio: fixedRatio,
+                                item: function(data, sort, size) {
+                                    var ratio = data.videoRatio,
+                                        width = ratio > fixedRatio ? size : Math.round(size * ratio / fixedRatio),
+                                        height = Math.round(width / ratio);
+                                    return {
+                                        height: height,
+                                        id: data.id,
+                                        info: Ox.formatDuration(data['in']) + ' - ' + Ox.formatDuration(data.out),
+                                        title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
+                                        url: '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg',
+                                        width: width
+                                    };
+                                },
+                                items: function(data, callback) {
+                                    pandora.api.findSequences(Ox.extend(data, {
+                                        query: {
+                                            conditions: [
+                                                {key: 'mode', value: mode, operator: '=='},
+                                                {key: 'hash', value: hash, operator: '=='}
+                                            ],
+                                            operator: '&'
+                                        }
+                                    }), callback);
+                                },
+                                keys: ['director', 'id', 'title', 'videoRatio'],
+                                max: 1,
+                                orientation: 'both',
+                                size: 128,
+                                sort: pandora.user.ui.sequenceSort,
+                                unique: 'id'
+                            })
+                            .bindEvent({
+                                init: function(data) {
+                                    $status.html(
+                                        Ox.formatNumber(data.items) + ' Clip'
+                                        + (data.items == 1 ? '' : 's')
+                                    );
+                                },
+                                open: openClip,
+                                select: function(data) {
+                                    $dialog[
+                                        data.ids.length ? 'enableButton' : 'disableButton'
+                                    ]('open');
+                                },
+                                pandora_sequencesort: function(data) {
+                                    Ox.print('SEQUENCESORT:', data)
+                                    $list.options({sort: data.value});
+                                }
+                            });
+                        $splitPanel.replaceElement(0, $sidebar);
+                        $splitPanel.replaceElement(1, $list);
+                    });
+                    return $splitPanel;                
+                },
+                tabs: [
+                    {id: 'shape', title: 'Similar Shapes', selected: pandora.user.ui.sequenceMode == 'shape'},
+                    {id: 'color', title: 'Similar Colors', selected: pandora.user.ui.sequenceMode == 'color'}
+                ]
+            })
+            .bindEvent({
+                change: function(data) {
+                    pandora.UI.set({sequenceMode: data.selected});
+                }
+            }),
         $dialog = Ox.Dialog({
             buttons: [
                 Ox.Button({
@@ -150,6 +159,7 @@ pandora.ui.sequencesDialog = function() {
                         key: key,
                         operator: pandora.getSortOperator(key)
                     }]});
+                    updateButton();
                 }
             })
             .css({float: 'right', margin: '4px 2px'})
@@ -162,6 +172,8 @@ pandora.ui.sequencesDialog = function() {
                 textAlign: 'center'
             })
             .appendTo($statusbar);
+
+    $tabPanel.find('.OxButtonGroup').css({width: '256px'});
 
     function getTitle() {
         return pandora.user.ui.sequenceSort[0].operator == '+' ? 'up' : 'down';
@@ -187,12 +199,11 @@ pandora.ui.sequencesDialog = function() {
             out: outPoint,
             position: inPoint
         };
-        Ox.print(selected, '???', set);
         $dialog.close();
         pandora.UI.set(set)
     }
     function updateButton() {
-        that.options({
+        $orderButton.options({
             title: getTitle(),
             tooltip: getTooltip()
         });
