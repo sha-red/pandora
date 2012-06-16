@@ -41,7 +41,6 @@ pandora.ui.sequencesDialog = function() {
                 click: function(data) {
                     item.position = data.id == 'previous'
                         ? sequence['in'] - 1 / fps : sequence.out;
-                    $item = null;
                     getClips();
                 }
             })
@@ -219,31 +218,30 @@ pandora.ui.sequencesDialog = function() {
                 sequence = Ox.extend({}, item, result.data);
                 $clipButtons[sequence['in'] > 0 ? 'enableButton' : 'disableButton']('previous');
                 $clipButtons[sequence.out < item.duration ? 'enableButton' : 'disableButton']('next');
-                if (!$item) {
-                    $item = Ox.IconList({
-                        fixedRatio: fixedRatio,
-                        item: getItem,
-                        /*
-                        items: [item],
-                        */
-                        ///*
-                        items: function(data, callback) {
-                            setTimeout(function() {
-                                callback({
-                                    data: {items: data.keys ? [sequence] : 1},
-                                    status: {code: 200, text: 'ok'}
-                                });
-                            }, 250);
-                        },
-                        //*/
-                        max: 0,
-                        orientation: 'both',
-                        size: 128,
-                        sort: [{key: 'id', operator: '+'}],
-                        unique: 'id'
-                    });
-                    $innerPanel.replaceElement(0, $item);
-                }
+                $item = Ox.IconList({
+                    fixedRatio: fixedRatio,
+                    item: getItem,
+                    /*
+                    items: [item],
+                    */
+                    ///*
+                    items: function(data, callback) {
+                        // FIXME: witout timeout, list layout is wrong
+                        setTimeout(function() {
+                            callback({
+                                data: {items: data.keys ? [sequence] : 1},
+                                status: {code: 200, text: 'ok'}
+                            });
+                        }, 25);
+                    },
+                    //*/
+                    max: 0,
+                    orientation: 'both',
+                    size: 128,
+                    sort: [{key: 'id', operator: '+'}],
+                    unique: 'id'
+                });
+                $innerPanel.replaceElement(0, $item);
                 if (sequence.hash) {
                     $list = Ox.IconList({
                             fixedRatio: fixedRatio,
