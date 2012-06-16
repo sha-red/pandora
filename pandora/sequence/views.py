@@ -41,7 +41,7 @@ def order_query(qs, sort):
             'out': 'end',
             'position': 'start',
         }.get(e['key'], e['key'])
-        if key not in ('start', 'end', 'mode', 'hash'):
+        if key not in ('duration', 'start', 'end', 'mode', 'hash'):
             key = 'sort__%s' % key
         order = '%s%s' % (operator, key)
         order_by.append(order)

@@ -30,6 +30,7 @@ class Sequence(models.Model):
     hash = models.CharField(db_index=True, max_length=16, default='')
     start = models.FloatField(default=-1, db_index=True)
     end = models.FloatField(default=-1)
+    duration = models.FloatField(default=0)
 
     objects = managers.SequenceManager()
 
@@ -37,6 +38,7 @@ class Sequence(models.Model):
         self.public_id = u"%s/%0.03f-%0.03f" % (
             self.item.itemId, float(self.start), float(self.end)
         )
+        self.duration = self.end - self.start
         if self.item:
             self.user = self.item.user and self.item.user.id
             self.sort = self.item.sort
