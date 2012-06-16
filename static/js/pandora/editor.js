@@ -69,14 +69,11 @@ pandora.ui.editor = function(data) {
                 Ox.Log('', 'addAnnotation', data);
                 // async to not capture keyboard input
                 setTimeout(function() {
-                    var d = new Date(),
-                        created = Ox.formatDate(d, '%Y-%m-%dT%H:%M:%SZ'),
-                        date = Ox.formatDate(d, '%B %e, %Y'),
+                    var created = Ox.formatDate(new Date(), '%Y-%m-%dT%H:%M:%SZ'),
                         type = Ox.getObjectById(pandora.site.layers, data.layer).type;
                     that.addAnnotation(data.layer, Ox.extend(
                         {
                             created: created,
-                            date: date,
                             duration: data.out - data['in'],
                             editable: true,
                             id: '_' + Ox.uid(),

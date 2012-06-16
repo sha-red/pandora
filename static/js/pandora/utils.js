@@ -880,7 +880,6 @@ pandora.getVideoOptions = function(data) {
     pandora.site.layers.forEach(function(layer, i) { 
         options.annotations[i] = Ox.extend({}, layer, {
             items: data.layers[layer.id].map(function(annotation) {
-                annotation.date = Ox.formatDate(annotation.modified.slice(0, 10), '%B %e, %Y');
                 annotation.duration = Math.abs(annotation.out - annotation['in']);
                 annotation.editable = annotation.editable
                     || annotation.user == pandora.user.username
