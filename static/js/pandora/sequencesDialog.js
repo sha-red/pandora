@@ -4,12 +4,17 @@
 
 pandora.ui.sequencesDialog = function() {
 
-    var data = pandora.getItemIdAndPosition(),
-        dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
+    var dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
+        fixedRatio = 16/9,
+        fps = 25,
+        item = pandora.getItemIdAndPosition(),
         mode = pandora.user.ui.sequenceMode,
-        sidebarWidth = 144,
+        sequence,
+        sidebarWidth = 160,
+        $item,
         $list,
+
         $tabPanel = Ox.TabPanel({
                 content: function(mode) {
                     var $splitPanel = Ox.SplitPanel({
@@ -24,68 +29,87 @@ pandora.ui.sequencesDialog = function() {
                             ],
                             orientation: 'horizontal'
                         });
-                    pandora.api.getSequence({
-                        id: data.id,
-                        mode: mode,
-                        position: data.position
+                    $dialog && $dialog.disableButton('open');
+                    pandora.api.get({
+                        id: item.id,
+                        keys: ['director', 'duration', 'title', 'videoRatio']
                     }, function(result) {
-                        // result.data: {hash, in, out}
-                        var fixedRatio = 16/9,
-                            hash = result.data.hash,
-                            $sidebar = Ox.Element(); // add video player
-                        $list = Ox.IconList({
-                                fixedRatio: fixedRatio,
-                                item: function(data, sort, size) {
-                                    var ratio = data.videoRatio,
-                                        width = ratio > fixedRatio ? size : Math.round(size * ratio / fixedRatio),
-                                        height = Math.round(width / ratio);
-                                    return {
-                                        height: height,
-                                        id: data.id,
-                                        info: Ox.formatDuration(data['in']) + ' - ' + Ox.formatDuration(data.out),
-                                        title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
-                                        url: '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg',
-                                        width: width
-                                    };
-                                },
-                                items: function(data, callback) {
-                                    pandora.api.findSequences(Ox.extend(data, {
-                                        query: {
-                                            conditions: [
-                                                {key: 'mode', value: mode, operator: '=='},
-                                                {key: 'hash', value: hash, operator: '=='}
-                                            ],
-                                            operator: '&'
-                                        }
-                                    }), callback);
-                                },
-                                keys: ['director', 'id', 'title', 'videoRatio'],
-                                max: 1,
-                                orientation: 'both',
-                                size: 128,
-                                sort: pandora.user.ui.sequenceSort,
-                                unique: 'id'
-                            })
-                            .bindEvent({
-                                init: function(data) {
-                                    $status.html(
-                                        Ox.formatNumber(data.items) + ' Clip'
-                                        + (data.items == 1 ? '' : 's')
-                                    );
-                                },
-                                open: openClip,
-                                select: function(data) {
-                                    $dialog[
-                                        data.ids.length ? 'enableButton' : 'disableButton'
-                                    ]('open');
-                                },
-                                pandora_sequencesort: function(data) {
-                                    Ox.print('SEQUENCESORT:', data)
-                                    $list.options({sort: data.value});
-                                }
-                            });
-                        $splitPanel.replaceElement(0, $sidebar);
-                        $splitPanel.replaceElement(1, $list);
+                        Ox.extend(item, result.data);
+                        pandora.api.getSequence({
+                            id: item.id,
+                            mode: mode,
+                            position: item.position
+                        }, function(result) {
+                            // result.data: {hash, id, in, out}
+                            sequence = Ox.extend({}, item, result.data);
+                            $item = Ox.IconList({
+                                    fixedRatio: fixedRatio,
+                                    item: getItem,
+                                    /*
+                                    items: [item],
+                                    */
+                                    ///*
+                                    items: function(data, callback) {
+                                        setTimeout(function() {
+                                            callback({
+                                                data: {items: data.keys ? [sequence] : 1},
+                                                status: {code: 200, text: 'ok'}
+                                            });
+                                        }, 250);
+                                    },
+                                    //*/
+                                    max: 0,
+                                    orientation: 'both',
+                                    size: 128,
+                                    sort: [{key: 'id', operator: '+'}],
+                                    unique: 'id'
+                                });
+                            $list = Ox.IconList({
+                                    fixedRatio: fixedRatio,
+                                    item: getItem,
+                                    items: function(data, callback) {
+                                        pandora.api.findSequences(Ox.extend(data, {
+                                            query: {
+                                                conditions: [
+                                                    {key: 'id', value: sequence.id, operator: '!='},
+                                                    {key: 'mode', value: mode, operator: '=='},
+                                                    {key: 'hash', value: sequence.hash, operator: '=='}
+                                                ],
+                                                operator: '&'
+                                            }
+                                        }), callback);
+                                    },
+                                    keys: ['director', 'id', 'title', 'videoRatio'],
+                                    max: 1,
+                                    orientation: 'both',
+                                    size: 128,
+                                    sort: pandora.user.ui.sequenceSort,
+                                    unique: 'id'
+                                })
+                                .bindEvent({
+                                    init: function(data) {
+                                        $status.html(
+                                            Ox.formatNumber(data.items) + ' Clip'
+                                            + (data.items == 1 ? '' : 's')
+                                        );
+                                    },
+                                    open: changeClip,
+                                    select: function(data) {
+                                        $dialog[
+                                            data.ids.length ? 'enableButton' : 'disableButton'
+                                        ]('open');
+                                    },
+                                    pandora_sequencesort: function(data) {
+                                        Ox.print('SEQUENCESORT:', data)
+                                        $list.options({sort: data.value});
+                                    }
+                                });
+                            $clipButtons[sequence['in'] > 0 ? 'enableButton' : 'disableButton']('previous');
+                            $clipButtons[sequence.out < item.duration ? 'enableButton' : 'disableButton']('next');
+                            $splitPanel.replaceElement(0, $item);
+                            $splitPanel.replaceElement(1, $list);
+                            $image.attr({src: getImageURL(mode, sequence.hash)});
+                        });
                     });
                     return $splitPanel;                
                 },
@@ -99,6 +123,7 @@ pandora.ui.sequencesDialog = function() {
                     pandora.UI.set({sequenceMode: data.selected});
                 }
             }),
+
         $dialog = Ox.Dialog({
             buttons: [
                 Ox.Button({
@@ -129,7 +154,26 @@ pandora.ui.sequencesDialog = function() {
             title: 'Similar Clips',
             width: dialogWidth
         }),
+
         $toolbar = $tabPanel.children('.OxBar'),
+
+        $clipButtons = Ox.ButtonGroup({
+                buttons: [
+                    {id: 'previous', title: 'left', disabled: true},
+                    {id: 'next', title: 'right', disabled: true}
+                ],
+                type: 'image'
+            })
+            .css({float: 'left', width: '32px', margin: '4px'})
+            .bindEvent({
+                click: function(data) {
+                    item.position = data.id == 'previous'
+                        ? sequence['in'] - 1 / fps : sequence.out;
+                    $tabPanel.reloadPanel();
+                }
+            })
+            .appendTo($toolbar),
+
         $orderButton = Ox.Button({
                 title: getTitle(),
                 tooltip: getTooltip(),
@@ -141,11 +185,12 @@ pandora.ui.sequencesDialog = function() {
                         key: pandora.user.ui.sequenceSort[0].key,
                         operator: pandora.user.ui.sequenceSort[0].operator == '+' ? '-' : '+'
                     }]});
-                    updateButton();
+                    updateOrderButton();
                 }
             })
             .css({float: 'right', margin: '4px 4px 4px 2px'})
             .appendTo($toolbar),
+
         $sortSelect = Ox.Select({
                 items: ['title', 'director', 'position', 'duration'].map(function(id) {
                     return {id: id, title: 'Sort by ' + Ox.toTitleCase(id)};
@@ -159,38 +204,119 @@ pandora.ui.sequencesDialog = function() {
                         key: key,
                         operator: pandora.getSortOperator(key)
                     }]});
-                    updateButton();
+                    updateOrderButton();
                 }
             })
             .css({float: 'right', margin: '4px 2px'})
             .appendTo($toolbar),
+
         $statusbar = $dialog.children('.OxButtonsbar'),
+
+        $image = $('<img>')
+            .attr({src: getImageURL()})
+            .css({
+                float: 'left',
+                width: '24px',
+                height: '16px',
+                borderRadius: '2px',
+                margin: '4px 4px 4px 8px',
+                boxShadow: '0 0 1px rgb(128, 128, 128)'
+            })
+            .appendTo($statusbar),
+
         $status = Ox.Element()
             .css({
-                margin: '6px 0 0 204px', // 4 + 128 + 4 + 64 + 4
+                float: 'left',
+                width: dialogWidth - 408 + 'px', // 2 * (4 + 128 + 4 + 64 + 4)
+                margin: '6px 0 0 168px', // 4 + 128 + 4 + 64 + 4 - 8 - 24 - 4
                 fontSize: '9px',
                 textAlign: 'center'
             })
+            .html('Loading...')
             .appendTo($statusbar);
 
-    $tabPanel.find('.OxButtonGroup').css({width: '256px'});
+    $($tabPanel.find('.OxButtonGroup')[0]).css({width: '256px'});
+
+    function changeClip(data) {
+        var split = data.ids[0].replace('-', '/').split('/');
+        item.id = split[0];
+        item.position = parseFloat(split[1]);
+        $tabPanel.reloadPanel();
+    }
+
+    function getImageURL(mode, hash) {
+        var canvas = $('<canvas>').attr({width: 8, height: 8})[0],
+            context = canvas.getContext('2d'),
+            imageData = context.getImageData(0, 0, 8, 8),
+            data = imageData.data;
+        if (mode == 'shape') {
+            Ox.loop(8, function(y) {
+                var value = parseInt(hash.substr(14 - y * 2, 2), 16);
+                Ox.loop(8, function(x) {
+                    var color = value & Math.pow(2, x) ? 255 : 0,
+                        index = y * 32 + x * 4;
+                    Ox.loop(3, function(i) {
+                        data[index + i] = color;
+                    });
+                    data[index + 3] = 255;
+                });
+            });
+        } else if (mode == 'color') {
+            Ox.loop(8, function(part) {
+                var x = part % 4 * 2,
+                    y = Math.floor(part / 4) * 4,
+                    value = parseInt(hash.substr(14 - part * 2, 2), 16),
+                    // RRRGGGBB
+                    color = [
+                        (value >> 5) * 32,
+                        (value >> 2 & 7) * 32,
+                        (value & 3) * 64
+                    ];
+                Ox.loop(4, function(dy) {
+                   Ox.loop(2, function(dx) {
+                       var index = (y + dy) * 32 + (x + dx) * 4;
+                       Ox.loop(3, function(i) {
+                           data[index + i] = color[i];
+                       });
+                       data[index + 3] = 255;
+                   });
+                });
+            });
+        }
+        context.putImageData(imageData, 0, 0);
+        return canvas.toDataURL();
+    }
+
+    function getItem(data, sort, size) {
+        var ratio = data.videoRatio,
+            width = ratio > fixedRatio ? size : Math.round(size * ratio / fixedRatio),
+            height = Math.round(width / ratio);
+        return {
+            height: height,
+            id: data.id,
+            info: Ox.formatDuration(data['in'], 2) + '-' + Ox.formatDuration(data.out, 2),
+            title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
+            url: '/' + data.id.split('/')[0] + '/' + height + 'p' + data['in'] + '.jpg',
+            width: width
+        };
+    }
 
     function getTitle() {
         return pandora.user.ui.sequenceSort[0].operator == '+' ? 'up' : 'down';
     }
+
     function getTooltip() {
         return pandora.user.ui.sequenceSort[0].operator == '+' ? 'Ascending' : 'Descending';
     }
+
     function openClip() {
         var selected = $list.options('selected')[0],
             split = selected.replace('-', '/').split('/'),
             item = split[0],
-            // FIXME: should be split[1] and split[2],
-            // but API currently returns 'id/mode/in-out'
-            inPoint = parseFloat(split[2]),
-            outPoint = parseFloat(split[3]),
+            inPoint = parseFloat(split[1]),
+            outPoint = parseFloat(split[2]),
             set = {
-                item: split[0],
+                item: item,
                 itemView: pandora.user.ui.videoView
             };
         set['videoPoints.' + split[0]] = {
@@ -202,7 +328,8 @@ pandora.ui.sequencesDialog = function() {
         $dialog.close();
         pandora.UI.set(set)
     }
-    function updateButton() {
+
+    function updateOrderButton() {
         $orderButton.options({
             title: getTitle(),
             tooltip: getTooltip()
