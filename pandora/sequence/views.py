@@ -113,11 +113,12 @@ def getSequence(request):
     '''
     data = json.loads(request.POST['data'])
     response = json_response()
+    position = float('%0.03f' % data['position'])
     qs = models.Sequence.objects.filter(
         item__itemId=data['id'],
         mode=data['mode'], 
-        start__lte=data['position'],
-        end__gt=data['position']
+        start__lte=position,
+        end__gt=position
     ).order_by('start', 'end')
     for sequence in qs:
         response['data'] = sequence.json()

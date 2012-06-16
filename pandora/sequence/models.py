@@ -34,7 +34,7 @@ class Sequence(models.Model):
     objects = managers.SequenceManager()
 
     def save(self, *args, **kwargs):
-        self.public_id = u"%s/%s-%s" % (
+        self.public_id = u"%s/%0.03f-%0.03f" % (
             self.item.itemId, float(self.start), float(self.end)
         )
         if self.item:
@@ -49,8 +49,8 @@ class Sequence(models.Model):
         j = {
             'id': self.public_id,
             'hash': self.hash,
-            'in': self.start,
-            'out': self.end,
+            'in': float('%0.03f' % self.start),
+            'out': float('%0.03f' % self.end),
         }
         if keys:
             for key in keys:

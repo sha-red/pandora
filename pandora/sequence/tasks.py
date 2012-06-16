@@ -27,8 +27,8 @@ def get_sequences(itemId):
                     s = models.Sequence()
                     s.item = i
                     s.mode = mode
-                    s.start = seq['in']
-                    s.end = seq['out']
+                    s.start = float('%0.03f' % seq['in'])
+                    s.end = float('%0.03f' % seq['out'])
                     s.hash = seq['hash']
                     s.save()
 
