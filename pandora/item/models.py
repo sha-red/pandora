@@ -40,7 +40,7 @@ import archive.models
 
 from person.models import get_name_sort
 from title.models import get_title_sort
-from sequence.task import get_sequences, update_sequence_ids
+from sequence.tasks import get_sequences, update_sequence_ids
 
 def get_id(info):
     q = Item.objects.all()
