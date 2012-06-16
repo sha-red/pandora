@@ -39,6 +39,7 @@ def order_query(qs, sort):
         key = {
             'in': 'start',
             'out': 'end',
+            'position': 'start',
         }.get(e['key'], e['key'])
         if key not in ('start', 'end', 'mode', 'hash'):
             key = 'sort__%s' % key
