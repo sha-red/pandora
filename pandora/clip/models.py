@@ -26,7 +26,7 @@ class MetaClip:
             self.volume = 0
   
     def save(self, *args, **kwargs):
-        self.public_id = u"%s/%s-%s" %(self.item.itemId, float(self.start), float(self.end))
+        self.public_id = u"%s/%0.03f-%0.03f" %(self.item.itemId, float(self.start), float(self.end))
         if self.duration != self.end - self.start:
             self.update_calculated_values()
         if not self.aspect_ratio and self.item:
@@ -89,7 +89,7 @@ class MetaClip:
     def get_or_create(cls, item, start, end):
         start = float(start)
         end = float(end)
-        public_id = u"%s/%s-%s" %(item.itemId, start, end)
+        public_id = u"%s/%0.03f-%0.03f" %(item.itemId, start, end)
         qs = cls.objects.filter(public_id=public_id)
         if qs.count() == 0:
             clip = Clip(item=item, start=start, end=end, public_id=public_id)
