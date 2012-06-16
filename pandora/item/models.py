@@ -1239,8 +1239,8 @@ class Item(models.Model):
                         annotation = Annotation(
                             item=self,
                             layer=layer,
-                            start=data['in'],
-                            end=data['out'],
+                            start=float('%0.03f'%data['in']),
+                            end=float('%0.03f'%data['out']),
                             value=value,
                             user=user
                         )
