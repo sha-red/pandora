@@ -70,6 +70,7 @@ def findSequences(request):
     query = parse_query(data, request.user)
     qs = query['qs']
     if 'keys' in data:
+        qs = order_query(qs, query['sort'])
         qs = qs[query['range'][0]:query['range'][1]]
         response['data']['items'] = [p.json(data['keys'], request.user) for p in qs]
     elif 'position' in query:
