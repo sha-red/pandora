@@ -276,13 +276,11 @@ pandora.enableDragAndDrop = function($list, canMove) {
                 if ($panel) {
                     title = $panel.children('.OxBar').children('.OxTitle')
                         .html().split(' ')[0].toLowerCase();
-                    // !pandora.user.ui.showFolder.items[title] && $bar.trigger('dblclick');
                     if (!pandora.user.ui.showFolder.items[title]) {
                         Ox.UI.elements[$panel.data('oxid')].options({collapsed: false});
                     }
                 }
                 if (!scrollInterval) {
-                    //Ox.Log('', 'AT TOP', isAtListsTop(event), 'AT BOTTOM', isAtListsBottom(event))
                     scroll = isAtListsTop(event) ? -16
                         : isAtListsBottom(event) ? 16 : 0
                     if (scroll) {
