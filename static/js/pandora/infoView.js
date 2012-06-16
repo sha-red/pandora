@@ -251,6 +251,7 @@ pandora.ui.infoView = function(data) {
     }
 
     // Summary -------------------------------------------------------------
+    $div = $('<div>').css(css).css('clear', 'both').appendTo($center);
 
     if (canEdit) {
         $('<div>')

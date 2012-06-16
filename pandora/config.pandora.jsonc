@@ -605,7 +605,7 @@
             "videoPoints": {},
             "videoResolution": 240,
             "videoScale": "fit",
-            "videoSize": "large",
+            "videoSize": "small",
             "videoTimeline": "antialias",
             "videoView": "player",
             "videoVolume": 1
