@@ -535,13 +535,9 @@
     "listViews": [
         {"id": "list", "title": "as List"},
         {"id": "grid", "title": "as Grid"},
-        //{"id": "info", "title": "with Info"},
         {"id": "timelines", "title": "with Timelines"},
         {"id": "clips", "title": "with Clips"},
-        //{"id": "maps", "title": "with Maps"},
-        //{"id": "calendars", "title": "with Calendars"},
         {"id": "clip", "title": "as Clips"},
-        //{"id": "video", "title": "as Video"},
         {"id": "map", "title": "on Map"},
         {"id": "calendar", "title": "on Calendar"}
     ],

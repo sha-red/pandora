@@ -432,7 +432,7 @@
             "id": "privatenotes",
             "title": "Private Notes",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
-            "item": "Note",
+            "item": "Private Note",
             "overlap": true,
             "private": true,
             "showInfo": true,
@@ -442,7 +442,7 @@
             "id": "publicnotes",
             "title": "Public Notes",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
-            "item": "Note",
+            "item": "Public Note",
             "overlap": true,
             "showInfo": true,
             "type": "text"
@@ -461,13 +461,9 @@
     "listViews": [
         {"id": "list", "title": "as List"},
         {"id": "grid", "title": "as Grid"},
-        //{"id": "info", "title": "with Info"},
         {"id": "timelines", "title": "with Timelines"},
         {"id": "clips", "title": "with Clips"},
-        //{"id": "maps", "title": "with Maps"},
-        //{"id": "calendars", "title": "with Calendars"},
         {"id": "clip", "title": "as Clips"},
-        //{"id": "video", "title": "as Video"},
         {"id": "map", "title": "on Map"},
         {"id": "calendar", "title": "on Calendar"}
     ],

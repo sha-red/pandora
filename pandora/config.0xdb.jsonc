@@ -582,7 +582,7 @@
             "id": "privatenotes",
             "title": "Private Notes",
             "canAddAnnotations": {"member": true, "friend": true, "staff": true, "admin": true},
-            "item": "Note",
+            "item": "Private Note",
             "overlap": true,
             "private": true,
             "showInfo": true,
@@ -592,7 +592,7 @@
             "id": "publicnotes",
             "title": "Public Notes",
             "canAddAnnotations": {"member": true, "friend": true, "staff": true, "admin": true},
-            "item": "Note",
+            "item": "Public Note",
             "overlap": true,
             "showInfo": true,
             "type": "text"
