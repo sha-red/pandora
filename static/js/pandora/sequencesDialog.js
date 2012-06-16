@@ -209,77 +209,83 @@ pandora.ui.sequencesDialog = function() {
                 position: item.position
             }, function(result) {
                 // result.data: {hash, id, in, out}
-                Ox.print('RD:::', result.data)
+                if (Ox.isEmpty(result.data)) {
+                    result.data['in'] = item.position;
+                    result.data.out = item.position + 1 / fps;
+                    result.data.id = item.id + '/'
+                        + Ox.formatNumber(result.data['in'], 3) + '-'
+                        + Ox.formatNumber(result.data.out, 3)
+                }
                 sequence = Ox.extend({}, item, result.data);
                 $clipButtons[sequence['in'] > 0 ? 'enableButton' : 'disableButton']('previous');
                 $clipButtons[sequence.out < item.duration ? 'enableButton' : 'disableButton']('next');
                 if (!$item) {
                     $item = Ox.IconList({
-                            fixedRatio: fixedRatio,
-                            item: getItem,
-                            /*
-                            items: [item],
-                            */
-                            ///*
-                            items: function(data, callback) {
-                                setTimeout(function() {
-                                    callback({
-                                        data: {items: data.keys ? [sequence] : 1},
-                                        status: {code: 200, text: 'ok'}
-                                    });
-                                }, 250);
-                            },
-                            //*/
-                            max: 0,
-                            orientation: 'both',
-                            size: 128,
-                            sort: [{key: 'id', operator: '+'}],
-                            unique: 'id'
-                        });
-                    $innerPanel.replaceElement(0, $item);
-                }
-                $list = Ox.IconList({
                         fixedRatio: fixedRatio,
                         item: getItem,
+                        /*
+                        items: [item],
+                        */
+                        ///*
                         items: function(data, callback) {
-                            pandora.api.findSequences(Ox.extend(data, {
-                                query: {
-                                    conditions: [
-                                        {key: 'id', value: sequence.id, operator: '!='},
-                                        {key: 'mode', value: pandora.user.ui.sequenceMode, operator: '=='},
-                                        {key: 'hash', value: sequence.hash, operator: '=='}
-                                    ],
-                                    operator: '&'
-                                }
-                            }), callback);
+                            setTimeout(function() {
+                                callback({
+                                    data: {items: data.keys ? [sequence] : 1},
+                                    status: {code: 200, text: 'ok'}
+                                });
+                            }, 250);
                         },
-                        keys: ['director', 'id', 'title', 'videoRatio'],
-                        max: 1,
+                        //*/
+                        max: 0,
                         orientation: 'both',
                         size: 128,
-                        sort: Ox.clone(pandora.user.ui.sequenceSort),
+                        sort: [{key: 'id', operator: '+'}],
                         unique: 'id'
-                    })
-                    .bindEvent({
-                        init: function(data) {
-                            $status.html(
-                                Ox.formatNumber(data.items) + ' Clip'
-                                + (data.items == 1 ? '' : 's')
-                            );
-                        },
-                        open: changeClip,
-                        select: function(data) {
-                            $dialog[
-                                data.ids.length ? 'enableButton' : 'disableButton'
-                            ]('open');
-                        },
-                        pandora_sequencesort: function(data) {
-                            Ox.print('SEQUENCESORT:', data)
-                            $list.options({sort: data.value});
-                        }
                     });
+                    $innerPanel.replaceElement(0, $item);
+                }
+                if (sequence.hash) {
+                    $list = Ox.IconList({
+                            fixedRatio: fixedRatio,
+                            item: getItem,
+                            items: function(data, callback) {
+                                pandora.api.findSequences(Ox.extend(data, {
+                                    query: {
+                                        conditions: [
+                                            {key: 'id', value: sequence.id, operator: '!='},
+                                            {key: 'mode', value: pandora.user.ui.sequenceMode, operator: '=='},
+                                            {key: 'hash', value: sequence.hash, operator: '=='}
+                                        ],
+                                        operator: '&'
+                                    }
+                                }), callback);
+                            },
+                            keys: ['director', 'id', 'title', 'videoRatio'],
+                            max: 1,
+                            orientation: 'both',
+                            size: 128,
+                            sort: Ox.clone(pandora.user.ui.sequenceSort),
+                            unique: 'id'
+                        })
+                        .bindEvent({
+                            init: function(data) {
+                                $status.html(
+                                    Ox.formatNumber(data.items) + ' Clip'
+                                    + (data.items == 1 ? '' : 's')
+                                );
+                            },
+                            open: changeClip,
+                            select: function(data) {
+                                $dialog[
+                                    data.ids.length ? 'enableButton' : 'disableButton'
+                                ]('open');
+                            }
+                        });
+                } else {
+                    $list = Ox.Element();
+                    $status.html('0 Clips');
+                }
                 $innerPanel.replaceElement(1, $list);
-                Ox.print('SEQUENCE::', sequence)
                 $image.attr({src: getImageURL(sequence.hash)});
             });
         });
