@@ -20,7 +20,7 @@ pandora.ui.mainMenu = function() {
                             { id: 'home', title: 'Home' },
                             {}
                         ],
-                        pandora.site.sitePages,
+                        Ox.clone(pandora.site.sitePages, true),
                         [
                             {},
                             { id: 'software', title: 'Software' }
