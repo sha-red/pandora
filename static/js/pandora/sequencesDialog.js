@@ -83,7 +83,7 @@ pandora.ui.sequencesDialog = function() {
                                     max: 1,
                                     orientation: 'both',
                                     size: 128,
-                                    sort: pandora.user.ui.sequenceSort,
+                                    sort: Ox.clone(pandora.user.ui.sequenceSort),
                                     unique: 'id'
                                 })
                                 .bindEvent({
@@ -104,6 +104,7 @@ pandora.ui.sequencesDialog = function() {
                                         $list.options({sort: data.value});
                                     }
                                 });
+                            Ox.print('SEQUENCE::', sequence)
                             $clipButtons[sequence['in'] > 0 ? 'enableButton' : 'disableButton']('previous');
                             $clipButtons[sequence.out < item.duration ? 'enableButton' : 'disableButton']('next');
                             $splitPanel.replaceElement(0, $item);
@@ -169,6 +170,7 @@ pandora.ui.sequencesDialog = function() {
                 click: function(data) {
                     item.position = data.id == 'previous'
                         ? sequence['in'] - 1 / fps : sequence.out;
+                    $status.html('Loading...');
                     $tabPanel.reloadPanel();
                 }
             })
@@ -186,6 +188,7 @@ pandora.ui.sequencesDialog = function() {
                         operator: pandora.user.ui.sequenceSort[0].operator == '+' ? '-' : '+'
                     }]});
                     updateOrderButton();
+                    $list.options({sort: pandora.user.ui.sequenceSort});
                 }
             })
             .css({float: 'right', margin: '4px 4px 4px 2px'})
@@ -193,8 +196,12 @@ pandora.ui.sequencesDialog = function() {
 
         $sortSelect = Ox.Select({
                 items: ['title', 'director', 'position', 'duration'].map(function(id) {
-                    return {id: id, title: 'Sort by ' + Ox.toTitleCase(id)};
+                    return {
+                        id: id,
+                        title: 'Sort by ' + Ox.toTitleCase(id)
+                    };
                 }),
+                value: pandora.user.ui.sequenceSort[0].key,
                 width: 128
             })
             .bindEvent({
@@ -205,6 +212,7 @@ pandora.ui.sequencesDialog = function() {
                         operator: pandora.getSortOperator(key)
                     }]});
                     updateOrderButton();
+                    $list.options({sort: pandora.user.ui.sequenceSort});
                 }
             })
             .css({float: 'right', margin: '4px 2px'})
@@ -241,6 +249,7 @@ pandora.ui.sequencesDialog = function() {
         var split = data.ids[0].replace('-', '/').split('/');
         item.id = split[0];
         item.position = parseFloat(split[1]);
+        $status.html('Loading...');
         $tabPanel.reloadPanel();
     }
 
