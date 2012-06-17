@@ -193,12 +193,12 @@ appPanel
         var prefix = '/static/';
         if (debug) {
             Ox.getJSON(prefix + 'json/pandora.json?' + Ox.random(1000), function(files) {
-                Ox.loadFile(files.map(function(file) {
+                Ox.getFile(files.map(function(file) {
                     return prefix + file;
                 }), callback);
             });
         } else {
-            Ox.loadFile(prefix + 'js/pandora.min.js', callback);
+            Ox.getFile(prefix + 'js/pandora.min.js', callback);
         }
     }
 
@@ -343,7 +343,7 @@ appPanel
                 return Ox.PATH + 'Ox.UI/png/browser' + browser.name.replace(' ', '') + '128.png';
             }),
             $loadingScreen = $('#loadingScreen');
-        Ox.loadFile(images, function() {
+        Ox.getFile(images, function() {
             var html = pandora.site.site.name
                     + ' requires an up-to-date web browser. Please take a moment to '
                     + (
