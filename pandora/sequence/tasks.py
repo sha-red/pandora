@@ -42,11 +42,11 @@ def get_sequences(itemId):
                 v = ', '.join([isinstance(v, basestring) and "'%s'"%v or str(v)
                                for v in sequence.values()])
                 values.append('(%s)'%v)
-
-        cursor = connection.cursor()
-        sql = "INSERT INTO sequence_sequence (%s) VALUES %s" % (keys, ', '.join(values));
-        cursor.execute(sql)
-        transaction.commit_unless_managed()
+        if values:
+            cursor = connection.cursor()
+            sql = "INSERT INTO sequence_sequence (%s) VALUES %s" % (keys, ', '.join(values));
+            cursor.execute(sql)
+            transaction.commit_unless_managed()
 
 @task(ignore_results=True, queue='encoding')
 def update_sequence_ids(itemId):
