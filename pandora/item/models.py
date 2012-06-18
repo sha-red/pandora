@@ -603,11 +603,11 @@ class Item(models.Model):
                         save(i, self.user.username)
                 elif key['id'] == 'annotations':
                     qs = Annotation.objects.filter(item=self)
-                    qs = qs.filter(layer__in=Annotation.public_layers())
+                    qs = qs.filter(layer__in=Annotation.public_layers()).exclude(findvalue=None)
                     qs = qs.order_by('start')
                     save(i, u'\n'.join([l.findvalue for l in qs]))
                 elif key['type'] == 'layer':
-                    qs = Annotation.objects.filter(item=self)
+                    qs = Annotation.objects.filter(item=self).exclude(findvalue=None)
                     qs = qs.filter(layer=i)
                     qs = qs.order_by('start')
                     save(i, u'\n'.join(filter(None, [l.findvalue for l in qs])))
