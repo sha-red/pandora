@@ -3,11 +3,11 @@
 
 pandora.ui.uploadDialog = function(data) {
 
-    var actionButton,
-        cancelled = false,
-        closeButton,
+    var cancelled = false,
         file,
         selectFile,
+        $actionButton,
+        $closeButton,
         $content = Ox.Element().css({margin: '16px'}),
         $info = $('<div>').css({padding: '4px'})
             .html('Please select the video file you want to upload.'),
@@ -15,7 +15,7 @@ pandora.ui.uploadDialog = function(data) {
         $status = $('<div>').css({padding: '4px', paddingTop: '8px'}),
         that = Ox.Dialog({
             buttons: [
-                closeButton = Ox.Button({
+                $closeButton = Ox.Button({
                     id: 'close',
                     title: 'Close'
                 }).bindEvent({
@@ -23,26 +23,24 @@ pandora.ui.uploadDialog = function(data) {
                         that.triggerEvent('close');
                     }
                 }),
-                actionButton = Ox.Button({
+                $actionButton = Ox.Button({
                     id: 'action',
                     title: 'Select Video'
                 }).bindEvent({
                     click: function() {
-                        if (actionButton.options('title') == 'Select Video') {
+                        if ($actionButton.options('title') == 'Select Video') {
                             if (selectVideo()) {
-                                actionButton.options('title', 'Upload');
+                                $actionButton.options('title', 'Upload');
                             }
-                        } else if (actionButton.options('title') == 'Close') {
-                            that.close();
-                        } else if (actionButton.options('title') == 'Cancel') {
+                        } else if ($actionButton.options('title') == 'Cancel') {
                             cancelled = true;
                             pandora.firefogg && pandora.firefogg.cancel();
                             pandora.$ui.upload && pandora.$ui.upload.abort();
-                            actionButton.options('title', 'Select Video');
-                            closeButton.show();
+                            $actionButton.options('title', 'Select Video');
+                            $closeButton.show();
                         } else {
-                            actionButton.options('title', 'Cancel');
-                            closeButton.hide();
+                            $actionButton.options('title', 'Cancel');
+                            $closeButton.hide();
                             encode();
                         }
                     }
@@ -97,14 +95,14 @@ pandora.ui.uploadDialog = function(data) {
             })
             .appendTo($content);
         */
-        actionButton.options({title: 'Close'});
-        $info.css({paddingTop: '16px', paddingBottom: '16px'}).html(
+        $info.html(
             'Currently, video upload is only supported in '
-            + '<a target="_new" href="http://mozilla.org/firefox/">Firefox</a> with '
+            + '<a target="_new" href="http://mozilla.org/firefox/">Firefox</a>, with '
             + '<a target="_new" href="http://firefogg.org/">Firefogg</a> installed.<br><br>'
             + 'Alternatively, you can use '
             + '<a target="_new" href="https://wiki.0x2620.org/wiki/pandora_client">pandora_client</a>.'
         );
+        $actionButton.hide();
     }
     $content.append($info);
     $content.append($status);
