@@ -23,7 +23,6 @@ def parseCondition(condition, user):
     k = condition.get('key', 'name')
     k = {
         'event': 'annotations__events__id',
-        'id': 'public_id',
         'in': 'start',
         'out': 'end',
         'place': 'annotations__places__id',
@@ -53,14 +52,17 @@ def parseCondition(condition, user):
     if op == '-':
         q = parseCondition({'key': k, 'value': v[0], 'operator': '>='}, user) \
             & parseCondition({'key': k, 'value': v[1], 'operator': '<'}, user)
-        if exclude:
-            return ~q
-        else:
-            return q
+        return exclude and ~q or q
     if (not exclude and op == '=' or op in ('$', '^', '>=', '<')) and v == '':
         return Q()
 
-    if k.endswith('__id'):
+    if k == 'id':
+        itemId, points = v.split('/')
+        points = [float('%0.03f'%float(p)) for p in points.split('-')]
+        q = Q(item__itemId=itemId, start=points[0], end=points[1])
+        return exclude and ~q or q
+
+    elif k.endswith('__id'):
         v = decode_id(v)
     if isinstance(v, bool): #featured and public flag
         key = k

@@ -19,10 +19,9 @@ from django.db import models
 
 class Sequence(models.Model):
     class Meta:
-        unique_together = ("public_id", "mode")
+        unique_together = ("item", "start", "end", "mode")
 
     mode = models.CharField(max_length=128)
-    public_id = models.CharField(max_length=128)
     item = models.ForeignKey(Item, null=True, related_name='sequences')
     sort = models.ForeignKey(ItemSort, null=True, related_name='sequences')
     user = models.IntegerField(db_index=True, null=True)
@@ -35,14 +34,15 @@ class Sequence(models.Model):
     objects = managers.SequenceManager()
 
     def save(self, *args, **kwargs):
-        self.public_id = u"%s/%0.03f-%0.03f" % (
-            self.item.itemId, float(self.start), float(self.end)
-        )
         self.duration = self.end - self.start
         if self.item:
             self.user = self.item.user and self.item.user.id
             self.sort = self.item.sort
         super(Sequence, self).save(*args, **kwargs)
+
+    @property
+    def public_id(self):
+        return u"%s/%0.03f-%0.03f" % (self.item.itemId, float(self.start), float(self.end))
 
     def __unicode__(self):
         return self.public_id

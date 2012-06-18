@@ -26,7 +26,6 @@ class MetaClip:
             self.volume = 0
   
     def save(self, *args, **kwargs):
-        self.public_id = u"%s/%0.03f-%0.03f" %(self.item.itemId, float(self.start), float(self.end))
         if self.duration != self.end - self.start:
             self.update_calculated_values()
         if not self.aspect_ratio and self.item:
@@ -89,16 +88,21 @@ class MetaClip:
     def get_or_create(cls, item, start, end):
         start = float(start)
         end = float(end)
-        public_id = u"%s/%0.03f-%0.03f" %(item.itemId, start, end)
-        qs = cls.objects.filter(public_id=public_id)
+        start = float('%0.03f' % start)
+        end = float('%0.03f' % end)
+        qs = cls.objects.filter(item=item, start=start, end=end)
         if qs.count() == 0:
-            clip = Clip(item=item, start=start, end=end, public_id=public_id)
+            clip = Clip(item=item, start=start, end=end)
             clip.save()
             created = True
         else:
             clip = qs[0]
             created = False
         return clip, created
+
+    @property
+    def public_id(self):
+        return u"%s/%0.03f-%0.03f" %(self.item.itemId, float(self.start), float(self.end))
 
     def __unicode__(self):
         return self.public_id
@@ -112,7 +116,6 @@ attrs = {
     'objects': managers.ClipManager(),
     'created': models.DateTimeField(auto_now_add=True),
     'modified': models.DateTimeField(auto_now=True),
-    'public_id': models.CharField(max_length=128, unique=True),
     'aspect_ratio': models.FloatField(default=0),
 
     'item': models.ForeignKey('item.Item', related_name='clips'),

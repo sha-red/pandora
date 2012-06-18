@@ -60,8 +60,13 @@ def order_query(qs, sort):
         elif key not in clip_keys:
             #key mgith need to be changed, see order_sort in item/views.py
             key = "sort__%s" % key
-        order = '%s%s' % (operator, key)
-        order_by.append(order)
+        if key == 'public_id':
+            order_by.append('%s%s' % (operator, 'sort__itemId'))
+            order_by.append('%s%s' % (operator, 'start'))
+            order_by.append('end')
+        else:
+            order = '%s%s' % (operator, key)
+            order_by.append(order)
     if order_by:
         qs = qs.order_by(*order_by, nulls_last=True)
     return qs
@@ -102,15 +107,19 @@ def findClips(request):
         response['data']['items'] = [add(p) for p in qs]
         keys = data['keys']
 
+        def clip_public_id(c):
+            return u'%s/%0.03f-%0.03f' % (c['public_id'].split('/')[0], c['clip__start'], c['clip__end'])
+
         def add_annotations(key, qs, add_layer=False):
-            values = ['public_id', 'value', 'clip__public_id']
+            values = ['public_id', 'value', 'clip__start', 'clip__end']
             if add_layer:
                 values.append('layer')
             if query['filter']:
                 qs = qs.filter(query['filter'])
             for a in qs.values(*values):
+                public_id = clip_public_id(a)
                 for i in response['data']['items']:
-                    if i['id'] == a['clip__public_id']:
+                    if i['id'] == public_id:
                         if not key in i:
                             i[key] = []
                         l = {
@@ -130,7 +139,8 @@ def findClips(request):
                 add_annotations(layer, aqs)
     elif 'position' in query:
         qs = order_query(qs, query['sort'])
-        ids = [i['public_id'] for i in qs.values('public_id')]
+        ids = [u'%s/%0.03f-%0.03f' % (c['item__itemId'], c['start'], c['end'])
+            for c in qs.values('item__itemId', 'start', 'end')]
         data['conditions'] = data['conditions'] + {
             'value': data['position'],
             'key': query['sort'][0]['key'],
@@ -142,7 +152,8 @@ def findClips(request):
             response['data']['position'] = utils.get_positions(ids, [qs[0].itemId])[0]
     elif 'positions' in data:
         qs = order_query(qs, query['sort'])
-        ids = [i['public_id'] for i in qs.values('public_id')]
+        ids = [u'%s/%0.03f-%0.03f' % (c['item__itemId'], c['start'], c['end'])
+            for c in qs.values('item__itemId', 'start', 'end')]
         response['data']['positions'] = utils.get_positions(ids, data['positions'])
     else:
         response['data']['items'] = qs.count()

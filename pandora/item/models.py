@@ -40,7 +40,7 @@ import archive.models
 
 from person.models import get_name_sort
 from title.models import get_title_sort
-from sequence.tasks import get_sequences, update_sequence_ids
+from sequence.tasks import get_sequences
 
 def get_id(info):
     q = Item.objects.all()
@@ -367,9 +367,8 @@ class Item(models.Model):
             for c in self.clips.all(): c.save()
             for a in self.annotations.all():
                 public_id = a.public_id.split('/')[1]
-                a.public_id = "%s/%s" % ( self.itemId, public_id)
+                a.public_id = "%s/%s" % (self.itemId, public_id)
                 a.save()
-            update_sequence_ids.delay(self.itemId)
         if update_poster:
             return tasks.update_poster.delay(self.itemId)
 

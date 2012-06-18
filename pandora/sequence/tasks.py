@@ -33,9 +33,6 @@ def get_sequences(itemId):
                     'end': float('%0.03f' % s['out']),
                     'hash': s['hash']
                 }
-                sequence['public_id'] = u"%s/%0.03f-%0.03f" % (
-                    i.itemId, sequence['start'], sequence['end']
-                )
                 sequence['duration'] = sequence['end'] - sequence['start']
                 if not keys:
                     keys = ', '.join(['"%s"'%k for k in sequence.keys()])
@@ -48,7 +45,3 @@ def get_sequences(itemId):
             cursor.execute(sql)
             transaction.commit_unless_managed()
 
-@task(ignore_results=True, queue='encoding')
-def update_sequence_ids(itemId):
-    for s in models.Sequence.objects.filter(item__itemId=itemId):
-        s.save()
