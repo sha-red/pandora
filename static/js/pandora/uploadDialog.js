@@ -67,7 +67,7 @@ pandora.ui.uploadDialog = function(data) {
     // FIXME: is this necessary?
     pandora._status = $status;
     pandora._info = $info;
-    if (Ox.isUndefined(Firefogg)) {
+    if (typeof Firefogg == 'undefined') {
         /*
         selectFile = $('<input>')
             .attr({
