@@ -66,12 +66,12 @@
         text of clips. Excluding a layer from this list means it will not be
         included in find annotations. // FIXME: the last bit is not implemented.
     */
-    "clipLayers": ["transcripts", "keywords", "places", "events", "descriptions"],
+    "clipLayers": ["publicnotes", "keywords", "subtitles"],
     // fixme: either this, or filter: true in itemKeys, but not both
     "filters": [
         {"id": "director", "title": "Director", "type": "string"},
         {"id": "country", "title": "Country", "type": "string"},
-        {"id": "year", "title": "Year", "type": "string"},
+        {"id": "year", "title": "Year", "type": "integer"},
         {"id": "language", "title": "Languages", "type": "string"},
         {"id": "featuring", "title": "Featuring", "type": "string"},
         {"id": "keywords", "title": "Keywords", "type": "string"}
@@ -119,7 +119,7 @@
         },
         {
             "id": "name",
-            "title": "People",
+            "title": "Name",
             "type": ["string"],
             "autocomplete": true,
             "find": true
@@ -168,8 +168,12 @@
         {
             "id": "year",
             "title": "Year",
-            "type": "string",
-            "columnWidth": 120,
+            "type": "year",
+            "additionalSort": [{"key": "director", "operator": "+"}, {"key": "title", "operator": "+"}],
+            "autocomplete": true,
+            "columnWidth": 60,
+            "filter": true,
+            "find": true,
             "sort": true
         },
         {
@@ -199,7 +203,7 @@
         },
         {
             "id": "publicnotes",
-            "title": "Public Notes",
+            "title": "Notes",
             "type": "layer",
             "find": true
         },
@@ -345,13 +349,6 @@
             "find": true
         },
         {
-            "id": "filename",
-            "title": "Filename",
-            "type": ["string"],
-            "capability": "canSeeFiles",
-            "find": true
-        },
-        {
             "id": "created",
             "title": "Date Created",
             "type": "date",
@@ -440,7 +437,7 @@
         },
         {
             "id": "publicnotes",
-            "title": "Public Notes",
+            "title": "Notes",
             "canAddAnnotations": {"member": true, "staff": true, "admin": true},
             "item": "Public Note",
             "overlap": true,
@@ -482,7 +479,7 @@
     ],
     "sendReferrer": true,
     "site": {
-        "description": "pan.do/ra is a free, open source media archive. It allows you to manage large, decentralized collections of video, to collaboratively create metadata and time-based annotations, and to serve your archive as a cutting-edge web application.",
+        "description": "This is a demp of pan.do/ra a free, open source media archive. It allows you to manage large, decentralized collections of video, to collaboratively create metadata and time-based annotations, and to serve your archive as a cutting-edge web application.",
         "email": {
             // E-mail address in contact form (to)
             "contact": "system@pandora.local",
@@ -492,7 +489,7 @@
             "system": "system@pandora.local"
         },
         "id": "pandora",
-        "name": "pan.do/ra",
+        "name": "Demo",
         "url": "pandora.local",
         "videoprefix": ""
     },
@@ -527,7 +524,7 @@
             "annotationsCalendarSize": 128,
             "annotationsFont": "small",
             "annotationsMapSize": 128,
-            "annotationsRange": "position",
+            "annotationsRange": "all",
             "annotationsSize": 256,
             "annotationsSort": "position",
             "clipsColumns": 2,
@@ -538,16 +535,16 @@
                 }
             },
             "filters": [
-                {"id": "director", "sort": [{"key": "name", "operator": "+"}]},
-                {"id": "country", "sort": [{"key": "name", "operator": "+"}]},
+                {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "country", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "year", "sort": [{"key": "name", "operator": "-"}]},
-                {"id": "featuring", "sort": [{"key": "name", "operator": "+"}]},
+                {"id": "featuring", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "keywords", "sort": [{"key": "items", "operator": "-"}]}
             ],
             "filtersSize": 176,
             "find": {"conditions": [], "operator": "&"},
             "followPlayer": true,
-            "icons": "frames",
+            "icons": "posters",
             "infoIconSize": 256,
             "item": "",
             "itemFind": "",
@@ -576,11 +573,10 @@
             "showIconBrowser": false,
             "showInfo": true,
             "showLayers": {
-                "places": false,
-                "events": false,
                 "keywords": true,
-                "descriptions": true,
-                "transcripts": true
+                "privatenotes": true,
+                "publicnotes": true,
+                "subtitles": true
             },
             "showMapControls": false,
             "showMapLabels": false,
