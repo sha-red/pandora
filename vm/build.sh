@@ -42,7 +42,6 @@ sudo  vmbuilder vbox ubuntu --suite=precise \
     --addpkg oxframe \
     --addpkg ffmpeg \
     --addpkg ffmpeg2theora \
-    --addpkg mkvtoolnix \
     --execscript=$base/install.sh \
     --firstboot=$base/firstboot.sh
 
