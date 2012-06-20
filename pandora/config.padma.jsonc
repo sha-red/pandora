@@ -582,8 +582,8 @@
     "timelines": [
         {"id": "antialias", "title": "Anti-Alias"},
         {"id": "slitscan", "title": "Slit-Scan"},
-        {"id": "keyframes", "title": "Key Frames"},
-        {"id": "audio", "title": "Audio"}
+        {"id": "keyframes", "title": "Keyframes"},
+        {"id": "audio", "title": "Waveform"}
     ],
     "totals": [
         {"id": "items"},
