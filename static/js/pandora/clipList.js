@@ -93,10 +93,10 @@ pandora.ui.clipList = function(videoRatio) {
                         operator: '&'
                     };
                 }
-                pandora.api.findClips(Ox.extend({
+                pandora.api.findClips(Ox.extend(data, {
                     itemsQuery: itemsQuery,
                     query: query
-                }, data), callback);
+                }), callback);
             },
             keys: ['annotations', 'id', 'in', 'out'].concat(
                 !ui.item ? ['videoRatio'] : []
