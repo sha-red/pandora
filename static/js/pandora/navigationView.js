@@ -209,13 +209,13 @@ pandora.ui.navigationView = function(type, videoRatio) {
                             operator: '&'
                         };
                     }
-                    return pandora.api.findClips(Ox.extend({
+                    return pandora.api.findClips(Ox.extend(data, {
                         itemsQuery: itemsQuery,
                         query: {
                             conditions: [{key: itemName, value: id, operator:'=='}],
                             operator: '&'
                         }
-                    }, data), callback);
+                    }), callback);
                 }
             });
             type == 'map' && pandora.UI.set({mapSelection: data.name});
