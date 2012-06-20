@@ -23,11 +23,7 @@ pandora.ui.titlesDialog = function() {
                             operator: '|'
                         };
                     $list.options({
-                        items: function(data, callback) {
-                            return pandora.api.findTitles(Ox.extend(data, {
-                                query: query
-                            }), callback);
-                        }
+                        query: query
                     });
                 }
             }),

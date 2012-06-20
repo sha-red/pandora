@@ -25,11 +25,7 @@ pandora.ui.namesDialog = function() {
                             operator: '|'
                         };
                     $list.options({
-                        items: function(data, callback) {
-                            return pandora.api.findNames(Ox.extend(data, {
-                                query: query
-                            }), callback);
-                        }
+                        query: query,
                     });
                 }
             }),

@@ -360,16 +360,13 @@ pandora.ui.usersDialog = function() {
                 ],
                 columnsRemovable: true,
                 columnsVisible: true,
-                items: function(data, callback) {
-                    pandora.api.findUsers(Ox.extend(data, {
-                        query: {
-                            conditions: [
-                                {key: 'level', value: 'guest', operator: '!='},
-                                {key: 'level', value: 'robot', operator: '!='}
-                            ],
-                            operator: '&'
-                        }
-                    }), callback);
+                items: pandora.api.findUsers,
+                query: {
+                    conditions: [
+                        {key: 'level', value: 'guest', operator: '!='},
+                        {key: 'level', value: 'robot', operator: '!='}
+                    ],
+                    operator: '&'
                 },
                 keys: ['notes', 'groups'],
                 max: -1,
@@ -976,11 +973,7 @@ pandora.ui.usersDialog = function() {
                 operator: key == 'all' && value ? '|' : '&'
             };
         $list.options({
-            items: function(data, callback) {
-                return pandora.api.findUsers(Ox.extend(data, {
-                    query: query
-                }), callback);
-            }
+            query: query
         });
     }
 
