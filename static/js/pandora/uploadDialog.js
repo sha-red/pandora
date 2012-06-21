@@ -169,6 +169,7 @@ pandora.ui.uploadDialog = function(data) {
                                     $progress.options({progress: 0.5 + progress / 2});
                                 },
                                 done: function(data) {
+                                    Ox.Request.clearCache();
                                     pandora.UI.set({
                                         item: item,
                                         itemView: 'files'
