@@ -9,8 +9,8 @@ pandora.ui.news = function(width, height) {
         $right = $('<div>')
             .css({position: 'absolute', top: '16px', right: '16px', width: '192px'})
             .appendTo(that),
-        color = Ox.Theme() == 'classic'
-            ? 'rgb(32, 32, 32)' : 'rgb(224, 224, 224)',        
+        backgroundColor = Ox.Theme() == 'classic'
+            ? 'rgb(224, 224, 224)' : 'rgb(32, 32, 32)',        
         isEditable = pandora.site.capabilities.canEditSitePages[pandora.user.level],
         items = [],
         selected,
@@ -166,7 +166,7 @@ pandora.ui.news = function(width, height) {
                     padding: '4px 8px 5px 8px',
                     borderRadius: '8px',
                     margin: '2px',
-                    boxShadow: item.id == selected ? '0 0 2px ' + color : '',
+                    backgroundColor: item.id == selected ? backgroundColor : '',
                     cursor: 'pointer'
                 })
                 .html(
@@ -178,8 +178,8 @@ pandora.ui.news = function(width, height) {
                 .bindEvent({
                     anyclick: function() {
                         selected = item.id;
-                        $('.item').css({boxShadow: 'none'});
-                        this.css({boxShadow: '0 0 2px ' + color});
+                        $('.item').css({backgroundColor: 'transparent'});
+                        this.css({backgroundColor: backgroundColor});
                         renderItem();
                     }
                 })
