@@ -19,6 +19,16 @@ _win = (sys.platform == "win32")
 
 RUN_RELOADER = True
 
+def get_version():
+    info = os.path.join(os.path.dirname(__file__), '..', '..', '.bzr/branch/last-revision')
+    if os.path.exists(info):
+        f = open(info)
+        rev = int(f.read().split()[0])
+        f.close()
+        if rev:
+            return u'%s' % rev
+    return u'unknown'
+
 def load_config():
     with open(settings.SITE_CONFIG) as f:
         try:
@@ -33,6 +43,7 @@ def load_config():
         settings.DEFAULT_FROM_EMAIL = config['site']['email']['system']
         settings.SERVER_EMAIL = config['site']['email']['system']
         config['site']['videoprefix'] = settings.VIDEO_PREFIX
+        config['site']['version'] = get_version()
 
         config['keys'] = {}
         for key in config['itemKeys']:

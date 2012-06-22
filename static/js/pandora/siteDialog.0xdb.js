@@ -28,6 +28,7 @@ pandora.ui.siteDialog = function(section) {
                             + '<p>To learn more about <b>pan.do/ra</b> and <b>OxJS</b>, '
                             + 'please visit <a href="https://pan.do/ra">pan.do/ra</a> '
                             + 'and <a href="https://oxjs.org">oxjs.org</a>.</p>'
+                            + '<b>' + pandora.site.site.name + '</b> is running pan.do/ra r'+ pandora.site.site.version 
                         )
                         .appendTo($content);
                 } else {
