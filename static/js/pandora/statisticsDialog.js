@@ -269,9 +269,9 @@ pandora.ui.statisticsDialog = function() {
                                         var split = value.split('-'),
                                             color = isYearOrMonth ? Ox.rgb(
                                                     Ox.mod(8 - parseInt(split[1], 10), 12) * 30, 1, 0.5
-                                                ).map(Math.round) : Ox.rgb(
+                                                ) : Ox.rgb(
                                                     (Math.abs(11.5 - parseInt(split[0], 10)) - 0.5) * -11, 1, 0.5
-                                                ).map(Math.round);
+                                                );
                                         if (pandora.user.ui.theme == 'classic') {
                                             color = color.map(function(c) {
                                                 return c - 64;
