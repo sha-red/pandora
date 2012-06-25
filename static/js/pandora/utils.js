@@ -529,8 +529,11 @@ pandora.getClipsQuery = function() {
 }());
 
 pandora.getFilterSizes = function() {
-    return Ox.divideInt(
-        window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1, 5
+    return Ox.splitInt(
+        window.innerWidth
+        - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize
+        - 1,
+        5
     );
 };
 

@@ -2,7 +2,7 @@
 
 'use strict';
 
-// fixme: remove
+// FIXME: remove
 
 pandora.ui.homePage = function() {
 
@@ -66,7 +66,7 @@ pandora.ui.homePage = function() {
             .appendTo($center);
 
     that.resize = function() {
-        var size = Ox.divideInt(window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1 - 64, 3);
+        var size = Ox.splitInt(window.innerWidth - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1 - 64, 3);
         $left.css({width: size[0] + 'px'});
         $center.css({width: size[1] + 'px'});
         $logo.css({width: size[1] + 'px'});
