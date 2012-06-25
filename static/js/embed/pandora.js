@@ -77,7 +77,7 @@ Ox.load('UI', {
                 videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
             });
             var options = parseQuery();
-            if (options.view == 'video') {
+            if (['video', 'player'].indexOf(options.view) > -1) {
                 pandora.ui.info = pandora.clip(options)
                     .css({width: '100%', height: '100%'})
                     .appendTo(document.body);

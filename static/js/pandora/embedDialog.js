@@ -32,7 +32,7 @@ pandora.ui.embedDialog = function(data) {
             }
         });
 
-    data.view = 'video';
+    data.view = 'player';
 
     content.html('To embed this video use this code on your page:<br>');
     content.append(
