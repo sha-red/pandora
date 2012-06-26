@@ -316,8 +316,7 @@ class Item(models.Model):
         #this does not work if another item without imdbid has the same metadata
         oxdbId = self.oxdb_id()
         if not settings.USE_IMDB:
-            update_poster = self.oxdbId != oxdbId
-            self.oxdbId = oxdbId
+            self.oxdbId = None
         elif oxdbId:
             if self.oxdbId != oxdbId:
                 q = Item.objects.filter(oxdbId=oxdbId).exclude(id=self.id)
