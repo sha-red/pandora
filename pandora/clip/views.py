@@ -74,8 +74,19 @@ def order_query(qs, sort):
 def findClips(request):
     '''
         param data {
-            query: ...
-            itemsQuery: ...
+            query: {
+                conditions: [],
+                operator: '&'
+            },
+            itemsQuery: {
+                conditions: [],
+                operator: '&'
+            },
+            keys: [],
+            position: int,
+            positions: [],
+            range: [in, out],
+            sort: []
         }
 
         return {
