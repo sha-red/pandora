@@ -4,7 +4,6 @@ import os
 
 from django.conf.urls.defaults import *
 from ox.django.http import HttpFileResponse
-from django.views.generic.simple import redirect_to
 
 from django.conf import settings
 
@@ -60,6 +59,3 @@ urlpatterns += patterns('',
     (r'^.*$', 'app.views.index'),
 )
 
-urlpatterns += patterns('django.views.generic.simple',
-    ('^ra$', 'redirect_to', {'url': '/'}),
-)
