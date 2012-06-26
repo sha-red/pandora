@@ -8,78 +8,133 @@ Ox.load('UI', {
     showScreen: true,
     theme: 'modern'
 }, function() {
+    var videoKeys = [ 'duration', 'layers', 'parts', 'posterFrame', 'rightslevel', 'size', 'title', 'videoRatio' ];
     window.pandora = new Ox.App({url: '/api/'}).bindEvent({
         load: function(data) {
             Ox.extend(pandora, {
                 site: data.site,
                 user: data.user.level == 'guest' ? Ox.clone(data.site.user) : data.user,
-                ui: {},
-                clip: function(options) {
-                    var that = Ox.Element(),
-                        keys = [ 'duration', 'layers', 'parts', 'posterFrame', 'rightslevel', 'size', 'title', 'videoRatio' ];
-                    pandora.user.ui.item = options.item;
-                    pandora.api.get({id: options.item, keys: keys}, function(result) {
-                        var videoOptions = getVideoOptions(result.data);
-                        that.append(pandora.player = Ox.VideoPlayer({
-                                censored: videoOptions.censored,
-                                controlsBottom: ['play', 'volume', 'scale', 'timeline', 'settings'],
-                                duration: result.data.duration,
-                                enableFind: false,
-                                enableFullscreen: true,
-                                enableKeyboard: true,
-                                enableMouse: true,
-                                enableTimeline: true,
-                                enableVolume: true,
-                                externalControls: false,
-                                height: window.innerHeight,
-                                'in': options['in'],
-                                out: options.out,
-                                paused: options.paused,
-                                position: options['in'],
-                                poster: '/' + options.item + '/' + '96p' + options['in'] +'.jpg',
-                                resolution: pandora.user.ui.videoResolution,
-                                showMarkers: false,
-                                showMilliseconds: 0,
-                                subtitles: videoOptions.subtitles,
-                                timeline: '/' + options.item + '/' + 'timeline16p.png',
-                                title: result.data.title,
-                                video: videoOptions.video,
-                                width: window.innerWidth
-                            })
-                            .bindEvent({
-                                playing: checkRange,
-                                position: checkRange,
-                                resolution: function(data) {
-                                    pandora.api.setUI({'videoResolution': data.resolution});
-                                },
-                            })
-                        );
-                        Ox.UI.hideLoadingScreen();
+                $ui: {},
+                ui: {
+                    player: function(options) {
+                        var that = Ox.Element();
+                        pandora.user.ui.item = options.item;
+                        pandora.api.get({id: options.item, keys: videoKeys}, function(result) {
+                            var data = getVideoOptions(result.data);
+                            that.append(pandora.player = Ox.VideoPlayer({
+                                    censored: data.censored,
+                                    censoredIcon: pandora.site.cantPlay.icon,
+                                    censoredTooltip: pandora.site.cantPlay.text,
+                                    controlsBottom: ['play', 'volume', 'scale', 'timeline', 'settings'],
+                                    duration: data.duration,
+                                    enableFind: false,
+                                    enableFullscreen: true,
+                                    enableKeyboard: true,
+                                    enableMouse: true,
+                                    enableTimeline: true,
+                                    enableVolume: true,
+                                    externalControls: false,
+                                    height: window.innerHeight,
+                                    'in': options['in'],
+                                    out: options.out,
+                                    paused: options.paused,
+                                    position: options['in'],
+                                    poster: '/' + options.item + '/' + '96p' + options['in'] +'.jpg',
+                                    resolution: pandora.user.ui.videoResolution,
+                                    showMarkers: false,
+                                    showMilliseconds: 0,
+                                    subtitles: data.subtitles,
+                                    timeline: '/' + options.item + '/' + 'timeline16p.png',
+                                    title: result.data.title,
+                                    video: data.video,
+                                    width: window.innerWidth
+                                })
+                                .bindEvent({
+                                    playing: checkRange,
+                                    position: checkRange,
+                                    resolution: function(data) {
+                                        pandora.api.setUI({'videoResolution': data.resolution});
+                                    },
+                                })
+                            );
+                            Ox.UI.hideLoadingScreen();
 
-                        function checkRange(data) {
-                            if (
-                                data.position < options['in'] - 0.04
-                                || data.position > options.out
-                            ) {
-                                if (!pandora.player.options('paused')) {
-                                    pandora.player.togglePaused();
-                                }
-                                pandora.player.options({
-                                    position: options['in']
-                                });
-                            }
-                        }
-                    });
-                    return that;
+                        });
+                        return that;
+                    },
+                    timeline: function(options) {
+                        var that = Ox.Element();
+                        pandora.user.ui.item = options.item;
+                        pandora.api.get({id: options.item, keys: videoKeys}, function(result) {
+                            Ox.UI.hideLoadingScreen();
+                            var data = getVideoOptions(result.data),
+                                ui = pandora.user.ui;
+                            that.append(pandora.player = Ox.VideoTimelinePlayer({
+                                    censored: data.censored,
+                                    censoredIcon: pandora.site.cantPlay.icon,
+                                    censoredTooltip: pandora.site.cantPlay.text,
+                                    cuts: data.cuts || [],
+                                    duration: data.duration,
+                                    followPlayer: ui.followPlayer,
+                                    getFrameURL: function(position) {
+                                        return '/' + ui.item + '/' + ui.videoResolution + 'p' + position + '.jpg';
+                                    },
+                                    getLargeTimelineURL: function(type, i) {
+                                        return '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg';
+                                    },
+                                    height: that.height(),
+                                    muted: ui.videoMuted,
+                                    'in': options['in'],
+                                    out: options.out,
+                                    paused: options.paused,
+                                    position: options['in'],
+                                    resolution: pandora.site.video.resolutions[0],
+                                    smallTimelineURL: '/' + ui.item + '/timeline16p.jpg',
+                                    subtitles: data.subtitles,
+                                    timeline: ui.videoTimeline,
+                                    timelines: pandora.site.timelines,
+                                    video: data.video,
+                                    videoRatio: data.videoRatio,
+                                    volume: ui.videoVolume,
+                                    width: that.width()
+                                })
+                                .bindEvent({
+                                    playing: checkRange,
+                                    position: checkRange,
+                                    resolution: function(data) {
+                                        pandora.api.setUI({'videoResolution': data.resolution});
+                                    },
+                                })
+                            );
+                        });
+                        return that;
+                    }
                 }
             });
+            function checkRange(data) {
+                if (
+                    data.position < options['in'] - 0.04
+                    || data.position > options.out
+                ) {
+                    if (!pandora.player.options('paused')) {
+                        pandora.player.togglePaused();
+                    }
+                    pandora.player.options({
+                        position: options['in']
+                    });
+                }
+            }
             Ox.extend(pandora.user, {
                 videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
             });
             var options = parseQuery();
             if (['video', 'player'].indexOf(options.view) > -1) {
-                pandora.ui.info = pandora.clip(options)
-                    .css({width: '100%', height: '100%'})
+                pandora.$ui.player = pandora.ui.player(options)
+                    .css({top: 0, bottom: 0, left: 0, right: 0, position: 'absolute'}) 
+                    .appendTo(document.body);
+            } else if (options.view == 'timeline') {
+                pandora.$ui.timeline = pandora.ui.timeline(options)
+                    .css({top: 0, bottom: 0, left: 0, right: 0, position: 'absolute'}) 
                     .appendTo(document.body);
             }
         }
@@ -142,6 +197,8 @@ Ox.load('UI', {
                 })
             });
         });
+        options.duration = data.duration;
+        options.videoRatio = data.videoRatio;
         return options;
     }
 
