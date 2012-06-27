@@ -7,7 +7,7 @@ pandora.ui.list = function() {
         preview = false;
 
     if (view == 'list') {
-        that = Ox.TextList({
+        that = Ox.TableList({
             columns: [].concat([{
                 align: 'center',
                 defaultWidth: 16,

@@ -93,7 +93,7 @@ pandora.ui.usersDialog = function() {
             })
             .css({float: 'right', margin: '4px'}),
 
-        $list = Ox.TextList({
+        $list = Ox.TableList({
                 columns: [
                     {
                         id: 'id',

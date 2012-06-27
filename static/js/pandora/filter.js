@@ -6,7 +6,7 @@ pandora.ui.filter = function(id) {
         panelWidth = pandora.$ui.document.width() - (pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize) - 1,
         title = Ox.getObjectById(pandora.site.filters, id).title,
         //width = pandora.getFilterWidth(i, panelWidth),
-        that = Ox.TextList({
+        that = Ox.TableList({
             _selected: !pandora.user.ui.showFilters
                 ? pandora.user.ui._filterState[i].selected
                 : false,

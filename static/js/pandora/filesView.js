@@ -73,7 +73,7 @@ pandora.ui.filesView = function(options, self) {
             }
         });
 
-    self.$filesList = Ox.TextList({
+    self.$filesList = Ox.TableList({
             columns: [
                 {
                     clickable: function(data) {
@@ -235,7 +235,7 @@ pandora.ui.filesView = function(options, self) {
             select: selectFiles
         });
 
-    self.$instancesList = Ox.TextList({
+    self.$instancesList = Ox.TableList({
         columns: [
             {
                 align: 'left',

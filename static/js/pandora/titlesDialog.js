@@ -28,7 +28,7 @@ pandora.ui.titlesDialog = function() {
                 }
             }),
 
-        $list = Ox.TextList({
+        $list = Ox.TableList({
                 columns: [
                     {
                         id: 'id',

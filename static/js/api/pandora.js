@@ -68,7 +68,7 @@ var app = new Ox.App({
 });
 
 function constructList() {
-    return new Ox.TextList({
+    return new Ox.TableList({
         columns: [
                 {
                     align: "left",

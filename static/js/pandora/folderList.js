@@ -240,7 +240,7 @@ pandora.ui.folderList = function(id) {
                 }, 1000);
             };
         }
-        that = Ox.TextList({
+        that = Ox.TableList({
             columns: columns,
             items: items,
             keys: ['query'],

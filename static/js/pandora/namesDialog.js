@@ -30,7 +30,7 @@ pandora.ui.namesDialog = function() {
                 }
             }),
 
-        $list = Ox.TextList({
+        $list = Ox.TableList({
                 columns: [
                     {
                         id: 'id',

@@ -5,7 +5,7 @@ pandora.ui.folderBrowserList = function(id) {
     // but resizeFolders will set them to different widths
     var columnWidth = (pandora.user.ui.sidebarSize - Ox.UI.SCROLLBAR_SIZE - 96) / 2,
         i = Ox.getIndexById(pandora.site.sectionFolders[pandora.user.ui.section], id),
-        that = Ox.TextList({
+        that = Ox.TableList({
             columns: [
                 {
                     clickable: true,
