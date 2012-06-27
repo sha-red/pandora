@@ -168,7 +168,6 @@ pandora.ui.filesView = function(options, self) {
                     id: 'id',
                     operator: '+',
                     title: 'ID',
-                    unique: true,
                     visible: false,
                     width: 120
                 },
@@ -199,7 +198,8 @@ pandora.ui.filesView = function(options, self) {
             },
             keys: ['wanted', 'instances'],
             scrollbarVisible: true,
-            sort: [{key: 'path', operator: '+'}]
+            sort: [{key: 'path', operator: '+'}],
+            unique: 'id'
         })
         .bindEvent({
             click: function(data) {
@@ -269,7 +269,8 @@ pandora.ui.filesView = function(options, self) {
         id: 'files',
         items: [],
         scrollbarVisible: true,
-        sort: [{key: 'user', operator: '+'}]
+        sort: [{key: 'user', operator: '+'}],
+        unique: 'path'
     });
 
     self.$movieLabel = Ox.Label({

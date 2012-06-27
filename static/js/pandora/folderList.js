@@ -39,7 +39,6 @@ pandora.ui.folderList = function(id) {
                     },
                     id: 'id',
                     operator: '+',
-                    unique: true,
                     visible: id == 'favorite',
                     // fixme: user and name are set to the same width here,
                     // but resizeFolders will set them to different widths
@@ -167,7 +166,6 @@ pandora.ui.folderList = function(id) {
                     id: 'name',
                     operator: '+',
                     tooltip: 'Edit Title',
-                    unique: true,
                     visible: true,
                     width: pandora.user.ui.sidebarWidth - 96
                 },
@@ -249,7 +247,8 @@ pandora.ui.folderList = function(id) {
             pageLength: 1000,
             //selected: pandora.getListData().folder == id ? [pandora.user.ui._list] : [],
             sort: [{key: 'position', operator: '+'}],
-            sortable: id != 'featured' || canEditFeaturedLists
+            sortable: id != 'featured' || canEditFeaturedLists,
+            unique: id != 'volumes' ? 'id' : 'name'
         })
         .css({
             left: 0,

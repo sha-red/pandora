@@ -33,7 +33,6 @@ pandora.ui.folderBrowserList = function(id) {
                     */
                     id: 'id',
                     titleImage: 'icon',
-                    unique: true,
                     visible: true,
                     width: 16
                 },
@@ -141,9 +140,8 @@ pandora.ui.folderBrowserList = function(id) {
             keys: id == 'featured' ? ['subscribed'] : [],
             pageLength: 1000,
             selected: pandora.getListData().folder == id ? [pandora.user.ui._list] : [],
-            sort: [
-                {key: 'name', operator: '+'}
-            ]
+            sort: [{key: 'name', operator: '+'}],
+            unique: 'id'
         })
         .bindEvent({
             click: function(data) {

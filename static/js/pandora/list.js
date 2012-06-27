@@ -69,7 +69,6 @@ pandora.ui.list = function() {
                     removable: !key.columnRequired,
                     title: key.title,
                     type: key.type,
-                    unique: key.id == 'id',
                     visible: position > -1,
                     width: pandora.user.ui.listColumnWidth[key.id] || key.columnWidth
                 };
@@ -88,7 +87,8 @@ pandora.ui.list = function() {
             },
             scrollbarVisible: true,
             selected: pandora.user.ui.listSelection,
-            sort: pandora.user.ui.listSort
+            sort: pandora.user.ui.listSort,
+            unique: 'id'
         })
         .bindEvent({
             columnchange: function(data) {

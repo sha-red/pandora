@@ -45,7 +45,6 @@ pandora.ui.filter = function(id) {
                     },
                     operator: filter.type == 'string' ? '+' : '-',
                     title: title,
-                    unique: true,
                     visible: true,
                     width: pandora.user.ui.filterSizes[i] - 40 - Ox.UI.SCROLLBAR_SIZE
                 },
@@ -78,7 +77,8 @@ pandora.ui.filter = function(id) {
             sort: [{
                 key: pandora.user.ui.filters[i].sort[0].key,
                 operator: pandora.user.ui.filters[i].sort[0].operator
-            }]
+            }],
+            unique: 'name'
         })
         .bindEvent({
             paste: function(data) {

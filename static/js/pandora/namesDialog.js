@@ -35,7 +35,6 @@ pandora.ui.namesDialog = function() {
                     {
                         id: 'id',
                         title: 'ID',
-                        unique: true,
                         visible: false,
                         width: 0
                     },
@@ -69,7 +68,8 @@ pandora.ui.namesDialog = function() {
                 items: pandora.api.findNames,
                 max: 1,
                 scrollbarVisible: true,
-                sort: [{key: 'sortname', operator: '+'}]
+                sort: [{key: 'sortname', operator: '+'}],
+                unique: 'id'
             })
             .bindEvent({
                 init: function(data) {

@@ -33,7 +33,6 @@ pandora.ui.titlesDialog = function() {
                     {
                         id: 'id',
                         title: 'ID',
-                        unique: true,
                         visible: false
                     },
                     {
@@ -58,7 +57,8 @@ pandora.ui.titlesDialog = function() {
                 keys: [],
                 max: 1,
                 scrollbarVisible: true,
-                sort: [{key: 'sorttitle', operator: '+'}]
+                sort: [{key: 'sorttitle', operator: '+'}],
+                unique: 'id'
             })
             .bindEvent({
                 init: function(data) {

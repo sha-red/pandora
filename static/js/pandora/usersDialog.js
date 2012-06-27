@@ -96,12 +96,6 @@ pandora.ui.usersDialog = function() {
         $list = Ox.TableList({
                 columns: [
                     {
-                        id: 'id',
-                        title: 'ID',
-                        unique: true,
-                        visible: false
-                    },
-                    {
                         format: function(value, data) {
                             return $('<img>')
                                 .attr({
@@ -371,7 +365,8 @@ pandora.ui.usersDialog = function() {
                 keys: ['notes', 'groups'],
                 max: -1,
                 scrollbarVisible: true,
-                sort: [{key: 'lastseen', operator: '-'}]
+                sort: [{key: 'lastseen', operator: '-'}],
+                unique: 'id'
             })
             .bindEvent({
                 init: function(data) {

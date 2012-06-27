@@ -56,7 +56,6 @@ pandora.ui.logsDialog = function() {
                     {
                         id: 'id',
                         title: 'ID',
-                        unique: true,
                         visible: false
                     },
                     {
@@ -107,9 +106,8 @@ pandora.ui.logsDialog = function() {
                 items: pandora.api.findLogs,
                 keys: ['line'],
                 scrollbarVisible: true,
-                sort: [
-                    {key: 'created', operator: '-'}
-                ]
+                sort: [{key: 'created', operator: '-'}],
+                unique: 'id'
             })
             .bindEvent({
                 init: function(data) {
