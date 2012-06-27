@@ -70,15 +70,14 @@ var app = new Ox.App({
 function constructList() {
     return new Ox.TableList({
         columns: [
-                {
-                    align: "left",
-                    id: "name",
-                    operator: "+",
-                    title: "Name",
-                    unique: true,
-                    visible: true,
-                    width: 140
-                },
+            {
+                align: "left",
+                id: "name",
+                operator: "+",
+                title: "Name",
+                visible: true,
+                width: 140
+            },
         ],
         columnsMovable: false,
         columnsRemovable: false,
@@ -110,12 +109,8 @@ function constructList() {
             }
         },
         scrollbarVisible: true,
-        sort: [
-            {
-                key: "name",
-                operator: "+"
-            }
-        ]
+        sort: [{key: "name", operator: "+"}],
+        unique: 'name'
     }).bindEvent({
        select: function(data) {
            var info = $('<div>').addClass('OxSelectable'),
