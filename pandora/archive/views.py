@@ -433,7 +433,7 @@ actions.register(removeFiles, cache=False)
 def lookup_file(request, oshash):
     oshash = oshash.replace('/', '')
     f = get_object_or_404(models.File, oshash=oshash)
-    return redirect(f.item.get_absolute_url())
+    return redirect('%s/files' % f.item.get_absolute_url())
 
 
 def _order_query(qs, sort, prefix=''):
