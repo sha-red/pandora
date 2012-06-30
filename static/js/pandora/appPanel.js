@@ -77,7 +77,7 @@ pandora.ui.appPanel = function() {
             if (pandora.user.level == 'guest') {
                 pandora.UI.set({page: ''});
             } else if (page == 'preferences') {
-                pandora.ui.preferencesDialog().open();
+                pandora.$ui.preferencesDialog = pandora.ui.preferencesDialog().open();
             } else {
                 pandora.ui.accountSignoutDialog().open();
             }
