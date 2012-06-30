@@ -959,7 +959,7 @@ pandora.logEvent = function(data, event, element) {
         'dragstart', 'drag', 'dragenter', 'dragleave', 'dragpause', 'dragend',
         'draganddropstart', 'draganddrop', 'draganddropenter', 'draganddropleave', 'draganddropend',
         'playing', 'position', 'progress', 'request'
-    ], event)) {
+    ], event) && !Ox.startsWith(event, 'pandora_')) {
         try {
             data = JSON.stringify(data)
         } catch(e) {}
