@@ -951,6 +951,36 @@ pandora.isClipView = function(view, item) {
     ).indexOf(view) > -1;
 };
 
+pandora.logEvent = function(data, event, element) {
+    var element = this,
+        handlers = self.eventHandlers ? self.eventHandlers[event] : [];
+    if (!Ox.contains([
+        'mousedown', 'mouserepeat', 'anyclick', 'singleclick', 'doubleclick',
+        'dragstart', 'drag', 'dragenter', 'dragleave', 'dragpause', 'dragend',
+        'draganddropstart', 'draganddrop', 'draganddropenter', 'draganddropleave', 'draganddropend',
+        'playing', 'position', 'progress', 'request'
+    ], event)) {
+        try {
+            data = JSON.stringify(data)
+        } catch(e) {}
+        Ox.print(
+            'EVENT',
+            element.oxid,
+            '"' + element[0].className.split(' ').filter(function(className) {
+                return /^Ox/.test(className);
+            }).map(function(className) {
+                return className.replace(/^Ox/, '');
+            }).join(' ') + '"',
+            event,
+            data,
+            handlers.length,
+            handlers.map(function(handler) {
+                return handler.toString().split('\n').shift();
+            })
+        );
+    }
+};
+
 pandora.signin = function(data) {
     pandora.user = data.user;
     Ox.extend(pandora.user, {
