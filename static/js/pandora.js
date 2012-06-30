@@ -276,13 +276,7 @@ appPanel
                     {id: 'featured', title: 'Featured Texts', showBrowser: false}
                 ]
             },
-            sortKeys: pandora.site.itemKeys.filter(function(key) {
-                return key.sort;
-            }).map(function(key) {
-                return Ox.extend(key, {
-                    operator: pandora.getSortOperator(key.id)
-                });
-            })
+            sortKeys: pandora.getSortKeys()
         });
         pandora.site.listSettings = {};
         Ox.forEach(pandora.site.user.ui, function(val, key) {
