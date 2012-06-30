@@ -680,7 +680,9 @@ pandora.ui.infoView = function(data) {
             id: data.id,
             keys: [ui.icons == 'posters' ? 'posters' : 'frames']
         }, 0, function(result) {
-            var images = result.data[ui.icons == 'posters' ? 'posters' : 'frames'],
+            var images = result.data[ui.icons == 'posters' ? 'posters' : 'frames'].map(function(image) {
+                    return Ox.extend(image, {index: image.index.toString()});
+                }),
                 selectedImage = images.filter(function(image) {
                     return image.selected;
                 })[0];
