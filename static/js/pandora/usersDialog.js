@@ -834,16 +834,17 @@ pandora.ui.usersDialog = function() {
     }
 
     function selectUsers(data) {
-        var users = $list.options('selected').map(function(id) {
+        var users = data.ids.map(function(id) {
             return $list.value(id);
         });
         setLabel();
         if ($formButton.value() == 'edit') {
             $form.empty();
-            if (data.ids.length == 1) {
-                if (['guest', 'robot'].indexOf(users[0].level) == -1) {
-                    $form.append($editForm = renderEditForm());
-                }
+            if (
+                data.ids.length == 1
+                && ['guest', 'robot'].indexOf(users[0].level) == -1
+            ) {
+                $form.append($editForm = renderEditForm());
             }
         } else {
             setTo();
