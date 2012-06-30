@@ -3,10 +3,11 @@
 
 pandora.ui.item = function() {
 
-    var that = Ox.Element(),
-        isVideoView = [
+    var isVideoView = [
             'timeline', 'player', 'editor'
-        ].indexOf(pandora.user.ui.itemView) > -1;
+        ].indexOf(pandora.user.ui.itemView) > -1,
+        item = pandora.user.ui.item,
+        that = Ox.Element();
 
     pandora.api.get({
         id: pandora.user.ui.item,
@@ -17,24 +18,16 @@ pandora.ui.item = function() {
         ] : []
     }, pandora.user.ui.itemView == 'info' && pandora.site.capabilities.canEditMetadata[pandora.user.level] ? 0 : -1, function(result) {
 
+        if (pandora.user.ui.item != item) {
+            return;
+        }
+
         if (result.status.code == 200) {
             // we want to cache the title in any way, so that after closing
             // a dialog and getting to this item, the title is correct
             var documentTitle = pandora.getDocumentTitle(result.data.title);
             document.title = pandora.getPageTitle(document.location.pathname) || documentTitle;
         }
-
-        /*if (result.status.code != 200) {
-            pandora.$ui.contentPanel.replaceElement(1,
-                Ox.Element()
-                    .css({marginTop: '32px', fontSize: '12px', textAlign: 'center'})
-                    .html(
-                        'Sorry, we can\'t find the '
-                        + pandora.site.itemName.singular.toLowerCase()
-                        + ' you\'re looking for.'
-                    )
-            );
-        }*/
 
         pandora.$ui.itemTitle
             .options({
