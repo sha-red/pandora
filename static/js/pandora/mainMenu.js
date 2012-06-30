@@ -152,11 +152,11 @@ pandora.ui.mainMenu = function() {
                             { id: 'clearcache', title: 'Clear Cache'},
                             { id: 'reloadapplication', title: 'Reload Application'},
                             {},
-                            { id: 'debugmode', title: (pandora.localStorage('debug') ? 'Disable' : 'Enable') + ' Debug Mode' },
+                            { id: 'debugmode', title: (pandora.localStorage('enableDebugMode') ? 'Disable' : 'Enable') + ' Debug Mode' },
                             { id: 'eventlogging', title: (pandora.localStorage('enableEventLogging') ? 'Disable' : 'Enable') + ' Event Logging'},
                             {},
-                            { id: 'logs', title: 'View Logs...'},
-                            { id: 'tests', title: 'Run Tests...'}
+                            { id: 'errorlogs', title: 'View Error Logs...'},
+                            { id: 'tests', title: 'Run Tests'}
                         ] }
                     ]
                     : []
@@ -333,17 +333,16 @@ pandora.ui.mainMenu = function() {
                     } else {
                         pandora.localStorage('enableDebugMode', true);
                     }
-                    // that.setItemTitle('debugmode', (pandora.localStorage('enableDebugMode') ? 'Disable' : 'Enable') + ' Debug Mode');
-                    pandora.$ui.appPanel.reload();
+                    window.location.reload();
                 } else if (data.id == 'eventlogging') {
                     if (pandora.localStorage('enableEventLogging')) {
                         pandora.localStorage['delete']('enableEventLogging');
                     } else {
                         pandora.localStorage('enableEventLogging', true);
                     }
+                    Ox.Event[pandora.localStorage('enableEventLogging') ? 'bind' : 'unbind'](pandora.logEvent);
                     that.setItemTitle('eventlogging', (pandora.localStorage('enableEventLogging') ? 'Disable' : 'Enable') + ' Event Logging');
-                    Ox.Event[pandora.localStorage('enableEventLogging' ? 'bind' : 'unbind')](pandora.logEvent);
-                } else if (data.id == 'logs') {
+                } else if (data.id == 'errorlogs') {
                     pandora.$ui.logsDialog = pandora.ui.logsDialog().open();
                 } else if (data.id == 'tests') {
                     pandora.tests();
