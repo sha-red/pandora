@@ -49,8 +49,8 @@ pandora.ui.clipsView = function(videoRatio) {
                     element: pandora.$ui.clipList = getClipList()
                 },
                 {
-                    element: Ox.Bar({size: 16})
-                        .append($status)
+                    element: Ox.Bar({size: 16}).append($status),
+                    size: 16
                 }
             ],
             orientation: 'vertical'
