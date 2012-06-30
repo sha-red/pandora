@@ -16,11 +16,8 @@ pandora.UI = (function() {
         return !key ? self.previousUI : self.previousUI[key];
     };
 
-    that.reset = function() {
-        pandora.user.ui = pandora.site.user.ui;
-        pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
-        pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
-        pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
+    that.reset = function(callback) {
+        pandora.api.resetUI({}, callback);
     };
 
     // sets pandora.user.ui.key to val
