@@ -2,9 +2,10 @@
 'use strict';
 
 pandora.ui.list = function() {
-    var that,
-        view = pandora.user.ui.listView,
-        preview = false;
+
+    var preview = false,
+        that,
+        view = pandora.user.ui.listView;
 
     if (view == 'list') {
         that = Ox.TableList({
@@ -508,7 +509,6 @@ pandora.ui.list = function() {
                     pandora.$ui.mainMenu.disableItem('copy');
                     pandora.$ui.mainMenu.disableItem('openmovie');
                 }
-                pandora.$ui.leftPanel.replaceElement(2, pandora.$ui.info = pandora.ui.info());
                 if (data.ids.length == 0) {
                     pandora.$ui.statusbar.set('selected', {items: 0});
                 } else {
