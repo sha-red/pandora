@@ -56,29 +56,35 @@ pandora.ui.accountDialogOptions = function(action, value) {
             return Ox.Button({
                 id: 'cancel' + Ox.toTitleCase(action),
                 title: 'Cancel'
-            }).bindEvent('click', function() {
-                pandora.$ui.accountDialog.close();
-                pandora.UI.set({page: ''});
+            }).bindEvent({
+                click: function() {
+                    pandora.$ui.accountDialog.close();
+                    pandora.UI.set({page: ''});
+                }
             });
         } else if (type == 'submit') {
             return Ox.Button({
                 disabled: true,
                 id: 'submit' + Ox.toTitleCase(action),
                 title: buttonTitle[action]
-            }).bindEvent('click', function() {
-                pandora.$ui.accountForm.submit();
+            }).bindEvent({
+                click: function() {
+                    pandora.$ui.accountForm.submit();
+                }
             });
         } else {
             return Ox.Button({
                 id: type,
                 title: buttonTitle[type] + '...'
-            }).bindEvent('click', function() {
-                if (['signin', 'signup'].indexOf(type) > -1 && type != pandora.user.ui.page) {
-                    pandora.UI.set({page: type});
-                } else {
-                    pandora.$ui.accountDialog.options(pandora.ui.accountDialogOptions(type));
+            }).bindEvent({
+                click: function() {
+                    if (['signin', 'signup'].indexOf(type) > -1 && type != pandora.user.ui.page) {
+                        pandora.UI.set({page: type});
+                    } else {
+                        pandora.$ui.accountDialog.options(pandora.ui.accountDialogOptions(type));
+                    }
+                    pandora.$ui.accountForm.find('input.OxInput')[0].focus();
                 }
-                pandora.$ui.accountForm.find('input.OxInput')[0].focus();
             });
         }
     }
@@ -310,19 +316,23 @@ pandora.ui.accountSignoutDialog = function() {
             Ox.Button({
                 id: 'stay',
                 title: 'Stay Signed In'
-            }).bindEvent('click', function() {
-                that.close();
-                pandora.UI.set({page: ''});
+            }).bindEvent({
+                click: function() {
+                    that.close();
+                    pandora.UI.set({page: ''});
+                }
             }),
             Ox.Button({
                 id: 'signout',
                 title: 'Sign Out'
-            }).bindEvent('click', function() {
-                that.close();
-                pandora.UI.set({page: ''});
-                pandora.api.signout({}, function(result) {
-                    pandora.signout(result.data);
-                });
+            }).bindEvent({
+                click: function() {
+                    that.close();
+                    pandora.UI.set({page: ''});
+                    pandora.api.signout({}, function(result) {
+                        pandora.signout(result.data);
+                    });
+                }
             })
         ],
         content: Ox.Element()
