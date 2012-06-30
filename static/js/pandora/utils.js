@@ -759,19 +759,10 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
                     operator: '&'
                 }
             } : {}), function(result) {
-                //Ox.print('RESULT::::::', result)
                 var annotation, span;
                 if (result.data.items.length) {
                     span = result.data.items[0];
                     annotation = span.id.split('/')[1];
-                    /*
-                    Ox.print("SETTING::::", {
-                        annotation: annotation,
-                        'in': span['in'],
-                        out: span.out,
-                        position: span['in']
-                    });
-                    */
                     type == 'annotation' && pandora.UI.set('videoPoints.' + item, {
                         annotation: annotation,
                         'in': span['in'],
@@ -817,6 +808,19 @@ pandora.getSortKeyData = function(key) {
     return Ox.getObjectById(pandora.site.itemKeys, key)
         || Ox.getObjectById(pandora.site.clipKeys, key);
 }
+
+pandora.getSortKeys = function() {
+    return pandora.site.itemKeys.filter(function(key) {
+        return key.sort && (
+            !key.capability
+            || pandora.site.capabilities[key.capability][pandora.user.level]
+        );
+    }).map(function(key) {
+        return Ox.extend(key, {
+            operator: pandora.getSortOperator(key.id)
+        });
+    });
+};
 
 pandora.getSortOperator = function(key) {
     var data = pandora.getSortKeyData(key);
@@ -982,14 +986,16 @@ pandora.logEvent = function(data, event, element) {
 };
 
 pandora.signin = function(data) {
-    pandora.user = data.user;
-    Ox.extend(pandora.user, {
+    // fixme: this is still voodoo
+    pandora.user = Ox.extend(data.user, {
         sectionElement: 'buttons',
         videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
     });
-    pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
-    pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
-    pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
+    // pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
+    // pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
+    // pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
+    pandora.site.sortKeys = pandora.getSortKeys();
+    pandora.URL.init();
     Ox.Theme(pandora.user.ui.theme);
     pandora.UI.set({find: pandora.user.ui.find});
     Ox.Request.clearCache();
@@ -997,10 +1003,13 @@ pandora.signin = function(data) {
 };
 
 pandora.signout = function(data) {
+    // fixme: this is still voodoo
     pandora.user = data.user;
-    pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
-    pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
-    pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
+    //pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
+    //pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
+    //pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
+    pandora.site.sortKeys = pandora.getSortKeys();
+    pandora.URL.init();
     Ox.Theme(pandora.site.user.ui.theme);
     pandora.UI.set({find: pandora.user.ui.find});
     Ox.Request.clearCache();
