@@ -149,13 +149,14 @@ pandora.ui.mainMenu = function() {
                 pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
                     ? [
                         { id: 'debugMenu', title: 'Debug', items: [
-                            { id: 'logs', title: 'View Logs...'},
                             { id: 'clearcache', title: 'Clear Cache'},
                             { id: 'reloadapplication', title: 'Reload Application'},
-                            { id: 'resetui', title: 'Reset UI Settings'},
-                            { id: 'debug', title: (pandora.localStorage('debug')?'Disable':'Enable')+' Debug Mode'},
-                            { id: 'tests', title: 'Run Tests'},
-                            { id: 'triggererror', title: 'Trigger JavaScript Error'}
+                            {},
+                            { id: 'debugmode', title: (pandora.localStorage('debug') ? 'Disable' : 'Enable') + ' Debug Mode' },
+                            { id: 'eventlogging', title: (pandora.localStorage('enableEventLogging') ? 'Disable' : 'Enable') + ' Event Logging'},
+                            {},
+                            { id: 'logs', title: 'View Logs...'},
+                            { id: 'tests', title: 'Run Tests...'}
                         ] }
                     ]
                     : []
@@ -321,28 +322,31 @@ pandora.ui.mainMenu = function() {
                         filters: pandora.site.user.ui.filters
                     });
                     pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
-                } else if (data.id == 'logs') {
-                    pandora.$ui.logsDialog = pandora.ui.logsDialog().open();
                 } else if (data.id == 'clearcache') {
                     Ox.Request.clearCache();
                 } else if (data.id == 'reloadapplication') {
                     Ox.Request.clearCache();
                     pandora.$ui.appPanel.reload();
-                } else if (data.id == 'resetui') {
-                    pandora.api.resetUI({}, function() {
-                        pandora.$ui.appPanel.reload();
-                    });
-                } else if (data.id == 'debug') {
-                    if (pandora.localStorage('debug')) {
-                        pandora.localStorage['delete']('debug');
+                } else if (data.id == 'debugmode') {
+                    if (pandora.localStorage('enableDebugMode')) {
+                        pandora.localStorage['delete']('enableDebugMode');
                     } else {
-                        pandora.localStorage('debug', true);
+                        pandora.localStorage('enableDebugMode', true);
                     }
-                    that.setItemTitle('debug', (pandora.localStorage('debug') ? 'Disable' : 'Enable') + ' Debug Mode');
+                    // that.setItemTitle('debugmode', (pandora.localStorage('enableDebugMode') ? 'Disable' : 'Enable') + ' Debug Mode');
+                    pandora.$ui.appPanel.reload();
+                } else if (data.id == 'eventlogging') {
+                    if (pandora.localStorage('enableEventLogging')) {
+                        pandora.localStorage['delete']('enableEventLogging');
+                    } else {
+                        pandora.localStorage('enableEventLogging', true);
+                    }
+                    that.setItemTitle('eventlogging', (pandora.localStorage('enableEventLogging') ? 'Disable' : 'Enable') + ' Event Logging');
+                    Ox.Event[pandora.localStorage('enableEventLogging' ? 'bind' : 'unbind')](pandora.logEvent);
+                } else if (data.id == 'logs') {
+                    pandora.$ui.logsDialog = pandora.ui.logsDialog().open();
                 } else if (data.id == 'tests') {
                     pandora.tests();
-                } else if (data.id == 'triggererror') {
-                    var e = error;
                 }
             },
             key_alt_control_f: function() {
