@@ -16,8 +16,15 @@ pandora.UI = (function() {
         return !key ? self.previousUI : self.previousUI[key];
     };
 
-    that.reset = function(callback) {
-        pandora.api.resetUI({}, callback);
+    that.reset = function() {
+        pandora.api.resetUI({}, function() {
+            pandora.user.ui = pandora.site.user.ui;
+            pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
+            pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
+            pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
+            Ox.Theme(pandora.user.ui.theme);
+            pandora.$ui.appPanel.reload();
+        });
     };
 
     // sets pandora.user.ui.key to val
