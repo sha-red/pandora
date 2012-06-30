@@ -20,7 +20,9 @@ pandora.ui.resetUIDialog = function(data) {
                 }).bindEvent({
                     click: function() {
                         that.close();
-                        pandora.UI.reset(pandora.$ui.appPanel.reload);
+                        pandora.$ui.preferencesDialog.close();
+                        pandora.UI.set({page: ''});
+                        pandora.UI.reset();
                     }
                 })
         ],
