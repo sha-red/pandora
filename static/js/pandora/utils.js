@@ -991,13 +991,13 @@ pandora.signin = function(data) {
         sectionElement: 'buttons',
         videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
     });
-    // pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
-    // pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
-    // pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
+    pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
+    pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
+    pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
     pandora.site.sortKeys = pandora.getSortKeys();
     pandora.URL.init();
+    pandora.URL.update();
     Ox.Theme(pandora.user.ui.theme);
-    pandora.UI.set({find: pandora.user.ui.find});
     Ox.Request.clearCache();
     pandora.$ui.appPanel.reload();
 };
@@ -1005,13 +1005,13 @@ pandora.signin = function(data) {
 pandora.signout = function(data) {
     // fixme: this is still voodoo
     pandora.user = data.user;
-    //pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
-    //pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
-    //pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
+    pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
+    pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);
+    pandora.user.ui._findState = pandora.getFindState(pandora.user.ui.find);
     pandora.site.sortKeys = pandora.getSortKeys();
     pandora.URL.init();
-    Ox.Theme(pandora.site.user.ui.theme);
-    pandora.UI.set({find: pandora.user.ui.find});
+    pandora.URL.update();
+    Ox.Theme(pandora.user.ui.theme);
     Ox.Request.clearCache();
     pandora.$ui.appPanel.reload();
 };
