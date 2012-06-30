@@ -31,7 +31,8 @@ appPanel
     };
 
     var animationInterval,
-        debug = localStorage && localStorage['pandora.debug'],
+        enableDebugMode = localStorage && localStorage['pandora.enableDebugMode'],
+        enableEventLogging = localStorage && localStorage['pandora.enableEventLogging'],
         isMSIE = /MSIE/.test(navigator.userAgent),
         theme = localStorage && localStorage['Ox.theme']
             && JSON.parse(localStorage['Ox.theme']) || 'modern';
@@ -86,7 +87,7 @@ appPanel
             images.loadingIcon.style.width = '32px';
             images.loadingIcon.style.height = '32px';
             images.loadingIcon.style.margin = 'auto';
-            images.loadingIcon.src = '/static/oxjs/' + (debug ? 'dev' : 'build')
+            images.loadingIcon.src = '/static/oxjs/' + (enableDebugMode ? 'dev' : 'build')
                 + '/Ox.UI/themes/' + theme + '/svg/symbolLoading.svg';
             callback(images);
         };
@@ -129,13 +130,13 @@ appPanel
         gradient && loadingScreen.appendChild(gradient);
         loadingScreen.appendChild(images.loadingIcon);
 
-        //FF3.6 document.body can be undefined here
+        // FF3.6 document.body can be undefined here
         window.onload = function() {
             document.body.style.margin = 0;
             document.body.appendChild(loadingScreen);
             startAnimation();
         };
-        //IE8 does not call onload if already loaded before set
+        // IE8 does not call onload if already loaded before set
         document.body && window.onload();
 
     }
@@ -151,7 +152,7 @@ appPanel
         } else {
             script.onload = callback;
         }
-        script.src = '/static/oxjs/' + (debug ? 'dev' : 'build') + '/Ox.js';
+        script.src = '/static/oxjs/' + (enableDebugMode ? 'dev' : 'build') + '/Ox.js';
         script.type = 'text/javascript';
         head.appendChild(script);
     }
@@ -175,6 +176,7 @@ appPanel
                     ui: {}
                 });
                 loadPandoraFiles(function() {
+                    enableEventLogging && Ox.Event.bind(pandora.logEvent);
                     initPandora(data);
                     if (pandora.localStorage('local')) {
                         var url = pandora.localStorage('local');
@@ -191,7 +193,7 @@ appPanel
 
     function loadPandoraFiles(callback) {
         var prefix = '/static/';
-        if (debug) {
+        if (enableDebugMode) {
             Ox.getJSON(prefix + 'json/pandora.json?' + Ox.random(1000), function(files) {
                 Ox.getFile(files.map(function(file) {
                     return prefix + file;
