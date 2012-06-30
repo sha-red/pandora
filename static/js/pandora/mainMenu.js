@@ -629,12 +629,7 @@ pandora.ui.mainMenu = function() {
             { id: 'sortitems', title: 'Sort ' + (isClipView || ui.item ? 'Clips' : pandora.site.itemName.plural) + ' by', items: [
                 { group: 'listsort', min: 1, max: 1, items: [].concat(
                     items,
-                    pandora.site.sortKeys.filter(function(key) {
-                        return Ox.getIndexById(items, key.id) == -1 && (
-                            !key.capability
-                            || pandora.site.capabilities[key.capability][pandora.user.level]
-                        );
-                    }).map(function(key) {
+                    pandora.site.sortKeys.map(function(key) {
                         return Ox.extend({
                             checked: ui.listSort[0].key == key.id
                         }, key);
