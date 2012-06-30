@@ -192,7 +192,7 @@ pandora.ui.logsDialog = function() {
             minWidth: 512,
             padding: 0,
             removeOnClose: true,
-            title: 'Manage Logs',
+            title: 'Error Logs',
             width: width
         }),
 
