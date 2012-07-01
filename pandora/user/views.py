@@ -170,9 +170,16 @@ def signup(request):
                     if key in l:
                         setattr(list, key, l[key])
                 list.save()
-
+            if request.session.session_key:
+                models.SessionData.objects.filter(session_key=request.session.session_key).update(user=user)
+            ui = json.loads(request.session.get('ui', 'null'))
             user = authenticate(username=data['username'],
                                 password=data['password'])
+            if ui:
+                profile = user.get_profile()
+                profile.ui = ui
+                profile.save()
+
             login(request, user)
             user_json = models.init_user(user, request)
             response = json_response({
