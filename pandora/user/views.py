@@ -99,6 +99,10 @@ def signout(request):
     '''
     response = json_response(text='ok')
     if request.user.is_authenticated():
+        profile = request.user.get_profile()
+        if profile.ui.get('page') == 'signout':
+            profile.ui['page'] = ''
+            profile.save()
         response = json_response(text='logged out')
         logout(request)
 
