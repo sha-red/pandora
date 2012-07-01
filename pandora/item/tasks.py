@@ -51,6 +51,8 @@ def update_poster(itemId):
     item.make_icon()
     models.Item.objects.filter(pk=item.id).update(
         poster=item.poster.name,
+        poster_height=item.poster.height,
+        poster_width=item.poster.width,
         icon=item.icon.name
     )
 
