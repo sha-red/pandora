@@ -7,7 +7,8 @@ pandora.ui.item = function() {
             'timeline', 'player', 'editor'
         ].indexOf(pandora.user.ui.itemView) > -1,
         item = pandora.user.ui.item,
-        that = Ox.Element();
+        that = Ox.Element(),
+        videopointsEvent = 'pandora_videopoints.' + item.toLowerCase();
 
     pandora.api.get({
         id: pandora.user.ui.item,
@@ -135,23 +136,25 @@ pandora.ui.item = function() {
         if (isVideoView && result.data.rendered) {
             // handle links in annotations
             pandora.$ui[pandora.user.ui.itemView].bindEvent(
-                'pandora_videopoints.' + pandora.user.ui.item.toLowerCase(),
-                function(data) {
-                    //Ox.print('DATA.VALUE', JSON.stringify(data.value));
+                videopointsEvent,
+                function(data, event, element) {
                     var options = {};
-                    if (data.value.annotation) {
-                        options.selected = pandora.user.ui.item + '/' + data.value.annotation;
-                    } else {
-                        // if annotation got set to something other than '',
-                        // points and position will be set in consequence,
-                        // so lets try to keep events from looping
-                        ['annotation', 'in', 'out', 'position'].forEach(function(key) {
-                            if (!Ox.isUndefined(data.value[key])) {
-                                options[key == 'annotation' ? 'selected' : key] = data.value[key];
-                            }
-                        });
+                    if (event == videopointsEvent) {
+                        //Ox.print('DATA.VALUE', JSON.stringify(data.value));
+                        if (data && data.value && data.value.annotation) {
+                            options.selected = pandora.user.ui.item + '/' + data.value.annotation;
+                        } else {
+                            // if annotation got set to something other than '',
+                            // points and position will be set in consequence,
+                            // so lets try to keep events from looping
+                            ['annotation', 'in', 'out', 'position'].forEach(function(key) {
+                                if (!Ox.isUndefined(data.value[key])) {
+                                    options[key == 'annotation' ? 'selected' : key] = data.value[key];
+                                }
+                            });
+                        }
+                        pandora.$ui[pandora.user.ui.itemView].options(options);
                     }
-                    pandora.$ui[pandora.user.ui.itemView].options(options);
                 }
             );
         }
