@@ -4,7 +4,8 @@
 
 pandora.ui.siteDialog = function(section) {
 
-    var dialogHeight = Math.round((window.innerHeight - 48) * 0.75),
+    var canSeeVersion = pandora.site.capabilities.canSeeSoftwareVersion[pandora.user.level],
+        dialogHeight = Math.round((window.innerHeight - 48) * 0.75),
         dialogWidth = Math.round(window.innerWidth * 0.75),
         isEditable = pandora.site.capabilities.canEditSitePages[pandora.user.level],
         tabs = Ox.clone(pandora.site.sitePages, true).concat([{id: 'software', title: 'Software'}]);
@@ -28,7 +29,13 @@ pandora.ui.siteDialog = function(section) {
                             + '<p>To learn more about <b>pan.do/ra</b> and <b>OxJS</b>, '
                             + 'please visit <a href="https://pan.do/ra">pan.do/ra</a> '
                             + 'and <a href="https://oxjs.org">oxjs.org</a>.</p>'
-                            + '<b>' + pandora.site.site.name + '</b> is running pan.do/ra r'+ pandora.site.site.version 
+                            + (
+                                canSeeVersion
+                                ? '<sub><b>' + pandora.site.site.name
+                                    + '</b> is running <b>pan.do/ra</b> revision '
+                                    + pandora.site.site.version + '.</sub>'
+                                : ''
+                            )
                         )
                         .appendTo($content);
                 } else {
