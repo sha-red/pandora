@@ -762,6 +762,8 @@ pandora.ui.infoView = function(data) {
                         }), function() {
                             // fixme: update the info (video preview) frame as well
                             var src;
+                            pandora.clearIconCache(data.id);
+                            Ox.Request.clearCache();
                             if (ui.icons == 'frames') {
                                 src = '/' + data.id + '/icon512.jpg?' + Ox.uid()
                                 $icon.attr({src: src});

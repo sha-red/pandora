@@ -182,6 +182,17 @@ pandora.changeListStatus = function(id, status, callback) {
     }
 };
 
+pandora.clearIconCache = function(item) {
+    ['poster', 'icon'].forEach(function(icon) {
+        ['', 64, 128, 512].forEach(function(size) {
+            var url = '/' + item + '/' + icon + size + '.jpg',
+                xhr = new XMLHttpRequest();
+            xhr.open('POST', url);
+            xhr.send();
+        });
+    });
+}
+
 pandora.clickLink = function(e) {
     if (
         e.target.hostname == document.location.hostname
