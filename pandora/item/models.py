@@ -776,7 +776,7 @@ class Item(models.Model):
                 s.bitrate = s.size * 8 / s.duration
             else:
                 s.bitrate = 0
-            s.volume = 0
+            s.volume = self.data.get('volume', 0)
         else:
             s.duration = None
             s.resolution = None
