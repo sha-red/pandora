@@ -23,7 +23,7 @@ pandora.ui.siteDialog = function(section) {
                             '<h1><b>pan.do/ra</b></h1>'
                             + '<sub>open media archive</sub>'
                             + '<p><b>' + pandora.site.site.name + '</b> is based on <b>pan.do/ra</b>, '
-                            + 'a free open source framework for media archives.</p>'
+                            + 'a free, open source platform for media archives.</p>'
                             + '<b>pan.do/ra</b> includes <b>OxJS</b>, '
                             + 'a new JavaScript library for web applications.</p>'
                             + '<p>To learn more about <b>pan.do/ra</b> and <b>OxJS</b>, '
