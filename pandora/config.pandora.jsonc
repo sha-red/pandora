@@ -236,7 +236,7 @@
             "title": "Aspect Ratio",
             "type": "float",
             "columnWidth": 90,
-            "format": {"type": "unit", "args": [":1"]},
+            "format": {"type": "unit", "args": [":1", 3]},
             "sort": true
         },
         {
