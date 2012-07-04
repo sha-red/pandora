@@ -572,7 +572,7 @@ pandora.ui.mainMenu = function() {
         Ox.forEach(elements, function(element, i) {
             if (element.hasFocus()) {
                 index = i;
-                Ox.Break();
+                return false;
             }
         });
         elements[Ox.mod((index + direction), elements.length)].gainFocus();
