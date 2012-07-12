@@ -8,7 +8,7 @@ Ox.load('UI', {
 }, function() {
 
 var app = new Ox.App({
-    apiURL: '/api/',
+    url: '/api/',
     init: 'init',
 }).bindEvent('load', function(data) {
     app.site = data.site;
