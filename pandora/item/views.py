@@ -97,6 +97,17 @@ def parse_query(data, user):
 
 def find(request):
     '''
+        Example: 
+            find({
+                query:{
+                    conditions:[{ key: '*', value: 'paris', operator: '='}],
+                    operator:'&'
+                },
+                keys: ['title', 'id'],
+                range: [0, 10],
+                sort: [{key: 'title', operator: '+'}]
+            })
+
         param data {
             'query': query,
             'sort': array,
@@ -793,8 +804,8 @@ def video(request, id, resolution, format, index=None):
             response = HttpResponse(extract.chop(path, t[0], t[1]), content_type=content_type)
             filename = u"Clip of %s - %s-%s - %s %s%s" % (
                 item.get('title'),
-                ox.formatDuration(t[0] * 1000).replace(':', '.')[:-4],
-                ox.formatDuration(t[1] * 1000).replace(':', '.')[:-4],
+                ox.format_duration(t[0] * 1000).replace(':', '.')[:-4],
+                ox.format_duration(t[1] * 1000).replace(':', '.')[:-4],
                 settings.SITENAME,
                 item.itemId,
                 ext

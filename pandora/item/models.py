@@ -1005,7 +1005,7 @@ class Item(models.Model):
             'url-list': url,
         }
         if duration:
-            meta['playtime'] = ox.formatDuration(duration*1000)[:-4]
+            meta['playtime'] = ox.format_duration(duration*1000)[:-4]
 
         #slightly bigger torrent file but better for streaming
         piece_size_pow2 = 15 #1 mbps -> 32KB pieces
@@ -1101,7 +1101,7 @@ class Item(models.Model):
             poster = self.make_siteposter()
             url = self.prefered_poster_url()
             if url:
-                data = ox.net.readUrl(url)
+                data = ox.net.read_url(url)
                 self.save_poster(data)
             elif os.path.exists(poster):
                 with open(poster) as f:
