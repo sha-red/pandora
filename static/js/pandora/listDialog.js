@@ -474,6 +474,7 @@ pandora.ui.listIconPanel = function(listData) {
                         src: '/list/' + listData.id + '/icon.jpg?' + Ox.uid()
                     });
                 pandora.$ui.info.updateListInfo();
+                pandora.clearListIconCache(listData.id);
             });
             $preview.options({position: position});
         }

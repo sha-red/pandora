@@ -193,6 +193,15 @@ pandora.clearIconCache = function(item) {
     });
 }
 
+pandora.clearListIconCache = function(list) {
+    ['', 256].forEach(function(size) {
+        var url = '/list/' + list + '/icon' + size + '.jpg',
+            xhr = new XMLHttpRequest();
+        xhr.open('POST', url);
+        xhr.send();
+    });
+}
+
 pandora.clickLink = function(e) {
     if (
         e.target.hostname == document.location.hostname
