@@ -1013,7 +1013,7 @@ class Item(models.Model):
             piece_size_pow2 = 16 #2 mbps -> 64KB pieces
         meta['piece_size_pow2'] = piece_size_pow2
 
-        ox.torrent.createTorrent(video, settings.TRACKER_URL, meta)
+        ox.torrent.create_torrent(video, settings.TRACKER_URL, meta)
         self.torrent.name = torrent[len(settings.MEDIA_ROOT)+1:]
         self.save()
 
