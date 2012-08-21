@@ -77,9 +77,9 @@ class File(models.Model):
     def set_state(self):
         self.path = self.create_path()
 
-        if not os.path.splitext(self.path)[-1] in (
-            '.srt', '.rar', '.sub', '.idx', '.txt', '.jpg', '.png', '.nfo') \
-           and self.info:
+        if not self.path.split('.')[-1] in (
+            'srt', 'rar', 'sub', 'idx', 'txt', 'jpg', 'png', 'nfo'
+        ) and self.info:
             for key in ('duration', 'size'):
                 setattr(self, key, self.info.get(key, 0))
 
@@ -126,9 +126,9 @@ class File(models.Model):
                 self.pixels = int(self.width * self.height * float(utils.parse_decimal(self.framerate)) * self.duration)
 
         else:
-            self.is_video = os.path.splitext(self.path)[-1].lower() in ('.avi', '.mkv', '.dv', '.ogv', '.mpeg', '.mov', '.webm', '.mp4', '.mpg', '.wmv', '.mts', '.flv')
-            self.is_audio = os.path.splitext(self.path)[-1].lower() in ('.mp3', '.wav', '.ogg', '.flac', '.oga', '.wma')
-            self.is_subtitle = os.path.splitext(self.path)[-1].lower() in ('.srt', )
+            self.is_video = self.path.split('.')[-1].lower() in ox.movie.EXTENSIONS['video']
+            self.is_audio = self.path.split('.')[-1].lower() in ox.movie.EXTENSIONS['audio']
+            self.is_audio = self.path.split('.')[-1].lower() == 'srt'
 
         if self.path.endswith('.srt'):
             self.is_subtitle = True
@@ -139,8 +139,8 @@ class File(models.Model):
 
         self.type = self.get_type()
         if self.instances.count()>0:
-            info = ox.parse_movie_path(self.path)
-            self.language = info['language']
+            info = ox.movie.parse_path(self.path)
+            self.language = info['language'] or ''
         self.part = self.get_part()
 
         if self.type not in ('audio', 'video'):
@@ -271,8 +271,11 @@ class File(models.Model):
     def create_path(self):
         instance = self.get_instance()
         if instance:
-            return instance.path
+            return ox.movie.parse_path(instance.path)['path']
         return self.path
+
+    def all_paths(self):
+        return [self.path] + [i.path for i in self.instances.all()]
 
     def delete_frames(self):
         frames = os.path.join(settings.MEDIA_ROOT, self.get_path('frames'))

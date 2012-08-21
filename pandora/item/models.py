@@ -595,8 +595,7 @@ class Item(models.Model):
                 elif i == 'rightslevel':
                     save(i, self.level)
                 elif i == 'filename':
-                    save(i,
-                        '\n'.join([f.path for f in self.files.all()]))
+                    save(i, '\n'.join(i.all_paths()))
                 elif i == 'user':
                     if self.user:
                         save(i, self.user.username)
@@ -904,6 +903,13 @@ class Item(models.Model):
         if len(videos) == 1:
             return os.path.join(settings.MEDIA_ROOT, videos[0].path(''))
         return os.path.join(settings.MEDIA_ROOT, self.path())
+
+    def all_paths(self):
+        return list(set([
+            item for sublist in
+            [f.all_paths() for f in self.files.all()]
+            for item in sublist
+        ]))
 
     def get_files(self, user):
         files = self.files.all().select_related()

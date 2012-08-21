@@ -429,6 +429,28 @@ def removeFiles(request):
     return render_to_json_response(response)
 actions.register(removeFiles, cache=False)
 
+def getPath(request):
+    '''
+        change file / item link
+        param data {
+            ids: [hash of file]
+        }
+
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+                path: {
+                    id: path
+                }
+            }
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    response = json_response({'path': {}})
+    for f in models.File.objects.filter(oshash__in=data['ids']):
+        response['data']['path'][f.oshash] = f.path
+    return render_to_json_response(response)
+actions.register(getPath, cache=True)
 
 def lookup_file(request, oshash):
     oshash = oshash.replace('/', '')
