@@ -89,6 +89,20 @@ pandora.ui.importAnnotations = function(data) {
             );
         }
     }
+    function parseSRT(data) {
+        var srt = Ox.parseSRT(data),
+            length = srt.length - 1;
+        //pandora layers include outpoint,
+        //speedtrans right now sets in to out,
+        //to avoid one frame overlaps,
+        //move outpoint by 0.001 seconds
+        for (var i=0; i < length; i++) {
+            if (srt[i].out == srt[i+1]['in']) {
+                srt[i].out = srt[i].out - 0.001;
+            }
+        }
+        return srt;
+    }
     content.append($('<div>').css({
         padding: '4px',
         paddingBottom: '16px'
@@ -118,7 +132,7 @@ pandora.ui.importAnnotations = function(data) {
                     file = this.files[0];
                     var reader = new FileReader();
                     reader.onloadend = function(event) {
-                        srt = Ox.parseSRT(this.result);
+                        srt = parseSRT(this.result);
                         total = srt.length;
                         total && importButton.options({disabled: false});
                         $status.html(
