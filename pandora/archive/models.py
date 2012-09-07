@@ -271,7 +271,7 @@ class File(models.Model):
     def create_path(self):
         instance = self.get_instance()
         if instance:
-            return ox.movie.parse_path(instance.path)['path']
+            return ox.movie.parse_path(instance.path)['normalizedPath']
         return self.path
 
     def all_paths(self):
