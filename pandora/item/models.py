@@ -595,7 +595,7 @@ class Item(models.Model):
                 elif i == 'rightslevel':
                     save(i, self.level)
                 elif i == 'filename':
-                    save(i, '\n'.join(i.all_paths()))
+                    save(i, '\n'.join(self.all_paths()))
                 elif i == 'user':
                     if self.user:
                         save(i, self.user.username)
