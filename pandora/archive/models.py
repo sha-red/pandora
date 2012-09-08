@@ -149,6 +149,8 @@ class File(models.Model):
     def save(self, *args, **kwargs):
         if self.auto:
             self.set_state()
+        if self.duration <= 0:
+            self.duration = sum([s.info.get('duration',0) for s in self.streams.filter(source=None)])
         self.sort_path = utils.sort_string(self.path)
         if self.is_subtitle:
             self.available = self.data and True or False
@@ -453,8 +455,6 @@ class Stream(models.Model):
             self.info = ox.avinfo(self.video.path)
         self.oshash = self.info.get('oshash')
         self.duration = self.info.get('duration', 0)
-        if self.duration <= 0:
-            self.duration = sum([s.info['duration'] for s in self.streams.filter(source=None)])
         if 'video' in self.info and self.info['video']:
             self.aspect_ratio = self.info['video'][0]['width'] / self.info['video'][0]['height']
         else:
