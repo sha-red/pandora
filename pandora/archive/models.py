@@ -453,6 +453,8 @@ class Stream(models.Model):
             self.info = ox.avinfo(self.video.path)
         self.oshash = self.info.get('oshash')
         self.duration = self.info.get('duration', 0)
+        if self.duration <= 0:
+            self.duration = sum([s.info['duration'] for s in self.streams.filter(source=None)])
         if 'video' in self.info and self.info['video']:
             self.aspect_ratio = self.info['video'][0]['width'] / self.info['video'][0]['height']
         else:
