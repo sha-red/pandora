@@ -52,9 +52,9 @@ pandora.ui.item = function() {
                     .html(
                         'Sorry, <i>' + result.data.title
                         + '</i> currently doesn\'t have '
-                        + ['a', 'e', 'i', 'o'].indexOf(
+                        + (['a', 'e', 'i', 'o'].indexOf(
                             pandora.user.ui.itemView.slice(0, 1)
-                        ) > -1 ? 'an': 'a' + ' '
+                        ) > -1 ? 'an': 'a') + ' '
                         + pandora.user.ui.itemView + ' view.'
                     )
             );
