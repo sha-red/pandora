@@ -957,7 +957,7 @@ def atom_xml(request):
                 el.attrib['rel'] = 'enclosure'
                 el.attrib['type'] = 'application/x-bittorrent'
                 el.attrib['href'] = '%s/torrent/' % page_link
-                el.attrib['length'] = '%s' % ox.getTorrentSize(item.torrent.path)
+                el.attrib['length'] = '%s' % ox.get_torrent_size(item.torrent.path)
             #FIXME: loop over streams
             #for s in item.streams().filter(resolution=max(settings.CONFIG['video']['resolutions'])):
             for s in item.streams().filter(source=None):
