@@ -39,14 +39,20 @@ pandora.ui.upload = function(oshash, file) {
                 that.progress = -1;
                 done();
             }
+            if (response.status && response.status.code != 200) {
+                that.status = response.status.text;
+                that.progress = -1;
+                done();
+                response = {};
+            }
             if (response.maxRetry) {
                 maxRetry = response.maxRetry;
             }
             chunkUrl = response.uploadUrl;
-            if (document.location.protocol == 'https:') {
-                chunkUrl = chunkUrl.replace(/http:\/\//, 'https://');
-            }
             if (chunkUrl) {
+                if (document.location.protocol == 'https:') {
+                    chunkUrl = chunkUrl.replace(/http:\/\//, 'https://');
+                }
                 that.status = 'uploading';
                 that.progress = 0.0;
                 //start upload

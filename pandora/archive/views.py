@@ -263,6 +263,8 @@ def firefogg_upload(request):
                     'result': 1
                 }
                 return render_to_json_response(response)
+            else:
+                response = json_response(status=404, text='permission denied')
     response = json_response(status=400, text='this request requires POST')
     return render_to_json_response(response)
 
