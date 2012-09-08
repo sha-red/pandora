@@ -76,10 +76,10 @@ def rebuild_timeline(itemId):
 @task(queue="encoding")
 def load_subtitles(itemId):
     item = models.Item.objects.get(itemId=itemId)
-    item.load_subtitles()
-    item.update_find()
-    item.update_sort()
-    item.update_facets()
+    if item.load_subtitles():
+        item.update_find()
+        item.update_sort()
+        item.update_facets()
 
 @task(ignore_results=True, queue='default')
 def update_sitemap(base_url):

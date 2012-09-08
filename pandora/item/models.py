@@ -1055,10 +1055,10 @@ class Item(models.Model):
         self.make_icon()
         if settings.CONFIG['video']['download']:
             self.make_torrent()
-        tasks.load_subtitles.delay(self.itemId)
-        get_sequences.delay(self.itemId)
         self.rendered = streams.count() > 0
         self.save()
+        tasks.load_subtitles.delay(self.itemId)
+        get_sequences.delay(self.itemId)
 
     def delete_poster(self):
         if self.poster:
@@ -1207,7 +1207,7 @@ class Item(models.Model):
 
     def load_subtitles(self):
         if not utils.get_by_id(settings.CONFIG['layers'], 'subtitles'):
-            return
+            return False
         with transaction.commit_on_success():
             layer = 'subtitles'
             Annotation.objects.filter(layer=layer,item=self).delete()
@@ -1268,6 +1268,7 @@ class Item(models.Model):
                 offset += f.duration
             #remove left over clips without annotations
             Clip.objects.filter(item=self, annotations__id=None).delete()
+        return True
 
     def srt(self, layer):
         def format_value(value):
