@@ -151,6 +151,7 @@ def addAnnotation(request):
             start=float(data['in']), end=float(data['out']),
             value=data['value'])
         annotation.save()
+        update_item.delay(annotation.id)
         response = json_response(annotation.json())
         response['data']['editable'] = True
     else:
