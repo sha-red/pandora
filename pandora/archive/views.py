@@ -447,7 +447,7 @@ def getPath(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    response = json_response({'path': {}})
+    response = json_response()
     ids = data['id']
     if isinstance(ids, basestring):
         ids = [ids]
