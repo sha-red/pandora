@@ -435,22 +435,23 @@ def getPath(request):
     '''
         change file / item link
         param data {
-            ids: [hash of file]
+            id: [hash of file]
         }
 
         return {
             status: {'code': int, 'text': string},
             data: {
-                path: {
-                    id: path
-                }
+                id: path
             }
         }
     '''
     data = json.loads(request.POST['data'])
     response = json_response({'path': {}})
-    for f in models.File.objects.filter(oshash__in=data['ids']):
-        response['data']['path'][f.oshash] = f.path
+    ids = data['id']
+    if isinstance(ids, basestring):
+        ids = [ids]
+    for f in models.File.objects.filter(oshash__in=ids).values('path', 'oshash'):
+        response['data'][f['oshash']] = f['path']
     return render_to_json_response(response)
 actions.register(getPath, cache=True)
 

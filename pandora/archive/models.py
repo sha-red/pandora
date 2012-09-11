@@ -18,15 +18,15 @@ import ox
 import chardet
 
 from item import utils
+from person.models import get_name_sort
 
 import extract
 
 
 class File(models.Model):
+
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-
-    auto = models.BooleanField(default=True)
 
     oshash = models.CharField(max_length=16, unique=True)
     item = models.ForeignKey("item.Item", related_name='files')
@@ -35,12 +35,13 @@ class File(models.Model):
     sort_path = models.CharField(max_length=2048, default="") # sort name
 
     type = models.CharField(default="", max_length=255)
-    part = models.IntegerField(null=True)
-    version = models.CharField(default="", max_length=255) 
-    language = models.CharField(default="", max_length=8)
 
-    season = models.IntegerField(default=-1)
-    episode = models.IntegerField(default=-1)
+    #editable
+    extension = models.CharField(default="", max_length=255, null=True) 
+    language = models.CharField(default="", max_length=8, null=True)
+    part = models.IntegerField(null=True)
+    part_title = models.CharField(default="", max_length=255, null=True)
+    version = models.CharField(default="", max_length=255, null=True) 
 
     size = models.BigIntegerField(default=0)
     duration = models.FloatField(null=True)
@@ -71,15 +72,15 @@ class File(models.Model):
     is_video = models.BooleanField(default=False)
     is_subtitle = models.BooleanField(default=False)
 
+    #upload and data handling
+    data = models.FileField(null=True, blank=True,
+                            upload_to=lambda f, x: f.get_path('data.bin'))
+
     def __unicode__(self):
         return self.path
 
-    def set_state(self):
-        self.path = self.create_path()
-
-        if not self.path.split('.')[-1] in (
-            'srt', 'rar', 'sub', 'idx', 'txt', 'jpg', 'png', 'nfo'
-        ) and self.info:
+    def parse_info(self):
+        if self.info:
             for key in ('duration', 'size'):
                 setattr(self, key, self.info.get(key, 0))
 
@@ -125,43 +126,63 @@ class File(models.Model):
             if self.framerate:
                 self.pixels = int(self.width * self.height * float(utils.parse_decimal(self.framerate)) * self.duration)
 
-        else:
-            self.is_video = self.path.split('.')[-1].lower() in ox.movie.EXTENSIONS['video']
-            self.is_audio = self.path.split('.')[-1].lower() in ox.movie.EXTENSIONS['audio']
-            self.is_audio = self.path.split('.')[-1].lower() == 'srt'
+    def parse_instance_path(self):
+        if self.instances.count():
+            path = self.instances.all()[0].path
+            data = ox.movie.parse_path(path)
+            self.extension = data['extension']
+            self.language = data['language']
+            self.part = data['part']
+            self.part_title = data['partTitle']
+            self.type = data['type'] or 'unknown'
+            self.version = data['version']
 
-        if self.path.endswith('.srt'):
-            self.is_subtitle = True
-            self.is_audio = False
-            self.is_video = False
-        else:
-            self.is_subtitle = False
+    def path_data(self):
+        data = {
+            'part': self.part,
+            'partTitle': self.part_title,
+            'language': self.language,
+            'version': self.version,
+            'extension': self.extension,
+            'type': self.type,
+            'directory': None
+        }
+        for key in (
+            'title', 'director', 'year',
+            'episode', 'episodeTitle', 'seriesTitle', 'seriesYear'
+        ):
+            data[key] = self.item.get(key)
+        data['directorSort'] = [get_name_sort(n) for n in self.item.get('director', [])]
+        return data
 
-        self.type = self.get_type()
-        if self.instances.count()>0:
-            info = ox.movie.parse_path(self.path)
-            self.language = info['language'] or ''
-        self.part = self.get_part()
+    def normalize_path(self):
+        return u'/'.join(ox.movie.format_path(self.path_data()).split('/')[1:])
+
+    def save(self, *args, **kwargs):
+        if self.id and not self.path and self.instances.count():
+            self.parse_info()
+            self.parse_instance_path()
+            self.path = self.normalize_path()
+
+        if self.path:
+            self.path = self.normalize_path()
+            self.sort_path = utils.sort_string(self.path)
+            self.is_audio = self.type == 'audio'
+            self.is_video = self.type == 'video'
+            self.is_subtitle = self.path.endswith('.srt')
 
         if self.type not in ('audio', 'video'):
             self.duration = None
+        elif self.duration <= 0:
+            self.duration = sum([s.info.get('duration',0)
+                for s in self.streams.filter(source=None)])
 
-    def save(self, *args, **kwargs):
-        if self.auto:
-            self.set_state()
-        if self.duration <= 0:
-            self.duration = sum([s.info.get('duration',0) for s in self.streams.filter(source=None)])
-        self.sort_path = utils.sort_string(self.path)
         if self.is_subtitle:
             self.available = self.data and True or False
         else:
             self.available = not self.uploading and \
-                             self.streams.filter(source=None, available=True).count() > 0
+                self.streams.filter(source=None, available=True).count() > 0
         super(File, self).save(*args, **kwargs)
-
-    #upload and data handling
-    data = models.FileField(null=True, blank=True,
-                            upload_to=lambda f, x: f.get_path('data.bin'))
 
     def get_path(self, name):
         h = self.oshash
@@ -242,7 +263,7 @@ class File(models.Model):
         return data
 
     def get_part(self):
-        if os.path.splitext(self.path)[-1] in ('.sub', '.idx', '.srt'):
+        if self.type not in ('audio', 'video'):
             name = os.path.splitext(self.path)[0]
             if self.language:
                 name = name[-(len(self.language)+1)]
@@ -256,27 +277,6 @@ class File(models.Model):
             if self in files:
                 return files.index(self) + 1
         return None
-
-    def get_type(self):
-        if self.is_video:
-            return 'video'
-        if self.is_audio:
-            return 'audio'
-        if self.is_subtitle or os.path.splitext(self.path)[-1] in ('.sub', '.idx'):
-            return 'subtitle'
-        return 'unknown'
-
-    def get_instance(self):
-        #FIXME: what about other instances?
-        if self.instances.all().count() > 0:
-            return self.instances.all()[0]
-        return None
-
-    def create_path(self):
-        instance = self.get_instance()
-        if instance:
-            return ox.movie.parse_path(instance.path)['normalizedPath']
-        return self.path
 
     def all_paths(self):
         return [self.path] + [i.path for i in self.instances.all()]
