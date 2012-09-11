@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from datetime import timedelta, datetime
 
-from celery.task import task
+from celery.task import task, periodic_task
 from django.contrib.auth.models import User
 
 import models
