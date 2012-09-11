@@ -167,7 +167,7 @@ class File(models.Model):
         if self.path:
             self.path = self.normalize_path()
             self.sort_path = utils.sort_string(self.path)
-            data = ox.movie.parse_path(self.path)
+            data = ox.movie.parse_path('_/%s' % self.path)
             self.type = data['type'] or 'unknown'
             self.is_audio = self.type == 'audio'
             self.is_video = self.type == 'video'
