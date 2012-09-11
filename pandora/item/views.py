@@ -1060,7 +1060,8 @@ def item_xml(request, id):
         item = qs[0]
         j = item.get_json()
         j['layers'] = item.get_layers(request.user)
-        j['resolution'] = {'width': j['resolution'][0], 'height':j['resolution'][1]}
+        if 'resolution' in j:
+            j['resolution'] = {'width': j['resolution'][0], 'height':j['resolution'][1]}
         def xmltree(root, key, data):
             if isinstance(data, list) or \
                 isinstance(data, tuple):
