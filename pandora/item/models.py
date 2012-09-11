@@ -368,9 +368,9 @@ class Item(models.Model):
                 public_id = a.public_id.split('/')[1]
                 a.public_id = "%s/%s" % (self.itemId, public_id)
                 a.save()
+        tasks.update_file_paths.delay(self.itemId)
         if update_poster:
             return tasks.update_poster.delay(self.itemId)
-
         return None
 
     def delete_files(self):
@@ -952,10 +952,6 @@ class Item(models.Model):
                 if s.filter(selected=False).count() > 0:
                     s.update(selected=True, wanted=False)
                     update = True
-                for f in s:
-                    if f.get_part() != f.part:
-                        f.save()
-                        update = True
                 if update:
                     self.rendered = False
                     self.update_timeline()
@@ -1152,7 +1148,7 @@ class Item(models.Model):
     def poster_frames(self):
         frames = []
         offset = 0
-        for f in self.files.filter(selected=True, is_video=True).order_by('part'):
+        for f in self.files.filter(selected=True, is_video=True).order_by('sort_path'):
             for ff in f.frames.all().order_by('position'):
                 frames.append({
                     'position': offset + ff.position,
@@ -1225,7 +1221,7 @@ class Item(models.Model):
 
             #loop over all videos
             for f in self.files.filter(Q(is_audio=True)|Q(is_video=True)) \
-                               .filter(selected=True).order_by('part'):
+                               .filter(selected=True).order_by('sort_path'):
                 subtitles_added = False
                 prefix = os.path.splitext(f.path)[0]
                 if f.instances.all().count() > 0:

@@ -39,7 +39,7 @@ class File(models.Model):
     #editable
     extension = models.CharField(default="", max_length=255, null=True) 
     language = models.CharField(default="", max_length=8, null=True)
-    part = models.IntegerField(null=True)
+    part = models.CharField(default="", max_length=255, null=True)
     part_title = models.CharField(default="", max_length=255, null=True)
     version = models.CharField(default="", max_length=255, null=True) 
 
@@ -167,6 +167,8 @@ class File(models.Model):
         if self.path:
             self.path = self.normalize_path()
             self.sort_path = utils.sort_string(self.path)
+            data = ox.movie.parse_path(self.path)
+            self.type = data['type'] or 'unknown'
             self.is_audio = self.type == 'audio'
             self.is_video = self.type == 'video'
             self.is_subtitle = self.path.endswith('.srt')
@@ -245,7 +247,11 @@ class File(models.Model):
             'framerate': self.framerate,
             'id': self.oshash,
             'instances': [i.json() for i in self.instances.all()],
+            'extension': self.extension,
+            'language': self.language,
             'part': self.part,
+            'partTitle': self.part_title,
+            'version': self.version,
             'path': self.path,
             'resolution': resolution,
             'samplerate': self.samplerate,
@@ -261,22 +267,6 @@ class File(models.Model):
                 if k not in keys:
                     del data[k]
         return data
-
-    def get_part(self):
-        if self.type not in ('audio', 'video'):
-            name = os.path.splitext(self.path)[0]
-            if self.language:
-                name = name[-(len(self.language)+1)]
-            qs = self.item.files.filter(Q(is_video=True)|Q(is_audio=True),
-                                        selected=True, path__startswith=name)
-            if qs.count()>0:
-                return qs[0].get_part()
-        if self.selected:
-            files = list(self.item.files.filter(type=self.type, language=self.language,
-                                                selected=self.selected).order_by('sort_path'))
-            if self in files:
-                return files.index(self) + 1
-        return None
 
     def all_paths(self):
         return [self.path] + [i.path for i in self.instances.all()]

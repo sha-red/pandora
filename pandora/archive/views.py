@@ -402,10 +402,11 @@ def editFile(request):
             #FIXME: is this to slow to run sync?
             f.item.update_selected()
             f.item.update_wanted()
-        for key in ('part', 'language'):
+        for key in ('extension', 'language', 'part', 'partTitle', 'version'):
             if key in data:
-                setattr(f, key, data[key])
-                f.auto = False
+                setattr(f,
+                    re.sub('([A-Z])', lambda m: '_%s' % m.groups()[0].lower(), key),
+                    data[key])
                 update = True
         if update:
             f.save()

@@ -57,6 +57,13 @@ def update_poster(itemId):
     )
 
 @task(ignore_results=True, queue='default')
+def update_file_paths(itemId):
+    item = models.Item.objects.get(itemId=itemId)
+    for f in item.files.all():
+        if f.normalize_path() != f.path:
+            f.save()
+
+@task(ignore_results=True, queue='default')
 def update_external(itemId):
     item = models.Item.objects.get(itemId=itemId)
     item.update_external()
