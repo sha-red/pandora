@@ -354,7 +354,6 @@ def editFiles(request):
     if True:
         if 'ignore' in data:
             models.Instance.objects.filter(file__in=files).update(ignore=data['ignore'])
-            files.update(auto=True)
             #FIXME: is this to slow to run sync?
             for i in Item.objects.filter(files__in=files).distinct():
                 i.update_selected()
@@ -396,7 +395,6 @@ def editFile(request):
         update = False
         #FIXME: should all instances be ignored?
         if 'ignore' in data:
-            f.auto = True
             f.instances.update(ignore=data['ignore'])
             f.save()
             #FIXME: is this to slow to run sync?
@@ -449,7 +447,7 @@ def getPath(request):
     ids = data['id']
     if isinstance(ids, basestring):
         ids = [ids]
-    for f in models.File.objects.filter(oshash__in=ids).values('path', 'oshash'):
+    for f in models.File.objects.filter(oshash__in=ids).values('path', 'oshash').order_by('sort_path'):
         response['data'][f['oshash']] = f['path']
     return render_to_json_response(response)
 actions.register(getPath, cache=True)

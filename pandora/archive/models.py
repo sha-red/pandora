@@ -133,7 +133,7 @@ class File(models.Model):
             data = ox.movie.parse_path(path)
             for key in (
                 'normalizedPath', 'isEpisode',
-                'title', 'director', 'year',
+                'title', 'director', 'directorSort', 'year',
                 'season', 'episode', 'episodeTitle',
                 'seriesTitle', 'seriesYear'
             ):
@@ -152,6 +152,8 @@ class File(models.Model):
         data['isEpisode'] = data.get('season') != None \
                 or data.get('episode') != None \
                 or data.get('episodes') != []
+        if data['isEpisode'] and data['seriesYear'] == None:
+            data['seriesYear'] = data['year']
         data['type'] = 'unknown'
         for type in ox.movie.EXTENSIONS:
             if data['extension'] in ox.movie.EXTENSIONS[type]:
