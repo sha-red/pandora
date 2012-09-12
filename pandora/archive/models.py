@@ -159,7 +159,7 @@ class File(models.Model):
         return data
 
     def normalize_path(self):
-        return u'/'.join(ox.movie.format_path(self.get_path_info()).split('/')[1:])
+        return u'/'.join(ox.movie.format_path(self.get_path_info()))
 
     def save(self, *args, **kwargs):
         if self.id and not self.path_info and self.instances.count():
