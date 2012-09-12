@@ -47,6 +47,7 @@ class File(models.Model):
     duration = models.FloatField(null=True)
 
     info = fields.DictField(default={})
+    path_info = fields.DictField(default={})
 
     video_codec = models.CharField(max_length=255)
     pixel_format = models.CharField(max_length=255)
@@ -130,45 +131,54 @@ class File(models.Model):
         if self.instances.count():
             path = self.instances.all()[0].path
             data = ox.movie.parse_path(path)
-            self.extension = data['extension']
-            self.language = data['language']
-            self.part = data['part']
-            self.part_title = data['partTitle']
-            self.type = data['type'] or 'unknown'
-            self.version = data['version']
+            for key in (
+                'normalizedPath', 'isEpisode',
+                'title', 'director', 'year',
+                'season', 'episode', 'episodeTitle',
+                'seriesTitle', 'seriesYear'
+            ):
+                del data[key]
+            self.path_info = data
 
-    def path_data(self):
-        data = {
-            'part': self.part,
-            'partTitle': self.part_title,
-            'language': self.language,
-            'version': self.version,
-            'extension': self.extension,
-            'type': self.type,
-            'directory': None
-        }
+    def get_path_info(self):
+        data = self.path_info.copy()
         for key in (
             'title', 'director', 'year',
-            'episode', 'episodeTitle', 'seriesTitle', 'seriesYear'
+            'season', 'episode', 'episodeTitle',
+            'seriesTitle', 'seriesYear'
         ):
             data[key] = self.item.get(key)
         data['directorSort'] = [get_name_sort(n) for n in self.item.get('director', [])]
+        data['isEpisode'] = data.get('season') != None \
+                or data.get('episode') != None \
+                or data.get('episodes') != []
+        data['type'] = 'unknown'
+        for type in ox.movie.EXTENSIONS:
+            if data['extension'] in ox.movie.EXTENSIONS[type]:
+                data['type'] = type
         return data
 
     def normalize_path(self):
-        return u'/'.join(ox.movie.format_path(self.path_data()).split('/')[1:])
+        return u'/'.join(ox.movie.format_path(self.get_path_info()).split('/')[1:])
 
     def save(self, *args, **kwargs):
-        if self.id and not self.path and self.instances.count():
+        if self.id and not self.path_info and self.instances.count():
             self.parse_info()
             self.parse_instance_path()
             self.path = self.normalize_path()
 
+        data = self.get_path_info()
+        self.extension = data.get('extension')
+        self.language = data.get('language')
+        self.part = data.get('part')
+        self.part_title = data.get('partTitle')
+        self.type = data.get('type') or 'unknown'
+        self.version = data.get('version')
+
         if self.path:
             self.path = self.normalize_path()
             self.sort_path = utils.sort_string(self.path)
-            data = ox.movie.parse_path('_/%s' % self.path)
-            self.type = data['type'] or 'unknown'
+
             self.is_audio = self.type == 'audio'
             self.is_video = self.type == 'video'
             self.is_subtitle = self.path.endswith('.srt')
