@@ -247,7 +247,7 @@ class File(models.Model):
 
     def json(self, keys=None, user=None):
         resolution = (self.width, self.height)
-        if resolution == (0, 0):
+        if resolution == (0, 0) or self.type != 'video':
             resolution = None
         duration = self.duration
         if self.type != 'video':
