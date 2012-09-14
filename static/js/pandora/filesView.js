@@ -275,7 +275,8 @@ pandora.ui.filesView = function(options, self) {
 
     self.$movieLabel = Ox.Label({
             textAlign: 'center',
-            title: 'Move Selected Files to Another ' + pandora.site.itemName.singular,
+            title: 'Move selected files to another '
+                + pandora.site.itemName.singular.toLowerCase(),
             width: 240
         })
         .css({margin: '8px'});
