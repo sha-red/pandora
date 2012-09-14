@@ -15,11 +15,13 @@ import item.models
 import managers
 import tasks
 
-def get_name_sort(name):
+def get_name_sort(name, sortname=None):
     name = unicodedata.normalize('NFKD', name).strip()
     if name:
         person, created = Person.objects.get_or_create(name=name)
         if created:
+            if sortname:
+                person.sortname = sortname
             person.save()
         sortname = unicodedata.normalize('NFKD', person.sortname)
     else:

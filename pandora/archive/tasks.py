@@ -9,7 +9,7 @@ from django.conf import settings
 
 from item.models import get_item, Item
 import item.tasks
-
+from person.models import get_name_sort 
 import models
 import extract
 
@@ -17,6 +17,9 @@ _INSTANCE_KEYS = ('mtime', 'path')
 
 def get_or_create_item(volume, info, user):
     item_info = ox.parse_movie_path(info['path'])
+    if item_info.get('director') and item_info.get('directorSort'):
+        for name, sortname in zip(item_info['director'], item_info['directorSort']):
+           get_name_sort(name, sortname) 
     return get_item(item_info, user)
 
 def get_or_create_file(volume, f, user, item=None):
