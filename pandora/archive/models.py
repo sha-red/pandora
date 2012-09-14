@@ -172,8 +172,8 @@ class File(models.Model):
         data = self.get_path_info()
         self.extension = data.get('extension')
         self.language = data.get('language')
-        self.part = ox.sort_string(data.get('part') or '')
-        self.part_title = ox.sort_string(data.get('partTitle') or '')
+        self.part = ox.sort_string(unicode(data.get('part')) or '')
+        self.part_title = ox.sort_string(unicode(data.get('partTitle')) or '')
         self.type = data.get('type') or 'unknown'
         self.version = data.get('version')
 
