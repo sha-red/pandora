@@ -172,8 +172,8 @@ class File(models.Model):
         data = self.get_path_info()
         self.extension = data.get('extension')
         self.language = data.get('language')
-        self.part = data.get('part')
-        self.part_title = data.get('partTitle')
+        self.part = ox.sort_string(data.get('part') or '')
+        self.part_title = ox.sort_string(data.get('partTitle') or '')
         self.type = data.get('type') or 'unknown'
         self.version = data.get('version')
 
@@ -259,11 +259,6 @@ class File(models.Model):
             'framerate': self.framerate,
             'id': self.oshash,
             'instances': [i.json() for i in self.instances.all()],
-            'extension': self.extension,
-            'language': self.language,
-            'part': self.part,
-            'partTitle': self.part_title,
-            'version': self.version,
             'path': self.path,
             'resolution': resolution,
             'samplerate': self.samplerate,
@@ -273,6 +268,8 @@ class File(models.Model):
             'videoCodec': self.video_codec,
             'wanted': self.wanted,
         }
+        for key in ('part', 'partTitle', 'version', 'language', 'extension'):
+            data[key] = self.path_info[key]
         data['users'] = list(set([i['user'] for i in data['instances']]))
         if keys:
             for k in data.keys():
