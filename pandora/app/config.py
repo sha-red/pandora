@@ -149,7 +149,7 @@ def update_geoip(force=False):
     if not os.path.exists(path) or force:
         url = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz'
         print 'download', url
-        ox.net.saveUrl(url, "%s.gz"%path)
+        ox.net.save_url(url, "%s.gz"%path)
         if os.path.exists(path):
             os.unlink(path)
         os.system('gunzip "%s.gz"' % path)
