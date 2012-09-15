@@ -270,8 +270,37 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($text);
 
-    // fixme: episodeDirector seems to be always missing
-    if (data.episodeDirector || data.writer || data.producer || data.cinematographer || data.editor) {
+    // FIXME: we will want to check for data.seriesId here
+    if (isEditable && data.seriesTitle) {
+        var $div = $('<div>')
+            .css(Ox.extend(css, {marginTop: '20px'})) // FIXME: just a guess
+            .appendTo($text);
+        ['episodeDirector', 'seriesYear'].forEach(function(key, i) {
+            i && $('<div>').css({float: 'left'}).html(';&nbsp;').appendTo($div);
+            $('<div>')
+                .css({float: 'left'})
+                .html(formatKey(Ox.toUnderscores(key).replace(/_/g, ' ')).replace('</span>', '&nbsp;</span>'))
+                .appendTo($div);
+            Ox.Editable({
+                    clickLink: pandora.clickLink,
+                    format: function(value) {
+                        return formatValue(value.split(', '), key)
+                    },
+                    placeholder: formatLight('unknown'),
+                    tooltip: 'Doubleclick to edit',
+                    value: key == 'episodeDirector'
+                        ? (data[key] ? data[key].join(', ') : [''])
+                        : data[key] || ''
+                })
+                .css({float: 'left'})
+                .bindEvent({
+                    submit: function(event) {
+                        editMetadata(key, event.value);
+                    }
+                })
+                .appendTo($div);
+        });
+    } else if (data.episodeDirector || data.writer || data.producer || data.cinematographer || data.editor) {
         $div = $('<div>')
             .css(css)
             .appendTo($text);
