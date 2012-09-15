@@ -18,25 +18,21 @@ pandora.ui.filesView = function(options, self) {
     self.$toolbar = Ox.Bar({
         size: 24
     });
+
     /*
-    self.$userSelect = Ox.Select({
+    self.$versionSelect = Ox.Select({
             items: [
-                {id: 'admin', title: 'Admin', disabled: true},
-                {id: 'j', title: 'User: j', checked: true},
-                {id: 'rlx', title: 'User: rlx'},
-                {},
-                {id: 'admin', title: 'Staff', disabled: true},
-                {},
-                {id: 'admin', title: 'Member', disabled: true}
-            ]
+                {id: 'user/volume/version', title: 'Version: user/volume/version'}
+            ],
+            width: 240
         })
         .css({
             float: 'left',
-            width: '128px',
             margin: '4px'
         })
         .appendTo(self.$toolbar);
     */
+
     self.$deleteButton = Ox.Button({
             disabled: false,
             title: 'Delete ' + pandora.site.itemName.singular,
@@ -283,8 +279,6 @@ pandora.ui.filesView = function(options, self) {
 
     ['title', 'director', 'year', 'id'].forEach(function(key) {
         self['$' + key + 'Input'] = Ox.Input({
-            clear: true,
-            id: key,
             label: key == 'id' ? 'ID' : Ox.toTitleCase(key),
             labelWidth: 64,
             width: 240
@@ -293,24 +287,6 @@ pandora.ui.filesView = function(options, self) {
             change: function(data) {
                 var conditions;
                 if (data.value.length) {
-                    /*
-                    if (key == 'id') {
-                        conditions = [{key: 'id', value: data.value, operator: '=='}]
-                    } else {
-                        conditions = Ox.map(['title', 'director', 'year'], function(key) {
-                            var value = self['$' + key + 'Input'].value()
-                            return value.length ? {key: key, value: value, operator: '='} : null;
-                        });
-                    }
-                    pandora.api.find({
-                        keys: ['title', 'director', 'year', 'id'],
-                        query: {
-                            conditions: conditions,
-                            operator: '&'
-                        },
-                        range: [0, 2]
-                    }, function(result) {
-                    */
                     conditions = {};
                     ['id', 'title', 'director', 'year'].map(function(key) {
                         var value = self['$' + key + 'Input'].value();
@@ -342,7 +318,6 @@ pandora.ui.filesView = function(options, self) {
     });
 
     self.$switch = Ox.Checkbox({
-        id: 'go',
         title: 'Switch to this '
             + pandora.site.itemName.singular.toLowerCase()
             + ' after moving files',
