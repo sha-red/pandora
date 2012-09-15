@@ -106,7 +106,7 @@ pandora.ui.filesView = function(options, self) {
                     operator: '+',
                     title: 'Users',
                     visible: true,
-                    width: 50
+                    width: 60
                 },
                 {
                     align: 'left',
@@ -114,21 +114,45 @@ pandora.ui.filesView = function(options, self) {
                     operator: '+',
                     title: 'Path',
                     visible: true,
-                    width: 480
+                    width: 360
+                },
+                {
+                    editable: true,
+                    id: 'version',
+                    operator: '+',
+                    title: 'Version',
+                    visible: true,
+                    width: 60
+                },
+                {
+                    editable: true,
+                    id: 'part',
+                    operator: '+',
+                    title: 'Part',
+                    visible: true,
+                    width: 60
+                },
+                {
+                    editable: true,
+                    id: 'partTitle',
+                    operator: '+',
+                    title: 'Part Title',
+                    visible: true,
+                    width: 60
+                },
+                {
+                    editable: true,
+                    id: 'language',
+                    operator: '+',
+                    title: 'Language',
+                    visible: true,
+                    width: 60
                 },
                 {
                     align: 'left',
                     id: 'type',
                     operator: '+',
                     title: 'Type',
-                    visible: true,
-                    width: 60
-                },
-                {
-                    align: 'right',
-                    id: 'part',
-                    operator: '+',
-                    title: 'Part',
                     visible: true,
                     width: 60
                 },
