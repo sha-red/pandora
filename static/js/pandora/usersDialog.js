@@ -148,7 +148,7 @@ pandora.ui.usersDialog = function() {
                         removable: false,
                         title: 'Username',
                         visible: true,
-                        width: 120
+                        width: 128
                     },
                     {
                         format: function(value, data) {
@@ -160,7 +160,7 @@ pandora.ui.usersDialog = function() {
                         operator: '+',
                         title: 'E-Mail Address',
                         visible: true,
-                        width: 180
+                        width: 192
                     },
                     {
                         align: 'center',
@@ -176,7 +176,7 @@ pandora.ui.usersDialog = function() {
                         title: 'Level',
                         type: 'label',
                         visible: true,
-                        width: 60
+                        width: 64
                     },
                     {
                         format: function(value) {
@@ -277,7 +277,7 @@ pandora.ui.usersDialog = function() {
                         operator: '-',
                         title: 'Times Seen',
                         visible: true,
-                        width: 90
+                        width: 80
                     },
                     {
                         align: 'right',
@@ -288,7 +288,7 @@ pandora.ui.usersDialog = function() {
                         operator: '-',
                         title: 'First Seen',
                         visible: true,
-                        width: 150
+                        width: 144
                     },
                     {
                         align: 'right',
@@ -299,7 +299,7 @@ pandora.ui.usersDialog = function() {
                         operator: '-',
                         title: 'Last Seen',
                         visible: true,
-                        width: 150
+                        width: 144
                     },
                     {
                         align: 'right',
@@ -311,14 +311,14 @@ pandora.ui.usersDialog = function() {
                         operator: '-',
                         title: 'Lists',
                         visible: true,
-                        width: 60
+                        width: 64
                     },
                     {
                         id: 'groups',
                         operator: '+',
                         title: 'Groups',
                         visible: true,
-                        width: 90
+                        width: 64
                     },
                     {
                         id: 'screensize',
@@ -326,7 +326,7 @@ pandora.ui.usersDialog = function() {
                         operator: '-',
                         title: 'Screen Size',
                         visible: true,
-                        width: 90
+                        width: 80
                     },
                     {
                         align: 'right',
@@ -334,7 +334,7 @@ pandora.ui.usersDialog = function() {
                         operator: '-',
                         title: 'Window Size',
                         visible: true,
-                        width: 90
+                        width: 80
                     },
                     {
                         align: 'right',
@@ -342,14 +342,14 @@ pandora.ui.usersDialog = function() {
                         operator: '+',
                         title: 'IP Address',
                         visible: true,
-                        width: 120
+                        width: 128
                     },
                     {
                         id: 'useragent',
                         operator: '+',
                         title: 'User Agent',
                         visible: true,
-                        width: 810
+                        width: 768
                     }
                 ],
                 columnsRemovable: true,
