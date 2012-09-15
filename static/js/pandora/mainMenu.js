@@ -419,7 +419,7 @@ pandora.ui.mainMenu = function() {
                 pandora.UI.set({showSidebar: !ui.showSidebar});
             },
             key_shift_t: function() {
-                ui.item && ui.itemView == 'video'
+                ui.item && ui.itemView == 'player'
                     && pandora.UI.set({showTimeline: !ui.showTimeline});
             },
             pandora_find: function() {
