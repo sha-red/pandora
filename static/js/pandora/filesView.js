@@ -251,47 +251,49 @@ pandora.ui.filesView = function(options, self) {
             init: function(data) {
                 self.numberOfItems = data.items;
             },
-            open: openFiles,
             select: selectFiles
         });
 
     self.$instancesList = Ox.TableList({
-        columns: [
-            {
-                align: 'left',
-                id: 'user',
-                operator: '+',
-                title: 'User',
-                visible: true,
-                width: 120
-            },
-            {
-                align: 'left',
-                id: 'volume',
-                operator: '+',
-                title: 'Volume',
-                visible: true,
-                width: 120
-            },
-            {
-                align: 'left',
-                id: 'path',
-                operator: '+',
-                title: 'Path',
-                visible: true,
-                width: 480
-            },
-        ],
-        columnsMovable: true,
-        columnsRemovable: true,
-        columnsResizable: true,
-        columnsVisible: true,
-        id: 'files',
-        items: [],
-        scrollbarVisible: true,
-        sort: [{key: 'user', operator: '+'}],
-        unique: 'path'
-    });
+            columns: [
+                {
+                    align: 'left',
+                    id: 'user',
+                    operator: '+',
+                    title: 'User',
+                    visible: true,
+                    width: 120
+                },
+                {
+                    align: 'left',
+                    id: 'volume',
+                    operator: '+',
+                    title: 'Volume',
+                    visible: true,
+                    width: 120
+                },
+                {
+                    align: 'left',
+                    id: 'path',
+                    operator: '+',
+                    title: 'Path',
+                    visible: true,
+                    width: 480
+                },
+            ],
+            columnsMovable: true,
+            columnsRemovable: true,
+            columnsResizable: true,
+            columnsVisible: true,
+            id: 'files',
+            items: [],
+            scrollbarVisible: true,
+            sort: [{key: 'user', operator: '+'}],
+            unique: 'path'
+        })
+        .bindEvent({
+            open: openFiles
+        });
 
     self.$movieLabel = Ox.Label({
             textAlign: 'center',
@@ -457,7 +459,7 @@ pandora.ui.filesView = function(options, self) {
 
     function openFiles(data) {
         data.ids.length == 1 && pandora.api.parsePath({
-            path: self.$filesList.value(data.ids[0], 'path')
+            path: self.$instancesList.value(data.ids[0], 'path')
         }, function(result) {
             ['title', 'director', 'year'].forEach(function(key) {
                 if (result.data[key]) {
