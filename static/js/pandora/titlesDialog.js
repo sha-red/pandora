@@ -105,53 +105,64 @@ pandora.ui.titlesDialog = function() {
             }),
 
         that = Ox.Dialog({
-            buttons: [
-                Ox.Button({
-                    title: 'Manage Names...'
-                }).bindEvent({
-                    click: function() {
-                        that.close();
-                        (pandora.$ui.namesDialog || (
-                            pandora.$ui.namesDialog = pandora.ui.namesDialog()
-                        )).open();
-                    }
-                }),
-                {},
-                $findButton,
-                Ox.Button({
-                    title: 'Done',
-                    width: 48
-                }).bindEvent({
-                    click: function() {
-                        that.close();
-                    }
-                })
-            ],
-            closeButton: true,
-            content: Ox.SplitPanel({
-                elements: [
-                    {
-                        element: Ox.Bar({size: 24})
-                            .append($status)
-                            .append(
-                                $findInput
-                            ),
-                        size: 24
-                    },
-                    {
-                        element: $list
-                    }
+                buttons: [
+                    Ox.Button({
+                        title: 'Manage Names...'
+                    }).bindEvent({
+                        click: function() {
+                            that.close();
+                            (pandora.$ui.namesDialog || (
+                                pandora.$ui.namesDialog = pandora.ui.namesDialog()
+                            )).open();
+                        }
+                    }),
+                    {},
+                    $findButton,
+                    Ox.Button({
+                        title: 'Done',
+                        width: 48
+                    }).bindEvent({
+                        click: function() {
+                            that.close();
+                        }
+                    })
                 ],
-                orientation: 'vertical'
+                closeButton: true,
+                content: Ox.SplitPanel({
+                    elements: [
+                        {
+                            element: Ox.Bar({size: 24})
+                                .append($status)
+                                .append(
+                                    $findInput
+                                ),
+                            size: 24
+                        },
+                        {
+                            element: $list
+                        }
+                    ],
+                    orientation: 'vertical'
+                }),
+                height: height,
+                maximizeButton: true,
+                minHeight: 256,
+                minWidth: 512,
+                padding: 0,
+                title: 'Manage Titles',
+                width: width
+            })
+            .bindEvent({
+                resizeend: function(data) {
+                    var width = (data.width - Ox.UI.SCROLLBAR_SIZE) / 2;
+                    [
+                        {id: 'title', width: Math.ceil(width)},
+                        {id: 'sorttitle', width: Math.floor(width)}
+                    ].forEach(function(column) {
+                        $list.resizeColumn(column.id, column.width);
+                    });
+                }
             }),
-            height: height,
-            maximizeButton: true,
-            minHeight: 256,
-            minWidth: 512,
-            padding: 0,
-            title: 'Manage Titles',
-            width: width
-        }),
 
         $status = $('<div>')
             .css({
