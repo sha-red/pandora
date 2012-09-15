@@ -214,6 +214,13 @@ class File(models.Model):
         for i in range(1, len(srt)):
             if srt[i-1]['out'] > srt[i]['in']:
                 srt[i-1]['out'] = srt[i]['in']
+
+        def shift(s):
+            s['in'] += offset
+            s['out'] += offset
+            return s
+        if offset:
+            srt = map(shift, srt)
         return srt
 
     def editable(self, user):
