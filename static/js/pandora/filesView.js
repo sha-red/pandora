@@ -341,7 +341,7 @@ pandora.ui.filesView = function(options, self) {
         });
     });
 
-    self.$checkbox = Ox.Checkbox({
+    self.$switch = Ox.Checkbox({
         id: 'go',
         title: 'Switch to this '
             + pandora.site.itemName.singular.toLowerCase()
@@ -356,7 +356,7 @@ pandora.ui.filesView = function(options, self) {
                 self.$directorInput,
                 self.$yearInput,
                 self.$idInput,
-                self.$checkbox
+                self.$switch
             ],
             width: 240
         })
@@ -445,7 +445,7 @@ pandora.ui.filesView = function(options, self) {
                 && pandora.user.ui.itemView == 'files'
             ) {
                 Ox.Request.clearCache(); // fixme: remove
-                if (self.$checkbox.value()) {
+                if (self.$switch.value()) {
                     pandora.UI.set({item: result.data.itemId});
                 } else {
                     Ox.Log('', 'moved', self.selected, result.data.itemId);
@@ -485,13 +485,13 @@ pandora.ui.filesView = function(options, self) {
 
     function updateForm() {
         if (self.selected.length == self.numberOfItems) {
-            self.wasChecked = self.$checkbox.value();
-            self.$checkbox.options({
+            self.wasChecked = self.$switch.value();
+            self.$switch.options({
                 disabled: true,
                 value: true
             });
         } else {
-            self.$checkbox.options({
+            self.$switch.options({
                 disabled: false,
                 value: self.wasChecked
             });
