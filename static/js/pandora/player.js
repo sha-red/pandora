@@ -13,6 +13,7 @@ pandora.ui.player = function(data) {
             annotationsRange: ui.annotationsRange,
             annotationsSize: ui.annotationsSize,
             annotationsSort: ui.annotationsSort,
+            annotationsTooltip: 'annotations <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'A</span>',
             censored: data.censored,
             censoredIcon: pandora.site.cantPlay.icon,
             censoredTooltip: pandora.site.cantPlay.text,
@@ -45,7 +46,7 @@ pandora.ui.player = function(data) {
             smallTimelineURL: '/' + ui.item + '/timeline16p.jpg',
             subtitles: data.subtitles,
             timeline: ui.videoTimeline,
-            tooltips: true,
+            timelineTooltip: 'timeline <span class="OxBright">' + Ox.SYMBOLS.SHIFT + 'T</span>',
             video: data.video,
             volume: ui.videoVolume,
             width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
