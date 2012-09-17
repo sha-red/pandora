@@ -49,8 +49,7 @@ def _order_query(qs, sort, prefix='sort__'):
         key = {
             'id': 'itemId',
         }.get(e['key'], e['key'])
-        if key not in ('itemId', ):
-            key = "%s%s" % (prefix, key)
+        key = "%s%s" % (prefix, key)
         order = '%s%s' % (operator, key)
         order_by.append(order)
     if order_by:
