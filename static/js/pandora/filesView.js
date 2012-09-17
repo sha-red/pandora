@@ -311,7 +311,12 @@ pandora.ui.filesView = function(options, self) {
         })
         .bindEvent({
             change: function(data) {
-                var conditions;
+                var conditions, matches;
+                if (key == 'id' && data.value.substr(0, 2) != '0x') {
+                    matches = data.value.match(/\d{7}/);
+                    data.value = matches ? matches[0] : '';
+                    self.$idInput.value(data.value);
+                }
                 if (data.value.length) {
                     conditions = {};
                     ['id', 'title', 'director', 'year'].map(function(key) {
