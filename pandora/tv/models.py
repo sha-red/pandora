@@ -25,9 +25,9 @@ class Channel(models.Model):
         now = datetime.now()
         cansee = settings.CONFIG['capabilities']['canSeeItem']['guest']
         if self.list:
-            items = self.list.get_items(self.list.user).filter(rendered=True, level__lte=cansee)
+            items = self.list.get_items(self.list.user).filter(rendered=True, level__lte=cansee, sort__duration__gt=0)
         else:
-            items = Item.objects.filter(rendered=True, level__lte=cansee)
+            items = Item.objects.filter(rendered=True, level__lte=cansee, sort__duration__gt=0)
         if items.count() == 0:
             return {}
 
@@ -53,7 +53,7 @@ class Channel(models.Model):
             p.item = item
             p.run = self.run
             p.start = start
-            p.end = start + timedelta(seconds=item.get_json()['duration'])
+            p.end = start + timedelta(seconds=item.sort.duration)
             p.channel = self
             p.save()
             program = self.program.order_by('-start')
