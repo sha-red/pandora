@@ -51,7 +51,7 @@ def get_matches(obj, model, layer_type, qs=None):
         q = Q(findvalue__icontains=" " + name)|Q(findvalue__istartswith=name)
         for name in obj.alternativeNames:
             name = ox.decode_html(name)
-            q = q|Q(value__icontains=" " + name)|Q(value__istartswith=name)
+            q = q|Q(findvalue__icontains=" " + name)|Q(findvalue__istartswith=name)
         contains_matches = q&Q(layer__in=contains)
         if f:
             f = contains_matches | f
@@ -69,7 +69,7 @@ def get_matches(obj, model, layer_type, qs=None):
         for name in [obj.name] + list(obj.alternativeNames):
             name = name.lower()
             name = ox.decode_html(name)
-            if name in value and (exact or re.compile('((^|\s)%s([\.,;:!?\-\/\s]|$))'%name).findall(value)):
+            if name in value and (exact or re.compile('((^|\s)%s([\.,;:!?\-\/\s]|$))'%re.escape(name)).findall(value)):
                 matches.append(a.id)
                 break
     if not matches:
@@ -135,7 +135,7 @@ class Annotation(models.Model):
         layer = self.get_layer()
         if self.value:
             self.value = utils.cleanup_value(self.value, layer['type'])
-            self.findvalue = ox.decode_html(ox.strip_tags(re.sub('<br */?>', ' ', self.value))).replace('\n', ' ')
+            self.findvalue = ox.decode_html(ox.strip_tags(re.sub('<br */?>\n?', ' ', self.value))).replace('\n', ' ')
             sortvalue = sort_string(self.findvalue)
             if sortvalue:
                 self.sortvalue = sortvalue[:900]
