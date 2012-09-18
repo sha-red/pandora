@@ -9,6 +9,5 @@ import models
 
 @periodic_task(run_every=timedelta(days=1), queue='encoding')
 def update_program(**kwargs):
-    user = User.objects.all()[0]
     for c in models.Channel.objects.all():
-        c.json(user)
+        c.update_program()

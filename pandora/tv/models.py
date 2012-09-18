@@ -21,15 +21,16 @@ class Channel(models.Model):
     def __unicode__(self):
         return u"%s %s" % (self.list or 'All', self.run)
 
-    def json(self, user):
-        now = datetime.now()
+    def update_program(self, now=None):
+        if not now:
+            now = datetime.now()
         cansee = settings.CONFIG['capabilities']['canSeeItem']['guest']
         if self.list:
             items = self.list.get_items(self.list.user).filter(rendered=True, level__lte=cansee, sort__duration__gt=0)
         else:
             items = Item.objects.filter(rendered=True, level__lte=cansee, sort__duration__gt=0)
         if items.count() == 0:
-            return {}
+            return None
 
         program = self.program.order_by('-start')
         changed = False
@@ -59,7 +60,15 @@ class Channel(models.Model):
             program = self.program.order_by('-start')
         if changed:
             self.save()
-        return program[0].json(user, now)
+        return program[0]
+
+    def json(self, user):
+        now = datetime.now()
+        program = self.update_program(now)
+        if not program:
+            return {}
+        else:
+            return program.json(user, now)
 
 class Program(models.Model):
     created = models.DateTimeField(auto_now_add=True)
