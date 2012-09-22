@@ -264,8 +264,8 @@ pandora.ui.infoView = function(data) {
         .html(
             formatKey('Alternative Title' + (data.alternativeTitles.length == 1 ? '' : 's'))
             + data.alternativeTitles.map(function(value) {
-                return value[0] + (value[1] ? ' '
-                    + formatLight('(' + value[1] + ')') : '');
+                return value[0] + (Ox.isArray(value[1]) ? ' '
+                    + formatLight('(' + value[1].join(', ') + ')') : '');
             }).join(', ')
         )
         .appendTo($text);
@@ -574,8 +574,8 @@ pandora.ui.infoView = function(data) {
             title = title.replace(match[0], formatLight(match[0]));
         }
         return title + (
-            data.originalTitle && data.originalTitle != title
-            ? ' ' + formatLight('(' + data.originalTitle + ')') : ''
+            data.internationalTitle && data.internationalTitle != title
+            ? ' ' + formatLight('(' + data.internationalTitle + ')') : ''
         );
     }
 
