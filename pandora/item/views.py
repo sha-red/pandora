@@ -796,7 +796,11 @@ def video(request, id, resolution, format, index=None):
     #FIXME: this needs to join segments if needed
     t = request.GET.get('t')
     if t:
-        t = map(float, t.split(','))
+        def parse_timestamp(s):
+            if ':' in s:
+                s = ox.time2ms(s) / 1000
+            return float(s)
+        t = map(parse_timestamp, t.split(','))
         ext = '.%s' % format
         content_type = mimetypes.guess_type(path)[0]
         if len(t) == 2 and t[1] > t[0] and stream.info['duration']>=t[1]:
