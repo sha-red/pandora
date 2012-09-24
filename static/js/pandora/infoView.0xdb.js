@@ -248,8 +248,8 @@ pandora.ui.infoView = function(data) {
                 html.push(
                     formatKey(key) + (
                         key != 'runtime' ? formatValue(data[key], key)
-                        : data[key] < 60 ? Math.round(data[key]) + ' sec'
-                        : Math.round(data[key] / 60) + ' min'
+                        : data[key] < 60 ? Math.round(data[key]) + '&nbsp;sec'
+                        : Math.round(data[key] / 60) + '&nbsp;min'
                     )
                 )
             }
