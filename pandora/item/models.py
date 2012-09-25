@@ -366,8 +366,10 @@ class Item(models.Model):
             for c in self.clips.all(): c.save()
             for a in self.annotations.all():
                 public_id = a.public_id.split('/')[1]
-                a.public_id = "%s/%s" % (self.itemId, public_id)
-                a.save()
+                public_id = "%s/%s" % (self.itemId, public_id)
+                if public_id != a.public_id:
+                    a.public_id = public_id
+                    a.save()
         tasks.update_file_paths.delay(self.itemId)
         if update_poster:
             return tasks.update_poster.delay(self.itemId)
