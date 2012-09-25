@@ -243,6 +243,8 @@ Positions
             for p in _p:
                 if p  == 'accessed':
                     r[p] = m.sort.accessed or ''
+                elif p == 'modified':
+                    r[p] = m.sort.modified
                 elif p == 'timesaccessed':
                     r[p] = m.sort.timesaccessed
                 else:
@@ -261,7 +263,9 @@ Positions
             return r
         qs = qs[query['range'][0]:query['range'][1]]
         #response['data']['items'] = [m.get_json(_p) for m in qs]
-        if 'viewed' in _p or 'timesaccessed' in _p or 'accessed' in _p:
+        if filter(lambda p: p in (
+            'accessed', 'modified', 'timesaccessed', 'viewed'
+        ), _p):
             qs = qs.select_related()
             response['data']['items'] = [only_p_sums(m) for m in qs]
         else:
