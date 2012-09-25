@@ -151,6 +151,7 @@ pandora.ui.infoView = function(data) {
         })
         .append(
             Ox.Editable({
+                    clickLink: pandora.clickLink,
                     editable: isEditable,
                     format: function(value) {
                         return formatTitle(value);
@@ -317,6 +318,7 @@ pandora.ui.infoView = function(data) {
         .css(css)
         .html(
             formatKey('cast') + data.cast.map(function(value) {
+                // FIXME: 'uncredited' should be removed on the backend
                 value.character = value.character.replace('(uncredited)', '').trim();
                 return formatValue(value.actor, 'name')
                     + (value.character ? ' '
@@ -569,9 +571,11 @@ pandora.ui.infoView = function(data) {
     }
 
     function formatTitle(title) {
-        var match = /(\(S\d{2}E\d{2}\))/.exec(title);
+        var match = /(.+) (\(S\d{2}E\d{2}\))/.exec(title);
         if (match) {
-            title = title.replace(match[0], formatLight(match[0]));
+            title = formatValue(match[1], 'title') + ' '
+                + formatLight(match[2])
+                + title.substr(match[0].length);
         }
         return title + (
             data.internationalTitle && data.internationalTitle != title
