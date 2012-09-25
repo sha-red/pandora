@@ -118,8 +118,9 @@ def get_item(info, user=None, async=False):
                     item = existing_item
                 except Item.DoesNotExist:
                     item.oxdbId = item.oxdb_id()
-                    item.save()
-                    tasks.update_poster.delay(item.itemId)
+                    p = item.save()
+                    if not p:
+                        tasks.update_poster.delay(item.itemId)
     else:
         qs = Item.objects.filter(find__key='title', find__value=info['title'])
         if qs.count() == 1:
@@ -128,8 +129,9 @@ def get_item(info, user=None, async=False):
             item = Item()
             item.data = item_data
             item.user = user
-            item.save()
-            tasks.update_poster.delay(item.itemId)
+            p = item.save()
+            if not p:
+                tasks.update_poster.delay(item.itemId)
     return item
 
 class Item(models.Model):
@@ -265,8 +267,11 @@ class Item(models.Model):
             response = external_data('getData', {'id': self.itemId})
             if response['status']['code'] == 200:
                 self.external_data = response['data']
-                self.make_poster(True)
-                self.save()
+                p = self.save()
+                if p:
+                    p.wait()
+                else:
+                    self.make_poster(True)
 
     def expand_connections(self):
         c = self.get('connections')
@@ -1058,19 +1063,6 @@ class Item(models.Model):
         tasks.load_subtitles.delay(self.itemId)
         get_sequences.delay(self.itemId)
 
-    def delete_poster(self):
-        if self.poster:
-            path = self.poster.path
-            try:
-                self.poster.delete()
-            except:
-                self.poster.name = None
-        else:
-            poster= self.path('poster.jpg')
-            path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
-        for f in glob(path.replace('.jpg', '*.jpg')):
-            os.unlink(f)
-
     def save_poster(self, data):
         self.poster.name = self.path('poster.jpg')
         poster = self.poster.path
@@ -1101,7 +1093,6 @@ class Item(models.Model):
     def make_poster(self, force=False):
         ox.makedirs(os.path.join(settings.MEDIA_ROOT,self.path()))
         if not self.poster or force:
-            self.delete_poster()
             poster = self.make_siteposter()
             url = self.prefered_poster_url()
             if url:
@@ -1112,6 +1103,13 @@ class Item(models.Model):
                     data = f.read()
                     if data:
                         self.save_poster(data)
+            poster = self.poster.path
+            for f in glob(poster.replace('.jpg', '*.jpg')):
+                if f != poster:
+                    try:
+                        os.unlink(f)
+                    except OSError:
+                        pass
 
     def make_siteposter(self):
         poster = self.path('siteposter.jpg')
@@ -1194,13 +1192,13 @@ class Item(models.Model):
         p = subprocess.Popen(cmd)
         p.wait()
         #remove cached versions
-        icons = os.path.abspath(os.path.join(settings.MEDIA_ROOT, icon))
-        icons = glob(icons.replace('.jpg', '*.jpg'))
-        for f in filter(lambda p: not p.endswith('/icon.jpg'), icons):
-            try:
-                os.unlink(f)
-            except:
-                pass
+        icon = os.path.abspath(os.path.join(settings.MEDIA_ROOT, icon))
+        for f in glob(icon.replace('.jpg', '*.jpg')):
+            if f != icon:
+                try:
+                    os.unlink(f)
+                except OSError:
+                    pass
         return icon
 
     def load_subtitles(self):
