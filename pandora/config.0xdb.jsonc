@@ -337,6 +337,14 @@
             "sort": true
         },
         {
+            "id": "likes",
+            "title": "Likes",
+            "type": "integer",
+            "columnWidth": 60,
+            "format": {"type": "number"},
+            "sort": true
+        },
+        {
             "id": "id",
             "title": "ID",
             "type": "string",
