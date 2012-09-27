@@ -358,15 +358,15 @@ class Item(models.Model):
         else:
             self.poster_height = 128
             self.poster_width = 80
-        self.update_find()
-        self.update_sort()
-        self.update_facets()
         if not settings.USE_IMDB:
             if self.poster_frame == -1 and self.sort.duration:
                 self.poster_frame = self.sort.duration/2
                 update_poster = True
         self.json = self.get_json()
         super(Item, self).save(*args, **kwargs)
+        self.update_find()
+        self.update_sort()
+        self.update_facets()
         if update_ids:
             for c in self.clips.all(): c.save()
             for a in self.annotations.all():
