@@ -339,9 +339,9 @@
         {
             "id": "likes",
             "title": "Likes",
-            "type": "integer",
+            "type": "float",
             "columnWidth": 60,
-            "format": {"type": "number"},
+            "format": {"type": "unit", "args": ["%", 2]},
             "sort": true
         },
         {
