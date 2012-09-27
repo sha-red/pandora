@@ -363,6 +363,7 @@ class Item(models.Model):
                 self.poster_frame = self.sort.duration/2
                 update_poster = True
         self.json = self.get_json()
+        self.json['modified'] = datetime.now()
         super(Item, self).save(*args, **kwargs)
         self.update_find()
         self.update_sort()
