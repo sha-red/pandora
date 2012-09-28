@@ -341,7 +341,7 @@
             "title": "Likes",
             "type": "float",
             "columnWidth": 60,
-            "format": {"type": "unit", "args": ["%", 2]},
+            "format": {"type": "unit", "args": ["%", 1]},
             "sort": true
         },
         {
