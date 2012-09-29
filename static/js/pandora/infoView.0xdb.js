@@ -409,14 +409,15 @@ pandora.ui.infoView = function(data) {
         $div.html(html.join('; '));
     }
 
-    if (data.rating || data.votes) {
+    if (data.rating || data.votes || data.likes) {
         $div = $('<div>')
             .css(css)
             .appendTo($text);
         html = [];
-        ['rating', 'votes'].forEach(function(key) {
+        ['rating', 'votes', 'likes'].forEach(function(key) {
+            var digits = key == 'rating' ? 0 : key == 'votes' ? 2 : 1;
             data[key] && html.push(
-                formatKey(key) + Ox.formatNumber(data[key], key == 'rating' ? 0 : 2) + '%'
+                formatKey(key) + Ox.formatNumber(data[key], digits) + '%'
             );
         });
         $div.html(html.join('; '));
