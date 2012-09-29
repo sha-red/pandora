@@ -445,7 +445,7 @@ pandora.ui.infoView = function(data) {
                             : connection.title
                     ) + (
                         connection.description
-                            ? ' (' + formatLight(connection.description) + ')'
+                            ? ' ' + formatLight('(' + connection.description + ')')
                             : ''
                     );
                 }).join(', ')
