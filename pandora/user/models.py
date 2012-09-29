@@ -172,6 +172,9 @@ class UserProfile(models.Model):
 
     notes = models.TextField(default='')
 
+    def __unicode__(self):
+        return self.user.username
+
     def get_ui(self):
         return get_ui(self.ui, self.user)
 

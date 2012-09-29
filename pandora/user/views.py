@@ -777,7 +777,7 @@ def setUI(request):
     else:
         ui = json.loads(request.session.get('ui', '{}'))
     for key in data:
-        keys = re.sub('([^\\\\])\.', '\\1\n', key).split('\n')
+        keys = map(lambda p: p.replace('\0', '\\.'), key.replace('\\.', '\0').split('.'))
         value = data[key]
         p = ui
         while len(keys)>1:
