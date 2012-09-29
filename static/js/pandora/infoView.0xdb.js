@@ -439,9 +439,15 @@ pandora.ui.infoView = function(data) {
         ].forEach(function(key) {
             data.connections[key] && html.push(
                 formatKey(key) + data.connections[key].map(function(connection) {
-                    return connection.item
-                        ? '<a href="/' + connection.item + '">' + connection.title + '</a>'
-                        : connection.title;
+                    return (
+                        connection.item
+                            ? '<a href="/' + connection.item + '">' + connection.title + '</a>'
+                            : connection.title
+                    ) + (
+                        connection.description
+                            ? ' (' + formatLight(connection.description) + ')'
+                            : ''
+                    );
                 }).join(', ')
             );
         });
