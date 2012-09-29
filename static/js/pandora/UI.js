@@ -156,7 +156,6 @@ pandora.UI = (function() {
         // items in args trigger events, items in add do not
         [args, add].forEach(function(obj, isAdd) {
             Ox.forEach(obj, function(val, key) {
-                Ox.Log('', 'key/val', key, val)
                 // make sure to not split at escaped dots ('\.')
                 var keys = key.replace(/\\\./g, '\n').split('.').map(function(key) {
                         return key.replace(/\n/g, '.')
