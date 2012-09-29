@@ -403,7 +403,8 @@ pandora.ui.infoView = function(data) {
         html = [];
         ['budget', 'gross', 'profit'].forEach(function(key) {
             data[key] && html.push(
-                formatKey(key) + Ox.formatCurrency(data[key], '$')
+                formatKey(key == 'profit' && data[key] < 0 ? 'loss' : key)
+                + Ox.formatCurrency(Math.abs(data[key]), '$')
             );
         });
         $div.html(html.join('; '));
