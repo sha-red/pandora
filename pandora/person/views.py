@@ -14,6 +14,7 @@ from ox.django.api import actions
 from item import utils
 
 import models
+import tasks
 
 @admin_required_json
 def editName(request):
@@ -31,6 +32,7 @@ def editName(request):
         person.sortname = data['sortname']
         person.edited = True
     person.save()
+    tasks.update_file_paths.delay(person.id)
     response['data'] = person.json()
     return render_to_json_response(response)
 actions.register(editName, cache=False)
