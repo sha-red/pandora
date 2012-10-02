@@ -190,6 +190,7 @@ USE_IMDB = False
 VIDEO_PREFIX=''
 #VIDEO_PREFIX='videoPART.example.com'
 #SESSION_COOKIE_DOMAIN=*.example.com"
+SESSION_COOKIE_AGE=60*24*60*60
 
 SCRIPT_ROOT = normpath(join(PROJECT_ROOT, '..', 'scripts'))
 #change script to customize

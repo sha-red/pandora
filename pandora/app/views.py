@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 import copy
+from datetime import datetime
 
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
@@ -159,6 +160,7 @@ def init(request):
 
     response['data']['site'] = config
     response['data']['user'] = init_user(request.user, request)
+    request.session['last_init'] = str(datetime.now())
     return render_to_json_response(response)
 actions.register(init)
 
