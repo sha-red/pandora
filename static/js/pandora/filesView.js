@@ -138,7 +138,7 @@ pandora.ui.filesView = function(options, self) {
                     operator: '+',
                     title: 'Part Title',
                     visible: true,
-                    width: 60
+                    width: 180
                 },
                 {
                     editable: true,
