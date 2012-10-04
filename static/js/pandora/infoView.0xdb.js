@@ -441,15 +441,15 @@ pandora.ui.infoView = function(data) {
         $div.html(html.join('; '));
     }
 
-    if (data.rating || data.votes || data.likes) {
+    if (data.votes || data.likes) {
         $div = $('<div>')
             .css(css)
             .appendTo($text);
         html = [];
-        ['rating', 'votes', 'likes'].forEach(function(key) {
-            var digits = key == 'rating' ? 0 : key == 'votes' ? 2 : 1;
+        ['votes', 'likes'].forEach(function(key) {
             data[key] && html.push(
-                formatKey(key) + Ox.formatNumber(data[key], digits) + '%'
+                formatKey(key == 'votes' ? 'Mainstream Score' : 'Arthouse Score')
+                + Ox.formatNumber(data[key], 1) + '%'
             );
         });
         $div.html(html.join('; '));

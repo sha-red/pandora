@@ -330,15 +330,15 @@
         },
         {
             "id": "votes",
-            "title": "Votes",
+            "title": "Mainstream Score",
             "type": "float",
             "columnWidth": 60,
-            "format": {"type": "unit", "args": ["%", 2]},
+            "format": {"type": "unit", "args": ["%", 1]},
             "sort": true
         },
         {
             "id": "likes",
-            "title": "Likes",
+            "title": "Arthouse Score",
             "type": "float",
             "columnWidth": 60,
             "format": {"type": "unit", "args": ["%", 1]},
