@@ -16,6 +16,7 @@ urlpatterns = patterns("item.views",
     (r'^(?P<id>[A-Z0-9].*)/(?P<resolution>\d+)p(?P<index>\d*)\.(?P<format>webm|ogv|mp4)$', 'video'),
 
     #torrent
+    (r'^(?P<id>[A-Z0-9].*)/torrent$', 'torrent'),
     (r'^(?P<id>[A-Z0-9].*)/torrent/(?P<filename>.*?)$', 'torrent'),
 
     #export
