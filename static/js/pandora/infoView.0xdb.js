@@ -389,6 +389,37 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($text);
 
+    if (data.connections) {
+        $div = $('<div>')
+            .css(css)
+            .appendTo($text);
+        html = [];
+        [
+            'Edited from', 'Edited into',
+            'Features', 'Featured in',
+            'Follows', 'Followed by',
+            'References', 'Referenced in',
+            'Remake of', 'Remade as',
+            'Spin off from', 'Spin off',
+            'Spoofs', 'Spoofed in'
+        ].forEach(function(key) {
+            data.connections[key] && html.push(
+                formatKey(key) + data.connections[key].map(function(connection) {
+                    return (
+                        connection.item
+                            ? '<a href="/' + connection.item + '">' + connection.title + '</a>'
+                            : connection.title
+                    ) + (
+                        connection.description
+                            ? ' ' + formatLight('(' + connection.description + ')')
+                            : ''
+                    );
+                }).join(', ')
+            );
+        });
+        $div.html(html.join('; '));
+    }
+
     data.releasedate && $('<div>')
         .css(css)
         .html(
@@ -419,37 +450,6 @@ pandora.ui.infoView = function(data) {
             var digits = key == 'rating' ? 0 : key == 'votes' ? 2 : 1;
             data[key] && html.push(
                 formatKey(key) + Ox.formatNumber(data[key], digits) + '%'
-            );
-        });
-        $div.html(html.join('; '));
-    }
-
-    if (data.connections) {
-        $div = $('<div>')
-            .css(css)
-            .appendTo($text);
-        html = [];
-        [
-            'Edited from', 'Edited into',
-            'Features', 'Featured in',
-            'Follows', 'Followed by',
-            'References', 'Referenced in',
-            'Remake of', 'Remade as',
-            'Spin off from', 'Spin off',
-            'Spoofs', 'Spoofed in'
-        ].forEach(function(key) {
-            data.connections[key] && html.push(
-                formatKey(key) + data.connections[key].map(function(connection) {
-                    return (
-                        connection.item
-                            ? '<a href="/' + connection.item + '">' + connection.title + '</a>'
-                            : connection.title
-                    ) + (
-                        connection.description
-                            ? ' ' + formatLight('(' + connection.description + ')')
-                            : ''
-                    );
-                }).join(', ')
             );
         });
         $div.html(html.join('; '));
