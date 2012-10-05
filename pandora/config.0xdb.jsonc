@@ -325,7 +325,7 @@
             "title": "Mainstream Score",
             "type": "float",
             "columnWidth": 60,
-            "format": {"type": "unit", "args": ["%", 1]},
+            "format": {"type": "ColorPercent", "args": [1, true]},
             "sort": true
         },
         {
@@ -333,7 +333,7 @@
             "title": "Arthouse Score",
             "type": "float",
             "columnWidth": 60,
-            "format": {"type": "unit", "args": ["%", 1]},
+            "format": {"type": "ColorPercent", "args": [1, true]},
             "sort": true
         },
         {

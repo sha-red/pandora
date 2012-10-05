@@ -462,7 +462,7 @@ pandora.ui.infoView = function(data) {
             .css({marginBottom: '4px'})
             .append(formatKey(key == 'votes' ? 'Mainstream Score' : 'Arthouse Score'), true)
             .append(
-                Ox.Theme.formatColor(value * 1.2, 'hue')
+                Ox.Theme.formatColor(Math.sqrt(value) * 12, 'hue')
                     .css({textAlign: 'right'})
                     .html(Ox.formatNumber(value, 1) + '%')
             )
