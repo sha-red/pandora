@@ -441,20 +441,6 @@ pandora.ui.infoView = function(data) {
         $div.html(html.join('; '));
     }
 
-    if (data.votes || data.likes) {
-        $div = $('<div>')
-            .css(css)
-            .appendTo($text);
-        html = [];
-        ['votes', 'likes'].forEach(function(key) {
-            data[key] && html.push(
-                formatKey(key == 'votes' ? 'Mainstream Score' : 'Arthouse Score')
-                + Ox.formatNumber(data[key], 1) + '%'
-            );
-        });
-        $div.html(html.join('; '));
-    }
-
     ['reviews', 'links'].forEach(function(key) {
         data[key] && $('<div>')
             .css(css)
@@ -468,16 +454,31 @@ pandora.ui.infoView = function(data) {
 
     $('<div>').css({height: '16px'}).appendTo($text);
 
+    // Mainstream Score, Arthouse Score ----------------------------------------
+
+    ['votes', 'likes'].forEach(function(key) {
+        var value = data[key] || 0;
+        $('<div>')
+            .css({marginBottom: '4px'})
+            .append(formatKey(key == 'votes' ? 'Mainstream Score' : 'Arthouse Score'), true)
+            .append(
+                Ox.Theme.formatColor(value * 1.2, 'hue')
+                    .css({textAlign: 'right'})
+                    .html(Ox.formatNumber(value, 1) + '%')
+            )
+            .appendTo($statistics);
+    });
+
     // Hue, Saturation, Lightness, Volume --------------------------------------
 
     ['hue', 'saturation', 'lightness', 'volume'].forEach(function(key) {
+        var value = data[key] || 0;
         $('<div>')
             .css({marginBottom: '4px'})
             .append(formatKey(key, true))
             .append(
-                Ox.Theme.formatColor(
-                    data[key] || 0, key == 'volume' ? 'lightness' : key
-                ).css({textAlign: 'right'})
+                Ox.Theme.formatColor(value, key == 'volume' ? 'lightness' : key)
+                    .css({textAlign: 'right'})
             )
             .appendTo($statistics);
     });
