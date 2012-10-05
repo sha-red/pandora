@@ -88,8 +88,6 @@ pandora.ui.statisticsDialog = function() {
 
         $tabPanel;
 
-    //Ox.getJSON('/static/json/deleteme.json', function(result) {
-    ///*
     pandora.api.findUsers({
         keys: ['browser', 'firstseen', 'lastseen', 'level', 'location', 'system'],
         query: {
@@ -99,7 +97,6 @@ pandora.ui.statisticsDialog = function() {
         range: [0, 1000000],
         sort: [{key: 'username', operator: '+'}]
     }, function(result) {    
-    //*/
 
         var data = {},
             flagCountry = {},
@@ -111,6 +108,7 @@ pandora.ui.statisticsDialog = function() {
                 year: {},
                 month: {},
                 day: {},
+                weekday: {},
                 hour: {},
                 continent: {},
                 region: {},
@@ -130,13 +128,15 @@ pandora.ui.statisticsDialog = function() {
                     ['firstseen', 'lastseen'].forEach(function(key, i) {
                         var year = item[key].slice(0, 4) + '-' + key,
                             month = item[key].slice(0, 7) + '-' + key,
-                            day = Ox.formatDate(item[key], '%u'),
+                            day = item[key].slice(0, 10),
+                            weekday = Ox.formatDate(item[key], '%u'),
                             hour = item[key].slice(11, 13);
                         data[mode].year[year] = data[mode].year[year] || {};
                         data[mode].year[year][month] = (data[mode].year[year][month] || 0) + 1;                
                         data[mode].month[month] = (data[mode].month[month] || 0) + 1;
-                        data[mode].day[day] = data[mode].day[day] || {};
-                        data[mode].day[day][hour] = (data[mode].day[day][hour] || 0) + 1;           
+                        data[mode].day[day] = (data[mode].day[day] || 0) + 1;
+                        data[mode].weekday[weekday] = data[mode].weekday[weekday] || {};
+                        data[mode].weekday[weekday][hour] = (data[mode].weekday[weekday][hour] || 0) + 1;           
                         data[mode].hour[hour] = (data[mode].hour[hour] || 0) + 1;           
                     });
                     if (item.location) {
@@ -262,13 +262,16 @@ pandora.ui.statisticsDialog = function() {
                                 : 'rgb(16, 16, 16)' 
                         });
                 if (id == 'seen') {
-                    ['year', 'month', 'day', 'hour'].forEach(function(key) {
-                        var isYearOrMonth = ['year', 'month'].indexOf(key) > -1;
+                    ['year', 'month', 'lastdays', 'topdays', 'weekday', 'hour'].forEach(function(key) {
+                        var isDate = ['year', 'month'].indexOf(key) > -1,
+                            isDay = ['lastdays', 'topdays'].indexOf(key) > -1;
                         Ox.Chart({
                                 color: function(value) {
                                         var split = value.split('-'),
-                                            color = isYearOrMonth ? Ox.rgb(
+                                            color = isDate ? Ox.rgb(
                                                     Ox.mod(8 - parseInt(split[1], 10), 12) * 30, 1, 0.5
+                                                ) : isDay ? Ox.rgb(
+                                                    Math.abs(parseInt(Ox.formatDate(value, '%w')) * 360 / 7), 1, 0.5
                                                 ) : Ox.rgb(
                                                     (Math.abs(11.5 - parseInt(split[0], 10)) - 0.5) * -11, 1, 0.5
                                                 );
@@ -279,16 +282,21 @@ pandora.ui.statisticsDialog = function() {
                                         }
                                         return color;
                                     },
-                                data: data[mode][key],
+                                data: data[mode][isDay ? 'day' : key],
                                 formatKey: function(value) {
                                     var ret, split;
-                                    if (isYearOrMonth) {
+                                    if (isDate) {
                                         split = value.split('-');
                                         ret = (split.pop() == 'firstseen' ? 'First' : 'Last') + ': '
                                             + (key == 'year' ? '' : Ox.MONTHS[parseInt(split[1], 10) - 1])
                                             + ' ' + split[0];
+                                    } else if (isDay) {
+                                        split = value.split('-');
+                                        ret = Ox.SHORT_WEEKDAYS[parseInt(Ox.formatDate(value, '%u')) - 1] + ', '
+                                            + Ox.SHORT_MONTHS[parseInt(split[1], 10) - 1] + ' '
+                                            + parseInt(split[2], 10) + ', ' + split[0];
                                     } else {
-                                        ret = key == 'day'
+                                        ret = key == 'weekday'
                                             ? Ox.WEEKDAYS[parseInt(value, 10) - 1]
                                             : value + ':00';
                                     }
@@ -296,9 +304,15 @@ pandora.ui.statisticsDialog = function() {
                                 },
                                 keyAlign: 'right',
                                 keyWidth: 128,
-                                rows: isYearOrMonth ? 2 : 1,
-                                sort: {key: 'key', operator: isYearOrMonth ? '-' : '+'},
-                                title: Ox.toTitleCase(key) + 's',
+                                limit: isDay ? 30 : 0,
+                                rows: isDate ? 2 : 1,
+                                sort: {
+                                    key: key == 'topdays' ? 'value' : 'key',
+                                    operator: isDate || isDay ? '-' : '+'
+                                },
+                                title: key == 'lastdays' ? 'Last 30 Days'
+                                    : key == 'topdays' ? 'Top 30 Days'
+                                    : Ox.toTitleCase(key) + 's',
                                 width: chartWidth
                             })
                             .css({
@@ -307,7 +321,7 @@ pandora.ui.statisticsDialog = function() {
                                 top: top + 'px'
                             })
                             .appendTo($content);
-                        top += Ox.len(data[mode][key]) * 16 + 32;
+                        top += (isDay ? 30 : Ox.len(data[mode][key])) * 16 + 32;
                     });
                 } else if (id == 'locations') {
                     ['continent', 'region', 'country', 'city'].forEach(function(key) {
