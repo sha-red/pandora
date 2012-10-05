@@ -461,11 +461,7 @@ pandora.ui.infoView = function(data) {
         $('<div>')
             .css({marginBottom: '4px'})
             .append(formatKey(key == 'votes' ? 'Mainstream Score' : 'Arthouse Score'), true)
-            .append(
-                Ox.Theme.formatColor(Math.sqrt(value) * 12, 'hue')
-                    .css({textAlign: 'right'})
-                    .html(Ox.formatNumber(value, 1) + '%')
-            )
+            .append(Ox.Theme.formatColorPercent(value, 1, true))
             .appendTo($statistics);
     });
 
