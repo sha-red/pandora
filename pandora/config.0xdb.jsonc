@@ -321,14 +321,6 @@
             "sort": true
         },
         {
-            "id": "rating",
-            "title": "Rating",
-            "type": "float",
-            "columnWidth": 60,
-            "format": {"type": "unit", "args": ["%"]},
-            "sort": true
-        },
-        {
             "id": "votes",
             "title": "Mainstream Score",
             "type": "float",
