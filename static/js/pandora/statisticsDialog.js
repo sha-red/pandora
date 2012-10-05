@@ -134,10 +134,12 @@ pandora.ui.statisticsDialog = function() {
                         data[mode].year[year] = data[mode].year[year] || {};
                         data[mode].year[year][month] = (data[mode].year[year][month] || 0) + 1;                
                         data[mode].month[month] = (data[mode].month[month] || 0) + 1;
-                        data[mode].day[day] = (data[mode].day[day] || 0) + 1;
-                        data[mode].weekday[weekday] = data[mode].weekday[weekday] || {};
-                        data[mode].weekday[weekday][hour] = (data[mode].weekday[weekday][hour] || 0) + 1;           
-                        data[mode].hour[hour] = (data[mode].hour[hour] || 0) + 1;           
+                        if (key == 'firstseen') {
+                            data[mode].day[day] = (data[mode].day[day] || 0) + 1;
+                            data[mode].weekday[weekday] = data[mode].weekday[weekday] || {};
+                            data[mode].weekday[weekday][hour] = (data[mode].weekday[weekday][hour] || 0) + 1;           
+                            data[mode].hour[hour] = (data[mode].hour[hour] || 0) + 1;
+                        }
                     });
                     if (item.location) {
                         split = item.location.split(', ')
