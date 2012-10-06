@@ -506,8 +506,12 @@ class Item(models.Model):
                 if key not in i:
                     value = self.get(key)
                     #also get values from sort table, i.e. numberof values
-                    if not value and  self.sort and hasattr(self.sort, key):
-                        value = getattr(self.sort, key)
+                    if not value:
+                        try:
+                            if self.sort and hasattr(self.sort, key):
+                                value = getattr(self.sort, key)
+                        except ItemSort.DoesNotExist:
+                            pass
                     if value:
                         i[key] = value
 
