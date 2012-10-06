@@ -161,7 +161,14 @@ class File(models.Model):
         return data
 
     def normalize_path(self):
-        return ox.movie.format_path(self.get_path_info())
+        #FIXME: always use path_info
+        if settings.USE_IMDB:
+            return ox.movie.format_path(self.get_path_info())
+        else:
+            path = self.path or ''
+            if self.instances.all().count():
+                path = self.instances.all()[0].path
+            return path
 
     def save(self, *args, **kwargs):
         if self.id and not self.path_info and self.instances.count():
