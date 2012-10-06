@@ -135,7 +135,8 @@ pandora.ui.statisticsDialog = function() {
                         data[mode].year[year][month] = (data[mode].year[year][month] || 0) + 1;                
                         data[mode].month[month] = (data[mode].month[month] || 0) + 1;
                         if (key == 'firstseen') {
-                            data[mode].day[day] = (data[mode].day[day] || 0) + 1;
+                            data[mode].day[day] = data[mode].day[day] || {};
+                            data[mode].day[day][hour] = (data[mode].day[day][hour] || 0) + 1;
                             data[mode].weekday[weekday] = data[mode].weekday[weekday] || {};
                             data[mode].weekday[weekday][hour] = (data[mode].weekday[weekday][hour] || 0) + 1;           
                             data[mode].hour[hour] = (data[mode].hour[hour] || 0) + 1;
@@ -188,7 +189,7 @@ pandora.ui.statisticsDialog = function() {
             firstKey = keys[0].split('-').map(function(str) {
                 return parseInt(str, 10);
             });
-            lastKey = keys[keys.length - 1].split('-').map(function(str) {
+            lastKey = Ox.formatDate(new Date(), '%F').split('-').map(function(str) {
                 return parseInt(str, 10);
             });
             Ox.loop(firstKey[0], lastKey[0] + 1, function(year) {
@@ -204,6 +205,28 @@ pandora.ui.statisticsDialog = function() {
                             var key = [year, Ox.pad(month, 2), key].join('-');
                             data[mode].month[key] = data[mode].month[key] || 0;
                         });
+                    }
+                );
+            });
+
+            keys = Object.keys(data[mode].day).sort();
+            firstKey = keys[0].split('-').map(function(str) {
+                return parseInt(str, 10);
+            });
+            Ox.loop(firstKey[0], lastKey[0] + 1, function(year) {
+                Ox.loop(
+                    year == firstKey[0] ? firstKey[1] : 1,
+                    year == lastKey[0] ? lastKey[1] + 1 : 13,
+                    function(month) {
+                        Ox.loop(
+                            year == firstKey[0] && month == firstKey[1] ? firstKey[2] : 1,
+                            year == lastKey[0] && month == lastKey[1] ? lastKey[2] + 1
+                                : Ox.getDaysInMonth(year, month) + 1,
+                            function(day) {
+                                var key = [year, Ox.pad(month, 2), Ox.pad(day, 2)].join('-');
+                                data[mode].day[key] = data[mode].day[key] || {};
+                            }
+                        );
                     }
                 );
             });
@@ -272,8 +295,6 @@ pandora.ui.statisticsDialog = function() {
                                         var split = value.split('-'),
                                             color = isDate ? Ox.rgb(
                                                     Ox.mod(8 - parseInt(split[1], 10), 12) * 30, 1, 0.5
-                                                ) : isDay ? Ox.rgb(
-                                                    Math.abs(parseInt(Ox.formatDate(value, '%w')) * 360 / 7), 1, 0.5
                                                 ) : Ox.rgb(
                                                     (Math.abs(11.5 - parseInt(split[0], 10)) - 0.5) * -11, 1, 0.5
                                                 );
