@@ -389,6 +389,27 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($text);
 
+    data.releasedate && $('<div>')
+        .css(css)
+        .html(
+            formatKey('Release Date') + Ox.formatDate(data.releasedate, '%A, %B %e, %Y')
+        )
+        .appendTo($text);
+
+    if (data.budget || data.gross || data.profit) {
+        $div = $('<div>')
+            .css(css)
+            .appendTo($text);
+        html = [];
+        ['budget', 'gross', 'profit'].forEach(function(key) {
+            data[key] && html.push(
+                formatKey(key == 'profit' && data[key] < 0 ? 'loss' : key)
+                + Ox.formatCurrency(Math.abs(data[key]), '$')
+            );
+        });
+        $div.html(html.join('; '));
+    }
+
     if (data.connections) {
         $div = $('<div>')
             .css(css)
@@ -415,27 +436,6 @@ pandora.ui.infoView = function(data) {
                             : ''
                     );
                 }).join(', ')
-            );
-        });
-        $div.html(html.join('; '));
-    }
-
-    data.releasedate && $('<div>')
-        .css(css)
-        .html(
-            formatKey('Release Date') + Ox.formatDate(data.releasedate, '%A, %B %e, %Y')
-        )
-        .appendTo($text);
-
-    if (data.budget || data.gross || data.profit) {
-        $div = $('<div>')
-            .css(css)
-            .appendTo($text);
-        html = [];
-        ['budget', 'gross', 'profit'].forEach(function(key) {
-            data[key] && html.push(
-                formatKey(key == 'profit' && data[key] < 0 ? 'loss' : key)
-                + Ox.formatCurrency(Math.abs(data[key]), '$')
             );
         });
         $div.html(html.join('; '));
