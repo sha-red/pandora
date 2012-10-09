@@ -1123,13 +1123,16 @@ class Item(models.Model):
         frame = self.get_poster_frame_path()
         timeline = '%stimelineantialias64p.jpg' % self.timeline_prefix
 
-        director = u', '.join(self.get('director', ['Unknown Director']))
+        director = u', '.join(self.get('director', []))
         cmd = [settings.ITEM_POSTER,
                '-t', self.get('title', '').encode('utf-8'),
-               '-d', director.encode('utf-8'),
                '-y', str(self.get('year', '')),
                '-p', poster
               ]
+        if director:
+            cmd += [
+               '-d', director.encode('utf-8'),
+            ]
         if frame:
             cmd += [
                '-f', frame,
