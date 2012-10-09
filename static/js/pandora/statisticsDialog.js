@@ -299,9 +299,7 @@ pandora.ui.statisticsDialog = function() {
                                                     (Math.abs(11.5 - parseInt(split[0], 10)) - 0.5) * -11, 1, 0.5
                                                 );
                                         if (pandora.user.ui.theme == 'classic') {
-                                            color = color.map(function(c) {
-                                                return c - 64;
-                                            });
+                                            color = getColor(color);
                                         }
                                         return color;
                                     },
@@ -354,9 +352,7 @@ pandora.ui.statisticsDialog = function() {
                                         key == 'continent' ? value : value.split(', ')[1]
                                     );
                                     if (pandora.user.ui.theme == 'classic') {
-                                        color = color.map(function(c) {
-                                            return c - 64;
-                                        });
+                                        color = getColor(color);
                                     }
                                     return color;
                                 },
@@ -445,9 +441,7 @@ pandora.ui.statisticsDialog = function() {
                                         var name = version ? getName(value) : value,
                                             color = colors[key][name];
                                         if (pandora.user.ui.theme == 'classic') {
-                                            color = color.map(function(c) {
-                                                return c - 64;
-                                            });
+                                            color = getColor(color);
                                         }
                                         return color;
                                     },
@@ -514,9 +508,7 @@ pandora.ui.statisticsDialog = function() {
                                         return Math.round(Ox.sum(c) / 2);
                                     });
                                 if (pandora.user.ui.theme == 'classic') {
-                                    color = color.map(function(c) {
-                                        return c - 64;
-                                    });
+                                    color = getColor(color);
                                 }
                                 return color;
                             },
@@ -602,6 +594,12 @@ pandora.ui.statisticsDialog = function() {
         $dialog.options({content: $tabPanel});
 
     });
+
+    function getColor(color) {
+        var hsl = Ox.hsl(color);
+        hsl[2] = 0.4;
+        return Ox.rgb(hsl);
+    }
 
     function getName(version) {
         var name = '';
