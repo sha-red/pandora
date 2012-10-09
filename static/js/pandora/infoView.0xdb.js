@@ -590,8 +590,8 @@ pandora.ui.infoView = function(data) {
                 + title.substr(match[0].length);
         }
         return title + (
-            data.internationalTitle && data.internationalTitle != title
-            ? ' ' + formatLight('(' + data.internationalTitle + ')') : ''
+            data.originalTitle && data.originalTitle != title
+            ? ' ' + formatLight('(' + data.originalTitle + ')') : ''
         );
     }
 

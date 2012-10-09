@@ -603,7 +603,7 @@ class Item(models.Model):
                 i = key['id']
                 if i == 'title':
                     save(i, u'\n'.join([self.get('title', 'Untitled'),
-                                        self.get('internationalTitle', '')]))
+                                        self.get('originalTitle', '')]))
                 elif i == 'rightslevel':
                     save(i, self.level)
                 elif i == 'filename':
@@ -846,7 +846,7 @@ class Item(models.Model):
                     current_values = [current_values]
                 else:
                     current_values = []
-                ot = self.get('internationalTitle')
+                ot = self.get('originalTitle')
                 if ot:
                     current_values.append(ot)
             elif key == 'character':
