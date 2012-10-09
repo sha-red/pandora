@@ -17,7 +17,7 @@ class MetaClip:
             start = min(self.start, self.item.sort.duration)
             end = min(self.end, self.item.sort.duration)
         self.duration = end - start
-        if self.duration > 0:
+        if int(end*25) - int(start*25):
             self.hue, self.saturation, self.lightness = extract.average_color(
                            self.item.timeline_prefix, self.start, self.end)
             self.volume = extract.average_volume(self.item.timeline_prefix, self.start, self.end)
