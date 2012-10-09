@@ -24,6 +24,8 @@ sudo  vmbuilder vbox ubuntu --suite=precise \
     --addpkg subversion \
     --addpkg mercurial \
     --addpkg avahi-daemon \
+    --addpkg update-manager-core \
+    --addpkg python-software-properties \
     --addpkg python-setuptools \
     --addpkg python-pip \
     --addpkg python-virtualenv \
