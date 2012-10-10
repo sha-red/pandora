@@ -340,7 +340,8 @@ class Item(models.Model):
                             q = Item.objects.filter(oxdbId=oxdbId).exclude(id=self.id)
                 self.oxdbId = oxdbId
                 update_poster = True
-                update_ids = True
+                if len(self.itemId) != 7:
+                    update_ids = True
         
         #id changed, what about existing item with new id?
         if settings.USE_IMDB and len(self.itemId) != 7 and self.oxdbId != self.itemId:
