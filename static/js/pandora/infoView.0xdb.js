@@ -114,18 +114,13 @@ pandora.ui.infoView = function(data) {
             })
             .appendTo($reflection),
 
-        $text = Ox.Element({
-                tooltip: canEdit && !isEditable ? 'Doubleclick to reload metadata' : ''
-            })
+        $text = Ox.Element()
             .css({
                 position: 'absolute',
                 left: margin + (iconSize == 256 ? 256 : iconWidth) + margin + 'px',
                 top: margin + 'px',
                 right: margin + statisticsWidth + margin + 'px'
             })
-            .bindEvent(canEdit && !isEditable ? {
-                doubleclick: reloadMetadata
-            } : {})
             .appendTo($data.$element),
 
         $statistics = $('<div>')
@@ -136,6 +131,8 @@ pandora.ui.infoView = function(data) {
                 right: margin + 'px'
             })
             .appendTo($data.$element),
+
+        $reloadButton,
 
         $capabilities,
 
@@ -454,6 +451,18 @@ pandora.ui.infoView = function(data) {
 
     $('<div>').css({height: '16px'}).appendTo($text);
 
+    if (canEdit && !isEditable) {
+        $reloadButton = Ox.Button({
+                title: 'Reload Metadata',
+                width: 128
+            })
+            .css({marginBottom: '4px'})
+            .bindEvent({
+                click: reloadMetadata
+            })
+            .appendTo($statistics);
+    }
+
     // Mainstream Score, Arthouse Score ----------------------------------------
 
     ['votes', 'likes'].forEach(function(key) {
@@ -629,6 +638,7 @@ pandora.ui.infoView = function(data) {
     function reloadMetadata() {
         var item = ui.item;
         // fixme: maybe there's a better method name for this?
+        $reloadButton.options({disabled: true, title: 'Reloading Metadata'});
         pandora.api.updateExternalData({
             id: ui.item
         }, function(result) {
