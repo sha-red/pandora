@@ -37,6 +37,25 @@ def editName(request):
     return render_to_json_response(response)
 actions.register(editName, cache=False)
 
+def sortName(request):
+    '''
+        param data {
+            'name': name
+            or
+            'names': [name, name]
+        }
+        can contain any of the allowed keys for name 
+    '''
+    data = json.loads(request.POST['data'])
+    names = data.get('names', [])
+    if 'name' in data:
+        names.append(data['name'])
+    response['data'] = {}
+    for name in names:
+        response['data'][name] = get_name_sort(name)
+    return render_to_json_response(response)
+actions.register(sortName, cache=False)
+
 def parse_query(data, user):
     query = {}
     query['range'] = [0, 100]
