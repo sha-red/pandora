@@ -50,9 +50,10 @@ def sortName(request):
     names = data.get('names', [])
     if 'name' in data:
         names.append(data['name'])
+    response = json_response()
     response['data'] = {}
     for name in names:
-        response['data'][name] = get_name_sort(name)
+        response['data'][name] = models.get_name_sort(name)
     return render_to_json_response(response)
 actions.register(sortName, cache=False)
 
