@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import mimetypes
 import random
 from urlparse import urlparse
+from urllib import quote
 import time
 
 import Image
@@ -762,7 +763,7 @@ def torrent(request, id, filename=None):
         response = HttpResponse(item.get_torrent(request),
                                 content_type='application/x-bittorrent')
         filename = utils.safe_filename("%s.torrent" % item.get('title'))
-        response['Content-Disposition'] = 'attachment; filename="%s"' % filename.encode('utf-8')
+        response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
         return response
     while filename.startswith('/'):
         filename = filename[1:]
@@ -770,8 +771,8 @@ def torrent(request, id, filename=None):
     filename = item.path('torrent/%s' % filename)
     filename = os.path.abspath(os.path.join(settings.MEDIA_ROOT, filename))
     response = HttpFileResponse(filename)
-    response['Content-Disposition'] = 'attachment; filename="%s"' % \
-                                      os.path.basename(filename.encode('utf-8'))
+    response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % \
+                                      quote(os.path.basename(filename.encode('utf-8')))
     return response
 
 def video(request, id, resolution, format, index=None):
@@ -817,8 +818,7 @@ def video(request, id, resolution, format, index=None):
                 item.itemId,
                 ext
             )
-            filename = filename.encode('utf8')
-            response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+            response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
             return response
         else:
             filename = "%s - %s %s%s" % (
@@ -828,8 +828,7 @@ def video(request, id, resolution, format, index=None):
                 ext
             )
             response = HttpFileResponse(path, content_type=content_type)
-            filename = filename.encode('utf8')
-            response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+            response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
             return response
     if not settings.XSENDFILE and not settings.XACCELREDIRECT:
         return redirect(stream.video.url)
@@ -843,8 +842,8 @@ def srt(request, id, layer, index=None):
         response = HttpResponseForbidden()
     else:
         response = HttpResponse()
-        filename = "%s.srt" % item.get('title')
-        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+        filename = u"%s.srt" % item.get('title')
+        response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
         response['Content-Type'] = 'text/x-srt'
         response.write(item.srt(layer))
     return response
