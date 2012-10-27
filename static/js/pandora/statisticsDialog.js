@@ -20,8 +20,8 @@ pandora.ui.statisticsDialog = function() {
             },
             browser: {
                 'Camino': [192, 192, 192],
-                'Chrome': [0, 255, 0],
                 'Chrome Frame': [255, 255, 0],
+                'Chrome': [0, 255, 0],
                 'Chromium': [128, 255, 0],
                 'Epiphany': [128, 128, 128],
                 'Firefox': [255, 128, 0],
