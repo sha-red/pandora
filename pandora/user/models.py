@@ -47,7 +47,7 @@ class SessionData(models.Model):
     def __unicode__(self):
         return u"%s" % self.session_key
 
-    def parse_data(self):
+    def parse_useragent(self):
         if self.useragent:
             ua = ox.parse_useragent(self.useragent)
             self.browser = ua['browser']['string'].lower()
@@ -58,6 +58,9 @@ class SessionData(models.Model):
                 self.system = None
             if ua['robot']['name']:
                 self.level = -1
+
+    def parse_data(self):
+        self.parse_useragent()
         if self.ip:
             try:
                 g = GeoIP()
