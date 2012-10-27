@@ -5,9 +5,9 @@
 pandora.ui.usersDialog = function() {
 
     var browsers = [
-            'Camino', 'Chrome', 'Chrome Frame', 'Epiphany', 'Firefox',
-            'Internet Explorer', 'Konqueror', 'Nokia Browser', 'Opera',
-            'Safari', 'WebKit'
+            'Camino', 'Chrome', 'Chrome Frame', 'Chromium', 'Epiphany',
+            'Firefox', 'Internet Explorer', 'Konqueror', 'Nokia Browser',
+            'Opera', 'Safari', 'WebKit'
         ],
         dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
