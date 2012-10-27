@@ -34,7 +34,6 @@ pandora.ui.statisticsDialog = function() {
         },
         dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
-        names = Object.keys(colors.system).concat(Object.keys(colors.browser)),
         tabs = [
             {id: 'seen', title: 'First Seen & Last Seen', selected: true},
             {id: 'locations', title: 'Locations'},
@@ -446,7 +445,7 @@ pandora.ui.statisticsDialog = function() {
                         ['system', 'browser'].forEach(function(key) {
                             Ox.Chart({
                                     color: function(value) {
-                                        var name = version ? getName(value) : value,
+                                        var name = version ? getName(key, value) : value,
                                             color = colors[key][name];
                                         if (pandora.user.ui.theme == 'classic') {
                                             color = getColor(color);
@@ -455,7 +454,7 @@ pandora.ui.statisticsDialog = function() {
                                     },
                                     data: data[mode][key + version],
                                     formatKey: function(value) {
-                                        var name = version ? getName(value) : value,
+                                        var name = version ? getName(key, value) : value,
                                             $element = $('<div>');
                                         $element.append(
                                             $('<div>')
@@ -510,7 +509,7 @@ pandora.ui.statisticsDialog = function() {
                         Ox.Chart({
                             color: function(value) {
                                 var color = Ox.zip(value.split(' / ').map(function(v, i) {
-                                        v = version ? getName(v) : v;
+                                        v = version ? getName(key, v) : v;
                                         return colors[i == 0 ? 'system' : 'browser'][v];
                                     })).map(function(c) {
                                         return Math.round(Ox.sum(c) / 2);
@@ -548,7 +547,7 @@ pandora.ui.statisticsDialog = function() {
                                             )
                                     );
                                 value.split(' / ').forEach(function(value, i) {
-                                    value = version ? getName(value) : value;
+                                    value = version ? getName(key, value) : value;
                                     $element.append(
                                         $('<img>')
                                             .attr({
@@ -609,9 +608,9 @@ pandora.ui.statisticsDialog = function() {
         return Ox.rgb(hsl);
     }
 
-    function getName(version) {
+    function getName(key, version) {
         var name = '';
-        Ox.forEach(names, function(v) {
+        Ox.forEach(Object.keys(colors[key]), function(v) {
             if (new RegExp('^' + v).test(version)) {
                 name = v;
                 return false;
