@@ -38,7 +38,7 @@ pandora.ui.statisticsDialog = function() {
         tabs = [
             {id: 'seen', title: 'First Seen & Last Seen', selected: true},
             {id: 'locations', title: 'Locations'},
-            {id: 'systems', title: 'Operating Systems & Browsers'}
+            {id: 'platforms', title: 'Platforms & Browsers'}
         ],
 
         $dialog = Ox.Dialog({
@@ -441,7 +441,7 @@ pandora.ui.statisticsDialog = function() {
                             .appendTo($content);
                         top += Ox.len(data[mode][key]) * 16 + 32;
                     });
-                } else if (id == 'systems') {
+                } else if (id == 'platforms') {
                     ['', 'version'].forEach(function(version, i) {
                         ['system', 'browser'].forEach(function(key) {
                             Ox.Chart({
@@ -495,7 +495,7 @@ pandora.ui.statisticsDialog = function() {
                                         ? {key: 'value', operator: '-'}
                                         : {key: 'key', operator: '+'},
                                     title: key == 'system'
-                                        ? (version == '' ? 'Operating Systems' : 'Operating System Versions')
+                                        ? (version == '' ? 'Platforms' : 'Platform Versions')
                                         : (version == '' ? 'Browsers' : 'Browser Versions'),
                                     width: chartWidth
                                 })
@@ -570,8 +570,8 @@ pandora.ui.statisticsDialog = function() {
                                 ? {key: 'value', operator: '-'}
                                 : {key: 'key', operator: '+'},
                             title: version == ''
-                                ? 'Operating Systems & Browsers'
-                                : 'Operating System & Browser Versions',
+                                ? 'Platforms & Browsers'
+                                : 'Platform & Browser Versions',
                             width: chartWidth
                         })
                         .css({
