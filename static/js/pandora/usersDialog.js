@@ -5,16 +5,17 @@
 pandora.ui.usersDialog = function() {
 
     var browsers = [
-            'Chrome', 'Chrome Frame', 'Firefox',
-            'Internet Explorer', 'Opera', 'Safari', 'WebKit'
+            'Camino', 'Chrome', 'Chrome Frame', 'Epiphany', 'Firefox',
+            'Internet Explorer', 'Konqueror', 'Nokia Browser', 'Opera',
+            'Safari', 'WebKit'
         ],
         dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
         formWidth = 256,
         numberOfUsers = 0,
         systems = [
-            'Android', 'BSD', 'iOS', 'Linux',
-            'Mac OS X', 'Unix', 'Windows'
+            'Android', 'BlackBerry', 'BSD', 'iOS', 'Java', 'Linux', 'Mac OS X',
+            'Nokia', 'PlayStation', 'Unix', 'Windows'
         ],
         userLevels = pandora.site.userLevels.map(function(userLevel) {
             return Ox.toTitleCase(userLevel);

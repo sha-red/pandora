@@ -7,18 +7,26 @@ pandora.ui.statisticsDialog = function() {
     var colors = {
             system: {
                 'Android': [0, 255, 0],
+                'BlackBerry': [64, 64, 64],
                 'BSD': [255, 0, 0],
                 'iOS': [0, 128, 255],
+                'Java': [128, 128, 128],
                 'Linux': [255, 128, 0],
                 'Mac OS X': [0, 255, 255],
+                'Nokia': [255, 0, 255],
+                'PlayStation': [192, 192, 192],
                 'Unix': [255, 255, 0],
                 'Windows': [0, 0, 255]
             },
             browser: {
-                'Chrome Frame': [255, 255, 0],
+                'Camino': [192, 192, 192],
                 'Chrome': [0, 255, 0],
+                'Chrome Frame': [255, 255, 0],
+                'Epiphany': [128, 128, 128],
                 'Firefox': [255, 128, 0],
                 'Internet Explorer': [0, 0, 255],
+                'Konqueror': [64, 64, 64],
+                'Nokia Browser': [255, 0, 255],
                 'Opera': [255, 0, 0],
                 'Safari': [0, 255, 255],
                 'WebKit': [0, 255, 128]
