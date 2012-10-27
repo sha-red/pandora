@@ -509,8 +509,9 @@ pandora.ui.statisticsDialog = function() {
                         Ox.Chart({
                             color: function(value) {
                                 var color = Ox.zip(value.split(' / ').map(function(v, i) {
+                                        var key = ['system', 'browser'][i];
                                         v = version ? getName(key, v) : v;
-                                        return colors[i == 0 ? 'system' : 'browser'][v];
+                                        return colors[key][v];
                                     })).map(function(c) {
                                         return Math.round(Ox.sum(c) / 2);
                                     });
@@ -547,12 +548,12 @@ pandora.ui.statisticsDialog = function() {
                                             )
                                     );
                                 value.split(' / ').forEach(function(value, i) {
+                                    var key = ['system', 'browser'][i];
                                     value = version ? getName(key, value) : value;
                                     $element.append(
                                         $('<img>')
                                             .attr({
-                                                src: Ox.UI.PATH + 'png/'
-                                                    + (i == 0 ? 'system' : 'browser')
+                                                src: Ox.UI.PATH + 'png/' + key
                                                     + value.replace(/ /g, '') + '128.png'
                                             })
                                             .css({
