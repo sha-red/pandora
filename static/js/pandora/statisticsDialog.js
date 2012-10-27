@@ -172,7 +172,7 @@ pandora.ui.statisticsDialog = function() {
                     ['system', 'browser'].forEach(function(key) {
                         var version = item[key];
                         if (version) {
-                            name[key] = getName(version);
+                            name[key] = getName(key, version);
                             if (name[key]) {
                                 data[mode][key][name[key]] = (data[mode][key][name[key]] || 0) + 1; 
                                 key = key + 'version';
