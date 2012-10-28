@@ -362,11 +362,6 @@ pandora.ui.folderList = function(id) {
                 pandora.resizeFolders();
             },
             move: function(data) {
-                /*
-                data.ids.forEach(function(id, pos) {
-                    pandora.user.ui.lists[id].position = pos;
-                });
-                */
                 pandora.api.sortLists({
                     section: id,
                     ids: data.ids
