@@ -64,7 +64,7 @@ service pandora-tasks start
 service pandora start
 
 #nginx
-sed "s/__PREFIX__/\/srv\/pandora/g" "/srv/pandora/etc/nginx/vhost.in" > "/etc/nginx/sites-available/default"
+cp "/srv/pandora/etc/nginx/pandora" "/etc/nginx/sites-available/default"
 service nginx restart
 
 cat > /usr/local/bin/fixtime <<EOF

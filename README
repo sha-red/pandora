@@ -1,20 +1,28 @@
 pan.do/ra - open media archive
 
+for more information on pan.do/ra visit our website at https://pan.do/ra
+
 == SETUP ==
-pan.do/ra is known to work with Ubuntu 12.04, older versions of
-Ubuntu or other distributions should also work.
+pan.do/ra is known to work with Ubuntu 12.04,
+but other distributions should also work.
+The instructions below are for Ubuntu 12.04.
+All commans given expect that you are root.
 
-To setup pan.do/ra, you need python, bazaar, pip and virtualenv
-and several other python modules:
+To run pan.do/ra you need to install and setup:
+    python
+    postgres
+    nginx (or apache2)
+    additinal video packages
 
-* Packages
-(add pandora ppa to get all packages in the required version)
+
+* Installing required packages
+1) add pandora ppa to get all packages in the required version
 
     apt-get install python-software-properties
     add-apt-repository ppa:j/pandora
     apt-get update
 
-(install dependencies)
+2) install all required packages
     apt-get install bzr git subversion mercurial \
             python-setuptools python-pip python-virtualenv ipython \
             python-dev python-imaging python-numpy python-psycopg2 \
@@ -24,8 +32,28 @@ and several other python modules:
             ffmpeg2theora ffmpeg \
             python-ox oxframe
 
-* Pan.do/ra
-Get code from bazzar
+
+* Prepare Environment
+1) add pandora user and set permissions
+   adduser pandora --disabled-login --disabled-password
+
+2) Setup Database
+   su postgres
+   createuser pandora
+   createdb  -T template0 --locale=C --encoding=UTF8 -O pandora pandora
+   echo "CREATE EXTENSION pg_trgm;" | psql pandora
+   exit
+
+3) Setup RabbitMQ
+Important: "use_your_own" is a password and you have to use the same value here and below for BROKER_PASSWORD
+
+    rabbitmqctl add_user pandora use_your_own
+    rabbitmqctl add_vhost /pandora
+    rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
+
+
+* Install Pan.do/ra
+1) Get code from bazzar
     cd /srv/
     bzr branch http://code.0x2620.org/pandora pandora
     cd pandora
@@ -35,94 +63,86 @@ Get code from bazzar
     cd static
     bzr branch http://code.0x2620.org/oxjs
 
-create local_settings.py and create config.jsonc in /srv/pandora/pandora
-do noy copy settings.py but only add your changes to local_settings.py
-(check https://wiki.0x2620.org/wiki/pandora/configuration
- and use settings.py / config.jsonc / config.*.jsonc as example)
+    cd /srv
+    chown -R pandora.pandora pandora
 
-create and configure database as described below
-after that
+2) create local_settings.py and config.jsonc
 
-create / update static files
-    
-    ./manage.py collectstatic -l --noinput
-    ./manage.py update_static 
-    ./manage.py compile_pyc
-
-* Database
-  We use postgresql but other databases might also work
-  (make sure you have the python bindings installed).
-
-  create a postgresql database
-
-    sudo -u postgres createdb  -T template0 --locale=C --encoding=UTF8 -O pandora pandora
-
-  (setting locale to C is required to fix a bug in sort if set to UTF8)
-
-  now add settings to local_settings.py:
+1) create file /srv/pandora/pandora/local_settings.py with the following content:
     DATABASES = {
         'default': {
             'NAME': 'pandora',
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
             'USER': 'pandora',
+            'PASSWORD': '',
         }
     }
+    DB_GIN_TRGM = True
+    BROKER_PASSWORD = "use_your_own"
 
-  and run ./manage.py syncdb to populate the database.
+    #with apache x-sendfile or lighttpd set this to True
+    XSENDFILE = False
 
-  Optionaly use pg_trgm to improve find speed (requires postgres 9.1 and postgresql-contrib)
-
-    echo "CREATE EXTENSION pg_trgm;" | sudo -u postgres psql pandora
-    ./manage.py sqlfindindex | ./manage.py dbshell
-    echo "DB_GIN_TRGM = True" >> local_settings.py
-
-
-
-* RabbitMQ
-  For background tasks RabbitMQ is required, to install rabbitmq:
-
-    sudo apt-get install rabbitmq-server
-
-  and create permissions according to BROKER_* in local_settings.py i.e.:
-
-    sudo rabbitmqctl add_user pandora box
-    sudo rabbitmqctl add_vhost /pandora
-    sudo rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
-
-
-* H264
-    for h264 videos, you need ffmpeg with x264 and libfaac enabled,
-    you also need to install qt-faststart (from ffmpeg/tools)
-    (you can use medibuntu.org packages or compile ffmpeg yourself)
-    to enable h264 derivatives add "mp4" to video.formats in your config.jsonc
-
-
-== Deployment ==
-* Install upstart scripts
-check etc/init for upstart scripts, adjust path and user and put into /etc/init
-
-To run pan.do/ra in production, we use nginx, using apache2 is also possible.
-
-* nginx setup
-    sudo apt-get install nginx 
-
-  add this to local_settings.py:
+    #with nginx X-Accel-Redirect set this to True
     XACCELREDIRECT = True
 
-  setup nginx according to etc/nginx/vhost.in
+2) create config.jsonc
+    config.jsonc holds the configuration for your site.
+    To start you can copy /srv/pandora/pandora/config.pandora.jsonc
+    to /srv/pandora/pandora/config.jsonc but have a look at 
+    https://wiki.0x2620.org/wiki/pandora/configuration and
+    config.0xdb.jsonc config.padma.jsonc for configuration options.
 
-* apache2 setup
+3) initialize database
+    su pandora
+    cd /srv/pandora/pandora
+    ./manage.py syncdb --noinput
+    ./manage.py sqlfindindex | ./manage.py dbshell
+    ./manage.py collectstatic -l --noinput
+    ./manage.py update_static
+    ./manage.py compile_pyc
+
+4) install init scripts and start daemons
+    cp /srv/pandora/etc/init/*.conf /etc/init/
+    service pandora start
+    service pandora-encoding start
+    service pandora-task start
+
+5) Setup Webserver
+a) nginx (recommended)
+    apt-get install nginx
+    cp /srv/pandora/etc/nginx/pandora /etc/nginx/sites-available/pandora
+    cd /etc/nginx/sites-enabled
+    ln -s ../sites-available/pandora
+
+    #read comments in /etc/nginx/sites-available/pandora for setting
+    #your hostname and other required settings
+    #make sure XACCELREDIRECT = True in /srv/pandora/pandora/local_settings.py
+    
+    service nginx reload
+
+b) apache2 (if you need it for other sites on the same server)
     apt-get install apache2-mpm-prefork libapache2-mod-xsendfile
+    a2enmod xsendfile
+    cp /srv/pandora/etc/apache2/pandora.conf /etc/apache2/sites-available/pandora.conf
+    a2ensite pandora
 
-  add this to local_settings.py:
-    XSENDFILE = True
+    #read comments in /etc/apache2/sites-available/pandora.conf for setting
+    #your hostname and other required settings
+    #make sure XSENDFILE = True in /srv/pandora/pandora/local_settings.py
+    
+    service apache2 reload
 
-  setup apache according to etc/apache2/vhost.in
 
-now you can start pandora services:
-  service pandora start
-  service pandora-tasks start
-  service pandora-encoding start
+Now you can open pandora in your browser, the first user to sign up will become admin.
+
+
+* A note about providing H.264 versions
+    For H.264 videos, you need ffmpeg with x264 and libfaac enabled,
+    you also need to install qt-faststart (from ffmpeg/tools)
+    (you can use medibuntu.org packages or compile ffmpeg yourself)
+    to enable H.264 derivatives add "mp4" to video.formats in your config.jsonc
+
 
 === Updating ===
 To update a pandora installation get the latest version from bzr by running
@@ -131,10 +151,13 @@ To update a pandora installation get the latest version from bzr by running
 this will update pandora/oxjs/python-ox and list possible upgrades to the db
 
 to update your database tables, use
+  su pandora
+  cd /srv/pandora/pandora
    ./manage.py sqldiff -a
 to check if there are changes and
    ./manage.py sqldiff -a | ./manage.py dbshell
 to apply them.
+
 
 === Development ===
   in one terminal:
@@ -142,4 +165,9 @@ to apply them.
 
   and background task in another:
     ./manage.py celeryd -B -Q celery,default,encoding
+
+  now you can access your local pandora instace at http://127.0.0.1:8000/
+
+  we use virtual machines for development, you can get a vm from our site
+  or use the script in vm/build.sh to create one.
 
