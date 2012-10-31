@@ -283,7 +283,7 @@ pandora.ui.usersDialog = function() {
                     {
                         align: 'right',
                         format: function(value) {
-                            return Ox.formatDate(value, "%Y-%m-%d %H:%M:%S");
+                            return Ox.formatDate(value, '%F %T');
                         },
                         id: 'firstseen',
                         operator: '-',
@@ -294,7 +294,7 @@ pandora.ui.usersDialog = function() {
                     {
                         align: 'right',
                         format: function(value) {
-                            return Ox.formatDate(value, "%Y-%m-%d %H:%M:%S");
+                            return Ox.formatDate(value, '%F %T');
                         },
                         id: 'lastseen',
                         operator: '-',
