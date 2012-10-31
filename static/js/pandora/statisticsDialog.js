@@ -606,7 +606,7 @@ pandora.ui.statisticsDialog = function() {
 
     function getColor(color) {
         var hsl = Ox.hsl(color);
-        hsl[2] = 0.4;
+        hsl[2] = Math.max(hsl[2] - 0.1, 0);
         return Ox.rgb(hsl);
     }
 
