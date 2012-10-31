@@ -8,7 +8,7 @@ pandora.URL = (function() {
 
     function getState() {
 
-        Ox.Log('', 'GET STATE, UI', pandora.user.ui)
+        Ox.Log('URL', 'getState:, UI', pandora.user.ui)
 
         if (pandora.user.ui.page) {
             return {page: pandora.user.ui.page};
@@ -130,6 +130,16 @@ pandora.URL = (function() {
                     // removing a query and reloading works as expected
                     set.find = pandora.site.user.ui.find;
                 }
+            }
+
+            if (state.hash && state.hash.query) {
+                state.hash.query.forEach(function(kv) {
+                    try {
+                        set[kv.key] = JSON.parse(kv.value);
+                    } catch(e) {
+                        set[kv.key] = kv.value;
+                    }
+                });
             }
 
             Ox.Request.cancel();
