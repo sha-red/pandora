@@ -1,11 +1,13 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
-// FIXME: this should be mainMenu.js!
+
 'use strict';
+
 pandora.ui.mainMenu = function() {
 
     var isGuest = pandora.user.level == 'guest',
         ui = pandora.user.ui,
         findState = pandora.getFindState(ui.find),
+        fullscreenState = Ox.Fullscreen.getState(),
         that = Ox.MainMenu({
             extras: [
                 pandora.$ui.loadingIcon = Ox.LoadingIcon({
@@ -110,7 +112,8 @@ pandora.ui.mainMenu = function() {
                         { id: 'showannotations', title: (ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations', disabled: !ui.item || ['timeline', 'player', 'editor'].indexOf(ui.itemView) == -1, keyboard: 'shift a' },
                         { id: 'showtimeline', title: (ui.showTimeline ? 'Hide' : 'Show') + ' Timeline', disabled: !ui.item || ui.itemView != 'player', keyboard: 'shift t' },
                         {},
-                        { id: 'fullscreen', title: 'Enter Fullscreen', disabled: !ui.item || ui.itemView != 'player' },
+                        { id: 'toggleapplicationfullscreen', title: (fullscreenState ? 'Exit' : 'Enter') + ' Application Fullscreen', disabled: fullscreenState === void 0, keyboard: 'shift alt control f' },
+                        { id: 'entervideofullscreen', title: 'Enter Video Fullscreen', disabled: !ui.item || ui.itemView != 'player' },
                         {},
                         { id: 'theme', title: 'Theme', items: [
                             { group: 'settheme', min: 1, max: 1, items: [
@@ -291,7 +294,9 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set({showAnnotations: !ui.showAnnotations});
                 } else if (data.id == 'showtimeline') {
                     pandora.UI.set({showTimeline: !ui.showTimeline});
-                } else if (data.id == 'fullscreen') {
+                } else if (data.id == 'toggleapplicationfullscreen') {
+                    Ox.Fullscreen.toggle();
+                } else if (data.id == 'entervideofullscreen') {
                     pandora.$ui.player.options({fullscreen: true});
                 } else if (data.id == 'advancedfind') {
                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
@@ -352,6 +357,9 @@ pandora.ui.mainMenu = function() {
                 if (!pandora.hasDialogOrScreen() && pandora.getItemIdAndPosition()) {
                     pandora.$ui.sequencesDialog = pandora.ui.sequencesDialog().open();
                 }
+            },
+            key_alt_control_shift_f: function() {
+                Ox.Fullscreen.toggle();
             },
             key_backtick: function() {
                 changeFocus(1);
@@ -449,14 +457,14 @@ pandora.ui.mainMenu = function() {
                 if (!data.value) {
                     that.disableItem('showannotations');
                     that.disableItem('showtimeline');
-                    that.disableItem('fullscreen');
+                    that.disableItem('entervideofullscreen');
                 } else {
                     if (['timeline', 'player', 'editor'].indexOf(ui.itemView) > -1) {
                         that.enableItem('showannotations');
                     }
                     if (ui.itemView == 'player') {
                         that.enableItem('showtimeline');
-                        that.enableItem('fullscreen');
+                        that.enableItem('entervideofullscreen');
                     }
                 }
             },
@@ -474,7 +482,7 @@ pandora.ui.mainMenu = function() {
                 if ((data.value == 'player') != (data.previousValue == 'player')) {
                     action = data.value == 'player' ? 'enableItem' : 'disableItem';
                     that[action]('showtimeline');
-                    that[action]('fullscreen');
+                    that[action]('entervideofullscreen');
                 }
                 that[
                     pandora.getItemIdAndPosition() ? 'enableItem' : 'disableItem'
@@ -526,6 +534,10 @@ pandora.ui.mainMenu = function() {
                 that.checkItem('viewMenu_timelines_' + data.value);
             }
         });
+
+    Ox.Fullscreen.bind('change', function(state) {
+        that.setItemTitle('toggleapplicationfullscreen', (state ? 'Exit' : 'Enter') + ' Application Fullscreen');
+    });
 
     function changeFocus(direction) {
         var elements = [],
