@@ -110,7 +110,7 @@ pandora.ui.mainMenu = function() {
                         { id: 'showannotations', title: (ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations', disabled: !ui.item || ['timeline', 'player', 'editor'].indexOf(ui.itemView) == -1, keyboard: 'shift a' },
                         { id: 'showtimeline', title: (ui.showTimeline ? 'Hide' : 'Show') + ' Timeline', disabled: !ui.item || ui.itemView != 'player', keyboard: 'shift t' },
                         {},
-                        { id: 'fullscreen', title: 'Enter Fullscreen', disabled: !ui.item || ui.itemView != 'video' },
+                        { id: 'fullscreen', title: 'Enter Fullscreen', disabled: !ui.item || ui.itemView != 'player' },
                         {},
                         { id: 'theme', title: 'Theme', items: [
                             { group: 'settheme', min: 1, max: 1, items: [
