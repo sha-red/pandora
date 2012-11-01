@@ -719,4 +719,3 @@ pandora.ui.mainMenu = function() {
     return that;
 
 };
-
