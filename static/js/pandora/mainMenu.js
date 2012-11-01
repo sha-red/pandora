@@ -112,7 +112,7 @@ pandora.ui.mainMenu = function() {
                         { id: 'showannotations', title: (ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations', disabled: !ui.item || ['timeline', 'player', 'editor'].indexOf(ui.itemView) == -1, keyboard: 'shift a' },
                         { id: 'showtimeline', title: (ui.showTimeline ? 'Hide' : 'Show') + ' Timeline', disabled: !ui.item || ui.itemView != 'player', keyboard: 'shift t' },
                         {},
-                        { id: 'toggleapplicationfullscreen', title: (fullscreenState ? 'Exit' : 'Enter') + ' Application Fullscreen', disabled: fullscreenState === void 0, keyboard: 'shift alt control f' },
+                        { id: 'togglefullscreen', title: (fullscreenState ? 'Exit' : 'Enter') + ' Fullscreen', disabled: fullscreenState === void 0, keyboard: 'shift alt control f' },
                         { id: 'entervideofullscreen', title: 'Enter Video Fullscreen', disabled: !ui.item || ui.itemView != 'player' },
                         {},
                         { id: 'theme', title: 'Theme', items: [
@@ -294,7 +294,7 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set({showAnnotations: !ui.showAnnotations});
                 } else if (data.id == 'showtimeline') {
                     pandora.UI.set({showTimeline: !ui.showTimeline});
-                } else if (data.id == 'toggleapplicationfullscreen') {
+                } else if (data.id == 'togglefullscreen') {
                     Ox.Fullscreen.toggle();
                 } else if (data.id == 'entervideofullscreen') {
                     pandora.$ui.player.options({fullscreen: true});
@@ -536,7 +536,7 @@ pandora.ui.mainMenu = function() {
         });
 
     Ox.Fullscreen.bind('change', function(state) {
-        that.setItemTitle('toggleapplicationfullscreen', (state ? 'Exit' : 'Enter') + ' Application Fullscreen');
+        that.setItemTitle('togglefullscreen', (state ? 'Exit' : 'Enter') + ' Fullscreen');
     });
 
     function changeFocus(direction) {
