@@ -73,7 +73,8 @@ def reloader_thread():
                 load_config()
                 _config_mtime = mtime
         except:
-            sys.stderr.write("reloading config failed\n")
+            #sys.stderr.write("reloading config failed\n")
+            pass
         time.sleep(1)
 
 def update_static():
