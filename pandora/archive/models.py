@@ -155,9 +155,10 @@ class File(models.Model):
         if data['isEpisode'] and data['seriesYear'] == None:
             data['seriesYear'] = data['year']
         data['type'] = 'unknown'
-        for type in ox.movie.EXTENSIONS:
-            if data['extension'] in ox.movie.EXTENSIONS[type]:
-                data['type'] = type
+        if 'extension' in data:
+            for type in ox.movie.EXTENSIONS:
+                if data['extension'] in ox.movie.EXTENSIONS[type]:
+                    data['type'] = type
         return data
 
     def normalize_path(self):
@@ -283,7 +284,7 @@ class File(models.Model):
             'wanted': self.wanted,
         }
         for key in ('part', 'partTitle', 'version', 'language', 'extension'):
-            data[key] = self.path_info[key]
+            data[key] = self.path_info.get(key)
         data['users'] = list(set([i['user'] for i in data['instances']]))
         if keys:
             for k in data.keys():

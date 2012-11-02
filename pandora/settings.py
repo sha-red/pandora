@@ -103,7 +103,7 @@ INSTALLED_APPS = (
 
     'django_extensions',
     'devserver',
-#    'south',
+    'south',
     'djcelery',
     'app',
     'log',
