@@ -310,7 +310,9 @@ appPanel
                 error: pandora.ui.errorDialog,
                 request: function(data) {
                     pandora.$ui.loadingIcon.options({
-                        tooltip: data.requests + ' request' + (data.requests == 1 ? '' : 's')
+                        tooltip: (data.requests || 'No')
+                            + ' request'
+                            + (data.requests == 1 ? '' : 's')
                     });
                 }
             });
