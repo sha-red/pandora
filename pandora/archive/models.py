@@ -156,6 +156,7 @@ class File(models.Model):
             data['seriesYear'] = data['year']
         data['type'] = 'unknown'
         if 'extension' in data:
+            data['extension'] = data['extension'].lower()
             for type in ox.movie.EXTENSIONS:
                 if data['extension'] in ox.movie.EXTENSIONS[type]:
                     data['type'] = type
