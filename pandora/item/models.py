@@ -245,6 +245,8 @@ class Item(models.Model):
                     self.data[key] = [ox.sanitize_html(t) for t in data[key]]
                 elif ktype == '[string]': 
                     self.data[key] = [ox.escape_html(t) for t in data[key]]
+                elif key in ('episodeTitle', 'seriesTitle'):
+                    self.data[key] = ox.escape_html(data[key])
                 elif isinstance(data[key], basestring):
                     self.data[key] = ox.escape_html(data[key])
                 elif isinstance(data[key], list):
