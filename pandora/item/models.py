@@ -790,7 +790,7 @@ class Item(models.Model):
                 s.bitrate = s.size * 8 / s.duration
             else:
                 s.bitrate = 0
-            s.volume = self.data.get('volume', 0)
+            s.volume = self.data.get('volume', None)
         else:
             s.duration = None
             s.resolution = None
@@ -1054,7 +1054,7 @@ class Item(models.Model):
             color = [0, 0, 0]
             n = streams.count()
             for s in streams:
-                self.data['volume'] = s.volume * s.duration
+                self.data['volume'] += s.volume * s.duration
                 color = map(lambda a,b: (a+b)/n, color,ox.image.getRGB(s.color))
                 offset += s.duration
             self.data['color'] = ox.image.getHSL(color)
