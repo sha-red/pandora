@@ -445,6 +445,9 @@ pandora.ui.filesView = function(options, self) {
         ['title', 'director', 'year'].forEach(function(key) {
             data[key] = self['$' + key + 'Input'].value();
         });
+        self.$moveButton.options(
+            {disabled: true, title: 'Moving Files'}
+        );
         pandora.api.moveFiles(data, function(result) {
             if (
                 pandora.user.ui.item == self.options.id
@@ -454,9 +457,11 @@ pandora.ui.filesView = function(options, self) {
                 if (self.$switch.value()) {
                     pandora.UI.set({item: result.data.itemId});
                 } else {
-                    Ox.Log('', 'moved', self.selected, result.data.itemId);
                     self.$filesList.reloadList();
                     self.$instancesList.reloadList();
+                    self.$moveButton.options(
+                        {disabled: false, title: 'Move Files'}
+                    );
                 }
             }
         });
