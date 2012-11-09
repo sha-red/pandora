@@ -95,7 +95,7 @@ def update(request):
                     f.save()
     if not upload_only:
         all_files = models.Instance.objects.filter(volume__user=user)
-        files = all_files.filter(file__avalable=False)
+        files = all_files.filter(file__available=False)
         if volume:
             files = files.filter(volume=volume)
         response['data']['info'] = [f.file.oshash for f in all_files.filter(file__info='{}')]
