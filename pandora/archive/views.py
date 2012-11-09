@@ -92,6 +92,7 @@ def update(request):
                         if key in info:
                             del info[key]
                     f.info = info
+                    f.parse_info()
                     f.save()
     if not upload_only:
         all_files = models.Instance.objects.filter(volume__user=user)
