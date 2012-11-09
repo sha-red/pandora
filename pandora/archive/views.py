@@ -94,10 +94,11 @@ def update(request):
                     f.info = info
                     f.save()
     if not upload_only:
-        files = models.Instance.objects.filter(volume__user=user, file__available=False)
+        all_files = models.Instance.objects.filter(volume__user=user)
+        files = all_files.filter(file__avalable=False)
         if volume:
             files = files.filter(volume=volume)
-        response['data']['info'] = [f.file.oshash for f in files.filter(file__info='{}')]
+        response['data']['info'] = [f.file.oshash for f in all_files.filter(file__info='{}')]
         response['data']['data'] = [f.file.oshash for f in files.filter(file__is_video=True,
                                                                         file__available=False,
                                                                         file__wanted=True)]

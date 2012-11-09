@@ -780,7 +780,7 @@ class Item(models.Model):
                 s.resolution = v.width * v.height
                 s.width = v.width
                 s.height = v.height
-            if not s.aspectratio:
+            if not s.aspectratio and v.display_aspect_ratio:
                 s.aspectratio = float(utils.parse_decimal(v.display_aspect_ratio))
             s.pixels = sum([v.pixels for v in videos])
             s.numberoffiles = self.files.all().count()
