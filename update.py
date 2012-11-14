@@ -63,6 +63,8 @@ if __name__ == "__main__":
             current += get('bzr', 'revno')
             run('bzr', 'pull', repos['oxsubtitles'])
             new += get('bzr', 'revno')
+        else:
+            print "oxtimelines is missing. please run:\n\n\tcd %s\n\tpip -E . install -r requirements.txt\n" % (base)
         os.chdir(join(base, 'pandora'))
         if current != new:
             run('./manage.py', 'update_static')
