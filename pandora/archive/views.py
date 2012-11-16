@@ -206,6 +206,14 @@ def addFile(request):
         i.save()
         f = models.File(oshash=oshash, item=i)
         f.path = data.get('filename', 'Untitled')
+        extension = f.path.split('.')
+        if len(extension) > 1:
+            extension = extension[-1]
+        else:
+            extension = 'webm'
+        f.path_info = {
+            'extension': extension
+        }
         f.selected = True
         f.info = data['info']
         f.save()
