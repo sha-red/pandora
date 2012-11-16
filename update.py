@@ -58,10 +58,10 @@ if __name__ == "__main__":
             run('bzr', 'pull', repos['python-ox'])
             new += get('bzr', 'revno')
 
-        if exists(join(base, 'src', 'oxsubtitles')):
-            os.chdir(join(base, 'src', 'oxsubtitles'))
+        if exists(join(base, 'src', 'oxtimelines')):
+            os.chdir(join(base, 'src', 'oxtimelines'))
             current += get('bzr', 'revno')
-            run('bzr', 'pull', repos['oxsubtitles'])
+            run('bzr', 'pull', repos['oxtimelines'])
             new += get('bzr', 'revno')
         else:
             print "oxtimelines is missing. please run:\n\n\tcd %s\n\tpip -E . install -r requirements.txt\n" % (base)
