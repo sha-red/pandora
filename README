@@ -146,7 +146,9 @@ Now you can open pandora in your browser, the first user to sign up will become 
 
 === Updating ===
 To update a pandora installation get the latest version from bzr by running
-    ./update.py
+  su pandora
+  cd /srv/pandora
+   ./update.py
 
 this will update pandora/oxjs/python-ox and list possible upgrades to the db
 

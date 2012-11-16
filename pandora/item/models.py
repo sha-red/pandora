@@ -361,10 +361,14 @@ class Item(models.Model):
         else:
             self.poster_height = 128
             self.poster_width = 80
-        if not settings.USE_IMDB and self.sort:
-            if self.poster_frame == -1 and self.sort.duration:
-                self.poster_frame = self.sort.duration/2
-                update_poster = True
+        if not settings.USE_IMDB:
+            if self.poster_frame == -1:
+                try:
+                    if self.sort.duration:
+                        self.poster_frame = self.sort.duration/2
+                        update_poster = True
+                except ItemSort.DoesNotExist:
+                    pass
         self.json = self.get_json()
         self.json['modified'] = datetime.now()
         super(Item, self).save(*args, **kwargs)
