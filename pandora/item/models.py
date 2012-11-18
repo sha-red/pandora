@@ -239,11 +239,11 @@ class Item(models.Model):
             else:
                 k = filter(lambda i: i['id'] == key, settings.CONFIG['itemKeys'])
                 ktype = k and k[0].get('type') or ''
-                if ktype == 'text': 
+                if ktype == 'text':
                     self.data[key] = ox.sanitize_html(data[key])
-                elif ktype == '[text]': 
+                elif ktype == '[text]':
                     self.data[key] = [ox.sanitize_html(t) for t in data[key]]
-                elif ktype == '[string]': 
+                elif ktype == '[string]':
                     self.data[key] = [ox.escape_html(t) for t in data[key]]
                 elif key in ('episodeTitle', 'seriesTitle', 'episodeDirector', 'seriesYear'):
                     self.data[key] = ox.escape_html(data[key])
@@ -344,7 +344,7 @@ class Item(models.Model):
                 update_poster = True
                 if len(self.itemId) != 7:
                     update_ids = True
-        
+
         #id changed, what about existing item with new id?
         if settings.USE_IMDB and len(self.itemId) != 7 and self.oxdbId != self.itemId:
             self.itemId = self.oxdbId
@@ -471,7 +471,7 @@ class Item(models.Model):
                     'selected': p == pos,
                     'url': '/%s/posterframe%d.jpg' %(self.itemId, p),
                     'height': f['height'],
-                    'width': f['width'] 
+                    'width': f['width']
                 })
                 p += 1
         return frames
@@ -600,6 +600,7 @@ class Item(models.Model):
                     value = value and 'true' or 'false'
                 if isinstance(value, basestring):
                     value = ox.decode_html(ox.strip_tags(value.strip()))
+                    value = unicodedata.normalize('NFKD', value).lower()
                 f.value = value
                 f.save()
             else:
@@ -719,7 +720,7 @@ class Item(models.Model):
             sort_type = key.get('sortType', key['type'])
             if 'value' in key:
                 if 'layer' in key['value']:
-                   continue 
+                   continue
                 source = key['value']['key']
                 sort_type = key['value'].get('type', sort_type)
             if isinstance(sort_type, list):
@@ -818,7 +819,7 @@ class Item(models.Model):
             s.cutsperminute = s.numberofcuts / (s.duration/60)
             s.wordsperminute = s.words / (s.duration / 60)
         else:
-            s.cutsperminute = None 
+            s.cutsperminute = None
             s.wordsperminute = None
         s.timesaccessed = self.accessed.aggregate(Sum('accessed'))['accessed__sum']
         if not s.timesaccessed:
@@ -1177,7 +1178,7 @@ class Item(models.Model):
     def select_frame(self):
         frames = self.poster_frames()
         if frames:
-            heat = [ox.image.getImageHeat(f['path']) for f in frames] 
+            heat = [ox.image.getImageHeat(f['path']) for f in frames]
             self.poster_frame = heat.index(max(heat))
 
     def get_poster_frame_path(self):
@@ -1232,7 +1233,7 @@ class Item(models.Model):
                 elif '' in languages:
                     language = ''
                 else:
-                    language = languages[0] 
+                    language = languages[0]
 
             #loop over all videos
             for f in self.files.filter(Q(is_audio=True)|Q(is_video=True)) \
@@ -1393,7 +1394,7 @@ class Facet(models.Model):
         does not perform to well if total number of items goes above 10k
         this happens for keywords in 0xdb right now
     '''
-    
+
     class Meta:
         unique_together = ("item", "key", "value")
 

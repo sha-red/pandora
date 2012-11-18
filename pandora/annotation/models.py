@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
 import re
+import unicodedata
 
 from django.db import models
 from django.db.models import Q
@@ -136,6 +137,7 @@ class Annotation(models.Model):
         if self.value:
             self.value = utils.cleanup_value(self.value, layer['type'])
             self.findvalue = ox.decode_html(ox.strip_tags(re.sub('<br */?>\n?', ' ', self.value))).replace('\n', ' ')
+            self.findvalue = unicodedata.normalize('NFKD', self.findvalue).lower()
             sortvalue = sort_string(self.findvalue)
             if sortvalue:
                 self.sortvalue = sortvalue[:900]

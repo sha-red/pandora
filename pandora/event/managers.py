@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+import unicodedata
 
 from django.db.models import Q, Manager
 from ox.django.query import QuerySet
@@ -31,6 +32,8 @@ def parseCondition(condition, user):
     }.get(op,'__icontains'))
 
     key = str(key)
+    if isinstance(v, unicode):
+        v = unicodedata.normalize('NFKD', v).lower()
     if exclude:
         q = ~Q(**{k: v})
     else:

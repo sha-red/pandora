@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from datetime import datetime
+import unicodedata
 
 from django.db.models import Q, Manager
 from django.conf import settings
@@ -130,6 +131,8 @@ def parseCondition(condition, user):
 
         k = str(k)
         value_key = str(value_key)
+        if isinstance(v, unicode):
+            v = unicodedata.normalize('NFKD', v).lower()
         if k == '*':
             q = Q(**{value_key: v})
         elif in_find:
