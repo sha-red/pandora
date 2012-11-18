@@ -159,7 +159,10 @@ class ClipManager(Manager):
                 '^': '__istartswith',
                 '$': '__iendswith',
             }.get(condition.get('opterator', ''), '__icontains'))
-            q = Q(**{key: condition['value']})
+            v = condition['value']
+            if isinstance(v, unicode):
+                v = unicodedata.normalize('NFKD', v).lower()
+            q = Q(**{key: v})
             if condition['key'] in settings.CONFIG['clipLayers']:
                 q = q & Q(layer=condition['key'])
             return q
