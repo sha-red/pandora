@@ -42,6 +42,10 @@ class Migration(SchemaMigration):
         ))
         db.create_unique('item_item_groups', ['item_id', 'group_id'])
 
+        # Adding model 'ItemSort'
+        db.create_table('item_itemsort', (
+            ('item', self.gf('django.db.models.fields.related.ForeignKey')(related_name='sort', to=orm['item.Item'],primary_key=True)),
+        ))
         # Adding model 'ItemFind'
         db.create_table('item_itemfind', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),

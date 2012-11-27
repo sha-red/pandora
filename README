@@ -97,7 +97,9 @@ Important: "use_your_own" is a password and you have to use the same value here 
     su pandora
     cd /srv/pandora/pandora
     ./manage.py syncdb --noinput
+    ./manage.py migrate
     ./manage.py sqlfindindex | ./manage.py dbshell
+    ./manage.py sync_itemsort
     ./manage.py collectstatic -l --noinput
     ./manage.py update_static
     ./manage.py compile_pyc
