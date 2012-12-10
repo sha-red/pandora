@@ -33,7 +33,7 @@ if __name__ == "__main__":
         else:
             print "You are upgrading from an older version of pan.do/ra."
             print "Please use ./manage.py sqldiff -a to check for updates"
-            print "and apply required changes. You might have to set defaults too"
+            print "and apply required changes. You might have to set defaults too."
             print "Once done run ./manage.py migrate --all --fake"
             print "Check http://wiki.0x2620.org/wiki/pandora/DatabaseUpdate for more information"
     else:
@@ -71,4 +71,4 @@ if __name__ == "__main__":
             run('./manage.py', 'compile_pyc')
         diff = get('./manage.py', 'sqldiff', '-a').strip()
         if diff != '-- No differences':
-            print 'Database was changes, please make a backup and run run ./update.py database'
+            print 'Database has changed, please make a backup and run ./update.py database'
