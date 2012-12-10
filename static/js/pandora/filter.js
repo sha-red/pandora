@@ -168,6 +168,13 @@ pandora.ui.filter = function(id) {
             type: 'image',
             value: id
         })
+        .css(Ox.UI.SCROLLBAR_SIZE == 16 ? {
+            right: 0,
+            width: '14px'
+        } : {
+            right: '-1px',
+            width: '8px',
+        })
         .bindEvent('change', function(data) {
             var filters = Ox.clone(pandora.user.ui.filters),
                 find,
