@@ -34,7 +34,9 @@ if __name__ == "__main__":
             print "You are upgrading from an older version of pan.do/ra."
             print "Please use ./manage.py sqldiff -a to check for updates"
             print "and apply required changes. You might have to set defaults too."
-            print "Once done run ./manage.py migrate --all --fake"
+            print "Once done run:"
+            print "\tcd %s" % os.path.abspath(os.curdir)
+            print "\t./manage.py migrate --all --fake"
             print "Check http://wiki.0x2620.org/wiki/pandora/DatabaseUpdate for more information"
     else:
         os.chdir(base)
