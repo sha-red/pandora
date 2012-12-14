@@ -437,14 +437,18 @@ class Stream(models.Model):
             for f in config['formats']:
                 derivative, created = Stream.objects.get_or_create(file=self.file,
                                                   resolution=resolution, format=f)
+                
+                name = derivative.name()
+                name = os.path.join(os.path.dirname(self.video.name), name)
                 if created:
                     derivative.source = self
                     derivative.save()
-                    name = derivative.name()
-                    derivative.video.name = os.path.join(os.path.dirname(self.video.name), name)
+                    derivative.video.name = name
                     derivative.encode()
                     derivative.save()
                 elif rebuild or not derivative.available:
+                    if not derivative.video:
+                        derivative.video.name = name
                     derivative.encode()
         return True
 
