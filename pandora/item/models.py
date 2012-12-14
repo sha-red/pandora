@@ -112,6 +112,10 @@ def get_item(info, user=None, async=False):
                 item = Item()
                 item.user = user
                 item.data = item_data
+                #set default values
+                for k in settings.CONFIG['itemKeys']:
+                    if 'default' in k:
+                        item.data[k['id']] = default_data[k['default']]
                 item.itemId = info.get('oxdbId', item.oxdb_id())
                 try:
                     existing_item = Item.objects.get(oxdbId=item.oxdb_id())

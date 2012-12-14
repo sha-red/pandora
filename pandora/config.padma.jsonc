@@ -454,7 +454,11 @@
             "type": ["string"],
             "columnWidth": 120,
             "filter": true,
-            "sort": true
+            "sort": true,
+            "default": [
+                "Creative Commons Attribution-ShareAlike 3.0 License",
+                "Pad.ma General Public License"
+            ]
         },
         {
             "id": "rightslevel",
