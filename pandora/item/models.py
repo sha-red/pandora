@@ -78,6 +78,7 @@ def get_item(info, user=None, async=False):
     }
     if filter(lambda k: k['id'] == 'year', settings.CONFIG['itemKeys']):
         item_data['year'] =info.get('year', '')
+
     for key in ('episodeTitle', 'episodeDirector', 'episodeYear',
                 'season', 'episode', 'seriesTitle'):
         if key in info and info[key]:
@@ -112,10 +113,6 @@ def get_item(info, user=None, async=False):
                 item = Item()
                 item.user = user
                 item.data = item_data
-                #set default values
-                for k in settings.CONFIG['itemKeys']:
-                    if 'default' in k:
-                        item.data[k['id']] = default_data[k['default']]
                 item.itemId = info.get('oxdbId', item.oxdb_id())
                 try:
                     existing_item = Item.objects.get(oxdbId=item.oxdb_id())
@@ -279,6 +276,11 @@ class Item(models.Model):
                 else:
                     self.make_poster(True)
 
+    def add_default_data(self):
+        for k in settings.CONFIG['itemKeys']:
+            if 'default' in k and not k['id'] in self.data:
+                self.data[k['id']] = k['default']
+
     def expand_connections(self):
         c = self.get('connections')
         if c:
@@ -320,6 +322,7 @@ class Item(models.Model):
                 self.level = settings.CONFIG['rightsLevel']['member']
             if not self.itemId:
                 self.itemId = str(uuid.uuid1())
+            self.add_default_data()
             super(Item, self).save(*args, **kwargs)
             if not settings.USE_IMDB:
                 self.itemId = ox.toAZ(self.id)
