@@ -81,6 +81,15 @@ pandora.ui.filter = function(id) {
             unique: 'name'
         })
         .bindEvent({
+            init: function(data) {
+                that.setColumnTitle(
+                    'name',
+                    Ox.getObjectById(pandora.site.filters, id).title
+                    + '<div class="OxColumnStatus OxLight">'
+                    + Ox.formatNumber(data.items)
+                    + '</div>'
+                );
+            },
             paste: function(data) {
                 pandora.$ui.list.triggerEvent('paste', data);
             },
