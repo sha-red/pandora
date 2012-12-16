@@ -20,7 +20,8 @@ from ox.utils import json
 
 img_extension='jpg'
 
-FFMPEG2THEORA = 'ffmpeg2theora'
+AVCONV = 'avconv'
+
 MAX_DISTANCE = math.sqrt(3 * pow(255, 2))
 
 
@@ -46,6 +47,20 @@ class AspectRatio(fractions.Fraction):
     def ratio(self):
         return "%d:%d" % (self.numerator, self.denominator)
 
+def supported_formats():
+    p = subprocess.Popen(['which', AVCONV],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = p.communicate()
+    if not stdout.strip():
+        return None
+    p = subprocess.Popen([AVCONV, '-codecs'],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = p.communicate()
+    return {
+        'ogg': 'libtheora' in stdout and 'libvorbis' in stdout,
+        'webm': 'libvpx' in stdout and 'libvorbis' in stdout,
+        'mp4': 'libx264' in stdout and 'libvo_aacenc' in stdout,
+    }
 
 def stream(video, target, profile, info):
     if not os.path.exists(target):
@@ -207,14 +222,13 @@ def stream(video, target, profile, info):
         if audiobitrate:
             audio_settings += ['-ab', audiobitrate]
         if format == 'mp4':
-            audio_settings += ['-acodec', 'libfaac']
+            audio_settings += ['-acodec', 'libvo_aacenc']
         else:
             audio_settings += ['-acodec', 'libvorbis']
     else:
         audio_settings = ['-an']
 
-    ffmpeg = FFMPEG2THEORA.replace('2theora', '')
-    cmd = [ffmpeg, '-y', '-i', video, '-threads', '4'] \
+    cmd = [AVCONV, '-y', '-i', video, '-threads', '4'] \
           + audio_settings \
           + video_settings
 
@@ -222,23 +236,23 @@ def stream(video, target, profile, info):
         cmd += ['-f', 'webm', target]
     elif format == 'mp4':
         #mp4 needs postprocessing(qt-faststart), write to temp file
-        cmd += ["%s.mp4"%target]
-    else :
+        cmd += ["%s.mp4" % target]
+    else:
         cmd += [target]
 
-    print cmd
+    #print cmd
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
                               stdout=open('/dev/null', 'w'),
                               stderr=subprocess.STDOUT)
     p.communicate()
     if format == 'mp4':
-        cmd = ['qt-faststart', "%s.mp4"%target, target]
-        print cmd
+        cmd = ['qt-faststart', "%s.mp4" % target, target]
+        #print cmd
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
                                   stdout=open('/dev/null', 'w'),
                                   stderr=subprocess.STDOUT)
         p.communicate()
-        os.unlink("%s.mp4"%target)
+        os.unlink("%s.mp4" % target)
     return True
 
 

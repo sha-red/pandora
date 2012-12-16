@@ -29,7 +29,7 @@ To run pan.do/ra you need to install and setup:
             python-geoip python-html5lib python-lxml \
             python-gst0.10 gstreamer0.10-plugins-good gstreamer0.10-plugins-bad \ 
             postgresql postgresql-contrib rabbitmq-server \
-            ffmpeg2theora ffmpeg \
+            ffmpeg2theora libav-tools libavcodec-extra-53 \
             python-ox oxframe
 
 
@@ -137,14 +137,6 @@ b) apache2 (if you need it for other sites on the same server)
 
 
 Now you can open pandora in your browser, the first user to sign up will become admin.
-
-
-* A note about providing H.264 versions
-    For H.264 videos, you need ffmpeg with x264 and libfaac enabled,
-    you also need to install qt-faststart (from ffmpeg/tools)
-    (you can use medibuntu.org packages or compile ffmpeg yourself)
-    to enable H.264 derivatives add "mp4" to video.formats in your config.jsonc
-
 
 === Updating ===
 To update a pandora installation get the latest version from bzr by running

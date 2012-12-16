@@ -4,12 +4,6 @@ apt-get -y install ipython ntp
 
 add-apt-repository ppa:j/pandora
 
-#ffmpeg installed as apt package
-#wget http://firefogg.org/nightly/ffmpeg.linux -O /usr/local/bin/ffmpeg
-#chmod 755 /usr/local/bin/ffmpeg
-#wget http://firefogg.org/nightly/ffmpeg2theora.linux -O /usr/local/bin/ffmpeg2theora
-#chmod 755 /usr/local/bin/ffmpeg2theora
-
 #postgresql
 apt-get -y install postgresql postgresql-contrib
 sudo -u postgres createuser -S -D -R pandora

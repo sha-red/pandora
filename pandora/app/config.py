@@ -14,6 +14,8 @@ from django.contrib.auth.models import User
 import ox.jsonc
 from ox.utils import json
 
+from archive.extract import supported_formats, AVCONV
+
 
 _win = (sys.platform == "win32")
 
@@ -49,6 +51,32 @@ def load_config():
         for key in config['itemKeys']:
             config['keys'][key['id']] = key
 
+        old_formats = getattr(settings, 'CONFIG', {}).get('video', {}).get('formats', [])
+        formats = config.get('video', {}).get('formats')
+        if set(old_formats) != set(formats):
+            sformats = supported_formats()
+            if sformats:
+                for f in formats:
+                    if f not in sformats or not sformats[f]:
+                        sys.stderr.write('''WARNING:
+Your configuration contains a video format "%s" that is
+not supported by your version of avconv. Make sure you
+dont have a local version of avconv in /usr/local/bin
+and libavcodec-extra-53 and libav-tools are installed:
+
+    sudo apt-get install libavcodec-extra-53 libav-tools
+
+''' % f)
+            else:
+                sys.stderr.write('''WARNING:
+You dont have "%s" installed.
+To fix this on Ubuntu 12.04, run:
+
+    sudo apt-get install libavcodec-extra-53 libav-tools
+
+check the README for further details.
+
+''' % AVCONV)
         settings.CONFIG = config
         admin = len(settings.CONFIG['userLevels']) - 1
         if not 'syncdb' in sys.argv \

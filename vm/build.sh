@@ -42,7 +42,8 @@ sudo  vmbuilder vbox ubuntu --suite=precise \
     --addpkg gstreamer0.10-plugins-good \
     --addpkg gstreamer0.10-plugins-bad \
     --addpkg oxframe \
-    --addpkg ffmpeg \
+    --addpkg libavcodec-extra-53 \
+    --addpkg libav-tools \
     --addpkg ffmpeg2theora \
     --execscript=$base/install.sh \
     --firstboot=$base/firstboot.sh
