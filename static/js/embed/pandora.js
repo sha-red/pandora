@@ -25,10 +25,11 @@ Ox.load('UI', {
                                     censored: data.censored,
                                     censoredIcon: pandora.site.cantPlay.icon,
                                     censoredTooltip: pandora.site.cantPlay.text,
+                                    controlsTop: Ox.Fullscreen.available ? ['fullscreen'] : null,
                                     controlsBottom: ['play', 'volume', 'scale', 'timeline', 'settings'],
                                     duration: data.duration,
                                     enableFind: false,
-                                    enableFullscreen: true,
+                                    enableFullscreen: Ox.Fullscreen.available,
                                     enableKeyboard: true,
                                     enableMouse: true,
                                     enableTimeline: true,
@@ -55,6 +56,9 @@ Ox.load('UI', {
                                     resolution: function(data) {
                                         pandora.api.setUI({'videoResolution': data.resolution});
                                     },
+                                    fullscreen: function(data) {
+                                        Ox.Fullscreen.toggle();
+                                    }
                                 })
                             );
                             Ox.UI.hideLoadingScreen();

@@ -45,7 +45,9 @@ pandora.ui.embedDialog = function(data) {
                 '<iframe width="' + width
                 + '" height="' + height
                 + '" src="' + constructURL(data)
-                + '" frameborder="0" allowfullscreen></iframe>'
+                + '" frameborder="0" '
+                + 'webkitAllowFullScreen mozallowfullscreen allowFullScreen'
+                + '></iframe>'
             ).on({
                 click: function() {
                     this.focus();
