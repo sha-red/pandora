@@ -68,8 +68,9 @@ appPanel
                 images.reflection.style.top = height + 'px';
                 images.reflection.style.right = 0;
                 images.reflection.style.bottom = 0;
-                images.reflection.style.width = width + 'px';
-                images.reflection.style.height = height + 'px';
+                // FIXME: `+2` and `+1` are temporary fixes for Chrome 26
+                images.reflection.style.width = width + 2 + 'px';
+                images.reflection.style.height = height + 1 + 'px';
                 images.reflection.style.margin = 'auto';
                 images.reflection.style.MozTransform = 'scaleY(-1)';
                 images.reflection.style.MSTransform = 'scaleY(-1)';
