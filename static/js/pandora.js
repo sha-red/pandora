@@ -105,7 +105,7 @@ appPanel
             gradient.style.bottom = 0;
             // FIXME: should be 320 and 160 - the values below are temporary fixes for Chrome 26
             gradient.style.width = '322px';
-            gradient.style.height = '161px';
+            gradient.style.height = '162px';
             gradient.style.margin = 'auto';
             gradient.style.background = theme == 'classic'
                 ? '-moz-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
