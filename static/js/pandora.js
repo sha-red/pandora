@@ -68,9 +68,8 @@ appPanel
                 images.reflection.style.top = height + 'px';
                 images.reflection.style.right = 0;
                 images.reflection.style.bottom = 0;
-                // FIXME: `+2` and `+1` are temporary fixes for Chrome 26
-                images.reflection.style.width = width + 2 + 'px';
-                images.reflection.style.height = height + 1 + 'px';
+                images.reflection.style.width = width + 'px';
+                images.reflection.style.height = height + 'px';
                 images.reflection.style.margin = 'auto';
                 images.reflection.style.MozTransform = 'scaleY(-1)';
                 images.reflection.style.MSTransform = 'scaleY(-1)';
@@ -104,8 +103,9 @@ appPanel
             gradient.style.top = '160px';
             gradient.style.right = 0;
             gradient.style.bottom = 0;
-            gradient.style.width = '320px';
-            gradient.style.height = '160px';
+            // FIXME: should be 320 and 160 - the values below are temporary fixes for Chrome 26
+            gradient.style.width = '322px';
+            gradient.style.height = '161px';
             gradient.style.margin = 'auto';
             gradient.style.background = theme == 'classic'
                 ? '-moz-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
