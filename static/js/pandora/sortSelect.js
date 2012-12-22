@@ -26,7 +26,7 @@ pandora.ui.sortSelect = function(isNavigationView) {
             id: 'sortSelect',
             items: items,
             value: pandora.user.ui[sortKey][0].key,
-            width: isNavigationView ? 128 : 144
+            width: isNavigationView ? 116 + Ox.UI.SCROLLBAR_SIZE : 144
         })
         .css({
             float: isNavigationView ? 'right' : 'left',
