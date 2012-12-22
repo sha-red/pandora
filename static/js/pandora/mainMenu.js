@@ -64,11 +64,14 @@ pandora.ui.mainMenu = function() {
                         { id: 'icons', title: 'Icons', items: [].concat([
                                 { group: 'viewicons', min: 1, max: 1, items: ['posters', 'frames'].map(function(icons) {
                                     return {id: icons, title: Ox.toTitleCase(icons), checked: ui.icons == icons};
-                                }) }
-                            ], pandora.site.media.importPosters ? [
+                                }) },
                                 {},
-                                { id: 'showsiteposters', title: 'Always Show ' + pandora.site.site.name + ' Poster', checked: ui.showSitePosters }
-                            ] : []
+                            ], pandora.site.media.importPosters ? [
+                                { id: 'showsiteposters', title: 'Always Show ' + pandora.site.site.name + ' Poster', checked: ui.showSitePosters },
+                                {}
+                            ] : [], [
+                                { id: 'showreflections', title: 'Show Reflections', checked: true, disabled: true }
+                            ]
                         ) },
                         { id: 'timelines', title: 'Timelines', items: [
                             { group: 'viewtimelines', min: 1, max: 1, items: pandora.site.timelines.map(function(mode) {
