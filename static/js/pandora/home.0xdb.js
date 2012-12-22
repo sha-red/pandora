@@ -37,8 +37,9 @@ pandora.ui.home = function() {
                 top: '160px',
                 right: 0,
                 bottom: 0,
-                width: '320px',
-                height: '160px',
+                // FIXME: should be 320 and 160 - the values below are temporary fixes for Chrome 26
+                width: '322px',
+                height: '162px',
                 margin: 'auto',
             })
             .appendTo(that),
