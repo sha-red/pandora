@@ -1084,9 +1084,9 @@ pandora.resizeFilters = function(width) {
         .size(0, pandora.user.ui.filterSizes[1])
         .size(2, pandora.user.ui.filterSizes[3]);
     pandora.$ui.filters.forEach(function($list, i) {
-        $list.resizeColumn('name', pandora.user.ui.filterSizes[i] - 40 - Ox.UI.SCROLLBAR_SIZE);
+        $list.resizeColumn('name', pandora.user.ui.filterSizes[i] - 44 - Ox.UI.SCROLLBAR_SIZE);
         if (pandora.user.ui.showFlags) {
-            $list.find('.flagname').css({width: pandora.user.ui.filterSizes[i] - 64 - Ox.UI.SCROLLBAR_SIZE})
+            $list.find('.flagname').css({width: pandora.user.ui.filterSizes[i] - 68 - Ox.UI.SCROLLBAR_SIZE})
         }
     });
 };

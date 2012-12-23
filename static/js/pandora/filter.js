@@ -35,7 +35,7 @@ pandora.ui.filter = function(id) {
                                         .addClass('flagname')
                                         .css({
                                             float: 'left',
-                                            width: pandora.user.ui.filterSizes[i] - 64 - Ox.UI.SCROLLBAR_SIZE,
+                                            width: pandora.user.ui.filterSizes[i] - 68 - Ox.UI.SCROLLBAR_SIZE,
                                             textOverflow: 'ellipsis',
                                             overflowX: 'hidden'
                                         })
@@ -46,15 +46,18 @@ pandora.ui.filter = function(id) {
                     operator: filter.type == 'string' ? '+' : '-',
                     title: title,
                     visible: true,
-                    width: pandora.user.ui.filterSizes[i] - 40 - Ox.UI.SCROLLBAR_SIZE
+                    width: pandora.user.ui.filterSizes[i] - 44 - Ox.UI.SCROLLBAR_SIZE
                 },
                 {
                     align: 'right',
+                    format: function(value) {
+                        return Ox.formatNumber(value);
+                    },
                     id: 'items',
                     operator: '-',
                     title: '#',
                     visible: true,
-                    width: 40
+                    width: 44
                 }
             ],
             columnsVisible: true,
