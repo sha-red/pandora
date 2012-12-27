@@ -9,7 +9,8 @@ for pixel_index in range(64):
     x, y = pixel_index % 8, int(pixel_index / 8)
     ZONE_INDEX.append(int(x / 2) + int(y / 4) * 4)
 
-def get_hash(image, mode, debug=False):
+def get_hash(image, mode):
+    image_hash = 0
     if mode == 'color':
         # divide the image into 8 zones:
         # 0 0 1 1 2 2 3 3
@@ -21,7 +22,6 @@ def get_hash(image, mode, debug=False):
         # 4 4 5 5 6 6 7 7
         # 4 4 5 5 6 6 7 7
         image_data = image.getdata()
-        image_hash = 0
         zone_values = []
         for zone_index in range(8):
             zone_values.append([])
@@ -39,16 +39,18 @@ def get_hash(image, mode, debug=False):
             ))
             image_hash += color_index * pow(2, zone_index * 8)
     elif mode == 'shape':
+        # pixels brighter than the mean register as 1,
+        # pixels equal to or darker than the mean as 0
         image_data = image.convert('L').getdata()
         image_mean = sum(image_data) / 64
-        image_hash = 0
         for pixel_index, pixel_value in enumerate(image_data):
             if pixel_value > image_mean:
                 image_hash += pow(2, pixel_index)
-    #return hash as 16 character hex string
-    h = hex(image_hash)[2:].upper()
-    if h.endswith('L'): h = h[:-1]
-    return '0' * (16-len(h)) + h
+    image_hash = hex(image_hash)[2:].upper()
+    if image_hash.endswith('L'):
+        image_hash = image_hash[:-1]
+    image_hash = '0' * (16 - len(h)) + h
+    return image_hash
 
 def get_sequences(path, position=0):
     modes = ['color', 'shape']
