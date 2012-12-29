@@ -118,6 +118,7 @@ pandora.ui.browser = function() {
                 ? pandora.site.user.ui.listSort: pandora.user.ui.listSort,
             unique: 'id'
         })
+        .addClass('OxMedia')
         .bindEvent({
             open: function() {
                 that.scrollToSelection();

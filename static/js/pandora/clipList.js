@@ -109,6 +109,7 @@ pandora.ui.clipList = function(videoRatio) {
             sort: !ui.item ? ui.listSort : ui.itemSort,
             unique: 'id'
         })
+        .addClass('OxMedia')
         .bindEvent({
             init: function(data) {
                 if (!ui.item && ui.listView == 'clip'/* && pandora.$ui.statusbar*/) {

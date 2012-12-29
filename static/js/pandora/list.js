@@ -166,7 +166,8 @@ pandora.ui.list = function() {
             size: 128,
             sort: pandora.user.ui.listSort,
             unique: 'id'
-        });
+        })
+        .addClass('OxMedia');
     } else if (view == 'info') {
         that = Ox.Element().css({margin: '16px'}).html(view + ' results view still missing.');
     } else if (view == 'clips') {
@@ -239,6 +240,7 @@ pandora.ui.list = function() {
                 - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
                 - Ox.UI.SCROLLBAR_SIZE
         })
+        .addClass('OxMedia')
         .bindEvent({
             key_left: function() {
                 // ...
