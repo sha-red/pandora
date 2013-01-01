@@ -22,6 +22,7 @@ pandora.ui.usersDialog = function() {
         }).concat(['Robot']),
 
         $reloadButton = Ox.Button({
+                disabled: true,
                 title: 'redo',
                 tooltip: 'Reload',
                 type: 'image'
@@ -29,6 +30,7 @@ pandora.ui.usersDialog = function() {
             .css({float: 'left', margin: '4px 2px 4px 4px'})
             .bindEvent({
                 click: function() {
+                    $reloadButton.options({disabled: true});
                     Ox.Request.clearCache('findUsers');
                     $list.reloadList(true);
                 }
@@ -386,6 +388,9 @@ pandora.ui.usersDialog = function() {
                             : ''
                         )
                     );
+                },
+                load: function() {
+                    $reloadButton.options({disabled: false});
                 },
                 select: selectUsers
             }),
