@@ -203,7 +203,7 @@ pandora.ui.statisticsDialog = function() {
             Ox.loop(firstKey[0], lastKey[0] + 1, function(year) {
                 ['firstseen', 'lastseen'].forEach(function(key) {
                     var key = [year, key].join('-');
-                    data[mode].year[key] = data[mode].year[key] || 0;
+                    data[mode].year[key] = data[mode].year[key] || {};
                 });
                 Ox.loop(
                     year == firstKey[0] ? firstKey[1] : 1,
