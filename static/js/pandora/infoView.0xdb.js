@@ -480,6 +480,25 @@ pandora.ui.infoView = function(data) {
             .appendTo($statistics);
     });
 
+    // Duration, Aspect Ratio --------------------------------------------------
+
+    ['duration', 'aspectratio'].forEach(function(key) {
+        var itemKey = Ox.getObjectById(pandora.site.itemKeys, key),
+            value = data[key] || 0;
+        $('<div>')
+            .css({marginBottom: '4px'})
+            .append(formatKey(itemKey.title, true))
+            .append(
+                Ox.Theme.formatColor(null, 'gradient')
+                    .css({textAlign: 'right'})
+                    .html(
+                        Ox['format' + Ox.toTitleCase(itemKey.format.type)]
+                            .apply(null, [value].concat(itemKey.format.args))
+                    )
+            )
+            .appendTo($statistics);
+    });
+
     // Hue, Saturation, Lightness, Volume --------------------------------------
 
     ['hue', 'saturation', 'lightness', 'volume'].forEach(function(key) {
@@ -490,6 +509,23 @@ pandora.ui.infoView = function(data) {
             .append(
                 Ox.Theme.formatColor(value, key == 'volume' ? 'lightness' : key)
                     .css({textAlign: 'right'})
+            )
+            .appendTo($statistics);
+    });
+
+    // Cuts per Minute, Words per Minute ---------------------------------------
+
+    ['cutsperminute', 'wordsperminute'].forEach(function(key) {
+        var value = data[key] || 0;
+        $('<div>')
+            .css({marginBottom: '4px'})
+            .append(
+                formatKey(key.slice(0, -9) + ' per minute', true)
+            )
+            .append(
+                Ox.Theme.formatColor(null, 'gradient')
+                    .css({textAlign: 'right'})
+                    .html(Ox.formatNumber(data[key], 3))
             )
             .appendTo($statistics);
     });
@@ -582,7 +618,8 @@ pandora.ui.infoView = function(data) {
 
     function formatKey(key, isStatistics) {
         return isStatistics
-            ? $('<div>').css({marginBottom: '4px', fontWeight: 'bold'}).html(Ox.toTitleCase(key))
+            ? $('<div>').css({marginBottom: '4px', fontWeight: 'bold'})
+                .html(Ox.toTitleCase(key).replace(' Per ', ' per '))
             : '<span style="font-weight: bold">' + Ox.toTitleCase(key) + ':</span> ';
     }
 

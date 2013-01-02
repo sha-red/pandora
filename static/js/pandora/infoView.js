@@ -279,6 +279,25 @@ pandora.ui.infoView = function(data) {
         $('<div>').css(css).html(data.summary).appendTo($center);
     }
 
+    // Duration, Aspect Ratio --------------------------------------------------
+
+    ['duration', 'aspectratio'].forEach(function(key) {
+        var itemKey = Ox.getObjectById(pandora.site.itemKeys, key),
+            value = data[key] || 0;
+        $('<div>')
+            .css({marginBottom: '4px'})
+            .append(formatKey(itemKey.title, true))
+            .append(
+                Ox.Theme.formatColor(null, 'gradient')
+                    .css({textAlign: 'right'})
+                    .html(
+                        Ox['format' + Ox.toTitleCase(itemKey.format.type)]
+                            .apply(null, [value].concat(itemKey.format.args))
+                    )
+            )
+            .appendTo($right);
+    });
+
     // Hue, Saturation, Lightness, Volume --------------------------------------
 
     ['hue', 'saturation', 'lightness', 'volume'].forEach(function(key) {
@@ -292,6 +311,18 @@ pandora.ui.infoView = function(data) {
             )
             .appendTo($right);
     });
+
+    // Cuts per Minute ---------------------------------------------------------
+
+    $('<div>')
+        .css({marginBottom: '4px'})
+        .append(formatKey('cuts per minute', true))
+        .append(
+            Ox.Theme.formatColor(null, 'gradient')
+                .css({textAlign: 'right'})
+                .html(Ox.formatNumber(data['cutsperminute'] || 0, 3))
+        )
+        .appendTo($right);
 
     // User and Groups ---------------------------------------------------------
 
@@ -412,7 +443,8 @@ pandora.ui.infoView = function(data) {
 
     function formatKey(key, isStatistics) {
         return isStatistics
-            ? $('<div>').css({marginBottom: '4px', fontWeight: 'bold'}).html(Ox.toTitleCase(key))
+            ? $('<div>').css({marginBottom: '4px', fontWeight: 'bold'})
+                .html(Ox.toTitleCase(key).replace(' Per ', ' per '))
             : '<span style="font-weight: bold">' + Ox.toTitleCase(key) + ':</span> ';
     }
 
