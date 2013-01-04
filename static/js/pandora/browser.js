@@ -53,6 +53,7 @@ pandora.ui.browser = function() {
                             }).reloadList();                            
                         }
                     });
+                    pandora.$ui.filters.updateMenus();
                 }
                 if (pandora.user.ui.listView == 'map') {
                     pandora.$ui.map.resizeMap();

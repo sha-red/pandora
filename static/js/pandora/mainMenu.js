@@ -361,6 +361,11 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.sequencesDialog = pandora.ui.sequencesDialog().open();
                 }
             },
+            key_alt_control_shift_a: function() {
+                if (!pandora.hasDialogOrScreen() && !ui.item) {
+                    pandora.$ui.filters.clearFilters();
+                }
+            },
             key_alt_control_shift_f: function() {
                 Ox.Fullscreen.toggle();
             },

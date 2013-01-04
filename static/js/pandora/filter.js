@@ -163,6 +163,7 @@ pandora.ui.filter = function(id) {
                     }
                 }
                 pandora.UI.set('find', find);
+                pandora.$ui.filters.updateMenus();
             },
             sort: function(data) {
                 Ox.Log('', 'SORT', data)
@@ -173,12 +174,16 @@ pandora.ui.filter = function(id) {
                 pandora.UI.set({filters: filters});
             }
         }),
-        $select = Ox.Select({
-                items: Ox.clone(pandora.site.filters),
-                max: 1,
-                min: 1,
+        $menu = Ox.MenuButton({
+                items: [
+                    {id: 'clearFilter', title: 'Clear Filter', keyboard: 'shift control a'},
+                    {id: 'clearFilters', title: 'Clear All Filters', keyboard: 'shift alt control a'},
+                    {},
+                    {group: 'filter', max: 1, min: 1, items: pandora.site.filters.map(function(filter) {
+                        return Ox.extend({checked: filter.id == id}, filter);
+                    })}
+                ],
                 type: 'image',
-                value: id
             })
             .css(Ox.UI.SCROLLBAR_SIZE == 16 ? {
                 right: 0,
@@ -187,63 +192,86 @@ pandora.ui.filter = function(id) {
                 right: '-1px',
                 width: '8px',
             })
-            .bindEvent('change', function(data) {
-                var filters = Ox.clone(pandora.user.ui.filters),
-                    find,
-                    id_ = data.value,
-                    i_ = Ox.getIndexById(pandora.user.ui.filters, id_);
-                if (i_ == -1) {
-                    // new filter was not part of old filter set
-                    if (pandora.user.ui._filterState[i].selected.length) {
-                        // if filter with selection gets replaced, update find
-                        find = Ox.clone(pandora.user.ui.find, true);
-                        find.conditions.splice(pandora.user.ui._filterState[i].index, 1);
+            .bindEvent({
+                change: function(data) {
+                    var filters = Ox.clone(pandora.user.ui.filters),
+                        find,
+                        id_ = data.checked[0].id,
+                        i_ = Ox.getIndexById(pandora.user.ui.filters, id_);
+                    if (i_ == -1) {
+                        // new filter was not part of old filter set
+                        if (pandora.user.ui._filterState[i].selected.length) {
+                            // if filter with selection gets replaced, update find
+                            find = Ox.clone(pandora.user.ui.find, true);
+                            find.conditions.splice(pandora.user.ui._filterState[i].index, 1);
+                        }
+                        filters[i] = makeFilter(id_);
+                        pandora.UI.set(Ox.extend({
+                            filters: filters
+                        }, find ? {
+                            find: find
+                        } : {}));
+                        replaceFilter(i, id_);
+                        // fixme: there is an obscure special case not yet covered:
+                        // switching to a new filter may change find from advanced to not advanced
+                        // if part of the existing query works as a filter selection in the new filter
+                    } else {
+                        // swap two existing filters
+                        var filterData = Ox.clone(pandora.user.ui._filterState[i]);
+                        pandora.user.ui._filterState[i] = pandora.user.ui._filterState[i_];
+                        pandora.user.ui._filterState[i_] = filterData;
+                        filters[i] = makeFilter(id_, pandora.user.ui.filters[i_].sort);
+                        filters[i_] = makeFilter(id, pandora.user.ui.filters[i].sort);
+                        pandora.UI.set({filters: filters});
+                        replaceFilter(i, id_);
+                        replaceFilter(i_, id);
                     }
-                    filters[i] = makeFilter(id_);
-                    pandora.UI.set(Ox.extend({
-                        filters: filters
-                    }, find ? {
-                        find: find
-                    } : {}));
-                    replaceFilter(i, id_);
-                    // fixme: there is an obscure special case not yet covered:
-                    // switching to a new filter may change find from advanced to not advanced
-                    // if part of the existing query works as a filter selection in the new filter
-                } else {
-                    // swap two existing filters
-                    var filterData = Ox.clone(pandora.user.ui._filterState[i]);
-                    pandora.user.ui._filterState[i] = pandora.user.ui._filterState[i_];
-                    pandora.user.ui._filterState[i_] = filterData;
-                    filters[i] = makeFilter(id_, pandora.user.ui.filters[i_].sort);
-                    filters[i_] = makeFilter(id, pandora.user.ui.filters[i].sort);
-                    pandora.UI.set({filters: filters});
-                    replaceFilter(i, id_);
-                    replaceFilter(i_, id);
-                }
-                function makeFilter(id, sort) {
-                    // makes user.ui._filterState object from site.filters object
-                    var filter = Ox.getObjectById(pandora.site.filters, id);
-                    return {
-                        id: filter.id,
-                        sort: sort || [{key: filter.type == 'integer' ? 'name' : 'items', operator: '-'}]
-                    };
-                }
-                function replaceFilter(i, id, find) {
-                    // if find is passed, selected items will be derived from it // FIXME: ???
-                    var isOuter = i % 4 == 0;
-                    pandora.$ui[isOuter ? 'browser' : 'filtersInnerPanel'].replaceElement(
-                        isOuter ? i / 2 : i - 1,
-                        pandora.$ui.filters[i] = pandora.ui.filter(id)
-                    );
+                    pandora.$ui.filters.updateMenus();
+                    function makeFilter(id, sort) {
+                        // makes user.ui._filterState object from site.filters object
+                        var filter = Ox.getObjectById(pandora.site.filters, id);
+                        return {
+                            id: filter.id,
+                            sort: sort || [{key: filter.type == 'integer' ? 'name' : 'items', operator: '-'}]
+                        };
+                    }
+                    function replaceFilter(i, id) {
+                        var isOuter = i % 4 == 0;
+                        pandora.$ui[isOuter ? 'browser' : 'filtersInnerPanel'].replaceElement(
+                            isOuter ? i / 2 : i - 1,
+                            pandora.$ui.filters[i] = pandora.ui.filter(id)
+                        );
+                    }
+                },
+                click: function(data) {
+                    if (data.id == 'clearFilter') {
+                        that.clearFilter();
+                    } else if (data.id == 'clearFilters') {
+                        pandora.$ui.filters.clearFilters();
+                    }
                 }
             })
             .appendTo(that.$bar.$element);
-    Ox.UI.SCROLLBAR_SIZE < 16 && $($select.find('input')[0]).css({
+    Ox.UI.SCROLLBAR_SIZE < 16 && $($menu.find('input')[0]).css({
         marginRight: '-3px',
         marginTop: '1px',
         width: '8px',
         height: '8px'
     });
+    that.clearFilter = function() {
+        // FIXME: List should trigger event on options change
+        if (!Ox.isEmpty(that.options('selected'))) {
+            that.options({selected: []}).triggerEvent('select', {ids: []});
+        }
+    };
+    that.disableMenuItem = function(id) {
+        Ox.print('disable', id);
+        $menu.disableItem(id);
+    };
+    that.enableMenuItem = function(id) {
+        Ox.print('enable', id);
+        $menu.enableItem(id);
+    };
     return that;
 };
 
@@ -252,7 +280,27 @@ pandora.ui.filters = function() {
     pandora.user.ui.filters.forEach(function(filter, i) {
         $filters[i] = pandora.ui.filter(filter.id);
     });
-    return $filters;
+    $filters.clearFilters = function() {
+        $filters.forEach(function($filter) {
+            $filter.clearFilter();
+        });
+    };
+    $filters.updateMenus = function() {
+        var selected = $filters.map(function($filter) {
+                return !Ox.isEmpty($filter.options('selected'));
+            }),
+            filtersHaveSelection = !!Ox.sum(selected);
+        $filters.forEach(function($filter, i) {
+            $filter[
+                 selected[i] ? 'enableMenuItem' : 'disableMenuItem'
+            ]('clearFilter');
+            $filter[
+                filtersHaveSelection ? 'enableMenuItem' : 'disableMenuItem'
+            ]('clearFilters');
+        });
+        return $filters;
+    };
+    return $filters.updateMenus();
 };
 
 pandora.ui.filtersInnerPanel = function() {
