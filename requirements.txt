@@ -1,5 +1,4 @@
 -e git+https://github.com/django/django.git@stable/1.4.x#egg=django
-#South
 -e bzr+http://code.0x2620.org/python-ox/#egg=python-ox
 -e bzr+http://code.0x2620.org/oxtimelines/#egg=oxtimelines
 simplejson
