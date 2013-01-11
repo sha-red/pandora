@@ -477,7 +477,11 @@ class Stream(models.Model):
         self.oshash = self.info.get('oshash')
         self.duration = self.info.get('duration', 0)
         if 'video' in self.info and self.info['video']:
-            self.aspect_ratio = self.info['video'][0]['width'] / self.info['video'][0]['height']
+            if 'display_aspect_ratio' in self.info['video'][0]:
+                dar = map(int, self.info['video'][0]['display_aspect_ratio'].split(':'))
+                self.aspect_ratio = dar[0] / dar[1]
+            else:
+                self.aspect_ratio = self.info['video'][0]['width'] / self.info['video'][0]['height']
         else:
             self.aspect_ratio = 128/80
         super(Stream, self).save(*args, **kwargs)
