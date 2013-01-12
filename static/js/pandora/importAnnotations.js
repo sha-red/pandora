@@ -8,7 +8,7 @@ pandora.ui.importAnnotations = function(data) {
         layers = pandora.site.layers.filter(function(layer) {
             return layer.canAddAnnotations[pandora.user.level];
         }),
-        layer = layers[0].id,
+        layer,
         width = 384,
         srt = [],
         total = 0,
@@ -109,12 +109,16 @@ pandora.ui.importAnnotations = function(data) {
     }).html('Import annotations from .srt file:'));
     selectLayer = Ox.Select({
             items: layers,
-            value: layer,
+            title: 'select...',
             label: 'Layer'
         })
         .bindEvent({
             change: function(data) {
+                selectLayer.options({
+                    title: null
+                });
                 layer = data.value;
+                total && layer && importButton.options({disabled: false});
             }
         })
         .appendTo(content);
@@ -134,7 +138,7 @@ pandora.ui.importAnnotations = function(data) {
                     reader.onloadend = function(event) {
                         srt = parseSRT(this.result);
                         total = srt.length;
-                        total && importButton.options({disabled: false});
+                        total && layer && importButton.options({disabled: false});
                         $status.html(
                             'File contains ' + total + ' annotation'
                             + (total == 1 ? '' : 's') + '.'
