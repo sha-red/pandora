@@ -63,16 +63,17 @@ def get_matches(obj, model, layer_type, qs=None):
     if not qs:
         qs = Annotation.objects.all()
     for a in qs.filter(f):
-        value = a.findvalue.lower()
-        for name in super_matches:
-            name = ox.decode_html(name)
-            value = value.replace(name.lower(), '')
-        for name in [obj.name] + list(obj.alternativeNames):
-            name = name.lower()
-            name = ox.decode_html(name)
-            if name in value and (exact or re.compile('((^|\s)%s([\.,;:!?\-\/\s]|$))'%re.escape(name)).findall(value)):
-                matches.append(a.id)
-                break
+        if a.findvalue:
+            value = a.findvalue.lower()
+            for name in super_matches:
+                name = ox.decode_html(name)
+                value = value.replace(name.lower(), '')
+            for name in [obj.name] + list(obj.alternativeNames):
+                name = name.lower()
+                name = ox.decode_html(name)
+                if name in value and (exact or re.compile('((^|\s)%s([\.,;:!?\-\/\s]|$))'%re.escape(name)).findall(value)):
+                    matches.append(a.id)
+                    break
     if not matches:
         matches = [-1]
     return Annotation.objects.filter(id__in=matches)
