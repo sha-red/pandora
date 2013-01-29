@@ -708,6 +708,16 @@ def poster(request, id, size=None):
     item = get_object_or_404(models.Item, itemId=id)
     if not item.access(request.user):
         return HttpResponseForbidden()
+    if not item.poster:
+        poster_path = os.path.join(settings.MEDIA_ROOT, item.path('poster.jpg'))
+        if os.path.exists(poster_path):
+            item.poster.name = item.path('poster.jpg')
+            models.Item.objects.filter(pk=item.id).update(
+                poster=item.poster.name,
+                poster_height=item.poster.height,
+                poster_width=item.poster.width,
+                icon=item.icon.name
+            )
     if item.poster:
         return image_to_response(item.poster, size)
     else:

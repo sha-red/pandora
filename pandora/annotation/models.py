@@ -19,7 +19,7 @@ from changelog.models import Changelog
 from item.utils import sort_string
 import managers
 import utils
-from tasks import update_matches, update_matches, update_item
+from tasks import update_matches, update_item
 
 
 def get_super_matches(obj, model):
