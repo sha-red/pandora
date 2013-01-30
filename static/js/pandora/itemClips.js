@@ -25,7 +25,6 @@ pandora.ui.itemClips = function(options) {
     self.height = self.options.ratio > 1 ? Math.round(self.size / self.options.ratio) : self.size;
 
     self.options.clips.forEach(function(clip, i) {
-        Ox.Log('', 'CLIP', clip)
         var annotations = clip.annotations.sort(function(a, b) {
                 var layerA = pandora.site.clipLayers.indexOf(a.layer),
                     layerB = pandora.site.clipLayers.indexOf(b.layer);

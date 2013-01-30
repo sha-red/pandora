@@ -525,7 +525,7 @@ pandora.ui.infoView = function(data) {
             .append(
                 Ox.Theme.formatColor(null, 'gradient')
                     .css({textAlign: 'right'})
-                    .html(Ox.formatNumber(data[key], 3))
+                    .html(Ox.formatNumber(value, 3))
             )
             .appendTo($statistics);
     });
