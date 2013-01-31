@@ -712,11 +712,14 @@ def poster(request, id, size=None):
         poster_path = os.path.join(settings.MEDIA_ROOT, item.path('poster.jpg'))
         if os.path.exists(poster_path):
             item.poster.name = item.path('poster.jpg')
+            item.poster_height = item.poster.height
+            item.poster_width = item.poster.width
             models.Item.objects.filter(pk=item.id).update(
                 poster=item.poster.name,
-                poster_height=item.poster.height,
-                poster_width=item.poster.width,
-                icon=item.icon.name
+                poster_height=item.poster_height,
+                poster_width=item.poster_width,
+                icon=item.icon.name,
+                json=item.get_json()
             )
     if item.poster:
         return image_to_response(item.poster, size)
