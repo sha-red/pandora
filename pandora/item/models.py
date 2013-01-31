@@ -544,6 +544,10 @@ class Item(models.Model):
         streams = self.streams()
         i['durations'] = [s.duration for s in streams]
         i['duration'] = sum(i['durations'])
+        if not streams:
+            i['duration'] = self.files.filter(
+                Q(selected=True)|Q(wanted=True)
+            ).aggregate(Sum('duration'))['duration__sum'] 
         i['parts'] = len(i['durations'])
         if i['parts']:
             i['videoRatio'] = streams[0].aspect_ratio
