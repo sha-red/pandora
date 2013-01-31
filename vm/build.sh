@@ -34,6 +34,7 @@ sudo  vmbuilder vbox ubuntu --suite=precise \
     --addpkg python-imaging \
     --addpkg python-numpy \
     --addpkg python-psycopg2 \
+    --addpkg python-pyinotify \
     --addpkg python-simplejson \
     --addpkg python-lxml \
     --addpkg python-html5lib \

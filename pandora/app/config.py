@@ -96,19 +96,31 @@ check the README for further details.
 
 def reloader_thread():
     _config_mtime = 0
-    while RUN_RELOADER:
-        try:
-            stat = os.stat(settings.SITE_CONFIG)
-            mtime = stat.st_mtime
-            if _win:
-                mtime -= stat.st_ctime
-            if mtime > _config_mtime:
-                load_config()
-                _config_mtime = mtime
-        except:
-            #sys.stderr.write("reloading config failed\n")
-            pass
-        time.sleep(1)
+    try:
+        import pyinotify
+        INOTIFY = True
+    except:
+        INOTIFY = False
+    if INOTIFY:
+        wm = pyinotify.WatchManager()
+        name = os.path.realpath(settings.SITE_CONFIG)
+        wm.add_watch(name, pyinotify.IN_CLOSE_WRITE, lambda event: load_config())
+        notifier = pyinotify.Notifier(wm)
+        notifier.loop()
+    else:
+        while RUN_RELOADER:
+            try:
+                stat = os.stat(settings.SITE_CONFIG)
+                mtime = stat.st_mtime
+                if _win:
+                    mtime -= stat.st_ctime
+                if mtime > _config_mtime:
+                    load_config()
+                    _config_mtime = mtime
+                time.sleep(1)
+            except:
+                #sys.stderr.write("reloading config failed\n")
+                pass
 
 def update_static():
     oxjs_build = os.path.join(settings.STATIC_ROOT, 'oxjs/tools/build/build.py')
