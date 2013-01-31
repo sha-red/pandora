@@ -32,6 +32,13 @@ pandora.ui.info = function() {
 
     updateInfo();
 
+    function emptyInfo() {
+        pandora.$ui.listInfo && pandora.$ui.listInfo.remove();
+        pandora.$ui.posterInfo && pandora.$ui.posterInfo.remove();
+        pandora.$ui.videoPreview && pandora.$ui.videoPreview.remove();
+        that.empty();              
+    }
+
     function getId() {
         return ui.item || (
             ui.listSelection.length
@@ -58,15 +65,15 @@ pandora.ui.info = function() {
             previousView = view;
         view = getView();
         if (view == 'list') {
-            pandora.$ui.listInfo && pandora.$ui.listInfo.remove();
-            that.empty().append(pandora.$ui.listInfo = pandora.ui.listInfo());
+            emptyInfo();
+            that.append(pandora.$ui.listInfo = pandora.ui.listInfo());
             previousView == 'video' && resizeInfo();
         } else if (view == 'poster') {
             pandora.api.get({id: id, keys: ['director', 'posterRatio', 'title']}, function(result) {
                 var ratio = result.data.posterRatio,
                     height = pandora.getInfoHeight(true);
-                pandora.$ui.posterInfo && pandora.$ui.posterInfo.remove();                
-                that.empty().append(
+                emptyInfo();
+                that.append(
                     pandora.$ui.posterInfo = pandora.ui.posterInfo(Ox.extend(result.data, {id: id}))
                 );
                 previousView == 'video' && resizeInfo();
@@ -76,9 +83,9 @@ pandora.ui.info = function() {
                 id: id,
                 keys: ['duration', 'rendered', 'videoRatio']
             }, function(result) {
+                emptyInfo();
                 if (result.data && result.data.rendered) {
-                    pandora.$ui.videoPreview && pandora.$ui.videoPreview.remove();
-                    that.empty().append(
+                    that.append(
                         pandora.$ui.videoPreview = pandora.ui.videoPreview({
                                 duration: result.data.duration,
                                 frameRatio: result.data.videoRatio,
