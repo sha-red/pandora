@@ -42,8 +42,3 @@ class Command(BaseCommand):
             name = 'findvalue'
             if name not in indexes:
                 create_table("%s_%s_idx"%(table_name, name), table_name, name)
-            for name in settings.CONFIG['clipLayers']:
-                name = '%s_findvalue' % name
-                if name  not in indexes:
-                    create_table("%s_%s_idx"%(table_name, name), table_name, name)
-

@@ -76,10 +76,6 @@ class Command(BaseCommand):
             if name not in model_fields:
                 sql = 'ALTER TABLE "%s" DROP COLUMN "%s"' % (table_name, name)
                 changes.append(sql)
-        if settings.DB_GIN_TRGM:
-            gin_indexes = ['%s_findvalue' % n for n in settings.CONFIG['clipLayers']]
-        else:
-            gin_indexes = []
         for f in clip.models.Clip._meta.fields:
             if not f.primary_key and not isinstance(f, fields.related.ForeignKey):
                 name = f.name
@@ -87,13 +83,8 @@ class Command(BaseCommand):
                 if name not in db_fields:
                     sql = 'ALTER TABLE "%s" ADD COLUMN "%s" %s' % (table_name, name, col_type)
                     changes.append(sql)
-                    if name in gin_indexes:
-                        sql = 'CREATE INDEX "%s_%s_idx" ON "%s" USING gin ("%s" gin_trgm_ops);' % (
-                            table_name, name, table_name, name
-                        )
-                    else:
-                        sql = 'CREATE INDEX "%s_%s_idx" ON "%s" ("%s")' % (table_name, name,
-                                                                           table_name, name)
+                    sql = 'CREATE INDEX "%s_%s_idx" ON "%s" ("%s")' % (table_name, name,
+                                                                       table_name, name)
                     changes.append(sql)
                     sql = 'ALTER TABLE "%s" ALTER COLUMN "%s" SET NOT NULL' % (table_name, name)
                     changes.append(sql)
