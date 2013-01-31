@@ -83,6 +83,10 @@ class Command(BaseCommand):
                 if name not in db_fields:
                     sql = 'ALTER TABLE "%s" ADD COLUMN "%s" %s' % (table_name, name, col_type)
                     changes.append(sql)
+                    sql = 'UPDATE "%s" SET "%s"=FALSE WHERE "%s" IS NULL' % (
+                        table_name, name, name
+                    )
+                    changes.append(sql)
                     sql = 'CREATE INDEX "%s_%s_idx" ON "%s" ("%s")' % (table_name, name,
                                                                        table_name, name)
                     changes.append(sql)

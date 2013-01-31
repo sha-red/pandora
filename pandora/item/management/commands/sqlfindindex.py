@@ -3,7 +3,7 @@
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
-from django.db import connection
+from django.db import connection, transaction
 from django.conf import settings
 
 import monkey_patch.models
@@ -42,3 +42,4 @@ class Command(BaseCommand):
             name = 'findvalue'
             if name not in indexes:
                 create_table("%s_%s_idx"%(table_name, name), table_name, name)
+            transaction.commit_unless_managed()
