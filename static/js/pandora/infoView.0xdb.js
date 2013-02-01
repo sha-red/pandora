@@ -805,6 +805,7 @@ pandora.ui.infoView = function(data) {
                     sort: [{key: 'index', operator: '+'}],
                     unique: 'index'
                 })
+                .addClass('OxMedia')
                 .css({
                     display: 'block',
                     position: 'absolute',
