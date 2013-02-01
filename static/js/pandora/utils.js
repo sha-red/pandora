@@ -219,7 +219,16 @@ pandora.clickLink = function(e) {
 pandora.createLinks = function($element) {
     $element
         .on({
-            click: function() {
+            click: function(e) {
+                if(
+                    $(e.target).is('a') && (
+                        e.target.hostname != document.location.hostname
+                        || Ox.startsWith(e.target.pathname, '/static')
+                    )
+                ) {
+                    e.preventDefault();
+                    window.open('/url=' + encodeURIComponent(e.target.href), '_blank');
+                }
                 return false;
             }
         })
