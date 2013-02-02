@@ -40,16 +40,19 @@ TEMPLATE_DEBUG = DEBUG
 JSON_DEBUG = False
 EOF
 
+MANAGE="sudo -H -u pandora python manage.py"
+
 cd /srv/pandora/pandora
-sudo -u pandora python manage.py syncdb --noinput
-sudo -u pandora python manage.py sqlfindindex | sudo -u pandora python manage.py dbshell
-echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 1=1;" | sudo -u pandora python manage.py dbshell
+$MANAGE syncdb --noinput
+$MANAGE migrate
 echo "DB_GIN_TRGM = True" >> /srv/pandora/pandora/local_settings.py
+$MANAGE sqlfindindex
+echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 1=1;" | $MANAGE dbshell
 
 mkdir /srv/pandora/data
 chown -R pandora:pandora /srv/pandora
-sudo -u pandora python manage.py update_static
-sudo -u pandora python manage.py collectstatic -l --noinput
+$MANAGE update_static
+$MANAGE collectstatic -l --noinput
 
 cp /srv/pandora/etc/init/* /etc/init/
 
