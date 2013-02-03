@@ -777,7 +777,7 @@ class Item(models.Model):
         #sort keys based on database, these will always be available
         s.itemId = self.itemId.replace('0x', 'xx')
         if not settings.USE_IMDB:
-            s.itemId = ox.sort_string(ox.fromAZ(s.itemId)) 
+            s.itemId = ox.sort_string(str(ox.fromAZ(s.itemId)))
         s.modified = self.modified
         s.created = self.created
         s.rightslevel = self.level
