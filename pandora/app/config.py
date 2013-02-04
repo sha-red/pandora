@@ -46,6 +46,8 @@ def load_config():
         settings.SERVER_EMAIL = config['site']['email']['system']
         config['site']['videoprefix'] = settings.VIDEO_PREFIX
         config['site']['version'] = get_version()
+        if not 'folderdepth' in config['site']:
+            config['site']['folderdepth'] = settings.USE_IMDB and 4 or 3
 
         config['keys'] = {}
         for key in config['itemKeys']:

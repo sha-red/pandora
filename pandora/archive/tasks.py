@@ -74,10 +74,7 @@ def update_files(user, volume, files):
     user = models.User.objects.get(username=user)
     volume, created = models.Volume.objects.get_or_create(user=user, name=volume)
     all_files = []
-    #ignore extras etc,
-    #imdb stlye is L/Last, First/Title (Year)/Title.. 4
-    #otherwise  T/Title (Year)/Title... 3
-    folder_depth = settings.USE_IMDB and 4 or 3
+    folder_depth = settings.CONFIG['site']['folderdepth']
     for f in files:
         if len(f['path'].split('/')) == folder_depth:
             all_files.append(f['oshash'])
