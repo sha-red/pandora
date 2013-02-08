@@ -19,7 +19,7 @@ def get_or_create_item(volume, info, user):
     item_info = ox.parse_movie_path(info['path'])
     if item_info.get('director') and item_info.get('directorSort'):
         for name, sortname in zip(item_info['director'], item_info['directorSort']):
-            get_name_sort(name, sortname) 
+            get_name_sort(name, sortname)
     return get_item(item_info, user)
 
 def get_or_create_file(volume, f, user, item=None):

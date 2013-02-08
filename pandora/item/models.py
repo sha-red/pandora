@@ -123,7 +123,7 @@ def get_item(info, user=None, async=False):
                     if not p:
                         tasks.update_poster.delay(item.itemId)
     else:
-        qs = Item.objects.filter(find__key='title', find__value=info['title'])
+        qs = Item.objects.filter(find__key='title', find__value__iexact=info['title'])
         if qs.count() == 1:
             item = qs[0]
         else:
@@ -1055,7 +1055,9 @@ class Item(models.Model):
     def streams(self):
         return archive.models.Stream.objects.filter(
             source=None, available=True, file__item=self, file__selected=True
-        ).filter(Q(file__is_audio=True)|Q(file__is_video=True)).order_by('file__part')
+        ).filter(
+            Q(file__is_audio=True)|Q(file__is_video=True)
+        ).order_by('file__part', 'file__sort_path')
 
     def update_timeline(self, force=False):
         streams = self.streams()

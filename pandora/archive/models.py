@@ -160,6 +160,8 @@ class File(models.Model):
             for type in ox.movie.EXTENSIONS:
                 if data['extension'] in ox.movie.EXTENSIONS[type]:
                     data['type'] = type
+        if 'part' in data and not data['part']:
+            del data['part']
         return data
 
     def normalize_path(self):
@@ -181,7 +183,7 @@ class File(models.Model):
         data = self.get_path_info()
         self.extension = data.get('extension')
         self.language = data.get('language')
-        self.part = ox.sort_string(unicode(data.get('part')) or '')
+        self.part = ox.sort_string(unicode(data.get('part', '')))
         self.part_title = ox.sort_string(unicode(data.get('partTitle')) or '')
         self.type = data.get('type') or 'unknown'
         self.version = data.get('version')
