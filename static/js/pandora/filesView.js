@@ -461,7 +461,7 @@ pandora.ui.filesView = function(options, self) {
             data[key] = self['$' + key + 'Input'].value();
         });
         self.$moveButton.options(
-            {disabled: true, title: 'Moving Files'}
+            {disabled: true, title: 'Moving Files...'}
         );
         pandora.api.moveFiles(data, function(result) {
             if (
