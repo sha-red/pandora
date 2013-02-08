@@ -11,63 +11,61 @@ pandora.ui.filesView = function(options, self) {
             })
             .options(options || {});
 
-    self.wasChecked = false;
+    self.filesQuery = {
+        conditions: [{
+            key: 'id',
+            value: self.options.id,
+            operator: '=='
+        }]
+    };
     self.numberOfItems = 0;
     self.selected = [];
+    self.wasChecked = false;
 
     self.$toolbar = Ox.Bar({
         size: 24
     });
 
-    /*
-    self.$versionSelect = Ox.Select({
-            items: [
-                {id: 'user/volume/version', title: 'Version: user/volume/version'}
-            ],
-            width: 240
+    self.$deleteButton = Ox.Button({
+            title: 'Delete ' + pandora.site.itemName.singular + '...',
+            width: 128
         })
         .css({
             float: 'left',
             margin: '4px'
         })
+        .bindEvent({
+            click: deleteItem 
+        })
         .appendTo(self.$toolbar);
-    */
 
-    self.$deleteButton = Ox.Button({
-            disabled: false,
-            title: 'Delete ' + pandora.site.itemName.singular,
-            width: 116
+    self.$saveButton = Ox.Button({
+            disabled: true,
+            title: 'Save Changes',
+            width: 128
         })
         .css({
             float: 'right',
             margin: '4px'
         })
-        .appendTo(self.$toolbar)
         .bindEvent({
-            click: deleteItem 
-        });
+            click: saveChanges
+        })
+        .appendTo(self.$toolbar);
 
     self.$ignoreButton = Ox.Button({
             disabled: 'true',
-            title: 'Ignore Selected Files...'
+            title: 'Ignore Selected Files',
+            width: 128
         })
         .css({
             float: 'right',
             margin: '4px'
         })
-        .appendTo(self.$toolbar)
         .bindEvent({
-            click: function() {
-                var data = {
-                    ids: self.selected,
-                    ignore: true
-                };
-                pandora.api.editFiles(data, function(result) {
-                    Ox.Request.clearCache();
-                    self.$filesList.reloadList();
-                });
-            }
-        });
+            click: ignoreFiles
+        })
+        .appendTo(self.$toolbar);
 
     self.$filesList = Ox.TableList({
             columns: [
@@ -149,6 +147,14 @@ pandora.ui.filesView = function(options, self) {
                     width: 60
                 },
                 {
+                    editable: true,
+                    id: 'extension',
+                    operator: '+',
+                    title: 'Extension',
+                    visible: true,
+                    width: 60
+                },
+                {
                     align: 'left',
                     id: 'type',
                     operator: '+',
@@ -207,13 +213,7 @@ pandora.ui.filesView = function(options, self) {
             id: 'files',
             items: function(data, callback) {
                 pandora.api.findFiles(Ox.extend(data, {
-                    query: {
-                        conditions: [{
-                            key: 'id',
-                            value: self.options.id,
-                            operator: '=='
-                        }]
-                    }
+                    query: self.filesQuery
                 }), callback);
             },
             keys: ['wanted', 'instances'],
@@ -251,7 +251,11 @@ pandora.ui.filesView = function(options, self) {
             init: function(data) {
                 self.numberOfItems = data.items;
             },
-            select: selectFiles
+            select: selectFiles,
+            submit: function(data) {
+                self.$saveButton.options({disabled: false});
+                self.$filesList.value(data.id, data.key, data.value || null);
+            }
         });
 
     self.$instancesList = Ox.TableList({
@@ -437,6 +441,18 @@ pandora.ui.filesView = function(options, self) {
         });
     }
 
+    function ignoreFiles() {
+        var data = {
+            files: self.selected.map(function(id) {
+                return {id: id, ignore: true};
+            })
+        };
+        pandora.api.editFiles(data, function(result) {
+            Ox.Request.clearCache();
+            self.$filesList.reloadList();
+        });
+    }
+
     function moveFiles(data) {
         var data = {
             ids: self.selected,
@@ -492,6 +508,29 @@ pandora.ui.filesView = function(options, self) {
                 ? self.$filesList.value(data.ids[0], 'instances') : []
         });
         updateForm();
+    }
+
+    function saveChanges() {
+        self.$saveButton.options({disabled: true, title: 'Saving Changes...'});
+        pandora.api.findFiles({
+            keys: ['id'],
+            query: self.filesQuery
+        }, function(result) {
+            pandora.api.editFiles({
+                files: result.data.items.map(function(item) {
+                    [
+                        'version', 'part', 'partTitle', 'language', 'extension'
+                    ].forEach(function(key) {
+                        Ox.extend(item, key, self.$filesList.value(item.id, key));
+                    })
+                    return item;
+                })
+            }, function(result) {
+                self.$saveButton.options({title: 'Save Changes'});
+                Ox.Request.clearCache(); // fixme: remove
+                self.$filesList.reloadList();
+            });
+        });
     }
 
     function updateForm() {
