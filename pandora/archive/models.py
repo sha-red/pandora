@@ -151,11 +151,11 @@ class File(models.Model):
             data['directorSort'] = [get_name_sort(n) for n in self.item.get('director', [])]
         data['isEpisode'] = data.get('season') != None \
                 or data.get('episode') != None \
-                or data.get('episodes') != []
+                or data.get('episodes') not in ([], None)
         if data['isEpisode'] and data['seriesYear'] == None:
             data['seriesYear'] = data['year']
         data['type'] = 'unknown'
-        if 'extension' in data:
+        if 'extension' in data and data['extension']:
             data['extension'] = data['extension'].lower()
             for type in ox.movie.EXTENSIONS:
                 if data['extension'] in ox.movie.EXTENSIONS[type]:

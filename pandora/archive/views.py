@@ -95,7 +95,6 @@ def update(request):
         files = all_files.filter(file__available=False)
         if volume:
             files = files.filter(volume=volume)
-        #fixme: might be better to check for file__path_info
         response['data']['info'] = [f.file.oshash for f in all_files.filter(file__info='{}')]
         response['data']['data'] = [f.file.oshash for f in files.filter(file__is_video=True,
                                                                         file__available=False,
@@ -369,9 +368,9 @@ def editFiles(request):
                 else:
                     dont_ignore.append(info['id'])
             update = False
-            for key in ('episodes', 'extension', 'language', 'part', 'partTitle', 'version'):
+            for key in f.PATH_INFO:
                 if key in info:
-                    f.path_info[key] = info[key]
+                    f.info[key] = info[key]
                     update = True
             if update:
                 f.save()
