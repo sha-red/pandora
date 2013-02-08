@@ -7,10 +7,17 @@ from django.db import models
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        for f in orm['archive.File'].objects.exclude(path_info={}):
-            f.info.update(f.path_info)
-            f.path_info = {}
-            f.save()
+        for f in orm['archive.File'].objects.all():
+            update = False
+            if f.path_info:
+                f.info.update(f.path_info)
+                f.path_info = {}
+                update = True
+            if not 'extension' in f.info and f.path:
+                f.info['extension'] = f.path.split('.')[-1]
+                update = True
+            if update:
+                f.save()
 
     def backwards(self, orm):
         "Write your backwards methods here."
