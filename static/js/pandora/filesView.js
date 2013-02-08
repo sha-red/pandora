@@ -76,7 +76,7 @@ pandora.ui.filesView = function(options, self) {
                     format: function(value, data) {
                         return $('<img>')
                             .attr({
-                                src: data.wanted ? Ox.UI.getImageURL('symbolStar') :
+                                src: data.wanted ? Ox.UI.getImageURL('symbolUpload') :
                                                    Ox.UI.getImageURL('symbolCheck')
                             })
                             .css({
@@ -136,7 +136,7 @@ pandora.ui.filesView = function(options, self) {
                     operator: '+',
                     title: 'Part Title',
                     visible: true,
-                    width: 180
+                    width: 120
                 },
                 {
                     editable: true,
@@ -442,12 +442,11 @@ pandora.ui.filesView = function(options, self) {
     }
 
     function ignoreFiles() {
-        var data = {
+        pandora.api.editFiles({
             files: self.selected.map(function(id) {
                 return {id: id, ignore: true};
             })
-        };
-        pandora.api.editFiles(data, function(result) {
+        }, function(result) {
             Ox.Request.clearCache();
             self.$filesList.reloadList();
         });
