@@ -86,10 +86,14 @@ def update(request):
         user_profile.save()
 
     if 'info' in data:
-        for f in models.File.objects.filter(oshash__in=data['info'].keys()):
+        files = models.File.objects.filter(oshash__in=data['info'].keys())
+        for f in files:
             if not f.info:
                 f.update_info(data['info'][f.oshash], user)
                 f.save()
+        for i in Item.objects.filter(files__in=files).distinct():
+            i.update_selected()
+            i.update_wanted()
     if not upload_only:
         all_files = models.Instance.objects.filter(volume__user=user)
         files = all_files.filter(file__available=False)
