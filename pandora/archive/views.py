@@ -341,11 +341,12 @@ def editFiles(request):
     '''
         change file / item link
         param data {
-            ids: ids of files 
-            part:
-            language:
-            ignore: boolean
+            files: [
+                {id:, key1: value1, key2: value2}
+                ...
+            ]
         }
+        possible keys: part, partTitle, language, ignore, extension, version, episodes
 
         return {
             status: {'code': int, 'text': string},
@@ -354,70 +355,42 @@ def editFiles(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    files = models.File.objects.filter(oshash__in=data['ids'])
-    response = json_response()
-    #FIXME: only editable files!
-    if True:
-        if 'ignore' in data:
-            models.Instance.objects.filter(file__in=files).update(ignore=data['ignore'])
-            #FIXME: is this to slow to run sync?
-            for i in Item.objects.filter(files__in=files).distinct():
-                i.update_selected()
-                i.update_wanted()
-            response = json_response(status=200, text='updated')
-        updates = {}
-        for key in ('part', 'language'):
-            if key in data:
-                updates[key] = data[key]
-        if updates:
-            files.update(**updates)
-            response = json_response(status=200, text='updated')
-    else:
-        response = json_response(status=403, text='permissino denied')
+
+    ignore = []
+    dont_ignore = []
+    response = json_response(status=200, text='updated')
+    response['data']['files'] = []
+    for info in data['files']:
+        f = get_object_or_404_json(models.File, oshash=info['id'])
+        if f.editable(request.user):
+            if 'ignore' in info:
+                if info['ignore']:
+                    ignore.append(info['id'])
+                else:
+                    dont_ignore.append(info['id'])
+            update = False
+            for key in ('episodes', 'extension', 'language', 'part', 'partTitle', 'version'):
+                if key in info:
+                    f.path_info[key] = info[key]
+                    update = True
+            if update:
+                f.save()
+            response['data']['files'].append(f.json())
+        else:
+            response['data']['files'].append({'id': info['id'], 'error': 'permission denied'})
+    if ignore:
+        models.Instance.objects.filter(file__oshash__in=ignore).update(ignore=True)
+    if dont_ignore:
+        models.Instance.objects.filter(file__oshash__in=dont_ignore).update(ignore=False)
+    if ignore or dont_ignore:
+        files = models.File.objects.filter(oshash__in=ignore+dont_ignore)
+        #FIXME: is this to slow to run sync?
+        for i in Item.objects.filter(files__in=files).distinct():
+            i.update_selected()
+            i.update_wanted()
     return render_to_json_response(response)
 actions.register(editFiles, cache=False)
 
-@login_required_json
-def editFile(request):
-    '''
-        change file / item link
-        param data {
-            id: hash of file
-            part:
-            language:
-            ignore: boolean
-        }
-
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-            }
-        }
-    '''
-    data = json.loads(request.POST['data'])
-    f = get_object_or_404_json(models.File, oshash=data['id'])
-    response = json_response()
-    if f.editable(request.user):
-        update = False
-        #FIXME: should all instances be ignored?
-        if 'ignore' in data:
-            f.instances.update(ignore=data['ignore'])
-            f.save()
-            #FIXME: is this to slow to run sync?
-            if f.item:
-                f.item.update_selected()
-                f.item.update_wanted()
-        for key in ('episodes', 'extension', 'language', 'part', 'partTitle', 'version'):
-            if key in data:
-                f.path_info[key] = data[key]
-                update = True
-        if update:
-            f.save()
-            response = json_response(status=200, text='updated')
-    else:
-        response = json_response(status=403, text='permissino denied')
-    return render_to_json_response(response)
-actions.register(editFile, cache=False)
 
 @login_required_json
 def removeFiles(request):
