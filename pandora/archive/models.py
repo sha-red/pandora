@@ -60,7 +60,6 @@ class File(models.Model):
     duration = models.FloatField(null=True)
 
     info = fields.DictField(default={})
-    path_info = fields.DictField(default={})
 
     video_codec = models.CharField(max_length=255)
     pixel_format = models.CharField(max_length=255)
