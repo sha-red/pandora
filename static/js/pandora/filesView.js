@@ -253,8 +253,11 @@ pandora.ui.filesView = function(options, self) {
             },
             select: selectFiles,
             submit: function(data) {
-                self.$saveButton.options({disabled: false});
-                self.$filesList.value(data.id, data.key, data.value || null);
+                var value = self.$filesList.value(data.id, data.key);
+                if (data.value != value && !(data.value === '' && value === null)) {
+                    self.$saveButton.options({disabled: false});
+                    self.$filesList.value(data.id, data.key, data.value || null);
+                }
             }
         });
 
