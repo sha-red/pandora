@@ -488,6 +488,10 @@ def _order_query(qs, sort, prefix=''):
         #    key = '%s_desc' % key
         order = '%s%s%s' % (operator, prefix, key)
         order_by.append(order)
+        if key == 'part':
+            order = '%s%s%s' % (operator, prefix, 'sort_path')
+            order_by.append(order)
+
     if order_by:
         qs = qs.order_by(*order_by)
     return qs
