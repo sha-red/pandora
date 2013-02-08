@@ -18,18 +18,31 @@ import ox
 import chardet
 
 from item import utils
+import item.models
 from person.models import get_name_sort
 
 import extract
 
 
 class File(models.Model):
+    AV_INFO = (
+        'duration', 'video', 'audio', 'oshash', 'size',
+    )
+
+    PATH_INFO = (
+        'episodes', 'extension', 'language', 'part', 'partTitle', 'version'
+    )
+    ITEM_INFO = (
+        'title', 'director', 'year',
+        'season', 'episode', 'episodeTitle',
+        'seriesTitle', 'seriesYear'
+    )
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
     oshash = models.CharField(max_length=16, unique=True)
-    item = models.ForeignKey("item.Item", related_name='files')
+    item = models.ForeignKey("item.Item", related_name='files', null=True)
 
     path = models.CharField(max_length=2048, default="") # canoncial path/file
     sort_path = models.CharField(max_length=2048, default="") # sort name
@@ -127,28 +140,15 @@ class File(models.Model):
             if self.framerate:
                 self.pixels = int(self.width * self.height * float(utils.parse_decimal(self.framerate)) * self.duration)
 
-    def parse_instance_path(self):
-        if self.instances.count():
-            path = self.instances.all()[0].path
-            data = ox.movie.parse_path(path)
-            for key in (
-                'normalizedPath', 'isEpisode',
-                'title', 'director', 'directorSort', 'year',
-                'season', 'episode', 'episodeTitle',
-                'seriesTitle', 'seriesYear'
-            ):
-                del data[key]
-            self.path_info = data
 
     def get_path_info(self):
-        data = self.path_info.copy()
-        for key in (
-            'title', 'director', 'year',
-            'season', 'episode', 'episodeTitle',
-            'seriesTitle', 'seriesYear'
-        ):
-            data[key] = self.item.get(key)
-        data['directorSort'] = [get_name_sort(n) for n in self.item.get('director', [])]
+        data = {}
+        for key in self.PATH_INFO:
+            data[key] = self.info.get(key, None)
+        if self.item:
+            for key in self.ITEM_INFO:
+                data[key] = self.item.get(key)
+            data['directorSort'] = [get_name_sort(n) for n in self.item.get('director', [])]
         data['isEpisode'] = data.get('season') != None \
                 or data.get('episode') != None \
                 or data.get('episodes') != []
@@ -160,12 +160,10 @@ class File(models.Model):
             for type in ox.movie.EXTENSIONS:
                 if data['extension'] in ox.movie.EXTENSIONS[type]:
                     data['type'] = type
-        if 'part' in data and not data['part']:
-            del data['part']
         return data
 
     def normalize_path(self):
-        #FIXME: always use path_info
+        #FIXME: always use format_path
         if settings.USE_IMDB:
             return ox.movie.format_path(self.get_path_info())
         else:
@@ -174,24 +172,31 @@ class File(models.Model):
                 path = self.instances.all()[0].path
             return path
 
-    def save(self, *args, **kwargs):
-        if self.id and not self.path_info and self.instances.count():
-            self.parse_info()
-            self.parse_instance_path()
-            self.path = self.normalize_path()
+    def update_info(self, info, user):
+        #populate name sort with director if unknown
+        if info.get('director') and info.get('directorSort'):
+            for name, sortname in zip(info['director'], info['directorSort']):
+                get_name_sort(name, sortname)
+        self.item = item.models.get_item(info, user)
+        for key in self.AV_INFO + self.PATH_INFO:
+            if key in info:
+                self.info[key] = info[key]
+        self.parse_info()
 
-        data = self.get_path_info()
-        self.extension = data.get('extension')
-        self.language = data.get('language')
-        self.part = ox.sort_string(unicode(data.get('part', '')))
-        self.part_title = ox.sort_string(unicode(data.get('partTitle')) or '')
-        self.type = data.get('type') or 'unknown'
-        self.version = data.get('version')
+    def save(self, *args, **kwargs):
+        if self.id and self.info:
+            self.path = self.normalize_path()
+        if self.item:
+            data = self.get_path_info()
+            self.extension = data.get('extension')
+            self.language = data.get('language')
+            self.part = ox.sort_string(unicode(data.get('part') or ''))
+            self.part_title = ox.sort_string(unicode(data.get('partTitle')) or '')
+            self.type = data.get('type') or 'unknown'
+            self.version = data.get('version')
 
         if self.path:
-            self.path = self.normalize_path()
             self.sort_path = utils.sort_string(self.path)
-
             self.is_audio = self.type == 'audio'
             self.is_video = self.type == 'video'
             self.is_subtitle = self.path.endswith('.srt')
@@ -238,7 +243,7 @@ class File(models.Model):
         p = user.get_profile()
         return p.get_level() in ('admin', 'staff') or \
             self.instances.filter(volume__user=user).count() > 0 or \
-            self.item.user == user
+            (not self.item or self.item.user == user)
 
     def save_chunk(self, chunk, chunk_id=-1, done=False):
         if not self.available:
@@ -286,8 +291,8 @@ class File(models.Model):
             'videoCodec': self.video_codec,
             'wanted': self.wanted,
         }
-        for key in ('part', 'partTitle', 'version', 'language', 'extension'):
-            data[key] = self.path_info.get(key)
+        for key in self.PATH_INFO:
+            data[key] = self.info.get(key)
         data['users'] = list(set([i['user'] for i in data['instances']]))
         if keys:
             for k in data.keys():

@@ -7,7 +7,7 @@ from datetime import datetime
 from django import forms
 from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
-from django.db.models import Count
+from django.db.models import Count, Q
 
 import ox
 from ox.utils import json
@@ -43,9 +43,12 @@ actions.register(removeVolume, cache=False)
 @login_required_json
 def update(request):
     '''
-        2 calls possible:
-            volume/files
-            info
+        2 steps:
+            send files
+                {volume: 'Videos', files: [{oshash:, path:, mtime:, ,,}]}
+            send info about changed/new files
+                {volume: 'Videos', info: {oshash: {...}]}
+
         call volume/files first and fill in requested info after that
 
         param data {
@@ -56,12 +59,13 @@ def update(request):
             ],
             info: {oshash: object}
         }
+
         return {
             status: {'code': int, 'text': string},
             data: {
-                info: list,
-                data: list,
-                file: list
+                info: list, // list of files that need info
+                data: list, // list of flies that should be encoded to highest profile and uploaded
+                file: list  // list of files that should be uploaded as is
             }
         }
     '''
@@ -82,23 +86,16 @@ def update(request):
         user_profile.save()
 
     if 'info' in data:
-        for oshash in data['info']:
-            info = data['info'][oshash]
-            f = models.File.objects.filter(oshash=oshash)
-            if f.count()>0:
-                f = f[0]
-                if not f.info:
-                    for key in ('atime', 'mtime', 'ctime'):
-                        if key in info:
-                            del info[key]
-                    f.info = info
-                    f.parse_info()
-                    f.save()
+        for f in models.File.objects.filter(oshash__in=data['info'].keys()):
+            if not f.info:
+                f.update_info(data['info'][f.oshash], user)
+                f.save()
     if not upload_only:
         all_files = models.Instance.objects.filter(volume__user=user)
         files = all_files.filter(file__available=False)
         if volume:
             files = files.filter(volume=volume)
+        #fixme: might be better to check for file__path_info
         response['data']['info'] = [f.file.oshash for f in all_files.filter(file__info='{}')]
         response['data']['data'] = [f.file.oshash for f in files.filter(file__is_video=True,
                                                                         file__available=False,
@@ -211,11 +208,10 @@ def addFile(request):
             extension = extension[-1]
         else:
             extension = 'webm'
-        f.path_info = {
-            'extension': extension
-        }
         f.selected = True
         f.info = data['info']
+        f.info['extension'] = extension
+        self.parse_info()
         f.save()
         response['data']['item'] = i.itemId
         response['data']['itemUrl'] = request.build_absolute_uri('/%s' % i.itemId)
@@ -408,8 +404,9 @@ def editFile(request):
             f.instances.update(ignore=data['ignore'])
             f.save()
             #FIXME: is this to slow to run sync?
-            f.item.update_selected()
-            f.item.update_wanted()
+            if f.item:
+                f.item.update_selected()
+                f.item.update_wanted()
         for key in ('episodes', 'extension', 'language', 'part', 'partTitle', 'version'):
             if key in data:
                 f.path_info[key] = data[key]
