@@ -360,6 +360,7 @@ pandora.ui.infoView = function(data) {
                     value: data.summary || ''
                 })
                 .css(css)
+                // this gets duplicated in the editable, result is 4px
                 .css({marginTop: '2px'})
                 .bindEvent({
                     submit: function(event) {
