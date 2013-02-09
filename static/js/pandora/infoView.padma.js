@@ -401,7 +401,7 @@ pandora.ui.infoView = function(data) {
 
     // Space -------------------------------------------------------------------
 
-    $div = $('<div>').css(css).css({height: '16px'}).appendTo($center);
+    $('<div>').css(css).css({width: '1px', height: '16px'}).appendTo($center);
 
     // Duration, Aspect Ratio --------------------------------------------------
 
