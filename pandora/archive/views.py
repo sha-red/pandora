@@ -214,7 +214,7 @@ def addFile(request):
         f.selected = True
         f.info = data['info']
         f.info['extension'] = extension
-        self.parse_info()
+        f.parse_info()
         f.save()
         response['data']['item'] = i.itemId
         response['data']['itemUrl'] = request.build_absolute_uri('/%s' % i.itemId)
