@@ -399,6 +399,10 @@ pandora.ui.infoView = function(data) {
         );
     }
 
+    // Space -------------------------------------------------------------------
+
+    $div = $('<div>').css(css).css({height: '16px'}).appendTo($center);
+
     // Duration, Aspect Ratio --------------------------------------------------
 
     ['duration', 'aspectratio'].forEach(function(key) {
