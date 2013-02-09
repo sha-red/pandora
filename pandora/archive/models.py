@@ -147,8 +147,11 @@ class File(models.Model):
         if self.item:
             for key in self.ITEM_INFO:
                 data[key] = self.item.get(key)
+            if self.item.get('series'):
+                data['isEpisode'] = True
             data['directorSort'] = [get_name_sort(n) for n in self.item.get('director', [])]
-        data['isEpisode'] = data.get('season') != None \
+        data['isEpisode'] = 'isEpisode' in data \
+                or data.get('season') != None \
                 or data.get('episode') != None \
                 or data.get('episodes') not in ([], None) \
                 or (data.get('seriesTitle') != None and data.get('episodeTitle') != None)
