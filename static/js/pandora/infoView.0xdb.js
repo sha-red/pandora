@@ -669,8 +669,8 @@ pandora.ui.infoView = function(data) {
             data.seriesTitle = split[0].trim();
             data.episodeTitle = split[1].trim();
         } else if (episode_match) {
-            data.seriesTitle = match[1].trim();
-            data.episodeTitle = match[2].trim();
+            data.seriesTitle = episode_match[1].trim();
+            data.episodeTitle = episode_match[2].trim();
         }
         return data;
     }
