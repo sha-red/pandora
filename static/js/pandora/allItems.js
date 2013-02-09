@@ -60,8 +60,12 @@ pandora.ui.allItems = function() {
     pandora.api.find({
         query: {conditions: [], operator: '&'}
     }, function(result) {
-        $items.html(Ox.formatNumber(result.data.items));
+        that.update(result.data.items);
     });
+
+    that.update = function(items) {
+        $items.html(Ox.formatNumber(items));
+    };
 
     that.resizeElement = function(width) {
         $name.css({width: width + 'px'});

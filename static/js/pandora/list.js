@@ -111,7 +111,6 @@ pandora.ui.list = function() {
                 that.size();
             },
             sort: function(data) {
-                Ox.Log('', '---- SORT ----', data)
                 pandora.UI.set({
                     listSort: [{key: data.key, operator: data.operator}]
                 });
@@ -397,6 +396,18 @@ pandora.ui.list = function() {
                 });
             },
             init: function(data) {
+                var find = pandora.user.ui.find, folder, list;
+                if (find.conditions.length == 0) {
+                    pandora.$ui.allItems.update(data.items);
+                } else if (
+                    find.conditions.length == 1
+                    && find.conditions[0].key == 'list'
+                    && find.conditions[0].operator == '=='
+                ) {
+                    list = find.conditions[0].value;
+                    folder = pandora.getListData(list).folder;
+                    pandora.$ui.folderList[folder].value(list, 'items', data.items);
+                }
                 pandora.$ui.statusbar.set('total', data);
                 data = [];
                 pandora.site.totals.forEach(function(v) {
