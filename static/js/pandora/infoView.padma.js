@@ -60,7 +60,8 @@ pandora.ui.infoView = function(data) {
                 top: margin + 'px',
                 width: iconWidth + 'px',
                 height: iconHeight + 'px',
-                borderRadius: borderRadius + 'px'
+                borderRadius: borderRadius + 'px',
+                cursor: 'pointer'
             })
             .bindEvent({
                 anyclick: function() {
