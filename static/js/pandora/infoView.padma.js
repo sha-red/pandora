@@ -6,6 +6,7 @@ pandora.ui.infoView = function(data) {
         descriptions = [],
         canEdit = pandora.site.capabilities.canEditMetadata[pandora.user.level] || data.editable,
         css = {
+            display: 'inline-block',
             marginTop: '4px',
             textAlign: 'justify',
             MozUserSelect: 'text',
@@ -185,12 +186,12 @@ pandora.ui.infoView = function(data) {
                             type: 'textarea',
                             value: data[key + 'description'] || ''
                         })
+                        .css(css)
                         .bindEvent({
                             submit: function(event) {
                                 editMetadata(key + 'description', event.value);
                             }
                         })
-                        .css(css)
                     ).css({
                         'margin-top': '8px',
                     })
@@ -273,7 +274,7 @@ pandora.ui.infoView = function(data) {
     // Director, Cinematographer and Featuring ---------------------------------
 
     if (canEdit) {
-        $div = $('<div>').css(css).css('clear', 'both').appendTo($center);
+        $div = $('<div>').css(css).appendTo($center);
         ['director', 'cinematographer', 'featuring'].forEach(function(key, i) {
             i && $('<div>').css({float: 'left'}).html(';&nbsp;').appendTo($div);
             $('<div>')
@@ -317,7 +318,7 @@ pandora.ui.infoView = function(data) {
 
     if (canEdit) {
         var key = 'topic';
-        $div = $('<div>').css(css).css('clear', 'both').appendTo($center);
+        $div = $('<div>').css(css).appendTo($center);
         $('<div>')
             .css({float: 'left'})
             .html(formatKey('Topics').replace('</span>', '&nbsp;</span>'))
@@ -363,12 +364,12 @@ pandora.ui.infoView = function(data) {
                     value: data.summary || '',
                     //width: 300
                 })
+                .css(css)
                 .bindEvent({
                     submit: function(event) {
                         editMetadata('summary', event.value);
                     }
                 })
-                .css(css)
             )
             .appendTo($center);
     } else if (data.summary) {
