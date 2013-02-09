@@ -406,9 +406,7 @@ pandora.ui.list = function() {
                 ) {
                     list = find.conditions[0].value;
                     folder = pandora.getListData(list).folder;
-                    pandora.$ui.folderList[folder].value(
-                        list, 'items', Ox.formatNumber(data.items)
-                    );
+                    pandora.$ui.folderList[folder].value(list, 'items', data.items);
                 }
                 pandora.$ui.statusbar.set('total', data);
                 data = [];
