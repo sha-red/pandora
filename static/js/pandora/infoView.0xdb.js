@@ -660,7 +660,7 @@ pandora.ui.infoView = function(data) {
     function parseTitle(title) {
         var data = {title: title},
             match = /(\(S(\d{2})E(\d{2})\))/.exec(title),
-            episode_match = /(.+) \(S01\) (.+)/.exec(title),
+            episodeMatch = /(.+) \(S01\) (.+)/.exec(title),
             split;
         if (match) {
             data.season = parseInt(match[2], 10);
@@ -668,9 +668,9 @@ pandora.ui.infoView = function(data) {
             split = title.split(match[1]);
             data.seriesTitle = split[0].trim();
             data.episodeTitle = split[1].trim();
-        } else if (episode_match) {
-            data.seriesTitle = episode_match[1].trim();
-            data.episodeTitle = episode_match[2].trim();
+        } else if (episodeMatch) {
+            data.seriesTitle = episodeMatch[1].trim();
+            data.episodeTitle = episodeMatch[2].trim();
         }
         return data;
     }
