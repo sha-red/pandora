@@ -151,7 +151,7 @@ class File(models.Model):
         data['isEpisode'] = data.get('season') != None \
                 or data.get('episode') != None \
                 or data.get('episodes') not in ([], None) \
-                or (data.get('seriesTitle') and data.get('episodeTitle'))
+                or (data.get('seriesTitle') != None and data.get('episodeTitle') != None)
         if data['isEpisode'] and data['seriesYear'] == None:
             data['seriesYear'] = data['year']
         data['type'] = 'unknown'
