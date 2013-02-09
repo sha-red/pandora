@@ -12,8 +12,7 @@
             if (localStorage && !localStorage['Ox.theme'])
                 localStorage['Ox.theme'] = '"{{settings.CONFIG.user.ui.theme}}"';
         </script>
-        <script type="text/javascript" src="/static/oxjs/build/Ox.js"></script>
-        <script type="text/javascript" src="/static/js/pandora.js"></script>
+        <script type="text/javascript" src="/static/js/pandora.js?{{settings.CONFIG.site.version}}"></script>
         <meta name="title" content="{{title}}" />
         <meta name="description" content="{{description}}"/>
         <meta name="keywords" content="{{keywords|safe}}"/>
