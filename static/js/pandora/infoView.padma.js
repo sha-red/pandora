@@ -359,8 +359,9 @@ pandora.ui.infoView = function(data) {
                     type: 'textarea',
                     value: data.summary || ''
                 })
-                // 4px marginTop gets duplicated in the editable, result is 8px
                 .css(css)
+                // 8px marginTop gets duplicated in the editable, result is 16px
+                .css({marginTop: '8px'})
                 .bindEvent({
                     submit: function(event) {
                         editMetadata('summary', event.value);
@@ -369,12 +370,12 @@ pandora.ui.infoView = function(data) {
             )
             .appendTo($center);
     } else if (data.summary) {
-        $('<div>').css(css).html(data.summary).appendTo($center);
+        $('<div>').css(css).css({marginTop: '16px'}).html(data.summary).appendTo($center);
     }
 
     // License -----------------------------------------------------------------
 
-    $div = $('<div>').css(css).css({marginTop: '8px'}).appendTo($center);
+    $div = $('<div>').css(css).css({marginTop: '16px'}).appendTo($center);
     if (canEdit) {
         $('<div>')
             .css({float: 'left'})
