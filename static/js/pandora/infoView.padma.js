@@ -352,7 +352,6 @@ pandora.ui.infoView = function(data) {
 
     if (canEdit) {
         $('<div>')
-            .css({marginTop: '16px'})
             .append(
                 Ox.Editable({
                     clickLink: pandora.clickLink,
@@ -378,7 +377,7 @@ pandora.ui.infoView = function(data) {
 
     // License -----------------------------------------------------------------
 
-    $div = $('<div>').css(css).css({marginTop: '16px'}).appendTo($center);
+    $div = $('<div>').css(css).css({marginTop: '4px'}).appendTo($center);
     if (canEdit) {
         $('<div>')
             .css({float: 'left'})
