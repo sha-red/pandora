@@ -1,0 +1,15 @@
+/var/log/pandora/*.log {
+    daily	
+	missingok
+	rotate 10
+	compress
+	delaycompress
+	notifempty
+	create 0640 pandora pandora
+	sharedscripts
+	postrotate
+        service pandora reload
+        service pandora-tasks reload
+        service pandora-encoding reload
+	endscript
+}

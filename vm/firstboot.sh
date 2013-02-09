@@ -60,6 +60,9 @@ service pandora-encoding start
 service pandora-tasks start
 service pandora start
 
+#logrotate
+cp "/srv/pandora/etc/logrotate.d/pandora" "/etc/logroated.d/pandora"
+
 #nginx
 cp "/srv/pandora/etc/nginx/pandora" "/etc/nginx/sites-available/default"
 service nginx restart
