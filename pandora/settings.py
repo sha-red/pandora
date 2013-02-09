@@ -39,6 +39,11 @@ SITE_ID = 1
 USE_I18N = True
 APPEND_SLASH = False
 
+# Uncomment this if you add https support.
+# Also make sue to send https from your https vhost:
+#    proxy_set_header X-Forwarded-Proto https;
+#SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = normpath(join(PROJECT_ROOT, '..', 'data'))
