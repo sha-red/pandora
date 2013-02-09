@@ -260,7 +260,6 @@ pandora.ui.infoView = function(data) {
                 })
                 .appendTo($div);
         });
-        $('<br>').appendTo($center);
     } else {
         html = [];
         ['location', 'date', 'language', 'duration'].forEach(function(key) {
@@ -300,7 +299,6 @@ pandora.ui.infoView = function(data) {
                 })
                 .appendTo($div);
         });
-        $('<br>').appendTo($center);
     } else if (data.director || data.cinematographer || data.featuring) {
         html = [];
         ['director', 'cinematographer', 'featuring'].forEach(function(key) {
@@ -341,7 +339,6 @@ pandora.ui.infoView = function(data) {
                 }
             })
             .appendTo($div);
-        $('<br>').appendTo($center);
         
     } else if (data.topic) {
         html = formatKey('topics') + formatValue(data.topic, 'topic');
@@ -360,10 +357,10 @@ pandora.ui.infoView = function(data) {
                     placeholder: formatLight('No Summary'),
                     tooltip: canEdit ? 'Doubleclick to edit' : '',
                     type: 'textarea',
-                    value: data.summary || '',
-                    //width: 300
+                    value: data.summary || ''
                 })
                 .css(css)
+                .css({marginTop: '2px'})
                 .bindEvent({
                     submit: function(event) {
                         editMetadata('summary', event.value);
