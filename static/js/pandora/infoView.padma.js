@@ -360,8 +360,8 @@ pandora.ui.infoView = function(data) {
                     value: data.summary || ''
                 })
                 .css(css)
-                // this gets duplicated in the editable, result is 4px
-                .css({marginTop: '2px'})
+                // this gets duplicated in the editable, result is 16px
+                .css({marginTop: '8px'})
                 .bindEvent({
                     submit: function(event) {
                         editMetadata('summary', event.value);
@@ -382,16 +382,18 @@ pandora.ui.infoView = function(data) {
             .html(formatKey('license').replace('</span>', '&nbsp;</span>'))
             .appendTo($div);
         Ox.Editable({
-            placeholder: formatLight('No License'),
-            tooltip: 'Doubleclick to edit',
-            value: (data.license || []).join(', ')
-        })
-        .bindEvent({
-            submit: function(event) {
-                editMetadata('license', event.value);
-            }
-        })
-        .appendTo($div);
+                placeholder: formatLight('No License'),
+                tooltip: 'Doubleclick to edit',
+                value: (data.license || []).join(', ')
+            })
+            // this gets duplicated in the editable, result is 16px
+            .css({marginTop: '8px'})
+            .bindEvent({
+                submit: function(event) {
+                    editMetadata('license', event.value);
+                }
+            })
+            .appendTo($div);
     } else if (data.license) {
         $div.html(
             formatKey('License')
