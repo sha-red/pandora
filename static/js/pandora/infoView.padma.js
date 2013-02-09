@@ -44,7 +44,7 @@ pandora.ui.infoView = function(data) {
 
         $icon = Ox.Element({
                 element: '<img>',
-                tooltip: 'Open in ' + Ox.getObjectById(
+                tooltip: 'Switch to ' + Ox.getObjectById(
                     pandora.site.itemViews,
                     ui.videoView
                 ).title
