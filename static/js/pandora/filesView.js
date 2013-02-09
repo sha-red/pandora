@@ -226,9 +226,11 @@ pandora.ui.filesView = function(options, self) {
                 if (data.key == 'selected') {
                     var ignored = self.$filesList.value(data.id, 'instances')
                             .filter(function(i) {return i.ignore; }).length > 0;
-                    pandora.api.editFile({
-                        id: data.id,
-                        ignore: !ignored
+                    pandora.api.editFiles({
+                        files: [{
+                            id: data.id,
+                            ignore: !ignored
+                        }]
                     }, function(result) {
                         Ox.Request.clearCache();
                         self.$filesList.reloadList();
