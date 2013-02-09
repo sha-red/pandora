@@ -44,6 +44,10 @@ pandora.ui.infoView = function(data) {
 
         $icon = Ox.Element({
                 element: '<img>',
+                tooltip: 'Open in ' + Ox.getObjectById(
+                    pandora.site.itemViews,
+                    ui.videoView
+                ).title
             })
             .attr({
                 src: '/' + data.id + '/' + (
@@ -57,6 +61,11 @@ pandora.ui.infoView = function(data) {
                 width: iconWidth + 'px',
                 height: iconHeight + 'px',
                 borderRadius: borderRadius + 'px'
+            })
+            .bindEvent({
+                anyclick: function() {
+                    pandora.UI.set({itemView: ui.videoView});
+                }
             })
             .appendTo($left),
 
