@@ -625,7 +625,7 @@ pandora.ui.infoView = function(data) {
     }
 
     function formatLight(str) {
-        return '<span style="color: rgb(128, 128, 128)">' + str + '</span>';
+        return '<span class="OxLight">' + str + '</span>';
     }
 
     function formatTitle(title) {
