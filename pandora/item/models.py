@@ -410,7 +410,7 @@ class Item(models.Model):
         '''
         for l in self.lists.all():
             l.remove(self)
-            if l.items.filter(id=other.id) == 0:
+            if l.items.filter(id=other.id).count() == 0:
                 l.add(other)
         #FIXME: should this really happen for annotations?
         for a in self.annotations.all():
