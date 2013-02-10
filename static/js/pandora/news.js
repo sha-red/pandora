@@ -9,8 +9,8 @@ pandora.ui.news = function(width, height) {
         $right = $('<div>')
             .css({position: 'absolute', top: '16px', right: '16px', width: '192px'})
             .appendTo(that),
-        backgroundColor = Ox.Theme() == 'classic'
-            ? 'rgb(224, 224, 224)' : 'rgb(32, 32, 32)',        
+        backgroundColor = Ox.Theme() == 'oxlight' ? 'rgb(224, 224, 224)'
+            : Ox.Theme() == 'oxmedium' ? 'rgb(128, 128, 128)' : 'rgb(32, 32, 32)',        
         isEditable = pandora.site.capabilities.canEditSitePages[pandora.user.level],
         items = [],
         selected,

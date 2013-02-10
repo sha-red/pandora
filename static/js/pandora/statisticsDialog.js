@@ -290,8 +290,8 @@ pandora.ui.statisticsDialog = function() {
                         .css({
                             padding: '16px',
                             overflowY: 'auto',
-                            background: pandora.user.ui.theme == 'classic'
-                                ? 'rgb(240, 240, 240)'
+                            background: pandora.user.ui.theme == 'oxlight' ? 'rgb(240, 240, 240)'
+                                : pandora.user.ui.theme == 'oxmedium' ? 'rgb(160, 160, 160)'
                                 : 'rgb(16, 16, 16)' 
                         });
                 if (id == 'seen') {
@@ -306,7 +306,7 @@ pandora.ui.statisticsDialog = function() {
                                                 ) : Ox.rgb(
                                                     (Math.abs(11.5 - parseInt(split[0], 10)) - 0.5) * -11, 1, 0.5
                                                 );
-                                        if (pandora.user.ui.theme == 'classic') {
+                                        if (pandora.user.ui.theme == 'oxlight') {
                                             color = getColor(color);
                                         }
                                         return color;
@@ -359,7 +359,7 @@ pandora.ui.statisticsDialog = function() {
                                     var color = Ox.getGeoColor(
                                         key == 'continent' ? value : value.split(', ')[1]
                                     );
-                                    if (pandora.user.ui.theme == 'classic') {
+                                    if (pandora.user.ui.theme == 'oxlight') {
                                         color = getColor(color);
                                     }
                                     return color;
@@ -448,7 +448,7 @@ pandora.ui.statisticsDialog = function() {
                                     color: function(value) {
                                         var name = version ? getName(key, value) : value,
                                             color = colors[key][name];
-                                        if (pandora.user.ui.theme == 'classic') {
+                                        if (pandora.user.ui.theme == 'oxlight') {
                                             color = getColor(color);
                                         }
                                         return color;
@@ -516,7 +516,7 @@ pandora.ui.statisticsDialog = function() {
                                     })).map(function(c) {
                                         return Math.round(Ox.sum(c) / 2);
                                     });
-                                if (pandora.user.ui.theme == 'classic') {
+                                if (pandora.user.ui.theme == 'oxlight') {
                                     color = getColor(color);
                                 }
                                 return color;

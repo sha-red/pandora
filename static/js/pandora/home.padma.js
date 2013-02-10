@@ -261,8 +261,9 @@ pandora.ui.home = function() {
         }, function(result) {
             var lists = result.data.items,
                 counter = 0, items = 8, mouse = false, position = 0, selected = 0,
-                color = Ox.Theme() == 'classic'
-                    ? 'rgb(32, 32, 32)' : 'rgb(224, 224, 224)',
+                color = Ox.Theme() == 'oxlight' ? 'rgb(32, 32, 32)'
+                    : Ox.Theme() == 'oxmedium' ? 'rgb(144, 144, 144)'
+                    : 'rgb(224, 224, 224)',
                 $label, $icon, $text,
                 $listsBox, $listsContainer, $listsContent,
                 $listBox = [], $listIcon = [],

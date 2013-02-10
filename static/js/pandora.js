@@ -119,7 +119,6 @@ appPanel
             gradient.style.background = theme == 'oxlight' ? '-webkit-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
                 : theme == 'oxmedium' ? '-webkit-linear-gradient(top, rgba(144, 144, 144, 0.75), rgba(144, 144, 144, 1), rgba(144, 144, 144, 1))'
                 : '-webkit-linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
-
         }
         var loadingScreen = document.createElement('div');
         loadingScreen.setAttribute('id', 'loadingScreen');
