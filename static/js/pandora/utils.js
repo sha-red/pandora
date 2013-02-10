@@ -217,15 +217,16 @@ pandora.clickLink = function(e) {
 };
 
 pandora.createLinks = function($element) {
+    function isExternalLink(target) {
+        return $(target).is('a') && (
+            target.hostname != document.location.hostname
+            || Ox.startsWith(target.pathname, '/static')
+        )
+    } 
     $element
         .on({
             click: function(e) {
-                if(
-                    $(e.target).is('a') && (
-                        e.target.hostname != document.location.hostname
-                        || Ox.startsWith(e.target.pathname, '/static')
-                    )
-                ) {
+                if(isExternalLink(e.target)) {
                     e.preventDefault();
                     window.open('/url=' + encodeURIComponent(e.target.href), '_blank');
                 }
@@ -234,7 +235,9 @@ pandora.createLinks = function($element) {
         })
         .bindEvent({
             singleclick: function(e) {
-                $(e.target).is('a') && pandora.clickLink(e);
+                if(!isExternalLink(e.target)) {
+                    pandora.clickLink(e);
+                }
             }
         });
 };

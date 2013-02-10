@@ -549,6 +549,7 @@ pandora.ui.infoView = function(data) {
             .append(formatKey('Notes', true))
             .append(
                 Ox.Editable({
+                        clickLink: pandora.clickLink,
                         height: 128,
                         placeholder: formatLight('No notes'),
                         tooltip: 'Doubleclick to edit',
