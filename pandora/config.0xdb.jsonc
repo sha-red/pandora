@@ -666,6 +666,7 @@
         {"id": "rights", "title": "Rights Management"},
         {"id": "contact", "title": "Contact"}
     ],
+    "themes": ["oxlight", "oxmedium", "oxdark"],
     "timelines": [
         {"id": "antialias", "title": "Anti-Alias"},
         {"id": "slitscan", "title": "Slit-Scan"},
@@ -753,7 +754,7 @@
             "showSitePosters": false,
             "showTimeline": true,
             "sidebarSize": 256,
-            "theme": "modern",
+            "theme": "oxdark",
             "videoMuted": false,
             "videoPoints": {},
             "videoResolution": 96,

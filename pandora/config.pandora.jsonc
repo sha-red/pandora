@@ -503,6 +503,7 @@
         {"id": "license", "title": "License"},
         {"id": "contact", "title": "Contact"}
     ],
+    "themes": ["oxlight", "oxmedium", "oxdark"],
     "timelines": [
         {"id": "antialias", "title": "Anti-Alias"},
         {"id": "slitscan", "title": "Slit-Scan"},
@@ -593,7 +594,7 @@
             "showSitePosters": false,
             "showTimeline": true,
             "sidebarSize": 256,
-            "theme": "classic",
+            "theme": "oxmedium",
             "videoMuted": false,
             "videoPoints": {},
             "videoResolution": 240,
