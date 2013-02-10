@@ -34,8 +34,11 @@ appPanel
         enableDebugMode = localStorage && localStorage['pandora.enableDebugMode'],
         enableEventLogging = localStorage && localStorage['pandora.enableEventLogging'],
         isMSIE = /MSIE/.test(navigator.userAgent),
+        legacyThemes = {classic: 'oxlight', modern: 'oxdark'},
         theme = localStorage && localStorage['Ox.theme']
-            && JSON.parse(localStorage['Ox.theme']) || 'modern';
+            && JSON.parse(localStorage['Ox.theme']) || 'oxmedium';
+
+    theme = legacyThemes[theme] || theme;
 
     loadImages(function(images) {
         loadScreen(images);
@@ -107,15 +110,16 @@ appPanel
             gradient.style.width = '322px';
             gradient.style.height = '162px';
             gradient.style.margin = 'auto';
-            gradient.style.background = theme == 'classic'
-                ? '-moz-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
+            gradient.style.background = theme == 'oxlight' ? '-moz-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
+                : theme == 'oxmedium' ? '-moz-linear-gradient(top, rgba(144, 144, 144, 0.75), rgba(144, 144, 144, 1), rgba(144, 144, 144, 1))'
                 : '-moz-linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
-            gradient.style.background = theme == 'classic'
-                ? '-o-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
+            gradient.style.background = theme == 'oxlight' ? '-o-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
+                : theme == 'oxmedium' ? '-o-linear-gradient(top, rgba(144, 144, 144, 0.75), rgba(144, 144, 144, 1), rgba(144, 144, 144, 1))'
                 : '-o-linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
-            gradient.style.background = theme == 'classic'
-                ? '-webkit-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
+            gradient.style.background = theme == 'oxlight' ? '-webkit-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
+                : theme == 'oxmedium' ? '-webkit-linear-gradient(top, rgba(144, 144, 144, 0.75), rgba(144, 144, 144, 1), rgba(144, 144, 144, 1))'
                 : '-webkit-linear-gradient(top, rgba(32, 32, 32, 0.75), rgba(32, 32, 32, 1), rgba(32, 32, 32, 1))';
+
         }
         var loadingScreen = document.createElement('div');
         loadingScreen.setAttribute('id', 'loadingScreen');
@@ -123,8 +127,8 @@ appPanel
         loadingScreen.style.position = 'absolute';
         loadingScreen.style.width = '100%';
         loadingScreen.style.height = '100%';
-        loadingScreen.style.backgroundColor = theme == 'classic'
-            ? 'rgb(224, 224, 224)' : 'rgb(32, 32, 32)';
+        loadingScreen.style.backgroundColor = theme == 'oxlight' ? 'rgb(224, 224, 224)'
+            : theme == 'oxmedium' ? 'rgb(144, 144, 144)' : 'rgb(32, 32, 32)';
         loadingScreen.style.zIndex = '1002';
         loadingScreen.appendChild(images.logo);
         images.reflection && loadingScreen.appendChild(images.reflection);
@@ -234,6 +238,8 @@ appPanel
                 delete pandora.user.ui[key];
             }
         });
+        // patch theme ... this can be removed at a later point
+        pandora.user.ui.theme = legacyThemes[pandora.user.ui.theme] || pandora.user.ui.theme;
         // patch itemView ... this can be removed at a later point
         if (pandora.user.ui.itemView == 'video') {
             pandora.user.ui.itemView = 'player';

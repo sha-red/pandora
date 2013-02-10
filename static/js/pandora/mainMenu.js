@@ -119,10 +119,9 @@ pandora.ui.mainMenu = function() {
                         { id: 'entervideofullscreen', title: 'Enter Video Fullscreen', disabled: !ui.item || ui.itemView != 'player' },
                         {},
                         { id: 'theme', title: 'Theme', items: [
-                            { group: 'settheme', min: 1, max: 1, items: [
-                                { id: 'classic', title: 'Light', checked: ui.theme == 'classic'},
-                                { id: 'modern', title: 'Dark', checked: ui.theme == 'modern' }
-                            ]}
+                            { group: 'settheme', min: 1, max: 1, items: pandora.site.themes.map(function(theme) {
+                                return {id: theme, title: Ox.Theme.getThemeData(theme).themeName, checked: ui.theme == theme}
+                            }) }
                         ] }
                     ]},
                     getSortMenu(),
