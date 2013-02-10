@@ -778,8 +778,8 @@ class Item(models.Model):
         s.itemId = self.itemId.replace('0x', 'xx')
         if not settings.USE_IMDB:
             s.itemId = ox.sort_string(str(ox.fromAZ(s.itemId)))
-        s.modified = self.modified
-        s.created = self.created
+        s.modified = self.modified or datetime.now()
+        s.created = self.created or datetime.now()
         s.rightslevel = self.level
 
         s.aspectratio = self.get('aspectratio')
