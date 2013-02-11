@@ -94,11 +94,13 @@ pandora.ui.info = function() {
                                 position: !ui.item && ui.listView == 'timelines'
                                     ? (ui.videoPoints[id] ? ui.videoPoints[id].position : 0)
                                     : result.data.posterFrame,
-                                tooltip: (ui.item && ['timeline', 'player', 'editor'].indexOf(ui.itemView) > -1)
-                                    ? 'Go to Position' : 'Open in ' + Ox.getObjectById(
-                                        pandora.site.itemViews,
-                                        ui.videoView
-                                    ).title + ' View',
+                                tooltip: function() {
+                                    return (ui.item && ['timeline', 'player', 'editor'].indexOf(ui.itemView) > -1)
+                                        ? 'Go to Position' : 'Open in ' + Ox.getObjectById(
+                                            pandora.site.itemViews,
+                                            ui.videoView
+                                        ).title + ' View';
+                                }
                                 width: ui.sidebarSize
                             })
                             .bindEvent({
