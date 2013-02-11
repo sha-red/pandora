@@ -423,6 +423,7 @@ pandora.ui.infoView = function(data) {
                     pandora.UI.set({item: result.data.id});
                     pandora.$ui.browser.value(data.id, 'id', result.data.id);
                 }
+                pandora.updateItemContext();
                 // FIXME: value function should accept {k: v, ...}
                 pandora.$ui.browser.value(result.data.id, 'title', result.data.title);
                 pandora.$ui.browser.value(result.data.id, 'director', result.data.director);
