@@ -21,11 +21,14 @@ Ox.load('UI', {
                         pandora.user.ui.item = options.item;
                         pandora.api.get({id: options.item, keys: videoKeys}, function(result) {
                             var data = getVideoOptions(result.data);
-                            that.append(pandora.player = Ox.VideoPlayer({
+                            that.append(pandora.$player = Ox.VideoPlayer({
                                     censored: data.censored,
                                     censoredIcon: pandora.site.cantPlay.icon,
                                     censoredTooltip: pandora.site.cantPlay.text,
-                                    controlsTop: Ox.Fullscreen.available ? ['fullscreen'] : [],
+                                    controlsTooltips: {open: 'Open in ' + pandora.site.site.name},
+                                    controlsTop: (Ox.Fullscreen.available ? ['fullscreen'] : []).concat(
+                                        ['space', 'open']
+                                    ),
                                     controlsBottom: ['play', 'volume', 'scale', 'timeline', 'settings'],
                                     duration: data.duration,
                                     enableFind: false,
@@ -51,6 +54,9 @@ Ox.load('UI', {
                                     width: window.innerWidth
                                 })
                                 .bindEvent({
+                                    open: function() {
+                                        pandora.$player.options({paused: true});
+                                    },
                                     playing: checkRange,
                                     position: checkRange,
                                     resolution: function(data) {
@@ -120,10 +126,10 @@ Ox.load('UI', {
                     data.position < options['in'] - 0.04
                     || data.position > options.out
                 ) {
-                    if (!pandora.player.options('paused')) {
-                        pandora.player.togglePaused();
+                    if (!pandora.$player.options('paused')) {
+                        pandora.$player.togglePaused();
                     }
-                    pandora.player.options({
+                    pandora.$player.options({
                         position: options['in']
                     });
                 }
