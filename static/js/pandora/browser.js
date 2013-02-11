@@ -156,13 +156,13 @@ pandora.ui.browser = function() {
                 that.options({
                     borderRadius: data.value == 'posters' ? 0 : 8,
                     defaultRatio: data.value == 'posters' ? 5/8 : 1
-                }).reloadList(true);
+                }).reloadList();
             },
             pandora_item: function(data) {
                 that.options({selected: [data.value]});
                 if (['accessed', 'timesaccessed'].indexOf(pandora.user.ui.listSort[0].key) > -1) {
                     Ox.Request.clearCache('find');
-                    that.reloadList(true);
+                    that.reloadList();
                 }
             },
             pandora_listsort: function() {
