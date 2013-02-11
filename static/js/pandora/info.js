@@ -95,11 +95,13 @@ pandora.ui.info = function() {
                                     ? (ui.videoPoints[id] ? ui.videoPoints[id].position : 0)
                                     : result.data.posterFrame,
                                 videoTooltip: function() {
-                                    return (ui.item && ['timeline', 'player', 'editor'].indexOf(ui.itemView) > -1)
-                                        ? 'Go to Position' : 'Open in ' + Ox.getObjectById(
-                                            pandora.site.itemViews,
-                                            ui.videoView
-                                        ).title + ' View';
+                                    return (
+                                        pandora.user.ui.item
+                                        && ['timeline', 'player', 'editor'].indexOf(pandora.user.ui.itemView) > -1
+                                    ) ? 'Go to Position' : 'Open in ' + Ox.getObjectById(
+                                        pandora.site.itemViews,
+                                        ui.videoView
+                                    ).title + ' View';
                                 },
                                 width: ui.sidebarSize
                             })
