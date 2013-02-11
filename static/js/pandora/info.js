@@ -100,7 +100,7 @@ pandora.ui.info = function() {
                                             pandora.site.itemViews,
                                             ui.videoView
                                         ).title + ' View';
-                                }
+                                },
                                 width: ui.sidebarSize
                             })
                             .bindEvent({
