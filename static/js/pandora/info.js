@@ -115,8 +115,8 @@ pandora.ui.info = function() {
                                 }
                             })
                     );
-                    previousView != 'video' && resizeInfo();
                 }
+                previousView != 'video' && resizeInfo();
             });
         }
     }
