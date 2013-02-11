@@ -47,7 +47,7 @@ pandora.ui.infoView = function(data) {
                 tooltip: 'Switch to ' + Ox.getObjectById(
                     pandora.site.itemViews,
                     ui.videoView
-                ).title
+                ).title + ' View'
             })
             .attr({
                 src: '/' + data.id + '/' + (
