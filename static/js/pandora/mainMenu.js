@@ -177,6 +177,18 @@ pandora.ui.mainMenu = function() {
                     } else {
                         that.checkItem('allitems');
                     }
+                } else if (data.id == 'cliporder') {
+                    if (!ui.item) {
+                        pandora.UI.set({listSort: [{key: pandora.user.ui.listSort[0].key, operator: value == 'ascending' ? '+' : '-'}]});
+                    } else {
+                        pandora.UI.set({itemSort: [{key: pandora.user.ui.itemSort[0].key, operator: value == 'ascending' ? '+' : '-'}]});
+                    }
+                } else if (data.id == 'clipsort') {
+                    if (!ui.item) {
+                        pandora.UI.set({listSort: [{key: value, operator: pandora.getSortOperator(value)}]});
+                    } else {
+                        pandora.UI.set({itemSort: [{key: value, operator: pandora.getSortOperator(value)}]});
+                    }
                 } else if (data.id == 'find') {
                     if (value) {
                         pandora.$ui.findSelect.value(value);
@@ -188,6 +200,10 @@ pandora.ui.mainMenu = function() {
                         that.checkItem('findMenu_find_' + pandora.$ui.findSelect.value());
                     }
                     pandora.$ui.findInput.focusInput(true);
+                } else if (data.id == 'itemorder') {
+                    pandora.UI.set({listSort: [{key: pandora.user.ui.listSort[0].key, operator: value == 'ascending' ? '+' : '-'}]});
+                } else if (data.id == 'itemsort') {
+                    pandora.UI.set({listSort: [{key: value, operator: pandora.getSortOperator(value)}]});
                 } else if (data.id == 'itemview') {
                     pandora.UI.set({itemView: value});
                 } else if (data.id == 'listview') {
@@ -210,12 +226,6 @@ pandora.ui.mainMenu = function() {
                     });
                     filters[index].sort[0].operator = operator;
                     pandora.UI.set({filters: filters});
-                } else if (data.id == 'listorder') {
-                    var key = pandora.user.ui.listSort[0].key,
-                        operator = value == 'ascending' ? '+' : '-';
-                    pandora.UI.set({listSort: [{key: key, operator: operator}]});
-                } else if (data.id == 'listsort') {
-                    pandora.UI.set({listSort: [{key: value, operator: pandora.getSortOperator(value)}]});
                 } else if (data.id == 'settheme') {
                     Ox.Theme(value);
                     pandora.UI.set('theme', value);
@@ -475,11 +485,20 @@ pandora.ui.mainMenu = function() {
                     }
                 }
             },
+            pandora_itemsort: function(data) {
+                that.checkItem('sortMenu_sortclips_' + data.value[0].key);
+                that.checkItem('sortMenu_orderclips_' + (
+                    data.value[0].operator == '+' ? 'ascending' : 'descending')
+                );
+            },
             pandora_itemview: function(data) {
                 var action,
                     isVideoView = ['timeline', 'player', 'editor'].indexOf(data.value) > -1,
                     wasVideoView = ['timeline', 'player', 'editor'].indexOf(data.previousValue) > -1;
                 that.checkItem('viewMenu_item_' + data.value);
+                if (pandora.isClipView() != pandora.isClipView(data.previousValue)) {
+                    that.replaceMenu('sortMenu', getSortMenu());
+                }
                 if (isVideoView) {
                     that.checkItem('viewMenu_clips_' + data.value);
                 }
@@ -504,10 +523,17 @@ pandora.ui.mainMenu = function() {
                 ]('findsimilar');
             },
             pandora_listsort: function(data) {
-                that.checkItem('sortMenu_sortitems_' + data.value[0].key);
-                that.checkItem('sortMenu_orderitems_' + (
-                    data.value[0].operator == '+' ? 'ascending' : 'descending')
-                );
+                if (pandora.isClipView(pandora.user.ui.listView, false)) {
+                    that.checkItem('sortMenu_sortclips_' + data.value[0].key);
+                    that.checkItem('sortMenu_orderclips_' + (
+                        data.value[0].operator == '+' ? 'ascending' : 'descending')
+                    );
+                } else {
+                    that.checkItem('sortMenu_sortitems_' + data.value[0].key);
+                    that.checkItem('sortMenu_orderitems_' + (
+                        data.value[0].operator == '+' ? 'ascending' : 'descending')
+                    );
+                }
             },
             pandora_listview: function(data) {
                 that.checkItem('viewMenu_items_' + data.value);
@@ -637,26 +663,36 @@ pandora.ui.mainMenu = function() {
 
     function getSortMenu() {
         var ui = pandora.user.ui,
-            isClipView = pandora.isClipView(ui.listView),
-            items = isClipView ? pandora.site.clipKeys.map(function(key) {
+            isClipView = pandora.isClipView(),
+            clipItems = (isClipView ? pandora.site.clipKeys.map(function(key) {
                 return Ox.extend(Ox.clone(key), {
                     checked: ui.listSort[0].key == key.id,
-                    title: 'Clip ' + key.title
+                    title: (!ui.item ? 'Clip ' : '') + key.title
                 });
-            }) : [];
+            }) : []).concat(!ui.item ? pandora.site.sortKeys.map(function(key) {
+                return Ox.extend({
+                    checked: ui.listSort[0].key == key.id
+                }, key);
+            }) : []);
         return { id: 'sortMenu', title: 'Sort', items: [
-            { id: 'sortitems', title: 'Sort ' + (isClipView || ui.item ? 'Clips' : pandora.site.itemName.plural) + ' by', items: [
-                { group: 'listsort', min: 1, max: 1, items: [].concat(
-                    items,
-                    pandora.site.sortKeys.map(function(key) {
-                        return Ox.extend({
-                            checked: ui.listSort[0].key == key.id
-                        }, key);
-                    })
-                ) }
+            { id: 'sortitems', title: 'Sort ' + pandora.site.itemName.plural + ' by', disabled: !ui.item && isClipView, items: [
+                { group: 'itemsort', min: 1, max: 1, items: pandora.site.sortKeys.map(function(key) {
+                    return Ox.extend({
+                        checked: ui.listSort[0].key == key.id
+                    }, key);
+                }) }
             ] },
-            { id: 'orderitems', title: 'Order ' + (isClipView ? 'Clips' : pandora.site.itemName.plural), items: [
-                { group: 'listorder', min: 1, max: 1, items: [
+            { id: 'orderitems', title: 'Order ' + pandora.site.itemName.plural, disabled: !ui.item && isClipView, items: [
+                { group: 'itemorder', min: 1, max: 1, items: [
+                    { id: 'ascending', title: 'Ascending', checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '+' },
+                    { id: 'descending', title: 'Descending', checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '-' }
+                ]}
+            ] },
+            { id: 'sortclips', title: 'Sort Clips by', disabled: !isClipView, items: [
+                { group: 'clipsort', min: 1, max: 1, items: clipItems }
+            ] },
+            { id: 'orderclips', title: 'Order Clips', disabled: !isClipView, items: [
+                { group: 'cliporder', min: 1, max: 1, items: [
                     { id: 'ascending', title: 'Ascending', checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '+' },
                     { id: 'descending', title: 'Descending', checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '-' }
                 ]}
