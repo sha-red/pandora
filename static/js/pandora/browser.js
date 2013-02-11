@@ -115,8 +115,7 @@ pandora.ui.browser = function() {
             pageLength: 32,
             selected: [pandora.user.ui.item],
             size: 64,
-            sort: ['text', 'position'].indexOf(pandora.user.ui.listSort[0].key) > -1
-                ? pandora.site.user.ui.listSort: pandora.user.ui.listSort,
+            sort: getSort(),
             unique: 'id'
         })
         .addClass('OxMedia')
@@ -162,6 +161,9 @@ pandora.ui.browser = function() {
             pandora_item: function(data) {
                 that.options({selected: [data.value]});
             },
+            pandora_listsort: function() {
+                that.options({sort: getSort()})
+            },
             pandora_showsiteposters: function() {
                 pandora.user.ui.icons == 'posters' && that.reloadList(true);
             }
@@ -180,6 +182,10 @@ pandora.ui.browser = function() {
         });
         that.css({overflowY: 'hidden'}); // this fixes a bug in firefox
         pandora.enableDragAndDrop(that, false);
+    }
+    function getSort() {
+        return ['text', 'position'].indexOf(pandora.user.ui.listSort[0].key) > -1
+            ? pandora.site.user.ui.listSort: pandora.user.ui.listSort
     }
     return that;
 };
