@@ -437,7 +437,7 @@ pandora.enableDragAndDrop = function($list, canMove) {
                         width: '16px',
                         height: '16px',
                         padding: '2px',
-                        border: '2px solid rgb(192, 192, 192)',
+                        border: '2px solid rgb(' + Ox.Theme.getThemeData().symbolDefaultColor.join(', ') + ')',
                         borderRadius: '12px',
                         margin: '3px 2px 2px 2px'
                     })
