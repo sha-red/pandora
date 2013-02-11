@@ -81,7 +81,7 @@ pandora.ui.info = function() {
         } else if (view == 'video') {
             pandora.api.get({
                 id: id,
-                keys: ['duration', 'rendered', 'videoRatio']
+                keys: ['duration', 'posterFrame', 'rendered', 'videoRatio']
             }, function(result) {
                 emptyInfo();
                 if (result.data && result.data.rendered) {
@@ -93,7 +93,7 @@ pandora.ui.info = function() {
                                 id: id,
                                 position: !ui.item && ui.listView == 'timelines'
                                     ? (ui.videoPoints[id] ? ui.videoPoints[id].position : 0)
-                                    : void 0,
+                                    : result.data.posterFrame,
                                 width: ui.sidebarSize
                             })
                             .bindEvent({
