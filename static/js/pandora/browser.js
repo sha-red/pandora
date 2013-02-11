@@ -161,7 +161,7 @@ pandora.ui.browser = function() {
             pandora_item: function(data) {
                 that.options({selected: [data.value]});
                 if (['accessed', 'timesaccessed'].indexOf(pandora.user.ui.listSort[0].key) > -1) {
-                    Ox.Request.clearCache();
+                    Ox.Request.clearCache('find');
                     that.reloadList(true);
                 }
             },
