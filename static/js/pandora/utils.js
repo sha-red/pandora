@@ -1244,6 +1244,23 @@ pandora.unloadWindow = function() {
     */
 };
 
+pandora.updateItemContext = function() {
+    if (!Ox.isEqual(pandora.user.ui.find, pandora.site.user.ui.find)) {
+        Ox.Request.clearCache('find');
+        pandora.api.find({
+            query: pandora.user.ui.find,
+            positions: [pandora.user.ui.item],
+            sort: pandora.user.ui.sort
+        }, function(result) {
+            if (result.data.positions[pandora.user.ui.item] === void 0) {
+                pandora.stayInItemView = true;
+                pandora.UI.set({find: pandora.site.user.ui.find});
+                pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
+            }
+        });
+    }
+};
+
 (function() {
 
     // Note: getFindState has to run after getListState and getFilterState
