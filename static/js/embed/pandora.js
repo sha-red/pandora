@@ -25,7 +25,7 @@ Ox.load('UI', {
                                     censored: data.censored,
                                     censoredIcon: pandora.site.cantPlay.icon,
                                     censoredTooltip: pandora.site.cantPlay.text,
-                                    controlsTop: Ox.Fullscreen.available ? ['fullscreen'] : null,
+                                    controlsTop: Ox.Fullscreen.available ? ['fullscreen'] : [],
                                     controlsBottom: ['play', 'volume', 'scale', 'timeline', 'settings'],
                                     duration: data.duration,
                                     enableFind: false,
