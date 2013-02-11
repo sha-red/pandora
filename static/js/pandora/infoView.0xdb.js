@@ -606,7 +606,9 @@ pandora.ui.infoView = function(data) {
                     Ox.Request.clearCache(); // fixme: too much
                     pandora.UI.set({item: result.data.id});
                     pandora.$ui.browser.value(data.id, 'id', result.data.id);
+                    // FIXME: does this update selected?
                 }
+                pandora.updateItemContext();
                 // FIXME: value function should accept {k: v, ...}
                 pandora.$ui.browser.value(result.data.id, 'title', result.data.title);
                 pandora.$ui.browser.value(result.data.id, 'director', result.data.director);
@@ -683,7 +685,7 @@ pandora.ui.infoView = function(data) {
         pandora.api.updateExternalData({
             id: ui.item
         }, function(result) {
-            //reloading metadata might change results too(i.e. genre)
+            pandora.updateItemContext();
             Ox.Request.clearCache();
             if (ui.item == item && ui.itemView == 'info') {
                 pandora.$ui.contentPanel.replaceElement(
