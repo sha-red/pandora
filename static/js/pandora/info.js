@@ -227,13 +227,13 @@ pandora.ui.listInfo = function() {
                     $description = Ox.Editable({
                             clickLink: pandora.clickLink,
                             format: function(value) {
-                                return '<div style="color: rgb(128, 128, 128); text-align: center">'
+                                return '<div class="OxLight" style="text-align: center">'
                                     + value + '</div>';
                             },
                             editable: editable,
                             height: pandora.user.ui.sidebarSize - 32,
                             placeholder: editable
-                                ? '<div style="color: rgb(128, 128, 128); text-align: center">No description</span>'
+                                ? '<div class="OxLight" style="text-align: center">No description</span>'
                                 : '',
                             tooltip: editable ? 'Doubleclick to edit description' : '',
                             type: 'textarea',
