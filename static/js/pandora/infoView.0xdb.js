@@ -857,7 +857,6 @@ pandora.ui.infoView = function(data) {
                              // fixme: api slightly inconsistent, this shouldn't be "position"
                             position: selectedImage.index
                         }), function() {
-                            // fixme: update the info (video preview) frame as well
                             var src;
                             pandora.clearIconCache(data.id);
                             Ox.Request.clearCache();
@@ -865,6 +864,11 @@ pandora.ui.infoView = function(data) {
                                 src = '/' + data.id + '/icon512.jpg?' + Ox.uid()
                                 $icon.attr({src: src});
                                 $reflectionIcon.attr({src: src});
+                                if (pandora.$ui.videoPreview) {
+                                    pandora.$ui.videoPreview.options({
+                                        position: $list.value(selectedImage.index, 'position')
+                                    });
+                                }
                             }
                             $browserImages.each(function() {
                                 $(this).attr({src: '/' + data.id + '/' + (

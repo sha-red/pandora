@@ -191,6 +191,12 @@ pandora.ui.editor = function(data) {
                 pandora.api.setPosterFrame({
                     id: ui.item,
                     position: data.position
+                }, function() {
+                    if (pandora.$ui.videoPreview) {
+                        pandora.$ui.videoPreview.options({
+                            position: data.position
+                        });
+                    }
                 });
             },
             removeannotation: function(data) {
