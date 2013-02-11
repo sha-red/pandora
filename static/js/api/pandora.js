@@ -4,7 +4,7 @@
 Ox.load('UI', {
     hideScreen: false,
     showScreen: true,
-    theme: 'classic'
+    theme: 'oxlight'
 }, function() {
 
 var app = new Ox.App({

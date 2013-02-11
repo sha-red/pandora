@@ -6,7 +6,7 @@ Ox.load('UI', {
     hideScreen: false,
     loadImages: true,
     showScreen: true,
-    theme: 'modern'
+    theme: 'oxdark'
 }, function() {
     var videoKeys = [ 'duration', 'layers', 'parts', 'posterFrame', 'rightslevel', 'size', 'title', 'videoRatio' ];
     window.pandora = new Ox.App({url: '/api/'}).bindEvent({
