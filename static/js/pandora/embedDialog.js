@@ -39,8 +39,10 @@ pandora.ui.embedDialog = function(data) {
         $('<textarea>')
             .css({
                 width: '520px',
-                margin: '16px',
-                height: '100%'
+                marginLeft: '16px',
+                marginRight: '16px',
+                marginTop: '8px',
+                height: '50px'
             }).val(
                 '<iframe width="' + width
                 + '" height="' + height
