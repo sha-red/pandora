@@ -100,7 +100,7 @@ pandora.ui.info = function() {
                                         && ['timeline', 'player', 'editor'].indexOf(pandora.user.ui.itemView) > -1
                                     ) ? 'Go to Position' : 'Open in ' + Ox.getObjectById(
                                         pandora.site.itemViews,
-                                        ui.videoView
+                                        pandora.user.ui.videoView
                                     ).title + ' View';
                                 },
                                 width: ui.sidebarSize
