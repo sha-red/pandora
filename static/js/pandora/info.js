@@ -115,6 +115,19 @@ pandora.ui.info = function() {
                                 }
                             })
                     );
+                } else {
+                    that.append(
+                        Ox.Bar({size: 16}).css({
+                            position: 'absolute',
+                            bottom: 0
+                        }).append(
+                            $('<div>').css({
+                                marginTop: '2px',
+                                fontSize: '9px',
+                                textAlign: 'center'
+                            }).html('No Video')
+                        )
+                    );
                 }
                 previousView != 'video' && resizeInfo();
             });
