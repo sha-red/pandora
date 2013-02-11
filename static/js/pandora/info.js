@@ -94,7 +94,7 @@ pandora.ui.info = function() {
                                 position: !ui.item && ui.listView == 'timelines'
                                     ? (ui.videoPoints[id] ? ui.videoPoints[id].position : 0)
                                     : result.data.posterFrame,
-                                tooltip: function() {
+                                videoTooltip: function() {
                                     return (ui.item && ['timeline', 'player', 'editor'].indexOf(ui.itemView) > -1)
                                         ? 'Go to Position' : 'Open in ' + Ox.getObjectById(
                                             pandora.site.itemViews,
