@@ -1245,8 +1245,8 @@ pandora.unloadWindow = function() {
 };
 
 pandora.updateItemContext = function() {
+    Ox.Request.clearCache('find');
     if (!Ox.isEqual(pandora.user.ui.find, pandora.site.user.ui.find)) {
-        Ox.Request.clearCache('find');
         pandora.api.find({
             query: pandora.user.ui.find,
             positions: [pandora.user.ui.item],
@@ -1256,8 +1256,12 @@ pandora.updateItemContext = function() {
                 pandora.stayInItemView = true;
                 pandora.UI.set({find: pandora.site.user.ui.find});
                 pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
+            } else {
+                pandora.$ui.browser.reloadList();
             }
         });
+    } else {
+        pandora.$ui.browser.reloadList();
     }
 };
 
