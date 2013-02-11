@@ -215,7 +215,7 @@ pandora.ui.mainMenu = function() {
                         operator = value == 'ascending' ? '+' : '-';
                     pandora.UI.set({listSort: [{key: key, operator: operator}]});
                 } else if (data.id == 'listsort') {
-                    pandora.UI.set({listSort: [{key: value, operator: ''}]});
+                    pandora.UI.set({listSort: [{key: value, operator: pandora.getSortOperator(value)}]});
                 } else if (data.id == 'settheme') {
                     Ox.Theme(value);
                     pandora.UI.set('theme', value);
