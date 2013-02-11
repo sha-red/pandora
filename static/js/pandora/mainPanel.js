@@ -58,7 +58,11 @@ pandora.ui.mainPanel = function() {
                         }
                     });
                 } else {
-                    that.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
+                    if (pandora.stayInItemView) {
+                        pandora.stayInItemView = false;
+                    } else {
+                        that.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
+                    }
                 }
             },
             pandora_item: function(data) {
