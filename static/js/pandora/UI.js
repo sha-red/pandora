@@ -64,9 +64,9 @@ pandora.UI = (function() {
             pandora.user.ui._list = list;
             pandora.user.ui._filterState = pandora.getFilterState(args.find);
             pandora.user.ui._findState = pandora.getFindState(args.find);
-            if (pandora.$ui.appPanel) {
-                // if we're not on page load,
-                // switch from item view to list view
+            if (pandora.$ui.appPanel && !pandora.stayInItemView) {
+                // if we're not on page load, and if find isn't a context change
+                // caused by an edit, then switch from item view to list view
                 args['item'] = '';
             }
             if (list != self.previousUI._list) {
@@ -179,6 +179,7 @@ pandora.UI = (function() {
         });
         Ox.len(set) && pandora.api.setUI(set);
         triggerEvents && Ox.forEach(trigger, function(val, key) {
+            Ox.Log('UI', 'TRIGGER ' + key + ' ' + val);
             Ox.forEach(pandora.$ui, function(element) {
                 Ox.UI.isElement(element) && element.triggerEvent('pandora_' + key.toLowerCase(), {
                     value: val,
