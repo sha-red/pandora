@@ -54,7 +54,7 @@ Ox.load('UI', {
                                     video: data.video,
                                     width: window.innerWidth
                                 })
-                                .bindEvent({
+                                .bindEvent(Ox.extend({
                                     open: function() {
                                         pandora.$player.options({paused: true});
                                         var url = document.location.protocol
@@ -63,15 +63,16 @@ Ox.load('UI', {
                                             + Ox.formatDuration(pandora.$player.options('position'));
                                         window.open(url, '_blank');
                                     },
-                                    playing: checkRange,
-                                    position: checkRange,
                                     resolution: function(data) {
                                         pandora.api.setUI({'videoResolution': data.resolution});
                                     },
                                     fullscreen: function(data) {
                                         Ox.Fullscreen.toggle();
                                     }
-                                })
+                                }, options['in'] || options.out ? {
+                                    playing: checkRange,
+                                    position: checkRange
+                                } : {}))
                             );
                             Ox.UI.hideLoadingScreen();
 
