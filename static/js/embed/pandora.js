@@ -42,6 +42,7 @@ Ox.load('UI', {
                                     height: window.innerHeight,
                                     invertHighlight: true,
                                     paused: options.paused,
+                                    playInToOut: true,
                                     poster: '/' + options.item + '/' + '96p' + data.posterFrame +'.jpg',
                                     resolution: pandora.user.ui.videoResolution,
                                     showMarkers: false,
@@ -58,7 +59,7 @@ Ox.load('UI', {
                                 } : {}, options.out ? {
                                     out: options.out
                                 } : {}))
-                                .bindEvent(Ox.extend({
+                                .bindEvent({
                                     open: function() {
                                         pandora.$player.options({paused: true});
                                         var url = document.location.protocol
@@ -73,10 +74,7 @@ Ox.load('UI', {
                                     fullscreen: function(data) {
                                         Ox.Fullscreen.toggle();
                                     }
-                                }, options['in'] || options.out ? {
-                                    playing: checkRange,
-                                    position: checkRange
-                                } : {}))
+                                })
                             );
                             Ox.UI.hideLoadingScreen();
                         });
@@ -131,19 +129,6 @@ Ox.load('UI', {
                     }
                 }
             });
-            function checkRange(data) {
-                if (
-                    data.position < options['in'] - 0.04
-                    || data.position > options.out
-                ) {
-                    if (!pandora.$player.options('paused')) {
-                        pandora.$player.togglePaused();
-                    }
-                    pandora.$player.options({
-                        position: options['in']
-                    });
-                }
-            }
             Ox.extend(pandora.user, {
                 videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
             });
