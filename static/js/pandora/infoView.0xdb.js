@@ -877,6 +877,9 @@ pandora.ui.infoView = function(data) {
                                     ui.icons == 'posters' ? 'poster' : 'icon'
                                 ) + '128.jpg?' + Ox.uid()});
                             });
+                            if (ui.sort[0].key == 'modified') {
+                                pandora.$ui.browser.reloadList();
+                            }
                         });
                     }
                 })
