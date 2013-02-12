@@ -35,6 +35,7 @@ Ox.load('UI', {
                                     enableFullscreen: Ox.Fullscreen.available,
                                     enableKeyboard: true,
                                     enableMouse: true,
+                                    enablePosition: true,
                                     enableTimeline: true,
                                     enableVolume: true,
                                     externalControls: false,
