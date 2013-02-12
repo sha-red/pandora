@@ -41,7 +41,7 @@ Ox.load('UI', {
                                     height: window.innerHeight,
                                     invertHighlight: true,
                                     paused: options.paused,
-                                    position: options['in'],
+                                    position: options['in'] || 0,
                                     poster: '/' + options.item + '/' + '96p' + options['in'] +'.jpg',
                                     resolution: pandora.user.ui.videoResolution,
                                     showMarkers: false,
