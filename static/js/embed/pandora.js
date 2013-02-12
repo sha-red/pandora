@@ -39,9 +39,9 @@ Ox.load('UI', {
                                     enableVolume: true,
                                     externalControls: false,
                                     height: window.innerHeight,
-                                    'in': options['in'] || 0,
+                                    'in': options['in'],
                                     invertHighlight: true,
-                                    out: options.out || data.duration,
+                                    out: options.out,
                                     paused: options.paused,
                                     position: options['in'],
                                     poster: '/' + options.item + '/' + '96p' + options['in'] +'.jpg',
@@ -155,6 +155,7 @@ Ox.load('UI', {
             }
         }
     });
+
     function getVideoUrl(id, resolution, part) {
         var prefix = pandora.site.site.videoprefix
             .replace('{id}', id)
@@ -227,8 +228,6 @@ Ox.load('UI', {
             },
             defaults = {
                 view: 'video',
-                'in': 0,
-                out: 10,
                 paused: true,
                 item: ''
             };
@@ -239,7 +238,7 @@ Ox.load('UI', {
                 'true': true, 'false': false
             }[query[v[0]]] || query[v[0]];
         });
-         
         return Ox.extend({}, defaults, query);
     }
+
 });
