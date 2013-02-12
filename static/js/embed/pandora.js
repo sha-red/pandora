@@ -227,7 +227,7 @@ Ox.load('UI', {
                 paused: true
             };
         vars.forEach(function(v) {
-            kv = v.split('='), k = kv[0], v = kv[1];
+            var kv = v.split('='), k = kv[0], v = kv[1];
             query[k] = decodeURIComponent(v);
             query[k] = {
                 'true': true, 'false': false
