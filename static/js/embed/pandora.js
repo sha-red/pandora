@@ -36,6 +36,7 @@ Ox.load('UI', {
                                     enableKeyboard: true,
                                     enableMouse: true,
                                     enablePosition: true,
+                                    enableSubtitles: true,
                                     enableTimeline: true,
                                     enableVolume: true,
                                     externalControls: false,
