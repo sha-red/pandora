@@ -396,15 +396,15 @@ pandora.ui.list = function() {
                 });
             },
             init: function(data) {
-                var find = pandora.user.ui.find, folder, list;
-                if (find.conditions.length == 0) {
+                var folder, list;
+                if (data.query.conditions.length == 0) {
                     pandora.$ui.allItems.update(data.items);
                 } else if (
-                    find.conditions.length == 1
-                    && find.conditions[0].key == 'list'
-                    && find.conditions[0].operator == '=='
+                    data.query.conditions.length == 1
+                    && data.query.conditions[0].key == 'list'
+                    && data.query.conditions[0].operator == '=='
                 ) {
-                    list = find.conditions[0].value;
+                    list = data.query.conditions[0].value;
                     folder = pandora.getListData(list).folder;
                     if (pandora.$ui.folderList[folder]) {
                         pandora.$ui.folderList[folder].value(
