@@ -25,15 +25,15 @@ Ox.load('UI', {
                                     censored: data.censored,
                                     censoredIcon: pandora.site.cantPlay.icon,
                                     censoredTooltip: pandora.site.cantPlay.text,
-                                    controlsTooltips: {open: 'Watch on ' + pandora.site.site.name},
-                                    controlsTop: (options.showCloseButton ? ['close'] : []).concat(
-                                        ['space']
-                                    ).concat(
+                                    controlsBottom: ['play', 'volume', 'scale'].concat(
                                         Ox.Fullscreen.available ? ['fullscreen'] : []
                                     ).concat(
-                                        ['open']
+                                        ['timeline', 'position', 'settings']
                                     ),
-                                    controlsBottom: ['play', 'volume', 'scale', 'timeline', 'position', 'settings'],
+                                    controlsTooltips: {open: 'Watch on ' + pandora.site.site.name},
+                                    controlsTop: (options.showCloseButton ? ['close'] : []).concat(
+                                        ['space', 'open']
+                                    ),
                                     duration: data.duration,
                                     enableFind: false,
                                     enableFullscreen: Ox.Fullscreen.available,
