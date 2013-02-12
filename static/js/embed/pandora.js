@@ -41,7 +41,6 @@ Ox.load('UI', {
                                     height: window.innerHeight,
                                     invertHighlight: true,
                                     paused: options.paused,
-                                    position: options['in'] || 0,
                                     poster: '/' + options.item + '/' + '96p' + options['in'] +'.jpg',
                                     resolution: pandora.user.ui.videoResolution,
                                     showMarkers: false,
@@ -52,7 +51,8 @@ Ox.load('UI', {
                                     video: data.video,
                                     width: window.innerWidth
                                 }, options['in'] ? {
-                                    'in': options['in']
+                                    'in': options['in'],
+                                    position: options['in']
                                 } : {}, options.out ? {
                                     out: options.out
                                 } : {}))
