@@ -88,7 +88,10 @@ Ox.load('UI', {
                                 } : {}))
                                 .bindEvent(function(data, event) {
                                     if (window.parent) {
-                                        window.parent.postMessage(JSON.stringify({event: event}), '*');
+                                        window.parent.postMessage(JSON.stringify({
+                                            event: event,
+                                            id: options.id
+                                        }), '*');
                                     }
                                 })
                             );
