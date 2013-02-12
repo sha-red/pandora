@@ -21,7 +21,7 @@ Ox.load('UI', {
                         pandora.user.ui.item = options.item;
                         pandora.api.get({id: options.item, keys: videoKeys}, function(result) {
                             var data = getVideoOptions(result.data);
-                            that.append(pandora.$player = Ox.VideoPlayer({
+                            that.append(pandora.$player = Ox.VideoPlayer(Ox.extend({
                                     censored: data.censored,
                                     censoredIcon: pandora.site.cantPlay.icon,
                                     censoredTooltip: pandora.site.cantPlay.text,
@@ -39,9 +39,7 @@ Ox.load('UI', {
                                     enableVolume: true,
                                     externalControls: false,
                                     height: window.innerHeight,
-                                    'in': options['in'],
                                     invertHighlight: true,
-                                    out: options.out,
                                     paused: options.paused,
                                     position: options['in'],
                                     poster: '/' + options.item + '/' + '96p' + options['in'] +'.jpg',
@@ -53,7 +51,11 @@ Ox.load('UI', {
                                     title: result.data.title,
                                     video: data.video,
                                     width: window.innerWidth
-                                })
+                                }, options['in'] ? {
+                                    'in': options['in']
+                                } : {}, options.out ? {
+                                    out: options.out
+                                } : {}))
                                 .bindEvent(Ox.extend({
                                     open: function() {
                                         pandora.$player.options({paused: true});
