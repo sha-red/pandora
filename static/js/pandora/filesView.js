@@ -476,6 +476,7 @@ pandora.ui.filesView = function(options, self) {
                 Ox.Request.clearCache(); // fixme: remove
                 if (self.$switch.value()) {
                     pandora.UI.set({item: result.data.itemId});
+                    pandora.updateItemContext();
                 } else {
                     self.$filesList.reloadList();
                     self.$instancesList.reloadList();
