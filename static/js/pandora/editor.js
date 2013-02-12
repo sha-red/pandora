@@ -197,7 +197,7 @@ pandora.ui.editor = function(data) {
                             position: data.position
                         });
                     }
-                    if (ui.sort[0].key == 'modified') {
+                    if (ui.listSort[0].key == 'modified') {
                         Ox.Request.clearCache('find');
                         pandora.$ui.browser.reloadList();
                     }
