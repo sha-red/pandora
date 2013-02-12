@@ -235,6 +235,9 @@ Ox.load('UI', {
         vars.forEach(function(v) {
             v = v.split('=');
             query[v[0]] = decodeURIComponent(v[1]);
+            if (query[v[0]] == 'false') {
+                query[v[0]] = false;
+            }
         });
          
         return Ox.extend({}, defaults, query);
