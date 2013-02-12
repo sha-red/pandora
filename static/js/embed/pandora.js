@@ -26,8 +26,12 @@ Ox.load('UI', {
                                     censoredIcon: pandora.site.cantPlay.icon,
                                     censoredTooltip: pandora.site.cantPlay.text,
                                     controlsTooltips: {open: 'Watch on ' + pandora.site.site.name},
-                                    controlsTop: (Ox.Fullscreen.available ? ['fullscreen'] : []).concat(
-                                        ['space', 'open']
+                                    controlsTop: (options.showCloseButton ? ['close'] : []).concat(
+                                        ['space']
+                                    ).concat(
+                                        Ox.Fullscreen.available ? ['fullscreen'] : []
+                                    ).concat(
+                                        ['open']
                                     ),
                                     controlsBottom: ['play', 'volume', 'scale', 'timeline', 'position', 'settings'],
                                     duration: data.duration,
@@ -79,6 +83,12 @@ Ox.load('UI', {
                                     playing: checkRange,
                                     position: checkRange
                                 } : {}))
+                                .bindEvent(function(data, event) {
+                                    window.postMessage(JSON.stringify({
+                                        event: event,
+                                        data: data
+                                    }), '*');
+                                });
                             );
                             Ox.UI.hideLoadingScreen();
                         });
