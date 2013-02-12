@@ -8,7 +8,7 @@ Ox.load('UI', {
     showScreen: true,
     theme: 'oxdark'
 }, function() {
-    var videoKeys = [ 'duration', 'layers', 'parts', 'posterFrame', 'rightslevel', 'size', 'title', 'videoRatio' ];
+    var videoKeys = ['duration', 'layers', 'parts', 'posterFrame', 'rightslevel', 'size', 'title', 'videoRatio'];
     window.pandora = new Ox.App({url: '/api/'}).bindEvent({
         load: function(data) {
             Ox.extend(pandora, {
@@ -42,7 +42,7 @@ Ox.load('UI', {
                                     height: window.innerHeight,
                                     invertHighlight: true,
                                     paused: options.paused,
-                                    poster: '/' + options.item + '/' + '96p' + options['in'] +'.jpg',
+                                    poster: '/' + options.item + '/' + '96p' + data.posterFrame +'.jpg',
                                     resolution: pandora.user.ui.videoResolution,
                                     showMarkers: false,
                                     showMilliseconds: 0,
@@ -53,7 +53,8 @@ Ox.load('UI', {
                                     width: window.innerWidth
                                 }, options['in'] ? {
                                     'in': options['in'],
-                                    position: options['in']
+                                    position: options['in'],
+                                    poster: '/' + options.item + '/' + '96p' + options['in'] +'.jpg',
                                 } : {}, options.out ? {
                                     out: options.out
                                 } : {}))
@@ -78,7 +79,6 @@ Ox.load('UI', {
                                 } : {}))
                             );
                             Ox.UI.hideLoadingScreen();
-
                         });
                         return that;
                     },
@@ -160,15 +160,6 @@ Ox.load('UI', {
         }
     });
 
-    function getVideoUrl(id, resolution, part) {
-        var prefix = pandora.site.site.videoprefix
-            .replace('{id}', id)
-            .replace('{part}', part)
-            .replace('{resolution}', resolution)
-            .replace('{uid}', Ox.uid());
-        return prefix + '/' + id + '/' + resolution + 'p' + part + '.' + pandora.user.videoFormat;
-    }
-
     function getVideoOptions(data) {
         var canPlayClips = data.editable || pandora.site.capabilities.canPlayClips[pandora.user.level] >= data.rightslevel,
             canPlayVideo = data.editable || pandora.site.capabilities.canPlayVideo[pandora.user.level] >= data.rightslevel,
@@ -200,12 +191,7 @@ Ox.load('UI', {
                     })
             )
             : [{'in': 0, out: data.duration}];
-        options.video = {};
-        pandora.site.video.resolutions.forEach(function(resolution) {
-            options.video[resolution] = Ox.range(data.parts).map(function(i) {
-                return getVideoUrl(data.item || pandora.user.ui.item, resolution, i + 1);
-            });
-        });
+        options.duration = data.duration;
         options.layers = [];
         pandora.site.layers.forEach(function(layer, i) { 
             options.layers[i] = Ox.extend({}, layer, {
@@ -218,9 +204,24 @@ Ox.load('UI', {
                 })
             });
         });
-        options.duration = data.duration;
+        options.posterFrame = data.posterFrame;
+        options.video = {};
+        pandora.site.video.resolutions.forEach(function(resolution) {
+            options.video[resolution] = Ox.range(data.parts).map(function(i) {
+                return getVideoUrl(data.item || pandora.user.ui.item, resolution, i + 1);
+            });
+        });
         options.videoRatio = data.videoRatio;
         return options;
+    }
+
+    function getVideoUrl(id, resolution, part) {
+        var prefix = pandora.site.site.videoprefix
+            .replace('{id}', id)
+            .replace('{part}', part)
+            .replace('{resolution}', resolution)
+            .replace('{uid}', Ox.uid());
+        return prefix + '/' + id + '/' + resolution + 'p' + part + '.' + pandora.user.videoFormat;
     }
 
     function parseQuery() {
