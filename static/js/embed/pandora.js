@@ -224,15 +224,17 @@ Ox.load('UI', {
             },
             defaults = {
                 view: 'video',
-                paused: true,
-                item: ''
+                paused: true
             };
         vars.forEach(function(v) {
-            v = v.split('=');
-            query[v[0]] = decodeURIComponent(v[1]);
-            query[v[0]] = {
+            kv = v.split('='), k = kv[0], v = kv[1];
+            query[k] = decodeURIComponent(v);
+            query[k] = {
                 'true': true, 'false': false
-            }[query[v[0]]] || query[v[0]];
+            }[query[k]] || query[k];
+            if (query[k].match(/^[\d\.]+$/)) {
+                query[k] = parseFloat(query[k]);
+            }
         });
         return Ox.extend({}, defaults, query);
     }
