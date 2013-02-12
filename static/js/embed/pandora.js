@@ -40,6 +40,7 @@ Ox.load('UI', {
                                     externalControls: false,
                                     height: window.innerHeight,
                                     'in': options['in'],
+                                    invertHighlight: true,
                                     out: options.out,
                                     paused: options.paused,
                                     position: options['in'],
