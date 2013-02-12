@@ -30,7 +30,10 @@ Ox.load('UI', {
                                     ).concat(
                                         ['timeline', 'position', 'settings']
                                     ),
-                                    controlsTooltips: {open: 'Watch on ' + pandora.site.site.name},
+                                    controlsTooltips: {
+                                        close: 'Close',
+                                        open: 'Watch on ' + pandora.site.site.name
+                                    },
                                     controlsTop: (options.showCloseButton ? ['close'] : []).concat(
                                         ['space', 'open']
                                     ),
