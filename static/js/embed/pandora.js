@@ -84,10 +84,7 @@ Ox.load('UI', {
                                     position: checkRange
                                 } : {}))
                                 .bindEvent(function(data, event) {
-                                    window.postMessage(JSON.stringify({
-                                        event: event,
-                                        data: data
-                                    }), '*');
+                                    window.postMessage(JSON.stringify({event: event}), '*');
                                 })
                             );
                             Ox.UI.hideLoadingScreen();
