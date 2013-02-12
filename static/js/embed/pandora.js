@@ -163,7 +163,10 @@ Ox.load('UI', {
     function getVideoOptions(data) {
         var canPlayClips = data.editable || pandora.site.capabilities.canPlayClips[pandora.user.level] >= data.rightslevel,
             canPlayVideo = data.editable || pandora.site.capabilities.canPlayVideo[pandora.user.level] >= data.rightslevel,
-            options = {};
+            options = {},
+            subtitlesLayer = pandora.site.layers.filter(function(layer) {
+                return layer.isSubtitles;
+            })[0];
         options.censored = canPlayVideo ? []
             : canPlayClips ? (
                 options.subtitles.length
@@ -200,11 +203,14 @@ Ox.load('UI', {
             });
         });
         options.posterFrame = data.posterFrame;
-        options.subtitles = data.layers.subtitles
-            ? data.layers.subtitles.map(function(subtitle) {
-                return {'in': subtitle['in'], out: subtitle.out, text: subtitle.value};
-            })
-            : [];
+        options.subtitles = subtitlesLayer ? data.layers[subtitlesLayer.id].map(function(subtitle) {
+            return {
+                id: subtitle.id,
+                'in': subtitle['in'],
+                out: subtitle.out,
+                text: subtitle.value.replace(/\n/g, ' ').replace(/<br\/?>/g, '\n')
+            };
+        }) : [];
         options.video = {};
         pandora.site.video.resolutions.forEach(function(resolution) {
             options.video[resolution] = Ox.range(data.parts).map(function(i) {
