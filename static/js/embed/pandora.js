@@ -88,7 +88,7 @@ Ox.load('UI', {
                                         event: event,
                                         data: data
                                     }), '*');
-                                });
+                                })
                             );
                             Ox.UI.hideLoadingScreen();
                         });
