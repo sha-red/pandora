@@ -62,9 +62,9 @@ Ox.load('UI', {
                                 .bindEvent({
                                     open: function() {
                                         pandora.$player.options({paused: true});
-                                        var url = document.location.protocol
-                                            + '//' + document.location.hostname
-                                            + '/' + options.item + '/'
+                                        var url = document.location.protocol + '//'
+                                            + document.location.hostname + '/'
+                                            + options.item + '/'
                                             + Ox.formatDuration(pandora.$player.options('position'));
                                         window.open(url, '_blank');
                                     },
