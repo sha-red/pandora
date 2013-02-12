@@ -269,6 +269,9 @@ Ox.load('UI', {
             } else if (query[k].match(/^[\d\.]+$/)) {
                 query[k] = parseFloat(query[k]);
             }
+            if (['in', 'out'].indexOf(k) > -1 && v.indexOf(':') > -1) {
+                query[k] = Ox.parseDuration(query[k]);
+            }
         });
         return Ox.extend({}, defaults, query);
     }
