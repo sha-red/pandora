@@ -29,7 +29,7 @@ Ox.load('UI', {
                                     controlsTop: (Ox.Fullscreen.available ? ['fullscreen'] : []).concat(
                                         ['space', 'open']
                                     ),
-                                    controlsBottom: ['play', 'volume', 'scale', 'timeline', 'settings'],
+                                    controlsBottom: ['play', 'volume', 'scale', 'timeline', 'position', 'settings'],
                                     duration: data.duration,
                                     enableFind: false,
                                     enableFullscreen: Ox.Fullscreen.available,
