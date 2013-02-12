@@ -141,7 +141,10 @@ Ox.load('UI', {
                     if (!pandora.$player.options('paused')) {
                         pandora.$player.togglePaused();
                     }
-                    pandora.$player.options({position: options['in']});
+                    pandora.$player.options({
+                        position: data.position < options['in'] - 0.04
+                            ? options['in'] : options.out
+                    });
                 }
             }
             Ox.extend(pandora.user, {
