@@ -244,10 +244,11 @@ Ox.load('UI', {
         vars.forEach(function(v) {
             var kv = v.split('='), k = kv[0], v = kv[1];
             query[k] = decodeURIComponent(v);
-            query[k] = {
-                'true': true, 'false': false
-            }[query[k]] || query[k];
-            if (query[k].match(/^[\d\.]+$/)) {
+            if (query[k] == 'true') {
+                query[k] = true;
+            } else if (query[k] == 'false') {
+                query[k] = false;
+            } else if (query[k].match(/^[\d\.]+$/)) {
                 query[k] = parseFloat(query[k]);
             }
         });
