@@ -155,6 +155,9 @@ Ox.load('UI', {
                 ) {
                     if (!pandora.$player.options('paused')) {
                         pandora.$player.togglePaused();
+                        if (data.position > options.out) {
+                            data.position = options['in'] - 0.05;
+                        }
                     }
                     pandora.$player.options({
                         position: data.position < options['in'] - 0.04
