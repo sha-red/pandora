@@ -265,11 +265,9 @@ pandora.ui.filter = function(id) {
         }
     };
     that.disableMenuItem = function(id) {
-        Ox.print('disable', id);
         $menu.disableItem(id);
     };
     that.enableMenuItem = function(id) {
-        Ox.print('enable', id);
         $menu.enableItem(id);
     };
     return that;
