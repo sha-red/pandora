@@ -48,15 +48,19 @@ Ox.load('UI', {
                                     enableVolume: true,
                                     externalControls: false,
                                     height: window.innerHeight,
-                                    invertHighlight: true,
+                                    invertHighlight: options.invertHighlight,
                                     paused: options.paused,
-                                    // playInToOut: true,
+                                    playInToOut: options.playInToOut,
                                     poster: '/' + options.item + '/' + '96p' + data.posterFrame +'.jpg',
                                     resolution: pandora.user.ui.videoResolution,
                                     showMarkers: false,
                                     showMilliseconds: 0,
                                     subtitles: data.subtitles,
-                                    timeline: '/' + options.item + '/' + 'timeline16p.png',
+                                    timeline: options.playInToOut ? function(size, i) {
+                                        return '/' + options.item
+                                            + '/timelineantialias'
+                                            + size + 'p' + i + '.jpg'
+                                    } : '/' + options.item + '/' + 'timeline16p.png',
                                     title: result.data.title,
                                     video: data.video,
                                     width: window.innerWidth
@@ -82,7 +86,7 @@ Ox.load('UI', {
                                     fullscreen: function(data) {
                                         Ox.Fullscreen.toggle();
                                     }
-                                }, options['in'] || options.out ? {
+                                }, ((options['in'] || options.out) && !options.playInToOut) ? {
                                     playing: checkRange,
                                     position: checkRange
                                 } : {}))
@@ -259,8 +263,10 @@ Ox.load('UI', {
                 item: window.location.pathname.slice(1).split('/')[0]
             },
             defaults = {
+                invertHighlight: true,
+                paused: true,
+                playInToOut: true,
                 view: 'video',
-                paused: true
             };
         vars.forEach(function(v) {
             var kv = v.split('='), k = kv[0], v = kv[1];
