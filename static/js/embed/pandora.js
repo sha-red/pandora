@@ -35,7 +35,7 @@ Ox.load('UI', {
                                         open: 'Watch on ' + pandora.site.site.name
                                     },
                                     controlsTop: (options.showCloseButton ? ['close'] : []).concat(
-                                        ['space', 'open']
+                                        ['title', 'open']
                                     ),
                                     duration: data.duration,
                                     enableFind: false,
