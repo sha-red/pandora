@@ -267,7 +267,8 @@ Ox.load('UI', {
                 paused: true,
                 playInToOut: true,
                 view: 'video',
-            };
+            },
+            options;
         vars.forEach(function(v) {
             var kv = v.split('='), k = kv[0], v = kv[1];
             query[k] = decodeURIComponent(v);
@@ -282,7 +283,11 @@ Ox.load('UI', {
                 query[k] = Ox.parseDuration(query[k]);
             }
         });
-        return Ox.extend({}, defaults, query);
+        options = Ox.extend({}, defaults, query);
+        if (!options['in'] && !options.out) {
+            options.playInToOut = false;
+        }
+        return options;
     }
 
 });
