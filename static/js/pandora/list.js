@@ -85,6 +85,7 @@ pandora.ui.list = function() {
                 pandora.api.find(Ox.extend(data, {
                     query: pandora.user.ui.find
                 }), callback);
+                return Ox.clone(data, true);
             },
             scrollbarVisible: true,
             selected: pandora.user.ui.listSelection,
@@ -159,6 +160,7 @@ pandora.ui.list = function() {
                 pandora.api.find(Ox.extend(data, {
                     query: pandora.user.ui.find
                 }), callback);
+                return Ox.clone(data, true);
             },
             keys: ['director', 'id', 'posterRatio', 'title', 'year'],
             selected: pandora.user.ui.listSelection,
@@ -229,6 +231,7 @@ pandora.ui.list = function() {
                         keys: []
                     }
                 }), callback);
+                return Ox.clone(data, true);
             },
             keys: ['clips', 'director', 'duration', 'id', 'posterRatio', 'title', 'videoRatio', 'year'],
             selected: pandora.user.ui.listSelection,
@@ -341,6 +344,7 @@ pandora.ui.list = function() {
                     items: 1000000,
                     keys: []
                 }} : {})), callback);
+                return Ox.clone(data, true);
             },
             keys: ['clips', 'director', 'duration', 'id', 'posterRatio', 'rendered', 'title', 'year'],
             selected: pandora.user.ui.listSelection,
