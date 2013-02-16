@@ -5,7 +5,7 @@ pandora.ui.sectionButtons = function() {
             buttons: [
                 {id: 'items', title: pandora.site.itemName.plural},
                 {id: 'edits', title: 'Edits', disabled: true},
-                {id: 'texts', title: 'Texts', disabled: true}
+                {id: 'texts', title: 'Texts', disabled: pandora.user.level != 'admin'}
             ],
             id: 'sectionButtons',
             selectable: true,
@@ -17,13 +17,7 @@ pandora.ui.sectionButtons = function() {
         .bindEvent({
             change: function(data) {
                 var section = data.value;
-                if (section == 'items') {
-                    pandora.URL.set(pandora.Query.toString());
-                } else if (section == 'clips') {
-                    pandora.URL.set('clips');
-                } else if (section == 'texts') {
-                    pandora.URL.set('texts');
-                }
+                pandora.UI.set({section: section});
             }
         });
     return that;

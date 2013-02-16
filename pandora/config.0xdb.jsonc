@@ -31,6 +31,8 @@
         "canEditAnnotations": {"staff": true, "admin": true},
         "canEditEvents": {"staff": true, "admin": true},
         "canEditFeaturedLists": {"staff": true, "admin": true},
+        "canEditFeaturedTexts": {"staff": true, "admin": true},
+        "canEditFeaturedEdits": {"staff": true, "admin": true},
         "canEditMetadata": {"staff": true, "admin": true},
         "canEditPlaces": {"staff": true, "admin": true},
         "canEditSitePages": {"staff": true, "admin": true},
@@ -712,6 +714,8 @@
             "icons": "posters",
             "infoIconSize": 256,
             "item": "",
+            "text": "",
+            "edit": "",
             "itemFind": "",
             "itemSort": [{"key": "position", "operator": "+"}],
             "itemView": "info",
@@ -748,6 +752,11 @@
                     "favorite": true,
                     "featured": true,
                     "volumes": true
+                }
+                "texts": {
+                    "personal": true,
+                    "favorite": true,
+                    "featured": true
                 }
             },
             "showSidebar": true,

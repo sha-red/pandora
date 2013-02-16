@@ -12,7 +12,11 @@ pandora.ui.allItems = function() {
         .on({
             click: function() {
                 that.gainFocus();
-                pandora.user.ui._list && pandora.UI.set('find', {conditions: [], operator: '&'});
+                if (pandora.user.ui.section == 'items') {
+                    pandora.user.ui._list && pandora.UI.set('find', {conditions: [], operator: '&'});
+                } else {
+                    pandora.UI.set(pandora.user.ui.section.slice(0, -1), '');
+                }
             }
         })
         .bindEvent({
@@ -33,35 +37,38 @@ pandora.ui.allItems = function() {
             overflow: 'hidden',
             whiteSpace: 'nowrap'
         })
-        .html('All ' + pandora.site.itemName.plural)
-        .appendTo(that),
-    $items = $('<div>')
-        .css({
-            float: 'left',
-            width: '42px',
-            margin: '1px 4px 1px 3px',
-            textAlign: 'right'
-        })
-        .appendTo(that),
-    $clickButton = Ox.Button({
-            style: 'symbol',
-            title: 'click',
-            type: 'image'
-        })
-        .css({opacity: 0.25})
-        .appendTo(that),
-    $uploadButton = Ox.Button({
-            style: 'symbol',
-            title: 'upload',
-            type: 'image'
-        })
+        .html(pandora.user.ui.section == 'items' ? 'All ' + pandora.site.itemName.plural
+            : pandora.site.site.name + ' ' + Ox.toTitleCase(pandora.user.ui.section))
         .appendTo(that);
 
-    pandora.api.find({
-        query: {conditions: [], operator: '&'}
-    }, function(result) {
-        that.update(result.data.items);
-    });
+    if (pandora.user.ui.section == 'items') {
+        var $items = $('<div>')
+            .css({
+                float: 'left',
+                width: '42px',
+                margin: '1px 4px 1px 3px',
+                textAlign: 'right'
+            })
+            .appendTo(that),
+        $clickButton = Ox.Button({
+                style: 'symbol',
+                title: 'click',
+                type: 'image'
+            })
+            .css({opacity: 0.25})
+            .appendTo(that),
+        $uploadButton = Ox.Button({
+                style: 'symbol',
+                title: 'upload',
+                type: 'image'
+            })
+            .appendTo(that);
+        pandora.api.find({
+            query: {conditions: [], operator: '&'}
+        }, function(result) {
+            that.update(result.data.items);
+        });
+    }
 
     that.update = function(items) {
         $items.html(Ox.formatNumber(items));

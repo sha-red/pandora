@@ -14,6 +14,7 @@ from ox.django.fields import DictField
 from ox.utils import json
 
 from itemlist.models import List, Position
+import text
 
 import managers
 import tasks
@@ -261,6 +262,29 @@ def get_ui(user_ui, user=None):
             '''
             ids.append(id)
         return ids
+    
+    def add_texts(texts, section):
+        P = text.models.Position
+        ids = []
+        for t in texts:
+            qs = P.objects.filter(section=section)
+            if section == 'featured':
+                try:
+                    pos = P.objects.get(text=t, section=section)
+                    created = False
+                except P.DoesNotExist:
+                    pos = P(text=t, section=section, user=l.user)
+                    pos.save()
+                    created = True 
+            else:
+                pos, created = P.objects.get_or_create(text=t, user=user, section=section)
+                qs = qs.filter(user=user)
+            if created:
+                pos.position = qs.aggregate(Max('position'))['position__max'] + 1
+                pos.save()
+            ids.append(t.get_id())
+        return ids
+
 
     ids = ['']
     if user:
@@ -270,6 +294,11 @@ def get_ui(user_ui, user=None):
     for i in ui['lists'].keys():
         if i not in ids:
             del ui['lists'][i]
+    tids = ['']
+    if user:
+        tids += add_texts(user.texts.exclude(status="featured"), 'personal')
+        tids += add_texts(user.subscribed_texts.filter(status='public'), 'public')
+    tids += add_texts(text.models.Text.objects.filter(status='featured'), 'featured')
     return ui
 
 def init_user(user, request=None):

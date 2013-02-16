@@ -65,6 +65,12 @@ pandora.ui.mainPanel = function() {
                     }
                 }
             },
+            pandora_section: function(data) {
+                if (data.value != data.previousValue) {
+                    that.replaceElement(0, pandora.$ui.leftPanel = pandora.ui.leftPanel());
+                    that.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
+                }
+            },
             pandora_item: function(data) {
                 if (!data.value || !data.previousValue) {
                     that.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());

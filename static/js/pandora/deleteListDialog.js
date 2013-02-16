@@ -3,6 +3,9 @@
 'use strict';
 
 pandora.ui.deleteListDialog = function(list) {
+    var ui = pandora.user.ui,
+        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
+        folderItem = folderItems.slice(0, -1);
 
     var listData = pandora.getListData(list),
         $folderList = pandora.$ui.folderList[listData.folder],
@@ -10,7 +13,7 @@ pandora.ui.deleteListDialog = function(list) {
             buttons: [
                 Ox.Button({
                     id: 'keep',
-                    title: 'Keep List'
+                    title: 'Keep ' + folderItem
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -18,23 +21,27 @@ pandora.ui.deleteListDialog = function(list) {
                 }),
                 Ox.Button({
                     id: 'delete',
-                    title: 'Delete List'
+                    title: 'Delete ' + folderItem
                 }).bindEvent({
                     click: function() {
                         that.close();
-                        pandora.api.removeList({
+                        pandora.api['remove' + folderItem]({
                             id: listData.id
                         }, function(result) {
-                            Ox.Request.clearCache('findLists');
+                            Ox.Request.clearCache('find' + folderItems);
                             Ox.Request.clearCache(listData.id);
                             $folderList
                                 .options({selected: []})
                                 .bindEventOnce({
                                     load: function() {
-                                        pandora.UI.set('lists.' + listData.id, null);
-                                        pandora.UI.set({
-                                            find: pandora.site.user.ui.find
-                                        });
+                                        if (ui.section == 'items') {
+                                            pandora.UI.set('lists.' + listData.id, null);
+                                            pandora.UI.set({
+                                                find: pandora.site.user.ui.find
+                                            });
+                                        } else {
+                                            pandora.UI.set(folderItem.toLowerCase(), '');
+                                        }
                                     }
                                 })
                                 .reloadList();
@@ -51,7 +58,7 @@ pandora.ui.deleteListDialog = function(list) {
                 .append(
                     $('<div>')
                         .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
-                        .html('Are you sure you want to delete the list "' + listData.name + '"?')
+                        .html('Are you sure you want to delete the ' + folderItem.toLowerCase() + ' "' + listData.name + '"?')
                 ),
             height: 128,
             keys: {enter: 'delete', escape: 'keep'},

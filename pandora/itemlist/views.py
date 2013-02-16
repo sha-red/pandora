@@ -207,7 +207,9 @@ def addList(request):
         return {
             status: {'code': int, 'text': string},
             data: {
-                list:
+                id:
+                name:
+                ...
             }
         }
     '''

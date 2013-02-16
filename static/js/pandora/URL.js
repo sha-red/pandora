@@ -16,17 +16,18 @@ pandora.URL = (function() {
 
         var state = {};
 
-        state.type = pandora.site.itemsSection;
+        state.type = pandora.user.ui.section == 'items' ? pandora.site.itemsSection : pandora.user.ui.section;
+        state.item = pandora.user.ui[pandora.user.ui.section.slice(0, -1)];
 
-        state.item = pandora.user.ui.item;
-
-        if (!pandora.user.ui.item) {
-            state.view = pandora.user.ui.listView;
-            state.sort = pandora.user.ui.listSort;
-            state.find = pandora.user.ui.find;
-        } else {
-            state.view = pandora.user.ui.itemView;
-            state.sort = pandora.user.ui.itemSort;
+        if(pandora.user.ui.section == 'items') {
+            if (!pandora.user.ui.item) {
+                state.view = pandora.user.ui.listView;
+                state.sort = pandora.user.ui.listSort;
+                state.find = pandora.user.ui.find;
+            } else {
+                state.view = pandora.user.ui.itemView;
+                state.sort = pandora.user.ui.itemSort;
+            }
         }
 
         if (state.view == 'map') {
@@ -79,56 +80,58 @@ pandora.URL = (function() {
 
             var set = {
                 section: state.type == pandora.site.itemsSection ? 'items' : state.type,
-                item: state.item,
                 page: ''
             };
+            set[set.section.slice(0, -1)] = state.item;
 
-            if (state.view) {
-                set[!state.item ? 'listView' : 'itemView'] = state.view;
-            }
-
-            if (state.span) {
-                if (['timeline', 'player', 'editor'].indexOf(state.view) > -1) {
-                    if (Ox.isArray(state.span)) {
-                        set['videoPoints.' + state.item] = {
-                            annotation: '',
-                            'in': state.span[state.span.length - 2] || 0,
-                            out: state.span.length == 1 ? 0 : Math.max(
-                                state.span[state.span.length - 2],
-                                state.span[state.span.length - 1]
-                            ),
-                            position: state.span[0]
-                        };                       
-                    } else {
-                        set['videoPoints.' + state.item + '.annotation'] = state.span;
-                    }
-                } else if (state.view == 'map') {
-                    // fixme: this doesn't handle map coordinates
-                    if (state.span[0] != '@') {
-                        //pandora.user.ui.mapSelection = state.span;
-                        set['mapSelection'] = state.span;
-                        set['mapFind'] = '';
-                    } else {
-                        //pandora.user.ui.mapFind = state.span.slice(1);
-                        set['mapFind'] = state.span.slice(1);
-                        set['mapSelection'] = '';
-                    }
-                } else if (state.view == 'calendar') {
-                    // ...
+            if (set.section == 'items') {
+                if (state.view) {
+                    set[!state.item ? 'listView' : 'itemView'] = state.view;
                 }
-            }
 
-            if (state.sort) {
-                set[!state.item ? 'listSort' : 'itemSort'] = state.sort;
-            }
+                if (state.span) {
+                    if (['timeline', 'player', 'editor'].indexOf(state.view) > -1) {
+                        if (Ox.isArray(state.span)) {
+                            set['videoPoints.' + state.item] = {
+                                annotation: '',
+                                'in': state.span[state.span.length - 2] || 0,
+                                out: state.span.length == 1 ? 0 : Math.max(
+                                    state.span[state.span.length - 2],
+                                    state.span[state.span.length - 1]
+                                ),
+                                position: state.span[0]
+                            };                       
+                        } else {
+                            set['videoPoints.' + state.item + '.annotation'] = state.span;
+                        }
+                    } else if (state.view == 'map') {
+                        // fixme: this doesn't handle map coordinates
+                        if (state.span[0] != '@') {
+                            //pandora.user.ui.mapSelection = state.span;
+                            set['mapSelection'] = state.span;
+                            set['mapFind'] = '';
+                        } else {
+                            //pandora.user.ui.mapFind = state.span.slice(1);
+                            set['mapFind'] = state.span.slice(1);
+                            set['mapSelection'] = '';
+                        }
+                    } else if (state.view == 'calendar') {
+                        // ...
+                    }
+                }
 
-            if (!state.item) {
-                if (state.find) {
-                    set.find = state.find;
-                } else if (!pandora.$ui.appPanel) {
-                    // when loading results without find, clear find, so that
-                    // removing a query and reloading works as expected
-                    set.find = pandora.site.user.ui.find;
+                if (state.sort) {
+                    set[!state.item ? 'listSort' : 'itemSort'] = state.sort;
+                }
+
+                if (!state.item) {
+                    if (state.find) {
+                        set.find = state.find;
+                    } else if (!pandora.$ui.appPanel) {
+                        // when loading results without find, clear find, so that
+                        // removing a query and reloading works as expected
+                        set.find = pandora.site.user.ui.find;
+                    }
                 }
             }
 
@@ -246,6 +249,19 @@ pandora.URL = (function() {
                 calendar: 'date'
             }
         };
+        //Text
+        views['texts'] = {
+            list: [],
+            item: ['text']
+        }
+        spanType['texts'] = {
+            list: [],
+            item: {}
+        }
+        sortKeys['texts'] = {
+            list: {},
+            item: {}
+        }
 
         findKeys = [{id: 'list', type: 'string'}].concat(pandora.site.itemKeys);
 

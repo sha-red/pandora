@@ -1,7 +1,10 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
 pandora.ui.folderBrowserBar = function(id) {
-    var that = Ox.Bar({
+    var ui = pandora.user.ui,
+        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
+        folderItem = folderItems.slice(0, -1),
+        that = Ox.Bar({
             size: 24
         });
     pandora.$ui.findListElement[id] = Ox.FormElementGroup({
@@ -9,7 +12,7 @@ pandora.ui.folderBrowserBar = function(id) {
                 pandora.$ui.findListSelect[id] = Ox.Select({
                         items: [
                             {id: 'user', title: 'Find: User'},
-                            {id: 'name', title: 'Find: List'}
+                            {id: 'name', title: 'Find: ' + folderItem}
                         ],
                         overlap: 'right',
                         type: 'image'
@@ -56,7 +59,7 @@ pandora.ui.folderBrowserBar = function(id) {
                     {key: 'status', value: 'private', operator: '!='},
                     {key: key, value: value, operator: '='}
                 ], operator: '&'};
-                return pandora.api.findLists(Ox.extend(data, {
+                return pandora.api['find' + folderItems](Ox.extend(data, {
                     query: query
                 }), callback);
             }

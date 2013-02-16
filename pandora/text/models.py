@@ -2,40 +2,158 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
 from datetime import datetime
+import os
+import subprocess
+from glob import glob
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
+import ox
+from ox.django.fields import DictField, TupleField
+
+from archive import extract
+
+import managers
 
 
 class Text(models.Model):
+
+    class Meta:
+        unique_together = ("user", "name")
+
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    published = models.DateTimeField(default=datetime.now, editable=False)
-    public = models.BooleanField(default=False)
+    user = models.ForeignKey(User, related_name='texts')
+    name = models.CharField(max_length=255)
+    status = models.CharField(max_length=20, default='private')
+    _status = ['private', 'public', 'featured']
+    type = models.CharField(max_length=255, default='html')
+    description = models.TextField(default='')
 
-    user = models.ForeignKey(User)
-    slug = models.SlugField()
-    title = models.CharField(null=True, max_length=1000)
-    text = models.TextField(default='')
+    icon = models.ImageField(default=None, blank=True,
+                             upload_to=lambda i, x: i.path("icon.jpg"))
+
+    text = models.TextField(default="")
+    links = DictField(default={}, editable=True)
+
+    poster_frames = TupleField(default=[], editable=False)
+    subscribed_users = models.ManyToManyField(User, related_name='subscribed_texts')
+
+    objects = managers.TextManager()
+
+    def save(self, *args, **kwargs):
+        super(Text, self).save(*args, **kwargs)
 
     def __unicode__(self):
-        return u"%s <%s>" % (self.title, self.slug)
+        return self.get_id()
 
-    def get_absolute_url(self):
-        return '/text/%s' % self.slug
+    def get_id(self):
+        return u'%s:%s' % (self.user.username, self.name)
 
+    def accessible(self, user):
+        return self.user == user or self.status in ('public', 'featured')
 
-class Image(models.Model):
-    image = models.ImageField(upload_to='text/image')
-    caption = models.CharField(max_length=255, default="")
+    def editable(self, user):
+        if user.is_anonymous():
+            return False
+        if self.user == user or \
+           user.is_staff or \
+           user.get_profile().capability('canEditFeaturedTexts') == True:
+            return True
+        return False
 
-    def get_absolute_url(self):
-        return self.image.url
+    def json(self, keys=None, user=None):
+        if not keys:
+             keys=['id', 'name', 'user', 'status', 'subscribed', 'posterFrames', 'description', 'text', 'type', 'links']
+        response = {}
+        _map = {
+            'posterFrames': 'poster_frames'
+        }
+        for key in keys:
+            if key == 'id':
+                response[key] = self.get_id()
+            elif key == 'user':
+                response[key] = self.user.username
+            elif key == 'subscribers':
+                response[key] = self.subscribed_users.all().count()
+            elif key == 'subscribed':
+                if user and not user.is_anonymous():
+                    response[key] = self.subscribed_users.filter(id=user.id).exists()
+            elif hasattr(self, _map.get(key, key)):
+                response[key] = getattr(self, _map.get(key,key))
+        return response
 
+    def path(self, name=''):
+        h = "%07d" % self.id
+        return os.path.join('texts', h[:2], h[2:4], h[4:6], h[6:], name)
 
-class Attachment(models.Model):
-    file = models.FileField(upload_to='text/attachment')
-    caption = models.CharField(max_length=255, default="")
+    def update_icon(self):
+        frames = []
+        if not self.poster_frames:
+            items = self.get_items(self.user).filter(rendered=True)
+            if items.count():
+                poster_frames = []
+                for i in range(0, items.count(), max(1, int(items.count()/4))):
+                    poster_frames.append({
+                        'item': items[int(i)].itemId,
+                        'position': items[int(i)].poster_frame
+                    })
+                self.poster_frames = tuple(poster_frames)
+                self.save()
+        for i in self.poster_frames:
+            from item.models import Item
+            qs = Item.objects.filter(itemId=i['item'])
+            if qs.count() > 0:
+                frame = qs[0].frame(i['position'])
+                if frame:
+                    frames.append(frame)
+        self.icon.name = self.path('icon.jpg')
+        icon = self.icon.path
+        if frames:
+            while len(frames) < 4:
+                frames += frames
+            folder = os.path.dirname(icon)
+            ox.makedirs(folder)
+            for f in glob("%s/icon*.jpg" % folder):
+                os.unlink(f)
+            cmd = [
+                settings.LIST_ICON,
+                '-f', ','.join(frames),
+                '-o', icon
+            ]
+            p = subprocess.Popen(cmd)
+            p.wait()
+            self.save()
 
-    def get_absolute_url(self):
-        return self.file.url
+    def get_icon(self, size=16):
+        path = self.path('icon%d.jpg' % size)
+        path = os.path.join(settings.MEDIA_ROOT, path)
+        if not os.path.exists(path):
+            folder = os.path.dirname(path)
+            ox.makedirs(folder)
+            if self.icon and os.path.exists(self.icon.path):
+                source = self.icon.path
+                max_size = min(self.icon.width, self.icon.height)
+            else:
+                source = os.path.join(settings.STATIC_ROOT, 'jpg/list256.jpg')
+                max_size = 256
+            if size < max_size:
+                extract.resize_image(source, path, size=size)
+            else:
+                path = source
+        return path
+
+class Position(models.Model):
+
+    class Meta:
+        unique_together = ("user", "text", "section")
+
+    text = models.ForeignKey(Text, related_name='position')
+    user = models.ForeignKey(User, related_name='text_position')
+    section = models.CharField(max_length='255')
+    position = models.IntegerField(default=0)
+
+    def __unicode__(self):
+        return u'%s/%s/%s' % (self.section, self.position, self.text)
+
