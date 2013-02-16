@@ -51,7 +51,12 @@ Ox.load('UI', {
                                     invertHighlight: options.invertHighlight,
                                     paused: options.paused,
                                     playInToOut: options.playInToOut,
-                                    poster: '/' + options.item + '/' + '96p' + data.posterFrame +'.jpg',
+                                    position: options.position || 0,
+                                    poster: '/' + options.item + '/' + '96p' + (
+                                        options.position !== void 0 ? options.position
+                                        : options['in'] !== void 0 ? options['in']
+                                        : data.posterFrame
+                                    ) +'.jpg',
                                     resolution: pandora.user.ui.videoResolution,
                                     showMarkers: false,
                                     showMilliseconds: 0,
@@ -66,8 +71,6 @@ Ox.load('UI', {
                                     width: window.innerWidth
                                 }, options['in'] ? {
                                     'in': options['in'],
-                                    position: options['in'],
-                                    poster: '/' + options.item + '/' + '96p' + options['in'] +'.jpg',
                                 } : {}, options.out ? {
                                     out: options.out
                                 } : {}))
@@ -284,6 +287,9 @@ Ox.load('UI', {
             }
         });
         options = Ox.extend({}, defaults, query);
+        if (!options.position) {
+            options.position = options['in'] || 0;
+        }
         if (!options['in'] && !options.out) {
             options.playInToOut = false;
         }
