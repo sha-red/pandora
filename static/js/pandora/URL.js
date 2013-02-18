@@ -137,11 +137,7 @@ pandora.URL = (function() {
 
             if (state.hash && state.hash.query) {
                 state.hash.query.forEach(function(kv) {
-                    try {
-                        set[kv.key] = JSON.parse(kv.value);
-                    } catch(e) {
-                        set[kv.key] = kv.value;
-                    }
+                    set[kv.key] = kv.value;
                 });
             }
 
