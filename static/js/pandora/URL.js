@@ -64,6 +64,8 @@ pandora.URL = (function() {
 
     function setState(state, callback) {
 
+        var set = {};
+
         Ox.Log('URL', 'setState:', state);
 
         pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
@@ -77,107 +79,115 @@ pandora.URL = (function() {
             }
             callback && callback();
 
-        } else if (state.page) {
-
-            pandora.UI.set(state);
-            callback && callback();
-
         } else {
-
-            var set = {page: ''};
-            if (state.type) {
-                set.section = state.type == pandora.site.itemsSection ? 'items' : state.type
-                set[set.section.slice(0, -1)] = state.item;
-            }
-
-            if (set.section == 'items') {
-                if (state.view) {
-                    set[!state.item ? 'listView' : 'itemView'] = state.view;
-                }
-
-                if (state.span) {
-                    if (['timeline', 'player', 'editor'].indexOf(state.view) > -1) {
-                        if (Ox.isArray(state.span)) {
-                            set['videoPoints.' + state.item] = {
-                                annotation: '',
-                                'in': state.span[state.span.length - 2] || 0,
-                                out: state.span.length == 1 ? 0 : Math.max(
-                                    state.span[state.span.length - 2],
-                                    state.span[state.span.length - 1]
-                                ),
-                                position: state.span[0]
-                            };                       
-                        } else {
-                            set['videoPoints.' + state.item + '.annotation'] = state.span;
-                        }
-                    } else if (state.view == 'map') {
-                        // fixme: this doesn't handle map coordinates
-                        if (state.span[0] != '@') {
-                            //pandora.user.ui.mapSelection = state.span;
-                            set['mapSelection'] = state.span;
-                            set['mapFind'] = '';
-                        } else {
-                            //pandora.user.ui.mapFind = state.span.slice(1);
-                            set['mapFind'] = state.span.slice(1);
-                            set['mapSelection'] = '';
-                        }
-                    } else if (state.view == 'calendar') {
-                        // ...
-                    }
-                }
-
-                if (state.sort) {
-                    set[!state.item ? 'listSort' : 'itemSort'] = state.sort;
-                }
-
-                if (!state.item) {
-                    if (state.find) {
-                        set.find = state.find;
-                    } else if (!pandora.$ui.appPanel) {
-                        // when loading results without find, clear find, so that
-                        // removing a query and reloading works as expected
-                        set.find = pandora.site.user.ui.find;
-                    }
-                }
-            }
 
             if (state.hash) {
                 set.hash = state.hash;
                 if (state.hash.query) {
                     if (state.hash.query.embed === true) {
-                    
+                        // ...
                     } else {
                         state.hash.query.forEach(function(kv) {
                             set[kv.key] = kv.value;
                         });
                     }
                 }
+            } else {
+                set.hash = {};
             }
 
-            Ox.Request.cancel();
-            $('video').each(function() {
-                $(this).trigger('stop');
-            });
+            if (state.page) {
 
-            Ox.Log('URL', 'UI.set', set)
-            if (!pandora.$ui.appPanel && state.item && pandora.user.ui.find) {
-                // on page load, if item is set and there was a query,
-                // we have to check if the item actually matches the query,
-                // and otherwise reset find
-                pandora.api.find({
-                    query: pandora.user.ui.find,
-                    positions: [state.item],
-                    sort: [{key: 'id', operator: ''}]
-                }, function(result) {
-                    if (Ox.isUndefined(result.data.positions[state.item])) {
-                        set.find = pandora.site.user.ui.find
-                    }
-                    pandora.UI.set(set);
-                    callback && callback();
-                });
-            } else {
+                set.page = state.page;
                 pandora.UI.set(set);
                 callback && callback();
+
+            } else {
+
+                set.page = '';
+
+                if (state.type) {
+                    set.section = state.type == pandora.site.itemsSection ? 'items' : state.type
+                    set[set.section.slice(0, -1)] = state.item;
+                }
+
+                if (set.section == 'items') {
+                    if (state.view) {
+                        set[!state.item ? 'listView' : 'itemView'] = state.view;
+                    }
+
+                    if (state.span) {
+                        if (['timeline', 'player', 'editor'].indexOf(state.view) > -1) {
+                            if (Ox.isArray(state.span)) {
+                                set['videoPoints.' + state.item] = {
+                                    annotation: '',
+                                    'in': state.span[state.span.length - 2] || 0,
+                                    out: state.span.length == 1 ? 0 : Math.max(
+                                        state.span[state.span.length - 2],
+                                        state.span[state.span.length - 1]
+                                    ),
+                                    position: state.span[0]
+                                };                       
+                            } else {
+                                set['videoPoints.' + state.item + '.annotation'] = state.span;
+                            }
+                        } else if (state.view == 'map') {
+                            // fixme: this doesn't handle map coordinates
+                            if (state.span[0] != '@') {
+                                //pandora.user.ui.mapSelection = state.span;
+                                set['mapSelection'] = state.span;
+                                set['mapFind'] = '';
+                            } else {
+                                //pandora.user.ui.mapFind = state.span.slice(1);
+                                set['mapFind'] = state.span.slice(1);
+                                set['mapSelection'] = '';
+                            }
+                        } else if (state.view == 'calendar') {
+                            // ...
+                        }
+                    }
+
+                    if (state.sort) {
+                        set[!state.item ? 'listSort' : 'itemSort'] = state.sort;
+                    }
+
+                    if (!state.item) {
+                        if (state.find) {
+                            set.find = state.find;
+                        } else if (!pandora.$ui.appPanel) {
+                            // when loading results without find, clear find, so that
+                            // removing a query and reloading works as expected
+                            set.find = pandora.site.user.ui.find;
+                        }
+                    }
+                }
+
+                Ox.Request.cancel();
+                $('video').each(function() {
+                    $(this).trigger('stop');
+                });
+
+                Ox.Log('URL', 'UI.set', set)
+                if (!pandora.$ui.appPanel && state.item && pandora.user.ui.find) {
+                    // on page load, if item is set and there was a query,
+                    // we have to check if the item actually matches the query,
+                    // and otherwise reset find
+                    pandora.api.find({
+                        query: pandora.user.ui.find,
+                        positions: [state.item],
+                        sort: [{key: 'id', operator: ''}]
+                    }, function(result) {
+                        if (Ox.isUndefined(result.data.positions[state.item])) {
+                            set.find = pandora.site.user.ui.find
+                        }
+                        pandora.UI.set(set);
+                        callback && callback();
+                    });
+                } else {
+                    pandora.UI.set(set);
+                    callback && callback();
+                }
+
             }
 
         }
