@@ -83,9 +83,9 @@ def getText(request):
         if qs.count() == 0:
             text = models.Text()
             text.name = ''
-            text.text = 'Please put something here'
+            text.text = ''
+            text.status = 'public'
             text.user = request.user
-            text.save()
         else:
             text = qs[0]
     else:
