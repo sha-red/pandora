@@ -10,45 +10,51 @@ pandora.URL = (function() {
 
         Ox.Log('URL', 'getState:, UI', pandora.user.ui)
 
-        if (pandora.user.ui.page) {
-            return {page: pandora.user.ui.page};
-        }
-
         var state = {};
 
-        state.type = pandora.user.ui.section == 'items' ? pandora.site.itemsSection : pandora.user.ui.section;
-        state.item = pandora.user.ui[pandora.user.ui.section.slice(0, -1)];
+        if (pandora.user.ui.page) {
 
-        if (pandora.user.ui.section == 'items') {
-            if (!pandora.user.ui.item) {
-                state.view = pandora.user.ui.listView;
-                state.sort = pandora.user.ui.listSort;
-                state.find = pandora.user.ui.find;
-            } else {
-                state.view = pandora.user.ui.itemView;
-                state.sort = pandora.user.ui.itemSort;
+            state.page = pandora.user.ui.page;
+
+        } else {
+
+            state.type = pandora.user.ui.section == 'items' ? pandora.site.itemsSection : pandora.user.ui.section;
+            state.item = pandora.user.ui[pandora.user.ui.section.slice(0, -1)];
+
+            if (pandora.user.ui.section == 'items') {
+                if (!pandora.user.ui.item) {
+                    state.view = pandora.user.ui.listView;
+                    state.sort = pandora.user.ui.listSort;
+                    state.find = pandora.user.ui.find;
+                } else {
+                    state.view = pandora.user.ui.itemView;
+                    state.sort = pandora.user.ui.itemSort;
+                }
             }
+
+            if (state.view == 'map') {
+                state.span = pandora.user.ui.mapFind
+                    ? '@' + pandora.user.ui.mapFind
+                    : pandora.user.ui.mapSelection
+                    ? '@' + pandora.user.ui.mapSelection
+                    : '';
+            } else if (state.view == 'calendar') {
+                // ...
+            } else if (['timeline', 'player', 'editor'].indexOf(state.view) > -1) {
+                var videoPoints = pandora.user.ui.videoPoints[state.item] || {};
+                state.span = videoPoints.annotation || [].concat(
+                    videoPoints.position
+                        ? videoPoints.position
+                        : [],
+                    videoPoints['in'] || videoPoints.out
+                        ? [videoPoints['in'], videoPoints.out]
+                        : []
+                );
+            }
+            
         }
 
-        if (state.view == 'map') {
-            state.span = pandora.user.ui.mapFind
-                ? '@' + pandora.user.ui.mapFind
-                : pandora.user.ui.mapSelection
-                ? '@' + pandora.user.ui.mapSelection
-                : '';
-        } else if (state.view == 'calendar') {
-            // ...
-        } else if (['timeline', 'player', 'editor'].indexOf(state.view) > -1) {
-            var videoPoints = pandora.user.ui.videoPoints[state.item] || {};
-            state.span = videoPoints.annotation || [].concat(
-                videoPoints.position
-                    ? videoPoints.position
-                    : [],
-                videoPoints['in'] || videoPoints.out
-                    ? [videoPoints['in'], videoPoints.out]
-                    : []
-            );
-        }
+        state.hash = pandora.user.ui.hash;
 
         Ox.Log('', 'URL', 'STATE ...', state)
 
@@ -135,10 +141,17 @@ pandora.URL = (function() {
                 }
             }
 
-            if (state.hash && state.hash.query) {
-                state.hash.query.forEach(function(kv) {
-                    set[kv.key] = kv.value;
-                });
+            if (state.hash) {
+                set.hash = state.hash;
+                if (state.hash.query) {
+                    if (state.hash.query.embed === true) {
+                    
+                    } else {
+                        state.hash.query.forEach(function(kv) {
+                            set[kv.key] = kv.value;
+                        });
+                    }
+                }
             }
 
             Ox.Request.cancel();
@@ -367,7 +380,7 @@ pandora.URL = (function() {
     };
 
     that.update = function(keys) {
-        Ox.Log('', 'update.........', keys)
+        Ox.Log('URL', 'update.........', keys)
         // this gets called from pandora.UI
         var action, state;
         if (!keys) {
