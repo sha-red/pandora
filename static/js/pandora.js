@@ -42,18 +42,12 @@ appPanel
 
     theme = legacyThemes[theme] || theme;
 
-    if (isEmbed) {
+    loadImages(function(images) {
+        loadScreen(images);
         loadOxJS(function() {
             loadOxUI(loadPandora);
         });
-    } else {
-        loadImages(function(images) {
-            loadScreen(images);
-            loadOxJS(function() {
-                loadOxUI(loadPandora);
-            });
-        });
-    }
+    });
 
     function loadImages(callback) {
         // Opera doesn't fire onload for SVGs,
@@ -171,7 +165,7 @@ appPanel
 
     function loadOxUI(callback) {
         Ox.load({
-            UI: {theme: theme, showScreen: isEmbed, hideScreen: isEmbed},
+            UI: {theme: theme},
             Geo: {}
         }, callback);
     }
@@ -316,26 +310,29 @@ appPanel
             }
 
             Ox.Theme(pandora.user.ui.theme);
-            pandora.$ui.appPanel = pandora.ui.appPanel().display();
-            Ox.Request.requests() && pandora.$ui.loadingIcon.start();
-            pandora.$ui.body.ajaxStart(pandora.$ui.loadingIcon.start);
-            pandora.$ui.body.ajaxStop(pandora.$ui.loadingIcon.stop);
-            Ox.Request.bindEvent({
-                error: pandora.ui.errorDialog,
-                request: function(data) {
-                    pandora.$ui.loadingIcon.options({
-                        tooltip: (data.requests || 'No')
-                            + ' request'
-                            + (data.requests == 1 ? '' : 's')
-                    });
+            if (isEmbed) {
+                pandora.$ui.embedPanel = pandora.ui.embedPanel().display();
+            } else {
+                pandora.$ui.appPanel = pandora.ui.appPanel().display();
+                Ox.Request.requests() && pandora.$ui.loadingIcon.start();
+                pandora.$ui.body.ajaxStart(pandora.$ui.loadingIcon.start);
+                pandora.$ui.body.ajaxStop(pandora.$ui.loadingIcon.stop);
+                Ox.Request.bindEvent({
+                    error: pandora.ui.errorDialog,
+                    request: function(data) {
+                        pandora.$ui.loadingIcon.options({
+                            tooltip: (data.requests || 'No')
+                                + ' request'
+                                + (data.requests == 1 ? '' : 's')
+                        });
+                    }
+                });
+                pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
+                if (localStorage && localStorage['pandora.onload']) {
+                    try {
+                        eval(localStorage['pandora.onload'])
+                    } catch(e) {}
                 }
-            });
-            pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
-
-            if (localStorage && localStorage['pandora.onload']) {
-                try {
-                    eval(localStorage['pandora.onload'])
-                } catch(e) {}
             }
 
         });
