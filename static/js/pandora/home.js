@@ -223,7 +223,11 @@ pandora.ui.home = function() {
             })
             .appendTo(that),
         $text = $('<div>')
-            .html('pan.do/ra. \u2620 2007-2012 0x2620. All Open Source.')
+            .html(
+                'pan.do/ra. \u2620 2007-'
+                + Ox.formatDate(new Date(), '%Y')
+                + ' 0x2620. All Open Source.'
+            )
             .css({
                 position: 'absolute',
                 left: 0,
