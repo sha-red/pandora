@@ -20,6 +20,7 @@ appPanel
 */
 
 (function() {
+
     window.onerror = function(error, url, line) {
         try {
             !isMSIE && pandora.api.log({
