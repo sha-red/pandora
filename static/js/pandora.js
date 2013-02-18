@@ -34,6 +34,7 @@ appPanel
     var animationInterval,
         enableDebugMode = localStorage && localStorage['pandora.enableDebugMode'],
         enableEventLogging = localStorage && localStorage['pandora.enableEventLogging'],
+        isEmbed = /embed=true/.test(document.location.hash),
         isMSIE = /MSIE/.test(navigator.userAgent),
         legacyThemes = {classic: 'oxlight', modern: 'oxdark'},
         theme = localStorage && localStorage['Ox.theme']
@@ -41,12 +42,18 @@ appPanel
 
     theme = legacyThemes[theme] || theme;
 
-    loadImages(function(images) {
-        loadScreen(images);
+    if (isEmbed) {
         loadOxJS(function() {
             loadOxUI(loadPandora);
         });
-    });
+    } else {
+        loadImages(function(images) {
+            loadScreen(images);
+            loadOxJS(function() {
+                loadOxUI(loadPandora);
+            });
+        });
+    }
 
     function loadImages(callback) {
         // Opera doesn't fire onload for SVGs,
@@ -164,7 +171,7 @@ appPanel
 
     function loadOxUI(callback) {
         Ox.load({
-            UI: {theme: theme},
+            UI: {theme: theme, showScreen: isEmbed, hideScreen: isEmbed},
             Geo: {}
         }, callback);
     }
