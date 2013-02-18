@@ -81,6 +81,7 @@
         {"id": "genre", "title": "Genre", "type": "string"},
         {"id": "writer", "title": "Writer", "type": "string"},
         {"id": "producer", "title": "Producer", "type": "string"},
+        {"id": "productioncompany", "title": "Production Company", "type": "string"},
         {"id": "cinematographer", "title": "Cinematographer", "type": "string"},
         {"id": "editor", "title": "Editor", "type": "string"},
         {"id": "actor", "title": "Actor", "type": "string"},
@@ -194,6 +195,17 @@
         {
             "id": "producer",
             "title": "Producer",
+            "type": ["string"],
+            "autocomplete": true,
+            "columnWidth": 180,
+            "filter": true,
+            "find": true,
+            "sort": true,
+            "sortType": "person"
+        },
+        {
+            "id": "productioncompany",
+            "title": "Production Company",
             "type": ["string"],
             "autocomplete": true,
             "columnWidth": 180,
@@ -712,7 +724,7 @@
             },
             "filters": [
                 {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
-                {"id": "producer", "sort": [{"key": "items", "operator": "-"}]},
+                {"id": "productioncompany", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "year", "sort": [{"key": "name", "operator": "-"}]},
                 {"id": "language", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "genre", "sort": [{"key": "items", "operator": "-"}]}
