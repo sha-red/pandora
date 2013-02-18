@@ -78,11 +78,11 @@ pandora.URL = (function() {
 
         } else {
 
-            var set = {
-                section: state.type == pandora.site.itemsSection ? 'items' : state.type,
-                page: ''
-            };
-            set[set.section.slice(0, -1)] = state.item;
+            var set = {page: ''};
+            if (state.type) {
+                set.section = state.type == pandora.site.itemsSection ? 'items' : state.type
+                set[set.section.slice(0, -1)] = state.item;
+            }
 
             if (set.section == 'items') {
                 if (state.view) {
