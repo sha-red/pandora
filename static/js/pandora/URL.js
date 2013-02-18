@@ -19,7 +19,7 @@ pandora.URL = (function() {
         state.type = pandora.user.ui.section == 'items' ? pandora.site.itemsSection : pandora.user.ui.section;
         state.item = pandora.user.ui[pandora.user.ui.section.slice(0, -1)];
 
-        if(pandora.user.ui.section == 'items') {
+        if (pandora.user.ui.section == 'items') {
             if (!pandora.user.ui.item) {
                 state.view = pandora.user.ui.listView;
                 state.sort = pandora.user.ui.listSort;
@@ -282,6 +282,7 @@ pandora.URL = (function() {
             Ox.Request.cancel();
             that.parse();
         };
+
         window.onpopstate = function(e) {
             Ox.Request.cancel();
             self.isPopState = true;
