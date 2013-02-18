@@ -655,18 +655,18 @@
     ],
     "sendReferrer": false,
     "site": {
-        "description": "indiancine.ma proposes is an entirely new approach to visualizing and navigating moving images, and we hope that it can serve as a point of reference for individuals and institutions who are dealing with large collections of films.",
+        "description": "Indiancine.ma proposes is an entirely new approach to visualizing and navigating moving images, and we hope that it can serve as a point of reference for individuals and institutions who are dealing with large collections of films.",
         // FIXME: "from" and "to" would be more intuitive as keys here
         "email": {
             // E-mail address in contact form (to)
             "contact": "contact@indiancine.ma",
             "footer": "-- \nIndian Cinema - https://indiancine.ma",
-            "prefix": "indiancine.ma newsletter -",
+            "prefix": "Indiancine.ma News -",
             // E-mail address uses by the system (from)
             "system": "system@indiancine.ma"
         },
         "id": "indiancinema",
-        "name": "indiancine.ma",
+        "name": "Indiancine.ma",
         "url": "indiancine.ma",
         "videoprefix": ""
     },
