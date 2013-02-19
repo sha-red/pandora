@@ -4,9 +4,8 @@ local_settings.py
 ./include
 ./src
 ./bin
-static/json/pandora.json
-static/js/pandora.min.js
-static/png/*.png
+./static/json/pandora.json
+./static/js/pandora.min.js
 config.jsonc
 ./local
 ./static/js/pandora.min.js.gz
@@ -17,3 +16,5 @@ config.jsonc
 ./scripts/poster.py
 ./scripts/list_icon.py
 ./scripts/item_icon.py
+./static/png/icon.png
+./static/png/logo.png
