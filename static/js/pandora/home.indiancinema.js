@@ -83,7 +83,13 @@ pandora.ui.home = function() {
                 right: 0,
                 width: '160px',
                 height: '20px',
-                margin: '0 auto 0 auto'
+                margin: '0 auto 0 auto',
+                opacity: 0
+            })
+            .one({
+                load: function() {
+                    $line.animate({opacity: 1}, 250);
+                }
             })
             .appendTo($box),
         $findInput = Ox.Input({
