@@ -33,7 +33,7 @@
         "canEditFeaturedEdits": {"student": true, "staff": true, "admin": true},
         "canEditFeaturedLists": {"student": true, "staff": true, "admin": true},
         "canEditFeaturedTexts": {"student": true, "staff": true, "admin": true},
-        "canEditMetadata": {"student", true, "staff": true, "admin": true},
+        "canEditMetadata": {"student": true, "staff": true, "admin": true},
         "canEditPlaces": {"student": true, "staff": true, "admin": true},
         "canEditSitePages": {"staff": true, "admin": true},
         "canEditUsers": {"staff": true, "admin": true},
