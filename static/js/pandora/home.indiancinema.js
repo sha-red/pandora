@@ -12,17 +12,17 @@ pandora.ui.home = function() {
                 width: '100%',
                 height: '100%',
                 opacity: 0,
+                overflowY: 'auto',
                 zIndex: 1001
             }),
         $box = $('<div>')
             .css({
                 position: 'absolute',
                 left: 0,
-                top: 0,
+                top: '80px',
                 right: 0,
-                bottom: 0,
                 width: '560px',
-                margin: window.innerHeight / 2 - 80 + 'px auto 0 auto'
+                margin: '0 auto 0 auto'
             })
             .appendTo(that),
         $reflectionImage = $('<img>')
@@ -30,7 +30,7 @@ pandora.ui.home = function() {
             .css({
                 position: 'absolute',
                 left: 0,
-                top: '80px',
+                top: '40px',
                 right: 0,
                 bottom: 0,
                 width: '320px',
@@ -45,14 +45,17 @@ pandora.ui.home = function() {
             .css({
                 position: 'absolute',
                 left: 0,
-                top: '80px',
+                top: '40px',
                 right: 0,
                 width: '320px',
-                height: '80px',
+                height: '40px',
                 margin: '0 auto 0 auto',
             })
             .appendTo($box),
-        $logo = $('<img>')
+        $logo = Ox.Element({
+                element: '<img>',
+                tooltip: 'Enter ' + pandora.site.site.name
+            })
             .attr({
                 id: 'logo',
                 src: '/static/png/logo.png'
@@ -61,7 +64,8 @@ pandora.ui.home = function() {
                 position: 'absolute',
                 left: 0,
                 right: 0,
-                width: '640px',
+                top: 0,
+                width: '320px',
                 margin: '0 auto 0 auto',
                 cursor: 'pointer'
             })
@@ -69,6 +73,18 @@ pandora.ui.home = function() {
                 click: function() {
                     $browseButton.triggerEvent('click');
                 }
+            })
+            .appendTo($box),
+        $line = $('<img>')
+            .attr({src: '/static/png/line.indiancinema.png'})
+            .css({
+                position: 'absolute',
+                left: 0,
+                top: '56px',
+                right: 0,
+                width: '240px',
+                height: '30px',
+                margin: '0 auto 0 auto'
             })
             .appendTo($box),
         $findInput = Ox.Input({
@@ -267,7 +283,8 @@ pandora.ui.home = function() {
                 $label, $icon, $text,
                 $listsBox, $listsContainer, $listsContent,
                 $listBox = [], $listIcon = [],
-                $previousButton, $nextButton;
+                $previousButton, $nextButton,
+                $space;
             $lists.empty();
             if (lists.length) {
                 $label = Ox.Label({
@@ -493,6 +510,16 @@ pandora.ui.home = function() {
                             .appendTo($listBox[i]);
                     });
                 }
+                $space = $('<div>')
+                    .css({
+                        position: 'absolute',
+                        top: lists.length == 0 ? '0px'
+                            : lists.length == 1 ? '150px'
+                            : '215px',
+                        width: '560px',
+                        height: '80px'
+                    })
+                    .appendTo($lists);
                 $lists.animate({opacity: 1}, 250);
             }
             function openList(i) {
@@ -570,7 +597,7 @@ pandora.ui.home = function() {
     }
 
     that.fadeInScreen = function() {
-        $box.css({marginTop: '80px'});
+        // $box.css({marginTop: '80px'});
         that.appendTo(Ox.UI.$body).animate({opacity: 1}, 500, function() {
             that.find('*').animate({opacity: 1}, 250, function() {
                 $findInput.focusInput(true);
@@ -591,7 +618,7 @@ pandora.ui.home = function() {
 
     that.showScreen = function(callback) {
         that.css({opacity: 1}).appendTo(Ox.UI.$body);
-        $box.css({marginTop: '80px'});
+        // $box.css({marginTop: '80px'});
         that.find('*').css({opacity: 1});
         $findInput.focusInput(true);
         showLists();
