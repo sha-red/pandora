@@ -744,7 +744,7 @@
             "listColumns": ["title", "director", "country", "year", "language", "runtime", "genre"],
             "listColumnWidth": {},
             "listSelection": [],
-            "listSort": [{"key": "director", "operator": "+"}],
+            "listSort": [{"key": "year", "operator": "+"}],
             "listView": "grid",
             "lists": {},
             "mapFind": "",
