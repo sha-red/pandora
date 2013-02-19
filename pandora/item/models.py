@@ -124,6 +124,8 @@ def get_item(info, user=None, async=False):
                         tasks.update_poster.delay(item.itemId)
     else:
         qs = Item.objects.filter(find__key='title', find__value__iexact=info['title'])
+        if 'year' in info:
+            qs = qs.filter(find__key='year', find__value__iexact=str(info['year']))
         if qs.count() == 1:
             item = qs[0]
         else:
