@@ -183,6 +183,17 @@
             "sort": true
         },
         {
+            "id": "productioncompany",
+            "title": "Studio",
+            "type": ["string"],
+            "autocomplete": true,
+            "columnWidth": 180,
+            "filter": true,
+            "find": true,
+            "sort": true,
+            "sortType": "person"
+        },
+        {
             "id": "writer",
             "title": "Writer",
             "type": ["string"],
@@ -196,17 +207,6 @@
         {
             "id": "producer",
             "title": "Producer",
-            "type": ["string"],
-            "autocomplete": true,
-            "columnWidth": 180,
-            "filter": true,
-            "find": true,
-            "sort": true,
-            "sortType": "person"
-        },
-        {
-            "id": "productioncompany",
-            "title": "Studio",
             "type": ["string"],
             "autocomplete": true,
             "columnWidth": 180,
@@ -728,7 +728,7 @@
                 {"id": "year", "sort": [{"key": "name", "operator": "+"}]},
                 {"id": "language", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "productioncompany", "sort": [{"key": "items", "operator": "-"}]},
-                {"id": "genre", "sort": [{"key": "items", "operator": "-"}]}
+                {"id": "actor", "sort": [{"key": "items", "operator": "-"}]}
             ],
             "filtersSize": 176,
             "find": {"conditions": [], "operator": "&"},
@@ -741,7 +741,7 @@
             "itemFind": "",
             "itemSort": [{"key": "position", "operator": "+"}],
             "itemView": "info",
-            "listColumns": ["title", "director", "country", "year", "language", "runtime", "genre"],
+            "listColumns": ["title", "director", "year", "language", "runtime", "productioncompany"],
             "listColumnWidth": {},
             "listSelection": [],
             "listSort": [{"key": "year", "operator": "+"}],
