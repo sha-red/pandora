@@ -25,13 +25,32 @@ pandora.ui.text = function() {
                 pandora.UI.set({text: ''});
             } else if (result.data.type == 'pdf') {
                 $text && $text.remove();
-                $text = Ox.Editable({
-                    clickLink: pandora.clickLink,
-                    editable: false,
-                    type: 'textarea',
-                    value: 'REPLACE ME WITH PDF VIEWER'
-                })
-                .appendTo(that);
+                $text = Ox.Element().appendTo(that);
+                if(result.data.available) {
+                    $text.append(
+                        $('<iframe>').attr({
+                            src: '/text/' + ui.text + '/text.pdf',
+                            frameBorder: 0
+                        }).css({
+                            width: '100%',
+                            height: '100%'
+                        })
+                    );
+                } else {
+                    Ox.FileButton({
+                        maxFiles: 1,
+                        title: 'Select PDF'
+                    }).bindEvent({
+                        click: function(data) {
+                            if(data.files.length) {
+                                pandora.$ui.uploadPDFDialog = pandora.ui.uploadPDFDialog({
+                                    file: data.files[0],
+                                    id: ui.text
+                                }).open();
+                            }
+                        }
+                    }).appendTo($text);
+                }
             } else {
                 var text = result.data ? result.data.text : '';
                 $text && $text.remove();

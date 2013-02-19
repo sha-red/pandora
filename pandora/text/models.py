@@ -41,12 +41,17 @@ class Text(models.Model):
     subscribed_users = models.ManyToManyField(User, related_name='subscribed_texts')
 
     objects = managers.TextManager()
+    uploading = models.BooleanField(default = False)
+    file = models.FileField(default=None, blank=True,null=True, upload_to=lambda f, x: f.path(x))
 
     def save(self, *args, **kwargs):
         super(Text, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return self.get_id()
+    
+    def get_absolute_url(self):
+        return '/texts/%s' % self.get_id()
 
     def get_id(self):
         return u'%s:%s' % (self.user.username, self.name)
@@ -82,6 +87,8 @@ class Text(models.Model):
                     response[key] = self.subscribed_users.filter(id=user.id).exists()
             elif hasattr(self, _map.get(key, key)):
                 response[key] = getattr(self, _map.get(key,key))
+        if self.type == 'pdf':
+            response['available'] = True if self.file and not self.uploading else False
         return response
 
     def path(self, name=''):
@@ -143,6 +150,23 @@ class Text(models.Model):
             else:
                 path = source
         return path
+
+    def save_chunk(self, chunk, chunk_id=-1, done=False):
+        if self.uploading:
+            if not self.file:
+                self.file.name = self.path('data.pdf')
+                ox.makedirs(os.path.dirname(self.file.path))
+                with open(self.file.path, 'w') as f:
+                    f.write(chunk.read())
+                self.save()
+            else:
+                with open(self.file.path, 'a') as f:
+                    f.write(chunk.read())
+            if done:
+                self.uploading = False
+                self.save()
+            return True
+        return False
 
 class Position(models.Model):
 

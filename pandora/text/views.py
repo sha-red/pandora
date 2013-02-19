@@ -10,6 +10,7 @@ from ox.django.api import actions
 from ox.django.decorators import login_required_json
 from ox.django.http import HttpFileResponse
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
+from django import forms
 from django.db.models import Count, Q, Sum, Max
 from django.conf import settings
 
@@ -451,3 +452,49 @@ def icon(request, id, size=16):
     else:
         icon = os.path.join(settings.STATIC_ROOT, 'jpg/list256.jpg')
     return HttpFileResponse(icon, content_type='image/jpeg')
+
+class ChunkForm(forms.Form):
+    chunk = forms.FileField()
+    chunkId = forms.IntegerField(required=False)
+    done = forms.IntegerField(required=False)
+
+def pdf(request, id):
+    text = get_text_or_404_json(id)
+    if text.type == 'pdf' and text.file and not text.uploading:
+        return HttpFileResponse(text.file.path, content_type='application/pdf')
+    response = json_response(status=404, text='file not found')
+
+@login_required_json
+def upload(request):
+    text = get_text_or_404_json(request.POST['id'])
+    if text.editable(request.user):
+        #post next chunk
+        if 'chunk' in request.FILES:
+            form = ChunkForm(request.POST, request.FILES)
+            if form.is_valid() and text.editable(request.user):
+                c = form.cleaned_data['chunk']
+                chunk_id = form.cleaned_data['chunkId']
+                response = {
+                    'result': 1,
+                    'resultUrl': request.build_absolute_uri(text.get_absolute_url())
+                }
+                if not text.save_chunk(c, chunk_id, form.cleaned_data['done']):
+                    response['result'] = -1
+                if form.cleaned_data['done']:
+                    response['done'] = 1
+                return render_to_json_response(response)
+        #init upload
+        else:
+            text.uploading = True
+            if text.file:
+                text.file.delete()
+            text.save()
+            return render_to_json_response({
+                'uploadUrl': request.build_absolute_uri('/api/upload/text'),
+                'url': request.build_absolute_uri(text.get_absolute_url()),
+                'result': 1
+            })
+    else:
+        response = json_response(status=404, text='permission denied')
+    response = json_response(status=400, text='this request requires POST')
+    return render_to_json_response(response)
