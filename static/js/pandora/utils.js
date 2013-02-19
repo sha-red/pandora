@@ -1132,7 +1132,7 @@ pandora.resizeFilters = function(width) {
         .size(2, pandora.user.ui.filterSizes[3]);
     pandora.$ui.filters && pandora.$ui.filters.forEach(function($list, i) {
         $list.resizeColumn('name', pandora.user.ui.filterSizes[i] - 44 - Ox.UI.SCROLLBAR_SIZE);
-        if (pandora.user.ui.showFlags) {
+        if (pandora.site.flags) {
             $list.find('.flagname').css({width: pandora.user.ui.filterSizes[i] - 68 - Ox.UI.SCROLLBAR_SIZE})
         }
     });

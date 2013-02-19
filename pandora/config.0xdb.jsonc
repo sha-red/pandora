@@ -86,6 +86,7 @@
         {"id": "actor", "title": "Actor", "type": "string"},
         {"id": "keyword", "title": "Keyword", "type": "string"}
     ],
+    "flags": true,
     /*
         An itemKey must have the following properties:
             id: The id of the key (as known by the server)
@@ -735,7 +736,6 @@
             "showBrowser": true,
             "showCalendarControls": true, // fixme: should be false
             "showFilters": true,
-            "showFlags": true, // fixme: this should be a site preference
             "showHome": true,
             "showIconBrowser": false,
             "showInfo": true,
