@@ -79,9 +79,9 @@
         {"id": "year", "title": "Year", "type": "integer"},
         {"id": "language", "title": "Language", "type": "string"},
         {"id": "genre", "title": "Genre", "type": "string"},
+        {"id": "productioncompany", "title": "Studio", "type": "string"},
         {"id": "writer", "title": "Writer", "type": "string"},
         {"id": "producer", "title": "Producer", "type": "string"},
-        {"id": "productioncompany", "title": "Studio", "type": "string"},
         {"id": "cinematographer", "title": "Cinematographer", "type": "string"},
         {"id": "editor", "title": "Editor", "type": "string"},
         {"id": "actor", "title": "Actor", "type": "string"},
@@ -183,6 +183,16 @@
             "sort": true
         },
         {
+            "id": "genre", 
+            "title": "Genre",
+            "type": ["string"],
+            "autocomplete": true,
+            "columnWidth": 120,
+            "filter": true,
+            "find": true,
+            "sort": true
+        },
+        {
             "id": "productioncompany",
             "title": "Studio",
             "type": ["string"],
@@ -273,16 +283,6 @@
             "id": "series",
             "title": "TV Series",
             "type": "boolean"
-        },
-        {
-            "id": "genre", 
-            "title": "Genre",
-            "type": ["string"],
-            "autocomplete": true,
-            "columnWidth": 120,
-            "filter": true,
-            "find": true,
-            "sort": true
         },
         {
             "id": "summary",
