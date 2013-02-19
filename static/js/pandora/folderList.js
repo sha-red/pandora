@@ -367,7 +367,7 @@ pandora.ui.folderList = function(id) {
             pandora.resizeFolders();
         },
         move: function(data) {
-            pandora.api['sort' + foldeItem]({
+            pandora.api['sort' + folderItems]({
                 section: id,
                 ids: data.ids
             });
