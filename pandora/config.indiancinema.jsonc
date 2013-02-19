@@ -155,13 +155,14 @@
         {
             "id": "year",
             "title": "Year",
-            "type": "string",
+            "type": "year",
             "additionalSort": [{"key": "director", "operator": "+"}, {"key": "title", "operator": "+"}],
             "autocomplete": true,
             "columnWidth": 60,
             "filter": true,
             "find": true,
-            "sort": true
+            "sort": true,
+            "sortOperator": "+"
         },
         {
             "id": "language",
