@@ -64,7 +64,6 @@ pandora.ui.home = function() {
                 position: 'absolute',
                 left: 0,
                 right: 0,
-                top: 0,
                 width: '320px',
                 margin: '0 auto 0 auto',
                 cursor: 'pointer'
@@ -608,6 +607,7 @@ pandora.ui.home = function() {
     };
 
     that.fadeOutScreen = function() {
+        $('.OxTooltip').remove();
         that.animate({opacity: 0}, 500, function() {
             that.remove();
         });
