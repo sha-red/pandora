@@ -634,7 +634,7 @@
     "personalLists": [
         {"title": "Favorites"},
         {"title": "Movies with Video", "query": {"conditions": [{"key": "duration", "value": 0, "operator": ">"}], "operator": "&"}},
-        {"title": "Out of Copyright", "query": {"conditions": [{"key": "rightslevel", "value": "Public", "operator": "=="}, {"key": "rightslevel", "value": "Out of Copyright", "operator": "=="}], "operator": "|"}},
+        {"title": "Out of Copyright", "query": {"conditions": [{"key": "rightslevel", "value": 2, "operator": "<"}], "operator": "&"}},
         {"title": "Silent Films", "query": {"conditions": [{"key": "language", "value": "None", "operator": "=="}], "operator": "&"}}
     ],
     "rightsLevel": {"member": 3, "student": 3, "staff": 3, "admin": 3},
