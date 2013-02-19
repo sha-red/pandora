@@ -6,7 +6,7 @@ import os
 
 root_dir = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-#using virtualenv's activate_this.py to reorder sys.path
+# using virtualenv's activate_this.py to reorder sys.path
 activate_this = os.path.join(root_dir, 'bin', 'activate_this.py')
 execfile(activate_this, dict(__file__=activate_this))
 
@@ -16,10 +16,10 @@ from optparse import OptionParser
 from ox.image import drawText, wrapText
 import sys
 
-
 static_root = os.path.join(os.path.dirname(__file__), 'data')
 
 def render_poster(title, director, year, series, oxdb_id, imdb_id, frame, timeline, poster):
+
     def get_oxdb_color(oxdb_id, series=False):
         i = int(round((int(oxdb_id[2:10], 16) * 762 / pow(2, 32))))
         if i < 127:
