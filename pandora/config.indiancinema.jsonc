@@ -540,11 +540,11 @@
             "type": "enum",
             "columnWidth": 90,
             "format": {"type": "ColorLevel", "args": [
-                ["Public", "Relaxed", "Regular", "Restricted", "Private"]
+                ["Public", "Out of Copyright", "Under Copyright", "Private"]
             ]},
             "sort": true,
             "sortOperator": "+",
-            "values": ["Public", "Relaxed", "Regular", "Restricted", "Private", "Unknown"]
+            "values": ["Public", "Out of Copyright", "Under Copyright", "Private", "Unknown"]
         },
         {
             "id": "canplayvideo",
@@ -633,13 +633,15 @@
     },
     "personalLists": [
         {"title": "Favorites"},
+        {"title": "Movies with Video", "query": {"conditions": [{"key": "duration", "value": 0, "operator": ">"}], "operator": "&"}},
+        {"title": "Out of Copyright", "query": {"conditions": [{"key": "rightslevel", "value": "Public", "operator": "=="}, {"key": "rightslevel", "value": "Out of Copyright", "operator": "=="}], "operator": "|"}},
         {"title": "Silent Films", "query": {"conditions": [{"key": "language", "value": "None", "operator": "=="}], "operator": "&"}}
     ],
     "rightsLevel": {"member": 3, "student": 3, "staff": 3, "admin": 3},
     "rightsLevels": [
         {"name": "Public", "color": [128, 255, 128]},
-        {"name": "Out of Copyright", "color": [255, 255, 128]},
-        {"name": "Under Copyright", "color": [255, 192, 128]},
+        {"name": "Out of Copyright", "color": [212, 255, 128]},
+        {"name": "Under Copyright", "color": [255, 212, 128]},
         {"name": "Private", "color": [255, 128, 128]}
     ],
     "sendReferrer": false,
