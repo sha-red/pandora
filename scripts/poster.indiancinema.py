@@ -165,7 +165,7 @@ def render_poster(title, director, year, frame, timeline, poster):
             fill=getRGB((hue, saturation, poster_lightness['image']))
         )
 
-    poster_image.save(poster)
+    poster_image.save(poster, quality=100)
 
 def main():
     parser = OptionParser()
