@@ -21,7 +21,9 @@ pandora.ui.text = function() {
 
     function getText(id) {
         pandora.api.getText({id: id}, function(result) {
-            if (result.data.type == 'pdf') {
+            if (!result.data) {
+                pandora.UI.set({text: ''});
+            } else if (result.data.type == 'pdf') {
                 $text && $text.remove();
                 $text = Ox.Editable({
                     clickLink: pandora.clickLink,

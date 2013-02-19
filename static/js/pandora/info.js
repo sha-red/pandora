@@ -3,6 +3,8 @@
 pandora.ui.info = function() {
 
     var ui = pandora.user.ui,
+        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
+        folderItem = folderItems.slice(0, -1),
         view = getView(),
 
         that = Ox.Element()
@@ -25,7 +27,8 @@ pandora.ui.info = function() {
                     ) {
                         updateInfo();
                     }
-                }
+                },
+                pandora_text: updateInfo
             });
 
     //pandora.$ui.leftPanel && resize();
@@ -40,7 +43,7 @@ pandora.ui.info = function() {
     }
 
     function getId() {
-        return ui.item || (
+        return ui[folderItem.toLowerCase()] || (
             ui.listSelection.length
             ? ui.listSelection[ui.listSelection.length - 1]
             : null
@@ -48,9 +51,13 @@ pandora.ui.info = function() {
     }
 
     function getView() {
-        return !getId() ? 'list'
-            : !ui.item && pandora.isClipView() ? 'poster'
-            : 'video';
+        return ui.section == 'items'
+            ? !getId()
+                ? 'list'
+                : !ui.item && pandora.isClipView()
+                    ? 'poster'
+                    : 'video'
+            : folderItem.toLowerCase();
     }
 
     function resizeInfo() {
@@ -64,7 +71,7 @@ pandora.ui.info = function() {
         var id = getId(),
             previousView = view;
         view = getView();
-        if (view == 'list') {
+        if (view == 'list' || view == 'text') {
             emptyInfo();
             that.append(pandora.$ui.listInfo = pandora.ui.listInfo());
             previousView == 'video' && resizeInfo();
@@ -147,7 +154,7 @@ pandora.ui.info = function() {
 
     that.resizeInfo = function() {
         var view = getView();
-        if (view == 'list') {
+        if (view == 'list' || view == 'text') {
             pandora.$ui.listInfo.resizeInfo();
         } else if (view == 'poster') {
             pandora.$ui.posterInfo.resizeInfo();
@@ -160,7 +167,7 @@ pandora.ui.info = function() {
     };
 
     that.updateListInfo = function() {
-        getView() == 'list' && that.empty().append(
+        ['list', 'text'].indexOf(getView()) > -1 && that.empty().append(
             pandora.$ui.listInfo = pandora.ui.listInfo()
         );
     };
@@ -170,14 +177,16 @@ pandora.ui.info = function() {
 };
 
 pandora.ui.listInfo = function() {
-
-    var list = pandora.user.ui._list,
-        canEditFeaturedLists = pandora.site.capabilities.canEditFeaturedLists[pandora.user.level],
+    var ui = pandora.user.ui,
+        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
+        folderItem = folderItems.slice(0, -1),
+        list = pandora.user.ui.section == 'items' ? pandora.user.ui._list : ui[folderItem.toLowerCase()],
+        canEditFeaturedLists = pandora.site.capabilities['canEditFeatured' + folderItems][pandora.user.level],
         that = $('<div>').css({padding: '16px', textAlign: 'center'}),
         $icon = Ox.Element('<img>')
             .attr({
                 src: list
-                    ? '/list/' + list + '/icon256.jpg?' + Ox.uid()
+                    ? '/' + folderItem.toLowerCase() + '/' + list + '/icon256.jpg?' + Ox.uid()
                     : '/static/png/icon.png'
             })
             .css(getIconCSS())
@@ -190,7 +199,7 @@ pandora.ui.listInfo = function() {
     //pandora.api.editList({id: list, description: 'foobbar'}, callback)
     //pandora.api.editPage({name: 'allItems', body: 'foobar'}, callback)
     if (list) {
-        pandora.api.findLists({
+        pandora.api['find' + folderItems]({
             query: {conditions: [{key: 'id', value: list, operator: '=='}]},
             keys: ['description', 'status', 'name', 'user']
         }, function(result) {
@@ -232,7 +241,7 @@ pandora.ui.listInfo = function() {
                             submit: function(data) {
                                 data.value = Ox.decodeHTMLEntities(data.value);
                                 if (data.value != item.name) {
-                                    pandora.api.editList({
+                                    pandora.api['edit' + folderItem]({
                                         id: list,
                                         name: data.value
                                     }, function(result) {
@@ -278,12 +287,12 @@ pandora.ui.listInfo = function() {
                             },
                             submit: function(data) {
                                 if (data.value != item.description) {
-                                    pandora.api.editList({
+                                    pandora.api['edit' + folderItem]({
                                         id: list,
                                         description: data.value
                                     }, function(result) {
                                         item.description = result.data.description;
-                                        Ox.Request.clearCache('findLists');
+                                        Ox.Request.clearCache('find' + folderItems);
                                     });
                                 }
                             }
@@ -293,7 +302,7 @@ pandora.ui.listInfo = function() {
                 that.append(
                     $('<div>')
                         .css({paddingTop: '16px'})
-                        .html('List not found')
+                        .html(folderItem + ' not found')
                 );
             }
         });
@@ -301,7 +310,10 @@ pandora.ui.listInfo = function() {
         that.append(
             $('<div>')
                 .css({fontWeight: 'bold'})
-                .html('All ' + pandora.site.itemName.plural)
+                .html(ui.section == 'items'
+                    ? 'All ' + pandora.site.itemName.plural
+                    : pandora.site.site.name + ' ' + folderItems
+                )
         );
     }
 

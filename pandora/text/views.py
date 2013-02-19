@@ -11,6 +11,7 @@ from ox.django.decorators import login_required_json
 from ox.django.http import HttpFileResponse
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 from django.db.models import Count, Q, Sum, Max
+from django.conf import settings
 
 from item import utils
 import models

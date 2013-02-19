@@ -355,13 +355,15 @@ pandora.ui.folderList = function(id) {
         },
         */
         init: function(data) {
-            pandora.site.sectionFolders[ui.section][i].items = data.items;
-            pandora.$ui.folder[i].$content.css({
-                height: data.items * 16 + 'px'
-            });
-            pandora.$ui.folderList[id].css({
-                height: data.items * 16 + 'px'
-            });
+            if(pandora.site.sectionFolders[ui.section][i]) {
+                pandora.site.sectionFolders[ui.section][i].items = data.items;
+                pandora.$ui.folder[i].$content.css({
+                    height: data.items * 16 + 'px'
+                });
+                pandora.$ui.folderList[id].css({
+                    height: data.items * 16 + 'px'
+                });
+            }
             pandora.resizeFolders();
         },
         move: function(data) {

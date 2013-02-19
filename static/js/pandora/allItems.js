@@ -39,24 +39,27 @@ pandora.ui.allItems = function() {
         })
         .html(pandora.user.ui.section == 'items' ? 'All ' + pandora.site.itemName.plural
             : pandora.site.site.name + ' ' + Ox.toTitleCase(pandora.user.ui.section))
-        .appendTo(that);
+        .appendTo(that),
+    $items,
+    $clickButton,
+    $uploadButton;
 
     if (pandora.user.ui.section == 'items') {
-        var $items = $('<div>')
+        $items = $('<div>')
             .css({
                 float: 'left',
                 width: '42px',
                 margin: '1px 4px 1px 3px',
                 textAlign: 'right'
             })
-            .appendTo(that),
+            .appendTo(that);
         $clickButton = Ox.Button({
                 style: 'symbol',
                 title: 'click',
                 type: 'image'
             })
             .css({opacity: 0.25})
-            .appendTo(that),
+            .appendTo(that);
         $uploadButton = Ox.Button({
                 style: 'symbol',
                 title: 'upload',
@@ -71,7 +74,7 @@ pandora.ui.allItems = function() {
     }
 
     that.update = function(items) {
-        $items.html(Ox.formatNumber(items));
+        $items && $items.html(Ox.formatNumber(items));
     };
 
     that.resizeElement = function(width) {
