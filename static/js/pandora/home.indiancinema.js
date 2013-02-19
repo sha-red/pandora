@@ -79,10 +79,10 @@ pandora.ui.home = function() {
             .css({
                 position: 'absolute',
                 left: 0,
-                top: '56px',
+                top: '62px',
                 right: 0,
-                width: '240px',
-                height: '30px',
+                width: '160px',
+                height: '20px',
                 margin: '0 auto 0 auto'
             })
             .appendTo($box),
