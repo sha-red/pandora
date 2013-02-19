@@ -997,6 +997,8 @@ class Item(models.Model):
             self.torrent.seek(0)
             data = ox.torrent.bdecode(self.torrent.read())
             url = request.build_absolute_uri("%s/torrent/"%self.get_absolute_url())
+            if url.startswith('https://'):
+                url = 'http' + url[5:]
             data['url-list'] = ['%s%s' % (url, u.split('torrent/')[1]) for u in data['url-list']]
             return ox.torrent.bencode(data)
 
