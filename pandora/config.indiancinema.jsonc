@@ -41,13 +41,13 @@
         "canManagePlacesAndEvents": {"student": true, "staff": true, "admin": true},
         "canManageTitlesAndNames": {"student": true, "staff": true, "admin": true},
         "canManageUsers": {"staff": true, "admin": true},
-        "canPlayClips": {"guest": 2, "member": 2, "student": 4, "staff": 4, "admin": 4},
-        "canPlayVideo": {"guest": 1, "member": 1, "student": 4, "staff": 4, "admin": 4},
+        "canPlayClips": {"guest": 1, "member": 1, "student": 3, "staff": 3, "admin": 3},
+        "canPlayVideo": {"guest": 1, "member": 1, "student": 3, "staff": 3, "admin": 3},
         "canSeeAccessed": {"student": true, "staff": true, "admin": true},
         "canSeeDebugMenu": {"student": true, "staff": true, "admin": true},
         "canSeeExtraItemViews": {"student": true, "staff": true, "admin": true},
         "canSeeFiles": {"student": true, "staff": true, "admin": true},
-        "canSeeItem": {"guest": 3, "member": 3, "student": 4, "staff": 4, "admin": 4},
+        "canSeeItem": {"guest": 3, "member": 3, "student": 3, "staff": 3, "admin": 3},
         "canSeeSize": {"student": true, "staff": true, "admin": true},
         "canSeeSoftwareVersion": {"student": true, "staff": true, "admin": true},
         "canSendMail": {"staff": true, "admin": true},
@@ -587,45 +587,22 @@
     // fixme: should be renamed to annotationLayers
     "layers": [
         {
-            "id": "publickeywords",
-            "title": "Public Keywords",
+            "id": "keywords",
+            "title": "Keywords",
             "canAddAnnotations": {"member": true, "student": true, "staff": true, "admin": true},
-            "item": "Public Keyword",
+            "hasEvents": true,
+            "hasPlaces": true,
+            "item": "Keyword",
             "overlap": true,
             "type": "string"
         },
         {
-            "id": "pirvatekeywords",
-            "title": "Private Keywords",
+            "id": "notes",
+            "title": "Notes",
             "canAddAnnotations": {"member": true, "student": true, "staff": true, "admin": true},
-            "item": "Private Keyword",
-            "overlap": true,
-            "type": "string"
-        },
-        {
-            "id": "publicnotes",
-            "title": "Public Notes",
-            "canAddAnnotations": {"member": true, "student": true, "staff": true, "admin": true},
-            "item": "Public Note",
-            "overlap": true,
-            "showInfo": true,
-            "type": "text"
-        },
-        {
-            "id": "privatenotes",
-            "title": "Private Notes",
-            "canAddAnnotations": {"member": true, "student": true, "staff": true, "admin": true},
-            "item": "Private Note",
-            "overlap": true,
-            "private": true,
-            "showInfo": true,
-            "type": "text"
-        },
-        {
-            "id": "publicnotes",
-            "title": "Public Notes",
-            "canAddAnnotations": {"member": true, "student": true, "staff": true, "admin": true},
-            "item": "Public Note",
+            "hasEvents": true,
+            "hasPlaces": true,
+            "item": "Note",
             "overlap": true,
             "showInfo": true,
             "type": "text"
@@ -633,7 +610,7 @@
         {
             "id": "subtitles",
             "title": "Subtitles",
-            "canAddAnnotations": {"staff": true, "admin": true},
+            "canAddAnnotations": {"student": true, "staff": true, "admin": true},
             "hasEvents": true,
             "hasPlaces": true,
             "isSubtitles": true,
@@ -658,12 +635,11 @@
         {"title": "Favorites"},
         {"title": "Silent Films", "query": {"conditions": [{"key": "language", "value": "None", "operator": "=="}], "operator": "&"}}
     ],
-    "rightsLevel": {"member": 4, "staff": 3, "admin": 2},
+    "rightsLevel": {"member": 3, "student": 3, "staff": 3, "admin": 3},
     "rightsLevels": [
         {"name": "Public", "color": [128, 255, 128]},
-        {"name": "Relaxed", "color": [192, 255, 128]},
-        {"name": "Regular", "color": [255, 255, 128]},
-        {"name": "Restricted", "color": [255, 192, 128]},
+        {"name": "Out of Copyright", "color": [255, 255, 128]},
+        {"name": "Under Copyright", "color": [255, 192, 128]},
         {"name": "Private", "color": [255, 128, 128]}
     ],
     "sendReferrer": false,
