@@ -159,7 +159,7 @@ pandora.ui.info = function() {
         } else if (view == 'poster') {
             pandora.$ui.posterInfo.resizeInfo();
         } else if (view == 'video') {
-            pandora.$ui.videoPreview.options({
+            pandora.$ui.videoPreview && pandora.$ui.videoPreview.options({
                 height: pandora.getInfoHeight(true),
                 width: ui.sidebarSize
             });
