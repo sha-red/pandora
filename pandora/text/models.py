@@ -9,6 +9,7 @@ from glob import glob
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.db.models.signals import pre_delete
 import ox
 from ox.django.fields import DictField, TupleField
 
@@ -167,6 +168,12 @@ class Text(models.Model):
                 self.save()
             return True
         return False
+
+def delete_file(sender, **kwargs):
+    t = kwargs['instance']
+    if t.file:
+        t.file.delete()
+pre_delete.connect(delete_file, sender=Text)
 
 class Position(models.Model):
 
