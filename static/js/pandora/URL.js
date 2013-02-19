@@ -93,7 +93,7 @@ pandora.URL = (function() {
                     }
                 }
             } else {
-                set.hash = {};
+                set.hash = null;
             }
 
             if (state.page) {
