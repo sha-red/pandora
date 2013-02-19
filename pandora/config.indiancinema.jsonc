@@ -6,7 +6,7 @@
 {
     "additionalSort": [
         {"key": "director", "operator": "+"},
-        {"key": "year", "operator": "-"},
+        {"key": "year", "operator": "+"},
         {"key": "title", "operator": "+"}
     ],
     "annotations": {
@@ -120,7 +120,7 @@
             "id": "title",
             "title": "Title",
             "type": "string",
-            "additionalSort": [{"key": "year", "operator": "-"}, {"key": "director", "operator": "+"}],
+            "additionalSort": [{"key": "year", "operator": "+"}, {"key": "director", "operator": "+"}],
             "autocomplete": true,
             "autocompleteSortKey": "votes",
             "columnRequired": true,
@@ -133,7 +133,7 @@
             "id": "director",
             "title": "Director",
             "type": ["string"],
-            "additionalSort": [{"key": "year", "operator": "-"}, {"key": "title", "operator": "-"}],
+            "additionalSort": [{"key": "year", "operator": "+"}, {"key": "title", "operator": "-"}],
             "autocomplete": true,
             "columnRequired": true,
             "columnWidth": 180,
@@ -155,7 +155,7 @@
         {
             "id": "year",
             "title": "Year",
-            "type": "year",
+            "type": "string",
             "additionalSort": [{"key": "director", "operator": "+"}, {"key": "title", "operator": "+"}],
             "autocomplete": true,
             "columnWidth": 60,
@@ -725,7 +725,7 @@
             "filters": [
                 {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "productioncompany", "sort": [{"key": "items", "operator": "-"}]},
-                {"id": "year", "sort": [{"key": "name", "operator": "-"}]},
+                {"id": "year", "sort": [{"key": "name", "operator": "+"}]},
                 {"id": "language", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "genre", "sort": [{"key": "items", "operator": "-"}]}
             ],
@@ -784,7 +784,7 @@
             "showSitePosters": false,
             "showTimeline": true,
             "sidebarSize": 256,
-            "theme": "oxlight",
+            "theme": "oxmedium",
             "videoMuted": false,
             "videoPoints": {},
             "videoResolution": 96,
