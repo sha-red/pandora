@@ -350,7 +350,7 @@ pandora.ui.statisticsDialog = function() {
                                 top: top + 'px'
                             })
                             .appendTo($content);
-                        top += (isDay ? Ox.min(Ox.len(data[mode][key]), 30) : Ox.len(data[mode][key])) * 16 + 32;
+                        top += (isDay ? Ox.min([Ox.len(data[mode].day), 30]) : Ox.len(data[mode][key])) * 16 + 32;
                     });
                 } else if (id == 'locations') {
                     ['continent', 'region', 'country', 'city'].forEach(function(key) {
