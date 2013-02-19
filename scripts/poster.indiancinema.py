@@ -31,7 +31,7 @@ def render_poster(title, director, year, frame, timeline, poster):
     draw = ImageDraw.Draw(poster_image)
     font_file = os.path.join(static_root, 'SourceSansProSemibold.ttf')
     font_size = {'cinema': 107, 'director': 32, 'title': 48, 'year': 387}
-    font_lightness = {'cinema': 0.8, 'director': 0.2, 'title': 0.2, 'year': 0.6}
+    font_lightness = {'cinema': 0.8 if year else 0.6, 'director': 0.2, 'title': 0.2, 'year': 0.6}
     poster_lightness = {'image': 0.2, 'text': 0.4}
 
     if year:
