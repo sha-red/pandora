@@ -68,13 +68,13 @@ pandora.ui.home = function() {
                 margin: '0 auto 0 auto',
                 cursor: 'pointer'
             })
-            .on({
-                click: function() {
+            .bindEvent({
+                anyclick: function() {
                     $browseButton.triggerEvent('click');
                 }
             })
             .appendTo($box),
-        $line = $('<img>')
+        $line = Ox.Element('<img>')
             .attr({src: '/static/png/line.indiancinema.png'})
             .css({
                 position: 'absolute',
@@ -88,7 +88,15 @@ pandora.ui.home = function() {
             })
             .one({
                 load: function() {
-                    $line.animate({opacity: 1}, 250);
+                    $line.animate({opacity: 1}, 250, function() {
+                        $line
+                            .options({tooltip: 'Visit Pad.ma'})
+                            .bindEvent({
+                                anyclick: function() {
+                                    document.location.href = '/url=https://pad.ma';
+                                }
+                            });
+                    });
                 }
             })
             .appendTo($box),

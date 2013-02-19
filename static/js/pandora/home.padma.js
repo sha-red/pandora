@@ -68,8 +68,8 @@ pandora.ui.home = function() {
                 margin: '0 auto 0 auto',
                 cursor: 'pointer'
             })
-            .on({
-                click: function() {
+            .bindEvent({
+                anyclick: function() {
                     $browseButton.triggerEvent('click');
                 }
             })
