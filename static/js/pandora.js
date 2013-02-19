@@ -241,6 +241,10 @@ appPanel
         });
         // patch theme ... this can be removed at a later point
         pandora.user.ui.theme = legacyThemes[pandora.user.ui.theme] || pandora.user.ui.theme;
+        // make sure theme is valid
+        if (!Ox.contains(pandora.site.themes, pandora.user.ui.theme)) {
+            pandora.user.ui.theme = pandora.site.user.ui.theme;
+        }
         // patch itemView ... this can be removed at a later point
         if (pandora.user.ui.itemView == 'video') {
             pandora.user.ui.itemView = 'player';
