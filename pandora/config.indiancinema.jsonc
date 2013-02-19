@@ -81,7 +81,7 @@
         {"id": "genre", "title": "Genre", "type": "string"},
         {"id": "writer", "title": "Writer", "type": "string"},
         {"id": "producer", "title": "Producer", "type": "string"},
-        {"id": "productioncompany", "title": "Production Company", "type": "string"},
+        {"id": "productioncompany", "title": "Studio", "type": "string"},
         {"id": "cinematographer", "title": "Cinematographer", "type": "string"},
         {"id": "editor", "title": "Editor", "type": "string"},
         {"id": "actor", "title": "Actor", "type": "string"},
@@ -206,7 +206,7 @@
         },
         {
             "id": "productioncompany",
-            "title": "Production Company",
+            "title": "Studio",
             "type": ["string"],
             "autocomplete": true,
             "columnWidth": 180,
