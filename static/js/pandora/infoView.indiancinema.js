@@ -462,24 +462,6 @@ pandora.ui.infoView = function(data) {
             .appendTo($statistics);
     }
 
-    // Mainstream Score, Arthouse Score ----------------------------------------
-
-    ['votes', 'likes'].forEach(function(key) {
-        var value = data[key] || 0;
-        $('<div>')
-            .css({marginBottom: '4px'})
-            .append(
-                formatKey(
-                    key == 'votes' ? 'Mainstream Score' : 'Arthouse Score', true
-                )
-            )
-            .append(
-                Ox.Theme.formatColorPercent(value, 1, true)
-                    .css({textAlign: 'right'})
-            )
-            .appendTo($statistics);
-    });
-
     // Duration, Aspect Ratio --------------------------------------------------
 
     ['duration', 'aspectratio'].forEach(function(key) {
