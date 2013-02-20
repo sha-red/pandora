@@ -39,7 +39,7 @@ def addText(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    data['name'] = re.sub(' \[\d+\]$', '', data['name']).strip()
+    data['name'] = re.sub(' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
     name = data['name']
     if not name:
         name = "Untitled"
@@ -50,6 +50,10 @@ def addText(request):
         num += 1
         name = data['name'] + ' [%d]' % num
     text.save()
+
+    del data['name']
+    if data:
+        text.edit(data, request.user)
 
     if text.status == 'featured':
         pos, created = models.Position.objects.get_or_create(text=text,
@@ -132,78 +136,7 @@ def editText(request):
         else:
             text = qs[0]
     if text.editable(request.user):
-        for key in data:
-            if key == 'status':
-                value = data[key]
-                if value not in text._status:
-                    value = text._status[0]
-                if value == 'private':
-                    for user in text.subscribed_users.all():
-                        text.subscribed_users.remove(user)
-                    qs = models.Position.objects.filter(user=request.user,
-                                                        section='section', text=text)
-                    if qs.count() > 1:
-                        pos = qs[0]
-                        pos.section = 'personal'
-                        pos.save()
-                elif value == 'featured':
-                    if request.user.get_profile().capability('canEditFeaturedTexts'):
-                        pos, created = models.Position.objects.get_or_create(text=text, user=request.user,
-                                                                             section='featured')
-                        if created:
-                            qs = models.Position.objects.filter(user=request.user, section='featured')
-                            pos.position = qs.aggregate(Max('position'))['position__max'] + 1
-                            pos.save()
-                        models.Position.objects.filter(text=text).exclude(id=pos.id).delete()
-                    else:
-                        value = text.status
-                elif text.status == 'featured' and value == 'public':
-                    models.Position.objects.filter(text=text).delete()
-                    pos, created = models.Position.objects.get_or_create(text=text,
-                                                  user=text.user,section='personal')
-                    qs = models.Position.objects.filter(user=text.user,
-                                                        section='personal')
-                    pos.position = qs.aggregate(Max('position'))['position__max'] + 1
-                    pos.save()
-                    for u in text.subscribed_users.all():
-                        pos, created = models.Position.objects.get_or_create(text=text, user=u,
-                                                                             section='public')
-                        qs = models.Position.objects.filter(user=u, section='public')
-                        pos.position = qs.aggregate(Max('position'))['position__max'] + 1
-                        pos.save()
-
-                text.status = value
-            elif key == 'name':
-                data['name'] = re.sub(' \[\d+\]$', '', data['name']).strip()
-                name = data['name']
-                if not name:
-                    name = "Untitled"
-                num = 1
-                while models.Text.objects.filter(name=name, user=text.user).exclude(id=text.id).count()>0:
-                    num += 1
-                    name = data['name'] + ' [%d]' % num
-                text.name = name
-            elif key == 'description':
-                text.description = ox.sanitize_html(data['description'])
-            elif key == 'text':
-                text.text = ox.sanitize_html(data['text'])
-
-        if 'position' in data:
-            pos, created = models.Position.objects.get_or_create(text=text, user=request.user)
-            pos.position = data['position']
-            pos.section = 'featured'
-            if text.status == 'private':
-                pos.section = 'personal'
-            pos.save()
-        if 'type' in data:
-            if data['type'] == 'pdf':
-                text.type = 'pdf'
-            else:
-                text.type = 'html'
-        if 'posterFrames' in data:
-            text.poster_frames = tuple(data['posterFrames'])
-            text.update_icon()
-        text.save()
+        text.edit(data, request.user)
         response['data'] = text.json(user=request.user)
     else:
         response = json_response(status=403, text='permission denied')

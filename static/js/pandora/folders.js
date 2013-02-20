@@ -82,35 +82,39 @@ pandora.ui.folders = function() {
                             }
                         })
                     ];
-                } else {
+                } else if(ui.section == 'texts') {
                     extras = [
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [
-                                { id: 'new' + folderItem.toLowerCase(), title: 'New ' + folderItem },
+                                { id: 'newtext', title: 'New Text' },
+                                { id: 'newpdf', title: 'New  PDF' },
                                 {},
-                                { id: 'delete' + folderItem.toLowerCase(), title: 'Delete Selected ' + folderItem + '...', disabled: !ui[ui.section.slice(0,-1)] }
+                                { id: 'deletetext', title: 'Delete Selected Text...', disabled: !ui.text }
                             ],
                             title: 'edit',
-                            tooltip: 'Manage Personal ' + folderItems,
+                            tooltip: 'Manage Personal Texts',
                             type: 'image'
                         })
                         .bindEvent({
                             click: function(data) {
                                 var $list = pandora.$ui.folderList[folder.id];
-                                // fixme: duplicated
-                                if (data.id == 'new' + folderItem.toLowerCase()) {
-                                    pandora['add' + folderItem]();
-                                } else if (data.id == 'delete' + folderItem.toLowerCase()) {
+                                if (data.id == 'newtext') {
+                                    pandora.addText({type: 'text'});
+                                } else if (data.id == 'newpdf') {
+                                    pandora.addText({type: 'pdf'});
+                                } else if (data.id == 'deletetext') {
                                     pandora.ui.deleteListDialog().open();
                                 }
                             }
                         })
-                        .bindEvent('pandora_' + ui.section.slice(0,-1), function(data) {
+                        .bindEvent('pandora_text', function(data) {
                             pandora.$ui.personalListsMenu[
                                 data.value && data.value.length ? 'enableItem' : 'disableItem'
-                            ]('delete' + folderItem.toLowerCase());
+                            ]('deletetext');
                         })
                     ];
+                } else {
+                    extras = [];
                 }
             }
         } else if (folder.id == 'favorite') {

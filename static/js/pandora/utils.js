@@ -147,9 +147,10 @@ pandora.addList = function() {
         }).reloadList();
     }
 };
-pandora.addText = function() {
+pandora.addText = function(options) {
     var $folderList = pandora.$ui.folderList.personal;
-    pandora.api.addText({name: 'Untitled'}, function(result) {
+    options = options || {};
+    pandora.api.addText(options, function(result) {
         reloadFolder(result.data.id);
     });
     function reloadFolder(newId) {

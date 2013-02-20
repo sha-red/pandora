@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
-from datetime import datetime
 import os
+import re
 import subprocess
+from datetime import datetime
 from glob import glob
 
 from django.db import models
@@ -68,6 +69,77 @@ class Text(models.Model):
            user.get_profile().capability('canEditFeaturedTexts') == True:
             return True
         return False
+
+    def edit(self, data, user):
+        for key in data:
+            if key == 'status':
+                value = data[key]
+                if value not in self._status:
+                    value = self._status[0]
+                if value == 'private':
+                    for user in self.subscribed_users.all():
+                        self.subscribed_users.remove(user)
+                    qs = Position.objects.filter(user=user,
+                                                 section='section', text=self)
+                    if qs.count() > 1:
+                        pos = qs[0]
+                        pos.section = 'personal'
+                        pos.save()
+                elif value == 'featured':
+                    if user.get_profile().capability('canEditFeaturedselfs'):
+                        pos, created = Position.objects.get_or_create(text=self, user=user,
+                                                                             section='featured')
+                        if created:
+                            qs = Position.objects.filter(user=user, section='featured')
+                            pos.position = qs.aggregate(Max('position'))['position__max'] + 1
+                            pos.save()
+                        Position.objects.filter(text=self).exclude(id=pos.id).delete()
+                    else:
+                        value = self.status
+                elif self.status == 'featured' and value == 'public':
+                    Position.objects.filter(text=self).delete()
+                    pos, created = Position.objects.get_or_create(text=self,
+                                                  user=self.user,section='personal')
+                    qs = Position.objects.filter(user=self.user,
+                                                        section='personal')
+                    pos.position = qs.aggregate(Max('position'))['position__max'] + 1
+                    pos.save()
+                    for u in self.subscribed_users.all():
+                        pos, created = Position.objects.get_or_create(text=self, user=u,
+                                                                             section='public')
+                        qs = Position.objects.filter(user=u, section='public')
+                        pos.position = qs.aggregate(Max('position'))['position__max'] + 1
+                        pos.save()
+
+                self.status = value
+            elif key == 'name':
+                data['name'] = re.sub(' \[\d+\]$', '', data['name']).strip()
+                name = data['name']
+                if not name:
+                    name = "Untitled"
+                num = 1
+                while Text.objects.filter(name=name, user=self.user).exclude(id=self.id).count()>0:
+                    num += 1
+                    name = data['name'] + ' [%d]' % num
+                self.name = name
+            elif key == 'description':
+                self.description = ox.sanitize_html(data['description'])
+            elif key == 'text':
+                self.text = ox.sanitize_html(data['text'])
+
+        if 'position' in data:
+            pos, created = Position.objects.get_or_create(text=text, user=user)
+            pos.position = data['position']
+            pos.section = 'featured'
+            if self.status == 'private':
+                pos.section = 'personal'
+            pos.save()
+        if 'type' in data:
+            self.type = data['type'] == 'pdf' and 'pdf' or 'html'
+        if 'posterFrames' in data:
+            self.poster_frames = tuple(data['posterFrames'])
+            self.update_icon()
+        self.save()
 
     def json(self, keys=None, user=None):
         if not keys:
