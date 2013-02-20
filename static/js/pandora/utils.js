@@ -775,7 +775,7 @@ pandora.getMetadataByIdOrName = function(item, view, str, callback) {
     Ox.Log('URL', 'getMetadataByIdOrName', item, view, str);
     var isName = str[0] == '@',
         canBeAnnotation = (
-            !view || view == 'video' || view == 'timeline'
+            !view || Ox.contains(['player', 'editor', 'timeline'], view)
         ) && item && !isName,
         canBeEvent = !view || view == 'calendar',
         canBePlace = !view || view == 'map';
