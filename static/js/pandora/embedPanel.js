@@ -83,6 +83,8 @@ pandora.ui.embedPanel = function() {
                             + '/timelineantialias'
                             + size + 'p' + i + '.jpg'
                     } : '/' + options.item + '/' + 'timeline16p.png',
+                    // timelineType: pandora.user.ui.videoTimeline,
+                    // timelineTypes: pandora.site.timelines,
                     title: video.title,
                     video: video.video,
                     volume: pandora.user.ui.videoVolume,
