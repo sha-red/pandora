@@ -42,7 +42,7 @@ pandora.ui.embedPlayer = function(data) {
                     + '/timelineantialias'
                     + size + 'p' + i + '.jpg'
             } : '/' + options.item + '/' + 'timeline16p.png',
-            title: result.data.title,
+            title: data.title,
             video: data.video,
             width: options.width
         }, options['in'] ? {
@@ -52,14 +52,17 @@ pandora.ui.embedPlayer = function(data) {
         } : {}));
 
     function getOptions() {
-        var defaults = {
-                height: 144,
+        var ui = pandora.user.ui,
+            defaults = {
+                height: window.innerHeight,
                 invertHighlight: true,
                 paused: true,
                 playInToOut: true,
-                width: 256
+                width: window.innerWidth
             },
-            options = Ox.extend(defaults, pandora.user.ui.hash.query);
+            options = Ox.extend({
+                item: ui.item
+            }, ui.videoPoints[ui.item] || {}, defaults, ui.hash.query);
         if (!options.position) {
             options.position = options['in'] || 0;
         }
