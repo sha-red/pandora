@@ -1,11 +1,12 @@
-pandora.ui.embedPlayer = function(data) {
+pandora.ui.embedPlayer = function(options, data) {
 
-    var options = getOptions(),
-        that = Ox.VideoPlayer(Ox.extend({
+    var that = Ox.VideoPlayer(Ox.extend({
             censored: data.censored,
             censoredIcon: pandora.site.cantPlay.icon,
             censoredTooltip: pandora.site.cantPlay.text,
-            controlsBottom: ['play', 'volume', 'scale'].concat(
+            controlsBottom: ['play', 'volume'].concat(
+                options.matchRatio ? [] : ['scale']
+            ).concat(
                 Ox.Fullscreen.available ? ['fullscreen'] : []
             ).concat(
                 ['timeline', 'position', 'settings']
@@ -27,6 +28,7 @@ pandora.ui.embedPlayer = function(data) {
             enableVolume: true,
             height: options.height,
             invertHighlight: options.invertHighlight,
+            muted: pandora.user.ui.videoMuted,
             paused: options.paused,
             playInToOut: options.playInToOut,
             position: options.position,
@@ -36,6 +38,7 @@ pandora.ui.embedPlayer = function(data) {
                 : data.posterFrame
             ) +'.jpg',
             resolution: pandora.user.ui.videoResolution,
+            scaleToFill: pandora.user.ui.videoScale == 'fill',
             subtitles: data.subtitles,
             timeline: options.playInToOut ? function(size, i) {
                 return '/' + options.item
@@ -44,40 +47,13 @@ pandora.ui.embedPlayer = function(data) {
             } : '/' + options.item + '/' + 'timeline16p.png',
             title: data.title,
             video: data.video,
+            volume: pandora.user.ui.videoVolume,
             width: options.width
         }, options['in'] ? {
             'in': options['in']
         } : {}, options.out ? {
             out: options.out
         } : {}));
-
-    function getOptions() {
-        var ui = pandora.user.ui,
-            defaults = {
-                height: window.innerHeight,
-                invertHighlight: true,
-                paused: true,
-                playInToOut: true,
-                width: window.innerWidth
-            },
-            options,
-            query = {};
-        ui.hash.query.forEach(function(condition) {
-            if (condition.key != 'embed') {
-                query[condition.key] = condition.value;
-            }
-        })
-        options = Ox.extend({
-            item: ui.item
-        }, ui.videoPoints[ui.item] || {}, defaults, query);
-        if (!options.position) {
-            options.position = options['in'] || 0;
-        }
-        if (!options['in'] && !options.out) {
-            options.playInToOut = false;
-        }
-        return options;
-    }
 
     return that;
 

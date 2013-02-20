@@ -1,25 +1,105 @@
 pandora.ui.embedPanel = function() {
 
-    var that, $errorBox, $errorLogo, $errorText;
+    var that = Ox.Element(),
+        data, options,
+        ui = pandora.user.ui,
+        $outerPanel, $innerPanel,
+        $title, $player, $controls, $timeline, $annotations,
+        $errorBox, $errorLogo, $errorText;
 
     if (pandora.user.ui.item) {
 
-        that = Ox.Element();
+        options = getOptions();
 
-        pandora.api.get({id: pandora.user.ui.item, keys: [
+        pandora.api.get({id: ui.item, keys: [
             'duration', 'layers', 'parts', 'posterFrame',
             'rightslevel', 'size', 'title', 'videoRatio'
         ]}, function(result) {
-            Ox.extend(result.data, pandora.getVideoOptions(result.data));
-            that.setElement(
-                pandora.$ui.embedPlayer = pandora.ui.embedPlayer(result.data)
-            );
+            data = result.data, innerHeight;
+            Ox.extend(data, pandora.getVideoOptions(data));
+            if (options.matchRatio || options.showAnnotations) {
+                options.height = Math.min(
+                    Math.round(window.innerWidth / data.videoRatio),
+                    window.innerHeight
+                        - (options.title ? 32 : 0)
+                        - (options.showTimeline ? 80 : 0)
+                        - (options.showAnnotations ? 128 : 0)
+                );
+            } else {
+                options.height = window.innerHeight
+                    - (options.title ? 32 : 0)
+                    - (options.showTimeline ? 80 : 0);
+            }
+            innerHeight = options.height
+                + (options.title ? 32 : 0)
+                + (options.showTimeline ? 80 : 0);
+            if (options.title) {
+                $title = Ox.Element()
+                    .css({position: 'absolute'})
+                    .append(
+                        $('<div>')
+                            .css({
+                                marginTop: !options.title.match(/\\n/) ? '8px' : '2px',
+                                textAlign: 'center'
+                            })
+                            .html(options.title.replace(/\\n/g, '<br>'))
+                    );
+            } else {
+                $title = Ox.Element();
+            }
+            $player = pandora.ui.embedPlayer(options, data)
+                .bindEvent({
+                    playing: function(data) {
+                        setPosition(data.position, true);
+                    },
+                    position: function(data) {
+                        setPosition(data.position);
+                    }
+                });
+            $controls = Ox.Element();
+            if (options.showTimeline) {
+                $timeline = Ox.LargeVideoTimeline({
+                        duration: data.duration,
+                        getImageURL: function(type, i) {
+                            return '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg';
+                        },
+                        position: options.position,
+                        subtitles: data.subtitles || [],
+                        type: ui.videoTimeline,
+                        width: window.innerWidth - 16
+                    })
+                    .css({
+                        top: '4px',
+                        left: '4px'
+                    })
+                    .bindEvent({
+                        mousedown: that.gainFocus,
+                        position: changeTimeline
+                    })
+                    .appendTo($controls);
+            }
+            $annotations = Ox.Element().html('ANNOTATIONS');
+            $innerPanel = Ox.SplitPanel({
+                elements: [
+                    {element: $title, size: options.title ? 32 : 0},
+                    {element: $player},
+                    {element: $controls, size: options.showTimeline ? 80 : 0}
+                ],
+                orientation: 'vertical'
+            });
+            $outerPanel = Ox.SplitPanel({
+                elements: [
+                    {element: $innerPanel, size: innerHeight},
+                    {element: $annotations}
+                ],
+                orientation: 'vertical'
+            });
+            that.setElement($outerPanel);
         });
 
     } else {
 
-        that = Ox.Element()
-            .addClass('OxScreen')
+        that.addClass('OxScreen')
             .css({
                 position: 'absolute',
                 left: 0,
@@ -57,6 +137,50 @@ pandora.ui.embedPanel = function() {
             .html('This view cannot<br>be embedded.')
             .appendTo($errorBox);
 
+    }
+
+    function changeTimeline(data) {
+        var position = options.playInToOut
+            ? Ox.limit(data.position, options['in'], options.out)
+            : data.position;
+        Ox.print('PPP', position);
+        $player.options({position: position});
+        position != data.position && $timeline.options({position: position});
+        options.showAnnotations && $annotations.options({position: position});
+    }
+
+    function getOptions() {
+        var options = {},
+            defaults = {
+                invertHighlight: true,
+                paused: true,
+                playInToOut: true,
+                width: window.innerWidth
+            };
+        ui.hash.query.forEach(function(condition) {
+            if (condition.key != 'embed') {
+                options[condition.key] = condition.value;                
+            }
+        });
+        options = Ox.extend(
+            {item: ui.item},
+            ui.videoPoints[ui.item] || {},
+            defaults,
+            options
+        );
+        if (!options.position) {
+            options.position = options['in'] || 0;
+        }
+        if (!options['in'] && !options.out) {
+            options.playInToOut = false;
+        }
+        return options;
+    }
+
+    function setPosition(position, playing) {
+        !playing && $player.options({position: position});
+        options.showTimeline && $timeline.options({position: position});
+        options.showAnnotations && $annotations.options({position: position});
     }
 
     that.display = function() {
