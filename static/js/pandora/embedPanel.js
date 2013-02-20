@@ -40,9 +40,7 @@ pandora.ui.embedPanel = function() {
                     censored: video.censored,
                     censoredIcon: pandora.site.cantPlay.icon,
                     censoredTooltip: pandora.site.cantPlay.text,
-                    controlsBottom: ['play', 'volume'].concat(
-                        options.matchRatio ? [] : ['scale']
-                    ).concat(
+                    controlsBottom: ['play', 'volume', 'scale'].concat(
                         Ox.Fullscreen.available ? ['fullscreen'] : []
                     ).concat(
                         ['timeline', 'position', 'settings']
