@@ -119,6 +119,9 @@ pandora.ui.embedPanel = function() {
                         $timeline.options({
                             subtitles: data.subtitles ? video.subtitles : []
                         });
+                    },
+                    fullscreen: function(data) {
+                        Ox.Fullscreen.toggle();
                     }
                 });
 
