@@ -16,28 +16,10 @@ pandora.ui.embedPanel = function() {
             'rightslevel', 'size', 'title', 'videoRatio'
         ]}, function(result) {
 
-            var innerHeight,
-                maxHeight = window.innerHeight
-                    - (options.title ? 32 : 0)
-                    - (options.showTimeline ? 80 : 0)
-                    - (options.showAnnotations ? 128 : 0);
+            var sizes = getSizes();
+            options.height = sizes.videoHeight;
 
             video = Ox.extend(result.data, pandora.getVideoOptions(result.data));
-
-            if (options.matchRatio || options.showAnnotations) {
-                options.height = Math.round(window.innerWidth / video.videoRatio);
-                options.matchRatio = options.height <= maxHeight;
-                if (!options.matchRatio) {
-                    options.height = maxHeight;
-                }
-            } else {
-                options.height = window.innerHeight
-                    - (options.title ? 32 : 0)
-                    - (options.showTimeline ? 80 : 0);
-            }
-            innerHeight = options.height
-                + (options.title ? 32 : 0)
-                + (options.showTimeline ? 80 : 0);
 
             if (options.title) {
                 $title = Ox.Element()
@@ -210,7 +192,7 @@ pandora.ui.embedPanel = function() {
 
             $outerPanel = Ox.SplitPanel({
                 elements: [
-                    {element: $innerPanel, size: innerHeight},
+                    {element: $innerPanel, size: sizes.innerHeight},
                     {element: $annotations}
                 ],
                 orientation: 'vertical'
@@ -307,6 +289,30 @@ pandora.ui.embedPanel = function() {
         return options;
     }
 
+    function getSizes() {
+        var innerHeight,
+            maxVideoHeight = window.innerHeight
+                - (options.title ? 32 : 0)
+                - (options.showTimeline ? 80 : 0)
+                - (options.showAnnotations ? 128 : 0),
+            videoHeight,
+        if (options.matchRatio || options.showAnnotations) {
+            videoHeight = Math.round(window.innerWidth / video.videoRatio);
+            options.matchRatio = options.height <= maxVideoHeight;
+            if (!options.matchRatio) {
+                videoHeight = maxVideoHeight;
+            }
+        } else {
+            videoHeight = window.innerHeight
+                - (options.title ? 32 : 0)
+                - (options.showTimeline ? 80 : 0);
+        }
+        innerHeight = options.height
+            + (options.title ? 32 : 0)
+            + (options.showTimeline ? 80 : 0);
+        return {innerHeight: innerHeight, videoHeight: videoHeight};
+    }
+
     function selectAnnotation(data) {
         if (data.id) {
             setPosition(Math.max(data['in'], options['in'] || 0));
@@ -329,6 +335,16 @@ pandora.ui.embedPanel = function() {
         animate && pandora.$ui.body.animate({opacity: 1}, 1000);
         return that;
     };
+
+    $(window).on({
+        resize: function() {
+            var sizes = getSizes();
+            $player.options({height: sizes.videoHeight});
+            $outerPanel.size(0, sizes.innerHeight);
+            options.showTimeline && $timeline.options({width: window.innerWidth - 16});
+            options.showAnnotations && $annotations.options({width: window.innerWidth});
+        }
+    });
 
     return that;
 
