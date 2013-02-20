@@ -60,9 +60,16 @@ pandora.ui.embedPlayer = function(data) {
                 playInToOut: true,
                 width: window.innerWidth
             },
-            options = Ox.extend({
-                item: ui.item
-            }, ui.videoPoints[ui.item] || {}, defaults, ui.hash.query);
+            options,
+            query = {};
+        ui.hash.query.forEach(function(condition) {
+            if (condition.key != 'embed') {
+                query[condition.key] = condition.value;
+            }
+        })
+        options = Ox.extend({
+            item: ui.item
+        }, ui.videoPoints[ui.item] || {}, defaults, query);
         if (!options.position) {
             options.position = options['in'] || 0;
         }
