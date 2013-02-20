@@ -163,6 +163,21 @@ pandora.ui.embedPanel = function() {
             }
 
             if (options.showAnnotations) {
+                if (options.playInToOut) {
+                    video.annotations.forEach(function(layer) {
+                        var items = [];
+                        layer.items.forEach(function(item) {
+                            if ((
+                                item['in'] >= options['in'] && item['in'] <= options.out
+                            ) || (
+                                item.out >= options['in'] && item.out <= options.out
+                            )) {
+                                items.push(item);
+                            }
+                        });
+                        layer.items = items;
+                    });
+                }
                 $annotations = Ox.AnnotationPanel(Ox.extend({
                     font: options.annotationsFont,
                     layers: video.annotations,
@@ -170,7 +185,8 @@ pandora.ui.embedPanel = function() {
                     range: options.annotationsRange,
                     showLayers: options.showLayers,
                     showUsers: true,
-                    sort: options.annotationsSort
+                    sort: options.annotationsSort,
+                    width: window.innerWidth
                 }, options['in'] ? {
                     'in': options['in']
                 } : {}, options.out ? {
@@ -293,9 +309,8 @@ pandora.ui.embedPanel = function() {
 
     function selectAnnotation(data) {
         if (data.id) {
-            setPosition(data['in']);
-            //setPoint('in', data['in']);
-            //setPoint('out', data.out);
+            setPosition(Math.max(data['in'], options['in'] || 0));
+            $annotations.options({selected: ''});
         }
     }
 
