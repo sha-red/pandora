@@ -41,7 +41,7 @@ pandora.ui.embedPanel = function() {
                     censoredIcon: pandora.site.cantPlay.icon,
                     censoredTooltip: pandora.site.cantPlay.text,
                     controlsBottom: ['play', 'volume', 'scale'].concat(
-                        Ox.Fullscreen.available ? ['fullscreen'] : []
+                        Ox.Fullscreen.available && options.showCloseButton ? ['fullscreen'] : []
                     ).concat(
                         ['timeline', 'position', 'settings']
                     ),
@@ -49,7 +49,11 @@ pandora.ui.embedPanel = function() {
                         close: 'Close',
                         open: 'Watch on ' + pandora.site.site.name
                     },
-                    controlsTop: (options.showCloseButton ? ['close'] : []).concat(
+                    controlsTop: [
+                        options.showCloseButton ? 'close'
+                        : Ox.Fullscreen.available ? 'fullscreen'
+                        : 'space16'
+                    ].concat(
                         ['title', 'open']
                     ),
                     duration: video.duration,
