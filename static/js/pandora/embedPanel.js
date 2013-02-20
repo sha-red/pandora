@@ -4,7 +4,17 @@ pandora.ui.embedPanel = function() {
 
     if (pandora.user.ui.item) {
 
-        that = Ox.Element().html('OK');
+        that = Ox.Element();
+
+        pandora.api.get({id: pandora.user.ui.item, keys: [
+            'duration', 'layers', 'parts', 'posterFrame',
+            'rightslevel', 'size', 'title', 'videoRatio'
+        ]}, function(result) {
+            Ox.extend(result.data, pandora.getVideoOptions(result.data));
+            that.setElement(
+                pandora.$ui.embedPlayer = pandora.ui.embedPlayer(result.data)
+            );
+        });
 
     } else {
 
