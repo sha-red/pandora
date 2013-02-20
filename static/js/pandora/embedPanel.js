@@ -112,6 +112,14 @@ pandora.ui.embedPanel = function() {
                     fullscreen: function(data) {
                         Ox.Fullscreen.toggle();
                     },
+                    open: function() {
+                        $player.options({paused: true});
+                        var url = document.location.protocol + '//'
+                            + document.location.hostname + '/'
+                            + options.item + '/'
+                            + Ox.formatDuration($player.options('position'));
+                        window.open(url, '_blank');
+                    },
                     playing: function(data) {
                         setPosition(data.position, true);
                     },

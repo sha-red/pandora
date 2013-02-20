@@ -221,7 +221,9 @@ appPanel
                     .on({
                         beforeunload: pandora.beforeunloadWindow,
                         resize: function() {
-                            pandora.resizeWindow();
+                            if (!isEmbed) {
+                                pandora.resizeWindow();
+                            }
                         },
                         unload: pandora.unloadWindow
                     })
