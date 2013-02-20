@@ -59,21 +59,10 @@ pandora.ui.embedDialog = function(data) {
     );
 
     function constructURL(data) {
-        var url = document.location.protocol
-                + '//' + document.location.host
-                + '/' + pandora.user.ui.item + '/embed?',
-            query = [];
-        Ox.forEach(data, function(value, key) {
-            if (['in', 'out'].indexOf(key) > -1) {
-                value = value.toFixed(3);
-            }
-            if (key[0] != '_') {
-                query.push(
-                    encodeURIComponent(key) + '=' + encodeURIComponent(value)
-                );
-            }
-        });
-        return url + query.join('&');
+        var url = document.location.href + (
+            document.location.hash ? '?embed=true' : '#?embed=true'
+        );
+        return url;
     }
 
     return that;
