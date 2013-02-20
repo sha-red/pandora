@@ -286,6 +286,7 @@ pandora.URL = (function() {
 
         self.URL = Ox.URL({
             findKeys: findKeys,
+            getHash: pandora.normalizeHashQuery,
             getItem: pandora.getItemByIdOrTitle,
             getSpan: pandora.getMetadataByIdOrName,
             pages: [].concat(
