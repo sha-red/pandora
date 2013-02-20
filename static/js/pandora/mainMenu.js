@@ -493,8 +493,8 @@ pandora.ui.mainMenu = function() {
             },
             pandora_itemview: function(data) {
                 var action,
-                    isVideoView = ['timeline', 'player', 'editor'].indexOf(data.value) > -1,
-                    wasVideoView = ['timeline', 'player', 'editor'].indexOf(data.previousValue) > -1;
+                    isVideoView = ['player', 'editor', 'timeline'].indexOf(data.value) > -1,
+                    wasVideoView = ['player', 'editor', 'timeline'].indexOf(data.previousValue) > -1;
                 that.checkItem('viewMenu_item_' + data.value);
                 if (pandora.isClipView() != pandora.isClipView(data.previousValue)) {
                     that.replaceMenu('sortMenu', getSortMenu());
