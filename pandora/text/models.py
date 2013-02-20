@@ -138,8 +138,9 @@ class Text(models.Model):
             self.type = data['type'] == 'pdf' and 'pdf' or 'html'
         if 'posterFrames' in data:
             self.poster_frames = tuple(data['posterFrames'])
-            self.update_icon()
         self.save()
+        if 'posterFrames' in data:
+            self.update_icon()
 
     def json(self, keys=None, user=None):
         if not keys:

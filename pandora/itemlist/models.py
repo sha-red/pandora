@@ -2,6 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
 import os
+import re
 import subprocess
 from glob import glob
 
@@ -98,6 +99,90 @@ class List(models.Model):
            user.get_profile().capability('canEditFeaturedLists') == True:
             return True
         return False
+
+    def edit(self, data, user):
+        for key in data:
+            if key == 'query' and not data['query']:
+                setattr(self, key, {"static":True})
+            elif key == 'query':
+                setattr(self, key, data[key])
+            elif key == 'type':
+                if data[key] == 'static':
+                    self.query = {"static":True}
+                    self.type = 'static'
+                else:
+                    self.type = 'dynamic'
+                    if self.query.get('static', False):
+                         self.query = {}
+            elif key == 'status':
+                value = data[key]
+                if value not in self._status:
+                    value = self._status[0]
+                if value == 'private':
+                    for user in self.subscribed_users.all():
+                        self.subscribed_users.remove(user)
+                    qs = Position.objects.filter(user=user,
+                                                        section='section', list=self)
+                    if qs.count() > 1:
+                        pos = qs[0]
+                        pos.section = 'personal'
+                        pos.save()
+                elif value == 'featured':
+                    if user.get_profile().capability('canEditFeaturedLists'):
+                        pos, created = Position.objects.get_or_create(list=self, user=user,
+                                                                             section='featured')
+                        if created:
+                            qs = Position.objects.filter(user=user, section='featured')
+                            pos.position = qs.aggregate(Max('position'))['position__max'] + 1
+                            pos.save()
+                        Position.objects.filter(list=self).exclude(id=pos.id).delete()
+                    else:
+                        value = self.status
+                elif self.status == 'featured' and value == 'public':
+                    Position.objects.filter(list=self).delete()
+                    pos, created = Position.objects.get_or_create(list=self,
+                                                  user=self.user, section='personal')
+                    qs = Position.objects.filter(user=self.user,
+                                                        section='personal')
+                    pos.position = qs.aggregate(Max('position'))['position__max'] + 1
+                    pos.save()
+                    for u in self.subscribed_users.all():
+                        pos, created = Position.objects.get_or_create(list=self, user=u,
+                                                                             section='public')
+                        qs = Position.objects.filter(user=u, section='public')
+                        pos.position = qs.aggregate(Max('position'))['position__max'] + 1
+                        pos.save()
+
+                self.status = value
+            elif key == 'name':
+                data['name'] = re.sub(' \[\d+\]$', '', data['name']).strip()
+                name = data['name']
+                if not name:
+                    name = "Untitled"
+                num = 1
+                while List.objects.filter(name=name, user=self.user).exclude(id=self.id).count()>0:
+                    num += 1
+                    name = data['name'] + ' [%d]' % num
+                self.name = name
+            elif key == 'description':
+                self.description = ox.sanitize_html(data['description'])
+
+        if 'position' in data:
+            pos, created = Position.objects.get_or_create(list=self, user=user)
+            pos.position = data['position']
+            pos.section = 'featured'
+            if self.status == 'private':
+                pos.section = 'personal'
+            pos.save()
+        if 'posterFrames' in data:
+            self.poster_frames = tuple(data['posterFrames'])
+        if 'view' in data:
+            self.view = data['view']
+        if 'sort' in data:
+            self.sort= tuple(data['sort'])
+        self.save()
+        if 'posterFrames' in data:
+            self.update_icon()
 
     def json(self, keys=None, user=None):
         if not keys:

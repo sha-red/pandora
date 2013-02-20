@@ -214,7 +214,7 @@ def addList(request):
         }
     '''
     data = json.loads(request.POST['data'])
-    data['name'] = re.sub(' \[\d+\]$', '', data['name']).strip()
+    data['name'] = re.sub(' \[\d+\]$', '', data.get('name', 'Untitled')).strip()
     name = data['name']
     if not name:
         name = "Untitled"
@@ -225,43 +225,16 @@ def addList(request):
         num += 1
         name = data['name'] + ' [%d]' % num
 
-    if 'query' in data and data['query']:
-        setattr(list, 'query', data['query'])
+    del data['name']
+    if data:
+        list.edit(data, request.user)
     else:
-        setattr(list, 'query', {"static":True})
-    if 'type' in data:
-        if data['type'] == 'static':
-            list.query = {"static":True}
-            list.type = 'static'
-        else:
-            list.type = 'dynamic'
-            if list.query.get('static', False):
-                 list.query = {}
-    if 'status' in data:
-        value = data['status']
-        if value not in list._status:
-            value = list._status[0]
-        if value == 'featured' and request.user.get_profile().capability('canEditFeaturedLists'):
-            value = list.status
-        list.status = value
-    if 'description' in data:
-        list.description = ox.sanitize_html(data['description'])
-    if 'view' in data:
-        list.view = data['view']
-    if 'sort' in data:
-        list.sort= tuple(data['sort'])
-    if 'posterFrames' in data:
-        list.poster_frames = tuple(data['posterFrames'])
-
-    list.save()
+        list.save()
     update_numberoflists.delay(request.user.username)
 
     if 'items' in data:
         for item in Item.objects.filter(itemId__in=data['items']):
             list.add(item)
-
-    if 'posterFrames' in data:
-        list.update_icon()
 
     if list.status == 'featured':
         pos, created = models.Position.objects.get_or_create(list=list,
@@ -301,87 +274,7 @@ def editList(request):
     list = get_list_or_404_json(data['id'])
     if list.editable(request.user):
         response = json_response()
-        for key in data:
-            if key == 'query' and not data['query']:
-                setattr(list, key, {"static":True})
-            elif key == 'query':
-                setattr(list, key, data[key])
-            elif key == 'type':
-                if data[key] == 'static':
-                    list.query = {"static":True}
-                    list.type = 'static'
-                else:
-                    list.type = 'dynamic'
-                    if list.query.get('static', False):
-                         list.query = {}
-            elif key == 'status':
-                value = data[key]
-                if value not in list._status:
-                    value = list._status[0]
-                if value == 'private':
-                    for user in list.subscribed_users.all():
-                        list.subscribed_users.remove(user)
-                    qs = models.Position.objects.filter(user=request.user,
-                                                        section='section', list=list)
-                    if qs.count() > 1:
-                        pos = qs[0]
-                        pos.section = 'personal'
-                        pos.save()
-                elif value == 'featured':
-                    if request.user.get_profile().capability('canEditFeaturedLists'):
-                        pos, created = models.Position.objects.get_or_create(list=list, user=request.user,
-                                                                             section='featured')
-                        if created:
-                            qs = models.Position.objects.filter(user=request.user, section='featured')
-                            pos.position = qs.aggregate(Max('position'))['position__max'] + 1
-                            pos.save()
-                        models.Position.objects.filter(list=list).exclude(id=pos.id).delete()
-                    else:
-                        value = list.status
-                elif list.status == 'featured' and value == 'public':
-                    models.Position.objects.filter(list=list).delete()
-                    pos, created = models.Position.objects.get_or_create(list=list,
-                                                  user=list.user,section='personal')
-                    qs = models.Position.objects.filter(user=list.user,
-                                                        section='personal')
-                    pos.position = qs.aggregate(Max('position'))['position__max'] + 1
-                    pos.save()
-                    for u in list.subscribed_users.all():
-                        pos, created = models.Position.objects.get_or_create(list=list, user=u,
-                                                                             section='public')
-                        qs = models.Position.objects.filter(user=u, section='public')
-                        pos.position = qs.aggregate(Max('position'))['position__max'] + 1
-                        pos.save()
-
-                list.status = value
-            elif key == 'name':
-                data['name'] = re.sub(' \[\d+\]$', '', data['name']).strip()
-                name = data['name']
-                if not name:
-                    name = "Untitled"
-                num = 1
-                while models.List.objects.filter(name=name, user=list.user).exclude(id=list.id).count()>0:
-                    num += 1
-                    name = data['name'] + ' [%d]' % num
-                list.name = name
-            elif key == 'description':
-                list.description = ox.sanitize_html(data['description'])
-
-        if 'position' in data:
-            pos, created = models.Position.objects.get_or_create(list=list, user=request.user)
-            pos.position = data['position']
-            pos.section = 'featured'
-            if list.status == 'private':
-                pos.section = 'personal'
-            pos.save()
-        if 'posterFrames' in data:
-            list.poster_frames = tuple(data['posterFrames'])
-            list.update_icon()
-        if 'view' in data:
-            list.view = data['view']
-        if 'sort' in data:
-            list.sort= tuple(data['sort'])
-        list.save()
+        list.edit(data, request.user)
         response['data'] = list.json(user=request.user)
     else:
         response = json_response(status=403, text='not allowed')

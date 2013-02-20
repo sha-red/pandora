@@ -49,11 +49,12 @@ def addText(request):
         text, created = models.Text.objects.get_or_create(name=name, user=request.user)
         num += 1
         name = data['name'] + ' [%d]' % num
-    text.save()
 
     del data['name']
     if data:
         text.edit(data, request.user)
+    else:
+        text.save()
 
     if text.status == 'featured':
         pos, created = models.Position.objects.get_or_create(text=text,
