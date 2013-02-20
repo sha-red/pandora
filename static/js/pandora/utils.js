@@ -1051,11 +1051,12 @@ pandora.logEvent = function(data, event, element) {
 pandora.normalizeHashQuery = function(state) {
     var embedKeys = [
             'annotationsFont', 'annotationsRange', 'annotationsSort',
-            'embed', 'height',
+            'embed',
             'ignoreRights', 'invertHighlight',
+            'matchRatio',
             'paused', 'playInToOut',
             'showAnnotations', 'showCloseButton', 'showLayers', 'showTimeline',
-            'title', 'width'
+            'title'
         ],
         isEmbed = state.hash && state.hash.query
             && Ox.indexOf(state.hash.query, function(condition) {
