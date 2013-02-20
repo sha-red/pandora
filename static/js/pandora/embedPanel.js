@@ -128,16 +128,21 @@ pandora.ui.embedPanel = function() {
             $controls = Ox.Element();
 
             if (options.showTimeline) {
-                $timeline = Ox.LargeVideoTimeline({
+                $timeline = Ox.LargeVideoTimeline(Ox.extend({
                         duration: video.duration,
                         getImageURL: function(type, i) {
                             return '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg';
                         },
                         position: options.position,
+                        showInToOut: options.playInToOut,
                         subtitles: ui.videoSubtitles ? video.subtitles : [],
                         type: ui.videoTimeline,
                         width: window.innerWidth - 16
-                    })
+                    }, options['in'] ? {
+                        'in': options['in']
+                    } : {}, options.out ? {
+                        out: options.out
+                    } : {}))
                     .css({
                         top: '4px',
                         left: '4px'
