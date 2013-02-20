@@ -16,10 +16,11 @@ pandora.ui.embedPanel = function() {
             'rightslevel', 'size', 'title', 'videoRatio'
         ]}, function(result) {
 
-            var sizes = getSizes();
-            options.height = sizes.videoHeight;
-
             video = Ox.extend(result.data, pandora.getVideoOptions(result.data));
+
+            var sizes = getSizes();
+            Ox.print('SIZES', sizes)
+            options.height = sizes.videoHeight;
 
             if (options.title) {
                 $title = Ox.Element()
@@ -295,7 +296,7 @@ pandora.ui.embedPanel = function() {
                 - (options.title ? 32 : 0)
                 - (options.showTimeline ? 80 : 0)
                 - (options.showAnnotations ? 128 : 0),
-            videoHeight,
+            videoHeight;
         if (options.matchRatio || options.showAnnotations) {
             videoHeight = Math.round(window.innerWidth / video.videoRatio);
             options.matchRatio = options.height <= maxVideoHeight;
@@ -307,7 +308,7 @@ pandora.ui.embedPanel = function() {
                 - (options.title ? 32 : 0)
                 - (options.showTimeline ? 80 : 0);
         }
-        innerHeight = options.height
+        innerHeight = videoHeight
             + (options.title ? 32 : 0)
             + (options.showTimeline ? 80 : 0);
         return {innerHeight: innerHeight, videoHeight: videoHeight};
@@ -339,7 +340,7 @@ pandora.ui.embedPanel = function() {
     $(window).on({
         resize: function() {
             var sizes = getSizes();
-            $player.options({height: sizes.videoHeight});
+            $player.options({width: window.innerWidth, height: sizes.videoHeight});
             $outerPanel.size(0, sizes.innerHeight);
             options.showTimeline && $timeline.options({width: window.innerWidth - 16});
             options.showAnnotations && $annotations.options({width: window.innerWidth});
