@@ -1,7 +1,7 @@
 pandora.ui.embedPanel = function() {
 
     var that = Ox.Element(),
-        data, options,
+        options, video,
         ui = pandora.user.ui,
         $outerPanel, $innerPanel,
         $title, $player, $controls, $timeline, $annotations,
@@ -15,11 +15,13 @@ pandora.ui.embedPanel = function() {
             'duration', 'layers', 'parts', 'posterFrame',
             'rightslevel', 'size', 'title', 'videoRatio'
         ]}, function(result) {
-            data = result.data, innerHeight;
-            Ox.extend(data, pandora.getVideoOptions(data));
+
+            video = result.data, innerHeight;
+            Ox.extend(video, pandora.getVideoOptions(video));
+
             if (options.matchRatio || options.showAnnotations) {
                 options.height = Math.min(
-                    Math.round(window.innerWidth / data.videoRatio),
+                    Math.round(window.innerWidth / video.videoRatio),
                     window.innerHeight
                         - (options.title ? 32 : 0)
                         - (options.showTimeline ? 80 : 0)
@@ -33,6 +35,7 @@ pandora.ui.embedPanel = function() {
             innerHeight = options.height
                 + (options.title ? 32 : 0)
                 + (options.showTimeline ? 80 : 0);
+
             if (options.title) {
                 $title = Ox.Element()
                     .css({position: 'absolute'})
@@ -47,24 +50,85 @@ pandora.ui.embedPanel = function() {
             } else {
                 $title = Ox.Element();
             }
-            $player = pandora.ui.embedPlayer(options, data)
+
+            $player = Ox.VideoPlayer(Ox.extend({
+                    censored: video.censored,
+                    censoredIcon: pandora.site.cantPlay.icon,
+                    censoredTooltip: pandora.site.cantPlay.text,
+                    controlsBottom: ['play', 'volume'].concat(
+                        options.matchRatio ? [] : ['scale']
+                    ).concat(
+                        Ox.Fullscreen.available ? ['fullscreen'] : []
+                    ).concat(
+                        ['timeline', 'position', 'settings']
+                    ),
+                    controlsTooltips: {
+                        close: 'Close',
+                        open: 'Watch on ' + pandora.site.site.name
+                    },
+                    controlsTop: (options.showCloseButton ? ['close'] : []).concat(
+                        ['title', 'open']
+                    ),
+                    duration: video.duration,
+                    enableFullscreen: Ox.Fullscreen.available,
+                    enableKeyboard: true,
+                    enableMouse: true,
+                    enablePosition: true,
+                    enableSubtitles: true,
+                    enableTimeline: true,
+                    enableVolume: true,
+                    height: options.height,
+                    invertHighlight: options.invertHighlight,
+                    muted: pandora.user.ui.videoMuted,
+                    paused: options.paused,
+                    playInToOut: options.playInToOut,
+                    position: options.position,
+                    poster: '/' + options.item + '/' + '96p' + (
+                        options.position !== void 0 ? options.position
+                        : options['in'] !== void 0 ? options['in']
+                        : video.posterFrame
+                    ) +'.jpg',
+                    resolution: pandora.user.ui.videoResolution,
+                    scaleToFill: pandora.user.ui.videoScale == 'fill',
+                    subtitles: video.subtitles,
+                    timeline: options.playInToOut ? function(size, i) {
+                        return '/' + options.item
+                            + '/timelineantialias'
+                            + size + 'p' + i + '.jpg'
+                    } : '/' + options.item + '/' + 'timeline16p.png',
+                    title: video.title,
+                    video: video.video,
+                    volume: pandora.user.ui.videoVolume,
+                    width: options.width
+                }, options['in'] ? {
+                    'in': options['in']
+                } : {}, options.out ? {
+                    out: options.out
+                } : {}))
                 .bindEvent({
                     playing: function(data) {
                         setPosition(data.position, true);
                     },
                     position: function(data) {
                         setPosition(data.position);
+                    },
+                    subtitles: function(data) {
+                        $timeline.options({
+                            subtitles: data.subtitles ? video.subtitles : []
+                        });
                     }
                 });
+
             $controls = Ox.Element();
+
             if (options.showTimeline) {
                 $timeline = Ox.LargeVideoTimeline({
-                        duration: data.duration,
+                        duration: video.duration,
                         getImageURL: function(type, i) {
                             return '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg';
                         },
                         position: options.position,
-                        subtitles: data.subtitles || [],
+                        subtitles: ui.videoSubtitles ? video.subtitles : [],
                         type: ui.videoTimeline,
                         width: window.innerWidth - 16
                     })
@@ -78,7 +142,28 @@ pandora.ui.embedPanel = function() {
                     })
                     .appendTo($controls);
             }
-            $annotations = Ox.Element().html('ANNOTATIONS');
+
+            if (options.showAnnotations) {
+                $annotations = Ox.AnnotationPanel(Ox.extend({
+                    font: options.annotationsFont,
+                    layers: video.annotations,
+                    position: options.position,
+                    range: options.annotationsRange,
+                    showLayers: options.showLayers,
+                    showUsers: true,
+                    sort: options.annotationsSort
+                }, options['in'] ? {
+                    'in': options['in']
+                } : {}, options.out ? {
+                    out: options.out
+                } : {}))
+                .bindEvent({
+                    select: selectAnnotation
+                })
+            } else {
+                $annotations = Ox.Element();
+            }
+
             $innerPanel = Ox.SplitPanel({
                 elements: [
                     {element: $title, size: options.title ? 32 : 0},
@@ -87,6 +172,7 @@ pandora.ui.embedPanel = function() {
                 ],
                 orientation: 'vertical'
             });
+
             $outerPanel = Ox.SplitPanel({
                 elements: [
                     {element: $innerPanel, size: innerHeight},
@@ -94,7 +180,9 @@ pandora.ui.embedPanel = function() {
                 ],
                 orientation: 'vertical'
             });
+
             that.setElement($outerPanel);
+
         });
 
     } else {
@@ -143,7 +231,6 @@ pandora.ui.embedPanel = function() {
         var position = options.playInToOut
             ? Ox.limit(data.position, options['in'], options.out)
             : data.position;
-        Ox.print('PPP', position);
         $player.options({position: position});
         position != data.position && $timeline.options({position: position});
         options.showAnnotations && $annotations.options({position: position});
@@ -152,9 +239,17 @@ pandora.ui.embedPanel = function() {
     function getOptions() {
         var options = {},
             defaults = {
+                annotationsFont: ui.annotationsFont,
+                annotationsRange: ui.annotationsRange,
+                annotationsSort: ui.annotationsSort,
                 invertHighlight: true,
+                matchRatio: false,
                 paused: true,
                 playInToOut: true,
+                showAnnotations: false,
+                showCloseButton: false,
+                showLayers: ui.showLayers,
+                showTimeline: false,
                 width: window.innerWidth
             };
         ui.hash.query.forEach(function(condition) {
@@ -175,6 +270,14 @@ pandora.ui.embedPanel = function() {
             options.playInToOut = false;
         }
         return options;
+    }
+
+    function selectAnnotation(data) {
+        if (data.id) {
+            setPosition(data['in']);
+            //setPoint('in', data['in']);
+            //setPoint('out', data.out);
+        }
     }
 
     function setPosition(position, playing) {
