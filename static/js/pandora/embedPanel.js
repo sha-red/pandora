@@ -113,7 +113,7 @@ pandora.ui.embedPanel = function() {
                         setPosition(data.position);
                     },
                     subtitles: function(data) {
-                        $timeline.options({
+                        options.showTimeline && $timeline.options({
                             subtitles: data.subtitles ? video.subtitles : []
                         });
                     }
