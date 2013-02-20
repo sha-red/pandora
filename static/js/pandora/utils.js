@@ -1085,6 +1085,12 @@ pandora.normalizeHashQuery = function(state) {
         newState.hash.query = newState.hash.query.filter(function(condition) {
             return !Ox.contains(removeKeys, condition.key);
         });
+        if (Ox.isEmpty(newState.hash.query)) {
+            delete newState.hash.query;
+        }
+    }
+    if (Ox.isEmpty(newState.hash)) {
+        delete newState.hash;
     }
     return newState;
 };
