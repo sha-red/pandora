@@ -1057,9 +1057,10 @@ pandora.normalizeHashQuery = function(state) {
             'showAnnotations', 'showCloseButton', 'showLayers', 'showTimeline',
             'title', 'width'
         ],
-        isEmbed = Ox.indexOf(state.hash.query, function(condition) {
-            return Ox.isEqual(condition, {key: 'embed', value: true});
-        }) > -1,
+        isEmbed = state.hash && state.hash.query
+            && Ox.indexOf(state.hash.query, function(condition) {
+                return Ox.isEqual(condition, {key: 'embed', value: true});
+            }) > -1,
         newState = Ox.clone(state, true),
         removeKeys = [];
     if (state.hash && state.hash.anchor) {

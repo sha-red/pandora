@@ -17,6 +17,7 @@ pandora.ui.embedPanel = function() {
                 right: 0,
                 bottom: 0,
             });
+
         $errorBox = $('<div>')
             .css({
                 position: 'absolute',
@@ -30,6 +31,7 @@ pandora.ui.embedPanel = function() {
                 margin: 'auto'
             })
             .appendTo(that);
+
         $errorLogo = $('<img>')
             .css({width: '96px', opacity: 0})
             .one({
@@ -39,6 +41,7 @@ pandora.ui.embedPanel = function() {
             })
             .attr({src: '/static/png/logo.png'})
             .appendTo($errorBox);
+
         $errorText = $('<div>')
             .css({marginTop: '4px', fontSize: '9px', textAlign: 'center'})
             .html('This view cannot<br>be embedded.')
