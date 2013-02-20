@@ -1048,6 +1048,47 @@ pandora.logEvent = function(data, event, element) {
     }
 };
 
+pandora.normalizeHashQuery = function(state) {
+    var embedKeys = [
+            'annotationsFont', 'annotationsRange', 'annotationsSort',
+            'embed', 'height',
+            'ignoreRights', 'invertHighlight',
+            'paused', 'playInToOut',
+            'showAnnotations', 'showCloseButton', 'showLayers', 'showTimeline',
+            'title', 'width'
+        ],
+        isEmbed = Ox.indexOf(state.hash.query, function(condition) {
+            return Ox.isEqual(condition, {key: 'embed', value: true});
+        }) > -1,
+        newState = Ox.clone(state, true),
+        removeKeys = [];
+    if (state.hash && state.hash.anchor) {
+        if (!state.page) {
+            delete newState.hash.anchor;
+        }
+    }
+    if (state.hash && state.hash.query) {
+        if (isEmbed) {
+            state.hash.query.forEach(function(condition) {
+                if (!Ox.contains(embedKeys, condition.key)) {
+                    removeKeys.push(condition.key);
+                }
+            });
+        } else {
+            state.hash.query.forEach(function(condition) {
+                var key = condition.key.split('.')[0];
+                if (pandora.site.user.ui[key] === void 0) {
+                    removeKeys.push(condition.key);
+                }
+            });
+        }
+        newState.hash.query = newState.hash.query.filter(function(condition) {
+            return !Ox.contains(removeKeys, condition.key);
+        });
+    }
+    return newState;
+};
+
 pandora.signin = function(data) {
     // fixme: this is still voodoo
     pandora.user = Ox.extend(data.user, {
