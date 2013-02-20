@@ -16,17 +16,20 @@ pandora.ui.embedPanel = function() {
             'rightslevel', 'size', 'title', 'videoRatio'
         ]}, function(result) {
 
-            video = result.data, innerHeight;
-            Ox.extend(video, pandora.getVideoOptions(video));
+            var innerHeight,
+                maxHeight = window.innerHeight
+                    - (options.title ? 32 : 0)
+                    - (options.showTimeline ? 80 : 0)
+                    - (options.showAnnotations ? 128 : 0);
+
+            video = Ox.extend(result.data, pandora.getVideoOptions(result.data));
 
             if (options.matchRatio || options.showAnnotations) {
-                options.height = Math.min(
-                    Math.round(window.innerWidth / video.videoRatio),
-                    window.innerHeight
-                        - (options.title ? 32 : 0)
-                        - (options.showTimeline ? 80 : 0)
-                        - (options.showAnnotations ? 128 : 0)
-                );
+                options.height = Math.round(window.innerWidth / video.videoRatio);
+                options.matchRatio = options.height <= maxHeight;
+                if (!options.matchRatio) {
+                    options.height = maxHeight;
+                }
             } else {
                 options.height = window.innerHeight
                     - (options.title ? 32 : 0)
