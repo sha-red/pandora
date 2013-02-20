@@ -19,7 +19,6 @@ pandora.ui.embedPanel = function() {
             video = Ox.extend(result.data, pandora.getVideoOptions(result.data));
 
             var sizes = getSizes();
-            Ox.print('SIZES', sizes)
             options.height = sizes.videoHeight;
 
             if (options.title) {
@@ -299,7 +298,7 @@ pandora.ui.embedPanel = function() {
             videoHeight;
         if (options.matchRatio || options.showAnnotations) {
             videoHeight = Math.round(window.innerWidth / video.videoRatio);
-            options.matchRatio = options.height <= maxVideoHeight;
+            options.matchRatio = videoHeight <= maxVideoHeight;
             if (!options.matchRatio) {
                 videoHeight = maxVideoHeight;
             }
