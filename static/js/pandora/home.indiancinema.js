@@ -75,7 +75,6 @@ pandora.ui.home = function() {
             })
             .appendTo($box),
         $line = Ox.Element('<img>')
-            .attr({src: '/static/png/line.indiancinema.png'})
             .css({
                 position: 'absolute',
                 left: 0,
@@ -99,6 +98,7 @@ pandora.ui.home = function() {
                     });
                 }
             })
+            .attr({src: '/static/png/line.indiancinema.png'})
             .appendTo($box),
         $findInput = Ox.Input({
                 width: 252
