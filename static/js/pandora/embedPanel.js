@@ -83,8 +83,10 @@ pandora.ui.embedPanel = function() {
                             + '/timelineantialias'
                             + size + 'p' + i + '.jpg'
                     } : '/' + options.item + '/' + 'timeline16p.png',
-                    // timelineType: pandora.user.ui.videoTimeline,
-                    // timelineTypes: pandora.site.timelines,
+                    timelineType: options.showTimeline
+                        ? options.timeline : '',
+                    timelineTypes: options.showTimeline
+                        ? pandora.site.timelines : [],
                     title: video.title,
                     video: video.video,
                     volume: pandora.user.ui.videoVolume,
@@ -130,7 +132,7 @@ pandora.ui.embedPanel = function() {
                         position: options.position,
                         showInToOut: options.playInToOut,
                         subtitles: ui.videoSubtitles ? video.subtitles : [],
-                        type: ui.videoTimeline,
+                        type: options.timeline,
                         width: window.innerWidth - 16
                     }, options['in'] ? {
                         'in': options['in']
@@ -151,17 +153,20 @@ pandora.ui.embedPanel = function() {
             if (options.showAnnotations) {
                 if (options.playInToOut) {
                     video.annotations.forEach(function(layer) {
-                        var items = [];
-                        layer.items.forEach(function(item) {
-                            if ((
-                                item['in'] >= options['in'] && item['in'] <= options.out
-                            ) || (
-                                item.out >= options['in'] && item.out <= options.out
-                            )) {
-                                items.push(item);
-                            }
-                        });
-                        layer.items = items;
+                        var items;
+                        if (Ox.contains(options.showLayers, layer.id)) {
+                            items = [];
+                            layer.items.forEach(function(item) {
+                                if ((
+                                    item['in'] >= options['in'] && item['in'] <= options.out
+                                ) || (
+                                    item.out >= options['in'] && item.out <= options.out
+                                )) {
+                                    items.push(item);
+                                }
+                            });
+                            layer.items = items;
+                        }
                     });
                 }
                 $annotations = Ox.AnnotationPanel(Ox.extend({
@@ -169,7 +174,7 @@ pandora.ui.embedPanel = function() {
                     layers: video.annotations,
                     position: options.position,
                     range: options.annotationsRange,
-                    showLayers: options.showLayers,
+                    showLayers: ui.showLayers,
                     showUsers: true,
                     sort: options.annotationsSort,
                     width: window.innerWidth
@@ -269,8 +274,11 @@ pandora.ui.embedPanel = function() {
                 playInToOut: true,
                 showAnnotations: false,
                 showCloseButton: false,
-                showLayers: ui.showLayers,
+                showLayers: pandora.site.layers.map(function(layer) {
+                    return layer.id;
+                }),
                 showTimeline: false,
+                timeline: ui.videoTimeline,
                 width: window.innerWidth
             };
         ui.hash.query.forEach(function(condition) {

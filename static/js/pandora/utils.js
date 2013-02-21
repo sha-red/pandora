@@ -1057,7 +1057,7 @@ pandora.normalizeHashQuery = function(state) {
             'matchRatio',
             'paused', 'playInToOut',
             'showAnnotations', 'showCloseButton', 'showLayers', 'showTimeline',
-            'title'
+            'timeline', 'title'
         ],
         isEmbed = state.hash && state.hash.query
             && Ox.indexOf(state.hash.query, function(condition) {
