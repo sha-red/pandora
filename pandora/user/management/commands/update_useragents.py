@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-from optparse import make_option
 
 from django.core.management.base import BaseCommand
 

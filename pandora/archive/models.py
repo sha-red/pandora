@@ -3,19 +3,16 @@
 from __future__ import division, with_statement
 
 import os.path
-import re
 import time
 import shutil
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Q
 from django.db.models.signals import pre_delete
 
 from ox.django import fields
 import ox
-import chardet
 
 from item import utils
 import item.models

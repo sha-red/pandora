@@ -3,12 +3,10 @@
 from glob import glob
 
 from celery.task import task
-import ox
 
 from django.conf import settings
 
 from item.models import Item
-import item.tasks
 import models
 import extract
 
@@ -107,7 +105,7 @@ def extract_derivatives(fileId, rebuild=False):
     file = models.File.objects.get(id=fileId)
     streams = file.streams.filter(source=None)
     if streams.count() > 0:
-        stream[0].extract_derivatives(rebuild)
+        streams[0].extract_derivatives(rebuild)
     return True
 
 @task(queue="encoding")

@@ -2,20 +2,11 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
 
-import re
-
-from django.db import models, transaction
-from django.contrib.auth.models import User, Group
-from django.db.models import Q
-from django.conf import settings
-import ox
+from django.db import models
 
 import managers
-from annotation.models import Annotation, get_matches, get_super_matches
 from item.models import Item, ItemSort
-from changelog.models import Changelog
 
-from django.db import models
 
 class Sequence(models.Model):
     class Meta:

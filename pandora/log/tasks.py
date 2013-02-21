@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-import os
 from datetime import timedelta, datetime
-import gzip
 import random
 random
 
-from django.conf import settings
-from celery.task import task, periodic_task
+from celery.task import periodic_task
 
 import models
 

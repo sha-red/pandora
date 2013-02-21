@@ -2,7 +2,6 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 import os.path
-from datetime import datetime, timedelta
 import mimetypes
 import random
 from urlparse import urlparse
@@ -10,7 +9,7 @@ from urllib import quote
 import time
 
 import Image
-from django.db.models import Count, Sum, Max
+from django.db.models import Count, Sum
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.shortcuts import get_object_or_404, redirect, render_to_response
@@ -21,7 +20,6 @@ from ox.utils import json, ET
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 from ox.django.http import HttpFileResponse
-from django.db.models import Q
 import ox
 
 import models
@@ -33,8 +31,6 @@ from archive import extract
 from clip.models import Clip 
 
 from ox.django.api import actions
-
-import utils
 
 
 def _order_query(qs, sort, prefix='sort__'):

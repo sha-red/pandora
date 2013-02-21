@@ -2,14 +2,12 @@
 # vi:si:et:sw=4:sts=4:ts=4
 import random
 random.seed()
-import re
 
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext, loader
 from django.utils import simplejson as json
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError, EmailMessage
-from django.db.models import Sum
 from django.shortcuts import redirect
 
 from ox.django.shortcuts import render_to_json_response, json_response, get_object_or_404_json
@@ -729,7 +727,6 @@ actions.register(editPreferences, cache=False)
 
 
 def reset_ui(request):
-    response = json_response()
     if request.user.is_authenticated():
         profile = request.user.get_profile()
         profile.ui = {}

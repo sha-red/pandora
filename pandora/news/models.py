@@ -3,7 +3,6 @@
 from __future__ import division, with_statement
 
 from django.db import models
-from django.contrib.auth.models import User
 import ox
 
 from changelog.models import Changelog

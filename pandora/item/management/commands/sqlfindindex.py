@@ -8,7 +8,6 @@ from django.conf import settings
 
 import monkey_patch.models
 from ... import models
-import time
 
 
 class Command(BaseCommand):

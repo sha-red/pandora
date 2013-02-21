@@ -2,12 +2,10 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 
-from django.db.models import Max, Min
-
 import ox
 from ox.utils import json
 
-from ox.django.decorators import login_required_json, admin_required_json
+from ox.django.decorators import admin_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 
 from ox.django.api import actions

@@ -4,11 +4,8 @@ from __future__ import division
 import os
 import re
 
-import ox
-
 from django.db.models import Max, Sum
 from django.db import transaction
-from django.http import HttpResponseForbidden, Http404
 from django.conf import settings
 from ox.utils import json
 from ox.django.decorators import login_required_json

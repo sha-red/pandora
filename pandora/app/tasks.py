@@ -2,7 +2,7 @@
 # vi:si:et:sw=4:sts=4:ts=4
 import datetime
 
-from celery.task import task, periodic_task
+from celery.task import periodic_task
 from celery.schedules import crontab
 
 

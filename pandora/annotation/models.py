@@ -12,14 +12,13 @@ from django.db.models.signals import pre_delete
 
 import ox
 
-from archive import extract
 from clip.models import Clip
 from changelog.models import Changelog
 
 from item.utils import sort_string
 import managers
 import utils
-from tasks import update_matches, update_item
+from tasks import update_matches
 
 
 def get_super_matches(obj, model):

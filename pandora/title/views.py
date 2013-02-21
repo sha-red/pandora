@@ -3,8 +3,6 @@
 from __future__ import division
 import unicodedata
 
-from django.db.models import Max, Min
-
 import ox
 from ox.utils import json
 

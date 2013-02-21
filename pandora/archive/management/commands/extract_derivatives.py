@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
-import os
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
-from django.conf import settings
 
 import monkey_patch.models
 from ... import models

@@ -2,19 +2,13 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 
-from django.conf import settings
-
 import ox
 from ox.utils import json
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
 
 
-from item.models import Item
 from ox.django.api import actions
-
-from item import utils
-from item.models import Item
 
 import models
 

@@ -3,9 +3,7 @@
 from __future__ import division, with_statement
 
 from datetime import datetime
-import math
 import os.path
-import re
 import subprocess
 from glob import glob
 import shutil
@@ -14,12 +12,10 @@ import unicodedata
 from urllib import quote
 
 from django.db import models, transaction
-from django.db.models import Count, Q, Sum, Max
-from django.core.files.base import ContentFile
+from django.db.models import Q, Sum, Max
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.db.models.signals import pre_delete
-from django.contrib.sites.models import Site
 
 import ox
 from ox.django import fields

@@ -3,7 +3,7 @@
 import copy
 from datetime import datetime
 
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Max
 from django.conf import settings
@@ -273,7 +273,7 @@ def get_ui(user_ui, user=None):
                     pos = P.objects.get(text=t, section=section)
                     created = False
                 except P.DoesNotExist:
-                    pos = P(text=t, section=section, user=l.user)
+                    pos = P(text=t, section=section, user=t.user)
                     pos.save()
                     created = True 
             else:
@@ -303,7 +303,7 @@ def get_ui(user_ui, user=None):
 
 def init_user(user, request=None):
     if request:
-        data = SessionData.get_or_create(request)
+        SessionData.get_or_create(request)
     if user.is_anonymous():
         result = settings.CONFIG['user'].copy()
         result['ui'] = get_ui(json.loads(request.session.get('ui', '{}')))

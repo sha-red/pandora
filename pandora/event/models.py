@@ -2,12 +2,8 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division, with_statement
 
-import re
-
 from django.db import models, transaction
 from django.contrib.auth.models import User
-from django.db.models import Q
-from django.conf import settings
 import ox
 from ox.django import fields
 

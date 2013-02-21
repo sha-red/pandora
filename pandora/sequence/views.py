@@ -2,17 +2,16 @@
 # vi:si:et:sw=4:sts=4:ts=4
 from __future__ import division
 
-from django.conf import settings
 from ox.utils import json
 from ox.django.shortcuts import render_to_json_response, json_response
 
 from ox.django.api import actions
 
-from annotation.models import Annotation
 from item.models import Item
 from item import utils
 
 import models
+
 
 def parse_query(data, user):
     query = {}

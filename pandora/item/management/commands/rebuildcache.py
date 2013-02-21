@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 
-import os
-from os.path import join, dirname, basename, splitext, exists
 import time
 
-from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
+from django.core.management.base import BaseCommand
 
 import monkey_patch.models
 from ... import models

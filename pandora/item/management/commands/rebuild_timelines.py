@@ -2,12 +2,9 @@
 # vi:si:et:sw=4:sts=4:ts=4
 
 import os
-from os.path import join, dirname, basename, splitext, exists
-import time
 from glob import glob
 
-from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
+from django.core.management.base import BaseCommand
 
 import monkey_patch.models
 from ... import models
@@ -23,7 +20,7 @@ class Command(BaseCommand):
     def handle(self, **options):
         offset = 0
         chunk = 100
-        count = pos = models.Item.objects.count()
+        count = models.Item.objects.count()
         while offset <= count:
             for i in models.Item.objects.all().order_by('id')[offset:offset+chunk]:
                 if not os.path.exists(os.path.join(i.timeline_prefix, 'cuts.json')) or \

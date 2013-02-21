@@ -7,7 +7,7 @@ from datetime import datetime
 from django import forms
 from django.shortcuts import get_object_or_404, redirect
 from django.conf import settings
-from django.db.models import Count, Q
+from django.db.models import Count
 
 import ox
 from ox.utils import json
@@ -282,7 +282,6 @@ def firefogg_upload(request):
 def taskStatus(request):
     #FIXME: should check if user has permissions to get status
     data = json.loads(request.POST['data'])
-    user = request.user
     task_id = data['task_id']
     response = task_status(request, task_id)
     return render_to_json_response(response)

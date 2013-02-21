@@ -4,7 +4,6 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
-from django.conf import settings
 from django.db.models import fields
 
 import monkey_patch.models

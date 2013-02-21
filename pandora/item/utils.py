@@ -3,9 +3,8 @@
 #
 from decimal import Decimal
 import re
-import unicodedata
 import ox
-from ox import sorted_strings, sort_string
+from ox import sort_string
 
 def safe_filename(filename):
     filename = filename.replace(': ', '_ ')
