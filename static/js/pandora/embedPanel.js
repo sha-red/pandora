@@ -151,22 +151,22 @@ pandora.ui.embedPanel = function() {
             }
 
             if (options.showAnnotations) {
+                video.annotations = video.annotations.filter(function(layer) {
+                    return Ox.contains(options.showLayers, layer.id);
+                });
                 if (options.playInToOut) {
                     video.annotations.forEach(function(layer) {
-                        var items;
-                        if (Ox.contains(options.showLayers, layer.id)) {
-                            items = [];
-                            layer.items.forEach(function(item) {
-                                if ((
-                                    item['in'] >= options['in'] && item['in'] <= options.out
-                                ) || (
-                                    item.out >= options['in'] && item.out <= options.out
-                                )) {
-                                    items.push(item);
-                                }
-                            });
-                            layer.items = items;
-                        }
+                        var items = [];
+                        layer.items.forEach(function(item) {
+                            if ((
+                                item['in'] >= options['in'] && item['in'] <= options.out
+                            ) || (
+                                item.out >= options['in'] && item.out <= options.out
+                            )) {
+                                items.push(item);
+                            }
+                        });
+                        layer.items = items;
                     });
                 }
                 $annotations = Ox.AnnotationPanel(Ox.extend({
