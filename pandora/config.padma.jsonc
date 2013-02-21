@@ -619,6 +619,7 @@
                     "columnWidth": {}
                 }
             },
+            "embedSize": 256,
             "filters": [
                 {"id": "source", "sort": [{"key": "name", "operator": "+"}]},
                 {"id": "project", "sort": [{"key": "name", "operator": "+"}]},

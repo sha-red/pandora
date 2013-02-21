@@ -700,6 +700,7 @@
                     "columnWidth": {}
                 }
             },
+            "embedSize": 256,
             "filters": [
                 {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
                 {"id": "year", "sort": [{"key": "name", "operator": "+"}]},
