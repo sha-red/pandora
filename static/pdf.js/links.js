@@ -24,21 +24,23 @@ function getEmbedURL(id, videoURL) {
         + '&in=' + inPoint + '&out=' + outPoint
         + '&paused=false&showCloseButton=true';
 }
-
 function getVideoOverlay(page) {
-    return (editable || links[page]) ? {
+    var links = embeds.filter(function(embed) {
+        return embed.page == page && embed.type =='inline';
+    });
+    return (editable || links.length) ? {
         beginLayout: function() {
             this.counter = 0;
-            //console.log('lets beging');
         },
         endLayout: function() {
-            //console.log('lets end it here');
         },
         appendImage: function(image) {
             var id = ++this.counter,
-                hasVideo = links[page] && links[page][id],
+                video = links.filter(function(embed) {
+                    return embed.id == id;
+                })[0],
                 $interface, $playButton, $editButton;
-            if (editable || hasVideo) {
+            if (editable || video) {
                 $interface = Ox.$('<div>')
                     .addClass('interface')
                     .css({
@@ -66,7 +68,7 @@ function getVideoOverlay(page) {
                 if (editable) {
                     $editButton.show();
                 }
-                if (hasVideo) {
+                if (video) {
                     enableVideoUI();
                 }
                 this.div.appendChild($interface[0]);
@@ -78,7 +80,7 @@ function getVideoOverlay(page) {
                     $iframe = Ox.$('<iframe>')
                         .attr({
                             id: videoId,
-                            src: getEmbedURL(videoId, links[page][id]),
+                            src: getEmbedURL(videoId, video.src),
                             width: '100%',
                             height: '100%',
                             frameborder: 0
@@ -92,21 +94,24 @@ function getVideoOverlay(page) {
                 var url;
                 e.preventDefault();
                 e.stopPropagation();
-                if (!links[page]) {
-                    links[page] = {}
-                }
-                if (!links[page][id]) {
-                    links[page][id] = '';
-                }
+                
                 url = prompt(
                     'Please enter a pan.do/ra video URL, like\n'
                     + 'https://0xdb.org/0315594/00:13:37,00:23:42 or\n'
                     + 'http://pad.ma/A/editor/00:00:00,00:01:00,00:02:00'
-                    + (links[page][id] ? '\n\nTo remove the video, just remove the URL.' : ''),
-                    links[page][id]
+                    + (video ? '\n\nTo remove the video, just remove the URL.' : ''),
+                    video.src
                 );
                 if (url !== null) {
-                    links[page][id] = url;
+                    if(!video) {
+                        video = {
+                            page: page,
+                            id: id,
+                            src: ''
+                        };
+                        embeds.push(video);
+                    }
+                    video.src = url
                     saveVideoOverlay();
                     url !== '' ? enableVideoUI() : disableVideoUI()
                 }
