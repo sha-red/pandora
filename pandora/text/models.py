@@ -38,7 +38,7 @@ class Text(models.Model):
                              upload_to=lambda i, x: i.path("icon.jpg"))
 
     text = models.TextField(default="")
-    links = DictField(default={}, editable=True)
+    embeds = TupleField(default=[], editable=True)
 
     poster_frames = TupleField(default=[], editable=False)
     subscribed_users = models.ManyToManyField(User, related_name='subscribed_texts')
@@ -142,6 +142,8 @@ class Text(models.Model):
             self.type = data['type'] == 'pdf' and 'pdf' or 'html'
         if 'posterFrames' in data:
             self.poster_frames = tuple(data['posterFrames'])
+        if 'embeds' in data:
+            self.embeds = tuple(data['embeds'])
         self.save()
         if 'posterFrames' in data:
             self.update_icon()
@@ -181,6 +183,7 @@ class Text(models.Model):
                 response[key] = getattr(self, _map.get(key,key))
         if self.type == 'pdf':
             response['uploaded'] = True if self.file and not self.uploading else False
+            response['embeds'] = self.embeds
         return response
 
     def path(self, name=''):

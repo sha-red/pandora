@@ -398,7 +398,7 @@ def pdf_viewer(request, id):
     if text.type == 'pdf' and text.file and not text.uploading:
         context = RequestContext(request, {
             'editable': json.dumps(text.editable(request.user)),
-            'links': json.dumps(text.links),
+            'embeds': json.dumps(text.embeds),
             'settings': settings,
             'url': text.get_absolute_pdf_url()
         })
