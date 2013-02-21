@@ -344,12 +344,18 @@ pandora.URL = (function() {
     };
 
     // on page load, this sets the state from the URL
-    that.parse = function(callback) {
+    that.parse = function(set, callback) {
+        if (arguments.length == 1) {
+            callback = arguments[0];
+        } else {
+            set = set === false ? false : true;
+        }
         if (document.location.pathname.slice(0, 4) == 'url=') {
             document.location.href = decodeURI(document.location.pathname.slice(4));
         } else {
             self.URL.parse(function(state) {
-                setState(state, callback); // setState -> UI.set -> URL.update
+                // setState -> UI.set -> URL.update
+                set ? setState(state, callback) : callback(state);
             });
         }
         return that;
