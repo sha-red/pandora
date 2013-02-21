@@ -100,7 +100,7 @@ function getVideoOverlay(page) {
                     + 'https://0xdb.org/0315594/00:13:37,00:23:42 or\n'
                     + 'http://pad.ma/A/editor/00:00:00,00:01:00,00:02:00'
                     + (video ? '\n\nTo remove the video, just remove the URL.' : ''),
-                    video.src
+                    video ? video.src : ''
                 );
                 if (url !== null) {
                     if(!video) {
