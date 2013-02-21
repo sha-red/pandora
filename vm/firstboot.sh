@@ -56,6 +56,7 @@ $MANAGE collectstatic -l --noinput
 
 cp /srv/pandora/etc/init/* /etc/init/
 
+service pandora-cron start
 service pandora-encoding start
 service pandora-tasks start
 service pandora start
