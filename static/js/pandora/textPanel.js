@@ -2,35 +2,28 @@
 
 pandora.ui.textPanel = function() {
 
-    var tags = [
-            'b', 'code', 'em', 'i', 's', 'strong', 'sub', 'sup', 'u',
-            'blockquote', 'h1', 'h2', 'h3', 'p', 'pre',
-            'li', 'ol', 'ul',
-            'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr',
-            'a', 'br', 'img',
-            'rtl'
-        ],
-
-        that = Ox.SplitPanel({
+    var that = Ox.SplitPanel({
             elements: [
                 {element: Ox.Element(), size: 24},
                 {element: Ox.Element()},
                 {element: Ox.Element(), size: 16}
             ],
             orientation: 'vertical'
-        });
+        }),
+        embedURLs,
+        selected;
 
     pandora.api.getText({id: pandora.user.ui.text}, function(result) {
 
         Ox.print('TEXT:', result.data);
 
-        var text = result.data,
+        var text = result.data;
+        embedURLs = text.type == 'html'
+            ? getEmbedURLs(text.text)
+            : [];
+        selected = embedURLs.length ? 0 : -1;
 
-            embedURLs = text.type == 'html'
-                ? getEmbedURLs(text.text)
-                : [],
-
-            $toolbar = Ox.Bar({size: 24}),
+        var $toolbar = Ox.Bar({size: 24}),
 
             $editMenu, $uploadButton,
 
@@ -61,6 +54,13 @@ pandora.ui.textPanel = function() {
                     float: 'right',
                     margin: '4px 2px 4px 2px'
                 })
+                .bindEvent({
+                    click: function() {
+                        selectEmbed(
+                            selected < embedURLs.length - 1 ? selected + 1 : 0
+                        );
+                    }
+                })
                 .appendTo($toolbar),
 
             $currentButton = Ox.Button({
@@ -85,6 +85,13 @@ pandora.ui.textPanel = function() {
                     float: 'right',
                     margin: '4px 2px 4px 2px'
                 })
+                .bindEvent({
+                    click: function() {
+                        selectEmbed(
+                            selected ? selected - 1 : embedURLs.length - 1
+                        );
+                    }
+                })
                 .appendTo($toolbar),
 
             $statusbar = Ox.Bar({size: 16}),
@@ -93,11 +100,11 @@ pandora.ui.textPanel = function() {
                 elements: [
                     {
                         element: pandora.$ui.text = text.type == 'html'
-                            ? pandora.ui.textHTML(text, tags)
+                            ? pandora.ui.textHTML(text)
                             : pandora.ui.textPDF(text)
                     },
                     {
-                        element: pandora.$ui.textEmbed = pandora.ui.textEmbed(embedURLs[0]),
+                        element: pandora.$ui.textEmbed = pandora.ui.textEmbed(embedURLs[selected]),
                         size: pandora.user.ui.embedSize,
                         resizable: true,
                         resize: [192, 256, 320, 384, 448, 512]
@@ -153,21 +160,28 @@ pandora.ui.textPanel = function() {
     });
 
     function getEmbedURLs(text) {
-        var matches = text.match(/<span data-video=".+?">/g),
+        var matches = text.match(/<a [^<>]*?href="(.+?)".*?>/gi),
             urls = [];
         if (matches) {
             matches.forEach(function(match) {
-                urls.push(match.match(/"(.+?)"/)[1]);
+                var url = match.match(/"(.+?)"/)[1];
+                if (pandora.isEmbedURL(url)) {
+                    urls.push(url);
+                }
             });
         }
         return urls;
+    }
+
+    function selectEmbed(selected) {
+        pandora.$ui.textEmbed.update(embedURLs[selected]);
     }
 
     return that;
 
 };
 
-pandora.ui.textHTML = function(text, tags) {
+pandora.ui.textHTML = function(text) {
 
     var height = getHeight(),
         width = getWidth(),
@@ -223,7 +237,6 @@ pandora.ui.textHTML = function(text, tags) {
                 height: height,
                 maxHeight: Infinity,
                 placeholder: text.editable ? 'Doubleclick to edit text' : '',
-                tags: tags,
                 tooltip: text.editable ? 'Doubleclick to edit text' : '',
                 type: 'textarea',
                 width: width,
@@ -294,8 +307,6 @@ pandora.ui.textPDF = function(text) {
 
 pandora.ui.textEmbed = function(url) {
 
-    // url = 'http://0xdb.local/0084628/player/00:10:00,00:10:00,00:20:00#?embed=true&matchRatio=true&showAnnotations=true&showLayers=["subtitles"]&showTimeline=true&title=Hello World "Hello"';
-
     var that = Ox.Element()
             .bindEvent({
                 resizestart: function() {
@@ -342,8 +353,10 @@ pandora.ui.textEmbed = function(url) {
 
     that.update = function(url) {
         if (url) {
+            url = url.replace(/&amp;/g, '&') + '&matchRatio=true';
+            $iframe[0].contentWindow.postMessage(url);
             $message.hide();
-            $iframe.attr({src: url}).show();
+            $iframe.show();
         } else {
             $iframe.hide();
             $message.show();
