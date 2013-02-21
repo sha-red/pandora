@@ -162,7 +162,7 @@ class Text(models.Model):
             elif hasattr(self, _map.get(key, key)):
                 response[key] = getattr(self, _map.get(key,key))
         if self.type == 'pdf':
-            response['available'] = True if self.file and not self.uploading else False
+            response['uploaded'] = True if self.file and not self.uploading else False
         return response
 
     def path(self, name=''):
