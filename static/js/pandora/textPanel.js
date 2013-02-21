@@ -22,9 +22,13 @@ pandora.ui.textPanel = function() {
 
     pandora.api.getText({id: pandora.user.ui.text}, function(result) {
 
+        Ox.print('TEXT:', result.data);
+
         var text = result.data,
 
-            embedURLs = getEmbedURLs(text.text),
+            embedURLs = text.type == 'html'
+                ? getEmbedURLs(text.text)
+                : text.urls,
 
             $toolbar = Ox.Bar({size: 24}),
 
@@ -162,9 +166,11 @@ pandora.ui.textHTML = function(text, tags) {
             .css({margin: '16px'}),
 
         $title = Ox.Editable({
+                editable: text.editable,
                 height: 32,
                 placeholder: text.editable ? 'Doubleclick to edit title' : 'Untitled',
                 tooltip: text.editable ? 'Doubleclick to edit title' : '',
+                value: text.name,
                 width: width
             })
             .css({
@@ -216,7 +222,8 @@ pandora.ui.textHTML = function(text, tags) {
                 tags: tags,
                 tooltip: text.editable ? 'Doubleclick to edit text' : '',
                 type: 'textarea',
-                width: width
+                width: width,
+                value: text.text
             })
             .css({
                 //position: 'absolute',
@@ -272,6 +279,8 @@ pandora.ui.textPDF = function(text) {
 
 pandora.ui.textEmbed = function(url) {
 
+    // url = 'http://0xdb.local/0084628/player/00:10:00,00:10:00,00:20:00#?embed=true&matchRatio=true&showAnnotations=true&showLayers=["subtitles"]&showTimeline=true&title=Hello World "Hello"';
+
     var that = Ox.Element()
             .bindEvent({
                 resizestart: function() {
@@ -297,7 +306,10 @@ pandora.ui.textEmbed = function(url) {
                 height: '100%',
                 frameborder: 0,
                 src: '',
-                width: '100%'
+                width: '100%',
+                allowFullScreen: true,
+                mozallowfullscreen: true,
+                webkitAllowFullScreen: true
             })
             .hide()
             .appendTo(that),
