@@ -3,8 +3,8 @@
 pandora.ui.textPanel = function() {
 
     var tags = [
-            'b', 'code', 'em', 'i', 's', 'span', 'strong', 'sub', 'sup', 'u',
-            'blockquote', 'div', 'h1', 'h2', 'h3', 'p', 'pre',
+            'b', 'code', 'em', 'i', 's', 'strong', 'sub', 'sup', 'u',
+            'blockquote', 'h1', 'h2', 'h3', 'p', 'pre',
             'li', 'ol', 'ul',
             'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr',
             'a', 'br', 'img',
@@ -28,7 +28,7 @@ pandora.ui.textPanel = function() {
 
             embedURLs = text.type == 'html'
                 ? getEmbedURLs(text.text)
-                : text.urls,
+                : [],
 
             $toolbar = Ox.Bar({size: 24}),
 
@@ -93,7 +93,7 @@ pandora.ui.textPanel = function() {
                 elements: [
                     {
                         element: pandora.$ui.text = text.type == 'html'
-                            ? pandora.ui.textHTML(text)
+                            ? pandora.ui.textHTML(text, tags)
                             : pandora.ui.textPDF(text)
                     },
                     {
@@ -209,26 +209,20 @@ pandora.ui.textHTML = function(text, tags) {
         $text = Ox.Editable({
                 clickLink: pandora.clickLink,
                 editable: text.editable,
+                format: function(text) {
+                    return text.replace(
+                        /<a [^<>]*?href="(.+?)".*?>/gi,
+                        function() {
+                            var link = arguments[0], url = arguments[1];
+                            return pandora.isEmbedURL(url)
+                                ? '<a class="OxSpecialLink" href="' + url + '">'
+                                : link;
+                        }
+                    );
+                },
                 height: height,
                 maxHeight: Infinity,
                 placeholder: text.editable ? 'Doubleclick to edit text' : '',
-                replaceTags: {
-                    span: [
-                        [
-                            /<span [^<>]*?data-video="(.+?)".*?>/gi,
-                            function(match) {
-                                var url = Ox.parseURL(arguments[1]),
-                                    query = Ox.unserialize(url.search);
-                                    str = url.origin + url.pathname;
-                                return 'foo';
-                            }
-                        ],
-                        [
-                            /<\/span>/gi,
-                            '</span>'
-                        ]
-                    ]
-                },
                 tags: tags,
                 tooltip: text.editable ? 'Doubleclick to edit text' : '',
                 type: 'textarea',
@@ -244,6 +238,7 @@ pandora.ui.textHTML = function(text, tags) {
             })
             .bindEvent({
                 submit: function(data) {
+                    Ox.print('SUBMIT', data.value);
                     Ox.Request.clearCache('getText');
                     pandora.api.editText({
                         id: pandora.user.ui.text,
