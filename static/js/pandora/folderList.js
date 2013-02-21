@@ -81,7 +81,7 @@ pandora.ui.folderList = function(id) {
                 format: function(value, data) {
                     return $('<img>')
                         .attr({
-                            src: Ox.UI.getImageURL(value == 'smart' ? 'symbolFind' : value == 'pdf' ? 'symbolFiles' : value == 'html' ? 'symbolFile' : 'symbolClick')
+                            src: Ox.UI.getImageURL(value == 'smart' ? 'symbolFind' : value == 'pdf' ? 'symbolBook' : value == 'html' ? 'symbolFile' : 'symbolClick')
                         })
                         .css({
                             width: '10px',
