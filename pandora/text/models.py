@@ -62,7 +62,7 @@ class Text(models.Model):
         return self.user == user or self.status in ('public', 'featured')
 
     def editable(self, user):
-        if user.is_anonymous():
+        if not user or user.is_anonymous():
             return False
         if self.user == user or \
            user.is_staff or \
@@ -144,7 +144,19 @@ class Text(models.Model):
 
     def json(self, keys=None, user=None):
         if not keys:
-             keys=['id', 'name', 'user', 'status', 'subscribed', 'posterFrames', 'description', 'text', 'type', 'links']
+             keys=[
+                'description',
+                'editable',
+                'id',
+                'links',
+                'name',
+                'posterFrames',
+                'status',
+                'subscribed',
+                'text',
+                'type',
+                'user'
+            ]
         response = {}
         _map = {
             'posterFrames': 'poster_frames'
@@ -152,6 +164,8 @@ class Text(models.Model):
         for key in keys:
             if key == 'id':
                 response[key] = self.get_id()
+            elif key == 'editable':
+                response[key] = self.editable(user)
             elif key == 'user':
                 response[key] = self.user.username
             elif key == 'subscribers':
