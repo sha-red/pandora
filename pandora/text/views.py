@@ -67,7 +67,7 @@ def addText(request):
     pos.position = qs.aggregate(Max('position'))['position__max'] + 1
     pos.save()
     response = json_response(status=200, text='created')
-    response['data'] = text.json()
+    response['data'] = text.json(user=request.user)
     return render_to_json_response(response)
 actions.register(addText, cache=False)
 
@@ -97,7 +97,7 @@ def getText(request):
             text = qs[0]
     else:
         text = get_text_or_404_json(data['id'])
-    response['data'] = text.json()
+    response['data'] = text.json(user=request.user)
     return render_to_json_response(response)
 actions.register(getText)
 

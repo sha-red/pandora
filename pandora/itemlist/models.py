@@ -7,6 +7,7 @@ import subprocess
 from glob import glob
 
 from django.db import models
+from django.db.models import Max
 from django.contrib.auth.models import User
 from django.conf import settings
 import ox
@@ -156,9 +157,9 @@ class List(models.Model):
                 self.status = value
             elif key == 'name':
                 data['name'] = re.sub(' \[\d+\]$', '', data['name']).strip()
+                if not data['name']:
+                    data['name'] = "Untitled"
                 name = data['name']
-                if not name:
-                    name = "Untitled"
                 num = 1
                 while List.objects.filter(name=name, user=self.user).exclude(id=self.id).count()>0:
                     num += 1

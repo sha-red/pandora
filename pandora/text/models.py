@@ -8,6 +8,7 @@ from datetime import datetime
 from glob import glob
 
 from django.db import models
+from django.db.models import Max
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.db.models.signals import pre_delete
@@ -114,9 +115,9 @@ class Text(models.Model):
                 self.status = value
             elif key == 'name':
                 data['name'] = re.sub(' \[\d+\]$', '', data['name']).strip()
+                if not data['name']:
+                    data['name'] = "Untitled"
                 name = data['name']
-                if not name:
-                    name = "Untitled"
                 num = 1
                 while Text.objects.filter(name=name, user=self.user).exclude(id=self.id).count()>0:
                     num += 1
@@ -128,7 +129,7 @@ class Text(models.Model):
                 self.text = ox.sanitize_html(data['text'])
 
         if 'position' in data:
-            pos, created = Position.objects.get_or_create(text=text, user=user)
+            pos, created = Position.objects.get_or_create(text=self, user=user)
             pos.position = data['position']
             pos.section = 'featured'
             if self.status == 'private':
