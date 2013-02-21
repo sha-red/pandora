@@ -19,7 +19,7 @@ PANDORA_BASE=/srv/pandora
 DAEMON_USER="pandora"
 DAEMON_NAME=pandora/manage.py
 DAEMON="$PANDORA_BASE/$DAEMON_NAME"
-DAEMON_ARGS="celeryd -Q encoding -n pandora-encoding -f /var/log/pandora/pandora-encoding.log -l INFO"
+DAEMON_ARGS="celeryd -Q encoding -n $NAME -f /var/log/pandora/$NAME.log -l INFO"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
