@@ -11,7 +11,14 @@ pandora.ui.textPanel = function() {
             'rtl'
         ],
 
-        that = Ox.Element();
+        that = Ox.SplitPanel({
+            elements: [
+                {element: Ox.Element(), size: 24},
+                {element: Ox.Element()},
+                {element: Ox.Element(), size: 16}
+            ],
+            orientation: 'vertical'
+        });
 
     pandora.api.getText({id: pandora.user.ui.text}, function(result) {
 
@@ -125,16 +132,9 @@ pandora.ui.textPanel = function() {
             }
         }
 
-        that.setElement(
-            Ox.SplitPanel({
-                elements: [
-                    {element: $toolbar, size: 24},
-                    {element: $panel},
-                    {element: $statusbar, size: 16}
-                ],
-                orientation: 'vertical'
-            })
-        );
+        that.replaceElement(0, $toolbar);
+        that.replaceElement(1, $panel);
+        that.replaceElement(2, $statusbar);
 
     });
 
