@@ -123,14 +123,24 @@ pandora.ui.textPanel = function() {
                     })
                     .appendTo($toolbar);
             } else {
-                $uploadButton = Ox.Button({
-                        title: 'upload',
+                $uploadButton = Ox.FileButton({
+                        image: 'upload',
                         tooltip: 'Upload PDF',
                         type: 'image'
                     })
                     .css({
                         float: 'left',
                         margin: '4px 2px 4px 4px'
+                    })
+                    .bindEvent({
+                        click: function(data) {
+                            if(data.files.length) {
+                                pandora.$ui.uploadPDFDialog = pandora.ui.uploadPDFDialog({
+                                    file: data.files[0],
+                                    id: pandora.user.ui.text
+                                }).open();
+                            }
+                        }
                     })
                     .appendTo($toolbar);
             }
@@ -270,9 +280,19 @@ pandora.ui.textHTML = function(text, tags) {
 pandora.ui.textPDF = function(text) {
 
     var that = Ox.Element();
+    if (text.uploaded) {
+        $('<iframe>')
+            .attr({
+                height: '100%',
+                frameborder: 0,
+                src: '/texts/' + pandora.user.ui.text + '/text.pdf.html',
+                width: '100%'
+            })
+        .appendTo(that);
 
-    that.html('UPLOADED: ' + text.uploaded);
-
+    } else {
+        that.html('UPLOADED: ' + text.uploaded);
+    }
     return that;
 
 };

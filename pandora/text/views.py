@@ -12,6 +12,8 @@ from ox.django.shortcuts import render_to_json_response, get_object_or_404_json,
 from django import forms
 from django.db.models import Sum, Max
 from django.conf import settings
+from django.shortcuts import render_to_response
+from django.template import RequestContext
 
 from item import utils
 import models
@@ -390,6 +392,19 @@ class ChunkForm(forms.Form):
     chunk = forms.FileField()
     chunkId = forms.IntegerField(required=False)
     done = forms.IntegerField(required=False)
+
+def pdf_viewer(request, id):
+    text = get_text_or_404_json(id)
+    if text.type == 'pdf' and text.file and not text.uploading:
+        context = RequestContext(request, {
+            'editable': json.dumps(text.editable(request.user)),
+            'links': json.dumps(text.links),
+            'settings': settings,
+            'url': text.get_absolute_pdf_url()
+        })
+        return render_to_response('pdf/viewer.html', context)
+    response = json_response(status=404, text='file not found')
+    return render_to_json_response(response)
 
 def pdf(request, id):
     text = get_text_or_404_json(id)

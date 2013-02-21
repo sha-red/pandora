@@ -5,6 +5,7 @@ import os
 import re
 import subprocess
 from glob import glob
+from urllib import quote
 
 from django.db import models
 from django.db.models import Max
@@ -53,7 +54,10 @@ class Text(models.Model):
         return self.get_id()
     
     def get_absolute_url(self):
-        return '/texts/%s' % self.get_id()
+        return '/texts/%s' % quote(self.get_id())
+
+    def get_absolute_pdf_url(self):
+        return '/texts/%s/text.pdf' % quote(self.get_id())
 
     def get_id(self):
         return u'%s:%s' % (self.user.username, self.name)
