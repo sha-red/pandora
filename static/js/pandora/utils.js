@@ -1019,6 +1019,12 @@ pandora.isClipView = function(view, item) {
     ).indexOf(view) > -1;
 };
 
+pandora.isEmbedURL = function(url) {
+    var hash = Ox.parseURL(url).hash;
+    return hash.substr(0, 2) == '#?'
+        && Ox.unserialize(hash.substr(2)).embed === true
+};
+
 pandora.logEvent = function(data, event, element) {
     var element = this,
         handlers = self.eventHandlers ? self.eventHandlers[event] : [];
