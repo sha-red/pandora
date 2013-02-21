@@ -90,7 +90,7 @@ class Text(models.Model):
                         pos.section = 'personal'
                         pos.save()
                 elif value == 'featured':
-                    if user.get_profile().capability('canEditFeaturedselfs'):
+                    if user.get_profile().capability('canEditFeaturedTexts'):
                         pos, created = Position.objects.get_or_create(text=self, user=user,
                                                                              section='featured')
                         if created:
