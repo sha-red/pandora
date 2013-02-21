@@ -17,7 +17,7 @@ pandora.ui.textPanel = function() {
 
         var text = result.data,
 
-            embedsURLs = getEmbedsURLs(),
+            embedURLs = getEmbedURLs(text.text),
 
             $toolbar = Ox.Bar({size: 24}),
 
@@ -95,32 +95,34 @@ pandora.ui.textPanel = function() {
                 orientation: 'horizontal'
             });
 
-        if (text.type == 'html') {
-            $editMenu = Ox.MenuButton({
-                    items: [
-                        {id: 'inserthtml', title: 'Insert HTML...'},
-                        {id: 'insertembed', title: 'Insert Embed...'}
-                    ],
-                    title: 'edit',
-                    tooltip: 'Editing Options',
-                    type: 'image'
-                })
-                .css({
-                    float: 'left',
-                    margin: '4px 2px 4px 4px'
-                })
-                .appendTo($toolbar);
-        } else {
-            $uploadButton = Ox.Button({
-                    title: 'upload',
-                    tooltip: 'Upload PDF',
-                    type: 'image'
-                })
-                .css({
-                    float: 'left',
-                    margin: '4px 2px 4px 4px'
-                })
-                .appendTo($toolbar);
+        if (text.editable) {
+            if (text.type == 'html') {
+                $editMenu = Ox.MenuButton({
+                        items: [
+                            {id: 'inserthtml', title: 'Insert HTML...'},
+                            {id: 'insertembed', title: 'Insert Embed...'}
+                        ],
+                        title: 'edit',
+                        tooltip: 'Editing Options',
+                        type: 'image'
+                    })
+                    .css({
+                        float: 'left',
+                        margin: '4px 2px 4px 4px'
+                    })
+                    .appendTo($toolbar);
+            } else {
+                $uploadButton = Ox.Button({
+                        title: 'upload',
+                        tooltip: 'Upload PDF',
+                        type: 'image'
+                    })
+                    .css({
+                        float: 'left',
+                        margin: '4px 2px 4px 4px'
+                    })
+                    .appendTo($toolbar);
+            }
         }
 
         that.setElement(
@@ -175,10 +177,10 @@ pandora.ui.textHTML = function(text, tags) {
                 submit: function(data) {
                     Ox.Request.clearCache('getText');
                     pandora.api.editText({
-                        id: ui.text,
+                        id: pandora.user.ui.text,
                         name: data.value
                     }, function(result) {
-                        // ...
+                        Ox.print('RESULT.DATA:', result.data);
                     });
                 }
             })
@@ -251,6 +253,8 @@ pandora.ui.textHTML = function(text, tags) {
         return that;
     };
 
+    return that;
+
 };
 
 pandora.ui.textPDF = function(text) {
@@ -266,20 +270,24 @@ pandora.ui.textPDF = function(text) {
 pandora.ui.textEmbed = function(url) {
 
     var that = Ox.Element()
-            .css({padding: '16px'})
-            .html('No Embeds')
             .bindEvent({
                 resizestart: function() {
                     url && $overlay.show();
                 },
                 resize: function(data) {
                     pandora.user.ui.embedSize = data.size;
-                    pandora.$ui.text.updateSize();
+                    pandora.$ui.text.update();
                 },
                 resizeend: function() {
                     url && $overlay.hide();
                 }
             }),
+
+        $message = $('<div>')
+            .css({marginTop: '16px', textAlign: 'center'})
+            .html('No Embeds')
+            .hide()
+            .appendTo(that),
 
         $iframe = $('<iframe>')
             .attr({
@@ -289,7 +297,7 @@ pandora.ui.textEmbed = function(url) {
                 width: '100%'
             })
             .hide()
-            .appendTo($element),
+            .appendTo(that),
 
         $overlay = $('<div>')
             .css({
@@ -300,13 +308,15 @@ pandora.ui.textEmbed = function(url) {
                 bottom: 0
             })
             .hide()
-            .appendTo($element);
+            .appendTo(that);
 
     that.update = function(url) {
         if (url) {
+            $message.hide();
             $iframe.attr({src: url}).show();
         } else {
             $iframe.hide();
+            $message.show();
         }
         return that;
     };
