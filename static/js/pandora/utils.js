@@ -1022,7 +1022,7 @@ pandora.isClipView = function(view, item) {
 pandora.isEmbedURL = function(url) {
     var hash = Ox.parseURL(url).hash;
     return hash.substr(0, 2) == '#?'
-        && Ox.unserialize(hash.substr(2)).embed === true
+        && Ox.unserialize(hash.substr(2), true).embed === true
 };
 
 pandora.logEvent = function(data, event, element) {
