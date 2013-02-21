@@ -1,3 +1,5 @@
+'use strict';
+
 pandora.ui.embedPanel = function() {
 
     var that = Ox.Element(),
