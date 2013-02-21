@@ -354,7 +354,7 @@ pandora.URL = (function() {
             } else {
                 self.URL.parse(function(state) {
                     // setState -> UI.set -> URL.update
-                    set ? setState(state, callback) : callback(state);
+                    setState(state, callback);
                 });
             }
         } else {
