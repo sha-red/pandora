@@ -16,6 +16,7 @@ pandora.ui.textPanel = function() {
     pandora.api.getText({id: pandora.user.ui.text}, function(result) {
 
         var text = result.data,
+            embedsURLs = getEmbedsURLs(),
 
             $toolbar = Ox.Bar({size 24}), 
 
@@ -39,6 +40,7 @@ pandora.ui.textPanel = function() {
                 .appendTo($toolbar),
 
             $nextButton = Ox.Button({
+                    disabled: embedURLs.length < 2,
                     title: 'arrowRight',
                     tooltip: 'Next Clip',
                     type: 'image'
@@ -50,6 +52,7 @@ pandora.ui.textPanel = function() {
                 .appendTo($toolbar),
 
             $currentButton = Ox.Button({
+                    disabled: embedURLs.length < 1,
                     title: 'center',
                     tooltip: 'Current Reference',
                     type: 'image'
@@ -61,6 +64,7 @@ pandora.ui.textPanel = function() {
                 .appendTo($toolbar),
 
             $previousButton = Ox.Button({
+                    disabled: embedURLs.length < 2,
                     title: 'arrowLeft',
                     tooltip: 'Previous Clip',
                     type: 'image'
@@ -81,7 +85,7 @@ pandora.ui.textPanel = function() {
                             : pandora.ui.textPDF(text)
                     },
                     {
-                        element: pandora.$ui.textEmbed = pandora.ui.textEmbed(),
+                        element: pandora.$ui.textEmbed = pandora.ui.textEmbed(embedURLs[0]),
                         size: pandora.user.ui.embedSize,
                         resizable: true,
                         resize: [192, 256, 320, 384, 448, 512]
@@ -131,8 +135,15 @@ pandora.ui.textPanel = function() {
 
     });
 
-    function getEmbeds(text) {
-        
+    function getEmbedURLs(text) {
+        var matches = text.match(/<span data-video=".+?">/g),
+            urls = [];
+        if (matches) {
+            matches.forEach(function(match) {
+                urls.push(match.match(/"(.+?)"/)[1]);
+            });
+        }
+        return urls;
     }
 
     return that;
@@ -254,16 +265,18 @@ pandora.ui.textPDF = function(text) {
 pandora.ui.textEmbed = function(url) {
 
     var that = Ox.Element()
+            .css({padding: '16px'})
+            .html('No Embeds')
             .bindEvent({
                 resizestart: function() {
-                    $overlay.show();
+                    url && $overlay.show();
                 },
                 resize: function(data) {
                     pandora.user.ui.embedSize = data.size;
                     pandora.$ui.text.updateSize();
                 },
                 resizeend: function() {
-                    $overlay.hide();
+                    url && $overlay.hide();
                 }
             }),
 
@@ -271,9 +284,10 @@ pandora.ui.textEmbed = function(url) {
             .attr({
                 height: '100%',
                 frameborder: 0,
-                src: url,
+                src: '',
                 width: '100%'
             })
+            .hide()
             .appendTo($element),
 
         $overlay = $('<div>')
@@ -288,9 +302,15 @@ pandora.ui.textEmbed = function(url) {
             .appendTo($element);
 
     that.update = function(url) {
-        $iframe.attr({src: url});
+        if (url) {
+            $iframe.attr({src: url}).show();
+        } else {
+            $iframe.hide();
+        }
         return that;
     };
+
+    that.update(url);
 
     return that;
 
