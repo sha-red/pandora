@@ -318,6 +318,13 @@ appPanel
             Ox.Theme(pandora.user.ui.theme);
             if (isEmbed) {
                 pandora.$ui.embedPanel = pandora.ui.embedPanel().display();
+                window.addEventListener('message', function(e) {
+                    Ox.print('MESSAGE:' e.data);
+                    var url = e.data;
+                    if (pandora.isEmbedURL(url)) {
+                        pandora.url.push(url);
+                    }
+                })
             } else {
                 pandora.$ui.appPanel = pandora.ui.appPanel().display();
                 Ox.Request.requests() && pandora.$ui.loadingIcon.start();
