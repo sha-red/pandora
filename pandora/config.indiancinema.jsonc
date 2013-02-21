@@ -75,7 +75,6 @@
     // fixme: either this, or filter: true in itemKeys, but not both
     "filters": [
         {"id": "director", "title": "Director", "type": "string"},
-        {"id": "country", "title": "Country", "type": "string"},
         {"id": "year", "title": "Year", "type": "integer"},
         {"id": "language", "title": "Language", "type": "string"},
         {"id": "genre", "title": "Genre", "type": "string"},
@@ -84,8 +83,7 @@
         {"id": "producer", "title": "Producer", "type": "string"},
         {"id": "cinematographer", "title": "Cinematographer", "type": "string"},
         {"id": "editor", "title": "Editor", "type": "string"},
-        {"id": "actor", "title": "Actor", "type": "string"},
-        {"id": "keyword", "title": "Keyword", "type": "string"}
+        {"id": "actor", "title": "Actor", "type": "string"}
     ],
     "flags": false,
     /*
