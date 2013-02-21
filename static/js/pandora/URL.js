@@ -344,19 +344,21 @@ pandora.URL = (function() {
     };
 
     // on page load, this sets the state from the URL
-    that.parse = function(set, callback) {
+    // can also be used to parse a URL
+    that.parse = function(url, callback) {
         if (arguments.length == 1) {
             callback = arguments[0];
+            url = null;
+            if (document.location.pathname.slice(0, 4) == 'url=') {
+                document.location.href = decodeURI(document.location.pathname.slice(4));
+            } else {
+                self.URL.parse(function(state) {
+                    // setState -> UI.set -> URL.update
+                    set ? setState(state, callback) : callback(state);
+                });
+            }
         } else {
-            set = set === false ? false : true;
-        }
-        if (document.location.pathname.slice(0, 4) == 'url=') {
-            document.location.href = decodeURI(document.location.pathname.slice(4));
-        } else {
-            self.URL.parse(function(state) {
-                // setState -> UI.set -> URL.update
-                set ? setState(state, callback) : callback(state);
-            });
+            self.URL.parse(url, callback);
         }
         return that;
     };
