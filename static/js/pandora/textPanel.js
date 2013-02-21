@@ -16,9 +16,10 @@ pandora.ui.textPanel = function() {
     pandora.api.getText({id: pandora.user.ui.text}, function(result) {
 
         var text = result.data,
+
             embedsURLs = getEmbedsURLs(),
 
-            $toolbar = Ox.Bar({size 24}), 
+            $toolbar = Ox.Bar({size: 24}),
 
             $editMenu, $uploadButton,
 
@@ -119,7 +120,7 @@ pandora.ui.textPanel = function() {
                     float: 'left',
                     margin: '4px 2px 4px 4px'
                 })
-                .appendTo($toolbar),
+                .appendTo($toolbar);
         }
 
         that.setElement(
