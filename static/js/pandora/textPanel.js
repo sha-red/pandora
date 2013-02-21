@@ -229,7 +229,7 @@ pandora.ui.textHTML = function(text, tags) {
                 submit: function(data) {
                     Ox.Request.clearCache('getText');
                     pandora.api.editText({
-                        id: ui.text,
+                        id: pandora.user.ui.text,
                         text: data.value
                     });
                 }
@@ -242,7 +242,10 @@ pandora.ui.textHTML = function(text, tags) {
     }
 
     function getWidth() {
-        return window.innerWidth - pandora.user.ui.embedSize - 1 - 32;
+        return window.innerWidth
+            - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
+            - pandora.user.ui.embedSize - 1
+            - 32;
     }
 
     that.update = function() {
