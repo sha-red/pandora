@@ -256,6 +256,7 @@ pandora.ui.infoView = function(data) {
 
     // Alternative Titles ------------------------------------------------------
 
+    // FIXME: This should be an array of objects {title: '', info: ''}
     data.alternativeTitles && $('<div>')
         .css(css)
         .html(
