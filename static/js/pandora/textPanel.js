@@ -173,7 +173,8 @@ pandora.ui.textPanel = function() {
         return urls;
     }
 
-    function selectEmbed(selected) {
+    function selectEmbed(index) {
+        selected = index;
         pandora.$ui.textEmbed.update(embedURLs[selected]);
     }
 
@@ -352,9 +353,23 @@ pandora.ui.textEmbed = function(url) {
             .appendTo(that);
 
     that.update = function(url) {
+        var parsed, src;
         if (url) {
             url = url.replace(/&amp;/g, '&') + '&matchRatio=true';
-            $iframe[0].contentWindow.postMessage(url);
+            src = $iframe.attr('src');
+            parsed = {src: Ox.parseURL(src), url: Ox.parseURL(url)};
+            if (
+                src
+                && parsed.url.protocol == parsed.src.protocol
+                && parsed.url.hostname == parsed.src.hostname
+            ) {
+                $iframe[0].contentWindow.postMessage(
+                    parsed.url.pathname + parsed.url.search + parsed.url.hash,
+                    '*'
+                );
+            } else {
+                $iframe.attr({src: url});                
+            }
             $message.hide();
             $iframe.show();
         } else {
