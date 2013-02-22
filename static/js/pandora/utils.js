@@ -1222,6 +1222,10 @@ pandora.resizeFolders = function() {
 };
 
 pandora.resizeWindow = function() {
+    if (pandora.$ui.embedPanel) {
+        pandora.$ui.embedPanel.resizePanel();
+        return;
+    }
     // FIXME: a lot of this throws errors on load
     pandora.$ui.leftPanel && pandora.$ui.leftPanel.size(2, pandora.getInfoHeight(true));
     pandora.resizeFolders();
