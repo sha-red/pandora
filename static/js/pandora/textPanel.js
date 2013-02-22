@@ -11,7 +11,8 @@ pandora.ui.textPanel = function() {
             orientation: 'vertical'
         }),
         embedURLs,
-        selected;
+        selected = -1,
+        selectedURL;
 
     pandora.api.getText({id: pandora.user.ui.text}, function(result) {
 
@@ -21,7 +22,6 @@ pandora.ui.textPanel = function() {
         embedURLs = text.type == 'html'
             ? getEmbedURLs(text.text)
             : [];
-        selected = -1;
 
         var $toolbar = Ox.Bar({size: 24}),
 
@@ -178,10 +178,20 @@ pandora.ui.textPanel = function() {
     that.selectEmbed = function(index) {
         if (index != selected) {
             selected = index;
+            selectedURL = embedURLs[selected]
             $('.OxSpecialLink').removeClass('OxActive');
-            $('#embed' + selected).addClass('OxActive');
-            pandora.$ui.textEmbed.update(embedURLs[selected]);
+            selected > -1 && $('#embed' + selected).addClass('OxActive');
+            pandora.$ui.textEmbed.update(selectedURL);
         }
+    };
+
+    that.update = function(text) {
+        embedURLs = getEmbedURLs(text);
+        selected = embedURLs.indexOf(selectedURL);
+        if (selected == -1 && embedURLs.length) {
+            selected = 0;
+        }
+        selectEmbed(selected);
     };
 
     return that;
@@ -271,6 +281,7 @@ pandora.ui.textHTML = function(text) {
                         id: pandora.user.ui.text,
                         text: data.value
                     });
+                    pandora.$ui.textPanel.update(data.value);
                 }
             })
             .appendTo(that);
