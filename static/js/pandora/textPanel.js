@@ -56,7 +56,7 @@ pandora.ui.textPanel = function() {
                 })
                 .bindEvent({
                     click: function() {
-                        selectEmbed(
+                        that.selectEmbed(
                             selected < embedURLs.length - 1 ? selected + 1 : 0
                         );
                     }
@@ -87,7 +87,7 @@ pandora.ui.textPanel = function() {
                 })
                 .bindEvent({
                     click: function() {
-                        selectEmbed(
+                        that.selectEmbed(
                             selected ? selected - 1 : embedURLs.length - 1
                         );
                     }
@@ -173,10 +173,14 @@ pandora.ui.textPanel = function() {
         return urls;
     }
 
-    function selectEmbed(index) {
-        selected = index;
-        pandora.$ui.textEmbed.update(embedURLs[selected]);
-    }
+    that.selectEmbed = function(index) {
+        if (index != selected) {
+            selected = index;
+            $('.OxSpecialLink').removeClass('OxActive');
+            $('#embed' + selected).addClass('OxActive');
+            pandora.$ui.textEmbed.update(embedURLs[selected]);
+        }
+    };
 
     return that;
 
@@ -225,13 +229,20 @@ pandora.ui.textHTML = function(text) {
                 clickLink: pandora.clickLink,
                 editable: text.editable,
                 format: function(text) {
+                    var index = 0;
                     return text.replace(
                         /<a [^<>]*?href="(.+?)".*?>/gi,
                         function() {
-                            var link = arguments[0], url = arguments[1];
-                            return pandora.isEmbedURL(url)
-                                ? '<a class="OxSpecialLink" href="' + url + '">'
-                                : link;
+                            var link = arguments[0], ret, url = arguments[1];
+                            if (pandora.isEmbedURL(url)) {
+                                ret = '<a id="embed' + index
+                                    + '" class="OxSpecialLink" href="' + url
+                                    + '">'
+                                index++;
+                            } else {
+                                ret = link;
+                            }
+                            return ret;
                         }
                     );
                 },
