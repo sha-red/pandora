@@ -315,7 +315,7 @@ appPanel
             if (isEmbed) {
                 pandora.$ui.embedPanel = pandora.ui.embedPanel().display();
                 window.addEventListener('message', function(e) {
-                    var data = {}
+                    var data = {};
                     try {
                         data = JSON.parse(e.data);
                     } catch(e) {}
