@@ -315,15 +315,15 @@ appPanel
             if (isEmbed) {
                 pandora.$ui.embedPanel = pandora.ui.embedPanel().display();
                 window.addEventListener('message', function(e) {
-                    var data;
+                    var data = {}
                     try {
                         data = JSON.parse(e.data);
-                        if (Ox.contains(pandora.site.themes, data.theme)) {
-                            Ox.Theme(data.theme);
-                        } else if (pandora.isEmbedURL(data.url)) {
-                            pandora.URL.push(data.url);
-                        }
-                    } catch() {}
+                    } catch(e) {}
+                    if (Ox.contains(pandora.site.themes, data.theme)) {
+                        Ox.Theme(data.theme);
+                    } else if (pandora.isEmbedURL(data.url)) {
+                        pandora.URL.push(data.url);
+                    }
                 });
             } else {
                 pandora.$ui.appPanel = pandora.ui.appPanel().display();
