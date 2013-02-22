@@ -356,10 +356,7 @@ pandora.ui.embedPanel = function() {
     };
 
     that.reloadPanel = function() {
-        Ox.print('RELOAD::')
-        that.setElement(
-            pandora.$ui.embedPanel = pandora.ui.embedPanel()
-        );
+        that.setElement(pandora.$ui.embedPanel = pandora.ui.embedPanel());
     };
 
     that.resizePanel = function() {
