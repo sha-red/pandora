@@ -355,14 +355,26 @@ pandora.ui.embedPanel = function() {
         return that;
     };
 
-    $(window).on({
-        resize: function() {
-            var sizes = getSizes();
-            $player.options({width: window.innerWidth, height: sizes.videoHeight});
-            $outerPanel.size(0, sizes.innerHeight);
-            options.showTimeline && $timeline.options({width: window.innerWidth - 16});
-            options.showAnnotations && $annotations.options({width: window.innerWidth});
-        }
+    that.reloadPanel = function() {
+        Ox.print('RELOAD::')
+        that.setElement(
+            pandora.$ui.embedPanel = pandora.ui.embedPanel()
+        );
+    };
+
+    that.resizePanel = function() {
+        var sizes = getSizes();
+        $player.options({width: window.innerWidth, height: sizes.videoHeight});
+        $outerPanel.size(0, sizes.innerHeight);
+        options.showTimeline && $timeline.options({width: window.innerWidth - 16});
+        options.showAnnotations && $annotations.options({width: window.innerWidth});
+    };
+
+    that.bindEvent({
+        pandora_item: that.reloadPanel,
+        pandora_itemview: that.reloadPanel,
+        pandora_videopoints: that.reloadPanel,
+        pandora_hash: that.reloadPanel
     });
 
     return that;
