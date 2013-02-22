@@ -225,7 +225,10 @@ pandora.clearListIconCache = function(list) {
 }
 
 pandora.clickLink = function(e) {
-    if (
+    var match = e.target.id.match(/^embed(\d+)$/)
+    if (match) {
+        pandora.$ui.textPanel.selectEmbed(parseInt(match[1]));
+    } else if (
         e.target.hostname == document.location.hostname
         && !Ox.startsWith(e.target.pathname, '/static')
     ) {
