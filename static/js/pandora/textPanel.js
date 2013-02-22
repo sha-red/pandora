@@ -324,14 +324,14 @@ pandora.ui.textEmbed = function() {
     var that = Ox.Element()
             .bindEvent({
                 resizestart: function() {
-                    url && $overlay.show();
+                    $iframe.attr('src') && $overlay.show();
                 },
                 resize: function(data) {
                     pandora.user.ui.embedSize = data.size;
                     pandora.$ui.text.update();
                 },
                 resizeend: function() {
-                    url && $overlay.hide();
+                    $iframe.attr('src') && $overlay.hide();
                 }
             }),
 
