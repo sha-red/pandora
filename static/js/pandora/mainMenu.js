@@ -235,7 +235,7 @@ pandora.ui.mainMenu = function() {
                         src = $(iframe).attr('src');
                         if (src && Ox.parseURL(src).hostname == document.location.hostname) {
                             iframe.contentWindow.postMessage(JSON.stringify({
-                                {theme: value}
+                                theme: value
                             }), '*');
                         }
                     }
