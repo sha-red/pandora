@@ -227,8 +227,18 @@ pandora.ui.mainMenu = function() {
                     filters[index].sort[0].operator = operator;
                     pandora.UI.set({filters: filters});
                 } else if (data.id == 'settheme') {
+                    var iframe, src;
                     Ox.Theme(value);
                     pandora.UI.set('theme', value);
+                    iframe = $('#embed')[0];
+                    if (iframe) {
+                        src = $(iframe).attr('src');
+                        if (src && Ox.parseURL(src).hostname == document.location.hostname) {
+                            iframe.contentWindow.postMessage(JSON.stringify({
+                                {theme: value}
+                            }), '*');
+                        }
+                    }
                 } else if (data.id == 'showsiteposters') {
                     pandora.UI.set('showSitePosters', data.checked)
                 } else if (Ox.startsWith(data.id, 'sortfilter')) {

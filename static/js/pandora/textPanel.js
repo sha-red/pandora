@@ -21,7 +21,7 @@ pandora.ui.textPanel = function() {
         embedURLs = text.type == 'html'
             ? getEmbedURLs(text.text)
             : [];
-        selected = embedURLs.length ? 0 : -1;
+        selected = -1;
 
         var $toolbar = Ox.Bar({size: 24}),
 
@@ -104,7 +104,7 @@ pandora.ui.textPanel = function() {
                             : pandora.ui.textPDF(text)
                     },
                     {
-                        element: pandora.$ui.textEmbed = pandora.ui.textEmbed(embedURLs[selected]),
+                        element: pandora.$ui.textEmbed = pandora.ui.textEmbed(),
                         size: pandora.user.ui.embedSize,
                         resizable: true,
                         resize: [192, 256, 320, 384, 448, 512]
@@ -156,6 +156,8 @@ pandora.ui.textPanel = function() {
         that.replaceElement(0, $toolbar);
         that.replaceElement(1, $panel);
         that.replaceElement(2, $statusbar);
+
+        embedURLs.length && that.selectEmbed(0);
 
     });
 
@@ -317,7 +319,7 @@ pandora.ui.textPDF = function(text) {
 
 };
 
-pandora.ui.textEmbed = function(url) {
+pandora.ui.textEmbed = function() {
 
     var that = Ox.Element()
             .bindEvent({
@@ -342,6 +344,7 @@ pandora.ui.textEmbed = function(url) {
         $iframe = $('<iframe>')
             .attr({
                 height: '100%',
+                id: 'embed',
                 frameborder: 0,
                 src: '',
                 width: '100%',
@@ -374,10 +377,9 @@ pandora.ui.textEmbed = function(url) {
                 && parsed.url.protocol == parsed.src.protocol
                 && parsed.url.hostname == parsed.src.hostname
             ) {
-                $iframe[0].contentWindow.postMessage(
-                    parsed.url.pathname + parsed.url.search + parsed.url.hash,
-                    '*'
-                );
+                $iframe[0].contentWindow.postMessage(JSON.stringify({
+                    url: parsed.url.pathname + parsed.url.search + parsed.url.hash
+                }), '*');
             } else {
                 $iframe.attr({src: url});                
             }
@@ -389,8 +391,6 @@ pandora.ui.textEmbed = function(url) {
         }
         return that;
     };
-
-    that.update(url);
 
     return that;
 
