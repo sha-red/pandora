@@ -293,7 +293,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
                             'in': Ox.isArray(state.span)
                                 ? Ox.formatDuration(state.span[state.span.length - 2]) : '',
                             out: Ox.isArray(state.span)
-                                ? Ox.formatDuration(state.span[state.span.length - 1]) : ''
+                                ? Ox.formatDuration(state.span[state.span.length - 1]) : '',
                             annotation: Ox.isString(state.span) ? state.span : '',
                             title: hash.title || '',
                             showTimeline: hash.showTimeline || false,
