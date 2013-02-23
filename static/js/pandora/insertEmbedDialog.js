@@ -6,7 +6,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
         dialogWidth = 416 - Ox.UI.SCROLLBAR_SIZE,
         dialogHeight = 416,
         formWidth = dialogWidth - 32,
-        $element = {},
+        $input = {},
 
         $panel = Ox.TabPanel({
             content: function(id) {
@@ -15,7 +15,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
 
                     var $form = Ox.Element().attr({id: 'form'});
 
-                    $element.advanced = Ox.ButtonGroup({
+                    $input.advanced = Ox.ButtonGroup({
                             buttons: [
                                 {id: 'basic', title: 'Basic'},
                                 {id: 'advanced', title: 'Advanced'}
@@ -39,7 +39,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
 
                     space().appendTo($form);
 
-                    $element.url = Ox.Input({
+                    $input.url = Ox.Input({
                             label: 'URL',
                             labelWidth: 128,
                             width: formWidth
@@ -53,7 +53,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
 
                     space().appendTo($form);
 
-                    $element.protocol = Ox.Select({
+                    $input.protocol = Ox.Select({
                             items: [
                                 {id: 'http', title: 'http'},
                                 {id: 'https', title: 'https'}
@@ -69,7 +69,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
                         .addClass('advanced')
                         .appendTo($form);
 
-                    $element.site = Ox.SelectInput({
+                    $input.site = Ox.SelectInput({
                             inputWidth: 128,
                             items: [pandora.site.site]
                                 .concat(pandora.site.sites)
@@ -89,7 +89,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
                         .addClass('advanced')
                         .appendTo($form);
 
-                    $element.item = Ox.Input({
+                    $input.item = Ox.Input({
                             label: pandora.site.itemName.singular,
                             labelWidth: 128,
                             width: formWidth
@@ -99,7 +99,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
                         })
                         .appendTo($input);
 
-                    $element.link = Ox.Select({
+                    $input.link = Ox.Select({
                             items: [
                                 {id: 'default', title: 'Default'},
                                 {id: 'player', title: 'Player'},
@@ -117,7 +117,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
                         })
                         .appendTo($form);
 
-                    $element.position = Ox.Input({
+                    $input.position = Ox.Input({
                             label: 'Position',
                             labelWidth: 128,
                             width: formWidth
@@ -131,7 +131,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
                         })
                         .appendTo($form);
 
-                    $element['in'] = Ox.Input({
+                    $input['in'] = Ox.Input({
                             label: 'In Point',
                             labelWidth: 128,
                             width: formWidth
@@ -144,7 +144,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
                         })
                         .appendTo($form);
 
-                    $element.out = Ox.Input({
+                    $input.out = Ox.Input({
                             label: 'Out Point',
                             labelWidth: 128,
                             width: formWidth
@@ -157,7 +157,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
                         })
                         .appendTo($form);
 
-                    $element.annotation = Ox.Input({
+                    $input.annotation = Ox.Input({
                             label: 'Annotation',
                             labelWidth: 128,
                             width: formWidth
@@ -169,7 +169,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
 
                     space().appendTo($form);
 
-                    $element.title = Ox.Input({
+                    $input.title = Ox.Input({
                             label: 'Title',
                             labelWidth: 128,
                             width: formWidth
@@ -180,7 +180,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
                         .addClass('advanced')
                         .appendTo($form);
 
-                    $element.showTimeline = Ox.Checkbox({
+                    $input.showTimeline = Ox.Checkbox({
                             label: 'Show Large Timeline',
                             labelWidth: 128,
                             value: false,
@@ -192,7 +192,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
                         .addClass('advanced')
                         .appendTo($form);
 
-                    $element.timeline = Ox.Select({
+                    $input.timeline = Ox.Select({
                             items: [
                                 {id: 'default', title: 'Default'}
                             ].concat(
@@ -209,7 +209,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
                         .addClass('advanced')
                         .appendTo($form);
 
-                    $element.showAnnotations = Ox.Checkbox({
+                    $input.showAnnotations = Ox.Checkbox({
                             label: 'Show Annotations',
                             labelWidth: 128,
                             value: false,
@@ -221,7 +221,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
                         .addClass('advanced')
                         .appendTo($form);
 
-                    $element.showLayersLabel = Ox.Label({
+                    Ox.Label({
                             title: 'Show Layers',
                             width: formWidth
                         })
@@ -231,7 +231,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
                         .addClass('advanced')
                         .appendTo($form);
 
-                    $element.showLayers = Ox.CheckboxGroup({
+                    $input.showLayers = Ox.CheckboxGroup({
                             checkboxes: pandora.site.layers.map(function(layer) {
                                 return {id: layer.id, title: layer.title};
                             }),
@@ -256,8 +256,8 @@ pandora.ui.insertEmbedDialog = function(callback) {
                 }
 
                 function formatURL() {
-                    var data = $element.map(function($e) {
-                        return $e.options('value');
+                    var data = $input.map(function($element) {
+                        return $element.options('value');
                     });
                     $url.value(
                         data.protocol + '://'
@@ -278,20 +278,32 @@ pandora.ui.insertEmbedDialog = function(callback) {
 
                 function parseURL(url) {
                     var parsed = Ox.parseURL(url);
-                    pandora.URL.parse(url, function(state) {
-                        var data = {
+                    pandora.URL.parse(parsed.pathname + path.search + path.hash, function(state) {
+                        var query = {};
+                        state.hash.query.forEach(function(condition) {
+                            query[condition.key] = condition.value;
+                        });
+                        Ox.forEach({
                             protocol: parsed.protocol,
                             site: parsed.hostname,
-                            item: state.item,
-                            link: state.view, // FIXME: wrong, user-dependent?
-                            // ...
-                        };
-                        state.hash.query.forEach(function(condition) {
-                            data[condition.key] = condition.value;
-                        });
-                        // loop over elements so we can set missing ones to false?
-                        Ox.forEach(data, function(value, key) {
-                            $element[key].options({value: value});
+                            item: state.item || '',
+                            link: state.view || 'default', // FIXME: wrong, user-dependent
+                            position: Ox.isArray(state.span)
+                                ? Ox.formatDuration(state.span[0]) : '',
+                            'in': Ox.isArray(state.span)
+                                ? Ox.formatDuration(state.span[state.span.length - 2]) : '',
+                            out: Ox.isArray(state.span)
+                                ? Ox.formatDuration(state.span[state.span.length - 1]) : ''
+                            annotation: Ox.isString(state.span) ? state.span : '',
+                            title: hash.title || '',
+                            showTimeline: hash.showTimeline || false,
+                            timeline: hash.timeline || 'default',
+                            showAnnotations: hash.showAnnotations || false,
+                            showLayers: hash.showLayers || pandora.site.layers.map(function(layer) {
+                                return layer.id;
+                            })
+                        }, function(value, key) {
+                            $input[key].options({value: value});
                         });
                     });
                 }
@@ -330,15 +342,16 @@ pandora.ui.insertEmbedDialog = function(callback) {
                     })
                     .bindEvent({
                         click: function() {
-                            callback($element.url.options('value'));
+                            callback($input.url.options('value'));
                             that.close();
                         }
                     })
             ],
             closeButton: true,
-            content: self.$content,
+            content: $panel,
             height: 416,
             keys: {enter: 'insert', escape: 'cancel'},
+            removeOnClose: true,
             title: 'Insert Embed',
             width: 416 + Ox.UI.SCROLLBAR_SIZE
         });

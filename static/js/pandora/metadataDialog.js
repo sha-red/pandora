@@ -196,7 +196,7 @@ pandora.ui.metadataDialog = function(data) {
                 removeOnClose: true,
                 title: 'Update Metadata',
                 width: 304
-            }).open()
+            }).open();
         
     }
 
