@@ -669,6 +669,10 @@
         {"id": "rights", "title": "Rights Management"},
         {"id": "contact", "title": "Contact"}
     ],
+    "sites": [
+        {"name": "Indiancine.ma", "url": "indiancine.ma"},
+        {"name": "Pad.ma", "url": "pad.ma"}
+    ],
     "themes": ["oxlight", "oxmedium", "oxdark"],
     "timelines": [
         {"id": "antialias", "title": "Anti-Alias"},
@@ -733,6 +737,7 @@
             "section": "items",
             "sequenceMode": "shape",
             "sequenceSort": [{"key": "director", "operator": "+"}],
+            "showAdvancedEmbedOptions": false,
             "showAnnotations": true,
             "showBrowser": true,
             "showCalendarControls": true, // fixme: should be false

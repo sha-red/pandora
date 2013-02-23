@@ -667,6 +667,10 @@
         {"id": "terms", "title": "Terms of Service"},
         {"id": "contact", "title": "Contact"}
     ],
+    "sites": [
+        {"name": "Pad.ma", "url": "pad.ma"},
+        {"name": "OxDB", "url": "0xdb.org"}
+    ],
     "themes": ["oxlight", "oxmedium", "oxdark"],
     "timelines": [
         {"id": "antialias", "title": "Anti-Alias"},
@@ -731,6 +735,7 @@
             "section": "items",
             "sequenceMode": "shape",
             "sequenceSort": [{"key": "director", "operator": "+"}],
+            "showAdvancedEmbedOptions": false,
             "showAnnotations": true,
             "showBrowser": true,
             "showCalendarControls": true, // fixme: should be false

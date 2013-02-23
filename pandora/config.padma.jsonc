@@ -586,6 +586,10 @@
         {"id": "license", "title": "License"},
         {"id": "contact", "title": "Contact"}
     ],
+    "sites": [
+        {"name": "Indiancine.ma", "url": "indiancine.ma"},
+        {"name": "OxDB", "url": "0xdb.org"}
+    ],
     "themes": ["oxlight", "oxmedium", "oxdark"],
     "timelines": [
         {"id": "antialias", "title": "Anti-Alias"},
@@ -651,6 +655,7 @@
             "section": "items",
             "sequenceMode": "shape",
             "sequenceSort": [{"key": "director", "operator": "+"}],
+            "showAdvancedEmbedOptions": false,
             "showAnnotations": true,
             "showAnnotationsCalendar": true,
             "showAnnotationsMap": true,
