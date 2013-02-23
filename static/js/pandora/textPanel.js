@@ -117,8 +117,8 @@ pandora.ui.textPanel = function() {
             if (text.type == 'html') {
                 $editMenu = Ox.MenuButton({
                         items: [
-                            {id: 'inserthtml', title: 'Insert HTML...'},
-                            {id: 'insertembed', title: 'Insert Embed...'}
+                            {id: 'insertHTML', title: 'Insert HTML...'},
+                            {id: 'insertEmbed', title: 'Insert Embed...'}
                         ],
                         title: 'edit',
                         tooltip: 'Editing Options',
@@ -127,6 +127,15 @@ pandora.ui.textPanel = function() {
                     .css({
                         float: 'left',
                         margin: '4px 2px 4px 4px'
+                    })
+                    .bindEvent({
+                        click: function(data) {
+                            if (data.id == 'insertEmbed') {
+                                pandora.$ui.insertEmbedDialog = pandora.ui.insertEmbedDialog(function() {
+                                    // ...
+                                }).open();
+                            }
+                        }
                     })
                     .appendTo($toolbar);
             } else {
