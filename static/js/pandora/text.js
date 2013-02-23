@@ -1,5 +1,7 @@
 'use strict';
 
+// FIXME: REMOVE
+
 pandora.ui.text = function() {
     var ui = pandora.user.ui,
         canEdit = pandora.site.capabilities.canEditSitePages[pandora.user.level],
