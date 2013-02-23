@@ -13,7 +13,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
 
                 if (id == 'video') {
 
-                    var $form = Ox.Element().attr({id: 'form'}),
+                    var $form = Ox.Element().attr({id: 'form'});
 
                     $element.advanced = Ox.ButtonGroup({
                             buttons: [
@@ -60,7 +60,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
                             ],
                             label: 'Protocol',
                             labelWidth: 128,
-                            value: 'http://'
+                            value: 'http',
                             width: formWidth
                         })
                         .bindEvent({
@@ -182,7 +182,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
 
                     $element.showTimeline = Ox.Checkbox({
                             label: 'Show Large Timeline',
-                            labelWidth: 128
+                            labelWidth: 128,
                             value: false,
                             width: formWidth
                         })
@@ -211,7 +211,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
 
                     $element.showAnnotations = Ox.Checkbox({
                             label: 'Show Annotations',
-                            labelWidth: 128
+                            labelWidth: 128,
                             value: false,
                             width: formWidth
                         })
@@ -240,7 +240,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
                             type: 'list',
                             value: pandora.site.layers.map(function(layer) {
                                 return layer.id;
-                            })
+                            }),
                             width: formWidth
                         })
                         .bindEvent({
@@ -251,64 +251,64 @@ pandora.ui.insertEmbedDialog = function(callback) {
 
                     updateForm();
 
-                    function formatURL() {
-                        var data = $element.map(function($e) {
-                            return $e.options('value');
-                        });
-                        $url.value(
-                            data.protocol + '://'
-                            + data.site + '/'
-                            + data.item + '/'
-                            + (data.link == 'default' ? '' : data.link + '/')
-                            // ...
-                            + (data.annotation || '')
-                            + '#?embed=true'
-                            + (data.title ? '&title=' + JSON.stringify(data.title) : '')
-                            + (data.showTimeline ? '&showTimeline=true' : '')
-                            + (data.timeline ? '&timeline=' + JSON.stringify(data.timeline) : '')
-                            + (data.showAnnotations ? '&showAnnotations=true' : '')
-                            + (data.showLayers.length ? '&showLayers=' + JSON.stringify(data.showLayers) : '')
-                            + '&matchRatio=true'
-                        );
-                    }
-
-                    function parseURL(url) {
-                        var parsed = Ox.parseURL(url);
-                        pandora.URL.parse(url, function(state) {
-                            var data = {
-                                protocol: parsed.protocol,
-                                site: parsed.hostname,
-                                item: state.item,
-                                link: state.view, // FIXME: wrong, user-dependent?
-                                // ...
-                            };
-                            state.hash.query.forEach(function(condition) {
-                                data[condition.key] = condition.value;
-                            });
-                            // loop over elements so we can set missing ones to false?
-                            Ox.forEach(data, function(value, key) {
-                                $element[key].options({value: value});
-                            });
-                        });
-                    }
-
-                    function updateForm() {
-                        $form.find('.advanced')[
-                            pandora.user.ui.showAdvancedEmbedOptions
-                            ? 'show' : 'hide'
-                        ]();
-                    }
-
                     return $form;
 
                 }
 
+                function formatURL() {
+                    var data = $element.map(function($e) {
+                        return $e.options('value');
+                    });
+                    $url.value(
+                        data.protocol + '://'
+                        + data.site + '/'
+                        + data.item + '/'
+                        + (data.link == 'default' ? '' : data.link + '/')
+                        // ...
+                        + (data.annotation || '')
+                        + '#?embed=true'
+                        + (data.title ? '&title=' + JSON.stringify(data.title) : '')
+                        + (data.showTimeline ? '&showTimeline=true' : '')
+                        + (data.timeline ? '&timeline=' + JSON.stringify(data.timeline) : '')
+                        + (data.showAnnotations ? '&showAnnotations=true' : '')
+                        + (data.showLayers.length ? '&showLayers=' + JSON.stringify(data.showLayers) : '')
+                        + '&matchRatio=true'
+                    );
+                }
+
+                function parseURL(url) {
+                    var parsed = Ox.parseURL(url);
+                    pandora.URL.parse(url, function(state) {
+                        var data = {
+                            protocol: parsed.protocol,
+                            site: parsed.hostname,
+                            item: state.item,
+                            link: state.view, // FIXME: wrong, user-dependent?
+                            // ...
+                        };
+                        state.hash.query.forEach(function(condition) {
+                            data[condition.key] = condition.value;
+                        });
+                        // loop over elements so we can set missing ones to false?
+                        Ox.forEach(data, function(value, key) {
+                            $element[key].options({value: value});
+                        });
+                    });
+                }
+
+                function updateForm() {
+                    $form.find('.advanced')[
+                        pandora.user.ui.showAdvancedEmbedOptions
+                        ? 'show' : 'hide'
+                    ]();
+                }
+
             },
-            tabs: [{
+            tabs: [
                 {id: 'video', title: 'Video', selected: true},
                 {id: 'map', title: 'Map', disabled: true},
                 {id: 'calendar', title: 'Calendar', disabled: true}
-            }]
+            ]
         }),
 
         that = Ox.Dialog({

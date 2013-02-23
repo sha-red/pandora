@@ -104,7 +104,7 @@ pandora.ui.metadataDialog = function(data) {
                                             }
                                         }),
                                     Ox.Input({
-                                            value: formatValue(v, itemKey.type)
+                                            value: formatValue(v, itemKey.type),
                                             width: formWidth - 80
                                         })
                                         .bindEvent({
