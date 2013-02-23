@@ -19,7 +19,7 @@ pandora.ui.insertEmbedDialog = function(callback) {
                             buttons: [
                                 {id: 'basic', title: 'Basic'},
                                 {id: 'advanced', title: 'Advanced'}
-                            ]
+                            ],
                             label: 'Show Advanced Options',
                             labelWidth: 128,
                             selectable: true,
