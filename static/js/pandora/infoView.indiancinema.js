@@ -451,8 +451,8 @@ pandora.ui.infoView = function(data) {
     $('<div>').css({height: '16px'}).appendTo($text);
 
     if (canEdit && !isEditable) {
-        $reloadButton = Ox.Button({
-                title: 'Reload Metadata',
+        $updateButton = Ox.Button({
+                title: 'Update Metadata...',
                 width: 128
             })
             .css({marginBottom: '4px'})
