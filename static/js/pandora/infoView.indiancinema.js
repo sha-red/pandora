@@ -132,6 +132,7 @@ pandora.ui.infoView = function(data) {
             .appendTo($data.$element),
 
         $reloadButton,
+        $updateButton,
 
         $capabilities,
 
