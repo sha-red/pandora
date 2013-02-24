@@ -350,6 +350,13 @@
             "sort": true
         },
         {
+            "id": "imdbId",
+            "title": "IMDb",
+            "type": "string",
+            "columnWidth": 90,
+            "sort": true
+        },
+        {
             "id": "subtitles",
             "title": "Subtitles",
             "type": "layer",
@@ -655,6 +662,7 @@
             // E-mail address uses by the system (from)
             "system": "system@indiancine.ma"
         },
+	"folderdepth": 4,
         "https": true,
         "id": "indiancinema",
         "name": "Indiancine.ma",
