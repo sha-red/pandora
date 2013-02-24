@@ -390,6 +390,40 @@ def findId(request):
     return render_to_json_response(response)
 actions.register(findId)
 
+
+def getMetadata(request):
+    '''
+        param data {
+            id: string,
+            keys: array
+        }
+
+        returns {
+           key: value,
+           ..
+        }
+
+    '''
+    data = json.loads(request.POST['data'])
+    response = json_response({})
+    if settings.DATA_SERVICE:
+        '''
+        info = {}
+        for c in data['query']['conditions']:
+            info[c['key']] = c['value']
+        r = models.external_data('getId', info)
+        '''
+        r = models.external_data('getData', {'id': data['id']})
+        if r['status']['code'] == 200:
+            if 'keys' in data and data['keys']:
+                for key in data['keys']:
+                    if key in r['data']:
+                        response['data'][key] = r['data'][key]
+            else:
+                response['data'] = r['data']
+    return render_to_json_response(response)
+actions.register(getMetadata)
+
 def get(request):
     '''
         param data {
@@ -627,6 +661,7 @@ def getImdbId(request):
         response = json_response(status=404, text='not found')
     return render_to_json_response(response)
 actions.register(getImdbId)
+
 
 '''
     media delivery
