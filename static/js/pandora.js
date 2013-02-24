@@ -187,7 +187,7 @@ appPanel
                     if (pandora.localStorage('local')) {
                         var url = pandora.localStorage('local');
                         window.pandora.local = Ox.API({
-                            'url': url + '/api/'
+                            url: url + '/api/'
                         }, function() {
                             pandora.site.site.videoprefix = url;
                         });
