@@ -3,6 +3,30 @@ Ox.Message.bind(function(event, data, oxid) {
         //process messages here
     }
 });
+Ox.$parent = {
+    postMessage: function(event, message) {
+        Ox.Message.post(event, message);
+        return this;
+    },
+    onMessage: function() {
+        var callback;
+        if (Ox.isObject(arguments[0])) {
+            Ox.forEach(arguments[0], function(callback, event) {
+                Ox.Message.bind(function(evt, data, oxid) {
+                    if (Ox.isUndefined(oxid) && event == evt) {
+                        callback(data);
+                    }
+                });
+            });
+        } else {
+            callback = arguments[0];
+            Ox.Message.bind(function(event, data, oxid) {
+                Ox.isUndefined(oxid) && callback(event, data);
+            });
+        }
+        return this;
+    }
+};
 
 function getEmbedURL(id, videoURL) {
     var parsed = Ox.parseURL(videoURL),
