@@ -213,7 +213,12 @@ pandora.ui.textHTML = function(text) {
         width = getWidth(),
 
         that = Ox.Element()
-            .css({margin: '16px'}),
+            .css({
+                'overflow-y': 'auto'
+            }),
+        $content = Ox.Element().css({
+                margin: '16px',
+        }).appendTo(that),
 
         $title = Ox.Editable({
                 editable: text.editable,
@@ -240,11 +245,11 @@ pandora.ui.textHTML = function(text) {
                     });
                 }
             })
-            .appendTo(that),
+            .appendTo($content),
 
         $spaceTop = Ox.Element()
             .css({height: '16px'})
-            .appendTo(that),
+            .appendTo($content),
 
         $text = Ox.Editable({
                 clickLink: pandora.clickLink,
@@ -267,8 +272,7 @@ pandora.ui.textHTML = function(text) {
                         }
                     );
                 },
-                height: height,
-                maxHeight: Infinity,
+                maxHeight: height - 1,
                 placeholder: text.editable ? 'Doubleclick to edit text' : '',
                 tooltip: text.editable ? 'Doubleclick to edit text' : '',
                 type: 'textarea',
@@ -277,7 +281,7 @@ pandora.ui.textHTML = function(text) {
             })
             .css({
                 //position: 'absolute',
-                height: height + 'px',
+                //height: height + 'px',
                 width: width + 'px',
                 //marginTop: '48px',
                 fontSize: '12px'
@@ -293,11 +297,12 @@ pandora.ui.textHTML = function(text) {
                     pandora.$ui.textPanel.update(data.value);
                 }
             })
-            .appendTo(that);
+            .appendTo($content);
 
     function getHeight() {
         // 24 menu + 24 toolbar + 16 statusbar + 32 title + 32 margins
-        return window.innerHeight - 128;
+        // + 1px to ge trid of scrollbar
+        return window.innerHeight - 128 -1;
     }
 
     function getWidth() {
@@ -309,7 +314,7 @@ pandora.ui.textHTML = function(text) {
 
     that.update = function() {
         $text.options({
-            height: getHeight(),
+            maxHeight: getHeight(),
             width: getWidth()
         });
         return that;
