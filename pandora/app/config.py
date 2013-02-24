@@ -40,7 +40,7 @@ def load_config():
 
     if config:
         settings.SITENAME = config['site']['name']
-        if getattr(settings, 'SITEURL'):
+        if getattr(settings, 'SITEURL', False):
             config['site']['url'] = settings.SITEURL
         settings.URL = config['site']['url']
         settings.EMAIL_SUBJECT_PREFIX = '[%s]'%settings.SITENAME
