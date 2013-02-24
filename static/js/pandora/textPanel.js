@@ -321,17 +321,25 @@ pandora.ui.textHTML = function(text) {
 
 pandora.ui.textPDF = function(text) {
 
-    var that = Ox.Element();
+    var that = Ox.Element(),
+        $iframe;
     if (text.uploaded) {
-        $('<iframe>')
+        $iframe = Ox.Element('<iframe>')
             .attr({
-                height: '100%',
                 frameborder: 0,
+                height: '100%',
                 src: '/texts/' + pandora.user.ui.text + '/text.pdf.html',
                 width: '100%'
             })
-        .appendTo(that);
-
+            .onMessage(function(event, data) {
+                if(event == 'edit') {
+                    Ox.Dialog({
+                        title: 'edit',
+                        content: Ox.Element().html('test')
+                    }).open()
+                }
+            })
+            .appendTo(that);
     } else {
         that.html('UPLOADED: ' + text.uploaded);
     }
@@ -361,7 +369,7 @@ pandora.ui.textEmbed = function() {
             .hide()
             .appendTo(that),
 
-        $iframe = $('<iframe>')
+        $iframe = Ox.Element('<iframe>')
             .attr({
                 height: '100%',
                 id: 'embed',
@@ -397,9 +405,9 @@ pandora.ui.textEmbed = function() {
                 && parsed.url.protocol == parsed.src.protocol
                 && parsed.url.hostname == parsed.src.hostname
             ) {
-                $iframe[0].contentWindow.postMessage(JSON.stringify({
+                $iframe.postMessage('seturl', {
                     url: parsed.url.pathname + parsed.url.search + parsed.url.hash
-                }), '*');
+                });
             } else {
                 $iframe.attr({src: url});                
             }

@@ -230,13 +230,11 @@ pandora.ui.mainMenu = function() {
                     var iframe, src;
                     Ox.Theme(value);
                     pandora.UI.set('theme', value);
-                    iframe = $('#embed')[0];
+                    iframe = Ox.UI.elements[$('#embed').data('oxid')];
                     if (iframe) {
-                        src = $(iframe).attr('src');
+                        src = iframe.attr('src');
                         if (src && Ox.parseURL(src).hostname == document.location.hostname) {
-                            iframe.contentWindow.postMessage(JSON.stringify({
-                                theme: value
-                            }), '*');
+                            iframe.postMessage('settheme', {theme: value});
                         }
                     }
                 } else if (data.id == 'showsiteposters') {

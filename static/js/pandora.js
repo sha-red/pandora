@@ -314,15 +314,16 @@ appPanel
             Ox.Theme(pandora.user.ui.theme);
             if (isEmbed) {
                 pandora.$ui.embedPanel = pandora.ui.embedPanel().display();
-                window.addEventListener('message', function(e) {
-                    var data = {};
-                    try {
-                        data = JSON.parse(e.data);
-                    } catch(e) {}
-                    if (Ox.contains(pandora.site.themes, data.theme)) {
-                        Ox.Theme(data.theme);
-                    } else if (pandora.isEmbedURL(data.url)) {
-                        pandora.URL.push(data.url);
+                Ox.$parent.onMessage({
+                    settheme: function(data) {
+                        if (Ox.contains(pandora.site.themes, data.theme)) {
+                            Ox.Theme(data.theme);
+                        }
+                    },
+                    seturl: function(data) {
+                        if (pandora.isEmbedURL(data.url)) {
+                            pandora.URL.push(data.url);
+                        }
                     }
                 });
             } else {

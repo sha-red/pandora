@@ -126,6 +126,9 @@ pandora.ui.embedPanel = function() {
                             type: data.timeline
                         });
                     }
+                })
+                .bindEvent(function(data, event) {
+                    Ox.$parent.postMessage(event, {});
                 });
 
             $controls = Ox.Element();

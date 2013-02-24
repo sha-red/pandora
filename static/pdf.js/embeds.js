@@ -1,15 +1,6 @@
-window.addEventListener('message', function(event) {
-    if (event.origin != 'null' && event.data) {
-        var data = JSON.parse(event.data);
-        if (data.event == 'close') {
-            var element = document.getElementById(data.id);
-            Array.prototype.forEach.call(element.parentElement.getElementsByClassName('button'), function(element) {
-                if (editable || element.className == 'button playButton') {
-                    element.style.display = 'block';
-                }
-            });
-            e.parentElement.removeChild(e);
-        }
+Ox.Message.bind(function(event, data, oxid) {
+    if (Ox.isUndefined(oxid)) {
+        //process messages here
     }
 });
 
@@ -78,6 +69,9 @@ function getVideoOverlay(page) {
                 e.stopPropagation();
                 var videoId = 'video' + page + id,
                     $iframe = Ox.$('<iframe>')
+                        .on('load', function() {
+                            Ox.Message.post($iframe, 'init', {id: $iframe.oxid});
+                        })
                         .attr({
                             id: videoId,
                             src: getEmbedURL(videoId, video.src),
@@ -86,6 +80,17 @@ function getVideoOverlay(page) {
                             frameborder: 0
                         })
                         .appendTo($interface);
+                Ox.Message.bind(function(event, data, oxid) {
+                    if ($iframe.oxid == oxid) {
+                        if(event == 'close') {
+                            $iframe.remove();
+                        }
+                    }
+                });
+                $iframe.postMessage = function(event, data) {
+                    Ox.Message.post($iframe, event, data);
+                    return $iframe;
+                };
                 $playButton.hide();
                 $editButton.hide();
                 return false;
@@ -94,27 +99,39 @@ function getVideoOverlay(page) {
                 var url;
                 e.preventDefault();
                 e.stopPropagation();
-                
-                url = prompt(
-                    'Please enter a pan.do/ra video URL, like\n'
-                    + 'https://0xdb.org/0315594/00:13:37,00:23:42 or\n'
-                    + 'http://pad.ma/A/editor/00:00:00,00:01:00,00:02:00'
-                    + (video ? '\n\nTo remove the video, just remove the URL.' : ''),
-                    video ? video.src : ''
-                );
-                if (url !== null) {
-                    if(!video) {
-                        video = {
-                            page: page,
-                            id: id,
-                            src: ''
-                        };
-                        embeds.push(video);
+                if(window.parent) {
+                    Ox.$parent.postMessage('edit', {
+                        video: video
+                            ? video
+                            : {
+                                id: id,
+                                page: page,
+                                src: ''
+                            }
+                    });
+                } else {
+                    url = prompt(
+                        'Please enter a pan.do/ra video URL, like\n'
+                        + 'https://0xdb.org/0315594/00:13:37,00:23:42 or\n'
+                        + 'http://pad.ma/A/editor/00:00:00,00:01:00,00:02:00'
+                        + (video ? '\n\nTo remove the video, just remove the URL.' : ''),
+                        video ? video.src : ''
+                    );
+                    if (url !== null) {
+                        if(!video) {
+                            video = {
+                                page: page,
+                                id: id,
+                                src: ''
+                            };
+                            embeds.push(video);
+                        }
+                        video.src = url
+                        saveVideoOverlay();
+                        url !== '' ? enableVideoUI() : disableVideoUI()
                     }
-                    video.src = url
-                    saveVideoOverlay();
-                    url !== '' ? enableVideoUI() : disableVideoUI()
                 }
+
                 return false;
             }
             function enableVideoUI() {
