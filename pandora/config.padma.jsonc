@@ -572,6 +572,7 @@
             // E-mail address uses by the system (from)
             "system": "system@pad.ma"
         },
+        "https": true,
         "id": "padma",
         "name": "Pad.ma",
         "url": "pad.ma",
@@ -587,8 +588,8 @@
         {"id": "contact", "title": "Contact"}
     ],
     "sites": [
-        {"name": "Indiancine.ma", "url": "indiancine.ma"},
-        {"name": "OxDB", "url": "0xdb.org"}
+        {"name": "Indiancine.ma", "url": "indiancine.ma", "https": true},
+        {"name": "OxDB", "url": "0xdb.org", "https": true}
     ],
     "themes": ["oxlight", "oxmedium", "oxdark"],
     "timelines": [

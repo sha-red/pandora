@@ -492,6 +492,7 @@
             // E-mail address uses by the system (from)
             "system": "system@pandora.local"
         },
+        "https": false,
         "id": "pandora",
         "name": "Demo",
         "url": "pandora.local",
@@ -507,9 +508,9 @@
         {"id": "contact", "title": "Contact"}
     ],
     "sites": [
-        {"name": "0xDB", "url": "0xdb.org"},
-        {"name": "Pad.ma", "url": "pad.ma"},
-        {"name": "Indiancine.ma", "url": "indiancine.ma"}
+        {"name": "0xDB", "url": "0xdb.org", "https": true},
+        {"name": "Pad.ma", "url": "pad.ma", "https": true},
+        {"name": "Indiancine.ma", "url": "indiancine.ma", "https": true}
     ],
     "themes": ["oxlight", "oxmedium", "oxdark"],
     "timelines": [

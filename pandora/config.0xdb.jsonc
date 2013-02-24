@@ -655,6 +655,7 @@
             // E-mail address uses by the system (from)
             "system": "0xDB@0xDB.org"
         },
+        "https": true,
         "id": "0xdb",
         "name": "0xDB",
         "url": "0xDB.org",
@@ -670,8 +671,8 @@
         {"id": "contact", "title": "Contact"}
     ],
     "sites": [
-        {"name": "Indiancine.ma", "url": "indiancine.ma"},
-        {"name": "Pad.ma", "url": "pad.ma"}
+        {"name": "Indiancine.ma", "url": "indiancine.ma", "https": true},
+        {"name": "Pad.ma", "url": "pad.ma", "https": true}
     ],
     "themes": ["oxlight", "oxmedium", "oxdark"],
     "timelines": [
