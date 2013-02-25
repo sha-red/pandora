@@ -144,7 +144,7 @@ pandora.ui.embedPanel = function() {
                             return '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg';
                         },
                         position: options.position,
-                        showInToOut: options.playInToOut,
+                        showInToOut: options.playInToOut && options['in'] < options.out,
                         subtitles: ui.videoSubtitles ? video.subtitles : [],
                         type: options.timeline,
                         width: window.innerWidth - 16
