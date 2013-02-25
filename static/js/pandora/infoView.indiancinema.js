@@ -396,7 +396,7 @@ pandora.ui.infoView = function(data) {
 
 
     function formatEditableValue(value, key) {
-        var ret, listKeys = [];
+        var ret;
         if (key == 'runtime') {
             ret = Math.round(data[key] / 60) + ' min';
 
