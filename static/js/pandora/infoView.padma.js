@@ -203,7 +203,7 @@ pandora.ui.infoView = function(data) {
                             }
                         })
                     ).css({
-                        'margin-top': '8px',
+                        marginTop: '8px',
                     })
                     .appendTo($div);
             }
@@ -254,7 +254,7 @@ pandora.ui.infoView = function(data) {
                     editable: key != 'duration',
                     format: function(value) {
                         return formatValue(listKeys.indexOf(key) >= 0
-                                           ? value.split(', ') : value, key);
+                            ? value.split(', ') : value, key);
                     },
                     placeholder: formatLight('unknown'),
                     tooltip: 'Doubleclick to edit',
