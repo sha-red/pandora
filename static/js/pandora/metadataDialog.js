@@ -4,12 +4,12 @@ pandora.ui.metadataDialog = function(data) {
 
     var keys = [
             'title', 'alternativeTitles',
-            'director', 'country', 'year', 'language', 'runtime',
-            // 'productionCompany',
+            'director',
+            'country', 'year', 'language', 'runtime', 'color', 'sound',
+            'productionCompany',
             'producer', 'writer', 'cinematographer', 'editor', 'actor',
             'genre', 'keyword',
             'summary'
-            // color, sound
         ],
         updateKeys,
         dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
@@ -75,7 +75,6 @@ pandora.ui.metadataDialog = function(data) {
                             that.close();
                         }
                     }),
-                {},
                 Ox.Button({
                         disabled: true,
                         id: 'update',
@@ -177,7 +176,7 @@ pandora.ui.metadataDialog = function(data) {
                 keys.forEach(function(key, index) {
                     var isEqual = Ox.isEqual(data[key], imdb[key]),
                         checked = isEqual ? [true, true]
-                            : !Ox.isUndefined(data) && Ox.isUndefined(imdb[key]) ? [true, false]
+                            : !Ox.isUndefined(data[key]) && Ox.isUndefined(imdb[key]) ? [true, false]
                             : [false, true];
                     if (index > 0) {
                         $('<div>')
@@ -243,9 +242,11 @@ pandora.ui.metadataDialog = function(data) {
     }
 
     function formatValue(key, value) {
-        return key == 'alternativeTitles' ? value.map(function(v) {
+        return !value ? ''
+            : key == 'alternativeTitles' ? value.map(function(v) {
                 return v[0];
             }).join('; ')
+            : key == 'runtime' ? Ox.formatDuration(value, 0, 'short')
             : Ox.isArray(
                 Ox.getObjectById(pandora.site.itemKeys, key).type
             ) ? value.join(', ')
@@ -263,12 +264,8 @@ pandora.ui.metadataDialog = function(data) {
 
     function getUpdateKeys() {
         return keys.filter(function(key) {
-            return $input[key][0].options('value')[0] === false;
+            return $input[key][0].options('inputs')[0].options('value') === false;
         });
-    }
-
-    function parseValue(value, type) {
-        return Ox.isArray(type) ? ', '.split(value) : value;
     }
 
     function setSize(data) {
@@ -288,9 +285,12 @@ pandora.ui.metadataDialog = function(data) {
     }
 
     function updateMetadata() {
-        var edit = {id: data.id};
+        var edit = {id: data.id},
+            type = Ox.getObjectById(pandora.site.itemKeys, key).type;
         updateKeys.forEach(function(key) {
-            edit[key] = imdb[key];
+            edit[key] = imdb[key] || (
+                Ox.isArray(type) ? [] : ''
+            );
         });
         that.disableButtons();
         pandora.api.edit(edit, function(result) {
