@@ -26,7 +26,7 @@
             for items of a rights level up to and including x
     */
     "capabilities": {
-        "canDeleteItems": {"admin": true},
+        "canAddItems": {"student": true, "staff": true, "admin": true}
         "canDownloadVideo": {"guest": -1, "member": -1, "student": -1, "staff": -1, "admin": -1},
         "canEditAnnotations": {"staff": true, "admin": true},
         "canEditEvents": {"student": true, "staff": true, "admin": true},
@@ -43,6 +43,7 @@
         "canManageUsers": {"staff": true, "admin": true},
         "canPlayClips": {"guest": 1, "member": 1, "student": 3, "staff": 3, "admin": 3},
         "canPlayVideo": {"guest": 1, "member": 1, "student": 3, "staff": 3, "admin": 3},
+        "canRemoveItems": {"staff": true, "admin": true},
         "canSeeAccessed": {"student": true, "staff": true, "admin": true},
         "canSeeDebugMenu": {"student": true, "staff": true, "admin": true},
         "canSeeExtraItemViews": {"student": true, "staff": true, "admin": true},
@@ -50,8 +51,7 @@
         "canSeeItem": {"guest": 3, "member": 3, "student": 3, "staff": 3, "admin": 3},
         "canSeeSize": {"student": true, "staff": true, "admin": true},
         "canSeeSoftwareVersion": {"student": true, "staff": true, "admin": true},
-        "canSendMail": {"staff": true, "admin": true},
-        "canUploadVideo": {"guest": false, "member": false, "student": true, "staff": true, "admin": true}
+        "canSendMail": {"staff": true, "admin": true}
     },
     /*
         clipKeys are the properties that clips can by sorted by.
@@ -192,19 +192,8 @@
             "sort": true
         },
         {
-            "id": "productioncompany",
+            "id": "productionCompany",
             "title": "Studio",
-            "type": ["string"],
-            "autocomplete": true,
-            "columnWidth": 180,
-            "filter": true,
-            "find": true,
-            "sort": true,
-            "sortType": "person"
-        },
-        {
-            "id": "writer",
-            "title": "Writer",
             "type": ["string"],
             "autocomplete": true,
             "columnWidth": 180,
@@ -216,6 +205,17 @@
         {
             "id": "producer",
             "title": "Producer",
+            "type": ["string"],
+            "autocomplete": true,
+            "columnWidth": 180,
+            "filter": true,
+            "find": true,
+            "sort": true,
+            "sortType": "person"
+        },
+        {
+            "id": "writer",
+            "title": "Writer",
             "type": ["string"],
             "autocomplete": true,
             "columnWidth": 180,
@@ -264,14 +264,6 @@
             "value": {"key": "actor", "type": "length"}
         },
         {
-            "id": "character", 
-            "title": "Character", 
-            "type": ["string"],
-            "autocomplete": true,
-            "find": true,
-            "sortType": "string"
-        },
-        {
             "id": "name",
             "title": "Name",
             "type": ["string"],
@@ -282,6 +274,14 @@
             "id": "series",
             "title": "TV Series",
             "type": "boolean"
+        },
+        {
+            "id": "keyword", 
+            "title": "Keyword",
+            "type": ["string"],
+            "autocomplete": true,
+            "filter": true,
+            "find": true
         },
         {
             "id": "summary",
@@ -579,6 +579,7 @@
         "singular": "Movie",
         "plural": "Movies"
     },
+    "itemRequiresVideo": false,
     "itemViews": [
         {"id": "info", "title": "Info"},
         {"id": "player", "title": "Player"},

@@ -26,7 +26,7 @@
             for items of a rights level up to and including x
     */
     "capabilities": {
-        "canDeleteItems": {"admin": true},
+        "canAddItems": {"staff": true, "admin": true},
         "canDownloadVideo": {"guest": -1, "member": -1, "friend": -1, "staff": -1, "admin": -1},
         "canEditAnnotations": {"staff": true, "admin": true},
         "canEditEvents": {"staff": true, "admin": true},
@@ -43,6 +43,7 @@
         "canManageUsers": {"staff": true, "admin": true},
         "canPlayClips": {"guest": 2, "member": 2, "friend": 4, "staff": 4, "admin": 4},
         "canPlayVideo": {"guest": 1, "member": 1, "friend": 4, "staff": 4, "admin": 4},
+        "canRemoveItems": {"admin": true},
         "canSeeAccessed": {"staff": true, "admin": true},
         "canSeeDebugMenu": {"staff": true, "admin": true},
         "canSeeExtraItemViews": {"staff": true, "admin": true},
@@ -50,8 +51,7 @@
         "canSeeItem": {"guest": 3, "member": 3, "friend": 4, "staff": 4, "admin": 4},
         "canSeeSize": {"friend": true, "staff": true, "admin": true},
         "canSeeSoftwareVersion": {"staff": true, "admin": true},
-        "canSendMail": {"staff": true, "admin": true},
-        "canUploadVideo": {"guest": false, "member": false, "staff": true, "admin": true}
+        "canSendMail": {"staff": true, "admin": true}
     },
     /*
         clipKeys are the properties that clips can by sorted by.
@@ -569,6 +569,7 @@
         "singular": "Movie",
         "plural": "Movies"
     },
+    "itemRequiresVideo": true,
     "itemViews": [
         {"id": "info", "title": "Info"},
         {"id": "player", "title": "Player"},
