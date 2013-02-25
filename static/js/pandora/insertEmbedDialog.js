@@ -206,21 +206,20 @@ pandora.ui.insertEmbedDialog = function(callback) {
             $input.position = Ox.Input({
                     label: 'Position',
                     labelWidth: 128,
-                    placeholder: '00:00:00',
+                    placeholder: '00:00:00.000',
                     width: formWidth
                 })
                 .addClass('advanced')
                 .css({display: 'inline-block', margin: '4px 0'})
                 .bindEvent({
                     change: function(data) {
-                        if ($input['in'].options('value')) {
+                        var hasInAndOut = $input['in'].options('value') !== '';
+                        if (data.value) {
                             $input.position.options({
-                                value: Ox.formatDuration(
-                                    Ox.limit(
-                                        Ox.parseDuration($input.position.options('value')),
-                                        Ox.parseDuration($input['in'].options('value')),
-                                        Ox.parseDuration($input.out.options('value'))
-                                    )
+                                value: limitPoint(
+                                    data.value,
+                                    hasInAndOut ? $input['in'].options('value') : 0,
+                                    hasInAndOut ? $input.out.options('value') : duration
                                 )
                             });
                         }
@@ -233,22 +232,26 @@ pandora.ui.insertEmbedDialog = function(callback) {
             $input['in'] = Ox.Input({
                     label: 'In Point',
                     labelWidth: 128,
-                    placeholder: '00:00:00',
+                    placeholder: '00:00:00.000',
                     width: formWidth
                 })
                 .css({display: 'inline-block', margin: '4px 0'})
                 .bindEvent({
                     change: function(data) {
-                        var min = Ox.parseDuration(data.value) + 1;
-                        if (
-                            $input.out.options('value') === ''
-                            || input.out.options('value') < min
-                        ) {
-                            $input.out.options({
-                                value: Ox.formatDuration(min)
+                        if (data.value) {
+                            $input['in'].options({
+                                value: limitPoint(data.value, 0, duration)
                             });
+                            if ($input.out.options('value') === '') {
+                                $input.out.options({value: Ox.formatDuration(duration)});
+                            } else if (
+                                Ox.parseDuration($input.out.options('value'))
+                                < Ox.parseDuration(data.value)
+                            ) {
+                                $input.out.options({value: data.value});
+                            }
+                            $input.annotation.options({value: ''});
                         }
-                        $input.annotation.options({value: ''});
                         formatURL();
                     }
                 })
@@ -257,26 +260,26 @@ pandora.ui.insertEmbedDialog = function(callback) {
             $input.out = Ox.Input({
                     label: 'Out Point',
                     labelWidth: 128,
-                    placeholder: '00:00:00',
+                    placeholder: '00:00:00.000',
                     width: formWidth
                 })
                 .css({display: 'inline-block', margin: '4px 0'})
                 .bindEvent({
                     change: function(data) {
-                        if (Ox.parseDuration(data.value) < 1) {
-                            $input.out.options({value: 1});
-                            data.value = 1
-                        }
-                        var max = Ox.parseDuration(data.value) - 1;
-                        if (
-                            !input['in'].options('value') === ''
-                            || input['in'].options > max
-                        ) {
+                        if (data.value) {
                             $input.out.options({
-                                value: Ox.formatDuration(max)
+                                value: limitPoint(data.value, 0, duration)
                             });
+                            if ($input['in'].options('value') === '') {
+                                $input['in'].options({value: Ox.formatDuration(0)});
+                            } else if (
+                                Ox.parseDuration($input['in'].options('value'))
+                                > Ox.parseDuration(data.value)
+                            ) {
+                                $input['in'].options({value: data.value});
+                            }
+                            $input.annotation.options({value: ''});
                         }
-                        $input.annotation.options({value: ''});
                         formatURL();
                     }
                 })
@@ -419,6 +422,16 @@ pandora.ui.insertEmbedDialog = function(callback) {
                 + (data.showAnnotations ? '&showAnnotations=true' : '')
                 + (data.showAnnotations && data.showLayers.length ? '&showLayers=' + JSON.stringify(data.showLayers) : '')
                 + '&matchRatio=true'
+            );
+        }
+
+        function limitPoint(value, min, max) {
+            return Ox.formatDuration(
+                Ox.limit(
+                    Ox.parseDuration(value),
+                    Ox.parseDuration(min),
+                    Ox.parseDuration(max)
+                )
             );
         }
 
