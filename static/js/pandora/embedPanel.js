@@ -20,7 +20,12 @@ pandora.ui.embedPanel = function() {
 
             video = Ox.extend(result.data, pandora.getVideoOptions(result.data));
 
-            var sizes = getSizes();
+            var isFrame = options['in'] !== void 0 && (
+                    options['in'] == options.out
+                    || options['in'] == video.duration
+                ),
+                sizes = getSizes();
+
             options.height = sizes.videoHeight;
 
             if (options.title) {
@@ -43,7 +48,7 @@ pandora.ui.embedPanel = function() {
                     censoredIcon: pandora.site.cantPlay.icon,
                     censoredTooltip: pandora.site.cantPlay.text,
                     controlsBottom: (
-                        options['in'] == options.out ? [] : ['play', 'volume']
+                        isFrame ? [] : ['play', 'volume']
                     ).concat(
                         ['scale']
                     ).concat(
@@ -64,12 +69,12 @@ pandora.ui.embedPanel = function() {
                     ),
                     duration: video.duration,
                     enableFullscreen: Ox.Fullscreen.available,
-                    enableKeyboard: true,
-                    enableMouse: true,
-                    enablePosition: true,
+                    enableKeyboard: !isFrame,
+                    enableMouse: !isFrame,
+                    enablePosition: !isFrame,
                     enableSubtitles: true,
-                    enableTimeline: true,
-                    enableVolume: true,
+                    enableTimeline: !isFrame,
+                    enableVolume: !isFrame,
                     height: options.height,
                     invertHighlight: options.invertHighlight,
                     muted: pandora.user.ui.videoMuted,
@@ -139,6 +144,7 @@ pandora.ui.embedPanel = function() {
 
             if (options.showTimeline) {
                 $timeline = Ox.LargeVideoTimeline(Ox.extend({
+                        disabled: isFrame,
                         duration: video.duration,
                         getImageURL: function(type, i) {
                             return '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg';
@@ -311,8 +317,10 @@ pandora.ui.embedPanel = function() {
         }
         if (!options['in'] && !options.out) {
             options.playInToOut = false;
-        } else if (options['in'] == options.out) {
+        } else if (options['in'] && options['in'] == options.out) {
             options.invertHighlight = false;
+            options.paused = true;
+            options.playInToOut = false;
         }
         return options;
     }
