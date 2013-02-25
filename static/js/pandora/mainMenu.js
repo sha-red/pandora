@@ -33,7 +33,6 @@ pandora.ui.mainMenu = function() {
                         {},
                         { id: 'preferences', title: 'Preferences...', disabled: isGuest, keyboard: 'control ,' },
                         { id: 'archives', title: 'Archives...', disabled: /*isGuest*/ true },
-                        { id: 'upload', title: 'Upload...', disabled: !pandora.site.capabilities.canUploadVideo[pandora.user.level]},
                         {},
                         { id: 'signup', title: 'Sign Up...', disabled: !isGuest },
                         isGuest ? { id: 'signin', title: 'Sign In...' }
@@ -41,6 +40,9 @@ pandora.ui.mainMenu = function() {
                     ] },
                     getListMenu(),
                     { id: 'editMenu', title: 'Edit', items: [
+                        { id: 'add', title: 'Add ' + pandora.site.itemName.singular, disabled: pandora.site.itemRequiresVideo || !pandora.site.capabilities.canAddItems[pandora.user.level] },
+                        { id: 'upload', title: 'Upload Video...', disabled: !pandora.site.capabilities.canAddItems[pandora.user.level] },
+                        {},
                         { id: 'undo', title: 'Undo', disabled: true, keyboard: 'control z' },
                         { id: 'redo', title: 'Redo', disabled: true, keyboard: 'shift control z' },
                         {},
@@ -290,8 +292,6 @@ pandora.ui.mainMenu = function() {
                     })
                 ).indexOf(data.id) > -1) {
                     pandora.UI.set({page: data.id});
-                } else if (data.id == 'upload') {
-                    pandora.$ui.uploadDialog = pandora.ui.uploadDialog().open();
                 } else if ([
                     'newlist', 'newlistfromselection', 'newsmartlist', 'newsmartlistfromresults'
                 ].indexOf(data.id) > -1) {
@@ -300,6 +300,10 @@ pandora.ui.mainMenu = function() {
                     pandora.addList(pandora.user.ui._list);
                 } else if (data.id == 'editlist') {
                     pandora.ui.listDialog().open();
+                } else if (data.id == 'add') {
+                    pandora.addItem();
+                } else if (data.id == 'upload') {
+                    pandora.$ui.uploadDialog = pandora.ui.uploadDialog().open();
                 } else if (data.id == 'deletelist') {
                     pandora.ui.deleteListDialog().open();
                 } else if (data.id == 'showsidebar') {
