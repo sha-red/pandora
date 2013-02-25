@@ -314,6 +314,19 @@ appPanel
             Ox.Theme(pandora.user.ui.theme);
             if (isEmbed) {
                 pandora.$ui.embedPanel = pandora.ui.embedPanel().display();
+                Ox.$parent.onMessage({
+                    settheme: function(data) {
+                        if (Ox.contains(pandora.site.themes, data.theme)) {
+                            Ox.Theme(data.theme);
+                        }
+                    },
+                    seturl: function(data) {
+                        Ox.print('SET URL', data.url);
+                        if (pandora.isEmbedURL(data.url)) {
+                            pandora.URL.push(data.url);
+                        }
+                    }
+                });
             } else {
                 pandora.$ui.appPanel = pandora.ui.appPanel().display();
                 Ox.Request.requests() && pandora.$ui.loadingIcon.start();

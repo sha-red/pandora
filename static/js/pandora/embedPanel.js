@@ -391,18 +391,7 @@ pandora.ui.embedPanel = function() {
         pandora_hash: that.reloadPanel
     });
 
-    Ox.$parent.onMessage({
-        settheme: function(data) {
-            if (Ox.contains(pandora.site.themes, data.theme)) {
-                Ox.Theme(data.theme);
-            }
-        },
-        seturl: function(data) {
-            if (pandora.isEmbedURL(data.url)) {
-                pandora.URL.push(data.url);
-            }
-        }
-    });
+    Ox.$parent.postMessage('loaded');
 
     return that;
 
