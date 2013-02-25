@@ -285,9 +285,9 @@ pandora.ui.metadataDialog = function(data) {
     }
 
     function updateMetadata() {
-        var edit = {id: data.id},
-            type = Ox.getObjectById(pandora.site.itemKeys, key).type;
+        var edit = {id: data.id}, type;
         updateKeys.forEach(function(key) {
+            type = Ox.getObjectById(pandora.site.itemKeys, key).type;
             edit[key] = imdb[key] || (
                 Ox.isArray(type) ? [] : ''
             );
