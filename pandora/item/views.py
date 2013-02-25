@@ -7,7 +7,6 @@ import random
 from urlparse import urlparse
 from urllib import quote
 import time
-import re
 
 import Image
 from django.db.models import Count, Sum
@@ -483,7 +482,11 @@ def add(request):
         i = models.Item()
         i.data['title'] = data['title']
         i.user = request.user
-        i.save()
+        p = i.save()
+        if p:
+            p.wait()
+        else:
+            i.make_poster(True)
         response = json_response(status=200, text='created')
         response['data'] = i.get_json()
     return render_to_json_response(response)
