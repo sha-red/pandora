@@ -4,6 +4,7 @@
 
 pandora.addItem = function() {
     pandora.api.add(function(result) {
+        Ox.Request.clearCache('find');
         pandora.UI.set({
             item: result.data.id,
             itemView: 'info'
@@ -222,7 +223,7 @@ pandora.clearIconCache = function(item) {
             xhr.send();
         });
     });
-}
+};
 
 pandora.clearListIconCache = function(list) {
     ['', 256].forEach(function(size) {
@@ -231,7 +232,7 @@ pandora.clearListIconCache = function(list) {
         xhr.open('POST', url);
         xhr.send();
     });
-}
+};
 
 pandora.clickLink = function(e) {
     var match = e.target.id.match(/^embed(\d+)$/)
