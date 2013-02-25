@@ -369,21 +369,15 @@ def findId(request):
     data = json.loads(request.POST['data'])
     response = json_response({})
     response['data']['items'] = []
-    '''
-    FIXME: can not handle query for director []
-    query = parse_query(data, request.user)
-    qs = _order_query(query['qs'], query['sort'])
-    if qs.count() == 1:
-        response['data']['items'] = [i.get_json(data['keys']) for i in qs]
-    elif settings.DATA_SERVICE:
-    '''
-    if settings.DATA_SERVICE:
-        '''
-        info = {}
-        for c in data['query']['conditions']:
-            info[c['key']] = c['value']
-        r = models.external_data('getId', info)
-        '''
+    if 'id' in data:
+        qs = models.Item.objects.filter(itemId=data['id'])
+        if qs.count() == 1:
+            response['data']['items'] = [
+                i.get_json(['title', 'director', 'year', 'id']) for i in qs
+            ]
+    if not response['data']['items'] \
+        and len(data['id']) == 7 \
+        and settings.DATA_SERVICE:
         r = models.external_data('getId', data)
         if r['status']['code'] == 200:
             response['data']['items'] = [r['data']]
