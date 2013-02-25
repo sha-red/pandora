@@ -821,12 +821,9 @@ class Item(models.Model):
             s.volume = None
             s.parts = 0
 
-        if 'color' in self.data and len(self.data['color']) == 3:
-            s.hue, s.saturation, s.lightness = self.data['color']
-        else:
-            s.hue = None
-            s.saturation = None
-            s.brighness = None
+        for key in ('hue', 'saturation', 'lightness'):
+            if key in self.data:
+                setattr(s, key, self.data.get(key, None))
         s.numberofannotations = self.annotations.all().count()
         s.numberofcuts = len(self.data.get('cuts', []))
         if s.duration:
@@ -1066,11 +1063,10 @@ class Item(models.Model):
         streams = self.streams()
         self.make_timeline()
         if streams.count() == 1:
-            self.data['color'] = streams[0].color
+            self.data['hue'], self.data['saturation'], self.data['lightness'] = streams[0].color
             self.data['cuts'] = streams[0].cuts
             self.data['volume'] = streams[0].volume
         else:
-            #self.data['color'] = extract.average_color(self.timeline_prefix)
             self.data['cuts'] = extract.cuts(self.timeline_prefix)
             self.data['volume'] = 0
             offset = 0
@@ -1080,7 +1076,7 @@ class Item(models.Model):
                 self.data['volume'] += s.volume * s.duration
                 color = map(lambda a,b: (a+b)/n, color,ox.image.getRGB(s.color))
                 offset += s.duration
-            self.data['color'] = ox.image.getHSL(color)
+            self.data['hue'], self.data['saturation'], self.data['lightness'] = ox.image.getHSL(color)
             if offset:
                 self.data['volume'] /= offset
         #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
