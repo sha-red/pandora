@@ -27,6 +27,7 @@ pandora.ui.filesView = function(options, self) {
     });
 
     self.$deleteButton = Ox.Button({
+            disabled: !pandora.site.capabilities.canRemoveItems[pandora.user.ui.level],
             title: 'Delete ' + pandora.site.itemName.singular + '...',
             width: 128
         })
