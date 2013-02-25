@@ -1242,7 +1242,7 @@ pandora.resizeWindow = function() {
     // FIXME: a lot of this throws errors on load
     pandora.$ui.leftPanel && pandora.$ui.leftPanel.size(2, pandora.getInfoHeight(true));
     pandora.resizeFolders();
-    if (pandora.user.ui.section == 'item') {
+    if (pandora.user.ui.section == 'items') {
         if (!pandora.user.ui.item) {
             pandora.resizeFilters(pandora.$ui.rightPanel.width());
             if (pandora.user.ui.listView == 'clips') {
