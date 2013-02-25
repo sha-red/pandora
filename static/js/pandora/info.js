@@ -106,7 +106,7 @@ pandora.ui.info = function() {
                                         pandora.user.ui.item
                                         && ['timeline', 'player', 'editor'].indexOf(pandora.user.ui.itemView) > -1
                                     ) ? 'Go to Position' : (
-                                        pandora.user.ui.item ? 'Switch to' : 'Open in'
+                                        pandora.user.ui.item ? 'Switch to ' : 'Open in '
                                     ) + Ox.getObjectById(
                                         pandora.site.itemViews,
                                         pandora.user.ui.videoView
