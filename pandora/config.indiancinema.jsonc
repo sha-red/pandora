@@ -26,7 +26,7 @@
             for items of a rights level up to and including x
     */
     "capabilities": {
-        "canAddItems": {"student": true, "staff": true, "admin": true}
+        "canAddItems": {"student": true, "staff": true, "admin": true},
         "canDownloadVideo": {"guest": -1, "member": -1, "student": -1, "staff": -1, "admin": -1},
         "canEditAnnotations": {"staff": true, "admin": true},
         "canEditEvents": {"student": true, "staff": true, "admin": true},
