@@ -256,7 +256,10 @@ class Item(models.Model):
                     self.data[key] = [cleanup(i) for i in data[key]]
                 else:
                     self.data[key] = ox.escape_html(data[key])
-        return self.save()
+        p = self.save()
+        if not settings.USE_IMDB and filter(lambda k: k in ('title', 'director', 'year'), data):
+            p = tasks.update_poster.delay(self.itemId)
+        return p
 
     def log(self):
         c = Changelog(type='item')
