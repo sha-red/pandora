@@ -27,7 +27,7 @@ pandora.ui.filesView = function(options, self) {
     });
 
     self.$deleteButton = Ox.Button({
-            disabled: !pandora.site.capabilities.canRemoveItems[pandora.user.ui.level],
+            disabled: !pandora.site.capabilities.canRemoveItems[pandora.user.level],
             title: 'Delete ' + pandora.site.itemName.singular + '...',
             width: 128
         })
@@ -323,7 +323,11 @@ pandora.ui.filesView = function(options, self) {
             change: function(data) {
                 var conditions, matches;
                 if (key == 'id' && data.value.substr(0, 2) != '0x') {
-                    matches = data.value.match(/\d{7}/);
+                    if (pandora.site.site.id == 'oxdb') {
+                        matches = data.value.match(/\d{7}/);
+                    } else {
+                        matches = data.value.match(/[A-Z]+/);
+                    }
                     data.value = matches ? matches[0] : '';
                     self.$idInput.value(data.value);
                 }
