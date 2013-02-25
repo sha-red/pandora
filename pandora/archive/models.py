@@ -164,7 +164,7 @@ class File(models.Model):
 
     def normalize_path(self):
         #FIXME: always use format_path
-        if settings.USE_IMDB:
+        if settings.CONFIG['site']['folderdepth'] == 4:
             return ox.movie.format_path(self.get_path_info())
         else:
             path = self.path or ''
