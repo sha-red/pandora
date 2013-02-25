@@ -610,12 +610,7 @@ pandora.ui.infoView = function(data) {
                     // FIXME: does this update selected?
                 }
                 pandora.updateItemContext();
-                // FIXME: value function should accept {k: v, ...}
-                pandora.$ui.browser.value(result.data.id, 'title', result.data.title);
-                pandora.$ui.browser.value(result.data.id, 'director', result.data.director);
-                pandora.$ui.browser.value(result.data.id, 'country', result.data.country);
-                pandora.$ui.browser.value(result.data.id, 'year', result.data.year);
-                //pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
+                pandora.$ui.browser.value(result.data.id, key, result.data[key]);
             });
         }
     }
