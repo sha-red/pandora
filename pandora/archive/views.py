@@ -187,7 +187,7 @@ def addFile(request):
     response = json_response({})
     data = json.loads(request.POST['data'])
     oshash = data.pop('id')
-    if not request.user.get_profile().capability('canUploadVideo'):
+    if not request.user.get_profile().capability('canAddItems'):
         response = json_response(status=403, text='permissino denied')
     elif models.File.objects.filter(oshash=oshash).count() > 0:
         f = models.File.objects.get(oshash=oshash)

@@ -7,6 +7,7 @@ import random
 from urlparse import urlparse
 from urllib import quote
 import time
+import re
 
 import Image
 from django.db.models import Count, Sum
@@ -460,6 +461,35 @@ def get(request):
 actions.register(get)
 
 @login_required_json
+def add(request):
+    '''
+        param data {
+        }
+        return {
+            status: {'code': int, 'text': string},
+            data: {
+                id:
+                name:
+                ...
+            }
+        }
+    '''
+
+    if not request.user.get_profile().capability('canAddItems'):
+        response = json_response(status=403, text='permissino denied')
+    else:
+        data = json.loads(request.POST['data'])
+        data['title'] = data.get('title', 'Untitled')
+        i = models.Item()
+        i.data['title'] = data['title']
+        i.user = request.user
+        i.save()
+        response = json_response(status=200, text='created')
+        response['data'] = i.get_json()
+    return render_to_json_response(response)
+actions.register(add, cache=False)
+
+@login_required_json
 def edit(request):
     '''
         param data {
@@ -515,7 +545,11 @@ def remove(request):
     response = json_response({})
     data = json.loads(request.POST['data'])
     item = get_object_or_404_json(models.Item, itemId=data['id'])
-    if item.editable(request.user):
+    user = request.user
+    if user.get_profile().capability('canRemoveItems') == True or \
+           user.is_staff or \
+           item.user == user or \
+           item.groups.filter(id__in=user.groups.all()).count() > 0:
         item.log()
         #FIXME: is this cascading enough or do we end up with orphan files etc.
         item.delete()
