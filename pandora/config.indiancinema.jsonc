@@ -182,10 +182,18 @@
             "sort": true
         },
         {
-            "id": "genre", 
-            "title": "Genre",
+            "id": "color",
+            "title": "Color",
             "type": ["string"],
-            "autocomplete": true,
+            "columnWidth": 120,
+            "filter": true,
+            "find": true,
+            "sort": true
+        },
+        {
+            "id": "sound",
+            "title": "Sound",
+            "type": ["string"],
             "columnWidth": 120,
             "filter": true,
             "find": true,
@@ -248,7 +256,7 @@
         },
         {
             "id": "actor",
-            "title": "Actor",
+            "title": "Actors",
             "type": ["string"],
             "autocomplete": true,
             "filter": true,
@@ -271,9 +279,14 @@
             "find": true
         },
         {
-            "id": "series",
-            "title": "TV Series",
-            "type": "boolean"
+            "id": "genre", 
+            "title": "Genre",
+            "type": ["string"],
+            "autocomplete": true,
+            "columnWidth": 120,
+            "filter": true,
+            "find": true,
+            "sort": true
         },
         {
             "id": "keyword", 
@@ -288,59 +301,6 @@
             "title": "Summary",
             "type": "text",
             "find": true
-        },
-        {
-            "id": "trivia",
-            "title": "Trivia",
-            "type": ["text"]
-        },
-        {
-            "id": "releasedate",
-            "title": "Release Date",
-            "type": "date",
-            "columnWidth": 120,
-            "format": {"type": "date", "args": ["%a, %b %e, %Y"]},
-            "sort": true
-        },
-        {
-            "id": "budget",
-            "title": "Budget",
-            "type": "integer",
-            "columnWidth": 90,
-            "format": {"type": "unit", "args": ["$"]},
-            "sort": true
-        },
-        {
-            "id": "gross",
-            "title": "Gross",
-            "type": "integer",
-            "columnWidth": 90,
-            "format": {"type": "unit", "args": ["$"]},
-            "sort": true
-        },
-        {
-            "id": "profit",
-            "title": "Profit",
-            "type": "integer",
-            "columnWidth": 90,
-            "format": {"type": "unit", "args": ["$"]},
-            "sort": true
-        },
-        {
-            "id": "votes",
-            "title": "Mainstream Score",
-            "type": "float",
-            "columnWidth": 60,
-            "format": {"type": "ColorPercent", "args": [1, true]},
-            "sort": true
-        },
-        {
-            "id": "likes",
-            "title": "Arthouse Score",
-            "type": "float",
-            "columnWidth": 60,
-            "format": {"type": "ColorPercent", "args": [1, true]},
-            "sort": true
         },
         {
             "id": "id",
