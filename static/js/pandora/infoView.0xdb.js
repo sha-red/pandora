@@ -188,7 +188,7 @@ pandora.ui.infoView = function(data) {
                         },
                         placeholder: formatLight('Unknown Director'),
                         tooltip: isEditable ? 'Doubleclick to edit' : '',
-                        value: data.director ? data.director.join(', ') : 'Unknown Director'
+                        value: data.director ? data.director.join(', ') : ''
                     })
                     .css({
                         display: 'inline-block',
@@ -271,6 +271,7 @@ pandora.ui.infoView = function(data) {
     // FIXME: we will want to check for data.seriesId here
     if (isEditable && data.seriesTitle) {
         var $div = $('<div>')
+            // FIXME: Don't extend!
             .css(Ox.extend(css, {marginTop: '20px'})) // FIXME: just a guess
             .appendTo($text);
         ['episodeDirector', 'seriesYear'].forEach(function(key, i) {
@@ -859,7 +860,7 @@ pandora.ui.infoView = function(data) {
                             pandora.clearIconCache(data.id);
                             Ox.Request.clearCache();
                             if (ui.icons == 'frames') {
-                                src = '/' + data.id + '/icon512.jpg?' + Ox.uid()
+                                src = '/' + data.id + '/icon512.jpg?' + Ox.uid();
                                 $icon.attr({src: src});
                                 $reflectionIcon.attr({src: src});
                                 if (pandora.$ui.videoPreview) {
