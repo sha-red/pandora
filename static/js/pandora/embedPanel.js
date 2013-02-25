@@ -42,7 +42,11 @@ pandora.ui.embedPanel = function() {
                     censored: video.censored,
                     censoredIcon: pandora.site.cantPlay.icon,
                     censoredTooltip: pandora.site.cantPlay.text,
-                    controlsBottom: ['play', 'volume', 'scale'].concat(
+                    controlsBottom: (
+                        options['in'] == options.out ? [] : ['play', 'volume']
+                    ).concat(
+                        ['scale']
+                    ).concat(
                         Ox.Fullscreen.available && options.showCloseButton ? ['fullscreen'] : []
                     ).concat(
                         ['timeline', 'position', 'settings']
@@ -307,6 +311,8 @@ pandora.ui.embedPanel = function() {
         }
         if (!options['in'] && !options.out) {
             options.playInToOut = false;
+        } else if (options['in'] == options.out) {
+            options.invertHighlight = false;
         }
         return options;
     }
