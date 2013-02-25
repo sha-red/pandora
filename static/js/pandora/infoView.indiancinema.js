@@ -131,7 +131,6 @@ pandora.ui.infoView = function(data) {
             })
             .appendTo($data.$element),
 
-        $reloadButton,
         $updateButton,
 
         $capabilities,
@@ -451,14 +450,16 @@ pandora.ui.infoView = function(data) {
 
     $('<div>').css({height: '16px'}).appendTo($text);
 
-    if (canEdit && !isEditable) {
+    if (canEdit) {
         $updateButton = Ox.Button({
                 title: 'Update Metadata...',
                 width: 128
             })
             .css({marginBottom: '4px'})
             .bindEvent({
-                click: reloadMetadata
+                click: function() {
+                    pandora.$ui.metadataDialog = pandora.ui.metadataDialog(data).open();
+                }
             })
             .appendTo($statistics);
     }
@@ -554,6 +555,18 @@ pandora.ui.infoView = function(data) {
 
     }
 
+    if (pandora.site.capabilities.canRemoveItems[pandora.user.ui.level]) {
+        $deleteButton = Ox.Button({
+                title: 'Delete ' + pandora.site.itemName.singular + '...',
+                width: 128
+            })
+            .css({marginTop: '4px'})
+            .bindEvent({
+                click: deleteItem
+            })
+            .appendTo($statistics);
+    }
+
     $('<div>').css({height: '16px'}).appendTo($statistics);
 
     if (canEdit) {
@@ -573,6 +586,10 @@ pandora.ui.infoView = function(data) {
         renderList();
     }
 
+    function deleteItem() {
+        pandora.ui.deleteItemDialog(data).open();
+    }
+
     function editMetadata(key, value) {
         if (value != data[key]) {
             var edit = {id: data.id};
@@ -589,12 +606,8 @@ pandora.ui.infoView = function(data) {
                     pandora.UI.set({item: result.data.id});
                     pandora.$ui.browser.value(data.id, 'id', result.data.id);
                 }
-                // FIXME: value function should accept {k: v, ...}
-                pandora.$ui.browser.value(result.data.id, 'title', result.data.title);
-                pandora.$ui.browser.value(result.data.id, 'director', result.data.director);
-                pandora.$ui.browser.value(result.data.id, 'country', result.data.country);
-                pandora.$ui.browser.value(result.data.id, 'year', result.data.year);
-                //pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
+                pandora.updateItemContext();
+                pandora.$ui.browser.value(result.data.id, key, result.data[key]);
             });
         }
     }
@@ -652,23 +665,6 @@ pandora.ui.infoView = function(data) {
             data.episodeTitle = split[1].trim();
         }
         return data;
-    }
-
-    function reloadMetadata() {
-        var item = ui.item;
-        // fixme: maybe there's a better method name for this?
-        $reloadButton.options({disabled: true, title: 'Reloading Metadata'});
-        pandora.api.updateExternalData({
-            id: ui.item
-        }, function(result) {
-            //reloading metadata might change results too(i.e. genre)
-            Ox.Request.clearCache();
-            if (ui.item == item && ui.itemView == 'info') {
-                pandora.$ui.contentPanel.replaceElement(
-                    1, pandora.$ui.item = pandora.ui.item()
-                );
-            }
-        });
     }
 
     function renderCapabilities(rightsLevel) {
