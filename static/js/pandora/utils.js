@@ -2,6 +2,15 @@
 
 'use strict';
 
+pandora.addItem = function() {
+    pandora.api.add(function(result) {
+        pandora.UI.set({
+            item: result.data.id,
+            itemView: 'info'
+        });
+    });
+};
+
 pandora.addList = function() {
     // addList(isSmart, isFrom) or addList(list) [=duplicate]
     var $folderList = pandora.$ui.folderList.personal,
@@ -64,7 +73,7 @@ pandora.addList = function() {
                     }
                 });
             } else {
-                addList()
+                addList();
             }
         });
     }
