@@ -3,75 +3,182 @@
 pandora.ui.metadataDialog = function(data) {
 
     var keys = [
-            'title', 'alternativetitles',
+            'title', 'alternativeTitles',
             'director', 'country', 'year', 'language', 'runtime',
-            'productioncompany',
-            'producer', 'writer', 'cinematographer', 'editor', 'cast',
-            'genre', 'keywords',
+            // 'productionCompany',
+            'producer', 'writer', 'cinematographer', 'editor', 'actor',
+            'genre', 'keyword',
             'summary'
             // color, sound
         ],
         updateKeys,
         dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
-        formWidth = dialogWidth - 32,
+        formWidth = getFormWidth(),
         imdb,
 
-        $content = Ox.Element(),
+        $confirmDialog,
 
+        $label = {},
         $input = {},
 
-        that = Ox.Dialog({
-                buttons: [
-                    Ox.Button({
-                            id: 'cancel',
-                            title: 'Don\'t Update'
-                        })
-                        .bindEvent({
-                            click: function() {
-                                that.close();
-                            }
-                        }),
-                    {},
-                    Ox.Button({
-                            id: 'update',
-                            title: 'Update'
-                        })
-                        .bindEvent({
-                            click: function() {
-                                updateMetadata();
-                            }
-                        })
-                ],
-                height: dialogHeight,
-                closeButton: true,
-                content: $content,
-                maximizeButton: true,
-                removeOnClose: true,
-                title: 'Update Metadata',
-                width: dialogWidth
-            })
-            .bindEvent({
-                resize: setSize
-            });
+        that = data.imdbId ? updateDialog() : idDialog();
+
+    data.imdbId && getMetadata();
+
+    function idDialog() {
+        return Ox.Dialog({
+            buttons: [
+                Ox.Button({
+                        id: 'close',
+                        title: 'Close'
+                    })
+                    .bindEvent({
+                        click: function() {
+                            that.close();
+                        }
+                    })
+            ],
+            content: Ox.Element()
+                .append(
+                    $('<img>')
+                        .attr({src: '/static/png/icon.png'})
+                        .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
+                )
+                .append(
+                    $('<div>')
+                        .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
+                        .html(
+                            'To update the metadata for this '
+                            + pandora.site.itemName.singular.toLowerCase()
+                            + ', please enter its IMDb ID.'
+                        )
+                ),
+            fixedSize: true,
+            height: 128,
+            keyboard: {enter: 'close', escape: 'close'},
+            removeOnClose: true,
+            title: 'Update Metadata',
+            width: 304
+        });
+    }
+    
+    function updateDialog() {
+        return Ox.Dialog({
+            buttons: [
+                Ox.Button({
+                        id: 'cancel',
+                        title: 'Don\'t Update'
+                    })
+                    .bindEvent({
+                        click: function() {
+                            that.close();
+                        }
+                    }),
+                {},
+                Ox.Button({
+                        disabled: true,
+                        id: 'update',
+                        title: 'Update'
+                    })
+                    .bindEvent({
+                        click: function() {
+                            $confirmDialog = confirmDialog().open();
+                        }
+                    })
+            ],
+            closeButton: true,
+            content: Ox.Element().append(
+                $('<img>')
+                    .attr({src: Ox.UI.getImageURL('symbolLoadingAnimated')})
+                    .css({
+                        position: 'absolute',
+                        width: '32px',
+                        height: '32px',
+                        left: 0,
+                        top: 0,
+                        right: 0,
+                        bottom: 0,
+                        margin: 'auto'
+                    })
+            ),
+            height: dialogHeight,
+            maximizeButton: true,
+            minHeight: 256,
+            minWidth: 512,
+            removeOnClose: true,
+            title: 'Update Metadata',
+            width: dialogWidth
+        })
+        .bindEvent({
+            resize: setSize
+        });
+    }
+
+    function confirmDialog() {
+        return Ox.Dialog({
+            buttons: [
+                Ox.Button({
+                        id: 'cancel',
+                        title: 'Don\'t Update'
+                    })
+                    .bindEvent({
+                        click: function() {
+                            $confirmDialog.close();
+                        }
+                    }),
+                {},
+                Ox.Button({
+                        id: 'update',
+                        title: 'Update'
+                    })
+                    .bindEvent({
+                        click: function() {
+                            $confirmDialog.close();
+                            updateMetadata();
+                        }
+                    })
+            ],
+            content: Ox.Element()
+                .append(
+                    $('<img>')
+                        .attr({src: '/static/png/icon.png'})
+                        .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
+                )
+                .append(
+                    $('<div>')
+                        .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
+                        .html(
+                            'Are you sure you want to update the value'
+                            + (updateKeys.length == 1 ? '' : 's')
+                            + ' for ' + updateKeys.map(function(key, index) {
+                                return (
+                                    index == 0 ? ''
+                                    : index < updateKeys.length - 1 ? ', '
+                                    : ' and '
+                                ) + getTitle(key)
+                            }).join('') + '?'
+                        )
+                ),
+            fixedSize: true,
+            height: 128,
+            keyboard: {enter: 'update', escape: 'cancel'},
+            removeOnClose: true,
+            title: 'Update Metadata',
+            width: 304
+        });
+    }
 
     function getMetadata(id, callback) {
-        // ox.data getData()
-        pandora.api.getMetadata({id: id, keys: keys}, function(results) {
+        pandora.api.getMetadata({id: data.imdbId, keys: keys}, function(result) {
+            var $content = Ox.Element().css({padding: '12px', overflowY: 'auto'});
             if (result.data) {
                 imdb = result.data;
-                imdb.alternativetitles = imdb.alternativetitles.map(function(value) {
-                    return value[0];
-                });
-                imdb.cast = imdb.cast.map(function(value) {
-                    return value.actor;
-                });
                 keys.forEach(function(key, index) {
                     var isEqual = Ox.isEqual(data[key], imdb[key]),
                         checked = isEqual ? [true, true]
-                            : !Ox.isEmpty(data) && Ox.isEmpty(imdb[key]) ? [true, false]
-                            : [false, true],
-                        itemKey = Ox.getObjectById(pandora.site.itemKeys, key);
+                            : !Ox.isUndefined(data) && Ox.isUndefined(imdb[key]) ? [true, false]
+                            : [false, true];
                     if (index > 0) {
                         $('<div>')
                             .css({
@@ -80,10 +187,11 @@ pandora.ui.metadataDialog = function(data) {
                             })
                             .appendTo($content);
                     }
-                    Ox.Label({
-                            title: itemKey.title,
+                    $label[key] = Ox.Label({
+                            title: getTitle(key),
                             width: formWidth
                         })
+                        .css({display: 'inline-block', margin: '4px'})
                         .appendTo($content);
                     $input[key] = [data[key], imdb[key]].map(function(v, i) {
                         return Ox.InputGroup({
@@ -96,7 +204,7 @@ pandora.ui.metadataDialog = function(data) {
                                         .bindEvent({
                                             change: function(data) {
                                                 var $otherInput = $input[key][1 - i],
-                                                    otherValue = $otherInput.optons('value');
+                                                    otherValue = $otherInput.options('value');
                                                 otherValue[0] = !otherValue[0];
                                                 $otherInput.options({value: otherValue});
                                                 updateKeys = getUpdateKeys();
@@ -104,7 +212,7 @@ pandora.ui.metadataDialog = function(data) {
                                             }
                                         }),
                                     Ox.Input({
-                                            value: formatValue(v, itemKey.type),
+                                            value: formatValue(key, v),
                                             width: formWidth - 80
                                         })
                                         .bindEvent({
@@ -112,7 +220,7 @@ pandora.ui.metadataDialog = function(data) {
                                                 // on submit, revert to initial value
                                                 $input[key][i].options({value: [
                                                     $input[key][i].options('value')[0],
-                                                    formatValue(v, itemKey.type)
+                                                    formatValue(key, v)
                                                 ]});
                                             }
                                         })
@@ -121,9 +229,11 @@ pandora.ui.metadataDialog = function(data) {
                                     {title: ['Current', 'Update'][i], width: 64}
                                 ]
                             })
+                            .css({display: 'inline-block', margin: '4px'})
                             .appendTo($content);
                     });
                 });
+                that.options({content: $content})
                 updateKeys = getUpdateKeys();
                 updateButton();
             } else {
@@ -132,72 +242,64 @@ pandora.ui.metadataDialog = function(data) {
         });
     }
 
-    function formatValue(value, type) {
-        return type == 'text' ? value.replace('/\\n/g', ' ') // FIXME: needed?
-            : Ox.isArray(type) ? value.join(', ')
-            : value
+    function formatValue(key, value) {
+        return key == 'alternativeTitles' ? value.map(function(v) {
+                return v[0];
+            }).join('; ')
+            : Ox.isArray(
+                Ox.getObjectById(pandora.site.itemKeys, key).type
+            ) ? value.join(', ')
+            : value;
+    }
+
+    function getFormWidth() {
+        return dialogWidth - 32 - Ox.UI.SCROLLBAR_SIZE;
+    }
+
+    function getTitle(key) {
+        return key == 'alternativeTitles' ? 'Alternative Titles'
+            : Ox.getObjectById(pandora.site.itemKeys, key).title;
     }
 
     function getUpdateKeys() {
         return keys.filter(function(key) {
-            return $input[key][0].options('value')[0] == false;
+            return $input[key][0].options('value')[0] === false;
         });
     }
 
-    function setSize() {
-        // ...
+    function parseValue(value, type) {
+        return Ox.isArray(type) ? ', '.split(value) : value;
+    }
+
+    function setSize(data) {
+        dialogHeight = data.height;
+        dialogWidth = data.width;
+        formWidth = getFormWidth();
+        Ox.forEach($input, function($inputs, key) {
+            $label[key].options({width: formWidth});
+            $inputs.forEach(function($element) {
+                $element.options('inputs')[1].options({width: formWidth - 80});
+            });
+        });
     }
 
     function updateButton() {
-        that[updateKeys.length ? 'disableButton' : 'enableButton']('update');
+        that[updateKeys.length ? 'enableButton' : 'disableButton']('update');
     }
 
     function updateMetadata() {
-        var $confirmDialog = Ox.Dialog({
-                buttons: [
-                    Ox.Button({
-                            id: 'cancel',
-                            title: 'Don\'t Update'
-                        })
-                        .bindEvent({
-                            click: function() {
-                                $confirmDialog.close();
-                            }
-                        }),
-                    {},
-                    Ox.Button({
-                            id: 'update',
-                            title: 'Update'
-                        })
-                        .bindEvent({
-                            click: function() {
-                                Ox.print('UPDATE')
-                            }
-                        })
-                ],
-                content: Ox.Element()
-                    .append(
-                        $('<img>')
-                            .attr({src: '/static/png/icon.png'})
-                            .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
-                    )
-                    .append(
-                        $('<div>')
-                            .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
-                            .html(
-                                'To add or edit ' + layer + ', ' + (
-                                    isEditor ? 'please sign up or sign in.'
-                                        : 'just switch to the editor.'
-                                )
-                            )
-                    ),
-                fixedSize: true,
-                height: 128,
-                removeOnClose: true,
-                title: 'Update Metadata',
-                width: 304
-            }).open();
-        
+        var edit = {id: data.id};
+        updateKeys.forEach(function(key) {
+            edit[key] = imdb[key];
+        });
+        that.disableButtons();
+        pandora.api.edit(edit, function(result) {
+            that.close();
+            pandora.updateItemContext();
+            pandora.$ui.contentPanel.replaceElement(1,
+                pandora.$ui.item = pandora.ui.item()
+            );
+        });
     }
 
     return that;
