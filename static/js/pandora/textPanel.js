@@ -200,7 +200,7 @@ pandora.ui.textPanel = function() {
         if (selected == -1 && embedURLs.length) {
             selected = 0;
         }
-        selectEmbed(selected);
+        that.selectEmbed(selected);
     };
 
     return that;
