@@ -3,11 +3,10 @@
 pandora.ui.metadataDialog = function(data) {
 
     var keys = [
-            'title', 'alternativeTitles',
-            'director',
-            'country', 'year', 'language', 'runtime', 'color', 'sound',
+            'title', 'alternativeTitles', 'director',
+            'year', 'language', 'runtime', 'color', 'sound',
             'productionCompany',
-            'producer', 'writer', 'cinematographer', 'editor', 'actor',
+            'producer', 'writer', 'cinematographer', 'editor', 'composer', 'actor',
             'genre', 'keyword',
             'summary'
         ],
