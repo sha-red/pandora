@@ -204,6 +204,7 @@
             "title": "Studio",
             "type": ["string"],
             "autocomplete": true,
+            "description": true,
             "columnWidth": 180,
             "filter": true,
             "find": true,
@@ -286,6 +287,7 @@
             "title": "Name",
             "type": ["string"],
             "autocomplete": true,
+            "description": true,
             "find": true
         },
         {

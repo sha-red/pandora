@@ -224,13 +224,19 @@ class Item(models.Model):
         for k in keys:
             key = '%sdescription' % k
             if key in data:
-                value = data.get(k, self.get(k, ''))
                 description = data.pop(key)
-                if not description:
-                    description = ''
-                d, created = Description.objects.get_or_create(key=k, value=value)
-                d.description = ox.sanitize_html(description)
-                d.save()
+                if isinstance(description, dict):
+                    for value in description:
+                        d, created = Description.objects.get_or_create(key=k, value=value)
+                        d.description = ox.sanitize_html(description[value])
+                        d.save()
+                else:
+                    value = data.get(k, self.get(k, ''))
+                    if not description:
+                        description = ''
+                    d, created = Description.objects.get_or_create(key=k, value=value)
+                    d.description = ox.sanitize_html(description)
+                    d.save()
         for key in data:
             if data[key] == None:
                 if key in self.data:
@@ -573,12 +579,23 @@ class Item(models.Model):
         if keys:
             dkeys = filter(lambda k: k in keys, dkeys)
         for key in dkeys:
-            qs = Description.objects.filter(key=key, value=self.get(key, ''))
-            if qs.count() == 0:
-                i['%sdescription'%key] = ''
+            k = filter(lambda i: i['id'] == key, settings.CONFIG['itemKeys'])
+            if isinstance((k and k[0].get('type') or ''), list):
+                i['%sdescription'%key] = {}
+                if key == 'name':
+                    values = []
+                    for ikey in filter(lambda i: i.get('sortType') == 'person',
+                            settings.CONFIG['itemKeys']):
+                        values += i.get(ikey['id'], [])
+                    values = list(set(values))
+                else:
+                    values = self.get(key)
+                if values:
+                    for d in Description.objects.filter(key=key, value__in=values):
+                        i['%sdescription'%key][d.value] = d.description
             else:
-                i['%sdescription'%key] = qs[0].description
-
+                qs = Description.objects.filter(key=key, value=self.get(key, ''))
+                i['%sdescription'%key] = '' if qs.count() == 0 else qs[0].description
         if keys:
             info = {}
             for key in keys:
@@ -1434,4 +1451,3 @@ class Description(models.Model):
     key = models.CharField(max_length=200, db_index=True)
     value = models.CharField(max_length=1000, db_index=True)
     description = models.TextField()
-
