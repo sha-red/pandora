@@ -254,6 +254,17 @@
             "sortType": "person"
         },
         {
+            "id": "composer",
+            "title": "Composer",
+            "type": ["string"],
+            "autocomplete": true,
+            "columnWidth": 180,
+            "filter": true,
+            "find": true,
+            "sort": true,
+            "sortType": "person"
+        },
+        {
             "id": "actor",
             "title": "Actor",
             "type": ["string"],
