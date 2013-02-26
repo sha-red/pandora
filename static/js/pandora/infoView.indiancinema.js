@@ -142,7 +142,7 @@ pandora.ui.infoView = function(data) {
         $browserImages = [],
 
         nameKeys = ['actor', 'director', 'writer', 'producer', 'cinematographer', 'editor'],
-        listKeys = ['country', 'language', 'genre', 'keyword'] + nameKeys;
+        listKeys = ['country', 'language', 'genre', 'keyword', 'productionCompany'] + nameKeys;
 
     //pandora.createLinks($text); // FIXME: this is wrong for editables that already have clickLink
 
@@ -224,7 +224,7 @@ pandora.ui.infoView = function(data) {
     $div && $div
         .appendTo($text);
 
-    $div = getBlock(['writer', 'producer', 'cinematographer', 'editor'])
+    $div = getBlock(['writer', 'producer', 'cinematographer', 'editor', 'productionCompany'])
     $div && $div.appendTo($text);
     
     $div = getBlock(['actor'])
@@ -511,11 +511,11 @@ pandora.ui.infoView = function(data) {
     }
 
     function formatKey(key, isStatistics) {
+        var item = Ox.getObjectById(pandora.site.itemKeys, key);
+        key = item ? item.title : key;
         if (key == 'alternativeTitles') {
             key = 'Alternative Title' + (data.alternativeTitles && data.alternativeTitles.length == 1 ? '' : 's');
-        } else if (key == 'actor') {
-            key = 'Actors';
-        } else if (key == 'imdbId') {
+        } else if (key == 'IMDb') {
             key = 'IMDb ID';
         }
         return isStatistics
