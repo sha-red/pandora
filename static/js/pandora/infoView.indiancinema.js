@@ -2,9 +2,6 @@
 
 pandora.ui.infoView = function(data) {
 
-    // fixme: given that currently, the info view doesn't scroll into view nicely
-    // when collapsing the movies browser, the info view should become a split panel
-
     var ui = pandora.user.ui,
         canEdit = pandora.site.capabilities.canEditMetadata[pandora.user.level],
         css = {
@@ -13,7 +10,6 @@ pandora.ui.infoView = function(data) {
             MozUserSelect: 'text',
             WebkitUserSelect: 'text'
         },
-        copyright = !data.year || data.year + 60 >= new Date().getFullYear(),
         iconRatio = ui.icons == 'posters'
             ? (ui.showSitePosters ? 5/8 : data.posterRatio) : 1,
         iconSize = ui.infoIconSize,
@@ -21,6 +17,7 @@ pandora.ui.infoView = function(data) {
         iconHeight = iconRatio < 1 ? iconSize : Math.round(iconSize / iconRatio),
         iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
         borderRadius = ui.icons == 'posters' ? 0 : iconSize / 8,
+        isCopyrighted = !data.year || data.year + 60 >= new Date().getFullYear(),
         listWidth = 144 + Ox.UI.SCROLLBAR_SIZE,
         margin = 16,
         statisticsWidth = 128,
@@ -767,8 +764,8 @@ pandora.ui.infoView = function(data) {
                     items: pandora.site.rightsLevels.map(function(rightsLevel, i) {
                         return {id: i, title: rightsLevel.name};
                     }).filter(function(rightsLevel) {
-                        return (!copyright && rightsLevel.title != 'Under Copyright')
-                            || (copyright && rightsLevel.title != 'Out of Copyright');
+                        return (!isCopyrighted && rightsLevel.title != 'Under Copyright')
+                            || (isCopyrighted && rightsLevel.title != 'Out of Copyright');
                     }),
                     width: 128,
                     value: data.rightslevel
