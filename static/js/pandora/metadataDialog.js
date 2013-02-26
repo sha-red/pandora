@@ -172,7 +172,7 @@ pandora.ui.metadataDialog = function(data) {
             if (result.data) {
                 imdb = result.data;
                 if (imdb.originalTitle) {
-                    imdb.alternativeTitles = [imdb.title, []].concat(imdb.alternativeTitles || []);
+                    imdb.alternativeTitles = [[imdb.title, []]].concat(imdb.alternativeTitles || []);
                     imdb.title = imdb.originalTitle;
                 }
                 keys.forEach(function(key, index) {
@@ -289,7 +289,8 @@ pandora.ui.metadataDialog = function(data) {
     function updateMetadata() {
         var edit = {id: data.id}, type;
         updateKeys.forEach(function(key) {
-            type = Ox.getObjectById(pandora.site.itemKeys, key).type;
+            type = key == 'alternativeTitles' ? []
+                : Ox.getObjectById(pandora.site.itemKeys, key).type;
             edit[key] = imdb[key] || (
                 Ox.isArray(type) ? [] : ''
             );
