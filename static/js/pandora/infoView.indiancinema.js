@@ -477,7 +477,7 @@ pandora.ui.infoView = function(data) {
             }
             pandora.api.edit(edit, function(result) {
                 var src;
-                data[key] == result.data[key];
+                data[key] = result.data[key];
                 if (result.data.id != data.id) {
                     Ox.Request.clearCache(); // fixme: too much
                     pandora.UI.set({item: result.data.id});
