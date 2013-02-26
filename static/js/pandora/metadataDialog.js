@@ -167,10 +167,14 @@ pandora.ui.metadataDialog = function(data) {
     }
 
     function getMetadata(id, callback) {
-        pandora.api.getMetadata({id: data.imdbId, keys: keys}, function(result) {
+        pandora.api.getMetadata({id: data.imdbId, keys: keys.concat(['originalTitle'])}, function(result) {
             var $content = Ox.Element().css({padding: '12px', overflowY: 'auto'});
             if (result.data) {
                 imdb = result.data;
+                if (imdb.originalTitle) {
+                    imdb.alternativeTitles = [imdb.title, []].concat(imdb.alternativeTitles || []);
+                    imdb.title = imdb.originalTitle;
+                }
                 keys.forEach(function(key, index) {
                     var isEqual = Ox.isEqual(data[key], imdb[key]),
                         checked = isEqual ? [true, true]
