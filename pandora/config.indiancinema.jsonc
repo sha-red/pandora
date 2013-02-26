@@ -121,7 +121,7 @@
             "type": "string",
             "additionalSort": [{"key": "year", "operator": "+"}, {"key": "director", "operator": "+"}],
             "autocomplete": true,
-            "autocompleteSortKey": "votes",
+            "autocompleteSortKey": "year",
             "columnRequired": true,
             "columnWidth": 180,
             "find": true,
