@@ -1249,10 +1249,11 @@ class Item(models.Model):
         return icon
 
     def load_subtitles(self):
-        if not utils.get_by_id(settings.CONFIG['layers'], 'subtitles'):
+        subtitles = utils.get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
+        if not subtitles:
             return False
         with transaction.commit_on_success():
-            layer = 'subtitles'
+            layer = subtitles['id']
             Annotation.objects.filter(layer=layer,item=self).delete()
             offset = 0
             language = ''
