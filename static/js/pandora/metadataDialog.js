@@ -4,11 +4,10 @@ pandora.ui.metadataDialog = function(data) {
 
     var keys = [
             'title', 'alternativeTitles', 'director',
-            'year', 'language', 'runtime', 'color', 'sound',
+            'country', 'year', 'language', 'runtime', 'color', 'sound',
             'productionCompany',
             'producer', 'writer', 'cinematographer', 'editor', 'composer', 'actor',
-            'genre', 'keyword',
-            'summary'
+            'genre', 'keyword', 'summary'
         ],
         updateKeys,
         dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
