@@ -127,6 +127,10 @@ pandora.ui.infoView = function(data) {
             })
             .appendTo($data.$element),
 
+        $alternativeTitles,
+
+        $minutes,
+
         $descriptions,
 
         $statistics = $('<div>')
@@ -232,17 +236,16 @@ pandora.ui.infoView = function(data) {
     renderGroup(['imdbId']);
 
     if (data.summary || canEdit) {
-        Ox.Editable({
+        Ox.EditableContent({
                 clickLink: pandora.clickLink,
                 editable: canEdit,
-                maxHeight: Infinity,
                 placeholder: formatLight('No Summary'),
                 tooltip: canEdit ? getTooltip : '',
                 type: 'textarea',
                 value: data.summary || ''
             })
             .css(css)
-            .css({marginTop: '8px'})
+            .css({marginTop: '12px'})
             .bindEvent({
                 submit: function(data) {
                     editMetadata('summary', data.value);
@@ -339,8 +342,7 @@ pandora.ui.infoView = function(data) {
             .css({marginBottom: '4px'})
             .append(formatKey('Notes', 'statistics'))
             .append(
-                Ox.Editable({
-                        height: 128,
+                Ox.EditableContent({
                         placeholder: formatLight('No notes'),
                         tooltip: getTooltip,
                         type: 'textarea',
@@ -406,10 +408,13 @@ pandora.ui.infoView = function(data) {
                 edit[key] = value ? value.split('; ').map(function(value) {
                     return [value, []];
                 }) : [];
+                data[key] = edit[key];
+                $alternativeTitles.html(formatKey(key));
             } else if (key == 'year') {
                 edit[key] = value ? parseInt(value) : '';
             } else if (key == 'runtime') {
                 edit[key] = value ? parseInt(value) * 60 : '';
+                $minutes[value ? 'show' : 'hide']();
             } else if (listKeys.indexOf(key) > -1) {
                 edit[key] = value ? value.split(', ') : [];
             } else {
@@ -449,8 +454,6 @@ pandora.ui.infoView = function(data) {
                 if (Ox.contains(nameKeys, key)) {
                     names = getNames();
                     renderDescriptions();
-                } else if (key == 'namedescription') {
-                    // ...
                 }
             });
         }
@@ -502,13 +505,13 @@ pandora.ui.infoView = function(data) {
 
     function formatValue(key, value) {
         var ret;
-        if (key == 'imdbId') {
-            ret = '<a href="http://www.imdb.com/title/tt'
-                + value + '">' + value + '</a>';
-        } else if (nameKeys.indexOf(key) > -1) {
+        if (nameKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), 'name');
         } else if (listKeys.indexOf(key) > -1 || key == 'year') {
             ret = formatLink(value.split(', '), key);
+        } else if (key == 'imdbId') {
+            ret = '<a href="http://www.imdb.com/title/tt'
+                + value + '">' + value + '</a>';
         } else {
             ret = value;
         }
@@ -661,7 +664,7 @@ pandora.ui.infoView = function(data) {
             if (canEdit || value.description) {
                 $('<div>')
                     .css(css)
-                    .css({marginTop: '8px', fontWeight: 'bold'})
+                    .css({marginTop: '12px', fontWeight: 'bold'})
                     .html(
                         formatLink(value.name, 'name')
                         + ' (' + value.keys.map(function(key) {
@@ -669,11 +672,10 @@ pandora.ui.infoView = function(data) {
                         }).join(', ') + ')'
                     )
                     .appendTo($descriptions);
-                Ox.Editable({
+                Ox.EditableContent({
                         clickLink: pandora.clickLink,
                         editable: canEdit,
-                        maxHeight: Infinity,
-                        placeholder: 'No description',
+                        placeholder: formatLight('No Description'),
                         tooltip: canEdit ? getTooltip : '',
                         type: 'textarea',
                         value: value.description || ''
@@ -703,7 +705,15 @@ pandora.ui.infoView = function(data) {
                     if ($element.children().length) {
                         $('<span>').html('; ').appendTo($element);
                     }
-                    $('<span>').html(formatKey(key)).appendTo($element);
+                    if (key == 'alternativeTitles') {
+                        $alternativeTitles = $('<span>')
+                            .html(formatKey(key))
+                            .appendTo($element);
+                    } else {
+                        $('<span>')
+                            .html(formatKey(key))
+                            .appendTo($element);
+                    }
                     Ox.EditableContent({
                             clickLink: pandora.clickLink,
                             format: function(value) {
@@ -714,13 +724,19 @@ pandora.ui.infoView = function(data) {
                             value: getValue(key, data[key])
                         })
                         .bindEvent({
+                            edit: function() {
+                                key == 'runtime' && $minutes.show();
+                            },
                             submit: function(data) {
                                 editMetadata(key, data.value);
                             }
                         })
                         .appendTo($element);
                     if (key == 'runtime') {
-                        $('<span>').html('&nbsp;min').appendTo($element);
+                        $minutes = $('<span>')
+                            .html('&nbsp;min')
+                            [data.runtime ? 'show' : 'hide']()
+                            .appendTo($element);
                     }
                 }
             });
