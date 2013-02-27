@@ -784,7 +784,7 @@
             "videoScale": "fit",
             "videoSize": "small",
             "videoSubtitles": true,
-            "videoTimeline": "keyframes",
+            "videoTimeline": "slitscan",
             "videoView": "player",
             "videoVolume": 1
         },
