@@ -248,7 +248,7 @@ pandora.ui.metadataDialog = function(data) {
             : key == 'alternativeTitles' ? value.map(function(v) {
                 return v[0];
             }).join('; ')
-            : key == 'runtime' ? Ox.formatDuration(value, 0, 'short')
+            : key == 'runtime' ? Math.round(value / 60) + ' min'
             : Ox.isArray(
                 Ox.getObjectById(pandora.site.itemKeys, key).type
             ) ? value.join(', ')
