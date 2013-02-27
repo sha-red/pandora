@@ -403,9 +403,13 @@ pandora.ui.infoView = function(data) {
             if (key == 'title') {
                 Ox.extend(edit, parseTitle(value));
             } else if (key == 'alternativeTitles') {
-                edit[key] = value ? value.split(', ').map(function(value) {
+                edit[key] = value ? value.split('; ').map(function(value) {
                     return [value, []];
                 }) : [];
+            } else if (key == 'year') {
+                edit[key] = value ? parseInt(value) : '';
+            } else if (key == 'runtime') {
+                edit[key] = value ? parseInt(value) * 60 : '';
             } else if (listKeys.indexOf(key) > -1) {
                 edit[key] = value ? value.split(', ') : [];
             } else {
@@ -498,9 +502,7 @@ pandora.ui.infoView = function(data) {
 
     function formatValue(key, value) {
         var ret;
-        if (key == 'runtime') {
-            ret = Math.round(data[key] / 60) + ' min';
-        } else if (key == 'imdbId') {
+        if (key == 'imdbId') {
             ret = '<a href="http://www.imdb.com/title/tt'
                 + value + '">' + value + '</a>';
         } else if (nameKeys.indexOf(key) > -1) {
@@ -555,7 +557,8 @@ pandora.ui.infoView = function(data) {
         return !value ? ''
             : key == 'alternativeTitles' ? value.map(function(value) {
                 return value[0];
-            }).join(', ')
+            }).join('; ')
+            : key == 'runtime' ? Math.round(value / 60)
             : Ox.contains(listKeys, key) ? value.join(', ')
             : value;
     }
@@ -716,6 +719,9 @@ pandora.ui.infoView = function(data) {
                             }
                         })
                         .appendTo($element);
+                    if (key == 'runtime') {
+                        $('<span>').html('&nbsp;min').appendTo($element);
+                    }
                 }
             });
             $element.appendTo($text);
