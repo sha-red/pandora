@@ -956,7 +956,9 @@ pandora.ui.infoView = function(data) {
                 } else {
                     $imdb.html(
                         '&nbsp;(<a href="/imdbId=' + data.imdbId + '">'
-                        + result.data.items + ' duplicates</a>)'
+                        + result.data.items + ' '
+                        + pandora.site.itemName.plural.toLowerCase()
+                        + ' with the same id</a>)'
                     );
                 }
             });
