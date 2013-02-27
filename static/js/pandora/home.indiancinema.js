@@ -5,6 +5,7 @@
 pandora.ui.home = function() {
 
     var self = {},
+
         that = $('<div>')
             .addClass('OxScreen')
             .css({
@@ -15,6 +16,7 @@ pandora.ui.home = function() {
                 overflowY: 'auto',
                 zIndex: 1001
             }),
+
         $box = $('<div>')
             .css({
                 position: 'absolute',
@@ -25,6 +27,7 @@ pandora.ui.home = function() {
                 margin: '0 auto 0 auto'
             })
             .appendTo(that),
+
         $reflectionImage = $('<img>')
             .attr({src: '/static/png/logo.png'})
             .css({
@@ -40,6 +43,7 @@ pandora.ui.home = function() {
                 WebkitTransform: 'scaleY(-1)'
             })
             .appendTo($box),
+
         $reflectionGradient = $('<div>')
             .addClass('OxReflection')
             .css({
@@ -52,6 +56,7 @@ pandora.ui.home = function() {
                 margin: '0 auto 0 auto',
             })
             .appendTo($box),
+
         $logo = Ox.Element({
                 element: '<img>',
                 tooltip: 'Enter ' + pandora.site.site.name
@@ -74,6 +79,7 @@ pandora.ui.home = function() {
                 }
             })
             .appendTo($box),
+
         $line = Ox.Element('<img>')
             .css({
                 position: 'absolute',
@@ -100,6 +106,7 @@ pandora.ui.home = function() {
             })
             .attr({src: '/static/png/line.indiancinema.png'})
             .appendTo($box),
+
         $findInput = Ox.Input({
                 width: 252
             })
@@ -126,6 +133,7 @@ pandora.ui.home = function() {
                 }
             })
             .appendTo($box),
+
         $findButton = Ox.Button({
                 title: 'Find',
                 width: 122
@@ -159,6 +167,7 @@ pandora.ui.home = function() {
                 }
             })
             .appendTo($box),
+
         $browseButton = Ox.Button({
                 title: 'Browse',
                 width: 122
@@ -181,6 +190,7 @@ pandora.ui.home = function() {
                 }
             })
             .appendTo($box),
+
         $signupButton = Ox.Button({
                 title: 'Sign Up',
                 width: 122
@@ -200,6 +210,7 @@ pandora.ui.home = function() {
                     that.fadeOutScreen();
                 }
             }),
+
         $signinButton = Ox.Button({
                 title: 'Sign In',
                 width: 122
@@ -219,6 +230,7 @@ pandora.ui.home = function() {
                     that.fadeOutScreen();
                 }
             }),
+
         $preferencesButton = Ox.Button({
                 title: 'Preferences',
                 width: 252
@@ -238,6 +250,7 @@ pandora.ui.home = function() {
                     that.fadeOutScreen();
                 }
             }),
+
         $aboutButton = Ox.Button({
                 title: 'About ' + pandora.site.site.name,
                 width: 252
@@ -258,8 +271,9 @@ pandora.ui.home = function() {
                 }
             })
             .appendTo($box),
-        $lists = $('<div>')
-            .attr({id: 'lists'})
+
+        $features = $('<div>')
+            .attr({id: 'features'})
             .css({
                 position: 'absolute',
                 left: 0,
@@ -279,30 +293,56 @@ pandora.ui.home = function() {
         $preferencesButton.appendTo($box);
     }
 
-    function showLists() {
-        pandora.api.findLists({
-            query: {
-                conditions: [{key: 'status', value: 'featured', operator: '=='}],
-                operator: '&'
+    function showFeatures() {
+        var $space,
+            featured = {},
+            find = {
+                query: {
+                    conditions: [{key: 'status', value: 'featured', operator: '=='}],
+                    operator: '&'
+                },
+                keys: ['user', 'name', 'description'],
+                sort: [{key: 'position', operator: '+'}]
             },
-            keys: ['user', 'name', 'description'],
-            sort: [{key: 'position', operator: '+'}]
-        }, function(result) {
-            var lists = result.data.items,
-                counter = 0, items = 8, mouse = false, position = 0, selected = 0,
+            items, lists, texts;
+        pandora.api.findLists(find, function(result) {
+            lists = result.data.items.length;
+            items = result.data.items.map(function(item) {
+                return Ox.extend(item, {type: 'list'});
+            });
+            pandora.api.findTexts(find, function(result) {
+                texts = result.data.items.length
+                items = items.concat(result.data.items.map(function(item) {
+                    return Ox.extend(item, {type: 'text'});
+                }));
+                $features.empty();
+                show();
+                return;
+                if (featured.lists.length) {
+                    top += 24;
+                }
+                show('texts');
+            });
+        });
+        function show() {
+            var counter = 0, max = 8, mouse = false, position = 0, selected = 0,
                 color = Ox.Theme() == 'oxlight' ? 'rgb(32, 32, 32)'
                     : Ox.Theme() == 'oxmedium' ? 'rgb(144, 144, 144)'
                     : 'rgb(224, 224, 224)',
                 $label, $icon, $text,
-                $listsBox, $listsContainer, $listsContent,
-                $listBox = [], $listIcon = [],
-                $previousButton, $nextButton,
-                $space;
-            $lists.empty();
-            if (lists.length) {
+                $featuresBox, $featuresContainer, $featuresContent,
+                $featureBox = [], $featureIcon = [],
+                $previousButton, $nextButton;
+            if (items.length) {
                 $label = Ox.Label({
                         textAlign: 'center',
-                        title: '<b>Featured List' + (lists.length > 1 ? 's' : '') + '</b>',
+                        title: '<b>Featured ' + (
+                            lists == 1 && texts == 0 ? 'List'
+                            : lists == 0 && texts == 1 ? 'Text'
+                            : texts == 0 ? 'Lists'
+                            : lists == 0 ? 'Texts'
+                            : 'Lists and Texts'
+                        ) + '</b>',
                         width: 512
                     })
                     .css({
@@ -313,7 +353,7 @@ pandora.ui.home = function() {
                         bottom: 0,
                         margin: '0 auto 0 auto'
                     })
-                    .appendTo($lists);
+                    .appendTo($features);
                 $text = Ox.Label({
                         width: 386
                     })
@@ -332,18 +372,16 @@ pandora.ui.home = function() {
                         whiteSpace: 'normal'
                     })
                     .html(
-                        '<b>' + Ox.encodeHTMLEntities(lists[selected].name) + '</b><br><br>'
-                        + lists[selected].description
+                        getHTML(items[selected])
                     )
-                    .appendTo($lists);
+                    .appendTo($features);
                 pandora.createLinks($text);
                 $icon = Ox.Element({
                         element: '<img>',
-                        tooltip: 'View List'
+                        tooltip: getTooltip(items[selected])
                     })
                     .attr({
-                        src: '/list/' + lists[selected].user + ':'
-                            + lists[selected].name + '/icon256.jpg'
+                        src: getImageURL(items[selected])
                     })
                     .css({
                         position: 'absolute',
@@ -358,12 +396,12 @@ pandora.ui.home = function() {
                     })
                     .bindEvent({
                         anyclick: function() {
-                            openList(selected);
+                            openItem(selected);
                         }
                     })
-                    .appendTo($lists);
-                if (lists.length > 1) {
-                    $listsBox = $('<div>')
+                    .appendTo($features);
+                if (items.length > 1) {
+                    $featuresBox = $('<div>')
                         .css({
                             position: 'absolute',
                             left: 0,
@@ -373,8 +411,8 @@ pandora.ui.home = function() {
                             width: '560px', // 16+8+512+8+16
                             margin: '0 auto 0 auto'
                         })
-                        .appendTo($lists);
-                    $listsContainer = $('<div>')
+                        .appendTo($features);
+                    $featuresContainer = $('<div>')
                         .css({
                             position: 'absolute',
                             left: '20px',
@@ -383,18 +421,18 @@ pandora.ui.home = function() {
                             width: '520px',
                             overflow: 'hidden'
                         })
-                        .appendTo($listsBox);
-                    $listsContent = $('<div>')
+                        .appendTo($featuresBox);
+                    $featuresContent = $('<div>')
                         .css({
                             position: 'absolute',
-                            width: lists.length * 65 + 'px',
+                            width: items.length * 65 + 'px',
                             height: '65px',
-                            marginLeft: lists.length < items
-                                ? (items - lists.length) * 65 / 2 + 'px'
+                            marginLeft: items.length < max
+                                ? (max - items.length) * 65 / 2 + 'px'
                                 : 0
                         })
-                        .appendTo($listsContainer);
-                    if (lists.length > items) {
+                        .appendTo($featuresContainer);
+                    if (items.length > max) {
                         $previousButton = Ox.Button({
                                 title: 'left',
                                 type: 'image'
@@ -419,12 +457,12 @@ pandora.ui.home = function() {
                                     }
                                 }
                             })
-                            .appendTo($listsBox);
+                            .appendTo($featuresBox);
                         $nextButton = Ox.Button({
                                 title: 'right',
                                 type: 'image'
                             })
-                            .addClass(position < lists.length - 1 ? 'visible' : '')
+                            .addClass(position < items.length - 1 ? 'visible' : '')
                             .css({
                                 position: 'absolute',
                                 right: 0,
@@ -444,8 +482,8 @@ pandora.ui.home = function() {
                                     }
                                 }
                             })
-                            .appendTo($listsBox);
-                        $listsBox.on({
+                            .appendTo($featuresBox);
+                        $featuresBox.on({
                             mouseenter: function() {
                                 mouse = true;
                                 $('.visible').show().stop().animate({
@@ -467,27 +505,8 @@ pandora.ui.home = function() {
                             }
                         });
                     }
-                    self.keydown = function(e) {
-                        var focused = Ox.Focus.focused(),
-                            key = Ox.KEYS[e.keyCode];
-                        if (
-                            focused === null
-                            || !Ox.UI.elements[focused].hasClass('OxInput')
-                        ) {
-                            if (key == 'left' && selected > 0) {
-                                selectList(selected - 1);
-                            } else if (key == 'up' && selected > 0) {
-                                selectList(0);
-                            } else if (key == 'right' && selected < lists.length - 1) {
-                                selectList(selected + 1);
-                            } else if (key == 'down' && selected < lists.length - 1) {
-                                selectList(lists.length - 1);
-                            }
-                        }
-                    };
-                    Ox.$document.on({keydown: self.keydown});
-                    lists.forEach(function(list, i) {
-                        $listBox[i] = $('<div>')
+                    items.forEach(function(item, i) {
+                        $featureBox[i] = $('<div>')
                             .css({
                                 float: 'left',
                                 width: '57px',
@@ -497,14 +516,14 @@ pandora.ui.home = function() {
                                 borderRadius: '16px',
                                 boxShadow: '0 0 2px ' + (i == selected ? color : 'transparent')
                             })
-                            .appendTo($listsContent);
-                        $listIcon[i] = Ox.Element({
+                            .appendTo($featuresContent);
+                        $featureIcon[i] = Ox.Element({
                                 element: '<img>',
-                                tooltip: Ox.encodeHTMLEntities(list.name)
+                                tooltip: (lists && texts ? Ox.toTitleCase(item.type) + ': ' : '')
+                                    + Ox.encodeHTMLEntities(item.name)
                             })
                             .attr({
-                                src: '/list/' + list.user + ':'
-                                    + list.name + '/icon256.jpg'
+                                src: getImageURL(item)
                             })
                             .css({
                                 width: '57px',
@@ -514,47 +533,87 @@ pandora.ui.home = function() {
                             })
                             .bindEvent({
                                 doubleclick: function() {
-                                    openList(i);
+                                    openItem(i);
                                 },
                                 singleclick: function() {
-                                    selectList(i);
+                                    selectItem(i);
                                 }
                             })
-                            .appendTo($listBox[i]);
+                            .appendTo($featureBox[i]);
                     });
+                    self.keydown = function(e) {
+                        var focused = Ox.Focus.focused(),
+                            key = Ox.KEYS[e.keyCode];
+                        if (
+                            focused === null
+                            || !Ox.UI.elements[focused].hasClass('OxInput')
+                        ) {
+                            if (key == 'left' && selected > 0) {
+                                selectItem(selected - 1);
+                            } else if (key == 'up' && selected > 0) {
+                                selectItem(0);
+                            } else if (key == 'right' && selected < items.length - 1) {
+                                selectItem(selected + 1);
+                            } else if (key == 'down' && selected < items.length - 1) {
+                                selectItem(itmes.length - 1);
+                            }
+                        }
+                    };
+                    Ox.$document.on({keydown: self.keydown});
                 }
                 $space = $('<div>')
                     .css({
                         position: 'absolute',
-                        top: lists.length == 0 ? '0px'
-                            : lists.length == 1 ? '150px'
+                        top: items.length == 0 ? '0px'
+                            : items.length == 1 ? '150px'
                             : '215px',
                         width: '560px',
                         height: '80px'
                     })
-                    .appendTo($lists);
-                $lists.animate({opacity: 1}, 250);
+                    .appendTo($features);
+                $features.animate({opacity: 1}, 250);
             }
-            function openList(i) {
+
+            function getHTML(item) {
+                return '<b>'
+                    + (lists && texts ? Ox.toTitleCase(item.type) + ': ' : '')
+                    + Ox.encodeHTMLEntities(item.name) + '</b><br><br>'
+                    + item.description;
+            }
+
+            function getImageURL(item) {
+                return '/' + item.type + '/' + item.user
+                    + ':' + item.name + '/icon256.jpg';
+            }
+
+            function getTooltip(item) {
+                return 'View ' + Ox.toTitleCase(item.type)
+            }
+
+            function openItem(i) {
                 that.fadeOutScreen();
-                pandora.UI.set({
-                    page: '',
-                    item: '',
+                pandora.UI.set(Ox.extend({
+                    section: items[i].type == 'list' ? 'items' : 'texts',
+                    page: ''
+                }, items[i].type == 'list' ? {
                     find: {
                         conditions: [{
                             key: 'list',
-                            value: lists[i].user + ':'
-                                + lists[i].name,
+                            value: items[i].user + ':'
+                                + items[i].name,
                             operator: '=='
                         }],
                         operator: '&'
                     }
-                });
+                } : {
+                    text: items[i].user + ':' + items[i].name
+                }));
             }
+
             function scrollToPosition(i, animate) {
-                if (i >= 0 && i <= lists.length - items && i != position) {
+                if (i >= 0 && i <= items.length - max && i != position) {
                     position = i;
-                    $listsContent.stop().animate({
+                    $featuresContent.stop().animate({
                         left: (position * -65) + 'px'
                     }, animate ? 250 : 0, function() {
                         if (position == 0) {
@@ -566,7 +625,7 @@ pandora.ui.home = function() {
                         } else {
                             $previousButton.addClass('visible');
                         }
-                        if (position == lists.length - items) {
+                        if (position == items.length - max) {
                             $nextButton.removeClass('visible').stop().animate({
                                 opacity: 0
                             }, 250, function() {
@@ -576,37 +635,38 @@ pandora.ui.home = function() {
                             $nextButton.addClass('visible');
                         }
                         if (mouse) {
-                            $listsBox.trigger('mouseenter');
+                            $featuresBox.trigger('mouseenter');
                         }
                     });
                 }
             }
-            function selectList(i) {
-                if (i >= 0 && i <= lists.length - 1 && i != selected) {
-                    $listBox[selected].css({
+
+            function selectItem(i) {
+                if (i >= 0 && i <= items.length - 1 && i != selected) {
+                    $featureBox[selected].css({
                         boxShadow: 'none'
                     });
                     selected = i;
-                    $listBox[selected].css({
+                    $featureBox[selected].css({
                         boxShadow: '0 0 2px ' + color
                     });
                     if (selected < position) {
                         scrollToPosition(selected, true);
-                    } else if (selected > position + items - 1) {
-                        scrollToPosition(selected - items + 1, true);
+                    } else if (selected > position + max - 1) {
+                        scrollToPosition(selected - max + 1, true);
                     }
                     $icon.attr({
-                        src: '/list/' + lists[selected].user + ':'
-                            + lists[selected].name + '/icon256.jpg'
+                        src: getImageURL(items[selected])
+                    }).options({
+                        tooltip: getTooltip(items[selected])
                     });
                     $text.html(
-                        '<b>' + Ox.encodeHTMLEntities(lists[selected].name) + '</b><br><br>'
-                        + lists[selected].description
+                        getHTML(items[selected])
                     );
                 }
             }
-        });
-        
+
+        }        
     }
 
     that.fadeInScreen = function() {
@@ -614,7 +674,7 @@ pandora.ui.home = function() {
         that.appendTo(Ox.UI.$body).animate({opacity: 1}, 500, function() {
             that.find('*').animate({opacity: 1}, 250, function() {
                 $findInput.focusInput(true);
-                showLists();
+                showFeatures();
             });
         });
         return that;
@@ -635,13 +695,13 @@ pandora.ui.home = function() {
         // $box.css({marginTop: '80px'});
         that.find('*').css({opacity: 1});
         $findInput.focusInput(true);
-        showLists();
+        showFeatures();
         /*
         $box.animate({marginTop: '80px'}, 500);
         setTimeout(function() {
             that.find('*').animate({opacity: 1}, 250, function() {
                 $findInput.focusInput(true);
-                showLists();
+                showFeatures();
             });
         }, 250);
         */
