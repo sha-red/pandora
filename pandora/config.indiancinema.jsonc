@@ -10,7 +10,7 @@
         {"key": "title", "operator": "+"}
     ],
     "annotations": {
-        "showUsers": false
+        "showUsers": true
     },
     "cantPlay": {
         "icon": "NoCopyright",
@@ -635,8 +635,8 @@
         {"id": "calendar", "title": "on Calendar"}
     ],
     "media": {
-        "importPosters": true,
-        "importFrames": true
+        "importPosters": false,
+        "importFrames": false
     },
     "personalLists": [
         {"title": "Favorites"},
