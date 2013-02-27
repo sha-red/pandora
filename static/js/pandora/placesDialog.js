@@ -22,24 +22,27 @@ pandora.ui.placesDialog = function(options) {
             getMatches: function(names, callback) {
                 // fixme: the results of this are of course
                 // not identical to actual place matches
-                var key, operator;
+                var conditions = [], keys, operator;
                 if (names.length == 0) {
                     callback(0);
                 } else {
-                    key = pandora.site.layers.filter(function(layer) {
+                    keys = pandora.site.layers.filter(function(layer) {
                         return layer.type == 'place' || layer.hasPlaces;
                     }).map(function(layer) {
                         return layer.id;
-                    })[0],
-                    operator = Ox.getObjectById(
-                        pandora.site.layers, key
-                    ).type == 'place' ? '==' : '=';
+                    });
+                    keys.forEach(function(key) {
+                        operator = Ox.getObjectById(
+                            pandora.site.layers, key
+                        ).type == 'place' ? '==' : '=';
+                        names.forEach(function(name) {
+                            conditions.push({key: key, value: name, operator: operator});
+                        });
+                    });
                     pandora.api.findClips({
                         query: {
-                            conditions: names.map(function(name) {
-                                return {key: key, value: name, operator: operator};
-                            }),
-                            operator: names.length == 1 ? '&' : '|'
+                            conditions: conditions,
+                            operator: conditions.length == 1 ? '&' : '|'
                         }
                     }, function(result) {
                         callback(result.data.items);
