@@ -16,6 +16,8 @@ pandora.ui.metadataDialog = function(data) {
         imdb,
 
         $confirmDialog,
+        $selectAllButton,
+        $selectNoneButton,
 
         $label = {},
         $input = {},
@@ -168,15 +170,45 @@ pandora.ui.metadataDialog = function(data) {
 
     function getMetadata(id, callback) {
         pandora.api.getMetadata({id: data.imdbId, keys: keys.concat(['originalTitle'])}, function(result) {
-            var $content = Ox.Element().css({padding: '12px', overflowY: 'auto'});
+            var $bar = Ox.Bar({size: 24}),
+                $data = Ox.Element().css({padding: '12px', overflowY: 'auto'}),
+                $content = Ox.SplitPanel({
+                    elements: [
+                        {element: $bar, size: 24},
+                        {element: $data}
+                    ],
+                    orientation: 'vertical'
+                });
+            $selectNoneButton = Ox.Button({
+                    title: 'Select No Updates',
+                })
+                .css({float: 'left', margin: '4px 2px 4px 4px'})
+                .bindEvent({
+                    click: function() {
+                        selectAll(0)
+                    }
+                })
+                .appendTo($bar),
+            $selectAllButton = Ox.Button({
+                    title: 'Select All Updates',
+                })
+                .css({float: 'left', margin: '4px 2px 4px 2px'})
+                .bindEvent({
+                    click: function() {
+                        selectAll(1);
+                    }
+                })
+                .appendTo($bar);
             if (result.data) {
-                imdb = result.data;
+                imdb = Ox.clone(result.data, true);
                 if (imdb.originalTitle) {
                     imdb.alternativeTitles = [[imdb.title, []]].concat(imdb.alternativeTitles || []);
                     imdb.title = imdb.originalTitle;
                 }
                 keys.forEach(function(key, index) {
-                    var isEqual = Ox.isEqual(data[key], imdb[key]),
+                    var isEqual = Ox.isEqual(data[key], imdb[key]) || (
+                            Ox.isEmpty(data[key]) && Ox.isUndefined(imdb[key])
+                        ),
                         checked = isEqual ? [true, true]
                             : !Ox.isUndefined(data[key]) && Ox.isUndefined(imdb[key]) ? [true, false]
                             : [false, true];
@@ -186,14 +218,14 @@ pandora.ui.metadataDialog = function(data) {
                                 height: '8px',
                                 width: formWidth + 'px',
                             })
-                            .appendTo($content);
+                            .appendTo($data);
                     }
                     $label[key] = Ox.Label({
                             title: getTitle(key),
                             width: formWidth
                         })
                         .css({display: 'inline-block', margin: '4px'})
-                        .appendTo($content);
+                        .appendTo($data);
                     $input[key] = [data[key], imdb[key]].map(function(v, i) {
                         return Ox.InputGroup({
                                 inputs: [
@@ -203,13 +235,8 @@ pandora.ui.metadataDialog = function(data) {
                                             width: 16
                                         })
                                         .bindEvent({
-                                            change: function(data) {
-                                                var $otherInput = $input[key][1 - i],
-                                                    otherValue = $otherInput.options('value');
-                                                otherValue[0] = !otherValue[0];
-                                                $otherInput.options({value: otherValue});
-                                                updateKeys = getUpdateKeys();
-                                                updateButton();
+                                            change: function() {
+                                                toggle(key);
                                             }
                                         }),
                                     Ox.Input({
@@ -231,12 +258,12 @@ pandora.ui.metadataDialog = function(data) {
                                 ]
                             })
                             .css({display: 'inline-block', margin: '4px'})
-                            .appendTo($content);
+                            .appendTo($data);
                     });
                 });
                 that.options({content: $content})
                 updateKeys = getUpdateKeys();
-                updateButton();
+                updateButtons();
             } else {
                 // ...
             }
@@ -270,6 +297,20 @@ pandora.ui.metadataDialog = function(data) {
         });
     }
 
+    function selectAll(i) {
+        keys.forEach(function(key) {
+            var $checkbox = $input[key][1].options('inputs')[0];
+            if (!$checkbox.options('disabled')) {
+                if (
+                    (i == 0 && $checkbox.options('value'))
+                    || (i == 1 && !$checkbox.options('value'))
+                ) {
+                    toggle(key);
+                }
+            }
+        })
+    }
+
     function setSize(data) {
         dialogHeight = data.height;
         dialogWidth = data.width;
@@ -282,7 +323,30 @@ pandora.ui.metadataDialog = function(data) {
         });
     }
 
-    function updateButton() {
+    function toggle(key) {
+        var $checkbox = $input[key][1].options('inputs')[0];
+        if (!$checkbox.options('disabled')) {
+            Ox.loop(2, function(i) {
+                var value = $input[key][i].options('value');
+                $input[key][i].options({
+                    value: [!value[0], value[1]]
+                });
+            })
+        }
+        updateKeys = getUpdateKeys();
+        updateButtons();
+    }
+
+    function updateButtons() {
+        var checked = [0, 0];
+        keys.forEach(function(key) {
+            var $checkbox = $input[key][1].options('inputs')[0];
+            if (!$checkbox.options('disabled')) {
+                checked[$checkbox.options('value') ? 1 : 0]++;
+            }
+        });
+        $selectNoneButton.options({disabled: checked[1] == 0});
+        $selectAllButton.options({disabled: checked[0] == 0})
         that[updateKeys.length ? 'enableButton' : 'disableButton']('update');
     }
 
