@@ -131,6 +131,8 @@ pandora.ui.infoView = function(data) {
 
         $minutes,
 
+        $imdb,
+
         $descriptions,
 
         $statistics = $('<div>')
@@ -234,6 +236,10 @@ pandora.ui.infoView = function(data) {
     renderGroup(['genre', 'keyword']);
 
     renderGroup(['imdbId']);
+
+    if (canEdit) {
+        updateIMDb();
+    }
 
     if (data.summary || canEdit) {
         Ox.EditableContent({
@@ -454,6 +460,8 @@ pandora.ui.infoView = function(data) {
                 if (Ox.contains(nameKeys, key)) {
                     names = getNames();
                     renderDescriptions();
+                } else if (key == 'imdbId') {
+                    updateIMDb();
                 }
             });
         }
@@ -737,6 +745,9 @@ pandora.ui.infoView = function(data) {
                             .html('&nbsp;min')
                             [data.runtime ? 'show' : 'hide']()
                             .appendTo($element);
+                    } else if (key == 'imdbId') {
+                        $imdb = $('<span>')
+                            .appendTo($element);
                     }
                 }
             });
@@ -931,6 +942,27 @@ pandora.ui.infoView = function(data) {
             left: margin + (iconSize == 256 ? 256 : iconWidth) + margin + 'px'
         }, 250);
         pandora.UI.set({infoIconSize: iconSize});
+    }
+
+    function updateIMDb() {
+        if (data.imdbId) {
+            pandora.api.find({
+                query: {
+                    conditions: [{key: 'imdbId', operator: '=', value: data.imdbId}]
+                }
+            }, function(result) {
+                if (result.data.items == 1) {
+                    $imdb.empty();
+                } else {
+                    $imdb.html(
+                        '&nbsp;(<a href="/imdbId=' + data.imdbId + '">'
+                        + result.data.items + ' duplicates</a>)'
+                    );
+                }
+            });
+        } else {
+            $imdb.empty();
+        }
     }
 
     that.reload = function() {
