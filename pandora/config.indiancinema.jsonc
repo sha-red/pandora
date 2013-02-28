@@ -79,7 +79,7 @@
         {"id": "language", "title": "Language", "type": "string"},
         {"id": "color", "title": "Color", "type": "string"},
         {"id": "sound", "title": "Sound", "type": "string"},
-        {"id": "productioncompany", "title": "Studio", "type": "string"},
+        {"id": "productionCompany", "title": "Studio", "type": "string"},
         {"id": "producer", "title": "Producer", "type": "string"},
         {"id": "codirector", "title": "Co-Director", "type": "string"},
         {"id": "writer", "title": "Writer", "type": "string"},
