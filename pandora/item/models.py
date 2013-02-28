@@ -375,14 +375,6 @@ class Item(models.Model):
         else:
             self.poster_height = 128
             self.poster_width = 80
-        if not settings.USE_IMDB:
-            if self.poster_frame == -1:
-                try:
-                    if self.sort.duration:
-                        self.poster_frame = self.sort.duration/2
-                        update_poster = True
-                except ItemSort.DoesNotExist:
-                    pass
         self.json = self.get_json()
         self.json['modified'] = datetime.now()
         super(Item, self).save(*args, **kwargs)
@@ -1194,16 +1186,28 @@ class Item(models.Model):
 
     def poster_frames(self):
         frames = []
-        offset = 0
-        for f in self.files.filter(selected=True, is_video=True).order_by('sort_path'):
-            for ff in f.frames.all().order_by('position'):
-                frames.append({
-                    'position': offset + ff.position,
-                    'path': ff.frame.path,
-                    'width': ff.frame.width,
-                    'height': ff.frame.height
-                })
-            offset += f.duration
+        if settings.CONFIG['media']['importFrames']:
+            offset = 0
+            for f in self.files.filter(selected=True, is_video=True).order_by('sort_path'):
+                for ff in f.frames.all().order_by('position'):
+                    frames.append({
+                        'position': offset + ff.position,
+                        'path': ff.frame.path,
+                        'width': ff.frame.width,
+                        'height': ff.frame.height
+                    })
+                offset += f.duration
+        else:
+            if 'videoRatio' in self.json:
+                width, height = self.json['resolution']
+                pos = self.sort.duration / 2
+                for p in map(int, [pos/2, pos, pos+pos/2]):
+                    frames.append({
+                        'position': p,
+                        'path': self.frame(p, height),
+                        'width': width,
+                        'height': height,
+                    })
         return frames
 
     def select_frame(self):
@@ -1211,18 +1215,26 @@ class Item(models.Model):
         if frames:
             heat = [ox.image.getImageHeat(f['path']) for f in frames]
             self.poster_frame = heat.index(max(heat))
+            if not settings.CONFIG['media']['importFrames']:
+                self.poster_frame = frames[self.poster_frame]['position']
 
     def get_poster_frame_path(self):
-        frames = self.poster_frames()
+        frames = []
+        path = None
         if self.poster_frame >= 0:
-            if frames and len(frames) > int(self.poster_frame):
-                return frames[int(self.poster_frame)]['path']
-            else:
-                size = settings.CONFIG['video']['resolutions'][0]
-                return self.frame(self.poster_frame, size)
-
-        if frames:
-            return frames[int(len(frames)/2)]['path']
+            if settings.CONFIG['media']['importFrames']:
+                frames = self.poster_frames()
+                if frames and len(frames) > int(self.poster_frame):
+                    path = frames[int(self.poster_frame)]['path']
+                elif frames:
+                    path = frames[int(len(frames)/2)]['path']
+                else:
+                    size = settings.CONFIG['video']['resolutions'][0]
+                    path = self.frame(self.poster_frame, size)
+        else:
+            size = settings.CONFIG['video']['resolutions'][0]
+            path = self.frame(self.poster_frame, size)
+        return path
 
     def make_icon(self):
         frame = self.get_poster_frame_path()
