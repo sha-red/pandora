@@ -1228,12 +1228,9 @@ class Item(models.Model):
                     path = frames[int(self.poster_frame)]['path']
                 elif frames:
                     path = frames[int(len(frames)/2)]['path']
-                else:
-                    size = settings.CONFIG['video']['resolutions'][0]
-                    path = self.frame(self.poster_frame, size)
-        else:
-            size = settings.CONFIG['video']['resolutions'][0]
-            path = self.frame(self.poster_frame, size)
+            else:
+                size = settings.CONFIG['video']['resolutions'][0]
+                path = self.frame(self.poster_frame, size)
         return path
 
     def make_icon(self):
