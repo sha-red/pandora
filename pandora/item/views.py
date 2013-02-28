@@ -375,8 +375,9 @@ def findId(request):
             response['data']['items'] = [
                 i.get_json(['title', 'director', 'year', 'id']) for i in qs
             ]
+
     if not response['data']['items'] \
-        and len(data['id']) == 7 \
+        and settings.USE_IMDB \
         and settings.DATA_SERVICE:
         r = models.external_data('getId', data)
         if r['status']['code'] == 200:
