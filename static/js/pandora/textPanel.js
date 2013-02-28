@@ -105,8 +105,9 @@ pandora.ui.textPanel = function() {
                     },
                     {
                         element: pandora.$ui.textEmbed = pandora.ui.textEmbed(),
-                        size: pandora.user.ui.embedSize,
-                        resizable: true,
+                        //fixme: at some point pdf will also have a sidebar
+                        size: text.type == 'html' ? pandora.user.ui.embedSize : 0,
+                        resizable: text.type == 'html',
                         resize: [192, 256, 320, 384, 448, 512]
                     }
                 ],
@@ -338,10 +339,29 @@ pandora.ui.textPDF = function(text) {
             })
             .onMessage(function(event, data) {
                 if(event == 'edit') {
-                    Ox.Dialog({
-                        title: 'edit',
-                        content: Ox.Element().html('test')
-                    }).open()
+                    console.log('existing url?', data);
+                    pandora.ui.insertEmbedDialog(data.src, function(url) {
+                        data.src = url;
+                        var embed = text.embeds.filter(function(embed) {
+                            return embed.id == data.id
+                                && embed.type == data.type
+                                && embed.page == data.page;
+                        })[0];
+                        if(embed) {
+                            embed.src = url;
+
+                        } else {
+                            text.embeds.push(data);
+                            //fixme sort embeds by page/id
+                        }
+                        console.log('saving', text.embeds);
+                        pandora.api.editText({
+                            id: text.id,
+                            embeds: text.embeds
+                        }, function(result) {
+                            $iframe.postMessage('update', data);
+                        });
+                    }).open();
                 }
             })
             .appendTo(that);

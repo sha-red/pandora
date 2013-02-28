@@ -137,7 +137,9 @@ pandora.ui.embedPanel = function() {
                     }
                 })
                 .bindEvent(function(data, event) {
-                    Ox.$parent.postMessage(event, {});
+                    if (Ox.contains(['close', 'paused'], event)) {
+                        Ox.$parent.postMessage(event, data);
+                    }
                 });
 
             $controls = Ox.Element();

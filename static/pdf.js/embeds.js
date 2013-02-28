@@ -1,44 +1,3 @@
-Ox.Message.bind(function(event, data, oxid) {
-    if (Ox.isUndefined(oxid)) {
-        //process messages here
-    }
-});
-Ox.$parent = {
-    postMessage: function(event, message) {
-        Ox.Message.post(event, message);
-        return this;
-    },
-    onMessage: function() {
-        var callback;
-        if (Ox.isObject(arguments[0])) {
-            Ox.forEach(arguments[0], function(callback, event) {
-                Ox.Message.bind(function(evt, data, oxid) {
-                    if (Ox.isUndefined(oxid) && event == evt) {
-                        callback(data);
-                    }
-                });
-            });
-        } else {
-            callback = arguments[0];
-            Ox.Message.bind(function(event, data, oxid) {
-                Ox.isUndefined(oxid) && callback(event, data);
-            });
-        }
-        return this;
-    }
-};
-
-function getEmbedURL(id, videoURL) {
-    var parsed = Ox.parseURL(videoURL),
-        parts = parsed.pathname.split('/'),
-        item = parts[1],
-        points = parts[parts.length - 1].split(','),
-        outPoint = points.pop(),
-        inPoint = points.pop();
-    return parsed.protocol + '//' + parsed.host + '/' + item + '/embed?view=player&id=' + id
-        + '&in=' + inPoint + '&out=' + outPoint
-        + '&paused=false&showCloseButton=true';
-}
 function getVideoOverlay(page) {
     var links = embeds.filter(function(embed) {
         return embed.page == page && embed.type =='inline';
@@ -87,34 +46,49 @@ function getVideoOverlay(page) {
                     enableVideoUI();
                 }
                 this.div.appendChild($interface[0]);
+                Ox.Message.bind(function(event, data, oxid) {
+                    if (event == 'update') {
+                        if(Ox.isUndefined(oxid)
+                            && video
+                            && data.id == video.id
+                            && data.page == video.page) {
+                            video.src = data.src;
+                            video.src !== '' ? enableVideoUI() : disableVideoUI();
+                        }
+                    }
+                });
             }
             function play(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                var videoId = 'video' + page + id,
+                var videoId = 'video' + page + id + Ox.uid(),
                     $iframe = Ox.$('<iframe>')
-                        .on('load', function() {
-                            Ox.Message.post($iframe, 'init', {id: $iframe.oxid});
-                        })
                         .attr({
                             id: videoId,
-                            src: getEmbedURL(videoId, video.src),
+                            src: video.src + '&showCloseButton=true&fullscreen=false',
                             width: '100%',
                             height: '100%',
                             frameborder: 0
                         })
-                        .appendTo($interface);
-                Ox.Message.bind(function(event, data, oxid) {
-                    if ($iframe.oxid == oxid) {
-                        if(event == 'close') {
-                            $iframe.remove();
-                        }
-                    }
-                });
+                        .appendTo($interface),
+                    closed = false;
                 $iframe.postMessage = function(event, data) {
                     Ox.Message.post($iframe, event, data);
                     return $iframe;
                 };
+                Ox.Message.bind(function(event, data, oxid) {
+                    if(!closed && event == 'loaded') {
+                        $iframe.postMessage('init', {id: videoId});
+                    } else if(event == 'close') {
+                        if(!closed && !Ox.isUndefined(oxid) && videoId == oxid) {
+                            closed = true;
+                            $iframe.remove();
+                            delete $iframe;
+                            $playButton.show();
+                            $editButton.show();
+                        }
+                    }
+                });
                 $playButton.hide();
                 $editButton.hide();
                 return false;
@@ -123,39 +97,13 @@ function getVideoOverlay(page) {
                 var url;
                 e.preventDefault();
                 e.stopPropagation();
-                if(window.parent) {
-                    Ox.$parent.postMessage('edit', {
-                        video: video
-                            ? video
-                            : {
-                                id: id,
-                                page: page,
-                                src: ''
-                            }
-                    });
-                } else {
-                    url = prompt(
-                        'Please enter a pan.do/ra video URL, like\n'
-                        + 'https://0xdb.org/0315594/00:13:37,00:23:42 or\n'
-                        + 'http://pad.ma/A/editor/00:00:00,00:01:00,00:02:00'
-                        + (video ? '\n\nTo remove the video, just remove the URL.' : ''),
-                        video ? video.src : ''
-                    );
-                    if (url !== null) {
-                        if(!video) {
-                            video = {
-                                page: page,
-                                id: id,
-                                src: ''
-                            };
-                            embeds.push(video);
-                        }
-                        video.src = url
-                        saveVideoOverlay();
-                        url !== '' ? enableVideoUI() : disableVideoUI()
-                    }
-                }
-
+                video = video || {
+                    id: id,
+                    page: page,
+                    src: '',
+                    type: 'inline'
+                };
+                Ox.$parent.postMessage('edit', video);
                 return false;
             }
             function enableVideoUI() {
@@ -176,8 +124,4 @@ function getVideoOverlay(page) {
             }
         }
     } : null;
-}
-
-function saveVideoOverlay() {
-    console.log('save not implemented, bubble to pan.do/ra?');
 }
