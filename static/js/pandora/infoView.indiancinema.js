@@ -4,6 +4,7 @@ pandora.ui.infoView = function(data) {
 
     var ui = pandora.user.ui,
         canEdit = pandora.site.capabilities.canEditMetadata[pandora.user.level],
+        canRemove = pandora.site.capabilities.canRemoveItems[pandora.user.level],
         css = {
             marginTop: '4px',
             textAlign: 'justify',
@@ -144,11 +145,9 @@ pandora.ui.infoView = function(data) {
             })
             .appendTo($data.$element),
 
-        $updateButton,
+        $editMenu,
 
         $capabilities,
-
-        $deleteButton,
 
         $browserImages = [];
 
@@ -220,6 +219,8 @@ pandora.ui.infoView = function(data) {
             .appendTo($text);
     }
 
+    // Groups ------------------------------------------------------------------
+
     renderGroup(['alternativeTitles']);
 
     renderGroup(['country', 'year', 'language', 'runtime', 'color', 'sound']);
@@ -241,6 +242,8 @@ pandora.ui.infoView = function(data) {
         updateIMDb();
     }
 
+    // Summary -----------------------------------------------------------------
+
     if (data.summary || canEdit) {
         Ox.EditableContent({
                 clickLink: pandora.clickLink,
@@ -260,21 +263,48 @@ pandora.ui.infoView = function(data) {
             .appendTo($text);
     }
 
+    // Descriptions ------------------------------------------------------------
+
     $descriptions = $('<div>').attr({id: 'descriptions'}).appendTo($text);
 
     renderDescriptions();
 
     $('<div>').css({height: '16px'}).appendTo($text);
 
+    // Menu --------------------------------------------------------------------
+
     if (canEdit) {
-        $updateButton = Ox.Button({
-                title: 'Update Metadata...',
+        $editMenu = Ox.MenuButton({
+                items: [
+                    {
+                        id: 'imdb',
+                        title: 'Update IMDb ID...',
+                        disabled: true
+                    },
+                    {
+                        id: 'metadata',
+                        title: 'Update Metadata...'
+                    },
+                    {},
+                    {
+                        id: 'delete',
+                        title: 'Delete ' + pandora.site.itemName.singular + '...',
+                        disabled: !canRemove
+                    }
+                ],
+                title: 'Edit...'
                 width: 128
             })
             .css({marginBottom: '4px'})
             .bindEvent({
-                click: function() {
-                    pandora.$ui.metadataDialog = pandora.ui.metadataDialog(data).open();
+                click: function(data) {
+                    if (data.id == 'imdb') {
+                        pandora.$ui.idDialog = pandora.ui.idDialog(data).open();
+                    } else if (data.id == 'metadata') {
+                        pandora.$ui.metadataDialog = pandora.ui.metadataDialog(data).open();
+                    } else if (data.id == 'delete') {
+                        pandora.$ui.deleteItemDialog = pandora.ui.deleteItemDialog(data).open();
+                    }
                 }
             })
             .appendTo($statistics);
@@ -370,47 +400,12 @@ pandora.ui.infoView = function(data) {
 
     }
 
-    if (pandora.site.capabilities.canRemoveItems[pandora.user.level]) {
-        $deleteButton = Ox.Button({
-                title: 'Delete ' + pandora.site.itemName.singular + '...',
-                width: 128
-            })
-            .css({marginTop: '4px'})
-            .bindEvent({
-                click: deleteItem
-            })
-            .appendTo($statistics);
-    }
-
     $('<div>').css({height: '16px'}).appendTo($statistics);
-
-    if (canEdit) {
-        $icon.bindEvent({
-            doubleclick: function() {
-                pandora.UI.set('showIconBrowser', !ui.showIconBrowser);
-                $info.animate({
-                    left: ui.showIconBrowser ? 0 : -listWidth + 'px'
-                }, 250);
-                $icon.options({
-                    tooltip: !pandora.user.ui.showIconBrowser
-                        ? 'Doubleclick to edit icon'
-                        : 'Doubleclick to hide icons'
-                });
-            }
-        });
-        renderList();
-    }
-
-    function deleteItem() {
-        pandora.ui.deleteItemDialog(data).open();
-    }
 
     function editMetadata(key, value) {
         if (value != data[key]) {
             var edit = {id: data.id};
-            if (key == 'title') {
-                Ox.extend(edit, parseTitle(value));
-            } else if (key == 'alternativeTitles') {
+            if (key == 'alternativeTitles') {
                 edit[key] = value ? value.split('; ').map(function(value) {
                     return [value, []];
                 }) : [];
@@ -572,20 +567,6 @@ pandora.ui.infoView = function(data) {
             : key == 'runtime' ? Math.round(value / 60)
             : Ox.contains(listKeys, key) ? value.join(', ')
             : value;
-    }
-
-    function parseTitle(title) {
-        var data = {title: title},
-            match = /(\(S(\d{2})E(\d{2})\))/.exec(title),
-            split;
-        if (match) {
-            data.season = parseInt(match[2], 10);
-            data.episode = parseInt(match[3], 10);
-            split = title.split(match[1]);
-            data.seriesTitle = split[0].trim();
-            data.episodeTitle = split[1].trim();
-        }
-        return data;
     }
 
     function renderCapabilities(rightsLevel) {
@@ -753,114 +734,6 @@ pandora.ui.infoView = function(data) {
             });
             $element.appendTo($text);
         }
-    }
-
-    function renderList() {
-        pandora.api.get({
-            id: data.id,
-            keys: [ui.icons == 'posters' ? 'posters' : 'frames']
-        }, 0, function(result) {
-            var images = result.data[ui.icons == 'posters' ? 'posters' : 'frames'].map(function(image) {
-                    return Ox.extend(image, {index: image.index.toString()});
-                }),
-                selectedImage = images.filter(function(image) {
-                    return image.selected;
-                })[0];
-            $list = Ox.IconList({
-                    defaultRatio: ui.icons == 'posters' || !data.stream ? 5/8 : data.stream.aspectratio,
-                    fixedRatio: ui.icons == 'posters' || !data.stream ? false : data.stream.aspectratio,
-                    item: function(data, sort, size) {
-                        var ratio = data.width / data.height;
-                        size = size || 128;
-                        return {
-                            height: ratio <= 1 ? size : size / ratio,
-                            id: data['id'],
-                            info: data.width + ' x ' + data.height + ' px',
-                            title: ui.icons == 'posters' ? data.source : Ox.formatDuration(data.position),
-                            url: data.url.replace('http://', '//'),
-                            width: ratio >= 1 ? size : size * ratio
-                        }
-                    },
-                    items: images,
-                    keys: ui.icons == 'posters'
-                        ? ['index', 'source', 'width', 'height', 'url']
-                        : ['index', 'position', 'width', 'height', 'url'],
-                    max: 1,
-                    min: 1,
-                    orientation: 'both',
-                    // fixme: should never be undefined
-                    selected: selectedImage ? [selectedImage['index']] : [],
-                    size: 128,
-                    sort: [{key: 'index', operator: '+'}],
-                    unique: 'index'
-                })
-                .addClass('OxMedia')
-                .css({
-                    display: 'block',
-                    position: 'absolute',
-                    left: 0,
-                    top: 0,
-                    width: listWidth + 'px',
-                    height: pandora.$ui.contentPanel.size(1) + 'px'
-                })
-                .bindEvent({
-                    select: function(event) {
-                        var index = event.ids[0];
-                        selectedImage = images.filter(function(image) {
-                            return image.index == index;
-                        })[0];
-                        var imageRatio = selectedImage.width / selectedImage.height,
-                            src = selectedImage.url.replace('http://', '//');
-                        if ($browserImages.length == 0) {
-                            $browserImages = pandora.$ui.browser.find('img[src*="/' + data.id + '/"]');
-                        }
-                        if (ui.icons == 'posters' && !ui.showSitePosters) {
-                            $browserImages.each(function() {
-                                var $this = $(this),
-                                    size = Math.max($this.width(), $this.height());
-                                $this.attr({src: src});
-                                ui.icons == 'posters' && $this.css(imageRatio < 1 ? {
-                                    width: Math.round(size * imageRatio) + 'px',
-                                    height: size + 'px'
-                                } : {
-                                    width: size + 'px',
-                                    height: Math.round(size / imageRatio) + 'px'
-                                });
-                            });
-                            $icon.attr({src: src});
-                            $reflectionIcon.attr({src: src});
-                            iconRatio = imageRatio;
-                            iconSize = iconSize == 256 ? 512 : 256;
-                            toggleIconSize();
-                        }
-                        pandora.api[ui.icons == 'posters' ? 'setPoster' : 'setPosterFrame'](Ox.extend({
-                            id: data.id
-                        }, ui.icons == 'posters' ? {
-                            source: selectedImage.source
-                        } : {
-                             // fixme: api slightly inconsistent, this shouldn't be "position"
-                            position: selectedImage.index
-                        }), function() {
-                            // fixme: update the info (video preview) frame as well
-                            var src;
-                            pandora.clearIconCache(data.id);
-                            Ox.Request.clearCache();
-                            if (ui.icons == 'frames') {
-                                src = '/' + data.id + '/icon512.jpg?' + Ox.uid()
-                                $icon.attr({src: src});
-                                $reflectionIcon.attr({src: src});
-                            }
-                            $browserImages.each(function() {
-                                $(this).attr({src: '/' + data.id + '/' + (
-                                    ui.icons == 'posters' ? 'poster' : 'icon'
-                                ) + '128.jpg?' + Ox.uid()});
-                            });
-                        });
-                    }
-                })
-                .appendTo($info);
-            $list.size();
-        });
     }
 
     function renderRightsLevel() {
