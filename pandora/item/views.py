@@ -360,11 +360,11 @@ actions.register(autocomplete)
 def findId(request):
     '''
         param data {
-            'query': query,
-            'sort': array,
-            'range': array
+            'id':
+            'title':
+            'director': []
+            'year': ...
         }
-
     '''
     data = json.loads(request.POST['data'])
     response = json_response({})
@@ -417,6 +417,30 @@ def getMetadata(request):
                 response['data'] = r['data']
     return render_to_json_response(response)
 actions.register(getMetadata)
+
+def getIds(request):
+    '''
+        param data {
+            title: '',
+            director: [],
+            year: int
+        }
+
+        returns {
+            items: [{tite, director, year, originalTitle}, ...]
+        }
+
+    '''
+    data = json.loads(request.POST['data'])
+    response = json_response({})
+    if settings.DATA_SERVICE:
+        r = models.external_data('getIds', data)
+        if r['status']['code'] == 200:
+            response['data']['items'] = r['data']['items']
+    else:
+        response['data']['items']
+    return render_to_json_response(response)
+actions.register(getIds)
 
 def get(request):
     '''
