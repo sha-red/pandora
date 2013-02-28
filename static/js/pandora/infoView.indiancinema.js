@@ -28,7 +28,10 @@ pandora.ui.infoView = function(data) {
         listKeys = nameKeys.concat([
             'country', 'language', 'productionCompany', 'genre', 'keyword'
         ]),
-        names = getNames(),
+        descriptions = {
+            names: getNames(),
+            studios: getStudios()
+        },
         statisticsWidth = 128,
         uid = Ox.uid(),
 
@@ -457,7 +460,10 @@ pandora.ui.infoView = function(data) {
                     }
                 }
                 if (Ox.contains(nameKeys, key)) {
-                    names = getNames();
+                    descriptions.names = getNames();
+                    renderDescriptions();
+                } else if (key == 'productionCompany') {
+                    descriptions.studios = getStudios();
                     renderDescriptions();
                 } else if (key == 'imdbId') {
                     updateIMDb();
@@ -557,6 +563,22 @@ pandora.ui.infoView = function(data) {
         );
     }
 
+    function getStudios() {
+        var studios = [];
+        if (data.productionCompany) {
+            data.productionCompany.forEach(function(studio) {
+                studios.push({
+                    name: studio,
+                    keys: ['productionCompany'],
+                    description: data.productionCompanydescription
+                        ? data.productionCompanydescription[studio]
+                        : void 0
+                });
+            });
+        }
+        return studios;
+    }
+
     function getTooltip(e) {
         var $target = $(e.target);
         return $target.is('a') || $target.parents('a').length
@@ -653,37 +675,43 @@ pandora.ui.infoView = function(data) {
 
     function renderDescriptions() {
         $descriptions.empty();
-        names.forEach(function(value) {
-            if (canEdit || value.description) {
-                $('<div>')
-                    .css(css)
-                    .css({marginTop: '12px', fontWeight: 'bold'})
-                    .html(
-                        formatLink(value.name, 'name')
-                        + ' (' + value.keys.map(function(key) {
-                            return formatKey(key, 'description');
-                        }).join(', ') + ')'
-                    )
-                    .appendTo($descriptions);
-                Ox.EditableContent({
-                        clickLink: pandora.clickLink,
-                        editable: canEdit,
-                        placeholder: formatLight('No Description'),
-                        tooltip: canEdit ? getTooltip : '',
-                        type: 'textarea',
-                        value: value.description || ''
-                    })
-                    .css(css)
-                    .bindEvent({
-                        submit: function(data) {
-                            editMetadata(
-                                'namedescription',
-                                Ox.extend({}, value.name, data.value)
-                            );
-                        }
-                    })
-                    .appendTo($descriptions);
-            }
+        ['studios', 'names'].forEach(function(key) {
+            descriptions[key].forEach(function(value) {
+                if (canEdit || value.description) {
+                    $('<div>')
+                        .css(css)
+                        .css({marginTop: '12px', fontWeight: 'bold'})
+                        .html(
+                            formatLink(
+                                value.name,
+                                key == 'studios' ? 'productionCompany' : 'name'
+                            ) + ' (' + value.keys.map(function(key) {
+                                return formatKey(key, 'description');
+                            }).join(', ') + ')'
+                        )
+                        .appendTo($descriptions);
+                    Ox.EditableContent({
+                            clickLink: pandora.clickLink,
+                            editable: canEdit,
+                            placeholder: formatLight('No Description'),
+                            tooltip: canEdit ? getTooltip : '',
+                            type: 'textarea',
+                            value: value.description || ''
+                        })
+                        .css(css)
+                        .bindEvent({
+                            submit: function(data) {
+                                editMetadata(
+                                    key == 'studios'
+                                    ? 'productionCompanydescription'
+                                    : 'namedescription',
+                                    Ox.extend({}, value.name, data.value)
+                                );
+                            }
+                        })
+                        .appendTo($descriptions);
+                }
+            });
         });
     }
 
