@@ -628,8 +628,10 @@ pandora.getInfoHeight = function(includeHidden) {
     // fixme: new, check if it can be used more
     var height = 0, isVideoPreview;
     if (pandora.user.ui.showInfo || includeHidden) {
-        isVideoPreview = pandora.user.ui.item || (
-            pandora.user.ui.listSelection.length && !pandora.isClipView()
+        isVideoPreview = pandora.user.ui.section == 'items' && (
+            pandora.user.ui.item || (
+                pandora.user.ui.listSelection.length && !pandora.isClipView()
+            )
         );
         height = Math.min(
             isVideoPreview
