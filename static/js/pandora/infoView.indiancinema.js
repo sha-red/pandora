@@ -460,9 +460,11 @@ pandora.ui.infoView = function(data) {
                     }
                 }
                 if (Ox.contains(nameKeys, key)) {
+                    data['namedescription'] = result.data['namedescription'];
                     descriptions.names = getNames();
                     renderDescriptions();
                 } else if (key == 'productionCompany') {
+                    data['productionCompanydescription'] = result.data['productionCompanydescription'];
                     descriptions.studios = getStudios();
                     renderDescriptions();
                 } else if (key == 'imdbId') {
