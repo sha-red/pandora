@@ -98,7 +98,7 @@ pandora.ui.idDialog = function(data) {
                         Ox.Input({
                             label: Ox.toTitleCase(key),
                             labelWidth: 128,
-                            value: key == 'director'
+                            value: key == 'director' && data[key]
                                 ? data[key].join(', ')
                                 : data[key],
                             width: formWidth
