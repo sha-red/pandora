@@ -18,3 +18,4 @@ config.jsonc
 ./scripts/item_icon.py
 ./static/png/icon.png
 ./static/png/logo.png
+._*
