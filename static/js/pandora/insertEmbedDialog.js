@@ -415,25 +415,42 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
             var data = Ox.map($input, function($element) {
                 return $element.options('value');
             });
-            $input.url.value(
-                data.protocol + '://'
-                + data.site + '/'
-                + data.item + '/'
-                + (data.link == 'default' ? '' : data.link + '/')
-                + ([data.position] || []).concat(
-                    data['in'] || data.out
-                    ? [data['in'], data.out]
-                    : []
-                ).join(','),
-                + (data.annotation || '')
-                + '#?embed=true'
-                + (data.title ? '&title=' + JSON.stringify(data.title) : '')
-                + (data.showTimeline ? '&showTimeline=true' : '')
-                + (data.timeline != 'default' ? '&timeline=' + JSON.stringify(data.timeline) : '')
-                + (data.showAnnotations ? '&showAnnotations=true' : '')
-                + (data.showAnnotations && data.showLayers.length ? '&showLayers=' + JSON.stringify(data.showLayers) : '')
-                + '&matchRatio=true'
-            );
+            Ox.print('FU', data.protocol + '://'
+            + data.site + '/'
+            + data.item + '/'
+            + (data.link == 'default' ? '' : data.link + '/')
+            + ([data.position] || []).concat(
+                data['in'] || data.out
+                ? [data['in'], data.out]
+                : []
+            ).join(','),
+            + (data.annotation || '')
+            + '#?embed=true'
+            + (data.title ? '&title=' + JSON.stringify(data.title) : '')
+            + (data.showTimeline ? '&showTimeline=true' : '')
+            + (data.timeline != 'default' ? '&timeline=' + JSON.stringify(data.timeline) : '')
+            + (data.showAnnotations ? '&showAnnotations=true' : '')
+            + (data.showAnnotations && data.showLayers.length ? '&showLayers=' + JSON.stringify(data.showLayers) : '')
+            + '&matchRatio=true');
+            $input.url.options({
+                value: data.protocol + '://'
+                    + data.site + '/'
+                    + data.item + '/'
+                    + (data.link == 'default' ? '' : data.link + '/')
+                    + ([data.position] || []).concat(
+                        data['in'] || data.out
+                        ? [data['in'], data.out]
+                        : []
+                    ).join(',')
+                    + (data.annotation || '')
+                    + '#?embed=true'
+                    + (data.title ? '&title=' + JSON.stringify(data.title) : '')
+                    + (data.showTimeline ? '&showTimeline=true' : '')
+                    + (data.timeline != 'default' ? '&timeline=' + JSON.stringify(data.timeline) : '')
+                    + (data.showAnnotations ? '&showAnnotations=true' : '')
+                    + (data.showAnnotations && data.showLayers.length ? '&showLayers=' + JSON.stringify(data.showLayers) : '')
+                    + '&matchRatio=true'
+            });
         }
 
         function limitPoint(value, min, max) {
