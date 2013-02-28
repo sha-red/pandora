@@ -151,8 +151,6 @@ pandora.ui.infoView = function(data) {
 
         $browserImages = [];
 
-    //pandora.createLinks($text); // FIXME: this is wrong for editables that already have clickLink
-
     // Title -------------------------------------------------------------------
 
     $('<div>')
@@ -299,9 +297,9 @@ pandora.ui.infoView = function(data) {
             .bindEvent({
                 click: function(data) {
                     if (data.id == 'imdb') {
-                        pandora.$ui.idDialog = pandora.ui.idDialog(data).open();
+                        pandora.$ui.idDialog = pandora.ui.idDialog(Ox.clone(data, true)).open();
                     } else if (data.id == 'metadata') {
-                        pandora.$ui.metadataDialog = pandora.ui.metadataDialog(data).open();
+                        pandora.$ui.metadataDialog = pandora.ui.metadataDialog(Ox.clone(data, true)).open();
                     } else if (data.id == 'delete') {
                         pandora.$ui.deleteItemDialog = pandora.ui.deleteItemDialog(data).open();
                     }
@@ -729,6 +727,7 @@ pandora.ui.infoView = function(data) {
                     } else if (key == 'imdbId') {
                         $imdb = $('<span>')
                             .appendTo($element);
+                        pandora.createLinks($imdb);
                     }
                 }
             });
