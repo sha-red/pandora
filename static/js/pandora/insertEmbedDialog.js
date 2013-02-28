@@ -1,6 +1,12 @@
 'use strict';
 
-pandora.ui.insertEmbedDialog = function(callback) {
+pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
+
+    if (arguments.length == 1) {
+        var url, callback = arguments[0];
+    } else {
+        var url = arguments[0], callback = arguments[1];
+    }
 
     var advanced = pandora.user.ui.showAdvancedEmbedOptions,
         dialogHeight = 344,
@@ -103,7 +109,8 @@ pandora.ui.insertEmbedDialog = function(callback) {
             $input.url = Ox.Input({
                     label: 'URL',
                     labelWidth: 128,
-                    width: formWidth
+                    width: formWidth,
+                    value: url
                 })
                 .bindEvent({
                     change: function(data) {
@@ -324,7 +331,10 @@ pandora.ui.insertEmbedDialog = function(callback) {
                 .addClass('advanced')
                 .css({display: 'inline-block', margin: '4px 0'})
                 .bindEvent({
-                    change: formatURL
+                    change: function() {
+                        updateForm();
+                        formatURL();
+                    }
                 })
                 .appendTo($form);
 
@@ -355,7 +365,10 @@ pandora.ui.insertEmbedDialog = function(callback) {
                 .addClass('advanced')
                 .css({display: 'inline-block', margin: '4px 0'})
                 .bindEvent({
-                    change: formatURL
+                    change: function() {
+                        updateForm();
+                        formatURL();
+                    }
                 })
                 .appendTo($form);
 
@@ -389,10 +402,8 @@ pandora.ui.insertEmbedDialog = function(callback) {
                 })
                 .appendTo($form);
 
-            formatURL();
+            url ? parseURL() : formatURL();
             updateForm();
-
-            pandora.$$$input = $input
 
         } else {
 
