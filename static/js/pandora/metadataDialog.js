@@ -210,8 +210,8 @@ pandora.ui.metadataDialog = function(data) {
                             Ox.isEmpty(data[key]) && Ox.isUndefined(imdb[key])
                         ),
                         checked = isEqual ? [true, true]
-                            : !Ox.isUndefined(data[key]) && Ox.isUndefined(imdb[key]) ? [true, false]
-                            : [false, true];
+                            : Ox.isEmpty(data[key]) && !Ox.isUndefined(imdb[key]) ? [false, true]
+                            : [true, false];
                     if (index > 0) {
                         $('<div>')
                             .css({
