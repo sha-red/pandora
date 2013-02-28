@@ -191,10 +191,27 @@ pandora.ui.metadataDialog = function(data) {
         });
     }
 
-    function getMetadata(id, callback) {
+    function formatValue(key, value) {
+        return !value ? ''
+            : key == 'alternativeTitles' ? value.map(function(v) {
+                return v[0];
+            }).join('; ')
+            : key == 'runtime' ? Math.round(value / 60) + ' min'
+            : Ox.isArray(
+                Ox.getObjectById(pandora.site.itemKeys, key).type
+            ) ? value.join(', ')
+            : value;
+    }
+
+    function getFormWidth() {
+        return dialogWidth - 32 - Ox.UI.SCROLLBAR_SIZE;
+    }
+
+    function getMetadata() {
         pandora.api.getMetadata({id: data.imdbId, keys: keys.concat(['originalTitle'])}, function(result) {
             var $bar = Ox.Bar({size: 24}),
-                $data = Ox.Element().css({padding: '12px', overflowY: 'auto'}),
+                $data = Ox.Element()
+                    .css({padding: '12px', overflowY: 'auto'}),
                 $content = Ox.SplitPanel({
                     elements: [
                         {element: $bar, size: 24},
@@ -284,29 +301,13 @@ pandora.ui.metadataDialog = function(data) {
                             .appendTo($data);
                     });
                 });
-                that.options({content: $content})
+                that.options({content: $content});
                 updateKeys = getUpdateKeys();
                 updateButtons();
             } else {
                 // ...
             }
         });
-    }
-
-    function formatValue(key, value) {
-        return !value ? ''
-            : key == 'alternativeTitles' ? value.map(function(v) {
-                return v[0];
-            }).join('; ')
-            : key == 'runtime' ? Math.round(value / 60) + ' min'
-            : Ox.isArray(
-                Ox.getObjectById(pandora.site.itemKeys, key).type
-            ) ? value.join(', ')
-            : value;
-    }
-
-    function getFormWidth() {
-        return dialogWidth - 32 - Ox.UI.SCROLLBAR_SIZE;
     }
 
     function getTitle(key) {
