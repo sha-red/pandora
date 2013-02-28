@@ -41,7 +41,7 @@
         "canManageUsers": {"staff": true, "admin": true},
         "canPlayClips": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
         "canPlayVideo": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
-        "canReadText": {"guest": 0, "member": 0, "staff", 1, "admin": 1},
+        "canReadText": {"guest": 0, "member": 0, "staff": 1, "admin": 1},
         "canRemoveItems": {"admin": true},
         "canSeeAccessed": {"staff": true, "admin": true},
         "canSeeDebugMenu": {"staff": true, "admin": true},
