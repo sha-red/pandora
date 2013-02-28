@@ -785,7 +785,7 @@
             "theme": "oxmedium",
             "videoMuted": false,
             "videoPoints": {},
-            "videoResolution": 96,
+            "videoResolution": 240,
             "videoScale": "fit",
             "videoSize": "small",
             "videoSubtitles": true,
