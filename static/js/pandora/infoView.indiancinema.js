@@ -59,12 +59,7 @@ pandora.ui.infoView = function(data) {
             .appendTo($info),
 
         $icon = Ox.Element({
-                element: '<img>',
-                tooltip: canEdit ? (
-                    !ui.showIconBrowser
-                        ? 'Doubleclick to edit icon'
-                        : 'Doubleclick to hide icons'
-                ) : ''
+                element: '<img>'
             })
             .attr({
                 src: '/' + data.id + '/' + (
