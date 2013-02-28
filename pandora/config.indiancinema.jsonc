@@ -43,6 +43,7 @@
         "canManageUsers": {"staff": true, "admin": true},
         "canPlayClips": {"guest": 3, "member": 3, "student": 3, "staff": 3, "admin": 3},
         "canPlayVideo": {"guest": 1, "member": 1, "student": 3, "staff": 3, "admin": 3},
+        "canReadText": {"guest": 0, "member": 0, "student": 1, "staff", 1, "admin": 1},
         "canRemoveItems": {"staff": true, "admin": true},
         "canSeeAccessed": {"student": true, "staff": true, "admin": true},
         "canSeeDebugMenu": {"student": true, "staff": true, "admin": true},
@@ -663,7 +664,7 @@
             // E-mail address uses by the system (from)
             "system": "system@indiancine.ma"
         },
-	"folderdepth": 4,
+	    "folderdepth": 4,
         "https": true,
         "id": "indiancinema",
         "name": "Indiancine.ma",
@@ -680,6 +681,10 @@
     "sites": [
         {"name": "Pad.ma", "url": "pad.ma", "https": true},
         {"name": "OxDB", "url": "0xdb.org", "https": true}
+    ],
+    "textRightsLevels": [
+        {"name": "Public", "color": [128, 255, 128]},
+        {"name": "Private", "color": [255, 128, 128]}
     ],
     "themes": ["oxlight", "oxmedium", "oxdark"],
     "timelines": [

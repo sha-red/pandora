@@ -41,6 +41,7 @@
         "canManageUsers": {"staff": true, "admin": true},
         "canPlayClips": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
         "canPlayVideo": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
+        "canReadText": {"guest": 0, "member": 0, "staff", 1, "admin": 1},
         "canRemoveItems": {"admin": true},
         "canSeeAccessed": {"staff": true, "admin": true},
         "canSeeDebugMenu": {"staff": true, "admin": true},
@@ -591,6 +592,10 @@
     "sites": [
         {"name": "Indiancine.ma", "url": "indiancine.ma", "https": true},
         {"name": "OxDB", "url": "0xdb.org", "https": true}
+    ],
+    "textRightsLevels": [
+        {"name": "Public", "color": [128, 255, 128]},
+        {"name": "Private", "color": [255, 128, 128]}
     ],
     "themes": ["oxlight", "oxmedium", "oxdark"],
     "timelines": [
