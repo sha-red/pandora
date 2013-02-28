@@ -244,7 +244,7 @@ pandora.ui.folderList = function(id) {
     that = Ox.TableList({
         columns: columns,
         items: items,
-        keys: ui.section == 'items' ? ['query'] : [],
+        keys: ui.section == 'items' ? ['query'] : ['rightslevel'],
         max: 1,
         min: 0,
         pageLength: 1000,

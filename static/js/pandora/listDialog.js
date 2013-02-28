@@ -174,18 +174,21 @@ pandora.ui.listGeneralPanel = function(listData) {
                 .css({position: 'absolute', left: '160px', top: '40px'})
                 .appendTo(that)
                 : Ox.Select({
-                    items: [
-                        {id: 'html', title: 'HMTL'},
-                        {id: 'pdf', title: 'PDF'}
-                    ],
-                    label: 'Type',
-                    labelWidth: 80,
-                    value: listData.type,
+                    items: pandora.site.textRightsLevels.map(function(rightsLevel, i) {
+                        console.log(listData);
+                        return {
+                            id: i,
+                            title: rightsLevel.name,
+                        };
+                    }),
+                    label: 'Rights Level',
+                    labelWidth: 90,
+                    value: listData.rightslevel,
                     width: 320
                 })
                 .css({position: 'absolute', left: '160px', top: '40px'})
                 .bindEvent({
-                    change: editType
+                    change: editRightsLevel
                 })
                 .appendTo(that),
             $statusSelect = listData.status == 'featured'
@@ -286,16 +289,15 @@ pandora.ui.listGeneralPanel = function(listData) {
                 );
             });
         }
-        function editType(data) {
-            var type = data.value;
-            $itemsInput.value(type == 'html' ? 'html' : 'pdf');
+        function editRightsLevel(data) {
+            var rightslevel = data.value;
             pandora.api.editText({
                 id: listData.id,
-                type: type
+                rightslevel: rightslevel
             }, function(result) {
                 Ox.Request.clearCache('getText');
                 //fixme: reload text and folder list
-                $itemsInput.value(result.data.type);
+                $itemsInput.value(result.data.rightslevel);
             });
         }
         function getDescriptionHeight() {

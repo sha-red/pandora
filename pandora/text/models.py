@@ -156,6 +156,7 @@ class Text(models.Model):
              keys=[
                 'description',
                 'editable',
+                'rightslevel',
                 'id',
                 'links',
                 'name',
