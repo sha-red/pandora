@@ -284,6 +284,11 @@ pandora.ui.infoView = function(data) {
                     },
                     {},
                     {
+                        id: 'upload',
+                        title: 'Upload Video...'
+                    },
+                    {},
+                    {
                         id: 'delete',
                         title: 'Delete ' + pandora.site.itemName.singular + '...',
                         disabled: !canRemove
@@ -299,6 +304,8 @@ pandora.ui.infoView = function(data) {
                         pandora.$ui.idDialog = pandora.ui.idDialog(data).open();
                     } else if (data_.id == 'metadata') {
                         pandora.$ui.metadataDialog = pandora.ui.metadataDialog(data).open();
+                    } else if (data_.id == 'upload') {
+                        pandora.$ui.uploadDialog = pandora.ui.uploadDialog(data).open();
                     } else if (data_.id == 'delete') {
                         pandora.$ui.deleteItemDialog = pandora.ui.deleteItemDialog(data).open();
                     }
@@ -829,7 +836,7 @@ pandora.ui.infoView = function(data) {
                         '&nbsp;(<a href="/imdbId=' + data.imdbId + '">'
                         + result.data.items + ' '
                         + pandora.site.itemName.plural.toLowerCase()
-                        + ' with the same id</a>)'
+                        + '</a> with the same IMDb ID</a>)'
                     );
                 }
             });

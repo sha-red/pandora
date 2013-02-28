@@ -25,6 +25,8 @@ pandora.ui.idDialog = function(data) {
                 })
         ),
 
+        $content,
+        $input = [],
         $checkboxGroup,
 
         that = Ox.Dialog({
@@ -43,7 +45,7 @@ pandora.ui.idDialog = function(data) {
                     {},
                     Ox.Button({
                             id: 'cancel',
-                            title: 'Don\'t Update IMDb ID'
+                            title: 'Don\'t Update'
                         })
                         .bindEvent({
                             click: function() {
@@ -87,12 +89,13 @@ pandora.ui.idDialog = function(data) {
             }
         });
         pandora.api.getIds(get, function(result) {
-            var checkboxes = [],
-                $content = Ox.Element()
-                    .css({padding: '13px', overflowY: 'auto'});
+            var checkboxes = [];
+            $content = Ox.Element()
+                .css({padding: '13px', overflowY: 'auto'});
             if (result.data.items) {
                 ['title', 'director', 'year'].forEach(function(key) {
-                    Ox.Input({
+                    $input.push(
+                        Ox.Input({
                             label: Ox.toTitleCase(key),
                             labelWidth: 128,
                             value: key == 'director'
@@ -110,14 +113,23 @@ pandora.ui.idDialog = function(data) {
                                 getIds();
                             }
                         })
-                        .appendTo($content);
+                        .appendTo($content)
+                    );
                 });
                 $('<div>')
                     .css({width: '1px', height: '8px'})
                     .appendTo($content);
                 if (!data.imdbId) {
                     checkboxes.push(
-                        {id: 'none', title: getTitle(data)}
+                        {
+                            id: 'none',
+                            title: getTitle({
+                                id: data.imdbId,
+                                title: data.title,
+                                director: data.director,
+                                year: data.year
+                            })
+                        }
                     );
                 }
                 (
@@ -126,15 +138,20 @@ pandora.ui.idDialog = function(data) {
                     ? pandora.api.findId
                     : Ox.noop
                 )({id: data.imdbId}, function(result_) {
-                    result_ && Ox.print(result_, '...', result_ && result_.data.items)
                     if (result_ && result_.data.items) {
                         checkboxes.push(
-                            {id: data.imdbId, title: getTitle(result_.data.items[0])}
+                            {
+                                id: data.imdbId,
+                                title: getTitle(result_.data.items[0])
+                            }
                         )
                     }
                     checkboxes = checkboxes.concat(
                         result.data.items.map(function(item) {
-                            return {id: item.id, title: getTitle(item)};
+                            return {
+                                id: item.id,
+                                title: getTitle(item)
+                            };
                         })
                     );
                     $checkboxGroup = Ox.CheckboxGroup({
@@ -148,6 +165,7 @@ pandora.ui.idDialog = function(data) {
                             change: updateButton
                         })
                         .appendTo($content);
+                    var elements = $checkboxGroup.find('.OxCheckbox:not(.OxButton)');
                     checkboxes.forEach(function(checkbox, index) {
                         if (checkbox.id != 'none') {
                             Ox.Button({
@@ -156,9 +174,8 @@ pandora.ui.idDialog = function(data) {
                                     type: 'image'
                                 })
                                 .css({
-                                    position: 'absolute',
-                                    top: 96 + index * 24 + 'px',
-                                    right: 16 + Ox.UI.SCROLLBAR_SIZE + 'px'
+                                    float: 'right',
+                                    marginTop: '-18px'
                                 })
                                 .bindEvent({
                                     click: function() {
@@ -168,9 +185,9 @@ pandora.ui.idDialog = function(data) {
                                         ), '_blank');
                                     }
                                 })
-                                .appendTo($content);
+                                .appendTo(elements[index])
                         }
-                    })
+                    });
                     that.options({content: $content});
                     updateButton();
                 });
@@ -178,19 +195,49 @@ pandora.ui.idDialog = function(data) {
         });
     }
 
-    function getTitle(data) {
+    function getTitle(item) {
+        if (item.id && item.id == data.imdbId) {
+            item.id = highlightTitle(item.id);
+        }
+        if (item.title == data.title) {
+            item.title = highlightTitle(item.title);
+        }
+        if (item.originalTitle == data.title) {
+            item.originalTitle = highlightTitle(item.originalTitle);
+        }
+        if (item.director) {
+            item.director.forEach(function(director, i) {
+                if (Ox.contains(data.director, director)) {
+                    item.director[i] = highlightTitle(director);
+                }
+            })
+        }
+        if (item.year && item.year == data.year) {
+            item.year = highlightTitle(item.year);
+        }
         return Ox.filter([
-            data.imdbId || data.id,
-            data.title + (data.originalTitle ? ' (' + data.originalTitle + ')' : ''),
-            data.director ? data.director.join(', ') : '',
-            data.year
+            item.id,
+            item.title + (item.originalTitle ? ' (' + item.originalTitle + ')' : ''),
+            item.director ? item.director.join(', ') : '',
+            item.year
         ]).join(' &mdash; ');
     }
 
-    function setSize() {
+    function highlightTitle(value) {
+        return '<span style="font-weight: bold">' + value + '</span>';
+    }
+
+    function isEmpty(value) {
+        return Ox.isEmpty(value) || Ox.isUndefined(value);
+    }
+
+    function setSize(data) {
         dialogHeight = data.height;
         dialogWidth = data.width;
         formWidth = getFormWidth();
+        $input.forEach(function($element) {
+            $element.options({width: formWidth});
+        });
         $checkboxGroup.options({width: formWidth});
     }
 

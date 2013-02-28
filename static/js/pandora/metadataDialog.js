@@ -104,7 +104,7 @@ pandora.ui.metadataDialog = function(data) {
                 {},
                 Ox.Button({
                         id: 'cancel',
-                        title: 'Don\'t Update Metadata'
+                        title: 'Don\'t Update'
                     })
                     .bindEvent({
                         click: function() {
@@ -246,10 +246,10 @@ pandora.ui.metadataDialog = function(data) {
                 }
                 keys.forEach(function(key, index) {
                     var isEqual = Ox.isEqual(data[key], imdb[key]) || (
-                            Ox.isEmpty(data[key]) && Ox.isUndefined(imdb[key])
+                            isEmpty(data[key]) && isEmpty(imdb[key])
                         ),
                         checked = isEqual ? [true, true]
-                            : Ox.isEmpty(data[key]) && !Ox.isUndefined(imdb[key]) ? [false, true]
+                            : isEmpty(data[key]) && !isEmpty(imdb[key]) ? [false, true]
                             : [true, false];
                     if (index > 0) {
                         $('<div>')
@@ -317,6 +317,10 @@ pandora.ui.metadataDialog = function(data) {
         return keys.filter(function(key) {
             return $input[key][0].options('inputs')[0].options('value') === false;
         });
+    }
+
+    function isEmpty(value) {
+        return Ox.isEmpty(value) || Ox.isUndefined(value);
     }
 
     function selectAll(i) {
