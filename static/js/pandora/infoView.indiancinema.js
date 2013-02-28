@@ -522,7 +522,10 @@ pandora.ui.infoView = function(data) {
         var ret;
         if (nameKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), 'name');
-        } else if (listKeys.indexOf(key) > -1 || key == 'year') {
+        } else if (
+            listKeys.indexOf(key) > -1
+            || Ox.contains(['year', 'color', 'sound'], key)
+        ) {
             ret = formatLink(value.split(', '), key);
         } else if (key == 'imdbId') {
             ret = '<a href="http://www.imdb.com/title/tt'
