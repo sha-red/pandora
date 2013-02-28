@@ -92,7 +92,6 @@ pandora.ui.metadataDialog = function(data) {
         return Ox.Dialog({
             buttons: [
                 Ox.Button({
-                        distabled: true,
                         id: 'switch',
                         title: 'Update IMDb Id...'
                     })
@@ -101,11 +100,11 @@ pandora.ui.metadataDialog = function(data) {
                             that.close();
                             pandora.$ui.idDialog = pandora.ui.idDialog(data).open();
                         }
-                    })
+                    }),
                 {},
                 Ox.Button({
                         id: 'cancel',
-                        title: 'Don\'t Update'
+                        title: 'Don\'t Update Metadata'
                     })
                     .bindEvent({
                         click: function() {
@@ -115,7 +114,7 @@ pandora.ui.metadataDialog = function(data) {
                 Ox.Button({
                         disabled: true,
                         id: 'update',
-                        title: 'Update...'
+                        title: 'Update Metadata...'
                     })
                     .bindEvent({
                         click: function() {
@@ -211,7 +210,7 @@ pandora.ui.metadataDialog = function(data) {
         pandora.api.getMetadata({id: data.imdbId, keys: keys.concat(['originalTitle'])}, function(result) {
             var $bar = Ox.Bar({size: 24}),
                 $data = Ox.Element()
-                    .css({padding: '12px', overflowY: 'auto'}),
+                    .css({padding: '13px', overflowY: 'auto'}),
                 $content = Ox.SplitPanel({
                     elements: [
                         {element: $bar, size: 24},
@@ -254,17 +253,14 @@ pandora.ui.metadataDialog = function(data) {
                             : [true, false];
                     if (index > 0) {
                         $('<div>')
-                            .css({
-                                height: '8px',
-                                width: formWidth + 'px',
-                            })
+                            .css({width: '1px', height: '8px'})
                             .appendTo($data);
                     }
                     $label[key] = Ox.Label({
                             title: getTitle(key),
                             width: formWidth
                         })
-                        .css({display: 'inline-block', margin: '4px'})
+                        .css({display: 'inline-block', margin: '3px 3px 5px 3px'})
                         .appendTo($data);
                     $input[key] = [data[key], imdb[key]].map(function(v, i) {
                         return Ox.InputGroup({
@@ -280,12 +276,14 @@ pandora.ui.metadataDialog = function(data) {
                                             }
                                         }),
                                     Ox.Input({
+                                            disabled: true,
                                             value: formatValue(key, v),
                                             width: formWidth - 80
                                         })
                                         .bindEvent({
-                                            submit: function() {
-                                                // on submit, revert to initial value
+                                            change: function() {
+                                                // on change, revert to initial value
+                                                // (if above you remove disabled: true)
                                                 $input[key][i].options({value: [
                                                     $input[key][i].options('value')[0],
                                                     formatValue(key, v)
@@ -297,7 +295,7 @@ pandora.ui.metadataDialog = function(data) {
                                     {title: ['Current', 'Update'][i], width: 64}
                                 ]
                             })
-                            .css({display: 'inline-block', margin: '4px'})
+                            .css({display: 'inline-block', margin: '3px'})
                             .appendTo($data);
                     });
                 });

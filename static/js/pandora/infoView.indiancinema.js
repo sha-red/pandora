@@ -276,8 +276,7 @@ pandora.ui.infoView = function(data) {
                 items: [
                     {
                         id: 'imdb',
-                        title: 'Update IMDb ID...',
-                        disabled: true
+                        title: 'Update IMDb ID...'
                     },
                     {
                         id: 'metadata',
@@ -290,17 +289,17 @@ pandora.ui.infoView = function(data) {
                         disabled: !canRemove
                     }
                 ],
-                title: 'Edit...'
+                title: 'Edit...',
                 width: 128
             })
             .css({marginBottom: '4px'})
             .bindEvent({
-                click: function(data) {
-                    if (data.id == 'imdb') {
-                        pandora.$ui.idDialog = pandora.ui.idDialog(Ox.clone(data, true)).open();
-                    } else if (data.id == 'metadata') {
-                        pandora.$ui.metadataDialog = pandora.ui.metadataDialog(Ox.clone(data, true)).open();
-                    } else if (data.id == 'delete') {
+                click: function(data_) {
+                    if (data_.id == 'imdb') {
+                        pandora.$ui.idDialog = pandora.ui.idDialog(data).open();
+                    } else if (data_.id == 'metadata') {
+                        pandora.$ui.metadataDialog = pandora.ui.metadataDialog(data).open();
+                    } else if (data_.id == 'delete') {
                         pandora.$ui.deleteItemDialog = pandora.ui.deleteItemDialog(data).open();
                     }
                 }
@@ -725,7 +724,7 @@ pandora.ui.infoView = function(data) {
                             [data.runtime ? 'show' : 'hide']()
                             .appendTo($element);
                     } else if (key == 'imdbId') {
-                        $imdb = $('<span>')
+                        $imdb = Ox.Element('<span>')
                             .appendTo($element);
                         pandora.createLinks($imdb);
                     }
