@@ -326,9 +326,9 @@ pandora.ui.home = function() {
         });
         function show() {
             var counter = 0, max = 8, mouse = false, position = 0, selected = 0,
-                color = Ox.Theme() == 'oxlight' ? 'rgb(32, 32, 32)'
-                    : Ox.Theme() == 'oxmedium' ? 'rgb(144, 144, 144)'
-                    : 'rgb(224, 224, 224)',
+                color = Ox.Theme() == 'oxlight' ? 'rgb(0, 0, 0)'
+                    : Ox.Theme() == 'oxmedium' ? 'rgb(0, 0, 0)'
+                    : 'rgb(255, 255, 255)',
                 $label, $icon, $text,
                 $featuresBox, $featuresContainer, $featuresContent,
                 $featureBox = [], $featureIcon = [],
