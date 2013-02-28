@@ -33,7 +33,7 @@ class Text(models.Model):
     _status = ['private', 'public', 'featured']
     type = models.CharField(max_length=255, default='html')
     description = models.TextField(default='')
-
+    rightslevel = models.IntegerField(db_index=True, default=0)
     icon = models.ImageField(default=None, blank=True,
                              upload_to=lambda i, x: i.path("icon.jpg"))
 
@@ -48,6 +48,7 @@ class Text(models.Model):
     file = models.FileField(default=None, blank=True,null=True, upload_to=lambda f, x: f.path(x))
 
     def save(self, *args, **kwargs):
+        self.rightslevel = min(self.rightslevel, len(settings.CONFIG['textRightsLevels']) - 1)
         super(Text, self).save(*args, **kwargs)
 
     def __unicode__(self):
@@ -130,6 +131,8 @@ class Text(models.Model):
                 self.description = ox.sanitize_html(data['description'])
             elif key == 'text':
                 self.text = ox.sanitize_html(data['text'])
+            elif key == 'rightslevel':
+                self.rightslevel = int(data['rightslevel'])
 
         if 'position' in data:
             pos, created = Position.objects.get_or_create(text=self, user=user)
