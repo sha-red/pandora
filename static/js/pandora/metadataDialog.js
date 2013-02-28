@@ -15,6 +15,20 @@ pandora.ui.metadataDialog = function(data) {
         formWidth = getFormWidth(),
         imdb,
 
+        $loading = Ox.Element().append(
+            $('<img>')
+                .attr({src: Ox.UI.getImageURL('symbolLoadingAnimated')})
+                .css({
+                    position: 'absolute',
+                    width: '32px',
+                    height: '32px',
+                    left: 0,
+                    top: 0,
+                    right: 0,
+                    bottom: 0,
+                    margin: 'auto'
+                })
+            ),
         $confirmDialog,
         $selectAllButton,
         $selectNoneButton,
@@ -31,11 +45,22 @@ pandora.ui.metadataDialog = function(data) {
             buttons: [
                 Ox.Button({
                         id: 'close',
-                        title: 'Close'
+                        title: 'Not Now'
                     })
                     .bindEvent({
                         click: function() {
                             that.close();
+                        }
+                    }),
+                Ox.Button({
+                        distabled: true,
+                        id: 'update',
+                        title: 'Update IMDb Id...'
+                    })
+                    .bindEvent({
+                        click: function() {
+                            that.close();
+                            pandora.$ui.idDialog = pandora.ui.idDialog(data).open();
                         }
                     })
             ],
@@ -56,7 +81,7 @@ pandora.ui.metadataDialog = function(data) {
                 ),
             fixedSize: true,
             height: 128,
-            keyboard: {enter: 'close', escape: 'close'},
+            keyboard: {enter: 'update', escape: 'close'},
             removeOnClose: true,
             title: 'Update Metadata',
             width: 304
@@ -66,6 +91,18 @@ pandora.ui.metadataDialog = function(data) {
     function updateDialog() {
         return Ox.Dialog({
             buttons: [
+                Ox.Button({
+                        distabled: true,
+                        id: 'switch',
+                        title: 'Update IMDb Id...'
+                    })
+                    .bindEvent({
+                        click: function() {
+                            that.close();
+                            pandora.$ui.idDialog = pandora.ui.idDialog(data).open();
+                        }
+                    })
+                {},
                 Ox.Button({
                         id: 'cancel',
                         title: 'Don\'t Update'
@@ -78,7 +115,7 @@ pandora.ui.metadataDialog = function(data) {
                 Ox.Button({
                         disabled: true,
                         id: 'update',
-                        title: 'Update'
+                        title: 'Update...'
                     })
                     .bindEvent({
                         click: function() {
@@ -87,20 +124,7 @@ pandora.ui.metadataDialog = function(data) {
                     })
             ],
             closeButton: true,
-            content: Ox.Element().append(
-                $('<img>')
-                    .attr({src: Ox.UI.getImageURL('symbolLoadingAnimated')})
-                    .css({
-                        position: 'absolute',
-                        width: '32px',
-                        height: '32px',
-                        left: 0,
-                        top: 0,
-                        right: 0,
-                        bottom: 0,
-                        margin: 'auto'
-                    })
-            ),
+            content: $loading,
             height: dialogHeight,
             maximizeButton: true,
             minHeight: 256,
@@ -126,7 +150,6 @@ pandora.ui.metadataDialog = function(data) {
                             $confirmDialog.close();
                         }
                     }),
-                {},
                 Ox.Button({
                         id: 'update',
                         title: 'Update'
@@ -359,7 +382,7 @@ pandora.ui.metadataDialog = function(data) {
                 Ox.isArray(type) ? [] : ''
             );
         });
-        that.disableButtons();
+        that.options({content: $loading}).disableButtons();
         pandora.api.edit(edit, function(result) {
             that.close();
             pandora.updateItemContext();
