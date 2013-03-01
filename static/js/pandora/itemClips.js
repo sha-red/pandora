@@ -106,7 +106,7 @@ pandora.ui.itemClips = function(options) {
                             poster: '/' + self.options.id + '/' + self.height + 'p' + points[0] + '.jpg',
                             rewind: true,
                             video: partsAndPoints.parts.map(function(i) {
-                                return pandora.getVideoUrl(self.options.id, 96, i + 1);
+                                return pandora.getVideoURL(self.options.id, Ox.min(pandora.site.video.resolutions), i + 1);
                             }),
                             width: self.width
                         })

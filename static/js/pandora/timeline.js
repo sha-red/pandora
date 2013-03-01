@@ -31,7 +31,7 @@ pandora.ui.timeline = function(data) {
             layers: data.annotations,
             muted: ui.videoMuted,
             position: ui.videoPoints[ui.item].position,
-            resolution: pandora.site.video.resolutions[0],
+            resolution: Ox.min(pandora.site.video.resolutions),
             selected: ui.videoPoints[ui.item].annotation
                 ? ui.item + '/' + ui.videoPoints[ui.item].annotation
                 : '',
