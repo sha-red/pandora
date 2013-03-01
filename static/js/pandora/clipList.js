@@ -9,6 +9,7 @@ pandora.ui.clipList = function(videoRatio) {
     var ui = pandora.user.ui,
         fixedRatio = !ui.item ? 16/9 : videoRatio,
         isClipView = !ui.item ? ui.listView == 'clip' : ui.itemView == 'clips',
+        isEmbed = pandora.isEmbedURL(),
         that = Ox.IconList({
             find: !ui.item ? pandora.getItemFind(ui.find) : ui.itemFind,
             fixedRatio: fixedRatio,
@@ -104,7 +105,7 @@ pandora.ui.clipList = function(videoRatio) {
                 !ui.item ? ['videoRatio'] : []
             ),
             max: 1,
-            orientation: 'both',
+            orientation: isEmbed && !isClipView ? 'horizontal' : 'both',
             size: 128,
             sort: !ui.item ? ui.listSort : ui.itemSort,
             unique: 'id'
@@ -182,7 +183,7 @@ pandora.ui.clipList = function(videoRatio) {
                                     poster: '/' + item + '/' + height + 'p' + points[0] + '.jpg',
                                     rewind: true,
                                     video: partsAndPoints.parts.map(function(i) {
-                                        return pandora.getVideoUrl(item, 96, i + 1);
+                                        return pandora.getVideoURL(item, Ox.min(pandora.site.video.resolutions), i + 1);
                                     }),
                                     width: width
                                 })
@@ -218,11 +219,11 @@ pandora.ui.clipList = function(videoRatio) {
                         //*/
                     }
                     !ui.item && pandora.UI.set('listSelection', [item]);
-                    pandora.$ui.mainMenu.enableItem('findsimilar');
+                    !isEmbed && pandora.$ui.mainMenu.enableItem('findsimilar');
                 } else {
                     $('.OxSelectedVideo').removeClass('OxSelectedVideo');
                     !ui.item && pandora.UI.set('listSelection', []);
-                    pandora.$ui.mainMenu.disableItem('findsimilar');
+                    !isEmbed && pandora.$ui.mainMenu.disableItem('findsimilar');
                 }
             },
             pandora_itemsort: function(data) {
