@@ -26,17 +26,35 @@ pandora.ui.filesView = function(options, self) {
         size: 24
     });
 
-    self.$deleteButton = Ox.Button({
-            disabled: !pandora.site.capabilities.canRemoveItems[pandora.user.level],
-            title: 'Delete ' + pandora.site.itemName.singular + '...',
-            width: 128
+    self.$menu = Ox.MenuButton({
+            items: [
+                {
+                    disabled: true,
+                    id: 'ignore',
+                    title: 'Ignore Selected Files'
+                },
+                {},
+                {
+                    disabled: !pandora.site.capabilities.canRemoveItems[pandora.user.level],
+                    id: 'delete',
+                    title: 'Delete ' + pandora.site.itemName.singular + '...'
+                }
+            ],
+            title: 'set',
+            type: 'image'
         })
         .css({
             float: 'left',
             margin: '4px'
         })
         .bindEvent({
-            click: deleteItem 
+            click: function(data) {
+                if (data.id == 'ignore') {
+                    ignoreFiles();
+                } else if (data.id == 'delete') {
+                    deleteItem();
+                }
+            }
         })
         .appendTo(self.$toolbar);
 
@@ -51,20 +69,6 @@ pandora.ui.filesView = function(options, self) {
         })
         .bindEvent({
             click: saveChanges
-        })
-        .appendTo(self.$toolbar);
-
-    self.$ignoreButton = Ox.Button({
-            disabled: 'true',
-            title: 'Ignore Selected Files',
-            width: 128
-        })
-        .css({
-            float: 'right',
-            margin: '4px'
-        })
-        .bindEvent({
-            click: ignoreFiles
         })
         .appendTo(self.$toolbar);
 
@@ -559,9 +563,9 @@ pandora.ui.filesView = function(options, self) {
         self.$moveButton.options({
             disabled: self.selected.length == 0
         });
-        self.$ignoreButton.options({
-            disabled: self.selected.length == 0
-        });
+        self.$menu[
+            self.selected.length == 0 ? 'disableItem' : 'enableItem'
+        ]('ignore');
     }
 
     return that;
