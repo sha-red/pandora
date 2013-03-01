@@ -89,7 +89,11 @@ class Command(BaseCommand):
                     sql = 'CREATE INDEX "%s_%s_idx" ON "%s" ("%s")' % (table_name, name,
                                                                        table_name, name)
                     changes.append(sql)
+                    sql = 'COMMIT'
+                    changes.append(sql)
                     sql = 'ALTER TABLE "%s" ALTER COLUMN "%s" SET NOT NULL' % (table_name, name)
+                    changes.append(sql)
+                    sql = 'BEGIN'
                     changes.append(sql)
         if changes:
             print "Database needs to be updated, plase wait..."
