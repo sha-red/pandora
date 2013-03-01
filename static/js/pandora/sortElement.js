@@ -5,6 +5,7 @@
 pandora.ui.sortElement = function(isNavigationView) {
 
     var isClipView = pandora.isClipView(),
+        isEmbed = pandora.isEmbedURL(),
         items = (
             isClipView ? pandora.site.clipKeys.map(function(key) {
                 return Ox.extend(Ox.clone(key), {
@@ -23,7 +24,7 @@ pandora.ui.sortElement = function(isNavigationView) {
         $sortSelect = Ox.Select({
                 items: items,
                 value: pandora.user.ui[sortKey][0].key,
-                width: isNavigationView ? 120 + Ox.UI.SCROLLBAR_SIZE : 144
+                width: !isEmbed && isNavigationView ? 120 + Ox.UI.SCROLLBAR_SIZE : 144
             })
             .bindEvent({
                 change: function(data) {
