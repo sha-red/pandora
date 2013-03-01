@@ -38,8 +38,6 @@ pandora.ui.infoView = function(data) {
 
         that = Ox.Element(),
 
-        $list,
-
         $info = $('<div>')
             .css({
                 position: 'absolute',
@@ -444,11 +442,6 @@ pandora.ui.infoView = function(data) {
                         $browserImages.each(function() {
                             $(this).attr({
                                 src: '/' + data.id + '/poster128.jpg?' + Ox.uid()
-                            });
-                        });
-                        $list.find('img[src*="siteposter.jpg"]').each(function() {
-                            $(this).attr({
-                                src: '/' + data.id + '/siteposter.jpg?' + Ox.uid()
                             });
                         });
                         src = '/' + data.id + '/poster512.jpg?' + Ox.uid()
@@ -880,12 +873,10 @@ pandora.ui.infoView = function(data) {
         iconRatio = ui.icons == 'posters'
             ? (ui.showSitePosters ? 5/8 : data.posterRatio) : 1;
         toggleIconSize();
-        pandora.user.level == 'admin' && $list.replaceWith($list = renderList());
     };
 
     that.resize = function() {
         var height = pandora.$ui.contentPanel.size(1);
-        $list && $list.css({height: height + 'px'});
         $data.css({height: height + 'px'});
     };
 
