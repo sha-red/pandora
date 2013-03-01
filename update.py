@@ -21,6 +21,8 @@ repos = {
     "oxtimelines": "http://code.0x2620.org/oxtimelines/",
 }
 
+def reload_notice(base):
+    print '\nYou might need to restart pandora to finish the update:\n\t"sudo %s/reload.sh"\n' % base
 
 if __name__ == "__main__":
     base = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
@@ -31,6 +33,7 @@ if __name__ == "__main__":
             print '\nRunning "./manage.py migrate"\n'
             run('./manage.py', 'migrate')
             run('./manage.py', 'sync_itemsort')
+            reload_notice(base)
         else:
             print "You are upgrading from an older version of pan.do/ra."
             print "Please use ./manage.py sqldiff -a to check for updates"
@@ -75,3 +78,5 @@ if __name__ == "__main__":
         diff = get('./manage.py', 'sqldiff', '-a').strip()
         if diff != '-- No differences':
             print 'Database has changed, please make a backup and run ./update.py database'
+        else:
+            reload_notice(base)
