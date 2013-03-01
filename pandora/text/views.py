@@ -172,9 +172,7 @@ def parse_query(data, user):
     for key in ('keys', 'group', 'text', 'range', 'position', 'positions', 'sort'):
         if key in data:
             query[key] = data[key]
-    print data
     query['qs'] = models.Text.objects.find(data, user).exclude(name='')
-    print query 
     return query
 
 
