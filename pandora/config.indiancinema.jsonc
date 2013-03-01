@@ -72,7 +72,7 @@
         text of clips. Excluding a layer from this list means it will not be
         included in find annotations.
     */
-    "clipLayers": ["subtitles"],
+    "clipLayers": ["subtitles", "keywords", "notes"],
     // fixme: either this, or filter: true in itemKeys, but not both
     "filters": [
         {"id": "director", "title": "Director", "type": "string"},
@@ -803,6 +803,6 @@
         "download": false,
         "formats": ["webm", "mp4"],
         "previewRatio": 1.7777777778,
-        "resolutions": [480, 240]
+        "resolutions": [240, 480]
     }
 }
