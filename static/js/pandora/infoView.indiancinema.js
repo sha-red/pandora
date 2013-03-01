@@ -26,7 +26,8 @@ pandora.ui.infoView = function(data) {
             'editor', 'composer', 'lyricist', 'actor'
         ],
         listKeys = nameKeys.concat([
-            'country', 'language', 'productionCompany', 'genre', 'keyword'
+            'country', 'language', 'color', 'sound', 'productionCompany',
+            'genre', 'keyword'
         ]),
         descriptions = {
             names: getNames(),
