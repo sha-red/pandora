@@ -132,7 +132,7 @@ Ox.load('UI', {
                                     out: options.out,
                                     paused: options.paused,
                                     position: options['in'],
-                                    resolution: pandora.site.video.resolutions[0],
+                                    resolution: Ox.min(pandora.site.video.resolutions),
                                     smallTimelineURL: '/' + ui.item + '/timeline16p.jpg',
                                     subtitles: data.subtitles,
                                     timeline: ui.videoTimeline,
@@ -242,14 +242,14 @@ Ox.load('UI', {
         options.video = {};
         pandora.site.video.resolutions.forEach(function(resolution) {
             options.video[resolution] = Ox.range(data.parts).map(function(i) {
-                return getVideoUrl(data.item || pandora.user.ui.item, resolution, i + 1);
+                return getVideoURL(data.item || pandora.user.ui.item, resolution, i + 1);
             });
         });
         options.videoRatio = data.videoRatio;
         return options;
     }
 
-    function getVideoUrl(id, resolution, part) {
+    function getVideoURL(id, resolution, part) {
         var prefix = pandora.site.site.videoprefix
             .replace('{id}', id)
             .replace('{part}', part)
