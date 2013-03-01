@@ -19,10 +19,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
 
         $toolbar = Ox.Bar({size: 24})
             .append(
-                pandora.$ui.orderButton = pandora.ui.orderButton(true)
-            )
-            .append(
-                pandora.$ui.sortSelect = pandora.ui.sortSelect(true)
+                pandora.$ui.sortElement = pandora.ui.sortElement(true)
             ),
 
         $list = pandora.ui.clipList(videoRatio)

@@ -18,9 +18,7 @@ pandora.ui.toolbar = function() {
         pandora.$ui.viewSelect = pandora.ui.viewSelect()
     );
     !ui.item && !isNavigationView && that.append(
-        pandora.$ui.sortSelect = pandora.ui.sortSelect()
-    ).append(
-        pandora.$ui.orderButton = pandora.ui.orderButton()
+        pandora.$ui.sortElement = pandora.ui.sortElement()
     );
     that.append(
         !ui.item
@@ -58,16 +56,14 @@ pandora.ui.toolbar = function() {
                 wasNavigationView = ['map', 'calendar'].indexOf(data.previousValue) > -1;
                 if (isNavigationView != wasNavigationView) {
                     if (isNavigationView) {
-                        pandora.$ui.sortSelect.remove();
-                        pandora.$ui.orderButton.remove();
+                        pandora.$ui.sortElement.remove();
                     } else {
-                        pandora.$ui.sortSelect = pandora.ui.sortSelect().insertAfter(pandora.$ui.viewSelect);
-                        pandora.$ui.orderButton = pandora.ui.orderButton().insertAfter(pandora.$ui.sortSelect);
+                        pandora.$ui.sortElement = pandora.ui.sortElement().insertAfter(pandora.$ui.viewSelect);
                     }
                     pandora.$ui.listTitle.css({left: getListTitleLeft() + 'px'});
                 } else if ((data.value == 'clip') != (data.previousValue == 'clip')) {
-                    pandora.$ui.sortSelect.replaceWith(
-                        pandora.$ui.sortSelect = pandora.ui.sortSelect()
+                    pandora.$ui.sortElement.replaceWith(
+                        pandora.$ui.sortElement = pandora.ui.sortElement()
                     );
                 }
             }
@@ -81,8 +77,8 @@ pandora.ui.toolbar = function() {
         ) + '</b>';
     }
     function getListTitleLeft() {
-        return 320 - (
-            ['map', 'calendar'].indexOf(pandora.user.ui.listView) > -1 ? 168 : 0
+        return 332 - (
+            ['map', 'calendar'].indexOf(pandora.user.ui.listView) > -1 ? 180 : 0
         );
     }
     that.updateListName = function(listId) {

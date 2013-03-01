@@ -18,10 +18,7 @@ pandora.ui.clipsView = function(videoRatio) {
                 {
                     element: Ox.Bar({size: 24})
                         .append(
-                            pandora.$ui.sortSelect = pandora.ui.sortSelect()
-                        )
-                        .append(
-                            pandora.$ui.orderButton = pandora.ui.orderButton()
+                            pandora.$ui.sortElement = pandora.ui.sortElement()
                         )
                         .append(
                             Ox.Input({
