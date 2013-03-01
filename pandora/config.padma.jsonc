@@ -699,6 +699,7 @@
             "showTimeline": true,
             "sidebarSize": 256,
             "theme": "oxlight",
+            "updateAdvancedFind": false,
             "videoMuted": false,
             "videoPoints": {},
             "videoResolution": 240,

@@ -777,6 +777,7 @@
             "showTimeline": true,
             "sidebarSize": 256,
             "theme": "oxdark",
+            "updateAdvancedFind": false,
             "videoMuted": false,
             "videoPoints": {},
             "videoResolution": 96,

@@ -618,6 +618,7 @@
             "showTimeline": true,
             "sidebarSize": 256,
             "theme": "oxmedium",
+            "updateAdvancedFind": false,
             "videoMuted": false,
             "videoPoints": {},
             "videoResolution": 240,
