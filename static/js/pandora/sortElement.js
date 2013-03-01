@@ -23,7 +23,7 @@ pandora.ui.sortElement = function(isNavigationView) {
         $sortSelect = Ox.Select({
                 items: items,
                 value: pandora.user.ui[sortKey][0].key,
-                width: isNavigationView ? 120 + Ox.UI.SCROLLBAR_SIZE : 160
+                width: isNavigationView ? 120 + Ox.UI.SCROLLBAR_SIZE : 144
             })
             .bindEvent({
                 change: function(data) {
@@ -37,10 +37,10 @@ pandora.ui.sortElement = function(isNavigationView) {
                 pandora_itemsort: updateSelect
             }),
 
-        $orderButton = OxButton({
-                overlap: 'left'
-                title: getTitle(),
-                tooltip: getTooltip(),
+        $orderButton = Ox.Button({
+                overlap: 'left',
+                title: getButtonTitle(),
+                tooltip: getButtonTooltip(),
                 type: 'image'
             })
             .bindEvent({
@@ -56,7 +56,8 @@ pandora.ui.sortElement = function(isNavigationView) {
             }),
 
         that = Ox.FormElementGroup({
-                elements: [$sortSelect, $orderButton]
+                elements: [$sortSelect, $orderButton],
+                float: 'right'
             })
             .css({
                 float: isNavigationView ? 'right' : 'left',
@@ -73,8 +74,8 @@ pandora.ui.sortElement = function(isNavigationView) {
 
     function updateButton() {
         $orderButton.options({
-            title: getTitle(),
-            tooltip: getTooltip()
+            title: getButtonTitle(),
+            tooltip: getButtonTooltip()
         });
     }
 
