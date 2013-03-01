@@ -34,7 +34,8 @@ appPanel
     var animationInterval,
         enableDebugMode = localStorage && localStorage['pandora.enableDebugMode'],
         enableEventLogging = localStorage && localStorage['pandora.enableEventLogging'],
-        isEmbed = /embed=true/.test(document.location.hash),
+        isEmbed = /^#\?/.test(document.location.hash)
+            && /embed=true/.test(document.location.hash),
         isMSIE = /MSIE/.test(navigator.userAgent),
         legacyThemes = {classic: 'oxlight', modern: 'oxdark'},
         theme = localStorage && localStorage['Ox.theme']
