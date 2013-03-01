@@ -598,7 +598,7 @@ pandora.getEditTooltip = function(title) {
         var $target = $(e.target);
         return (
             $target.is('a') || $target.parents('a').length
-            ? 'Shift+doubleclick to edit' : 'Doubleclick to edit';
+            ? 'Shift+doubleclick to edit' : 'Doubleclick to edit'
         ) + (title ? ' ' + title : '');
     }
 };
