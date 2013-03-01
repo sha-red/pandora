@@ -28,6 +28,7 @@ if __name__ == "__main__":
         os.chdir(join(base, 'pandora'))
         if get('./manage.py', 'south_installed').strip() == 'yes':
             run('./manage.py', 'syncdb')
+            print '\nRunning "./manage.py migrate"\n'
             run('./manage.py', 'migrate')
             run('./manage.py', 'sync_itemsort')
         else:
