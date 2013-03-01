@@ -92,7 +92,7 @@ pandora.ui.idDialog = function(data) {
             var checkboxes = [];
             $content = Ox.Element()
                 .css({padding: '13px', overflowY: 'auto'});
-            if (result.data.items) {
+            if (result.data.items.length) {
                 ['title', 'director', 'year'].forEach(function(key) {
                     $input.push(
                         Ox.Input({
@@ -138,7 +138,7 @@ pandora.ui.idDialog = function(data) {
                     ? pandora.api.findId
                     : Ox.noop
                 )({id: data.imdbId}, function(result_) {
-                    if (result_ && result_.data.items) {
+                    if (result_ && result_.data.items.length) {
                         checkboxes.push(
                             {
                                 id: data.imdbId,
