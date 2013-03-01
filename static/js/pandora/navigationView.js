@@ -5,9 +5,8 @@
 pandora.ui.navigationView = function(type, videoRatio) {
 
     var ui = pandora.user.ui,
-
+        isEmbed = pandora.isEmbedURL(),
         itemName = type == 'map' ? 'place' : 'event',
-
         listSizes = [
             144 + Ox.UI.SCROLLBAR_SIZE,
             280 + Ox.UI.SCROLLBAR_SIZE,
@@ -83,7 +82,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
             }
         }),
 
-        that = Ox.SplitPanel({
+        that = !isEmbed ? Ox.SplitPanel({
             elements: [
                 {
                     element: $element
@@ -97,6 +96,17 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 }
             ],
             orientation: 'horizontal'
+        }) : Ox.SplitPanel({
+            elements: [
+                {
+                    element: $element
+                },
+                {
+                    element: $listPanel,
+                    size: 188 + Ox.UI.SCROLLBAR_SIZE
+                }
+            ],
+            orientation: 'vertical'
         });
 
     if (type == 'map') {
@@ -106,8 +116,8 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 // clickable: pandora.site.capabilities.canClickMap[pandora.user.level],
                 find: ui.mapFind,
                 // 20 px menu + 24 px toolbar + 1px resizbar + 16px statusbar (if !item)
-                height: !ui.item
-                    ? window.innerHeight - ui.showFilters * ui.filtersSize - 61
+                height: isEmbed ? window.innerHeight - 40
+                    : !ui.item ? window.innerHeight - ui.showFilters * ui.filtersSize - 61
                     : window.innerHeight - ui.showBrowser * (112 + Ox.UI.SCROLLBAR_SIZE) - 45,
                 places: function(data, callback) {
                     var itemsQuery;
@@ -128,7 +138,8 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 showLabels: ui.showMapLabels,
                 showTypes: true,
                 toolbar: true,
-                width: window.innerWidth - ui.showSidebar * ui.sidebarSize - listSize - 2,
+                width: isEmbed ? window.innerWidth
+                    : window.innerWidth - ui.showSidebar * ui.sidebarSize - listSize - 2,
                 zoombar: true
             })
             .bindEvent({
