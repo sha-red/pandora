@@ -381,7 +381,7 @@ pandora.ui.infoView = function(data) {
             .append(formatKey('Notes', 'statistics'))
             .append(
                 Ox.EditableContent({
-                        clickLink: pandora.clickLink
+                        clickLink: pandora.clickLink,
                         placeholder: formatLight('No notes'),
                         tooltip: pandora.getEditTooltip(),
                         type: 'textarea',
