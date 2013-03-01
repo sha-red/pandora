@@ -32,9 +32,7 @@ pandora.ui.sortElement = function(isNavigationView) {
                         key: key,
                         operator: pandora.getSortOperator(key)
                     }]);
-                },
-                pandora_listsort: updateSelect,
-                pandora_itemsort: updateSelect
+                }
             }),
 
         $orderButton = Ox.Button({
@@ -50,9 +48,7 @@ pandora.ui.sortElement = function(isNavigationView) {
                         operator: pandora.user.ui[sortKey][0].operator == '+' ? '-' : '+'
                     }]);
                     updateButton();
-                },
-                pandora_listsort: updateButton,
-                pandora_itemsort: updateButton
+                }
             }),
 
         that = Ox.FormElementGroup({
@@ -62,7 +58,8 @@ pandora.ui.sortElement = function(isNavigationView) {
             .css({
                 float: isNavigationView ? 'right' : 'left',
                 margin: isNavigationView ? '4px 4px 0 0' : '4px 0 0 4px'
-            });
+            })
+            .bindEvent('pandora_' + sortKey.toLowerCase(), updateElement);
 
     function getButtonTitle() {
         return pandora.user.ui[sortKey][0].operator == '+' ? 'up' : 'down';
@@ -72,15 +69,12 @@ pandora.ui.sortElement = function(isNavigationView) {
         return pandora.user.ui[sortKey][0].operator == '+' ? 'Ascending' : 'Descending';
     }
 
-    function updateButton() {
+    function updateElement() {
+        $sortSelect.value(pandora.user.ui[sortKey][0].key);
         $orderButton.options({
             title: getButtonTitle(),
             tooltip: getButtonTooltip()
         });
-    }
-
-    function updateSelect(data) {
-        $sortSelect.value(data.value[0].key);
     }
 
     return that;
