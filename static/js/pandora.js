@@ -322,7 +322,6 @@ appPanel
                         }
                     },
                     seturl: function(data) {
-                        Ox.print('SET URL', data.url);
                         if (pandora.isEmbedURL(data.url)) {
                             pandora.URL.push(data.url);
                         }
