@@ -16,8 +16,6 @@ pandora.ui.textPanel = function() {
 
     pandora.api.getText({id: pandora.user.ui.text}, function(result) {
 
-        Ox.print('TEXT:', result.data);
-
         var text = result.data;
         embedURLs = text.type == 'html'
             ? getEmbedURLs(text.text)
