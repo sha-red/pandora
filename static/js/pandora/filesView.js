@@ -568,6 +568,9 @@ pandora.ui.filesView = function(options, self) {
         ]('ignore');
     }
 
+    that.reload = function() {
+        self.$filesList.reloadList();
+    }
     return that;
 
 };

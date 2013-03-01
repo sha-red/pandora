@@ -196,14 +196,17 @@ def addFile(request):
         response['data']['item'] = f.item.itemId
         response['data']['itemUrl'] = request.build_absolute_uri('/%s' % f.item.itemId)
     else:
-        title = ox.parse_movie_path(os.path.splitext(data['filename'])[0])['title']
-        i = Item()
-        i.data = {
-            'title': title,
-            'director': data.get('director', []),
-        }
-        i.user = request.user
-        i.save()
+        if 'item' in data:
+            i = Item.objects.get(itemId=data['item'])
+        else:
+            title = ox.parse_movie_path(os.path.splitext(data['filename'])[0])['title']
+            i = Item()
+            i.data = {
+                'title': title,
+                'director': data.get('director', []),
+            }
+            i.user = request.user
+            i.save()
         f = models.File(oshash=oshash, item=i)
         f.path = data.get('filename', 'Untitled')
         extension = f.path.split('.')
@@ -327,7 +330,7 @@ def moveFiles(request):
             f.save()
     for itemId in changed:
         c = Item.objects.get(itemId=itemId)
-        if c.files.count() == 0:
+        if c.files.count() == 0 and settings.CONFIG['itemRequiresVideo']:
             c.delete()
         else:
             c.rendered = False

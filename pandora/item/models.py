@@ -1089,6 +1089,8 @@ class Item(models.Model):
             if offset:
                 self.data['volume'] /= offset
         #extract.timeline_strip(self, self.data['cuts'], stream.info, self.timeline_prefix[:-8])
+        self.json = self.get_json()
+        self.update_sort()
         self.select_frame()
         self.make_poster(True)
         self.make_icon()
@@ -1219,11 +1221,12 @@ class Item(models.Model):
                 self.poster_frame = frames[self.poster_frame]['position']
 
     def get_poster_frame_path(self):
-        frames = []
         path = None
+        frames = self.poster_frames()
+        if frames and self.poster_frame < 0:
+            self.select_frame()
         if self.poster_frame >= 0:
             if settings.CONFIG['media']['importFrames']:
-                frames = self.poster_frames()
                 if frames and len(frames) > int(self.poster_frame):
                     path = frames[int(self.poster_frame)]['path']
                 elif frames:
@@ -1231,6 +1234,7 @@ class Item(models.Model):
             else:
                 size = settings.CONFIG['video']['resolutions'][0]
                 path = self.frame(self.poster_frame, size)
+
         return path
 
     def make_icon(self):

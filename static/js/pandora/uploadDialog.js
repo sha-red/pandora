@@ -65,7 +65,16 @@ pandora.ui.uploadDialog = function(data) {
     // FIXME: is this necessary?
     pandora._status = $status;
     pandora._info = $info;
-    if (typeof Firefogg == 'undefined') {
+    if (!pandora.site.itemRequiresVideo && !pandora.user.ui.item) {
+        $info.html(
+            'You can only upload a video to an existing '
+            + pandora.site.itemName.singular.toLowerCase()
+            + '. Please check if an entry for the '
+            + pandora.site.itemName.singular.toLowerCase()
+            + ' you want to upload exists and create otherwise.'
+        );
+        $actionButton.hide();
+    } else if (typeof Firefogg == 'undefined') {
         /*
         selectFile = $('<input>')
             .attr({
@@ -148,7 +157,8 @@ pandora.ui.uploadDialog = function(data) {
         pandora.api.addFile({
             filename: filename,
             id: oshash,
-            info: info
+            info: info,
+            item: pandora.site.itemRequiresVideo ? undefined : pandora.user.ui.item
         }, function(result) {
             item = result.data.item;
             pandora.firefogg.encode(
@@ -170,10 +180,14 @@ pandora.ui.uploadDialog = function(data) {
                                 },
                                 done: function(data) {
                                     Ox.Request.clearCache();
-                                    pandora.UI.set({
-                                        item: item,
-                                        itemView: 'files'
-                                    });
+                                    if (pandora.user.ui.item == item && pandora.user.ui.itemView == 'files') {
+                                        pandora.$ui.item.reload();
+                                    } else {
+                                        pandora.UI.set({
+                                            item: item,
+                                            itemView: 'files'
+                                        });
+                                    }
                                     delete pandora.firefogg;
                                     that.close();
                                }

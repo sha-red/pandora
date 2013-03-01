@@ -87,7 +87,6 @@ def update_files(user, volume, files):
 @task(queue="encoding")
 def process_stream(fileId):
     file = models.File.objects.get(id=fileId)
-
     streams = file.streams.filter(source=None)
     if streams.count() > 0:
         stream = streams[0]
