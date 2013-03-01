@@ -2,7 +2,7 @@
 
 'use strict';
 
-pandora.user.ui.sortElement = function(isNavigationView) {
+pandora.ui.sortElement = function(isNavigationView) {
 
     var isClipView = pandora.isClipView(),
         items = (
