@@ -918,7 +918,7 @@ pandora.getSortOperator = function(key) {
     ) > -1 ? '+' : '-';
 };
 
-pandora.getVideoUrl = function(id, resolution, part) {
+pandora.getVideoURL = function(id, resolution, part) {
     var prefix = pandora.site.site.videoprefix
         .replace('{id}', id)
         .replace('{part}', part)
@@ -967,7 +967,7 @@ pandora.getVideoOptions = function(data) {
     options.video = {};
     pandora.site.video.resolutions.forEach(function(resolution) {
         options.video[resolution] = Ox.range(data.parts).map(function(i) {
-            return pandora.getVideoUrl(data.item || pandora.user.ui.item, resolution, i + 1);
+            return pandora.getVideoURL(data.item || pandora.user.ui.item, resolution, i + 1);
         });
     });
     options.annotations = [];
@@ -1045,6 +1045,7 @@ pandora.isClipView = function(view, item) {
 };
 
 pandora.isEmbedURL = function(url) {
+    url = url || document.location.href;
     var hash = Ox.parseURL(url).hash;
     return hash.substr(0, 2) == '#?'
         && Ox.unserialize(hash.substr(2), true).embed === true
