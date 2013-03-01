@@ -48,7 +48,6 @@ pandora.ui.sortElement = function(isNavigationView) {
                         key: pandora.user.ui[sortKey][0].key,
                         operator: pandora.user.ui[sortKey][0].operator == '+' ? '-' : '+'
                     }]);
-                    updateButton();
                 }
             }),
 
