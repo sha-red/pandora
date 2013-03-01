@@ -44,7 +44,7 @@ pandora.ui.siteDialog = function(section) {
                         Ox.Editable({
                                 clickLink: pandora.clickLink,
                                 editable: isEditable,
-                                tooltip: isEditable ? 'Doubleclick to edit' : '',
+                                tooltip: isEditable ? pandora.getEditTooltip() : '',
                                 type: 'textarea',
                                 placeholder: isEditable ? 'Doubleclick to insert text' : '',
                                 value: result.data.text

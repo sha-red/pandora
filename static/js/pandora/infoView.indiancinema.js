@@ -167,7 +167,7 @@ pandora.ui.infoView = function(data) {
                     format: function(value) {
                         return formatTitle(value);
                     },
-                    tooltip: canEdit ? getTooltip : '',
+                    tooltip: canEdit ? pandora.getEditTooltip() : '',
                     value: data.title
                 })
                 .css({
@@ -201,7 +201,7 @@ pandora.ui.infoView = function(data) {
                             return formatLink(value.split(', '), 'name');
                         },
                         placeholder: formatLight('Unknown Director'),
-                        tooltip: canEdit ? getTooltip : '',
+                        tooltip: canEdit ? pandora.getEditTooltip() : '',
                         value: data.director ? data.director.join(', ') : ''
                     })
                     .css({
@@ -250,7 +250,7 @@ pandora.ui.infoView = function(data) {
                 clickLink: pandora.clickLink,
                 editable: canEdit,
                 placeholder: formatLight('No Summary'),
-                tooltip: canEdit ? getTooltip : '',
+                tooltip: canEdit ? pandora.getEditTooltip() : '',
                 type: 'textarea',
                 value: data.summary || ''
             })
@@ -386,8 +386,9 @@ pandora.ui.infoView = function(data) {
             .append(formatKey('Notes', 'statistics'))
             .append(
                 Ox.EditableContent({
+                        clickLink: pandora.clickLink
                         placeholder: formatLight('No notes'),
-                        tooltip: getTooltip,
+                        tooltip: pandora.getEditTooltip(),
                         type: 'textarea',
                         value: data.notes,
                         width: 128
@@ -584,12 +585,6 @@ pandora.ui.infoView = function(data) {
         return studios;
     }
 
-    function getTooltip(e) {
-        var $target = $(e.target);
-        return $target.is('a') || $target.parents('a').length
-            ? 'Shift+doubleclick to edit' : 'Doubleclick to edit';
-    }
-
     function getValue(key, value) {
         return !value ? ''
             : key == 'alternativeTitles' ? value.map(function(value) {
@@ -699,7 +694,7 @@ pandora.ui.infoView = function(data) {
                             clickLink: pandora.clickLink,
                             editable: canEdit,
                             placeholder: formatLight('No Description'),
-                            tooltip: canEdit ? getTooltip : '',
+                            tooltip: canEdit ? pandora.getEditTooltip() : '',
                             type: 'textarea',
                             value: value.description || ''
                         })
@@ -746,7 +741,7 @@ pandora.ui.infoView = function(data) {
                                 return formatValue(key, value);
                             },
                             placeholder: formatLight('unknown'),
-                            tooltip: canEdit ? getTooltip : '',
+                            tooltip: canEdit ? pandora.getEditTooltip() : '',
                             value: getValue(key, data[key])
                         })
                         .bindEvent({

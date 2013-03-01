@@ -69,7 +69,7 @@ pandora.ui.news = function(width, height) {
             index = Ox.getIndexById(items, selected);
         $title = Ox.Editable({
                 editable: isEditable,
-                tooltip: isEditable ? 'Doubleclick to edit' : '',
+                tooltip: isEditable ? pandora.getEditTooltip() : '',
                 value: items[index].title
             })
             .css({
@@ -91,7 +91,7 @@ pandora.ui.news = function(width, height) {
                 format: function(value) {
                     return Ox.formatDate(value, '%B %e, %Y');
                 },
-                tooltip: isEditable ? 'Doubleclick to edit' : '',
+                tooltip: isEditable ? pandora.getEditTooltip() : '',
                 value: items[index].date
             })
             .css({
@@ -112,7 +112,7 @@ pandora.ui.news = function(width, height) {
                 editable: isEditable,
                 maxHeight: height - 96,
                 placeholder: 'No text',
-                tooltip: isEditable ? 'Doubleclick to edit' : '',
+                tooltip: isEditable ? pandora.getEditTooltip() : '',
                 type: 'textarea',
                 value: items[index].text,
                 width: width - 512

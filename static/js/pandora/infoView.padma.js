@@ -172,7 +172,7 @@ pandora.ui.infoView = function(data) {
                     },
                     placeholder: formatLight('unknown'),
                     editable: canEdit,
-                    tooltip: canEdit ? 'Doubleclick to edit' : '',
+                    tooltip: canEdit ? pandora.getEditTooltip() : '',
                     value: listKeys.indexOf(key) >= 0
                           ? (data[key] || []).join(', ')
                           : data[key] || ''
@@ -192,7 +192,7 @@ pandora.ui.infoView = function(data) {
                             clickLink: pandora.clickLink,
                             placeholder: formatLight('No ' + Ox.toTitleCase(key) + ' Description'),
                             editable: canEdit,
-                            tooltip: canEdit ? 'Doubleclick to edit' : '',
+                            tooltip: canEdit ? pandora.getEditTooltip() : '',
                             type: 'textarea',
                             value: data[key + 'description'] || ''
                         })
@@ -220,7 +220,7 @@ pandora.ui.infoView = function(data) {
         .append(
             Ox.Editable({
                     editable: canEdit,
-                    tooltip: canEdit ? 'Doubleclick to edit' : '',
+                    tooltip: canEdit ? pandora.getEditTooltip() : '',
                     value: data.title
                 })
                 .css({
@@ -257,7 +257,7 @@ pandora.ui.infoView = function(data) {
                             ? value.split(', ') : value, key);
                     },
                     placeholder: formatLight('unknown'),
-                    tooltip: 'Doubleclick to edit',
+                    tooltip: pandora.getEditTooltip(),
                     value: listKeys.indexOf(key) >= 0
                           ? (data[key] || []).join(', ')
                           : data[key] || ''
@@ -296,7 +296,7 @@ pandora.ui.infoView = function(data) {
                         return formatValue(value.split(', '), 'name');
                     },
                     placeholder: formatLight('unknown'),
-                    tooltip: 'Doubleclick to edit',
+                    tooltip: pandora.getEditTooltip(),
                     value: listKeys.indexOf(key) >= 0
                           ? (data[key] || []).join(', ')
                           : data[key] || ''
@@ -337,7 +337,7 @@ pandora.ui.infoView = function(data) {
                     return formatValue(value.split(', '), key);
                 },
                 placeholder: formatLight('unknown'),
-                tooltip: 'Doubleclick to edit',
+                tooltip: pandora.getEditTooltip(),
                 value: listKeys.indexOf(key) >= 0
                       ? (data[key] || []).join(', ')
                       : data[key] || ''
@@ -365,7 +365,7 @@ pandora.ui.infoView = function(data) {
                     editable: canEdit,
                     maxHeight: Infinity,
                     placeholder: formatLight('No Summary'),
-                    tooltip: canEdit ? 'Doubleclick to edit' : '',
+                    tooltip: canEdit ? pandora.getEditTooltip() : '',
                     type: 'textarea',
                     value: data.summary || ''
                 })
@@ -393,7 +393,7 @@ pandora.ui.infoView = function(data) {
             .appendTo($div);
         Ox.Editable({
                 placeholder: formatLight('No License'),
-                tooltip: 'Doubleclick to edit',
+                tooltip: pandora.getEditTooltip(),
                 value: (data.license || []).join(', ')
             })
             .bindEvent({
@@ -471,7 +471,7 @@ pandora.ui.infoView = function(data) {
                         Ox.Editable({
                             placeholder: key == 'groups' ? formatLight('No Groups') : '',
                             editable: canEdit,
-                            tooltip: canEdit ? 'Doubleclick to edit' : '',
+                            tooltip: canEdit ? pandora.getEditTooltip() : '',
                             value: key == 'user' ? data[key] : data[key].join(', ')
                         })
                         .bindEvent({
@@ -519,7 +519,7 @@ pandora.ui.infoView = function(data) {
                 Ox.Editable({
                         height: 128,
                         placeholder: formatLight('No notes'),
-                        tooltip: 'Doubleclick to edit',
+                        tooltip: pandora.getEditTooltip(),
                         type: 'textarea',
                         value: data.notes,
                         width: 128

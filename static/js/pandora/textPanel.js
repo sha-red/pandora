@@ -225,7 +225,7 @@ pandora.ui.textHTML = function(text) {
                 editable: text.editable,
                 height: 32,
                 placeholder: text.editable ? 'Doubleclick to edit title' : 'Untitled',
-                tooltip: text.editable ? 'Doubleclick to edit title' : '',
+                tooltip: text.editable ? pandora.getEditTooltip('title') : '',
                 value: text.name,
                 width: width
             })
@@ -275,7 +275,7 @@ pandora.ui.textHTML = function(text) {
                 },
                 maxHeight: height - 1,
                 placeholder: text.editable ? 'Doubleclick to edit text' : '',
-                tooltip: text.editable ? 'Doubleclick to edit text' : '',
+                tooltip: text.editable ? pandora.getEditTooltip('text') : '',
                 type: 'textarea',
                 width: width,
                 value: text.text

@@ -593,6 +593,16 @@ pandora.getClipsQuery = function() {
     };
 }());
 
+pandora.getEditTooltip = function(title) {
+    return function(e) {
+        var $target = $(e.target);
+        return (
+            $target.is('a') || $target.parents('a').length
+            ? 'Shift+doubleclick to edit' : 'Doubleclick to edit';
+        ) + (title ? ' ' + title : '');
+    }
+};
+
 pandora.getFilterSizes = function() {
     return Ox.splitInt(
         window.innerWidth

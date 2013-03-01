@@ -152,7 +152,7 @@ pandora.ui.infoView = function(data) {
                     format: function(value) {
                         return formatTitle(value);
                     },
-                    tooltip: isEditable ? 'Doubleclick to edit' : '',
+                    tooltip: isEditable ? pandora.getEditTooltip() : '',
                     value: data.title
                 })
                 .css({
@@ -187,7 +187,7 @@ pandora.ui.infoView = function(data) {
                             return formatValue(value.split(', '), 'name');
                         },
                         placeholder: formatLight('Unknown Director'),
-                        tooltip: isEditable ? 'Doubleclick to edit' : '',
+                        tooltip: isEditable ? pandora.getEditTooltip() : '',
                         value: data.director ? data.director.join(', ') : ''
                     })
                     .css({
@@ -225,7 +225,7 @@ pandora.ui.infoView = function(data) {
                         return formatValue(value.split(', '), key)
                     },
                     placeholder: formatLight('unknown'),
-                    tooltip: 'Doubleclick to edit',
+                    tooltip: pandora.getEditTooltip(),
                     value: key == 'country'
                         ? (data[key] ? data[key].join(', ') : [''])
                         : data[key] || ''
@@ -286,7 +286,7 @@ pandora.ui.infoView = function(data) {
                         return formatValue(value.split(', '), key)
                     },
                     placeholder: formatLight('unknown'),
-                    tooltip: 'Doubleclick to edit',
+                    tooltip: pandora.getEditTooltip(),
                     value: key == 'episodeDirector'
                         ? (data[key] ? data[key].join(', ') : [''])
                         : data[key] || ''
@@ -554,7 +554,7 @@ pandora.ui.infoView = function(data) {
                         clickLink: pandora.clickLink,
                         height: 128,
                         placeholder: formatLight('No notes'),
-                        tooltip: 'Doubleclick to edit',
+                        tooltip: pandora.getEditTooltip(),
                         type: 'textarea',
                         value: data.notes,
                         width: 128

@@ -227,7 +227,7 @@ pandora.ui.listInfo = function() {
                                     )
                                 )
                             },
-                            tooltip: editable ? 'Doubleclick to edit title' : '',
+                            tooltip: editable ? pandora.getEditTooltip('title') : '',
                             value: item.name,
                             width: pandora.user.ui.sidebarSize - 32
                         })
@@ -268,7 +268,7 @@ pandora.ui.listInfo = function() {
                             placeholder: editable
                                 ? '<div class="OxLight" style="text-align: center">No description</span>'
                                 : '',
-                            tooltip: editable ? 'Doubleclick to edit description' : '',
+                            tooltip: editable ? pandora.getEditTooltip('description') : '',
                             type: 'textarea',
                             value: item.description,
                             width: pandora.user.ui.sidebarSize - 32
