@@ -4,8 +4,6 @@
 
 pandora.ui.clipList = function(videoRatio) {
 
-    //Ox.print('CLIP LIST FIND', !pandora.user.ui.item ? pandora.getItemFind(pandora.user.ui.find) : pandora.user.ui.itemFind);
-
     var ui = pandora.user.ui,
         fixedRatio = !ui.item ? 16/9 : videoRatio,
         isClipView = !ui.item ? ui.listView == 'clip' : ui.itemView == 'clips',
@@ -118,6 +116,7 @@ pandora.ui.clipList = function(videoRatio) {
                 }
             },
             open: function(data) {
+                Ox.print(data.ids[0], '$$$$$', that.value(data.ids[0]))
                 var id = data.ids[0],
                     item = !ui.item ? id.split('/')[0] : ui.item,
                     points = {
@@ -126,17 +125,23 @@ pandora.ui.clipList = function(videoRatio) {
                         out: that.value(id, 'out'),
                         position: that.value(id, 'in')
                     },
+                    set;
+                if (isEmbed) {
+                    // FIXME: This is wrong, see ticket #1333.
+                    window.open('/' + item + '/' + points.annotation, '_blank');
+                } else {
                     set = {
                         item: item,
                         itemView: pandora.user.ui.videoView
                     };
-                set['videoPoints.' + item] = Ox.extend(points, {
-                    position: points['in']
-                });
-                if (['accessed', 'timesaccessed'].indexOf(ui.listSort[0].key) > -1) {
-                    Ox.Request.clearCache('find');
+                    set['videoPoints.' + item] = Ox.extend(points, {
+                        position: points['in']
+                    });
+                    if (['accessed', 'timesaccessed'].indexOf(ui.listSort[0].key) > -1) {
+                        Ox.Request.clearCache('find');
+                    }
+                    pandora.UI.set(set);
                 }
-                pandora.UI.set(set);
             },
             openpreview: function(data) {
                 // on press space key
