@@ -662,7 +662,7 @@ pandora.ui.infoView = function(data) {
         ['studios', 'names'].forEach(function(key) {
             descriptions[key].forEach(function(value) {
                 if (canEdit || value.description) {
-                    var $name = $('<div>')
+                    var $name = Ox.Element()
                         .css(css)
                         .css({marginTop: '12px', fontWeight: 'bold'})
                         .html(
