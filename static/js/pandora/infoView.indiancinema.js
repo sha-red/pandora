@@ -3,6 +3,7 @@
 pandora.ui.infoView = function(data) {
 
     var ui = pandora.user.ui,
+        browserImages = [],
         canEdit = pandora.site.capabilities.canEditMetadata[pandora.user.level],
         canRemove = pandora.site.capabilities.canRemoveItems[pandora.user.level],
         css = {
@@ -144,9 +145,7 @@ pandora.ui.infoView = function(data) {
 
         $editMenu,
 
-        $capabilities,
-
-        $browserImages = [];
+        $capabilities;
 
     // Title -------------------------------------------------------------------
 
@@ -436,10 +435,10 @@ pandora.ui.infoView = function(data) {
                 if (Ox.contains(['title', 'director', 'year'], key)) {
                     pandora.clearIconCache(data.id);
                     if (ui.icons == 'posters') {
-                        if ($browserImages.length == 0) {
-                            $browserImages = pandora.$ui.browser.find('img[src*="/' + data.id + '/"]');
+                        if (browserImages.length == 0) {
+                            browserImages = pandora.$ui.browser.find('img[src*="/' + data.id + '/"]');
                         }
-                        $browserImages.each(function() {
+                        browserImages.each(function() {
                             $(this).attr({
                                 src: '/' + data.id + '/poster128.jpg?' + Ox.uid()
                             });
