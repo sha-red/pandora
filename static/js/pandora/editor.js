@@ -199,7 +199,15 @@ pandora.ui.editor = function(data) {
                     }
                     if (ui.listSort[0].key == 'modified') {
                         Ox.Request.clearCache('find');
-                        pandora.$ui.browser.reloadList();
+                        pandora.$ui.browser
+                            .reloadList()
+                            .bindEventOnce({
+                                load: function() {
+                                    updateBrowser();
+                                }
+                            });
+                    } else {
+                        updateBrowser();
                     }
                 });
             },
@@ -255,6 +263,14 @@ pandora.ui.editor = function(data) {
                 that.options({timeline: data.value});
             }
         });
+
+    function updateBrowser() {
+        pandora.$ui.browser.find('img[src*="/' + data.id + '/"]').each(function() {
+            $(this).attr({
+                src: '/' + data.id + '/' + ui.icons.slice(0, -1) + '128.jpg?' + Ox.uid()
+            });
+        });
+    }
 
     return that;
 
