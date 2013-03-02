@@ -690,6 +690,9 @@ pandora.getItemByIdOrTitle = function(type, str, callback) {
                 });
             }
         });
+    } else if (type == 'text') {
+        // /number is page for pdf or percent for html
+        callback(str.replace(/\/\d+$/, ''));
     } else {
         callback(str);
     }
@@ -793,42 +796,46 @@ pandora.getListData = function(list) {
     return data;
 };
 
-pandora.getMetadataByIdOrName = function(item, view, str, callback) {
+pandora.getMetadataByIdOrName = function(type, item, view, str, callback) {
     // For a given item (or none) and a given view (or any), this takes a string
     // and checks if it's an annotation/event/place id or an event/place name,
     // and returns the id (or none) and the view (or none)
     // fixme: "subtitles:23" is still missing
-    Ox.Log('URL', 'getMetadataByIdOrName', item, view, str);
-    var isName = str[0] == '@',
-        canBeAnnotation = (
-            !view || Ox.contains(['player', 'editor', 'timeline'], view)
-        ) && item && !isName,
-        canBeEvent = !view || view == 'calendar',
-        canBePlace = !view || view == 'map';
-    str = isName ? str.slice(1) : str;
-    getId(canBeAnnotation ? 'annotation' : '', function(id) {
-        if (id) {
-            Ox.Log('URL', 'id?', id)
-            callback(id, pandora.user.ui.videoView);
-        } else {
-            getId(canBePlace ? 'place' : '', function(id) {
-                if (id) {
-                    Ox.Log('', 'found place id', id)
-                    callback(id, 'map');
-                } else {
-                    getId(canBeEvent ? 'event' : '', function(id) {
-                        if (id) {
-                            callback(id, 'calendar');
-                        } else if (canBePlace && isName) {
-                            callback('@' + str, 'map');
-                        } else {
-                            callback();
-                        }
-                    });
-                }
-            });
-        }
-    });
+    if (type == pandora.site.itemName.plural.toLowerCase()) {
+        var isName = str[0] == '@',
+            canBeAnnotation = (
+                !view || Ox.contains(['player', 'editor', 'timeline'], view)
+            ) && item && !isName,
+            canBeEvent = !view || view == 'calendar',
+            canBePlace = !view || view == 'map';
+        str = isName ? str.slice(1) : str;
+        getId(canBeAnnotation ? 'annotation' : '', function(id) {
+            if (id) {
+                Ox.Log('URL', 'id?', id)
+                callback(id, pandora.user.ui.videoView);
+            } else {
+                getId(canBePlace ? 'place' : '', function(id) {
+                    if (id) {
+                        Ox.Log('', 'found place id', id)
+                        callback(id, 'map');
+                    } else {
+                        getId(canBeEvent ? 'event' : '', function(id) {
+                            if (id) {
+                                callback(id, 'calendar');
+                            } else if (canBePlace && isName) {
+                                callback('@' + str, 'map');
+                            } else {
+                                callback();
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    } else if (type == 'text') {
+        callback();
+    }
+
     function getId(type, callback) {
         if (type) {
             pandora.api['find' + Ox.toTitleCase(type + 's')](Ox.extend({
