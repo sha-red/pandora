@@ -50,7 +50,6 @@ pandora.URL = (function() {
                     );
                 }
             } else if (pandora.user.ui.section == 'texts') {
-                state.view = 'text';
                 var position = pandora.user.ui.textPositions[pandora.user.ui.text];
                 if (position) {
                     state.span = position;
@@ -429,7 +428,8 @@ pandora.URL = (function() {
                             'listColumnWidth', 'listColumns', 'listSelection',
                             'mapFind', 'mapSelection'
                         ].indexOf(key) > -1
-                        || /^videoPoints/.test(key);
+                        || /^videoPoints/.test(key)
+                        || /^textPositions/.test(key);
                 })
             ) {
                 action = 'replace';
