@@ -90,7 +90,7 @@ pandora.ui.embedPlayer = function() {
                 enableVolume: !isFrame,
                 height: options.height,
                 invertHighlight: options.invertHighlight,
-                muted: pandora.user.ui.videoMuted,
+                muted: ui.videoMuted,
                 paused: options.paused,
                 playInToOut: options.playInToOut,
                 position: options.position,
@@ -99,8 +99,8 @@ pandora.ui.embedPlayer = function() {
                     : options['in'] !== void 0 ? options['in']
                     : video.posterFrame
                 ) +'.jpg',
-                resolution: pandora.user.ui.videoResolution,
-                scaleToFill: pandora.user.ui.videoScale == 'fill',
+                resolution: ui.videoResolution,
+                scaleToFill: ui.videoScale == 'fill',
                 subtitles: video.subtitles,
                 timeline: options.playInToOut ? function(size, i) {
                     return '/' + options.item
@@ -113,7 +113,7 @@ pandora.ui.embedPlayer = function() {
                     ? pandora.site.timelines : [],
                 title: video.title,
                 video: video.video,
-                volume: pandora.user.ui.videoVolume,
+                volume: ui.videoVolume,
                 width: options.width
             }, options['in'] ? {
                 'in': options['in']
@@ -244,6 +244,8 @@ pandora.ui.embedPlayer = function() {
 
         that.setElement($outerPanel);
 
+        Ox.$parent.postMessage('loaded');
+
     });
 
     function changeTimeline(data) {
@@ -326,8 +328,6 @@ pandora.ui.embedPlayer = function() {
         options.showAnnotations && $annotations.options({width: window.innerWidth});
         return that;
     };
-
-    Ox.$parent.postMessage('loaded');
 
     return that;
 
