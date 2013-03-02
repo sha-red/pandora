@@ -265,9 +265,11 @@ pandora.ui.editor = function(data) {
         });
 
     function updateBrowser() {
-        pandora.$ui.browser.find('img[src*="/' + data.id + '/"]').each(function() {
+        pandora.$ui.browser.find('img[src*="/' + ui.item + '/"]').each(function() {
             $(this).attr({
-                src: '/' + data.id + '/' + ui.icons.slice(0, -1) + '128.jpg?' + Ox.uid()
+                src: '/' + ui.item + '/' + (
+                    ui.icons == 'posters' ? 'poster' : 'icon'
+                ) + '128.jpg?' + Ox.uid()
             });
         });
     }
