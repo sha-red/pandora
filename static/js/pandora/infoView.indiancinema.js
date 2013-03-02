@@ -662,7 +662,7 @@ pandora.ui.infoView = function(data) {
         ['studios', 'names'].forEach(function(key) {
             descriptions[key].forEach(function(value) {
                 if (canEdit || value.description) {
-                    $('<div>')
+                    var $name = $('<div>')
                         .css(css)
                         .css({marginTop: '12px', fontWeight: 'bold'})
                         .html(
@@ -674,6 +674,7 @@ pandora.ui.infoView = function(data) {
                             }).join(', ') + ')'
                         )
                         .appendTo($descriptions);
+                    pandora.createLinks($name);
                     Ox.EditableContent({
                             clickLink: pandora.clickLink,
                             editable: canEdit,
