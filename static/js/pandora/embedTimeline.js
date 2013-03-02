@@ -21,7 +21,7 @@ pandora.ui.embedTimeline = function() {
 
     pandora.api.get({id: ui.item, keys: [
         'duration', 'layers', 'parts', 'rightslevel', 'videoRatio'
-    ]}, function(result)) {
+    ]}), function(result) {
 
         video = Ox.extend(result.data, pandora.getVideoOptions(result.data));
 
