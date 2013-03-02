@@ -90,112 +90,111 @@ pandora.ui.idDialog = function(data) {
         });
         pandora.api.getIds(get, function(result) {
             var checkboxes = [];
+            if (!data.imdbId) {
+                checkboxes.push(
+                    {
+                        id: 'none',
+                        title: getTitle({
+                            id: data.imdbId,
+                            title: data.title,
+                            director: data.director,
+                            year: data.year
+                        })
+                    }
+                );
+            }
             $content = Ox.Element()
                 .css({padding: '13px', overflowY: 'auto'});
-            if (result.data.items.length) {
-                ['title', 'director', 'year'].forEach(function(key) {
-                    $input.push(
-                        Ox.Input({
-                            label: Ox.toTitleCase(key),
-                            labelWidth: 128,
-                            value: key == 'director' && data[key]
-                                ? data[key].join(', ')
-                                : data[key],
-                            width: formWidth
-                        })
-                        .css({display: 'inline-block', margin: '3px'})
-                        .bindEvent({
-                            change: function(data_) {
-                                data[key] = key == 'director'
-                                    ? data_.value.split(', ')
-                                    : data_.value;
-                                that.options({content: $loading});
-                                getIds();
-                            }
-                        })
-                        .appendTo($content)
-                    );
-                });
-                $('<div>')
-                    .css({width: '1px', height: '8px'})
-                    .appendTo($content);
-                if (!data.imdbId) {
+            ['title', 'director', 'year'].forEach(function(key) {
+                $input.push(
+                    Ox.Input({
+                        label: Ox.toTitleCase(key),
+                        labelWidth: 128,
+                        value: key == 'director' && data[key]
+                            ? data[key].join(', ')
+                            : data[key],
+                        width: formWidth
+                    })
+                    .css({display: 'inline-block', margin: '3px'})
+                    .bindEvent({
+                        change: function(data_) {
+                            data[key] = key == 'director'
+                                ? data_.value.split(', ')
+                                : data_.value;
+                            that.options({content: $loading});
+                            getIds();
+                        }
+                    })
+                    .appendTo($content)
+                );
+            });
+            $('<div>')
+                 .css({width: '1px', height: '8px'})
+                 .appendTo($content);
+            (
+                data.imdbId
+                && Ox.getIndexById(result.data.items, data.imdbId) == -1
+                ? pandora.api.findId
+                : Ox.noop
+            )({id: data.imdbId}, function(result_) {
+                if (result_ && result_.data.items.length) {
                     checkboxes.push(
                         {
-                            id: 'none',
-                            title: getTitle({
-                                id: data.imdbId,
-                                title: data.title,
-                                director: data.director,
-                                year: data.year
-                            })
+                            id: data.imdbId,
+                            title: getTitle(result_.data.items[0])
                         }
-                    );
+                    )
                 }
-                (
-                    data.imdbId
-                    && Ox.getIndexById(result.data.items, data.imdbId) == -1
-                    ? pandora.api.findId
-                    : Ox.noop
-                )({id: data.imdbId}, function(result_) {
-                    if (result_ && result_.data.items.length) {
-                        checkboxes.push(
-                            {
-                                id: data.imdbId,
-                                title: getTitle(result_.data.items[0])
-                            }
-                        )
+                checkboxes = checkboxes.concat(
+                    result.data.items.map(function(item) {
+                        return {
+                            id: item.id,
+                            title: getTitle(item)
+                        };
+                    })
+                );
+                $checkboxGroup = Ox.CheckboxGroup({
+                        checkboxes: checkboxes,
+                        type: 'list',
+                        width: formWidth,
+                        value: !data.imdbId ? 'none' : data.imdbId
+                    })
+                    .css({display: 'inline-block', margin: '3px'})
+                    .bindEvent({
+                        change: updateButton
+                    })
+                    .appendTo($content);
+                var elements = $checkboxGroup.find('.OxCheckbox:not(.OxButton)');
+                checkboxes.forEach(function(checkbox, index) {
+                    if (checkbox.id != 'none') {
+                        Ox.Button({
+                                title: 'arrowRight',
+                                tooltip: 'View on IMDb',
+                                type: 'image'
+                            })
+                            .css({
+                                float: 'right',
+                                marginTop: '-18px'
+                            })
+                            .bindEvent({
+                                click: function() {
+                                    window.open('/url=' + encodeURIComponent(
+                                        'http://imdb.com/title/tt'
+                                        + checkbox.id + '/combined'
+                                    ), '_blank');
+                                }
+                            })
+                            .appendTo(elements[index]);
                     }
-                    checkboxes = checkboxes.concat(
-                        result.data.items.map(function(item) {
-                            return {
-                                id: item.id,
-                                title: getTitle(item)
-                            };
-                        })
-                    );
-                    $checkboxGroup = Ox.CheckboxGroup({
-                            checkboxes: checkboxes,
-                            type: 'list',
-                            width: formWidth,
-                            value: !data.imdbId ? 'none' : data.imdbId
-                        })
-                        .css({display: 'inline-block', margin: '3px'})
-                        .bindEvent({
-                            change: updateButton
-                        })
-                        .appendTo($content);
-                    var elements = $checkboxGroup.find('.OxCheckbox:not(.OxButton)');
-                    checkboxes.forEach(function(checkbox, index) {
-                        if (checkbox.id != 'none') {
-                            Ox.Button({
-                                    title: 'arrowRight',
-                                    tooltip: 'View on IMDb',
-                                    type: 'image'
-                                })
-                                .css({
-                                    float: 'right',
-                                    marginTop: '-18px'
-                                })
-                                .bindEvent({
-                                    click: function() {
-                                        window.open('/url=' + encodeURIComponent(
-                                            'http://imdb.com/title/tt'
-                                            + checkbox.id + '/combined'
-                                        ), '_blank');
-                                    }
-                                })
-                                .appendTo(elements[index])
-                        }
-                    });
-                    that.options({content: $content});
-                    updateButton();
                 });
-            }
+                that.options({content: $content});
+                updateButton();
+            });
         });
     }
 
     function getTitle(item) {
+        item = Ox.clone(item, true);
         if (item.id && item.id == data.imdbId) {
             item.id = highlightTitle(item.id);
         }
