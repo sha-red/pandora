@@ -302,12 +302,12 @@ pandora.URL = (function() {
             views: views
         });
 
-        window.onhashchange = function() {
+        window.addEventListener('hashchange', function() {
             Ox.Request.cancel();
             that.parse();
-        };
+        });
 
-        window.onpopstate = function(e) {
+        window.addEventListener('popstate', function(e) {
             Ox.Request.cancel();
             self.isPopState = true;
             $('.OxDialog:visible').each(function() {
@@ -337,7 +337,7 @@ pandora.URL = (function() {
             } else {
                 that.parse();
             }
-        };
+        });
 
         return that;
 
