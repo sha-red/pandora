@@ -123,7 +123,8 @@ def findClips(request):
 
         def add_annotations(key, qs, add_layer=False):
             values = ['public_id', 'value', 'clip__start', 'clip__end']
-            if add_layer:
+            subtitles = utils.get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
+            if subtitles or add_layer:
                 values.append('layer')
             if query['filter']:
                 qs = qs.filter(query['filter'])
@@ -137,6 +138,8 @@ def findClips(request):
                             'id': a['public_id'],
                             'value': a['value'],
                         }
+                        if a['layer'] == subtitles['id'] and not a['value']:
+                            del l['id']
                         if add_layer:
                             l['layer'] = a['layer']
                         i[key].append(l)

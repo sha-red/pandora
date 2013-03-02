@@ -119,16 +119,18 @@ pandora.ui.clipList = function(videoRatio) {
                 Ox.print(data.ids[0], '$$$$$', that.value(data.ids[0]))
                 var id = data.ids[0],
                     item = !ui.item ? id.split('/')[0] : ui.item,
+                    annotation = that.value(id, 'annotations')[0].id,
                     points = {
-                        annotation: that.value(id, 'annotations')[0].id.split('/')[1],
+                        annotation: annotation ? annotation.split('/')[1] : '',
                         'in': that.value(id, 'in'),
                         out: that.value(id, 'out'),
                         position: that.value(id, 'in')
                     },
                     set;
                 if (isEmbed) {
-                    // FIXME: This is wrong, see ticket #1333.
-                    window.open('/' + item + '/' + points.annotation, '_blank');
+                    window.open( '/' + item + '/'
+                        + (annotation ? points.annotation : points['in'] + ',' + points.out),
+                        '_blank');
                 } else {
                     set = {
                         item: item,

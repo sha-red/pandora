@@ -15,7 +15,7 @@ import ox
 from clip.models import Clip
 from changelog.models import Changelog
 
-from item.utils import sort_string
+from item.utils import sort_string, get_by_key
 import managers
 import utils
 from tasks import update_matches
@@ -235,6 +235,10 @@ class Annotation(models.Model):
                 streams = self.item.streams()
                 if streams:
                     j['videoRatio'] = streams[0].aspect_ratio
+        subtitles = get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
+        if subtitles:
+            if 'id' in j and self.layer == subtitles['id'] and not self.value:
+                del j['id']
         return j
 
     def log(self):
