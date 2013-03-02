@@ -1,5 +1,14 @@
 #!/usr/bin/python
 import os
+
+root_dir = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
+os.chdir(root_dir)
+
+#using virtualenv's activate_this.py to reorder sys.path
+activate_this = os.path.join(root_dir, 'bin', 'activate_this.py')
+if os.path.exists(activate_this):
+    execfile(activate_this, dict(__file__=activate_this))
+
 import sys
 import subprocess
 from os.path import join, exists
