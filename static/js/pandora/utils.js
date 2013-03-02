@@ -582,12 +582,16 @@ pandora.getClipsQuery = function() {
             itemTitles[pandora.user.ui.item] = itemTitle
         }
         var parts = [pandora.site.site.name];
-        if (!pandora.user.ui.item) {
-            pandora.user.ui._list && parts.push('List ' + pandora.user.ui._list);
-            parts.push(Ox.toTitleCase(pandora.user.ui.listView) + ' View');
-        } else {
-            parts.push(itemTitles[pandora.user.ui.item] || pandora.user.ui.item);
-            parts.push(Ox.toTitleCase(pandora.user.ui.itemView) + ' View');
+        if (pandora.user.ui.section == 'items') {
+            if (!pandora.user.ui.item) {
+                pandora.user.ui._list && parts.push('List ' + pandora.user.ui._list);
+                parts.push(Ox.toTitleCase(pandora.user.ui.listView) + ' View');
+            } else {
+                parts.push(itemTitles[pandora.user.ui.item] || pandora.user.ui.item);
+                parts.push(Ox.toTitleCase(pandora.user.ui.itemView) + ' View');
+            }
+        } else if (pandora.user.ui.section == 'texts') {
+            parts.push(pandora.user.ui.text ? pandora.user.ui.text : 'Texts');
         }
         return parts.join(' - ');
     };
