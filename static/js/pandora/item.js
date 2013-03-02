@@ -70,18 +70,6 @@ pandora.ui.item = function() {
                     })
             );
 
-        } else if (pandora.user.ui.itemView == 'clips') {
-
-            pandora.$ui.contentPanel.replaceElement(1,
-                pandora.ui.clipsView(result.data.videoRatio)
-            );
-
-        } else if (pandora.user.ui.itemView == 'timeline') {
-
-            pandora.$ui.contentPanel.replaceElement(1,
-                pandora.$ui.timeline = pandora.ui.timeline(result.data)
-            );
-
         } else if (pandora.user.ui.itemView == 'player') {
 
             pandora.$ui.contentPanel.replaceElement(1,
@@ -92,6 +80,18 @@ pandora.ui.item = function() {
 
             pandora.$ui.contentPanel.replaceElement(1,
                 pandora.$ui.editor = pandora.ui.editor(result.data)
+            );
+
+        } else if (pandora.user.ui.itemView == 'timeline') {
+
+            pandora.$ui.contentPanel.replaceElement(1,
+                pandora.$ui.timeline = pandora.ui.timeline(result.data)
+            );
+
+        } else if (pandora.user.ui.itemView == 'clips') {
+
+            pandora.$ui.contentPanel.replaceElement(1,
+                pandora.ui.clipsView(result.data.videoRatio)
             );
 
         } else if (pandora.user.ui.itemView == 'map') {
