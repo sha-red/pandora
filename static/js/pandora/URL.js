@@ -30,26 +30,31 @@ pandora.URL = (function() {
                     state.view = pandora.user.ui.itemView;
                     state.sort = pandora.user.ui.itemSort;
                 }
-            }
-
-            if (state.view == 'map') {
-                state.span = pandora.user.ui.mapFind
-                    ? '@' + pandora.user.ui.mapFind
-                    : pandora.user.ui.mapSelection
-                    ? '@' + pandora.user.ui.mapSelection
-                    : '';
-            } else if (state.view == 'calendar') {
-                // ...
-            } else if (['timeline', 'player', 'editor'].indexOf(state.view) > -1) {
-                var videoPoints = pandora.user.ui.videoPoints[state.item] || {};
-                state.span = videoPoints.annotation || [].concat(
-                    videoPoints.position
-                        ? videoPoints.position
-                        : [],
-                    videoPoints['in'] || videoPoints.out
-                        ? [videoPoints['in'], videoPoints.out]
-                        : []
-                );
+                if (state.view == 'map') {
+                    state.span = pandora.user.ui.mapFind
+                        ? '@' + pandora.user.ui.mapFind
+                        : pandora.user.ui.mapSelection
+                        ? '@' + pandora.user.ui.mapSelection
+                        : '';
+                } else if (state.view == 'calendar') {
+                    // ...
+                } else if (['timeline', 'player', 'editor'].indexOf(state.view) > -1) {
+                    var videoPoints = pandora.user.ui.videoPoints[state.item] || {};
+                    state.span = videoPoints.annotation || [].concat(
+                        videoPoints.position
+                            ? videoPoints.position
+                            : [],
+                        videoPoints['in'] || videoPoints.out
+                            ? [videoPoints['in'], videoPoints.out]
+                            : []
+                    );
+                }
+            } else if (pandora.user.ui.section == 'texts') {
+                state.view = 'text';
+                var position = pandora.user.ui.textPositions[pandora.user.ui.text];
+                if (position) {
+                    state.span = position;
+                }
             }
             
         }
@@ -159,6 +164,10 @@ pandora.URL = (function() {
                             // removing a query and reloading works as expected
                             set.find = pandora.site.user.ui.find;
                         }
+                    }
+                } else if (state.type == 'texts') {
+                    if (state.span) {
+                        set['textPositions.' + state.item] = state.span;
                     }
                 }
 
@@ -275,7 +284,9 @@ pandora.URL = (function() {
         }
         spanType['texts'] = {
             list: [],
-            item: {}
+            item: {
+                'text': 'number'
+            }
         }
         sortKeys['texts'] = {
             list: {},

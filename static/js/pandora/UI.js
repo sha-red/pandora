@@ -54,6 +54,7 @@ pandora.UI = (function() {
 
         self.previousUI = Ox.clone(pandora.user.ui, true);
         self.previousUI._list = pandora.getListState(self.previousUI.find);
+
         if (args.section == 'texts') {
             trigger['section'] = args['section'];
             trigger['text'] = args['text'];

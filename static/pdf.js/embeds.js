@@ -1,3 +1,17 @@
+Ox.load(function() {
+    window.addEventListener('hashchange', function() {
+        var page = document.location.hash.substring(1).split('=')[1];
+        page && Ox.$parent.postMessage('page', {
+            page: page
+        });
+    });
+    Ox.$parent.onMessage(function(event, data, oxid) {
+        if (event == 'page' && Ox.isUndefined(oxid)) {
+            window.location.hash = '#page=' + data.page;
+        }
+    });
+});
+
 function getVideoOverlay(page) {
     var links = embeds.filter(function(embed) {
         return embed.page == page && embed.type =='inline';

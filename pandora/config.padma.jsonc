@@ -698,6 +698,7 @@
             "showSitePosters": false,
             "showTimeline": true,
             "sidebarSize": 256,
+            "textPositions": {},
             "theme": "oxlight",
             "updateAdvancedFind": false,
             "videoMuted": false,

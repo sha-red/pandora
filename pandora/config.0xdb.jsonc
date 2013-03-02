@@ -776,6 +776,7 @@
             "showSitePosters": false,
             "showTimeline": true,
             "sidebarSize": 256,
+            "textPositions": {},
             "theme": "oxdark",
             "updateAdvancedFind": false,
             "videoMuted": false,

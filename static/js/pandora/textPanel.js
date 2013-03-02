@@ -326,18 +326,20 @@ pandora.ui.textHTML = function(text) {
 pandora.ui.textPDF = function(text) {
 
     var that = Ox.Element(),
-        $iframe;
+        $iframe,
+        page = pandora.user.ui.textPositions[pandora.user.ui.text] ?
+            pandora.user.ui.textPositions[pandora.user.ui.text][0] : 1,
+        url = '/texts/' + pandora.user.ui.text + '/text.pdf.html#page=' + page;
     if (text.uploaded) {
         $iframe = Ox.Element('<iframe>')
             .attr({
                 frameborder: 0,
                 height: '100%',
-                src: '/texts/' + pandora.user.ui.text + '/text.pdf.html',
+                src: url,
                 width: '100%'
             })
             .onMessage(function(event, data) {
                 if(event == 'edit') {
-                    console.log('existing url?', data);
                     pandora.ui.insertEmbedDialog(data.src, function(url) {
                         data.src = url;
                         var embed = text.embeds.filter(function(embed) {
@@ -352,7 +354,6 @@ pandora.ui.textPDF = function(text) {
                             text.embeds.push(data);
                             //fixme sort embeds by page/id
                         }
-                        console.log('saving', text.embeds);
                         pandora.api.editText({
                             id: text.id,
                             embeds: text.embeds
@@ -360,9 +361,14 @@ pandora.ui.textPDF = function(text) {
                             $iframe.postMessage('update', data);
                         });
                     }).open();
+                } else if (event == 'page') {
+                    pandora.UI.set('textPositions.' + pandora.user.ui.text, [data.page]);
                 }
             })
             .appendTo(that);
+        that.setPage = function(page) {
+            $iframe && $iframe.postMessage('page', {page: page});
+        }
     } else {
         that.html('UPLOADED: ' + text.uploaded);
     }
