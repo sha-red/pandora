@@ -2,48 +2,50 @@
 
 pandora.ui.allItems = function() {
 
-    var that = Ox.Element()
-        .addClass('OxSelectableElement' + (pandora.user.ui._list ? '' : ' OxSelected'))
-        .css({
-            height: '16px',
-            cursor: 'default',
-            overflow: 'hidden'
-        })
-        .on({
-            click: function() {
-                that.gainFocus();
-                if (pandora.user.ui.section == 'items') {
-                    pandora.user.ui._list && pandora.UI.set('find', {conditions: [], operator: '&'});
-                } else {
-                    pandora.UI.set(pandora.user.ui.section.slice(0, -1), '');
+    var canAddItems = !pandora.site.itemRequiresVideo && pandora.site.capabilities.canAddItems[pandora.user.level],
+        canUploadVideo = pandora.site.capabilities.canAddItems[pandora.user.level],
+        that = Ox.Element()
+            .addClass('OxSelectableElement' + (pandora.user.ui._list ? '' : ' OxSelected'))
+            .css({
+                height: '16px',
+                cursor: 'default',
+                overflow: 'hidden'
+            })
+            .on({
+                click: function() {
+                    that.gainFocus();
+                    if (pandora.user.ui.section == 'items') {
+                        pandora.user.ui._list && pandora.UI.set('find', {conditions: [], operator: '&'});
+                    } else {
+                        pandora.UI.set(pandora.user.ui.section.slice(0, -1), '');
+                    }
                 }
-            }
-        })
-        .bindEvent({
-            pandora_find: function() {
-                that[pandora.user.ui._list ? 'removeClass' : 'addClass']('OxSelected');
-            }
-        }),
-    $icon = $('<img>')
-        .attr({src: '/static/png/icon.png'})
-        .css({float: 'left', width: '14px', height: '14px', margin: '1px'})
-        .appendTo(that),
-    $name = $('<div>')
-        .css({
-            float: 'left',
-            height: '14px',
-            margin: '1px 4px 1px 3px',
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap'
-        })
-        .html(
-            pandora.user.ui.section == 'items'
-            ? 'All ' + pandora.site.itemName.plural
-            : pandora.site.site.name + ' ' + Ox.toTitleCase(pandora.user.ui.section)
-        )
-        .appendTo(that),
-    $items;
+            })
+            .bindEvent({
+                pandora_find: function() {
+                    that[pandora.user.ui._list ? 'removeClass' : 'addClass']('OxSelected');
+                }
+            }),
+        $icon = $('<img>')
+            .attr({src: '/static/png/icon.png'})
+            .css({float: 'left', width: '14px', height: '14px', margin: '1px'})
+            .appendTo(that),
+        $name = $('<div>')
+            .css({
+                float: 'left',
+                height: '14px',
+                margin: '1px 4px 1px 3px',
+                textOverflow: 'ellipsis',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap'
+            })
+            .html(
+                pandora.user.ui.section == 'items'
+                ? 'All ' + pandora.site.itemName.plural
+                : pandora.site.site.name + ' ' + Ox.toTitleCase(pandora.user.ui.section)
+            )
+            .appendTo(that),
+        $items;
 
     if (pandora.user.ui.section == 'items') {
         $items = $('<div>')
@@ -56,15 +58,26 @@ pandora.ui.allItems = function() {
             .appendTo(that);
         Ox.Button({
                 style: 'symbol',
-                title: 'click',
+                title: 'add',
+                tooltip: canAddItems ? 'Add ' + pandora.site.itemName.singular : ''
                 type: 'image'
             })
-            .css({opacity: 0.25})
+            .css({opacity: canAddItems ? 1 : 0.25})
+            .bindEvent({
+                click: pandora.addItem
+            })
             .appendTo(that);
         Ox.Button({
                 style: 'symbol',
                 title: 'upload',
+                tooltip: canUploadVideo ? 'Upload Video...' : '',
                 type: 'image'
+            })
+            .css({opacity: canUploadVideo ? 1 : 0.25})
+            .bindEvent({
+                click: function() {
+                    pandora.$ui.uploadDialog = pandora.ui.uploadDialog().open();
+                }
             })
             .appendTo(that);
         pandora.api.find({
@@ -79,6 +92,7 @@ pandora.ui.allItems = function() {
                 tooltip: 'HTML',
                 type: 'image'
             })
+            .css({opacity: 0.25})
             .appendTo(that);
         Ox.Button({
                 style: 'symbol',
@@ -86,6 +100,7 @@ pandora.ui.allItems = function() {
                 tooltip: 'Help',
                 type: 'image'
             })
+            .css({opacity: 0.25})
             .appendTo(that);
     }
 
