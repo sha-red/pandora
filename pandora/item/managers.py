@@ -244,8 +244,7 @@ def parseConditions(conditions, operator, user):
         else:
             q = conn
         return q
-    return Q() 
-
+    return [Q()]
 
 class ItemManager(Manager):
 
