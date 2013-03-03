@@ -9,6 +9,7 @@ from django.utils import simplejson as json
 from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError, EmailMessage
 from django.shortcuts import redirect
+from django.db.models import Max
 
 from ox.django.shortcuts import render_to_json_response, json_response, get_object_or_404_json
 from ox.django.decorators import admin_required_json, login_required_json
@@ -168,6 +169,10 @@ def signup(request):
                     if key in l:
                         setattr(list, key, l[key])
                 list.save()
+                pos = models.Position(list=list, section='personal', user=user)
+                qs = models.Position.objects.filter(user=user, section='personal')
+                pos.position = (qs.aggregate(Max('position'))['position__max'] or 0) + 1
+                pos.save()
             if request.session.session_key:
                 models.SessionData.objects.filter(session_key=request.session.session_key).update(user=user)
             ui = json.loads(request.session.get('ui', 'null'))
