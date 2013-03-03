@@ -297,7 +297,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                         Ox.Request.clearCache('find' + folderItems);
                         pandora.$ui.info.updateListInfo();
                         pandora.$ui.listDialog.options({
-                            title: folderItme + ' &mdash; ' + Ox.encodeHTMLEntities(listData.name)
+                            title: folderItem + ' &mdash; ' + Ox.encodeHTMLEntities(listData.name)
                         });
                     }
                 });
