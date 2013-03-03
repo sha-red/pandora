@@ -20,16 +20,21 @@ limitations under the License.
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title></title>
 
+
     <link rel="stylesheet" href="/static/pdf.js/viewer.css"/>
 
     <script type="text/javascript" src="/static/oxjs/build/Ox.js"></script>
     <script type="text/javascript" src="/static/oxjs/source/Ox.UI/js/Core/Message.js"></script>
     <script type="text/javascript" src="/static/pdf.js/compatibility.js"></script>
 
+
+
     <!-- This snippet is used in production, see Makefile -->
     <link rel="resource" type="application/l10n" href="/static/pdf.js/locale/locale.properties"/>
     <script type="text/javascript" src="/static/pdf.js/l10n.js"></script>
     <script type="text/javascript" src="/static/pdf.js/pdf.js"></script>
+
+
     <script type="text/javascript" src="/static/pdf.js/debugger.js"></script>
     <script type="text/javascript">
         var DEFAULT_URL = '{{url}}',
@@ -37,8 +42,10 @@ limitations under the License.
             editable = {{editable|safe}};
     </script>
     <script type="text/javascript" src="/static/pdf.js/embeds.js"></script>
+
     <script type="text/javascript" src="/static/pdf.js/viewer.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/pdf.js/css/videopdf.css"/>
+
   </head>
 
   <body>
@@ -132,11 +139,11 @@ limitations under the License.
               <div class="outerCenter">
                 <div class="innerCenter" id="toolbarViewerMiddle">
                   <div class="splitToolbarButton">
-                    <button class="toolbarButton zoomOut" id="zoom_out" title="Zoom Out" tabindex="8" data-l10n-id="zoom_out">
+                    <button class="toolbarButton zoomOut" title="Zoom Out" tabindex="8" data-l10n-id="zoom_out">
                       <span data-l10n-id="zoom_out_label">Zoom Out</span>
                     </button>
                     <div class="splitToolbarButtonSeparator"></div>
-                    <button class="toolbarButton zoomIn" id="zoom_in" title="Zoom In" tabindex="9" data-l10n-id="zoom_in">
+                    <button class="toolbarButton zoomIn" title="Zoom In" tabindex="9" data-l10n-id="zoom_in">
                       <span data-l10n-id="zoom_in_label">Zoom In</span>
                      </button>
                   </div>
@@ -205,3 +212,4 @@ limitations under the License.
     <div id="printContainer"></div>
   </body>
 </html>
+

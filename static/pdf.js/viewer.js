@@ -43,7 +43,7 @@ var FindStates = {
   FIND_PENDING: 3
 };
 
-PDFJS.workerSrc = '/static/pdf.js/pdf.js';
+  PDFJS.workerSrc = '/static/pdf.js/pdf.js';
 
 var mozL10n = document.mozL10n || document.webL10n;
 
@@ -890,16 +890,28 @@ var PDFView = {
       PDFView.loadingBar = new ProgressBar('#loadingBar', {});
     }
 
-    window.addEventListener('message', function window_message(e) {
+    function windowMessage(e) {
       var args = e.data;
 
       if (typeof args !== 'object' || !('pdfjsLoadAction' in args))
         return;
       switch (args.pdfjsLoadAction) {
+        case 'supportsChunkedLoading':
+          window.removeEventListener('message', windowMessage);
+          PDFView.open({
+            url: args.pdfUrl,
+            chunkedChromeLoading: true,
+            totalLength: args.totalLength,
+            loadedBegin: args.loadedBegin,
+            loadedChunk: args.loadedChunk
+          }, 0);
+          break;
         case 'progress':
           PDFView.progress(args.loaded / args.total);
           break;
         case 'complete':
+          // TODO(mack): remove the listener when file loading is complete
+          // window.removeEventListener('message', windowMessage);
           if (!args.data) {
             PDFView.error(mozL10n.get('loading_error', null,
                           'An error occurred while loading the PDF.'), e);
@@ -908,7 +920,8 @@ var PDFView = {
           PDFView.open(args.data, 0);
           break;
       }
-    });
+    }
+    window.addEventListener('message', windowMessage);
     FirefoxCom.requestSync('initPassiveLoading', null);
   },
 
@@ -934,6 +947,10 @@ var PDFView = {
       parameters.url = url;
     } else if (url && 'byteLength' in url) { // ArrayBuffer
       parameters.data = url;
+    } else {
+      this.setTitleUsingUrl(url.url);
+      parameters = url;
+      parameters.password = password;
     }
 
     if (!PDFView.loadingBar) {
@@ -1175,6 +1192,7 @@ var PDFView = {
       container.removeChild(container.lastChild);
 
     var pagesCount = pdfDocument.numPages;
+
     var id = pdfDocument.fingerprint;
     document.getElementById('numPages').textContent =
       mozL10n.get('page_of', {pageCount: pagesCount}, 'of {{pageCount}}');
@@ -1189,29 +1207,74 @@ var PDFView = {
     var pages = this.pages = [];
     this.pageText = [];
     this.startedTextExtraction = false;
-    var pagesRefMap = {};
+    var pagesRefMap = this.pagesRefMap = {};
     var thumbnails = this.thumbnails = [];
     var pagePromises = [];
-    for (var i = 1; i <= pagesCount; i++)
-      pagePromises.push(pdfDocument.getPage(i));
+
+    var firstPageLoaded = true;
+
     var self = this;
-    var pagesPromise = PDFJS.Promise.all(pagePromises);
-    pagesPromise.then(function(promisedPages) {
-      for (var i = 1; i <= pagesCount; i++) {
-        var page = promisedPages[i - 1];
-        var pageView = new PageView(container, page, i, scale,
-                                    page.stats, self.navigateTo.bind(self));
-        var thumbnailView = new ThumbnailView(thumbsView, page, i);
+    for (var pageIdx = 0; pageIdx < pagesCount; ++pageIdx) {
+      var pageNum = pageIdx + 1;
+      var pagePromise = pdfDocument.getPage(pageNum);
+      pagePromise.then(function(page) {
+
+        if (firstPageLoaded) {
+          var pagesFrag = document.createDocumentFragment();
+          // TODO(mack): clone
+          var defaultView = page.view;
+          for (var pageIdx = 0; pageIdx < pagesCount; ++pageIdx) {
+            var pageNum = pageIdx + 1;
+            var pageView = new PageView(container, pageNum, scale,
+                                    self.navigateTo.bind(self), defaultView);
+            pages[pageIdx] = pageView;
+            pagesFrag.appendChild(pageView.element);
+          }
+          container.appendChild(pagesFrag);
+
+          var storedHash = null;
+          if (store.get('exists', false)) {
+            var page_ = store.get('page', '1');
+            var zoom = store.get('zoom', PDFView.currentScale);
+            var left = store.get('scrollLeft', '0');
+            var top = store.get('scrollTop', '0');
+
+            storedHash =
+              'page=' + page_ + '&zoom=' + zoom + ',' + left +',' + top;
+          }
+
+          self.setInitialView(storedHash, scale);
+          firstPageLoaded = false;
+        }
+
+        var pageIdx = page.pageInfo.pageIndex;
+        var pageNum = pageIdx + 1;
+
+        var pageView = pages[pageIdx];
+        pageView.setPdfPage(page);
+        pageView.setStats(page.stats);
+        var thumbnailView = new ThumbnailView(thumbsView, page, pageNum);
         bindOnAfterDraw(pageView, thumbnailView);
 
-        pages.push(pageView);
-        thumbnails.push(thumbnailView);
+        pages[pageIdx] = pageView;
+        thumbnails[pageIdx] = thumbnailView;
         var pageRef = page.ref;
-        pagesRefMap[pageRef.num + ' ' + pageRef.gen + ' R'] = i;
-      }
+        pagesRefMap[pageRef.num + ' ' + pageRef.gen + ' R'] = pageNum;
 
-      self.pagesRefMap = pagesRefMap;
-    });
+        var visiblePages = self.visiblePages;
+        var firstNum = visiblePages.first.id;
+        var lastNum = visiblePages.last.id;
+        if (pageNum >= firstNum && pageNum <= lastNum) {
+          // TODO(mack): This logic could probably be better, as it's probably
+          // going in here more often than necessary
+          self.renderHighestPriority();
+          //updateViewarea();
+        }
+      });
+      pagePromises.push(pagePromise);
+    }
+
+    var pagesPromise = PDFJS.Promise.all(pagePromises);
 
     var destinationsPromise = pdfDocument.getDestinations();
     destinationsPromise.then(function(destinations) {
@@ -1225,20 +1288,6 @@ var PDFView = {
       pdfDocument.getOutline().then(function(outline) {
         self.outline = new DocumentOutlineView(outline);
       });
-
-      var storedHash = null;
-      if (store.get('exists', false)) {
-        var page = store.get('page', '1');
-        var zoom = store.get('zoom', PDFView.currentScale);
-        var left = store.get('scrollLeft', '0');
-        var top = store.get('scrollTop', '0');
-        if(document.location.hash) {
-            page = document.location.hash.substring(1);
-        }
-        storedHash = 'page=' + page + '&zoom=' + zoom + ',' + left + ',' + top;
-      }
-
-      self.setInitialView(storedHash, scale);
     });
 
     pdfDocument.getMetadata().then(function(data) {
@@ -1296,8 +1345,8 @@ var PDFView = {
 
   renderHighestPriority: function pdfViewRenderHighestPriority() {
     // Pages have a higher priority than thumbnails, so check them first.
-    var visiblePages = this.getVisiblePages();
-    var pageView = this.getHighestPriority(visiblePages, this.pages,
+    this.visiblePages = this.getVisiblePages();
+    var pageView = this.getHighestPriority(this.visiblePages, this.pages,
                                            this.pageViewScroll.down);
     if (pageView) {
       this.renderView(pageView, 'page');
@@ -1330,7 +1379,7 @@ var PDFView = {
     }
     for (var i = 0; i < numVisible; ++i) {
       var view = visibleViews[i].view;
-      if (!this.isViewFinished(view))
+      if (!this.isViewRenderable(view))
         return view;
     }
 
@@ -1338,19 +1387,22 @@ var PDFView = {
     if (scrolledDown) {
       var nextPageIndex = visible.last.id;
       // ID's start at 1 so no need to add 1.
-      if (views[nextPageIndex] && !this.isViewFinished(views[nextPageIndex]))
+      if (views[nextPageIndex] && !this.isViewRenderable(views[nextPageIndex]))
         return views[nextPageIndex];
     } else {
       var previousPageIndex = visible.first.id - 2;
       if (views[previousPageIndex] &&
-          !this.isViewFinished(views[previousPageIndex]))
+          !this.isViewRenderable(views[previousPageIndex]))
         return views[previousPageIndex];
     }
     // Everything that needs to be rendered has been.
     return false;
   },
 
-  isViewFinished: function pdfViewNeedsRendering(view) {
+  isViewRenderable: function pdfViewNeedsRendering(view) {
+    if (view instanceof PageView && !view.pdfPage) {
+      return false;
+    }
     return view.renderingState === RenderingStates.FINISHED;
   },
 
@@ -1711,14 +1763,30 @@ var PDFView = {
   }
 };
 
-var PageView = function pageView(container, pdfPage, id, scale,
-                                 stats, navigateTo) {
+var PageView = function pageView(container, id, scale,
+                                 navigateTo, defaultView) {
   this.id = id;
-  this.pdfPage = pdfPage;
+  //this.pdfPage = pdfPage;
 
   this.rotation = 0;
   this.scale = scale || 1.0;
-  this.viewport = this.pdfPage.getViewport(this.scale, this.pdfPage.rotate);
+  //this.viewport = this.pdfPage.getViewport(this.scale, this.pdfPage.rotate);
+  this.defaultView = defaultView;
+
+  this.getViewport = function pageViewGetViewport() {
+    var view;
+    var totalRotation;
+    if (this.pdfPage) {
+      totalRotation = (this.rotation + this.pdfPage.rotate) % 360;
+      view = this.pdfPage.view;
+    } else {
+      totalRotation = this.rotation;
+      view = this.defaultView;
+    }
+    return new PDFJS.PageViewport(view, this.scale, totalRotation, 0, 0);
+  };
+
+  this.viewport = this.getViewport();
 
   this.renderingState = RenderingStates.INITIAL;
   this.resume = null;
@@ -1730,13 +1798,34 @@ var PageView = function pageView(container, pdfPage, id, scale,
   anchor.name = '' + this.id;
 
   var div = this.el = document.createElement('div');
+  //var div = this.el = element;
   div.id = 'pageContainer' + this.id;
   div.className = 'page';
   div.style.width = Math.floor(this.viewport.width) + 'px';
   div.style.height = Math.floor(this.viewport.height) + 'px';
 
-  container.appendChild(anchor);
-  container.appendChild(div);
+  this.container = container;
+  //this.container.appendChild(anchor);
+  //this.container.appendChild(div);
+
+  var docFrag = document.createDocumentFragment();
+  docFrag.appendChild(anchor);
+  docFrag.appendChild(div);
+
+  Object.defineProperty(this, 'element', {
+    get: function PlaceholderPageView_getElement() {
+      return docFrag;
+    },
+    enumerable: true
+  });
+
+  this.setPdfPage = function pageViewSetPdfPage(pdfPage) {
+    this.pdfPage = pdfPage;
+  };
+
+  this.setStats = function pageViewSetStats(stats) {
+    this.stats = stats;
+  };
 
   this.destroy = function pageViewDestroy() {
     this.update();
@@ -1752,9 +1841,7 @@ var PageView = function pageView(container, pdfPage, id, scale,
     }
 
     this.scale = scale || this.scale;
-
-    var totalRotation = (this.rotation + this.pdfPage.rotate) % 360;
-    var viewport = this.pdfPage.getViewport(this.scale, totalRotation);
+    var viewport = this.getViewport();
 
     this.viewport = viewport;
     div.style.width = Math.floor(viewport.width) + 'px';
@@ -1960,6 +2047,12 @@ var PageView = function pageView(container, pdfPage, id, scale,
   };
 
   this.draw = function pageviewDraw(callback) {
+    if (!this.pdfPage) {
+      console.log('Cannot draw without page');
+      return;
+    }
+    var pdfPage = this.pdfPage;
+
     if (this.renderingState !== RenderingStates.INITIAL) {
       console.error('Must be in new state before drawing');
     }
@@ -2016,6 +2109,7 @@ var PageView = function pageView(container, pdfPage, id, scale,
     if (outputScale.scaled) {
       ctx.scale(outputScale.sx, outputScale.sy);
     }
+
 
     // Rendering area
 
@@ -2093,6 +2187,12 @@ var PageView = function pageView(container, pdfPage, id, scale,
 
   this.beforePrint = function pageViewBeforePrint() {
     var pdfPage = this.pdfPage;
+
+    if (!pdfPage) {
+      console.log('Pdf page has not been rendered and thus cannot be printed');
+      return;
+    }
+
     var viewport = pdfPage.getViewport(1);
     // Use the same hack we use for high dpi displays for printing to get better
     // output until bug 811002 is fixed in FF.
@@ -2143,6 +2243,10 @@ var PageView = function pageView(container, pdfPage, id, scale,
   };
 
   this.updateStats = function pageViewUpdateStats() {
+    if (!this.stats) {
+      console.log('No stats available');
+    }
+
     if (PDFJS.pdfBug && Stats.enabled) {
       var stats = this.stats;
       Stats.add(this.id, stats);
@@ -3042,9 +3146,6 @@ window.addEventListener('scalechange', function scalechange(evt) {
     customScaleOption.textContent = Math.round(evt.scale * 10000) / 100 + '%';
     customScaleOption.selected = true;
   }
-  
-  document.getElementById('zoom_out').disabled = (evt.scale === MIN_SCALE);
-  document.getElementById('zoom_in').disabled = (evt.scale === MAX_SCALE);
 
   updateViewarea();
 }, true);
@@ -3056,18 +3157,22 @@ window.addEventListener('pagechange', function pagechange(evt) {
     var selected = document.querySelector('.thumbnail.selected');
     if (selected)
       selected.classList.remove('selected');
+
     var thumbnail = document.getElementById('thumbnailContainer' + page);
-    thumbnail.classList.add('selected');
-    var visibleThumbs = PDFView.getVisibleThumbs();
-    var numVisibleThumbs = visibleThumbs.views.length;
-    // If the thumbnail isn't currently visible scroll it into view.
-    if (numVisibleThumbs > 0) {
-      var first = visibleThumbs.first.id;
-      // Account for only one thumbnail being visible.
-      var last = numVisibleThumbs > 1 ?
-                  visibleThumbs.last.id : first;
-      if (page <= first || page >= last)
-        scrollIntoView(thumbnail);
+    // FIXME(mack): remove checking if thumbnail is null hack
+    if (thumbnail) {
+      thumbnail.classList.add('selected');
+      var visibleThumbs = PDFView.getVisibleThumbs();
+      var numVisibleThumbs = visibleThumbs.views.length;
+      // If the thumbnail isn't currently visible scroll it into view.
+      if (numVisibleThumbs > 0) {
+        var first = visibleThumbs.first.id;
+        // Account for only one thumbnail being visible.
+        var last = numVisibleThumbs > 1 ?
+                    visibleThumbs.last.id : first;
+        if (page <= first || page >= last)
+          scrollIntoView(thumbnail);
+      }
     }
 
   }
@@ -3194,12 +3299,6 @@ window.addEventListener('keydown', function keydown(evt) {
       case 80: // 'p'
         PDFView.page--;
         handled = true;
-        break;
-      case 27: // esc key
-        if (!PDFView.supportsIntegratedFind && PDFFindBar.opened) {
-          PDFFindBar.close();
-          handled = true;
-        }
         break;
       case 40: // down arrow
       case 34: // pg down

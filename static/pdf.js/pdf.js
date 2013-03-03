@@ -16,8 +16,8 @@
  */
 
 var PDFJS = {};
-PDFJS.version = '0.7.227';
-PDFJS.build = 'c33b920';
+PDFJS.version = '0.7.290';
+PDFJS.build = '009bc18';
 
 (function pdfjsWrapper() {
   // Use strict in our context only - users might not want it
@@ -39,12 +39,193 @@ PDFJS.build = 'c33b920';
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/* globals assertWellFormed, calculateMD5, Catalog, error, info, isArray,
-           isArrayBuffer, isDict, isName, isStream, isString, Lexer,
-           Linearization, NullStream, PartialEvaluator, shadow, Stream,
-           StreamsSequenceStream, stringToPDFString, TODO, Util, warn, XRef */
+/* globals error */
 
 'use strict';
+
+
+var NetworkManager = (function NetworkManagerClosure() {
+  function NetworkManager(url, args) {
+    this.url = url;
+    this.httpHeaders = args.httpHeaders;
+    this.getXhr = args.getXhr ||
+      function NetworkManager_getXhr() {
+        return new XMLHttpRequest();
+      };
+
+    this.currXhrId = 0;
+    this.xhrRequests = {};
+    this.loadedXhrs = {};
+  }
+
+  function getArrayBuffer(xhr) {
+    var data = (xhr.mozResponseArrayBuffer || xhr.mozResponse ||
+                xhr.responseArrayBuffer || xhr.response);
+    if (typeof data !== 'string') {
+      return data;
+    }
+    var length = data.length;
+    var buffer = new Uint8Array(length);
+    for (var i = 0; i < length; i++) {
+      buffer[i] = data.charCodeAt(i) & 0xFF;
+    }
+    return buffer;
+  }
+
+  // TODO(mack): support onprogress during range request
+  NetworkManager.prototype = {
+    // Optimized to not to fetch the same chunks again.
+    // e.g. If we already have chunk 3, and we need chunks [2, 5), do not
+    // fetch 2; instead fetch [2, 3) and [4, 5); Realistically though, this
+    // should not happen often w/ PDFs
+    // TODO(mack): this optimization might do more harm than good; investigate
+    requestRange: function NetworkManager_requestRange(begin, end, callback) {
+      this.request({
+        begin: begin,
+        end: end,
+        onDone: callback
+      });
+    },
+
+    requestFull: function NetworkManager_requestRange(args) {
+      this.request(args);
+    },
+
+    request: function NetworkManager_requestRange(args) {
+      var xhr = this.getXhr();
+      var xhrId = this.currXhrId++;
+      this.xhrRequests[xhrId] = xhr;
+
+      xhr.open('GET', this.url);
+      if (this.httpHeaders) {
+        for (var property in this.httpHeaders) {
+          var value = this.httpHeaders[property];
+          if (typeof value === 'undefined') {
+            continue;
+          }
+          xhr.setRequestHeader(property, value);
+        }
+      }
+      if ('begin' in args && 'end' in args) {
+        var rangeStr = args.begin + '-' + (args.end - 1);
+        xhr.setRequestHeader('Range', 'bytes=' + rangeStr);
+        xhr.expectedStatus = 206;
+      } else {
+        xhr.expectedStatus = 200;
+      }
+
+      xhr.mozResponseType = xhr.responseType = 'arraybuffer';
+
+      // TODO(mack): Support onprogress
+      xhr.onprogress = function(evt) {
+      };
+
+      // TODO(mack): Support onerror
+      xhr.onerror = function(evt) {
+        error('Received onerror');
+      };
+
+      xhr.onreadystatechange = this.onStateChange.bind(this, xhrId);
+
+      xhr.onHeadersReceived = args.onHeadersReceived;
+      xhr.onDone = args.onDone;
+
+      xhr.send(null);
+    },
+
+    onStateChange: function NetworkManager_onStateChange(xhrId, evt) {
+      // xhr seems to queue requests for different readyState,
+      // so that we come here multiple times; the problem is when we pause
+      // via debugger, then, xhr.readyState will be 4 multiple times. This
+      // is a fix for this issue.
+      if (xhrId in this.loadedXhrs) {
+        return;
+      }
+
+      var xhr = this.xhrRequests[xhrId];
+      if (!xhr) {
+        // Maybe abortRequest was called...
+        return;
+      }
+
+      if (xhr.readyState >= 2 && xhr.onHeadersReceived) {
+        xhr.onHeadersReceived({
+          xhrId: xhrId
+        });
+        delete xhr.onHeadersReceived;
+        return;
+      } else if (xhr.readyState !== 4) {
+        return;
+      }
+
+      this.loadedXhrs[xhrId] = true;
+      delete this.xhrRequests[xhrId];
+
+      if (xhr.status === 0) {
+        //warn('Received xhr.status of 0');
+        return;
+      }
+
+      // TODO(mack): Support error callback
+      // This could be a 200 response to indicate that range requests are not
+      // supported
+      if (xhr.status !== xhr.expectedStatus) {
+        //warn('Received xhr.status of ' + xhr.status);
+        return;
+      }
+
+      var chunk = getArrayBuffer(xhr);
+      if (xhr.expectedStatus === 206) {
+        var rangeHeader = xhr.getResponseHeader('Content-Range');
+        var matches = /bytes (\d+)-(\d+)\/(\d+)/.exec(rangeHeader);
+        var begin = parseInt(matches[1], 10);
+        var end = parseInt(matches[2], 10) + 1;
+        var totalLength = parseInt(matches[3], 10);
+        xhr.onDone({
+          begin: begin,
+          end: end,
+          chunk: chunk,
+          totalLength: totalLength
+        });
+      } else {
+        xhr.onDone({
+          chunk: chunk,
+          totalLength: chunk.byteLength
+        });
+      }
+    },
+
+    hasPendingRequests: function NetworkManager_hasPendingRequests() {
+      for (var xhrId in this.xhrRequests) {
+        return true;
+      }
+      return false;
+    },
+
+    isPendingRequest: function NetworkManager_isPendingRequest(xhrId) {
+      return xhrId in this.xhrRequests;
+    },
+
+    abortXhrs: function NetworkManager_abortXhrs() {
+      for (var xhrId in this.xhrRequests) {
+        xhrId = xhrId | 0;
+        var xhr = this.xhrRequests[xhrId];
+        delete this.xhrRequests[xhrId];
+        xhr.abort();
+      }
+    },
+
+    abortRequest: function NetworkManager_abortRequest(xhrId) {
+      var xhr = this.xhrRequests[xhrId];
+      delete this.xhrRequests[xhrId];
+      xhr.abort();
+    }
+  };
+
+  return NetworkManager;
+})();
+
+
 
 var globalScope = (typeof window === 'undefined') ? this : window;
 
@@ -60,69 +241,7 @@ if (!globalScope.PDFJS) {
   globalScope.PDFJS = {};
 }
 
-// getPdf()
-// Convenience function to perform binary Ajax GET
-// Usage: getPdf('http://...', callback)
-//        getPdf({
-//                 url:String ,
-//                 [,progress:Function, error:Function]
-//               },
-//               callback)
-function getPdf(arg, callback) {
-  var params = arg;
-  if (typeof arg === 'string')
-    params = { url: arg };
-//#if !B2G
-  var xhr = new XMLHttpRequest();
-//#else
-//var xhr = new XMLHttpRequest({mozSystem: true});
-//#endif
-  xhr.open('GET', params.url);
 
-  var headers = params.headers;
-  if (headers) {
-    for (var property in headers) {
-      if (typeof headers[property] === 'undefined')
-        continue;
-
-      xhr.setRequestHeader(property, params.headers[property]);
-    }
-  }
-
-  xhr.mozResponseType = xhr.responseType = 'arraybuffer';
-
-  var protocol = params.url.substring(0, params.url.indexOf(':') + 1);
-  xhr.expected = (protocol === 'http:' || protocol === 'https:') ? 200 : 0;
-
-  if ('progress' in params)
-    xhr.onprogress = params.progress || undefined;
-
-  var calledErrorBack = false;
-
-  if ('error' in params) {
-    xhr.onerror = function errorBack() {
-      if (!calledErrorBack) {
-        calledErrorBack = true;
-        params.error();
-      }
-    };
-  }
-
-  xhr.onreadystatechange = function getPdfOnreadystatechange(e) {
-    if (xhr.readyState === 4) {
-      if (xhr.status === xhr.expected) {
-        var data = (xhr.mozResponseArrayBuffer || xhr.mozResponse ||
-                    xhr.responseArrayBuffer || xhr.response);
-        callback(data);
-      } else if (params.error && !calledErrorBack) {
-        calledErrorBack = true;
-        params.error(e);
-      }
-    }
-  };
-  xhr.send(null);
-}
-globalScope.PDFJS.getPdf = getPdf;
 globalScope.PDFJS.pdfBug = false;
 
 var Page = (function PageClosure() {
@@ -421,8 +540,8 @@ var PDFDocument = (function PDFDocumentClosure() {
   function init(stream, password) {
     assertWellFormed(stream.length > 0, 'stream must have data');
     this.stream = stream;
-    this.setup(password);
-    this.acroForm = this.catalog.catDict.get('AcroForm');
+    var xref = new XRef(this.stream, password);
+    this.xref = xref;
   }
 
   function find(stream, needle, limit, backwards) {
@@ -460,14 +579,20 @@ var PDFDocument = (function PDFDocumentClosure() {
   };
 
   PDFDocument.prototype = {
+    parse: function(recoveryMode) {
+      this.setup(recoveryMode);
+      this.acroForm = this.catalog.catDict.get('AcroForm');
+    },
+
     get linearization() {
       var length = this.stream.length;
       var linearization = false;
       if (length) {
         try {
           linearization = new Linearization(this.stream);
-          if (linearization.length != length)
+          if (linearization.length != length) {
             linearization = false;
+          }
         } catch (err) {
           warn('The linearization data is not available ' +
                'or unreadable pdf data is found');
@@ -547,14 +672,15 @@ var PDFDocument = (function PDFDocumentClosure() {
       }
       // May not be a PDF file, continue anyway.
     },
-    setup: function PDFDocument_setup(password) {
+    setup: function PDFDocument_setup(recoveryMode) {
       this.checkHeader();
-      var xref = new XRef(this.stream,
-                          this.startXRef,
-                          this.mainXRefEntriesOffset,
-                          password);
-      this.xref = xref;
-      this.catalog = new Catalog(xref);
+      var startXRef = this.startXRef;
+      // FIXME(mack): Clean up how this done
+      if (!this.xref.startXrefQueue) {
+        this.xref.startXrefQueue = [[startXRef]];
+      }
+      this.xref.parse(recoveryMode);
+      this.catalog = new Catalog(this.xref);
     },
     get numPages() {
       var linearization = this.linearization;
@@ -562,7 +688,7 @@ var PDFDocument = (function PDFDocumentClosure() {
       // shadow the prototype getter
       return shadow(this, 'numPages', num);
     },
-    getDocumentInfo: function PDFDocument_getDocumentInfo() {
+    get documentInfo() {
       var docInfo = {
         PDFFormatVersion: this.pdfFormatVersion,
         IsAcroFormPresent: !!this.acroForm
@@ -585,9 +711,9 @@ var PDFDocument = (function PDFDocumentClosure() {
           }
         }
       }
-      return shadow(this, 'getDocumentInfo', docInfo);
+      return shadow(this, 'documentInfo', docInfo);
     },
-    getFingerprint: function PDFDocument_getFingerprint() {
+    get fingerprint() {
       var xref = this.xref, fileID;
       if (xref.trailer.has('ID')) {
         fileID = '';
@@ -606,10 +732,16 @@ var PDFDocument = (function PDFDocumentClosure() {
         }
       }
 
-      return shadow(this, 'getFingerprint', fileID);
+      return shadow(this, 'fingerprint', fileID);
     },
-    getPage: function PDFDocument_getPage(n) {
-      return this.catalog.getPage(n);
+
+    // TODO(mack): Return promise
+    traversePages: function PDFDocument_traversePages() {
+      this.catalog.traversePages();
+    },
+
+    getPage: function PDFDocument_getPage(pageIndex) {
+      return this.catalog.getPage(pageIndex);
     }
   };
 
@@ -738,6 +870,23 @@ function shadow(obj, prop, value) {
   return value;
 }
 
+/**
+ * Copy all of the properties to the first object from subsequent objects
+ * and return the first object. It is in-order, so the later objects will
+ * will override properties of the same name in earlier objects
+ */
+function extend() {
+  assert(arguments.length >= 2, 'At least 2 objects needed to perform extend');
+  var obj = arguments[0];
+  for (var i = 1; i < arguments.length; ++i) {
+    var otherObj = arguments[i];
+    for (var prop in otherObj) {
+      obj[prop] = otherObj[prop];
+    }
+  }
+  return obj;
+}
+
 var PasswordException = (function PasswordExceptionClosure() {
   function PasswordException(msg, code) {
     this.name = 'PasswordException';
@@ -787,6 +936,45 @@ var MissingPDFException = (function MissingPDFExceptionClosure() {
 
   return MissingPDFException;
 })();
+
+var NotImplementedException = (function NotImplementedExceptionClosure() {
+  function NotImplementedException(msg) {
+    this.message = msg;
+  }
+
+  NotImplementedException.prototype = new Error();
+  NotImplementedException.prototype.name = 'NotImplementedException';
+  NotImplementedException.constructor = NotImplementedException;
+
+  return NotImplementedException;
+})();
+
+var MissingDataException = (function MissingDataExceptionClosure() {
+  function MissingDataException(begin, end) {
+    this.begin = begin;
+    this.end = end;
+    this.message = 'Missing data [begin, end)';
+  }
+
+  MissingDataException.prototype = new Error();
+  MissingDataException.prototype.name = 'MissingDataException';
+  MissingDataException.constructor = MissingDataException;
+
+  return MissingDataException;
+})();
+
+var XrefParseException = (function XrefParseExceptionClosure() {
+  function XrefParseException(msg) {
+    this.message = msg;
+  }
+
+  XrefParseException.prototype = new Error();
+  XrefParseException.prototype.name = 'XrefParseException';
+  XrefParseException.constructor = XrefParseException;
+
+  return XrefParseException;
+})();
+
 
 function bytesToString(bytes) {
   var str = '';
@@ -1023,6 +1211,13 @@ function stringToPDFString(str) {
 
 function stringToUTF8String(str) {
   return decodeURIComponent(escape(str));
+}
+
+function isEmptyObj(obj) {
+  for (var key in obj) {
+    return false;
+  }
+  return true;
 }
 
 function isBool(v) {
@@ -1368,9 +1563,10 @@ PDFJS.getDocument = function getDocument(source) {
 
   workerInitializedPromise = new PDFJS.Promise();
   workerReadyPromise = new PDFJS.Promise();
-  transport = new WorkerTransport(workerInitializedPromise, workerReadyPromise);
+  transport = new WorkerTransport(workerInitializedPromise,
+      workerReadyPromise, params);
   workerInitializedPromise.then(function transportInitialized() {
-    transport.fetchDocument(params);
+    transport.fetchDocument();
   });
   return workerReadyPromise;
 };
@@ -1418,10 +1614,7 @@ var PDFDocumentProxy = (function PDFDocumentProxyClosure() {
      * mapping named destinations to reference numbers.
      */
     getDestinations: function PDFDocumentProxy_getDestinations() {
-      var promise = new PDFJS.Promise();
-      var destinations = this.pdfInfo.destinations;
-      promise.resolve(destinations);
-      return promise;
+      return this.transport.getDestinations();
     },
     /**
      * @return {Promise} A promise that is resolved with an {array} that is a
@@ -1604,7 +1797,7 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
           }
 
           var gfx = new CanvasGraphics(params.canvasContext, this.commonObjs,
-            this.objs, params.textLayer, params.imageLayer);
+            this.objs, !this.pageInfo.disableTextLayer && params.textLayer, params.imageLayer);
           try {
             this.display(gfx, params.viewport, complete, continueCallback);
           } catch (e) {
@@ -1756,7 +1949,10 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
  * For internal use only.
  */
 var WorkerTransport = (function WorkerTransportClosure() {
-  function WorkerTransport(workerInitializedPromise, workerReadyPromise) {
+  function WorkerTransport(workerInitializedPromise, workerReadyPromise,
+      source) {
+    this.source = source;
+
     this.workerReadyPromise = workerReadyPromise;
     this.commonObjs = new PDFObjects();
 
@@ -1838,6 +2034,16 @@ var WorkerTransport = (function WorkerTransportClosure() {
       function WorkerTransport_setupMessageHandler(messageHandler) {
       this.messageHandler = messageHandler;
 
+      if (this.source.chunkedChromeLoading) {
+        window.addEventListener('message', function window_message(evt) {
+          this.messageHandler.send('SendDataRange', evt.data);
+        }.bind(this));
+      }
+
+      messageHandler.on('RequestDataRange', function transportDataRange(args) {
+        FirefoxCom.request('requestDataRange', args);
+      }, this);
+
       messageHandler.on('GetDoc', function transportDoc(data) {
         var pdfInfo = data.pdfInfo;
         var pdfDocument = new PDFDocumentProxy(pdfInfo, this);
@@ -1873,6 +2079,11 @@ var WorkerTransport = (function WorkerTransportClosure() {
         promise.resolve(page);
       }, this);
 
+      messageHandler.on('GetDestinations', function transportPage(data) {
+        var destinations = data.destinations;
+        this.destinationsPromise.resolve(destinations);
+      }, this);
+
       messageHandler.on('GetAnnotations', function transportAnnotations(data) {
         var annotations = data.annotations;
         var promise = this.pageCache[data.pageIndex].annotationsPromise;
@@ -1900,10 +2111,11 @@ var WorkerTransport = (function WorkerTransportClosure() {
             // At this point, only the font object is created but the font is
             // not yet attached to the DOM. This is done in `FontLoader.bind`.
             var font;
-            if ('error' in exportedData)
+            if ('error' in exportedData) {
               font = new ErrorFont(exportedData.error);
-            else
+            } else {
               font = new Font(exportedData);
+            }
             this.commonObjs.resolve(id, font);
             break;
           default:
@@ -1995,8 +2207,8 @@ var WorkerTransport = (function WorkerTransportClosure() {
       });
     },
 
-    fetchDocument: function WorkerTransport_fetchDocument(source) {
-      this.messageHandler.send('GetDocRequest', {source: source});
+    fetchDocument: function WorkerTransport_fetchDocument() {
+      this.messageHandler.send('GetDocRequest', {source: this.source});
     },
 
     getData: function WorkerTransport_getData(promise) {
@@ -2018,6 +2230,12 @@ var WorkerTransport = (function WorkerTransportClosure() {
     getAnnotations: function WorkerTransport_getAnnotations(pageIndex) {
       this.messageHandler.send('GetAnnotationsRequest',
         { pageIndex: pageIndex });
+    },
+
+    getDestinations: function WorkerTransport_getDestinations() {
+      this.destinationsPromise = new PDFJS.Promise();
+      this.messageHandler.send('GetDestinationsRequest');
+      return this.destinationsPromise;
     }
   };
   return WorkerTransport;
@@ -3465,10 +3683,10 @@ var CanvasGraphics = (function CanvasGraphicsClosure() {
     // Compatibility
 
     beginCompat: function CanvasGraphics_beginCompat() {
-      // TODO ignore undefined operators (should we do that anyway?)
+      TODO('ignore undefined operators (should we do that anyway?)');
     },
     endCompat: function CanvasGraphics_endCompat() {
-      // TODO stop ignoring undefined operators
+      TODO('stop ignoring undefined operators');
     },
 
     // Helper functions
@@ -3641,9 +3859,16 @@ var RefSet = (function RefSetClosure() {
 var Catalog = (function CatalogClosure() {
   function Catalog(xref) {
     this.xref = xref;
-    var obj = xref.getCatalogObj();
-    assertWellFormed(isDict(obj), 'catalog object is not a dictionary');
-    this.catDict = obj;
+    this.catDict = xref.getCatalogObj();
+    assertWellFormed(isDict(this.catDict),
+      'catalog object is not a dictionary');
+
+    this.traversePagesQueue = [{
+      pagesDict: this.toplevelPagesDict,
+      pos: 0
+    }];
+    this.pagePromises = [];
+    this.currPageIndex = 0;
   }
 
   Catalog.prototype = {
@@ -3747,27 +3972,6 @@ var Catalog = (function CatalogClosure() {
       // shadow the prototype getter
       return shadow(this, 'num', obj);
     },
-    traverseKids: function Catalog_traverseKids(pagesDict) {
-      var pageCache = this.pageCache;
-      var kids = pagesDict.get('Kids');
-      assertWellFormed(isArray(kids),
-                       'page dictionary kids object is not an array');
-      for (var i = 0, ii = kids.length; i < ii; ++i) {
-        var kid = kids[i];
-        assertWellFormed(isRef(kid),
-                        'page dictionary kid is not a reference');
-        var obj = this.xref.fetch(kid);
-        if (isDict(obj, 'Page') || (isDict(obj) && !obj.has('Kids'))) {
-          pageCache.push(new Page(this.xref, pageCache.length, obj, kid));
-        } else { // must be a child page dictionary
-          assertWellFormed(
-            isDict(obj),
-            'page dictionary kid reference points to wrong type of object'
-          );
-          this.traverseKids(obj);
-        }
-      }
-    },
     get destinations() {
       function fetchDestination(dest) {
         return isDict(dest) ? dest.get('D') : dest;
@@ -3784,6 +3988,7 @@ var Catalog = (function CatalogClosure() {
       if (nameDictionaryRef) {
         // reading simple destination dictionary
         obj = nameDictionaryRef;
+        // TODO(mack): use stream.ensureRanges() to ensure all ranges at once
         obj.forEach(function catalogForEach(key, value) {
           if (!value) return;
           dests[key] = fetchDestination(value);
@@ -3818,13 +4023,52 @@ var Catalog = (function CatalogClosure() {
       }
       return shadow(this, 'destinations', dests);
     },
-    getPage: function Catalog_getPage(n) {
-      var pageCache = this.pageCache;
-      if (!pageCache) {
-        pageCache = this.pageCache = [];
-        this.traverseKids(this.toplevelPagesDict);
+
+    getPage: function Catalog_getPage(pageIndex) {
+      if (!(pageIndex in this.pagePromises)) {
+        this.pagePromises[pageIndex] = new PDFJS.Promise();
       }
-      return this.pageCache[n - 1];
+      return this.pagePromises[pageIndex];
+    },
+
+    traversePages: function Catalog_traversePages() {
+      var queue = this.traversePagesQueue;
+      while (queue.length) {
+        var queueItem = queue[queue.length - 1];
+        var pagesDict = queueItem.pagesDict;
+
+        var kids = pagesDict.get('Kids');
+        assert(isArray(kids), 'page dictionary kids object is not an array');
+        if (queueItem.pos >= kids.length) {
+          queue.pop();
+          continue;
+        }
+        var kidRef = kids[queueItem.pos];
+        assert(isRef(kidRef), 'page dictionary kid is not a reference');
+
+        var kid = this.xref.fetch(kidRef);
+        if (isDict(kid, 'Page') || (isDict(kid) && !kid.has('Kids'))) {
+
+          var pageIndex = this.currPageIndex++;
+          var page = new Page(this.xref, pageIndex, kid, kidRef);
+          if (!(pageIndex in this.pagePromises)) {
+            this.pagePromises[pageIndex] = new PDFJS.Promise();
+          }
+          this.pagePromises[pageIndex].resolve(page);
+
+        } else { // must be a child page dictionary
+          assert(
+            isDict(kid),
+            'page dictionary kid reference points to wrong type of object'
+          );
+
+          queue.push({
+            pagesDict: kid,
+            pos: 0
+          });
+        }
+        ++queueItem.pos;
+      }
     }
   };
 
@@ -3832,75 +4076,53 @@ var Catalog = (function CatalogClosure() {
 })();
 
 var XRef = (function XRefClosure() {
-  function XRef(stream, startXRef, mainXRefEntriesOffset, password) {
+  function XRef(stream, password) {
+
     this.stream = stream;
     this.entries = [];
     this.xrefstms = {};
-    var trailerDict = this.readXRef(startXRef);
-    trailerDict.assignXref(this);
-    this.trailer = trailerDict;
     // prepare the XRef cache
     this.cache = [];
-
-    var encrypt = trailerDict.get('Encrypt');
-    if (encrypt) {
-      var ids = trailerDict.get('ID');
-      var fileId = (ids && ids.length) ? ids[0] : '';
-      this.encrypt = new CipherTransformFactory(encrypt, fileId, password);
-    }
-
-    // get the root dictionary (catalog) object
-    if (!(this.root = trailerDict.get('Root')))
-      error('Invalid root reference');
+    this.password = password;
+    this.startXrefQueue = undefined;
   }
 
   XRef.prototype = {
-    readXRefTable: function XRef_readXRefTable(parser) {
-      // Example of cross-reference table:
-      // xref
-      // 0 1                    <-- subsection header (first obj #, obj count)
-      // 0000000000 65535 f     <-- actual object (offset, generation #, f/n)
-      // 23 2                   <-- subsection header ... and so on ...
-      // 0000025518 00002 n
-      // 0000025635 00000 n
-      // trailer
-      // ...
-
-      // Outer loop is over subsection headers
-      var obj;
-      while (!isCmd(obj = parser.getObj(), 'trailer')) {
-        var first = obj,
-            count = parser.getObj();
-
-        if (!isInt(first) || !isInt(count))
-          error('Invalid XRef table: wrong types in subsection header');
-
-        // Inner loop is over objects themselves
-        for (var i = 0; i < count; i++) {
-          var entry = {};
-          entry.offset = parser.getObj();
-          entry.gen = parser.getObj();
-          var type = parser.getObj();
-
-          if (isCmd(type, 'f'))
-            entry.free = true;
-          else if (isCmd(type, 'n'))
-            entry.uncompressed = true;
-
-          // Validate entry obj
-          if (!isInt(entry.offset) || !isInt(entry.gen) ||
-              !(entry.free || entry.uncompressed)) {
-            error('Invalid entry in XRef subsection: ' + first + ', ' + count);
-          }
-
-          if (!this.entries[i + first])
-            this.entries[i + first] = entry;
-        }
+    parse: function(recoveryMode) {
+      var trailerDict;
+      if (!recoveryMode) {
+        trailerDict = this.readXRef();
+      } else {
+        warn('Indexing all PDF objects');
+        trailerDict = this.indexObjects();
+      }
+      trailerDict.assignXref(this);
+      this.trailer = trailerDict;
+      var encrypt = trailerDict.get('Encrypt');
+      if (encrypt) {
+        var ids = trailerDict.get('ID');
+        var fileId = (ids && ids.length) ? ids[0] : '';
+        this.encrypt = new CipherTransformFactory(
+            encrypt, fileId, this.password);
       }
 
-      // Sanity check: as per spec, first object must be free
-      if (this.entries[0] && !this.entries[0].free)
-        error('Invalid XRef table: unexpected first object');
+      // get the root dictionary (catalog) object
+      if (!(this.root = trailerDict.get('Root'))) {
+        error('Invalid root reference');
+      }
+    },
+
+    processXRefTable: function XRef_processXRefTable(parser) {
+      if (!this.tableState) {
+        this.tableState = {
+          pos: parser.lexer.stream.pos,
+          i: 0,
+          buf1: parser.buf1,
+          buf2: parser.buf2
+        };
+      }
+
+      var obj = this.readXRefTable(parser);
 
       // Sanity check
       if (!isCmd(obj, 'trailer'))
@@ -3919,27 +4141,140 @@ var XRef = (function XRefClosure() {
       if (!isDict(dict))
         error('Invalid XRef table: could not parse trailer dictionary');
 
+      delete this.tableState;
+
       return dict;
     },
+
+    readXRefTable: function XRef_readXRefTable(parser) {
+      // Example of cross-reference table:
+      // xref
+      // 0 1                    <-- subsection header (first obj #, obj count)
+      // 0000000000 65535 f     <-- actual object (offset, generation #, f/n)
+      // 23 2                   <-- subsection header ... and so on ...
+      // 0000025518 00002 n
+      // 0000025635 00000 n
+      // trailer
+      // ...
+
+      var stream = parser.lexer.stream;
+      stream.pos = this.tableState.pos;
+      parser.buf1 = this.tableState.buf1;
+      parser.buf2 = this.tableState.buf2;
+
+      // Outer loop is over subsection headers
+      var obj;
+
+      while (true) {
+        if (!('first' in this.tableState) || !('count' in this.tableState)) {
+          if (isCmd(obj = parser.getObj(), 'trailer')) {
+            break;
+          }
+          var obj2 = parser.getObj();
+          this.tableState.first = obj;
+          this.tableState.count = obj2;
+        }
+
+        var first = this.tableState.first;
+        var count = this.tableState.count;
+        if (!isInt(first) || !isInt(count))
+          error('Invalid XRef table: wrong types in subsection header');
+
+        // Inner loop is over objects themselves
+        for (var i = this.tableState.i; i < count; i++) {
+          this.tableState.pos = stream.pos;
+          this.tableState.i = i;
+          this.tableState.buf1 = parser.buf1;
+          this.tableState.buf2 = parser.buf2;
+
+          var entry = {};
+          entry.offset = parser.getObj();
+          entry.gen = parser.getObj();
+          var type = parser.getObj();
+
+          if (isCmd(type, 'f'))
+            entry.free = true;
+          else if (isCmd(type, 'n'))
+            entry.uncompressed = true;
+
+          // Validate entry obj
+          if (!isInt(entry.offset) || !isInt(entry.gen) ||
+              !(entry.free || entry.uncompressed)) {
+            console.log(entry.offset, entry.gen, entry.free,
+                entry.uncompressed);
+            error('Invalid entry in XRef subsection: ' + first + ', ' + count);
+          }
+
+          if (!this.entries[i + first])
+            this.entries[i + first] = entry;
+        }
+
+        this.tableState.i = 0;
+        this.tableState.pos = stream.pos;
+        this.tableState.buf1 = parser.buf1;
+        this.tableState.buf2 = parser.buf2;
+        delete this.tableState.first;
+        delete this.tableState.count;
+      }
+
+      // Sanity check: as per spec, first object must be free
+      if (this.entries[0] && !this.entries[0].free)
+        error('Invalid XRef table: unexpected first object');
+
+      return obj;
+    },
+
+    processXRefStream: function XRef_processXRefStream(stream) {
+      if (!this.streamState) {
+        var streamParameters = stream.parameters;
+        var byteWidths = streamParameters.get('W');
+        var range = streamParameters.get('Index');
+        if (!range) {
+          range = [0, streamParameters.get('Size')];
+        }
+
+        this.streamState = {
+          range: range,
+          byteWidths: byteWidths,
+          i: 0,
+          pos: stream.pos
+        };
+      }
+      this.readXRefStream(stream);
+
+      delete this.streamState;
+
+      return stream.parameters;
+    },
+
     readXRefStream: function XRef_readXRefStream(stream) {
-      var streamParameters = stream.parameters;
-      var byteWidths = streamParameters.get('W');
-      var range = streamParameters.get('Index');
-      if (!range)
-        range = [0, streamParameters.get('Size')];
+      //var streamParameters = stream.parameters;
+      //var byteWidths = streamParameters.get('W');
+      //var range = streamParameters.get('Index');
+      //if (!range)
+      //  range = [0, streamParameters.get('Size')];
       var i, j;
-      while (range.length > 0) {
-        var first = range[0], n = range[1];
+      stream.pos = this.streamState.pos;
+
+      while (this.streamState.range.length > 0) {
+        var first = this.streamState.range[0];
+        var n = this.streamState.range[1];
+
         if (!isInt(first) || !isInt(n))
           error('Invalid XRef range fields: ' + first + ', ' + n);
-        var typeFieldWidth = byteWidths[0];
-        var offsetFieldWidth = byteWidths[1];
-        var generationFieldWidth = byteWidths[2];
+
+        var typeFieldWidth = this.streamState.byteWidths[0];
+        var offsetFieldWidth = this.streamState.byteWidths[1];
+        var generationFieldWidth = this.streamState.byteWidths[2];
+
         if (!isInt(typeFieldWidth) || !isInt(offsetFieldWidth) ||
             !isInt(generationFieldWidth)) {
           error('Invalid XRef entry fields length: ' + first + ', ' + n);
         }
-        for (i = 0; i < n; ++i) {
+        for (i = this.streamState.i; i < n; ++i) {
+          this.streamState.i = i;
+          this.streamState.pos = stream.pos;
+
           var type = 0, offset = 0, generation = 0;
           for (j = 0; j < typeFieldWidth; ++j)
             type = (type << 8) | stream.getByte();
@@ -3968,9 +4303,12 @@ var XRef = (function XRefClosure() {
           if (!this.entries[first + i])
             this.entries[first + i] = entry;
         }
-        range.splice(0, 2);
+
+        this.streamState.i = 0;
+        this.streamState.pos = stream.pos;
+        this.streamState.range.splice(0, 2);
       }
-      return streamParameters;
+      //return streamParameters;
     },
     indexObjects: function XRef_indexObjects() {
       // Simple scan through the PDF content to find objects,
@@ -4058,7 +4396,8 @@ var XRef = (function XRefClosure() {
       }
       // reading XRef streams
       for (var i = 0, ii = xrefStms.length; i < ii; ++i) {
-          this.readXRef(xrefStms[i], true);
+        this.startXrefQueue.push([xrefStms[i], true]);
+        this.readXRef(/* recoveryMode */ true);
       }
       // finding main trailer
       var dict;
@@ -4082,64 +4421,87 @@ var XRef = (function XRefClosure() {
       // calling error() would reject worker with an UnknownErrorException.
       throw new InvalidPDFException('Invalid PDF structure');
     },
-    readXRef: function XRef_readXRef(startXRef, recoveryMode) {
+
+    readXRef: function XRef_readXRef(recoveryMode) {
       var stream = this.stream;
-      stream.pos = startXRef;
 
       try {
-        var parser = new Parser(new Lexer(stream), true, null);
-        var obj = parser.getObj();
-        var dict;
+        while (this.startXrefQueue.length) {
+          var startXRef = this.startXrefQueue[0][0];
 
-        // Get dictionary
-        if (isCmd(obj, 'xref')) {
-          // Parse end-of-file XRef
-          dict = this.readXRefTable(parser);
+          stream.pos = startXRef;
 
-          // Recursively get other XRefs 'XRefStm', if any
-          obj = dict.get('XRefStm');
-          if (isInt(obj)) {
-            var pos = obj;
-            // ignore previously loaded xref streams
-            // (possible infinite recursion)
-            if (!(pos in this.xrefstms)) {
-              this.xrefstms[pos] = 1;
-              this.readXRef(pos);
+          var parser = new Parser(new Lexer(stream), true, null);
+          var obj = parser.getObj();
+          var dict;
+
+          // Get dictionary
+          if (isCmd(obj, 'xref')) {
+
+            // Parse end-of-file XRef
+            //dict = this.readXRefTable(parser);
+            dict = this.processXRefTable(parser);
+            if (!this.topDict) {
+              this.topDict = dict;
             }
+
+            // Recursively get other XRefs 'XRefStm', if any
+            obj = dict.get('XRefStm');
+            if (isInt(obj)) {
+              var pos = obj;
+              // ignore previously loaded xref streams
+              // (possible infinite recursion)
+              if (!(pos in this.xrefstms)) {
+                this.xrefstms[pos] = 1;
+                this.startXrefQueue.push([pos]);
+              }
+            }
+          } else if (isInt(obj)) {
+
+            // Parse in-stream XRef
+            if (!isInt(parser.getObj()) ||
+                !isCmd(parser.getObj(), 'obj') ||
+                !isStream(obj = parser.getObj())) {
+              error('Invalid XRef stream');
+            }
+            //dict = this.readXRefStream(obj);
+            dict = this.processXRefStream(obj);
+            if (!this.topDict) {
+              this.topDict = dict;
+            }
+
+            if (!dict)
+              error('Failed to read XRef stream');
           }
-        } else if (isInt(obj)) {
-          // Parse in-stream XRef
-          if (!isInt(parser.getObj()) ||
-              !isCmd(parser.getObj(), 'obj') ||
-              !isStream(obj = parser.getObj())) {
-            error('Invalid XRef stream');
+
+          // Recursively get previous dictionary, if any
+          obj = dict.get('Prev');
+          if (isInt(obj)) {
+            this.startXrefQueue.push([obj, recoveryMode]);
+          } else if (isRef(obj)) {
+            // The spec says Prev must not be a reference, i.e. "/Prev NNN"
+            // This is a fallback for non-compliant PDFs, i.e. "/Prev NNN 0 R"
+            this.startXrefQueue.push([obj.num, recoveryMode]);
           }
-          dict = this.readXRefStream(obj);
-          if (!dict)
-            error('Failed to read XRef stream');
+
+          this.startXrefQueue.shift();
         }
 
-        // Recursively get previous dictionary, if any
-        obj = dict.get('Prev');
-        if (isInt(obj))
-          this.readXRef(obj, recoveryMode);
-        else if (isRef(obj)) {
-          // The spec says Prev must not be a reference, i.e. "/Prev NNN"
-          // This is a fallback for non-compliant PDFs, i.e. "/Prev NNN 0 R"
-          this.readXRef(obj.num, recoveryMode);
-        }
-
-        return dict;
+        return this.topDict;
       } catch (e) {
+        if (e instanceof MissingDataException) {
+          throw e;
+        }
+
         log('(while reading XRef): ' + e);
       }
 
-      if (recoveryMode)
+      if (recoveryMode) {
         return;
-
-      warn('Indexing all PDF objects');
-      return this.indexObjects();
+      }
+      throw new XrefParseException();
     },
+
     getEntry: function XRef_getEntry(i) {
       var e = this.entries[i];
       if (e === null)
@@ -14170,6 +14532,7 @@ var CipherTransformFactory = (function CipherTransformFactoryClosure() {
     var ownerPassword = stringToBytes(dict.get('O'));
     var userPassword = stringToBytes(dict.get('U'));
     var flags = dict.get('P');
+    this.disableTextLayer = !(flags & 16);
     var revision = dict.get('R');
     var encryptMetadata = algorithm == 4 &&  // meaningful when V is 4
       dict.get('EncryptMetadata') !== false; // makes true as default value
@@ -14429,6 +14792,10 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
           translated = this.translateFont(font, xref, resources,
                                           dependency);
         } catch (e) {
+          if (e instanceof MissingDataException) {
+            font.loadedName = undefined;
+            throw e;
+          }
           translated = new ErrorFont(e instanceof Error ? e.message : e);
         }
         font.translated = translated;
@@ -15457,7 +15824,7 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
       var lastChar = dict.get('LastChar') || maxCharIndex;
 
       var fontName = descriptor.get('FontName');
-      var baseFont = dict.get('BaseFont');
+      var baseFont = baseDict.get('BaseFont');
       // Some bad pdf's have a string as the font name.
       if (isString(fontName)) {
         fontName = new Name(fontName);
@@ -15467,6 +15834,13 @@ var PartialEvaluator = (function PartialEvaluatorClosure() {
       }
 
       var fontNameStr = fontName && fontName.name;
+      // 9.7.6.1
+      if (type.name == 'CIDFontType0') {
+        var cidEncoding = baseDict.get('Encoding');
+        if (isName(cidEncoding)) {
+          fontNameStr = fontNameStr + '-' + cidEncoding.name;
+        }
+      }
       var baseFontStr = baseFont && baseFont.name;
       if (fontNameStr !== baseFontStr) {
         warn('The FontDescriptor\'s FontName is "' + fontNameStr +
@@ -16012,7 +16386,6 @@ function mapPrivateUseChars(code) {
 }
 
 var FontLoader = {
-//#if !(MOZCENTRAL)
   loadingContext: {
     requests: [],
     nextRequestId: 0
@@ -16209,22 +16582,6 @@ var FontLoader = {
       document.body.appendChild(frame);
       /** Hack end */
   }
-//#else
-//bind: function fontLoaderBind(fonts, callback) {
-//  assert(!isWorker, 'bind() shall be called from main thread');
-//
-//  for (var i = 0, ii = fonts.length; i < ii; i++) {
-//    var font = fonts[i];
-//    if (font.attached)
-//      continue;
-//
-//    font.attached = true;
-//    font.bindDOM()
-//  }
-//
-//  setTimeout(callback);
-//}
-//#endif
 };
 
 var UnicodeRanges = [
@@ -18111,7 +18468,6 @@ var Font = (function FontClosure() {
         codeIndices.push(codes[n].code);
         ++end;
         ++n;
-        if (end === 0x10000) { break; }
       }
       ranges.push([start, end, codeIndices]);
     }
@@ -18122,20 +18478,15 @@ var Font = (function FontClosure() {
   function createCmapTable(glyphs, deltas) {
     var ranges = getRanges(glyphs);
 
-    var numTables = ranges[ranges.length - 1][1] > 0xFFFF ? 2 : 1;
+    var numTables = 1;
     var cmap = '\x00\x00' + // version
                string16(numTables) +  // numTables
                '\x00\x03' + // platformID
                '\x00\x01' + // encodingID
                string32(4 + numTables * 8); // start of the table record
 
-    for (var i = ranges.length - 1; i >= 0; --i) {
-      if (ranges[i][0] <= 0xFFFF) { break; }
-    }
-    var bmpLength = i + 1;
-
-    var trailingRangesCount = ranges[bmpLength - 1][1] < 0xFFFF ? 1 : 0;
-    var segCount = bmpLength + trailingRangesCount;
+    var trailingRangesCount = ranges[ranges.length - 1][1] < 0xFFFF ? 1 : 0;
+    var segCount = ranges.length + trailingRangesCount;
     var segCount2 = segCount * 2;
     var searchRange = getMaxPower2(segCount) * 2;
     var searchEntry = Math.log(segCount) / Math.log(2);
@@ -18150,7 +18501,7 @@ var Font = (function FontClosure() {
     var bias = 0;
 
     if (deltas) {
-      for (var i = 0, ii = bmpLength; i < ii; i++) {
+      for (var i = 0, ii = ranges.length; i < ii; i++) {
         var range = ranges[i];
         var start = range[0];
         var end = range[1];
@@ -18167,7 +18518,7 @@ var Font = (function FontClosure() {
           glyphsIds += string16(deltas[codes[j]]);
       }
     } else {
-      for (var i = 0, ii = bmpLength; i < ii; i++) {
+      for (var i = 0, ii = ranges.length; i < ii; i++) {
         var range = ranges[i];
         var start = range[0];
         var end = range[1];
@@ -18195,66 +18546,10 @@ var Font = (function FontClosure() {
                     endCount + '\x00\x00' + startCount +
                     idDeltas + idRangeOffsets + glyphsIds;
 
-    var format31012 = '';
-    var header31012 = '';
-    if (numTables > 1) {
-      cmap += '\x00\x03' + // platformID
-              '\x00\x0A' + // encodingID
-              string32(4 + numTables * 8 +
-                       4 + format314.length); // start of the table record
-      format31012 = '';
-      if (deltas) {
-        for (var i = 0, ii = ranges.length; i < ii; i++) {
-          var range = ranges[i];
-          var start = range[0];
-          var codes = range[2];
-          var code = deltas[codes[0]];
-          for (var j = 1, jj = codes.length; j < jj; ++j) {
-            if (deltas[codes[j]] !== deltas[codes[j - 1]] + 1) {
-              var end = range[0] + j - 1;
-              format31012 += string32(start) + // startCharCode
-                             string32(end) + // endCharCode
-                             string32(code); // startGlyphID
-              start = end + 1;
-              code = deltas[codes[j]];
-            }
-          }
-          format31012 += string32(start) + // startCharCode
-                         string32(range[1]) + // endCharCode
-                         string32(code); // startGlyphID
-        }
-      } else {
-        for (var i = 0, ii = ranges.length; i < ii; i++) {
-          var range = ranges[i];
-          var start = range[0];
-          var codes = range[2];
-          var code = codes[0];
-          for (var j = 1, jj = codes.length; j < jj; ++j) {
-            if (codes[j] !== codes[j - 1] + 1) {
-              var end = range[0] + j - 1;
-              format31012 += string32(start) + // startCharCode
-                             string32(end) + // endCharCode
-                             string32(code); // startGlyphID
-              start = end + 1;
-              code = codes[j];
-            }
-          }
-          format31012 += string32(start) + // startCharCode
-                         string32(range[1]) + // endCharCode
-                         string32(code); // startGlyphID
-        }
-      }
-      header31012 = '\x00\x0C' + // format
-                    '\x00\x00' + // reserved
-                    string32(format31012.length + 16) + // length
-                    '\x00\x00\x00\x00' + // language
-                    string32(format31012.length / 12); // nGroups
-    }
-
     return stringToArray(cmap +
                          '\x00\x04' + // format
                          string16(format314.length + 4) + // length
-                         format314 + header31012 + format31012);
+                         format314);
   }
 
   function validateOS2Table(os2) {
@@ -30307,7 +30602,13 @@ var Lexer = (function LexerClosure() {
         }
         stream.skip();
       }
-      var value = parseFloat(str);
+      // TODO(mack): gotta test this optimization
+      var value;
+      if (floating) {
+        value = parseFloat(str);
+      } else {
+        value = str | 0;
+      }
       if (isNaN(value))
         error('Invalid floating point number: ' + value);
       return value;
@@ -30492,6 +30793,7 @@ var Lexer = (function LexerClosure() {
           return Cmd.get(ch);
         // hex string or dict punctuation
         case '<':
+          var position = stream.pos;
           ch = stream.lookChar();
           if (ch == '<') {
             // dict punctuation
@@ -31017,6 +31319,7 @@ var Stream = (function StreamClosure() {
       return this.end - this.start;
     },
     getByte: function Stream_getByte() {
+      //throw new Error('getByte');
       if (this.pos >= this.end)
         return null;
       return this.bytes[this.pos++];
@@ -31024,6 +31327,7 @@ var Stream = (function StreamClosure() {
     // returns subarray of original buffer
     // should only be read
     getBytes: function Stream_getBytes(length) {
+      //throw new Error('getBytes');
       var bytes = this.bytes;
       var pos = this.pos;
       var strEnd = this.end;
@@ -31039,11 +31343,13 @@ var Stream = (function StreamClosure() {
       return bytes.subarray(pos, end);
     },
     lookChar: function Stream_lookChar() {
+      //throw new Error('lookChar');
       if (this.pos >= this.end)
         return null;
       return String.fromCharCode(this.bytes[this.pos]);
     },
     getChar: function Stream_getChar() {
+      //throw new Error('getChar');
       if (this.pos >= this.end)
         return null;
       return String.fromCharCode(this.bytes[this.pos++]);
@@ -33345,6 +33651,633 @@ var NullStream = (function NullStreamClosure() {
 })();
 
 
+var ChunkedStream = (function ChunkedStreamClosure() {
+  function ChunkedStream(length, chunkSize) {
+    this.bytes = new Uint8Array(length);
+    this.start = 0;
+    this.pos = 0;
+    this.end = length;
+    this.chunkSize = chunkSize;
+    this.loadedChunks = [];
+    this.numChunksLoaded = 0;
+    this.numChunks = Math.ceil(length / chunkSize);
+  }
+
+  // required methods for a stream. if a particular stream does not
+  // implement these, an error should be thrown
+  ChunkedStream.prototype = {
+
+    getMissingChunks: function ChunkedStream_getMissingChunks() {
+      var chunks = [];
+      for (var chunk = 0; chunk < this.numChunks; ++chunk) {
+        if (!(chunk in this.loadedChunks)) {
+          chunks.push(chunk);
+        }
+      }
+      return chunks;
+    },
+
+    allChunksLoaded: function ChunkedStream_allChunksLoaded() {
+      // TODO(mack): might want to use list of unloaded chunks to be safer...
+      return this.numChunksLoaded === this.numChunks;
+    },
+
+    onReceiveData: function(begin, chunk) {
+      var end = begin + chunk.byteLength;
+
+      assert(begin % this.chunkSize === 0, 'Bad begin offset: ' + begin);
+      // Using this.length is inaccurate here since this.start can be moved
+      // See ChunkedStream.moveStart()
+      var length = this.bytes.length;
+      assert(end % this.chunkSize === 0 || end === length,
+        'Bad end offset: ' + end);
+
+      this.bytes.set(new Uint8Array(chunk), begin);
+      var chunkSize = this.chunkSize;
+      var beginChunk = Math.floor(begin / chunkSize);
+      var endChunk = Math.floor((end - 1) / chunkSize) + 1;
+
+      for (var chunk = beginChunk; chunk < endChunk; ++chunk) {
+        if (!(chunk in this.loadedChunks)) {
+          this.loadedChunks[chunk] = true;
+          ++this.numChunksLoaded;
+        }
+      }
+    },
+
+    ensureRange: function ChunkedStream_ensureRange(begin, end) {
+      if (begin >= end) {
+        return;
+      }
+
+      var chunkSize = this.chunkSize;
+      var beginChunk = Math.floor(begin / chunkSize);
+      var endChunk = Math.floor((end - 1) / chunkSize) + 1;
+      for (var chunk = beginChunk; chunk < endChunk; ++chunk) {
+        if (!(chunk in this.loadedChunks)) {
+          throw new MissingDataException(begin, end);
+        }
+      }
+    },
+
+    nextEmptyChunk: function ChunkedStream_nextEmptyChunk(beginChunk) {
+      for (var chunk = beginChunk; chunk < this.numChunks; ++chunk) {
+        if (!(chunk in this.loadedChunks)) {
+          return chunk;
+        }
+      }
+      // Wrap around to beginning
+      for (var chunk = 0; chunk < beginChunk; ++chunk) {
+        if (!(chunk in this.loadedChunks)) {
+          return chunk;
+        }
+      }
+      return null;
+    },
+
+    hasChunk: function ChunkedStream_hasChunk(chunk) {
+      return chunk in this.loadedChunks;
+    },
+
+    get length() {
+      return this.end - this.start;
+    },
+
+    getByte: function ChunkedStream_getByte() {
+      var pos = this.pos;
+      if (pos >= this.end) {
+        return null;
+      }
+      this.ensureRange(pos, pos + 1);
+      return this.bytes[this.pos++];
+    },
+
+    // returns subarray of original buffer
+    // should only be read
+    getBytes: function ChunkedStream_getBytes(length) {
+      var bytes = this.bytes;
+      var pos = this.pos;
+      var strEnd = this.end;
+
+      if (!length) {
+        this.ensureRange(pos, strEnd);
+        return bytes.subarray(pos, strEnd);
+      }
+
+      var end = pos + length;
+      if (end > strEnd)
+        end = strEnd;
+      this.ensureRange(pos, end);
+
+      this.pos = end;
+      return bytes.subarray(pos, end);
+    },
+
+    // TODO(mack): make getBytes call this
+    // returns subarray of original buffer
+    // should only be read
+    getByteRange: function ChunkedStream_getBytes(begin, end) {
+      this.ensureRange(begin, end);
+      return this.bytes.subarray(begin, end);
+    },
+
+    lookChar: function ChunkedStream_lookChar() {
+      var pos = this.pos;
+      if (pos >= this.end)
+        return null;
+      this.ensureRange(pos, pos + 1);
+      return String.fromCharCode(this.bytes[pos]);
+    },
+
+    getChar: function ChunkedStream_getChar() {
+      var pos = this.pos;
+      if (pos >= this.end)
+        return null;
+      this.ensureRange(pos, pos + 1);
+      return String.fromCharCode(this.bytes[this.pos++]);
+    },
+
+    skip: function ChunkedStream_skip(n) {
+      if (!n)
+        n = 1;
+      this.pos += n;
+    },
+
+    reset: function ChunkedStream_reset() {
+      this.pos = this.start;
+    },
+
+    moveStart: function ChunkedStream_moveStart() {
+      this.start = this.pos;
+    },
+
+    makeSubStream: function ChunkedStream_makeSubStream(start, length, dict) {
+      function ChunkedStreamSubstream() {}
+      ChunkedStreamSubstream.prototype = Object.create(this);
+      var subStream = new ChunkedStreamSubstream();
+      subStream.pos = subStream.start = start;
+      subStream.end = start + length || this.end;
+      subStream.dict = dict;
+      return subStream;
+    },
+
+    isStream: true
+  };
+
+  return ChunkedStream;
+})();
+
+var ChunkedStreamManager = (function ChunkedStreamManagerClosure() {
+
+  // FIXME(mack): support http headers
+  function ChunkedStreamManager(stream, url, args) {
+    this.stream = stream;
+    this.chunkSize = stream.chunkSize;
+    this.length = stream.length;
+    this.url = url;
+
+    // Prefill stream with fully loaded chunks
+    if (args.loadedChunk && isInt(args.loadedBegin)) {
+      var loadedBegin = args.loadedBegin;
+      var actualChunk = args.loadedChunk;
+      var actualEnd = loadedBegin + actualChunk.byteLength;
+      var loadedEnd = Math.floor(actualEnd / this.chunkSize) * this.chunkSize;
+      var loadedChunk = actualChunk.subarray(loadedBegin, loadedEnd);
+      this.stream.onReceiveData(loadedBegin, loadedChunk);
+    }
+
+    if (args.fetchByChrome) {
+      args.msgHandler.on('SendDataRange', this.onReceiveData.bind(this));
+      this.sendRequest = function streamManager_sendRequest(begin, end) {
+        args.msgHandler.send(
+          'RequestDataRange',
+          { begin: begin, end: end }
+        );
+      };
+    } else {
+
+      var getXhr = function getXhr() {
+        return new XMLHttpRequest();
+      };
+      this.networkManager = new NetworkManager(this.url, { getXhr: getXhr });
+      this.sendRequest = function streamManager_sendRequest(begin, end) {
+        this.networkManager.requestRange(
+          begin, end, this.onReceiveData.bind(this));
+      };
+    }
+
+    this.currRequestId = 0;
+
+    this.chunksNeededByRequest = {};
+    this.requestsByChunk = {};
+    this.callbacksByRequest = {};
+
+    this.loadedStream = new PDFJS.Promise();
+  }
+
+  ChunkedStreamManager.prototype = {
+
+    onLoadedStream: function ChunkedStreamManager_getLoadedStream() {
+      return this.loadedStream;
+    },
+
+    requestAllChunks: function ChunkedStreamManager_requestAllChunks() {
+      var missingChunks = this.stream.getMissingChunks();
+      var chunksToRequest = [];
+      for (var i = 0; i < missingChunks.length; ++i) {
+        var chunk = missingChunks[i];
+        if (!(chunk in this.requestsByChunk)) {
+          this.requestsByChunk[chunk] = [];
+          chunksToRequest.push(chunk);
+        }
+      }
+      var groupedChunks = this.groupChunks(chunksToRequest);
+      for (var i = 0; i < groupedChunks.length; ++i) {
+        var groupedChunk = groupedChunks[i];
+        var begin = groupedChunk.beginChunk * this.chunkSize;
+        var end = groupedChunk.endChunk * this.chunkSize;
+        this.sendRequest(begin, end);
+      }
+    },
+
+    getStream: function ChunkedStreamManager_getStream() {
+      return this.stream;
+    },
+
+    requestRange: function ChunkedStreamManager_requestRange(
+                      begin, end, callback) {
+
+      end = Math.min(end, this.length);
+
+      var beginChunk = this.getBeginChunk(begin);
+      var endChunk = this.getEndChunk(end);
+
+      var requestId = this.currRequestId++;
+
+      var chunksNeeded;
+      this.chunksNeededByRequest[requestId] = chunksNeeded = {};
+      for (var chunk = beginChunk; chunk < endChunk; ++chunk) {
+        if (!this.stream.hasChunk(chunk)) {
+          chunksNeeded[chunk] = true;
+        }
+      }
+
+      if (isEmptyObj(chunksNeeded)) {
+        callback();
+        return;
+      }
+
+      this.callbacksByRequest[requestId] = callback;
+
+      var chunksToRequest = [];
+      for (var chunk in chunksNeeded) {
+        chunk = chunk | 0;
+        if (!(chunk in this.requestsByChunk)) {
+          this.requestsByChunk[chunk] = [];
+          chunksToRequest.push(chunk);
+        }
+        this.requestsByChunk[chunk].push(requestId);
+      }
+
+      if (!chunksToRequest.length) {
+        return;
+      }
+
+      var groupedChunksToRequest = this.groupChunks(chunksToRequest);
+
+      for (var i = 0; i < groupedChunksToRequest.length; ++i) {
+        var groupedChunk = groupedChunksToRequest[i];
+        var begin = groupedChunk.beginChunk * this.chunkSize;
+        var end = groupedChunk.endChunk * this.chunkSize;
+        this.sendRequest(begin, end);
+      }
+    },
+
+    groupChunks: function ChunkedStreamManager_groupChunks(chunks) {
+      var groupedChunks = [];
+      var beginChunk;
+      var prevChunk;
+      for (var i = 0; i < chunks.length; ++i) {
+        var chunk = chunks[i];
+
+        if (!beginChunk) {
+          beginChunk = chunk;
+        }
+
+        if (prevChunk && prevChunk + 1 !== chunk) {
+          groupedChunks.push({
+            beginChunk: beginChunk, endChunk: prevChunk + 1});
+          beginChunk = chunk;
+        }
+        if (i + 1 === chunks.length) {
+          groupedChunks.push({
+            beginChunk: beginChunk, endChunk: chunk + 1});
+        }
+
+        prevChunk = chunk;
+      }
+      return groupedChunks;
+    },
+
+    onReceiveData: function ChunkedStreamManager_onReceiveData(args) {
+      // TODO(mack): Support error callback
+      // TODO(mack): validate if view around ArrayBuffer is actually needeed
+      var chunk = args.chunk;
+      var begin = args.begin;
+      var end = begin + chunk.byteLength;
+
+      var beginChunk = this.getBeginChunk(begin);
+      var endChunk = this.getEndChunk(end);
+
+      this.stream.onReceiveData(begin, chunk);
+      if (this.stream.allChunksLoaded()) {
+        this.loadedStream.resolve(this.stream);
+      }
+
+      var loadedRequests = [];
+      for (var chunk = beginChunk; chunk < endChunk; ++chunk) {
+
+        var requestIds = this.requestsByChunk[chunk];
+        delete this.requestsByChunk[chunk];
+
+        for (var i = 0; i < requestIds.length; ++i) {
+          var requestId = requestIds[i];
+          var chunksNeeded = this.chunksNeededByRequest[requestId];
+          if (chunk in chunksNeeded) {
+            delete chunksNeeded[chunk];
+          }
+
+          if (!isEmptyObj(chunksNeeded)) {
+            continue;
+          }
+
+          loadedRequests.push(requestId);
+        }
+      }
+
+      // TODO(mack): maybe this logic should be NetworkPdf.loadPdf...
+      // TODO(mack): could also just check if
+      // networkManager.hasPendingRequests()... except that's not accessible
+      // for firefox extension
+      if (isEmptyObj(this.requestsByChunk)) {
+        var nextEmptyChunk;
+        if (this.stream.numChunksLoaded === 1) {
+          // This is a special optimization so that after fetching the first
+          // chunk, rather than fetching the second chunk, we fetch the last
+          // chunk.
+          var lastChunk = this.stream.numChunks - 1;
+          if (!this.stream.hasChunk(lastChunk)) {
+            nextEmptyChunk = lastChunk;
+          }
+        } else {
+          nextEmptyChunk = this.stream.nextEmptyChunk(endChunk);
+        }
+        if (isInt(nextEmptyChunk)) {
+          var nextEmptyByte = nextEmptyChunk * this.chunkSize;
+          this.requestRange(nextEmptyByte, nextEmptyByte + this.chunkSize,
+              function() {});
+        }
+      }
+
+      for (var i = 0; i < loadedRequests.length; ++i) {
+        var requestId = loadedRequests[i];
+        var callback = this.callbacksByRequest[requestId];
+        delete this.callbacksByRequest[requestId];
+        callback();
+      }
+    },
+
+    getBeginChunk: function ChunkedStreamManager_getBeginChunk(begin) {
+      var chunk = Math.floor(begin / this.chunkSize);
+      return chunk;
+    },
+
+    getEndChunk: function ChunkedStreamManager_getEndChunk(end) {
+      if (end % this.chunkSize === 0) {
+        return end / this.chunkSize;
+      }
+
+      // 0 -> 0
+      // 1 -> 1
+      // 99 -> 1
+      // 100 -> 1
+      // 101 -> 2
+      var chunk = Math.floor((end - 1) / this.chunkSize) + 1;
+      return chunk;
+    }
+  };
+
+  return ChunkedStreamManager;
+})();
+
+
+
+var BasePdfManager = (function BasePdfManagerClosure() {
+  function BasePdfManager() {
+    throw new Error('Cannot initialize BaseManagerManager');
+  }
+
+  BasePdfManager.prototype = {
+    onLoadedStream: function BasePdfManager_onLoadedStream() {
+      throw new NotImplementedException();
+    },
+
+    ensureModel: function BasePdfManager_ensureModel(prop) {
+      var args = [].slice.call(arguments);
+      args.unshift(this.pdfModel);
+      return this.ensure.apply(this, args);
+    },
+
+    ensureXref: function BasePdfManager_ensureXref(prop) {
+      var args = [].slice.call(arguments);
+      args.unshift(this.pdfModel.xref);
+      return this.ensure.apply(this, args);
+    },
+
+    ensureCatalog: function BasePdfManager_ensureCatalog(prop) {
+      var args = [].slice.call(arguments);
+      args.unshift(this.pdfModel.catalog);
+      return this.ensure.apply(this, args);
+    },
+
+    ensurePage: function BasePdfManager_ensurePage(pageIndex, prop) {
+      var promise = new PDFJS.Promise(pageIndex);
+      var args = [].slice.call(arguments, 1);
+      this.pdfModel.getPage(pageIndex).then(
+        function(pdfPage) {
+          args.unshift(pdfPage);
+          this.ensure.apply(this, args).then(
+            promise.resolve.bind(promise),
+            promise.reject.bind(promise)
+          );
+        }.bind(this),
+        promise.reject.bind(promise)
+      );
+      return promise;
+    },
+
+    ensure: function BasePdfManager_ensure(obj, prop) {
+      return new NotImplementedException();
+    },
+
+    requestAllChunks: function BasePdfManager_requestAllChunks() {}
+  };
+
+  return BasePdfManager;
+})();
+
+var LocalPdfManager = (function LocalPdfManagerClosure() {
+  function LocalPdfManager(data, password) {
+    var stream = new Stream(data);
+    this.pdfModel = new PDFDocument(stream, password);
+    this.loadedStream = new PDFJS.Promise();
+    this.loadedStream.resolve(stream);
+  }
+
+  LocalPdfManager.prototype = Object.create(BasePdfManager.prototype);
+  extend(LocalPdfManager.prototype, {
+
+    onLoadedStream: function LocalPdfManager_getLoadedStream() {
+      return this.loadedStream;
+    },
+
+    ensure: function LocalPdfManager_ensure(obj, prop) {
+      var promise = new PDFJS.Promise();
+      var result;
+      var value = obj[prop];
+      try {
+        if (typeof(value) === 'function') {
+          var args = [].slice.call(arguments, 2);
+          result = value.apply(obj, args);
+        } else {
+          result = value;
+        }
+        promise.resolve(result);
+      } catch (e) {
+        console.log(e.stack);
+        promise.reject(e);
+      }
+      return promise;
+    }
+  });
+
+  return LocalPdfManager;
+})();
+
+var NetworkPdfManager = (function NetworkPdfManagerClosure() {
+
+  var CHUNK_SIZE = 64000;
+
+  function NetworkPdfManager(args, msgHandler) {
+
+    this.chunkSize = CHUNK_SIZE;
+    this.pdfUrl = args.url;
+    this.httpHeaders = args.httpHeaders;
+    this.pdfLength = args.totalLength;
+    this.stream = new ChunkedStream(this.pdfLength, this.chunkSize);
+    this.pdfModel = new PDFDocument(this.stream, args.password);
+    this.msgHandler = msgHandler;
+
+    var params = {
+      msgHandler: msgHandler,
+      fetchByChrome: args.chunkedChromeLoading,
+      loadedBegin: args.loadedBegin,
+      loadedChunk: args.loadedChunk
+    };
+    this.streamManager = new ChunkedStreamManager(
+        this.stream, this.pdfUrl, params);
+  }
+
+  NetworkPdfManager.prototype = Object.create(BasePdfManager.prototype);
+  extend(NetworkPdfManager.prototype, {
+
+    onLoadedStream: function NetworkPdfManager_getLoadedStream() {
+      return this.streamManager.onLoadedStream();
+    },
+
+    ensure: function NetworkPdfManager_ensure(obj, prop) {
+      var promise = new PDFJS.Promise();
+      var args = [].slice.call(arguments);
+      args.unshift(promise);
+      this.ensureHelper.apply(this, args);
+      return promise;
+    },
+
+    ensureHelper: function NetworkPdfManager_ensureHelper(promise, obj, prop) {
+      try {
+        var result;
+        var value = obj[prop];
+        if (typeof(value) === 'function') {
+          var args = [].slice.call(arguments, 3);
+          result = value.apply(obj, args);
+        } else {
+          result = value;
+        }
+        promise.resolve(result);
+      } catch(e) {
+        if (!(e instanceof MissingDataException)) {
+          console.log(e.stack);
+          promise.reject(e);
+          return;
+        }
+
+        var allArgs = [].slice.call(arguments);
+        this.loadPdf(e.begin, e.end).then(function() {
+          this.ensureHelper.apply(this, allArgs);
+        }.bind(this));
+      }
+    },
+
+    loadPdf: function NetworkPdfManager_loadPdf(begin, end) {
+      var promise = new PDFJS.Promise();
+      this.streamManager.requestRange(begin, end, function loadMorePdf() {
+        this.msgHandler.send('DocProgress', {
+          // TODO(mack): consider sending these params through args from
+          // StreamManager
+          loaded: this.stream.numChunksLoaded * this.chunkSize,
+          // FIXME(mack): look into where lengthComputable is set
+          // e.g. code used to be: lengthComputable ? evt.total : void(0)
+          total: this.pdfLength
+        });
+
+        promise.resolve();
+      }.bind(this));
+
+      return promise;
+    },
+
+    requestAllChunks: function NetworkPdfManager_requestAllChunks() {
+      this.streamManager.requestAllChunks();
+    }
+  });
+
+  return NetworkPdfManager;
+
+  //function networkPdfError(evt) {
+  //  if (evt.target.status == 404) {
+  //    var exception = new MissingPDFException(
+  //        'Missing PDF "' + this.pdfUrl + '".');
+  //    this.msgHandler.send('MissingPDF', {
+  //      exception: exception
+  //    });
+  //  } else {
+  //    this.msgHandler.send('DocError', 'Unexpected server response (' +
+  //        evt.target.status + ') while retrieving PDF "' +
+  //        this.pdfUrl + '".');
+  //  }
+  //}
+})();
+
+
+
+var START_TIME = (new Date()).getTime() / 1000;
+function timeLog() {
+  var elapsedTime = (new Date()).getTime() / 1000 - START_TIME;
+  var args = [].slice.call(arguments);
+  args.unshift(elapsedTime);
+  console.log.apply(console, args);
+}
+
 function MessageHandler(name, comObj) {
   this.name = name;
   this.comObj = comObj;
@@ -33371,13 +34304,16 @@ function MessageHandler(name, comObj) {
   }];
 
   comObj.onmessage = function messageHandlerComObjOnMessage(event) {
+
+    var handler;
+
     var data = event.data;
     if (data.isReply) {
       var callbackId = data.callbackId;
       if (data.callbackId in callbacks) {
         var callback = callbacks[callbackId];
         delete callbacks[callbackId];
-        callback(data.data);
+        handler = callback.bind(undefined, data.data);
       } else {
         error('Cannot resolve callback ' + callbackId);
       }
@@ -33392,13 +34328,19 @@ function MessageHandler(name, comObj) {
             data: resolvedData
           });
         });
-        action[0].call(action[1], data.data, promise);
+        handler = action[0].bind(action[1], data.data, promise);
       } else {
-        action[0].call(action[1], data.data);
+        handler = action[0].bind(action[1], data.data);
       }
     } else {
       error('Unkown action from worker: ' + data.action);
     }
+
+    if (!handler) {
+      return;
+    }
+
+    handler();
   };
 }
 
@@ -33432,57 +34374,94 @@ MessageHandler.prototype = {
 
 var WorkerMessageHandler = {
   setup: function wphSetup(handler) {
-    var pdfModel = null;
+    var pdfManager;
 
-    function loadDocument(pdfData, pdfModelSource) {
-      // Create only the model of the PDFDoc, which is enough for
-      // processing the content of the pdf.
-      var pdfPassword = pdfModelSource.password;
-      try {
-        pdfModel = new PDFDocument(new Stream(pdfData), pdfPassword);
-      } catch (e) {
-        if (e instanceof PasswordException) {
-          if (e.code === 'needpassword') {
-            handler.send('NeedPassword', {
-              exception: e
-            });
-          } else if (e.code === 'incorrectpassword') {
-            handler.send('IncorrectPassword', {
-              exception: e
-            });
-          }
+    function loadDocument(recoveryMode) {
+      var loadDocumentPromise = new PDFJS.Promise();
 
-          return;
-        } else if (e instanceof InvalidPDFException) {
-          handler.send('InvalidPDF', {
-            exception: e
-          });
+      var parseSuccess = function parseSuccess() {
+        var numPagesPromise = pdfManager.ensureModel('numPages');
+        var fingerprintPromise = pdfManager.ensureModel('fingerprint');
+        var outlinePromise = pdfManager.ensureCatalog('documentOutline');
+        var infoPromise = pdfManager.ensureModel('documentInfo');
+        var metadataPromise = pdfManager.ensureCatalog('metadata');
+        var encryptedPromise = pdfManager.ensureXref('encrypt');
+        PDFJS.Promise.all([numPagesPromise, fingerprintPromise, outlinePromise,
+          infoPromise, metadataPromise, encryptedPromise]).then(
+            function onDocReady(results) {
 
-          return;
-        } else if (e instanceof MissingPDFException) {
-          handler.send('MissingPDF', {
-            exception: e
-          });
-
-          return;
-        } else {
-          handler.send('UnknownError', {
-            exception: new UnknownErrorException(e.message, e.toString())
-          });
-
-          return;
-        }
-      }
-      var doc = {
-        numPages: pdfModel.numPages,
-        fingerprint: pdfModel.getFingerprint(),
-        destinations: pdfModel.catalog.destinations,
-        outline: pdfModel.catalog.documentOutline,
-        info: pdfModel.getDocumentInfo(),
-        metadata: pdfModel.catalog.metadata,
-        encrypted: !!pdfModel.xref.encrypt
+          var doc = {
+            numPages: results[0],
+            fingerprint: results[1],
+            outline: results[2],
+            info: results[3],
+            metadata: results[4],
+            encrypted: !!results[5]
+          };
+          loadDocumentPromise.resolve(doc);
+        });
       };
-      handler.send('GetDoc', {pdfInfo: doc});
+
+      var parseFailure = function parseFailure(e) {
+        loadDocumentPromise.reject(e);
+      };
+
+      pdfManager.ensureModel('parse', recoveryMode).then(
+          parseSuccess, parseFailure);
+
+      return loadDocumentPromise;
+    }
+
+    function getPdfManager(data) {
+      var pdfManagerPromise = new PDFJS.Promise();
+
+      var source = data.source;
+      if (source.data) {
+        pdfManager = new LocalPdfManager(source.data, source.password);
+        pdfManagerPromise.resolve();
+        return pdfManagerPromise;
+      } else if (source.chunkedChromeLoading) {
+        pdfManager = new NetworkPdfManager(source, handler);
+        pdfManagerPromise.resolve();
+        return pdfManagerPromise;
+      }
+
+      var networkManager = new NetworkManager(source.url, {
+        httpHeaders: source.httpHeaders
+      });
+      networkManager.requestFull({
+        onHeadersReceived: function onHeadersReceieved(args) {
+          var fullRequestXhrId = args.xhrId;
+
+          // This is done in onHeadersReceived because we want to
+          // guarantee that the full request is sent first in
+          // case that the server will only allow max 1 request
+          // (eg. pay-wall)
+          networkManager.requestRange(0, 1, function getPdfLength(args) {
+            // The full request is already finished, in which case we do not
+            // need to fetch chunks
+            if (!networkManager.isPendingRequest(fullRequestXhrId)) {
+              return;
+            }
+
+            // TODO(mack): In this case, we should access the data that
+            // is already fetched from the full request so we do not refetch
+            // the same data
+            networkManager.abortRequest(fullRequestXhrId);
+
+            source.totalLength = args.totalLength;
+            pdfManager = new NetworkPdfManager(source, handler);
+            pdfManagerPromise.resolve(pdfManager);
+          });
+        },
+        onDone: function onDone(args) {
+          // the data is array, instantiating directly from it
+          pdfManager = new LocalPdfManager(args.chunk, source.password);
+          pdfManagerPromise.resolve();
+        }
+      });
+
+      return pdfManagerPromise;
     }
 
     handler.on('test', function wphSetupTest(data) {
@@ -33502,81 +34481,132 @@ var WorkerMessageHandler = {
     });
 
     handler.on('GetDocRequest', function wphSetupDoc(data) {
-      var source = data.source;
-      if (source.data) {
-        // the data is array, instantiating directly from it
-        loadDocument(source.data, source);
-        return;
-      }
 
-      PDFJS.getPdf(
-        {
-          url: source.url,
-          progress: function getPDFProgress(evt) {
-            handler.send('DocProgress', {
-              loaded: evt.loaded,
-              total: evt.lengthComputable ? evt.total : void(0)
+      var onSuccess = function(doc) {
+        handler.send('GetDoc', { pdfInfo: doc });
+        pdfManager.ensureModel('traversePages');
+      };
+
+      var onFailure = function(e) {
+        if (e instanceof PasswordException) {
+          if (e.code === 'needpassword') {
+            handler.send('NeedPassword', {
+              exception: e
             });
-          },
-          error: function getPDFError(e) {
-            if (e.target.status == 404) {
-              handler.send('MissingPDF', {
-                exception: new MissingPDFException(
-                  'Missing PDF \"' + source.url + '\".')});
-            } else {
-              handler.send('DocError', 'Unexpected server response (' +
-                            e.target.status + ') while retrieving PDF \"' +
-                            source.url + '\".');
-            }
-          },
-          headers: source.httpHeaders
-        },
-        function getPDFLoad(data) {
-          loadDocument(data, source);
+          } else if (e.code === 'incorrectpassword') {
+            handler.send('IncorrectPassword', {
+              exception: e
+            });
+          }
+        } else if (e instanceof InvalidPDFException) {
+          handler.send('InvalidPDF', {
+            exception: e
+          });
+        } else if (e instanceof MissingPDFException) {
+          handler.send('MissingPDF', {
+            exception: e
+          });
+        } else {
+          handler.send('UnknownError', {
+            exception: new UnknownErrorException(e.message, e.toString())
+          });
+        }
+      };
+
+      getPdfManager(data).then(function() {
+        loadDocument(false).then(onSuccess, function(ex) {
+
+          // Try again with recoveryMode == true
+          if (!(ex instanceof XrefParseException)) {
+            onFailure(ex);
+            return;
+          }
+
+          pdfManager.onLoadedStream().then(function() {
+            loadDocument(true).then(onSuccess, onFailure);
+          });
         });
+      });
     });
 
     handler.on('GetPageRequest', function wphSetupGetPage(data) {
-      var pageNumber = data.pageIndex + 1;
-      var pdfPage = pdfModel.getPage(pageNumber);
-      var page = {
-        pageIndex: data.pageIndex,
-        rotate: pdfPage.rotate,
-        ref: pdfPage.ref,
-        view: pdfPage.view
-      };
-      handler.send('GetPage', {pageInfo: page});
+      var pageIndex = data.pageIndex;
+      var rotatePromise = pdfManager.ensurePage(pageIndex, 'rotate');
+      var refPromise = pdfManager.ensurePage(pageIndex, 'ref');
+      var viewPromise = pdfManager.ensurePage(pageIndex, 'view');
+      var encryptPromise = pdfManager.ensureXref('encrypt');
+
+      PDFJS.Promise.all([rotatePromise, refPromise, viewPromise,
+          encryptPromise]).then(function(results) {
+
+        var encrypt = results[4];
+        var page = {
+          pageIndex: data.pageIndex,
+          rotate: results[0],
+          ref: results[1],
+          view: results[2],
+          // This assumes encrypt will not throw MissingDataException
+          disableTextLayer: encrypt ? encrypt.disableTextLayer : false
+        };
+
+        handler.send('GetPage', { pageInfo: page });
+      });
+    });
+
+    handler.on('GetDestinationsRequest', function wphSetupGetDestinations() {
+      pdfManager.ensureCatalog('destinations').then(function(destinations) {
+        handler.send('GetDestinations', { destinations: destinations });
+      });
     });
 
     handler.on('GetData', function wphSetupGetData(data, promise) {
-      promise.resolve(pdfModel.stream.bytes);
+      pdfManager.requestAllChunks();
+      pdfManager.onLoadedStream().then(function(stream) {
+        promise.resolve(stream.bytes);
+      });
     });
 
     handler.on('GetAnnotationsRequest', function wphSetupGetAnnotations(data) {
-      var pdfPage = pdfModel.getPage(data.pageIndex + 1);
-      handler.send('GetAnnotations', {
-        pageIndex: data.pageIndex,
-        annotations: pdfPage.getAnnotations()
+      pdfManager.ensurePage(data.pageIndex, 'getAnnotations')
+          .then(function(annotations) {
+        handler.send('GetAnnotations', {
+          pageIndex: data.pageIndex,
+          annotations: annotations
+        });
       });
     });
 
     handler.on('RenderPageRequest', function wphSetupRenderPage(data) {
       var pageNum = data.pageIndex + 1;
-
-      // The following code does quite the same as
-      // Page.prototype.startRendering, but stops at one point and sends the
-      // result back to the main thread.
-      var gfx = new CanvasGraphics(null);
-
+      // TODO(mack): The start time should really be after we get the page...
       var start = Date.now();
-
       var dependency = [];
-      var operatorList = null;
-      try {
-        var page = pdfModel.getPage(pageNum);
-        // Pre compile the pdf page and fetch the fonts/images.
-        operatorList = page.getOperatorList(handler, dependency);
-      } catch (e) {
+      // Pre compile the pdf page and fetch the fonts/images.
+      pdfManager.ensurePage(data.pageIndex, 'getOperatorList', handler,
+          dependency).then(function(operatorList) {
+
+        // The following code does quite the same as
+        // Page.prototype.startRendering, but stops at one point and sends the
+        // result back to the main thread.
+
+        log('page=%d - getOperatorList: time=%dms, len=%d', pageNum,
+            Date.now() - start, operatorList.fnArray.length);
+
+        // Filter the dependecies for fonts.
+        var fonts = {};
+        for (var i = 0, ii = dependency.length; i < ii; i++) {
+          var dep = dependency[i];
+          if (dep.indexOf('g_font_') === 0) {
+            fonts[dep] = true;
+          }
+        }
+        handler.send('RenderPage', {
+          pageIndex: data.pageIndex,
+          operatorList: operatorList,
+          depFonts: Object.keys(fonts)
+        });
+      }, function(e) {
+
         var minimumStackMessage =
             'worker.js: while trying to getPage() and getOperatorList()';
 
@@ -33604,43 +34634,21 @@ var WorkerMessageHandler = {
           pageNum: pageNum,
           error: wrappedException
         });
-        return;
-      }
-
-      log('page=%d - getOperatorList: time=%dms, len=%d', pageNum,
-                              Date.now() - start, operatorList.fnArray.length);
-
-      // Filter the dependecies for fonts.
-      var fonts = {};
-      for (var i = 0, ii = dependency.length; i < ii; i++) {
-        var dep = dependency[i];
-        if (dep.indexOf('g_font_') === 0) {
-          fonts[dep] = true;
-        }
-      }
-      handler.send('RenderPage', {
-        pageIndex: data.pageIndex,
-        operatorList: operatorList,
-        depFonts: Object.keys(fonts)
       });
     }, this);
 
     handler.on('GetTextContent', function wphExtractText(data, promise) {
       var pageNum = data.pageIndex + 1;
+      // TODO(mack): The start time should really be after we get the page...
       var start = Date.now();
-
-      var textContent = '';
-      try {
-        var page = pdfModel.getPage(pageNum);
-        textContent = page.extractTextContent();
+      pdfManager.ensurePage(data.pageIndex,
+          'extractTextContent').then(function(textContent) {
         promise.resolve(textContent);
-      } catch (e) {
+        log('text indexing: page=%d - time=%dms', pageNum, Date.now() - start);
+      }, function (e) {
         // Skip errored pages
         promise.reject(e);
-      }
-
-      log('text indexing: page=%d - time=%dms',
-                      pageNum, Date.now() - start);
+      });
     });
   }
 };
@@ -38084,4 +39092,5 @@ var JpegImage = (function jpegImage() {
 
 
 }).call((typeof window === 'undefined') ? this : window);
+
 
