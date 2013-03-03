@@ -134,6 +134,7 @@ pandora.ui.folders = function() {
                         var listData;
                         Ox.Request.clearCache(); // fixme: remove
                         pandora.site.sectionFolders[ui.section][i].showBrowser = !pandora.site.sectionFolders[ui.section][i].showBrowser;
+                        this.options({tooltip: data.value ? 'Done' : 'Manage Favorite ' + folderItems});
                         if (pandora.site.sectionFolders[ui.section][i].showBrowser) {
                             pandora.$ui.folderList.favorite.replaceWith(
                                 pandora.$ui.folderBrowser.favorite = pandora.ui.folderBrowser('favorite')
@@ -180,6 +181,7 @@ pandora.ui.folders = function() {
                         var listData;
                         Ox.Request.clearCache(); // fixme: remove
                         pandora.site.sectionFolders[ui.section][i].showBrowser = !pandora.site.sectionFolders[ui.section][i].showBrowser;
+                        this.options({tooltip: data.value ? 'Done' : 'Manage Favorite ' + folderItems});
                         if (pandora.site.sectionFolders[ui.section][i].showBrowser) {
                             pandora.$ui.folderList.featured.replaceWith(
                                 pandora.$ui.folderBrowser.featured = pandora.ui.folderBrowser('featured')
