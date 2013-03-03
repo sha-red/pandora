@@ -222,7 +222,7 @@
         {
             "id": "duration",
             "title": "Duration",
-            "type": "float",
+            "type": "time",
             "columnWidth": 90,
             "format": {"type": "duration", "args": [0, "short"]},
             "sort": true
