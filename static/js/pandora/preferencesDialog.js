@@ -129,6 +129,16 @@ pandora.ui.preferencesDialog = function() {
         $dialog = Ox.Dialog({
             buttons: [
                 Ox.Button({
+                    id: 'signout',
+                    title: 'Sign Out...'
+                }).bindEvent({
+                    click: function() {
+                        $dialog.close();
+                        pandora.UI.set({page: 'signout'});
+                    }
+                }),
+                {},
+                Ox.Button({
                     id: 'done',
                     title: 'Done'
                 }).bindEvent({
