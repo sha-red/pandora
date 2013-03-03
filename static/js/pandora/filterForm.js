@@ -45,11 +45,11 @@ pandora.ui.filterForm = function(list) {
                             id: list.id,
                             query: data.query
                         }, function(result) {
-                            if (pandora.user.ui.updateAdvancedFind) {
+                            if (pandora.user.ui.updateAdvancedFindResults) {
                                 that.updateResults(data.query);
                             }
                         });
-                    } else if (pandora.user.ui.updateAdvancedFind) {
+                    } else if (pandora.user.ui.updateAdvancedFindResults) {
                         that.updateResults();
                     }
                     that.triggerEvent('change', data);

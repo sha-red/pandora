@@ -49,7 +49,7 @@ pandora.ui.listDialog = function(section) {
                 if (
                     pandora.user.ui.section == 'items'
                     && data.selected != 'query'
-                    && !pandora.user.ui.updateAdvancedFind
+                    && !pandora.user.ui.updateAdvancedFindResults
                 ) {
                     pandora.$ui.filterForm.updateResults();
                 }
@@ -107,7 +107,7 @@ pandora.ui.listDialog = function(section) {
                         click: function() {
                             if (
                                 pandora.$ui.listDialogTabPanel.selected() == 'query'
-                                && !pandora.user.ui.updateAdvancedFind
+                                && !pandora.user.ui.updateAdvancedFindResults
                             ) {
                                 pandora.$ui.filterForm.updateResults();
                             }
@@ -129,13 +129,13 @@ pandora.ui.listDialog = function(section) {
 
         $updateCheckbox = Ox.Checkbox({
                 title: 'Update Results in the Background',
-                value: pandora.user.ui.updateAdvancedFind
+                value: pandora.user.ui.updateAdvancedFindResults
             })
             .css({float: 'left', margin: '4px'})
             [section == 'query' ? 'show' : 'hide']()
             .bindEvent({
                 change: function(data) {
-                    pandora.UI.set({updateAdvancedFind: data.value});
+                    pandora.UI.set({updateAdvancedFindResults: data.value});
                     data.value && pandora.$ui.filterForm.updateResults();
                 }
             });

@@ -35,7 +35,7 @@ pandora.ui.filterDialog = function(list) {
                                         })
                                         .reloadList();
                                 });
-                            } else if (!pandora.user.ui.updateAdvancedFind) {
+                            } else if (!pandora.user.ui.updateAdvancedFindResults) {
                                 pandora.$ui.filterForm.updateResults();
                             }
                             that.close();
@@ -55,12 +55,12 @@ pandora.ui.filterDialog = function(list) {
 
         $updateCheckbox = Ox.Checkbox({
                 title: 'Update Results in the Background',
-                value: pandora.user.ui.updateAdvancedFind
+                value: pandora.user.ui.updateAdvancedFindResults
             })
             .css({float: 'left', margin: '4px'})
             .bindEvent({
                 change: function(data) {
-                    pandora.UI.set({updateAdvancedFind: data.value});
+                    pandora.UI.set({updateAdvancedFindResults: data.value});
                     data.value && pandora.$ui.filterForm.updateResults();
                 }
             });

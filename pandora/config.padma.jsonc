@@ -700,7 +700,7 @@
             "sidebarSize": 256,
             "textPositions": {},
             "theme": "oxlight",
-            "updateAdvancedFind": false,
+            "updateAdvancedFindResults": false,
             "videoMuted": false,
             "videoPoints": {},
             "videoResolution": 240,

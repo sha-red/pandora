@@ -3,6 +3,7 @@
 
     You can edit this file.
 */
+
 {
     "additionalSort": [
         {"key": "director", "operator": "+"},
@@ -796,7 +797,7 @@
             "sidebarSize": 256,
             "textPositions": {},
             "theme": "oxmedium",
-            "updateAdvancedFind": false,
+            "updateAdvancedFindResults": false,
             "videoMuted": false,
             "videoPoints": {},
             "videoResolution": 240,
