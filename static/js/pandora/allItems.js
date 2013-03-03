@@ -22,9 +22,9 @@ pandora.ui.allItems = function() {
                 }
             })
             .bindEvent({
-                pandora_find: function() {
-                    that[pandora.user.ui._list ? 'removeClass' : 'addClass']('OxSelected');
-                }
+                pandora_find: updateSelected,
+                pandora_section: updateSelected,
+                pandora_text: updateSelected
             }),
         $icon = $('<img>')
             .attr({src: '/static/png/icon.png'})
@@ -92,7 +92,6 @@ pandora.ui.allItems = function() {
                 tooltip: 'HTML',
                 type: 'image'
             })
-            .css({opacity: 0.25})
             .appendTo(that);
         Ox.Button({
                 style: 'symbol',
@@ -100,8 +99,22 @@ pandora.ui.allItems = function() {
                 tooltip: 'Help',
                 type: 'image'
             })
-            .css({opacity: 0.25})
+            .bindEvent({
+                click: function() {
+                    pandora.UI.set({page: 'help'});
+                }
+            })
             .appendTo(that);
+    }
+
+    updateSelected();
+
+    function updateSelected() {
+        that[
+            (pandora.user.ui.section == 'items' && pandora.user.ui._list)
+            || (pandora.user.ui.section == 'texts' && pandora.user.ui.text)
+            ? 'removeClass' : 'addClass'
+        ]('OxSelected');
     }
 
     that.update = function(items) {

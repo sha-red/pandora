@@ -94,7 +94,7 @@ pandora.ui.folderList = function(id) {
                             width: '10px',
                             height: '10px',
                             padding: '3px',
-                            opacity: ui.section == 'items' && data.user == pandora.user.username ? 1 : 0.25
+                            opacity: ui.section == 'texts' || data.user == pandora.user.username ? 1 : 0.25
                         });
                 },
                 id: 'type',
