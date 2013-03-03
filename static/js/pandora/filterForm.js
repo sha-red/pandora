@@ -45,29 +45,39 @@ pandora.ui.filterForm = function(list) {
                             id: list.id,
                             query: data.query
                         }, function(result) {
-                            Ox.Request.clearCache(list.id);
-                            pandora.$ui.list
-                                .bindEventOnce({
-                                    init: function(data) {
-                                        pandora.$ui.folderList[
-                                            pandora.getListData().folder
-                                        ].value(list.id, 'items', data.items);
-                                    }
-                                })
-                                .reloadList();
-                            pandora.$ui.filters.forEach(function($filter) {
-                                $filter.reloadList();
-                            });
+                            if (pandora.user.ui.updateAdvancedFind) {
+                                that.updateResults(data.query);
+                            }
                         });
-                    } else {
-                        Ox.Log('FIND', 'change form', data.query, pandora.user.ui.find)
-                        pandora.UI.set({find: Ox.clone(data.query, true)});
-                        pandora.$ui.findElement.updateElement();
+                    } else if (pandora.user.ui.updateAdvancedFind) {
+                        that.updateResults();
                     }
+                    that.triggerEvent('change', data);
                 }
             })
         );
+        that.getList = that.$filter.getList;
     });
+    that.updateResults = function(query) {
+        if (list) {
+            Ox.Request.clearCache(list.id);
+            pandora.$ui.list
+                .bindEventOnce({
+                    init: function(data) {
+                        pandora.$ui.folderList[
+                            pandora.getListData().folder
+                        ].value(list.id, 'query', query);
+                    }
+                })
+                .reloadList();
+            pandora.$ui.filters.forEach(function($filter) {
+                $filter.reloadList();
+            });
+        } else {
+            pandora.UI.set({find: Ox.clone(that.$filter.options('query'), true)});
+            pandora.$ui.findElement.updateElement();
+        }
+    };
     return that;
 };
 

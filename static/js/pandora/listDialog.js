@@ -5,7 +5,6 @@
 pandora.ui.listDialog = function(section) {
 
     section = section || 'general';
-    var width = getWidth(section);
     var listData = pandora.getListData(),
         tabs = [].concat([
             {id: 'general', title: 'General'},
@@ -15,6 +14,7 @@ pandora.ui.listDialog = function(section) {
             : []
         ),
         ui = pandora.user.ui,
+        width = getWidth(section),
         folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
         folderItem = folderItems.slice(0, -1);
     Ox.getObjectById(tabs, section).selected = true;
@@ -26,7 +26,12 @@ pandora.ui.listDialog = function(section) {
                 } else if (id == 'icon') {
                     return pandora.$ui.listIconPanel = pandora.ui.listIconPanel(listData);
                 } else if (id == 'query') {
-                    return pandora.$ui.filterForm = pandora.ui.filterForm(listData);
+                    return pandora.$ui.filterForm = pandora.ui.filterForm(listData)
+                        .bindEvent({
+                            change: function(data) {
+                                listData.query = data.query;
+                            }
+                        });
                 }
             },
             tabs: tabs
@@ -40,6 +45,14 @@ pandora.ui.listDialog = function(section) {
                 });
                 $dialog.setSize(width, 312);
                 $findElement[data.selected == 'icon' ? 'show' : 'hide']();
+                $updateCheckbox[data.selected == 'query' ? 'show' : 'hide']();
+                if (
+                    pandora.user.ui.section == 'items'
+                    && data.selected != 'query'
+                    && !pandora.user.ui.updateAdvancedFind
+                ) {
+                    pandora.$ui.filterForm.updateResults();
+                }
             }
         });
     pandora.$ui.listDialogTabPanel.find('.OxButtonGroup').css({width: '256px'});
@@ -80,35 +93,55 @@ pandora.ui.listDialog = function(section) {
                 })
             ],
         })
-        .css({float: 'right', margin: '4px', align: 'right'});
-    if (section != 'icon') {
-        $findElement.hide();
-    }
-    $findElement.appendTo(pandora.$ui.listDialogTabPanel.children('.OxBar'));
+        .css({float: 'right', margin: '4px', align: 'right'})
+        [section == 'icon' ? 'show' : 'hide']()
+        .appendTo(pandora.$ui.listDialogTabPanel.children('.OxBar')),
 
-    var $dialog = Ox.Dialog({
-        buttons: [
-            Ox.Button({
-                    id: 'done',
-                    title: 'Done'
-                })
-                .bindEvent({
-                    click: function() {
-                        $dialog.close();
-                    }
-                })
-        ],
-        closeButton: true,
-        content: pandora.$ui.listDialogTabPanel,
-        maxWidth: width,
-        minHeight: 312,
-        minWidth: width,
-        height: 312,
-        // keys: {enter: 'save', escape: 'cancel'},
-        removeOnClose: true,
-        title: folderItem + ' &mdash; ' + Ox.encodeHTMLEntities(listData.name),
-        width: width
-    });
+        $dialog = Ox.Dialog({
+            buttons: [
+                Ox.Button({
+                        id: 'done',
+                        title: 'Done'
+                    })
+                    .bindEvent({
+                        click: function() {
+                            if (
+                                pandora.$ui.listDialogTabPanel.selected() == 'query'
+                                && !pandora.user.ui.updateAdvancedFind
+                            ) {
+                                pandora.$ui.filterForm.updateResults();
+                            }
+                            $dialog.close();
+                        }
+                    })
+            ],
+            closeButton: true,
+            content: pandora.$ui.listDialogTabPanel,
+            maxWidth: width,
+            minHeight: 312,
+            minWidth: width,
+            height: 312,
+            // keys: {enter: 'save', escape: 'cancel'},
+            removeOnClose: true,
+            title: folderItem + ' &mdash; ' + Ox.encodeHTMLEntities(listData.name),
+            width: width
+        }),
+
+        $updateCheckbox = Ox.Checkbox({
+                title: 'Update Results in the Background',
+                value: pandora.user.ui.updateAdvancedFind
+            })
+            .css({float: 'left', margin: '4px'})
+            [section == 'query' ? 'show' : 'hide']()
+            .bindEvent({
+                change: function(data) {
+                    pandora.UI.set({updateAdvancedFind: data.value});
+                    data.value && pandora.$ui.filterForm.updateResults();
+                }
+            });
+
+    $($updateCheckbox.find('.OxButton')[0]).css({margin: 0});
+    $($dialog.$element.find('.OxBar')[2]).append($updateCheckbox);
 
     function getWidth(section) {
         return section == 'general' ? 496
