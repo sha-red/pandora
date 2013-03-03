@@ -72,7 +72,7 @@ pandora.ui.allItems = function() {
         }, function(result) {
             that.update(result.data.items);
         });
-    } else if (pandora.user.ui.section == 'text') {
+    } else if (pandora.user.ui.section == 'texts') {
         Ox.Button({
                 style: 'symbol',
                 title: 'file',

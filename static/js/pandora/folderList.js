@@ -76,7 +76,9 @@ pandora.ui.folderList = function(id) {
             },
             {
                 clickable: function(data) {
-                    return data.type == 'smart' || data.user == pandora.user.username;
+                    return pandora.user.ui.section == 'items' && (
+                        data.type == 'smart' || data.user == pandora.user.username
+                    );
                 },
                 format: function(value, data) {
                     return $('<img>')

@@ -1236,6 +1236,7 @@ pandora.resizeFolders = function() {
             pandora.user.ui.section == 'items' ? 96 : 32
         ),
         columnWidth = {};
+    Ox.print('WIDTH:::', width)
     columnWidth.user = Math.round(width * 0.4);
     columnWidth.name = width - columnWidth.user;
     pandora.$ui.allItems.resizeElement(width - 8);
