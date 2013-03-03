@@ -33,6 +33,8 @@ def parse_time(t):
         parse time string and return seconds as float
     '''
     s = 0.0
+    if isinstance(t, float) or isinstance(t, int):
+        return s
     p = t.split(':')
     for i in range(len(p)):
         _p = p[i]
