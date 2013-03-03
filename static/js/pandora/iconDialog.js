@@ -1,6 +1,6 @@
 'use strict';
 
-pandora.iconDialog = function(options) {
+pandora.ui.iconDialog = function(options) {
 
     var options = Ox.extend({
                 closeButton: false,
