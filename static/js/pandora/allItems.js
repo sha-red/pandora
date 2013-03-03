@@ -59,7 +59,7 @@ pandora.ui.allItems = function() {
         Ox.Button({
                 style: 'symbol',
                 title: 'add',
-                tooltip: canAddItems ? 'Add ' + pandora.site.itemName.singular : ''
+                tooltip: canAddItems ? 'Add ' + pandora.site.itemName.singular : '',
                 type: 'image'
             })
             .css({opacity: canAddItems ? 1 : 0.25})
