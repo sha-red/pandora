@@ -142,6 +142,9 @@ pandora.ui.list = function() {
                         )['format' + Ox.toTitleCase(format.type)].apply(
                             this, [data[sortKey]].concat(format.args || [])
                         );
+                        if (sortKey == 'rightslevel') {
+                            info.css({width: '96px'});
+                        }
                     } else {
                         info = data[sortKey];
                     }
@@ -197,6 +200,9 @@ pandora.ui.list = function() {
                         )['format' + Ox.toTitleCase(format.type)].apply(
                             this, [data[sortKey]].concat(format.args || [])
                         );
+                        if (sortKey == 'rightslevel') {
+                            info.css({width: '96px'});
+                        }
                     } else {
                         info = data[sortKey];
                     }
@@ -279,6 +285,9 @@ pandora.ui.list = function() {
                         )['format' + Ox.toTitleCase(format.type)].apply(
                             this, [data[sortKey]].concat(format.args || [])
                         );
+                        if (sortKey == 'rightslevel') {
+                            info.css({width: '96px'});
+                        }
                     } else {
                         info = data[sortKey];
                     }
