@@ -75,24 +75,31 @@ pandora.ui.folderBrowserList = function(id) {
                     format: function(value, data) {
                         return $('<img>')
                             .attr({
-                                src: Ox.UI.getImageURL(value == 'smart' ? 'symbolFind' : value == 'pdf' ? 'symbolFiles' : value == 'html' ? 'symbolFile' : 'symbolClick')
+                                src: Ox.UI.getImageURL(
+                                    value == 'static' ? 'symbolClick'
+                                    : value == 'smart' ? 'symbolFind'
+                                    : value == 'html' ? 'symbolFile'
+                                    : 'symbolBook'
+                                )
                             })
                             .css({
                                 width: '10px',
                                 height: '10px',
                                 padding: '3px',
-                                opacity: data.user == pandora.user.username ? 1 : 0.25
+                                opacity: pandora.user.ui.section == 'items' && data.user == pandora.user.username ? 1 : 0.25
                             });
                     },
                     id: 'type',
                     operator: '+',
                     titleImage: 'edit',
                     tooltip: function(data) {
-                        return data.type == 'smart'
+                        return data.type == 'static'
+                            ? (data.user == pandora.user.username ? 'Edit Default View' : 'Default View: ...')
+                            : data.type == 'smart'
                             ? (data.user == pandora.user.username ? 'Edit Query' : 'Show Query')
-                            : (data.user == pandora.user.username ? 'Edit Default View' : 'Default View: ...');
+                            : data.type.toUpperCase();
                     },
-                    visible: ui.section == 'items',
+                    visible: true,
                     width: 16
                 },
                 {

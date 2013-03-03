@@ -37,12 +37,13 @@ pandora.ui.allItems = function() {
             overflow: 'hidden',
             whiteSpace: 'nowrap'
         })
-        .html(pandora.user.ui.section == 'items' ? 'All ' + pandora.site.itemName.plural
-            : pandora.site.site.name + ' ' + Ox.toTitleCase(pandora.user.ui.section))
+        .html(
+            pandora.user.ui.section == 'items'
+            ? 'All ' + pandora.site.itemName.plural
+            : pandora.site.site.name + ' ' + Ox.toTitleCase(pandora.user.ui.section)
+        )
         .appendTo(that),
-    $items,
-    $clickButton,
-    $uploadButton;
+    $items;
 
     if (pandora.user.ui.section == 'items') {
         $items = $('<div>')
@@ -53,14 +54,14 @@ pandora.ui.allItems = function() {
                 textAlign: 'right'
             })
             .appendTo(that);
-        $clickButton = Ox.Button({
+        Ox.Button({
                 style: 'symbol',
                 title: 'click',
                 type: 'image'
             })
             .css({opacity: 0.25})
             .appendTo(that);
-        $uploadButton = Ox.Button({
+        Ox.Button({
                 style: 'symbol',
                 title: 'upload',
                 type: 'image'
@@ -71,6 +72,21 @@ pandora.ui.allItems = function() {
         }, function(result) {
             that.update(result.data.items);
         });
+    } else if (pandora.user.ui.section == 'text') {
+        Ox.Button({
+                style: 'symbol',
+                title: 'file',
+                tooltip: 'HTML',
+                type: 'image'
+            })
+            .appendTo(that);
+        Ox.Button({
+                style: 'symbol',
+                title: 'help',
+                tooltip: 'Help',
+                type: 'image'
+            })
+            .appendTo(that);
     }
 
     that.update = function(items) {

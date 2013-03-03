@@ -45,7 +45,7 @@ pandora.ui.folderList = function(id) {
                 visible: id == 'favorite',
                 // fixme: user and name are set to the same width here,
                 // but resizeFolders will set them to different widths
-                width: ui.sidebarWidth - 96
+                width: ui.sidebarWidth - (ui.section == 'items' ? 96 : 48)
             },
             {
                 editable: function(data) {
@@ -64,14 +64,14 @@ pandora.ui.folderList = function(id) {
                     return Ox.decodeHTMLEntities(value);
                 },
                 visible: id != 'favorite',
-                width: ui.sidebarWidth - 96
+                width: ui.sidebarWidth - (ui.section == 'items' ? 96 : 48)
             },
             {
                 align: 'right',
                 id: 'items',
                 format: {type: 'number'},
                 operator: '-',
-                visible: true,
+                visible: ui.section == 'items',
                 width: 48
             },
             {
@@ -81,21 +81,28 @@ pandora.ui.folderList = function(id) {
                 format: function(value, data) {
                     return $('<img>')
                         .attr({
-                            src: Ox.UI.getImageURL(value == 'smart' ? 'symbolFind' : value == 'pdf' ? 'symbolBook' : value == 'html' ? 'symbolFile' : 'symbolClick')
+                            src: Ox.UI.getImageURL(
+                                value == 'static' ? 'symbolClick'
+                                : value == 'smart' ? 'symbolFind'
+                                : value == 'html' ? 'symbolFile'
+                                : 'symbolBook'
+                            )
                         })
                         .css({
                             width: '10px',
                             height: '10px',
                             padding: '3px',
-                            opacity: data.user == pandora.user.username ? 1 : 0.25
+                            opacity: pandora.user.ui.section == 'items' && data.user == pandora.user.username ? 1 : 0.25
                         });
                 },
                 id: 'type',
                 operator: '+',
                 tooltip: function(data) {
-                    return data.type == 'smart'
+                    return data.type == 'static'
+                        ? (data.user == pandora.user.username ? 'Edit Default View' : 'Default View: ...')
+                        : data.type == 'smart'
                         ? (data.user == pandora.user.username ? 'Edit Query' : 'Show Query')
-                        : (data.user == pandora.user.username ? 'Edit Default View' : 'Default View: ...');
+                        : data.type.toUpperCase();
                 },
                 visible: true,
                 width: 16
