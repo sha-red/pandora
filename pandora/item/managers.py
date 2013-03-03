@@ -229,12 +229,12 @@ def parseConditions(conditions, operator, user):
         if 'conditions' in condition:
             q = parseConditions(condition['conditions'],
                              condition.get('operator', '&'), user)
-            if isinstance(q, list):
-                conn += q
-            elif q:
-                conn.append(q)
         else:
-            conn.append(parseCondition(condition, user))
+            q = parseCondition(condition, user)
+        if isinstance(q, list):
+            conn += q
+        elif q:
+            conn.append(q)
     if conn:
         if operator == '|':
             q = conn[0]
