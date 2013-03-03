@@ -1237,7 +1237,7 @@ pandora.resizeFolders = function() {
             pandora.user.ui.section == 'items' ? 96 : 48
         ),
         userColumnWidth = Math.round(columnWidth * 0.4),
-        nameColumnWidth = columnWidth - userWidth;
+        nameColumnWidth = columnWidth - userColumnWidth;
     pandora.$ui.allItems.resizeElement(columnWidth - 8);
     Ox.forEach(pandora.$ui.folderList, function($list, id) {
         var pos = Ox.getIndexById(pandora.site.sectionFolders[pandora.user.ui.section], id);
