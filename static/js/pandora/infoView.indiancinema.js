@@ -131,6 +131,8 @@ pandora.ui.infoView = function(data) {
 
         $imdb,
 
+        $links,
+
         $descriptions,
 
         $statistics = $('<div>')
@@ -233,6 +235,31 @@ pandora.ui.infoView = function(data) {
 
     if (canEdit) {
         updateIMDb();
+    }
+
+    // Encyclopedia and Wiki ---------------------------------------------------
+
+    if ((data.encyclopedia || data.wiki) && canEdit) {
+        $links = Ox.Element().css(css);
+        if (data.encyclopedia) {
+            $links
+                .append(formatKey('encyclopedia'))
+                .append(
+                    '<a href="/texts/indiancine.ma:Encyclopedia%20of%20Indian%20Cinema/'
+                    + (data.encyclopedia == 'Summary' ? '240' : '570') + '">'
+                    + data.encyclopedia + '</a>'
+                )
+                .append(data.wiki ? '; ' : '');
+        }
+        if (data.wiki) {
+            $links
+                .append(formatKey('wiki'))
+                .append(
+                    '<a href="' + data.wiki + '">' + decodeURI(data.wiki) + '</a>'
+                );
+        }
+        $links.appendTo($text);
+        pandora.createLinks($links);
     }
 
     // Summary -----------------------------------------------------------------
@@ -375,7 +402,19 @@ pandora.ui.infoView = function(data) {
 
         $('<div>')
             .css({marginBottom: '4px'})
-            .append(formatKey('Notes', 'statistics'))
+            .append(
+                formatKey('Notes', 'statistics').options({
+                    tooltip: 'Only '
+                        + Object.keys(pandora.site.capabilities.canEditMetadata).map(function(level, i) {
+                            return (
+                                i == 0 ? ''
+                                : i < pandora.site.capabilities.canEditMetadata.length - 1 ? ', '
+                                : ' and '
+                            ) + Ox.toTitleCase(level)
+                        })
+                        + ' can see and edit these notes'
+                })
+            )
             .append(
                 Ox.EditableContent({
                         clickLink: pandora.clickLink,
@@ -472,7 +511,7 @@ pandora.ui.infoView = function(data) {
             ? '<span style="font-weight: bold">' + Ox.toTitleCase(key) + ':</span> '
             : mode == 'description'
             ? Ox.toTitleCase(key)
-            : $('<div>')
+            : Ox.Element()
                 .css({marginBottom: '4px', fontWeight: 'bold'})
                 .html(Ox.toTitleCase(key)
                 .replace(' Per ', ' per '));
