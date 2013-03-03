@@ -21,7 +21,7 @@ pandora.ui.iconDialog = function(options) {
                 )
                 .append(
                     $('<div>')
-                        .css({position: 'absolute', left: '96px', top: '16px', width: width - 112 + 'px'})
+                        .css({position: 'absolute', left: '96px', top: '16px', width: options.width - 112 + 'px'})
                         .html(options.text)
                 ),
             fixedSize: true,
