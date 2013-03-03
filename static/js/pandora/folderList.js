@@ -76,7 +76,7 @@ pandora.ui.folderList = function(id) {
             },
             {
                 clickable: function(data) {
-                    return pandora.user.ui.section == 'items' && (
+                    return ui.section == 'items' && (
                         data.type == 'smart' || data.user == pandora.user.username
                     );
                 },
@@ -94,7 +94,7 @@ pandora.ui.folderList = function(id) {
                             width: '10px',
                             height: '10px',
                             padding: '3px',
-                            opacity: pandora.user.ui.section == 'items' && data.user == pandora.user.username ? 1 : 0.25
+                            opacity: ui.section == 'items' && data.user == pandora.user.username ? 1 : 0.25
                         });
                 },
                 id: 'type',
