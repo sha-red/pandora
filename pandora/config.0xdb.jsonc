@@ -341,6 +341,12 @@
             "sort": true
         },
         {
+            "id": "notes",
+            "title": "Notes",
+            "type": "text",
+            "capability": "canEditMetadata"
+        },
+        {
             "id": "id",
             "title": "ID",
             "type": "string",

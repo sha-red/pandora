@@ -371,6 +371,12 @@
             "sort": true
         },
         {
+            "id": "notes",
+            "title": "Notes",
+            "type": "text",
+            "capability": "canEditMetadata"
+        },
+        {
             "id": "subtitles",
             "title": "Subtitles",
             "type": "layer",
@@ -772,8 +778,8 @@
             "showIconBrowser": false,
             "showInfo": true,
             "showLayers": {
-                "privatenotes": true,
-                "publicnotes": true,
+                "keywords": true,
+                "notes": true,
                 "subtitles": true
             },
             "showMapControls": false,
