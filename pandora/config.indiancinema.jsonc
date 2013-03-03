@@ -351,6 +351,18 @@
             "sort": true
         },
         {
+            "id": "encyclopedia",
+            "title": "Encyclopedia",
+            "type": "string",
+            "capability": "canEditMetadata"
+        },
+        {
+            "id": "wiki",
+            "title": "Wiki",
+            "type": "string",
+            "capability": "canEditMetadata"
+        },
+        {
             "id": "imdbId",
             "title": "IMDb ID",
             "type": "string",
