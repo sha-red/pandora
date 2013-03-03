@@ -1406,7 +1406,8 @@ for key in filter(lambda k: k.get('sort', False) or k['type'] in ('integer', 'ti
         'time': 'integer',
         'enum': 'integer',
     }.get(sort_type, sort_type)]
-    attrs[name] = model[0](**model[1])
+    if name not in attrs:
+        attrs[name] = model[0](**model[1])
 
 ItemSort = type('ItemSort', (models.Model,), attrs)
 ItemSort.fields = [f.name for f in ItemSort._meta.fields]
