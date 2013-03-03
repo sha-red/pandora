@@ -8,11 +8,12 @@ pandora.ui.iconDialog = function(options) {
                 keys: null,
                 text: '',
                 title: '',
-                width: 368,
+                width: 304,
             }, options),
 
         that = Ox.Dialog({
             buttons: options.buttons,
+            closeButton: options.closeButton,
             content: Ox.Element()
                 .append(
                     $('<img>')

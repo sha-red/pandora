@@ -3,11 +3,11 @@
 
 pandora.ui.resetUIDialog = function(data) {
 
-    var that = Ox.Dialog({
+    var that = pandora.ui.iconDialog({
         buttons: [
             Ox.Button({
                     id: 'cancel',
-                    title: 'Cancel'
+                    title: 'Don\'t Reset'
                 })
                 .bindEvent({
                     click: function() {
@@ -26,21 +26,9 @@ pandora.ui.resetUIDialog = function(data) {
                     }
                 })
         ],
-        content: Ox.Element()
-            .append(
-                $('<img>')
-                    .attr({src: '/static/png/icon.png'})
-                    .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
-            )
-            .append(
-                $('<div>')
-                    .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
-                    .html('Are you sure you want to reset all UI settings?')
-            ),
-        height: 128,
         keys: {enter: 'reset', escape: 'cancel'},
-        title: 'Reset UI Settings',
-        width: 304
+        text: 'Are you sure you want to reset all UI settings?',
+        title: 'Reset UI Settings'
     });
 
     return that;

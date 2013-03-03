@@ -312,7 +312,7 @@ pandora.ui.folders = function() {
             type: 'image'
         }).bindEvent({
             click: function() {
-                var $dialog = Ox.Dialog({
+                var $dialog = pandora.ui.iconDialog({
                     buttons: title != 'Featured Lists' ? [
                         Ox.Button({title: 'Sign Up...'}).bindEvent({
                             click: function() {
@@ -339,21 +339,7 @@ pandora.ui.folders = function() {
                             }
                         })
                     ],
-                    content: Ox.Element()
-                        .append(
-                            $('<img>')
-                                .attr({src: '/static/png/icon.png'})
-                                .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
-                        )
-                        .append(
-                            $('<div>')
-                                .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
-                                .html(text)
-                        ),
-                    fixedSize: true,
-                    height: 128,
-                    removeOnClose: true,
-                    width: 304,
+                    text: text,
                     title: title
                 }).open();
             }

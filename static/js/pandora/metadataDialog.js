@@ -41,7 +41,7 @@ pandora.ui.metadataDialog = function(data) {
     data.imdbId && getMetadata();
 
     function idDialog() {
-        return Ox.Dialog({
+        return pandora.ui.iconDialog({
             buttons: [
                 Ox.Button({
                         id: 'close',
@@ -64,27 +64,11 @@ pandora.ui.metadataDialog = function(data) {
                         }
                     })
             ],
-            content: Ox.Element()
-                .append(
-                    $('<img>')
-                        .attr({src: '/static/png/icon.png'})
-                        .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
-                )
-                .append(
-                    $('<div>')
-                        .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
-                        .html(
-                            'To update the metadata for this '
-                            + pandora.site.itemName.singular.toLowerCase()
-                            + ', please enter its IMDb ID.'
-                        )
-                ),
-            fixedSize: true,
-            height: 128,
             keyboard: {enter: 'update', escape: 'close'},
-            removeOnClose: true,
-            title: 'Update Metadata',
-            width: 304
+            text: 'To update the metadata for this '
+                + pandora.site.itemName.singular.toLowerCase()
+                + ', please enter its IMDb ID.',
+            title: 'Update Metadata'
         });
     }
     
@@ -138,7 +122,7 @@ pandora.ui.metadataDialog = function(data) {
     }
 
     function confirmDialog() {
-        return Ox.Dialog({
+        return pandora.ui.iconDialog({
             buttons: [
                 Ox.Button({
                         id: 'cancel',
@@ -160,33 +144,18 @@ pandora.ui.metadataDialog = function(data) {
                         }
                     })
             ],
-            content: Ox.Element()
-                .append(
-                    $('<img>')
-                        .attr({src: '/static/png/icon.png'})
-                        .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
-                )
-                .append(
-                    $('<div>')
-                        .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
-                        .html(
-                            'Are you sure you want to update the value'
-                            + (updateKeys.length == 1 ? '' : 's')
-                            + ' for ' + updateKeys.map(function(key, index) {
-                                return (
-                                    index == 0 ? ''
-                                    : index < updateKeys.length - 1 ? ', '
-                                    : ' and '
-                                ) + getTitle(key)
-                            }).join('') + '?'
-                        )
-                ),
-            fixedSize: true,
-            height: 128,
+            height: 192,
             keyboard: {enter: 'update', escape: 'cancel'},
-            removeOnClose: true,
-            title: 'Update Metadata',
-            width: 304
+            text: 'Are you sure you want to update the value'
+                + (updateKeys.length == 1 ? '' : 's')
+                + ' for ' + updateKeys.map(function(key, index) {
+                    return (
+                        index == 0 ? ''
+                        : index < updateKeys.length - 1 ? ', '
+                        : ' and '
+                    ) + getTitle(key)
+                }).join('') + '?',
+            title: 'Update Metadata'
         });
     }
 

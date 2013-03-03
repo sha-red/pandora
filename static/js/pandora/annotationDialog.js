@@ -3,25 +3,25 @@
 
 pandora.ui.annotationDialog = function(layer) {
     var isEditor = pandora.user.ui.itemView == 'editor',
-        $dialog = Ox.Dialog({
+        that = pandora.ui.iconDialog({
             buttons: [].concat(
                 isEditor ? [
                     Ox.Button({title: 'Sign Up...'}).bindEvent({
                         click: function() {
-                            $dialog.close();
+                            that.close();
                             pandora.$ui.accountDialog = pandora.ui.accountDialog('signup').open();
                         }
                     }),
                     Ox.Button({title: 'Sign In...'}).bindEvent({
                         click: function() {
-                            $dialog.close();
+                            that.close();
                             pandora.$ui.accountDialog = pandora.ui.accountDialog('signin').open();
                         }
                     })
                 ] : [
                     Ox.Button({title: 'Switch to Editor'}).bindEvent({
                         click: function() {
-                            $dialog.close();
+                            that.close();
                             pandora.UI.set({itemView: 'editor'});
                         }
                     })
@@ -30,32 +30,17 @@ pandora.ui.annotationDialog = function(layer) {
                     {},
                     Ox.Button({title: 'Not Now'}).bindEvent({
                         click: function() {
-                            $dialog.close();
+                            that.close();
                         }
                     })
                 ]
             ),
-            content: Ox.Element()
-                .append(
-                    $('<img>')
-                        .attr({src: '/static/png/icon.png'})
-                        .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
-                )
-                .append(
-                    $('<div>')
-                        .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
-                        .html(
-                            'To add or edit ' + layer + ', ' + (
-                                isEditor ? 'please sign up or sign in.'
-                                    : 'just switch to the editor.'
-                            )
-                        )
-                ),
-            fixedSize: true,
-            height: 128,
-            removeOnClose: true,
-            width: 304,
+            text: 'To add or edit ' + layer + ', ' + (
+                isEditor
+                ? 'please sign up or sign in.'
+                : 'just switch to the editor.'
+            ),
             title: Ox.toTitleCase(layer)
         });
-    return $dialog;
+    return that;
 };

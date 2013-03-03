@@ -105,7 +105,7 @@ pandora.ui.contactForm = function() {
                     message: data.message,
                     receipt: $receiptCheckbox.value()
                 }, function(result) {
-                    var $dialog = Ox.Dialog({
+                    var $dialog = pandora.ui.iconDialog({
                             buttons: [
                                 Ox.Button({
                                     id: 'close',
@@ -117,22 +117,9 @@ pandora.ui.contactForm = function() {
                                     }
                                 })
                             ],
-                            content: Ox.Element()
-                                .append(
-                                    $('<img>')
-                                        .attr({src: '/static/png/icon.png'})
-                                        .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
-                                )
-                                .append(
-                                    Ox.Element()
-                                        .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
-                                        .html('Thanks for your message!<br/><br/>We will get back to you as soon as possible.')
-                                ),
-                            fixedSize: true,
-                            height: 128,
                             keys: {enter: 'close', escape: 'close'},
-                            title: 'Message Sent',
-                            width: 304
+                            text: 'Thanks for your message!<br/><br/>We will get back to you as soon as possible.',
+                            title: 'Message Sent'
                         })
                         .open();
                 });

@@ -866,13 +866,7 @@ pandora.ui.usersDialog = function() {
             message: getFormItemById('message').value(),
             receipt: getFormItemById('receipt').value()
         }, function(result) {
-            var title = result.status.code == 200
-                    ? 'Message Sent'
-                    : 'Application Error',
-                message = result.status.code == 200
-                    ? 'Your message has been sent.'
-                    : 'Your message could not be sent. Please try again.',
-                $dialog = Ox.Dialog({
+            var $dialog = pandora.ui.iconDialog({
                     buttons: [
                         Ox.Button({
                             id: 'close',
@@ -884,23 +878,13 @@ pandora.ui.usersDialog = function() {
                             }
                         })
                     ],
-                    // FIXME: we need a template for this type of dialog
-                    content: Ox.Element()
-                        .append(
-                            $('<img>')
-                                .attr({src: '/static/png/icon.png'})
-                                .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
-                        )
-                        .append(
-                            $('<div>')
-                                .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
-                                .html(message)
-                        ),
-                    height: 128,
                     keys: {enter: 'close', escape: 'close'},
-                    removeOnClose: true,
-                    title: title,
-                    width: 304
+                    text: result.status.code == 200
+                        ? 'Your message has been sent.'
+                        : 'Your message could not be sent. Please try again.',
+                    title: result.status.code == 200
+                        ? 'Message Sent'
+                        : 'Application Error'
                 }).open();
             $sendButton.options({title: 'Send', disabled: false});
         });

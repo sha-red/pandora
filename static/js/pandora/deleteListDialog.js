@@ -3,13 +3,14 @@
 'use strict';
 
 pandora.ui.deleteListDialog = function(list) {
+
     var ui = pandora.user.ui,
         folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
-        folderItem = folderItems.slice(0, -1);
-
-    var listData = pandora.getListData(list),
+        folderItem = folderItems.slice(0, -1),
+        listData = pandora.getListData(list),
         $folderList = pandora.$ui.folderList[listData.folder],
-        that = Ox.Dialog({
+
+        that = pandora.ui.iconDialog({
             buttons: [
                 Ox.Button({
                     id: 'keep',
@@ -49,23 +50,11 @@ pandora.ui.deleteListDialog = function(list) {
                     }
                 })
             ],
-            content: Ox.Element()
-                .append(
-                    $('<img>')
-                        .attr({src: '/static/png/icon.png'})
-                        .css({position: 'absolute', left: '16px', top: '16px', width: '64px', height: '64px'})
-                )
-                .append(
-                    $('<div>')
-                        .css({position: 'absolute', left: '96px', top: '16px', width: '192px'})
-                        .html('Are you sure you want to delete the ' + folderItem.toLowerCase() + ' "' + listData.name + '"?')
-                ),
-            height: 128,
             keys: {enter: 'delete', escape: 'keep'},
-            title: 'Delete List',
-            width: 304
+            text: 'Are you sure you want to delete the ' + folderItem.toLowerCase() + ' "' + listData.name + '"?',
+            title: 'Delete ' + folderItem
         });
 
     return that;
 
-}
+};
