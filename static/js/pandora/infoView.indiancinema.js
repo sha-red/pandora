@@ -411,7 +411,7 @@ pandora.ui.infoView = function(data) {
                                 : i < Ox.len(pandora.site.capabilities.canEditMetadata) - 1 ? ', '
                                 : ' and '
                             ) + Ox.toTitleCase(level)
-                        })
+                        }).join('')
                         + ' can see and edit these notes'
                 })
             )
