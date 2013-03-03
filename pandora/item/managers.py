@@ -229,17 +229,20 @@ def parseConditions(conditions, operator, user):
         if 'conditions' in condition:
             q = parseConditions(condition['conditions'],
                              condition.get('operator', '&'), user)
-            if q:
+            if isinstance(q, list):
+                conn += q
+            elif q:
                 conn.append(q)
         else:
             conn.append(parseCondition(condition, user))
     if conn:
-        q = conn[0]
-        for c in conn[1:]:
-            if operator == '|':
+        if operator == '|':
+            q = conn[0]
+            for c in conn[1:]:
                 q = q | c
-            else:
-                q = q & c
+            q = [q]
+        else:
+            q = conn
         return q
     return Q() 
 
@@ -269,7 +272,8 @@ class ItemManager(Manager):
                         conditions = parseConditions(data['query']['conditions'],
                                                      data['query'].get('operator', '&'),
                                                      user)
-                        qs = qs.filter(conditions)
+                        for c in conditions:
+                            qs = qs.filter(c)
                     else:
                         qs = qs.filter(id__in=lqs[0].items.all())
         return qs
@@ -302,7 +306,9 @@ class ItemManager(Manager):
         conditions = parseConditions(data.get('query', {}).get('conditions', []),
                                      data.get('query', {}).get('operator', '&'),
                                      user)
-        qs = qs.filter(conditions)
+        for c in conditions:
+            qs = qs.filter(c)
+
         #FIXME: can this be avoided? needed for grid/accessed/foo
         qs = qs.distinct()
         
