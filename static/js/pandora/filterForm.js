@@ -16,10 +16,13 @@ pandora.ui.filterForm = function(list) {
         that.append(
             that.$filter = Ox.Filter({
                 findKeys: pandora.site.itemKeys.map(function(itemKey) {
-                    var key = Ox.clone(itemKey);
+                    var key = Ox.clone(itemKey, true);
                     key.type = key.type == 'layer'
                         ? Ox.getObjectById(pandora.site.layers, key.id).type
                         : key.type;
+                    if (key.format && key.format.type == 'ColorPercent') {
+                        key.format.type = 'percent';
+                    }
                     return key;
                 }).concat([{
                     id: 'list',
