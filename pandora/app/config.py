@@ -98,7 +98,10 @@ check the README for further details.
             except:
                 pass
 
+
+
 def reloader_thread():
+    settings.RELOADER_RUNNING=True
     _config_mtime = 0
     try:
         import pyinotify
@@ -106,11 +109,20 @@ def reloader_thread():
     except:
         INOTIFY = False
     if INOTIFY:
-        wm = pyinotify.WatchManager()
-        name = os.path.realpath(settings.SITE_CONFIG)
-        wm.add_watch(name, pyinotify.IN_CLOSE_WRITE, lambda event: load_config())
-        notifier = pyinotify.Notifier(wm)
-        notifier.loop()
+        class ConfigChanges:
+            def __init__(self):
+                name = os.path.realpath(settings.SITE_CONFIG)
+                self.name = name
+                self.wm = pyinotify.WatchManager()
+                self.reload_config()
+                notifier = pyinotify.Notifier(self.wm)
+                notifier.loop()
+    
+            def reload_config(self):
+                load_config()
+                self.wm.add_watch(self.name, pyinotify.IN_CLOSE_WRITE,
+                        lambda event: self.reload_config())
+        ConfigChanges()
     else:
         while RUN_RELOADER:
             try:
@@ -205,5 +217,6 @@ def update_geoip(force=False):
         os.system('gunzip "%s.gz"' % path)
 
 def init():
-    load_config()
-    thread.start_new_thread(reloader_thread, ())
+    if not settings.RELOADER_RUNNING:
+        load_config()
+        thread.start_new_thread(reloader_thread, ())

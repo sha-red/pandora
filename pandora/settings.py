@@ -206,6 +206,8 @@ LIST_ICON   = join(SCRIPT_ROOT, 'list_icon.py')
 
 DB_GIN_TRGM = False
 
+
+RELOADER_RUNNING = False
 #you can ignore things below this line
 #=========================================================================
 
