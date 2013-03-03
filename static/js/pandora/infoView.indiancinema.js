@@ -408,7 +408,7 @@ pandora.ui.infoView = function(data) {
                         + Object.keys(pandora.site.capabilities.canEditMetadata).map(function(level, i) {
                             return (
                                 i == 0 ? ''
-                                : i < pandora.site.capabilities.canEditMetadata.length - 1 ? ', '
+                                : i < Ox.len(pandora.site.capabilities.canEditMetadata) - 1 ? ', '
                                 : ' and '
                             ) + Ox.toTitleCase(level)
                         })
