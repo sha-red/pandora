@@ -665,6 +665,7 @@
             "filtersSize": 176,
             "find": {"conditions": [], "operator": "&"},
             "followPlayer": true,
+            "hash": {"anchor": "", "query": []},
             "icons": "frames",
             "infoIconSize": 256,
             "item": "",
