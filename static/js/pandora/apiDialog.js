@@ -3,7 +3,9 @@
 
 pandora.ui.apiDialog = function() {
 
-    var actions,
+    var selected = pandora.user.ui.hash && pandora.user.ui.hash.anchor
+            ? pandora.user.ui.hash.anchor : '',
+        actions,
         $loading = Ox.Element()
             .append(
                 $('<img>')
@@ -40,30 +42,36 @@ pandora.ui.apiDialog = function() {
             maximizeButton: true,
             minHeight: 256,
             minWidth: 576,
+            removeOnClose: true,
             title: 'API Documentation',
             width: Math.round(window.innerWidth * 0.75)
         })
         .bindEvent({
             close: function() {
-                pandora.UI.set({page: ''});
+                pandora.UI.set({page: '', 'hash.anchor': ''});
             },
             resize: function() {
                 $list.size();
+            },
+            'pandora_hash.anchor': function(data) {
+                pandora.user.ui.page == 'api' && that.select(data.value);
             }
         }),
         overview = '<div class="OxSelectable"><h2>Pan.do/ra API Overview</h2>use this api in the browser with <a href="/static/oxjs/demos/doc2/index.html#Ox.App">Ox.app</a> or use <a href="http://code.0x2620.org/pandora_client">pandora_client</a> it in python. Further description of the api can be found <a href="https://wiki.0x2620.org/wiki/pandora/API">on the wiki</a></div>';
 
     pandora.api.api({docs: true, code: true}, function(results) {
-        var items = [];
+        var items = [{
+            id: '',
+            title: pandora.site.site.name + ' API',
+            sort: 'aaa'
+        }];
         actions = results.data.actions;
         Ox.forEach(results.data.actions, function(v, k) {
             items.push({
                 'id':  k,
-                'title':  k
+                'title':  k,
+                'sort': k
             });
-        });
-        items.sort(function (a, b) {
-            return a.name > b.name ? 1 : a.name == b.name ? 0 : -1;
         });
 
         $list = Ox.TableList({
@@ -80,11 +88,14 @@ pandora.ui.apiDialog = function() {
                 min: 1,
                 scrollbarVisible: true,
                 selected: [],
-                sort: [{key: 'title', operator: '+'}],
+                sort: [{key: 'sort', operator: '+'}],
                 unique: 'id'
             })
             .bindEvent({
-                select: selectSection
+                select: function(data) {
+                    var id = data.ids[0];
+                    pandora.UI.set({'hash.anchor': id});
+                }
             });
 
         $text = Ox.Element()
@@ -107,10 +118,9 @@ pandora.ui.apiDialog = function() {
         
     });
 
-    function selectSection(data) {
-       if (data.ids.length) {
-          $text.html('');
-          data.ids.forEach(function(id) {
+    that.select = function(id) {
+        if (id) {
+            $text.html('');
             $text.append(
                 $('<h2>')
                     .html(id)
@@ -148,11 +158,12 @@ pandora.ui.apiDialog = function() {
             .css({
                 borderWidth: '1px',
             }).appendTo($text).hide();
-          });
         } else {
             $text.html(overview);
         }
+        return that;
     }
+
     return that;
 
 };
