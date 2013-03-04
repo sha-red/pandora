@@ -129,6 +129,7 @@ pandora.URL = (function() {
                 }
 
                 if (set.section == 'items') {
+
                     if (state.view) {
                         set[!state.item ? 'listView' : 'itemView'] = state.view;
                     }
@@ -289,21 +290,20 @@ pandora.URL = (function() {
                 calendar: 'date'
             }
         };
-        //Text
+
+        // Texts
         views['texts'] = {
             list: [],
             item: ['text']
-        }
+        };
         spanType['texts'] = {
             list: [],
-            item: {
-                'text': 'number'
-            }
-        }
+            item: {text: 'number'}
+        };
         sortKeys['texts'] = {
             list: {},
             item: {}
-        }
+        };
 
         findKeys = [{id: 'list', type: 'string'}].concat(pandora.site.itemKeys);
 
