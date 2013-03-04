@@ -44,6 +44,7 @@ pandora.ui.helpDialog = function() {
             maximizeButton: true,
             minHeight: 256,
             minWidth: 576,
+            removeOnClose: true,
             title: 'Help',
             width: Math.round(window.innerWidth * 0.75)
         })
@@ -55,7 +56,8 @@ pandora.ui.helpDialog = function() {
                 $list.size();
             },
             'pandora_hash.anchor': function(data) {
-                that.select(data.value == '' ? 'help' : data.value);
+                pandora.user.ui.page == 'help' &&
+                    that.select(data.value == '' ? 'help' : data.value);
             }
         });
 
