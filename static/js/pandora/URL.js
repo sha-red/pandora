@@ -369,7 +369,9 @@ pandora.URL = (function() {
     // on page load, this sets the state from the URL
     // can also be used to parse a URL
     that.parse = function(url, callback) {
-        if (arguments.length == 1) {
+        if (arguments.length == 2) {
+            self.URL.parse(url, callback);
+        } else {
             callback = arguments[0];
             url = null;
             if (document.location.pathname.slice(0, 4) == 'url=') {
@@ -380,8 +382,6 @@ pandora.URL = (function() {
                     setState(state, callback);
                 });
             }
-        } else {
-            self.URL.parse(url, callback);
         }
         return that;
     };
