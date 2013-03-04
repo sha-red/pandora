@@ -638,6 +638,61 @@ pandora.getFoldersWidth = function() {
     return width;
 };
 
+pandora.getHash = function(state, callback) {
+    var embedKeys = [
+            'annotationsFont', 'annotationsRange', 'annotationsSort',
+            'embed',
+            'ignoreRights', 'invertHighlight',
+            'matchRatio',
+            'paused', 'playInToOut',
+            'showAnnotations', 'showCloseButton', 'showLayers', 'showTimeline',
+            'timeline', 'title'
+        ],
+        isEmbed = state.hash && state.hash.query
+            && Ox.indexOf(state.hash.query, function(condition) {
+                return Ox.isEqual(condition, {key: 'embed', value: true});
+            }) > -1,
+        removeKeys = [];
+    if (state.hash && state.hash.anchor) {
+        if (state.page == 'help') {
+            if (
+                state.hash.anchor == 'help'
+                || !Ox.getObjectById(pandora.site.help, state.hash.anchor)
+            ) {
+                delete state.hash.anchor;
+            }
+        }
+    } else if (state.hash) {
+        delete state.hash.anchor;
+    }
+    if (state.hash && state.hash.query) {
+        if (isEmbed) {
+            state.hash.query.forEach(function(condition) {
+                if (!Ox.contains(embedKeys, condition.key)) {
+                    removeKeys.push(condition.key);
+                }
+            });
+        } else {
+            state.hash.query.forEach(function(condition) {
+                var key = condition.key.split('.')[0];
+                if (pandora.site.user.ui[key] === void 0) {
+                    removeKeys.push(condition.key);
+                }
+            });
+        }
+        state.hash.query = state.hash.query.filter(function(condition) {
+            return !Ox.contains(removeKeys, condition.key);
+        });
+        if (Ox.isEmpty(state.hash.query)) {
+            delete state.hash.query;
+        }
+    }
+    if (Ox.isEmpty(state.hash)) {
+        delete state.hash;
+    }
+    callback();
+};
+
 pandora.getInfoHeight = function(includeHidden) {
     // fixme: new, check if it can be used more
     var height = 0, isVideoPreview;
@@ -657,11 +712,11 @@ pandora.getInfoHeight = function(includeHidden) {
     return height;
 }
 
-pandora.getItemByIdOrTitle = function(type, str, callback) {
-    if (type == pandora.site.itemName.plural.toLowerCase()) {
+pandora.getItem = function(state, str, callback) {
+    if (state.type == pandora.site.itemName.plural.toLowerCase()) {
         var sortKey = Ox.getObjectById(pandora.site.itemKeys, 'votes')
-                      ? 'votes'
-                      : 'timesaccessed';
+            ? 'votes'
+            : 'timesaccessed';
         pandora.api.get({id: str, keys: ['id']}, function(result) {
             if (result.status.code == 200) {
                 callback(result.data.id);
@@ -800,88 +855,6 @@ pandora.getListData = function(list) {
     return data;
 };
 
-pandora.getMetadataByIdOrName = function(type, item, view, str, callback) {
-    // For a given item (or none) and a given view (or any), this takes a string
-    // and checks if it's an annotation/event/place id or an event/place name,
-    // and returns the id (or none) and the view (or none)
-    // fixme: "subtitles:23" is still missing
-    if (type == pandora.site.itemName.plural.toLowerCase()) {
-        var isName = str[0] == '@',
-            canBeAnnotation = (
-                !view || Ox.contains(['player', 'editor', 'timeline'], view)
-            ) && item && !isName,
-            canBeEvent = !view || view == 'calendar',
-            canBePlace = !view || view == 'map';
-        str = isName ? str.slice(1) : str;
-        getId(canBeAnnotation ? 'annotation' : '', function(id) {
-            if (id) {
-                Ox.Log('URL', 'id?', id)
-                callback(id, pandora.user.ui.videoView);
-            } else {
-                getId(canBePlace ? 'place' : '', function(id) {
-                    if (id) {
-                        Ox.Log('', 'found place id', id)
-                        callback(id, 'map');
-                    } else {
-                        getId(canBeEvent ? 'event' : '', function(id) {
-                            if (id) {
-                                callback(id, 'calendar');
-                            } else if (canBePlace && isName) {
-                                callback('@' + str, 'map');
-                            } else {
-                                callback();
-                            }
-                        });
-                    }
-                });
-            }
-        });
-    } else if (type == 'text') {
-        callback();
-    }
-
-    function getId(type, callback) {
-        if (type) {
-            pandora.api['find' + Ox.toTitleCase(type + 's')](Ox.extend({
-                query: {
-                    conditions: [{
-                        key: isName ? 'name' : 'id',
-                        value: type != 'annotation' ? str : item + '/' + str,
-                        operator: '=='
-                    }],
-                    operator: '&'
-                },
-                keys: type != 'annotation' ? ['id'] : ['id', 'in', 'out'],
-                range: [0, 1]
-            }, item && type != 'annotation' ? {
-                itemQuery: {
-                    conditions: [{key: 'id', value: item, operator: '=='}],
-                    operator: '&'
-                }
-            } : {}), function(result) {
-                var annotation, span;
-                if (result.data.items.length) {
-                    span = result.data.items[0];
-                    annotation = span.id.split('/')[1];
-                    type == 'annotation' && pandora.UI.set('videoPoints.' + item, {
-                        annotation: annotation,
-                        'in': span['in'],
-                        out: span.out,
-                        position: span['in']
-                    });
-                }
-                callback(
-                    !span ? ''
-                    : type != 'annotation' ? span.id
-                    : annotation
-                );
-            });
-        } else {
-            callback();
-        }
-    }
-};
-
 pandora.getPageTitle = function(stateOrURL) {
     var pages = [
             {id: '', title: ''},
@@ -927,6 +900,98 @@ pandora.getSortOperator = function(key) {
     return data.sortOperator || ['string', 'text'].indexOf(
         Ox.isArray(data.type) ? data.type[0] : data.type
     ) > -1 ? '+' : '-';
+};
+
+pandora.getSpan = function(state, str, callback) {
+    // For a given item, or none (state.item), and a given view, or any
+    // (state.view), this takes a string and checks if it is a valid
+    // annotation/event/place id or an event/place name, and in that case sets
+    // state.span, and may modify state.view.
+    // fixme: "subtitles:23" is still missing
+    if (state.type == pandora.site.itemName.plural.toLowerCase()) {
+        var isName = str[0] == '@',
+            canBeAnnotation = (
+                !state.view
+                || Ox.contains(['player', 'editor', 'timeline'], state.view)
+            ) && state.item && !isName,
+            canBeEvent = !state.view || state.view == 'calendar',
+            canBePlace = !state.view || state.view == 'map';
+        str = isName ? str.slice(1) : str;
+        getId(canBeAnnotation ? 'annotation' : '', function(id) {
+            if (id) {
+                Ox.Log('URL', 'id?', id)
+                state.span = id;
+                state.view = pandora.user.ui.videoView;
+                callback();
+            } else {
+                getId(canBePlace ? 'place' : '', function(id) {
+                    if (id) {
+                        Ox.Log('URL', 'found place id', id)
+                        state.span = id;
+                        state.view = 'map';
+                        callback();
+                    } else {
+                        getId(canBeEvent ? 'event' : '', function(id) {
+                            if (id) {
+                                Ox.Log('URL', 'found event id', id)
+                                state.span = id;
+                                state.view = 'calendar';
+                            } else if (canBePlace && isName) {
+                                Ox.Log('URL', 'setting place id', '@' + str)
+                                state.span = '@' + str;
+                                state.view = 'map';
+                            }
+                            callback();
+                        });
+                    }
+                });
+            }
+        });
+    } else if (type == 'text') {
+        callback();
+    }
+
+    function getId(type, callback) {
+        if (type) {
+            pandora.api['find' + Ox.toTitleCase(type + 's')](Ox.extend({
+                query: {
+                    conditions: [{
+                        key: isName ? 'name' : 'id',
+                        value: type != 'annotation' ? str : state.item + '/' + str,
+                        operator: '=='
+                    }],
+                    operator: '&'
+                },
+                keys: type != 'annotation' ? ['id'] : ['id', 'in', 'out'],
+                range: [0, 1]
+            }, state.item && type != 'annotation' ? {
+                itemQuery: {
+                    conditions: [{key: 'id', value: state.item, operator: '=='}],
+                    operator: '&'
+                }
+            } : {}), function(result) {
+                var annotation, span;
+                if (result.data.items.length) {
+                    span = result.data.items[0];
+                    annotation = span.id.split('/')[1];
+                    type == 'annotation' && pandora.UI.set('videoPoints.' + state.item, {
+                        annotation: annotation,
+                        'in': span['in'],
+                        out: span.out,
+                        position: span['in']
+                    });
+                }
+                callback(
+                    !span ? ''
+                    : type != 'annotation' ? span.id
+                    : annotation
+                );
+            });
+        } else {
+            callback();
+        }
+    }
+
 };
 
 pandora.getVideoURL = function(id, resolution, part) {
@@ -1090,55 +1155,6 @@ pandora.logEvent = function(data, event, element) {
             })
         );
     }
-};
-
-pandora.normalizeHashQuery = function(state) {
-    var embedKeys = [
-            'annotationsFont', 'annotationsRange', 'annotationsSort',
-            'embed',
-            'ignoreRights', 'invertHighlight',
-            'matchRatio',
-            'paused', 'playInToOut',
-            'showAnnotations', 'showCloseButton', 'showLayers', 'showTimeline',
-            'timeline', 'title'
-        ],
-        isEmbed = state.hash && state.hash.query
-            && Ox.indexOf(state.hash.query, function(condition) {
-                return Ox.isEqual(condition, {key: 'embed', value: true});
-            }) > -1,
-        newState = Ox.clone(state, true),
-        removeKeys = [];
-    if (state.hash && state.hash.anchor) {
-        if (!state.page) {
-            delete newState.hash.anchor;
-        }
-    }
-    if (state.hash && state.hash.query) {
-        if (isEmbed) {
-            state.hash.query.forEach(function(condition) {
-                if (!Ox.contains(embedKeys, condition.key)) {
-                    removeKeys.push(condition.key);
-                }
-            });
-        } else {
-            state.hash.query.forEach(function(condition) {
-                var key = condition.key.split('.')[0];
-                if (pandora.site.user.ui[key] === void 0) {
-                    removeKeys.push(condition.key);
-                }
-            });
-        }
-        newState.hash.query = newState.hash.query.filter(function(condition) {
-            return !Ox.contains(removeKeys, condition.key);
-        });
-        if (Ox.isEmpty(newState.hash.query)) {
-            delete newState.hash.query;
-        }
-    }
-    if (Ox.isEmpty(newState.hash)) {
-        delete newState.hash;
-    }
-    return newState;
 };
 
 pandora.signin = function(data) {
