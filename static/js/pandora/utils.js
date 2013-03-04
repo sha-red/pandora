@@ -914,7 +914,6 @@ pandora.getSortOperator = function(key) {
 };
 
 pandora.getSpan = function(state, str, callback) {
-    Ox.print('GET SPAN', state, str)
     // For a given item, or none (state.item), and a given view, or any
     // (state.view), this takes a string and checks if it is a valid
     // annotation/event/place id or an event/place name, and in that case sets
