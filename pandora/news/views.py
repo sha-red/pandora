@@ -14,14 +14,20 @@ import models
 
 def getNews(request):
     '''
-        param data {
+        takes {
+            id: string
         }
 
-        return {
-            'status': {'code': int, 'text': string}
-            'data': {
-                items = [{..}, {...}, ...]
-            }
+        returns {
+            id: string,
+            ...
+        }
+
+        if not id is passed, return all news items
+
+        takes {}
+        returns {
+            items: [object]
         }
     '''
     data = json.loads(request.POST['data'])
@@ -38,16 +44,14 @@ actions.register(getNews)
 @login_required_json
 def addNews(request):
     '''
-        param data {
+        takes {
             title: string,
             date: string,
             text: text,
         }
-        return {'status': {'code': int, 'text': string},
-                'data': {
-                    id: 123,
-                    ...
-                }
+        returns {
+            id: string,
+            ...
         }
     '''
     data = json.loads(request.POST['data'])
@@ -64,13 +68,10 @@ actions.register(addNews, cache=False)
 @login_required_json
 def removeNews(request):
     '''
-        param data {
+        takes {
             ids: []
         }
-        return {'status': {'code': int, 'text': string},
-                'data': {
-                }
-        }
+        returns {}
     '''
     data = json.loads(request.POST['data'])
     response = json_response({})
@@ -86,17 +87,15 @@ actions.register(removeNews, cache=False)
 @login_required_json
 def editNews(request):
     '''
-        param data {
-            id:,
-            title:
-            text:
-            date:
+        takes {
+            id: string,
+            title: string,
+            text: string,
+            date: string
         }
-        return {'status': {'code': int, 'text': string},
-                'data': {
-                    id:
-                    ...
-                }
+        returns {
+            id: string
+            ...
         }
     '''
     response = json_response({})

@@ -10,6 +10,17 @@ from itemlist.views import get_list_or_404_json
 from ox.django.api import actions
 
 def tv(request):
+    '''
+        takes {
+            list: string
+        }
+        returns {
+            item: string,
+            position: float,
+            title: string,
+            ...
+        }
+    '''
     data = json.loads(request.POST['data'])
     if 'list' in data and data['list']:
         list = get_list_or_404_json(data['list'])

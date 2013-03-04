@@ -51,7 +51,7 @@ def update(request):
 
         call volume/files first and fill in requested info after that
 
-        param data {
+        takes {
             volume: '',
             files: [
                 {oshash:, path:, mtime:, },
@@ -60,13 +60,10 @@ def update(request):
             info: {oshash: object}
         }
 
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-                info: list, // list of files that need info
-                data: list, // list of flies that should be encoded to highest profile and uploaded
-                file: list  // list of files that should be uploaded as is
-            }
+        returns {
+            info: list, // list of files that need info
+            data: list, // list of flies that should be encoded to highest profile and uploaded
+            file: list  // list of files that should be uploaded as is
         }
     '''
     data = json.loads(request.POST['data'])
@@ -76,8 +73,6 @@ def update(request):
     response = json_response({'info': [], 'data': [], 'file': []})
     volume = None
     if 'files' in data:
-        #update files info async, this takes to long otherwise
-        #FIXME: how can client know if update is done? possibly with taksStatus?
         t = tasks.update_files.delay(user.username, data['volume'], data['files'])
         response['data']['taskId'] = t.task_id
 
@@ -121,16 +116,15 @@ actions.register(update, cache=False)
 @login_required_json
 def upload(request):
     '''
-        id: string
-        frame: [] //multipart frames
-        file: [] //multipart file
+        takes {
+            id: string
+            frame: [] //multipart frames
+            file: [] //multipart file
+        }
 
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-                info: object,
-                rename: object
-             }
+        returns {
+            info: object,
+            rename: object
         }
     '''
     response = json_response({})
@@ -174,14 +168,13 @@ class VideoChunkForm(forms.Form):
 @login_required_json
 def addFile(request):
     '''
-        id: oshash
-        title: 
-        info: {}
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-                item: id,
-             }
+        takes {
+            id: oshash
+            title: 
+            info: {}
+        }
+        returns {
+            item: id,
         }
     '''
     response = json_response({})
@@ -298,15 +291,12 @@ actions.register(taskStatus, cache=False)
 def moveFiles(request):
     '''
         change file / item link
-        param data {
+        takes {
             ids: ids of files
             itemId: new itemId
         }
 
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-            }
+        returns {
         }
     '''
     data = json.loads(request.POST['data'])
@@ -348,7 +338,7 @@ actions.register(moveFiles, cache=False)
 def editFiles(request):
     '''
         change file / item link
-        param data {
+        takes {
             files: [
                 {id:, key1: value1, key2: value2}
                 ...
@@ -356,10 +346,7 @@ def editFiles(request):
         }
         possible keys: part, partTitle, language, ignore, extension, version, episodes
 
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-            }
+        returns {
         }
     '''
     data = json.loads(request.POST['data'])
@@ -419,15 +406,12 @@ actions.register(removeFiles, cache=False)
 def getPath(request):
     '''
         change file / item link
-        param data {
+        takes {
             id: [hash of file]
         }
 
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-                id: path
-            }
+        returns {
+            id: path
         }
     '''
     data = json.loads(request.POST['data'])
@@ -477,7 +461,7 @@ def _order_query(qs, sort, prefix=''):
 
 def findFiles(request):
     '''
-        param data {
+        takes {
             'query': query,
             'sort': array,
             'range': array
@@ -501,11 +485,12 @@ def findFiles(request):
             group:    group elements by, country, genre, director...
 
         with keys, items is list of dicts with requested properties:
-          return {'status': {'code': int, 'text': string},
-                'data': {items: array}}
+          returns {
+              items: [object]
+          }
 
 Groups
-        param data {
+        takes {
             'query': query,
             'key': string,
             'group': string,
@@ -522,28 +507,27 @@ Groups
 
         with keys
         items contains list of {'path': string, 'items': int}:
-        return {'status': {'code': int, 'text': string},
-            'data': {items: array}}
+        returns {
+            items: [object]
+        }
 
         without keys: return number of items in given query
-          return {'status': {'code': int, 'text': string},
-                'data': {items: int}}
+          returns {
+              items: int
+          }
 
 Positions
-        param data {
+        takes {
             'query': query,
-            'positions': []
+            'positions': [string]
         }
 
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
             positions:  ids of items for which positions are required
-        return {
-            status: {...},
-            data: {
-                positions: {
-                    id: position
-                }
+        returns {
+            positions: {
+                id: position
             }
         }
     '''
@@ -613,14 +597,11 @@ actions.register(findFiles)
 
 def parsePath(request): #parse path and return info
     '''
-        param data {
+        takes {
             path: string
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-                imdb: string
-            }
+        returns {
+            imdb: string
         }
     '''
     path = json.loads(request.POST['data'])['path']
@@ -630,15 +611,12 @@ actions.register(parsePath)
 
 def getFileInfo(request):
     '''
-        param data {
+        takes {
             id: oshash of stream file
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-                item: itemId,
-                file: oshash of source file
-            }
+        returns {
+            item: itemId,
+            file: oshash of source file
         }
     '''
     data = json.loads(request.POST['data'])

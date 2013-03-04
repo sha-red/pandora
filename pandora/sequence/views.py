@@ -50,18 +50,15 @@ def order_query(qs, sort):
 
 def findSequences(request):
     '''
-        param data {
+        takes {
             query: ...
             itemsQuery: ...
         }
 
         one of your conditions has to be key: 'mode', value: [shape,color], operator: '=='
 
-        return {
-            'status': {'code': int, 'text': string}
-            'data': {
-                items = [{..}, {...}, ...]
-            }
+        returns {
+            items: [object]
         }
     '''
     data = json.loads(request.POST['data'])
@@ -96,20 +93,17 @@ actions.register(findSequences)
 
 def getSequence(request):
     '''
-        param data {
+        takes {
             id
             mode 
             position
         }
 
-        return {
-            'status': {'code': int, 'text': string}
-            'data': {
-                id
-                mode
-                in
-                out
-            }
+        returns {
+            id
+            mode
+            in
+            out
         }
     '''
     data = json.loads(request.POST['data'])

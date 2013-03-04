@@ -27,16 +27,13 @@ def get_text_or_404_json(id):
 @login_required_json
 def addText(request):
     '''
-        param data {
+        takes {
             name: value,
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-                id:
-                name:
-                ...
-            }
+        returns {
+            id:
+            name:
+            ...
         }
     '''
     data = json.loads(request.POST['data'])
@@ -74,10 +71,10 @@ actions.register(addText, cache=False)
 
 def getText(request):
     '''
-        param data {
+        takes {
             id: textid
         }
-        return {
+        returns {
             id:
             text:
             ...
@@ -106,12 +103,12 @@ actions.register(getText)
 @login_required_json
 def editText(request):
     '''
-        param data {
+        takes {
             id:
             text:
             public: boolean
         }
-        return {
+        returns {
             id:
             text:
             ...
@@ -178,7 +175,7 @@ def parse_query(data, user):
 
 def findTexts(request):
     '''
-        param data {
+        takes {
             query: {
                 conditions: [
                     {
@@ -201,12 +198,8 @@ def findTexts(request):
             name, user, featured, subscribed, query
 
         }
-        return {status: {code: int, text: string},
-                data: {
-                    items: [
-                        {name:, user:, featured:, public...}
-                    ]
-                }
+        returns {
+            items: [object]
         }
     '''
     data = json.loads(request.POST['data'])
@@ -248,13 +241,10 @@ actions.register(findTexts)
 @login_required_json
 def removeText(request):
     '''
-        param data {
-            id: testId,
+        takes {
+            id: string,
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-            }
+        returns {
         }
     '''
     data = json.loads(request.POST['data'])
@@ -271,14 +261,10 @@ actions.register(removeText, cache=False)
 @login_required_json
 def subscribeToText(request):
     '''
-        param data {
-            id: testId,
+        takes {
+            id: string,
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-            }
-        }
+        returns {}
     '''
     data = json.loads(request.POST['data'])
     text = get_text_or_404_json(data['id'])
@@ -299,15 +285,11 @@ actions.register(subscribeToText, cache=False)
 @login_required_json
 def unsubscribeFromText(request):
     '''
-        param data {
-            id: testId,
+        takes {
+            id: string,
             user: username(only admins)
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-            }
-        }
+        returns {}
     '''
     data = json.loads(request.POST['data'])
     text = get_text_or_404_json(data['id'])
@@ -322,17 +304,14 @@ actions.register(unsubscribeFromText, cache=False)
 @login_required_json
 def sortTexts(request):
     '''
-        param data {
+        takes {
             section: 'personal',
             ids: [1,2,4,3]
         }
-        known sections: 'personal', 'public', 'featured'
-        featured can only be edited by admins
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-            }
-        }
+            known sections: 'personal', 'public', 'featured'
+            featured can only be edited by admins
+
+        returns {}
     '''
     data = json.loads(request.POST['data'])
     position = 0

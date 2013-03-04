@@ -25,21 +25,18 @@ import models
 
 def signin(request):
     '''
-        param data {
-            username: 'username',
-            password: 'password'
+        takes {
+            username: string,
+            password: string
         }
 
-        return {
-            status: {'code': 200, 'text': 'ok'}
-            data: {
-                errors: {
-                    username: 'Unknown Username',
-                    password: 'Incorrect Password'
-                }
-                user: {
-                    ...
-                }
+        returns {
+            errors: {
+                username: 'Unknown Username',
+                password: 'Incorrect Password'
+            }
+            user: {
+                ...
             }
         }
     '''
@@ -84,15 +81,11 @@ actions.register(signin, cache=False)
 
 def signout(request):
     '''
-        param data {
-        }
+        takes {}
 
-        return {
-            status: {'code': int, 'text': string}
-            data: {
-                user: {
-                    default user
-                }
+        returns {
+            user: {
+                default user
             }
         }
     '''
@@ -112,22 +105,19 @@ actions.register(signout, cache=False)
 
 def signup(request):
     '''
-        param data {
-            username: 'username',
-            password: 'password',
-            email: 'emailaddress'
+        takes {
+            username: string,
+            password: string,
+            email: string
         }
 
-        return {
-            status: {'code': int, 'text': string}
-            data: {
-                errors: {
-                    username: 'Unknown Username',
-                    password: 'Incorrect Password'
-                }
-                user: {
-                    ...
-                }
+        returns {
+            errors: {
+                username: 'Unknown Username',
+                password: 'Incorrect Password'
+            }
+            user: {
+                ...
             }
         }
     '''
@@ -196,20 +186,17 @@ actions.register(signup, cache=False)
 
 def resetPassword(request):
     '''
-        param data {
-            username: username,
-            password: new password
-            code: reset code 
+        takes {
+            username: string,
+            password: string,
+            code: string
         }
 
-        return {
-            status: {'code': int, 'text': string}
-            data: {
-                errors: {
-                    code: 'Incorrect Code'
-                }
-                user {
-                }
+        returns {
+            errors: {
+                code: 'Incorrect Code'
+            }
+            user {
             }
         }
     '''
@@ -252,20 +239,17 @@ actions.register(resetPassword, cache=False)
 
 def requestToken(request):
     '''
-        param data {
-            username: username,
-            email: email
+        takes {
+            username: string,
+            email: string
         }
 
-        return {
-            status: {'code': int, 'text': string}
-            data: {
-                errors: {
-                    username: 'Unknown Username'
-                    email: 'Unknown Email'
-                }
-                username: user
+        returns {
+            errors: {
+                username: 'Unknown Username'
+                email: 'Unknown Email'
             }
+            username: user
         }
     '''
     data = json.loads(request.POST['data'])
@@ -321,16 +305,13 @@ actions.register(requestToken, cache=False)
 @admin_required_json
 def editUser(request):
     '''
-        param data {
+        takes {
             key: value
         }
         required key: id 
         optional keys: username, email, level, notes
 
-        return {
-            'status': {'code': int, 'text': string}
-            'data': {
-            }
+        returns {
         }
     '''
     response = json_response()
@@ -377,14 +358,10 @@ actions.register(editUser, cache=False)
 @admin_required_json
 def removeUser(request):
     '''
-        param data {
+        takes {
             username: username
         }
-        return {
-            'status': {'code': int, 'text': string}
-            'data': {
-            }
-        }
+        returns {}
     '''
     response = json_response()
     data = json.load(request.POST['data'])
@@ -395,18 +372,15 @@ actions.register(removeUser, cache=False)
 
 def findUser(request):
     '''
-        param data {
-            key: "username",
-            value: "foo",
-            operator: "=="
-            keys: []
+        takes {
+            key: string, //username, email
+            value: string,
+            operator: "==" // "==", "="
+            keys: [string]
         }
 
-        return {
-            'status': {'code': int, 'text': string}
-            'data': {
-                users = [{username: 'user1', level: ...}, {username: 'user2', ..}]
-            }
+        returns {
+            users: [object]
         }
     '''
     data = json.loads(request.POST['data'])
@@ -468,7 +442,7 @@ def order_query(qs, sort):
 @admin_required_json
 def findUsers(request):
     '''
-        param data {
+        takes {
             query: {
                 conditions: [
                     {
@@ -487,19 +461,17 @@ def findUsers(request):
         possible query keys:
             username, email, lastLogin, browser
         
-        return {
-                status: {
-                    code: int,
-                    text: string
-                },
-                data: {
-                    items: [
-                        {name:, user:, featured:, public...}
-                    ]
-                }
+        returns {
+            items: [
+                {name:, user:, featured:, public...}
+            ]
         }
-        param data
-            {'query': query, 'sort': array, 'range': array}
+
+        takes {
+            query: query,
+            sort: array,
+            range: array
+        }
 
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
@@ -517,12 +489,15 @@ def findUsers(request):
             range:       result range, array [from, to]
 
         with keys, items is list of dicts with requested properties:
-          return {'status': {'code': int, 'text': string},
-                'data': {items: array}}
+        returns {
+            items: [object]
+        }
 
 Positions
-        param data
-            {'query': query, 'positions': []}
+        takes {
+            query: query,
+            positions: []
+        }
 
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
@@ -560,18 +535,17 @@ actions.register(findUsers)
 @login_required_json
 def mail(request):
     '''
-        param data {
-            'to': array of usernames,
-            'subject': string,
-            'message': string
+        takes {
+            to: [string], // array of usernames to send mail to
+            subject: string,
+            message: string
         }
 
         message can contain {username} or {email},
         this will be replace with the user/email
         the mail is sent to.
 
-        return {
-            'status': {'code': int, 'text': string}
+        returns {
         }
     '''
     response = json_response()
@@ -625,14 +599,13 @@ actions.register(mail, cache=False)
 
 def contact(request):
     '''
-        param data {
-            'email': string,
-            'subject': string,
-            'message': string
+        takes {
+            email: string,
+            subject: string,
+            message: string
         }
 
-        return {
-            'status': {'code': int, 'text': string}
+        returns {
         }
     '''
     data = json.loads(request.POST['data'])
@@ -699,11 +672,11 @@ def getPositionById(list, key):
 @login_required_json
 def editPreferences(request):
     '''
-        param data {
+        takes {
             key: value
         }
         keys: email, password
-        return
+        returns {}
     '''
     data = json.loads(request.POST['data'])
     errors = {}
@@ -743,11 +716,10 @@ def reset_ui(request):
 def resetUI(request):
     '''
         reset user ui settings to defaults
-        param data {
+        takes {
         }
 
-        return {
-            'status': {'code': int, 'text': string}
+        returns {
         }
     '''
     response = json_response()
@@ -762,14 +734,13 @@ actions.register(resetUI, cache=False)
 
 def setUI(request):
     '''
-        param data {
+        takes {
             key.subkey: value
         }
         you can set nested keys
             api.setUI({"lists|my|ListView": "icons"})
 
-        return {
-            'status': {'code': int, 'text': string}
+        returns {
         }
     '''
     data = json.loads(request.POST['data'])

@@ -104,7 +104,7 @@ def find(request):
                 sort: [{key: 'title', operator: '+'}]
             })
 
-        param data {
+        takes {
             'query': query,
             'sort': array,
             'range': array
@@ -129,11 +129,12 @@ def find(request):
             group:    group elements by, country, genre, director...
 
         with keys, items is list of dicts with requested properties:
-          return {'status': {'code': int, 'text': string},
-                'data': {items: array}}
+          returns {
+              items: [objects]
+          }
 
 Groups
-        param data {
+        takes {
             'query': query,
             'key': string,
             'group': string,
@@ -151,15 +152,17 @@ Groups
 
         with keys
         items contains list of {'name': string, 'items': int}:
-        return {'status': {'code': int, 'text': string},
-            'data': {items: array}}
+        returns {
+            items: [objects]
+        }
 
         without keys: return number of items in given query
-          return {'status': {'code': int, 'text': string},
-                'data': {items: int}}
+          returns {
+              items: int
+          }
 
 Positions
-        param data {
+        takes {
             'query': query,
             'positions': [],
             'sort': array
@@ -168,12 +171,9 @@ Positions
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
             positions: ids of items for which positions are required
-        return {
-            status: {...},
-            data: {
-                positions: {
-                    id: position
-                }
+        returns {
+            positions: {
+                id: position
             }
         }
     '''
@@ -298,15 +298,16 @@ actions.register(find)
 
 def autocomplete(request):
     '''
-        param data
-            key
-            value
-            operator '=', '==', '^', '$'
-            query
-            range
-        return 
-
-        query can be an item query to limit results
+        takes {
+            key: string,
+            value: string,
+            operator: string // '=', '==', '^', '$'
+            query: object // item query to limit results
+            range: [int, int]
+        }
+        returns {
+            items: [string, ...] //array of matching values
+        }
     '''
     data = json.loads(request.POST['data'])
     if not 'range' in data:
@@ -359,11 +360,11 @@ actions.register(autocomplete)
 
 def findId(request):
     '''
-        param data {
-            'id':
-            'title':
-            'director': []
-            'year': ...
+        takes {
+            'id': string
+            'title': string
+            'director': [string]
+            'year': int
         }
     '''
     data = json.loads(request.POST['data'])
@@ -388,13 +389,13 @@ actions.register(findId)
 
 def getMetadata(request):
     '''
-        param data {
+        takes {
             id: string,
-            keys: array
+            keys: [string]
         }
 
         returns {
-           key: value,
+           key: value
            ..
         }
 
@@ -421,16 +422,20 @@ actions.register(getMetadata)
 
 def getIds(request):
     '''
-        param data {
-            title: '',
-            director: [],
+        takes {
+            title: string,
+            director: [string],
             year: int
         }
 
         returns {
-            items: [{tite, director, year, originalTitle}, ...]
+            items: [{
+                tite: string,
+                director: [string],
+                year: int,
+                originalTitle: string
+            }]
         }
-
     '''
     data = json.loads(request.POST['data'])
     response = json_response({})
@@ -445,11 +450,13 @@ actions.register(getIds)
 
 def get(request):
     '''
-        param data {
-            id: string
-            keys: array
+        takes {
+            id: string,
+            keys: [string]
         }
-        return item array
+        returns {
+            key: value
+        }
     '''
     response = json_response({})
     data = json.loads(request.POST['data'])
@@ -481,15 +488,13 @@ actions.register(get)
 @login_required_json
 def add(request):
     '''
-        param data {
+        takes {
+            title: string, //(optional)
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-                id:
-                name:
-                ...
-            }
+        returns {
+            id:
+            name:
+            ...
         }
     '''
 
@@ -514,13 +519,17 @@ actions.register(add, cache=False)
 @login_required_json
 def edit(request):
     '''
-        param data {
+        edit item with id, you can pass one or many key/value pairs,
+        returns all key/values for edited item.
+
+        takes {
             id: string,
-            key: value,..
+            key: value,
+            ...
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {}
+        returns {
+            key: value
+            ..
         }
     '''
     update_clips = False
@@ -558,11 +567,13 @@ actions.register(edit, cache=False)
 @login_required_json
 def remove(request):
     '''
-        param data {
+        remove item with id, return status is 200/removed on sucess or 403/permission deinied.
+        takes {
             id: string
         }
 
-        return {'status': {'code': int, 'text': string}}
+        returns {
+        }
     '''
     response = json_response({})
     data = json.loads(request.POST['data'])
@@ -581,21 +592,13 @@ def remove(request):
     return render_to_json_response(response)
 actions.register(remove, cache=False)
 
-'''
-    Poster API
-'''
-
-
-def setPosterFrame(request): #parse path and return info
+def setPosterFrame(request):
     '''
-        param data {
-            id: itemId,
+        takes {
+            id: string,
             position: float
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-            }
+        returns {
         }
     '''
     data = json.loads(request.POST['data'])
@@ -610,16 +613,18 @@ def setPosterFrame(request): #parse path and return info
     return render_to_json_response(response)
 actions.register(setPosterFrame, cache=False)
 
-def setPoster(request): #parse path and return info
+
+def setPoster(request):
     '''
-        param data {
-            id: itemId,
-            source: string
+        takes {
+            id: string,
+            source: string // url
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-                poster: {url,width,height}
+        returns {
+            poster: {
+                url: string,
+                width: int,
+                height: int
             }
         }
     '''
@@ -645,14 +650,10 @@ actions.register(setPoster, cache=False)
 
 def updateExternalData(request):
     '''
-        param data {
-            id: itemId,
+        takes {
+            id: string,
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-                poster: {url,width,height}
-            }
+        returns {
         }
     '''
     data = json.loads(request.POST['data'])
@@ -667,20 +668,17 @@ actions.register(updateExternalData, cache=False)
 
 def lookup(request):
     '''
-        param data {
+        takes {
             title: string,
             director: [string],
             year: string,
             id: string
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-                title: string,
-                director: [string],
-                year: string,
-                id: string
-            }
+        returns {
+            title: string,
+            director: [string],
+            year: string,
+            id: string
         }
     '''
     data = json.loads(request.POST['data'])
@@ -695,33 +693,7 @@ def lookup(request):
     return render_to_json_response(response)
 actions.register(lookup)
 
-def getImdbId(request):
-    '''
-        param data {
-            title: string,
-            director: string,
-            year: string
-        }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-                imdbId:string
-            }
-        }
-    '''
-    data = json.loads(request.POST['data'])
-    imdbId = ox.web.imdb.getImdbId(data['title'], data['director'], timeout=-1)
-    if imdbId:
-        response = json_response({'imdbId': imdbId})
-    else:
-        response = json_response(status=404, text='not found')
-    return render_to_json_response(response)
-actions.register(getImdbId)
 
-
-'''
-    media delivery
-'''
 def frame(request, id, size, position=None):
     item = get_object_or_404(models.Item, itemId=id)
     if not item.access(request.user):

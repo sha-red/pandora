@@ -17,11 +17,14 @@ import models
 @admin_required_json
 def editTitle(request):
     '''
-        param data {
-            'id': titleid,
-            'sorttitle': ...
+        takes {
+            id: string
+            sorttitle: string
         }
         can contain any of the allowed keys for title 
+        returns {
+            id: string
+        }
     '''
     data = json.loads(request.POST['data'])
     title = get_object_or_404_json(models.Title, pk=ox.fromAZ(data['id']))
@@ -65,7 +68,7 @@ def order_query(qs, sort):
 
 def findTitles(request):
     '''
-        param data {
+        takes {
             query: {
                 conditions: [
                     {
@@ -90,19 +93,15 @@ def findTitles(request):
         possible keys:
             title, sorttitle, numberoftitles
         
-        return {
-                status: {
-                    code: int,
-                    text: string
-                },
-                data: {
-                    items: [
-                        {title:, user:, featured:, public...}
-                    ]
-                }
+        returns {
+            items: [object]
         }
-        param data
-            {'query': query, 'sort': array, 'range': array}
+
+        takes {
+            query: object,
+            sort: [object],
+            range: [int, int]
+        }
 
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
@@ -120,8 +119,7 @@ def findTitles(request):
             range:       result range, array [from, to]
 
         with keys, items is list of dicts with requested properties:
-          return {'status': {'code': int, 'text': string},
-                'data': {items: array}}
+          returns {items: [object]}
 
     '''
     data = json.loads(request.POST['data'])

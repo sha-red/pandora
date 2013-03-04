@@ -17,11 +17,15 @@ import tasks
 @admin_required_json
 def editName(request):
     '''
-        param data {
-            'id': nameid,
-            'sortname': ...
+        takes {
+            id: id,
+            sortname: string
         }
-        can contain any of the allowed keys for name 
+        returns {
+            id: string,
+            name: string
+            ...
+        }
     '''
     data = json.loads(request.POST['data'])
     person = get_object_or_404_json(models.Person, pk=ox.fromAZ(data['id']))
@@ -37,12 +41,14 @@ actions.register(editName, cache=False)
 
 def sortName(request):
     '''
-        param data {
-            'name': name
-            or
-            'names': [name, name]
+        get sort name(s) for given name or names
+        takes {
+            names: [string]
+            name: string
         }
-        can contain any of the allowed keys for name 
+        returns {
+            name: sortName
+        }
     '''
     data = json.loads(request.POST['data'])
     names = data.get('names', [])
@@ -85,7 +91,7 @@ def order_query(qs, sort):
 
 def findNames(request):
     '''
-        param data {
+        takes {
             query: {
                 conditions: [
                     {
@@ -110,16 +116,8 @@ def findNames(request):
         possible keys:
             name, sortname, numberofnames
         
-        return {
-                status: {
-                    code: int,
-                    text: string
-                },
-                data: {
-                    items: [
-                        {name:, user:, featured:, public...}
-                    ]
-                }
+        returns {
+            items: [{name:, user:, featured:, public...}]
         }
         param data
             {'query': query, 'sort': array, 'range': array}
@@ -140,9 +138,9 @@ def findNames(request):
             range:       result range, array [from, to]
 
         with keys, items is list of dicts with requested properties:
-          return {'status': {'code': int, 'text': string},
-                'data': {items: array}}
-
+        returns {
+              items: [string]
+        }
     '''
     data = json.loads(request.POST['data'])
     response = json_response()

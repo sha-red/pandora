@@ -18,13 +18,14 @@ import models
 @login_required_json
 def addEvent(request):
     '''
-        param data
-            {
-                'name': '',
-                'start': ''
-                'end': ''
-            }
-            required keys: name, start, end
+       takes {
+           name: string,
+           start: string,
+           end: string
+        }
+        returns {
+            id: string
+        }
     '''
     data = json.loads(request.POST['data'])
     existing_names = []
@@ -67,13 +68,16 @@ actions.register(addEvent, cache=False)
 @login_required_json
 def editEvent(request):
     '''
-        param data
-            {
-                'id': event id,
-                'name': ''
-                ...
-            }
-            update provides keys of event with id
+        takes {
+            id: string,
+            name: string,
+            start: string,
+            end: string
+        }
+        returns {
+            id: string,
+            ...
+        }
     '''
     data = json.loads(request.POST['data'])
     event = get_object_or_404_json(models.Event, pk=ox.fromAZ(data['id']))
@@ -118,11 +122,11 @@ actions.register(editEvent, cache=False)
 @login_required_json
 def removeEvent(request):
     '''
-        param data {
+        remove Event with given id
+        takes {
             id: event id
         }
-        remove Event with given id
-
+        returns {}
     '''
     data = json.loads(request.POST['data'])
     event = get_object_or_404_json(models.Event, pk=ox.fromAZ(data['id']))
@@ -164,8 +168,11 @@ def order_query(qs, sort):
 
 def findEvents(request):
     '''
-        param data
-            {'query': query, 'sort': array, 'range': array}
+        takes {
+            query: object,
+            sort: array
+            range': [int, int]
+        }
 
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
@@ -188,16 +195,17 @@ def findEvents(request):
         itemsQuery can be used to limit the resuts to matches in those items.
         
         with keys, items is list of dicts with requested properties:
-          return {'status': {'code': int, 'text': string},
+          returns {'status': {'code': int, 'text': string},
                 'data': {items: array}}
 
 Positions
-        param data
-            {'query': query, 'ids': []}
-
-            query: query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            ids:  ids of events for which positions are required
+        takes {
+            query: object,
+            ids: [string]
+        }
+        query: query object, more on query syntax at
+               https://wiki.0x2620.org/wiki/pandora/QuerySyntax
+        ids:  ids of events for which positions are required
     '''
     response = json_response(status=200, text='ok')
 
@@ -231,18 +239,10 @@ actions.register(findEvents)
 
 def getEventNames(request):
     '''
-        param data {
+        takes {
         }
-        return {
-                status: {
-                    code: int,
-                    text: string
-                },
-                data: {
-                    items: [
-                        {name:, matches}
-                    ]
-                }
+        returns {
+            items: [{name: string, matches: int}]
         }
     '''
     response = json_response({})

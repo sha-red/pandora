@@ -64,7 +64,7 @@ def order_query(qs, sort):
 
 def findAnnotations(request):
     '''
-        param data {
+        takes {
             query: {
                 conditions: [],
                 operator: '&'
@@ -79,11 +79,8 @@ def findAnnotations(request):
             range: [in, out],
             sort: []
         }
-        return {
-            'status': {'code': int, 'text': string}
-            'data': {
-                annotations = [{..}, {...}, ...]
-            }
+        returns {
+            annotations = [{..}, {...}, ...]
         }
     '''
     data = json.loads(request.POST['data'])
@@ -117,18 +114,16 @@ actions.register(findAnnotations)
 @login_required_json
 def addAnnotation(request):
     '''
-        param data {
+        takes {
             item: itemId,
             layer: layerId,
             in: float,
             out: float,
             value: string
         }
-        return {'status': {'code': int, 'text': string},
-                'data': {
-                    id: 123, //id of new annotation
-                    ...
-                }
+        returns {
+            id: string, //id of new annotation
+            ...
         }
     '''
     data = json.loads(request.POST['data'])
@@ -160,7 +155,7 @@ actions.register(addAnnotation, cache=False)
 @login_required_json
 def addAnnotations(request):
     '''
-        param data {
+        takes {
             item: itemId,
             layer: layerId,
             annotations: [{
@@ -169,11 +164,8 @@ def addAnnotations(request):
                 value: string
             }, ...]
         }
-        return {'status': {'code': int, 'text': string},
-                'data': {
-                    id: 123, //id of new annotation
-                    ...
-                }
+        returns {
+            taskId: string
         }
     '''
     data = json.loads(request.POST['data'])
@@ -200,12 +192,10 @@ actions.register(addAnnotations, cache=False)
 @login_required_json
 def removeAnnotation(request):
     '''
-        param data {
+        takes {
             id: annotationId
         }
-        return {'status': {'code': int, 'text': string},
-                'data': {
-                }
+        returns {
         }
     '''
     response = json_response({})
@@ -223,17 +213,15 @@ actions.register(removeAnnotation, cache=False)
 @login_required_json
 def editAnnotation(request):
     '''
-        param data {
+        takes {
             id:,
             in: float,
             out: float,
             value: string,
         }
-        return {'status': {'code': int, 'text': string},
-                'data': {
-                    id:
-                    ...
-                }
+        returns {
+            id:
+            ...
         }
     '''
     response = json_response({})

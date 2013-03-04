@@ -57,7 +57,7 @@ def parse_query(data, user):
 
 def findLists(request):
     '''
-        param data {
+        takes {
             query: {
                 conditions: [
                     {
@@ -80,12 +80,8 @@ def findLists(request):
             name, user, featured, subscribed, query
 
         }
-        return {status: {code: int, text: string},
-                data: {
-                    items: [
-                        {name:, user:, featured:, public...}
-                    ]
-                }
+        returns {
+            items: [{name: string, user: string, featured: bool, public...}]
         }
     '''
     data = json.loads(request.POST['data'])
@@ -126,15 +122,12 @@ actions.register(findLists)
 @login_required_json
 def addListItems(request):
     '''
-        param data {
+        takes {
             list: listId,
             items: [itemId],
             query: ...
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-            }
+        returns {
         }
     '''
     data = json.loads(request.POST['data'])
@@ -158,15 +151,12 @@ actions.register(addListItems, cache=False)
 @login_required_json
 def removeListItems(request):
     '''
-        param data {
+        takes {
              list: listId,
              items: [itemId],
              quert: ...
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-            }
+        returns {
         }
     '''
     data = json.loads(request.POST['data'])
@@ -189,7 +179,7 @@ actions.register(removeListItems, cache=False)
 @login_required_json
 def addList(request):
     '''
-        param data {
+        takes {
             name: value,
         }
         possible keys to create list:
@@ -201,13 +191,10 @@ def addList(request):
             view
             sort
 
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-                id:
-                name:
-                ...
-            }
+        returns {
+            id: string,
+            name: string,
+            ...
         }
     '''
     data = json.loads(request.POST['data'])
@@ -252,7 +239,7 @@ actions.register(addList, cache=False)
 @login_required_json
 def editList(request):
     '''
-        param data {
+        takes {
             id: listId,
             key: value,
         }
@@ -261,10 +248,9 @@ def editList(request):
 
         posterFrames:
             array with objects that have item/position
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-            }
+        returns {
+            id: string,
+            ...
         }
     '''
     data = json.loads(request.POST['data'])
@@ -281,13 +267,10 @@ actions.register(editList, cache=False)
 @login_required_json
 def removeList(request):
     '''
-        param data {
+        takes {
             id: listId,
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-            }
+        returns {
         }
     '''
     data = json.loads(request.POST['data'])
@@ -305,13 +288,10 @@ actions.register(removeList, cache=False)
 @login_required_json
 def subscribeToList(request):
     '''
-        param data {
+        takes {
             id: listId,
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-            }
+        returns {
         }
     '''
     data = json.loads(request.POST['data'])
@@ -333,14 +313,11 @@ actions.register(subscribeToList, cache=False)
 @login_required_json
 def unsubscribeFromList(request):
     '''
-        param data {
+        takes {
             id: listId,
             user: username(only admins)
         }
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-            }
+        returns {
         }
     '''
     data = json.loads(request.POST['data'])
@@ -356,16 +333,13 @@ actions.register(unsubscribeFromList, cache=False)
 @login_required_json
 def sortLists(request):
     '''
-        param data {
+        takes {
             section: 'personal',
             ids: [1,2,4,3]
         }
         known sections: 'personal', 'public', 'featured'
         featured can only be edited by admins
-        return {
-            status: {'code': int, 'text': string},
-            data: {
-            }
+        returns {
         }
     '''
     data = json.loads(request.POST['data'])

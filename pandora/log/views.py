@@ -17,17 +17,12 @@ import models
 
 def log(request):
     '''
-        param data {
-            url: url
-            line: line
-            text: text
+        takes {
+            url: string,
+            line: string,
+            text: string
         }
-        return {
-            status: ...
-            data: {
-                name:
-                body:
-            }
+        returns {
         }
     '''
     data = json.loads(request.POST['data'])
@@ -53,10 +48,10 @@ actions.register(log, cache=False)
 @admin_required_json
 def removeLogs(request):
     '''
-        param data {
-            'ids': ,
+        takes {
+            ids: [string]
         }
-        can contain any of the allowed keys for place 
+        returns {}
     '''
     data = json.loads(request.POST['data'])
     models.Log.objects.filter(id__in=[ox.fromAZ(i) for i in data['ids']]).delete()
@@ -91,7 +86,7 @@ def order_query(qs, sort):
 @admin_required_json
 def findLogs(request):
     '''
-        param data {
+        takes {
             query: {
                 conditions: [
                     {
@@ -103,8 +98,11 @@ def findLogs(request):
                 operator: ","
             },
             sort: [{key: 'created', operator: '+'}],
-            range: [0, 100]
-            keys: []
+            range: [int, int]
+            keys: [string]
+        }
+        returns {
+            items: [object]
         }
 
     '''

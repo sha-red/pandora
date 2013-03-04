@@ -13,14 +13,14 @@ import models
 @login_required_json
 def addClip(request):
     '''
-        param data
-            {timeline: timelineId,
-             item: itemId,
-             start: float,
-             end: float,
-           }
-        return {'status': {'code': int, 'text': string},
-                'data': {}}
+        takes {
+            item: string,
+            edit: string,
+            start: float,
+            end: float,
+        }
+        returns {
+        }
     '''
     data = json.loads(request.POST['data'])
     list = get_object_or_404_json(models.Timeline, pk=data['list'])
@@ -43,12 +43,11 @@ actions.register(addClip, cache=False)
 @login_required_json
 def removeClip(request):
     '''
-        param data
-            {timeline: timelineId,
-             clip: clipId,
-           }
-        return {'status': {'code': int, 'text': string},
-                'data': {}}
+       takes {
+           item: string
+        }
+        returns {
+        }
     '''
     data = json.loads(request.POST['data'])
     list = get_object_or_404_json(models.Timeline, pk=data['list'])
@@ -70,13 +69,12 @@ actions.register(removeClip, cache=False)
 
 def getTimeline(request):
     '''
-        param data
-            {name: value, user: user}
-        return {
-            'status': {'code': int, 'text': string},
-            'data': {
-                fixme
-            }
+        takes {
+            name: string,
+            user: string
+        }
+        returns {
+            ...
         }
 
 could be
@@ -107,10 +105,12 @@ actions.register(getTimeline)
 @login_required_json
 def addTimeline(request):
     '''
-        param data
-            {name: value}
-        return {'status': {'code': int, 'text': string},
-                'data': {}}
+        takes {
+            ...
+        }
+        returns {
+            ...
+        }
     '''
     data = json.loads(request.POST['data'])
     if models.Timeline.filter(name=data['name'], user=request.user).count() == 0:
@@ -129,11 +129,11 @@ actions.register(addTimeline, cache=False)
 @login_required_json
 def editTimeline(request):
     '''
-        param data
-            {key: value}
-        keys: name, public
-        return {'status': {'code': int, 'text': string},
-                'data': {}
+        takes {
+            ...
+        }
+        returns {
+            ...
         }
     '''
     data = json.loads(request.POST['data'])
@@ -151,10 +151,12 @@ actions.register(editTimeline, cache=False)
 @login_required_json
 def removeTimeline(request):
     '''
-        param data
-            {key: value}
-        return {'status': {'code': int, 'text': string},
-                'data': {}}
+        takes {
+            ...
+        }
+        returns {
+            ...
+        }
     '''
     data = json.loads(request.POST['data'])
     list = get_object_or_404_json(models.Timeline, pk=data['list'])

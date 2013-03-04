@@ -73,27 +73,24 @@ def order_query(qs, sort):
 
 def findClips(request):
     '''
-        param data {
+        takes {
             query: {
-                conditions: [],
-                operator: '&'
+                conditions: [object],
+                operator: string // '&' or '|'
             },
             itemsQuery: {
                 conditions: [],
-                operator: '&'
+                operator: string // '&' or '|'
             },
-            keys: [],
+            keys: [string],
             position: int,
-            positions: [],
-            range: [in, out],
+            positions: [string],
+            range: [int, int],
             sort: []
         }
 
-        return {
-            'status': {'code': int, 'text': string}
-            'data': {
-                items = [{..}, {...}, ...]
-            }
+        returns {
+            items: [object]
         }
     '''
     data = json.loads(request.POST['data'])

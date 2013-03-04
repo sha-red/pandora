@@ -142,7 +142,7 @@ pandora.ui.apiDialog = function() {
                 .appendTo($text);
 
             Ox.Button({
-                    title: 'View Source (' + f + ')',
+                    title: 'Source (' + f + ')',
                 }).bindEvent({
                     click: function() {
                         $code.toggle();
@@ -159,7 +159,7 @@ pandora.ui.apiDialog = function() {
             })
             .css({
                 borderWidth: '1px',
-            }).appendTo($text).hide();
+            }).appendTo($text);
         } else {
             $text.html(overview);
         }

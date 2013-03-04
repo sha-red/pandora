@@ -95,15 +95,12 @@ def robots_txt(request, url):
 
 def getPage(request):
     '''
-        param data {
+        takes {
             name: pagename
         }
-        return {
-            status: ...
-            data: {
-                name:
-                text:
-            }
+        returns {
+            name:
+            text:
         }
     '''
     data = json.loads(request.POST['data'])
@@ -123,16 +120,13 @@ actions.register(getPage)
 @login_required_json
 def editPage(request):
     '''
-        param data {
+        takes {
             name: pagename
             text: text
         }
-        return {
-            status: ...
-            data: {
-                name:
-                text:
-            }
+        returns {
+            name:
+            text:
         }
     '''
     if request.user.get_profile().capability('canEditSitePages'):
@@ -151,8 +145,10 @@ actions.register(editPage)
 
 def init(request):
     '''
-        return {'status': {'code': int, 'text': string},
-                'data': {user: object}}
+        takes {}
+        returns {
+            user: object
+        }
     '''
     response = json_response({})
     config = copy.deepcopy(settings.CONFIG)
@@ -168,20 +164,15 @@ actions.register(init)
 def embedURL(request):
     '''
         
-        param data {
+        takes {
             url
             maxwidth
             maxheight
         }
-        return {
-            status: ...
-            data: {
-                html
-                ...
-            }
+        returns {
+            html
+            ...
         }
-        return {'status': {'code': int, 'text': string},
-                'data': {user: object}}
     '''
     data = json.loads(request.POST['data'])
     response = json_response({})

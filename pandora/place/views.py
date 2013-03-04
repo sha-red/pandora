@@ -19,7 +19,7 @@ import models
 @login_required_json
 def addPlace(request):
     '''
-        param data {
+        takes {
             name: "",
             alternativeNames: [],
             geoname: "",
@@ -32,6 +32,9 @@ def addPlace(request):
             lng: float,
             area: float,
             type: ""
+        }
+        returns {
+            id: string
         }
     '''
     #FIXME: check permissions
@@ -95,12 +98,14 @@ actions.register(addPlace, cache=False)
 @login_required_json
 def editPlace(request):
     '''
-        param data {
-            'id': placeid,
-            'name': ...
-            'north': 0...
+        takes {
+            id: string,
+            name: string
+            north: int
         }
-        can contain any of the allowed keys for place 
+        returns {
+            names: []
+        }
     '''
     data = json.loads(request.POST['data'])
     place = get_object_or_404_json(models.Place, pk=ox.fromAZ(data['id']))
@@ -158,9 +163,10 @@ actions.register(editPlace, cache=False)
 @login_required_json
 def removePlace(request):
     '''
-        param data {
-            'id': placeid,
+        takes {
+            id: string,
         }
+        returns {}
     '''
     data = json.loads(request.POST['data'])
     if isinstance(data, dict):
@@ -205,7 +211,7 @@ def order_query(qs, sort):
 
 def findPlaces(request):
     '''
-        param data {
+        takes {
             query: {
                 conditions: [
                     {
@@ -220,8 +226,8 @@ def findPlaces(request):
                 //see find request
             },
             sort: [{key: 'name', operator: '+'}],
-            range: [0, 100]
-            keys: []
+            range: [int, int]
+            keys: [string]
         }
 
         possible query keys:
@@ -233,20 +239,14 @@ def findPlaces(request):
         possible keys:
             name, geoname, user
         
-        return {
-                status: {
-                    code: int,
-                    text: string
-                },
-                data: {
-                    items: [
-                        {name:, user:, featured:, public...}
-                    ]
-                }
+        returns {
+            items: [object]
         }
-        param data
-            {'query': query, 'sort': array, 'range': array}
-
+        takes {
+            query: object,
+            sort: [object]
+            range: [int, int]
+        }
             query: query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
             sort: array of key, operator dics
@@ -263,16 +263,18 @@ def findPlaces(request):
             range:       result range, array [from, to]
 
         with keys, items is list of dicts with requested properties:
-          return {'status': {'code': int, 'text': string},
-                'data': {items: array}}
+        returns {
+            items: [string]    
+        }
 
 Positions
-        param data
-            {'query': query, 'positions': []}
-
-            query: query object, more on query syntax at
-                   https://wiki.0x2620.org/wiki/pandora/QuerySyntax
-            positions:  ids of places for which positions are required
+        takes {
+            query: object,
+            positions: [string]
+        }
+        query: query object, more on query syntax at
+               https://wiki.0x2620.org/wiki/pandora/QuerySyntax
+        positions:  ids of places for which positions are required
     '''
     data = json.loads(request.POST['data'])
     response = json_response()
@@ -311,18 +313,9 @@ actions.register(findPlaces)
 
 def getPlaceNames(request):
     '''
-        param data {
-        }
-        return {
-                status: {
-                    code: int,
-                    text: string
-                },
-                data: {
-                    items: [
-                        {name:, matches}
-                    ]
-                }
+        takes {}
+        returns {
+            items: [{name: string, matches: int}]
         }
     '''
     response = json_response({})
