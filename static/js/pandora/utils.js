@@ -1401,7 +1401,7 @@ pandora.beforeunloadWindow = function() {
         return "Encoding is currently running\nDo you want to leave this page?";
     //prevent error dialogs on unload
     pandora.isUnloading = true;
-}
+};
 
 pandora.unloadWindow = function() {
     /*
@@ -1438,6 +1438,24 @@ pandora.updateItemContext = function() {
         pandora.$ui.browser.reloadList();
     }
 };
+
+pandora.wait = function(taskId, callback, timeout) {
+    var task = {};
+    timeout = timeout || 5000;
+    task.timeout = setTimeout(function() {
+        pandora.api.taskStatus({taskId: taskId}, function(result) {
+            var t;
+            if(result.data.status == 'PENDING') {
+                t = pandora.wait(taskId, callback);
+                task.timeout = t.timeout;
+            } else {
+                callback(result);
+            }
+        });
+    }, 5000);
+    return task;
+};
+
 
 (function() {
 

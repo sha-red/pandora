@@ -4,18 +4,17 @@
 pandora.ui.importAnnotations = function(data) {
     var content = Ox.Element().css({margin: '16px'}),
         file,
-        height = 192,
+        height = 128,
         layers = pandora.site.layers.filter(function(layer) {
             return layer.canAddAnnotations[pandora.user.level];
         }),
         layer,
-        width = 384,
         srt = [],
         total = 0,
         importButton,
         selectLayer,
         selectFile,
-        that = Ox.Dialog({
+        that = pandora.ui.iconDialog({
             buttons: [
                 Ox.Button({
                     id: 'close',
@@ -32,20 +31,16 @@ pandora.ui.importAnnotations = function(data) {
                 }).bindEvent({
                     click: function() {
                         importButton.hide();
-                        selectLayer.hide();
-                        selectFile.hide();
-                        addAnnotation();
+                        addAnnotations();
                     }
                 })
             ],
             closeButton: true,
-            content: content,
+            text: content,
             keys: {
                 'escape': 'close'
             },
-            height: height,
             removeOnClose: true,
-            width: width,
             title: 'Import Annotations'
         })
         .bindEvent({
@@ -54,39 +49,50 @@ pandora.ui.importAnnotations = function(data) {
             }
         }),
         $status = $('<div>').css({
-            padding: '4px'
-        });
+            padding: '4px',
+            paddingBottom: '8px'
+        }).appendTo(content);
 
-    function addAnnotation() {
+    setStatus('Please select layer and .srt file')
+    function addAnnotations() {
+        var annotations, task;
         if (srt.length > 0) {
-            var data = srt.shift();
-            data.text = Ox.sanitizeHTML(data.text)
-                .replace(/<br[ /]*?>\n/g, '\n')
-                .replace(/\n\n/g, '<br>\n')
-                .replace(/\n/g, '<br>\n');
-            $status.html(
-                Ox.formatDuration(data['in']) + ' to '
-                + Ox.formatDuration(data.out) + '<br>\n' + data.text
-            );
-            pandora.api.addAnnotation({
-                'in': data['in'],
-                out: data.out,
-                value: data.text,
+            setStatus('Loading...');
+            var annotations = srt.filter(function(data) {
+                return !Ox.isUndefined(data['in']) && !Ox.isUndefined(data.out) && data.text;
+            
+            }).map(function(data) {
+                return {
+                    'in': data['in'],
+                    out: data.out,
+                    value: Ox.sanitizeHTML(data.text)
+                        .replace(/<br[ /]*?>\n/g, '\n')
+                        .replace(/\n\n/g, '<br>\n')
+                        .replace(/\n/g, '<br>\n')
+                };
+            });
+            pandora.api.addAnnotations({
+                annotations: annotations,
                 item: pandora.user.ui.item,
                 layer: layer
             }, function(result) {
-                if (result.status.code == 200) {
-                    addAnnotation();
+                if (result.data.taskId) {
+                    setStatus('Waiting or server to import annotations...');
+                    pandora.wait(result.data.taskId, function(result) {
+                        if(result.data.status == 'SUCCESS') {
+                            setStatus(annotations.length + ' annotations imported.');
+                            Ox.Request.clearCache(pandora.user.ui.item);
+                            pandora.$ui.contentPanel.replaceElement(
+                                1, pandora.$ui.item = pandora.ui.item()
+                            );
+                        } else {
+                            setStatus('Importing annotations failed.');
+                        }
+                    });
                 } else {
-                    content.html('Failed');
+                    setStatus('Importing annotations failed.');
                 }
             });
-        } else {
-            $status.html(total + ' annotations imported.');
-            Ox.Request.clearCache(pandora.user.ui.item);
-            pandora.$ui.contentPanel.replaceElement(
-                1, pandora.$ui.item = pandora.ui.item()
-            );
         }
     }
     function parseSRT(data) {
@@ -103,14 +109,17 @@ pandora.ui.importAnnotations = function(data) {
         }
         return srt;
     }
-    content.append($('<div>').css({
-        padding: '4px',
-        paddingBottom: '16px'
-    }).html('Import annotations from .srt file:'));
+
+    function setStatus(status) {
+        $status.html(status);
+    }
+
     selectLayer = Ox.Select({
             items: layers,
-            title: 'select...',
-            label: 'Layer'
+            title: 'Select Layer',
+        })
+        .css({
+            margin: '4px 2px 4px 4px'
         })
         .bindEvent({
             change: function(data) {
@@ -123,28 +132,33 @@ pandora.ui.importAnnotations = function(data) {
         })
         .appendTo(content);
 
-    selectFile = $('<input>')
-        .attr({
-            type: 'file'
+    selectFile = Ox.FileButton({
+            image: 'upload',
+            lbael: 'File',
+            title: 'Select SRT...',
+            width: 156
         })
         .css({
-            padding: '8px'
+            margin: '4px 2px 4px 4px'
         })
-        .on({
-            change: function(event) {
-                if (this.files.length) {
-                    file = this.files[0];
+        .bindEvent({
+            click: function(data) {
+                if(data.files.length) {
                     var reader = new FileReader();
                     reader.onloadend = function(event) {
                         srt = parseSRT(this.result);
                         total = srt.length;
-                        total && layer && importButton.options({disabled: false});
-                        $status.html(
+                        if(total && layer) {
+                            importButton.options({disabled: false});
+                            selectLayer.hide();
+                            selectFile.hide();
+                        }
+                        setStatus(
                             'File contains ' + total + ' annotation'
                             + (total == 1 ? '' : 's') + '.'
                         );
                     };
-                    reader.readAsText(file);
+                    reader.readAsText(data.files[0]);
                 } else {
                     srt = [];
                     total = 0;
@@ -155,6 +169,6 @@ pandora.ui.importAnnotations = function(data) {
             }
         })
         .appendTo(content);
-    content.append($status);
+
     return that;
 };

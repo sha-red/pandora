@@ -15,7 +15,7 @@ from item import utils
 from item.models import Item
 
 import models
-from tasks import update_item
+from tasks import update_item, add_annotations
 
 def parse_query(data, user):
     query = {}
@@ -157,6 +157,45 @@ def addAnnotation(request):
     return render_to_json_response(response)
 actions.register(addAnnotation, cache=False)
 
+@login_required_json
+def addAnnotations(request):
+    '''
+        param data {
+            item: itemId,
+            layer: layerId,
+            annotations: [{
+                in: float,
+                out: float,
+                value: string
+            }, ...]
+        }
+        return {'status': {'code': int, 'text': string},
+                'data': {
+                    id: 123, //id of new annotation
+                    ...
+                }
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    for key in ('item', 'layer', 'annotations'):
+        if key not in data:
+            return render_to_json_response(json_response(status=400,
+                                                         text='invalid data'))
+
+    item = get_object_or_404_json(Item, itemId=data['item'])
+    
+    layer_id = data['layer']
+    layer = filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers'])[0]
+    if item.editable(request.user) \
+        and layer['canAddAnnotations'].get(request.user.get_profile().get_level()):
+        response = json_response()
+        data['user'] = request.user.username
+        t = add_annotations.delay(data)
+        response['data']['taskId'] = t.task_id
+    else:
+        response = json_response(status=403, text='permission denied')
+    return render_to_json_response(response)
+actions.register(addAnnotations, cache=False)
 
 @login_required_json
 def removeAnnotation(request):

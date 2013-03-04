@@ -285,7 +285,10 @@ def firefogg_upload(request):
 def taskStatus(request):
     #FIXME: should check if user has permissions to get status
     data = json.loads(request.POST['data'])
-    task_id = data['task_id']
+    if 'taskId' in data:
+        task_id = data['taskId']
+    else:
+        task_id = data['task_id']
     response = task_status(request, task_id)
     return render_to_json_response(response)
 actions.register(taskStatus, cache=False)

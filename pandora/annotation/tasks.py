@@ -4,6 +4,7 @@ import json
 import ox
 
 from django.conf import settings
+from django.db import transaction
 from celery.task import task
 
 import models
@@ -62,6 +63,33 @@ def update_matches(id, type):
         #annotation has no value, remove all exisint matches
         for e in a_matches.all():
             e.update_matches(models.Annotation.objects.filter(pk=a.id))
+
+@task(ignore_results=False, queue='default')
+def add_annotations(data):
+    from item.models import Item
+    from user.models import User
+    item = Item.objects.get(itemId=data['item'])
+    layer_id = data['layer']
+    layer = filter(lambda l: l['id'] == layer_id, settings.CONFIG['layers'])[0]
+    user = User.objects.get(username=data['user'])
+    with transaction.commit_on_success():
+        for a in data['annotations']:
+            annotation = models.Annotation(
+                item=item,
+                layer=layer_id,
+                user=user,
+                start=float(a['in']), end=float(a['out']),
+                value=a['value'])
+            annotation.save()
+        #update facets if needed
+        if filter(lambda f: f['id'] == layer_id, settings.CONFIG['filters']):
+            item.update_layer_facet(layer_id)
+        Item.objects.filter(id=item.id).update(modified=annotation.modified)
+        annotation.item.modified = annotation.modified
+        annotation.item.update_find()
+        annotation.item.update_sort()
+        annotation.item.update_facets()
+    return True
 
 @task(ignore_results=True, queue='default')
 def update_item(id):
