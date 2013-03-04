@@ -66,12 +66,12 @@ pandora.ui.apiDialog = function() {
                 pandora.user.ui.page == 'api' && that.select(data.value);
             }
         }),
-        overview = '<div class="OxSelectable"><h2>Pan.do/ra API Overview</h2>use this api in the browser with <a href="/static/oxjs/demos/doc2/index.html#Ox.App">Ox.app</a> or use <a href="http://code.0x2620.org/pandora_client">pandora_client</a> it in python. Further description of the api can be found <a href="https://wiki.0x2620.org/wiki/pandora/API">on the wiki</a></div>';
+        overview = '<div class="OxSelectable"><h2>API Documentation</h2>use this api in the browser with <a href="/static/oxjs/demos/doc2/index.html#Ox.App">Ox.app</a> or use <a href="http://code.0x2620.org/pandora_client">pandora_client</a> it in python. Further description of the api can be found <a href="https://wiki.0x2620.org/wiki/pandora/API">on the wiki</a></div>';
 
     pandora.api.api({docs: true, code: true}, function(results) {
         var items = [{
             id: '',
-            title: pandora.site.site.name + ' API',
+            title: 'API Documentation',
             sort: 'aaa'
         }];
         actions = results.data.actions;
