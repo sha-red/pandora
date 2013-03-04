@@ -150,7 +150,8 @@ pandora.ui.mainMenu = function() {
                         { id: 'statistics', title: 'Statistics...', disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] }
                     ] },
                     { id: 'helpMenu', title: 'Help', items: [
-                        { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'control ?' }
+                        { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'control ?' },
+                        { id: 'api', title: pandora.site.site.name + ' API' }
                     ] }
                 ],
                 pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
@@ -285,7 +286,7 @@ pandora.ui.mainMenu = function() {
             click: function(data) {
                 if ([
                     'home', 'software', 'signup', 'signin', 'signout',
-                    'preferences', 'tv', 'help'
+                    'preferences', 'tv', 'help', 'api'
                 ].concat(
                     pandora.site.sitePages.map(function(page) {
                         return page.id;

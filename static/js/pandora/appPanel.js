@@ -41,7 +41,7 @@ pandora.ui.appPanel = function() {
                 // unless we're on page load, remove home screen
                 pandora.$ui.home.fadeOutScreen();
             }
-            ['site', 'account', 'preferences', 'help'].forEach(function(dialog) {
+            ['site', 'account', 'preferences', 'help', 'api'].forEach(function(dialog) {
                 pandora.$ui[dialog + 'Dialog'] && pandora.$ui[dialog + 'Dialog'].close();
             });
             if (pandora.$ui.tv) {
@@ -63,6 +63,8 @@ pandora.ui.appPanel = function() {
             }
         } else if (page == 'help') {
             pandora.$ui.helpDialog = pandora.ui.helpDialog().open();
+        } else if (page == 'api') {
+            pandora.$ui.apiDialog = pandora.ui.apiDialog().open();
         } else if (['signup', 'signin'].indexOf(page) > -1) {
             if (pandora.user.level == 'guest') {
                 if (pandora.$ui.accountDialog && pandora.$ui.accountDialog.is(':visible')) {
