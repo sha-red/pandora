@@ -30,7 +30,7 @@ pandora.ui.helpDialog = function() {
             buttons: [
                 Ox.Button({
                     id: 'switch',
-                    title: pandora.site.site.name + ' API...'
+                    title: 'API Documentation...'
                 }).bindEvent({
                     click: function() {
                         pandora.UI.set({page: 'api', 'hash.anchor': ''})
@@ -59,7 +59,7 @@ pandora.ui.helpDialog = function() {
         })
         .bindEvent({
             close: function() {
-                pandora.UI.set({page: '', 'hash.anchor': ''});
+                pandora.user.ui.page == 'help' && pandora.UI.set({page: '', 'hash.anchor': ''});
             },
             resize: function() {
                 $list.size();

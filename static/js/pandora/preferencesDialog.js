@@ -133,7 +133,6 @@ pandora.ui.preferencesDialog = function() {
                     title: 'Sign Out...'
                 }).bindEvent({
                     click: function() {
-                        $dialog.close();
                         pandora.UI.set({page: 'signout'});
                     }
                 }),
@@ -154,13 +153,12 @@ pandora.ui.preferencesDialog = function() {
             minWidth: 432,
             title: 'Preferences',
             width: 432
-        }),
-        closeDialog = $dialog.close;
-
-    $dialog.close = function() {
-        closeDialog();
-        pandora.UI.set({page: ''});
-    };
+        })
+        .bindEvent({
+            close: function() {
+                pandora.user.ui.page == 'preferences' && pandora.UI.set({page: ''});
+            }
+        });
 
     return $dialog;
 
