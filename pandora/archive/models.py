@@ -250,7 +250,7 @@ class File(models.Model):
             config = settings.CONFIG['video']
             stream, created = Stream.objects.get_or_create(
                         file=self,
-                        resolution=config['resolutions'][0],
+                        resolution=max(config['resolutions']),
                         format=config['formats'][0])
             if created:
                 stream.video.name = stream.path(stream.name())

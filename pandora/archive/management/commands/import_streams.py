@@ -43,7 +43,7 @@ class Command(BaseCommand):
                                 stream.file.info = stream.info
                                 stream.file.save()
         #link streams
-        resolution = settings.CONFIG['video']['resolutions'][0]
+        resolution = max(settings.CONFIG['video']['resolutions'])
         format = settings.CONFIG['video']['formats'][0]
         for s in models.Stream.objects.exclude(format=format, resolution=resolution).filter(source=None):
             s.source = models.Stream.objects.get(file=s.file, resolution=resolution, format=format)

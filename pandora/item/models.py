@@ -1232,7 +1232,7 @@ class Item(models.Model):
                 elif frames:
                     path = frames[int(len(frames)/2)]['path']
             else:
-                size = settings.CONFIG['video']['resolutions'][0]
+                size = max(settings.CONFIG['video']['resolutions'])
                 path = self.frame(self.poster_frame, size)
 
         return path
