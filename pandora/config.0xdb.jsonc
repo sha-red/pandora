@@ -88,6 +88,23 @@
         {"id": "keyword", "title": "Keyword", "type": "string"}
     ],
     "flags": true,
+    "help": [
+        {"id": "help", "title": "Help"},
+        {"id": "accounts", "title": "Accounts"},
+        {"id": "annotations", "title": "Annotations"},
+        {"id": "calendars", "title": "Calendars"},
+        {"id": "clips", "title": "Clips"},
+        {"id": "edits", "title": "Edits"},
+        {"id": "filters", "title": "Filters"},
+        {"id": "lists", "title": "Lists"},
+        {"id": "maps", "title": "Maps"},
+        {"id": "navigation", "title": "Navigation"},
+        {"id": "search", "title": "Search"},
+        {"id": "texts", "title": "Texts"},
+        {"id": "timelines", "title": "Timelines"},
+        {"id": "video", "title": "Video"},
+        {"id": "views", "title": "Views"}
+    ],
     /*
         An itemKey must have the following properties:
             id: The id of the key (as known by the server)
@@ -730,6 +747,7 @@
             "filtersSize": 176,
             "find": {"conditions": [], "operator": "&"},
             "followPlayer": true,
+            "hash": {"anchor": "", "query": []},
             "icons": "posters",
             "infoIconSize": 256,
             "item": "",
