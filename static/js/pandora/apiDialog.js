@@ -31,10 +31,10 @@ pandora.ui.apiDialog = function() {
                     title: 'Help...'
                 }).bindEvent({
                     click: function() {
-                        pandora.UI.set({page: 'help', 'hash.anchor': ''})
+                        pandora.UI.set({page: 'help', 'hash.anchor': ''});
                     }
                 }),
-                {},            
+                {},
                 Ox.Button({
                     id: 'close',
                     title: 'Close'
@@ -66,7 +66,7 @@ pandora.ui.apiDialog = function() {
                 pandora.user.ui.page == 'api' && that.select(data.value);
             }
         }),
-        overview = '<div class="OxSelectable"><h2>API Documentation</h2>use this api in the browser with <a href="/static/oxjs/demos/doc2/index.html#Ox.App">Ox.app</a> or use <a href="http://code.0x2620.org/pandora_client">pandora_client</a> it in python. Further description of the api can be found <a href="https://wiki.0x2620.org/wiki/pandora/API">on the wiki</a></div>';
+        overview = '<h1><b>API Documentation</b></h1><br>use this api in the browser with <a href="/static/oxjs/demos/doc2/index.html#Ox.App">Ox.app</a> or use <a href="http://code.0x2620.org/pandora_client">pandora_client</a> it in python. Further description of the api can be found <a href="https://wiki.0x2620.org/wiki/pandora/API">on the wiki</a></div>';
 
     pandora.api.api({docs: true, code: true}, function(results) {
         var items = [{
@@ -96,7 +96,7 @@ pandora.ui.apiDialog = function() {
                 max: 1,
                 min: 1,
                 scrollbarVisible: true,
-                selected: [],
+                selected: [selected],
                 sort: [{key: 'sort', operator: '+'}],
                 unique: 'id'
             })
@@ -122,20 +122,14 @@ pandora.ui.apiDialog = function() {
             orientation: 'horizontal'
         });
 
-        that.options({content: $panel});
+        that.select(selected).options({content: $panel});
+        $list.gainFocus();
         
     });
 
     that.select = function(id) {
-        if (id) {
-            $text.html('');
-            $text.append(
-                $('<h2>')
-                    .html(id)
-                    .css({
-                        marginBottom: '8px'
-                    })
-            );
+        if (id && actions[id]) {
+            $text.html('<h1><b>' + id + '</b><h1><br>');
             var code = actions[id].code[1],
                 f = actions[id].code[0],
                 line = Math.round(Ox.last(f.split(':')) || 0),

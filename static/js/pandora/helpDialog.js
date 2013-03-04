@@ -33,7 +33,7 @@ pandora.ui.helpDialog = function() {
                     title: 'API Documentation...'
                 }).bindEvent({
                     click: function() {
-                        pandora.UI.set({page: 'api', 'hash.anchor': ''})
+                        pandora.UI.set({page: 'api', 'hash.anchor': ''});
                     }
                 }),
                 {},
