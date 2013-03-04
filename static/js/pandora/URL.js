@@ -58,9 +58,17 @@ pandora.URL = (function() {
             
         }
 
-        state.hash = pandora.user.ui.hash;
+        if (pandora.user.ui.hash.anchor || !Ox.isEmpty(pandora.user.ui.hash.query)) {
+            state.hash = {};
+            if (pandora.user.ui.hash.anchor) {
+                state.hash.anchor = pandora.user.ui.hash.anchor;
+            }
+            if (!Ox.isEmpty(pandora.user.ui.hash.query)) {
+                state.hash.query = pandora.user.ui.hash.query;
+            }
+        }
 
-        Ox.Log('', 'URL', 'STATE ...', state)
+        Ox.Log('URL', 'GOT STATE ...', state)
 
         return state;
 
@@ -87,6 +95,9 @@ pandora.URL = (function() {
 
             if (state.hash) {
                 set.hash = state.hash;
+                if (!state.hash.anchor) {
+                    state.hash.anchor = '';
+                }
                 if (state.hash.query) {
                     if (state.hash.query.embed === true) {
                         // ...
@@ -95,9 +106,11 @@ pandora.URL = (function() {
                             set[kv.key] = kv.value;
                         });
                     }
+                } else {
+                    set.hash.query = [];
                 }
             } else {
-                set.hash = null;
+                set.hash = Ox.clone(pandora.site.user.ui.hash, true);
             }
 
             if (state.page) {
@@ -296,9 +309,9 @@ pandora.URL = (function() {
 
         self.URL = Ox.URL({
             findKeys: findKeys,
-            getHash: pandora.normalizeHashQuery,
-            getItem: pandora.getItemByIdOrTitle,
-            getSpan: pandora.getMetadataByIdOrName,
+            getHash: pandora.getHash,
+            getItem: pandora.getItem,
+            getSpan: pandora.getSpan,
             pages: [].concat(
                 ['home', 'software', 'api', 'help', 'tv'],
                 pandora.site.sitePages.map(function(page) {
