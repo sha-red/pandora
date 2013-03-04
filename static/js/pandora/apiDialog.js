@@ -27,6 +27,15 @@ pandora.ui.apiDialog = function() {
         that = Ox.Dialog({
             buttons: [
                 Ox.Button({
+                    id: 'switch',
+                    title: 'Help...'
+                }).bindEvent({
+                    click: function() {
+                        pandora.UI.set({page: 'help', 'hash.anchor': ''})
+                    }
+                }),
+                {},            
+                Ox.Button({
                     id: 'close',
                     title: 'Close'
                 }).bindEvent({
@@ -48,7 +57,7 @@ pandora.ui.apiDialog = function() {
         })
         .bindEvent({
             close: function() {
-                pandora.UI.set({page: '', 'hash.anchor': ''});
+                pandora.user.ui.page == 'api' && pandora.UI.set({page: '', 'hash.anchor': ''});
             },
             resize: function() {
                 $list.size();
@@ -104,7 +113,6 @@ pandora.ui.apiDialog = function() {
                 overflowY: 'auto'
             })
             .html(overview);
-
 
         $panel = Ox.SplitPanel({
             elements: [
