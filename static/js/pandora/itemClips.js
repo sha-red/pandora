@@ -53,9 +53,12 @@ pandora.ui.itemClips = function(options) {
                     : i == self.options.clips.length - 1 ? '2px -2px 2px 2px'
                     : '2px'
             })
-            .data(Ox.extend(annotations.length ? {
-                annotation: annotations[0].id.split('/')[1]
-            } : {}, {'in': clip['in'], out: clip.out}));
+            .data(
+                // default 5 second clips are annotations without id
+                Ox.extend(annotations.length && annotations[0].id ? {
+                    annotation: annotations[0].id.split('/')[1]
+                } : {}, {'in': clip['in'], out: clip.out})
+            );
         $item.find('.OxTarget').addClass('OxSpecialTarget');
         that.append($item);
     });
