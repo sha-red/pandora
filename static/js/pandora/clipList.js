@@ -119,7 +119,6 @@ pandora.ui.clipList = function(videoRatio) {
                 }
             },
             open: function(data) {
-                Ox.print(data.ids[0], '$$$$$', that.value(data.ids[0]))
                 var id = data.ids[0],
                     item = !ui.item ? id.split('/')[0] : ui.item,
                     annotation = that.value(id, 'annotations')[0].id,
