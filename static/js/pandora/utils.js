@@ -719,7 +719,8 @@ pandora.getItem = function(state, str, callback) {
             : 'timesaccessed';
         pandora.api.get({id: str, keys: ['id']}, function(result) {
             if (result.status.code == 200) {
-                callback(result.data.id);
+                state.item = result.data.id;
+                callback();
             } else {
                 pandora.api.find({
                     query: {
@@ -730,7 +731,6 @@ pandora.getItem = function(state, str, callback) {
                     range: [0, 100],
                     keys: ['id', 'title', sortKey]
                 }, function(result) {
-                    var id = '';
                     if (result.data.items.length) {
                         var items = Ox.filter(Ox.map(result.data.items, function(item) {
                             // test if exact match or word match
@@ -740,20 +740,31 @@ pandora.getItem = function(state, str, callback) {
                             // fixme: remove the (...|| 0) check once the backend sends correct data
                         }));
                         if (items.length) {
-                            id = items.sort(function(a, b) {
+                            state.item = items.sort(function(a, b) {
                                 return b.sort - a.sort;
                             })[0].id;
                         }
                     }
-                    callback(id);
+                    callback();
                 });
             }
         });
-    } else if (type == 'text') {
-        // /number is page for pdf or percent for html
-        callback(str.replace(/\/\d+$/, ''));
+    } else if (state.type == 'texts') {
+        pandora.api.getText({id: str}, function(result) {
+            if (result.status.code == 200) {
+                state.item = result.data.id;
+                callback();
+            } else {
+                // FIXME: add findText call here?
+                // FIXME: it's obscure that in the texts case,
+                // we have to set item to '', while for videos,
+                // it remains undefined 
+                state.item = '';
+                callback();
+            }
+        });
     } else {
-        callback(str);
+        callback();
     }
 }
 
@@ -903,6 +914,7 @@ pandora.getSortOperator = function(key) {
 };
 
 pandora.getSpan = function(state, str, callback) {
+    Ox.print('GET SPAN', state, str)
     // For a given item, or none (state.item), and a given view, or any
     // (state.view), this takes a string and checks if it is a valid
     // annotation/event/place id or an event/place name, and in that case sets
@@ -947,7 +959,8 @@ pandora.getSpan = function(state, str, callback) {
                 });
             }
         });
-    } else if (type == 'text') {
+    } else if (type == 'texts') {
+        state.span = str;
         callback();
     }
 
