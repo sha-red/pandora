@@ -150,8 +150,8 @@ pandora.ui.mainMenu = function() {
                         { id: 'statistics', title: 'Statistics...', disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] }
                     ] },
                     { id: 'helpMenu', title: 'Help', items: [
-                        { id: 'help', title: pandora.site.site.name + ' Help', keyboard: 'control ?' },
-                        { id: 'api', title: pandora.site.site.name + ' API' }
+                        { id: 'help', title: 'Help...', keyboard: 'control ?' },
+                        { id: 'api', title: 'API Documentation...' }
                     ] }
                 ],
                 pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
