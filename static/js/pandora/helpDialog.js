@@ -29,6 +29,15 @@ pandora.ui.helpDialog = function() {
         that = Ox.Dialog({
             buttons: [
                 Ox.Button({
+                    id: 'switch',
+                    title: pandora.site.site.name + ' API...'
+                }).bindEvent({
+                    click: function() {
+                        pandora.UI.set({page: 'api', 'hash.anchor': ''})
+                    }
+                }),
+                {},
+                Ox.Button({
                     id: 'close',
                     title: 'Close'
                 }).bindEvent({
