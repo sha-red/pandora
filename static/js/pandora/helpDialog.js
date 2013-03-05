@@ -72,11 +72,17 @@ pandora.ui.helpDialog = function() {
 
     Ox.get('/static/html/help.html', function(html) {
 
-        var $html = $('<div>').html(html);
+        pandora.site.itemName = Ox.map(pandora.site.itemName, function(v) {
+            return v.toLowerCase();
+        });
+        var $html = $('<div>').html(Ox.formatString(html, pandora.site));
+        pandora.site.itemName = Ox.map(pandora.site.itemName, function(v) {
+            return Ox.toTitleCase(v);
+        });
 
         pandora.site.help.forEach(function(section) {
             var html = $html.find('#' + section.id).html();
-            text[section.id] = '<h1><b>' + section.title + '</b><h1><br>\n' + html;
+            text[section.id] = '<h1><b>' + section.title + '</b></h1>\n' + html;
         });
 
         $list = Ox.TableList({
@@ -127,6 +133,11 @@ pandora.ui.helpDialog = function() {
 
     that.select = function(id) {
         $text.html(text[id]);
+        $text.find('td:first-child').css({
+            height: '16px',
+            paddingRight: '8px',
+            textAlign: 'right'
+        });
         return that;
     }
 
