@@ -86,16 +86,19 @@ def getText(request):
     if public_id == '':
         qs = models.Text.objects.filter(name='')
         if qs.count() == 0:
-            text = models.Text()
-            text.name = ''
-            text.text = ''
-            text.status = 'public'
-            text.user = request.user
+            text = None
+            response['data'] = {
+                    'name': '',
+                    'text': '',
+                    'type': 'html',
+                    'editable': not request.user.is_anonymous() and request.user.get_profile().capability('canEditFeaturedTexts')
+            }
         else:
             text = qs[0]
     else:
         text = get_text_or_404_json(data['id'])
-    response['data'] = text.json(user=request.user)
+    if text:
+        response['data'] = text.json(user=request.user)
     return render_to_json_response(response)
 actions.register(getText)
 
