@@ -96,7 +96,7 @@ pandora.ui.helpDialog = function() {
                     {
                         id: 'title',
                         visible: true,
-                        width: 192 - Ox.UI.SCROLLBAR_SIZE
+                        width: 128 - Ox.UI.SCROLLBAR_SIZE
                     }
                 ],
                 items: pandora.site.help.map(function(value, index) {
@@ -128,7 +128,7 @@ pandora.ui.helpDialog = function() {
 
         $panel = Ox.SplitPanel({
             elements: [
-                {element: $list, size: 192},
+                {element: $list, size: 128},
                 {element: $text}
             ],
             orientation: 'horizontal'
@@ -143,13 +143,15 @@ pandora.ui.helpDialog = function() {
         $text.html(text[id]);
         $text.find('img')
             .css({
-                width: '100%'
+                width: '100%',
+                borderRadius: '8px'
             });
         $text.find('td:first-child')
             .css({
                 height: '16px',
                 paddingRight: '8px',
-                textAlign: 'right'
+                textAlign: 'right',
+                whiteSpace: 'nowrap'
             });
         return that;
     }
