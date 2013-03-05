@@ -48,14 +48,14 @@ pandora.ui.helpDialog = function() {
             ],
             closeButton: true,
             content: $loading,
-            height: Math.round((window.innerHeight - 24) * 0.75),
+            height: 384,
             keys: {escape: 'close'},
             maximizeButton: true,
             minHeight: 256,
-            minWidth: 576,
+            minWidth: 544 + Ox.UI.SCROLLBAR_SIZE,
             removeOnClose: true,
             title: 'Help',
-            width: Math.round(window.innerWidth * 0.75)
+            width: 672 + Ox.UI.SCROLLBAR_SIZE
         })
         .bindEvent({
             close: function() {

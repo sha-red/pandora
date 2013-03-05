@@ -46,14 +46,14 @@ pandora.ui.apiDialog = function() {
             ],
             closeButton: true,
             content: $loading,
-            height: Math.round((window.innerHeight - 24) * 0.75),
+            height: 384,
             keys: {escape: 'close'},
             maximizeButton: true,
             minHeight: 256,
-            minWidth: 576,
+            minWidth: 544 + Ox.UI.SCROLLBAR_SIZE,
             removeOnClose: true,
             title: 'API Documentation',
-            width: Math.round(window.innerWidth * 0.75)
+            width: 672 + Ox.UI.SCROLLBAR_SIZE
         })
         .bindEvent({
             close: function() {
@@ -89,7 +89,7 @@ pandora.ui.apiDialog = function() {
                     {
                         id: 'title',
                         visible: true,
-                        width: 192 - Ox.UI.SCROLLBAR_SIZE
+                        width: 128 - Ox.UI.SCROLLBAR_SIZE
                     }
                 ],
                 items: items,
@@ -116,7 +116,7 @@ pandora.ui.apiDialog = function() {
 
         $panel = Ox.SplitPanel({
             elements: [
-                {element: $list, size: 192},
+                {element: $list, size: 128},
                 {element: $text}
             ],
             orientation: 'horizontal'
