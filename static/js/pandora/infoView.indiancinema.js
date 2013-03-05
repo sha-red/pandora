@@ -878,7 +878,7 @@ pandora.ui.infoView = function(data) {
         if (data.imdbId) {
             pandora.api.find({
                 query: {
-                    conditions: [{key: 'imdbId', operator: '=', value: data.imdbId}]
+                    conditions: [{key: 'imdbId', operator: '==', value: data.imdbId}]
                 }
             }, function(result) {
                 if (result.data.items == 1) {
