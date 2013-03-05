@@ -163,6 +163,7 @@ pandora.ui.apiDialog = function() {
         } else {
             $text.html(overview);
         }
+        $text.scrollTop(0);
         return that;
     }
 

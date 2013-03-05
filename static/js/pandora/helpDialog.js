@@ -140,7 +140,7 @@ pandora.ui.helpDialog = function() {
     });
 
     that.select = function(id) {
-        $text.html(text[id]);
+        $text.html(text[id]).scrollTop(0);
         $text.find('img')
             .css({
                 width: '100%',
