@@ -72,13 +72,17 @@ pandora.ui.helpDialog = function() {
 
     Ox.get('/static/html/help.html', function(html) {
 
-        pandora.site.itemName = Ox.map(pandora.site.itemName, function(v) {
+        var $html = $('<div>'),
+            strings = Ox.clone(pandora.site, true);
+
+        strings.itemName = Ox.map(strings.itemName, function(v) {
             return v.toLowerCase();
         });
-        var $html = $('<div>').html(Ox.formatString(html, pandora.site));
-        pandora.site.itemName = Ox.map(pandora.site.itemName, function(v) {
-            return Ox.toTitleCase(v);
-        });
+        strings.addAnnotationShortcuts = strings.layers.map(function(layer, index) {
+            return '<tr><td>' + index + '</td><td>Add ' + layer.item.toLowerCase() + '</td></tr>';
+        }).join('\n');
+
+        $html.html(Ox.formatString(html, strings));
 
         pandora.site.help.forEach(function(section) {
             var html = $html.find('#' + section.id).html();
@@ -115,7 +119,11 @@ pandora.ui.helpDialog = function() {
         $text = Ox.Element()
             .css({
                 padding: '16px',
-                overflowY: 'auto'
+                // fontSize: '12px',
+                lineHeight: '16px',
+                overflowY: 'auto',
+                MozUserSelect: 'text',
+                WebkitUserSelect: 'text'
             });
 
         $panel = Ox.SplitPanel({
@@ -133,11 +141,16 @@ pandora.ui.helpDialog = function() {
 
     that.select = function(id) {
         $text.html(text[id]);
-        $text.find('td:first-child').css({
-            height: '16px',
-            paddingRight: '8px',
-            textAlign: 'right'
-        });
+        $text.find('img')
+            .css({
+                width: '100%'
+            });
+        $text.find('td:first-child')
+            .css({
+                height: '16px',
+                paddingRight: '8px',
+                textAlign: 'right'
+            });
         return that;
     }
 

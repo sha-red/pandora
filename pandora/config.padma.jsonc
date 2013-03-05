@@ -87,19 +87,20 @@
     "help": [
         {"id": "help", "title": "Help"},
         {"id": "accounts", "title": "Accounts"},
-        {"id": "annotations", "title": "Annotations"},
-        {"id": "calendars", "title": "Calendars"},
+        {"id": "navigation", "title": "Navigation"},
+        {"id": "views", "title": "Views"},
+        {"id": "timelines", "title": "Timelines"},
         {"id": "clips", "title": "Clips"},
-        {"id": "edits", "title": "Edits"},
+        {"id": "maps", "title": "Maps"},
+        {"id": "calendars", "title": "Calendars"},
+        {"id": "find", "title": "Find"},
         {"id": "filters", "title": "Filters"},
         {"id": "lists", "title": "Lists"},
-        {"id": "maps", "title": "Maps"},
-        {"id": "navigation", "title": "Navigation"},
-        {"id": "search", "title": "Search"},
+        {"id": "player", "title": "Player"},
+        {"id": "editor", "title": "Editor"},
+        {"id": "edits", "title": "Edits"},
         {"id": "texts", "title": "Texts"},
-        {"id": "timelines", "title": "Timelines"},
-        {"id": "video", "title": "Video"},
-        {"id": "views", "title": "Views"}
+        {"id": "embeds", "title": "Embeds"}
     ],
     /*
         An itemKey must have the following properties:
