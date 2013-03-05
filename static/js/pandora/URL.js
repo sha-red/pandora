@@ -58,7 +58,10 @@ pandora.URL = (function() {
             
         }
 
-        if (pandora.user.ui.hash.anchor || !Ox.isEmpty(pandora.user.ui.hash.query)) {
+        if (
+            pandora.user.ui.hash &&
+            (pandora.user.ui.hash.anchor || !Ox.isEmpty(pandora.user.ui.hash.query))
+        ) {
             state.hash = {};
             if (pandora.user.ui.hash.anchor) {
                 state.hash.anchor = pandora.user.ui.hash.anchor;
