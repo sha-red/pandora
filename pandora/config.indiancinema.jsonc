@@ -127,6 +127,7 @@
             find: If true, this key will appear as a find option
             format: {type: "...", args: [...]}, for special formatting
                 (Ox.formatType(args) will be called)
+            secondaryId: If true, loading /value will redirect to the item
             sort: If true, one can sort results by this key
             sortOperator: sort operator (+, -), in case it differs from the
                 default for the key's type (+ for strings, - for numbers)
@@ -386,6 +387,7 @@
             "title": "IMDb ID",
             "type": "string",
             "columnWidth": 90,
+            "secondaryId": true,
             "sort": true
         },
         {
