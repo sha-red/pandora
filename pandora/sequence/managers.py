@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
 from django.db.models import Q, Manager
-from django.conf import settings
 
 from ox.django.query import QuerySet
 
 from item.utils import decode_id
+
+import models
 
 
 def parseCondition(condition, user):
@@ -47,24 +48,30 @@ def parseCondition(condition, user):
     if k == 'id':
         itemId, points = v.split('/')
         points = [float('%0.03f'%float(p)) for p in points.split('-')]
-        q = Q(item__itemId=itemId, start=points[0], end=points[1])
+        q = Q(sort__item__itemId=itemId, start=points[0], end=points[1])
         return exclude and ~q or q
-
+    if k == 'hash':
+        v =  models.parse_hash(v)
+    if k == 'mode':
+        v = models.Sequence.MODE[v]
     if k.endswith('__id'):
         v = decode_id(v)
     if isinstance(v, bool): #featured and public flag
         key = k
     else:
-        key = "%s%s" % (k, {
-            '>': '__gt',
-            '>=': '__gte',
-            '<': '__lt',
-            '<=': '__lte',
-            '==': '__iexact',
-            '=': '__icontains',
-            '^': '__istartswith',
-            '$': '__iendswith',
-        }.get(op, '__icontains'))
+        if k in ('mode', 'hash'):
+            key = k
+        else:
+            key = "%s%s" % (k, {
+                '>': '__gt',
+                '>=': '__gte',
+                '<': '__lt',
+                '<=': '__lte',
+                '==': '__iexact',
+                '=': '__icontains',
+                '^': '__istartswith',
+                '$': '__iendswith',
+            }.get(op, '__icontains'))
 
     key = str(key)
     if exclude:
@@ -150,16 +157,4 @@ class SequenceManager(Manager):
         if conditions:
             qs = qs.filter(conditions)
 
-        #anonymous can only see public items
-        if not user or user.is_anonymous():
-            allowed_level = settings.CONFIG['capabilities']['canSeeItem']['guest']
-            qs = qs.filter(sort__rightslevel__lte=allowed_level)
-        #users can see public items, there own items and items of there groups
-        else:
-            allowed_level = settings.CONFIG['capabilities']['canSeeItem'][user.get_profile().get_level()]
-            q = Q(sort__rightslevel__lte=allowed_level)|Q(user=user.id)
-            if user.groups.count():
-                q |= Q(item__groups__in=user.groups.all())
-            qs = qs.filter(q)
-        #admins can see all available items
         return qs

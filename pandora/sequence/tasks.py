@@ -18,12 +18,11 @@ def get_sequences(itemId):
         for mode in data:
             for s in data[mode]:
                 sequence = {
-                    'item_id': i.pk,
                     'sort_id': i.sort.pk,
                     'mode': mode,
                     'start': float('%0.03f' % s['in']),
                     'end': float('%0.03f' % s['out']),
-                    'hash': s['hash']
+                    'hash': models.parse_hash(s['hash'])
                 }
                 sequence['duration'] = sequence['end'] - sequence['start']
                 if not keys:
