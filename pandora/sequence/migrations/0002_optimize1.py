@@ -2,12 +2,17 @@
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
-from django.db import models
+from django.db import models, connection, transaction
 
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        table_name = orm['sequence.Sequence']._meta.db_table
+        cursor = connection.cursor()
+        sql = 'DELETE FROM "%s" WHERE 1=1' % table_name
+        cursor.execute(sql)
+        transaction.commit_unless_managed()
 
         # Removing unique constraint on 'Sequence', fields ['item', 'end', 'mode', 'start']
         db.delete_unique('sequence_sequence', ['item_id', 'end', 'mode', 'start'])
@@ -30,8 +35,6 @@ class Migration(SchemaMigration):
 
         # Adding unique constraint on 'Sequence', fields ['sort', 'start', 'end', 'mode']
         db.create_unique('sequence_sequence', ['sort_id', 'start', 'end', 'mode'])
-
-        orm['sequence.Sequence'].objects.all().delete()
 
     def backwards(self, orm):
         # Removing unique constraint on 'Sequence', fields ['sort', 'start', 'end', 'mode']
