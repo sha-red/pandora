@@ -286,7 +286,7 @@ pandora.ui.mainMenu = function() {
             click: function(data) {
                 if ([
                     'home', 'software', 'signup', 'signin', 'signout',
-                    'preferences', 'tv', 'help', 'api'
+                    'preferences', 'tv', 'api'
                 ].concat(
                     pandora.site.sitePages.map(function(page) {
                         return page.id;
@@ -352,6 +352,8 @@ pandora.ui.mainMenu = function() {
                         filters: pandora.site.user.ui.filters
                     });
                     pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
+                } else if (data.id == 'help') {
+                    pandora.UI.set({page: 'help', 'hash.anchor': ui.help});
                 } else if (data.id == 'clearcache') {
                     Ox.Request.clearCache();
                 } else if (data.id == 'reloadapplication') {
@@ -420,7 +422,7 @@ pandora.ui.mainMenu = function() {
             },
             key_control_slash: function() {
                 if (!pandora.hasDialogOrScreen()) {
-                    pandora.UI.set({page: 'help'});
+                    pandora.UI.set({page: 'help', 'hash.anchor': ui.help});
                 }
             },
             key_control_space: function() {

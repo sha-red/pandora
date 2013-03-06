@@ -18,7 +18,8 @@ pandora.URL = (function() {
 
         } else {
 
-            state.type = pandora.user.ui.section == 'items' ? pandora.site.itemsSection : pandora.user.ui.section;
+            state.type = pandora.user.ui.section == 'items'
+                ? pandora.site.itemsSection : pandora.user.ui.section;
             state.item = pandora.user.ui[pandora.user.ui.section.slice(0, -1)];
 
             if (pandora.user.ui.section == 'items') {
@@ -119,6 +120,9 @@ pandora.URL = (function() {
             if (state.page) {
 
                 set.page = state.page;
+                if (state.page == 'help') {
+                    set.help = state.hash ? state.hash.anchor : '';
+                }
                 pandora.UI.set(set);
                 callback && callback();
 

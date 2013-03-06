@@ -3,10 +3,7 @@
 
 pandora.ui.helpDialog = function() {
 
-    var selected = pandora.user.ui.hash && pandora.user.ui.hash.anchor
-            ? pandora.user.ui.hash.anchor : 'help',
-
-        text = {},
+    var text = {},
 
         $loading = Ox.Element()
             .append(
@@ -64,7 +61,7 @@ pandora.ui.helpDialog = function() {
             resize: function() {
                 $list.size();
             },
-            'pandora_hash.anchor': function(data) {
+            'pandora_help': function(data) {
                 pandora.user.ui.page == 'help' &&
                     that.select(data.value == '' ? 'help' : data.value);
             }
@@ -105,14 +102,14 @@ pandora.ui.helpDialog = function() {
                 max: 1,
                 min: 1,
                 scrollbarVisible: true,
-                selected: [selected],
+                selected: [pandora.user.ui.help || 'help'],
                 sort: [{key: 'index', operator: '+'}],
                 unique: 'id'
             })
             .bindEvent({
                 select: function(data) {
-                    var id = data.ids[0];
-                    pandora.UI.set({'hash.anchor': id == 'help' ? '' : id});
+                    var id = data.ids[0] == 'help' ? '' : data.ids[0];
+                    pandora.UI.set({help: id, 'hash.anchor': id});
                 }
             });
 
@@ -134,13 +131,13 @@ pandora.ui.helpDialog = function() {
             orientation: 'horizontal'
         });
 
-        that.select(selected).options({content: $panel});
+        that.select(pandora.user.ui.help).options({content: $panel});
         $list.gainFocus();
         
     });
 
     that.select = function(id) {
-        $text.html(text[id]).scrollTop(0);
+        $text.html(text[id || 'help']).scrollTop(0);
         $text.find('img')
             .css({
                 width: '100%',
