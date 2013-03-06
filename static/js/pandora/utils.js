@@ -714,38 +714,61 @@ pandora.getInfoHeight = function(includeHidden) {
 
 pandora.getItem = function(state, str, callback) {
     if (state.type == pandora.site.itemName.plural.toLowerCase()) {
-        var sortKey = Ox.getObjectById(pandora.site.itemKeys, 'votes')
-            ? 'votes'
-            : 'timesaccessed';
+        var secondaryId = pandora.site.itemKeys.filter(function(key) {
+                return key.secondaryId;
+            }).map(function(key) {
+                return key.id;
+            })[0],
+            sortKey = Ox.getObjectById(pandora.site.itemKeys, 'votes')
+                ? 'votes'
+                : 'timesaccessed';
+        Ox.getObjectById(pandora.site.itemKeys, 'alt')
         pandora.api.get({id: str, keys: ['id']}, function(result) {
             if (result.status.code == 200) {
                 state.item = result.data.id;
                 callback();
             } else {
-                pandora.api.find({
+                (secondaryId ? pandora.api.find : Ox.noop)({
                     query: {
-                        conditions: [{key: 'title', value: str, operator: '='}],
+                        conditions: [{key: secondaryId, value: str, operator: '=='}],
                         operator: '&'
                     },
-                    sort: [{key: sortKey, operator: ''}],
-                    range: [0, 100],
-                    keys: ['id', 'title', sortKey]
+                    sort: [{key: sortKey, operator: '-'}],
+                    range: [0, 1],
+                    keys: ['id']
                 }, function(result) {
-                    if (result.data.items.length) {
-                        var items = Ox.filter(Ox.map(result.data.items, function(item) {
-                            // test if exact match or word match
-                            var sort = new RegExp('^' + str + '$', 'i').test(item.title) ? 2000000
-                                : new RegExp('\\b' + str + '\\b', 'i').test(item.title) ? 1000000 : 0;
-                            return sort ? {id: item.id, sort: sort + (parseInt(item[sortKey]) || 0)} : null;
-                            // fixme: remove the (...|| 0) check once the backend sends correct data
-                        }));
-                        if (items.length) {
-                            state.item = items.sort(function(a, b) {
-                                return b.sort - a.sort;
-                            })[0].id;
-                        }
+                    if (result && result.data.items.length) {
+                        state.item = result.data.items[0].id;
+                        callback();
+                    } else {
+                        pandora.api.find({
+                            query: {
+                                conditions: [{key: 'title', value: str, operator: '=='}],
+                                operator: '&'
+                            },
+                            sort: [{key: sortKey, operator: '-'}],
+                            range: [0, 100],
+                            keys: ['id', 'title', sortKey]
+                        }, function(result) {
+                            if (result.data.items.length) {
+                                var regexp = new RegExp('^' + Ox.escapeRegExp(str) + '$', 'i'),
+                                    items = result.data.items.map(function(item) {
+                                        return {
+                                            id: item.id,
+                                            // prefer title match over originalTitle match
+                                            sort: (item.title == str ? 1000000 : 0)
+                                                + (parseInt(item[sortKey]) || 0)
+                                            // fixme: remove the (...|| 0) check
+                                            // once the backend sends correct data
+                                        };
+                                    });
+                                state.item = items.sort(function(a, b) {
+                                    return b.sort - a.sort;
+                                })[0].id;
+                            }
+                            callback();
+                        });
                     }
-                    callback();
                 });
             }
         });
