@@ -4,12 +4,13 @@ from django.db import connection, transaction
 from celery.task import task
 
 import models
+import item.models
 import extract
 
 @task(ignore_results=True, queue='encoding')
 def get_sequences(itemId):
-    i = models.Item.objects.get(itemId=itemId)
-    models.Sequence.objects.filter(item=i).delete()
+    i = item.models.Item.objects.get(itemId=itemId)
+    models.Sequence.objects.filter(sort=i.sort).delete()
     position = 0
     for stream in i.streams():
         data, position = extract.get_sequences(stream.timeline_prefix, position)
@@ -19,7 +20,7 @@ def get_sequences(itemId):
             for s in data[mode]:
                 sequence = {
                     'sort_id': i.sort.pk,
-                    'mode': mode,
+                    'mode': models.Sequence.MODE[mode],
                     'start': float('%0.03f' % s['in']),
                     'end': float('%0.03f' % s['out']),
                     'hash': models.parse_hash(s['hash'])
