@@ -648,6 +648,8 @@
             "annotationsRange": "position",
             "annotationsSize": 256,
             "annotationsSort": "position",
+            "calendarFind": "",
+            "calendarSelection": "",
             "clipsColumns": 2,
             "columns": {
                 "Colors": {

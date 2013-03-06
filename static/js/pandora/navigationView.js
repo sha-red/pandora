@@ -173,13 +173,14 @@ pandora.ui.navigationView = function(type, videoRatio) {
         }, function(result) {
             that.replaceElement(0,
                 $element = Ox.Calendar({
-                    date: new Date(0),
+                    date: new Date(ui.calendarFind || 0),
                     events: result.data.items,
                     // 20 px menu + 24 px toolbar + 1px resizbar + 16px statusbar (if !item)
                     height: !ui.item
                         ? window.innerHeight - ui.showFilters * ui.filtersSize - 61
                         : window.innerHeight - ui.showBrowser * (112 + Ox.UI.SCROLLBAR_SIZE) - 45,
                     range: [-5000, 5000],
+                    selected: ui.calendarSelection,
                     showControls: ui.showCalendarControls,
                     showToolbar: true,
                     showZoombar: true,

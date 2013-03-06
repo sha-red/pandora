@@ -159,16 +159,19 @@ pandora.URL = (function() {
                         } else if (state.view == 'map') {
                             // fixme: this doesn't handle map coordinates
                             if (state.span[0] != '@') {
-                                //pandora.user.ui.mapSelection = state.span;
-                                set['mapSelection'] = state.span;
-                                set['mapFind'] = '';
+                                set.mapSelection = state.span;
+                                set.mapFind = '';
                             } else {
-                                //pandora.user.ui.mapFind = state.span.slice(1);
-                                set['mapFind'] = state.span.slice(1);
-                                set['mapSelection'] = '';
+                                set.mapFind = state.span.slice(1);
+                                set.mapSelection = '';
                             }
                         } else if (state.view == 'calendar') {
-                            // ...
+                            // fixme: this is still very much unclear
+                            if (state.span.length == 1 && /^\d/.test(state.span)) {
+                                set.calendarFind = state.span[0];
+                            } else if (state.span.length == 2) {
+                                set.calendarFind = state.span[0];
+                            }
                         }
                     }
 
