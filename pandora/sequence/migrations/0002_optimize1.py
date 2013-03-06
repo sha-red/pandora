@@ -29,12 +29,20 @@ class Migration(SchemaMigration):
 
         # Adding unique constraint on 'Sequence', fields ['sort', 'start', 'end', 'mode']
         db.create_unique('sequence_sequence', ['sort_id', 'start', 'end', 'mode'])
-
-
-        for s in orm['sequence.Sequence'].objects.all():
-            s.mode2 = s.mode == 'color' and 1 or 0
-            s.hash2 = int(s.hash, 16) - 9223372036854775808
-            s.save()
+        
+        def nslice(s, n):
+            while len(s) >= n:
+                yield s[:n]
+                s = s[n:]
+            if len(s):
+                yield s
+        
+        ids = [s['id'] for s in orm['sequence.Sequence'].objects.all().values('id')]
+        for i in nslice(ids, 10000):
+            for s in orm['sequence.Sequence'].objects.filter(id__in=i):
+                s.mode2 = s.mode == 'color' and 1 or 0
+                s.hash2 = int(s.hash, 16) - 9223372036854775808
+                s.save()
 
     def backwards(self, orm):
         # Removing unique constraint on 'Sequence', fields ['sort', 'start', 'end', 'mode']
