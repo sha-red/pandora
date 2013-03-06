@@ -8,7 +8,6 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        orm['sequence.Sequence'].objects.all().delete()
 
         # Removing unique constraint on 'Sequence', fields ['item', 'end', 'mode', 'start']
         db.delete_unique('sequence_sequence', ['item_id', 'end', 'mode', 'start'])
@@ -32,6 +31,7 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'Sequence', fields ['sort', 'start', 'end', 'mode']
         db.create_unique('sequence_sequence', ['sort_id', 'start', 'end', 'mode'])
 
+        orm['sequence.Sequence'].objects.all().delete()
 
     def backwards(self, orm):
         # Removing unique constraint on 'Sequence', fields ['sort', 'start', 'end', 'mode']
