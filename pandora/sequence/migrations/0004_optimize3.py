@@ -8,53 +8,13 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        orm['sequence.Sequence'].objects.all().delete()
-
-        # Removing unique constraint on 'Sequence', fields ['item', 'end', 'mode', 'start']
-        db.delete_unique('sequence_sequence', ['item_id', 'end', 'mode', 'start'])
-
-        # Deleting field 'Sequence.item'
-        db.delete_column('sequence_sequence', 'item_id')
-
-        # Deleting field 'Sequence.user'
-        db.delete_column('sequence_sequence', 'user')
-
-        # Adding field 'Sequence.mode2'
-        db.add_column('sequence_sequence', 'mode2',
-                      self.gf('django.db.models.fields.IntegerField')(default=0),
-                      keep_default=False)
-
-        # Adding field 'Sequence.hash2'
-        db.add_column('sequence_sequence', 'hash2',
-                      self.gf('django.db.models.fields.BigIntegerField')(default=0, db_index=True),
-                      keep_default=False)
-
-        # Adding unique constraint on 'Sequence', fields ['sort', 'start', 'end', 'mode']
-        db.create_unique('sequence_sequence', ['sort_id', 'start', 'end', 'mode'])
+        # Removing index on 'Sequence', fields ['start']
+        db.delete_index('sequence_sequence', ['start'])
 
 
     def backwards(self, orm):
-        # Removing unique constraint on 'Sequence', fields ['sort', 'start', 'end', 'mode']
-        db.delete_unique('sequence_sequence', ['sort_id', 'start', 'end', 'mode'])
-
-        # Adding field 'Sequence.item'
-        db.add_column('sequence_sequence', 'item',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='sequences', null=True, to=orm['item.Item']),
-                      keep_default=False)
-
-        # Adding field 'Sequence.user'
-        db.add_column('sequence_sequence', 'user',
-                      self.gf('django.db.models.fields.IntegerField')(null=True, db_index=True),
-                      keep_default=False)
-
-        # Deleting field 'Sequence.mode2'
-        db.delete_column('sequence_sequence', 'mode2')
-
-        # Deleting field 'Sequence.hash2'
-        db.delete_column('sequence_sequence', 'hash2')
-
-        # Adding unique constraint on 'Sequence', fields ['item', 'end', 'mode', 'start']
-        db.create_unique('sequence_sequence', ['item_id', 'end', 'mode', 'start'])
+        # Adding index on 'Sequence', fields ['start']
+        db.create_index('sequence_sequence', ['start'])
 
 
     models = {
@@ -171,13 +131,11 @@ class Migration(SchemaMigration):
             'Meta': {'unique_together': "(('sort', 'start', 'end', 'mode'),)", 'object_name': 'Sequence'},
             'duration': ('django.db.models.fields.FloatField', [], {'default': '0'}),
             'end': ('django.db.models.fields.FloatField', [], {'default': '-1'}),
-            'hash': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '16', 'db_index': 'True'}),
-            'hash2': ('django.db.models.fields.BigIntegerField', [], {'default': '0', 'db_index': 'True'}),
+            'hash': ('django.db.models.fields.BigIntegerField', [], {'default': '-9223372036854775808', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'mode': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'mode2': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'mode': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'sort': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'sequences'", 'null': 'True', 'to': "orm['item.ItemSort']"}),
-            'start': ('django.db.models.fields.FloatField', [], {'default': '-1', 'db_index': 'True'})
+            'start': ('django.db.models.fields.FloatField', [], {'default': '-1'})
         }
     }
 
