@@ -26,7 +26,7 @@ class Sequence(models.Model):
     sort = models.ForeignKey(ItemSort, null=True, related_name='sequences')
 
     hash = models.BigIntegerField(db_index=True, default=-9223372036854775808)
-    start = models.FloatField(default=-1, db_index=True)
+    start = models.FloatField(default=-1)
     end = models.FloatField(default=-1)
     duration = models.FloatField(default=0)
 
