@@ -271,7 +271,6 @@ pandora.ui.folderList = function(id) {
         add: function(event) {
             // fixme: this is duplicated,
             // see folder collapse panel menu handler
-            var i = ['personal', 'favorite', 'featured'].indexOf(id);
             if (id == 'personal') {
                 if (event.keys == '' || event.keys == 'alt') {
                     pandora.api.addList({
