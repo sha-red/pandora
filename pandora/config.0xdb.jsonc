@@ -738,6 +738,7 @@
                     "columnWidth": {}
                 }
             },
+            "edit": "",
             "embedSize": 256,
             "filters": [
                 {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
@@ -749,12 +750,11 @@
             "filtersSize": 176,
             "find": {"conditions": [], "operator": "&"},
             "followPlayer": true,
+            "help": "",
             "hash": {"anchor": "", "query": []},
             "icons": "posters",
             "infoIconSize": 256,
             "item": "",
-            "text": "",
-            "edit": "",
             "itemFind": "",
             "itemSort": [{"key": "position", "operator": "+"}],
             "itemView": "info",
@@ -802,6 +802,7 @@
             "showSitePosters": false,
             "showTimeline": true,
             "sidebarSize": 256,
+            "text": "",
             "textPositions": {},
             "theme": "oxdark",
             "updateAdvancedFindResults": false,
