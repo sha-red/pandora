@@ -34,6 +34,9 @@ class Command(BaseCommand):
 
         annotations = ox.srt.load(filename)
         print 'importing %d annotations into %s/%s' % (len(annotations), itemId, layer_id)
+        for i in range(len(annotations)-1):
+            if annotations[i]['out'] == annotations[i+1]['in']:
+                annotations[i]['out'] = annotations[i]['out'] - 0.001
         with transaction.commit_on_success():
             for a in annotations:
                 if a['value']:
@@ -41,7 +44,8 @@ class Command(BaseCommand):
                         item=item,
                         layer=layer_id,
                         user=user,
-                        start=float(a['in']), end=float(a['out']),
+                        start=float(a['in']),
+                        end=float(a['out']),
                         value=a['value'])
                     annotation.save()
             #update facets if needed
