@@ -50,10 +50,10 @@ pandora.ui.apiDialog = function() {
             keys: {escape: 'close'},
             maximizeButton: true,
             minHeight: 256,
-            minWidth: 544 + 2 * Ox.UI.SCROLLBAR_SIZE,
+            minWidth: 544 + Ox.UI.SCROLLBAR_SIZE,
             removeOnClose: true,
             title: 'API Documentation',
-            width: 672 + 2 * Ox.UI.SCROLLBAR_SIZE
+            width: 672 + Ox.UI.SCROLLBAR_SIZE
         })
         .bindEvent({
             close: function() {
@@ -65,8 +65,7 @@ pandora.ui.apiDialog = function() {
             'pandora_hash.anchor': function(data) {
                 pandora.user.ui.page == 'api' && that.select(data.value);
             }
-        }),
-        overview = '<h1><b>API Documentation</b></h1><br>use this api in the browser with <a href="/static/oxjs/demos/doc2/index.html#Ox.App">Ox.app</a> or use <a href="http://code.0x2620.org/pandora_client">pandora_client</a> it in python. Further description of the api can be found <a href="https://wiki.0x2620.org/wiki/pandora/API">on the wiki</a></div>';
+        });
 
     pandora.api.api({docs: true, code: true}, function(results) {
         var items = [{
@@ -110,13 +109,13 @@ pandora.ui.apiDialog = function() {
         $text = Ox.Element()
             .css({
                 padding: '16px',
+                lineHeight: '16px',
                 overflowY: 'auto'
-            })
-            .html(overview);
+            });
 
         $panel = Ox.SplitPanel({
             elements: [
-                {element: $list, size: 128 + Ox.UI.SCROLLBAR_SIZE},
+                {element: $list, size: 128},
                 {element: $text}
             ],
             orientation: 'horizontal'
@@ -126,6 +125,60 @@ pandora.ui.apiDialog = function() {
         $list.gainFocus();
         
     });
+
+    function getIndex() {
+        var $index = Ox.Element()
+            .html(
+                '<h1><b>API Documentation</b></h1>\n'
+                + '<p><b>' + pandora.site.site.name + '</b> uses a JSON API'
+                + ' to communicate between the browser and the server.'
+                + ' This API is 100% public, which means that there is'
+                + ' virtually no limit to what you can do with the site,'
+                + ' or build on top of it &mdash; from writing simple scripts'
+                + ' to read or write specific information to including'
+                + ' data from <b>' + pandora.site.site.name + '</b>'
+                + ' (not just videos, but also metadata, annotations, lists,'
+                + ' or a custom search interface) in your own website.</p>\n'
+                + '<p>If you are using the API in JavaScript, you may want to'
+                + ' take a look at <a href="https://oxjs.org/#doc/Ox.API">'
+                + ' OxJS</a>, and if you are using Python, there is'
+                + ' <a href="https://wiki.0x2620.org/wiki/python-ox">'
+                + ' python-ox</a>, which is used by'
+                + ' <a href="https://wiki.0x2620.org/wiki/pandora_client">'
+                + ' pandora_client</a> to automate certain tasks.</p>\n'
+                + '<p>To get started, just open the console and paste the'
+                + ' following snippet. For the first ten items that are'
+                + ' both shorter than one hour and whose title does not'
+                + ' start with "X" (sorted by duration, then title, both'
+                + ' in ascending order), it will return their duration,'
+                + ' id and title properties.'
+            )
+            .append(
+                Ox.SyntaxHighlighter({
+                    source: "pandora.api.find({\n"
+                        + "    keys: ['duration', 'id', 'title'],\n"
+                        + "    query: {\n"
+                        + "        conditions: [\n"
+                        + "            {key: 'duration', operator: '<', value: '01:00:00'},\n"
+                        + "            {key: 'title', operator: '!=', value: 'x*'}\n"
+                        + "        ],\n"
+                        + "        operator: '&'\n"
+                        + "    },\n"
+                        + "    range: [0, 10],\n"
+                        + "    sort: [\n"
+                        + "        {key: 'duration', operator: '+'},\n"
+                        + "        {key: 'title', operator: '+'}\n"
+                        + "    ]\n"
+                        + "}, function(result) {\n"
+                        + "    console.log(\n"
+                        + "        result.status.code == 200 ? result.data : result.status\n"
+                        + "    );\n"
+                        + "});"
+                })
+            );
+        pandora.createLinks($index);
+        return $index;
+    }
 
     that.select = function(id) {
         if (id && actions[id]) {
@@ -161,7 +214,8 @@ pandora.ui.apiDialog = function() {
                 borderWidth: '1px',
             }).appendTo($text);
         } else {
-            $text.html(overview);
+            Ox.print('ELSE')
+            $text.empty().append(getIndex());
         }
         $text.scrollTop(0);
         return that;
