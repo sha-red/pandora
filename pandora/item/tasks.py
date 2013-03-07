@@ -145,12 +145,11 @@ def update_sitemap(base_url):
         #el.text = absolute_url("%s/video" % i.itemId)
         el = ET.SubElement(video, "video:player_loc")
         el.attrib['allow_embed'] = 'no'
-        el.text = absolute_url("%s/video" % i.itemId)
+        el.text = absolute_url("%s/player" % i.itemId)
         el = ET.SubElement(video, "video:title")
         el.text = i.get('title')
         el = ET.SubElement(video, "video:thumbnail_loc")
-        icon = settings.CONFIG['user']['ui']['icons'] == 'frames' and 'icon' or 'poster'
-        el.text = absolute_url("%s/%s256.jpg" %(i.itemId, icon))
+        el.text = absolute_url("%s/%96p.jpg" % i.itemId)
         description = i.get('description', i.get('summary', ''))
         if description:
             el = ET.SubElement(video, "video:description")

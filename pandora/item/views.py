@@ -700,14 +700,15 @@ def frame(request, id, size, position=None):
         return HttpResponseForbidden()
     frame = None
     if not position:
-        frames = item.poster_frames()
-        if frames:
-            position = item.poster_frame
-            if position == -1 or position > len(frames):
-                position = int(len(frames)/2)
-            position = frames[int(position)]['position']
-        elif item.poster_frame == -1 and item.sort.duration:
-            position = item.sort.duration/2
+        if settings.CONFIG['media']['importFrames'] or item.poster_frame == -1:
+            frames = item.poster_frames()
+            if frames:
+                position = item.poster_frame
+                if position == -1 or position > len(frames):
+                    position = int(len(frames)/2)
+                position = frames[int(position)]['position']
+            elif item.poster_frame == -1 and item.sort.duration:
+                position = item.sort.duration/2
         else:
             position = item.poster_frame
     else:
