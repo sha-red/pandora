@@ -7,6 +7,7 @@ pandora.ui.infoView = function(data) {
 
     var ui = pandora.user.ui,
         canEdit = pandora.site.capabilities.canEditMetadata[pandora.user.level],
+        canSeeAllMetadata = pandora.user.level != 'guest',
         css = {
             marginTop: '4px',
             textAlign: 'justify',
@@ -262,8 +263,11 @@ pandora.ui.infoView = function(data) {
         .html(
             formatKey('Alternative Title' + (data.alternativeTitles.length == 1 ? '' : 's'))
             + data.alternativeTitles.map(function(value) {
-                return value[0] + (Ox.isArray(value[1]) ? ' '
-                    + formatLight('(' + value[1].join(', ') + ')') : '');
+                return value[0] + (
+                    canSeeAllMetadata && Ox.isArray(value[1])
+                    ? ' ' + formatLight('(' + value[1].join(', ') + ')')
+                    : ''
+                );
             }).join(', ')
         )
         .appendTo($text);
@@ -319,19 +323,21 @@ pandora.ui.infoView = function(data) {
                 // FIXME: 'uncredited' should be removed on the backend
                 value.character = value.character.replace('(uncredited)', '').trim();
                 return formatValue(value.actor, 'name')
-                    + (value.character ? ' '
-                    + formatLight('(' + formatValue(value.character) + ')')
-                    : '');
+                    + (
+                        canSeeAllMetadata && value.character
+                        ? ' ' + formatLight('(' + formatValue(value.character) + ')')
+                        : ''
+                    );
             }).join(', ')
         )
         .appendTo($text);
 
-    if (data.genre || data.keyword) {
+    if (data.genre || (data.keyword && canSeeAllMetadata)) {
         $div = $('<div>')
             .css(css)
             .appendTo($text);
         html = [];
-        ['genre', 'keyword'].forEach(function(key) {
+        (canSeeAllMetadata ? ['genre', 'keyword'] : ['genre']).forEach(function(key) {
             data[key] && html.push(
                 formatKey(key == 'keyword' ? 'keywords' : key)
                 + formatValue(data[key], key)
@@ -347,96 +353,100 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($text);
 
-    data.trivia && data.trivia.forEach(function(value) {
-        $('<div>')
-            .css({
-                display: 'table-row'
-            })
-            .append(
-                $('<div>')
-                    .css({
-                        display: 'table-cell',
-                        width: '12px',
-                        paddingTop: '4px'
-                    })
-                    .html('<span style="font-weight: bold">&bull;</span>')
-            )
-            .append(
-                $('<div>')
-                    .css({
-                        display: 'table-cell',
-                        paddingTop: '4px',
-                        textAlign: 'justify',
-                        MozUserSelect: 'text',
-                        WebkitUserSelect: 'text'
-                    })
-                    .html(value)
-            )
-            .append(
-                $('<div>').css({clear: 'both'})
-            )
-            .appendTo($text);
-    });
-
-    data.filmingLocations && $('<div>')
-        .css(css)
-        .html(
-            formatKey('Filming Locations') + data.filmingLocations.map(function(location) {
-                return  '<a href="/map/@' + location + '">' + location + '</a>'
-            }).join(', ')
-        )
-        .appendTo($text);
-
-    data.releasedate && $('<div>')
-        .css(css)
-        .html(
-            formatKey('Release Date') + Ox.formatDate(data.releasedate, '%A, %B %e, %Y')
-        )
-        .appendTo($text);
-
-    if (data.budget || data.gross || data.profit) {
-        $div = $('<div>')
-            .css(css)
-            .appendTo($text);
-        html = [];
-        ['budget', 'gross', 'profit'].forEach(function(key) {
-            data[key] && html.push(
-                formatKey(key == 'profit' && data[key] < 0 ? 'loss' : key)
-                + Ox.formatCurrency(Math.abs(data[key]), '$')
-            );
+    if (canSeeAllMetadata) {
+        
+        data.trivia && data.trivia.forEach(function(value) {
+            $('<div>')
+                .css({
+                    display: 'table-row'
+                })
+                .append(
+                    $('<div>')
+                        .css({
+                            display: 'table-cell',
+                            width: '12px',
+                            paddingTop: '4px'
+                        })
+                        .html('<span style="font-weight: bold">&bull;</span>')
+                )
+                .append(
+                    $('<div>')
+                        .css({
+                            display: 'table-cell',
+                            paddingTop: '4px',
+                            textAlign: 'justify',
+                            MozUserSelect: 'text',
+                            WebkitUserSelect: 'text'
+                        })
+                        .html(value)
+                )
+                .append(
+                    $('<div>').css({clear: 'both'})
+                )
+                .appendTo($text);
         });
-        $div.html(html.join('; '));
-    }
 
-    if (data.connections) {
-        $div = $('<div>')
+        data.filmingLocations && $('<div>')
             .css(css)
-            .appendTo($text);
-        html = [];
-        [
-            'Edited from', 'Edited into',
-            'Features', 'Featured in',
-            'Follows', 'Followed by',
-            'References', 'Referenced in',
-            'Remake of', 'Remade as',
-            'Spin off from', 'Spin off',
-            'Spoofs', 'Spoofed in'
-        ].forEach(function(key) {
-            data.connections[key] && html.push(
-                formatKey(key) + data.connections[key].map(function(connection) {
-                    return (
-                        connection.item
-                            ? '<a href="/' + connection.item + '">' + connection.title + '</a>'
-                            : connection.title
-                    ) + (
-                        connection.description
-                            ? ' ' + formatLight('(' + connection.description + ')')
-                            : ''
-                    );
+            .html(
+                formatKey('Filming Locations') + data.filmingLocations.map(function(location) {
+                    return  '<a href="/map/@' + location + '">' + location + '</a>'
                 }).join(', ')
-            );
-        });
-        $div.html(html.join('; '));
+            )
+            .appendTo($text);
+
+        data.releasedate && $('<div>')
+            .css(css)
+            .html(
+                formatKey('Release Date') + Ox.formatDate(data.releasedate, '%A, %B %e, %Y')
+            )
+            .appendTo($text);
+
+        if (data.budget || data.gross || data.profit) {
+            $div = $('<div>')
+                .css(css)
+                .appendTo($text);
+            html = [];
+            ['budget', 'gross', 'profit'].forEach(function(key) {
+                data[key] && html.push(
+                    formatKey(key == 'profit' && data[key] < 0 ? 'loss' : key)
+                    + Ox.formatCurrency(Math.abs(data[key]), '$')
+                );
+            });
+            $div.html(html.join('; '));
+        }
+
+        if (data.connections) {
+            $div = $('<div>')
+                .css(css)
+                .appendTo($text);
+            html = [];
+            [
+                'Edited from', 'Edited into',
+                'Features', 'Featured in',
+                'Follows', 'Followed by',
+                'References', 'Referenced in',
+                'Remake of', 'Remade as',
+                'Spin off from', 'Spin off',
+                'Spoofs', 'Spoofed in'
+            ].forEach(function(key) {
+                data.connections[key] && html.push(
+                    formatKey(key) + data.connections[key].map(function(connection) {
+                        return (
+                            connection.item
+                                ? '<a href="/' + connection.item + '">' + connection.title + '</a>'
+                                : connection.title
+                        ) + (
+                            connection.description
+                                ? ' ' + formatLight('(' + connection.description + ')')
+                                : ''
+                        );
+                    }).join(', ')
+                );
+            });
+            $div.html(html.join('; '));
+        }
+
     }
 
     ['reviews', 'links'].forEach(function(key) {
