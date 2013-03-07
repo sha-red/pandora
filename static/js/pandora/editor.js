@@ -241,20 +241,20 @@ pandora.ui.editor = function(data) {
             timeline: function(data) {
                 pandora.UI.set('videoTimeline', data.timeline);
             },
+            toggleannotations: function(data) {
+                pandora.UI.set('showAnnotations', data.showAnnotations);
+            },
             togglecalendar: function(data) {
                 pandora.UI.set('showAnnotationsCalendar', !data.collapsed);
+            },
+            togglelayer: function(data) {
+                pandora.UI.set('showLayers.' + data.layer, !data.collapsed);
             },
             togglemap: function(data) {
                 pandora.UI.set('showAnnotationsMap', !data.collapsed);
             },
             togglesize: function(data) {
                 pandora.UI.set({videoSize: data.size});
-            },
-            toggleannotations: function(data) {
-                pandora.UI.set('showAnnotations', data.showAnnotations);
-            },
-            togglelayer: function(data) {
-                pandora.UI.set('showLayers.' + data.layer, !data.collapsed);
             },
             pandora_showannotations: function(data) {
                 that.options({showAnnotations: data.value});
