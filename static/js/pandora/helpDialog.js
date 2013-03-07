@@ -21,7 +21,7 @@ pandora.ui.helpDialog = function() {
                     })
             ),
 
-        $panel, $list, $text,
+        $panel, $list, $text, $image,
 
         that = Ox.Dialog({
             buttons: [
@@ -49,18 +49,16 @@ pandora.ui.helpDialog = function() {
             keys: {escape: 'close'},
             maximizeButton: true,
             minHeight: 256,
-            minWidth: 544 + Ox.UI.SCROLLBAR_SIZE,
+            minWidth: 544 + 2 * Ox.UI.SCROLLBAR_SIZE,
             removeOnClose: true,
             title: 'Help',
-            width: 672 + Ox.UI.SCROLLBAR_SIZE
+            width: 672 + 2 * Ox.UI.SCROLLBAR_SIZE
         })
         .bindEvent({
             close: function() {
                 pandora.user.ui.page == 'help' && pandora.UI.set({page: '', 'hash.anchor': ''});
             },
-            resize: function() {
-                $list.size();
-            },
+            resize: resize,
             'pandora_help': function(data) {
                 if (pandora.user.ui.page == 'help') {
                     that.select(data.value == '' ? 'help' : data.value);
@@ -119,16 +117,15 @@ pandora.ui.helpDialog = function() {
         $text = Ox.Element()
             .css({
                 padding: '16px',
-                // fontSize: '12px',
                 lineHeight: '16px',
-                overflowY: 'auto',
+                overflowY: 'scroll',
                 MozUserSelect: 'text',
                 WebkitUserSelect: 'text'
             });
 
         $panel = Ox.SplitPanel({
             elements: [
-                {element: $list, size: 128},
+                {element: $list, size: 128 + Ox.UI.SCROLLBAR_SIZE},
                 {element: $text}
             ],
             orientation: 'horizontal'
@@ -139,13 +136,30 @@ pandora.ui.helpDialog = function() {
         
     });
 
+    function getImageSize() {
+        var width = that.options('width') - 160 - 2 * Ox.UI.SCROLLBAR_SIZE,
+            height = Math.round(width * 5/8);
+        return {width: width, height: height};
+    }
+
+    function resize(data) {
+        $list.size();
+        $image && $image.options(getImageSize());
+    }
+
     that.select = function(id) {
+        var img, $img;
         $text.html(text[id || 'help']).scrollTop(0);
-        $text.find('img')
-            .css({
-                width: '100%',
-                borderRadius: '8px'
-            });
+        img = $text.find('img');
+        if (img) {
+            $img = $(img);
+            $img.replaceWith(
+                $image = Ox.ImageElement(
+                    Ox.extend(getImageSize(), {src: $img.attr('src')})
+                )
+                .css({borderRadius: '8px'})
+            );
+        }
         $text.find('td:first-child')
             .css({
                 height: '16px',
