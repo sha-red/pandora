@@ -62,8 +62,9 @@ pandora.ui.helpDialog = function() {
                 $list.size();
             },
             'pandora_help': function(data) {
-                pandora.user.ui.page == 'help' &&
+                if (pandora.user.ui.page == 'help') {
                     that.select(data.value == '' ? 'help' : data.value);
+                }
             }
         });
 
@@ -72,12 +73,14 @@ pandora.ui.helpDialog = function() {
         var $html = $('<div>'),
             strings = Ox.clone(pandora.site, true);
 
-        strings.itemName = Ox.map(strings.itemName, function(v) {
-            return v.toLowerCase();
-        });
         strings.addAnnotationShortcuts = strings.layers.map(function(layer, index) {
             return '<tr><td>' + index + '</td><td>Add ' + layer.item.toLowerCase() + '</td></tr>';
         }).join('\n');
+        strings.itemName = Ox.map(strings.itemName, function(v) {
+            return v.toLowerCase();
+        });
+        strings.signup = pandora.user.level == 'guest'
+            ? '<a href="/signup">sign up</a>' : 'sign up';
 
         $html.html(Ox.formatString(html, strings));
 
@@ -150,6 +153,7 @@ pandora.ui.helpDialog = function() {
                 textAlign: 'right',
                 whiteSpace: 'nowrap'
             });
+        pandora.createLinks($text);
         return that;
     }
 
