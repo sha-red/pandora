@@ -13,8 +13,10 @@ pandora.ui.siteDialog = function(section) {
     var $tabPanel = Ox.TabPanel({
             content: function(id) {
                 var $content = Ox.Element()
-                    .addClass('OxTextPage')
                     .css({padding: '16px', overflowY: 'auto'});
+                if (id != 'contact') {
+                    $content.addClass('OxTextPage');
+                }
                 if (id == 'contact') {
                     pandora.$ui.contactForm = pandora.ui.contactForm().appendTo($content);
                 } else if (id == 'news') {

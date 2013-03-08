@@ -13,8 +13,10 @@ pandora.ui.siteDialog = function(section) {
     var $tabPanel = Ox.TabPanel({
             content: function(id) {
                 var $content = Ox.Element()
-                    .addClass('OxTextPage')
                     .css({padding: '16px', overflowY: 'auto'});
+                if (id != 'contact') {
+                    $content.addClass('OxTextPage');
+                }
                 if (id == 'contact') {
                     pandora.$ui.contactForm = pandora.ui.contactForm().appendTo($content);
                 } else if (id == 'news') {
@@ -70,7 +72,7 @@ pandora.ui.siteDialog = function(section) {
                             .appendTo($content);
                         if (id == 'rights') {
                             $right = $('<div>')
-                                .css({position: 'absolute', top: '16px', right: '16px', width: '128px'})
+                                .css({position: 'absolute', top: '16px', right: '16px', width: '128px', lineHeight: 'normal'})
                                 .appendTo($content);
                             $('<img>')
                                 .attr({src: '/static/png/rights.png'})
