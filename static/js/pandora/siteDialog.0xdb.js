@@ -154,7 +154,7 @@ pandora.ui.siteDialog = function(section) {
         })
         .bindEvent({
             close: function(data) {
-                pandora.UI.set({page: ''});
+                Ox.getObjectById(tabs, pandora.user.ui.page) && pandora.UI.set({page: ''});
             },
             resize: function(data) {
                 var selected = $tabPanel.selected();
