@@ -6,21 +6,6 @@ pandora.ui.apiDialog = function() {
     var selected = pandora.user.ui.hash && pandora.user.ui.hash.anchor
             ? pandora.user.ui.hash.anchor : '',
         actions,
-        $loading = Ox.Element()
-            .append(
-                $('<img>')
-                    .attr({src: Ox.UI.getImageURL('symbolLoadingAnimated')})
-                    .css({
-                        position: 'absolute',
-                        width: '32px',
-                        height: '32px',
-                        left: 0,
-                        top: 0,
-                        right: 0,
-                        bottom: 0,
-                        margin: 'auto'
-                    })
-            ),
 
         $panel, $list, $text,
 
@@ -45,7 +30,7 @@ pandora.ui.apiDialog = function() {
                 })
             ],
             closeButton: true,
-            content: $loading,
+            content: Ox.LoadingScreen(),
             height: 384,
             keys: {escape: 'close'},
             maximizeButton: true,

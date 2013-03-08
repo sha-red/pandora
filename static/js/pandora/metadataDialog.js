@@ -15,20 +15,6 @@ pandora.ui.metadataDialog = function(data) {
         formWidth = getFormWidth(),
         imdb,
 
-        $loading = Ox.Element().append(
-            $('<img>')
-                .attr({src: Ox.UI.getImageURL('symbolLoadingAnimated')})
-                .css({
-                    position: 'absolute',
-                    width: '32px',
-                    height: '32px',
-                    left: 0,
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    margin: 'auto'
-                })
-            ),
         $confirmDialog,
         $selectAllButton,
         $selectNoneButton,
@@ -107,7 +93,7 @@ pandora.ui.metadataDialog = function(data) {
                     })
             ],
             closeButton: true,
-            content: $loading,
+            content: Ox.LoadingScreen(),
             height: dialogHeight,
             maximizeButton: true,
             minHeight: 256,
@@ -354,7 +340,7 @@ pandora.ui.metadataDialog = function(data) {
                 Ox.isArray(type) ? [] : ''
             );
         });
-        that.options({content: $loading}).disableButtons();
+        that.options({content: Ox.LoadingScreen()}).disableButtons();
         pandora.api.edit(edit, function(result) {
             that.close();
             pandora.updateItemContext();

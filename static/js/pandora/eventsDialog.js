@@ -31,20 +31,7 @@ pandora.ui.eventsDialog = function(options) {
                 })
             ],
             closeButton: true,
-            content: Ox.Element().append(
-                $('<img>')
-                    .attr({src: Ox.UI.getImageURL('symbolLoadingAnimated')})
-                    .css({
-                        position: 'absolute',
-                        width: '32px',
-                        height: '32px',
-                        left: 0,
-                        top: 0,
-                        right: 0,
-                        bottom: 0,
-                        margin: 'auto'
-                    })
-            ),
+            content: Ox.LoadingScreen(),
             height: height,
             maximizeButton: true,
             minHeight: 256,

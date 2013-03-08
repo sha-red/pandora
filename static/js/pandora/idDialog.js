@@ -10,21 +10,6 @@ pandora.ui.idDialog = function(data) {
         dialogWidth = Math.round(window.innerWidth * 0.9),
         formWidth = getFormWidth(),
 
-        $loading = Ox.Element().append(
-            $('<img>')
-                .attr({src: Ox.UI.getImageURL('symbolLoadingAnimated')})
-                .css({
-                    position: 'absolute',
-                    width: '32px',
-                    height: '32px',
-                    left: 0,
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    margin: 'auto'
-                })
-        ),
-
         $content,
         $input = [],
         $checkboxGroup,
@@ -62,7 +47,7 @@ pandora.ui.idDialog = function(data) {
                         })
                 ],
                 closeButton: true,
-                content: $loading,
+                content: Ox.LoadingScreen(),
                 height: dialogHeight,
                 maximizeButton: true,
                 minHeight: 256,
@@ -121,7 +106,7 @@ pandora.ui.idDialog = function(data) {
                             data[key] = key == 'director'
                                 ? data_.value.split(', ')
                                 : data_.value;
-                            that.options({content: $loading});
+                            that.options({content: Ox.LoadingScreen()});
                             getIds();
                         }
                     })
@@ -249,7 +234,7 @@ pandora.ui.idDialog = function(data) {
     }
 
     function updateId() {
-        that.options({content: $loading}).disableButtons();
+        that.options({content: Ox.LoadingScreen()}).disableButtons();
         pandora.api.edit({
             id: data.id,
             imdbId: $checkboxGroup.options('value')
