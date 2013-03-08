@@ -149,7 +149,7 @@ def update_sitemap(base_url):
         el = ET.SubElement(video, "video:title")
         el.text = i.get('title')
         el = ET.SubElement(video, "video:thumbnail_loc")
-        el.text = absolute_url("%s/%96p.jpg" % i.itemId)
+        el.text = absolute_url("%s/96p.jpg" % i.itemId)
         description = i.get('description', i.get('summary', ''))
         if description:
             el = ET.SubElement(video, "video:description")
