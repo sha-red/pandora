@@ -5,6 +5,7 @@ pandora.ui.infoView = function(data) {
     var ui = pandora.user.ui,
         canEdit = pandora.site.capabilities.canEditMetadata[pandora.user.level],
         canRemove = pandora.site.capabilities.canRemoveItems[pandora.user.level],
+        canSeeAllMetadata = pandora.user.level != 'guest',
         css = {
             marginTop: '4px',
             textAlign: 'justify',
@@ -231,7 +232,7 @@ pandora.ui.infoView = function(data) {
 
     renderGroup(['actor']);
 
-    renderGroup(['genre', 'keyword']);
+    renderGroup(canSeeAllMetadata ? ['genre', 'keyword'] : ['genre']);
 
     renderGroup(['imdbId']);
 
