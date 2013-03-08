@@ -115,9 +115,9 @@ pandora.ui.helpDialog = function() {
             });
 
         $text = Ox.Element()
+            .addClass('OxTextPage')
             .css({
                 padding: '16px',
-                lineHeight: '16px',
                 overflowY: 'scroll',
                 MozUserSelect: 'text',
                 WebkitUserSelect: 'text'

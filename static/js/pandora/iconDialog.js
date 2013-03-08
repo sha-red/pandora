@@ -22,6 +22,7 @@ pandora.ui.iconDialog = function(options) {
                 )
                 .append(
                     $('<div>')
+                        .addClass('OxTextPage')
                         .css({position: 'absolute', left: '96px', top: '16px', width: options.width - 112 + 'px'})
                         .html(options.text)
                 ),

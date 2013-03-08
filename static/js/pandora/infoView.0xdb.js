@@ -115,6 +115,7 @@ pandora.ui.infoView = function(data) {
             .appendTo($reflection),
 
         $text = Ox.Element()
+            .addClass('OxTextPage')
             .css({
                 position: 'absolute',
                 left: margin + (iconSize == 256 ? 256 : iconWidth) + margin + 'px',
