@@ -259,7 +259,7 @@ pandora.createLinks = function($element) {
     $element
         .on({
             click: function(e) {
-                if($(e.target).is('a') && isExternalLink(e.target)) {
+                if ($(e.target).is('a') && isExternalLink(e.target)) {
                     e.preventDefault();
                     window.open('/url=' + encodeURIComponent(e.target.href), '_blank');
                 }
@@ -268,7 +268,7 @@ pandora.createLinks = function($element) {
         })
         .bindEvent({
             singleclick: function(e) {
-                if($(e.target).is('a') && !isExternalLink(e.target)) {
+                if ($(e.target).is('a') && !isExternalLink(e.target)) {
                     pandora.clickLink(e);
                 }
             }
@@ -892,6 +892,7 @@ pandora.getListData = function(list) {
 pandora.getPageTitle = function(stateOrURL) {
     var pages = [
             {id: '', title: ''},
+            {id: 'api', title: 'API Documentation'},
             {id: 'help', title: 'Help'},
             {id: 'home', title: ''},
             {id: 'preferences', title: 'Preferences'},
