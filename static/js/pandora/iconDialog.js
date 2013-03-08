@@ -8,7 +8,7 @@ pandora.ui.iconDialog = function(options) {
                 keys: null,
                 text: '',
                 title: '',
-                width: 304,
+                width: 368,
             }, options),
 
         that = Ox.Dialog({
