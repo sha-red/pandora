@@ -26,9 +26,10 @@ pandora.ui.infoView = function(data) {
             'editor', 'composer', 'lyricist', 'actor'
         ],
         listKeys = nameKeys.concat([
-            'country', 'language', 'color', 'sound', 'productionCompany',
-            'genre', 'keyword'
+            'country', 'language', 'color', 'sound', 'genre', 'keyword'
         ]),
+        // these may contain commas, and are thus separated by semicolons
+        specialListKeys = ['alternativeTitles', 'productionCompany'],
         descriptions = {
             names: getNames(),
             studios: getStudios()
@@ -458,6 +459,8 @@ pandora.ui.infoView = function(data) {
                 $minutes[value ? 'show' : 'hide']();
             } else if (listKeys.indexOf(key) > -1) {
                 edit[key] = value ? value.split(', ') : [];
+            } else if (specialListKeys.indexOf(key) > -1) {
+                edit[key] = value ? value.split('; ') : [];
             } else {
                 edit[key] = value;
             }
@@ -527,7 +530,7 @@ pandora.ui.infoView = function(data) {
             return key
                 ? '<a href="/' + key + '=' + value + '">' + value + '</a>'
                 : value;
-        }).join(', ');
+        }).join(Ox.contains(specialListKeys, key) ? '; ' : ', ');
     }
 
     function formatTitle(title) {
@@ -547,11 +550,10 @@ pandora.ui.infoView = function(data) {
         var ret;
         if (nameKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), 'name');
-        } else if (
-            listKeys.indexOf(key) > -1
-            || Ox.contains(['year', 'color', 'sound'], key)
-        ) {
+        } else if (listKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), key);
+        } else if (specialListKeys.indexOf(key) > -1) {
+            ret = formatLink(value.split('; '), key);
         } else if (key == 'imdbId') {
             ret = '<a href="http://www.imdb.com/title/tt'
                 + value + '">' + value + '</a>';
@@ -616,6 +618,7 @@ pandora.ui.infoView = function(data) {
             }).join('; ')
             : key == 'runtime' ? Math.round(value / 60)
             : Ox.contains(listKeys, key) ? value.join(', ')
+            : Ox.contains(specialListKeys, key) ? value.join('; ')
             : value;
     }
 
