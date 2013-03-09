@@ -1,6 +1,6 @@
 'use strict';
 
-// FIXME: rename to embed
+// FIXME: rename to embedView
 
 pandora.ui.embedPanel = function() {
 

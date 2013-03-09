@@ -307,6 +307,8 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.uploadDialog = pandora.ui.uploadDialog().open();
                 } else if (data.id == 'deletelist') {
                     pandora.ui.deleteListDialog().open();
+                } else if (data.id == 'print') {
+                    window.open('#?print=true', '_blank')
                 } else if (data.id == 'showsidebar') {
                     pandora.UI.set({showSidebar: !ui.showSidebar});
                 } else if (data.id == 'showinfo') {
@@ -409,6 +411,9 @@ pandora.ui.mainMenu = function() {
                         pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                     }
                 }
+            },
+            key_control_p: function() {
+                window.open('#?print=true', '_blank');
             },
             key_control_shift_f: function() {
                 if (!pandora.hasDialogOrScreen()) {
@@ -671,6 +676,7 @@ pandora.ui.mainMenu = function() {
                 { id: 'editlist', title: 'Edit Selected List...', disabled: isGuest || !pandora.user.ui._list, keyboard: 'control e' },
                 { id: 'deletelist', title: 'Delete Selected List...', disabled: isGuest || !pandora.user.ui._list, keyboard: 'delete' },
                 {},
+                { id: 'print', title: 'Print', keyboard: 'control p' },
                 { id: 'tv', title: 'TV', keyboard: 'control space' }
             ]
         )};

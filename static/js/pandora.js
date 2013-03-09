@@ -37,6 +37,8 @@ appPanel
         isEmbed = /^#\?/.test(document.location.hash)
             && /embed=true/.test(document.location.hash),
         isMSIE = /MSIE/.test(navigator.userAgent),
+        isPrint = /^#\?/.test(document.location.hash)
+            && /print=true/.test(document.location.hash),
         legacyThemes = {classic: 'oxlight', modern: 'oxdark'},
         theme = localStorage && localStorage['Ox.theme']
             && JSON.parse(localStorage['Ox.theme']) || 'oxmedium';
@@ -57,7 +59,7 @@ appPanel
         images.logo = document.createElement('img');
         images.logo.onload = function() {
             var ratio = images.logo.width / images.logo.height,
-                width = isEmbed ? 96 : 320,
+                width = isEmbed || isPrint ? 96 : 320,
                 height = width / ratio;
             images.logo.style.position = 'absolute';
             images.logo.style.left = 0;
@@ -87,11 +89,11 @@ appPanel
             images.loadingIcon.setAttribute('id', 'loadingIcon');
             images.loadingIcon.style.position = 'absolute';
             images.loadingIcon.style.left = 0;
-            images.loadingIcon.style.top = isEmbed ? '32px' : '80px';
+            images.loadingIcon.style.top = isEmbed || isPrint ? '32px' : '80px';
             images.loadingIcon.style.right = 0;
             images.loadingIcon.style.bottom = 0;
-            images.loadingIcon.style.width = isEmbed ? '16px' : '32px';
-            images.loadingIcon.style.height = isEmbed ? '16px' : '32px';
+            images.loadingIcon.style.width = isEmbed || isPrint ? '16px' : '32px';
+            images.loadingIcon.style.height = isEmbed || isPrint ? '16px' : '32px';
             images.loadingIcon.style.margin = 'auto';
             images.loadingIcon.src = '/static/oxjs/' + (enableDebugMode ? 'dev' : 'build')
                 + '/Ox.UI/themes/' + theme + '/svg/symbolLoading.svg';
@@ -106,12 +108,12 @@ appPanel
             var gradient = document.createElement('div');
             gradient.style.position = 'absolute';
             gradient.style.left = 0;
-            gradient.style.top = isEmbed ? '48px' : '160px';
+            gradient.style.top = isEmbed || isPrint ? '48px' : '160px';
             gradient.style.right = 0;
             gradient.style.bottom = 0;
             // FIXME: should be 320 and 160 - the values below are temporary fixes for Chrome 26
-            gradient.style.width = isEmbed ? '98px' : '322px';
-            gradient.style.height = isEmbed ? '50px' : '162px';
+            gradient.style.width = isEmbed || isPrint ? '98px' : '322px';
+            gradient.style.height = isEmbed || isPrint ? '50px' : '162px';
             gradient.style.margin = 'auto';
             gradient.style.background = theme == 'oxlight' ? '-moz-linear-gradient(top, rgba(224, 224, 224, 0.75), rgba(224, 224, 224, 1), rgba(224, 224, 224, 1))'
                 : theme == 'oxmedium' ? '-moz-linear-gradient(top, rgba(144, 144, 144, 0.75), rgba(144, 144, 144, 1), rgba(144, 144, 144, 1))'
@@ -327,6 +329,8 @@ appPanel
                         }
                     }
                 });
+            } else if (isPrint) {
+                pandora.$ui.printView = pandora.ui.printView().display();
             } else {
                 pandora.$ui.appPanel = pandora.ui.appPanel().display();
                 Ox.Request.requests() && pandora.$ui.loadingIcon.start();
