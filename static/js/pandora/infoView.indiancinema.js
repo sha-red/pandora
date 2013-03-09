@@ -509,9 +509,11 @@ pandora.ui.infoView = function(data) {
         key = item ? item.title : key;
         mode = mode || 'text'
         if (key == 'alternativeTitles') {
-            key = 'Alternative Title' + (
+            key = 'alternative title' + (
                 data.alternativeTitles && data.alternativeTitles.length == 1 ? '' : 's'
             );
+        } else if (key == 'keyword') {
+            key = 'keywords'
         }
         return mode == 'text'
             ? '<span style="font-weight: bold">' + Ox.toTitleCase(key) + ':</span> '
