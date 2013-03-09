@@ -89,7 +89,7 @@ pandora.ui.editor = function(data) {
                             event: {start: '', end: ''}
                         } : {}
                     ));
-                    Ox.Request.clearCache('findAnnotations');
+                    Ox.Request.clearCache();
                 });
             },
             annotationsfont: function(data) {
@@ -128,7 +128,7 @@ pandora.ui.editor = function(data) {
                         result.data.modified.slice(0, 10), '%B %e, %Y'
                     );
                     that.updateAnnotation(data.id, result.data);
-                    Ox.Request.clearCache('findAnnotations');
+                    Ox.Request.clearCache();
                 };
                 if (data.id[0] == '_') {
                     pandora.api.addAnnotation({
@@ -220,7 +220,7 @@ pandora.ui.editor = function(data) {
                 }, function(result) {
                     //fixme: check for errors
                     //that.removeAnnotation(data.layer, data.id);
-                    Ox.Request.clearCache('findAnnotations');
+                    Ox.Request.clearCache();
                 });
             },
             resize: function(data) {
