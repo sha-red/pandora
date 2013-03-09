@@ -263,7 +263,7 @@
         {
             "id": "annotations",
             "title": "Annotations",
-            "type": "string",
+            "type": "string", // fixme: not the best type for this magic key
             "find": true
         },
         {

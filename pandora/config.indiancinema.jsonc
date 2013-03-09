@@ -391,10 +391,28 @@
             "sort": true
         },
         {
-            "id": "notes",
-            "title": "Notes",
+            "id": "comments",
+            "title": "Comments",
             "type": "text",
             "capability": "canEditMetadata"
+        },
+        {
+            "id": "annotations",
+            "title": "Annotations",
+            "type": "string", // fixme: not the best type for this magic key
+            "find": true
+        },
+        {
+            "id": "keywords",
+            "title": "Keywords",
+            "type": "layer",
+            "find": true
+        },
+        {
+            "id": "notes",
+            "title": "Notes",
+            "type": "layer",
+            "find": true
         },
         {
             "id": "subtitles",
@@ -544,8 +562,7 @@
             "id": "filename",
             "title": "Filename",
             "type": ["string"],
-            "capability": "canSeeFiles",
-            "find": true
+            "capability": "canSeeFiles"
         },
         {
             "id": "created",

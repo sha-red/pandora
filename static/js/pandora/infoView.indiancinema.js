@@ -400,14 +400,14 @@ pandora.ui.infoView = function(data) {
         .appendTo($statistics);
     renderRightsLevel();
 
-    // Notes -------------------------------------------------------------------
+    // Comments ----------------------------------------------------------------
 
     if (canEdit) {
 
         $('<div>')
             .css({marginBottom: '4px'})
             .append(
-                formatKey('Notes', 'statistics').options({
+                formatKey('Comments', 'statistics').options({
                     tooltip: 'Only '
                         + Object.keys(pandora.site.capabilities.canEditMetadata).map(function(level, i) {
                             return (
@@ -416,23 +416,23 @@ pandora.ui.infoView = function(data) {
                                 : ' and '
                             ) + Ox.toTitleCase(level)
                         }).join('')
-                        + ' can see and edit these notes'
+                        + ' can see and edit these comments'
                 })
             )
             .append(
                 Ox.EditableContent({
                         clickLink: pandora.clickLink,
-                        placeholder: formatLight('No notes'),
+                        placeholder: formatLight('No comments'),
                         tooltip: pandora.getEditTooltip(),
                         type: 'textarea',
-                        value: data.notes,
+                        value: data.comments,
                         width: 128
                     })
                     .bindEvent({
                         submit: function(event) {
                             pandora.api.edit({
                                 id: data.id,
-                                notes: event.value
+                                comments: event.value
                             }, function(result) {
                                 // ...
                             });
