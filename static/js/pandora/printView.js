@@ -81,7 +81,8 @@ pandora.ui.printView = function(data) {
                         + (
                             item.summary
                             ? ' <span style="color: rgb(128, 128, 128)">'
-                                + item.summary + '</span>'
+                                + Ox.encodeHTMLEntities(item.summary)
+                                + '</span>'
                             : ''
                         )
                     )
