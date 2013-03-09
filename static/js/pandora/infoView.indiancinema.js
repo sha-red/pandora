@@ -258,7 +258,8 @@ pandora.ui.infoView = function(data) {
             $links
                 .append(formatKey('wiki'))
                 .append(
-                    '<a href="' + data.wiki + '">' + decodeURI(data.wiki) + '</a>'
+                    '<a href="' + data.wiki + '">'
+                    + decodeURI(data.wiki.split('/').pop()) + '</a>'
                 );
         }
         $links.appendTo($text);
