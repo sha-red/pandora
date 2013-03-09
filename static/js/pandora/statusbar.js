@@ -29,35 +29,6 @@ pandora.ui.statusbar = function() {
                     .append($text.selected)
             );
 
-    function getText(data) {
-        var ui = pandora.user.ui,
-            canSeeFiles = pandora.site.capabilities.canSeeFiles[pandora.user.level],
-            canSeeSize = pandora.site.capabilities.canSeeSize[pandora.user.level],
-            itemName = ui.listView == 'clip'
-                ? (data.items == 1 ? 'Clip' : 'Clips')
-                : (pandora.site.itemName[data.items == 1 ? 'singular' : 'plural']),
-            parts = [];
-        parts.push(Ox.formatNumber(data.items) + ' '+ itemName);
-        if (data.runtime) {
-            parts.push(Ox.formatDuration(data.runtime, 'short'));
-        } else if (data.duration) {
-            parts.push(Ox.formatDuration(data.duration, 'short'));
-        }
-        if (canSeeFiles) {
-            data.files && parts.push(
-                Ox.formatNumber(data.files) + ' file' + (data.files == 1 ? '' : 's')
-            );
-            data.duration && parts.push(Ox.formatDuration(data.duration));
-        }
-        if (canSeeSize) {
-            data.size && parts.push(Ox.formatValue(data.size, 'B'));
-        }
-        if (canSeeFiles) {
-            data.pixels && parts.push(Ox.formatValue(data.pixels, 'px'));
-        }
-        return parts.join(', ');
-    }
-
     function setTotal() {
         pandora.api.find({
             query: pandora.user.ui.find,
@@ -83,10 +54,10 @@ pandora.ui.statusbar = function() {
                 } else {
                     $text.titleTotal.show();
                     $text.titleSelected.show();
-                    $text.selected.html(getText(data)).show();
+                    $text.selected.html(pandora.getStatusText(data)).show();
                 }
             } else {
-                $text.total.html(getText(data)).show();
+                $text.total.html(pandora.getStatusText(data)).show();
             }
         }
     };

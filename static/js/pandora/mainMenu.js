@@ -308,7 +308,7 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'deletelist') {
                     pandora.ui.deleteListDialog().open();
                 } else if (data.id == 'print') {
-                    window.open('#?print=true', '_blank')
+                    window.open(document.location.href + '#?print=true', '_blank');
                 } else if (data.id == 'showsidebar') {
                     pandora.UI.set({showSidebar: !ui.showSidebar});
                 } else if (data.id == 'showinfo') {
@@ -413,7 +413,7 @@ pandora.ui.mainMenu = function() {
                 }
             },
             key_control_p: function() {
-                window.open('#?print=true', '_blank');
+                window.open(document.location.href + '#?print=true', '_blank');
             },
             key_control_shift_f: function() {
                 if (!pandora.hasDialogOrScreen()) {

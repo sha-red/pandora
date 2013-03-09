@@ -10,83 +10,95 @@ pandora.ui.printView = function(data) {
                 backgroundColor: 'rgb(255, 255, 255)',
                 color: 'rgb(0, 0, 0)'
             }),
-        keys = ['director', 'year', 'title'];
+        $loading = Ox.LoadingScreen().appendTo(that),
+        sortKey = pandora.user.ui.listSort[0].key,
+        keys = Ox.unique(
+            ['director', 'id', 'summary', 'title', 'year'].concat(sortKey)
+        );
 
     Ox.$body.css({
         background: 'rgb(255, 255, 255)',
         overflow: 'auto'
     });
 
-    Ox.LoadingScreen().appendTo(that);
-
     pandora.api.find({
-        keys: keys.concat(['id', 'summary']),
-        query: pandora.user.ui.find,
-        range: [0, 1000000],
-        sort: keys.map(function(key) {
-            return {
-                key: key,
-                operator: Ox.getObjectById(pandora.site.itemKeys, key).operator
-            };
-        })
+        query: pandora.user.ui.find
     }, function(result) {
-        var padding;
-        that.empty();
-        $('<div>')
-            .css({
-                height: '16px'
-            })
-            .html(
-                '<b>' + pandora.site.site.name + ' - '
-                + (pandora.user.ui._list || 'All ' + pandora.site.itemName.plural)
-                + '</b>'
-            )
-            .appendTo(that);
-        $('<div>').css({height: '16px'}).appendTo(that);
-        result.data.items && result.data.items.forEach(function(item) {
-            var url = (pandora.site.https ? 'https://' : 'http://')
-                + pandora.site.site.url + '/' + item.id;
+        var totals = pandora.getStatusText(result.data);
+        pandora.api.find({
+            keys: keys,
+            query: pandora.user.ui.find,
+            range: [0, result.data.items],
+            sort: pandora.user.ui.listSort
+        }, function(result) {
+            var padding;
+            $loading.remove();
             $('<div>')
-                .attr({title: url})
-                .css({
-                    height: '16px',
-                    textAlign: 'justify',
-                    textOverflow: 'ellipsis',
-                    overflow: 'hidden'
-                })
+                .css({height: '16px'})
                 .html(
-                    (item.director ? item.director.join(', ') + ': ' : '')
-                    + '<b>' + item.title + '</b>'
-                    + (item.year ? ' (' + item.year + ')' : '')
-                    + (
-                        item.summary
-                        ? ' <span style="color: rgb(128, 128, 128)">'
-                        + item.summary + '</span>'
-                        : ''
-                    )
+                    '<b>' + pandora.site.site.name + ' - '
+                    + (pandora.user.ui._list || 'All ' + pandora.site.itemName.plural)
+                    + '</b>'
                 )
-                .on({
-                    click: function() {
-                        document.location.href = url;
-                    }
-                })
+                .appendTo(that);
+            $('<div>').css({height: '16px'}).appendTo(that);
+            result.data.items && result.data.items.forEach(function(item) {
+                var format = Ox.clone(
+                        Ox.getObjectById(pandora.site.itemKeys, sortKey).format
+                    ),
+                    url = (pandora.site.https ? 'https://' : 'http://')
+                        + pandora.site.site.url + '/' + item.id;
+                if (format && format.type == 'ColorPercent') {
+                    format = {type: 'percent', args: [100, 1]};
+                }
+                $('<div>')
+                    .attr({title: url})
+                    .css({
+                        height: '16px',
+                        textAlign: 'justify',
+                        textOverflow: 'ellipsis',
+                        overflow: 'hidden'
+                    })
+                    .html(
+                        (item.director ? item.director.join(', ') + ' ' : '')
+                        + '<b>' + item.title + '</b>'
+                        + (item.year ? ' (' + item.year + ')' : '')
+                        + (
+                            item[sortKey] && !Ox.contains(['director', 'title', 'year'], sortKey)
+                            ? ' ' + ( 
+                                format && !/^color/.test(format.type)
+                                ? Ox['format' + Ox.toTitleCase(format.type)].apply(
+                                    this, [item[sortKey]].concat(format.args || [])
+                                )
+                                : item[sortKey]
+                            )
+                            : ''
+                        )
+                        + (
+                            item.summary
+                            ? ' <span style="color: rgb(128, 128, 128)">'
+                                + item.summary + '</span>'
+                            : ''
+                        )
+                    )
+                    .on({
+                        click: function() {
+                            document.location.href = url;
+                        }
+                    })
+                    .appendTo(that);
+            });
+            if (result.data.items.length) {
+                $('<div>').css({height: '16px'}).appendTo(that);
+            }
+            $('<div>')
+                .css({height: '16px'})
+                .html(
+                    '<span style="color: rgb(128, 128, 128)">'
+                    + totals + '</span'
+                )
                 .appendTo(that);
         });
-        if (result.data.items.length) {
-            $('<div>').css({height: '16px'}).appendTo(that);
-        }
-        $('<div>')
-            .css({
-                height: '16px'
-            })
-            .html(
-                Ox.formatCount(
-                    result.data.items.length,
-                    pandora.site.itemName.singular,
-                    pandora.site.itemName.plural
-                ).toLowerCase()
-            )
-            .appendTo(that);
     });
 
     that.display = function() {
