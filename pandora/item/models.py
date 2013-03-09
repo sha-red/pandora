@@ -594,6 +594,14 @@ class Item(models.Model):
             return info
         return i
 
+    def get_item_description(self):
+        if settings.USE_IMDB:
+            info = tuple([self.data.get(k, 0) for k in ['hue', 'saturation', 'lightness']])
+            description = 'Hue: %.3f, Saturation: %.3f, Lightness: %.3f' % info
+        else:
+            description = ox.strip_tags(self.get('summary', ''))
+        return description
+
     def oxdb_id(self):
         if not self.get('title') and not self.get('director'):
             return self.itemId

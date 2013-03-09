@@ -1216,17 +1216,15 @@ def item(request, id):
             'data': data,
             'clips': clips,
             'icon': settings.CONFIG['user']['ui']['icons'] == 'frames' and 'icon' or 'poster',
-
+            'title': item.get('title', ''),
+            'description': item.get_item_description()
         }
-        for key in ('title', 'description', 'keywords'):
-            value = item.get({
-                'description': 'summary',
-                'keywords': 'topic' in keys and 'topic' or 'keywords'
-            }.get(key, key))
+        if not settings.USE_IMDB:
+            value = item.get('topic' in keys and 'topic' or 'keywords')
             if isinstance(value, list):
                 value = value = ', '.join(value)
             if value:
-                ctx[key] = ox.strip_tags(value)
+                ctx['keywords'] = ox.strip_tags(value)
 
         context = RequestContext(request, ctx)
     return render_to_response(template, context)

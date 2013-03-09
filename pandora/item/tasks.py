@@ -130,7 +130,7 @@ def update_sitemap(base_url):
         url = ET.SubElement(urlset, "url")
         # URL of the page. This URL must begin with the protocol (such as http)
         loc = ET.SubElement(url, "loc")
-        loc.text = absolute_url("%s" % i.itemId)
+        loc.text = absolute_url("%s/info" % i.itemId)
         # This date should be in W3C Datetime format, can be %Y-%m-%d
         lastmod = ET.SubElement(url, "lastmod")
         lastmod.text = i.modified.strftime("%Y-%m-%d")
@@ -150,7 +150,7 @@ def update_sitemap(base_url):
         el.text = i.get('title')
         el = ET.SubElement(video, "video:thumbnail_loc")
         el.text = absolute_url("%s/96p.jpg" % i.itemId)
-        description = i.get('description', i.get('summary', ''))
+        description = i.get_item_description()
         if description:
             el = ET.SubElement(video, "video:description")
             el.text = i.get('description', i.get('summary', ''))

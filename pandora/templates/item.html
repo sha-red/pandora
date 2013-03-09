@@ -14,8 +14,8 @@
         </script>
         <script type="text/javascript" src="/static/js/pandora.js?{{settings.CONFIG.site.version}}"></script>
         <meta name="title" content="{{title}}" />
-        <meta name="description" content="{{description}}"/>
-        <meta name="keywords" content="{{keywords|safe}}"/>
+        {%if description %}<meta name="description" content="{{description|safe}}"/> {%endif%}
+        {%if keywords %}<meta name="keywords" content="{{keywords|safe}}"/> {%endif%}
         <meta content="{{url}}/96p.jpg" name="thumbnail"/>
         <meta content="{{url}}/96p.jpg" name="image_src"/>
         <meta property="og:title" content="{{title}}"/>
@@ -23,7 +23,7 @@
         <meta property="og:url" content="{{url}}"/>
         <meta property="og:image" content="{{url}}/96p.jpg"/>
         <meta property="og:site_name" content="{{settings.SITENAME}}"/>
-        <meta property="og:description" content="{{description}}"/>
+        {%if description %}<meta property="og:description" content="{{description}}"/>{%endif%}
         <meta name="google" value="notranslate"/>
     </head>
     <body>
