@@ -57,6 +57,7 @@ pandora.ui.printView = function(data) {
                         height: '16px',
                         textAlign: 'justify',
                         textOverflow: 'ellipsis',
+                        cursor: 'pointer',
                         overflow: 'hidden'
                     })
                     .html(
