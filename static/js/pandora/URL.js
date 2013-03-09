@@ -105,6 +105,8 @@ pandora.URL = (function() {
                 if (state.hash.query) {
                     if (state.hash.query.embed === true) {
                         // ...
+                    } else if (state.hash.query.print == true) {
+                        // ...
                     } else {
                         state.hash.query.forEach(function(kv) {
                             set[kv.key] = kv.value;

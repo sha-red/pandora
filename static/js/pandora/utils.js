@@ -652,6 +652,11 @@ pandora.getHash = function(state, callback) {
             && Ox.indexOf(state.hash.query, function(condition) {
                 return Ox.isEqual(condition, {key: 'embed', value: true});
             }) > -1,
+        isPrint = state.hash && state.hash.query
+            && Ox.indexOf(state.hash.query, function(condition) {
+                return Ox.isEqual(condition, {key: 'print', value: true});
+            }) > -1,
+        printKeys = ['print'],
         removeKeys = [];
     if (state.hash && state.hash.anchor) {
         if (state.page == 'help') {
@@ -669,6 +674,12 @@ pandora.getHash = function(state, callback) {
         if (isEmbed) {
             state.hash.query.forEach(function(condition) {
                 if (!Ox.contains(embedKeys, condition.key)) {
+                    removeKeys.push(condition.key);
+                }
+            });
+        } else if (isPrint) {
+            state.hash.query.forEach(function(condition) {
+                if (!Ox.contains(printKeys, condition.key)) {
                     removeKeys.push(condition.key);
                 }
             });
@@ -1313,6 +1324,8 @@ pandora.resizeFolders = function() {
 pandora.resizeWindow = function() {
     if (pandora.$ui.embedPanel) {
         pandora.$ui.embedPanel.resizePanel();
+    }
+    if (pandora.$ui.embedPanel || pandora.$ui.printView) {
         return;
     }
     // FIXME: a lot of this throws errors on load
