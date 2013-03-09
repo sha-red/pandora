@@ -210,7 +210,7 @@ DB_GIN_TRGM = False
 RELOADER_RUNNING = False
 #you can ignore things below this line
 #=========================================================================
-
+LOCAL_APPS = []
 #load installation specific settings from local_settings.py
 try:
     from local_settings import *
@@ -234,3 +234,4 @@ except NameError:
         except IOError:
             Exception('Please create a %s file with random characters to generate your secret key!' % SECRET_FILE)
 
+INSTALLED_APPS = tuple(list(INSTALLED_APPS) + LOCAL_APPS)
