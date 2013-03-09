@@ -37,8 +37,11 @@ pandora.ui.printView = function(data) {
                 .css({height: '16px'})
                 .html(
                     '<b>' + pandora.site.site.name + ' - '
-                    + (pandora.user.ui._list || 'All ' + pandora.site.itemName.plural)
-                    + '</b>'
+                    + (
+                        pandora.user.ui._list
+                        ? 'List ' + pandora.user.ui._list
+                        : 'All ' + pandora.site.itemName.plural
+                    ) + '</b>'
                 )
                 .appendTo(that);
             $('<div>').css({height: '16px'}).appendTo(that);
