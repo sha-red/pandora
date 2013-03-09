@@ -425,7 +425,7 @@ pandora.ui.infoView = function(data) {
                         placeholder: formatLight('No comments'),
                         tooltip: pandora.getEditTooltip(),
                         type: 'textarea',
-                        value: data.comments,
+                        value: data.comments || '',
                         width: 128
                     })
                     .bindEvent({

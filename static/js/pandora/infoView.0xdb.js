@@ -567,7 +567,7 @@ pandora.ui.infoView = function(data) {
                         placeholder: formatLight('No notes'),
                         tooltip: pandora.getEditTooltip(),
                         type: 'textarea',
-                        value: data.notes,
+                        value: data.notes || '',
                         width: 128
                     })
                     .bindEvent({

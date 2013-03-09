@@ -470,13 +470,21 @@ def get(request):
             info['layers'] = item.get_layers(request.user)
         if data['keys'] and 'files' in data['keys']:
             info['files'] = item.get_files(request.user)
-        if not data['keys'] or 'notes' in data['keys'] \
-           and request.user.get_profile().capability('canEditMetadata'):
-            info['notes'] = item.notes
         if not data['keys'] or 'groups' in data['keys'] \
            and request.user.get_profile().capability('canEditMetadata'):
             info['groups'] = [g.name for g in item.groups.all()]
-
+        def check_capability(capability):
+            if request.user.is_anonymous():
+                level = 'guest'
+            else:
+                level = request.user.get_profile().get_level()
+            return level in settings.CONFIG['capabilities'][capability] \
+                    and settings.CONFIG['capabilities'][capability][level]
+        for k in settings.CONFIG['itemKeys']:
+            if 'capability' in k \
+                and not check_capability(k['capability']) \
+                and k['id'] in info:
+                    del info[k['id']]
         info['editable'] = item.editable(request.user)
         response['data'] = info
     else:
@@ -538,10 +546,6 @@ def edit(request):
     if item.editable(request.user):
         item.log()
         response = json_response(status=200, text='ok')
-        if 'notes' in data:
-            if request.user.get_profile().capability('canEditMetadata'):
-                item.notes = ox.sanitize_html(data['notes'])
-            del data['notes']
         if 'rightslevel' in data:
             item.level = int(data['rightslevel'])
             del data['rightslevel']
