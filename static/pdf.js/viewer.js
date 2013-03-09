@@ -708,6 +708,10 @@ var PDFView = {
     }, false);
   },
 
+  getPage: function pdfViewGetPage(n) {
+    return this.pdfDocument.getPage(n);
+  },
+
   // Helper function to keep track whether a div was scrolled up or down and
   // then call a callback.
   watchScroll: function pdfViewWatchScroll(viewAreaElement, state, callback) {
@@ -890,28 +894,43 @@ var PDFView = {
       PDFView.loadingBar = new ProgressBar('#loadingBar', {});
     }
 
-    function windowMessage(e) {
+    var PdfDataRangeTransport = {
+      listeners: [],
+
+      addListener: function PdfDataRangeTransport_addListener(listener) {
+        this.listeners.push(listener);
+      },
+
+      onDataRange: function PdfDataRangeTransport_onDataRange(args) {
+        for (var i = 0; i < this.listeners.length; ++i) {
+          this.listeners[i](args);
+        }
+      },
+
+      requestDataRange: function PdfDataRangeTransport_requestDataRange(
+                                  begin, end) {
+        FirefoxCom.request('requestDataRange', { begin: begin, end: end });
+      }
+    };
+
+    window.addEventListener('message', function windowMessage(e) {
       var args = e.data;
 
       if (typeof args !== 'object' || !('pdfjsLoadAction' in args))
         return;
       switch (args.pdfjsLoadAction) {
         case 'supportsChunkedLoading':
-          window.removeEventListener('message', windowMessage);
-          PDFView.open({
-            url: args.pdfUrl,
-            chunkedChromeLoading: true,
-            totalLength: args.totalLength,
-            loadedBegin: args.loadedBegin,
-            loadedChunk: args.loadedChunk
-          }, 0);
+          PDFView.open(args.pdfUrl, 0, undefined, PdfDataRangeTransport, {
+            totalLength: args.totalLength
+          });
+          break;
+        case 'chunk':
+          PdfDataRangeTransport.onDataRange(args);
           break;
         case 'progress':
           PDFView.progress(args.loaded / args.total);
           break;
         case 'complete':
-          // TODO(mack): remove the listener when file loading is complete
-          // window.removeEventListener('message', windowMessage);
           if (!args.data) {
             PDFView.error(mozL10n.get('loading_error', null,
                           'An error occurred while loading the PDF.'), e);
@@ -920,8 +939,7 @@ var PDFView = {
           PDFView.open(args.data, 0);
           break;
       }
-    }
-    window.addEventListener('message', windowMessage);
+    });
     FirefoxCom.requestSync('initPassiveLoading', null);
   },
 
@@ -940,17 +958,21 @@ var PDFView = {
     document.title = title;
   },
 
-  open: function pdfViewOpen(url, scale, password) {
+  // TODO(mack): This function signature should really be pdfViewOpen(url, args)
+  open: function pdfViewOpen(url, scale, password,
+                  pdfDataRangeTransport, args) {
+    scale = scale || 1;
     var parameters = {password: password};
     if (typeof url === 'string') { // URL
       this.setTitleUsingUrl(url);
       parameters.url = url;
     } else if (url && 'byteLength' in url) { // ArrayBuffer
       parameters.data = url;
-    } else {
-      this.setTitleUsingUrl(url.url);
-      parameters = url;
-      parameters.password = password;
+    }
+    if (args) {
+      for (var prop in args) {
+        parameters[prop] = args[prop];
+      }
     }
 
     if (!PDFView.loadingBar) {
@@ -960,7 +982,7 @@ var PDFView = {
     this.pdfDocument = null;
     var self = this;
     self.loading = true;
-    PDFJS.getDocument(parameters).then(
+    PDFJS.getDocument(parameters, pdfDataRangeTransport).then(
       function getDocumentCallback(pdfDocument) {
         self.load(pdfDocument, scale);
         self.loading = false;
@@ -1192,7 +1214,6 @@ var PDFView = {
       container.removeChild(container.lastChild);
 
     var pagesCount = pdfDocument.numPages;
-
     var id = pdfDocument.fingerprint;
     document.getElementById('numPages').textContent =
       mozL10n.get('page_of', {pageCount: pagesCount}, 'of {{pageCount}}');
@@ -1209,79 +1230,70 @@ var PDFView = {
     this.startedTextExtraction = false;
     var pagesRefMap = this.pagesRefMap = {};
     var thumbnails = this.thumbnails = [];
-    var pagePromises = [];
 
-    var firstPageLoaded = true;
-
+    var defaultViewportPromise = new PDFJS.Promise();
+    var pagesPromise = new PDFJS.Promise();
     var self = this;
-    for (var pageIdx = 0; pageIdx < pagesCount; ++pageIdx) {
-      var pageNum = pageIdx + 1;
-      var pagePromise = pdfDocument.getPage(pageNum);
-      pagePromise.then(function(page) {
 
-        if (firstPageLoaded) {
-          var pagesFrag = document.createDocumentFragment();
-          // TODO(mack): clone
-          var defaultView = page.view;
-          for (var pageIdx = 0; pageIdx < pagesCount; ++pageIdx) {
-            var pageNum = pageIdx + 1;
-            var pageView = new PageView(container, pageNum, scale,
-                                    self.navigateTo.bind(self), defaultView);
-            pages[pageIdx] = pageView;
-            pagesFrag.appendChild(pageView.element);
-          }
-          container.appendChild(pagesFrag);
+    // TODO(mack): Verify is safe to assume at least one page if
+    // we're here.
+    pdfDocument.getPage(1).then(function(pdfPage) {
+      var viewport = pdfPage.getViewport(scale);
+      defaultViewportPromise.resolve(viewport);
+    });
 
-          var storedHash = null;
-          if (store.get('exists', false)) {
-            var page_ = store.get('page', '1');
-            var zoom = store.get('zoom', PDFView.currentScale);
-            var left = store.get('scrollLeft', '0');
-            var top = store.get('scrollTop', '0');
-
-            storedHash =
-              'page=' + page_ + '&zoom=' + zoom + ',' + left +',' + top;
-          }
-
-          self.setInitialView(storedHash, scale);
-          firstPageLoaded = false;
-        }
-
-        var pageIdx = page.pageInfo.pageIndex;
-        var pageNum = pageIdx + 1;
-
-        var pageView = pages[pageIdx];
-        pageView.setPdfPage(page);
-        pageView.setStats(page.stats);
-        var thumbnailView = new ThumbnailView(thumbsView, page, pageNum);
+    defaultViewportPromise.then(function(viewport) {
+      var pagePromises = [];
+      for (var pageNum = 1; pageNum <= pagesCount; ++pageNum) {
+        var viewportClone = viewport.clone();
+        var pageView = new PageView(container, pageNum, scale,
+                                    self.navigateTo.bind(self),
+                                    viewportClone);
+        var thumbnailView = new ThumbnailView(thumbsView, pageNum,
+                                              viewportClone);
         bindOnAfterDraw(pageView, thumbnailView);
+        pages.push(pageView);
+        thumbnails.push(thumbnailView);
 
-        pages[pageIdx] = pageView;
-        thumbnails[pageIdx] = thumbnailView;
-        var pageRef = page.ref;
-        pagesRefMap[pageRef.num + ' ' + pageRef.gen + ' R'] = pageNum;
+        var pagePromise = pdfDocument.getPage(pageNum);
+        pagePromise.then(function(pdfPage) {
+          pageView.setPdfPage(pdfPage);
+          thumbnailView.setPdfPage(pdfPage);
 
-        var visiblePages = self.visiblePages;
-        var firstNum = visiblePages.first.id;
-        var lastNum = visiblePages.last.id;
-        if (pageNum >= firstNum && pageNum <= lastNum) {
-          // TODO(mack): This logic could probably be better, as it's probably
-          // going in here more often than necessary
-          self.renderHighestPriority();
-          //updateViewarea();
-        }
+          var pageRef = pdfPage.ref;
+          var refStr = pageRef.num + ' ' + pageRef.gen + ' R';
+          pagesRefMap[refStr] = pdfPage.pageNumber;
+        });
+        pagePromises.push(pagePromise);
+      }
+
+      var event = document.createEvent('CustomEvent');
+      event.initCustomEvent('documentload', true, true, {});
+      window.dispatchEvent(event);
+
+      var storedHash = null;
+      if (store.get('exists', false)) {
+        var page_ = store.get('page', '1');
+        var zoom = store.get('zoom', PDFView.currentScale);
+        var left = store.get('scrollLeft', '0');
+        var top = store.get('scrollTop', '0');
+
+        storedHash = 'page=' + page_ + '&zoom=' + zoom + ',' + left +',' + top;
+      }
+
+      self.setInitialView(storedHash, scale);
+
+      PDFJS.Promise.all(pagePromises).then(function(pages) {
+        pagesPromise.resolve(pages);
       });
-      pagePromises.push(pagePromise);
-    }
-
-    var pagesPromise = PDFJS.Promise.all(pagePromises);
+    });
 
     var destinationsPromise = pdfDocument.getDestinations();
     destinationsPromise.then(function(destinations) {
       self.destinations = destinations;
     });
 
-    // outline and initial view depends on destinations and pagesRefMap
+    // outline depends on destinations and pagesRefMap
     var promises = [pagesPromise, destinationsPromise, storePromise,
                     PDFView.animationStartedPromise];
     PDFJS.Promise.all(promises).then(function() {
@@ -1345,8 +1357,8 @@ var PDFView = {
 
   renderHighestPriority: function pdfViewRenderHighestPriority() {
     // Pages have a higher priority than thumbnails, so check them first.
-    this.visiblePages = this.getVisiblePages();
-    var pageView = this.getHighestPriority(this.visiblePages, this.pages,
+    var visiblePages = this.getVisiblePages();
+    var pageView = this.getHighestPriority(visiblePages, this.pages,
                                            this.pageViewScroll.down);
     if (pageView) {
       this.renderView(pageView, 'page');
@@ -1379,7 +1391,7 @@ var PDFView = {
     }
     for (var i = 0; i < numVisible; ++i) {
       var view = visibleViews[i].view;
-      if (!this.isViewRenderable(view))
+      if (!this.isViewFinished(view))
         return view;
     }
 
@@ -1387,22 +1399,19 @@ var PDFView = {
     if (scrolledDown) {
       var nextPageIndex = visible.last.id;
       // ID's start at 1 so no need to add 1.
-      if (views[nextPageIndex] && !this.isViewRenderable(views[nextPageIndex]))
+      if (views[nextPageIndex] && !this.isViewFinished(views[nextPageIndex]))
         return views[nextPageIndex];
     } else {
       var previousPageIndex = visible.first.id - 2;
       if (views[previousPageIndex] &&
-          !this.isViewRenderable(views[previousPageIndex]))
+          !this.isViewFinished(views[previousPageIndex]))
         return views[previousPageIndex];
     }
     // Everything that needs to be rendered has been.
     return false;
   },
 
-  isViewRenderable: function pdfViewNeedsRendering(view) {
-    if (view instanceof PageView && !view.pdfPage) {
-      return false;
-    }
+  isViewFinished: function pdfViewNeedsRendering(view) {
     return view.renderingState === RenderingStates.FINISHED;
   },
 
@@ -1682,7 +1691,7 @@ var PDFView = {
 
     for (var i = 0, l = this.thumbnails.length; i < l; i++) {
       var thumb = this.thumbnails[i];
-      thumb.updateRotation(this.pageRotation);
+      thumb.update(this.pageRotation);
     }
 
     var currentPage = this.pages[this.page - 1];
@@ -1764,29 +1773,13 @@ var PDFView = {
 };
 
 var PageView = function pageView(container, id, scale,
-                                 navigateTo, defaultView) {
+                                 navigateTo, defaultViewport) {
   this.id = id;
-  //this.pdfPage = pdfPage;
 
   this.rotation = 0;
   this.scale = scale || 1.0;
-  //this.viewport = this.pdfPage.getViewport(this.scale, this.pdfPage.rotate);
-  this.defaultView = defaultView;
-
-  this.getViewport = function pageViewGetViewport() {
-    var view;
-    var totalRotation;
-    if (this.pdfPage) {
-      totalRotation = (this.rotation + this.pdfPage.rotate) % 360;
-      view = this.pdfPage.view;
-    } else {
-      totalRotation = this.rotation;
-      view = this.defaultView;
-    }
-    return new PDFJS.PageViewport(view, this.scale, totalRotation, 0, 0);
-  };
-
-  this.viewport = this.getViewport();
+  this.viewport = defaultViewport;
+  this.pdfPageRotate = defaultViewport.rotate;
 
   this.renderingState = RenderingStates.INITIAL;
   this.resume = null;
@@ -1798,38 +1791,27 @@ var PageView = function pageView(container, id, scale,
   anchor.name = '' + this.id;
 
   var div = this.el = document.createElement('div');
-  //var div = this.el = element;
   div.id = 'pageContainer' + this.id;
   div.className = 'page';
   div.style.width = Math.floor(this.viewport.width) + 'px';
   div.style.height = Math.floor(this.viewport.height) + 'px';
 
-  this.container = container;
-  //this.container.appendChild(anchor);
-  //this.container.appendChild(div);
-
-  var docFrag = document.createDocumentFragment();
-  docFrag.appendChild(anchor);
-  docFrag.appendChild(div);
-
-  Object.defineProperty(this, 'element', {
-    get: function PlaceholderPageView_getElement() {
-      return docFrag;
-    },
-    enumerable: true
-  });
+  container.appendChild(anchor);
+  container.appendChild(div);
 
   this.setPdfPage = function pageViewSetPdfPage(pdfPage) {
     this.pdfPage = pdfPage;
-  };
-
-  this.setStats = function pageViewSetStats(stats) {
-    this.stats = stats;
+    this.pdfPageRotate = pdfPage.rotate;
+    this.viewport = pdfPage.getViewport(this.scale);
+    this.stats = pdfPage.stats;
+    this.update();
   };
 
   this.destroy = function pageViewDestroy() {
     this.update();
-    this.pdfPage.destroy();
+    if (this.pdfPage) {
+      this.pdfPage.destroy();
+    }
   };
 
   this.update = function pageViewUpdate(scale, rotation) {
@@ -1841,11 +1823,14 @@ var PageView = function pageView(container, id, scale,
     }
 
     this.scale = scale || this.scale;
-    var viewport = this.getViewport();
+    var totalRotation = (this.rotation + this.pdfPageRotate) % 360;
+    this.viewport = this.viewport.clone({
+      scale: this.scale,
+      rotation: totalRotation
+    });
 
-    this.viewport = viewport;
-    div.style.width = Math.floor(viewport.width) + 'px';
-    div.style.height = Math.floor(viewport.height) + 'px';
+    div.style.width = Math.floor(this.viewport.width) + 'px';
+    div.style.height = Math.floor(this.viewport.height) + 'px';
 
     while (div.hasChildNodes())
       div.removeChild(div.lastChild);
@@ -2047,11 +2032,16 @@ var PageView = function pageView(container, id, scale,
   };
 
   this.draw = function pageviewDraw(callback) {
-    if (!this.pdfPage) {
-      console.log('Cannot draw without page');
+    var pdfPage = this.pdfPage;
+
+    if (!pdfPage) {
+      var promise = PDFView.getPage(this.id);
+      promise.then(function(pdfPage) {
+        this.setPdfPage(pdfPage);
+        this.draw(callback);
+      }.bind(this));
       return;
     }
-    var pdfPage = this.pdfPage;
 
     if (this.renderingState !== RenderingStates.INITIAL) {
       console.error('Must be in new state before drawing');
@@ -2110,7 +2100,6 @@ var PageView = function pageView(container, id, scale,
       ctx.scale(outputScale.sx, outputScale.sy);
     }
 
-
     // Rendering area
 
     var self = this;
@@ -2138,6 +2127,15 @@ var PageView = function pageView(container, id, scale,
         self.onAfterDraw();
 
       cache.push(self);
+
+      // TODO(mack): Verify this will not happend for thumbnails
+      // TODO(mack): Maybe should be attaching event to canvas
+      var event = document.createEvent('CustomEvent');
+      event.initCustomEvent('pagerender', true, true, {
+        pageNum: pdfPage.pageNumber
+      });
+      div.dispatchEvent(event);
+
       callback();
     }
 
@@ -2183,13 +2181,14 @@ var PageView = function pageView(container, id, scale,
 
     setupAnnotations(this.pdfPage, this.viewport);
     div.setAttribute('data-loaded', true);
+
   };
 
   this.beforePrint = function pageViewBeforePrint() {
     var pdfPage = this.pdfPage;
 
     if (!pdfPage) {
-      console.log('Pdf page has not been rendered and thus cannot be printed');
+      // TODO(mack): What to do if page is not loaded?
       return;
     }
 
@@ -2244,7 +2243,7 @@ var PageView = function pageView(container, id, scale,
 
   this.updateStats = function pageViewUpdateStats() {
     if (!this.stats) {
-      console.log('No stats available');
+      return;
     }
 
     if (PDFJS.pdfBug && Stats.enabled) {
@@ -2254,7 +2253,7 @@ var PageView = function pageView(container, id, scale,
   };
 };
 
-var ThumbnailView = function thumbnailView(container, pdfPage, id) {
+var ThumbnailView = function thumbnailView(container, id, defaultViewport) {
   var anchor = document.createElement('a');
   anchor.href = PDFView.getAnchorUrl('#page=' + id);
   anchor.title = mozL10n.get('thumb_page_title', {page: id}, 'Page {{page}}');
@@ -2263,18 +2262,20 @@ var ThumbnailView = function thumbnailView(container, pdfPage, id) {
     return false;
   };
 
-  var rotation = 0;
-  var totalRotation = (rotation + pdfPage.rotate) % 360;
-  var viewport = pdfPage.getViewport(1, totalRotation);
-  var pageWidth = this.width = viewport.width;
-  var pageHeight = this.height = viewport.height;
-  var pageRatio = pageWidth / pageHeight;
+  this.pdfPage = undefined;
+  this.viewport = defaultViewport;
+  this.pdfPageRotate = defaultViewport.rotate;
+
+  this.rotation = 0;
+  this.totalRotation = (this.rotation + this.pdfPageRotate) % 360;
+  this.pageWidth = this.viewport.width;
+  this.pageHeight = this.viewport.height;
+  this.pageRatio = this.pageWidth / this.pageHeight;
   this.id = id;
 
-  var canvasWidth = 98;
-  var canvasHeight = canvasWidth / this.width * this.height;
-  var scaleX = this.scaleX = (canvasWidth / pageWidth);
-  var scaleY = this.scaleY = (canvasHeight / pageHeight);
+  this.canvasWidth = 98;
+  this.canvasHeight = this.canvasWidth / this.pageWidth * this.pageHeight;
+  this.scale = (this.canvasWidth / this.pageWidth);
 
   var div = this.el = document.createElement('div');
   div.id = 'thumbnailContainer' + id;
@@ -2288,8 +2289,8 @@ var ThumbnailView = function thumbnailView(container, pdfPage, id) {
 
   var ring = document.createElement('div');
   ring.className = 'thumbnailSelectionRing';
-  ring.style.width = canvasWidth + 'px';
-  ring.style.height = canvasHeight + 'px';
+  ring.style.width = this.canvasWidth + 'px';
+  ring.style.height = this.canvasHeight + 'px';
 
   div.appendChild(ring);
   anchor.appendChild(div);
@@ -2298,36 +2299,46 @@ var ThumbnailView = function thumbnailView(container, pdfPage, id) {
   this.hasImage = false;
   this.renderingState = RenderingStates.INITIAL;
 
-  this.updateRotation = function(rot) {
+  this.setPdfPage = function thumbnailViewSetPdfPage(pdfPage) {
+    this.pdfPage = pdfPage;
+    this.pdfPageRotate = pdfPage.rotate;
+    this.viewport = pdfPage.getViewport(this.scale);
+    this.update();
+  };
 
-    rotation = rot;
-    totalRotation = (rotation + pdfPage.rotate) % 360;
-    viewport = pdfPage.getViewport(1, totalRotation);
-    pageWidth = this.width = viewport.width;
-    pageHeight = this.height = viewport.height;
-    pageRatio = pageWidth / pageHeight;
+  this.update = function(rot) {
+    if (rot !== undefined) {
+      this.rotation = rot;
+    }
+    this.totalRotation = (this.rotation + this.pdfPageRotate) % 360;
+    this.viewport = this.viewport.clone({
+      scale: 1,
+      rotation: this.totalRotation
+    });
+    this.pageWidth = this.viewport.width;
+    this.pageHeight = this.viewport.height;
+    this.pageRatio = this.pageWidth / this.pageHeight;
 
-    canvasHeight = canvasWidth / this.width * this.height;
-    scaleX = this.scaleX = (canvasWidth / pageWidth);
-    scaleY = this.scaleY = (canvasHeight / pageHeight);
+    this.canvasHeight = this.canvasWidth / this.pageWidth * this.pageHeight;
+    this.scale = (this.canvasHeight / this.pageHeight);
 
     div.removeAttribute('data-loaded');
     ring.textContent = '';
-    ring.style.width = canvasWidth + 'px';
-    ring.style.height = canvasHeight + 'px';
+    ring.style.width = this.canvasWidth + 'px';
+    ring.style.height = this.canvasHeight + 'px';
 
     this.hasImage = false;
     this.renderingState = RenderingStates.INITIAL;
     this.resume = null;
   };
 
-  function getPageDrawContext() {
+  this.getPageDrawContext = function thumnailViewGetPageDrawContext() {
     var canvas = document.createElement('canvas');
     canvas.id = 'thumbnail' + id;
     canvas.mozOpaque = true;
 
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
+    canvas.width = this.canvasWidth;
+    canvas.height = this.canvasHeight;
     canvas.className = 'thumbnailImage';
     canvas.setAttribute('aria-label', mozL10n.get('thumb_page_canvas',
       {page: id}, 'Thumbnail of Page {{page}}'));
@@ -2339,16 +2350,25 @@ var ThumbnailView = function thumbnailView(container, pdfPage, id) {
     var ctx = canvas.getContext('2d');
     ctx.save();
     ctx.fillStyle = 'rgb(255, 255, 255)';
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
     ctx.restore();
     return ctx;
-  }
+  },
 
   this.drawingRequired = function thumbnailViewDrawingRequired() {
     return !this.hasImage;
   };
 
   this.draw = function thumbnailViewDraw(callback) {
+    if (!this.pdfPage) {
+      var promise = PDFView.getPage(this.id);
+      promise.then(function(pdfPage) {
+        this.setPdfPage(pdfPage);
+        this.draw(callback);
+      }.bind(this));
+      return;
+    }
+
     if (this.renderingState !== RenderingStates.INITIAL) {
       console.error('Must be in new state before drawing');
     }
@@ -2360,8 +2380,9 @@ var ThumbnailView = function thumbnailView(container, pdfPage, id) {
     }
 
     var self = this;
-    var ctx = getPageDrawContext();
-    var drawViewport = pdfPage.getViewport(scaleX, totalRotation);
+    var ctx = this.getPageDrawContext();
+    var drawViewport = this.pdfPage.getViewport(this.scale,
+                                                this.totalRotation);
     var renderContext = {
       canvasContext: ctx,
       viewport: drawViewport,
@@ -2377,7 +2398,7 @@ var ThumbnailView = function thumbnailView(container, pdfPage, id) {
         cont();
       }
     };
-    pdfPage.render(renderContext).then(
+    this.pdfPage.render(renderContext).then(
       function pdfPageRenderCallback() {
         self.renderingState = RenderingStates.FINISHED;
         callback();
@@ -2394,7 +2415,7 @@ var ThumbnailView = function thumbnailView(container, pdfPage, id) {
     if (this.hasImage || !img)
       return;
     this.renderingState = RenderingStates.FINISHED;
-    var ctx = getPageDrawContext();
+    var ctx = this.getPageDrawContext();
     ctx.drawImage(img, 0, 0, img.width, img.height,
                   0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -2837,8 +2858,13 @@ document.addEventListener('DOMContentLoaded', function webViewerLoad(evt) {
   var hash = document.location.hash.substring(1);
   var hashParams = PDFView.parseQueryString(hash);
 
-  if ('disableWorker' in hashParams)
+  if ('disableWorker' in hashParams) {
     PDFJS.disableWorker = (hashParams['disableWorker'] === 'true');
+  }
+
+  if ('rangeSupport' in hashParams) {
+    PDFJS.rangeSupport = hashParams['rangeSupport'];
+  }
 
   var locale = navigator.language;
   if ('locale' in hashParams)
@@ -3157,24 +3183,19 @@ window.addEventListener('pagechange', function pagechange(evt) {
     var selected = document.querySelector('.thumbnail.selected');
     if (selected)
       selected.classList.remove('selected');
-
     var thumbnail = document.getElementById('thumbnailContainer' + page);
-    // FIXME(mack): remove checking if thumbnail is null hack
-    if (thumbnail) {
-      thumbnail.classList.add('selected');
-      var visibleThumbs = PDFView.getVisibleThumbs();
-      var numVisibleThumbs = visibleThumbs.views.length;
-      // If the thumbnail isn't currently visible scroll it into view.
-      if (numVisibleThumbs > 0) {
-        var first = visibleThumbs.first.id;
-        // Account for only one thumbnail being visible.
-        var last = numVisibleThumbs > 1 ?
-                    visibleThumbs.last.id : first;
-        if (page <= first || page >= last)
-          scrollIntoView(thumbnail);
-      }
+    thumbnail.classList.add('selected');
+    var visibleThumbs = PDFView.getVisibleThumbs();
+    var numVisibleThumbs = visibleThumbs.views.length;
+    // If the thumbnail isn't currently visible scroll it into view.
+    if (numVisibleThumbs > 0) {
+      var first = visibleThumbs.first.id;
+      // Account for only one thumbnail being visible.
+      var last = numVisibleThumbs > 1 ?
+                  visibleThumbs.last.id : first;
+      if (page <= first || page >= last)
+        scrollIntoView(thumbnail);
     }
-
   }
   document.getElementById('previous').disabled = (page <= 1);
   document.getElementById('next').disabled = (page >= PDFView.pages.length);

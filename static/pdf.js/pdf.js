@@ -16,8 +16,8 @@
  */
 
 var PDFJS = {};
-PDFJS.version = '0.7.290';
-PDFJS.build = '009bc18';
+PDFJS.version = '0.7.315';
+PDFJS.build = '547a8d6';
 
 (function pdfjsWrapper() {
   // Use strict in our context only - users might not want it
@@ -46,6 +46,7 @@ PDFJS.build = '009bc18';
 
 var NetworkManager = (function NetworkManagerClosure() {
   function NetworkManager(url, args) {
+    args = args || {};
     this.url = url;
     this.httpHeaders = args.httpHeaders;
     this.getXhr = args.getXhr ||
@@ -54,8 +55,8 @@ var NetworkManager = (function NetworkManagerClosure() {
       };
 
     this.currXhrId = 0;
-    this.xhrRequests = {};
-    this.loadedXhrs = {};
+    this.pendingRequests = {};
+    this.loadedRequests = {};
   }
 
   function getArrayBuffer(xhr) {
@@ -78,9 +79,8 @@ var NetworkManager = (function NetworkManagerClosure() {
     // e.g. If we already have chunk 3, and we need chunks [2, 5), do not
     // fetch 2; instead fetch [2, 3) and [4, 5); Realistically though, this
     // should not happen often w/ PDFs
-    // TODO(mack): this optimization might do more harm than good; investigate
     requestRange: function NetworkManager_requestRange(begin, end, callback) {
-      this.request({
+      return this.request({
         begin: begin,
         end: end,
         onDone: callback
@@ -88,13 +88,13 @@ var NetworkManager = (function NetworkManagerClosure() {
     },
 
     requestFull: function NetworkManager_requestRange(args) {
-      this.request(args);
+      return this.request(args);
     },
 
     request: function NetworkManager_requestRange(args) {
       var xhr = this.getXhr();
       var xhrId = this.currXhrId++;
-      this.xhrRequests[xhrId] = xhr;
+      this.pendingRequests[xhrId] = xhr;
 
       xhr.open('GET', this.url);
       if (this.httpHeaders) {
@@ -131,35 +131,33 @@ var NetworkManager = (function NetworkManagerClosure() {
       xhr.onDone = args.onDone;
 
       xhr.send(null);
+
+      return xhrId;
     },
 
     onStateChange: function NetworkManager_onStateChange(xhrId, evt) {
-      // xhr seems to queue requests for different readyState,
-      // so that we come here multiple times; the problem is when we pause
-      // via debugger, then, xhr.readyState will be 4 multiple times. This
-      // is a fix for this issue.
-      if (xhrId in this.loadedXhrs) {
-        return;
-      }
-
-      var xhr = this.xhrRequests[xhrId];
+      var xhr = this.pendingRequests[xhrId];
       if (!xhr) {
         // Maybe abortRequest was called...
         return;
       }
 
       if (xhr.readyState >= 2 && xhr.onHeadersReceived) {
-        xhr.onHeadersReceived({
-          xhrId: xhrId
-        });
+        xhr.onHeadersReceived();
         delete xhr.onHeadersReceived;
-        return;
-      } else if (xhr.readyState !== 4) {
+      }
+
+      if (xhr.readyState !== 4) {
         return;
       }
 
-      this.loadedXhrs[xhrId] = true;
-      delete this.xhrRequests[xhrId];
+      if (!(xhrId in this.pendingRequests)) {
+        // The XHR request might have been aborted in onHeadersReceived()
+        // callback, in which case we should abort request
+        return;
+      }
+
+      delete this.pendingRequests[xhrId];
 
       if (xhr.status === 0) {
         //warn('Received xhr.status of 0');
@@ -173,6 +171,8 @@ var NetworkManager = (function NetworkManagerClosure() {
         //warn('Received xhr.status of ' + xhr.status);
         return;
       }
+
+      this.loadedRequests[xhrId] = true;
 
       var chunk = getArrayBuffer(xhr);
       if (xhr.expectedStatus === 206) {
@@ -196,28 +196,36 @@ var NetworkManager = (function NetworkManagerClosure() {
     },
 
     hasPendingRequests: function NetworkManager_hasPendingRequests() {
-      for (var xhrId in this.xhrRequests) {
+      for (var xhrId in this.pendingRequests) {
         return true;
       }
       return false;
     },
 
+    getRequestXhr: function NetworkManager_getXhr(xhrId) {
+      return this.pendingRequests[xhrId];
+    },
+
     isPendingRequest: function NetworkManager_isPendingRequest(xhrId) {
-      return xhrId in this.xhrRequests;
+      return xhrId in this.pendingRequests;
+    },
+
+    isLoadedRequest: function NetworkManager_isLoadedRequest(xhrId) {
+      return xhrId in this.loadedRequests;
     },
 
     abortXhrs: function NetworkManager_abortXhrs() {
-      for (var xhrId in this.xhrRequests) {
+      for (var xhrId in this.pendingRequests) {
         xhrId = xhrId | 0;
-        var xhr = this.xhrRequests[xhrId];
-        delete this.xhrRequests[xhrId];
+        var xhr = this.pendingRequests[xhrId];
+        delete this.pendingRequests[xhrId];
         xhr.abort();
       }
     },
 
     abortRequest: function NetworkManager_abortRequest(xhrId) {
-      var xhr = this.xhrRequests[xhrId];
-      delete this.xhrRequests[xhrId];
+      var xhr = this.pendingRequests[xhrId];
+      delete this.pendingRequests[xhrId];
       xhr.abort();
     }
   };
@@ -240,7 +248,6 @@ var verbosity = WARNINGS;
 if (!globalScope.PDFJS) {
   globalScope.PDFJS = {};
 }
-
 
 globalScope.PDFJS.pdfBug = false;
 
@@ -594,6 +601,10 @@ var PDFDocument = (function PDFDocumentClosure() {
             linearization = false;
           }
         } catch (err) {
+          if (err instanceof MissingDataException) {
+            throw err;
+          }
+
           warn('The linearization data is not available ' +
                'or unreadable pdf data is found');
           linearization = false;
@@ -672,13 +683,12 @@ var PDFDocument = (function PDFDocumentClosure() {
       }
       // May not be a PDF file, continue anyway.
     },
+    setXrefStart: function PDFDocument_setXrefStart() {
+      var startXRef = this.startXRef;
+      this.xref.startXrefQueue = [startXRef];
+    },
     setup: function PDFDocument_setup(recoveryMode) {
       this.checkHeader();
-      var startXRef = this.startXRef;
-      // FIXME(mack): Clean up how this done
-      if (!this.xref.startXrefQueue) {
-        this.xref.startXrefQueue = [[startXRef]];
-      }
       this.xref.parse(recoveryMode);
       this.catalog = new Catalog(this.xref);
     },
@@ -1109,6 +1119,12 @@ var Util = PDFJS.Util = (function UtilClosure() {
 
 var PageViewport = PDFJS.PageViewport = (function PageViewportClosure() {
   function PageViewport(viewBox, scale, rotate, offsetX, offsetY) {
+    this.viewBox = viewBox;
+    this.scale = scale;
+    this.rotate = rotate;
+    this.offsetX = offsetX;
+    this.offsetY = offsetY;
+
     // creating transform to convert pdf coordinate system to the normal
     // canvas like coordinates taking in account scale and rotation
     var centerX = (viewBox[2] + viewBox[0]) / 2;
@@ -1158,13 +1174,22 @@ var PageViewport = PDFJS.PageViewport = (function PageViewportClosure() {
       offsetCanvasY - rotateB * scale * centerX - rotateD * scale * centerY
     ];
 
-    this.offsetX = offsetX;
-    this.offsetY = offsetY;
     this.width = width;
     this.height = height;
     this.fontScale = scale;
   }
   PageViewport.prototype = {
+    clone: function PageViewPort_clone(args) {
+      args = args || {};
+      var scale = 'scale' in args ? args.scale : this.scale;
+      var rotate = 'rotate' in args ? args.rotate : this.rotate;
+      var viewBoxClone = [];
+      for (var i = 0; i < this.viewBox.length; ++i) {
+        viewBoxClone[i] = this.viewBox[i];
+      }
+      return new PageViewport(viewBoxClone, scale, rotate,
+          this.offsetX, this.offsetY);
+    },
     convertToViewportPoint: function PageViewport_convertToViewportPoint(x, y) {
       return Util.applyTransform([x, y], this.transform);
     },
@@ -1536,7 +1561,7 @@ PDFJS.createBlob = function createBlob(data, contentType) {
  *
  * @return {Promise} A promise that is resolved with {PDFDocumentProxy} object.
  */
-PDFJS.getDocument = function getDocument(source) {
+PDFJS.getDocument = function getDocument(source, pdfDataRangeTransport) {
   var workerInitializedPromise, workerReadyPromise, transport;
 
   if (typeof source === 'string') {
@@ -1564,9 +1589,9 @@ PDFJS.getDocument = function getDocument(source) {
   workerInitializedPromise = new PDFJS.Promise();
   workerReadyPromise = new PDFJS.Promise();
   transport = new WorkerTransport(workerInitializedPromise,
-      workerReadyPromise, params);
+      workerReadyPromise, pdfDataRangeTransport);
   workerInitializedPromise.then(function transportInitialized() {
-    transport.fetchDocument();
+    transport.fetchDocument(params);
   });
   return workerReadyPromise;
 };
@@ -1950,8 +1975,8 @@ var PDFPageProxy = (function PDFPageProxyClosure() {
  */
 var WorkerTransport = (function WorkerTransportClosure() {
   function WorkerTransport(workerInitializedPromise, workerReadyPromise,
-      source) {
-    this.source = source;
+      pdfDataRangeTransport) {
+    this.pdfDataRangeTransport = pdfDataRangeTransport;
 
     this.workerReadyPromise = workerReadyPromise;
     this.commonObjs = new PDFObjects();
@@ -2034,15 +2059,19 @@ var WorkerTransport = (function WorkerTransportClosure() {
       function WorkerTransport_setupMessageHandler(messageHandler) {
       this.messageHandler = messageHandler;
 
-      if (this.source.chunkedChromeLoading) {
-        window.addEventListener('message', function window_message(evt) {
-          this.messageHandler.send('SendDataRange', evt.data);
-        }.bind(this));
-      }
+      var pdfDataRangeTransport = this.pdfDataRangeTransport;
+      if (pdfDataRangeTransport) {
+        pdfDataRangeTransport.addListener(function(args) {
+          messageHandler.send('OnDataRange', args);
+        });
 
-      messageHandler.on('RequestDataRange', function transportDataRange(args) {
-        FirefoxCom.request('requestDataRange', args);
-      }, this);
+        messageHandler.on('RequestDataRange',
+        function transportDataRange(data) {
+          var begin = data.begin;
+          var end = data.end;
+          pdfDataRangeTransport.requestDataRange(begin, end);
+        }, this);
+      }
 
       messageHandler.on('GetDoc', function transportDoc(data) {
         var pdfInfo = data.pdfInfo;
@@ -2111,11 +2140,10 @@ var WorkerTransport = (function WorkerTransportClosure() {
             // At this point, only the font object is created but the font is
             // not yet attached to the DOM. This is done in `FontLoader.bind`.
             var font;
-            if ('error' in exportedData) {
+            if ('error' in exportedData)
               font = new ErrorFont(exportedData.error);
-            } else {
+            else
               font = new Font(exportedData);
-            }
             this.commonObjs.resolve(id, font);
             break;
           default:
@@ -2207,8 +2235,12 @@ var WorkerTransport = (function WorkerTransportClosure() {
       });
     },
 
-    fetchDocument: function WorkerTransport_fetchDocument() {
-      this.messageHandler.send('GetDocRequest', {source: this.source});
+    fetchDocument: function WorkerTransport_fetchDocument(source) {
+      extend(source, { chunkedViewerLoading: !!this.pdfDataRangeTransport });
+      this.messageHandler.send('GetDocRequest', {
+        source: source,
+        rangeSupport: PDFJS.rangeSupport
+      });
     },
 
     getData: function WorkerTransport_getData(promise) {
@@ -4084,7 +4116,6 @@ var XRef = (function XRefClosure() {
     // prepare the XRef cache
     this.cache = [];
     this.password = password;
-    this.startXrefQueue = undefined;
   }
 
   XRef.prototype = {
@@ -4248,11 +4279,6 @@ var XRef = (function XRefClosure() {
     },
 
     readXRefStream: function XRef_readXRefStream(stream) {
-      //var streamParameters = stream.parameters;
-      //var byteWidths = streamParameters.get('W');
-      //var range = streamParameters.get('Index');
-      //if (!range)
-      //  range = [0, streamParameters.get('Size')];
       var i, j;
       stream.pos = this.streamState.pos;
 
@@ -4308,7 +4334,6 @@ var XRef = (function XRefClosure() {
         this.streamState.pos = stream.pos;
         this.streamState.range.splice(0, 2);
       }
-      //return streamParameters;
     },
     indexObjects: function XRef_indexObjects() {
       // Simple scan through the PDF content to find objects,
@@ -4396,7 +4421,7 @@ var XRef = (function XRefClosure() {
       }
       // reading XRef streams
       for (var i = 0, ii = xrefStms.length; i < ii; ++i) {
-        this.startXrefQueue.push([xrefStms[i], true]);
+        this.startXrefQueue.push(xrefStms[i]);
         this.readXRef(/* recoveryMode */ true);
       }
       // finding main trailer
@@ -4427,7 +4452,7 @@ var XRef = (function XRefClosure() {
 
       try {
         while (this.startXrefQueue.length) {
-          var startXRef = this.startXrefQueue[0][0];
+          var startXRef = this.startXrefQueue[0];
 
           stream.pos = startXRef;
 
@@ -4453,7 +4478,7 @@ var XRef = (function XRefClosure() {
               // (possible infinite recursion)
               if (!(pos in this.xrefstms)) {
                 this.xrefstms[pos] = 1;
-                this.startXrefQueue.push([pos]);
+                this.startXrefQueue.push(pos);
               }
             }
           } else if (isInt(obj)) {
@@ -4477,11 +4502,11 @@ var XRef = (function XRefClosure() {
           // Recursively get previous dictionary, if any
           obj = dict.get('Prev');
           if (isInt(obj)) {
-            this.startXrefQueue.push([obj, recoveryMode]);
+            this.startXrefQueue.push(obj);
           } else if (isRef(obj)) {
             // The spec says Prev must not be a reference, i.e. "/Prev NNN"
             // This is a fallback for non-compliant PDFs, i.e. "/Prev NNN 0 R"
-            this.startXrefQueue.push([obj.num, recoveryMode]);
+            this.startXrefQueue.push(obj.num);
           }
 
           this.startXrefQueue.shift();
@@ -4496,9 +4521,8 @@ var XRef = (function XRefClosure() {
         log('(while reading XRef): ' + e);
       }
 
-      if (recoveryMode) {
+      if (recoveryMode)
         return;
-      }
       throw new XrefParseException();
     },
 
@@ -30602,13 +30626,7 @@ var Lexer = (function LexerClosure() {
         }
         stream.skip();
       }
-      // TODO(mack): gotta test this optimization
-      var value;
-      if (floating) {
-        value = parseFloat(str);
-      } else {
-        value = str | 0;
-      }
+      var value = parseFloat(str);
       if (isNaN(value))
         error('Invalid floating point number: ' + value);
       return value;
@@ -30793,7 +30811,6 @@ var Lexer = (function LexerClosure() {
           return Cmd.get(ch);
         // hex string or dict punctuation
         case '<':
-          var position = stream.pos;
           ch = stream.lookChar();
           if (ch == '<') {
             // dict punctuation
@@ -31319,7 +31336,6 @@ var Stream = (function StreamClosure() {
       return this.end - this.start;
     },
     getByte: function Stream_getByte() {
-      //throw new Error('getByte');
       if (this.pos >= this.end)
         return null;
       return this.bytes[this.pos++];
@@ -31327,7 +31343,6 @@ var Stream = (function StreamClosure() {
     // returns subarray of original buffer
     // should only be read
     getBytes: function Stream_getBytes(length) {
-      //throw new Error('getBytes');
       var bytes = this.bytes;
       var pos = this.pos;
       var strEnd = this.end;
@@ -31343,13 +31358,11 @@ var Stream = (function StreamClosure() {
       return bytes.subarray(pos, end);
     },
     lookChar: function Stream_lookChar() {
-      //throw new Error('lookChar');
       if (this.pos >= this.end)
         return null;
       return String.fromCharCode(this.bytes[this.pos]);
     },
     getChar: function Stream_getChar() {
-      //throw new Error('getChar');
       if (this.pos >= this.end)
         return null;
       return String.fromCharCode(this.bytes[this.pos++]);
@@ -33678,7 +33691,6 @@ var ChunkedStream = (function ChunkedStreamClosure() {
     },
 
     allChunksLoaded: function ChunkedStream_allChunksLoaded() {
-      // TODO(mack): might want to use list of unloaded chunks to be safer...
       return this.numChunksLoaded === this.numChunks;
     },
 
@@ -33773,9 +33785,6 @@ var ChunkedStream = (function ChunkedStreamClosure() {
       return bytes.subarray(pos, end);
     },
 
-    // TODO(mack): make getBytes call this
-    // returns subarray of original buffer
-    // should only be read
     getByteRange: function ChunkedStream_getBytes(begin, end) {
       this.ensureRange(begin, end);
       return this.bytes.subarray(begin, end);
@@ -33836,23 +33845,10 @@ var ChunkedStreamManager = (function ChunkedStreamManagerClosure() {
     this.length = stream.length;
     this.url = url;
 
-    // Prefill stream with fully loaded chunks
-    if (args.loadedChunk && isInt(args.loadedBegin)) {
-      var loadedBegin = args.loadedBegin;
-      var actualChunk = args.loadedChunk;
-      var actualEnd = loadedBegin + actualChunk.byteLength;
-      var loadedEnd = Math.floor(actualEnd / this.chunkSize) * this.chunkSize;
-      var loadedChunk = actualChunk.subarray(loadedBegin, loadedEnd);
-      this.stream.onReceiveData(loadedBegin, loadedChunk);
-    }
-
-    if (args.fetchByChrome) {
-      args.msgHandler.on('SendDataRange', this.onReceiveData.bind(this));
-      this.sendRequest = function streamManager_sendRequest(begin, end) {
-        args.msgHandler.send(
-          'RequestDataRange',
-          { begin: begin, end: end }
-        );
+    if (args.chunkedViewerLoading) {
+      args.msgHandler.on('OnDataRange', this.onReceiveData.bind(this));
+      this.sendRequest = function ChunkedStreamManager_sendRequest(begin, end) {
+        args.msgHandler.send('RequestDataRange', { begin: begin, end: end });
       };
     } else {
 
@@ -33860,7 +33856,7 @@ var ChunkedStreamManager = (function ChunkedStreamManagerClosure() {
         return new XMLHttpRequest();
       };
       this.networkManager = new NetworkManager(this.url, { getXhr: getXhr });
-      this.sendRequest = function streamManager_sendRequest(begin, end) {
+      this.sendRequest = function ChunkedStreamManager_sendRequest(begin, end) {
         this.networkManager.requestRange(
           begin, end, this.onReceiveData.bind(this));
       };
@@ -34180,9 +34176,7 @@ var NetworkPdfManager = (function NetworkPdfManagerClosure() {
 
     var params = {
       msgHandler: msgHandler,
-      fetchByChrome: args.chunkedChromeLoading,
-      loadedBegin: args.loadedBegin,
-      loadedChunk: args.loadedChunk
+      chunkedViewerLoading: args.chunkedViewerLoading
     };
     this.streamManager = new ChunkedStreamManager(
         this.stream, this.pdfUrl, params);
@@ -34270,14 +34264,6 @@ var NetworkPdfManager = (function NetworkPdfManagerClosure() {
 
 
 
-var START_TIME = (new Date()).getTime() / 1000;
-function timeLog() {
-  var elapsedTime = (new Date()).getTime() / 1000 - START_TIME;
-  var args = [].slice.call(arguments);
-  args.unshift(elapsedTime);
-  console.log.apply(console, args);
-}
-
 function MessageHandler(name, comObj) {
   this.name = name;
   this.comObj = comObj;
@@ -34304,16 +34290,13 @@ function MessageHandler(name, comObj) {
   }];
 
   comObj.onmessage = function messageHandlerComObjOnMessage(event) {
-
-    var handler;
-
     var data = event.data;
     if (data.isReply) {
       var callbackId = data.callbackId;
       if (data.callbackId in callbacks) {
         var callback = callbacks[callbackId];
         delete callbacks[callbackId];
-        handler = callback.bind(undefined, data.data);
+        callback(data.data);
       } else {
         error('Cannot resolve callback ' + callbackId);
       }
@@ -34328,19 +34311,13 @@ function MessageHandler(name, comObj) {
             data: resolvedData
           });
         });
-        handler = action[0].bind(action[1], data.data, promise);
+        action[0].call(action[1], data.data, promise);
       } else {
-        handler = action[0].bind(action[1], data.data);
+        action[0].call(action[1], data.data);
       }
     } else {
       error('Unkown action from worker: ' + data.action);
     }
-
-    if (!handler) {
-      return;
-    }
-
-    handler();
   };
 }
 
@@ -34406,8 +34383,10 @@ var WorkerMessageHandler = {
         loadDocumentPromise.reject(e);
       };
 
-      pdfManager.ensureModel('parse', recoveryMode).then(
-          parseSuccess, parseFailure);
+      pdfManager.ensureModel('setXrefStart').then(function() {
+        pdfManager.ensureModel('parse', recoveryMode).then(
+            parseSuccess, parseFailure);
+      });
 
       return loadDocumentPromise;
     }
@@ -34416,11 +34395,12 @@ var WorkerMessageHandler = {
       var pdfManagerPromise = new PDFJS.Promise();
 
       var source = data.source;
+      var rangeSupport = data.rangeSupport;
       if (source.data) {
         pdfManager = new LocalPdfManager(source.data, source.password);
         pdfManagerPromise.resolve();
         return pdfManagerPromise;
-      } else if (source.chunkedChromeLoading) {
+      } else if (source.chunkedViewerLoading) {
         pdfManager = new NetworkPdfManager(source, handler);
         pdfManagerPromise.resolve();
         return pdfManagerPromise;
@@ -34429,30 +34409,33 @@ var WorkerMessageHandler = {
       var networkManager = new NetworkManager(source.url, {
         httpHeaders: source.httpHeaders
       });
-      networkManager.requestFull({
-        onHeadersReceived: function onHeadersReceieved(args) {
-          var fullRequestXhrId = args.xhrId;
+      var fullRequestXhrId = networkManager.requestFull({
+        onHeadersReceived: function onHeadersReceived() {
+          if (rangeSupport === 'disable') {
+            return;
+          }
 
-          // This is done in onHeadersReceived because we want to
-          // guarantee that the full request is sent first in
-          // case that the server will only allow max 1 request
-          // (eg. pay-wall)
-          networkManager.requestRange(0, 1, function getPdfLength(args) {
-            // The full request is already finished, in which case we do not
-            // need to fetch chunks
-            if (!networkManager.isPendingRequest(fullRequestXhrId)) {
-              return;
-            }
+          var fullRequestXhr = networkManager.getRequestXhr(fullRequestXhrId);
+          if (fullRequestXhr.getResponseHeader('Accept-Ranges') !== 'bytes') {
+            return;
+          }
 
-            // TODO(mack): In this case, we should access the data that
-            // is already fetched from the full request so we do not refetch
-            // the same data
-            networkManager.abortRequest(fullRequestXhrId);
+          var contentLength = fullRequestXhr.getResponseHeader(
+                                'Content-Length');
+          contentLength = parseInt(contentLength, 10);
+          if (!isInt(contentLength)) {
+            return;
+          }
 
-            source.totalLength = args.totalLength;
-            pdfManager = new NetworkPdfManager(source, handler);
-            pdfManagerPromise.resolve(pdfManager);
-          });
+          // NOTE: by cancelling the full request, and then issuing range
+          // requests, there will be an issue for sites where you can only
+          // request the pdf once. However, if this is the case, then the
+          // server should not be returning that it can support range requests.
+          networkManager.abortRequest(fullRequestXhrId);
+
+          source.totalLength = contentLength;
+          pdfManager = new NetworkPdfManager(source, handler);
+          pdfManagerPromise.resolve(pdfManager);
         },
         onDone: function onDone(args) {
           // the data is array, instantiating directly from it
