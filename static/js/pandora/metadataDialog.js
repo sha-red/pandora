@@ -151,6 +151,7 @@ pandora.ui.metadataDialog = function(data) {
                 return v[0];
             }).join('; ')
             : key == 'runtime' ? Math.round(value / 60) + ' min'
+            : key == 'productionCompany' ? value.join('; ')
             : Ox.isArray(
                 Ox.getObjectById(pandora.site.itemKeys, key).type
             ) ? value.join(', ')
