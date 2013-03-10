@@ -42,6 +42,7 @@ pandora.ui.siteDialog = function(section) {
                             )
                         )
                         .appendTo($content);
+                    pandora.createLinks($content);
                 } else {
                     pandora.api.getPage({name: id}, function(result) {
                         Ox.Editable({
