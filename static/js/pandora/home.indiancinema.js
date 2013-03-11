@@ -98,7 +98,7 @@ pandora.ui.home = function() {
                             .options({tooltip: 'Visit Pad.ma'})
                             .bindEvent({
                                 anyclick: function() {
-                                    document.location.href = '/url=https://pad.ma';
+                                    window.open('/url=https://pad.ma', '_blank');
                                 }
                             });
                     });
