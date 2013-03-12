@@ -159,7 +159,9 @@ def join_tiles(source_paths, target_path):
                 save_and_open(data)
                 target_x -= large_tile_w
                 data['target_images']['large'].paste(source_image, (target_x, 0))
-        target_w += source_w
+        # save_and_open saves previous tile and opens tile at target_w
+        # increase target_w to be in next tile
+        target_w += large_tile_w
         save_and_open(data)
 
     # save full timelines
