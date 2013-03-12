@@ -554,7 +554,7 @@ pandora.ui.infoView = function(data) {
         var ret;
         if (key == 'year') {
             ret = formatLink(value);
-        else if (nameKeys.indexOf(key) > -1) {
+        } else if (nameKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), 'name');
         } else if (listKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), key);
