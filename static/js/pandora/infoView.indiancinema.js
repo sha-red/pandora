@@ -553,7 +553,7 @@ pandora.ui.infoView = function(data) {
     function formatValue(key, value) {
         var ret;
         if (key == 'year') {
-            ret = formatLink(value);
+            ret = formatLink(value, 'year');
         } else if (nameKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), 'name');
         } else if (listKeys.indexOf(key) > -1) {
