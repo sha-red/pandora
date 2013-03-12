@@ -68,10 +68,10 @@ def update_external(itemId):
     item = models.Item.objects.get(itemId=itemId)
     item.update_external()
 
-@task(queue="default")
+@task(queue="encoding")
 def update_timeline(itemId):
     item = models.Item.objects.get(itemId=itemId)
-    item.update_timeline()
+    item.update_timeline(async=False)
 
 @task(queue="encoding")
 def rebuild_timeline(itemId):

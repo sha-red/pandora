@@ -203,9 +203,11 @@ class File(models.Model):
 
         if self.type not in ('audio', 'video'):
             self.duration = None
-        elif self.duration <= 0:
-            self.duration = sum([s.info.get('duration',0)
+        else:
+            duration = sum([s.info.get('duration', 0)
                 for s in self.streams.filter(source=None)])
+            if duration:
+                self.duration = duration
 
         if self.is_subtitle:
             self.available = self.data and True or False

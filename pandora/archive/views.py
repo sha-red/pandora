@@ -170,7 +170,8 @@ def addFile(request):
     '''
         takes {
             id: oshash
-            title: 
+            filename: string,
+            item: string
             info: {}
         }
         returns {

@@ -1000,7 +1000,8 @@ class Item(models.Model):
                     update = True
                 if update:
                     self.rendered = False
-                    self.update_timeline()
+                    self.save()
+                    tasks.update_timeline.delay(self.itemId)
                 break
 
     def get_torrent(self, request):
@@ -1074,7 +1075,7 @@ class Item(models.Model):
             Q(file__is_audio=True)|Q(file__is_video=True)
         ).order_by('file__part', 'file__sort_path')
 
-    def update_timeline(self, force=False):
+    def update_timeline(self, force=False, async=True):
         streams = self.streams()
         self.make_timeline()
         if streams.count() == 1:
@@ -1104,8 +1105,12 @@ class Item(models.Model):
             self.make_torrent()
         self.rendered = streams.count() > 0
         self.save()
-        tasks.load_subtitles.delay(self.itemId)
-        get_sequences.delay(self.itemId)
+        if async:
+            tasks.load_subtitles.delay(self.itemId)
+            get_sequences.delay(self.itemId)
+        else:
+            tasks.load_subtitles(self.itemId)
+            get_sequences(self.itemId)
 
     def save_poster(self, data):
         self.poster.name = self.path('poster.jpg')
