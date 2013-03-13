@@ -284,7 +284,10 @@ pandora.ui.infoView = function(data) {
                 value: data.summary || ''
             })
             .css(css)
-            .css({marginTop: '12px'})
+            .css({
+                marginTop: '12px',
+                overflow: 'auto'
+            })
             .bindEvent({
                 submit: function(data) {
                     editMetadata('summary', data.value);
@@ -745,6 +748,9 @@ pandora.ui.infoView = function(data) {
                             value: value.description || ''
                         })
                         .css(css)
+                        .css({
+                            overflow: 'auto'
+                        })
                         .bindEvent({
                             submit: function(data) {
                                 editMetadata(
