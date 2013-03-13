@@ -272,6 +272,12 @@ pandora.ui.infoView = function(data) {
         Ox.EditableContent({
                 clickLink: pandora.clickLink,
                 editable: canEdit,
+                format: function(value) {
+                    return value.replace(
+                        /<img src=/g,
+                        '<img style="max-width: 256px; max-height: 256px; margin: 0 16px 16px 0;float: left;" src='
+                    );
+                },
                 placeholder: formatLight('No Summary'),
                 tooltip: canEdit ? pandora.getEditTooltip() : '',
                 type: 'textarea',
@@ -727,6 +733,12 @@ pandora.ui.infoView = function(data) {
                     Ox.EditableContent({
                             clickLink: pandora.clickLink,
                             editable: canEdit,
+                            format: function(value) {
+                                return value.replace(
+                                    /<img src=/g,
+                                    '<img style="max-width: 256px; max-height: 256px; margin: 0 16px 16px 0;float: left;" src='
+                                );
+                            },
                             placeholder: formatLight('No Description'),
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
                             type: 'textarea',
