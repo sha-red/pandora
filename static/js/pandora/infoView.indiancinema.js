@@ -286,7 +286,7 @@ pandora.ui.infoView = function(data) {
             .css(css)
             .css({
                 marginTop: '12px',
-                overflow: 'auto'
+                overflow: 'hidden'
             })
             .bindEvent({
                 submit: function(data) {
@@ -749,7 +749,7 @@ pandora.ui.infoView = function(data) {
                         })
                         .css(css)
                         .css({
-                            overflow: 'auto'
+                            overflow: 'hidden'
                         })
                         .bindEvent({
                             submit: function(data) {
