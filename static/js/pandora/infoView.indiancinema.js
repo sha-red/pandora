@@ -578,7 +578,7 @@ pandora.ui.infoView = function(data) {
         return ret;
     }
 
-    function getFilmography(key, value, callback) {
+    function getFilmography(key, value, roles, callback) {
         var keys = ['id', 'title', 'year'].concat(
                 key == 'name' ? nameKeys : []
             );
@@ -601,11 +601,16 @@ pandora.ui.infoView = function(data) {
                 result.data.items.forEach(function(item) {
                     var year = item.year || 'Unknown Year';
                     if (key == 'name') {
-                        item.role = nameKeys.filter(function(nameKey) {
+                        item.roles = nameKeys.filter(function(nameKey) {
                             return Ox.contains(item[nameKey], value);
-                        }).map(function(nameKey) {
-                            return Ox.getObjectById(pandora.site.itemKeys, nameKey).title;
                         });
+                        if (roles.length == 1 && Ox.isEqual(item.roles, roles)) {
+                            delete item.roles;
+                        } else {
+                            item.roles = item.roles.map(function(nameKey) {
+                                return Ox.getObjectById(pandora.site.itemKeys, nameKey).title;
+                            });
+                        }
                     }
                     if (!items[year]) {
                         items[year] = [];
@@ -617,7 +622,7 @@ pandora.ui.infoView = function(data) {
                 Object.keys(items).sort().map(function(year) {
                     return '<b>' + year + ':</b> ' + items[year].map(function(item) {
                         return '<a href="/' + item.id + '">' + item.title + '</a>'
-                            + (item.role ? ' (' + item.role.join(', ') + ')' : '');
+                            + (item.roles ? ' (' + item.roles.join(', ') + ')' : '');
                     }).join(', ');
                 }).join(', ')
             );
@@ -792,6 +797,7 @@ pandora.ui.infoView = function(data) {
                                     getFilmography(
                                         key == 'studios' ? 'productionCompany' : 'name',
                                         value.name,
+                                        value.keys,
                                         function($element) {
                                             $link.addClass('OxLink')
                                                 .html('Hide ' + filmography)
