@@ -135,7 +135,7 @@ def findClips(request):
                             'id': a['public_id'],
                             'value': a['value'],
                         }
-                        if a['layer'] == subtitles['id'] and not a['value']:
+                        if subtitles and a['layer'] == subtitles['id'] and not a['value']:
                             del l['id']
                         if add_layer:
                             l['layer'] = a['layer']
