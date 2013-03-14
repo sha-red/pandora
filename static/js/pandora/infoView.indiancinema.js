@@ -23,7 +23,7 @@ pandora.ui.infoView = function(data) {
         listWidth = 144 + Ox.UI.SCROLLBAR_SIZE,
         margin = 16,
         nameKeys = [
-            'director', 'codirector', 'producer', 'writer', 'cinematographer',
+            'director', 'producer', 'codirector', 'writer', 'cinematographer',
             'editor', 'composer', 'lyricist', 'actor'
         ],
         listKeys = nameKeys.concat([
@@ -578,6 +578,54 @@ pandora.ui.infoView = function(data) {
         return ret;
     }
 
+    function getFilmography(key, value, callback) {
+        var keys = ['id', 'title', 'year'].concat(
+                key == 'name' ? nameKeys : []
+            );
+        pandora.api.find({
+            keys: keys,
+            query: {
+                conditions: [{key: key, operator: '==', value: value}],
+                operator: '&'
+            },
+            sort: [
+                {key: 'year', operator: '+'},
+                {key: 'title', operator: '+'},
+                {key: 'director', operator: '+'}
+            ],
+            range: [0, 1000000]
+        }, function(result) {
+            var $element = Ox.Element('<span>'),
+                items = {};
+            if (result.data.items) {
+                result.data.items.forEach(function(item) {
+                    var year = item.year || 'Unknown Year';
+                    if (key == 'name') {
+                        item.role = nameKeys.filter(function(nameKey) {
+                            return Ox.contains(item[nameKey], value);
+                        }).map(function(nameKey) {
+                            return Ox.getObjectById(pandora.site.itemKeys, nameKey).title;
+                        });
+                    }
+                    if (!items[year]) {
+                        items[year] = [];
+                    }
+                    items[year].push(item);
+                });
+            }
+            $element.html(
+                Object.keys(items).sort().map(function(year) {
+                    return '<b>' + year + ':</b> ' + items[year].map(function(item) {
+                        return '<a href="/' + item.id + '">' + item.title + '</a>'
+                            + (item.role ? ' (' + item.role.join(', ') + ')' : '');
+                    }).join(', ');
+                }).join(', ')
+            );
+            pandora.createLinks($element);
+            callback($element);
+        });
+    }
+
     function getNames() {
         var names = [];
         nameKeys.forEach(function(key) {
@@ -720,26 +768,62 @@ pandora.ui.infoView = function(data) {
         ['studios', 'names'].forEach(function(key) {
             descriptions[key].forEach(function(value) {
                 if (canEdit || value.description) {
-                    var $name = Ox.Element()
-                        .css(css)
-                        .css({marginTop: '12px', fontWeight: 'bold'})
-                        .html(
-                            formatLink(
-                                value.name,
-                                key == 'studios' ? 'productionCompany' : 'name'
-                            ) + ' (' + value.keys.map(function(key) {
-                                return formatKey(key, 'description');
-                            }).join(', ') + ')'
-                        )
-                        .appendTo($descriptions);
+                    var filmography = key == 'studios' ? 'Films' : 'Filmography',
+                        $name = Ox.Element()
+                            .css(css)
+                            .css({marginTop: '12px', fontWeight: 'bold'})
+                            .html(
+                                formatLink(
+                                    value.name,
+                                    key == 'studios' ? 'productionCompany' : 'name'
+                                ) + ' (' + value.keys.map(function(key) {
+                                    return formatKey(key, 'description');
+                                }).join(', ') + ') -&nbsp;'
+                            )
+                            .appendTo($descriptions),
+                        $link = $('<span>')
+                            .addClass('OxLink')
+                            .css({fontWeight: 'bold'})
+                            .html('Show ' + filmography)
+                            .one({
+                                click: function() {
+                                    $link.removeClass('OxLink')
+                                        .html('Loading ' + filmography + '...');
+                                    getFilmography(
+                                        key == 'studios' ? 'productionCompany' : 'name',
+                                        value.name,
+                                        function($element) {
+                                            $link.addClass('OxLink')
+                                                .html('Hide ' + filmography)
+                                                .on({
+                                                    click: function() {
+                                                        if (Ox.startsWith($link.html(), 'Show')) {
+                                                            $link.html('Hide ' + filmography);
+                                                            $text.show();
+                                                        } else {
+                                                            $link.html('Show ' + filmography);
+                                                            $text.hide();
+                                                        }
+                                                    }
+                                                });
+                                            $text.append($element).show();
+                                        }
+                                    );
+                                }
+                            })
+                            .appendTo($name),
+                        $text = $('<div>')
+                            .css(css)
+                            .hide()
+                            .appendTo($descriptions);
                     pandora.createLinks($name);
                     Ox.EditableContent({
                             clickLink: pandora.clickLink,
                             editable: canEdit,
                             format: function(value) {
                                 return value.replace(
-                                    /<img src=/g,
-                                    '<img style="max-width: 256px; max-height: 256px; margin: 0 16px 16px 0;float: left;" src='
+                                    /<img /g,
+                                    '<img style="max-width: 256px; max-height: 256px; margin: 0 16px 16px 0; float: left;" '
                                 );
                             },
                             placeholder: formatLight('No Description'),
