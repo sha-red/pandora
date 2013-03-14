@@ -600,7 +600,7 @@ pandora.ui.infoView = function(data) {
             if (result.data.items) {
                 result.data.items.forEach(function(item) {
                     var year = item.year || 'Unknown Year';
-                    if (key == 'name' && result.data.item.length > 1) {
+                    if (key == 'name' && result.data.items.length > 1) {
                         item.roles = nameKeys.filter(function(nameKey) {
                             return Ox.contains(item[nameKey], value);
                         });
