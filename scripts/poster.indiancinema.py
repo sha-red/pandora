@@ -20,9 +20,9 @@ static_root = os.path.join(os.path.dirname(__file__), 'data')
 
 def render_poster(title, director, year, frame, timeline, poster):
 
-    poster_width = 640
+    poster_width = 704
     poster_height = 1024
-    frame_height = 480
+    frame_height = 512
     frame_ratio = poster_width / frame_height
     timeline_height = 64
     text_margin = 24
@@ -30,7 +30,7 @@ def render_poster(title, director, year, frame, timeline, poster):
     poster_image = Image.new('RGB', (poster_width, poster_height))
     draw = ImageDraw.Draw(poster_image)
     font_file = os.path.join(static_root, 'SourceSansProSemibold.ttf')
-    font_size = {'cinema': 107, 'director': 32, 'title': 48, 'year': 387}
+    font_size = {'cinema': 117, 'director': 32, 'title': 48, 'year': 426}
     font_lightness = {'cinema': 0.7, 'director': 0.8, 'title': 0.8, 'year': 0.6}
     poster_lightness = {'image': 0.2, 'text': 0.4}
 
@@ -51,7 +51,7 @@ def render_poster(title, director, year, frame, timeline, poster):
     if year:
         drawText(
             poster_image,
-            (-84, poster_height - timeline_height - font_size['year'] + 6),
+            (-93, poster_height - timeline_height - font_size['year'] + 48),
             year,
             font_file,
             font_size['year'],
@@ -63,7 +63,7 @@ def render_poster(title, director, year, frame, timeline, poster):
         for x in [-1, 1]:
             drawText(
                 poster_image,
-                (-10 + x, poster_height - timeline_height - font_size['cinema'] + 1 + y),
+                (-11 + x, poster_height - timeline_height - font_size['cinema'] + 1 + y),
                 'Indiancine.ma',
                 font_file,
                 font_size['cinema'],
@@ -71,7 +71,7 @@ def render_poster(title, director, year, frame, timeline, poster):
             )
     drawText(
         poster_image,
-        (-10, poster_height - timeline_height - font_size['cinema'] + 1),
+        (-11, poster_height - timeline_height - font_size['cinema'] + 1),
         'Indiancine.ma',
         font_file,
         font_size['cinema'],
@@ -81,7 +81,7 @@ def render_poster(title, director, year, frame, timeline, poster):
     # director and title
     offset_top = frame_height + text_margin
     if not director:
-        title_max_lines = 8
+        title_max_lines = 7
     else:
         title_max_lines = min(len(wrapText(
             title,
@@ -89,8 +89,8 @@ def render_poster(title, director, year, frame, timeline, poster):
             0,
             font_file,
             font_size['title']
-        )), 7)
-        director_max_lines = 11 - int((title_max_lines * 3 - 1) / 2)
+        )), 6)
+        director_max_lines = 9 - int((title_max_lines * 3 - 1) / 2)
 
     # director
     if director:
@@ -110,7 +110,7 @@ def render_poster(title, director, year, frame, timeline, poster):
                 font_size['director'],
                 getRGB((hue, saturation, font_lightness['director']))
             )
-            offset_top += font_size['director'] + 2
+            offset_top += font_size['director'] + 4
         offset_top += size[1] - font_size['director'] + 6
 
     # title
@@ -140,7 +140,7 @@ def render_poster(title, director, year, frame, timeline, poster):
             font_size['title'],
             getRGB((hue, saturation, font_lightness['title']))
         )
-        offset_top += font_size['title'] + 3
+        offset_top += font_size['title'] + 6
 
     # frame
     if frame:

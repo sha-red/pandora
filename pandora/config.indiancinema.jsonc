@@ -863,7 +863,7 @@
     "video": {
         "download": false,
         "formats": ["webm", "mp4"],
-        "previewRatio": 1.7777777778,
+        "previewRatio": 1.375,
         "resolutions": [240, 480]
     }
 }
