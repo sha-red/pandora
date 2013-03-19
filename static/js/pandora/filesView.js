@@ -327,7 +327,7 @@ pandora.ui.filesView = function(options, self) {
             change: function(data) {
                 var conditions, matches;
                 if (key == 'id' && data.value.substr(0, 2) != '0x') {
-                    if (pandora.site.site.id == 'oxdb') {
+                    if (pandora.site.site.id == '0xdb') {
                         matches = data.value.match(/\d{7}/);
                     } else {
                         matches = data.value.match(/[A-Z]+/);
