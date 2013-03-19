@@ -63,7 +63,7 @@ def render_poster(title, director, year, frame, timeline, poster):
         for x in [-1, 1]:
             drawText(
                 poster_image,
-                (-11 + x, poster_height - timeline_height - font_size['cinema'] + 1 + y),
+                (-10 + x, poster_height - timeline_height - font_size['cinema'] + 1 + y),
                 'Indiancine.ma',
                 font_file,
                 font_size['cinema'],
@@ -71,7 +71,7 @@ def render_poster(title, director, year, frame, timeline, poster):
             )
     drawText(
         poster_image,
-        (-11, poster_height - timeline_height - font_size['cinema'] + 1),
+        (-10, poster_height - timeline_height - font_size['cinema'] + 1),
         'Indiancine.ma',
         font_file,
         font_size['cinema'],
