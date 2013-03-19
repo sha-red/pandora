@@ -409,11 +409,9 @@ class Item(models.Model):
             l.remove(self)
             if l.items.filter(id=other.id).count() == 0:
                 l.add(other)
-        #FIXME: should this really happen for annotations?
-        for a in self.annotations.all():
-            a.item = other
-            a.public_id = None
-            a.save()
+        self.annotations.all().update(item=other, public_id=None)
+        for a in other.annotations.filter(public_id=None).order_by('id'):
+            a.set_public_id()
 
         if hasattr(self, 'files'):
             for f in self.files.all():
