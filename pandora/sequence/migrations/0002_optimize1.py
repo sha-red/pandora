@@ -15,7 +15,7 @@ class Migration(SchemaMigration):
         transaction.commit_unless_managed()
 
         # Removing unique constraint on 'Sequence', fields ['item', 'end', 'mode', 'start']
-        db.delete_unique('sequence_sequence', ['item_id', 'end', 'mode', 'start'])
+        # db.delete_unique('sequence_sequence', ['item_id', 'end', 'mode', 'start'])
 
         # Deleting field 'Sequence.item'
         db.delete_column('sequence_sequence', 'item_id')
