@@ -220,11 +220,11 @@ pandora.ui.textHTML = function(text) {
         }).appendTo(that),
 
         $title = Ox.Editable({
-                editable: text.editable,
+                editable: text.name ? text.editable : false,
                 height: 32,
                 placeholder: text.editable ? 'Doubleclick to edit title' : 'Untitled',
                 tooltip: text.editable ? pandora.getEditTooltip('title') : '',
-                value: text.name,
+                value: text.name || pandora.site.site.name + ' Texts',
                 width: width
             })
             .css({
