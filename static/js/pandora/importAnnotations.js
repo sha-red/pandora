@@ -77,7 +77,7 @@ pandora.ui.importAnnotations = function(data) {
                 layer: layer
             }, function(result) {
                 if (result.data.taskId) {
-                    setStatus('Waiting or server to import annotations...');
+                    setStatus('Waiting for server to import annotations...');
                     pandora.wait(result.data.taskId, function(result) {
                         if(result.data.status == 'SUCCESS') {
                             setStatus(annotations.length + ' annotations imported.');
