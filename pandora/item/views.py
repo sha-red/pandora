@@ -483,7 +483,8 @@ def get(request):
         for k in settings.CONFIG['itemKeys']:
             if 'capability' in k \
                 and not check_capability(k['capability']) \
-                and k['id'] in info:
+                and k['id'] in info \
+                and k['id'] not in ('parts', 'durations'):
                     del info[k['id']]
         info['editable'] = item.editable(request.user)
         response['data'] = info
