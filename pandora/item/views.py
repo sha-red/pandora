@@ -484,7 +484,7 @@ def get(request):
             if 'capability' in k \
                 and not check_capability(k['capability']) \
                 and k['id'] in info \
-                and k['id'] not in ('parts', 'durations'):
+                and k['id'] not in ('parts', 'durations', 'duration'):
                     del info[k['id']]
         info['editable'] = item.editable(request.user)
         response['data'] = info
