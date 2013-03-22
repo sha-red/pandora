@@ -31,7 +31,7 @@ def render_poster(title, director, year, frame, timeline, poster):
     draw = ImageDraw.Draw(poster_image)
     font_file = os.path.join(static_root, 'SourceSansProSemibold.ttf')
     font_size = {'cinema': 117, 'director': 32, 'title': 48, 'year': 426}
-    font_lightness = {'cinema': 0.7, 'director': 0.8, 'title': 0.8, 'year': 0.6}
+    font_lightness = {'cinema': 0.7, 'director': 0.8, 'title': 0.8, 'year': 0.5}
     poster_lightness = {'image': 0.2, 'text': 0.4}
 
     if year:
@@ -51,7 +51,7 @@ def render_poster(title, director, year, frame, timeline, poster):
     if year:
         drawText(
             poster_image,
-            (-93, poster_height - timeline_height - font_size['year'] + 48),
+            (-93, poster_height - timeline_height - font_size['year'] + 6),
             year,
             font_file,
             font_size['year'],
