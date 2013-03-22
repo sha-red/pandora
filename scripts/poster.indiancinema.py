@@ -25,7 +25,7 @@ def render_poster(title, director, year, frame, timeline, poster):
     frame_height = 512
     frame_ratio = poster_width / frame_height
     timeline_height = 64
-    text_margin = 24
+    text_margin = 16
     text_width = poster_width - 2 * text_margin
     poster_image = Image.new('RGB', (poster_width, poster_height))
     draw = ImageDraw.Draw(poster_image)
@@ -110,8 +110,8 @@ def render_poster(title, director, year, frame, timeline, poster):
                 font_size['director'],
                 getRGB((hue, saturation, font_lightness['director']))
             )
-            offset_top += font_size['director'] + 4
-        offset_top += size[1] - font_size['director'] + 6
+            offset_top += font_size['director'] + 2
+        offset_top += size[1] - font_size['director'] - 2
 
     # title
     lines = wrapText(
@@ -126,7 +126,7 @@ def render_poster(title, director, year, frame, timeline, poster):
             for x in [-1, 1]:
                 drawText(
                     poster_image,
-                    (text_margin + x, offset_top + 4 + y),
+                    (text_margin + x, offset_top + y),
                     line,
                     font_file,
                     font_size['title'],
@@ -134,13 +134,13 @@ def render_poster(title, director, year, frame, timeline, poster):
                 )
         drawText(
             poster_image,
-            (text_margin, offset_top + 4),
+            (text_margin, offset_top),
             line,
             font_file,
             font_size['title'],
             getRGB((hue, saturation, font_lightness['title']))
         )
-        offset_top += font_size['title'] + 6
+        offset_top += font_size['title'] + 3
 
     # frame
     if frame:
