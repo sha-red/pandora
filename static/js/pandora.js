@@ -30,17 +30,23 @@ appPanel
             });
         } catch(e) {}
     };
-
+    function getLocalStorage(key) {
+        //fails if localStorage does not exist or
+        //if third party cookies are disabled
+        try {
+            return localStorage['pandora.enableDebugMode'];
+        } catch(e) {}
+    }
     var animationInterval,
-        enableDebugMode = localStorage && localStorage['pandora.enableDebugMode'],
-        enableEventLogging = localStorage && localStorage['pandora.enableEventLogging'],
+        enableDebugMode = getLocalStorage('pandora.enableDebugMode'),
+        enableEventLogging = getLocalStorage('pandora.enableEventLogging'),
         isEmbed = /^#\?/.test(document.location.hash)
             && /embed=true/.test(document.location.hash),
         isMSIE = /MSIE/.test(navigator.userAgent),
         isPrint = /^#\?/.test(document.location.hash)
             && /print=true/.test(document.location.hash),
         legacyThemes = {classic: 'oxlight', modern: 'oxdark'},
-        theme = localStorage && localStorage['Ox.theme']
+        theme = getLocalStorage('Ox.theme')
             && JSON.parse(localStorage['Ox.theme']) || 'oxmedium';
 
     theme = legacyThemes[theme] || theme;
@@ -347,7 +353,7 @@ appPanel
                     }
                 });
                 pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
-                if (localStorage && localStorage['pandora.onload']) {
+                if (getLocalStorage('pandora.onload')) {
                     try {
                         eval(localStorage['pandora.onload'])
                     } catch(e) {}
