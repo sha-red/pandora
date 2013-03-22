@@ -1166,8 +1166,12 @@ class Item(models.Model):
         timeline = '%stimelineantialias64p.jpg' % self.timeline_prefix
 
         director = u', '.join(self.get('director', []))
+        director = ox.decode_html(director)
+        title = self.get('title', '')
+        title = ox.decode_html(title)
+
         cmd = [settings.ITEM_POSTER,
-               '-t', self.get('title', '').encode('utf-8'),
+               '-t', title.encode('utf-8'),
                '-y', str(self.get('year', '')),
                '-p', poster
               ]
