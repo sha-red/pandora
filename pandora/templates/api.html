@@ -9,8 +9,11 @@
         <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="{{settings.SITENAME}}" />
         <link rel="alternate" type="application/atom+xml" title="{{settings.SITENAME}}" href="/atom.xml" />
         <script>
-            if (localStorage && !localStorage['Ox.theme'])
-                localStorage['Ox.theme'] = '"{{settings.CONFIG.user.ui.theme}}"';
+            try {
+                if (localStorage && !localStorage['Ox.theme']) {
+                    localStorage['Ox.theme'] = '"{{settings.CONFIG.user.ui.theme}}"';
+                }
+            } catch(e) {}
         </script>
         <script type="text/javascript" src="/static/js/pandora.js?{{settings.CONFIG.site.version}}"></script>
         <meta name="title" content="{{title}}" />
