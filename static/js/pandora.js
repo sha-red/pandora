@@ -34,7 +34,7 @@ appPanel
         //fails if localStorage does not exist or
         //if third party cookies are disabled
         try {
-            return localStorage['pandora.enableDebugMode'];
+            return localStorage[key];
         } catch(e) {}
     }
     var animationInterval,
