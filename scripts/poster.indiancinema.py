@@ -102,6 +102,16 @@ def render_poster(title, director, year, frame, timeline, poster):
             font_size['director']
         )
         for line in lines:
+            for y in [-1, 1]:
+                for x in [-1, 1]:
+                    drawText(
+                        poster_image,
+                        (text_margin + x, offset_top + y),
+                        line,
+                        font_file,
+                        font_size['director'],
+                        getRGB((hue, saturation, poster_lightness['text']))
+                    )
             size = drawText(
                 poster_image,
                 (text_margin, offset_top),
