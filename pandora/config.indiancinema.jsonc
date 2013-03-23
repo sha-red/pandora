@@ -38,7 +38,7 @@
         "canEditPlaces": {"student": true, "staff": true, "admin": true},
         "canEditSitePages": {"staff": true, "admin": true},
         "canEditUsers": {"staff": true, "admin": true},
-        "canImportAnnotations": {"admin": true},
+        "canImportAnnotations": {"student": true, "staff": true, "admin": true},
         "canManagePlacesAndEvents": {"student": true, "staff": true, "admin": true},
         "canManageTitlesAndNames": {"student": true, "staff": true, "admin": true},
         "canManageUsers": {"staff": true, "admin": true},
