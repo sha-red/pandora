@@ -347,7 +347,7 @@ def average_color(prefix, start=0, end=0, mode='antialias'):
         start = int(start * 25)
         end = int(end * 25)
     mode = 'timeline' + mode
-    timelines = sorted(filter(lambda t: t!= '%s%s%sp.jpg'%(prefix, mode, height),
+    timelines = ox.sorted_strings(filter(lambda t: t!= '%s%s%sp.jpg'%(prefix, mode, height),
                               glob("%s%s%sp*.jpg"%(prefix, mode, height))))
     for image in timelines:
         start_offset = 0
