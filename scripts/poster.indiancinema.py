@@ -81,7 +81,7 @@ def render_poster(title, director, year, frame, timeline, poster):
     # director and title
     offset_top = frame_height + text_margin
     if not director:
-        title_max_lines = 7
+        title_max_lines = 8
     else:
         title_max_lines = min(len(wrapText(
             title,
@@ -89,8 +89,8 @@ def render_poster(title, director, year, frame, timeline, poster):
             0,
             font_file,
             font_size['title']
-        )), 6)
-        director_max_lines = 9 - int((title_max_lines * 3 - 1) / 2)
+        )), 7)
+        director_max_lines = 11 - int((title_max_lines * 3 - 1) / 2)
 
     # director
     if director:
