@@ -26,8 +26,8 @@
   });
 */
 pandora.chunkupload = function(options) {
-    var chunkSize = options.size || 1024*1024,
-        chunkUrl,
+    var chunkSize = options.size || 1024 * 1024,
+        chunkURL,
         file = options.file,
         maxRetry = -1,
         retries = 0,
@@ -45,7 +45,7 @@ pandora.chunkupload = function(options) {
     }
 
     function initUpload() {
-        //request upload slot from server
+        // request upload slot from server
         that.status = 'requesting chunk upload';
         that.progress = 0;
         request = new XMLHttpRequest();
@@ -63,14 +63,14 @@ pandora.chunkupload = function(options) {
             if (response.maxRetry) {
                 maxRetry = response.maxRetry;
             }
-            chunkUrl = response.uploadUrl;
+            chunkURL = response.uploadUrl;
             if (document.location.protocol == 'https:') {
-                chunkUrl = chunkUrl.replace(/http:\/\//, 'https://');
+                chunkURL = chunkURL.replace(/http:\/\//, 'https://');
             }
-            if (chunkUrl) {
+            if (chunkURL) {
                 that.status = 'uploading';
                 that.progress = 0.0;
-                //start upload
+                // start upload
                 uploadChunk(0);
             } else {
                 that.status = 'upload failed, no upload url provided';
@@ -111,7 +111,7 @@ pandora.chunkupload = function(options) {
             chunk,
             chunkOffset = chunkId * chunkSize;
 
-        if(file.mozSlice) {
+        if (file.mozSlice) {
             chunk = file.mozSlice(chunkOffset, chunkOffset+chunkSize, file.type);
         } else if(file.webkitSlice) {
             chunk = file.webkitSlice(chunkOffset, chunkOffset+chunkSize, file.type);
@@ -119,7 +119,7 @@ pandora.chunkupload = function(options) {
             chunk = file.slice(chunkOffset, chunkOffset+chunkSize, file.type);
         } else {
             that.status = 'Sorry, your browser is currently not supported.';
-            done()
+            done();
         }
 
         progress(parseFloat(chunkOffset)/bytesAvailable);
@@ -140,12 +140,12 @@ pandora.chunkupload = function(options) {
                 that.status = 'done';
                 done();
             } else if (response.result == 1) {
-                //reset retry counter
+                // reset retry counter
                 retries = 0;
-                //start uploading next chunk
+                // start uploading next chunk
                 uploadChunk(chunkId + 1);
             } else {
-                //failed to upload, try again in 5 second
+                // failed to upload, try again in 5 second
                 retries++;
                 if (maxRetry > 0 && retries > maxRetry) {
                     that.status = 'uplaod failed';
@@ -159,7 +159,7 @@ pandora.chunkupload = function(options) {
             }
         }, false);
         request.addEventListener('error', function (evt) {
-            //failed to upload, try again in 3 second
+            // failed to upload, try again in 3 second
             retries++;
             if (maxRetry > 0 && retries > maxRetry) {
                 that.status = 'uplaod failed';
@@ -191,7 +191,7 @@ pandora.chunkupload = function(options) {
             formData.append('done', 1);
         }
         formData.append('chunk', chunk);
-        request.open('POST', chunkUrl, true);
+        request.open('POST', chunkURL, true);
         request.send(formData);
     }
 
@@ -201,5 +201,7 @@ pandora.chunkupload = function(options) {
             request = null;
         }
     };
+
     return that;
+
 };
