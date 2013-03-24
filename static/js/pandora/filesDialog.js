@@ -7,6 +7,7 @@ pandora.ui.filesDialog = function() {
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
         itemWidth = 256,
+        selected = null,
 
         $findSelect = Ox.Select({
                 items: [
@@ -131,7 +132,8 @@ pandora.ui.filesDialog = function() {
                     );
                 },
                 select: function(data) {
-                    selectFile(data.ids[0]);
+                    selected = data.ids[0];
+                    selectFile();
                 }
             }),
 
@@ -268,21 +270,28 @@ pandora.ui.filesDialog = function() {
         }).open();
     }
 
-    function getFormItemById(id) {
-        var ret;
-        Ox.forEach((
-            $formButton.value() == 'edit' ? $editForm : $mailForm
-        ).options('items'), function($item) {
-            if ($item.options('id') == id) {
-                ret = $item;
-                return false;
-            }
-        });
-        return ret;
-    };
+    function getPreviewSize() {
+        var left = 0,
+            ratio = $list.value(selected, 'ratio'),
+            width = itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE,
+            height = Math.round(width / ratio);
+        if (height > 256) {
+            height = 256;
+            width = Math.round(height * ratio);
+            left = Math.floor((itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE - width) / 2);
+        }
+        return {
+            height: height,
+            // fixme: CSS gets applied twice, to image and enclosing element
+            margin: [8, 8, 8, 8 + left].map(function(px) {
+                return px / 2 + 'px';
+            }).join(' '),
+            width: width
+        };
+    }
 
-    function renderForm(id) {
-        var file = $list.value(id),
+    function renderForm() {
+        var file = $list.value(selected),
             editable = file.user == pandora.user.username
                 || pandora.site.capabilities.canEditFiles[pandora.user.level];
         return Ox.Form({
@@ -321,7 +330,7 @@ pandora.ui.filesDialog = function() {
                 }),
                 Ox.Input({
                     disabled: !editable,
-                    height: dialogHeight - 184,
+                    height: 256,
                     id: 'description',
                     placeholder: 'Description',
                     type: 'textarea',
@@ -346,55 +355,60 @@ pandora.ui.filesDialog = function() {
         });
     }
 
-    function renderPreview(id) {
-        var isImage = Ox.contains(['jpg', 'png'], id.split('.').pop()),
-            src = '/files/' + id + (isImage ? '' : '.jpg'),
-            width = itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE,
-            height = Math.round(width / $list.value(id, 'ratio'))
+    function renderPreview() {
+        var isImage = Ox.contains(['jpg', 'png'], selected.split('.').pop()),
+            size = getPreviewSize(),
+            src = '/files/' + selected + (isImage ? '' : '.jpg');
         return Ox.ImageElement({
-                height: height,
+                height: size.height,
                 src: src,
-                width: width
+                width: size.width
             })
             .css({
-                margin: '4px',
+                margin: size.margin,
                 borderRadius: '8px'
             });
     }
 
-    function selectFile(id) {
-        var file = $list.value(id),
+    function selectFile() {
+        var file = $list.value(selected),
             editable = file.user == pandora.user.username
                 || pandora.site.capabilities.canEditFiles[pandora.user.level];
-        setLabel(id);
+        setLabel();
         $item.empty();
-        if (id) {
-            $preview = renderPreview(id).appendTo($item);
-            $form = renderForm(id).appendTo($item);
+        if (selected) {
+            $preview = renderPreview().appendTo($item);
+            $form = renderForm().appendTo($item);
             $deleteButton.options({disabled: !editable}).show();
         } else {
             $deleteButton.hide();
         }
     }
 
-    function setLabel(id) {
+    function setLabel() {
         $itemLabel.options({
-            title: id
-                ? id.split(':').slice(1).join(':')
+            title: selected
+                ? selected.split(':').slice(1).join(':')
                 : 'No file selected'
         });
     }
 
     function setWidth() {
+        var size;
         itemWidth = $content.size(1);
         $itemLabel.options({width: itemWidth - 8});
-        $preview && $preview.css({
-            maxWidth: itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE,
-            maxHeight: itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE
-        });
-        $form && $form.options('items').forEach(function($item) {
-            $item.options({width: itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE});
-        });
+        if (selected) {
+            size = getPreviewSize(),
+            $preview.options({
+                height: size.height,
+                width: size.width
+            }).css({
+                margin: size.margin
+            });
+            $form.options('items').forEach(function($item) {
+                $item.options({width: itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE});
+            });
+        }
         $status.css({right: itemWidth + 128 + 'px'});
     }
 
