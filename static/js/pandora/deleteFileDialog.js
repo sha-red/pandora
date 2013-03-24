@@ -20,7 +20,7 @@ pandora.ui.deleteFileDialog = function(file, callback) {
                     click: function() {
                         that.close();
                         pandora.api.removeFile({
-                            id: file.id
+                            id: file
                         }, function(result) {
                             Ox.Request.clearCache('findFiles');
                             callback();
@@ -30,7 +30,7 @@ pandora.ui.deleteFileDialog = function(file, callback) {
             ],
             keys: {enter: 'delete', escape: 'keep'},
             text: 'Are you sure you want to delete the file'
-                + ' "'+ item.filename + '"?',
+                + ' "'+ file + '"?',
             title: 'Delete File'
         });
 
