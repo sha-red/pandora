@@ -244,7 +244,7 @@ pandora.ui.filesDialog = function() {
                 minWidth: 512,
                 padding: 0,
                 removeOnClose: true,
-                title: 'Manage Users',
+                title: 'Manage Files',
                 width: dialogWidth
             }),
 
