@@ -4,7 +4,7 @@ from __future__ import division, with_statement
 import os
 import re
 import subprocess
-from urllib import quote
+from urllib import quote, unquote
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -72,7 +72,7 @@ class File(models.Model):
         return username, name, extension
 
     def get_absolute_url(self):
-        return '/files/%s' % quote(self.get_id())
+        return ('/files/%s' % quote(self.get_id())).replace('%3A', ':')
 
     def get_id(self):
         return u'%s:%s.%s' % (self.user.username, self.name, self.extension)
@@ -175,7 +175,22 @@ class File(models.Model):
             size = [1,1]
         self.ratio = size[0] / size[1]
 
-
+    def update_matches(self):
+        import annotation.models
+        import item.models
+        import text.models
+        urls = [self.get_absolute_url()]
+        url = unquote(urls[0])
+        if url != urls[0]:
+            urls.append(url)
+        matches = 0
+        for url in urls:
+            matches += annotation.models.Annotation.objects.filter(value__contains=url).count()
+            matches += item.models.Item.objects.filter(data__contains=url).count()
+            matches += text.models.Text.objects.filter(text__contains=url).count()
+        if matches != self.matches:
+            File.objects.filter(id=self.id).update(matches=matches)
+            self.matches = matches
 
 def delete_file(sender, **kwargs):
     t = kwargs['instance']
