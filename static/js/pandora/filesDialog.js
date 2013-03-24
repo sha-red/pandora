@@ -6,7 +6,7 @@ pandora.ui.filesDialog = function() {
 
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
-        itemWidth = 256,
+        itemWidth = 272 + Ox.UI.SCROLLBAR_SIZE,
         selected = null,
 
         $findSelect = Ox.Select({
@@ -140,7 +140,7 @@ pandora.ui.filesDialog = function() {
         $itemLabel = Ox.Label({
                 textAlign: 'center',
                 title: 'No file selected',
-                width: 248
+                width: itemWidth - 8
             })
             .css({margin: '4px'}),
 
@@ -213,8 +213,12 @@ pandora.ui.filesDialog = function() {
                             resize: setWidth
                         }),
                     resizable: true,
-                    resize: [256, 384, 512],
-                    size: 256
+                    resize: [
+                        272 + Ox.UI.SCROLLBAR_SIZE,
+                        400 + Ox.UI.SCROLLBAR_SIZE,
+                        528 + Ox.UI.SCROLLBAR_SIZE
+                    ],
+                    size: 272 + Ox.UI.SCROLLBAR_SIZE
                 }
             ],
             orientation: 'horizontal'
@@ -271,15 +275,10 @@ pandora.ui.filesDialog = function() {
     }
 
     function getPreviewSize() {
-        var left = 0,
-            ratio = $list.value(selected, 'ratio'),
-            width = itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE,
-            height = Math.round(width / ratio);
-        if (height > 256) {
-            height = 256;
-            width = Math.round(height * ratio);
+        var ratio = $list.value(selected, 'ratio'),
+            height = ratio < 1 ? 256 : 256 / ratio,
+            width = ratio >= 1 ? 256 : 256 * ratio,
             left = Math.floor((itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE - width) / 2);
-        }
         return {
             height: height,
             // fixme: CSS gets applied twice, to image and enclosing element
@@ -326,6 +325,14 @@ pandora.ui.filesDialog = function() {
                     label: 'Size',
                     labelWidth: 80,
                     value: Ox.formatValue(file.size, 'B'),
+                    width: itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE
+                }),
+                Ox.Input({
+                    disabled: true,
+                    id: 'matches',
+                    label: 'Matches',
+                    labelWidth: 80,
+                    value: file.matches,
                     width: itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE
                 }),
                 Ox.Input({
