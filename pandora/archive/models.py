@@ -266,6 +266,7 @@ class File(models.Model):
                     f.write(chunk.read())
             if done:
                 stream.available = True
+                stream.info = {}
                 stream.save()
             return True
         return False
