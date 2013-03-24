@@ -72,9 +72,7 @@ pandora.ui.usersDialog = function() {
             .bindEvent({
                 change: function(data) {
                     $findInput.value() && updateList();
-                    $findInput.options({
-                        placeholder: data.title
-                    });
+                    $findInput.options({placeholder: data.title});
                 }
             }),
 
@@ -424,7 +422,7 @@ pandora.ui.usersDialog = function() {
                 change: selectForm
             }),
 
-        $form = Ox.Element({}),
+        $form = Ox.Element(),
 
         $editForm,
 
@@ -958,9 +956,7 @@ pandora.ui.usersDialog = function() {
                     ),
                 operator: key == 'all' && value ? '|' : '&'
             };
-        $list.options({
-            query: query
-        });
+        $list.options({query: query});
     }
 
     return that;
