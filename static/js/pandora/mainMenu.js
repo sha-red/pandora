@@ -140,6 +140,8 @@ pandora.ui.mainMenu = function() {
                         { id: 'findsimilar', title: 'Find Similar Clips...', keyboard: 'alt control f', disabled: !pandora.getItemIdAndPosition() }
                     ] },
                     { id: 'dataMenu', title: 'Data', items: [
+                        { id: 'files', title: 'Manage Files...', disabled: !pandora.site.capabilities.canManageFiles[pandora.user.level] },
+                        {},
                         { id: 'titles', title: 'Manage Titles...', disabled: !pandora.site.capabilities.canManageTitlesAndNames[pandora.user.level] },
                         { id: 'names', title: 'Manage Names...', disabled: !pandora.site.capabilities.canManageTitlesAndNames[pandora.user.level] },
                         {},
@@ -329,6 +331,10 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                 } else if (data.id == 'findsimilar') {
                     pandora.$ui.sequencesDialog = pandora.ui.sequencesDialog().open();
+                } else if (data.id == 'files') {
+                    (pandora.$ui.filesDialog || (
+                        pandora.$ui.filesDialog = pandora.ui.filesDialog()
+                    )).open();
                 } else if (data.id == 'titles') {
                     (pandora.$ui.titlesDialog || (
                         pandora.$ui.titlesDialog = pandora.ui.titlesDialog()
