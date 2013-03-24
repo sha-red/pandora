@@ -30,7 +30,7 @@ To run pan.do/ra you need to install and setup:
             python-gst0.10 gstreamer0.10-plugins-good gstreamer0.10-plugins-bad \
             postgresql postgresql-contrib rabbitmq-server \
             ffmpeg2theora libav-tools libavcodec-extra-53 \
-            python-ox oxframe
+            python-ox oxframe imagemagick
 
 
 * Prepare Environment

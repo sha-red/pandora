@@ -46,6 +46,7 @@ sudo  vmbuilder vbox ubuntu --suite=precise \
     --addpkg libavcodec-extra-53 \
     --addpkg libav-tools \
     --addpkg ffmpeg2theora \
+    --addpkg imagemagick \
     --execscript=$base/install.sh \
     --firstboot=$base/firstboot.sh
 

@@ -130,6 +130,7 @@ INSTALLED_APPS = (
     'user',
     'urlalias',
     'tv',
+    'file',
 )
 
 # Log errors into db
