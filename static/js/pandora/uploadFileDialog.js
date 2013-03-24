@@ -5,11 +5,25 @@ pandora.ui.uploadFileDialog = function(file, callback) {
 
     var extension = file.name.split('.').pop().toLowerCase(),
 
-        extensions = ['jpg', 'jpeg', 'pdf', 'png'],
-
-        jpg = false,
+        extensions = ['gif', 'jpg', 'jpeg', 'pdf', 'png'],
 
         upload,
+
+        $errorDialog = pandora.iconDialog({
+            buttons: [
+                Ox.Button({
+                        id: 'close',
+                        title: 'Close'
+                    })
+                    .bindEvent({
+                        click: function() {
+                            $extensionDialog.close();
+                        }
+                    })
+            ],
+            title: 'Upload File',
+            text: 'Supported file types are GIF, JPG, PNG and PDF.'
+        }),
 
         $content = Ox.Element(),
 
@@ -23,51 +37,6 @@ pandora.ui.uploadFileDialog = function(file, callback) {
                 showTime: true
             })
             .appendTo($content),
-
-        $extensionDialog = pandora.iconDialog({
-            buttons: [
-                Ox.Button({
-                        id: 'close',
-                        title: 'Close'
-                    })
-                    .bindEvent({
-                        click: function() {
-                            $extensionDialog.close();
-                        }
-                    })
-            ],
-            title: 'Upload File',
-            text: 'Supported file types are JPG, PNG and PDF.'
-        }),
-
-        $imageDialog = pandora.iconDialog({
-            buttons: [
-                Ox.Button({
-                        id: 'png',
-                        title: 'Keep as PNG',
-                    })
-                    .bindEvent({
-                        click: function() {
-                            $imageDialog.close();
-                            $uploadDialog.open();
-                        }
-                    }),
-                Ox.Button({
-                        id: 'jpg'
-                        title: 'Encode as JPG'
-                    })
-                    .bindEvent({
-                        click: function() {
-                            jpg = true;
-                            $imageDialog.close();
-                            $uploadDialog.open();
-                        }
-                    })
-            ],
-            text: 'Do you want to encode the image as JPG?<br><br>'
-                + '(JPGs are significantly smaller, but do not support transparency.)',
-            title: 'Upload File'
-        }),
 
         $uploadDialog = Ox.Dialog({
                 buttons: [
@@ -93,7 +62,7 @@ pandora.ui.uploadFileDialog = function(file, callback) {
                 open: function() {
                     upload = pandora.chunkupload({
                             data: {
-                                filename: jpg || extension == 'jpeg'
+                                filename: extension == 'jpeg'
                                     ? file.name.split('.').slice(0, -1).join('.') + '.jpg'
                                     : file.name
                             },
@@ -117,9 +86,7 @@ pandora.ui.uploadFileDialog = function(file, callback) {
                 }
             });
 
-    return !Ox.contains(extensions, extension) ? $extensionDialog
-        : extension == 'png' ? $imageDialog
-        : $uploadDialog;
+    return !Ox.contains(extensions, extension) ? $errorDialog : $uploadDialog;
 
 };
 
