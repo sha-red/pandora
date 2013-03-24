@@ -635,8 +635,13 @@ class Item(models.Model):
             for key in settings.CONFIG['itemKeys']:
                 i = key['id']
                 if i == 'title':
-                    save(i, u'\n'.join([self.get('title', 'Untitled'),
-                                        self.get('originalTitle', '')]))
+                    titles = [self.get('title', 'Untitled')]
+                    if self.get('originalTitle'):
+                        titles.append(self.get('originalTitle'))
+                    at = self.get('alternativeTitles')
+                    if at:
+                        titles += [a[0] for a in at]
+                    save(i, u'\n'.join(titles))
                 elif i == 'rightslevel':
                     save(i, self.level)
                 elif i == 'filename':
@@ -881,6 +886,9 @@ class Item(models.Model):
                 ot = self.get('originalTitle')
                 if ot:
                     current_values.append(ot)
+                at = self.get('alternativeTitles')
+                if at:
+                    current_values += [a[0] for a in at]
             elif key == 'character':
                 current_values = filter(lambda x: x.strip(),
                                         [f['character'] for f in self.get('cast', [])])

@@ -567,6 +567,8 @@ pandora.ui.infoView = function(data) {
             ret = formatLink(value.split(', '), 'name');
         } else if (listKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), key);
+        } else if (key == 'alternativeTitles') {
+            ret = formatLink(value.split('; '), 'title');
         } else if (specialListKeys.indexOf(key) > -1) {
             ret = formatLink(value.split('; '), key);
         } else if (key == 'imdbId') {
