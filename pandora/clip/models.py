@@ -92,7 +92,7 @@ class MetaClip:
         end = float('%0.03f' % end)
         qs = cls.objects.filter(item=item, start=start, end=end)
         if qs.count() == 0:
-            clip = Clip(item=item, start=start, end=end)
+            clip, created = cls.objects.get_or_create(item=item, start=start, end=end)
             clip.save()
             created = True
         else:
