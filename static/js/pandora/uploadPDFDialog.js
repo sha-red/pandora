@@ -27,11 +27,11 @@ pandora.ui.uploadPDFDialog = function(options) {
                     disabled: true
                 }).bindEvent({
                     click: function(data) {
-                            cancelled = true;
-                            pandora.$ui.upload && pandora.$ui.upload.abort();
-                            $fileButton.show();
-                            $cancelButton.hide()
-                            $closeButton.show();
+                        cancelled = true;
+                        pandora.$ui.upload && pandora.$ui.upload.abort();
+                        $fileButton.show();
+                        $cancelButton.hide()
+                        $closeButton.show();
                     }
                 }),
             ],
@@ -78,9 +78,9 @@ pandora.ui.uploadPDFDialog = function(options) {
                 $progress.options({progress: progress});
             },
             callback: function(result) {
-                if(result.progress == 1) {
+                if (result.progress == 1) {
                     Ox.Request.clearCache();
-                    //fixme reload text view here
+                    // fixme reload text view here
                     that.close();
                 } else {
                     $content.html("failed: " + result.responseText);
@@ -88,18 +88,17 @@ pandora.ui.uploadPDFDialog = function(options) {
             }
         }).bindEvent({
             progress: function(data) {
-                var progress = data.progress || 0;
-                $progress.options({progress: progress});
+                $progress.options({progress: data.progress || 0});
             },
             done: function(data) {
-                if(data.progress == 1) {
+                if (data.progress == 1) {
                     Ox.Request.clearCache();
                     pandora.$ui.mainPanel.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
                     that.close();
                 } else {
                     $content.html("failed: " + data.responseText);
                 }
-           }
+            }
         });
     }
 
