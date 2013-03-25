@@ -166,7 +166,7 @@ class VideoChunkForm(forms.Form):
     done = forms.IntegerField(required=False)
 
 @login_required_json
-def addFile(request):
+def addMedia(request):
     '''
         takes {
             id: oshash
@@ -216,7 +216,7 @@ def addFile(request):
         response['data']['item'] = i.itemId
         response['data']['itemUrl'] = request.build_absolute_uri('/%s' % i.itemId)
     return render_to_json_response(response)
-actions.register(addFile, cache=False)
+actions.register(addMedia, cache=False)
 
 @login_required_json
 def firefogg_upload(request):
@@ -289,7 +289,7 @@ actions.register(taskStatus, cache=False)
 
 
 @login_required_json
-def moveFiles(request):
+def moveMedia(request):
     '''
         change file / item link
         takes {
@@ -333,10 +333,10 @@ def moveFiles(request):
     response = json_response(text='updated')
     response['data']['itemId'] = i.itemId
     return render_to_json_response(response)
-actions.register(moveFiles, cache=False)
+actions.register(moveMedia, cache=False)
 
 @login_required_json
-def editFiles(request):
+def editMedia(request):
     '''
         change file / item link
         takes {
@@ -385,11 +385,11 @@ def editFiles(request):
             i.update_selected()
             i.update_wanted()
     return render_to_json_response(response)
-actions.register(editFiles, cache=False)
+actions.register(editMedia, cache=False)
 
 
 @login_required_json
-def removeFiles(request):
+def removeMedia(request):
     data = json.loads(request.POST['data'])
     response = json_response()
     if request.user.get_profile().get_level() == 'admin':
@@ -402,7 +402,7 @@ def removeFiles(request):
     else:
         response = json_response(status=403, text='permissino denied')
     return render_to_json_response(response)
-actions.register(removeFiles, cache=False)
+actions.register(removeMedia, cache=False)
 
 def getPath(request):
     '''
@@ -460,7 +460,7 @@ def _order_query(qs, sort, prefix=''):
     return qs
 
 
-def findFiles(request):
+def findMedia(request):
     '''
         takes {
             'query': query,
@@ -594,7 +594,7 @@ Positions
         response['data']['items'] = files.count()
     return render_to_json_response(response)
 
-actions.register(findFiles)
+actions.register(findMedia)
 
 def parsePath(request): #parse path and return info
     '''
@@ -610,7 +610,7 @@ def parsePath(request): #parse path and return info
     return render_to_json_response(response)
 actions.register(parsePath)
 
-def getFileInfo(request):
+def getMediaInfo(request):
     '''
         takes {
             id: oshash of stream file
@@ -637,5 +637,5 @@ def getFileInfo(request):
             'item': f.item.itemId
         }
     return render_to_json_response(response)
-actions.register(getFileInfo)
+actions.register(getMediaInfo)
 

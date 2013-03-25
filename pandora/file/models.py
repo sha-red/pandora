@@ -48,8 +48,8 @@ class File(models.Model):
                 if self.extension == 'pdf' and not os.path.exists(self.thumbnail()):
                     self.make_thumbnail()
 
-        self.name_sort = ox.sort_string(self.name or u'')[:255]
-        self.description_sort = ox.sort_string(self.description or u'')[:512]
+        self.name_sort = ox.sort_string(self.name or u'')[:255].lower()
+        self.description_sort = ox.sort_string(self.description or u'')[:512].lower()
 
         super(File, self).save(*args, **kwargs)
 
@@ -130,7 +130,7 @@ class File(models.Model):
 
     def path(self, name=''):
         h = "%07d" % self.id
-        return os.path.join('uploads', h[:2], h[2:4], h[4:6], h[6:], name)
+        return os.path.join('files', h[:2], h[2:4], h[4:6], h[6:], name)
 
     def save_chunk(self, chunk, chunk_id=-1, done=False):
         if self.uploading:

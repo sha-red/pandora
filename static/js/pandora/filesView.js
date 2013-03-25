@@ -217,7 +217,7 @@ pandora.ui.filesView = function(options, self) {
             columnsVisible: true,
             id: 'files',
             items: function(data, callback) {
-                pandora.api.findFiles(Ox.extend(data, {
+                pandora.api.findMedia(Ox.extend(data, {
                     query: self.filesQuery
                 }), callback);
             },
@@ -231,7 +231,7 @@ pandora.ui.filesView = function(options, self) {
                 if (data.key == 'selected') {
                     var ignored = self.$filesList.value(data.id, 'instances')
                             .filter(function(i) {return i.ignore; }).length > 0;
-                    pandora.api.editFiles({
+                    pandora.api.editMedia({
                         files: [{
                             id: data.id,
                             ignore: !ignored
@@ -247,7 +247,7 @@ pandora.ui.filesView = function(options, self) {
                     return self.$filesList.value(id, 'instances').length == 0;
                 });
                 if (ids.length > 0 && pandora.user.level == 'admin') {
-                    pandora.api.removeFiles({
+                    pandora.api.removeMedia({
                         ids: ids
                     }, function(result) {
                         Ox.Request.clearCache();
@@ -456,7 +456,7 @@ pandora.ui.filesView = function(options, self) {
     }
 
     function ignoreFiles() {
-        pandora.api.editFiles({
+        pandora.api.editMedia({
             files: self.selected.map(function(id) {
                 return {id: id, ignore: true};
             })
@@ -477,7 +477,7 @@ pandora.ui.filesView = function(options, self) {
         self.$moveButton.options(
             {disabled: true, title: 'Moving Files...'}
         );
-        pandora.api.moveFiles(data, function(result) {
+        pandora.api.moveMedia(data, function(result) {
             if (
                 pandora.user.ui.item == self.options.id
                 && pandora.user.ui.itemView == 'files'
@@ -526,11 +526,11 @@ pandora.ui.filesView = function(options, self) {
 
     function saveChanges() {
         self.$saveButton.options({disabled: true, title: 'Saving Changes...'});
-        pandora.api.findFiles({
+        pandora.api.findMedia({
             keys: ['id'],
             query: self.filesQuery
         }, function(result) {
-            pandora.api.editFiles({
+            pandora.api.editMedia({
                 files: result.data.items.map(function(item) {
                     [
                         'version', 'part', 'partTitle', 'language', 'extension'

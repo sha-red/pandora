@@ -154,7 +154,7 @@ pandora.ui.uploadDialog = function(data) {
             item,
             oshash = info.oshash;
         resetProgress();
-        pandora.api.addFile({
+        pandora.api.addMedia({
             filename: filename,
             id: oshash,
             info: info,
@@ -337,7 +337,7 @@ pandora.ui.uploadDialog = function(data) {
                 oshash = info.oshash,
                 filename = pandora.firefogg.sourceFilename,
                 item;
-            pandora.api.findFiles({
+            pandora.api.findMedia({
                 query: {
                     conditions: [{key: 'oshash', value: oshash}]
                 },

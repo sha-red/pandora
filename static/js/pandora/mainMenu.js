@@ -332,9 +332,7 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'findsimilar') {
                     pandora.$ui.sequencesDialog = pandora.ui.sequencesDialog().open();
                 } else if (data.id == 'files') {
-                    (pandora.$ui.filesDialog || (
-                        pandora.$ui.filesDialog = pandora.ui.filesDialog()
-                    )).open();
+                    pandora.$ui.filesDialog = pandora.ui.filesDialog().open();
                 } else if (data.id == 'titles') {
                     (pandora.$ui.titlesDialog || (
                         pandora.$ui.titlesDialog = pandora.ui.titlesDialog()

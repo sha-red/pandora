@@ -218,7 +218,7 @@ class File(models.Model):
 
     def get_path(self, name):
         h = self.oshash
-        return os.path.join('files', h[:2], h[2:4], h[4:6], h[6:], name)
+        return os.path.join('media', h[:2], h[2:4], h[4:6], h[6:], name)
 
     def contents(self):
         if self.data != None:
