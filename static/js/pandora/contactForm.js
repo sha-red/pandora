@@ -98,6 +98,10 @@ pandora.ui.contactForm = function() {
         .bindEvent({
             click: function() {
                 var data = $form.values();
+                $sendButton.options({
+                    disabled: true,
+                    title: 'Sending Message...'
+                });
                 pandora.api.contact({
                     name: data.name,
                     email: data.email,
@@ -122,6 +126,10 @@ pandora.ui.contactForm = function() {
                             title: 'Message Sent'
                         })
                         .open();
+                    $sendButton.options({
+                        disabled: false,
+                        title: 'Send Message'
+                    });
                 });
                 
             }
