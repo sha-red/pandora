@@ -140,10 +140,10 @@ pandora.ui.statisticsDialog = function() {
                     if (item.location) {
                         split = item.location.split(', ')
                         if (split.length == 1) {
-                            country = item.location;
+                            country = split[0];
                         } else {
-                            country = split[1];
                             city = split[0];
+                            country = split[1];
                         }
                         countryData = Ox.getCountryByName(country) || {continent: '', region: ''};
                         continent = countryData.continent;
@@ -245,14 +245,6 @@ pandora.ui.statisticsDialog = function() {
                 });
             });
 
-        });
-
-        data.all.city['Antarctica, Antarctica, Neutral Zone, Other'] = 0;
-        Ox.forEach(data.all.city, function(value, key) {
-            if (value < 2) {
-                data.all.city['Antarctica, Antarctica, Neutral Zone, Other']++;
-                delete data.all.city[key];
-            }
         });
 
         $guestsCheckbox = Ox.Checkbox({
@@ -414,10 +406,17 @@ pandora.ui.statisticsDialog = function() {
                                 },
                                 keyAlign: 'right',
                                 keyWidth: 128,
+                                limit: 1000,
                                 sort: {key: 'value', operator: '-'},
-                                title: Ox.endsWith(key, 'y')
+                                title: (
+                                    Ox.endsWith(key, 'y')
                                     ? Ox.toTitleCase(key).slice(0, -1) + 'ies'
-                                    : Ox.toTitleCase(key) + 's',
+                                    : Ox.toTitleCase(key) + 's'
+                                ) + ' (' + (
+                                    Ox.len(data[mode][key]) > 1000
+                                    ? '1,000 of '
+                                    : ''
+                                ) + Ox.formatNumber(Ox.len(data[mode][key])) + ')',
                                 width: chartWidth
                             })
                             .css({
