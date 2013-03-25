@@ -179,17 +179,26 @@ pandora.ui.uploadDialog = function(data) {
                                     $progress.options({progress: 0.5 + progress / 2});
                                 },
                                 done: function(data) {
-                                    Ox.Request.clearCache();
-                                    if (pandora.user.ui.item == item && pandora.user.ui.itemView == 'files') {
-                                        pandora.$ui.item.reload();
+                                    if (data.progress == 1) {
+                                        Ox.Request.clearCache();
+                                        if (pandora.user.ui.item == item && pandora.user.ui.itemView == 'files') {
+                                            pandora.$ui.item.reload();
+                                        } else {
+                                            pandora.UI.set({
+                                                item: item,
+                                                itemView: 'files'
+                                            });
+                                        }
+                                        delete pandora.firefogg;
+                                        that.close();
                                     } else {
-                                        pandora.UI.set({
-                                            item: item,
-                                            itemView: 'files'
+                                        $status.html('Upload Failed.');
+                                        pandora.api.log({
+                                            text: data.responseText,
+                                            url: '/' + item,
+                                            line: 1
                                         });
                                     }
-                                    delete pandora.firefogg;
-                                    that.close();
                                }
                             });
                     });
