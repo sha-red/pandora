@@ -14,7 +14,7 @@ pandora.ui.importAnnotations = function(data) {
         importButton,
         selectLayer,
         selectFile,
-        that = pandora.ui.iconDialog({
+        that = Ox.Dialog({
             buttons: [
                 Ox.Button({
                     id: 'close',
@@ -36,11 +36,13 @@ pandora.ui.importAnnotations = function(data) {
                 })
             ],
             closeButton: true,
-            text: content,
+            content: content,
             keys: {
                 'escape': 'close'
             },
+            height: 128,
             removeOnClose: true,
+            width: 368,
             title: 'Import Annotations'
         })
         .bindEvent({
@@ -77,7 +79,9 @@ pandora.ui.importAnnotations = function(data) {
                 layer: layer
             }, function(result) {
                 if (result.data.taskId) {
-                    setStatus('Waiting for server to import annotations...');
+                    $status.html('').append(Ox.LoadingScreen({
+                        text: 'Importing ' + srt.length + ' annotations...'
+                    }));
                     pandora.wait(result.data.taskId, function(result) {
                         if(result.data.status == 'SUCCESS') {
                             setStatus(annotations.length + ' annotations imported.');

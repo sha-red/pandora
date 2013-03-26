@@ -5,6 +5,7 @@ pandora.ui.uploadDialog = function(data) {
 
     var cancelled = false,
         file,
+        hasFirefogg = !(typeof Firefogg == 'undefined'),
         selectFile,
         $actionButton,
         $closeButton,
@@ -18,12 +19,22 @@ pandora.ui.uploadDialog = function(data) {
                 $closeButton = Ox.Button({
                     id: 'close',
                     title: 'Close'
+                }).css({
+                    float: 'left'
                 }).bindEvent({
                     click: function() {
-                        that.triggerEvent('close');
+                        if ($closeButton.options('title') == 'Cancel') {
+                            cancelled = true;
+                            pandora.firefogg && pandora.firefogg.cancel();
+                            pandora.$ui.upload && pandora.$ui.upload.abort();
+                            $closeButton.options('title', 'Close');
+                            $actionButton.show();
+                        } else {
+                            that.triggerEvent('close');
+                        }
                     }
                 }),
-                $actionButton = Ox.Button({
+                $actionButton = hasFirefogg ? Ox.Button({
                     id: 'action',
                     title: 'Select Video'
                 }).bindEvent({
@@ -39,9 +50,22 @@ pandora.ui.uploadDialog = function(data) {
                             $actionButton.options('title', 'Select Video');
                             $closeButton.show();
                         } else {
-                            $actionButton.options('title', 'Cancel');
-                            $closeButton.hide();
+                            $closeButton.options('title', 'Cancel');
+                            $actionButton.hide().options('title', 'Select Video');
                             encode();
+                        }
+                    }
+                }) : Ox.FileButton({
+                    id: 'action',
+                    title: 'Select Video',
+                    maxFiles: 1,
+                    width: 96
+                }).bindEvent({
+                    click: function(data) {
+                        if(data.files.length) {
+                            $actionButton.hide();
+                            $closeButton.options('title', 'Cancel');
+                            upload(data.files[0]);
                         }
                     }
                 })
@@ -62,9 +86,6 @@ pandora.ui.uploadDialog = function(data) {
             }
         });
 
-    // FIXME: is this necessary?
-    pandora._status = $status;
-    pandora._info = $info;
     if (!pandora.site.itemRequiresVideo && !pandora.user.ui.item) {
         $info.html(
             'You can only upload a video to an existing '
@@ -72,44 +93,6 @@ pandora.ui.uploadDialog = function(data) {
             + '. Please check if an entry for the '
             + pandora.site.itemName.singular.toLowerCase()
             + ' you want to upload exists and create otherwise.'
-        );
-        $actionButton.hide();
-    } else if (typeof Firefogg == 'undefined') {
-        /*
-        selectFile = $('<input>')
-            .attr({
-                type: 'file'
-            })
-            .css({
-                padding: '8px'
-            })
-            .on({
-                change: function(event) {
-                    if (this.files.length) {
-                        file = this.files[0];
-                        if (file.type == 'video/webm') {
-                            $status.html('');
-                            uploadButton.options({
-                                disabled: false
-                            });
-                        } else {
-                            $status.html('Currently only WebM files are supported.  (<a href="/help/encoding">Help encoding video</a>)');
-                        }
-                    } else {
-                        uploadButton.options({
-                            disabled: true
-                        });
-                    }
-                }
-            })
-            .appendTo($content);
-        */
-        $info.html(
-            'Currently, video upload is only supported in '
-            + '<a target="_new" href="http://mozilla.org/firefox/">Firefox</a>, with '
-            + '<a target="_new" href="http://firefogg.org/">Firefogg</a> installed.<br><br>'
-            + 'Alternatively, you can use '
-            + '<a target="_new" href="https://wiki.0x2620.org/wiki/pandora_client">pandora_client</a>.'
         );
         $actionButton.hide();
     }
@@ -138,14 +121,14 @@ pandora.ui.uploadDialog = function(data) {
         };
     }
 
-    function resetProgress() {
+    function resetProgress(status) {
         $progress = Ox.Progressbar({
             progress: 0,
             showPercent: true,
             showTime: true,
             width: 304
         });
-        $status.html('').append($progress);
+        $status.html(status || '').append($progress);
     }
 
     function encode() {
@@ -153,6 +136,7 @@ pandora.ui.uploadDialog = function(data) {
             info = JSON.parse(pandora.firefogg.sourceInfo),
             item,
             oshash = info.oshash;
+        $info.html('<b>' + filename + '</b><br>encoding...');
         resetProgress();
         pandora.api.addMedia({
             filename: filename,
@@ -171,43 +155,97 @@ pandora.ui.uploadDialog = function(data) {
                         return;
                     }
                     setTimeout(function() {
-                        //$status.html('uploading... ');
-                        pandora.$ui.upload = pandora.ui.upload(oshash, file)
-                            .bindEvent({
-                                progress: function(data) {
-                                    var progress = data.progress || 0;
-                                    $progress.options({progress: 0.5 + progress / 2});
-                                },
-                                done: function(data) {
-                                    if (data.progress == 1) {
-                                        Ox.Request.clearCache();
-                                        if (pandora.user.ui.item == item && pandora.user.ui.itemView == 'files') {
-                                            pandora.$ui.item.reload();
-                                        } else {
-                                            pandora.UI.set({
-                                                item: item,
-                                                itemView: 'files'
-                                            });
-                                        }
-                                        delete pandora.firefogg;
-                                        that.close();
-                                    } else {
-                                        $status.html('Upload Failed.');
-                                        pandora.api.log({
-                                            text: data.responseText,
-                                            url: '/' + item,
-                                            line: 1
-                                        });
-                                    }
-                               }
-                            });
+                        $info.html('<b>' + filename + '</b><br>uploading...');
+                        uploadStream(item, oshash, file);
                     });
                 },
                 function(progress) {
                     progress = JSON.parse(progress).progress || 0;
-                    $progress.options({progress: progress / 2});
+                    $progress.options({progress: progress});
                 }
             );
+        });
+    }
+
+    function uploadStream(item, oshash, file) {
+        var format = pandora.site.video.formats[0],
+            resolution = Ox.max(pandora.site.video.resolutions);
+        pandora.$ui.upload = pandora.chunkupload({
+            file: file,
+            url: '/api/upload/?profile=' + resolution + 'p.' + format + '&id=' + oshash,
+            data: {}
+        }).bindEvent({
+            done: function(data) {
+                if (data.progress == 1) {
+                    Ox.Request.clearCache();
+                    if (pandora.user.ui.item == item && pandora.user.ui.itemView == 'files') {
+                        pandora.$ui.item.reload();
+                    } else {
+                        pandora.UI.set({
+                            item: item,
+                            itemView: 'files'
+                        });
+                    }
+                    delete pandora.firefogg;
+                    that.close();
+                } else {
+                    $status.html('Upload Failed.');
+                    pandora.api.log({
+                        text: data.responseText,
+                        url: '/' + item,
+                        line: 1
+                    });
+                }
+            },
+            progress: function(data) {
+                $progress.options({progress: data.progress || 0});
+            },
+        });
+    }
+
+    function upload(file) {
+        resetProgress();
+        $info.html('Uploading ' + file.name);
+        Ox.oshash(file, function(oshash) {
+            pandora.api.addMedia({
+                filename: file.name,
+                id: oshash,
+                item: pandora.site.itemRequiresVideo ? undefined : pandora.user.ui.item
+            }, function(result) {
+                var item = result.data.item;
+                pandora.$ui.upload = pandora.chunkupload({
+                    file: file,
+                    url: '/api/upload/direct/',
+                    data: {
+                        id: oshash
+                    }
+                }).bindEvent({
+                    done: function(data) {
+                        if (data.progress == 1) {
+                            Ox.Request.clearCache();
+                            if (pandora.user.ui.item == item && pandora.user.ui.itemView == 'files') {
+                                pandora.$ui.item.reload();
+                            } else {
+                                pandora.UI.set({
+                                    item: item,
+                                    itemView: 'files'
+                                });
+                            }
+                            that.close();
+                        } else {
+                            $status.html(cancelled ? 'Upload cancelled.' : 'Upload failed.');
+                            !cancelled && pandora.api.log({
+                                text: data.responseText,
+                                url: '/' + item,
+                                line: 1
+                            });
+                        }
+                    },
+                    progress: function(data) {
+                        $progress.options({progress: data.progress || 0});
+                    }
+                });
+            });
         });
     }
 

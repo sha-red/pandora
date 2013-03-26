@@ -76,7 +76,7 @@ pandora.ui.filesView = function(options, self) {
             columns: [
                 {
                     clickable: function(data) {
-                        return true;
+                        return !data.encoding;
                     },
                     format: function(value, data) {
                         return $('<img>')
@@ -99,7 +99,9 @@ pandora.ui.filesView = function(options, self) {
                     title: 'Status',
                     titleImage: 'check',
                     tooltip: function (data) {
-                        return data.instances.filter(function(i) {return i.ignore; }).length > 0
+                        return data.encoding
+                            ? 'Processing video on server'
+                            : data.instances.filter(function(i) {return i.ignore; }).length > 0
                             ? 'Use this file'
                             : 'Dont use this file';
                     },
