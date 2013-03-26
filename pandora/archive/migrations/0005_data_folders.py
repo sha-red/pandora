@@ -12,6 +12,9 @@ class Migration(DataMigration):
         for s in orm['archive.Stream'].objects.all():
             s.video.name = s.video.name.replace('files/', 'media/')
             s.save()
+        for f in orm['archive.File'].objects.exclude(data=''):
+            f.data.name = f.data.name.replace('files/', 'media/')
+            f.save()
 
     def backwards(self, orm):
         "Write your backwards methods here."
