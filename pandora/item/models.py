@@ -1225,12 +1225,14 @@ class Item(models.Model):
                 width, height = self.json['resolution']
                 pos = self.sort.duration / 2
                 for p in map(int, [pos/2, pos, pos+pos/2]):
-                    frames.append({
-                        'position': p,
-                        'path': self.frame(p, height),
-                        'width': width,
-                        'height': height,
-                    })
+                    path = self.frame(p, height)
+                    if path:
+                        frames.append({
+                            'position': p,
+                            'path': path,
+                            'width': width,
+                            'height': height,
+                        })
         return frames
 
     def select_frame(self):
