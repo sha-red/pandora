@@ -160,7 +160,7 @@ def upload(request):
 actions.register(upload, cache=False)
 
 
-class VideoChunkForm(forms.Form):
+class ChunkForm(forms.Form):
     chunk = forms.FileField()
     chunkId = forms.IntegerField(required=False)
     done = forms.IntegerField(required=False)
@@ -209,7 +209,8 @@ def addMedia(request):
         else:
             extension = 'webm'
         f.selected = True
-        f.info = data['info']
+        if 'info' in data and data['info']:
+            f.info = data['info']
         f.info['extension'] = extension
         f.parse_info()
         f.save()
@@ -230,7 +231,7 @@ def firefogg_upload(request):
         #post next chunk
         if 'chunk' in request.FILES and oshash:
             f = get_object_or_404(models.File, oshash=oshash)
-            form = VideoChunkForm(request.POST, request.FILES)
+            form = ChunkForm(request.POST, request.FILES)
             if form.is_valid() and profile == video_profile and f.editable(request.user):
                 c = form.cleaned_data['chunk']
                 chunk_id = form.cleaned_data['chunkId']
@@ -238,7 +239,7 @@ def firefogg_upload(request):
                     'result': 1,
                     'resultUrl': request.build_absolute_uri('/%s'%f.item.itemId)
                 }
-                if not f.save_chunk(c, chunk_id, form.cleaned_data['done']):
+                if not f.save_chunk_stream(c, chunk_id, form.cleaned_data['done']):
                     response['result'] = -1
                 elif form.cleaned_data['done']:
                     f.uploading = False
@@ -272,6 +273,51 @@ def firefogg_upload(request):
             else:
                 response = json_response(status=404, text='permission denied')
     response = json_response(status=400, text='this request requires POST')
+    return render_to_json_response(response)
+
+@login_required_json
+def direct_upload(request):
+    if 'id' in request.GET:
+        file = models.File.objects.get(oshash=request.GET['id'])
+    else:
+        oshash = request.POST['id']
+    response = json_response(status=400, text='this request requires POST')
+    if 'chunk' in request.FILES:
+        form = ChunkForm(request.POST, request.FILES)
+        if form.is_valid() and file.editable(request.user):
+            c = form.cleaned_data['chunk']
+            chunk_id = form.cleaned_data['chunkId']
+            response = {
+                'result': 1,
+                'resultUrl': request.build_absolute_uri(file.item.get_absolute_url())
+            }
+            if not file.save_chunk(c, chunk_id, form.cleaned_data['done']):
+                response['result'] = -1
+            if form.cleaned_data['done']:
+                file.uploading = False
+                file.save()
+                #try/execpt so it does not fail if rabitmq is down
+                try:
+                    t = tasks.extract_stream.delay(file.id)
+                    response['resultUrl'] = t.task_id
+                except:
+                    pass
+                response['done'] = 1
+            return render_to_json_response(response)
+    #init upload
+    else:
+        file, created = models.File.objects.get_or_create(oshash=oshash)
+        if file.editable(request.user):
+            file.uploading = True
+            file.save()
+            upload_url = request.build_absolute_uri('/api/upload/direct/?id=%s' % file.oshash)
+            return render_to_json_response({
+                'uploadUrl': upload_url,
+                'url': request.build_absolute_uri(file.item.get_absolute_url()),
+                'result': 1
+            })
+        else:
+            response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
 
 

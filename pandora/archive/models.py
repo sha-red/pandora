@@ -76,6 +76,7 @@ class File(models.Model):
     available = models.BooleanField(default = False)
     selected = models.BooleanField(default = False)
     uploading = models.BooleanField(default = False)
+    encoding = models.BooleanField(default = False)
     wanted = models.BooleanField(default = False)
 
     is_audio = models.BooleanField(default=False)
@@ -249,6 +250,25 @@ class File(models.Model):
 
     def save_chunk(self, chunk, chunk_id=-1, done=False):
         if not self.available:
+            if not self.data:
+                name = 'data.%s' % self.info.get('extension', 'avi')
+                self.data.name = self.get_path(name)
+                ox.makedirs(os.path.dirname(self.data.path))
+                with open(self.data.path, 'w') as f:
+                    f.write(chunk.read())
+                self.save()
+            else:
+                with open(self.data.path, 'a') as f:
+                    f.write(chunk.read())
+            if done:
+                self.info.update(ox.avinfo(self.data.path))
+                self.parse_info()
+                self.save()
+            return True
+        return False
+
+    def save_chunk_stream(self, chunk, chunk_id=-1, done=False):
+        if not self.available:
             config = settings.CONFIG['video']
             stream, created = Stream.objects.get_or_create(
                         file=self,
@@ -282,6 +302,7 @@ class File(models.Model):
             'audioCodec': self.audio_codec,
             'available': self.available,
             'duration': duration,
+            'encoding': self.encoding,
             'framerate': self.framerate,
             'id': self.oshash,
             'instances': [i.json() for i in self.instances.all()],
@@ -465,6 +486,15 @@ class Stream(models.Model):
     def encode(self):
         if self.source:
             video = self.source.video.path
+            target = self.video.path
+            info = ox.avinfo(video)
+            if extract.stream(video, target, self.name(), info):
+                self.available = True
+            else:
+                self.available = False
+            self.save()
+        elif self.file.data:
+            video = self.file.data.path
             target = self.video.path
             info = ox.avinfo(video)
             if extract.stream(video, target, self.name(), info):

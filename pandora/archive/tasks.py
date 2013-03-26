@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 # vi:si:et:sw=4:sts=4:ts=4
+import os
 from glob import glob
 
 from celery.task import task
 
 from django.conf import settings
+import ox
 
 from item.models import Item
 import models
@@ -86,18 +88,48 @@ def update_files(user, volume, files):
 
 @task(queue="encoding")
 def process_stream(fileId):
+    '''
+        process uploaded stream
+    '''
     file = models.File.objects.get(id=fileId)
     streams = file.streams.filter(source=None)
     if streams.count() > 0:
         stream = streams[0]
+        models.File.objects.filter(id=fileId).update(encoding=True)
         stream.make_timeline()
         stream.extract_derivatives()
+        models.File.objects.filter(id=fileId).update(encoding=False)
     file.item.update_selected()
     if not file.item.rendered:
         file.item.update_timeline()
     if file.item.rendered:
         file.item.save()
     return True
+
+@task(queue="encoding")
+def extract_stream(fileId):
+    '''
+        extract stream from direct upload
+    '''
+    file = models.File.objects.get(id=fileId)
+    if file.data:
+        config = settings.CONFIG['video']
+        stream, created = models.Stream.objects.get_or_create(
+            file=file, resolution=max(config['resolutions']),
+            format=config['formats'][0])
+        if created:
+            models.File.objects.filter(id=fileId).update(encoding=True)
+            stream.video.name = stream.path(stream.name())
+            stream.encode()
+            if stream.available:
+                stream.make_timeline()
+                stream.extract_derivatives()
+                file.item.update_selected()
+                if not file.item.rendered:
+                    file.item.update_timeline()
+                if file.item.rendered:
+                    file.item.save()
+            models.File.objects.filter(id=fileId).update(encoding=False)
 
 @task(queue="encoding")
 def extract_derivatives(fileId, rebuild=False):

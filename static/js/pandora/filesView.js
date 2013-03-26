@@ -81,8 +81,11 @@ pandora.ui.filesView = function(options, self) {
                     format: function(value, data) {
                         return $('<img>')
                             .attr({
-                                src: data.wanted ? Ox.UI.getImageURL('symbolUpload') :
-                                                   Ox.UI.getImageURL('symbolCheck')
+                                src: data.encoding
+                                    ? Ox.UI.getImageURL('symbolSync')
+                                    : data.wanted
+                                    ? Ox.UI.getImageURL('symbolUpload')
+                                    : Ox.UI.getImageURL('symbolCheck')
                             })
                             .css({
                                 width: '10px',
@@ -221,7 +224,7 @@ pandora.ui.filesView = function(options, self) {
                     query: self.filesQuery
                 }), callback);
             },
-            keys: ['wanted', 'instances'],
+            keys: ['encoding', 'instances', 'wanted'],
             scrollbarVisible: true,
             sort: [{key: 'path', operator: '+'}],
             unique: 'id'
