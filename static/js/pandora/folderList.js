@@ -408,6 +408,7 @@ pandora.ui.folderList = function(id) {
             data_[data.key] = data.value;
             pandora.api['edit' + folderItem](data_, function(result) {
                 if (result.data.id != data.id) {
+                    Ox.Request.clearCache();
                     pandora.renameList(data.id, result.data.id, result.data.name, id);
                     pandora.$ui.info.updateListInfo();
                 }
