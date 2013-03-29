@@ -464,7 +464,7 @@ class Stream(models.Model):
 
     def extract_derivatives(self, rebuild=False):
         config = settings.CONFIG['video']
-        for resolution in config['resolutions']:
+        for resolution in sorted(config['resolutions'], reverse=True):
             for f in config['formats']:
                 derivative, created = Stream.objects.get_or_create(file=self.file,
                                                   resolution=resolution, format=f)
