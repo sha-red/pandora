@@ -478,6 +478,8 @@ def get(request):
                 level = 'guest'
             else:
                 level = request.user.get_profile().get_level()
+            if request.user == item.user:
+                return True
             return level in settings.CONFIG['capabilities'][capability] \
                     and settings.CONFIG['capabilities'][capability][level]
         for k in settings.CONFIG['itemKeys']:
