@@ -15,7 +15,7 @@ class Migration(DataMigration):
         for f in orm['archive.File'].objects.exclude(data=''):
             f.data.name = f.data.name.replace('files/', 'media/')
             f.save()
-        for f in orm['archive.Frame'].objects.exclude(data=''):
+        for f in orm['archive.Frame'].objects.exclude(frame=''):
             f.frame.name = f.frame.name.replace('files/', 'media/')
             f.save()
 
