@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.mail import send_mail, BadHeaderError, EmailMessage
 from django.shortcuts import redirect
 from django.db.models import Max
+from django.contrib.auth.models import User, Group
 
 from ox.django.shortcuts import render_to_json_response, json_response, get_object_or_404_json
 from ox.django.decorators import admin_required_json, login_required_json
@@ -43,7 +44,7 @@ def signin(request):
     data = json.loads(request.POST['data'])
     if 'username' in data and 'password' in data:
         data['username'] = data['username'].strip()
-        qs = models.User.objects.filter(username__iexact=data['username'])
+        qs = User.objects.filter(username__iexact=data['username'])
         if qs.count() == 0:
             response = json_response({
                 'errors': {
@@ -126,13 +127,13 @@ def signup(request):
         data['username'] = data['username'].strip()
         if 'email' in data:
             data['email'] = ox.escape_html(data['email'])
-        if models.User.objects.filter(username__iexact=data['username']).count() > 0:
+        if User.objects.filter(username__iexact=data['username']).count() > 0:
             response = json_response({
                 'errors': {
                     'username': 'Username already exists'
                 }
             })
-        elif models.User.objects.filter(email__iexact=data['email']).count() > 0:
+        elif User.objects.filter(email__iexact=data['email']).count() > 0:
             response = json_response({
                 'errors': {
                     'email': 'Email address already exits'
@@ -145,8 +146,8 @@ def signup(request):
                 }
             })
         else:
-            first_user = models.User.objects.count() == 0
-            user = models.User(username=data['username'], email=data['email'])
+            first_user = User.objects.count() == 0
+            user = User(username=data['username'], email=data['email'])
             user.set_password(data['password'])
             #make first user admin
             user.is_superuser = first_user
@@ -256,13 +257,13 @@ def requestToken(request):
     user = None
     if 'username' in data:
         try:
-            user = models.User.objects.get(username__iexact=data['username'])
-        except models.User.DoesNotExist:
+            user = User.objects.get(username__iexact=data['username'])
+        except User.DoesNotExist:
             user = None
     elif 'email' in data:
         try:
-            user = models.User.objects.get(email__iexact=data['email'])
-        except models.User.DoesNotExist:
+            user = User.objects.get(email__iexact=data['email'])
+        except User.DoesNotExist:
             user = None
     if user:
         while True:
@@ -316,14 +317,14 @@ def editUser(request):
     '''
     response = json_response()
     data = json.loads(request.POST['data'])
-    user = get_object_or_404_json(models.User, pk=ox.fromAZ(data['id']))
+    user = get_object_or_404_json(User, pk=ox.fromAZ(data['id']))
     profile = user.get_profile()
     if 'disabled' in data:
         user.is_active = not data['disabled']
     if 'email' in data:
         if 'email' in data:
             data['email'] = ox.escape_html(data['email'])
-        if models.User.objects.filter(email__iexact=data['email']).exclude(id=user.id).count()>0:
+        if User.objects.filter(email__iexact=data['email']).exclude(id=user.id).count()>0:
             response = json_response(status=403, text='email already in use')
             return render_to_json_response(response)
         user.email = data['email']
@@ -341,10 +342,10 @@ def editUser(request):
             user.groups.exclude(name__in=groups).delete()
             current_groups = [g.name for g in user.groups.all()]
             for g in filter(lambda g: g not in current_groups, groups):
-                group, created = models.Group.objects.get_or_create(name=g) 
+                group, created = Group.objects.get_or_create(name=g) 
                 user.groups.add(group)
     if 'username' in data:
-        if models.User.objects.filter(
+        if User.objects.filter(
                 username__iexact=data['username']).exclude(id=user.id).count()>0:
             response = json_response(status=403, text='username already in use')
             return render_to_json_response(response)
@@ -365,7 +366,7 @@ def removeUser(request):
     '''
     response = json_response()
     data = json.load(request.POST['data'])
-    user = get_object_or_404_json(models.User, username=data['username'])
+    user = get_object_or_404_json(User, username=data['username'])
     user.delete()
     return render_to_json_response(response)
 actions.register(removeUser, cache=False)
@@ -392,10 +393,10 @@ def findUser(request):
 
     if data['key'] == 'email':
         response['data']['users'] = [models.user_json(u, keys)
-                                     for u in models.User.objects.filter(email__iexact=data['value'])]
+                                     for u in User.objects.filter(email__iexact=data['value'])]
     else:
         response['data']['users'] = [models.user_json(u, keys)
-                                     for u in models.User.objects.filter(username__iexact=data['value'])]
+                                     for u in User.objects.filter(username__iexact=data['value'])]
     return render_to_json_response(response)
 actions.register(findUser)
 
@@ -557,7 +558,7 @@ def mail(request):
             'Reply-To': settings.CONFIG['site']['email']['contact']
         }
         subject = data.get('subject', '').strip()
-        users = [models.User.objects.get(username=username) for username in data['to']]
+        users = [User.objects.get(username=username) for username in data['to']]
         for user in users:
             if user.email:
                 message = data['message']
@@ -683,7 +684,7 @@ def editPreferences(request):
     change = False
     response = json_response()
     if 'email' in data:
-        if models.User.objects.filter(
+        if User.objects.filter(
                 email=data['email']).exclude(username=request.user.username).count()>0:
             errors['email'] = 'Email address already in use'
         else:
