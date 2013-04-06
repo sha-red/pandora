@@ -58,7 +58,7 @@ Important: "use_your_own" is a password and you have to use the same value here 
     bzr branch http://code.0x2620.org/pandora pandora
     cd pandora
     virtualenv --system-site-packages .
-    pip -E . install -r requirements.txt
+    ./bin/pip install -r requirements.txt
 
     cd static
     bzr branch http://code.0x2620.org/oxjs
