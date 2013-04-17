@@ -30,9 +30,13 @@ pandora.chunkupload = function(options) {
         chunkURL,
         file = options.file,
         maxRetry = -1,
+        nextChunkId,
+        paused = false,
         retries = 0,
         request,
         that = Ox.Element();
+
+    options.data = options.data || {};
 
     initUpload();
 
@@ -143,7 +147,12 @@ pandora.chunkupload = function(options) {
                 // reset retry counter
                 retries = 0;
                 // start uploading next chunk
-                uploadChunk(chunkId + 1);
+                if (paused) {
+                    nextChunkId = chunkId + 1;
+                    that.triggerEvent('paused', {next: nextChunkId});
+                } else {
+                    uploadChunk(chunkId + 1);
+                }
             } else {
                 // failed to upload, try again in 5 second
                 retries++;
@@ -153,7 +162,12 @@ pandora.chunkupload = function(options) {
                     done();
                 } else {
                     setTimeout(function() {
-                        uploadChunk(chunkId);
+                        if (paused) {
+                            nextChunkId = chunkId;
+                            that.triggerEvent('paused', {next: nextChunkId});
+                        } else {
+                            uploadChunk(chunkId);
+                        }
                     }, 5000);
                 }
             }
@@ -167,7 +181,12 @@ pandora.chunkupload = function(options) {
                 done();
             } else {
                 setTimeout(function() {
-                    uploadChunk(chunkId);
+                    if (paused) {
+                        nextChunkId = chunkId;
+                        that.triggerEvent('paused', {next: nextChunkId});
+                    } else {
+                        uploadChunk(chunkId);
+                    }
                 }, 3000);
             }
         }, false);
@@ -200,6 +219,21 @@ pandora.chunkupload = function(options) {
             request.abort();
             request = null;
         }
+        return that;
+    };
+    that.pause = function() {
+        paused = true;
+        return that;
+    };
+    that.resume = function() {
+        if (paused) {
+            paused = false;
+            if (nextChunkId) {
+                uploadChunk(nextChunkId);
+                nextChunkId = null;
+            }
+        }
+        return that;
     };
 
     return that;
