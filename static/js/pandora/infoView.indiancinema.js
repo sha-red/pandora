@@ -458,8 +458,8 @@ pandora.ui.infoView = function(data) {
         if (value != data[key]) {
             var edit = {id: data.id};
             if (key == 'alternativeTitles') {
-                edit[key] = value ? value.split('; ').map(function(value) {
-                    return [value, []];
+                edit[key] = value ? Ox.decodeHTMLEntities(value).split('; ').map(function(value) {
+                    return [Ox.encodeHTMLEntities(value), []];
                 }) : [];
                 data[key] = edit[key];
                 $alternativeTitles.html(formatKey(key));
@@ -471,7 +471,9 @@ pandora.ui.infoView = function(data) {
             } else if (listKeys.indexOf(key) > -1) {
                 edit[key] = value ? value.split(', ') : [];
             } else if (specialListKeys.indexOf(key) > -1) {
-                edit[key] = value ? value.split('; ') : [];
+                edit[key] = value
+                    ? Ox.decodeHTMLEntities(value).split('; ').map(Ox.encodeHTMLEntities)
+                    : [];
             } else {
                 edit[key] = value;
             }
@@ -568,9 +570,13 @@ pandora.ui.infoView = function(data) {
         } else if (listKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), key);
         } else if (key == 'alternativeTitles') {
-            ret = formatLink(value.split('; '), 'title');
+            ret = formatLink(
+                Ox.decodeHTMLEntities(value).split('; ').map(Ox.encodeHTMLEntities),
+                'title');
         } else if (specialListKeys.indexOf(key) > -1) {
-            ret = formatLink(value.split('; '), key);
+            ret = formatLink(
+                Ox.decodeHTMLEntities(value).split('; ').map(Ox.encodeHTMLEntities),
+                key);
         } else if (key == 'imdbId') {
             ret = '<a href="http://www.imdb.com/title/tt'
                 + value + '">' + value + '</a>';
