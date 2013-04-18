@@ -147,7 +147,7 @@ pandora.ui.infoView = function(data) {
             Ox.Editable({
                     editable: canEdit,
                     tooltip: canEdit ? pandora.getEditTooltip() : '',
-                    value: data.title
+                    value: data.title || ''
                 })
                 .css({
                     display: 'inline-block',
@@ -387,7 +387,7 @@ pandora.ui.infoView = function(data) {
                         placeholder: formatLight('No notes'),
                         tooltip: pandora.getEditTooltip(),
                         type: 'textarea',
-                        value: data.notes,
+                        value: data.notes || '',
                         width: 128
                     })
                     .bindEvent({
