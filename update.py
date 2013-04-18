@@ -11,6 +11,8 @@ if os.path.exists(activate_this):
 
 import sys
 import subprocess
+import ox
+import json
 from os.path import join, exists
 
 def run(*cmd):
@@ -23,11 +25,30 @@ def get(*cmd):
     stdout, error = p.communicate()
     return stdout
 
+def get_release():
+    try:
+        return json.loads(ox.net.read_url('https://pan.do/json/release.json'))
+    except:
+        print "failed to load https://pan.do/ra, check your internet connection"
+        sys.exit(1)
+
 repos = {
-    "pandora": "http://code.0x2620.org/pandora/",
-    "oxjs": "http://code.0x2620.org/oxjs/",
-    "python-ox": "http://code.0x2620.org/python-ox/",
-    "oxtimelines": "http://code.0x2620.org/oxtimelines/",
+  "pandora": {
+    "url": "http://code.0x2620.org/pandora/", 
+    "path": ".", 
+  }, 
+  "oxjs": {
+    "url": "http://code.0x2620.org/oxjs/", 
+    "path": "./static/oxjs", 
+  }, 
+  "oxtimelines": {
+    "url": "http://code.0x2620.org/oxtimelines/", 
+    "path": "./src/oxtimelines", 
+  }, 
+  "python-ox": {
+    "url": "http://code.0x2620.org/python-ox/", 
+    "path": "./src/python-ox", 
+  }
 }
 
 def reload_notice(base):
@@ -52,38 +73,50 @@ if __name__ == "__main__":
             print "\t./manage.py migrate --all --fake"
             print "Check http://wiki.0x2620.org/wiki/pandora/DatabaseUpdate for more information"
     else:
+
+        if len(sys.argv) == 1:
+            release = get_release()
+            repos = release['repos']
+            development = False
+        else:
+            release = {
+                'date': 'development'
+            }
+            development = True
         os.chdir(base)
-        current = get('bzr', 'revno')
-        run('bzr', 'pull', repos['pandora'])
-        new = get('bzr', 'revno')
-
-        if exists(join(base, 'static', 'oxjs')):
-            os.chdir(join(base, 'static', 'oxjs'))
-            current += get('bzr', 'revno')
-            run('bzr', 'pull', repos['oxjs'])
-            new += get('bzr', 'revno')
-        else:
-            os.chdir(join(base, 'static'))
-            run('bzr', 'branch', repos['oxjs'])
-            new += '+'
-
-        if exists(join(base, 'src', 'python-ox')):
-            os.chdir(join(base, 'src', 'python-ox'))
-            current += get('bzr', 'revno')
-            run('bzr', 'pull', repos['python-ox'])
-            new += get('bzr', 'revno')
-
-        if exists(join(base, 'src', 'oxtimelines')):
-            os.chdir(join(base, 'src', 'oxtimelines'))
-            current += get('bzr', 'revno')
-            run('bzr', 'pull', repos['oxtimelines'])
-            new += get('bzr', 'revno')
-        else:
-            print "oxtimelines is missing. please run:\n\n\tcd %s\n\tpip -E . install -r requirements.txt\n" % (base)
+        current = ''
+        new = ''
+        for repo in repos:
+            path = os.path.join(base, repos[repo]['path'])
+            if exists(path):
+                os.chdir(path)
+                revno = get('bzr', 'revno')
+                current += revno
+                url = repos[repo]['url']
+                if 'revision' in repos[repo]:
+                    if int(revno) < repos[repo]['revision']:
+                        run('bzr', 'pull', url, '-r', '%s' % repos[repo]['revision'])
+                else:
+                    run('bzr', 'pull', url)
+                revno = get('bzr', 'revno')
+                new += revno
+            else:
+                os.chdir(os.path.dirname(path))
+                cmd = ['bzr', 'branch', repos[repo]['url']]
+                if 'revision' in repos[repo]:
+                    cmd += ['-r', '%s' % repos[repo]['revision']]
+                run(*cmd)
+                setup = os.path.join(base, repos[repo]['path'], 'setup.py')
+                if repo in ('python-ox', 'oxtimelines') and os.path.exists(setup):
+                    os.chdir(os.path.dirname(setup))
+                    run(os.path.join(base, 'bin', 'python'), 'setup.py', 'develop')
+                new += '+'
         os.chdir(join(base, 'pandora'))
         if current != new:
             run('./manage.py', 'update_static')
             run('./manage.py', 'compile_pyc')
+        elif not development:
+            print 'pan.do/ra is up to date, run "./update development" to update to the current development version'
         diff = get('./manage.py', 'sqldiff', '-a').strip()
         if diff != '-- No differences':
             print 'Database has changed, please make a backup and run ./update.py database'
