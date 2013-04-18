@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
         if len(sys.argv) == 1:
             release = get_release()
-            repos = release['repos']
+            repos = release['repositories']
             development = False
         else:
             release = {
