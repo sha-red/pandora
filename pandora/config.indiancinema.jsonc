@@ -58,7 +58,7 @@
         "canSendMail": {"staff": true, "admin": true}
     },
     /*
-        clipKeys are the properties that clips can by sorted by.
+        clipKeys are the properties that clips can be sorted by.
         If sortOperator is not specified, it will be + for strings and - for numbers.
     */
     "clipKeys": [
