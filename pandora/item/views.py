@@ -1064,8 +1064,8 @@ def atom_xml(request):
 
 def oembed(request):
     format = request.GET.get('format', 'json')
-    maxwidth = request.GET.get('maxwidth', 640)
-    maxheight = request.GET.get('maxheight', 480)
+    maxwidth = int(request.GET.get('maxwidth', 640))
+    maxheight = int(request.GET.get('maxheight', 480))
 
     url = request.GET['url']
     parts = urlparse(url).path.split('/')
@@ -1073,6 +1073,7 @@ def oembed(request):
     #fixme: embed should reflect actuall url
     item = get_object_or_404_json(models.Item, itemId=itemId)
     embed_url = request.build_absolute_uri('/%s/embed' % item.itemId)
+    embed_url = '%s#?embed=true' % url
     oembed = {}
     oembed['version'] = '1.0'
     oembed['type'] = 'video'
@@ -1081,13 +1082,13 @@ def oembed(request):
     oembed['title'] = item.get('title')
     #oembed['author_name'] = item.get('director')
     #oembed['author_url'] = ??
-    height = 96
-    width = 128
-    if maxheight > height or height > maxheight:
-        height = maxheight
-    if maxwidth > width or width > maxwidth:
+    height = max(settings.CONFIG['video']['resolutions'])
+    height = min(height, maxheight)
+    width = int(round(height * item.stream_aspect))
+    if width > maxwidth:
         width = maxwidth
-    oembed['html'] = '<iframe width="%s" height="%s" src="%s" frameborder="0" allowfullscreen></iframe>' % (width, height, embed_url)
+        height = min(maxheight, int(width / item.stream_aspect))
+    oembed['html'] = '<iframe width="%s" height="%s" src="%s" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>' % (width, height, embed_url)
     oembed['width'] = width
     oembed['height'] = height
     thumbheight = 96
