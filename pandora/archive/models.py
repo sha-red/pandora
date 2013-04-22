@@ -178,7 +178,14 @@ class File(models.Model):
         if info.get('director') and info.get('directorSort'):
             for name, sortname in zip(info['director'], info['directorSort']):
                 get_name_sort(name, sortname)
-        self.item = item.models.get_item(info, user)
+        #add all files in one folder to same item
+        if self.instances.all().count():
+            folder = os.path.dirname(self.instances.all()[0].path)
+            qs = item.models.Item.objects.filter(files__instances__path__startswith=folder)
+            if qs.exists():
+                self.item = qs[0]
+        if not self.item:
+            self.item = item.models.get_item(info, user)
         for key in self.AV_INFO + self.PATH_INFO:
             if key in info:
                 self.info[key] = info[key]
