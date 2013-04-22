@@ -195,7 +195,7 @@ USE_IMDB = False
 #if you set VIDEO_PREFIX make sure cookies work accros subsomains
 VIDEO_PREFIX=''
 #VIDEO_PREFIX = '//video{uid}.example.com'
-#SESSION_COOKIE_DOMAIN = '*.example.com'
+#SESSION_COOKIE_DOMAIN = '.example.com'
 
 SESSION_COOKIE_AGE=60*24*60*60
 
