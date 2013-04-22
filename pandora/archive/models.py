@@ -275,13 +275,13 @@ class File(models.Model):
                         resolution=max(config['resolutions']),
                         format=config['formats'][0])
             if created:
-                stream.video.name = stream.path(stream.name())
-                ox.makedirs(os.path.dirname(stream.video.path))
-                with open(stream.video.path, 'w') as f:
+                stream.media.name = stream.path(stream.name())
+                ox.makedirs(os.path.dirname(stream.media.path))
+                with open(stream.media.path, 'w') as f:
                     f.write(chunk.read())
                 stream.save()
             else:
-                with open(stream.video.path, 'a') as f:
+                with open(stream.media.path, 'a') as f:
                     #FIXME: should check that chunk_id/offset is right
                     f.write(chunk.read())
             if done:
@@ -436,7 +436,7 @@ class Stream(models.Model):
     resolution = models.IntegerField(default=96)
     format = models.CharField(max_length=255, default='webm')
 
-    video = models.FileField(default=None, blank=True, upload_to=lambda f, x: f.path(x))
+    media = models.FileField(default=None, blank=True, upload_to=lambda f, x: f.path(x))
     source = models.ForeignKey('Stream', related_name='derivatives', default=None, null=True)
     available = models.BooleanField(default=False)
     oshash = models.CharField(max_length=16, null=True, db_index=True)
@@ -470,34 +470,34 @@ class Stream(models.Model):
                                                   resolution=resolution, format=f)
                 
                 name = derivative.name()
-                name = os.path.join(os.path.dirname(self.video.name), name)
+                name = os.path.join(os.path.dirname(self.media.name), name)
                 if created:
                     derivative.source = self
                     derivative.save()
-                    derivative.video.name = name
+                    derivative.media.name = name
                     derivative.encode()
                     derivative.save()
                 elif rebuild or not derivative.available:
-                    if not derivative.video:
-                        derivative.video.name = name
+                    if not derivative.media:
+                        derivative.media.name = name
                     derivative.encode()
         return True
 
     def encode(self):
         if self.source:
-            video = self.source.video.path
-            target = self.video.path
-            info = ox.avinfo(video)
-            if extract.stream(video, target, self.name(), info):
+            media = self.source.media.path
+            target = self.media.path
+            info = ox.avinfo(media)
+            if extract.stream(media, target, self.name(), info):
                 self.available = True
             else:
                 self.available = False
             self.save()
         elif self.file.data:
-            video = self.file.data.path
-            target = self.video.path
-            info = ox.avinfo(video)
-            if extract.stream(video, target, self.name(), info):
+            media = self.file.data.path
+            target = self.media.path
+            info = ox.avinfo(media)
+            if extract.stream(media, target, self.name(), info):
                 self.available = True
             else:
                 self.available = False
@@ -505,15 +505,15 @@ class Stream(models.Model):
 
     def make_timeline(self):
         if self.available and not self.source:
-            extract.timeline(self.video.path, self.timeline_prefix)
+            extract.timeline(self.media.path, self.timeline_prefix)
             self.cuts = tuple(extract.cuts(self.timeline_prefix))
             self.color = tuple(extract.average_color(self.timeline_prefix))
             self.volume = extract.average_volume(self.timeline_prefix)
             self.save()
 
     def save(self, *args, **kwargs):
-        if self.video and not self.info:
-            self.info = ox.avinfo(self.video.path)
+        if self.media and not self.info:
+            self.info = ox.avinfo(self.media.path)
         self.oshash = self.info.get('oshash')
         self.duration = self.info.get('duration', 0)
         if 'video' in self.info and self.info['video']:
@@ -536,6 +536,6 @@ class Stream(models.Model):
 
 def delete_stream(sender, **kwargs):
     f = kwargs['instance']
-    if f.video:
-        f.video.delete()
+    if f.media:
+        f.media.delete()
 pre_delete.connect(delete_stream, sender=Stream)

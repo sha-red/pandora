@@ -943,8 +943,8 @@ class Item(models.Model):
                     height = min(height, stream.resolution)
                 path = os.path.join(settings.MEDIA_ROOT, stream.path(),
                                     'frames', "%dp"%height, "%s.jpg"%position)
-                if not os.path.exists(path) and stream.video:
-                    extract.frame(stream.video.path, path, position, height)
+                if not os.path.exists(path) and stream.media:
+                    extract.frame(stream.media.path, path, position, height)
                 if not os.path.exists(path):
                     return None
                 return path
@@ -1040,8 +1040,8 @@ class Item(models.Model):
                                            quote(filename.encode('utf-8')))
             video = "%s.webm" % base
             v = streams[0]
-            os.symlink(v.video.path, video)
-            size = v.video.size
+            os.symlink(v.media.path, video)
+            size = v.media.size
             duration = v.duration
         else:
             url =  "%s/torrent/" % self.get_absolute_url()
@@ -1050,8 +1050,8 @@ class Item(models.Model):
             for v in streams:
                 video = "%s/%s.Part %d.webm" % (base, filename, part)
                 part += 1
-                os.symlink(v.video.path, video)
-                size += v.video.size
+                os.symlink(v.media.path, video)
+                size += v.media.size
                 duration += v.duration
             video = base
 

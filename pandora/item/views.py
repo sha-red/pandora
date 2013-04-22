@@ -863,20 +863,15 @@ def video(request, id, resolution, format, index=None):
         index = int(index) - 1
     else:
         index = 0
-    #streams = Stream.object.filter(file__item__itemId=item.itemId,
-    #                               file__selected=True, file__part=index,
-    #                               resolution=resolution, format=format)
-    #if streams.count() != 1:
-    # reise Http404
     streams = Stream.objects.filter(file__item__itemId=item.itemId,
         file__selected=True,
         resolution=resolution, format=format).order_by('file__part', 'file__sort_path')
     if index + 1 > streams.count():
         raise Http404
     stream = streams[index]
-    if not stream.available or not stream.video:
+    if not stream.available or not stream.media:
         raise Http404
-    path = stream.video.path
+    path = stream.media.path
 
     #server side cutting
     #FIXME: this needs to join segments if needed
@@ -912,7 +907,7 @@ def video(request, id, resolution, format, index=None):
             response['Content-Disposition'] = "attachment; filename*=UTF-8''%s" % quote(filename.encode('utf-8'))
             return response
     if not settings.XSENDFILE and not settings.XACCELREDIRECT:
-        return redirect(stream.video.url)
+        return redirect(stream.media.url)
     response = HttpFileResponse(path)
     response['Cache-Control'] = 'public'
     return response
@@ -1052,7 +1047,7 @@ def atom_xml(request):
                 el.attrib['rel'] = 'enclosure'
                 el.attrib['type'] = 'video/%s' % s.format
                 el.attrib['href'] = '%s/%sp.%s' % (page_link, s.resolution, s.format)
-                el.attrib['length'] = '%s'%s.video.size
+                el.attrib['length'] = '%s'%s.media.size
 
         el = ET.SubElement(entry, "media:thumbnail")
         thumbheight = 96
