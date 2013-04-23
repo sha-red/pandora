@@ -68,11 +68,7 @@ def update_or_create_instance(volume, f):
 def update_files(user, volume, files):
     user = models.User.objects.get(username=user)
     volume, created = models.Volume.objects.get_or_create(user=user, name=volume)
-    all_files = []
-    folder_depth = settings.CONFIG['site']['folderdepth']
-    for f in files:
-        if len(f['path'].split('/')) == folder_depth:
-            all_files.append(f['oshash'])
+    all_files = [f['oshash'] for f in files]
 
     #remove deleted files
     removed = models.Instance.objects.filter(volume=volume).exclude(file__oshash__in=all_files)
@@ -80,8 +76,7 @@ def update_files(user, volume, files):
            files__instances__in=removed.filter(file__selected=True)).distinct().values('itemId')]
     removed.delete()
     for f in files:
-        if f['oshash'] in all_files:
-            update_or_create_instance(volume, f)
+        update_or_create_instance(volume, f)
     for i in ids:
         i = Item.objects.get(itemId=i)
         i.update_selected()

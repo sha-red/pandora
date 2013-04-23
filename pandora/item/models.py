@@ -72,13 +72,22 @@ def get_item(info, user=None, async=False):
         'title': info.get('title', ''),
         'director': info.get('director', []),
     }
+
     if filter(lambda k: k['id'] == 'year', settings.CONFIG['itemKeys']):
-        item_data['year'] =info.get('year', '')
+        item_data['year'] = info.get('year', '')
+    
+    #add additional item metadata parsed from path
+    for key in [i for i in info
+        if i in set([k['id'] for k in settings.CONFIG['itemKeys']]) \
+            and i not in ('language', ) \
+            and i not in item_data]:
+        item_data[key] = info[key]
 
     for key in ('episodeTitle', 'episodeDirector', 'episodeYear',
                 'season', 'episode', 'seriesTitle'):
         if key in info and info[key]:
             item_data[key] = info[key]
+
     if settings.USE_IMDB:
         if 'imdbId' in info and info['imdbId']:
             try:
