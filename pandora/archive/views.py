@@ -514,8 +514,10 @@ def findMedia(request):
             'range': array
         }
 
-            query: query object, more on query syntax at
+            query: item query object, more on query syntax at
                    https://wiki.0x2620.org/wiki/pandora/QuerySyntax
+                   get media for all items matching the given query
+
             sort: array of key, operator dics
                 [
                     {
