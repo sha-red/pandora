@@ -137,12 +137,45 @@ pandora.ui.filesDialog = function() {
                 }
             }),
 
+        $embedButton = Ox.Button({
+                title: 'embed',
+                tooltip: 'Embed',
+                type: 'image'
+            })
+            .css({
+                float: 'left',
+                margin: '4px 2px 4px 4px'
+            })
+            .bindEvent({
+                click: function() {
+                    
+                }
+            }),
+
         $itemLabel = Ox.Label({
                 textAlign: 'center',
                 title: 'No file selected',
-                width: itemWidth - 8
+                width: itemWidth - 48
             })
-            .css({margin: '4px'}),
+            .css({
+                float: 'left',
+                margin: '4px'
+            }),
+
+        $closeButton = Ox.Button({
+                title: 'close',
+                tooltip: 'Close',
+                type: 'image'
+            })
+            .css({
+                float: 'left',
+                margin: '4px 4px 4px 2px'
+            })
+            .bindEvent({
+                click: function() {
+                    $list.options({selected: []});
+                }
+            }),
 
         $item = Ox.Element().css({overflowY: 'scroll'}),
 
@@ -357,6 +390,7 @@ pandora.ui.filesDialog = function() {
                         $list.value(file.id, 'id', result.data.id);
                     }
                     Ox.Request.clearCache('findFiles');
+                    $list.reloadList();
                 });
             }
         });
@@ -403,7 +437,7 @@ pandora.ui.filesDialog = function() {
     function setWidth() {
         var size;
         itemWidth = $content.size(1);
-        $itemLabel.options({width: itemWidth - 8});
+        $itemLabel.options({width: itemWidth - 48});
         if (selected) {
             size = getPreviewSize(),
             $preview.options({
