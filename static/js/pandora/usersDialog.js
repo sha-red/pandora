@@ -40,7 +40,7 @@ pandora.ui.usersDialog = function() {
                 title: 'Include Guests',
                 value: false
             })
-            .css({float: 'left', margin: '4px 2px 4px 2px'})
+            .css({float: 'left', margin: '4px 2px'})
             .bindEvent({
                 change: function(data) {
                     data.value
@@ -54,7 +54,7 @@ pandora.ui.usersDialog = function() {
                 title: 'Include Robots',
                 value: false
             })
-            .css({float: 'left', margin: '4px 2px 4px 2px'})
+            .css({float: 'left', margin: '4px 2px'})
             .hide()
             .bindEvent({
                 change: updateList
