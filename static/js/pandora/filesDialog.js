@@ -148,7 +148,9 @@ pandora.ui.filesDialog = function() {
             })
             .bindEvent({
                 click: function() {
-                    
+                    pandora.ui.embedFileDialog(
+                        $list.options('selected')[0]
+                    ).open();
                 }
             }),
 
