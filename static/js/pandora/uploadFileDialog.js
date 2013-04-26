@@ -35,10 +35,13 @@ pandora.ui.uploadFileDialog = function(file, callback) {
                         title: 'Cancel Upload'
                     }).bindEvent({
                         click: function() {
-                            if (this.options('title') == 'Cancel Upload') {
-                                upload.abort();
-                            }
+                            var title = this.options('title');
                             $uploadDialog.close();
+                            if (title == 'Cancel Upload') {
+                                upload.abort();
+                            } else if (title == 'Done') {
+                                callback();
+                            }
                         }
                     })
                 ],
