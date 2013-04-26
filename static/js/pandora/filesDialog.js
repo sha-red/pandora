@@ -9,6 +9,35 @@ pandora.ui.filesDialog = function() {
         itemWidth = 272 + Ox.UI.SCROLLBAR_SIZE,
         selected = null,
 
+        $reloadButton = Ox.Button({
+                disabled: true,
+                title: 'redo',
+                tooltip: 'Reload',
+                type: 'image'
+            })
+            .css({float: 'left', margin: '4px 2px 4px 4px'})
+            .bindEvent({
+                click: function() {
+                    $reloadButton.options({disabled: true});
+                    Ox.Request.clearCache('findFiles');
+                    $list.reloadList(true);
+                }
+            }),
+
+        $userCheckbox = Ox.Checkbox({
+                title: 'Only show my files',
+                value: false
+            })
+            .css({float: 'left', margin: '4px 2px'})
+            .bindEvent({
+                change: function(data) {
+                    data.value
+                        ? $robotsCheckbox.show()
+                        : $robotsCheckbox.hide().options({value: false});
+                    updateList();
+                }
+            }),
+
         $findSelect = Ox.Select({
                 items: [
                     {id: 'all', title: 'Find: All'},
@@ -131,6 +160,9 @@ pandora.ui.filesDialog = function() {
                         + ' file' + (data.items == 1 ? '' : 's')
                     );
                 },
+                load: function() {
+                    $reloadButton.options({disabled: false});
+                },
                 select: function(data) {
                     selected = data.ids[0];
                     selectFile();
@@ -216,6 +248,8 @@ pandora.ui.filesDialog = function() {
                         elements: [
                             {
                                 element: Ox.Bar({size: 24})
+                                    .append($reloadButton)
+                                    .append($userCheckbox)
                                     .append($findElement),
                                 size: 24
                             },
@@ -462,7 +496,8 @@ pandora.ui.filesDialog = function() {
     }
 
     function updateList() {
-        var key = $findSelect.value(),
+        var user = $userCheckbox.value(),
+            key = $findSelect.value(),
             value = $findInput.value(),
             query = {
                 conditions: value
@@ -473,7 +508,13 @@ pandora.ui.filesDialog = function() {
                     : [],
                 operator: '|'
             };
-        $list.options({query: query});
+        $list.options({query: user ? {
+            conditions: [
+                {key: 'user', value: pandora.user.username, operator: '='},
+                query
+            ],
+            operator: '&'
+        } : query});
     }
 
     function uploadFile(data) {
