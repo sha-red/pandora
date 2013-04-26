@@ -157,7 +157,7 @@ pandora.ui.filesDialog = function() {
         $itemLabel = Ox.Label({
                 textAlign: 'center',
                 title: 'No file selected',
-                width: itemWidth - 48
+                width: getLabelWidth()
             })
             .css({
                 float: 'left',
@@ -309,6 +309,10 @@ pandora.ui.filesDialog = function() {
         }).open();
     }
 
+    function getLabelWidth() {
+        return $content.size(1) - (selected ? 48 : 8);
+    }
+
     function getPreviewSize() {
         var ratio = $list.value(selected, 'ratio'),
             height = ratio < 1 ? 256 : 256 / ratio,
@@ -417,6 +421,8 @@ pandora.ui.filesDialog = function() {
         var file = $list.value(selected),
             editable = file.user == pandora.user.username
                 || pandora.site.capabilities.canEditFiles[pandora.user.level];
+        $embedButton[selected ? 'show' : 'hide']();
+        $closeButton[selected ? 'show' : 'hide']();
         setLabel();
         $item.empty();
         if (selected) {
@@ -432,14 +438,14 @@ pandora.ui.filesDialog = function() {
         $itemLabel.options({
             title: selected
                 ? selected.split(':').slice(1).join(':')
-                : 'No file selected'
+                : 'No file selected',
+            width: getLabelWidth()
         });
     }
 
     function setWidth() {
         var size;
-        itemWidth = $content.size(1);
-        $itemLabel.options({width: itemWidth - 48});
+        $itemLabel.options({width: getLabelWidth()});
         if (selected) {
             size = getPreviewSize(),
             $preview.options({
