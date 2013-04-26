@@ -21,10 +21,7 @@ pandora.ui.deleteFileDialog = function(file, callback) {
                         that.close();
                         pandora.api.removeFile({
                             id: file
-                        }, function(result) {
-                            Ox.Request.clearCache('findFiles');
-                            callback();
-                        });
+                        }, callback);
                     }
                 })
             ],
