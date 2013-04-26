@@ -147,9 +147,9 @@ pandora.ui.editor = function(data) {
                     }, callback);
                 }
             },
-            embedselection: function(data) {
-                pandora.$ui.embedDialog && pandora.$ui.embedDialog.remove();
-                pandora.$ui.embedDialog = pandora.ui.embedDialog(data).open();
+            embedselection: function() {
+                pandora.$ui.embedVideoDialog && pandora.$ui.embedVideoDialog.remove();
+                pandora.$ui.embedVideoDialog = pandora.ui.embedVideoDialog().open();
             },
             find: function(data) {
                 pandora.UI.set('itemFind', data.find);
