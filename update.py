@@ -52,7 +52,7 @@ repos = {
 }
 
 def reload_notice(base):
-    print '\nYou might need to restart pandora to finish the update:\n\t"sudo %s/reload.sh"\n' % base
+    print '\nYou might need to restart pandora to finish the update:\n\t"sudo %s/ctl reload"\n' % base
 
 if __name__ == "__main__":
     base = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))

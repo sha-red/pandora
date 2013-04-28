@@ -1,12 +1,13 @@
 #!/bin/sh
-if [ `whoami` != 'root' ]; then
-    echo you have to be root or run with sudo
-    exit 1
-fi
 if [ -z "$1" ]; then
-    action=reload
+    echo "Usage: $0 (start|stop|restart|reload)"
+    exit 1
 else
     action="$1"
+fi
+if [ `whoami` != 'root' ]; then
+    echo you have to be root or run $0 with sudo
+    exit 1
 fi
 for service in pandora pandora-tasks pandora-encoding pandora-cron; do
     service $service $action
