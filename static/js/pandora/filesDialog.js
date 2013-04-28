@@ -186,16 +186,6 @@ pandora.ui.filesDialog = function() {
                 }
             }),
 
-        $itemLabel = Ox.Label({
-                textAlign: 'center',
-                title: 'No file selected',
-                width: getLabelWidth()
-            })
-            .css({
-                float: 'left',
-                margin: '4px'
-            }),
-
         $closeButton = Ox.Button({
                 title: 'close',
                 tooltip: 'Close',
@@ -292,6 +282,16 @@ pandora.ui.filesDialog = function() {
             ],
             orientation: 'horizontal'
         }),
+
+        $itemLabel = Ox.Label({
+                textAlign: 'center',
+                title: 'No file selected',
+                width: getLabelWidth()
+            })
+            .css({
+                float: 'left',
+                margin: '4px'
+            }),
 
         that = Ox.Dialog({
                 buttons: [
@@ -521,17 +521,17 @@ pandora.ui.filesDialog = function() {
         pandora.ui.uploadFileDialog(data.files[0], function(file) {
             Ox.Request.clearCache('findFiles');
             pandora.api.findFiles({
-                ids: [file.id],
-                query: $list.options.query,
-                sort: $list.options.sort,
+                positions: [file.id],
+                query: $list.options('query'),
+                sort: $list.options('sort'),
             }, function(data) {
                 $list.bindEventOnce({
                     load: function() {
-                        list.options({selected: [file.id]});
+                        $list.options({selected: [file.id]});
                         // selectFile(file.id);
                     }
                 });
-                if (data.positions[file.id] > -1) {
+                if (data.data.positions[file.id] > -1) {
                     $list.reloadList();
                 } else {
                     $list.options({

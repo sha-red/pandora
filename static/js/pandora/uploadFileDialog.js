@@ -7,6 +7,11 @@ pandora.ui.uploadFileDialog = function(file, callback) {
 
         extensions = ['gif', 'jpg', 'jpeg', 'pdf', 'png'],
 
+        filename = file.name.split('.').slice(0, -1).join('.') + '.'
+            + (extension == 'jpeg' ? 'jpg' : extension),
+
+        id = pandora.user.username + ':' + filename,
+
         upload,
 
         $errorDialog,
@@ -40,7 +45,9 @@ pandora.ui.uploadFileDialog = function(file, callback) {
                             if (title == 'Cancel Upload') {
                                 upload.abort();
                             } else if (title == 'Done') {
-                                callback();
+                                callback({
+                                    id: id
+                                });
                             }
                         }
                     })
@@ -55,9 +62,7 @@ pandora.ui.uploadFileDialog = function(file, callback) {
                 open: function() {
                     upload = pandora.chunkupload({
                             data: {
-                                filename: extension == 'jpeg'
-                                    ? file.name.split('.').slice(0, -1).join('.') + '.jpg'
-                                    : file.name
+                                filename: filename
                             },
                             file: file,
                             url: '/api/upload/file/',
@@ -93,11 +98,10 @@ pandora.ui.uploadFileDialog = function(file, callback) {
                 range: [0, 1],
                 sort: [{key: 'name', operator: '+'}]
             }, function(result) {
-                var id = pandora.user.name + ':' + file.name;
                 if (result.data.items.length) {
                     errorDialog(
                         'The file ' + id + ' already exists' + (
-                            file.name == result.data.items[0].id
+                            filename == result.data.items[0].id
                                 ? ''
                                 : ' as ' + result.data.items[0].id
                         ) + '.'

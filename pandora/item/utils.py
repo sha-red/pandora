@@ -68,8 +68,8 @@ def get_positions(ids, pos):
     for i in pos:
         try:
             positions[i] = ids.index(i)
-        except:                         
-            pass                                    
+        except:
+            pass
     return positions
 
 def get_by_key(objects, key, value):
