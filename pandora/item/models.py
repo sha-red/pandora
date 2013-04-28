@@ -74,7 +74,7 @@ def get_item(info, user=None, async=False):
     }
 
     if filter(lambda k: k['id'] == 'year', settings.CONFIG['itemKeys']):
-        item_data['year'] = info.get('year', '')
+        item_data['year'] = info.get('year', '') or ''
     
     #add additional item metadata parsed from path
     for key in [i for i in info
@@ -1167,7 +1167,8 @@ class Item(models.Model):
                     data = f.read()
                     if data:
                         self.save_poster(data)
-            poster = self.poster.path
+            poster = self.path('poster.jpg')
+            poster = os.path.abspath(os.path.join(settings.MEDIA_ROOT, poster))
             for f in glob(poster.replace('.jpg', '*.jpg')):
                 if f != poster:
                     try:
