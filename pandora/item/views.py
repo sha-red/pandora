@@ -856,6 +856,10 @@ def torrent(request, id, filename=None):
     return response
 
 def video(request, id, resolution, format, index=None):
+    resolution = int(resolution)
+    resolutions = sorted(settings.CONFIG['video']['resolutions'])
+    if resolution not in resolutions:
+        raise Http404
     item = get_object_or_404(models.Item, itemId=id)
     if not item.access(request.user):
         return HttpResponseForbidden()
@@ -863,12 +867,10 @@ def video(request, id, resolution, format, index=None):
         index = int(index) - 1
     else:
         index = 0
-    streams = Stream.objects.filter(file__item__itemId=item.itemId,
-        file__selected=True,
-        resolution=resolution, format=format).order_by('file__part', 'file__sort_path')
+    streams = item.streams()
     if index + 1 > streams.count():
         raise Http404
-    stream = streams[index]
+    stream = streams[index].get(resolution, format)
     if not stream.available or not stream.media:
         raise Http404
     path = stream.media.path

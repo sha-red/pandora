@@ -466,28 +466,40 @@ class Stream(models.Model):
     def __unicode__(self):
         return u"%s/%s" % (self.file, self.name())
 
+    def get(self, resolution, format):
+        streams = []
+        if self.format == format:
+            streams.append(self)
+        for stream in self.derivatives.filter(format=format).order_by('-resolution'):
+            streams.append(stream)
+        stream = streams.pop(0)
+        while streams and streams[0].resolution >= resolution:
+            stream = streams.pop(0)
+        return stream
+
     def path(self, name=''):
         return self.file.get_path(name)
 
     def extract_derivatives(self, rebuild=False):
         config = settings.CONFIG['video']
         for resolution in sorted(config['resolutions'], reverse=True):
-            for f in config['formats']:
-                derivative, created = Stream.objects.get_or_create(file=self.file,
-                                                  resolution=resolution, format=f)
-                
-                name = derivative.name()
-                name = os.path.join(os.path.dirname(self.media.name), name)
-                if created:
-                    derivative.source = self
-                    derivative.save()
-                    derivative.media.name = name
-                    derivative.encode()
-                    derivative.save()
-                elif rebuild or not derivative.available:
-                    if not derivative.media:
+            if resolution <= self.resolution:
+                for f in config['formats']:
+                    derivative, created = Stream.objects.get_or_create(file=self.file,
+                                                      resolution=resolution, format=f)
+                    
+                    name = derivative.name()
+                    name = os.path.join(os.path.dirname(self.media.name), name)
+                    if created:
+                        derivative.source = self
+                        derivative.save()
                         derivative.media.name = name
-                    derivative.encode()
+                        derivative.encode()
+                        derivative.save()
+                    elif rebuild or not derivative.available:
+                        if not derivative.media:
+                            derivative.media.name = name
+                        derivative.encode()
         return True
 
     def encode(self):
