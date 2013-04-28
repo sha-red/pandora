@@ -23,6 +23,6 @@ class Command(BaseCommand):
     def handle(self, **options):
         for s in models.Stream.objects.filter(source=None):
             if options['forground']:
-                extract_derivatives(s.item.id, options['rebuild'])
+                extract_derivatives(s.file.id, options['rebuild'])
             else:
-                extract_derivatives.delay(s.item.id, options['rebuild'])
+                extract_derivatives.delay(s.file.id, options['rebuild'])
