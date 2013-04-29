@@ -22,7 +22,6 @@ def get_or_create_file(volume, f, user, item=None):
         file = models.File()
         file.oshash = f['oshash']
         file.path = f['path']
-        file.path = f['path']
         if item:
             file.item = item
         else:
