@@ -70,7 +70,8 @@ pandora.validateNewPassword = function(value, callback) {
     callback({
         message: '',
         // message: 'Missing password',
-        valid: value.length > 0
+        valid: value.length > 0,
+        value: value
     });
 };
 
@@ -78,7 +79,8 @@ pandora.validatePassword = function(value, callback) {
     callback({
         message: '',
         // message: 'Missing password',
-        valid: value.length > 0
+        valid: value.length > 0,
+        value: value
     });
 };
 
