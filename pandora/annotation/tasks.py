@@ -25,7 +25,7 @@ def update_matches(id, type):
         if p.annotations.exclude(id=id).count() == 0:
             p.delete()
     if a.get_layer().get('type') == type and a_matches.count() == 0:
-        a.places.add(Model.get_or_create(a.value))
+        a_matches.add(Model.get_or_create(a.value))
         for p in a_matches.all():
             p.update_matches()
     
