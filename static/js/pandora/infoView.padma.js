@@ -578,6 +578,8 @@ pandora.ui.infoView = function(data) {
     }
 
     function formatKey(key, isStatistics) {
+        var item = Ox.getObjectById(pandora.site.itemKeys, key);
+        key = item ? item.title : key;
         return isStatistics
             ? $('<div>').css({marginBottom: '4px', fontWeight: 'bold'})
                 .html(Ox.toTitleCase(key).replace(' Per ', ' per '))
