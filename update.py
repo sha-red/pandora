@@ -56,7 +56,7 @@ def reload_notice(base):
 
 if __name__ == "__main__":
     base = os.path.normpath(os.path.abspath(os.path.dirname(__file__)))
-    if len(sys.argv) == 2 and sys.argv[1] == 'database':
+    if len(sys.argv) == 2 and sys.argv[1] in ('database', 'db'):
         os.chdir(join(base, 'pandora'))
         if get('./manage.py', 'south_installed').strip() == 'yes':
             run('./manage.py', 'syncdb')
@@ -119,6 +119,6 @@ if __name__ == "__main__":
             print 'pan.do/ra is up to date, run "./update dev" to update to the current development version'
         diff = get('./manage.py', 'sqldiff', '-a').strip()
         if diff != '-- No differences':
-            print 'Database has changed, please make a backup and run ./update.py database'
+            print 'Database has changed, please make a backup and run ./update.py db'
         elif current != new:
             reload_notice(base)
