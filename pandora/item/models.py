@@ -1275,6 +1275,9 @@ class Item(models.Model):
         icon = self.path('icon.jpg')
         self.icon.name = icon
         timeline = '%stimelineantialias64p.jpg' % self.timeline_prefix
+        audio_timeline = '%stimelineaudio64p.jpg' % self.timeline_prefix
+        if not os.path.exists(timeline) and os.path.exists(audio_timeline):
+            timeline = audio_timeline
         cmd = [settings.ITEM_ICON,
            '-i', self.icon.path
         ]
