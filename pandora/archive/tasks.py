@@ -113,7 +113,7 @@ def extract_stream(fileId):
             format=config['formats'][0])
         if created:
             models.File.objects.filter(id=fileId).update(encoding=True)
-            stream.video.name = stream.path(stream.name())
+            stream.media.name = stream.path(stream.name())
             stream.encode()
             if stream.available:
                 stream.make_timeline()
