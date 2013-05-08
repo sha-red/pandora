@@ -425,7 +425,7 @@ pandora.ui.statisticsDialog = function() {
                                 top: top + 'px'
                             })
                             .appendTo($content);
-                        top += Ox.len(data[mode][key]) * 16 + 32;
+                        top += Math.min(Ox.len(data[mode][key]), 1000) * 16 + 32;
                     });
                 } else if (id == 'platforms') {
                     ['', 'version'].forEach(function(version, i) {
