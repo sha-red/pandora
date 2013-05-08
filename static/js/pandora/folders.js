@@ -287,10 +287,10 @@ pandora.ui.folders = function() {
         //$sections.push(pandora.$ui.section[i]);
         pandora.$ui.folderList[folder.id] = pandora.ui.folderList(folder.id)
             .bindEvent({
-                selectafter: function() {
+                selectnext: function() {
                     // ...
                 },
-                selectbefore: function() {
+                selectprevious: function() {
                     // ...
                 }
             })
