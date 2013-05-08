@@ -39,7 +39,7 @@ pandora.ui.findElement = function() {
                                 }),
                                 [{}, {
                                     id: 'advanced',
-                                    title: 'Find: Advanced'
+                                    title: 'Find: Advanced...'
                                 }]
                             ),
                             overlap: 'right',
