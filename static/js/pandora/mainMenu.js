@@ -158,7 +158,6 @@ pandora.ui.mainMenu = function() {
                                 return {id: theme, title: Ox.Theme.getThemeData(theme).themeName, checked: ui.theme == theme}
                             }) }
                         ] },
-                        {},
                         { id: 'locale', title: Ox._('Language'), items: [
                             { group: 'setlocale', min: 1, max: 1, items: Object.keys(Ox.LOCALE_NAMES).map(function(locale) {
                                 return {id: locale, title: Ox.LOCALE_NAMES[locale], checked: ui.locale == locale}
