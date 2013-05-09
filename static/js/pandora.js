@@ -228,7 +228,7 @@ appPanel
                 document: $(document),
                 window: $(window)
                     .on({
-                        beforeunload: pandora.beforeunloadWindow,
+                        beforeunload: pandora.beforeUnloadWindow,
                         resize: pandora.resizeWindow,
                         unload: pandora.unloadWindow
                     })

@@ -157,6 +157,7 @@ pandora.addList = function() {
         }).reloadList();
     }
 };
+
 pandora.addText = function(options) {
     var $folderList = pandora.$ui.folderList.personal;
     options = options || {};
@@ -176,6 +177,13 @@ pandora.addText = function(options) {
         }).reloadList();
     }
 }
+
+pandora.beforeUnloadWindow = function() {
+    if (pandora.firefogg)
+        return Ox._("Encoding is currently running\nDo you want to leave this page?");
+    //prevent error dialogs on unload
+    pandora.isUnloading = true;
+};
 
 pandora.changeFolderItemStatus = function(id, status, callback) {
     var ui = pandora.user.ui,
@@ -1463,18 +1471,11 @@ pandora.selectList = function() {
 };
 
 pandora.setLocale = function(locale, callback) {
-    Ox.setLocale(locale, locale && locale != 'en'
-        ? '/static/json/locale.' + locale + '.json'
-        : void 0, function(result) {
-        callback(result);
-    });
-}
-
-pandora.beforeunloadWindow = function() {
-    if (pandora.firefogg)
-        return Ox._("Encoding is currently running\nDo you want to leave this page?");
-    //prevent error dialogs on unload
-    pandora.isUnloading = true;
+    Ox.setLocale(
+        locale,
+        locale && locale != 'en' ? '/static/json/locale.' + locale + '.json' : null,
+        callback
+    );
 };
 
 pandora.unloadWindow = function() {
