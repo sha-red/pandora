@@ -19,7 +19,7 @@ pandora.ui.idDialog = function(data) {
                     Ox.Button({
                             distabled: true,
                             id: 'switch',
-                            title: 'Update Metadata...'
+                            title: Ox._('Update Metadata...')
                         })
                         .bindEvent({
                             click: function() {
@@ -30,7 +30,7 @@ pandora.ui.idDialog = function(data) {
                     {},
                     Ox.Button({
                             id: 'cancel',
-                            title: 'Don\'t Update'
+                            title: Ox._('Don\'t Update')
                         })
                         .bindEvent({
                             click: function() {
@@ -40,7 +40,7 @@ pandora.ui.idDialog = function(data) {
                     Ox.Button({
                             disabled: true,
                             id: 'update',
-                            title: 'Update IMDb ID'
+                            title: Ox._('Update IMDb ID')
                         })
                         .bindEvent({
                             click: updateId
@@ -53,7 +53,7 @@ pandora.ui.idDialog = function(data) {
                 minHeight: 256,
                 minWidth: 512,
                 removeOnClose: true,
-                title: 'Update IMDb ID',
+                title: Ox._('Update IMDb ID'),
                 width: dialogWidth
             })
             .bindEvent({
@@ -154,7 +154,7 @@ pandora.ui.idDialog = function(data) {
                     if (checkbox.id != 'none') {
                         Ox.Button({
                                 title: 'arrowRight',
-                                tooltip: 'View on IMDb',
+                                tooltip: Ox._('View on IMDb'),
                                 type: 'image'
                             })
                             .css({

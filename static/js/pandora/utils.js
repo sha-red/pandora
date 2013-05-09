@@ -433,33 +433,33 @@ pandora.enableDragAndDrop = function($list, canMove) {
     function getTitle() {
         var image, text;
         if (drag.action == 'move' && drag.source.user != pandora.user.username) {
-            image = 'symbolClose'
-            text = 'You can only remove ' + pandora.site.itemName.plural.toLowerCase()
-                + '<br/>from your own lists.';
+            image = 'symbolClose';
+            text = Ox._('You can only remove {0}<br/>from your own lists.',
+                [pandora.site.itemName.plural.toLowerCase()]);
         } else if (drag.action == 'move' && drag.source.type == 'smart') {
             image = 'symbolClose';
-            text = 'You can\'t remove ' + pandora.site.itemName.plural.toLowerCase()
-                + '<br/>from smart lists.';
+            text = Ox._('You can\'t remove {0}<br/>from smart lists.',
+                    [pandora.site.itemName.plural.toLowerCase()]);
         } else if (drag.target && drag.target.user != pandora.user.username) {
-            image = 'symbolClose'
-            text = 'You can only ' + drag.action + ' ' + pandora.site.itemName.plural.toLowerCase()
-                + '<br/>to your own lists';
+            image = 'symbolClose';
+            text = Ox._('You can only {0} {1}<br/>to your own lists',
+                    [drag.action, pandora.site.itemName.plural.toLowerCase()]);
         } else if (drag.target && drag.target.type == 'smart') {
-            image = 'symbolClose'
-            text = 'You can\'t ' + drag.action + ' ' + pandora.site.itemName.plural.toLowerCase()
-                + '<br/>to smart lists';
+            image = 'symbolClose';
+            text = Ox._('You can\'t {0} {1}<br/>to smart lists',
+                    [drag.action, pandora.site.itemName.plural.toLowerCase()]);
         } else {
             image = drag.action == 'copy' ? 'symbolAdd' : 'symbolRemove';
-            text = Ox.toTitleCase(drag.action) + ' ' + (
+            text = Ox._(Ox.toTitleCase(drag.action)) + ' ' + (
                 Ox.isString(drag.item)
                 ? '"' + drag.item + '"'
                 : drag.item + ' ' + pandora.site.itemName[
                     drag.item == 1 ? 'singular' : 'plural'
                 ].toLowerCase()
-            ) + '</br> to ' + (
+            ) + '<br/>' + (
                 drag.target && !drag.target.selected
-                ? 'the list "' + Ox.encodeHTMLEntities(drag.target.name) + '"'
-                : (pandora.user.ui._list ? 'another' : 'a') + ' list'
+                ? Ox._('to the list "{0}"', [Ox.encodeHTMLEntities(drag.target.name)])
+                : Ox._('to ' + (pandora.user.ui._list ? 'another' : 'a') + ' list')
             );
         }
         return $('<div>')
@@ -584,14 +584,14 @@ pandora.getClipsQuery = function() {
         var parts = [pandora.site.site.name];
         if (pandora.user.ui.section == 'items') {
             if (!pandora.user.ui.item) {
-                pandora.user.ui._list && parts.push('List ' + pandora.user.ui._list);
-                parts.push(Ox.toTitleCase(pandora.user.ui.listView) + ' View');
+                pandora.user.ui._list && parts.push(Ox._('List {0}', [pandora.user.ui._list]));
+                parts.push(Ox._(Ox.toTitleCase(pandora.user.ui.listView) + ' View'));
             } else {
                 parts.push(itemTitles[pandora.user.ui.item] || pandora.user.ui.item);
-                parts.push(Ox.toTitleCase(pandora.user.ui.itemView) + ' View');
+                parts.push(Ox._(Ox.toTitleCase(pandora.user.ui.itemView) + ' View'));
             }
         } else if (pandora.user.ui.section == 'texts') {
-            parts.push(pandora.user.ui.text ? pandora.user.ui.text : 'Texts');
+            parts.push(pandora.user.ui.text ? pandora.user.ui.text : Ox._('Texts'));
         }
         return parts.join(' - ');
     };
@@ -602,7 +602,7 @@ pandora.getEditTooltip = function(title) {
         var $target = $(e.target);
         return (
             $target.is('a') || $target.parents('a').length
-            ? 'Shift+doubleclick to edit' : 'Doubleclick to edit'
+            ? Ox._('Shift+doubleclick to edit') : Ox._('Doubleclick to edit')
         ) + (title ? ' ' + title : '');
     }
 };
@@ -903,15 +903,15 @@ pandora.getListData = function(list) {
 pandora.getPageTitle = function(stateOrURL) {
     var pages = [
             {id: '', title: ''},
-            {id: 'api', title: 'API Documentation'},
-            {id: 'help', title: 'Help'},
+            {id: 'api', title: Ox._('API Documentation')},
+            {id: 'help', title: Ox._('Help')},
             {id: 'home', title: ''},
-            {id: 'preferences', title: 'Preferences'},
-            {id: 'signin', title: 'Sign In'},
-            {id: 'signout', title: 'Sign Out'},
-            {id: 'signup', title: 'Sign Up'},
-            {id: 'software', title: 'Software'},
-            {id: 'tv', title: 'TV'}
+            {id: 'preferences', title: Ox._('Preferences')},
+            {id: 'signin', title: Ox._('Sign In')},
+            {id: 'signout', title: Ox._('Sign Out')},
+            {id: 'signup', title: Ox._('Sign Up')},
+            {id: 'software', title: Ox._('Software')},
+            {id: 'tv', title: Ox._('TV')}
         ].concat(pandora.site.sitePages),
         page = Ox.getObjectById(
             pages,
@@ -1046,7 +1046,7 @@ pandora.getStatusText = function(data) {
         canSeeFiles = pandora.site.capabilities.canSeeFiles[pandora.user.level],
         canSeeSize = pandora.site.capabilities.canSeeSize[pandora.user.level],
         itemName = ui.listView == 'clip'
-            ? (data.items == 1 ? 'Clip' : 'Clips')
+            ? (data.items == 1 ? Ox._('Clip') : Ox._('Clips'))
             : (pandora.site.itemName[data.items == 1 ? 'singular' : 'plural']),
         parts = [];
     parts.push(Ox.formatNumber(data.items) + ' '+ itemName);
@@ -1057,7 +1057,7 @@ pandora.getStatusText = function(data) {
     }
     if (canSeeFiles) {
         data.files && parts.push(
-            Ox.formatNumber(data.files) + ' file' + (data.files == 1 ? '' : 's')
+            Ox.formatCount(data.files, 'file')
         );
         data.duration && parts.push(Ox.formatDuration(data.duration));
     }
@@ -1462,9 +1462,17 @@ pandora.selectList = function() {
     }
 };
 
+pandora.setLocale = function(locale, callback) {
+    Ox.setLocale(locale, locale && locale != 'en'
+        ? '/static/json/locale.' + locale + '.json'
+        : void 0, function(result) {
+        callback(result);
+    });
+}
+
 pandora.beforeunloadWindow = function() {
     if (pandora.firefogg)
-        return "Encoding is currently running\nDo you want to leave this page?";
+        return Ox._("Encoding is currently running\nDo you want to leave this page?");
     //prevent error dialogs on unload
     pandora.isUnloading = true;
 };

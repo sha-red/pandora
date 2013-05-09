@@ -3,8 +3,8 @@
 pandora.ui.preferencesDialog = function() {
 
     var tabs = [
-            {id: 'account', title: 'Account', selected: true},
-            {id: 'advanced', title: 'Advanced'}
+            {id: 'account', title: Ox._('Account'), selected: true},
+            {id: 'advanced', title: Ox._('Advanced')}
         ],
         $tabPanel = Ox.TabPanel({
             content: function(id) {
@@ -28,7 +28,7 @@ pandora.ui.preferencesDialog = function() {
                                 Ox.Input({
                                     disabled: true,
                                     id: 'username',
-                                    label: 'Username',
+                                    label: Ox._('Username'),
                                     labelWidth: 120,
                                     value: pandora.user.username,
                                     width: 320
@@ -36,7 +36,7 @@ pandora.ui.preferencesDialog = function() {
                                 Ox.Input({
                                         autovalidate: /.+/,
                                         id: 'password',
-                                        label: 'New Password',
+                                        label: Ox._('New Password'),
                                         labelWidth: 120,
                                         type: 'password',
                                         validate: pandora.validateNewPassword,
@@ -50,7 +50,7 @@ pandora.ui.preferencesDialog = function() {
                                 Ox.Input({
                                         autovalidate: pandora.autovalidateEmail,
                                         id: 'email',
-                                        label: 'E-Mail Address',
+                                        label: Ox._('E-Mail Address'),
                                         labelWidth: 120,
                                         validate: pandora.validateNewEmail,
                                         value: pandora.user.email,
@@ -67,16 +67,16 @@ pandora.ui.preferencesDialog = function() {
                                 Ox.Input({
                                     disabled: true,
                                     id: 'level',
-                                    label: 'Level',
+                                    label: Ox._('Level'),
                                     labelWidth: 120,
                                     value: Ox.toTitleCase(pandora.user.level),
                                     width: 320
                                 }),
                                 Ox.Checkbox({
                                         id: 'newsletter',
-                                        label: 'Newsletter',
+                                        label: Ox._('Newsletter'),
                                         labelWidth: 120,
-                                        title: pandora.user.newsletter ? 'Subscribed' : 'Unsubscribed',
+                                        title: pandora.user.newsletter ? Ox._('Subscribed') : Ox._('Unsubscribed'),
                                         value: pandora.user.newsletter,
                                         width: 320
                                     })
@@ -84,7 +84,7 @@ pandora.ui.preferencesDialog = function() {
                                         change: function(data) {
                                             pandora.user.newsletter = data.value;
                                             this.options({
-                                                title: pandora.user.newsletter ? 'Subscribed' : 'Unsubscribed'
+                                                title: pandora.user.newsletter ? Ox._('Subscribed') : Ox._('Unsubscribed')
                                             });
                                             pandora.api.editPreferences({
                                                 newsletter: pandora.user.newsletter 
@@ -99,7 +99,7 @@ pandora.ui.preferencesDialog = function() {
                 } else {
                     $content.append(
                         Ox.Button({
-                            title: 'Reset UI Settings...',
+                            title: Ox._('Reset UI Settings...'),
                             width: 160
                         })
                         .bindEvent({
@@ -111,7 +111,7 @@ pandora.ui.preferencesDialog = function() {
                     );
                     $content.append(
                         Ox.Button({
-                            title: 'Run Script on Load...',
+                            title: Ox._('Run Script on Load...'),
                             width: 160
                         })
                         .bindEvent({
@@ -130,7 +130,7 @@ pandora.ui.preferencesDialog = function() {
             buttons: [
                 Ox.Button({
                     id: 'signout',
-                    title: 'Sign Out...'
+                    title: Ox._('Sign Out...')
                 }).bindEvent({
                     click: function() {
                         pandora.UI.set({page: 'signout'});
@@ -139,7 +139,7 @@ pandora.ui.preferencesDialog = function() {
                 {},
                 Ox.Button({
                     id: 'done',
-                    title: 'Done'
+                    title: Ox._('Done')
                 }).bindEvent({
                     click: function() {
                         $dialog.close();
@@ -151,7 +151,7 @@ pandora.ui.preferencesDialog = function() {
             height: 192,
             minHeight: 192,
             minWidth: 432,
-            title: 'Preferences',
+            title: Ox._('Preferences'),
             width: 432
         })
         .bindEvent({

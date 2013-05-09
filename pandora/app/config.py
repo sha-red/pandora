@@ -7,6 +7,7 @@ import sys
 import shutil
 import time
 import thread
+from glob import glob
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -192,6 +193,20 @@ def update_static():
                 shutil.copyfile(site, image)
             else:
                 shutil.copyfile(pandora, image)
+    #locale
+    for f in sorted(glob(os.path.join(settings.STATIC_ROOT, 'json/locale.pandora.*.json'))):
+        with open(f) as fd:
+            locale = json.load(fd)
+        site_locale = f.replace('pandora', settings.CONFIG['site']['id'])
+        locale_file = f.replace('.pandora', '')
+        if os.path.exists(site_locale):
+            with open(f) as site_locale:
+                locale.update(json.load(fd))
+        print 'write', locale_file
+        with open(locale_file, 'w') as fd:
+            json.dump(locale, fd)
+        os.system('gzip -9 -c "%s" > "%s.gz"' % (locale_file, locale_file))
+
 
     #download geo data
     update_geoip()

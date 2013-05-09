@@ -310,56 +310,55 @@ appPanel
         });
 
         // set up url controller
-
-        pandora.URL.init().parse(function() {
-
-            if (data.browserSupported) {
-                stopAnimation();
-                $('#loadingScreen').remove();
-            } else {
-                loadBrowserMessage();
-            }
-
-            Ox.Theme(pandora.user.ui.theme);
-            if (isEmbed) {
-                pandora.$ui.embedPanel = pandora.ui.embedPanel().display();
-                Ox.$parent.onMessage({
-                    settheme: function(data) {
-                        if (Ox.contains(pandora.site.themes, data.theme)) {
-                            Ox.Theme(data.theme);
-                        }
-                    },
-                    seturl: function(data) {
-                        if (pandora.isEmbedURL(data.url)) {
-                            pandora.URL.push(data.url);
-                        }
-                    }
-                });
-            } else if (isPrint) {
-                pandora.$ui.printView = pandora.ui.printView().display();
-            } else {
-                pandora.$ui.appPanel = pandora.ui.appPanel().display();
-                Ox.Request.requests() && pandora.$ui.loadingIcon.start();
-                pandora.$ui.body.ajaxStart(pandora.$ui.loadingIcon.start);
-                pandora.$ui.body.ajaxStop(pandora.$ui.loadingIcon.stop);
-                Ox.Request.bindEvent({
-                    error: pandora.ui.errorDialog,
-                    request: function(data) {
-                        pandora.$ui.loadingIcon.options({
-                            tooltip: (data.requests || 'No')
-                                + ' request'
-                                + (data.requests == 1 ? '' : 's')
-                        });
-                    }
-                });
-                pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
-                if (getLocalStorage('pandora.onload')) {
-                    try {
-                        eval(localStorage['pandora.onload'])
-                    } catch(e) {}
+        pandora.setLocale(pandora.user.ui.locale, function() {
+            pandora.URL.init().parse(function() {
+                if (data.browserSupported) {
+                    stopAnimation();
+                    $('#loadingScreen').remove();
+                } else {
+                    loadBrowserMessage();
                 }
-            }
 
+                Ox.Theme(pandora.user.ui.theme);
+                if (isEmbed) {
+                    pandora.$ui.embedPanel = pandora.ui.embedPanel().display();
+                    Ox.$parent.onMessage({
+                        settheme: function(data) {
+                            if (Ox.contains(pandora.site.themes, data.theme)) {
+                                Ox.Theme(data.theme);
+                            }
+                        },
+                        seturl: function(data) {
+                            if (pandora.isEmbedURL(data.url)) {
+                                pandora.URL.push(data.url);
+                            }
+                        }
+                    });
+                } else if (isPrint) {
+                    pandora.$ui.printView = pandora.ui.printView().display();
+                } else {
+                    pandora.$ui.appPanel = pandora.ui.appPanel().display();
+                    Ox.Request.requests() && pandora.$ui.loadingIcon.start();
+                    pandora.$ui.body.ajaxStart(pandora.$ui.loadingIcon.start);
+                    pandora.$ui.body.ajaxStop(pandora.$ui.loadingIcon.stop);
+                    Ox.Request.bindEvent({
+                        error: pandora.ui.errorDialog,
+                        request: function(data) {
+                            pandora.$ui.loadingIcon.options({
+                                tooltip: (data.requests || 'No')
+                                    + ' request'
+                                    + (data.requests == 1 ? '' : 's')
+                            });
+                        }
+                    });
+                    pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
+                    if (getLocalStorage('pandora.onload')) {
+                        try {
+                            eval(localStorage['pandora.onload'])
+                        } catch(e) {}
+                    }
+                }
+            });
         });
 
     }

@@ -7,7 +7,7 @@ pandora.ui.resetUIDialog = function(data) {
         buttons: [
             Ox.Button({
                     id: 'cancel',
-                    title: 'Don\'t Reset'
+                    title: Ox._('Don\'t Reset')
                 })
                 .bindEvent({
                     click: function() {
@@ -16,7 +16,7 @@ pandora.ui.resetUIDialog = function(data) {
                 }),
             Ox.Button({
                     id: 'reset',
-                    title: 'Reset'
+                    title: Ox._('Reset')
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -27,8 +27,8 @@ pandora.ui.resetUIDialog = function(data) {
                 })
         ],
         keys: {enter: 'reset', escape: 'cancel'},
-        text: 'Are you sure you want to reset all UI settings?',
-        title: 'Reset UI Settings'
+        text: Ox._('Are you sure you want to reset all UI settings?'),
+        title: Ox._('Reset UI Settings')
     });
 
     return that;

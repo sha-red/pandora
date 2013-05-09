@@ -15,7 +15,7 @@ pandora.ui.errorDialog = function(data) {
             buttons: [
                 Ox.Button({
                     id: 'close',
-                    title: 'Close'
+                    title: Ox._('Close')
                 })
                 .bindEvent({
                     click: function() {
@@ -24,7 +24,7 @@ pandora.ui.errorDialog = function(data) {
                 })
             ],
             keys: {enter: 'close', escape: 'close'},
-            text: 'Sorry, you have made an unauthorized request.',
+            text: Ox._('Sorry, you have made an unauthorized request.'),
             title: Ox.toTitleCase(data.status.text)
         })
         .addClass('OxErrorDialog')
@@ -40,7 +40,7 @@ pandora.ui.errorDialog = function(data) {
                     buttons: [
                         Ox.Button({
                                 id: 'close',
-                                title: 'Close'
+                                title: Ox._('Close')
                             })
                             .bindEvent({
                                 click: function() {
@@ -49,12 +49,12 @@ pandora.ui.errorDialog = function(data) {
                             })
                     ],
                     keys: {enter: 'close', escape: 'close'},
-                    text: 'Sorry, a server ' + error
+                    text: Ox._('Sorry, a server {0}'
                         + ' occured while handling your request.'
                         + ' To help us find out what went wrong,'
                         + ' you may want to report this error to an administrator.'
-                        + ' Otherwise, please try again later.',
-                    title: 'Server ' + Ox.toTitleCase(error)
+                        + ' Otherwise, please try again later.', [error]),
+                    title: Ox._('Server {0}', [Ox.toTitleCase(error)])
                 })
                 .addClass('OxErrorDialog')
                 .open();

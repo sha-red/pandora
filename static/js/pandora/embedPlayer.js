@@ -70,8 +70,8 @@ pandora.ui.embedPlayer = function() {
                     ['timeline', 'position', 'settings']
                 ),
                 controlsTooltips: {
-                    close: 'Close',
-                    open: 'Watch on ' + pandora.site.site.name
+                    close: Ox._('Close'),
+                    open: Ox._('Watch on {0}', [pandora.site.site.name])
                 },
                 controlsTop: [
                     options.showCloseButton ? 'close'

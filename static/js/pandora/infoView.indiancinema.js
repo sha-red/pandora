@@ -279,7 +279,7 @@ pandora.ui.infoView = function(data) {
                         '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
                     );
                 },
-                placeholder: formatLight('No Summary'),
+                placeholder: formatLight(Ox._('No Summary')),
                 tooltip: canEdit ? pandora.getEditTooltip() : '',
                 type: 'textarea',
                 value: data.summary || ''
@@ -312,25 +312,25 @@ pandora.ui.infoView = function(data) {
                 items: [
                     {
                         id: 'imdb',
-                        title: 'Update IMDb ID...'
+                        title: Ox._('Update IMDb ID...')
                     },
                     {
                         id: 'metadata',
-                        title: 'Update Metadata...'
+                        title: Ox._('Update Metadata...')
                     },
                     {},
                     {
                         id: 'upload',
-                        title: 'Upload Video...'
+                        title: Ox._('Upload Video...')
                     },
                     {},
                     {
                         id: 'delete',
-                        title: 'Delete ' + pandora.site.itemName.singular + '...',
+                        title: Ox._('Delete {0}...', [pandora.site.itemName.singular]),
                         disabled: !canRemove
                     }
                 ],
-                title: 'Edit...',
+                title: Ox._('Edit...'),
                 width: 128
             })
             .css({marginBottom: '4px'})
@@ -418,21 +418,20 @@ pandora.ui.infoView = function(data) {
             .css({marginBottom: '4px'})
             .append(
                 formatKey('Comments', 'statistics').options({
-                    tooltip: 'Only '
-                        + Object.keys(pandora.site.capabilities.canEditMetadata).map(function(level, i) {
+                    tooltip: Ox._('Only {0} can see and edit these comments', [
+                        Object.keys(pandora.site.capabilities.canEditMetadata).map(function(level, i) {
                             return (
                                 i == 0 ? ''
                                 : i < Ox.len(pandora.site.capabilities.canEditMetadata) - 1 ? ', '
-                                : ' and '
+                                : ' ' + Ox._('and') + ' '
                             ) + Ox.toTitleCase(level)
-                        }).join('')
-                        + ' can see and edit these comments'
+                        }).join('')])
                 })
             )
             .append(
                 Ox.EditableContent({
                         clickLink: pandora.clickLink,
-                        placeholder: formatLight('No comments'),
+                        placeholder: formatLight(Ox._('No comments')),
                         tooltip: pandora.getEditTooltip(),
                         type: 'textarea',
                         value: data.comments || '',
@@ -518,7 +517,7 @@ pandora.ui.infoView = function(data) {
 
     function formatKey(key, mode) {
         var item = Ox.getObjectById(pandora.site.itemKeys, key);
-        key = item ? item.title : key;
+        key = Ox._(item ? item.title : key);
         mode = mode || 'text'
         if (key == 'alternativeTitles') {
             key = 'alternative title' + (
@@ -762,8 +761,8 @@ pandora.ui.infoView = function(data) {
             });
             if (!canEdit) {
                 Ox.Button({
-                    title: 'Help',
-                    tooltip: 'About Rights',
+                    title: Ox._('Help'),
+                    tooltip: Ox._('About Rights'),
                     type: 'image'
                 })
                 .css({marginLeft: '52px'})
@@ -782,7 +781,7 @@ pandora.ui.infoView = function(data) {
         ['studios', 'names'].forEach(function(key) {
             descriptions[key].forEach(function(value) {
                 if (canEdit || value.description) {
-                    var filmography = key == 'studios' ? 'Films' : 'Filmography',
+                    var filmography = key == 'studios' ? Ox._('Films') : Ox._('Filmography'),
                         $name = Ox.Element()
                             .css(css)
                             .css({marginTop: '12px', fontWeight: 'bold'})
@@ -798,25 +797,25 @@ pandora.ui.infoView = function(data) {
                         $link = $('<span>')
                             .addClass('OxLink')
                             .css({fontWeight: 'bold'})
-                            .html('Show ' + filmography)
+                            .html(Ox._('Show {0}', [filmography]))
                             .one({
                                 click: function() {
                                     $link.removeClass('OxLink')
-                                        .html('Loading ' + filmography + '...');
+                                        .html(Ox._('Loading {0}...', [filmography]));
                                     getFilmography(
                                         key == 'studios' ? 'productionCompany' : 'name',
                                         value.name,
                                         value.keys,
                                         function($element) {
                                             $link.addClass('OxLink')
-                                                .html('Hide ' + filmography)
+                                                .html(Ox._('Hide {0}', [filmography]))
                                                 .on({
                                                     click: function() {
-                                                        if (Ox.startsWith($link.html(), 'Show')) {
-                                                            $link.html('Hide ' + filmography);
+                                                        if (Ox.startsWith($link.html(), Ox._('Show'))) {
+                                                            $link.html(Ox._('Hide {0}', [filmography]));
                                                             $text.show();
                                                         } else {
-                                                            $link.html('Show ' + filmography);
+                                                            $link.html(Ox._('Show {0}', [filmography]));
                                                             $text.hide();
                                                         }
                                                     }
@@ -841,7 +840,7 @@ pandora.ui.infoView = function(data) {
                                     '<img style="max-width: 256px; max-height: 256px; margin: 0 16px 16px 0; float: left;" '
                                 );
                             },
-                            placeholder: formatLight('No Description'),
+                            placeholder: formatLight(Ox._('No Description')),
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
                             type: 'textarea',
                             value: value.description || ''
@@ -930,8 +929,8 @@ pandora.ui.infoView = function(data) {
                         return {
                             id: i,
                             title: rightsLevel.name,
-                            disabled: !isCopyrighted && rightsLevel.name == 'Under Copyright'
-                                || isCopyrighted && rightsLevel.name == 'Out of Copyright'
+                            disabled: !isCopyrighted && rightsLevel.name == Ox._('Under Copyright')
+                                || isCopyrighted && rightsLevel.name == Ox._('Out of Copyright')
                         };
                     }),
                     width: 128,
@@ -1015,7 +1014,7 @@ pandora.ui.infoView = function(data) {
                         '&nbsp;(<a href="/imdbId=' + data.imdbId + '">'
                         + result.data.items + ' '
                         + pandora.site.itemName.plural.toLowerCase()
-                        + '</a> with the same IMDb ID</a>)'
+                        + '</a>' + Ox._('with the same IMDb ID') + '</a>)'
                     );
                 }
             });

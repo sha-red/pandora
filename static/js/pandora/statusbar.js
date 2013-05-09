@@ -5,11 +5,11 @@
 pandora.ui.statusbar = function() {
 
     var $text = {
-            titleTotal: Ox.Element('<span>').html('Total: '),
+            titleTotal: Ox.Element('<span>').html(Ox._('Total: ')),
             total: Ox.Element('<span>'),
-            titleSelected: Ox.Element('<span>').html(' &mdash; Selected: '),
+            titleSelected: Ox.Element('<span>').html(' &mdash; ' + Ox._('Selected: ')),
             selected: Ox.Element('<span>'),
-            loading: Ox.Element('<span>').html('Loading...')
+            loading: Ox.Element('<span>').html(Ox._('Loading...'))
         },
 
         that = Ox.Bar({size: 16})

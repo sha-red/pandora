@@ -805,6 +805,7 @@
             "listSort": [{"key": "year", "operator": "+"}],
             "listView": "grid",
             "lists": {},
+            "locale": "en",
             "mapFind": "",
             "mapSelection": "",
             "page": "",

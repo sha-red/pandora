@@ -193,7 +193,7 @@ pandora.ui.infoView = function(data) {
                                     '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
                                 );
                             },
-                            placeholder: formatLight(Ox._('No ' + Ox.toTitleCase(key) + ' Description')),
+                            placeholder: formatLight(Ox._('No {0} Description', [Ox._(Ox.toTitleCase(key))])),
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
                             type: 'textarea',
                             value: data[key + 'description'] || ''
@@ -377,7 +377,7 @@ pandora.ui.infoView = function(data) {
         var $rightsLevel = $('<div>');
         $('<div>')
             .css({marginBottom: '4px'})
-            .append(formatKey('Rights Level', true))
+            .append(formatKey(Ox._('Rights Level'), true))
             .append($rightsLevel)
             .appendTo($right);
         renderRightsLevel();

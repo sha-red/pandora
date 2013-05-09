@@ -40,11 +40,11 @@ pandora.ui.homePage = function() {
             items: [].concat(pandora.site.findKeys.map(function(key) {
                 return {
                     id: key.id,
-                    title: 'Find: ' + key.title
+                    title: Ox._('Find: {0}', [Ox._(key.title)])
                 };
             }), [{}, {
                 id: 'advanced',
-                title: 'Find: Advanced'
+                title: Ox._('Find: Advanced')
             }]),
             overlap: 'right',
             width: 112

@@ -30,7 +30,7 @@ pandora.ui.folderList = function(id) {
                 tooltip: function(data) {
                     return data.user == pandora.user.username
                         || (id == 'featured' && canEditFeatured)
-                        ? 'Edit Icon'
+                        ? Ox._('Edit Icon')
                         : '';
                 },
                 visible: true,
@@ -59,7 +59,7 @@ pandora.ui.folderList = function(id) {
                     autovalidate: pandora.ui.autovalidateListname
                 },
                 operator: '+',
-                tooltip: id == 'personal' ? 'Edit Title' : '',
+                tooltip: id == 'personal' ? Ox._('Edit Title') : '',
                 unformat: function(value) {
                     return Ox.decodeHTMLEntities(value);
                 },
@@ -101,9 +101,9 @@ pandora.ui.folderList = function(id) {
                 operator: '+',
                 tooltip: function(data) {
                     return data.type == 'static'
-                        ? (data.user == pandora.user.username ? 'Edit Default View' : 'Default View: ...')
+                        ? (data.user == pandora.user.username ? Ox._('Edit Default View') : Ox._('Default View: ...'))
                         : data.type == 'smart'
-                        ? (data.user == pandora.user.username ? 'Edit Query' : 'Show Query')
+                        ? (data.user == pandora.user.username ? Ox._('Edit Query') : Ox._('Show Query'))
                         : data.type.toUpperCase();
                 },
                 visible: true,
@@ -129,7 +129,7 @@ pandora.ui.folderList = function(id) {
                 id: 'status',
                 operator: '+',
                 tooltip: id == 'personal' ? function(data) {
-                    return data.status == 'private' ? 'Make Public' : 'Make Private';
+                    return data.status == 'private' ? Ox._('Make Public') : Ox._('Make Private');
                 } : null,
                 visible: true,
                 width: 16
@@ -177,7 +177,7 @@ pandora.ui.folderList = function(id) {
                 editable: true,
                 id: 'name',
                 operator: '+',
-                tooltip: 'Edit Title',
+                tooltip: Ox._('Edit Title'),
                 visible: true,
                 width: ui.sidebarWidth - 96
             },
@@ -207,7 +207,7 @@ pandora.ui.folderList = function(id) {
                 id: 'path',
                 operator: '+',
                 tooltip: function(data) {
-                    return data.mounted ? 'Scan Volume' : 'Edit Path';
+                    return data.mounted ? Ox._('Scan Volume') : Ox._('Edit Path');
                 },
                 visible: true,
                 width: 16
@@ -229,7 +229,7 @@ pandora.ui.folderList = function(id) {
                 id: 'mounted',
                 operator: '+',
                 tooltip: function(data) {
-                    return data.mounted ? 'Unmount Volume' : 'Mount Volume';
+                    return data.mounted ? Ox._('Unmount Volume') : Ox._('Mount Volume');
                 },
                 visible: true,
                 width: 16

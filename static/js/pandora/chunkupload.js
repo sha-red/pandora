@@ -122,7 +122,7 @@ pandora.chunkupload = function(options) {
         } else if(file.slice) {
             chunk = file.slice(chunkOffset, chunkOffset+chunkSize, file.type);
         } else {
-            that.status = 'Sorry, your browser is currently not supported.';
+            that.status = Ox._('Sorry, your browser is currently not supported.');
             done();
         }
 

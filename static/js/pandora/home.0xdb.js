@@ -91,7 +91,7 @@ pandora.ui.home = function() {
             })
             .appendTo(that),
         $findButton = Ox.Button({
-                title: 'Find',
+                title: Ox._('Find'),
                 width: 74
             })
             .css({
@@ -124,7 +124,7 @@ pandora.ui.home = function() {
             })
             .appendTo(that),
         $browseButton = Ox.Button({
-                title: 'Browse',
+                title: Ox._('Browse'),
                 width: 74
             })
             .css({
@@ -146,7 +146,7 @@ pandora.ui.home = function() {
             })
             .appendTo(that),
         $signupButton = Ox.Button({
-                title: 'Sign Up',
+                title: Ox._('Sign Up'),
                 width: 74
             })
             .css({
@@ -165,7 +165,7 @@ pandora.ui.home = function() {
                 }
             }),
         $signinButton = Ox.Button({
-                title: 'Sign In',
+                title: Ox._('Sign In'),
                 width: 74
             })
             .css({
@@ -184,7 +184,7 @@ pandora.ui.home = function() {
                 }
             }),
         $preferencesButton = Ox.Button({
-                title: 'Preferences',
+                title: Ox._('Preferences'),
                 width: 156
             })
             .css({
@@ -203,7 +203,7 @@ pandora.ui.home = function() {
                 }
             }),
         $aboutButton = Ox.Button({
-                title: 'About ' + pandora.site.site.name,
+                title: Ox._('About {0}', [pandora.site.site.name]),
                 width: 156
             })
             .css({
@@ -223,12 +223,10 @@ pandora.ui.home = function() {
             })
             .appendTo(that),
         $text = $('<div>')
-            .html(
-                'A Movie Database. \u2620 2007-'
-                + Ox.formatDate(new Date(), '%Y')
-                + ' 0x2620. All Open Source.'
-            )
-            .css({
+            .html(Ox._(
+                'A Movie Database. \u2620 2007-{0} 0x2620. All Open Source.',
+                [Ox.formatDate(new Date(), '%Y')]
+            )).css({
                 position: 'absolute',
                 left: 0,
                 top: '176px',

@@ -40,22 +40,22 @@ pandora.ui.accountDialogOptions = function(action, value) {
             resetAndSignin: 'Sign In'
         },
         dialogText = {
-            signin: 'To sign in to your account, please enter your username and password.',
-            signup: 'To sign up for an account, please choose a username and password, and enter your e-mail address.',
-            reset: 'To reset your password, please enter either your username or your e-mail address.',
-            resetAndSignin: 'To sign in to your account, please choose a new password, and enter the code that we have just e-mailed to you.'
+            signin: Ox._('To sign in to your account, please enter your username and password.'),
+            signup: Ox._('To sign up for an account, please choose a username and password, and enter your e-mail address.'),
+            reset: Ox._('To reset your password, please enter either your username or your e-mail address.'),
+            resetAndSignin: Ox._('To sign in to your account, please choose a new password, and enter the code that we have just e-mailed to you.')
         },
         dialogTitle = {
-            signin: 'Sign In',
-            signup: 'Sign Up',
-            reset: 'Reset Password',
-            resetAndSignin: 'Reset Password'
+            signin: Ox._('Sign In'),
+            signup: Ox._('Sign Up'),
+            reset: Ox._('Reset Password'),
+            resetAndSignin: Ox._('Reset Password')
         };
     function button(type) {
         if (type == 'cancel') {
             return Ox.Button({
                 id: 'cancel' + Ox.toTitleCase(action),
-                title: 'Cancel'
+                title: Ox._('Cancel')
             }).bindEvent({
                 click: function() {
                     pandora.$ui.accountDialog.close();
@@ -66,7 +66,7 @@ pandora.ui.accountDialogOptions = function(action, value) {
             return Ox.Button({
                 disabled: true,
                 id: 'submit' + Ox.toTitleCase(action),
-                title: buttonTitle[action]
+                title: Ox._(buttonTitle[action])
             }).bindEvent({
                 click: function() {
                     pandora.$ui.accountForm.submit();
@@ -75,7 +75,7 @@ pandora.ui.accountDialogOptions = function(action, value) {
         } else {
             return Ox.Button({
                 id: type,
-                title: buttonTitle[type] + '...'
+                title: Ox._(buttonTitle[type] + '...')
             }).bindEvent({
                 click: function() {
                     if (['signin', 'signup'].indexOf(type) > -1 && type != pandora.user.ui.page) {
@@ -151,7 +151,7 @@ pandora.ui.accountForm = function(action, value) {
                             pandora.signin(result.data);
                         } else {
                             pandora.$ui.accountDialog.enableButtons();
-                            that.setMessages([{id: 'password', message: 'Incorrect password'}]);
+                            that.setMessages([{id: 'password', message: Ox._('Incorrect password')}]);
                         }
                     });
                 } else if (action == 'signup') {
@@ -176,7 +176,7 @@ pandora.ui.accountForm = function(action, value) {
                             pandora.$ui.accountDialog.enableButtons();
                         } else {
                             pandora.$ui.accountDialog.enableButtons();
-                            that.setMessages([{id: 'usernameOrEmail', message: 'Unknown ' + (key == 'username' ? 'username' : 'e-mail address')}])
+                            that.setMessages([{id: 'usernameOrEmail', message: Ox._('Unknown ' + (key == 'username' ? 'username' : 'e-mail address'))}])
                         }
                     });
                 } else if (action == 'resetAndSignin') {
@@ -186,7 +186,7 @@ pandora.ui.accountForm = function(action, value) {
                             pandora.signin(result.data);
                         } else {
                             pandora.$ui.accountDialog.enableButtons();
-                            that.setMessages([{id: 'code', message: 'Incorrect code'}]);
+                            that.setMessages([{id: 'code', message: Ox._('Incorrect code')}]);
                         }
                     });
                 }
@@ -204,7 +204,7 @@ pandora.ui.accountForm = function(action, value) {
             return Ox.Input({
                 autovalidate: pandora.autovalidateCode,
                 id: 'code',
-                label: 'Code',
+                label: Ox._('Code'),
                 labelWidth: 120,
                 validate: pandora.validateCode,
                 width: 320
@@ -213,7 +213,7 @@ pandora.ui.accountForm = function(action, value) {
             return Ox.Input({
                 autovalidate: pandora.autovalidateEmail,
                 id: 'email',
-                label: 'E-Mail Address',
+                label: Ox._('E-Mail Address'),
                 labelWidth: 120,
                 type: 'email', // fixme: ??
                 validate: pandora.validateUser('email'),
@@ -223,7 +223,7 @@ pandora.ui.accountForm = function(action, value) {
             return Ox.Input({
                 autovalidate: /.+/,
                 id: 'password',
-                label: 'New Password',
+                label: Ox._('New Password'),
                 labelWidth: 120,
                 type: 'password',
                 validate: pandora.validateNewPassword,
@@ -233,7 +233,7 @@ pandora.ui.accountForm = function(action, value) {
             return Ox.Input({
                 autovalidate: pandora.autovalidateUsername,
                 id: 'username',
-                label: 'Username',
+                label: Ox._('Username'),
                 labelWidth: 120,
                 validate: pandora.validateUser('username'),
                 width: 320
@@ -242,7 +242,7 @@ pandora.ui.accountForm = function(action, value) {
             return Ox.Input({
                 disabled: true,
                 id: 'username',
-                label: 'Username',
+                label: Ox._('Username'),
                 labelWidth: 120,
                 value: value,
                 width: 320
@@ -251,7 +251,7 @@ pandora.ui.accountForm = function(action, value) {
             return Ox.Input({
                 autovalidate: /.+/,
                 id: 'password',
-                label: 'Password',
+                label: Ox._('Password'),
                 labelWidth: 120,
                 type: 'password',
                 validate: pandora.validatePassword,
@@ -261,7 +261,7 @@ pandora.ui.accountForm = function(action, value) {
             return Ox.Input({
                 autovalidate: pandora.autovalidateUsername,
                 id: 'username',
-                label: 'Username',
+                label: Ox._('Username'),
                 labelWidth: 120,
                 validate: pandora.validateUser('username', true),
                 width: 320
@@ -273,8 +273,8 @@ pandora.ui.accountForm = function(action, value) {
                     pandora.$ui.usernameOrEmailSelect = Ox.Select({
                             id: 'usernameOrEmailSelect',
                             items: [
-                                {id: 'username', title: 'Username'},
-                                {id: 'email', title: 'E-Mail Address'},
+                                {id: 'username', title: Ox._('Username')},
+                                {id: 'email', title: Ox._('E-Mail Address')},
                             ],
                             overlap: 'right',
                             width: 128
@@ -315,7 +315,7 @@ pandora.ui.accountSignoutDialog = function() {
         buttons: [
             Ox.Button({
                 id: 'stay',
-                title: 'Stay Signed In'
+                title: Ox._('Stay Signed In')
             }).bindEvent({
                 click: function() {
                     that.close();
@@ -324,7 +324,7 @@ pandora.ui.accountSignoutDialog = function() {
             }),
             Ox.Button({
                 id: 'signout',
-                title: 'Sign Out'
+                title: Ox._('Sign Out')
             }).bindEvent({
                 click: function() {
                     that.close();
@@ -350,7 +350,7 @@ pandora.ui.accountSignoutDialog = function() {
         height: 128,
         keys: {enter: 'signout', escape: 'stay'},
         removeOnClose: true,
-        title: 'Sign Out',
+        title: Ox._('Sign Out'),
         width: 304
     });
     return that;
@@ -361,7 +361,7 @@ pandora.ui.accountWelcomeDialog = function() {
             buttons: [
                 Ox.Button({
                     id: 'preferences',
-                    title: 'Preferences...'
+                    title: Ox._('Preferences...')
                 }).bindEvent('click', function() {
                     that.close();
                     pandora.$ui.preferencesDialog = pandora.ui.preferencesDialog().open();
@@ -369,7 +369,7 @@ pandora.ui.accountWelcomeDialog = function() {
                 {},
                 Ox.Button({
                     id: 'close',
-                    title: 'Close'
+                    title: Ox._('Close')
                 }).bindEvent('click', function() {
                     that.close();
                 })
@@ -392,7 +392,7 @@ pandora.ui.accountWelcomeDialog = function() {
             height: 128,
             keys: {enter: 'close', escape: 'close'},
             removeOnClose: true,
-            title: 'Welcome to ' + pandora.site.site.name,
+            title: Ox._('Welcome to {0}', [pandora.site.site.name]),
             width: 304
         });
     return that;

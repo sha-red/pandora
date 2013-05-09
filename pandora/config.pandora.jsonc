@@ -606,6 +606,7 @@
             "listSort": [{"key": "title", "operator": "+"}],
             "listView": "grid",
             "lists": {},
+            "locale": "en",
             "mapFind": "",
             "mapSelection": "",
             "page": "",

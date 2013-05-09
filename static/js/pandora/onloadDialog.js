@@ -9,9 +9,9 @@ pandora.ui.onloadDialog = function() {
         $input = Ox.Input({
                 height: dialogHeight - 32,
                 id: 'onload',
-                placeholder: '/*\nAny JavaScript you paste here will run on load.\n'
+                placeholder: Ox._('/*\nAny JavaScript you paste here will run on load.\n'
                     + 'If you ever need to manually change or remove it, '
-                    + 'you can do so by setting localStorage["pandora.onload"] in the console.\n*/',
+                    + 'you can do so by setting localStorage["pandora.onload"] in the console.\n*/'),
                 type: 'textarea',
                 value: localStorage['pandora.onload'] || '',
                 width: dialogWidth - 32
@@ -20,7 +20,7 @@ pandora.ui.onloadDialog = function() {
         that = Ox.Dialog({
                 buttons: [
                     Ox.Button({
-                            title: 'Clear'
+                            title: Ox._('Clear')
                         })
                         .css({margin: '4px 4px 4px 0'})
                         .bindEvent({
@@ -30,7 +30,7 @@ pandora.ui.onloadDialog = function() {
                         }),
                     Ox.Button({
                             id: 'done',
-                            title: 'Done',
+                            title: Ox._('Done'),
                             width: 48
                         }).bindEvent({
                             click: function() {
@@ -45,7 +45,7 @@ pandora.ui.onloadDialog = function() {
                 minHeight: 256,
                 minWidth: 512,
                 removeOnClose: true,
-                title: 'Run Script on Load',
+                title: Ox._('Run Script on Load'),
                 width: dialogWidth
             })
             .bindEvent({

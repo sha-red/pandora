@@ -105,12 +105,9 @@ pandora.ui.info = function() {
                                     return (
                                         pandora.user.ui.item
                                         && ['timeline', 'player', 'editor'].indexOf(pandora.user.ui.itemView) > -1
-                                    ) ? 'Go to Position' : (
-                                        pandora.user.ui.item ? 'Switch to ' : 'Open in '
-                                    ) + Ox.getObjectById(
-                                        pandora.site.itemViews,
-                                        pandora.user.ui.videoView
-                                    ).title + ' View';
+                                    ) ? Ox._('Go to Position') : (
+                                        Ox._(pandora.user.ui.item ? 'Switch to {0} View' : 'Open in {0} Vew',
+                                            [Ox._(Ox.getObjectById(pandora.site.itemViews, pandora.user.ui.videoView).title)]));
                                 },
                                 width: ui.sidebarSize
                             })
@@ -209,7 +206,7 @@ pandora.ui.listInfo = function() {
                         || (item.status == 'featured' && canEditFeaturedLists);
                 if (editable) {
                     $icon.options({
-                        tooltip: 'Doubleclick to edit icon'
+                        tooltip: Ox._('Doubleclick to edit icon')
                     }).bindEvent({
                         doubleclick: editIcon
                     });
@@ -266,7 +263,7 @@ pandora.ui.listInfo = function() {
                             editable: editable,
                             height: pandora.user.ui.sidebarSize - 32,
                             placeholder: editable
-                                ? '<div class="OxLight" style="text-align: center">No description</span>'
+                                ? '<div class="OxLight" style="text-align: center">' + Ox._('No description') + '</span>'
                                 : '',
                             tooltip: editable ? pandora.getEditTooltip('description') : '',
                             type: 'textarea',

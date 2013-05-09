@@ -49,7 +49,7 @@ pandora.ui.list = function() {
                 },
                 id: 'posterRatio',
                 resizable: false,
-                title: 'Icon',
+                title: Ox._('Icon'),
                 titleImage: pandora.user.ui.icons == 'posters' ? 'SetPoster' : 'Icon',
                 visible: pandora.user.ui.listColumns.indexOf('posterRatio') > -1,
                 width: 16
@@ -68,7 +68,7 @@ pandora.ui.list = function() {
                     operator: pandora.getSortOperator(key.id),
                     position: position,
                     removable: !key.columnRequired,
-                    title: key.title,
+                    title: Ox._(key.title),
                     type: key.type,
                     visible: position > -1,
                     width: pandora.user.ui.listColumnWidth[key.id] || key.columnWidth

@@ -24,7 +24,7 @@ pandora.ui.usersDialog = function() {
         $reloadButton = Ox.Button({
                 disabled: true,
                 title: 'redo',
-                tooltip: 'Reload',
+                tooltip: Ox._('Reload'),
                 type: 'image'
             })
             .css({float: 'left', margin: '4px 2px 4px 4px'})
@@ -37,7 +37,7 @@ pandora.ui.usersDialog = function() {
             }),
 
         $guestsCheckbox = Ox.Checkbox({
-                title: 'Include Guests',
+                title: Ox._('Include Guests'),
                 value: false
             })
             .css({float: 'left', margin: '4px 2px'})
@@ -51,7 +51,7 @@ pandora.ui.usersDialog = function() {
             }),
 
         $robotsCheckbox = Ox.Checkbox({
-                title: 'Include Robots',
+                title: Ox._('Include Robots'),
                 value: false
             })
             .css({float: 'left', margin: '4px 2px'})
@@ -62,9 +62,9 @@ pandora.ui.usersDialog = function() {
 
         $findSelect = Ox.Select({
                 items: [
-                    {id: 'all', title: 'Find: All'},
-                    {id: 'username', title: 'Find: Username'},
-                    {id: 'email', title: 'Find: E-Mail-Address'}
+                    {id: 'all', title: Ox._('Find: All')},
+                    {id: 'username', title: Ox._('Find: Username')},
+                    {id: 'email', title: Ox._('Find: E-Mail-Address')}
                 ],
                 overlap: 'right',
                 type: 'image'
@@ -113,7 +113,7 @@ pandora.ui.usersDialog = function() {
                         },
                         id: 'disabled',
                         operator: '-',
-                        title: 'Enabled',
+                        title: Ox._('Enabled'),
                         titleImage: 'check',
                         visible: true,
                         width: 16
@@ -132,7 +132,7 @@ pandora.ui.usersDialog = function() {
                                 });
                         },
                         id: 'newsletter',
-                        title: 'Newsletter',
+                        title: Ox._('Newsletter'),
                         titleImage: 'mail',
                         operator: '-',
                         visible: true,
@@ -147,7 +147,7 @@ pandora.ui.usersDialog = function() {
                         id: 'username',
                         operator: '+',
                         removable: false,
-                        title: 'Username',
+                        title: Ox._('Username'),
                         visible: true,
                         width: 128
                     },
@@ -159,7 +159,7 @@ pandora.ui.usersDialog = function() {
                         },
                         id: 'email',
                         operator: '+',
-                        title: 'E-Mail Address',
+                        title: Ox._('E-Mail Address'),
                         visible: true,
                         width: 192
                     },
@@ -174,7 +174,7 @@ pandora.ui.usersDialog = function() {
                         },
                         id: 'level',
                         operator: '-',
-                        title: 'Level',
+                        title: Ox._('Level'),
                         type: 'label',
                         visible: true,
                         width: 64
@@ -198,7 +198,7 @@ pandora.ui.usersDialog = function() {
                         },
                         id: 'location',
                         operator: '+',
-                        title: 'Location',
+                        title: Ox._('Location'),
                         titleImage: 'flag',
                         visible: true,
                         width: 16
@@ -233,7 +233,7 @@ pandora.ui.usersDialog = function() {
                         },
                         id: 'system',
                         operator: '+',
-                        title: 'System',
+                        title: Ox._('System'),
                         titleImage: 'square',
                         visible: true,
                         width: 16
@@ -264,7 +264,7 @@ pandora.ui.usersDialog = function() {
                         },
                         id: 'browser',
                         operator: '+',
-                        title: 'Browser',
+                        title: Ox._('Browser'),
                         titleImage: 'circle',
                         visible: true,
                         width: 16 
@@ -276,7 +276,7 @@ pandora.ui.usersDialog = function() {
                         },
                         id: 'timesseen',
                         operator: '-',
-                        title: 'Times Seen',
+                        title: Ox._('Times Seen'),
                         visible: true,
                         width: 80
                     },
@@ -287,7 +287,7 @@ pandora.ui.usersDialog = function() {
                         },
                         id: 'firstseen',
                         operator: '-',
-                        title: 'First Seen',
+                        title: Ox._('First Seen'),
                         visible: true,
                         width: 144
                     },
@@ -298,7 +298,7 @@ pandora.ui.usersDialog = function() {
                         },
                         id: 'lastseen',
                         operator: '-',
-                        title: 'Last Seen',
+                        title: Ox._('Last Seen'),
                         visible: true,
                         width: 144
                     },
@@ -310,14 +310,14 @@ pandora.ui.usersDialog = function() {
                         },
                         id: 'numberoflists',
                         operator: '-',
-                        title: 'Lists',
+                        title: Ox._('Lists'),
                         visible: true,
                         width: 64
                     },
                     {
                         id: 'groups',
                         operator: '+',
-                        title: 'Groups',
+                        title: Ox._('Groups'),
                         visible: true,
                         width: 64
                     },
@@ -325,7 +325,7 @@ pandora.ui.usersDialog = function() {
                         id: 'screensize',
                         align: 'right',
                         operator: '-',
-                        title: 'Screen Size',
+                        title: Ox._('Screen Size'),
                         visible: true,
                         width: 80
                     },
@@ -333,7 +333,7 @@ pandora.ui.usersDialog = function() {
                         align: 'right',
                         id: 'windowsize',
                         operator: '-',
-                        title: 'Window Size',
+                        title: Ox._('Window Size'),
                         visible: true,
                         width: 80
                     },
@@ -341,14 +341,14 @@ pandora.ui.usersDialog = function() {
                         align: 'right',
                         id: 'ip',
                         operator: '+',
-                        title: 'IP Address',
+                        title: Ox._('IP Address'),
                         visible: true,
                         width: 128
                     },
                     {
                         id: 'useragent',
                         operator: '+',
-                        title: 'User Agent',
+                        title: Ox._('User Agent'),
                         visible: true,
                         width: 768
                     }
@@ -395,7 +395,7 @@ pandora.ui.usersDialog = function() {
 
         $formLabel = Ox.Label({
                 textAlign: 'center',
-                title: 'No user selected',
+                title: Ox._('No user selected'),
                 width: 212
             })
             .css({float: 'left', margin: '4px 2px 4px 4px'}),
@@ -406,12 +406,12 @@ pandora.ui.usersDialog = function() {
                         id: 'edit',
                         selected: true,
                         title: 'edit',
-                        tooltip: 'Edit'
+                        tooltip: Ox._('Edit')
                     },
                     {
                         id: 'mail',
                         title: 'mail',
-                        tooltip: 'Mail'
+                        tooltip: Ox._('Mail')
                     }
                 ],
                 selectable: true,
@@ -429,7 +429,7 @@ pandora.ui.usersDialog = function() {
         $sendButton = Ox.Button({
                 disabled: true,
                 id: 'send',
-                title: 'Send',
+                title: Ox._('Send'),
                 width: 64
             })
             .bindEvent({
@@ -488,7 +488,7 @@ pandora.ui.usersDialog = function() {
                 buttons: [
                     Ox.Button({
                         id: 'statistics',
-                        title: 'Statistics...'
+                        title: Ox._('Statistics...')
                     }).bindEvent({
                         click: function() {
                             that.close();
@@ -497,7 +497,7 @@ pandora.ui.usersDialog = function() {
                     }),
                     {},
                     Ox.Button({
-                            title: 'Export E-Mail Addresses'
+                            title: Ox._('Export E-Mail Addresses')
                         })
                         .css({margin: '4px 4px 4px 0'})
                         .bindEvent({
@@ -511,7 +511,7 @@ pandora.ui.usersDialog = function() {
                                     var $dialog = Ox.Dialog({
                                             buttons: [
                                                 Ox.Button({
-                                                        title: 'Close'
+                                                        title: Ox._('Close')
                                                     })
                                                     .bindEvent({
                                                         click: function() {
@@ -531,7 +531,7 @@ pandora.ui.usersDialog = function() {
                                                     }).join(', ')
                                                 ),
                                             removeOnClose: true,
-                                            title: 'E-Mail Addresses'
+                                            title: Ox._('E-Mail Addresses')
                                         })
                                         .open();
                                 });
@@ -539,7 +539,7 @@ pandora.ui.usersDialog = function() {
                         }),
                     Ox.Button({
                             id: 'done',
-                            title: 'Done',
+                            title: Ox._('Done'),
                             width: 48
                         }).bindEvent({
                             click: function() {
@@ -555,7 +555,7 @@ pandora.ui.usersDialog = function() {
                 minWidth: 512,
                 padding: 0,
                 removeOnClose: true,
-                title: 'Manage Users',
+                title: Ox._('Manage Users'),
                 width: dialogWidth
             })
             .bindEvent({
@@ -751,8 +751,8 @@ pandora.ui.usersDialog = function() {
                 Ox.Select({
                         id: 'include',
                         items: [
-                            {id: 'users', title: 'All users'},
-                            {id: 'subscribers', title: 'Subscribers only'},
+                            {id: 'users', title: Ox._('All users')},
+                            {id: 'subscribers', title: Ox._('Subscribers only')},
                         ],
                         label: 'Include',
                         labelWidth: 80,
@@ -788,10 +788,10 @@ pandora.ui.usersDialog = function() {
                 Ox.MenuButton({
                         id: 'insert',
                         items: [
-                            {id: 'username', title: 'Username'},
-                            {id: 'email', title: 'E-Mail address'},
+                            {id: 'username', title: Ox._('Username')},
+                            {id: 'email', title: Ox._('E-Mail address')},
                         ],
-                        title: 'Insert...',
+                        title: Ox._('Insert...'),
                         width: formWidth - 16
                     })
                     .bindEvent({
@@ -809,7 +809,7 @@ pandora.ui.usersDialog = function() {
                     }),
                 Ox.Checkbox({
                     id: 'receipt',
-                    title: 'Send a receipt to ' + pandora.user.email,
+                    title: Ox._('Send a receipt to {0}', [pandora.user.email]),
                     value: false,
                     width: formWidth - 16
                 }),
@@ -857,7 +857,7 @@ pandora.ui.usersDialog = function() {
     }
 
     function sendMail() {
-        $sendButton.options({title: 'Sending', disabled: true});
+        $sendButton.options({title: Ox._('Sending'), disabled: true});
         pandora.api.mail({
             to: getTo(),
             subject: getFormItemById('subject').value(),
@@ -868,7 +868,7 @@ pandora.ui.usersDialog = function() {
                     buttons: [
                         Ox.Button({
                             id: 'close',
-                            title: 'Close'
+                            title: Ox._('Close')
                         })
                         .bindEvent({
                             click: function() {
@@ -878,13 +878,13 @@ pandora.ui.usersDialog = function() {
                     ],
                     keys: {enter: 'close', escape: 'close'},
                     text: result.status.code == 200
-                        ? 'Your message has been sent.'
-                        : 'Your message could not be sent. Please try again.',
+                        ? Ox._('Your message has been sent.')
+                        : Ox._('Your message could not be sent. Please try again.'),
                     title: result.status.code == 200
-                        ? 'Message Sent'
-                        : 'Application Error'
+                        ? Ox._('Message Sent')
+                        : Ox._('Application Error')
                 }).open();
-            $sendButton.options({title: 'Send', disabled: false});
+            $sendButton.options({title: Ox._('Send'), disabled: false});
         });
     }
 
@@ -901,20 +901,20 @@ pandora.ui.usersDialog = function() {
         var users = $list.options('selected').map(function(id) {
                 return $list.value(id);
             }),
-            title = users.length == 0 ? 'No user selected'
+            title = users.length == 0 ? Ox._('No user selected')
                 : users.length == 1 ? (
                     ['guest', 'robot'].indexOf(users[0].level) > -1
                     ? Ox.toTitleCase(users[0].level)
                     : Ox.encodeHTMLEntities(users[0].username)
                         + ' &lt;' + users[0].email + '&gt;'
                 )
-                : users.length + ' users selected';
+                : Ox._('{0} users selected', [users.length]);
         $formLabel.options({title: title});
     }
 
     function setSend() {
         getFormItemById('send').options({
-            disabled: getFormItemById('to').value() == 'No recipients'
+            disabled: getFormItemById('to').value() == Ox._('No recipients')
                 || getFormItemById('subject').value() === ''
                 || getFormItemById('message').value() === ''
         }); 
@@ -923,7 +923,7 @@ pandora.ui.usersDialog = function() {
     function setTo() {
         var recipients = getTo().length;
         $mailForm.values({
-            to: (recipients || 'No') + ' recipient' + (recipients == 1 ? '' : 's')
+            to: (recipients || Ox._('No')) + (recipients == 1 ? Ox._('recipient') : Ox._('recipients'))
         });
     }
 

@@ -9,7 +9,8 @@ local_settings.py
 config.jsonc
 ./local
 ./static/js/pandora.min.js.gz
-./static/json/pandora.json.gz
+./static/json/*.json.gz
+./static/json/locale.??.json
 ./static/oxjs
 ./static/admin
 ./data

@@ -56,11 +56,11 @@ pandora.validateNewEmail = function(value, callback) {
         operator: '=='
     }, function(result) {
         callback({
-            message: 'E-mail address already exists',
+            message: Ox._('E-mail address already exists'),
             valid: !result.data.users.length
         });
     }) : callback({
-        message: value.length ? 'Invalid e-mail address' : '',
+        message: value.length ? Ox._('Invalid e-mail address') : '',
         // message: (!value.length ? 'Missing' : 'Invalid') + ' e-mail address',
         valid: false
     });
@@ -97,12 +97,12 @@ pandora.validateUser = function(key, existing) {
             var valid = existing == !!result.data.users.length;
             callback({
                 message: existing ?
-                    'Unknown ' + string :
-                    string[0].toUpperCase() + string.slice(1) + ' already exists',
+                    Ox._('Unknown ' + string) :
+                    Ox._(string[0].toUpperCase() + string.slice(1) + ' already exists'),
                 valid: valid
             });
         }) : callback({
-            message: value.length ? 'Invalid ' + string : '',
+            message: value.length ? Ox._('Invalid ' + string) : '',
             // message: (!value.length ? 'Missing' : 'Invalid') + ' ' + string,
             valid: false
         });

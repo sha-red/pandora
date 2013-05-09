@@ -29,7 +29,7 @@ pandora.ui.news = function(width, height) {
 
     function addItem() {
         pandora.api.addNews({
-            title: 'Untitled',
+            title: Ox._('Untitled'),
             date: Ox.formatDate(new Date(), '%Y-%m-%d'),
             text: ''
         }, function(result) {
@@ -136,7 +136,7 @@ pandora.ui.news = function(width, height) {
                 .css({height: '16px', marginBottom: '8px'})
                 .append(
                     Ox.Button({
-                            title: 'Add',
+                            title: Ox._('Add'),
                             width: 92
                         })
                         .css({float: 'left', margin: '0 4px 0 0'})
@@ -146,7 +146,7 @@ pandora.ui.news = function(width, height) {
                 )
                 .append(
                     Ox.Button({
-                            title: 'Remove',
+                            title: Ox._('Remove'),
                             width: 92
                         })
                         .css({float: 'left', margin: '0 0 0 4px'})

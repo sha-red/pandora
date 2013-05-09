@@ -7,15 +7,15 @@ pandora.ui.listDialog = function(section) {
     section = section || 'general';
     var listData = pandora.getListData(),
         tabs = [].concat([
-            {id: 'general', title: 'General'},
-            {id: 'icon', title: 'Icon'}
+            {id: 'general', title: Ox._('General')},
+            {id: 'icon', title: Ox._('Icon')}
         ], listData.type == 'smart'
-            ? [{id: 'query', title: 'Query'}]
+            ? [{id: 'query', title: Ox._('Query')}]
             : []
         ),
         ui = pandora.user.ui,
         width = getWidth(section),
-        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
+        folderItems = ui.section == 'items' ? Ox._('Lists') : Ox.toTitleCase(ui.section),
         folderItem = folderItems.slice(0, -1);
     Ox.getObjectById(tabs, section).selected = true;
 
@@ -61,7 +61,7 @@ pandora.ui.listDialog = function(section) {
             elements: [
                 pandora.$ui.findIconItemSelect = Ox.Select({
                     items: pandora.site.findKeys.map(function(findKey) {
-                        return {id: findKey.id, title: 'Find: ' + findKey.title};
+                        return {id: findKey.id, title: Ox._('Find: {0}', [Ox._(findKey.title)])};
                     }),
                     overlap: 'right',
                     type: 'image'
@@ -101,7 +101,7 @@ pandora.ui.listDialog = function(section) {
             buttons: [
                 Ox.Button({
                         id: 'done',
-                        title: 'Done'
+                        title: Ox._('Done')
                     })
                     .bindEvent({
                         click: function() {
@@ -128,7 +128,7 @@ pandora.ui.listDialog = function(section) {
         }),
 
         $updateCheckbox = Ox.Checkbox({
-                title: 'Update Results in the Background',
+                title: Ox._('Update Results in the Background'),
                 value: pandora.user.ui.updateAdvancedFindResults
             })
             .css({float: 'left', margin: '4px'})
@@ -236,8 +236,8 @@ pandora.ui.listGeneralPanel = function(listData) {
                 .appendTo(that)
                 : Ox.Select({
                     items: [
-                        {id: 'private', title: 'Private'},
-                        {id: 'public', title: 'Public'}
+                        {id: 'private', title: Ox._('Private')},
+                        {id: 'public', title: Ox._('Public')}
                     ],
                     label: 'Status',
                     labelWidth: 80,

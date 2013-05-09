@@ -182,7 +182,7 @@ pandora.ui.infoView = function(data) {
                         return formatValue(listKeys.indexOf(key) >= 0
                                            ? value.split(', ') : value, key);
                     },
-                    placeholder: formatLight('unknown'),
+                    placeholder: formatLight(Ox._('unknown')),
                     tooltip: pandora.getEditTooltip(),
                     value: listKeys.indexOf(key) >= 0
                           ? (data[key] || []).join(', ')
@@ -222,7 +222,7 @@ pandora.ui.infoView = function(data) {
                     format: function(value) {
                         return formatValue(value.split(', '), 'name');
                     },
-                    placeholder: formatLight('unknown'),
+                    placeholder: formatLight(Ox._('unknown')),
                     tooltip: pandora.getEditTooltip(),
                     value: listKeys.indexOf(key) >= 0
                           ? (data[key] || []).join(', ')
@@ -538,8 +538,8 @@ pandora.ui.infoView = function(data) {
             });
             if (!canEdit) {
                 Ox.Button({
-                    title: 'Help',
-                    tooltip: 'About Rights',
+                    title: Ox._('Help'),
+                    tooltip: Ox._('About Rights'),
                     type: 'image'
                 })
                 .css({marginLeft: '52px'})

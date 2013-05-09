@@ -41,8 +41,8 @@ pandora.ui.allItems = function() {
             })
             .html(
                 pandora.user.ui.section == 'items'
-                ? 'All ' + pandora.site.itemName.plural
-                : pandora.site.site.name + ' ' + Ox.toTitleCase(pandora.user.ui.section)
+                ? Ox._('All {0}', [Ox._(pandora.site.itemName.plural)])
+                : Ox._('{0} ' + Ox.toTitleCase(pandora.user.ui.section), [pandora.site.site.name])
             )
             .appendTo(that),
         $items;
@@ -59,7 +59,7 @@ pandora.ui.allItems = function() {
         Ox.Button({
                 style: 'symbol',
                 title: 'add',
-                tooltip: canAddItems ? 'Add ' + pandora.site.itemName.singular : '',
+                tooltip: canAddItems ? Ox._('Add {0}', [Ox._(pandora.site.itemName.singular)]) : '',
                 type: 'image'
             })
             .css({opacity: canAddItems ? 1 : 0.25})
@@ -70,7 +70,7 @@ pandora.ui.allItems = function() {
         Ox.Button({
                 style: 'symbol',
                 title: 'upload',
-                tooltip: canUploadVideo ? 'Upload Video...' : '',
+                tooltip: canUploadVideo ? Ox._('Upload Video...') : '',
                 type: 'image'
             })
             .css({opacity: canUploadVideo ? 1 : 0.25})
@@ -89,14 +89,14 @@ pandora.ui.allItems = function() {
         Ox.Button({
                 style: 'symbol',
                 title: 'file',
-                tooltip: 'HTML',
+                tooltip: Ox._('HTML'),
                 type: 'image'
             })
             .appendTo(that);
         Ox.Button({
                 style: 'symbol',
                 title: 'help',
-                tooltip: 'Help',
+                tooltip: Ox._('Help'),
                 type: 'image'
             })
             .bindEvent({

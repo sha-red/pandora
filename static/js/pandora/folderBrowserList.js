@@ -45,7 +45,7 @@ pandora.ui.folderBrowserList = function(id) {
                     },
                     id: 'user',
                     operator: '+',
-                    title: 'User',
+                    title: Ox._('User'),
                     visible: true,
                     width: Math.floor(columnWidth)
                 },
@@ -55,7 +55,7 @@ pandora.ui.folderBrowserList = function(id) {
                     },
                     id: 'name',
                     operator: '+',
-                    title: folderItem,
+                    title: Ox._(folderItem),
                     visible: true,
                     width: Math.ceil(columnWidth)
                 },
@@ -64,7 +64,7 @@ pandora.ui.folderBrowserList = function(id) {
                     id: 'items',
                     format: {type: 'number'},
                     operator: '-',
-                    title: 'Items',
+                    title: Ox._('Items'),
                     visible: ui.section == 'items',
                     width: 48
                 },
@@ -96,10 +96,10 @@ pandora.ui.folderBrowserList = function(id) {
                     titleImage: 'edit',
                     tooltip: function(data) {
                         return data.type == 'static'
-                            ? (data.user == pandora.user.username ? 'Edit Default View' : 'Default View: ...')
+                            ? (data.user == pandora.user.username ? Ox._('Edit Default View') : Ox._('Default View: ...'))
                             : data.type == 'smart'
-                            ? (data.user == pandora.user.username ? 'Edit Query' : 'Show Query')
-                            : data.type.toUpperCase();
+                            ? (data.user == pandora.user.username ? Ox._('Edit Query') : Ox._('Show Query'))
+                            : Ox._(data.type.toUpperCase());
                     },
                     visible: true,
                     width: 16
@@ -127,8 +127,8 @@ pandora.ui.folderBrowserList = function(id) {
                     titleImage: id == 'favorite' ? 'like' : 'star',
                     tooltip: function(data) {
                         var checked = id == 'favorite' ? data.subscribed : data.status == 'featured';
-                        return (checked ? 'Remove from' : 'Add to')
-                            + ' ' + Ox.toTitleCase(id) + ' ' + folderItems;
+                        return Ox._((checked ? 'Remove from' : 'Add to')
+                            + ' ' + Ox.toTitleCase(id) + ' ' + folderItems);
                     },
                     visible: true,
                     width: 16

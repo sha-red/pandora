@@ -6,7 +6,7 @@ pandora.ui.makeListPrivateDialog = function(name, subscribers, callback) {
             buttons: [
                 Ox.Button({
                     id: 'keep',
-                    title: 'Keep List Public'
+                    title: Ox._('Keep List Public')
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -15,7 +15,7 @@ pandora.ui.makeListPrivateDialog = function(name, subscribers, callback) {
                 }),
                 Ox.Button({
                     id: 'make',
-                    title: 'Make List Private'
+                    title: Ox._('Make List Private')
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -24,11 +24,9 @@ pandora.ui.makeListPrivateDialog = function(name, subscribers, callback) {
                 })
             ],
             keys: {enter: 'make', escape: 'keep'},
-            text: 'Are you sure you want to make the list "'
-                + name + '" private and lose its '
-                + (subscribers == 1 ? 'subscriber' : subscribers + ' subscribers')
-                + '?',
-            title: 'Make List Private'
+            text: Ox._('Are you sure you want to make the list "{0}" private and loose its {1}?',
+                [name, subscribers == 1 ? Ox._('subscriber') : Ox._('{0} subscribers', [subscribers])]),
+            title: Ox._('Make List Private')
         });
 
     return that;

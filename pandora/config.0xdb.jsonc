@@ -768,6 +768,7 @@
             "listSort": [{"key": "director", "operator": "+"}],
             "listView": "grid",
             "lists": {},
+            "locale": "en",
             "mapFind": "",
             "mapSelection": "",
             "page": "",

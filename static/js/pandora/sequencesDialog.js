@@ -48,8 +48,8 @@ pandora.ui.sequencesDialog = function() {
 
         $modeButtons = Ox.ButtonGroup({
                 buttons: [
-                    {id: 'shape', title: 'Similar Shapes'},
-                    {id: 'color', title: 'Similar Colors'}
+                    {id: 'shape', title: Ox._('Similar Shapes')},
+                    {id: 'color', title: Ox._('Similar Colors')}
                 ],
                 selectable: true,
                 value: pandora.user.ui.sequenceMode
@@ -89,9 +89,12 @@ pandora.ui.sequencesDialog = function() {
 
         $sortSelect = Ox.Select({
                 items: ['title', 'director', 'position', 'duration'].map(function(id) {
+                    var item = Ox.getObjectById(pandora.site.itemKeys, id)
+                            || Ox.getObjectById(pandora.site.clipKeys, id),
+                        title = Ox._(item ? item.title : Ox.toTitleCase(id));
                     return {
                         id: id,
-                        title: 'Sort by ' + Ox.toTitleCase(id)
+                        title: Ox._('Sort by {0}', [title])
                     };
                 }),
                 value: pandora.user.ui.sequenceSort[0].key,
@@ -124,14 +127,14 @@ pandora.ui.sequencesDialog = function() {
                     Ox.Button({
                         disabled: true,
                         id: 'open',
-                        title: 'Open Selected Clip',
+                        title: Ox._('Open Selected Clip'),
                         width: 128
                     }).bindEvent({
                         click: openClip
                     }),
                     Ox.Button({
                         id: 'close',
-                        title: 'Close',
+                        title: Ox._('Close'),
                         width: 64
                     }).bindEvent({
                         click: function() {
@@ -146,7 +149,7 @@ pandora.ui.sequencesDialog = function() {
                 maximizeButton: true,
                 padding: 0,
                 removeOnClose: true,
-                title: 'Similar Clips',
+                title: Ox._('Similar Clips'),
                 width: dialogSize.width
             })
             .bindEvent({
@@ -181,7 +184,7 @@ pandora.ui.sequencesDialog = function() {
                 fontSize: '9px',
                 textAlign: 'center'
             })
-            .html('Loading...')
+            .html(Ox._('Loading...'))
             .appendTo($statusbar);
 
     getClips();
@@ -196,7 +199,7 @@ pandora.ui.sequencesDialog = function() {
 
     function getClips() {
         $dialog && $dialog.disableButton('open');
-        $status && $status.html('Loading...');
+        $status && $status.html(Ox._('Loading...'));
         pandora.api.get({
             id: item.id,
             keys: ['director', 'duration', 'title', 'videoRatio']

@@ -6,7 +6,7 @@ pandora.ui.filterDialog = function(list) {
             buttons: [
                 Ox.Button({
                         id: 'done',
-                        title: 'Done'
+                        title: Ox._('Done')
                     })
                     .bindEvent({
                         click: function() {
@@ -49,12 +49,12 @@ pandora.ui.filterDialog = function(list) {
             height: 264,
             // keys: {enter: 'save', escape: 'cancel'},
             removeOnClose: true,
-            title: list ? 'Smart List - ' + list.name : 'Advanced Find',
+            title: list ? Ox._('Smart List - {0}', [list.name]) : Ox._('Advanced Find'),
             width: 648 + Ox.UI.SCROLLBAR_SIZE
         }),
 
         $updateCheckbox = Ox.Checkbox({
-                title: 'Update Results in the Background',
+                title: Ox._('Update Results in the Background'),
                 value: pandora.user.ui.updateAdvancedFindResults
             })
             .css({float: 'left', margin: '4px'})

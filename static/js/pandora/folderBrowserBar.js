@@ -11,8 +11,8 @@ pandora.ui.folderBrowserBar = function(id) {
             elements: [
                 pandora.$ui.findListSelect[id] = Ox.Select({
                         items: [
-                            {id: 'user', title: 'Find: User'},
-                            {id: 'name', title: 'Find: ' + folderItem}
+                            {id: 'user', title: Ox._('Find: User')},
+                            {id: 'name', title: Ox._('Find: {0}', [folderItem])}
                         ],
                         overlap: 'right',
                         type: 'image'
@@ -30,7 +30,7 @@ pandora.ui.folderBrowserBar = function(id) {
                 pandora.$ui.findListInput[id] = Ox.Input({
                         changeOnKeypress: true,
                         clear: true,
-                        placeholder: 'Find: User',
+                        placeholder: Ox._('Find: User'),
                         width: pandora.getFoldersWidth() - 24
                     })
                     .bindEvent({

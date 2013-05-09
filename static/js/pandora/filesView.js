@@ -31,13 +31,13 @@ pandora.ui.filesView = function(options, self) {
                 {
                     disabled: true,
                     id: 'ignore',
-                    title: 'Ignore Selected Files'
+                    title: Ox._('Ignore Selected Files')
                 },
                 {},
                 {
                     disabled: !pandora.site.capabilities.canRemoveItems[pandora.user.level],
                     id: 'delete',
-                    title: 'Delete ' + pandora.site.itemName.singular + '...'
+                    title: Ox._('Delete {0}...', [Ox._(pandora.site.itemName.singular)])
                 }
             ],
             title: 'set',
@@ -60,7 +60,7 @@ pandora.ui.filesView = function(options, self) {
 
     self.$saveButton = Ox.Button({
             disabled: true,
-            title: 'Save Changes',
+            title: Ox._('Save Changes'),
             width: 128
         })
         .css({
@@ -96,14 +96,14 @@ pandora.ui.filesView = function(options, self) {
                     },
                     id: 'selected',
                     operator: '-',
-                    title: 'Status',
+                    title: Ox._('Status'),
                     titleImage: 'check',
                     tooltip: function (data) {
                         return data.encoding
-                            ? 'Processing video on server'
+                            ? Ox._('Processing video on server')
                             : data.instances.filter(function(i) {return i.ignore; }).length > 0
-                            ? 'Use this file'
-                            : 'Dont use this file';
+                            ? Ox._('Use this file')
+                            : Ox._('Dont use this file');
                     },
                     visible: true,
                     width: 16
@@ -112,7 +112,7 @@ pandora.ui.filesView = function(options, self) {
                     align: 'left',
                     id: 'users',
                     operator: '+',
-                    title: 'Users',
+                    title: Ox._('Users'),
                     visible: true,
                     width: 60
                 },
@@ -120,7 +120,7 @@ pandora.ui.filesView = function(options, self) {
                     align: 'left',
                     id: 'path',
                     operator: '+',
-                    title: 'Path',
+                    title: Ox._('Path'),
                     visible: true,
                     width: 360
                 },
@@ -128,7 +128,7 @@ pandora.ui.filesView = function(options, self) {
                     editable: true,
                     id: 'version',
                     operator: '+',
-                    title: 'Version',
+                    title: Ox._('Version'),
                     visible: true,
                     width: 60
                 },
@@ -136,7 +136,7 @@ pandora.ui.filesView = function(options, self) {
                     editable: true,
                     id: 'part',
                     operator: '+',
-                    title: 'Part',
+                    title: Ox._('Part'),
                     visible: true,
                     width: 60
                 },
@@ -144,7 +144,7 @@ pandora.ui.filesView = function(options, self) {
                     editable: true,
                     id: 'partTitle',
                     operator: '+',
-                    title: 'Part Title',
+                    title: Ox._('Part Title'),
                     visible: true,
                     width: 120
                 },
@@ -152,7 +152,7 @@ pandora.ui.filesView = function(options, self) {
                     editable: true,
                     id: 'language',
                     operator: '+',
-                    title: 'Language',
+                    title: Ox._('Language'),
                     visible: true,
                     width: 60
                 },
@@ -160,7 +160,7 @@ pandora.ui.filesView = function(options, self) {
                     editable: true,
                     id: 'extension',
                     operator: '+',
-                    title: 'Extension',
+                    title: Ox._('Extension'),
                     visible: true,
                     width: 60
                 },
@@ -168,7 +168,7 @@ pandora.ui.filesView = function(options, self) {
                     align: 'left',
                     id: 'type',
                     operator: '+',
-                    title: 'Type',
+                    title: Ox._('Type'),
                     visible: true,
                     width: 60
                 },
@@ -177,7 +177,7 @@ pandora.ui.filesView = function(options, self) {
                     format: {type: 'value', args: ['B']},
                     id: 'size',
                     operator: '-',
-                    title: 'Size',
+                    title: Ox._('Size'),
                     visible: true,
                     width: 90
                 },
@@ -186,7 +186,7 @@ pandora.ui.filesView = function(options, self) {
                     format: {type: 'resolution', args: ['px']},
                     id: 'resolution',
                     operator: '-',
-                    title: 'Resolution',
+                    title: Ox._('Resolution'),
                     visible: true,
                     width: 90
                 },
@@ -195,7 +195,7 @@ pandora.ui.filesView = function(options, self) {
                     format: {type: 'duration', args: [0, 'short']},
                     id: 'duration',
                     operator: '-',
-                    title: 'Duration',
+                    title: Ox._('Duration'),
                     visible: true,
                     width: 90
                 },
@@ -203,7 +203,7 @@ pandora.ui.filesView = function(options, self) {
                     align: 'left',
                     id: 'id',
                     operator: '+',
-                    title: 'ID',
+                    title: Ox._('ID'),
                     visible: false,
                     width: 120
                 },
@@ -211,7 +211,7 @@ pandora.ui.filesView = function(options, self) {
                     align: 'left',
                     id: 'instances',
                     operator: '+',
-                    title: 'Instances',
+                    title: Ox._('Instances'),
                     visible: false,
                     width: 120
                 }
@@ -279,7 +279,7 @@ pandora.ui.filesView = function(options, self) {
                     align: 'left',
                     id: 'user',
                     operator: '+',
-                    title: 'User',
+                    title: Ox._('User'),
                     visible: true,
                     width: 120
                 },
@@ -287,7 +287,7 @@ pandora.ui.filesView = function(options, self) {
                     align: 'left',
                     id: 'volume',
                     operator: '+',
-                    title: 'Volume',
+                    title: Ox._('Volume'),
                     visible: true,
                     width: 120
                 },
@@ -295,7 +295,7 @@ pandora.ui.filesView = function(options, self) {
                     align: 'left',
                     id: 'path',
                     operator: '+',
-                    title: 'Path',
+                    title: Ox._('Path'),
                     visible: true,
                     width: 480
                 },
@@ -316,15 +316,17 @@ pandora.ui.filesView = function(options, self) {
 
     self.$movieLabel = Ox.Label({
             textAlign: 'center',
-            title: 'Move selected files to another '
-                + pandora.site.itemName.singular.toLowerCase(),
+            title: Ox._('Move selected files to another {0}',
+                [Ox._(pandora.site.itemName.singular.toLowerCase())]),
             width: 240
         })
         .css({margin: '8px'});
 
     ['title', 'director', 'year', 'id'].forEach(function(key) {
+        var itemKey = Ox.getObjectById(pandora.site.itemKeys, key);
         self['$' + key + 'Input'] = Ox.Input({
-            label: key == 'id' ? 'ID' : Ox.toTitleCase(key),
+            label: Ox._(key == 'id' ? 'ID'
+                : itemKey ? itemKey.title : Ox.toTitleCase(key)),
             labelWidth: 64,
             width: 240
         })
@@ -372,9 +374,8 @@ pandora.ui.filesView = function(options, self) {
     });
 
     self.$switch = Ox.Checkbox({
-        title: 'Switch to this '
-            + pandora.site.itemName.singular.toLowerCase()
-            + ' after moving files',
+        title: Ox._('Switch to this {0} after moving files',
+            [Ox._(pandora.site.itemName.singular.toLowerCase())]),
         value: false,
         width: 240
     });
@@ -392,7 +393,7 @@ pandora.ui.filesView = function(options, self) {
         .css({margin: '8px'});
 
     self.$clearButton = Ox.Button({
-            title: 'Clear Form',
+            title: Ox._('Clear Form'),
             width: 116
         })
         .css({margin: '0 4px 4px 8px'})
@@ -406,7 +407,7 @@ pandora.ui.filesView = function(options, self) {
 
     self.$moveButton = Ox.Button({
             disabled: true,
-            title: 'Move Files',
+            title: Ox._('Move Files'),
             width: 116
         })
         .css({margin: '0 4px 4px 4px'})
@@ -480,7 +481,7 @@ pandora.ui.filesView = function(options, self) {
             data[key] = self['$' + key + 'Input'].value();
         });
         self.$moveButton.options(
-            {disabled: true, title: 'Moving Files...'}
+            {disabled: true, title: Ox._('Moving Files...')}
         );
         pandora.api.moveMedia(data, function(result) {
             if (
@@ -495,7 +496,7 @@ pandora.ui.filesView = function(options, self) {
                     self.$filesList.reloadList();
                     self.$instancesList.reloadList();
                     self.$moveButton.options(
-                        {disabled: false, title: 'Move Files'}
+                        {disabled: false, title: Ox._('Move Files')}
                     );
                 }
             }
@@ -530,7 +531,7 @@ pandora.ui.filesView = function(options, self) {
     }
 
     function saveChanges() {
-        self.$saveButton.options({disabled: true, title: 'Saving Changes...'});
+        self.$saveButton.options({disabled: true, title: Ox._('Saving Changes...')});
         pandora.api.findMedia({
             keys: ['id'],
             query: self.filesQuery
@@ -545,7 +546,7 @@ pandora.ui.filesView = function(options, self) {
                     return item;
                 })
             }, function(result) {
-                self.$saveButton.options({title: 'Save Changes'});
+                self.$saveButton.options({title: Ox._('Save Changes')});
                 Ox.Request.clearCache(); // fixme: remove
                 self.$filesList.reloadList();
             });

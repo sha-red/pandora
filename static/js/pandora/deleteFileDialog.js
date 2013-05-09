@@ -7,7 +7,7 @@ pandora.ui.deleteFileDialog = function(file, callback) {
             buttons: [
                 Ox.Button({
                     id: 'keep',
-                    title: 'Keep File'
+                    title: Ox._('Keep File')
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -15,7 +15,7 @@ pandora.ui.deleteFileDialog = function(file, callback) {
                 }),
                 Ox.Button({
                     id: 'delete',
-                    title: 'Delete File'
+                    title: Ox._('Delete File')
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -26,9 +26,8 @@ pandora.ui.deleteFileDialog = function(file, callback) {
                 })
             ],
             keys: {enter: 'delete', escape: 'keep'},
-            text: 'Are you sure you want to delete the file'
-                + ' "'+ file + '"?',
-            title: 'Delete File'
+            text: Ox._('Are you sure you want to delete the file "{0}"?', [file]),
+            title: Ox._('Delete File')
         });
 
     return that;

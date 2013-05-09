@@ -10,7 +10,7 @@ pandora.ui.embedFileDialog = function(id) {
         $content = Ox.Element()
             .css({margin: '16px'})
             .html(
-                'To embed this file, use the following HTML:<br>'
+                Ox._('To embed this file, use the following HTML:<br>')
             ),
 
         $embed = $('<textarea>')
@@ -36,7 +36,7 @@ pandora.ui.embedFileDialog = function(id) {
             buttons: [
                 Ox.Button({
                     id: 'close',
-                    title: 'Close'
+                    title: Ox._('Close')
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -49,7 +49,7 @@ pandora.ui.embedFileDialog = function(id) {
             height: 128,
             keys: {escape: 'close'},
             removeOnClose: true,
-            title: 'Embed File',
+            title: Ox._('Embed File'),
             width: 368 
         });
 

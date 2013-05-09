@@ -12,7 +12,7 @@ pandora.ui.contactForm = function() {
             items: [
                 Ox.Input({
                     id: 'name',
-                    label: 'Your Name',
+                    label: Ox._('Your Name'),
                     labelWidth: 128,
                     validate: function(value, callback) {
                         callback({valid: true});
@@ -23,13 +23,13 @@ pandora.ui.contactForm = function() {
                 Ox.Input({
                     autovalidate: pandora.autovalidateEmail,
                     id: 'email',
-                    label: 'Your E-Mail Address',
+                    label: Ox._('Your E-Mail Address'),
                     labelWidth: 128,
                     validate: function(value, callback) {
                         callback({
-                            message: 'Please enter '
+                            message: Ox._('Please enter '
                                 + (value.length == 0 ? 'your' : 'a valid')
-                                + ' e-mail address',
+                                + ' e-mail address'),
                             valid: Ox.isValidEmail(value)
                         });
                     },
@@ -38,7 +38,7 @@ pandora.ui.contactForm = function() {
                 }),
                 Ox.Input({
                     id: 'subject',
-                    label: 'Subject',
+                    label: Ox._('Subject'),
                     labelWidth: 128,
                     validate: function(value, callback) {
                         callback({valid: true});
@@ -54,7 +54,7 @@ pandora.ui.contactForm = function() {
                     type: 'textarea',
                     validate: function(value, callback) {
                         callback({
-                            message: 'Please enter a message',
+                            message: Ox._('Please enter a message'),
                             valid: value.length > 0
                         });
                     },
@@ -73,7 +73,7 @@ pandora.ui.contactForm = function() {
 
     $receiptCheckbox = Ox.Checkbox({
             id: 'receipt',
-            title: 'Send a receipt to ' + pandora.user.email,
+            title: Ox._('Send a receipt to {}', pandora.user.email),
             value: pandora.user.level != 'guest',
             width: width - 136
         })
@@ -82,8 +82,8 @@ pandora.ui.contactForm = function() {
             change: function(data) {
                 $receiptCheckbox.options({
                     title: data.value
-                        ? 'Send a receipt to ' + pandora.user.email
-                        : 'Don\'t send me a receipt'
+                        ? Ox._('Send a receipt to {0}', [pandora.user.email])
+                        : Ox._('Don\'t send me a receipt')
                 });
             }
         })
@@ -91,7 +91,7 @@ pandora.ui.contactForm = function() {
 
     $sendButton = Ox.Button({
             disabled: true,
-            title: 'Send Message',
+            title: Ox._('Send Message'),
             width: 128
         })
         .css({float: 'left', margin: '8px 0 8px ' + (pandora.user.level == 'guest' ? width - 128 : 4) + 'px'})
@@ -100,7 +100,7 @@ pandora.ui.contactForm = function() {
                 var data = $form.values();
                 $sendButton.options({
                     disabled: true,
-                    title: 'Sending Message...'
+                    title: Ox._('Sending Message...')
                 });
                 pandora.api.contact({
                     name: data.name,
@@ -113,7 +113,7 @@ pandora.ui.contactForm = function() {
                             buttons: [
                                 Ox.Button({
                                     id: 'close',
-                                    title: 'Close'
+                                    title: Ox._('Close')
                                 }).bindEvent({
                                     click: function() {
                                         $dialog.close();
@@ -122,13 +122,13 @@ pandora.ui.contactForm = function() {
                                 })
                             ],
                             keys: {enter: 'close', escape: 'close'},
-                            text: 'Thanks for your message!<br/><br/>We will get back to you as soon as possible.',
-                            title: 'Message Sent'
+                            text: Ox._('Thanks for your message!<br/><br/>We will get back to you as soon as possible.'),
+                            title: Ox._('Message Sent')
                         })
                         .open();
                     $sendButton.options({
                         disabled: false,
-                        title: 'Send Message'
+                        title: Ox._('Send Message')
                     });
                 });
                 
@@ -139,9 +139,9 @@ pandora.ui.contactForm = function() {
     $text = $('<div>')
         .css({width: width + 'px'})
         .html(
-            '&nbsp;Alternatively, you can contact us via <a href="mailto:'
-            + pandora.site.site.email.contact + '">'
-            + pandora.site.site.email.contact + '</a>'
+            '&nbsp;' + Ox._('Alternatively, you can contact us via {0}',
+            ['<a href="mailto:' + pandora.site.site.email.contact + '">'
+            + pandora.site.site.email.contact + '</a>'])
         )
         .appendTo(that);
  

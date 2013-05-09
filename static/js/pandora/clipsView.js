@@ -11,7 +11,7 @@ pandora.ui.clipsView = function(videoRatio) {
                 fontSize: '9px',
                 textAlign: 'center'
             })
-            .html('Loading...'),
+            .html(Ox._('Loading...')),
 
         that = Ox.SplitPanel({
             elements: [
@@ -23,14 +23,14 @@ pandora.ui.clipsView = function(videoRatio) {
                         .append(
                             Ox.Input({
                                     clear: true,
-                                    placeholder: 'Find Clips',
+                                    placeholder: Ox._('Find Clips'),
                                     value: pandora.user.ui.itemFind,
                                     width: 192
                                 })
                                 .css({float: 'right', margin: '4px'})
                                 .bindEvent({
                                     submit: function(data) {
-                                        $status.html('Loading...');
+                                        $status.html(Ox._('Loading...'));
                                         pandora.UI.set('itemFind', data.value);
                                         // since this is the only way itemFind can change,
                                         // there's no need for an event handler
@@ -59,8 +59,7 @@ pandora.ui.clipsView = function(videoRatio) {
                 init: function(data) {
                     var items = data.items;
                     $status.html(
-                        (items ? Ox.formatNumber(items) : 'No')
-                        + ' Clip' + (items == 1 ? '' : 's')
+                        Ox.formatCount(items, 'Clip')
                     );
                 }
             });

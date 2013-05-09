@@ -13,7 +13,7 @@ pandora.ui.apiDialog = function() {
             buttons: [
                 Ox.Button({
                     id: 'switch',
-                    title: 'Help...'
+                    title: Ox._('Help...')
                 }).bindEvent({
                     click: function() {
                         pandora.UI.set({page: 'help', 'hash.anchor': ''});
@@ -22,7 +22,7 @@ pandora.ui.apiDialog = function() {
                 {},
                 Ox.Button({
                     id: 'close',
-                    title: 'Close'
+                    title: Ox._('Close')
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -37,7 +37,7 @@ pandora.ui.apiDialog = function() {
             minHeight: 256,
             minWidth: 544 + Ox.UI.SCROLLBAR_SIZE,
             removeOnClose: true,
-            title: 'API Documentation',
+            title: Ox._('API Documentation'),
             width: 672 + Ox.UI.SCROLLBAR_SIZE
         })
         .bindEvent({
@@ -55,7 +55,7 @@ pandora.ui.apiDialog = function() {
     pandora.api.api({docs: true, code: true}, function(results) {
         var items = [{
             id: '',
-            title: 'API Documentation',
+            title: Ox._('API Documentation'),
             sort: 'aaa'
         }];
         actions = results.data.actions;
@@ -180,7 +180,7 @@ pandora.ui.apiDialog = function() {
                 .appendTo($text);
 
             Ox.Button({
-                    title: 'Source (' + f + ')',
+                    title: Ox._('Source ({0})', [f]),
                 }).bindEvent({
                     click: function() {
                         $code.toggle();

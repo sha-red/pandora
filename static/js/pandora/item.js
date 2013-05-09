@@ -50,12 +50,12 @@ pandora.ui.item = function() {
                 Ox.Element()
                     .css({marginTop: '32px', fontSize: '12px', textAlign: 'center'})
                     .html(
-                        'Sorry, <i>' + result.data.title
-                        + '</i> currently doesn\'t have '
+                        Ox._('Sorry, <i>{0}</i>'
+                        + ' currently doesn\'t have '
                         + (['a', 'e', 'i', 'o'].indexOf(
                             pandora.user.ui.itemView.slice(0, 1)
                         ) > -1 ? 'an': 'a') + ' '
-                        + pandora.user.ui.itemView + ' view.'
+                        +'{1} view.', [result.data.title, Ox._(pandora.user.ui.itemView)])
                     )
             );
 

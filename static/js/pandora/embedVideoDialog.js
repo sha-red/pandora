@@ -11,7 +11,7 @@ pandora.ui.embedVideoDialog = function() {
 
         $content = Ox.Element()
             .css({margin: '16px'})
-            .html('To embed this clip, use the following HTML:<br>'),
+            .html(Ox._('To embed this clip, use the following HTML:<br>')),
 
         $embed = $('<textarea>')
             .css({
@@ -39,7 +39,7 @@ pandora.ui.embedVideoDialog = function() {
             buttons: [
                 Ox.Button({
                     id: 'close',
-                    title: 'Close'
+                    title: Ox._('Close')
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -52,7 +52,7 @@ pandora.ui.embedVideoDialog = function() {
             height: 128,
             keys: {escape: 'close'},
             removeOnClose: true,
-            title: 'Embed Video',
+            title: Ox._('Embed Video'),
             width: 368 
         });
 

@@ -12,16 +12,16 @@ pandora.ui.sortMenu = function() {
                     return Ox.extend(Ox.clone(key), {
                         checked: key.id == pandora.user.ui.itemSort[0].key,
                         id: key.id,
-                        title: 'Sort by ' + key.title
+                        title: Ox._('Sort by {0}', [key.title])
                     });
                 }),
                 [
                     {},
-                    {id: 'ascending', title: 'Ascending', checked: pandora.user.ui.itemSort[0].operator == '+'},
-                    {id: 'descending', title: 'Descending', checked: pandora.user.ui.itemSort[0].operator == '-'}
+                    {id: 'ascending', title: Ox._('Ascending'), checked: pandora.user.ui.itemSort[0].operator == '+'},
+                    {id: 'descending', title: Ox._('Descending'), checked: pandora.user.ui.itemSort[0].operator == '-'}
                 ]
             ),
-            tooltip: 'Sort clips',
+            tooltip: Ox._('Sort clips'),
             type: 'image'
         })
         .css({float: 'left', margin: '2px'})

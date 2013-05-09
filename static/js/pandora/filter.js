@@ -4,7 +4,7 @@ pandora.ui.filter = function(id) {
     var i = Ox.getIndexById(pandora.user.ui.filters, id),
         filter = Ox.getObjectById(pandora.site.filters, id),
         panelWidth = pandora.$ui.document.width() - (pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize) - 1,
-        title = Ox.getObjectById(pandora.site.filters, id).title,
+        title = Ox._(Ox.getObjectById(pandora.site.filters, id).title),
         //width = pandora.getFilterWidth(i, panelWidth),
         that = Ox.TableList({
             _selected: !pandora.user.ui.showFilters
@@ -87,7 +87,7 @@ pandora.ui.filter = function(id) {
             init: function(data) {
                 that.setColumnTitle(
                     'name',
-                    Ox.getObjectById(pandora.site.filters, id).title
+                    Ox._(Ox.getObjectById(pandora.site.filters, id).title)
                     + '<div class="OxColumnStatus OxLight">'
                     + (data.items ? Ox.formatNumber(data.items) : '')
                     + '</div>'
@@ -176,8 +176,8 @@ pandora.ui.filter = function(id) {
         }),
         $menu = Ox.MenuButton({
                 items: [
-                    {id: 'clearFilter', title: 'Clear Filter', keyboard: 'shift control a'},
-                    {id: 'clearFilters', title: 'Clear All Filters', keyboard: 'shift alt control a'},
+                    {id: 'clearFilter', title: Ox._('Clear Filter'), keyboard: 'shift control a'},
+                    {id: 'clearFilters', title: Ox._('Clear All Filters'), keyboard: 'shift alt control a'},
                     {},
                     {group: 'filter', max: 1, min: 1, items: pandora.site.filters.map(function(filter) {
                         return Ox.extend({checked: filter.id == id}, filter);

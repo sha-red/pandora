@@ -2,7 +2,7 @@
 'use strict';
 pandora.ui.backButton = function() {
     var that = Ox.Button({
-        title: 'Back to ' + pandora.site.itemName.plural,
+        title: Ox._('Back to {0}', [Ox._(pandora.site.itemName.plural)]),
         width: 96
     }).css({
         float: 'left',

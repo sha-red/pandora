@@ -31,7 +31,7 @@ pandora.ui.metadataDialog = function(data) {
             buttons: [
                 Ox.Button({
                         id: 'close',
-                        title: 'Not Now'
+                        title: Ox._('Not Now')
                     })
                     .bindEvent({
                         click: function() {
@@ -41,7 +41,7 @@ pandora.ui.metadataDialog = function(data) {
                 Ox.Button({
                         distabled: true,
                         id: 'update',
-                        title: 'Update IMDb Id...'
+                        title: Ox._('Update IMDb ID...')
                     })
                     .bindEvent({
                         click: function() {
@@ -51,10 +51,9 @@ pandora.ui.metadataDialog = function(data) {
                     })
             ],
             keyboard: {enter: 'update', escape: 'close'},
-            text: 'To update the metadata for this '
-                + pandora.site.itemName.singular.toLowerCase()
-                + ', please enter its IMDb ID.',
-            title: 'Update Metadata'
+            text: Ox._('To update the metadata for this {0}, please enter its IMDb ID.',
+                [pandora.site.itemName.singular.toLowerCase()]),
+            title: Ox._('Update Metadata')
         });
     }
     
@@ -63,7 +62,7 @@ pandora.ui.metadataDialog = function(data) {
             buttons: [
                 Ox.Button({
                         id: 'switch',
-                        title: 'Update IMDb Id...'
+                        title: Ox._('Update IMDb ID...')
                     })
                     .bindEvent({
                         click: function() {
@@ -74,7 +73,7 @@ pandora.ui.metadataDialog = function(data) {
                 {},
                 Ox.Button({
                         id: 'cancel',
-                        title: 'Don\'t Update'
+                        title: Ox._('Don\'t Update')
                     })
                     .bindEvent({
                         click: function() {
@@ -84,7 +83,8 @@ pandora.ui.metadataDialog = function(data) {
                 Ox.Button({
                         disabled: true,
                         id: 'update',
-                        title: 'Update Metadata...'
+                        title: Ox._('Update Metadata...')
+
                     })
                     .bindEvent({
                         click: function() {
@@ -99,7 +99,7 @@ pandora.ui.metadataDialog = function(data) {
             minHeight: 256,
             minWidth: 512,
             removeOnClose: true,
-            title: 'Update Metadata',
+            title: Ox._('Update Metadata'),
             width: dialogWidth
         })
         .bindEvent({
@@ -112,7 +112,7 @@ pandora.ui.metadataDialog = function(data) {
             buttons: [
                 Ox.Button({
                         id: 'cancel',
-                        title: 'Don\'t Update'
+                        title: Ox._('Don\'t Update')
                     })
                     .bindEvent({
                         click: function() {
@@ -121,7 +121,7 @@ pandora.ui.metadataDialog = function(data) {
                     }),
                 Ox.Button({
                         id: 'update',
-                        title: 'Update'
+                        title: Ox._('Update')
                     })
                     .bindEvent({
                         click: function() {
@@ -132,16 +132,16 @@ pandora.ui.metadataDialog = function(data) {
             ],
             height: 192,
             keyboard: {enter: 'update', escape: 'cancel'},
-            text: 'Are you sure you want to update the value'
+            text: Ox._('Are you sure you want to update the value'
                 + (updateKeys.length == 1 ? '' : 's')
-                + ' for ' + updateKeys.map(function(key, index) {
+                + ' for {0}?', [updateKeys.map(function(key, index) {
                     return (
                         index == 0 ? ''
                         : index < updateKeys.length - 1 ? ', '
-                        : ' and '
+                        : ' ' + Ox._('and') + ' '
                     ) + getTitle(key)
-                }).join('') + '?',
-            title: 'Update Metadata'
+                }).join('')]),
+            title: Ox._('Update Metadata')
         });
     }
 
@@ -175,7 +175,7 @@ pandora.ui.metadataDialog = function(data) {
                     orientation: 'vertical'
                 });
             $selectNoneButton = Ox.Button({
-                    title: 'Select No Updates',
+                    title: Ox._('Select No Updates'),
                 })
                 .css({float: 'left', margin: '4px 2px 4px 4px'})
                 .bindEvent({
@@ -185,7 +185,7 @@ pandora.ui.metadataDialog = function(data) {
                 })
                 .appendTo($bar),
             $selectAllButton = Ox.Button({
-                    title: 'Select All Updates',
+                    title: Ox._('Select All Updates'),
                 })
                 .css({float: 'left', margin: '4px 2px 4px 2px'})
                 .bindEvent({
@@ -265,8 +265,10 @@ pandora.ui.metadataDialog = function(data) {
     }
 
     function getTitle(key) {
-        return key == 'alternativeTitles' ? 'Alternative Titles'
-            : Ox.getObjectById(pandora.site.itemKeys, key).title;
+        return key == Ox._(
+            'alternativeTitles' ? 'Alternative Titles'
+            : Ox.getObjectById(pandora.site.itemKeys, key).title
+        );
     }
 
     function getUpdateKeys() {

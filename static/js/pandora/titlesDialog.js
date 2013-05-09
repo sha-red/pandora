@@ -32,14 +32,14 @@ pandora.ui.titlesDialog = function() {
                 columns: [
                     {
                         id: 'id',
-                        title: 'ID',
+                        title: Ox._('ID'),
                         visible: false
                     },
                     {
                         id: 'title',
                         operator: '+',
                         removable: false,
-                        title: 'Title',
+                        title: Ox._('Title'),
                         visible: true,
                         width: 256
                     },
@@ -47,7 +47,7 @@ pandora.ui.titlesDialog = function() {
                         editable: true,
                         id: 'sorttitle',
                         operator: '+',
-                        title: 'Sort Title',
+                        title: Ox._('Sort Title'),
                         visible: true,
                         width: 256
                     },
@@ -87,7 +87,7 @@ pandora.ui.titlesDialog = function() {
 
         $findButton = Ox.Button({
                 disabled: true,
-                title: 'Find',
+                title: Ox._('Find'),
                 width: 48
             }).bindEvent({
                 click: function() {
@@ -107,7 +107,7 @@ pandora.ui.titlesDialog = function() {
         that = Ox.Dialog({
                 buttons: [
                     Ox.Button({
-                        title: 'Manage Names...'
+                        title: Ox._('Manage Names...')
                     }).bindEvent({
                         click: function() {
                             that.close();
@@ -119,7 +119,7 @@ pandora.ui.titlesDialog = function() {
                     {},
                     $findButton,
                     Ox.Button({
-                        title: 'Done',
+                        title: Ox._('Done'),
                         width: 48
                     }).bindEvent({
                         click: function() {
@@ -149,7 +149,7 @@ pandora.ui.titlesDialog = function() {
                 minHeight: 256,
                 minWidth: 512,
                 padding: 0,
-                title: 'Manage Titles',
+                title: Ox._('Manage Titles'),
                 width: width
             })
             .bindEvent({

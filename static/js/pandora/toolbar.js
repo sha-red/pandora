@@ -72,7 +72,7 @@ pandora.ui.toolbar = function() {
     function getListName(listId) {
         return '<b>' + (
             listId == ''
-                ? 'All ' + pandora.site.itemName.plural
+                ? Ox._('All {0}', [pandora.site.itemName.plural])
                 : Ox.encodeHTMLEntities(listId.slice(listId.indexOf(':') + 1))
         ) + '</b>';
     }

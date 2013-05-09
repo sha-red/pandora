@@ -18,7 +18,7 @@ pandora.ui.importAnnotations = function(data) {
             buttons: [
                 Ox.Button({
                     id: 'close',
-                    title: 'Close'
+                    title: Ox._('Close')
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -27,7 +27,7 @@ pandora.ui.importAnnotations = function(data) {
                 importButton = Ox.Button({
                     disabled: true,
                     id: 'import',
-                    title: 'Import'
+                    title: Ox._('Import')
                 }).bindEvent({
                     click: function() {
                         importButton.hide();
@@ -43,7 +43,7 @@ pandora.ui.importAnnotations = function(data) {
             height: 128,
             removeOnClose: true,
             width: 368,
-            title: 'Import Annotations'
+            title: Ox._('Import Annotations')
         })
         .bindEvent({
             close: function(data) {
@@ -55,11 +55,11 @@ pandora.ui.importAnnotations = function(data) {
             paddingBottom: '8px'
         }).appendTo(content);
 
-    setStatus('Please select layer and .srt file')
+    setStatus(Ox._('Please select layer and .srt file'))
     function addAnnotations() {
         var annotations, task;
         if (srt.length > 0) {
-            setStatus('Loading...');
+            setStatus(Ox._('Loading...'));
             var annotations = srt.filter(function(data) {
                 return !Ox.isUndefined(data['in']) && !Ox.isUndefined(data.out) && data.text;
             
@@ -80,21 +80,21 @@ pandora.ui.importAnnotations = function(data) {
             }, function(result) {
                 if (result.data.taskId) {
                     $status.html('').append(Ox.LoadingScreen({
-                        text: 'Importing ' + srt.length + ' annotations...'
+                        text: Ox._('Importing {0} annotations...', [srt.length])
                     }));
                     pandora.wait(result.data.taskId, function(result) {
                         if(result.data.status == 'SUCCESS') {
-                            setStatus(annotations.length + ' annotations imported.');
+                            setStatus(Ox._('{0} annotations imported.', [annotations.length]));
                             Ox.Request.clearCache(pandora.user.ui.item);
                             pandora.$ui.contentPanel.replaceElement(
                                 1, pandora.$ui.item = pandora.ui.item()
                             );
                         } else {
-                            setStatus('Importing annotations failed.');
+                            setStatus(Ox._('Importing annotations failed.'));
                         }
                     });
                 } else {
-                    setStatus('Importing annotations failed.');
+                    setStatus(Ox._('Importing annotations failed.'));
                 }
             });
         }
@@ -120,7 +120,7 @@ pandora.ui.importAnnotations = function(data) {
 
     selectLayer = Ox.Select({
             items: layers,
-            title: 'Select Layer',
+            title: Ox._('Select Layer'),
         })
         .css({
             margin: '4px 2px 4px 4px'
@@ -139,7 +139,7 @@ pandora.ui.importAnnotations = function(data) {
     selectFile = Ox.FileButton({
             image: 'upload',
             lbael: 'File',
-            title: 'Select SRT...',
+            title: Ox._('Select SRT...'),
             width: 156
         })
         .css({
@@ -158,8 +158,8 @@ pandora.ui.importAnnotations = function(data) {
                             selectFile.hide();
                         }
                         setStatus(
-                            'File contains ' + total + ' annotation'
-                            + (total == 1 ? '' : 's') + '.'
+                            Ox._('File contains {0} annotation'
+                            + (total == 1 ? '' : 's') + '.', [total])
                         );
                     };
                     reader.readAsText(data.files[0]);

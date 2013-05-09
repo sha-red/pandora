@@ -9,10 +9,10 @@ pandora.ui.logsDialog = function() {
 
         $findSelect = Ox.Select({
                 items: [
-                    {id: 'all', title: 'Find: All'},
-                    {id: 'user', title: 'Find: User'},
-                    {id: 'url', title: 'Find: URL'},
-                    {id: 'text', title: 'Find: Text'}
+                    {id: 'all', title: Ox._('Find: All')},
+                    {id: 'user', title: Ox._('Find: User')},
+                    {id: 'url', title: Ox._('Find: URL')},
+                    {id: 'text', title: Ox._('Find: Text')}
                 ],
                 overlap: 'right',
                 type: 'image',
@@ -55,7 +55,7 @@ pandora.ui.logsDialog = function() {
                 columns: [
                     {
                         id: 'id',
-                        title: 'ID',
+                        title: Ox._('ID'),
                         visible: false
                     },
                     {
@@ -64,7 +64,7 @@ pandora.ui.logsDialog = function() {
                         },
                         id: 'user',
                         operator: '+',
-                        title: 'User',
+                        title: Ox._('User'),
                         visible: true,
                         width: 72
                     },
@@ -75,7 +75,7 @@ pandora.ui.logsDialog = function() {
                         },
                         id: 'created',
                         operator: '-',
-                        title: 'Date',
+                        title: Ox._('Date'),
                         visible: true,
                         width: 144
                     },
@@ -85,7 +85,7 @@ pandora.ui.logsDialog = function() {
                         },
                         id: 'url',
                         operator: '+',
-                        title: 'URL',
+                        title: Ox._('URL'),
                         visible: true,
                         width: 320
                     },
@@ -95,7 +95,7 @@ pandora.ui.logsDialog = function() {
                         },
                         id: 'text',
                         operator: '+',
-                        title: 'Text',
+                        title: Ox._('Text'),
                         visible: true,
                         width: 640
                     },
@@ -131,7 +131,7 @@ pandora.ui.logsDialog = function() {
                             buttons: [
                                 Ox.Button({
                                     id: 'close',
-                                    title: 'Close'
+                                    title: Ox._('Close')
                                 })
                                 .bindEvent({
                                     click: function() {
@@ -161,7 +161,7 @@ pandora.ui.logsDialog = function() {
             buttons: [
                 Ox.Button({
                         id: 'done',
-                        title: 'Done',
+                        title: Ox._('Done'),
                         width: 48
                     }).bindEvent({
                         click: function() {
@@ -192,7 +192,7 @@ pandora.ui.logsDialog = function() {
             minWidth: 512,
             padding: 0,
             removeOnClose: true,
-            title: 'Error Logs',
+            title: Ox._('Error Logs'),
             width: width
         }),
 

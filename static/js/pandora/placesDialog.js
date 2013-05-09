@@ -79,7 +79,7 @@ pandora.ui.placesDialog = function(options) {
             buttons: [
                 Ox.Button({
                     id: 'manageEvents',
-                    title: 'Manage Events...'
+                    title: Ox._('Manage Events...')
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -91,7 +91,7 @@ pandora.ui.placesDialog = function(options) {
                 {},
                 Ox.Button({
                     id: 'done',
-                    title: 'Done',
+                    title: Ox._('Done'),
                     width: 48
                 }).bindEvent({
                     click: function() {
@@ -107,7 +107,7 @@ pandora.ui.placesDialog = function(options) {
             minWidth: 512,
             //keys: {enter: 'done', escape: 'done'},
             padding: 0,
-            title: 'Manage Places',
+            title: Ox._('Manage Places'),
             width: width
         })
         .bindEvent({

@@ -34,7 +34,7 @@ pandora.ui.namesDialog = function() {
                 columns: [
                     {
                         id: 'id',
-                        title: 'ID',
+                        title: Ox._('ID'),
                         visible: false,
                         width: 0
                     },
@@ -42,7 +42,7 @@ pandora.ui.namesDialog = function() {
                         id: 'name',
                         operator: '+',
                         removable: false,
-                        title: 'Name',
+                        title: Ox._('Name'),
                         visible: true,
                         width: 256
                     },
@@ -50,8 +50,8 @@ pandora.ui.namesDialog = function() {
                         editable: true,
                         id: 'sortname',
                         operator: '+',
-                        title: 'Sort Name',
-                        tooltip: 'Edit Sort Name',
+                        title: Ox._('Sort Name'),
+                        tooltip: Ox._('Edit Sort Name'),
                         visible: true,
                         width: 256
                     },
@@ -59,7 +59,7 @@ pandora.ui.namesDialog = function() {
                         id: 'numberofnames',
                         align: 'right',
                         operator: '-',
-                        title: 'Names',
+                        title: Ox._('Names'),
                         visible: true,
                         width: 64
                     },
@@ -98,7 +98,7 @@ pandora.ui.namesDialog = function() {
 
         $findButton = Ox.Button({
                 disabled: true,
-                title: 'Find',
+                title: Ox._('Find'),
                 width: 48
             }).bindEvent({
                 click: function() {
@@ -118,7 +118,7 @@ pandora.ui.namesDialog = function() {
         that = Ox.Dialog({
                 buttons: [
                     Ox.Button({
-                        title: 'Manage Titles...'
+                        title: Ox._('Manage Titles...')
                     }).bindEvent({
                         click: function() {
                             that.close();
@@ -130,7 +130,7 @@ pandora.ui.namesDialog = function() {
                     {},
                     $findButton,
                     Ox.Button({
-                        title: 'Done',
+                        title: Ox._('Done'),
                         width: 48
                     }).bindEvent({
                         click: function() {
@@ -160,7 +160,7 @@ pandora.ui.namesDialog = function() {
                 minHeight: 256,
                 minWidth: 512,
                 padding: 0,
-                title: 'Manage Names',
+                title: Ox._('Manage Names'),
                 width: width
             })
             .bindEvent({

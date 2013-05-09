@@ -5,7 +5,7 @@ pandora.ui.publicListsDialog = function() { // fixme: unused
         buttons: [
             Ox.Button({
                 id: 'done',
-                title: 'Done'
+                title: Ox._('Done')
             }).bindEvent({
                 click: function() {
                     that.close();
@@ -16,7 +16,7 @@ pandora.ui.publicListsDialog = function() { // fixme: unused
         height: 320,
         keys: {enter: 'close', escape: 'close'},
         padding: 0,
-        title: 'Public Lists',
+        title: Ox._('Public Lists'),
         width: 420
     })
     .css({

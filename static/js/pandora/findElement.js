@@ -10,8 +10,8 @@ pandora.ui.findElement = function() {
             elements: [].concat(pandora.user.ui._list ? [
                     pandora.$ui.findListSelect = Ox.Select({
                             items: [
-                                {id: 'all', title: 'Find: All ' + pandora.site.itemName.plural},
-                                {id: 'list', title: 'Find: This List'}
+                                {id: 'all', title: Ox._('Find: All {0}', [Ox._(pandora.site.itemName.plural)])},
+                                {id: 'list', title: Ox._('Find: This List')}
                             ],
                             overlap: 'right',
                             type: 'image',
@@ -34,12 +34,12 @@ pandora.ui.findElement = function() {
                                 }).map(function(key) {
                                     return {
                                         id: key.id,
-                                        title: 'Find: ' + key.title
+                                        title: Ox._('Find: {0}', [Ox._(key.title)])
                                     };
                                 }),
                                 [{}, {
                                     id: 'advanced',
-                                    title: 'Find: Advanced...'
+                                    title: Ox._('Find: Advanced...')
                                 }]
                             ),
                             overlap: 'right',
@@ -70,7 +70,7 @@ pandora.ui.findElement = function() {
                         autocompleteSelectSubmit: true,
                         clear: true,
                         id: 'input',
-                        placeholder: findKey == 'advanced' ? 'Edit Query...' : '',
+                        placeholder: findKey == 'advanced' ? Ox._('Edit Query...') : '',
                         value: findValue,
                         width: 192
                     })
@@ -146,7 +146,7 @@ pandora.ui.findElement = function() {
         pandora.$ui.findSelect.value(findState.key);
         pandora.$ui.findInput.options(
             findState.key == 'advanced'
-            ? {placeholder: 'Edit Query...', value: ''}
+            ? {placeholder: Ox._('Edit Query...'), value: ''}
             : {
                 autocomplete: autocompleteFunction(),
                 placeholder: '',

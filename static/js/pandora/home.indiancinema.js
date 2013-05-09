@@ -135,7 +135,7 @@ pandora.ui.home = function() {
             .appendTo($box),
 
         $findButton = Ox.Button({
-                title: 'Find',
+                title: Ox._('Find'),
                 width: 122
             })
             .css({
@@ -169,7 +169,7 @@ pandora.ui.home = function() {
             .appendTo($box),
 
         $browseButton = Ox.Button({
-                title: 'Browse',
+                title: Ox._('Browse'),
                 width: 122
             })
             .css({
@@ -192,7 +192,7 @@ pandora.ui.home = function() {
             .appendTo($box),
 
         $signupButton = Ox.Button({
-                title: 'Sign Up',
+                title: Ox._('Sign Up'),
                 width: 122
             })
             .css({
@@ -212,7 +212,7 @@ pandora.ui.home = function() {
             }),
 
         $signinButton = Ox.Button({
-                title: 'Sign In',
+                title: Ox._('Sign In'),
                 width: 122
             })
             .css({
@@ -232,7 +232,7 @@ pandora.ui.home = function() {
             }),
 
         $preferencesButton = Ox.Button({
-                title: 'Preferences',
+                title: Ox._('Preferences'),
                 width: 252
             })
             .css({
@@ -252,7 +252,7 @@ pandora.ui.home = function() {
             }),
 
         $aboutButton = Ox.Button({
-                title: 'About ' + pandora.site.site.name,
+                title: Ox._('About {0}', [pandora.site.site.name]),
                 width: 252
             })
             .css({
@@ -336,13 +336,13 @@ pandora.ui.home = function() {
             if (items.length) {
                 $label = Ox.Label({
                         textAlign: 'center',
-                        title: '<b>Featured ' + (
+                        title: '<b>' + Ox._('Featured ' + (
                             lists == 1 && texts == 0 ? 'List'
                             : lists == 0 && texts == 1 ? 'Text'
                             : texts == 0 ? 'Lists'
                             : lists == 0 ? 'Texts'
                             : 'Lists and Texts'
-                        ) + '</b>',
+                        )) + '</b>',
                         width: 512
                     })
                     .css({
@@ -519,7 +519,7 @@ pandora.ui.home = function() {
                             .appendTo($featuresContent);
                         $featureIcon[i] = Ox.Element({
                                 element: '<img>',
-                                tooltip: (lists && texts ? Ox.toTitleCase(item.type) + ': ' : '')
+                                tooltip: (lists && texts ? Ox._(Ox.toTitleCase(item.type)) + ': ' : '')
                                     + Ox.encodeHTMLEntities(item.name)
                             })
                             .attr({
@@ -576,7 +576,7 @@ pandora.ui.home = function() {
 
             function getHTML(item) {
                 return '<b>'
-                    + (lists && texts ? Ox.toTitleCase(item.type) + ': ' : '')
+                    + (lists && texts ? Ox._(Ox.toTitleCase(item.type)) + ': ' : '')
                     + Ox.encodeHTMLEntities(item.name) + '</b><br><br>'
                     + item.description;
             }
@@ -587,7 +587,7 @@ pandora.ui.home = function() {
             }
 
             function getTooltip(item) {
-                return 'View ' + Ox.toTitleCase(item.type)
+                return Ox._('View {0}', [Ox._(Ox.toTitleCase(item.type))])
             }
 
             function openItem(i) {

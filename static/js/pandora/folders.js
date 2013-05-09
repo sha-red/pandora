@@ -25,26 +25,26 @@ pandora.ui.folders = function() {
         if (folder.id == 'personal') {
             if (pandora.user.level == 'guest') {
                 extras = [
-                    infoButton('Personal ' + folderItems, 'To create and share your own ' + (ui.section == 'items'
-                        ? 'lists of ' + pandora.site.itemName.plural.toLowerCase()
-                        : ui.section) + ', please sign up or sign in.')
+                    infoButton(Ox._('Personal {0}', [Ox._(folderItems)]),
+                        Ox._('To create and share your own list of {0} please sign up or sign in.', [Ox._(pandora.site.itemName.plural.toLowerCase())]),
+                        Ox._('To create and share your own {0} please sign up or sign in.', [ui.section]))
                 ];
             } else {
                 if (ui.section == 'items') {
                     extras = [
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [
-                                { id: 'newlist', title: 'New List' },
-                                { id: 'newlistfromselection', title: 'New List from Selection', disabled: ui.listSelection.length == 0 },
-                                { id: 'newsmartlist', title: 'New Smart List' },
-                                { id: 'newsmartlistfromresults', title: 'New Smart List from Results' },
+                                { id: 'newlist', title: Ox._('New List') },
+                                { id: 'newlistfromselection', title: Ox._('New List from Selection'), disabled: ui.listSelection.length == 0 },
+                                { id: 'newsmartlist', title: Ox._('New Smart List') },
+                                { id: 'newsmartlistfromresults', title: Ox._('New Smart List from Results') },
                                 {},
-                                { id: 'duplicatelist', title: 'Duplicate Selected List', disabled: !pandora.user.ui._list },
-                                { id: 'editlist', title: 'Edit Selected List...', disabled: !pandora.user.ui._list },
-                                { id: 'deletelist', title: 'Delete Selected List...', disabled: !pandora.user.ui._list }
+                                { id: 'duplicatelist', title: Ox._('Duplicate Selected List'), disabled: !pandora.user.ui._list },
+                                { id: 'editlist', title: Ox._('Edit Selected List...'), disabled: !pandora.user.ui._list },
+                                { id: 'deletelist', title: Ox._('Delete Selected List...'), disabled: !pandora.user.ui._list }
                             ],
                             title: 'edit',
-                            tooltip: 'Manage Personal Lists',
+                            tooltip: Ox._('Manage Personal Lists'),
                             type: 'image'
                         })
                         .bindEvent({
@@ -86,13 +86,13 @@ pandora.ui.folders = function() {
                     extras = [
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [
-                                { id: 'newtext', title: 'New Text' },
-                                { id: 'newpdf', title: 'New  PDF' },
+                                { id: 'newtext', title: Ox._('New Text') },
+                                { id: 'newpdf', title: Ox._('New  PDF') },
                                 {},
-                                { id: 'deletetext', title: 'Delete Selected Text...', disabled: !ui.text }
+                                { id: 'deletetext', title: Ox._('Delete Selected Text...'), disabled: !ui.text }
                             ],
                             title: 'edit',
-                            tooltip: 'Manage Personal Texts',
+                            tooltip: Ox._('Manage Personal Texts'),
                             type: 'image'
                         })
                         .bindEvent({
@@ -119,14 +119,14 @@ pandora.ui.folders = function() {
             }
         } else if (folder.id == 'favorite') {
             if (pandora.user.level == 'guest') {
-                extras = [infoButton('Favorite ' + folderItems,
-                    'To browse and subscribe to shared ' + folderItems.toLowerCase() + ' from other users, please sign up or sign in.')];
+                extras = [infoButton(Ox._('Favorite ', folderItems),
+                    Ox._('To browse and subscribe to shared {0} from other users, please sign up or sign in.', [Ox._(folderItems.toLowerCase())]))];
             } else {
                 extras = [pandora.$ui.manageListsButton['favorite'] = Ox.Button({
                     selectable: true,
                     style: 'symbol',
-                    title: 'Edit',
-                    tooltip: 'Manage Favorite ' + folderItems,
+                    title: Ox._('Edit'),
+                    tooltip: Ox._('Manage Favorite {0}', [Ox._(folderItems)]),
                     type: 'image'
                 })
                 .bindEvent({
@@ -134,7 +134,7 @@ pandora.ui.folders = function() {
                         var listData;
                         Ox.Request.clearCache(); // fixme: remove
                         pandora.site.sectionFolders[ui.section][i].showBrowser = !pandora.site.sectionFolders[ui.section][i].showBrowser;
-                        this.options({tooltip: data.value ? 'Done' : 'Manage Favorite ' + folderItems});
+                        this.options({tooltip: data.value ? Ox._('Done') : Ox._('Manage Favorite {0}', [Ox._(folderItems)])});
                         if (pandora.site.sectionFolders[ui.section][i].showBrowser) {
                             pandora.$ui.folderList.favorite.replaceWith(
                                 pandora.$ui.folderBrowser.favorite = pandora.ui.folderBrowser('favorite')
@@ -167,13 +167,15 @@ pandora.ui.folders = function() {
             }
         } else if (folder.id == 'featured') {
             if (pandora.user.level != 'admin') {
-                extras = [infoButton('Featured ' + folderItems, 'Featured ' + folderItems.toLowerCase() + ' are selected public ' + folderItems.toLowerCase() + ', picked by the ' + pandora.site.site.name + ' staff.')];
+                extras = [infoButton(Ox._('Featured {0}', [Ox._(folderItems)]),
+                    Ox._('Featured {0} are selected public {0}, picked by the {1} staff.',
+                        [Ox._(folderItems.toLowerCase()), pandora.site.site.name]))];
             } else {
                 extras = [pandora.$ui.manageListsButton['featured'] = Ox.Button({
                     selectable: true,
                     style: 'symbol',
-                    title: 'Edit',
-                    tooltip: 'Manage Featured ' + folderItems,
+                    title: Ox._('Edit'),
+                    tooltip: Ox._('Manage Featured {0}', [Ox._(folderItems)]),
                     type: 'image'
                 })
                 .bindEvent({
@@ -181,7 +183,7 @@ pandora.ui.folders = function() {
                         var listData;
                         Ox.Request.clearCache(); // fixme: remove
                         pandora.site.sectionFolders[ui.section][i].showBrowser = !pandora.site.sectionFolders[ui.section][i].showBrowser;
-                        this.options({tooltip: data.value ? 'Done' : 'Manage Favorite ' + folderItems});
+                        this.options({tooltip: data.value ? Ox._('Done') : Ox._('Manage Favorite {0}', [Ox._(folderItems)])});
                         if (pandora.site.sectionFolders[ui.section][i].showBrowser) {
                             pandora.$ui.folderList.featured.replaceWith(
                                 pandora.$ui.folderBrowser.featured = pandora.ui.folderBrowser('featured')
@@ -221,18 +223,20 @@ pandora.ui.folders = function() {
             }
         } else if (folder.id == 'volumes') {
             if (pandora.user.level == 'guest') {
-                extras = [infoButton('Local Volumes', 'To import movies from a local disk, please sign up or sign in.')];
+                extras = [infoButton(Ox._('Local Volumes'), Ox._('To import {0} from a local disk, please sign up or sign in.',
+                    [Ox._(pandora.site.itemName.plural.toLocaleLowerCase())]))];
             } else {
                 extras = [Ox.MenuButton({
                     items: [
-                        { id: 'add', title: 'Add Volume...', disabled: true },
-                        { id: 'scan', title: 'Scan Selected Volume...', disabled: true },
-                        { id: 'remove', title: 'Remove Selected Volume...', disabled: true },
+                        { id: 'add', title: Ox._('Add Volume...'), disabled: true },
+                        { id: 'scan', title: Ox._('Scan Selected Volume...'), disabled: true },
+                        { id: 'remove', title: Ox._('Remove Selected Volume...'), disabled: true },
                         {},
-                        { id: 'import', title: 'Import Movies...', disabled: true }
+                        { id: 'import', title: Ox._('Import {0}...',
+                            [Ox._(pandora.site.itemName.plural.toLocaleLowerCase())]), disabled: true }
                     ],
                     title: 'edit',
-                    tooltip: 'Manage Volumes',
+                    tooltip: Ox._('Manage Volumes'),
                     type: 'image'
                 })
                 .bindEvent({
@@ -315,27 +319,27 @@ pandora.ui.folders = function() {
         }).bindEvent({
             click: function() {
                 var $dialog = pandora.ui.iconDialog({
-                    buttons: title != 'Featured Lists' ? [
-                        Ox.Button({title: 'Sign Up...'}).bindEvent({
+                    buttons: title != Ox._('Featured Lists') ? [
+                        Ox.Button({title: Ox._('Sign Up...')}).bindEvent({
                             click: function() {
                                 $dialog.close();
                                 pandora.$ui.accountDialog = pandora.ui.accountDialog('signup').open();
                             }
                         }),
-                        Ox.Button({title: 'Sign In...'}).bindEvent({
+                        Ox.Button({title: Ox._('Sign In...')}).bindEvent({
                             click: function() {
                                 $dialog.close();
                                 pandora.$ui.accountDialog = pandora.ui.accountDialog('signin').open();
                             }
                         }),
                         {},
-                        Ox.Button({title: 'Not Now'}).bindEvent({
+                        Ox.Button({title: Ox._('Not Now')}).bindEvent({
                             click: function() {
                                 $dialog.close();
                             }
                         })
                     ] : [
-                        Ox.Button({title: 'Close'}).bindEvent({
+                        Ox.Button({title: Ox._('Close')}).bindEvent({
                             click: function() {
                                 $dialog.close();
                             }

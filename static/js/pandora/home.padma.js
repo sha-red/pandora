@@ -54,7 +54,7 @@ pandora.ui.home = function() {
             .appendTo($box),
         $logo = Ox.Element({
                 element: '<img>',
-                tooltip: 'Enter ' + pandora.site.site.name
+                tooltip: Ox._('Enter {0}', [pandora.site.site.name])
             })
             .attr({
                 id: 'logo',
@@ -101,7 +101,7 @@ pandora.ui.home = function() {
             })
             .appendTo($box),
         $findButton = Ox.Button({
-                title: 'Find',
+                title: Ox._('Find'),
                 width: 122
             })
             .css({
@@ -134,7 +134,7 @@ pandora.ui.home = function() {
             })
             .appendTo($box),
         $browseButton = Ox.Button({
-                title: 'Browse',
+                title: Ox._('Browse'),
                 width: 122
             })
             .css({
@@ -156,7 +156,7 @@ pandora.ui.home = function() {
             })
             .appendTo($box),
         $signupButton = Ox.Button({
-                title: 'Sign Up',
+                title: Ox._('Sign Up'),
                 width: 122
             })
             .css({
@@ -175,7 +175,7 @@ pandora.ui.home = function() {
                 }
             }),
         $signinButton = Ox.Button({
-                title: 'Sign In',
+                title: Ox._('Sign In'),
                 width: 122
             })
             .css({
@@ -194,7 +194,7 @@ pandora.ui.home = function() {
                 }
             }),
         $preferencesButton = Ox.Button({
-                title: 'Preferences',
+                title: Ox._('Preferences'),
                 width: 252
             })
             .css({
@@ -213,7 +213,7 @@ pandora.ui.home = function() {
                 }
             }),
         $aboutButton = Ox.Button({
-                title: 'About ' + pandora.site.site.name,
+                title: Ox._('About {0}', [pandora.site.site.name]),
                 width: 252
             })
             .css({
@@ -276,7 +276,7 @@ pandora.ui.home = function() {
             if (lists.length) {
                 $label = Ox.Label({
                         textAlign: 'center',
-                        title: '<b>Featured List' + (lists.length > 1 ? 's' : '') + '</b>',
+                        title: '<b>' + Ox.formatCount(lists, 'Featured List') +  '</b>',
                         width: 512
                     })
                     .css({
@@ -313,7 +313,7 @@ pandora.ui.home = function() {
                 pandora.createLinks($text);
                 $icon = Ox.Element({
                         element: '<img>',
-                        tooltip: 'View List'
+                        tooltip: Ox._('View List')
                     })
                     .attr({
                         src: '/list/' + lists[selected].user + ':'

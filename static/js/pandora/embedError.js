@@ -34,8 +34,8 @@ pandora.ui.embedError = function(notImplemented) {
                 .css({marginTop: '4px', fontSize: '9px', textAlign: 'center'})
                 .html(
                     notImplemented
-                    ? 'This view is not<br>implemented.'
-                    : 'This view cannot<br>be embedded.'
+                    ? Ox._('This view is not<br>implemented.')
+                    : Ox._('This view cannot<br>be embedded.')
                 )
         )
         .appendTo(that);

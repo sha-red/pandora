@@ -19,7 +19,7 @@ pandora.ui.uploadFileDialog = function(file, callback) {
         $content = Ox.Element().css({margin: '16px'}),
 
         $text = $('<div>')
-            .html('Uploading ' + file.name)
+            .html(Ox._('Uploading {0}', [file.name]))
             .appendTo($content),
 
         $progress = Ox.Progressbar({
@@ -37,14 +37,14 @@ pandora.ui.uploadFileDialog = function(file, callback) {
                 buttons: [
                     Ox.Button({
                         id: 'close',
-                        title: 'Cancel Upload'
+                        title: Ox._('Cancel Upload')
                     }).bindEvent({
                         click: function() {
                             var title = this.options('title');
                             $uploadDialog.close();
-                            if (title == 'Cancel Upload') {
+                            if (title == Ox._('Cancel Upload')) {
                                 upload.abort();
-                            } else if (title == 'Done') {
+                            } else if (title == Ox._('Done')) {
                                 callback({
                                     id: id
                                 });
@@ -56,7 +56,7 @@ pandora.ui.uploadFileDialog = function(file, callback) {
                 height: 112,
                 keys: {escape: 'close'},
                 width: 288,
-                title: 'Upload File'
+                title: Ox._('Upload File')
             })
             .bindEvent({
                 open: function() {
@@ -70,11 +70,11 @@ pandora.ui.uploadFileDialog = function(file, callback) {
                         .bindEvent({
                             done: function(data) {
                                 if (data.progress == 1) {
-                                    $uploadDialog.options('buttons')[0].options({title: 'Done'});
+                                    $uploadDialog.options('buttons')[0].options({title: Ox._('Done')});
                                     Ox.print('SUCCEEDED');
                                 } else {
-                                    $message.html('Upload failed.')
-                                    $uploadDialog.options('buttons')[0].options({title: 'Close'});
+                                    $message.html(Ox._('Upload failed.'))
+                                    $uploadDialog.options('buttons')[0].options({title: Ox._('Close')});
                                     Ox.print('FAILED');
                                 }
                             },
@@ -86,7 +86,7 @@ pandora.ui.uploadFileDialog = function(file, callback) {
             });
 
     if (!Ox.contains(extensions, extension)) {
-        return errorDialog('Supported file types are GIF, JPG, PNG and PDF.');
+        return errorDialog(Ox._('Supported file types are GIF, JPG, PNG and PDF.'));
     } else {
         Ox.oshash(file, function(oshash) {
             pandora.api.findFiles({
@@ -99,12 +99,9 @@ pandora.ui.uploadFileDialog = function(file, callback) {
                 sort: [{key: 'name', operator: '+'}]
             }, function(result) {
                 if (result.data.items.length) {
-                    errorDialog(
-                        'The file ' + id + ' already exists' + (
-                            filename == result.data.items[0].id
-                                ? ''
-                                : ' as ' + result.data.items[0].id
-                        ) + '.'
+                    errorDialog(filename == result.data.items[0].id
+                        ? Ox._('The file {0} already exists', [filename])
+                        : Ox._('The file {0} already exists as {1}', [filename, result.data.items[0].id])
                     ).open();
                 } else {
                     $uploadDialog.open();
@@ -119,7 +116,7 @@ pandora.ui.uploadFileDialog = function(file, callback) {
             buttons: [
                 Ox.Button({
                         id: 'close',
-                        title: 'Close'
+                        title: Ox._('Close')
                     })
                     .bindEvent({
                         click: function() {
@@ -127,7 +124,7 @@ pandora.ui.uploadFileDialog = function(file, callback) {
                         }
                     })
             ],
-            title: 'Upload File',
+            title: Ox._('Upload File'),
             text: text
         });
     }

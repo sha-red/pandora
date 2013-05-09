@@ -11,7 +11,7 @@ pandora.ui.helpDialog = function() {
             buttons: [
                 Ox.Button({
                     id: 'switch',
-                    title: 'API Documentation...'
+                    title: Ox._('API Documentation...')
                 }).bindEvent({
                     click: function() {
                         pandora.UI.set({page: 'api', 'hash.anchor': ''});
@@ -20,7 +20,7 @@ pandora.ui.helpDialog = function() {
                 {},
                 Ox.Button({
                     id: 'close',
-                    title: 'Close'
+                    title: Ox._('Close')
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -35,7 +35,7 @@ pandora.ui.helpDialog = function() {
             minHeight: 256,
             minWidth: 544 + 2 * Ox.UI.SCROLLBAR_SIZE,
             removeOnClose: true,
-            title: 'Help',
+            title: Ox._('Help'),
             width: 672 + 2 * Ox.UI.SCROLLBAR_SIZE
         })
         .bindEvent({
@@ -56,19 +56,19 @@ pandora.ui.helpDialog = function() {
             strings = Ox.clone(pandora.site, true);
 
         strings.addAnnotationShortcuts = strings.layers.map(function(layer, index) {
-            return '<tr><td>' + index + '</td><td>Add ' + layer.item.toLowerCase() + '</td></tr>';
+            return '<tr><td>' + index + '</td><td>' + Ox._('Add {0}', [layer.item.toLowerCase()]) + '</td></tr>';
         }).join('\n');
         strings.itemName = Ox.map(strings.itemName, function(v) {
             return v.toLowerCase();
         });
         strings.signup = pandora.user.level == 'guest'
-            ? '<a href="/signup">sign up</a>' : 'sign up';
+            ? '<a href="/signup">' + Ox._('sign up') + '</a>' : Ox._('sign up');
 
         $html.html(Ox.formatString(html, strings));
 
         pandora.site.help.forEach(function(section) {
             var html = $html.find('#' + section.id).html();
-            text[section.id] = '<h1><b>' + section.title + '</b></h1>\n' + html;
+            text[section.id] = '<h1><b>' + Ox._(section.title) + '</b></h1>\n' + html;
         });
 
         $list = Ox.TableList({

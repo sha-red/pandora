@@ -92,7 +92,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
                     resizable: true,
                     resize: listSizes,
                     size: listSize,
-                    tooltip: 'clips'
+                    tooltip: Ox._('clips')
                 }
             ],
             orientation: 'horizontal'
@@ -206,7 +206,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
     function selectItem(data) {
         var id = data.id || '';
         if (id && id[0] != '_') {
-            $status.html('Loading...');
+            $status.html(Ox._('Loading...'));
             $list.options({
                 items: function(data, callback) {
                     var itemsQuery;

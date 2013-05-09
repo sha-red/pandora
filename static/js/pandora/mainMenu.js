@@ -3,7 +3,6 @@
 'use strict';
 
 pandora.ui.mainMenu = function() {
-
     var isGuest = pandora.user.level == 'guest',
         ui = pandora.user.ui,
         findState = pandora.getFindState(ui.find),
@@ -19,154 +18,194 @@ pandora.ui.mainMenu = function() {
                 [
                     { id: pandora.site.site.id + 'Menu', title: pandora.site.site.name, items: [].concat(
                         [
-                            { id: 'home', title: 'Home' },
+                            { id: 'home', title: Ox._('Home') },
                             {}
                         ],
-                        Ox.clone(pandora.site.sitePages, true),
+                        Ox.clone(pandora.site.sitePages, true).map(function(page) {
+                            page.title = Ox._(page.title);
+                            return page;
+                        }),
                         [
                             {},
-                            { id: 'software', title: 'Software' }
+                            { id: 'software', title: Ox._('Software') }
                         ]
                     ) },
-                    { id: 'userMenu', title: 'User', items: [
-                        { id: 'username', title: 'User: ' + (isGuest ? 'not signed in' : Ox.encodeHTMLEntities(pandora.user.username)), disabled: true },
+                    { id: 'userMenu', title: Ox._('User'), items: [
+                        { id: 'username', title: Ox._('User: {0}', [isGuest ? 'not signed in' : Ox.encodeHTMLEntities(pandora.user.username)]), disabled: true },
                         {},
-                        { id: 'preferences', title: 'Preferences...', disabled: isGuest, keyboard: 'control ,' },
-                        { id: 'archives', title: 'Archives...', disabled: /*isGuest*/ true },
+                        { id: 'preferences', title: Ox._('Preferences...'), disabled: isGuest, keyboard: 'control ,' },
+                        { id: 'archives', title: Ox._('Archives...'), disabled: /*isGuest*/ true },
                         {},
-                        { id: 'signup', title: 'Sign Up...', disabled: !isGuest },
-                        isGuest ? { id: 'signin', title: 'Sign In...' }
-                            : { id: 'signout', title: 'Sign Out...'}
+                        { id: 'signup', title: Ox._('Sign Up...'), disabled: !isGuest },
+                        isGuest ? { id: 'signin', title: Ox._('Sign In...')}
+                            : { id: 'signout', title: Ox._('Sign Out...')}
                     ] },
                     getListMenu(),
-                    { id: 'editMenu', title: 'Edit', items: [
-                        { id: 'add', title: 'Add ' + pandora.site.itemName.singular, disabled: pandora.site.itemRequiresVideo || !pandora.site.capabilities.canAddItems[pandora.user.level] },
-                        { id: 'upload', title: 'Upload Video...', disabled: !pandora.site.capabilities.canAddItems[pandora.user.level] },
+                    { id: 'editMenu', title: Ox._('Edit'), items: [
+                        { id: 'add', title: Ox._('Add {0}', [Ox._(pandora.site.itemName.singular)]), disabled: pandora.site.itemRequiresVideo || !pandora.site.capabilities.canAddItems[pandora.user.level] },
+                        { id: 'upload', title: Ox._('Upload Video...'), disabled: !pandora.site.capabilities.canAddItems[pandora.user.level] },
                         {},
-                        { id: 'undo', title: 'Undo', disabled: true, keyboard: 'control z' },
-                        { id: 'redo', title: 'Redo', disabled: true, keyboard: 'shift control z' },
+                        { id: 'undo', title: Ox._('Undo'), disabled: true, keyboard: 'control z' },
+                        { id: 'redo', title: Ox._('Redo'), disabled: true, keyboard: 'shift control z' },
                         {},
-                        { id: 'cut', title: 'Cut', disabled: true, keyboard: 'control x' },
-                        { id: 'copy', title: 'Copy', disabled: true, keyboard: 'control c' },
-                        { id: 'paste', title: 'Paste', disabled: true, keyboard: 'control v' },
-                        { id: 'delete', title: 'Delete', disabled: true, keyboard: 'delete' },
+                        { id: 'cut', title: Ox._('Cut{control_x}', {control_x:''}), disabled: true, keyboard: 'control x' },
+                        { id: 'copy', title: Ox._('Copy'), disabled: true, keyboard: 'control c' },
+                        { id: 'paste', title: Ox._('Paste'), disabled: true, keyboard: 'control v' },
+                        { id: 'delete', title: Ox._('Delete'), disabled: true, keyboard: 'delete' },
                         {},
-                        { id: 'selectall', title: 'Select All', disabled: true, keyboard: 'control a' },
-                        { id: 'selectnone', title: 'Select None', disabled: true, keyboard: 'shift control a' },
-                        { id: 'invertselection', title: 'Invert Selection', disabled: true, keyboard: 'alt control a' }
+                        { id: 'selectall', title: Ox._('Select All'), disabled: true, keyboard: 'control a' },
+                        { id: 'selectnone', title: Ox._('Select None'), disabled: true, keyboard: 'shift control a' },
+                        { id: 'invertselection', title: Ox._('Invert Selection'), disabled: true, keyboard: 'alt control a' }
                     ] },
-                    { id: 'viewMenu', title: 'View', items: [
-                        { id: 'items', title: 'View ' + pandora.site.itemName.plural, items: [
+                    { id: 'viewMenu', title: Ox._('View'), items: [
+                        { id: 'items', title: Ox._('View {0}', [Ox._(pandora.site.itemName.plural)]), items: [
                             { group: 'listview', min: 1, max: 1, items: pandora.site.listViews.map(function(view) {
                                 return Ox.extend({
                                     checked: ui.listView == view.id
-                                }, view);
+                                }, view, {
+                                    title: Ox._(view.title)
+                                });
                             }) },
                         ]},
-                        { id: 'icons', title: 'Icons', items: [].concat([
+                        { id: 'icons', title: Ox._('Icons'), items: [].concat([
                                 { group: 'viewicons', min: 1, max: 1, items: ['posters', 'frames'].map(function(icons) {
-                                    return {id: icons, title: Ox.toTitleCase(icons), checked: ui.icons == icons};
+                                    return {id: icons, title: Ox._(Ox.toTitleCase(icons)), checked: ui.icons == icons};
                                 }) },
                                 {},
                             ], pandora.site.media.importPosters ? [
-                                { id: 'showsiteposters', title: 'Always Show ' + pandora.site.site.name + ' Poster', checked: ui.showSitePosters },
+                                { id: 'showsiteposters', title: Ox._('Always Show {0} Poster', [pandora.site.site.name]), checked: ui.showSitePosters },
                                 {}
                             ] : [], [
-                                { id: 'showreflections', title: 'Show Reflections', checked: true, disabled: true }
+                                { id: 'showreflections', title: Ox._('Show Reflections'), checked: true, disabled: true }
                             ]
                         ) },
-                        { id: 'timelines', title: 'Timelines', items: [
+                        { id: 'timelines', title: Ox._('Timelines'), items: [
                             { group: 'viewtimelines', min: 1, max: 1, items: pandora.site.timelines.map(function(mode) {
-                                return {id: mode.id, title: mode.title, checked: ui.videoTimeline == mode.id};
+                                return {id: mode.id, title: Ox._(mode.title), checked: ui.videoTimeline == mode.id};
                             }) }
                         ]},
-                        { id: 'columns', title: 'Columns', items: [
-                            { id: 'loadcolumns', title: 'Load Layout...', disabled: true },
-                            { id: 'savecolumns', title: 'Save Layout...', disabled: true },
+                        { id: 'columns', title: Ox._('Columns'), items: [
+                            { id: 'loadcolumns', title: Ox._('Load Layout...'), disabled: true },
+                            { id: 'savecolumns', title: Ox._('Save Layout...'), disabled: true },
                             {},
-                            { id: 'resetcolumns', title: 'Reset Layout', disabled: true }
+                            { id: 'resetcolumns', title: Ox._('Reset Layout'), disabled: true }
                         ] },
                         {},
-                        { id: 'item', title: ['Open ' + pandora.site.itemName.singular, 'Open ' + pandora.site.itemName.plural], items: [
+                        { id: 'item', title: [
+                                Ox._('Open {0}', [Ox._(pandora.site.itemName.singular)]),
+                                Ox._('Open {0}', [Ox._(pandora.site.itemName.plural)])
+                            ], items: [
                             { group: 'itemview', min: 1, max: 1, items: pandora.site.itemViews.map(function(view) {
                                 return Ox.extend({
                                     checked: ui.itemView == view.id
                                 }, view);
                             }) },
                         ] },
-                        { id: 'clips', title: 'Open Clips', items: [
+                        { id: 'clips', title: Ox._('Open Clips'), items: [
                             { group: 'videoview', min: 1, max: 1, items: ['player', 'editor', 'timeline'].map(function(view) {
-                                return {id: view, title: Ox.toTitleCase(view), checked: ui.videoView == view};
+                                return {id: view, title: Ox._(Ox.toTitleCase(view)), checked: ui.videoView == view};
                             }) }
                         ] },
                         {},
-                        { id: 'filters', title: 'Filters', items: [
+                        { id: 'filters', title: Ox._('Filters'), items: [
                             { group: 'filters', min: 5, max: 5, items: pandora.site.filters.map(function(filter) {
                                 return Ox.extend({
                                     checked: Ox.getIndexById(ui.filters, filter.id) > -1
-                                }, filter);
+                                }, filter, {
+                                    title: Ox._(filter.title)
+                                });
                             }) },
                             {},
-                            { id: 'resetfilters', title: 'Reset Filters' }
+                            { id: 'resetfilters', title: Ox._('Reset Filters') }
                         ] },
                         {},
-                        { id: 'showsidebar', title: (ui.showSidebar ? 'Hide' : 'Show') + ' Sidebar', keyboard: 'shift s' },
-                        { id: 'showinfo', title: (ui.showInfo ? 'Hide' : 'Show') + ' Info', disabled: !ui.showSidebar, keyboard: 'shift i' },
-                        { id: 'showfilters', title: (ui.showFilters ? 'Hide' : 'Show') + ' Filters', disabled: !!ui.item, keyboard: 'shift f' },
-                        { id: 'showbrowser', title: (ui.showBrowser ? 'Hide' : 'Show') + ' ' + pandora.site.itemName.singular + ' Browser', disabled: !ui.item, keyboard: 'shift b' },
-                        { id: 'showannotations', title: (ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations', disabled: !ui.item || ['timeline', 'player', 'editor'].indexOf(ui.itemView) == -1, keyboard: 'shift a' },
-                        { id: 'showtimeline', title: (ui.showTimeline ? 'Hide' : 'Show') + ' Timeline', disabled: !ui.item || ui.itemView != 'player', keyboard: 'shift t' },
+                        { 
+                            id: 'showsidebar',
+                            title: Ox._((ui.showSidebar ? 'Hide' : 'Show') + ' Sidebar'),
+                            keyboard: 'shift s' },
+                        { 
+                            id: 'showinfo',
+                            title: Ox._((ui.showInfo ? 'Hide' : 'Show') + ' Info'),
+                            disabled: !ui.showSidebar, keyboard: 'shift i' },
+                        { 
+                            id: 'showfilters',
+                            title: Ox._((ui.showFilters ? 'Hide' : 'Show') + ' Filters'),
+                            disabled: !!ui.item, keyboard: 'shift f' },
+                        { 
+                            id: 'showbrowser',
+                            title: Ox._((ui.showBrowser ? 'Hide': 'Show') + ' {0} Browser', [Ox._(pandora.site.itemName.singular)]),
+                            disabled: !ui.item, keyboard: 'shift b' },
+                        { 
+                            id: 'showannotations',
+                            title: Ox._((ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations'),
+                            disabled: !ui.item || ['timeline', 'player', 'editor'].indexOf(ui.itemView) == -1, keyboard: 'shift a' },
+                        {
+                            id: 'showtimeline',
+                            title: Ox._((ui.showTimeline ? 'Hide' : 'Show') + ' Timeline'),
+                            disabled: !ui.item || ui.itemView != 'player', keyboard: 'shift t' },
                         {},
-                        { id: 'togglefullscreen', title: (fullscreenState ? 'Exit' : 'Enter') + ' Fullscreen', disabled: fullscreenState === void 0, keyboard: 'shift alt control f' },
-                        { id: 'entervideofullscreen', title: 'Enter Video Fullscreen', disabled: !ui.item || ui.itemView != 'player' },
+                        { 
+                            id: 'togglefullscreen',
+                            title: Ox._((fullscreenState ? 'Exit' : 'Enter') + ' Fullscreen'),
+                            disabled: fullscreenState === void 0, keyboard: 'shift alt control f' },
+                        { 
+                            id: 'entervideofullscreen',
+                            title: Ox._('Enter Video Fullscreen'),
+                            disabled: !ui.item || ui.itemView != 'player' },
                         {},
-                        { id: 'theme', title: 'Theme', items: [
+                        { id: 'theme', title: Ox._('Theme'), items: [
                             { group: 'settheme', min: 1, max: 1, items: pandora.site.themes.map(function(theme) {
                                 return {id: theme, title: Ox.Theme.getThemeData(theme).themeName, checked: ui.theme == theme}
+                            }) }
+                        ] },
+                        {},
+                        { id: 'locale', title: Ox._('Language'), items: [
+                            { group: 'setlocale', min: 1, max: 1, items: Object.keys(Ox.LOCALES).map(function(locale) {
+                                return {id: locale, title: Ox.LOCALES[locale], checked: ui.locale == locale}
                             }) }
                         ] }
                     ]},
                     getSortMenu(),
-                    { id: 'findMenu', title: 'Find', items: [
-                        { id: 'find', title: 'Find', items: [
+                    { id: 'findMenu', title: Ox._('Find'), items: [
+                        { id: 'find', title: Ox._('Find'), items: [
                             { group: 'find', min: 0, max: 1, items: pandora.site.findKeys.map(function(key, i) {
                                 return Ox.extend({
                                     checked: key.id == findState.key
                                 }, key);
                             }) }
                         ] },
-                        { id: 'advancedfind', title: 'Advanced Find...', keyboard: 'shift control f' },
+                        { id: 'advancedfind', title: Ox._('Advanced Find...'), keyboard: 'shift control f' },
                         {},
-                        { id: 'findsimilar', title: 'Find Similar Clips...', keyboard: 'alt control f', disabled: !pandora.getItemIdAndPosition() }
+                        { id: 'findsimilar', title: Ox._('Find Similar Clips...'), keyboard: 'alt control f', disabled: !pandora.getItemIdAndPosition() }
                     ] },
-                    { id: 'dataMenu', title: 'Data', items: [
-                        { id: 'files', title: 'Manage Files...', disabled: !pandora.site.capabilities.canManageFiles[pandora.user.level] },
+                    { id: 'dataMenu', title: Ox._('Data'), items: [
+                        { id: 'files', title: Ox._('Manage Files...'), disabled: !pandora.site.capabilities.canManageFiles[pandora.user.level] },
                         {},
-                        { id: 'titles', title: 'Manage Titles...', disabled: !pandora.site.capabilities.canManageTitlesAndNames[pandora.user.level] },
-                        { id: 'names', title: 'Manage Names...', disabled: !pandora.site.capabilities.canManageTitlesAndNames[pandora.user.level] },
+                        { id: 'titles', title: Ox._('Manage Titles...'), disabled: !pandora.site.capabilities.canManageTitlesAndNames[pandora.user.level] },
+                        { id: 'names', title: Ox._('Manage Names...'), disabled: !pandora.site.capabilities.canManageTitlesAndNames[pandora.user.level] },
                         {},
-                        { id: 'places', title: 'Manage Places...', disabled: !pandora.site.capabilities.canManagePlacesAndEvents[pandora.user.level] },
-                        { id: 'events', title: 'Manage Events...', disabled: !pandora.site.capabilities.canManagePlacesAndEvents[pandora.user.level] },
+                        { id: 'places', title: Ox._('Manage Places...'), disabled: !pandora.site.capabilities.canManagePlacesAndEvents[pandora.user.level] },
+                        { id: 'events', title: Ox._('Manage Events...'), disabled: !pandora.site.capabilities.canManagePlacesAndEvents[pandora.user.level] },
                         {},
-                        { id: 'users', title: 'Manage Users...', disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] },
-                        { id: 'statistics', title: 'Statistics...', disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] }
+                        { id: 'users', title: Ox._('Manage Users...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] },
+                        { id: 'statistics', title: Ox._('Statistics...'), disabled: !pandora.site.capabilities.canManageUsers[pandora.user.level] }
                     ] },
-                    { id: 'helpMenu', title: 'Help', items: [
-                        { id: 'help', title: 'Help...', keyboard: 'control ?' },
-                        { id: 'api', title: 'API Documentation...' }
+                    { id: 'helpMenu', title: Ox._('Help'), items: [
+                        { id: 'help', title: Ox._('Help...'), keyboard: 'control ?' },
+                        { id: 'api', title: Ox._('API Documentation...') }
                     ] }
                 ],
                 pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
                     ? [
-                        { id: 'debugMenu', title: 'Debug', items: [
-                            { id: 'clearcache', title: 'Clear Cache'},
-                            { id: 'reloadapplication', title: 'Reload Application'},
+                        { id: 'debugMenu', title: Ox._('Debug'), items: [
+                            { id: 'clearcache', title: Ox._('Clear Cache')},
+                            { id: 'reloadapplication', title: Ox._('Reload Application')},
                             {},
-                            { id: 'debugmode', title: (pandora.localStorage('enableDebugMode') ? 'Disable' : 'Enable') + ' Debug Mode' },
-                            { id: 'eventlogging', title: (pandora.localStorage('enableEventLogging') ? 'Disable' : 'Enable') + ' Event Logging'},
+                            { id: 'debugmode', title: Ox._((pandora.localStorage('enableDebugMode') ? 'Disable' : 'Enable') + ' Debug Mode') },
+                            { id: 'eventlogging', title: Ox._((pandora.localStorage('enableEventLogging') ? 'Disable' : 'Enable') + ' Event Logging')},
                             {},
-                            { id: 'errorlogs', title: 'View Error Logs...'},
-                            { id: 'tests', title: 'Run Tests'}
+                            { id: 'errorlogs', title: Ox._('View Error Logs...')},
+                            { id: 'tests', title: Ox._('Run Tests')}
                         ] }
                     ]
                     : []
@@ -231,6 +270,11 @@ pandora.ui.mainMenu = function() {
                     });
                     filters[index].sort[0].operator = operator;
                     pandora.UI.set({filters: filters});
+                } else if (data.id == 'setlocale') {
+                    pandora.UI.set('locale', value);
+                    pandora.setLocale(value, function() {
+                        pandora.$ui.appPanel.reload();
+                    });
                 } else if (data.id == 'settheme') {
                     var iframe, src;
                     Ox.Theme(value);
@@ -379,7 +423,7 @@ pandora.ui.mainMenu = function() {
                         pandora.localStorage('enableEventLogging', true);
                     }
                     Ox.Event[pandora.localStorage('enableEventLogging') ? 'bind' : 'unbind'](pandora.logEvent);
-                    that.setItemTitle('eventlogging', (pandora.localStorage('enableEventLogging') ? 'Disable' : 'Enable') + ' Event Logging');
+                    that.setItemTitle('eventlogging', Ox._((pandora.localStorage('enableEventLogging') ? 'Disable' : 'Enable') + ' Event Logging'));
                 } else if (data.id == 'errorlogs') {
                     pandora.$ui.logsDialog = pandora.ui.logsDialog().open();
                 } else if (data.id == 'tests') {
@@ -569,23 +613,23 @@ pandora.ui.mainMenu = function() {
                 ]('findsimilar');
             },
             pandora_showannotations: function(data) {
-                that.setItemTitle('showannotations', (data.value ? 'Hide' : 'Show') + ' Annotations');
+                that.setItemTitle('showannotations', Ox._((data.value ? 'Hide' : 'Show') + ' Annotations'));
             },
             pandora_showbrowser: function(data) {
-                that.setItemTitle('showbrowser', (data.value ? 'Hide' : 'Show') + ' ' + pandora.site.itemName.singular + ' Browser');
+                that.setItemTitle('showbrowser', Ox._((data.value ? 'Hide' : 'Show') + ' {0} Browser', [Ox._(pandora.site.itemName.singular)]));
             },
             pandora_showfilters: function(data) {
-                that.setItemTitle('showfilters', (data.value ? 'Hide' : 'Show') + ' Filters');
+                that.setItemTitle('showfilters', Ox._((data.value ? 'Hide' : 'Show') + ' Filters'));
             },
             pandora_showinfo: function(data) {
-                that.setItemTitle('showinfo', (data.value ? 'Hide' : 'Show') + ' Info');
+                that.setItemTitle('showinfo', Ox._((data.value ? 'Hide' : 'Show') + ' Info'));
             },
             pandora_showsidebar: function(data) {
-                that.setItemTitle('showsidebar', (data.value ? 'Hide' : 'Show') + ' Sidebar');
+                that.setItemTitle('showsidebar', Ox._((data.value ? 'Hide' : 'Show') + ' Sidebar'));
                 that[data.value ? 'enableItem' : 'disableItem']('showinfo');
             },
             pandora_showtimeline: function(data) {
-                that.setItemTitle('showtimeline', (data.value ? 'Hide' : 'Show') + ' Timeline');
+                that.setItemTitle('showtimeline', Ox._((data.value ? 'Hide' : 'Show') + ' Timeline'));
             },
             pandora_videotimeline: function(data) {
                 that.checkItem('viewMenu_timelines_' + data.value);
@@ -593,7 +637,7 @@ pandora.ui.mainMenu = function() {
         });
 
     Ox.Fullscreen.bind('change', function(state) {
-        that.setItemTitle('togglefullscreen', (state ? 'Exit' : 'Enter') + ' Fullscreen');
+        that.setItemTitle('togglefullscreen', Ox._((state ? 'Exit' : 'Enter') + ' Fullscreen'));
     });
 
     function changeFocus(direction) {
@@ -648,16 +692,16 @@ pandora.ui.mainMenu = function() {
     }
 
     function getListMenu(lists) {
-        return { id: 'listMenu', title: 'List', items: [].concat(
-            { id: 'allitems', title: 'All ' + pandora.site.itemName.plural, checked: !ui.item && !ui._list, keyboard: 'shift control w' },
+        return { id: 'listMenu', title: Ox._('List'), items: [].concat(
+            { id: 'allitems', title: Ox._('All {0}', [Ox._(pandora.site.itemName.plural)]), checked: !ui.item && !ui._list, keyboard: 'shift control w' },
             ['personal', 'favorite', 'featured'].map(function(folder) {
                 return {
                     id: folder + 'lists',
-                    title: Ox.toTitleCase(folder) + ' Lists',
+                    title: Ox._('{0} Lists', [Ox._(Ox.toTitleCase(folder))]),
                     items: Ox.isUndefined(lists)
-                        ? [{id: 'loading', title: 'Loading...', disabled: true}]
+                        ? [{id: 'loading', title: Ox._('Loading...'), disabled: true}]
                         : lists[folder].length == 0
-                        ? [{id: 'nolists', title: 'No ' + Ox.toTitleCase(folder) + ' Lists', disabled: true}]
+                        ? [{id: 'nolists', title: Ox._('No {0} Lists', [Ox._(Ox.toTitleCase(folder))]), disabled: true}]
                         : lists[folder].map(function(list) {
                             return {
                                 id: 'viewlist' + list.id,
@@ -671,17 +715,17 @@ pandora.ui.mainMenu = function() {
             }),
             [
                 {},
-                { id: 'newlist', title: 'New List', disabled: isGuest, keyboard: 'control n' },
-                { id: 'newlistfromselection', title: 'New List from Selection', disabled: isGuest || ui.listSelection.length == 0, keyboard: 'shift control n' },
-                { id: 'newsmartlist', title: 'New Smart List', disabled: isGuest, keyboard: 'alt control n' },
-                { id: 'newsmartlistfromresults', title: 'New Smart List from Results', disabled: isGuest, keyboard: 'shift alt control n' },
+                { id: 'newlist', title: Ox._('New List'), disabled: isGuest, keyboard: 'control n' },
+                { id: 'newlistfromselection', title: Ox._('New List from Selection'), disabled: isGuest || ui.listSelection.length == 0, keyboard: 'shift control n' },
+                { id: 'newsmartlist', title: Ox._('New Smart List'), disabled: isGuest, keyboard: 'alt control n' },
+                { id: 'newsmartlistfromresults', title: Ox._('New Smart List from Results'), disabled: isGuest, keyboard: 'shift alt control n' },
                 {},
-                { id: 'duplicatelist', title: 'Duplicate Selected List', disabled: isGuest || !pandora.user.ui._list, keyboard: 'control d' },
-                { id: 'editlist', title: 'Edit Selected List...', disabled: isGuest || !pandora.user.ui._list, keyboard: 'control e' },
-                { id: 'deletelist', title: 'Delete Selected List...', disabled: isGuest || !pandora.user.ui._list, keyboard: 'delete' },
+                { id: 'duplicatelist', title: Ox._('Duplicate Selected List'), disabled: isGuest || !pandora.user.ui._list, keyboard: 'control d' },
+                { id: 'editlist', title: Ox._('Edit Selected List...'), disabled: isGuest || !pandora.user.ui._list, keyboard: 'control e' },
+                { id: 'deletelist', title: Ox._('Delete Selected List...'), disabled: isGuest || !pandora.user.ui._list, keyboard: 'delete' },
                 {},
-                { id: 'print', title: 'Print', keyboard: 'control p' },
-                { id: 'tv', title: 'TV', keyboard: 'control space' }
+                { id: 'print', title: Ox._('Print'), keyboard: 'control p' },
+                { id: 'tv', title: Ox._('TV'), keyboard: 'control space' }
             ]
         )};
     };
@@ -692,58 +736,68 @@ pandora.ui.mainMenu = function() {
             clipItems = (isClipView ? pandora.site.clipKeys.map(function(key) {
                 return Ox.extend(Ox.clone(key), {
                     checked: ui.listSort[0].key == key.id,
-                    title: (!ui.item ? 'Clip ' : '') + key.title
+                    title: (!ui.item ? Ox._('Clip') + ' ' : '') + Ox._(key.title)
                 });
             }) : []).concat(!ui.item ? pandora.site.sortKeys.map(function(key) {
                 return Ox.extend({
                     checked: ui.listSort[0].key == key.id
                 }, key);
             }) : []);
-        return { id: 'sortMenu', title: 'Sort', items: [
-            { id: 'sortitems', title: 'Sort ' + pandora.site.itemName.plural + ' by', disabled: !ui.item && isClipView, items: [
+        return { id: 'sortMenu', title: Ox._('Sort'), items: [
+            { id: 'sortitems', title: Ox._('Sort {0} by', [Ox._(pandora.site.itemName.plural)]), disabled: !ui.item && isClipView, items: [
                 { group: 'itemsort', min: 1, max: 1, items: pandora.site.sortKeys.map(function(key) {
                     return Ox.extend({
                         checked: ui.listSort[0].key == key.id
-                    }, key);
+                    }, key, {
+                        title: Ox._(key.title)
+                    });
                 }) }
             ] },
-            { id: 'orderitems', title: 'Order ' + pandora.site.itemName.plural, disabled: !ui.item && isClipView, items: [
+            { id: 'orderitems', title: Ox._('Order {0}', [Ox._(pandora.site.itemName.plural)]), disabled: !ui.item && isClipView, items: [
                 { group: 'itemorder', min: 1, max: 1, items: [
-                    { id: 'ascending', title: 'Ascending', checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '+' },
-                    { id: 'descending', title: 'Descending', checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '-' }
+                    { id: 'ascending', title: Ox._('Ascending'), checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '+' },
+                    { id: 'descending', title: Ox._('Descending'), checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '-' }
                 ]}
             ] },
-            { id: 'sortclips', title: 'Sort Clips by', disabled: !isClipView, items: [
+            { id: 'sortclips', title: Ox._('Sort Clips by'), disabled: !isClipView, items: [
                 { group: 'clipsort', min: 1, max: 1, items: clipItems }
             ] },
-            { id: 'orderclips', title: 'Order Clips', disabled: !isClipView, items: [
+            { id: 'orderclips', title: Ox._('Order Clips'), disabled: !isClipView, items: [
                 { group: 'cliporder', min: 1, max: 1, items: [
-                    { id: 'ascending', title: 'Ascending', checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '+' },
-                    { id: 'descending', title: 'Descending', checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '-' }
+                    {
+                        id: 'ascending',
+                        title: Ox._('Ascending'),
+                        checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '+'
+                    },
+                    { 
+                        id: 'descending',
+                        title: Ox._('Descending'),
+                        checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '-' 
+                    }
                 ]}
             ] },
-            { id: 'advancedsort', title: 'Advanced Sort...', keyboard: 'shift control s', disabled: true },
+            { id: 'advancedsort', title: Ox._('Advanced Sort...'), keyboard: 'shift control s', disabled: true },
             {},
-            { id: 'sortfilters', title: 'Sort Filters', items: pandora.user.ui.filters.map(function(filter) {
+            { id: 'sortfilters', title: Ox._('Sort Filters'), items: pandora.user.ui.filters.map(function(filter) {
                 return {
                     id: 'sortfilter' + filter.id,
-                    title: 'Sort ' + Ox.getObjectById(pandora.site.filters, filter.id).title + ' Filter by',
+                    title: Ox._('Sort {0} Filter by', [Ox._(Ox.getObjectById(pandora.site.filters, filter.id).title)]),
                     items: [
                         { group: 'sortfilter' + filter.id, min: 1, max: 1, items: [
-                            { id: 'name', title: 'Name', checked: filter.sort[0].key == 'name' },
-                            { id: 'items', title: 'Items', checked: filter.sort[0].key == 'items' }
+                            { id: 'name', title: Ox._('Name'), checked: filter.sort[0].key == 'name' },
+                            { id: 'items', title: Ox._('Items'), checked: filter.sort[0].key == 'items' }
                         ] }
                     ]
                 }
             }) },
-            { id: 'orderfilters', title: 'Order Filters', items: pandora.user.ui.filters.map(function(filter) {
+            { id: 'orderfilters', title: Ox._('Order Filters'), items: pandora.user.ui.filters.map(function(filter) {
                 return {
                     id: 'orderfilter' + filter.id,
-                    title: 'Order ' + Ox.getObjectById(pandora.site.filters, filter.id).title + ' Filter',
+                    title: Ox._('Order {0} Filter', [Ox._(Ox.getObjectById(pandora.site.filters, filter.id).title)]),
                     items: [
                         { group: 'orderfilter' + filter.id, min: 1, max: 1, items: [
-                            { id: 'ascending', title: 'Ascending', checked: filter.sort[0].operator == '+' },
-                            { id: 'descending', title: 'Descending', checked: filter.sort[0].operator == '-' }
+                            { id: 'ascending', title: Ox._('Ascending'), checked: filter.sort[0].operator == '+' },
+                            { id: 'descending', title: Ox._('Descending'), checked: filter.sort[0].operator == '-' }
                         ] }
                     ]
                 }

@@ -9,13 +9,13 @@ pandora.ui.sortElement = function(isNavigationView) {
         items = (
             isClipView ? pandora.site.clipKeys.map(function(key) {
                 return Ox.extend(Ox.clone(key), {
-                    title: 'Sort by ' + (!pandora.user.ui.item ? 'Clip ' : '') + key.title
+                    title: Ox._((!pandora.user.ui.item ? 'Sort by Clip {0}' : 'Sort by {0}'), [Ox._(key.title)])
                 });
             }) : []
         ).concat(
             !pandora.user.ui.item ? pandora.site.sortKeys.map(function(key) {
                 return Ox.extend(Ox.clone(key), {
-                    title: 'Sort by ' + key.title
+                    title: Ox._('Sort by {0}', [Ox._(key.title)])
                 });
             }) : []
         ),
@@ -62,11 +62,11 @@ pandora.ui.sortElement = function(isNavigationView) {
             .bindEvent('pandora_' + sortKey.toLowerCase(), updateElement);
 
     function getButtonTitle() {
-        return pandora.user.ui[sortKey][0].operator == '+' ? 'up' : 'down';
+        return Ox._(pandora.user.ui[sortKey][0].operator == '+' ? 'up' : 'down');
     }
 
     function getButtonTooltip() {
-        return pandora.user.ui[sortKey][0].operator == '+' ? 'Ascending' : 'Descending';
+        return Ox._(pandora.user.ui[sortKey][0].operator == '+' ? 'Ascending' : 'Descending');
     }
 
     function updateElement() {

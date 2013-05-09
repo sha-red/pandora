@@ -6,20 +6,20 @@ pandora.ui.annotationDialog = function(layer) {
         that = pandora.ui.iconDialog({
             buttons: [].concat(
                 isEditor ? [
-                    Ox.Button({title: 'Sign Up...'}).bindEvent({
+                    Ox.Button({title: Ox._('Sign Up...')}).bindEvent({
                         click: function() {
                             that.close();
                             pandora.$ui.accountDialog = pandora.ui.accountDialog('signup').open();
                         }
                     }),
-                    Ox.Button({title: 'Sign In...'}).bindEvent({
+                    Ox.Button({title: Ox._('Sign In...')}).bindEvent({
                         click: function() {
                             that.close();
                             pandora.$ui.accountDialog = pandora.ui.accountDialog('signin').open();
                         }
                     })
                 ] : [
-                    Ox.Button({title: 'Switch to Editor'}).bindEvent({
+                    Ox.Button({title: Ox._('Switch to Editor')}).bindEvent({
                         click: function() {
                             that.close();
                             pandora.UI.set({itemView: 'editor'});
@@ -28,17 +28,17 @@ pandora.ui.annotationDialog = function(layer) {
                 ],
                 [
                     {},
-                    Ox.Button({title: 'Not Now'}).bindEvent({
+                    Ox.Button({title: Ox._('Not Now')}).bindEvent({
                         click: function() {
                             that.close();
                         }
                     })
                 ]
             ),
-            text: 'To add or edit ' + layer + ', ' + (
+            text: Ox._('To add or edit {0}, ' + (
                 isEditor
                 ? 'please sign up or sign in.'
-                : 'just switch to the editor.'
+                : 'just switch to the editor.'), [layer]
             ),
             title: Ox.toTitleCase(layer)
         });

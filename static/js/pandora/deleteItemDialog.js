@@ -7,7 +7,7 @@ pandora.ui.deleteItemDialog = function(item) {
             buttons: [
                 Ox.Button({
                     id: 'keep',
-                    title: 'Keep ' + pandora.site.itemName.singular
+                    title: Ox._('Keep {0}', [Ox._(pandora.site.itemName.singular)])
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -15,7 +15,7 @@ pandora.ui.deleteItemDialog = function(item) {
                 }),
                 Ox.Button({
                     id: 'delete',
-                    title: 'Delete ' + pandora.site.itemName.singular
+                    title: Ox._('Delete {0}', [Ox._(pandora.site.itemName.singular)])
                 }).bindEvent({
                     click: function() {
                         that.close();
@@ -29,10 +29,10 @@ pandora.ui.deleteItemDialog = function(item) {
                 })
             ],
             keys: {enter: 'delete', escape: 'keep'},
-            text: 'Are you sure you want to delete the '
-                + pandora.site.itemName.singular
-                + ' "'+ item.title + '"?<br><br>All data will be removed.',
-            title: 'Delete ' + pandora.site.itemName.singular
+            text: Ox._('Are you sure you want to delete the {0} "{1}"?'
+                + '<br><br>All data will be removed.',
+                [Ox._(pandora.site.itemName.singular), item.title]),
+            title: Ox._('Delete {0}', [Ox._(pandora.site.itemName.singular)])
         });
 
     return that;

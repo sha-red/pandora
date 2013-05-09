@@ -9,7 +9,7 @@ pandora.ui.viewSelect = function() {
         items = pandora.site[viewKey + 's'].filter(function(view) {
             return view.id != 'data' && view.id != 'files';
         }).map(function(view) {
-            return {id: view.id, title: 'View ' + view.title};
+            return {id: view.id, title: Ox._('View {0}', [Ox._(view.title)])};
         }),
         that;
     if (
@@ -18,8 +18,8 @@ pandora.ui.viewSelect = function() {
     ) {
         items = items.concat([
             {},
-            {id: 'data', title: 'View Data'},
-            {id: 'files', title: 'View Files'}
+            {id: 'data', title: Ox._('View Data')},
+            {id: 'files', title: Ox._('View Files')}
         ]);
     }
     that = Ox.Select({

@@ -17,6 +17,7 @@ pandora.ui.filterForm = function(list) {
             that.$filter = Ox.Filter({
                 findKeys: pandora.site.itemKeys.map(function(itemKey) {
                     var key = Ox.clone(itemKey, true);
+                    key.title = Ox._(key.title);
                     key.type = key.type == 'layer'
                         ? Ox.getObjectById(pandora.site.layers, key.id).type
                         : key.type;
@@ -26,7 +27,7 @@ pandora.ui.filterForm = function(list) {
                     return key;
                 }).concat([{
                     id: 'list',
-                    title: 'List',
+                    title: Ox._('List'),
                     type: 'list',
                     values: result.data.items.map(function(item) {
                         return item.id;

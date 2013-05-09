@@ -61,9 +61,9 @@ pandora.ui.tv = function() {
                         'volume', 'scale', 'timeline', 'position', 'settings'
                     ],
                     controlsTooltips: {
-                        open: 'Open in ' + Ox.getObjectById(
+                        open: Ox._('Open in {0} View', [Ox._(Ox.getObjectById(
                             pandora.site.itemViews, pandora.user.ui.videoView
-                        ).title + ' View'
+                        ).title)])
                     },
                     controlsTop: ['close', 'title', 'open'],
                     duration: result.data.duration,
@@ -78,7 +78,7 @@ pandora.ui.tv = function() {
                     tooltips: true,
                     timeline: '/' + result.data.item + '/timeline16p.jpg',
                     title: pandora.site.site.name + ' &mdash; ' + (
-                            list || 'All ' + pandora.site.itemName.plural
+                            list || Ox._('All {0}', [Ox._(pandora.site.itemName.plural)])
                         ) + ' &mdash; '
                         + result.data.title
                         + (

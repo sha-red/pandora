@@ -55,8 +55,8 @@ pandora.ui.infoView = function(data) {
                 element: '<img>',
                 tooltip: canEdit ? (
                     !ui.showIconBrowser
-                        ? 'Doubleclick to edit icon'
-                        : 'Doubleclick to hide icons'
+                        ? Ox._('Doubleclick to edit icon')
+                        : Ox._('Doubleclick to hide icons')
                 ) : ''
             })
             .attr({
@@ -189,7 +189,7 @@ pandora.ui.infoView = function(data) {
                         format: function(value) {
                             return formatValue(value.split(', '), 'name');
                         },
-                        placeholder: formatLight('Unknown Director'),
+                        placeholder: formatLight(Ox._('Unknown Director')),
                         tooltip: isEditable ? pandora.getEditTooltip() : '',
                         value: data.director ? data.director.join(', ') : ''
                     })
@@ -263,7 +263,7 @@ pandora.ui.infoView = function(data) {
     data.alternativeTitles && $('<div>')
         .css(css)
         .html(
-            formatKey('Alternative Title' + (data.alternativeTitles.length == 1 ? '' : 's'))
+            formatKey(Ox.formatCount(data.alternativeTitles, 'Alternative Title'))
             + data.alternativeTitles.map(function(value) {
                 return value[0] + (
                     canSeeAllMetadata && Ox.isArray(value[1])
@@ -389,7 +389,7 @@ pandora.ui.infoView = function(data) {
         data.filmingLocations && $('<div>')
             .css(css)
             .html(
-                formatKey('Filming Locations') + data.filmingLocations.map(function(location) {
+                formatKey(Ox._('Filming Locations')) + data.filmingLocations.map(function(location) {
                     return  '<a href="/map/@' + location + '">' + location + '</a>'
                 }).join(', ')
             )
@@ -398,7 +398,7 @@ pandora.ui.infoView = function(data) {
         data.releasedate && $('<div>')
             .css(css)
             .html(
-                formatKey('Release Date') + Ox.formatDate(data.releasedate, '%A, %B %e, %Y')
+                formatKey(Ox._('Release Date')) + Ox.formatDate(data.releasedate, '%A, %B %e, %Y')
             )
             .appendTo($text);
 
@@ -561,7 +561,7 @@ pandora.ui.infoView = function(data) {
             .append(
                 Ox.EditableContent({
                         clickLink: pandora.clickLink,
-                        placeholder: formatLight('No notes'),
+                        placeholder: formatLight(Ox._('No notes')),
                         tooltip: pandora.getEditTooltip(),
                         type: 'textarea',
                         value: data.notes || '',
@@ -626,8 +626,8 @@ pandora.ui.infoView = function(data) {
     function formatKey(key, isStatistics) {
         return isStatistics
             ? $('<div>').css({marginBottom: '4px', fontWeight: 'bold'})
-                .html(Ox.toTitleCase(key).replace(' Per ', ' per '))
-            : '<span style="font-weight: bold">' + Ox.toTitleCase(key) + ':</span> ';
+                .html(Ox._(Ox.toTitleCase(key).replace(' Per ', ' per ')))
+            : '<span style="font-weight: bold">' + Ox._(Ox.toTitleCase(key)) + ':</span> ';
     }
 
     function formatLight(str) {
@@ -763,7 +763,7 @@ pandora.ui.infoView = function(data) {
             if (!canEdit) {
                 Ox.Button({
                     title: 'Help',
-                    tooltip: 'About Rights',
+                    tooltip: Ox._('About Rights'),
                     type: 'image'
                 })
                 .css({marginLeft: '52px'})

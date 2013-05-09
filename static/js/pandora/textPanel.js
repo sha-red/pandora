@@ -27,7 +27,7 @@ pandora.ui.textPanel = function() {
 
             $find = Ox.Input({
                     clear: true,
-                    placeholder: 'Find in Texts',
+                    placeholder: Ox._('Find in Texts'),
                     value: pandora.user.ui.textFind,
                     width: 188
                 })
@@ -45,7 +45,7 @@ pandora.ui.textPanel = function() {
             $nextButton = Ox.Button({
                     disabled: embedURLs.length < 2,
                     title: 'arrowRight',
-                    tooltip: 'Next Clip',
+                    tooltip: Ox._('Next Clip'),
                     type: 'image'
                 })
                 .css({
@@ -64,7 +64,7 @@ pandora.ui.textPanel = function() {
             $currentButton = Ox.Button({
                     disabled: embedURLs.length < 1,
                     title: 'center',
-                    tooltip: 'Current Reference',
+                    tooltip: Ox._('Current Reference'),
                     type: 'image'
                 })
                 .css({
@@ -76,7 +76,7 @@ pandora.ui.textPanel = function() {
             $previousButton = Ox.Button({
                     disabled: embedURLs.length < 2,
                     title: 'arrowLeft',
-                    tooltip: 'Previous Clip',
+                    tooltip: Ox._('Previous Clip'),
                     type: 'image'
                 })
                 .css({
@@ -116,11 +116,11 @@ pandora.ui.textPanel = function() {
             if (text.type == 'html') {
                 $editMenu = Ox.MenuButton({
                         items: [
-                            {id: 'insertHTML', title: 'Insert HTML...'},
-                            {id: 'insertEmbed', title: 'Insert Embed...'}
+                            {id: 'insertHTML', title: Ox._('Insert HTML...')},
+                            {id: 'insertEmbed', title: Ox._('Insert Embed...')}
                         ],
                         title: 'edit',
-                        tooltip: 'Editing Options',
+                        tooltip: Ox._('Editing Options'),
                         type: 'image'
                     })
                     .css({
@@ -140,7 +140,7 @@ pandora.ui.textPanel = function() {
             } else {
                 $uploadButton = Ox.FileButton({
                         image: 'upload',
-                        tooltip: 'Upload PDF',
+                        tooltip: Ox._('Upload PDF'),
                         type: 'image'
                     })
                     .css({
@@ -222,9 +222,9 @@ pandora.ui.textHTML = function(text) {
         $title = Ox.Editable({
                 editable: text.name ? text.editable : false,
                 height: 32,
-                placeholder: text.editable ? 'Doubleclick to edit title' : 'Untitled',
+                placeholder: text.editable ? Ox._('Doubleclick to edit title') : Ox._('Untitled'),
                 tooltip: text.editable ? pandora.getEditTooltip('title') : '',
-                value: text.name || pandora.site.site.name + ' Texts',
+                value: text.name || Ox._('{0} Texts', [pandora.site.site.name]),
                 width: width
             })
             .css({
@@ -272,7 +272,7 @@ pandora.ui.textHTML = function(text) {
                     );
                 },
                 maxHeight: height - 1,
-                placeholder: text.editable ? 'Doubleclick to edit text' : '',
+                placeholder: text.editable ? Ox._('Doubleclick to edit text') : '',
                 tooltip: text.editable ? pandora.getEditTooltip('text') : '',
                 type: 'textarea',
                 width: width,

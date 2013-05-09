@@ -15,7 +15,7 @@ pandora.ui.uploadPDFDialog = function(options) {
             buttons: [
                 $closeButton = Ox.Button({
                     id: 'close',
-                    title: 'Close'
+                    title: Ox._('Close')
                 }).bindEvent({
                     click: function() {
                         that.triggerEvent('close');
@@ -23,7 +23,7 @@ pandora.ui.uploadPDFDialog = function(options) {
                 }),
                 $cancelButton = Ox.Button({
                     id: 'cancel',
-                    title: 'Cancel',
+                    title: Ox._('Cancel'),
                     disabled: true
                 }).bindEvent({
                     click: function(data) {
@@ -39,7 +39,7 @@ pandora.ui.uploadPDFDialog = function(options) {
             height: 128,
             removeOnClose: true,
             width: 368,
-            title: 'Upload PDF',
+            title: Ox._('Upload PDF'),
         })
         .bindEvent({
             close: function(data) {

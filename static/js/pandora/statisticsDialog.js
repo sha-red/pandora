@@ -36,16 +36,16 @@ pandora.ui.statisticsDialog = function() {
         dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
         tabs = [
-            {id: 'seen', title: 'First Seen & Last Seen', selected: true},
-            {id: 'locations', title: 'Locations'},
-            {id: 'platforms', title: 'Platforms & Browsers'}
+            {id: 'seen', title: Ox._('First Seen & Last Seen'), selected: true},
+            {id: 'locations', title: Ox._('Locations')},
+            {id: 'platforms', title: Ox._('Platforms & Browsers')}
         ],
 
         $dialog = Ox.Dialog({
             buttons: [
                 Ox.Button({
                     id: 'manageUsers',
-                    title: 'Manage Users...'
+                    title: Ox._('Manage Users...')
                 }).bindEvent({
                     click: function() {
                         $dialog.close();
@@ -55,7 +55,7 @@ pandora.ui.statisticsDialog = function() {
                 {},
                 Ox.Button({
                     id: 'close',
-                    title: 'Close'
+                    title: Ox._('Close')
                 }).bindEvent({
                     click: function() {
                         $dialog.close();
@@ -69,7 +69,7 @@ pandora.ui.statisticsDialog = function() {
             minHeight: 256,
             minWidth: 512,
             removeOnClose: true,
-            title: 'Statistics',
+            title: Ox._('Statistics'),
             width: dialogWidth
         })
         .bindEvent({
@@ -248,7 +248,7 @@ pandora.ui.statisticsDialog = function() {
         });
 
         $guestsCheckbox = Ox.Checkbox({
-                title: 'Include Guests',
+                title: Ox._('Include Guests'),
                 value: false
             })
             .css({float: 'left', margin: '4px'})

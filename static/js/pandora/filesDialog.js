@@ -12,7 +12,7 @@ pandora.ui.filesDialog = function() {
         $reloadButton = Ox.Button({
                 disabled: true,
                 title: 'redo',
-                tooltip: 'Reload',
+                tooltip: Ox._('Reload'),
                 type: 'image'
             })
             .css({float: 'left', margin: '4px 2px 4px 4px'})
@@ -25,7 +25,7 @@ pandora.ui.filesDialog = function() {
             }),
 
         $userCheckbox = Ox.Checkbox({
-                title: 'Only show my files',
+                title: Ox._('Only show my files'),
                 value: false
             })
             .css({float: 'left', margin: '4px 2px'})
@@ -40,9 +40,9 @@ pandora.ui.filesDialog = function() {
 
         $findSelect = Ox.Select({
                 items: [
-                    {id: 'all', title: 'Find: All'},
-                    {id: 'user', title: 'Find: Username'},
-                    {id: 'file', title: 'Find: Filename'}
+                    {id: 'all', title: Ox._('Find: All')},
+                    {id: 'user', title: Ox._('Find: Username')},
+                    {id: 'file', title: Ox._('Find: Filename')}
                 ],
                 overlap: 'right',
                 type: 'image'
@@ -57,7 +57,7 @@ pandora.ui.filesDialog = function() {
         $findInput = Ox.Input({
                 changeOnKeypress: true,
                 clear: true,
-                placeholder: 'Find: All',
+                placeholder: Ox._('Find: All'),
                 width: 192
             })
             .bindEvent({
@@ -77,7 +77,7 @@ pandora.ui.filesDialog = function() {
                     {
                         id: 'user',
                         operator: '+',
-                        title: 'Username',
+                        title: Ox._('Username'),
                         visible: true,
                         width: 128
                     },
@@ -85,14 +85,14 @@ pandora.ui.filesDialog = function() {
                         align: 'right',
                         id: 'name',
                         operator: '+',
-                        title: 'Filename',
+                        title: Ox._('Filename'),
                         visible: true,
                         width: 256
                     },
                     {
                         id: 'extension',
                         operator: '+',
-                        title: 'Extension',
+                        title: Ox._('Extension'),
                         visible: true,
                         width: 64
                     },
@@ -103,7 +103,7 @@ pandora.ui.filesDialog = function() {
                         },
                         id: 'size',
                         operator: '-',
-                        title: 'Size',
+                        title: Ox._('Size'),
                         visible: true,
                         width: 64
                     },
@@ -111,14 +111,14 @@ pandora.ui.filesDialog = function() {
                         align: 'right',
                         id: 'matches',
                         operator: '-',
-                        title: 'Matches',
+                        title: Ox._('Matches'),
                         visible: true,
                         width: 64
                     },
                     {
                         id: 'description',
                         operator: '+',
-                        title: 'Description',
+                        title: Ox._('Description'),
                         visible: true,
                         width: 256
                     },
@@ -129,7 +129,7 @@ pandora.ui.filesDialog = function() {
                         },
                         id: 'created',
                         operator: '-',
-                        title: 'Created',
+                        title: Ox._('Created'),
                         visible: true,
                         width: 144
                     },
@@ -140,7 +140,7 @@ pandora.ui.filesDialog = function() {
                         },
                         id: 'modified',
                         operator: '-',
-                        title: 'Modified',
+                        title: Ox._('Modified'),
                         visible: true,
                         width: 144
                     }
@@ -156,8 +156,7 @@ pandora.ui.filesDialog = function() {
             .bindEvent({
                 init: function(data) {
                     $status.html(
-                        Ox.formatNumber(data.items)
-                        + ' file' + (data.items == 1 ? '' : 's')
+                        Ox.formatCount(data.items, 'file')
                     );
                 },
                 load: function() {
@@ -171,7 +170,7 @@ pandora.ui.filesDialog = function() {
 
         $embedButton = Ox.Button({
                 title: 'embed',
-                tooltip: 'Embed',
+                tooltip: Ox._('Embed'),
                 type: 'image'
             })
             .css({
@@ -188,7 +187,7 @@ pandora.ui.filesDialog = function() {
 
         $closeButton = Ox.Button({
                 title: 'close',
-                tooltip: 'Close',
+                tooltip: Ox._('Close'),
                 type: 'image'
             })
             .css({
@@ -210,7 +209,7 @@ pandora.ui.filesDialog = function() {
         $itemToolbar = Ox.Bar({size: 24}),
 
         $deleteButton = Ox.Button({
-                title: 'Delete File...',
+                title: Ox._('Delete File...'),
                 width: 96
             })
             .css({float: 'left', margin: '4px'})
@@ -222,7 +221,7 @@ pandora.ui.filesDialog = function() {
 
         $uploadButton = Ox.FileButton({
                 maxFiles: 1,
-                title: 'Upload File...',
+                title: Ox._('Upload File...'),
                 width: 96
             })
             .css({float: 'right', margin: '4px'})
@@ -285,7 +284,7 @@ pandora.ui.filesDialog = function() {
 
         $itemLabel = Ox.Label({
                 textAlign: 'center',
-                title: 'No file selected',
+                title: Ox._('No file selected'),
                 width: getLabelWidth()
             })
             .css({
@@ -297,7 +296,7 @@ pandora.ui.filesDialog = function() {
                 buttons: [
                     Ox.Button({
                             id: 'done',
-                            title: 'Done',
+                            title: Ox._('Done'),
                             width: 48
                         }).bindEvent({
                             click: function() {
@@ -313,7 +312,7 @@ pandora.ui.filesDialog = function() {
                 minWidth: 512,
                 padding: 0,
                 removeOnClose: true,
-                title: 'Manage Files',
+                title: Ox._('Manage Files'),
                 width: dialogWidth
             }),
 
@@ -371,7 +370,7 @@ pandora.ui.filesDialog = function() {
                 Ox.Input({
                     disabled: true,
                     id: 'username',
-                    label: 'Username',
+                    label: Ox._('Username'),
                     labelWidth: 80,
                     value: file.user,
                     width: itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE
@@ -379,7 +378,7 @@ pandora.ui.filesDialog = function() {
                 Ox.Input({
                     disabled: !editable,
                     id: 'name',
-                    label: 'Filename',
+                    label: Ox._('Filename'),
                     labelWidth: 80,
                     value: file.name,
                     width: itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE
@@ -387,7 +386,7 @@ pandora.ui.filesDialog = function() {
                 Ox.Input({
                     disabled: true,
                     id: 'extension',
-                    label: 'Extension',
+                    label: Ox._('Extension'),
                     labelWidth: 80,
                     value: file.extension,
                     width: itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE
@@ -395,7 +394,7 @@ pandora.ui.filesDialog = function() {
                 Ox.Input({
                     disabled: true,
                     id: 'size',
-                    label: 'Size',
+                    label: Ox._('Size'),
                     labelWidth: 80,
                     value: Ox.formatValue(file.size, 'B'),
                     width: itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE
@@ -403,7 +402,7 @@ pandora.ui.filesDialog = function() {
                 Ox.Input({
                     disabled: true,
                     id: 'matches',
-                    label: 'Matches',
+                    label: Ox._('Matches'),
                     labelWidth: 80,
                     value: file.matches,
                     width: itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE
@@ -412,7 +411,7 @@ pandora.ui.filesDialog = function() {
                     disabled: !editable,
                     height: 256,
                     id: 'description',
-                    placeholder: 'Description',
+                    placeholder: Ox._('Description'),
                     type: 'textarea',
                     value: file.description,
                     width: itemWidth - 16 - Ox.UI.SCROLLBAR_SIZE
@@ -472,7 +471,7 @@ pandora.ui.filesDialog = function() {
         $itemLabel.options({
             title: selected
                 ? selected.split(':').slice(1).join(':')
-                : 'No file selected',
+                : Ox._('No file selected'),
             width: getLabelWidth()
         });
     }
