@@ -197,12 +197,14 @@ def update_static():
     for f in sorted(glob(os.path.join(settings.STATIC_ROOT, 'json/locale.pandora.*.json'))):
         with open(f) as fd:
             locale = json.load(fd)
-        site_locale = f.replace('pandora', settings.CONFIG['site']['id'])
-        locale_file = f.replace('.pandora', '')
-        if os.path.exists(site_locale):
-            with open(f) as site_locale:
-                locale.update(json.load(fd))
+        site_locale = f.replace('locale.pandora', 'locale.' + settings.CONFIG['site']['id'])
+        locale_file = f.replace('locale.pandora', 'locale')
         print 'write', locale_file
+        print '    adding', f
+        if os.path.exists(site_locale):
+            with open(site_locale) as fdl:
+                print '    adding', site_locale
+                locale.update(json.load(fdl))
         with open(locale_file, 'w') as fd:
             json.dump(locale, fd)
         os.system('gzip -9 -c "%s" > "%s.gz"' % (locale_file, locale_file))
