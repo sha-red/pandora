@@ -1299,7 +1299,7 @@ class Item(models.Model):
 
     def load_subtitles(self):
         subtitles = utils.get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
-        if not subtitles:
+        if not settings.USE_IMDB or not subtitles:
             return False
         with transaction.commit_on_success():
             layer = subtitles['id']
