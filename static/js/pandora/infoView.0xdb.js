@@ -14,8 +14,9 @@ pandora.ui.infoView = function(data) {
             MozUserSelect: 'text',
             WebkitUserSelect: 'text'
         },
-        iconRatio = ui.icons == 'posters'
-            ? (ui.showSitePosters ? 5/8 : data.posterRatio) : 1,
+        iconRatio = ui.icons == 'posters' ? (
+            ui.showSitePosters ? 5/8 : data.posterRatio
+        ) : 1,
         iconSize = ui.infoIconSize,
         iconWidth = iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio),
         iconHeight = iconRatio < 1 ? iconSize : Math.round(iconSize / iconRatio),
@@ -85,7 +86,7 @@ pandora.ui.infoView = function(data) {
                 left: margin + 'px',
                 top: margin + iconHeight + 'px',
                 width: iconSize + 'px',
-                height: iconSize / 2 + 'px',
+                height: Math.round(iconSize / 2) + 'px',
                 overflow: 'hidden'
             })
             .appendTo($data.$element),
@@ -110,7 +111,7 @@ pandora.ui.infoView = function(data) {
             .css({
                 position: 'absolute',
                 width: iconSize + 'px',
-                height: iconSize / 2 + 'px'
+                height: Math.round(iconSize / 2) + 'px'
             })
             .appendTo($reflection),
 
@@ -148,7 +149,7 @@ pandora.ui.infoView = function(data) {
             marginTop: '-2px'
         })
         .append(
-            Ox.Editable({
+            Ox.EditableContent({
                     clickLink: pandora.clickLink,
                     editable: isEditable,
                     format: function(value) {
@@ -182,7 +183,7 @@ pandora.ui.infoView = function(data) {
                 marginTop: '2px'
             })
             .append(
-                Ox.Editable({
+                Ox.EditableContent({
                         clickLink: pandora.clickLink,
                         editable: isEditable,
                         format: function(value) {
@@ -221,7 +222,7 @@ pandora.ui.infoView = function(data) {
                 .css({float: 'left'})
                 .html(formatKey(key).replace('</span>', '&nbsp;</span>'))
                 .appendTo($div);
-            Ox.Editable({
+            Ox.EditableContent({
                     clickLink: pandora.clickLink,
                     format: function(value) {
                         return formatValue(value.split(', '), key)
@@ -349,9 +350,7 @@ pandora.ui.infoView = function(data) {
 
     data.summary && $('<div>')
         .css(css)
-        .html(
-            formatKey('summary') + data.summary
-        )
+        .html(formatKey('summary') + data.summary)
         .appendTo($text);
 
     if (canSeeAllMetadata) {
@@ -556,14 +555,12 @@ pandora.ui.infoView = function(data) {
     // Notes -------------------------------------------------------------------
 
     if (canEdit) {
-
         $('<div>')
             .css({marginBottom: '4px'})
             .append(formatKey('Notes', true))
             .append(
-                Ox.Editable({
+                Ox.EditableContent({
                         clickLink: pandora.clickLink,
-                        height: 128,
                         placeholder: formatLight('No notes'),
                         tooltip: pandora.getEditTooltip(),
                         type: 'textarea',
@@ -582,7 +579,6 @@ pandora.ui.infoView = function(data) {
                     })
             )
             .appendTo($statistics);
-
     }
 
     $('<div>').css({height: '16px'}).appendTo($statistics);

@@ -12,8 +12,9 @@ pandora.ui.infoView = function(data) {
             MozUserSelect: 'text',
             WebkitUserSelect: 'text'
         },
-        iconRatio = ui.icons == 'posters'
-            ? (ui.showSitePosters ? 5/8 : data.posterRatio) : 1,
+        iconRatio = ui.icons == 'posters' ? (
+            ui.showSitePosters ? 5/8 : data.posterRatio
+        ) : 1,
         iconSize = ui.infoIconSize,
         iconWidth = iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio),
         iconHeight = iconRatio < 1 ? iconSize : Math.round(iconSize / iconRatio),
@@ -43,7 +44,7 @@ pandora.ui.infoView = function(data) {
         $info = $('<div>')
             .css({
                 position: 'absolute',
-                left: canEdit && !ui.showIconBrowser ? -listWidth + 'px' : 0,
+                left: 0,
                 top: 0,
                 right: 0
             })
@@ -89,7 +90,7 @@ pandora.ui.infoView = function(data) {
                 left: margin + 'px',
                 top: margin + iconHeight + 'px',
                 width: iconSize + 'px',
-                height: iconSize / 2 + 'px',
+                height: Math.round(iconSize / 2) + 'px',
                 overflow: 'hidden'
             })
             .appendTo($data.$element),
@@ -114,7 +115,7 @@ pandora.ui.infoView = function(data) {
             .css({
                 position: 'absolute',
                 width: iconSize + 'px',
-                height: iconSize / 2 + 'px'
+                height: Math.round(iconSize / 2) + 'px'
             })
             .appendTo($reflection),
 
@@ -275,7 +276,7 @@ pandora.ui.infoView = function(data) {
                 format: function(value) {
                     return value.replace(
                         /<img src=/g,
-                        '<img style="max-width: 256px; max-height: 256px; margin: 0 16px 16px 0;float: left;" src='
+                        '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
                     );
                 },
                 placeholder: formatLight('No Summary'),

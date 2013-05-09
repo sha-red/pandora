@@ -3,15 +3,14 @@
 pandora.ui.infoView = function(data) {
 
     var ui = pandora.user.ui,
-        descriptions = [],
         canEdit = pandora.site.capabilities.canEditMetadata[pandora.user.level] || data.editable,
         css = {
-            display: 'inline-block',
             marginTop: '4px',
             textAlign: 'justify',
             MozUserSelect: 'text',
             WebkitUserSelect: 'text'
         },
+        descriptions = [],
         html,
         iconRatio = ui.icons == 'posters' ? data.posterRatio : 1,
         iconSize = ui.infoIconSize,
@@ -20,6 +19,8 @@ pandora.ui.infoView = function(data) {
         iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
         borderRadius = ui.icons == 'posters' ? 0 : iconSize / 8,
         margin = 16,
+        nameKeys = ['director', 'cinematograper', 'featuring'],
+        listKeys = nameKeys.concat(['language', 'topic', 'license', 'groups']),
         statisticsWidth = 128,
         uid = Ox.uid(),
 
@@ -40,6 +41,9 @@ pandora.ui.infoView = function(data) {
             .appendTo(that),
 
         $left = Ox.Element()
+            .css({
+                position: 'absolute'
+            })
             .appendTo($info),
 
         $icon = Ox.Element({
@@ -77,7 +81,7 @@ pandora.ui.infoView = function(data) {
                 left: margin + 'px',
                 top: margin + iconHeight + 'px',
                 width: iconSize + 'px',
-                height: iconSize / 2 + 'px',
+                height: Math.round(iconSize / 2) + 'px',
                 overflow: 'hidden'
             })
             .appendTo($left),
@@ -101,7 +105,7 @@ pandora.ui.infoView = function(data) {
             .css({
                 position: 'absolute',
                 width: iconSize + 'px',
-                height: iconSize / 2 + 'px'
+                height: Math.round(iconSize / 2) + 'px'
             })
             .appendTo($reflection),
 
@@ -140,29 +144,22 @@ pandora.ui.infoView = function(data) {
         pandora.createLinks($info);        
     }
 
-    var listKeys = [
-        'language', 'topic', 'director', 'cinematographer', 'featuring',
-        'groups', 'license'
-    ];
-
     // Source & Project --------------------------------------------------------
 
-    var count = 0;
     ['source', 'project'].forEach(function(key) {
-        $div = $('<div>').appendTo($data);
         if (canEdit || data[key]) {
-            count && $('<br>').appendTo($div);
-            $('<div>')
-                .css({float: 'left'})
+            $div = $('<div>').css(css).css({margin: 0}).appendTo($data);
+            $('<span>')
                 .html(
                     formatKey({
                         category: 'categories',
                     }[key] || key).replace('</span>', '&nbsp;</span>')
                 )
                 .appendTo($div);
-            Ox.Editable({
+            Ox.EditableContent({
                     clickLink: pandora.clickLink,
                     format: function(value) {
+                        // FIXME: what??
                         return listKeys.indexOf(key) >= 0
                             ? formatValue(value.split(', '), {
                                 'director': 'name',
@@ -171,14 +168,13 @@ pandora.ui.infoView = function(data) {
                             }[key] || key)
                             : value;
                     },
-                    placeholder: formatLight('unknown'),
+                    placeholder: formatLight(Ox._('unknown')),
                     editable: canEdit,
                     tooltip: canEdit ? pandora.getEditTooltip() : '',
                     value: listKeys.indexOf(key) >= 0
                           ? (data[key] || []).join(', ')
                           : data[key] || ''
                 })
-                .css({float: 'left'})
                 .bindEvent({
                     submit: function(event) {
                         editMetadata(key, event.value);
@@ -186,13 +182,18 @@ pandora.ui.infoView = function(data) {
                 })
                 .appendTo($div);
             if (canEdit || data[key + 'description']) {
-                $('<br>').css({'clear': 'both'}).appendTo($div);
                 $('<div>')
                     .append(
-                        descriptions[key] = Ox.Editable({
+                        descriptions[key] = Ox.EditableContent({
                             clickLink: pandora.clickLink,
-                            placeholder: formatLight('No ' + Ox.toTitleCase(key) + ' Description'),
                             editable: canEdit,
+                            format: function(value) {
+                                return value.replace(
+                                    /<img src=/g,
+                                    '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
+                                );
+                            },
+                            placeholder: formatLight(Ox._('No ' + Ox.toTitleCase(key) + ' Description')),
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
                             type: 'textarea',
                             value: data[key + 'description'] || ''
@@ -204,11 +205,10 @@ pandora.ui.infoView = function(data) {
                             }
                         })
                     ).css({
-                        marginTop: '8px',
+                        margin: '12px 0',
                     })
                     .appendTo($div);
             }
-            count++;
         }
     });
 
@@ -216,17 +216,16 @@ pandora.ui.infoView = function(data) {
 
     $('<div>')
         .css({
-            marginTop: '-2px',
+            margin: '-2px 0 12px 0',
         })
         .append(
-            Ox.Editable({
+            Ox.EditableContent({
                     editable: canEdit,
                     tooltip: canEdit ? pandora.getEditTooltip() : '',
                     value: data.title
                 })
                 .css({
-                    display: 'inline-block',
-                    marginBottom: '-3px',
+                    //marginBottom: '-3px',
                     fontWeight: 'bold',
                     fontSize: '13px',
                     MozUserSelect: 'text',
@@ -240,139 +239,37 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($center);
 
-    // Location, Date, Language and Duration -----------------------------------
+    // Groups ------------------------------------------------------------------
 
-    if (canEdit) {
-        $div = $('<div>').css(css).css({marginTop: '12px'}).appendTo($center);
-        ['location', 'date', 'language', 'duration'].forEach(function(key, i) {
-            i && $('<div>').css({float: 'left'}).html(';&nbsp;').appendTo($div);
-            $('<div>')
-                .css({float: 'left'})
-                .html(formatKey(key).replace('</span>', '&nbsp;</span>'))
-                .appendTo($div);
-            Ox.Editable({
-                    clickLink: pandora.clickLink,
-                    editable: key != 'duration',
-                    format: function(value) {
-                        return formatValue(listKeys.indexOf(key) >= 0
-                            ? value.split(', ') : value, key);
-                    },
-                    placeholder: formatLight('unknown'),
-                    tooltip: pandora.getEditTooltip(),
-                    value: listKeys.indexOf(key) >= 0
-                          ? (data[key] || []).join(', ')
-                          : data[key] || ''
-                })
-                .css({float: 'left'})
-                .bindEvent({
-                    submit: function(event) {
-                        editMetadata(key, event.value);
-                    }
-                })
-                .appendTo($div);
-        });
-    } else {
-        html = [];
-        ['location', 'date', 'language', 'duration'].forEach(function(key) {
-            if (data[key]) {
-                html.push(formatKey(key) + formatValue(data[key], key));
-            }
-        });
-        $('<div>').css(css).html(html.join('; ')).appendTo($center);
-    }
+    renderGroup(['location', 'date', 'language']);
 
-    // Director, Cinematographer and Featuring ---------------------------------
+    renderGroup(['director', 'cinematographer', 'featuring']);
 
-    if (canEdit) {
-        $div = $('<div>').css(css).appendTo($center);
-        ['director', 'cinematographer', 'featuring'].forEach(function(key, i) {
-            i && $('<div>').css({float: 'left'}).html(';&nbsp;').appendTo($div);
-            $('<div>')
-                .css({float: 'left'})
-                .html(formatKey(key).replace('</span>', '&nbsp;</span>'))
-                .appendTo($div);
-            Ox.Editable({
-                    clickLink: pandora.clickLink,
-                    format: function(value) {
-                        return formatValue(value.split(', '), 'name');
-                    },
-                    placeholder: formatLight('unknown'),
-                    tooltip: pandora.getEditTooltip(),
-                    value: listKeys.indexOf(key) >= 0
-                          ? (data[key] || []).join(', ')
-                          : data[key] || ''
-                })
-                .css({float: 'left'})
-                .bindEvent({
-                    submit: function(event) {
-                        editMetadata(key, event.value);
-                    }
-                })
-                .appendTo($div);
-        });
-    } else if (data.director || data.cinematographer || data.featuring) {
-        html = [];
-        ['director', 'cinematographer', 'featuring'].forEach(function(key) {
-            if (data[key] && data[key].length) {
-                html.push(
-                    formatKey(key)
-                    + formatValue(data[key], key)
-                );
-            }
-        });
-        $('<div>').css(css).html(html.join('; ')).appendTo($center);
-    }
-
-    // Topic -------------------------------------------------------------------
-
-    if (canEdit) {
-        var key = 'topic';
-        $div = $('<div>').css(css).appendTo($center);
-        $('<div>')
-            .css({float: 'left'})
-            .html(formatKey('Topics').replace('</span>', '&nbsp;</span>'))
-            .appendTo($div);
-        Ox.Editable({
-                clickLink: pandora.clickLink,
-                format: function(value) {
-                    return formatValue(value.split(', '), key);
-                },
-                placeholder: formatLight('unknown'),
-                tooltip: pandora.getEditTooltip(),
-                value: listKeys.indexOf(key) >= 0
-                      ? (data[key] || []).join(', ')
-                      : data[key] || ''
-            })
-            .css({float: 'left'})
-            .bindEvent({
-                submit: function(event) {
-                    editMetadata(key, event.value);
-                }
-            })
-            .appendTo($div);
-        
-    } else if (data.topic) {
-        html = formatKey('topics') + formatValue(data.topic, 'topic');
-        $('<div>').css(css).html(html).appendTo($center);
-    }
+    renderGroup(['topics']);
 
     // Summary -------------------------------------------------------------
 
-    if (canEdit) {
+    if (canEdit || data.summary) {
         $('<div>')
             .append(
-                Ox.Editable({
+                Ox.EditableContent({
                     clickLink: pandora.clickLink,
                     editable: canEdit,
+                    format: function(value) {
+                        return value.replace(
+                            /<img src=/g,
+                            '<img style="float: left; max-width: 256px; max-height: 256px; margin: 0 16px 16px 0" src='
+                        );
+                    },
                     maxHeight: Infinity,
-                    placeholder: formatLight('No Summary'),
+                    placeholder: formatLight(Ox._('No Summary')),
                     tooltip: canEdit ? pandora.getEditTooltip() : '',
                     type: 'textarea',
                     value: data.summary || ''
                 })
                 .css(css)
-                // 8px marginTop gets duplicated in the editable, result is 16px
-                .css({marginTop: '8px'})
+                // margin gets doubled in the editable -- does it?
+                .css({margin: '16px 0 12px 0'})
                 .bindEvent({
                     submit: function(event) {
                         editMetadata('summary', event.value);
@@ -380,35 +277,12 @@ pandora.ui.infoView = function(data) {
                 })
             )
             .appendTo($center);
-    } else if (data.summary) {
-        $('<div>').css(css).css({marginTop: '16px'}).html(data.summary).appendTo($center);
+        $('<div>').css({width: '1px', height: 0, clear: 'both'}).appendTo($center);
     }
 
     // License -----------------------------------------------------------------
 
-    $div = $('<div>').css(css).css({marginTop: '16px'}).appendTo($center);
-    if (canEdit) {
-        $('<div>')
-            .css({float: 'left'})
-            .html(formatKey('license').replace('</span>', '&nbsp;</span>'))
-            .appendTo($div);
-        Ox.Editable({
-                placeholder: formatLight('No License'),
-                tooltip: pandora.getEditTooltip(),
-                value: (data.license || []).join(', ')
-            })
-            .bindEvent({
-                submit: function(event) {
-                    editMetadata('license', event.value);
-                }
-            })
-            .appendTo($div);
-    } else if (data.license) {
-        $div.html(
-            formatKey('License')
-            + (data.license || []).join(', ')
-        );
-    }
+    renderGroup(['license']);
 
     // Space -------------------------------------------------------------------
 
@@ -470,7 +344,7 @@ pandora.ui.infoView = function(data) {
                     .css({margin: '2px 0 0 -1px'}) // fixme: weird
                     .append(
                         Ox.Editable({
-                            placeholder: key == 'groups' ? formatLight('No Groups') : '',
+                            placeholder: key == 'groups' ? formatLight(Ox._('No Groups')) : '',
                             editable: canEdit,
                             tooltip: canEdit ? pandora.getEditTooltip() : '',
                             value: key == 'user' ? data[key] : data[key].join(', ')
@@ -512,14 +386,13 @@ pandora.ui.infoView = function(data) {
     // Notes --------------------------------------------------------------------
 
     if (canEdit) {
-
         $('<div>')
             .css({marginBottom: '4px'})
             .append(formatKey('Notes', true))
             .append(
-                Ox.Editable({
+                Ox.EditableContent({
                         height: 128,
-                        placeholder: formatLight('No notes'),
+                        placeholder: formatLight(Ox._('No notes')),
                         tooltip: pandora.getEditTooltip(),
                         type: 'textarea',
                         value: data.notes || '',
@@ -532,7 +405,6 @@ pandora.ui.infoView = function(data) {
                     })
             )
             .appendTo($right);
-
     }
 
     $('<div>').css({height: '16px'}).appendTo($right);
@@ -552,7 +424,6 @@ pandora.ui.infoView = function(data) {
                 descriptions[key] && descriptions[key].options({
                     value: result.data[key + 'description']
                 });
-
                 Ox.Request.clearCache(); // fixme: too much? can change filter/list etc
                 if (result.data.id != data.id) {
                     pandora.UI.set({item: result.data.id});
@@ -579,30 +450,36 @@ pandora.ui.infoView = function(data) {
 
     function formatKey(key, isStatistics) {
         var item = Ox.getObjectById(pandora.site.itemKeys, key);
-        key = item ? item.title : key;
+        key = Ox._(item ? item.title : key);
         return isStatistics
             ? $('<div>').css({marginBottom: '4px', fontWeight: 'bold'})
-                .html(Ox.toTitleCase(key).replace(' Per ', ' per '))
-            : '<span style="font-weight: bold">' + Ox.toTitleCase(key) + ':</span> ';
+                .html(Ox._(Ox.toTitleCase(key).replace(' Per ', ' per ')))
+            : '<span style="font-weight: bold">' + Ox._(Ox.toTitleCase(key))
+                + ':</span> ';
     }
 
     function formatLight(str) {
         return '<span style="color: rgb(128, 128, 128)">' + str + '</span>';
     }
 
-    function formatValue(value, key) {
-        if (key == 'date') {
-            return value ? Ox.formatDate(value,
-                ['', '%Y', '%B %Y', '%B %e, %Y'][value.split('-').length]
-            ) : '';
-        } else if (key == 'duration') {
-            return value < 60 ? Math.round(value) + ' sec' : Math.round(value / 60) + ' min';
-        }
+    function formatLink(value, key) {
         return (Ox.isArray(value) ? value : [value]).map(function(value) {
             return key ?
                 '<a href="/' + key + '==' + value + '">' + value + '</a>'
                 : value;
         }).join(', ');
+    }
+
+    function formatValue(value, key) {
+        var ret;
+        if (key == 'date') {
+            ret = value ? Ox.formatDate(value,
+                ['', '%Y', '%B %Y', '%B %e, %Y'][value.split('-').length]
+            ) : '';
+        } else {
+            ret = value;
+        }
+        return formatLink(ret, key);
     }
 
     function getRightsLevelElement(rightsLevel) {
@@ -612,6 +489,12 @@ pandora.ui.infoView = function(data) {
                 return rightsLevel.name;
             })
         );
+    }
+
+    function getValue(key, value) {
+        return !value ? ''
+            : Ox.contains(listKeys, key) ? value.join(', ')
+            : value;
     }
 
     function renderCapabilities(rightsLevel) {
@@ -674,8 +557,8 @@ pandora.ui.infoView = function(data) {
             });
             if (!canEdit) {
                 Ox.Button({
-                    title: 'Help',
-                    tooltip: 'About Rights',
+                    title: Ox._('Help'),
+                    tooltip: Ox._('About Rights'),
                     type: 'image'
                 })
                 .css({marginLeft: '52px'})
@@ -689,6 +572,39 @@ pandora.ui.infoView = function(data) {
         });
     }
 
+    function renderGroup(keys) {
+        var $element;
+        if (canEdit || keys.filter(function(key) {
+            return data[key];
+        }).length) {
+            $element = $('<div>').css(css);
+            keys.forEach(function(key, i) {
+                if (canEdit || data[key]) {
+                    if ($element.children().length) {
+                        $('<span>').html('; ').appendTo($element);
+                    }
+                    $('<span>').html(formatKey(key)).appendTo($element);
+                    Ox.EditableContent({
+                            clickLink: pandora.clickLink,
+                            format: function(value) {
+                                return formatValue(value, key);
+                            },
+                            placeholder: formatLight('unknown'),
+                            tooltip: canEdit ? pandora.getEditTooltip() : '',
+                            value: getValue(key, data[key])
+                        })
+                        .bindEvent({
+                            submit: function(data) {
+                                editMetadata(key, data.value);
+                            }
+                        })
+                        .appendTo($element);
+                }
+            });
+            $element.appendTo($center);
+        }
+    }
+
     function renderRightsLevel() {
         var $rightsLevelElement = getRightsLevelElement(data.rightslevel),
             $rightsLevelSelect;
@@ -696,7 +612,7 @@ pandora.ui.infoView = function(data) {
         if (canEdit) {
             $rightsLevelSelect = Ox.Select({
                     items: pandora.site.rightsLevels.map(function(rightsLevel, i) {
-                        return {id: i, title: rightsLevel.name};
+                        return {id: i, title: Ox._(rightsLevel.name)};
                     }),
                     width: 128,
                     value: data.rightslevel
@@ -771,8 +687,8 @@ pandora.ui.infoView = function(data) {
 
     that.reload = function() {
         var src = src = '/' + data.id + '/' + (
-                ui.icons == 'posters' ? 'poster' : 'icon'
-            ) + '512.jpg?' + Ox.uid();
+            ui.icons == 'posters' ? 'poster' : 'icon'
+        ) + '512.jpg?' + Ox.uid();
         $icon.attr({src: src});
         $reflectionIcon.attr({src: src});
         iconSize = iconSize == 256 ? 512 : 256;
