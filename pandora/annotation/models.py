@@ -243,7 +243,7 @@ class Annotation(models.Model):
 
     def log(self):
         c = Changelog(type='annotation')
-        c.value = self.json()
+        c.value = self.json(layer=True)
         c.save()
 
     def __unicode__(self):
