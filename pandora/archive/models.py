@@ -505,15 +505,20 @@ class Stream(models.Model):
     def encode(self):
         if self.source:
             media = self.source.media.path
+            if not self.media:
+                self.media.name = os.path.join(os.path.dirname(self.source.media.name), self.name())
             target = self.media.path
             info = ox.avinfo(media)
             if extract.stream(media, target, self.name(), info):
                 self.available = True
             else:
+                self.media = None
                 self.available = False
             self.save()
         elif self.file.data:
             media = self.file.data.path
+            if not self.media:
+                self.media.name = self.path(self.name())
             target = self.media.path
             info = ox.avinfo(media)
             if extract.stream(media, target, self.name(), info):
