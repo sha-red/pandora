@@ -222,26 +222,6 @@ pandora.changeFolderItemStatus = function(id, status, callback) {
     }
 };
 
-pandora.clearIconCache = function(item) {
-    ['poster', 'icon'].forEach(function(icon) {
-        ['', 64, 128, 512].forEach(function(size) {
-            var url = '/' + item + '/' + icon + size + '.jpg',
-                xhr = new XMLHttpRequest();
-            xhr.open('POST', url);
-            xhr.send();
-        });
-    });
-};
-
-pandora.clearListIconCache = function(list) {
-    ['', 256].forEach(function(size) {
-        var url = '/list/' + list + '/icon' + size + '.jpg',
-            xhr = new XMLHttpRequest();
-        xhr.open('POST', url);
-        xhr.send();
-    });
-};
-
 pandora.clickLink = function(e) {
     var match = e.target.id.match(/^embed(\d+)$/)
     if (match) {

@@ -863,7 +863,6 @@ pandora.ui.infoView = function(data) {
                             position: selectedImage.index
                         }), function() {
                             var src;
-                            pandora.clearIconCache(data.id);
                             Ox.Request.clearCache();
                             if (ui.icons == 'frames') {
                                 src = '/' + data.id + '/icon512.jpg?' + Ox.uid();

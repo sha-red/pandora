@@ -487,7 +487,6 @@ pandora.ui.infoView = function(data) {
                 pandora.updateItemContext();
                 pandora.$ui.browser.value(result.data.id, key, result.data[key]);
                 if (Ox.contains(['title', 'director', 'year'], key)) {
-                    pandora.clearIconCache(data.id);
                     if (ui.icons == 'posters') {
                         pandora.$ui.browser.find('img[src*="/' + data.id + '/"]').each(function() {
                             $(this).attr({

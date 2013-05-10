@@ -318,9 +318,9 @@ pandora.ui.statisticsDialog = function() {
                                     key: key == 'topdays' ? 'value' : 'key',
                                     operator: isDate || isDay ? '-' : '+'
                                 },
-                                title: key == 'lastdays' ? 'Last 30 Days'
-                                    : key == 'topdays' ? 'Top 30 Days'
-                                    : Ox.toTitleCase(key) + 's',
+                                title: key == 'lastdays' ? Ox._('Last 30 Days')
+                                    : key == 'topdays' ? Ox._('Top 30 Days')
+                                    : Ox._(Ox.toTitleCase(key) + 's'),
                                 width: chartWidth
                             })
                             .css({
@@ -480,9 +480,9 @@ pandora.ui.statisticsDialog = function() {
                                     sort: version == ''
                                         ? {key: 'value', operator: '-'}
                                         : {key: 'key', operator: '+'},
-                                    title: key == 'system'
+                                    title: Ox._(key == 'system'
                                         ? (version == '' ? 'Platforms' : 'Platform Versions')
-                                        : (version == '' ? 'Browsers' : 'Browser Versions'),
+                                        : (version == '' ? 'Browsers' : 'Browser Versions')),
                                     width: chartWidth
                                 })
                                 .css({
@@ -557,8 +557,8 @@ pandora.ui.statisticsDialog = function() {
                                 ? {key: 'value', operator: '-'}
                                 : {key: 'key', operator: '+'},
                             title: version == ''
-                                ? 'Platforms & Browsers'
-                                : 'Platform & Browser Versions',
+                                ? Ox._('Platforms & Browsers')
+                                : Ox._('Platform & Browser Versions'),
                             width: chartWidth
                         })
                         .css({

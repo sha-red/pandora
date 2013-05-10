@@ -17,7 +17,7 @@ pandora.ui.folderList = function(id) {
                 },
                 format: function(value, data) {
                     return $('<img>').attr({
-                            src: '/' + folderItem.toLowerCase() + '/' + data.id + '/icon.jpg'
+                            src: '/' + folderItem.toLowerCase() + '/' + data.id + '/icon.jpg?' + data.modified
                         }).css({
                             width: '14px',
                             height: '14px',
@@ -253,7 +253,7 @@ pandora.ui.folderList = function(id) {
     that = Ox.TableList({
         columns: columns,
         items: items,
-        keys: ui.section == 'items' ? ['query'] : ['rightslevel'],
+        keys: ['modified'].concat(ui.section == 'items' ? ['query'] : ['rightslevel']),
         max: 1,
         min: 0,
         pageLength: 1000,

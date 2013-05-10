@@ -23,10 +23,10 @@ pandora.ui.siteDialog = function(section) {
                     pandora.$ui.news = pandora.ui.news(dialogWidth, dialogHeight).appendTo($content);
                 } else if (id == 'software') {
                     Ox.Element()
-                        .html(
+                        .html(Ox._(
                             '<h1><b>pan.do/ra</b></h1>'
                             + '<sub>open media archive</sub>'
-                            + '<p><b>' + pandora.site.site.name + '</b> is based on <b>pan.do/ra</b>, '
+                            + '<p><b>{0}</b> is based on <b>pan.do/ra</b>, '
                             + 'a free, open source platform for media archives.</p>'
                             + '<b>pan.do/ra</b> includes <b>OxJS</b>, '
                             + 'a new JavaScript library for web applications.</p>'
@@ -35,12 +35,13 @@ pandora.ui.siteDialog = function(section) {
                             + 'and <a href="https://oxjs.org">oxjs.org</a>.</p>'
                             + (
                                 canSeeVersion
-                                ? '<sub><b>' + pandora.site.site.name
+                                ? '<sub><b>{0}'
                                     + '</b> is running <b>pan.do/ra</b> revision '
-                                    + pandora.site.site.version + '.</sub>'
+                                    + '{1}.</sub>'
                                 : ''
-                            )
-                        )
+                            ),
+                        [pandora.site.site.name, pandora.site.site.version]
+                        ))
                         .appendTo($content);
                     pandora.createLinks($content);
                 } else {

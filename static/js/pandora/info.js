@@ -76,7 +76,7 @@ pandora.ui.info = function() {
             that.append(pandora.$ui.listInfo = pandora.ui.listInfo());
             previousView == 'video' && resizeInfo();
         } else if (view == 'poster') {
-            pandora.api.get({id: id, keys: ['director', 'posterRatio', 'title']}, function(result) {
+            pandora.api.get({id: id, keys: ['director', 'modified', 'posterRatio', 'title']}, function(result) {
                 var ratio = result.data.posterRatio,
                     height = pandora.getInfoHeight(true);
                 emptyInfo();
@@ -299,7 +299,7 @@ pandora.ui.listInfo = function() {
                 that.append(
                     $('<div>')
                         .css({paddingTop: '16px'})
-                        .html(folderItem + ' not found')
+                        .html(Ox._('{0} not found', [Ox._(folderItem)]))
                 );
             }
         });
@@ -308,8 +308,8 @@ pandora.ui.listInfo = function() {
             $('<div>')
                 .css({fontWeight: 'bold'})
                 .html(ui.section == 'items'
-                    ? 'All ' + pandora.site.itemName.plural
-                    : pandora.site.site.name + ' ' + folderItems
+                    ? Ox._('All {0}', [Ox._(pandora.site.itemName.plural)])
+                    : Ox._('{} ' + folderItems, [pandora.site.site.name])
                 )
         );
     }
@@ -351,7 +351,7 @@ pandora.ui.listInfo = function() {
 
 pandora.ui.posterInfo = function(data) {
     var $poster = $('<img>')
-            .attr({src: '/' + data.id + '/poster512.jpg'})
+            .attr({src: '/' + data.id + '/poster512.jpg' + data.modified})
             .css(getPosterCSS()),
         $text = $('<div>')
             .css({

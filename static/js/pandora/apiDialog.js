@@ -113,15 +113,15 @@ pandora.ui.apiDialog = function() {
 
     function getIndex() {
         var $index = Ox.Element()
-            .html(
+            .html(Ox._(
                 '<h1><b>API Documentation</b></h1>\n'
-                + '<p><b>' + pandora.site.site.name + '</b> uses a JSON API'
+                + '<p><b>{0}</b> uses a JSON API'
                 + ' to communicate between the browser and the server.'
                 + ' This API is 100% public, which means that there is'
                 + ' virtually no limit to what you can do with the site,'
                 + ' or build on top of it &mdash; from writing simple scripts'
                 + ' to read or write specific information to including'
-                + ' data from <b>' + pandora.site.site.name + '</b>'
+                + ' data from <b>{0}</b>'
                 + ' (not just videos, but also metadata, annotations, lists,'
                 + ' or a custom search interface) in your own website.</p>\n'
                 + '<p>If you are using the API in JavaScript, you may want to'
@@ -137,7 +137,7 @@ pandora.ui.apiDialog = function() {
                 + ' start with "X" (sorted by duration, then title, both'
                 + ' in ascending order), it will return their duration,'
                 + ' id and title properties.'
-            )
+            [pandora.site.site.name]))
             .append(
                 Ox.SyntaxHighlighter({
                     source: "pandora.api.find({\n"
