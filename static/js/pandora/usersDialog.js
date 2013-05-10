@@ -735,7 +735,7 @@ pandora.ui.usersDialog = function() {
                 Ox.Input({
                     disabled: true,
                     id: 'from',
-                    label: Ox_('From'),
+                    label: Ox._('From'),
                     labelWidth: 80,
                     value: pandora.site.site.name + ' <' + pandora.site.site.email.contact + '>',
                     width: formWidth - 16
@@ -922,8 +922,9 @@ pandora.ui.usersDialog = function() {
 
     function setTo() {
         var recipients = getTo().length;
+        //fixme shoule be No not no from formatCount here
         $mailForm.values({
-            to: (recipients || Ox._('No')) + (recipients == 1 ? Ox._('recipient') : Ox._('recipients'))
+            to: Ox.formatCount(recipients, 'recipient')
         });
     }
 

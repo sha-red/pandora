@@ -276,7 +276,7 @@ pandora.ui.home = function() {
             if (lists.length) {
                 $label = Ox.Label({
                         textAlign: 'center',
-                        title: '<b>' + Ox.formatCount(lists, 'Featured List') +  '</b>',
+                        title: '<b>' + Ox.formatCount(lists.length, 'Featured List') +  '</b>',
                         width: 512
                     })
                     .css({
