@@ -38,7 +38,6 @@ def annotation_sort_key(key):
 
 def order_query(qs, sort):
     order_by = []
-    print sort
     for e in sort:
         operator = e['operator']
         if operator != '-':
