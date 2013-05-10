@@ -217,7 +217,8 @@ def stream(video, target, profile, info):
 
     if info['audio']:
         audio_settings = ['-ar', str(audiorate), '-aq', str(audioquality)]
-        if audiochannels and 'channels' in info['audio'][0] and info['audio'][0]['channels'] > audiochannels:
+        if audiochannels and 'channels' in info['audio'][0] \
+            and info['audio'][0]['channels'] > audiochannels:
             audio_settings += ['-ac', str(audiochannels)]
         if audiobitrate:
             audio_settings += ['-ab', audiobitrate]
@@ -284,7 +285,8 @@ def frame(videoFile, frame, position, height=128, redo=False):
         frameFolder = os.path.dirname(frame)
         if redo or not exists(frame):
             ox.makedirs(frameFolder)
-            cmd = ['oxframe', '-i', videoFile, '-o', frame, '-p', str(position), '-y', str(height)]
+            cmd = ['oxframe', '-i', videoFile, '-o', frame,
+                '-p', str(position), '-y', str(height)]
             run_command(cmd)
 
 
@@ -331,7 +333,8 @@ def timeline(video, prefix, modes=None, size=None):
         '-o', prefix,
         '-c', os.path.join(prefix, 'cuts.json'),
     ] + video
-    p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     #print cmd
     #p = subprocess.Popen(cmd)
     p.wait()
