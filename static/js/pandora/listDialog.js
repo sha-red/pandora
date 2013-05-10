@@ -15,7 +15,7 @@ pandora.ui.listDialog = function(section) {
         ),
         ui = pandora.user.ui,
         width = getWidth(section),
-        folderItems = ui.section == 'items' ? Ox._('Lists') : Ox.toTitleCase(ui.section),
+        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
         folderItem = folderItems.slice(0, -1);
     Ox.getObjectById(tabs, section).selected = true;
 
@@ -402,7 +402,8 @@ pandora.ui.listIconPanel = function(listData) {
 
             $interface = Ox.Element({
                     tooltip: function(e) {
-                        return 'Edit ' + $(e.target).attr('id').replace('-', ' ') + ' image';
+                        var quarterName = ($(e.target).attr('id') || '').replace('-', ' ');
+                        return quarterName ? Ox._('Edit ' + quarterName + ' image') : null;
                     }
                 })
                 .css({
@@ -434,7 +435,7 @@ pandora.ui.listIconPanel = function(listData) {
                     id: data.id,
                     info: data[['title', 'director'].indexOf(sort[0].key) > -1 ? 'year' : sort[0].key],
                     title: data.title + (data.director.length ? ' (' + data.director.join(', ') + ')' : ''),
-                    url: '/' + data.id + '/icon' + size + '.jpg',
+                    url: '/' + data.id + '/icon' + size + '.jpg?' + data.modified,
                     width: size
                 };
             },
@@ -446,7 +447,7 @@ pandora.ui.listIconPanel = function(listData) {
                     }
                 }), callback);
             },
-            keys: ['director', 'duration', 'id', 'posterFrame', 'title', 'videoRatio', 'year'],
+            keys: ['director', 'duration', 'id', 'modified', 'posterFrame', 'title', 'videoRatio', 'year'],
             max: 1,
             min: 1,
             //orientation: 'vertical',
@@ -473,7 +474,7 @@ pandora.ui.listIconPanel = function(listData) {
                 } else {
                     itemData = $list.value(posterFrame.item);
                 }
-                posterFrames.length && renderPreview(itemData);
+                itemData && renderPreview(itemData);
             }
         })
         .gainFocus();
@@ -536,7 +537,7 @@ pandora.ui.listIconPanel = function(listData) {
             if (posterFrames.length) {
                 posterFrames[quarter] = posterFrame;
             } else {
-                posterFrames = Ox.repeat([posterFrame], 4);
+                posterFrames = Ox.range(4).map(function() { return Ox.clone(posterFrame); } );
             }
             pandora.api['edit' + folderItem]({
                 id: listData.id,
@@ -551,7 +552,6 @@ pandora.ui.listIconPanel = function(listData) {
                         src: '/' + folderItem.toLowerCase() + '/' + listData.id + '/icon.jpg?' + Ox.uid()
                     });
                 pandora.$ui.info.updateListInfo();
-                pandora.clearListIconCache(listData.id);
             });
             $preview.options({position: position});
         }
