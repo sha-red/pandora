@@ -73,7 +73,7 @@ pandora.ui.contactForm = function() {
 
     $receiptCheckbox = Ox.Checkbox({
             id: 'receipt',
-            title: Ox._('Send a receipt to {}', pandora.user.email),
+            title: Ox._('Send a receipt to {0}', [pandora.user.email]),
             value: pandora.user.level != 'guest',
             width: width - 136
         })
