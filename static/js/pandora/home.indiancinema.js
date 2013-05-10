@@ -301,7 +301,7 @@ pandora.ui.home = function() {
                     conditions: [{key: 'status', value: 'featured', operator: '=='}],
                     operator: '&'
                 },
-                keys: ['user', 'name', 'description'],
+                keys: ['description', 'modified', 'name', 'user'],
                 sort: [{key: 'position', operator: '+'}]
             },
             items, lists, texts;
@@ -583,7 +583,7 @@ pandora.ui.home = function() {
 
             function getImageURL(item) {
                 return '/' + item.type + '/' + item.user
-                    + ':' + item.name + '/icon256.jpg';
+                    + ':' + item.name + '/icon256.jpg?' + item.modified;
             }
 
             function getTooltip(item) {

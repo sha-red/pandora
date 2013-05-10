@@ -259,7 +259,7 @@ pandora.ui.home = function() {
                 conditions: [{key: 'status', value: 'featured', operator: '=='}],
                 operator: '&'
             },
-            keys: ['user', 'name', 'description'],
+            keys: ['user', 'name', 'description', 'modified'],
             sort: [{key: 'position', operator: '+'}]
         }, function(result) {
             var lists = result.data.items,
@@ -317,7 +317,7 @@ pandora.ui.home = function() {
                     })
                     .attr({
                         src: '/list/' + lists[selected].user + ':'
-                            + lists[selected].name + '/icon256.jpg'
+                            + lists[selected].name + '/icon256.jpg?' + lists[selected].modified
                     })
                     .css({
                         position: 'absolute',
@@ -478,7 +478,7 @@ pandora.ui.home = function() {
                             })
                             .attr({
                                 src: '/list/' + list.user + ':'
-                                    + list.name + '/icon256.jpg'
+                                    + list.name + '/icon256.jpg?' + list.modified
                             })
                             .css({
                                 width: '57px',
@@ -571,7 +571,7 @@ pandora.ui.home = function() {
                     }
                     $icon.attr({
                         src: '/list/' + lists[selected].user + ':'
-                            + lists[selected].name + '/icon256.jpg'
+                            + lists[selected].name + '/icon256.jpg?' + lists[selected].modified
                     });
                     $text.html(
                         '<b>' + Ox.encodeHTMLEntities(lists[selected].name) + '</b><br><br>'
