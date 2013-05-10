@@ -274,7 +274,7 @@ pandora.ui.folderList = function(id) {
             if (id == 'personal') {
                 if (event.keys == '' || event.keys == 'alt') {
                     pandora.api.addList({
-                        name: 'Untitled',
+                        name: Ox._('Untitled'),
                         status: 'private',
                         type: event.keys == '' ? 'static' : 'smart'
                     }, function(result) {

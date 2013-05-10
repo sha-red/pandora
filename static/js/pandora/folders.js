@@ -259,7 +259,7 @@ pandora.ui.folders = function() {
                         hasFocus, id;
                     if (data.id == 'new' || data.id == 'newsmart') {
                         pandora.api.addList({
-                            name: 'Untitled',
+                            name: Ox._('Untitled'),
                             status: 'private',
                             type: data.id == 'new' ? 'static' : 'smart'
                         }, function(result) {

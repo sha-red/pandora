@@ -239,10 +239,8 @@ pandora.ui.navigationView = function(type, videoRatio) {
     }
 
     function updateStatusbar(items) {
-        $status.html(
-            (items ? Ox.formatNumber(items) : 'No')
-            + ' Clip' + (items == 1 ? '' : 's')
-        );
+        //fixme how to capitalize Ox.formatCount?
+        $status.html(Ox.formatCount(items, 'Clip'));
     }
 
     if (type == 'map') {

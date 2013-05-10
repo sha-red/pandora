@@ -394,7 +394,7 @@ pandora.ui.textEmbed = function() {
 
         $message = $('<div>')
             .css({marginTop: '16px', textAlign: 'center'})
-            .html('No Embeds')
+            .html(Ox._('No Embeds'))
             .hide()
             .appendTo(that),
 

@@ -140,7 +140,7 @@ pandora.ui.info = function() {
                                 marginTop: '2px',
                                 fontSize: '9px',
                                 textAlign: 'center'
-                            }).html('No Video')
+                            }).html(Ox._('No Video'))
                         )
                     );
                 }

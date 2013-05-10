@@ -612,23 +612,23 @@ pandora.ui.usersDialog = function() {
             items: [
                 Ox.Checkbox({
                         id: 'status',
-                        label: 'Status',
+                        label: Ox._('Status'),
                         labelWidth: 80,
-                        title: !user.disabled ? 'Enabled' : 'Disabled',
+                        title: !user.disabled ? Ox._('Enabled') : Ox._('Disabled'),
                         value: !user.disabled,
                         width: formWidth - 16
                     })
                     .bindEvent({
                         change: function(data) {
                             this.options({
-                                title: this.options('title') == 'Enabled'
-                                    ? 'Disabled' : 'Enabled'
+                                title: this.options('title') == Ox._('Enabled')
+                                    ? Ox._('Disabled') : Ox._('Enabled')
                             });
                         }
                     }),
                 Ox.Input({
                         id: 'username',
-                        label: 'Username',
+                        label: Ox._('Username'),
                         labelWidth: 80,
                         value: user.username,
                         width: formWidth - 16
@@ -640,7 +640,7 @@ pandora.ui.usersDialog = function() {
                     }),
                 Ox.Input({
                         id: 'email',
-                        label: 'E-Mail',
+                        label: Ox._('E-Mail'),
                         labelWidth: 80,
                         value: user.email,
                         width: formWidth - 16
@@ -658,30 +658,30 @@ pandora.ui.usersDialog = function() {
                             title: Ox.toTitleCase(level)
                         };
                     }),
-                    label: 'Level',
+                    label: Ox._('Level'),
                     labelWidth: 80,
                     value: user.level,
                     width: formWidth - 16
                 }),
                 Ox.Checkbox({
                         id: 'newsletter',
-                        label: 'Newsletter',
+                        label: Ox._('Newsletter'),
                         labelWidth: 80,
-                        title: user.newsletter ? 'Subscribed' : 'Unsubscribed',
+                        title: user.newsletter ? Ox._('Subscribed') : Ox._('Unsubscribed'),
                         value: user.newsletter,
                         width: formWidth - 16
                     })
                     .bindEvent({
                         change: function(data) {
                             this.options({
-                                title: this.options('title') == 'Subscribed'
-                                    ? 'Unsubscribed' : 'Subscribed'
+                                title: this.options('title') == Ox._('Subscribed')
+                                    ? Ox._('Unsubscribed') : Ox._('Subscribed')
                             });
                         }
                     }),
                 Ox.Input({
                         id: 'groups',
-                        label: 'Groups',
+                        label: Ox._('Groups'),
                         labelWidth: 80,
                         value: user.groups ? user.groups.join(', ') : '',
                         width: formWidth - 16
@@ -694,7 +694,7 @@ pandora.ui.usersDialog = function() {
                 Ox.Input({
                     height: dialogHeight - 184,
                     id: 'notes',
-                    placeholder: 'Notes',
+                    placeholder: Ox._('Notes'),
                     type: 'textarea',
                     value: user.notes,
                     width: formWidth - 16
@@ -735,7 +735,7 @@ pandora.ui.usersDialog = function() {
                 Ox.Input({
                     disabled: true,
                     id: 'from',
-                    label: 'From',
+                    label: Ox_('From'),
                     labelWidth: 80,
                     value: pandora.site.site.name + ' <' + pandora.site.site.email.contact + '>',
                     width: formWidth - 16
@@ -743,7 +743,7 @@ pandora.ui.usersDialog = function() {
                 Ox.Input({
                     disabled: true,
                     id: 'to',
-                    label: 'To',
+                    label: Ox._('To'),
                     labelWidth: 80,
                     value: '',
                     width: formWidth - 16
@@ -754,7 +754,7 @@ pandora.ui.usersDialog = function() {
                             {id: 'users', title: Ox._('All users')},
                             {id: 'subscribers', title: Ox._('Subscribers only')},
                         ],
-                        label: 'Include',
+                        label: Ox._('Include'),
                         labelWidth: 80,
                         width: formWidth - 16
                     })
@@ -766,7 +766,7 @@ pandora.ui.usersDialog = function() {
                     }),
                 Ox.Input({
                         id: 'subject',
-                        label: 'Subject',
+                        label: Ox._('Subject'),
                         labelWidth: 80,
                         value: pandora.site.site.email.prefix + ' ',
                         width: formWidth - 16
@@ -777,7 +777,7 @@ pandora.ui.usersDialog = function() {
                 Ox.Input({
                         height: dialogHeight - 208,
                         id: 'message',
-                        placeholder: 'Message',
+                        placeholder: Ox._('Message'),
                         type: 'textarea',
                         value: '\n\n' + pandora.site.site.email.footer,
                         width: formWidth - 16

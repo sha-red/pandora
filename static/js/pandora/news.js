@@ -111,7 +111,7 @@ pandora.ui.news = function(width, height) {
                 clickLink: pandora.clickLink,
                 editable: isEditable,
                 maxHeight: height - 96,
-                placeholder: 'No text',
+                placeholder: Ox._('No text'),
                 tooltip: isEditable ? pandora.getEditTooltip() : '',
                 type: 'textarea',
                 value: items[index].text,

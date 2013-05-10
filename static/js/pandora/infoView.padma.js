@@ -19,7 +19,7 @@ pandora.ui.infoView = function(data) {
         iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
         borderRadius = ui.icons == 'posters' ? 0 : iconSize / 8,
         margin = 16,
-        nameKeys = ['director', 'cinematograper', 'featuring'],
+        nameKeys = ['director', 'cinematographer', 'featuring'],
         listKeys = nameKeys.concat(['language', 'topic', 'license', 'groups']),
         statisticsWidth = 128,
 

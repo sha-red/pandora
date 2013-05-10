@@ -248,7 +248,7 @@ pandora.ui.metadataDialog = function(data) {
                                         })
                                 ],
                                 separators: [
-                                    {title: ['Current', 'Update'][i], width: 64}
+                                    {title: [Ox._('Current'), Ox_('Update')][i], width: 64}
                                 ]
                             })
                             .css({display: 'inline-block', margin: '3px'})

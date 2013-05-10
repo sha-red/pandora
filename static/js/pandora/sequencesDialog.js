@@ -356,11 +356,11 @@ pandora.ui.sequencesDialog = function() {
     }
 
     function getTitle() {
-        return pandora.user.ui.sequenceSort[0].operator == '+' ? 'up' : 'down';
+        return pandora.user.ui.sequenceSort[0].operator == '+' ? Ox._('up') : Ox._('down');
     }
 
     function getTooltip() {
-        return pandora.user.ui.sequenceSort[0].operator == '+' ? 'Ascending' : 'Descending';
+        return pandora.user.ui.sequenceSort[0].operator == '+' ? Ox._('Ascending') : Ox._('Descending');
     }
 
     function openClip() {

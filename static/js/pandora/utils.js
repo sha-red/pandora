@@ -21,7 +21,7 @@ pandora.addList = function() {
         isSmart = arguments[0];
         isFrom = arguments[1];
         data = {
-            name: 'Untitled',
+            name: Ox._('Untitled'),
             status: 'private',
             type: !isSmart ? 'static' : 'smart'
         };

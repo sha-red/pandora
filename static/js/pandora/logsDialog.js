@@ -32,7 +32,7 @@ pandora.ui.logsDialog = function() {
         $findInput = Ox.Input({
                 changeOnKeypress: true,
                 clear: true,
-                placeholder: 'Find: All',
+                placeholder: Ox._('Find: All'),
                 width: 192
             })
             .bindEvent({

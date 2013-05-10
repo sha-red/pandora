@@ -80,7 +80,7 @@ pandora.ui.listDialog = function(section) {
                 pandora.$ui.findIconItemInput = Ox.Input({
                     changeOnKeypress: true,
                     clear: true,
-                    placeholder: 'Find: All',
+                    placeholder: Ox._('Find: All'),
                     width: 128 + Ox.UI.SCROLLBAR_SIZE
                 })
                 .bindEvent({
@@ -165,7 +165,7 @@ pandora.ui.listGeneralPanel = function(listData) {
             subscribers = result.data.items[0].subscribers,
             $icon = Ox.Element({
                     element: '<img>',
-                    tooltip: 'Doubleclick to edit icon'
+                    tooltip: Ox._('Doubleclick to edit icon')
                 })
                 .attr({
                     src: '/' + folderItem.toLowerCase() + '/' + listData.id + '/icon256.jpg?' + Ox.uid()
@@ -185,7 +185,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                 })
                 .appendTo(that),
             $nameInput = Ox.Input({
-                    label: 'Name',
+                    label: Ox._('Name'),
                     labelWidth: 80,
                     value: listData.name,
                     width: 320
@@ -199,7 +199,7 @@ pandora.ui.listGeneralPanel = function(listData) {
             $itemsInput = ui.section == 'items'
                 ? Ox.Input({
                     disabled: true,
-                    label: 'Items',
+                    label: Ox._('Items'),
                     labelWidth: 80,
                     value: listData.items,
                     width: 320
@@ -214,7 +214,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                             title: rightsLevel.name,
                         };
                     }),
-                    label: 'Rights Level',
+                    label: Ox._('Rights Level'),
                     labelWidth: 90,
                     value: listData.rightslevel,
                     width: 320
@@ -227,7 +227,7 @@ pandora.ui.listGeneralPanel = function(listData) {
             $statusSelect = listData.status == 'featured'
                 ? Ox.Input({
                     disabled: true,
-                    label: 'Status',
+                    label: Ox._('Status'),
                     labelWidth: 80,
                     value: 'Featured',
                     width: 320
@@ -239,7 +239,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                         {id: 'private', title: Ox._('Private')},
                         {id: 'public', title: Ox._('Public')}
                     ],
-                    label: 'Status',
+                    label: Ox._('Status'),
                     labelWidth: 80,
                     value: listData.status,
                     width: 320
@@ -251,7 +251,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                 .appendTo(that),
             $subscribersInput = Ox.Input({
                     disabled: true,
-                    label: 'Subscribers',
+                    label: Ox._('Subscribers'),
                     labelWidth: 80,
                     value: subscribers,
                     width: 320
@@ -261,7 +261,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                 .appendTo(that),
             $descriptionInput = Ox.Input({
                     height: getDescriptionHeight(),
-                    placeholder: 'Description',
+                    placeholder: Ox._('Description'),
                     type: 'textarea',
                     value: description,
                     width: 320
@@ -297,7 +297,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                         Ox.Request.clearCache('find' + folderItems);
                         pandora.$ui.info.updateListInfo();
                         pandora.$ui.listDialog.options({
-                            title: folderItem + ' &mdash; ' + Ox.encodeHTMLEntities(listData.name)
+                            title: Ox._(folderItem) + ' &mdash; ' + Ox.encodeHTMLEntities(listData.name)
                         });
                     }
                 });
