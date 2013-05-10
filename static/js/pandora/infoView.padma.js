@@ -22,7 +22,6 @@ pandora.ui.infoView = function(data) {
         nameKeys = ['director', 'cinematograper', 'featuring'],
         listKeys = nameKeys.concat(['language', 'topic', 'license', 'groups']),
         statisticsWidth = 128,
-        uid = Ox.uid(),
 
         that = Ox.Element(),
 
@@ -56,7 +55,7 @@ pandora.ui.infoView = function(data) {
             .attr({
                 src: '/' + data.id + '/' + (
                     ui.icons == 'posters' ? 'poster' : 'icon'
-                ) + '512.jpg?' + uid
+                ) + '512.jpg?' + data.modified
             })
             .css({
                 position: 'absolute',
@@ -90,7 +89,7 @@ pandora.ui.infoView = function(data) {
             .attr({
                 src: '/' + data.id + '/' + (
                     ui.icons == 'posters' ? 'poster' : 'icon'
-                ) + '512.jpg?' + uid
+                ) + '512.jpg?' + data.modified
             })
             .css({
                 position: 'absolute',

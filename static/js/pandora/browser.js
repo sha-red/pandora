@@ -77,7 +77,7 @@ pandora.ui.browser = function() {
                     url = '/' + data.id + '/' + (
                         ui.icons == 'posters'
                         ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-                    ) + '128.jpg',
+                    ) + '128.jpg?' + data.modified,
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director', 'random'].indexOf(sortKey) > -1) {
                     info = data['year'];
@@ -111,7 +111,7 @@ pandora.ui.browser = function() {
                     query: pandora.user.ui.find
                 }), callback);
             },
-            keys: ['director', 'id', 'posterRatio', 'title', 'year'],
+            keys: ['director', 'id', 'modified', 'posterRatio', 'title', 'year'],
             max: 1,
             min: 1,
             orientation: 'horizontal',

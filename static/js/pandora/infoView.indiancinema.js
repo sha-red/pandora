@@ -37,7 +37,6 @@ pandora.ui.infoView = function(data) {
             studios: getStudios()
         },
         statisticsWidth = 128,
-        uid = Ox.uid(),
 
         that = Ox.Element(),
 
@@ -67,7 +66,7 @@ pandora.ui.infoView = function(data) {
                 src: '/' + data.id + '/' + (
                     ui.icons == 'posters'
                     ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-                ) + '512.jpg?' + uid
+                ) + '512.jpg?' + data.modified
             })
             .css({
                 position: 'absolute',
@@ -100,7 +99,7 @@ pandora.ui.infoView = function(data) {
                 src: '/' + data.id + '/' + (
                     ui.icons == 'posters'
                     ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-                ) + '512.jpg?' + uid
+                ) + '512.jpg?' + data.modified
             })
             .css({
                 position: 'absolute',

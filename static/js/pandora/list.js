@@ -44,7 +44,7 @@ pandora.ui.list = function() {
                             //background: 'transparent'
                         });
                     }).attr({
-                        src: '/' + data.id + '/' + icon + '14.jpg'
+                        src: '/' + data.id + '/' + icon + '14.jpg?' + data.modified 
                     });
                 },
                 id: 'posterRatio',
@@ -83,7 +83,8 @@ pandora.ui.list = function() {
             items: function(data, callback) {
                 //Ox.Log('', 'data, pandora.Query.toObject', data, pandora.Query.toObject())
                 pandora.api.find(Ox.extend(data, {
-                    query: pandora.user.ui.find
+                    query: pandora.user.ui.find,
+                    keys: ['modified'].concat(data.keys)
                 }), callback);
                 return Ox.clone(data, true);
             },
@@ -130,7 +131,7 @@ pandora.ui.list = function() {
                     url = '/' + data.id + '/' + (
                         ui.icons == 'posters'
                         ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-                    ) + size + '.jpg',
+                    ) + size + '.jpg?' + data.modified,
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director', 'random'].indexOf(sortKey) > -1) {
                     info = data['year'];
@@ -165,7 +166,7 @@ pandora.ui.list = function() {
                 }), callback);
                 return Ox.clone(data, true);
             },
-            keys: ['director', 'id', 'posterRatio', 'title', 'year'],
+            keys: ['director', 'id', 'modified', 'posterRatio', 'title', 'year'],
             selected: pandora.user.ui.listSelection,
             size: 128,
             sort: pandora.user.ui.listSort,
@@ -188,7 +189,7 @@ pandora.ui.list = function() {
                     url = '/' + data.id + '/' + (
                         ui.icons == 'posters'
                         ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-                    ) + size + '.jpg',
+                    ) + size + '.jpg?' + data.modified,
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director'].indexOf(sortKey) > -1) {
                     info = data['year'];
@@ -239,7 +240,7 @@ pandora.ui.list = function() {
                 }), callback);
                 return Ox.clone(data, true);
             },
-            keys: ['clips', 'director', 'duration', 'id', 'posterRatio', 'title', 'videoRatio', 'year'],
+            keys: ['clips', 'director', 'duration', 'id', 'modified', 'posterRatio', 'title', 'videoRatio', 'year'],
             selected: pandora.user.ui.listSelection,
             size: 192,
             sort: pandora.user.ui.listSort,
@@ -273,7 +274,7 @@ pandora.ui.list = function() {
                     url = '/' + data.id + '/' + (
                         ui.icons == 'posters'
                         ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-                    ) + size + '.jpg',
+                    ) + size + '.jpg?' + data.modified,
                     format, info, sortKey = sort[0].key;
                 if (['title', 'director'].indexOf(sortKey) > -1) {
                     info = data['year'];
@@ -355,7 +356,7 @@ pandora.ui.list = function() {
                 }} : {})), callback);
                 return Ox.clone(data, true);
             },
-            keys: ['clips', 'director', 'duration', 'id', 'posterRatio', 'rendered', 'title', 'year'],
+            keys: ['clips', 'director', 'duration', 'id', 'modified', 'posterRatio', 'rendered', 'title', 'year'],
             selected: pandora.user.ui.listSelection,
             size: 192,
             sort: pandora.user.ui.listSort,
@@ -448,7 +449,7 @@ pandora.ui.list = function() {
                 }
                 pandora.requests.preview && pandora.api.cancel(pandora.requests.preview);
                 pandora.requests.preview = pandora.api.find({
-                    keys: ['director', 'id', 'posterRatio', 'title', 'year'],
+                    keys: ['director', 'id', 'modified', 'posterRatio', 'title', 'year'],
                     query: {
                         conditions: data.ids.map(function(id) {
                             return {
