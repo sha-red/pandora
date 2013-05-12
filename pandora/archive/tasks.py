@@ -92,7 +92,9 @@ def process_stream(fileId):
         models.File.objects.filter(id=fileId).update(encoding=True)
         stream.make_timeline()
         stream.extract_derivatives()
-        models.File.objects.filter(id=fileId).update(encoding=False)
+        file = models.File.objects.get(id=fileId)
+        file.encoding = False
+        file.save()
     file.item.update_selected()
     if not file.item.rendered:
         file.item.update_timeline()
