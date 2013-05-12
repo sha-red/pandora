@@ -811,8 +811,9 @@ class Item(models.Model):
         s.rightslevel = self.level
 
         s.aspectratio = self.get('aspectratio')
-        s.words = sum([len(a.value.split()) for a in self.annotations.exclude(value='')])
-        s.clips = self.clips.count()
+        if self.id:
+            s.words = sum([len(a.value.split()) for a in self.annotations.exclude(value='')])
+            s.clips = self.clips.count()
 
         videos = self.files.filter(selected=True).filter(Q(is_video=True)|Q(is_audio=True))
         if videos.count() > 0:
