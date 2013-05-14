@@ -1122,10 +1122,8 @@ class Item(models.Model):
         self.rendered = streams.count() > 0
         self.save()
         if async:
-            tasks.load_subtitles.delay(self.itemId)
             get_sequences.delay(self.itemId)
         else:
-            tasks.load_subtitles(self.itemId)
             get_sequences(self.itemId)
 
     def save_poster(self, data):

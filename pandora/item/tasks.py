@@ -78,7 +78,7 @@ def rebuild_timeline(itemId):
     i = models.Item.objects.get(itemId=itemId)
     for s in i.streams():
         s.make_timeline()
-    i.update_timeline()
+    i.update_timeline(async=False)
 
 @task(queue="encoding")
 def load_subtitles(itemId):
