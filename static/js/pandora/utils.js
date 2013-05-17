@@ -1193,6 +1193,13 @@ pandora.isEmbedURL = function(url) {
         && Ox.unserialize(hash.substr(2), true).embed === true
 };
 
+pandora.isPrintURL = function(url) {
+    url = url || document.location.href;
+    var hash = Ox.parseURL(url).hash;
+    return hash.substr(0, 2) == '#?'
+        && Ox.unserialize(hash.substr(2), true).print === true
+};
+
 pandora.logEvent = function(data, event, element) {
     var element = this,
         handlers = self.eventHandlers ? self.eventHandlers[event] : [];

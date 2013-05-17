@@ -182,7 +182,7 @@ pandora.UI = (function() {
                 }
             });
         });
-        Ox.len(set) && pandora.api.setUI(set);
+        !pandora.isEmbedURL() && !pandora.isPrintURL() && Ox.len(set) && pandora.api.setUI(set);
         triggerEvents && Ox.forEach(trigger, function(val, key) {
             Ox.Log('UI', 'TRIGGER ' + key + ' ' + val);
             Ox.forEach(pandora.$ui, function(element) {
