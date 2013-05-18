@@ -134,7 +134,7 @@ def reloader_thread():
                 if mtime > _config_mtime:
                     load_config()
                     _config_mtime = mtime
-                time.sleep(1)
+                time.sleep(10)
             except:
                 #sys.stderr.write("reloading config failed\n")
                 pass
