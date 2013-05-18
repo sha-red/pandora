@@ -11,7 +11,7 @@ from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
 
-import monkey_patch.models
+import app.monkey_patch
 
 import ox.django.api.urls
 

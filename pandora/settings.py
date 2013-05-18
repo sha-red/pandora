@@ -94,7 +94,6 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-    'monkey_patch',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -112,7 +111,6 @@ INSTALLED_APPS = (
     'djcelery',
     'app',
     'log',
-
     'annotation',
     'clip',
     'sequence',

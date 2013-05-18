@@ -6,6 +6,8 @@ from django.db import models
 
 from changelog.models import Changelog
 
+import monkey_patch
+
 class Page(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)

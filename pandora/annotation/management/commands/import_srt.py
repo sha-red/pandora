@@ -7,7 +7,7 @@ from django.conf import settings
 
 import ox
 
-import monkey_patch.models
+import app.monkey_patch
 
 from item.models import Item
 from user.models import User

@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from django.db import connection, transaction
 from django.conf import settings
 
-import monkey_patch.models
+import app.monkey_patch
 from ... import models
 
 

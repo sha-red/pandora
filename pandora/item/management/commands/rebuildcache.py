@@ -5,7 +5,7 @@ import time
 
 from django.core.management.base import BaseCommand
 
-import monkey_patch.models
+import app.monkey_patch
 from ... import models
 
 

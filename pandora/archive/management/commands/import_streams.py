@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 import os
 
-import monkey_patch.models
+import app.monkey_patch
 from ... import models
 from ...tasks import update_stream
 
