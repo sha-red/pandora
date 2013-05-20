@@ -64,7 +64,7 @@ pandora.ui.usersDialog = function() {
                 items: [
                     {id: 'all', title: Ox._('Find: All')},
                     {id: 'username', title: Ox._('Find: Username')},
-                    {id: 'email', title: Ox._('Find: E-Mail-Address')}
+                    {id: 'email', title: Ox._('Find: E-Mail Address')}
                 ],
                 overlap: 'right',
                 type: 'image'
@@ -789,7 +789,7 @@ pandora.ui.usersDialog = function() {
                         id: 'insert',
                         items: [
                             {id: 'username', title: Ox._('Username')},
-                            {id: 'email', title: Ox._('E-Mail address')},
+                            {id: 'email', title: Ox._('E-Mail Address')},
                         ],
                         title: Ox._('Insert...'),
                         width: formWidth - 16

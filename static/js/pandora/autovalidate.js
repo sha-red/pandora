@@ -56,7 +56,7 @@ pandora.validateNewEmail = function(value, callback) {
         operator: '=='
     }, function(result) {
         callback({
-            message: Ox._('E-mail address already exists'),
+            message: Ox._('E-Mail Address already exists'),
             valid: !result.data.users.length
         });
     }) : callback({

@@ -127,7 +127,7 @@ pandora.ui.siteDialog = function(section) {
         .bindEvent({
             change: function(data) {
                 that.options({
-                    title: Ox.getObjectById(tabs, data.selected).title
+                    title: Ox._(Ox.getObjectById(tabs, data.selected).title)
                 });
                 pandora.UI.set({page: data.selected});
             }
@@ -151,7 +151,7 @@ pandora.ui.siteDialog = function(section) {
             minHeight: 256,
             minWidth: 688, // 16 + 256 + 16 + 384 + 16
             removeOnClose: true,
-            title: Ox.getObjectById(tabs, section).title,
+            title: Ox._(Ox.getObjectById(tabs, section).title),
             width: dialogWidth
         })
         .bindEvent({
