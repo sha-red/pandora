@@ -31,13 +31,13 @@
         "canEditFeaturedEdits": {"staff": true, "admin": true},
         "canEditFeaturedLists": {"staff": true, "admin": true},
         "canEditFeaturedTexts": {"staff": true, "admin": true},
-        "canEditFiles": {"staff": true, "admin": true},
+        "canEditMedia": {"staff": true, "admin": true},
         "canEditMetadata": {"staff": true, "admin": true},
         "canEditPlaces": {"staff": true, "admin": true},
         "canEditSitePages": {"staff": true, "admin": true},
         "canEditUsers": {"admin": true},
         "canImportAnnotations": {"member": true, "staff": true, "admin": true},
-        "canManageFiles": {"member": true, "staff": true, "admin": true},
+        "canManageDocuments": {"member": true, "staff": true, "admin": true},
         "canManagePlacesAndEvents": {"member": true, "staff": true, "admin": true},
         "canManageTitlesAndNames": {"member": true, "staff": true, "admin": true},
         "canManageUsers": {"staff": true, "admin": true},
@@ -48,7 +48,7 @@
         "canSeeAccessed": {"staff": true, "admin": true},
         "canSeeDebugMenu": {"staff": true, "admin": true},
         "canSeeExtraItemViews": {"staff": true, "admin": true},
-        "canSeeFiles": {"staff": true, "admin": true},
+        "canSeeMedia": {"staff": true, "admin": true},
         "canSeeItem": {"guest": 1, "member": 1, "staff": 4, "admin": 4},
         "canSeeSize": {"staff": true, "admin": true},
         "canSeeSoftwareVersion": {"staff": true, "admin": true},
@@ -410,7 +410,7 @@
             "id": "size",
             "title": "Size",
             "type": "integer",
-            "capability": "canSeeFiles",
+            "capability": "canSeeMedia",
             "columnWidth": 60,
             "format": {"type": "value", "args": ["B"]},
             "sort": true
@@ -427,7 +427,7 @@
             "id": "numberoffiles",
             "title": "Number of Files",
             "type": "integer",
-            "capability": "canSeeFiles",
+            "capability": "canSeeMedia",
             "columnWidth": 60,
             "sort": true,
             "value": {"key": "files", "type": "length"}
@@ -436,14 +436,14 @@
             "id": "user",
             "title": "User",
             "type": "string",
-            "capability": "canSeeFiles",
+            "capability": "canSeeMedia",
             "find": true
         },
         {
             "id": "filename",
             "title": "Filename",
             "type": ["string"],
-            "capability": "canSeeFiles",
+            "capability": "canSeeMedia",
             "find": true
         },
         {
@@ -524,7 +524,7 @@
         {"id": "map", "title": "Map"},
         {"id": "calendar", "title": "Calendar"},
         {"id": "data", "title": "Data"},
-        {"id": "files", "title": "Files"}
+        {"id": "media", "title": "Media"}
     ],
     "layers": [
         {

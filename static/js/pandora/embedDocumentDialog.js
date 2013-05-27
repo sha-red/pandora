@@ -1,11 +1,11 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
 
-pandora.ui.embedFileDialog = function(id) {
+pandora.ui.embedDocumentDialog = function(id) {
 
     var isImage = Ox.contains(['jpg', 'png'], selected.split('.').pop()),
         url = 'http' + (pandora.site.site.https ? 's' : '') + '://'
-            + pandora.site.site.url + '/files/' + id,
+            + pandora.site.site.url + '/documents/' + id,
 
         $content = Ox.Element()
             .css({margin: '16px'})

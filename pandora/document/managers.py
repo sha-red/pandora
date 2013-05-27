@@ -88,10 +88,10 @@ def parseConditions(conditions, operator, user):
     return None
 
 
-class FileManager(Manager):
+class DocumentManager(Manager):
 
     def get_query_set(self):
-        return super(FileManager, self).get_query_set()
+        return super(DocumentManager, self).get_query_set()
 
     def find(self, data, user):
         '''

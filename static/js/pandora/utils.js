@@ -1031,7 +1031,7 @@ pandora.getSpan = function(state, str, callback) {
 
 pandora.getStatusText = function(data) {
     var ui = pandora.user.ui,
-        canSeeFiles = pandora.site.capabilities.canSeeFiles[pandora.user.level],
+        canSeeMedia = pandora.site.capabilities.canSeeMedia[pandora.user.level],
         canSeeSize = pandora.site.capabilities.canSeeSize[pandora.user.level],
         itemName = ui.listView == 'clip'
             ? (data.items == 1 ? Ox._('Clip') : Ox._('Clips'))
@@ -1043,7 +1043,7 @@ pandora.getStatusText = function(data) {
     } else if (data.duration) {
         parts.push(Ox.formatDuration(data.duration, 'short'));
     }
-    if (canSeeFiles) {
+    if (canSeeMedia) {
         data.files && parts.push(
             Ox.formatCount(data.files, 'file')
         );
@@ -1052,7 +1052,7 @@ pandora.getStatusText = function(data) {
     if (canSeeSize) {
         data.size && parts.push(Ox.formatValue(data.size, 'B'));
     }
-    if (canSeeFiles) {
+    if (canSeeMedia) {
         data.pixels && parts.push(Ox.formatValue(data.pixels, 'px'));
     }
     return parts.join(', ');

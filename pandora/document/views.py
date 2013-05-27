@@ -10,14 +10,44 @@ from ox.django.shortcuts import render_to_json_response, get_object_or_404_json,
 from django import forms
 
 from item import utils
+from item.models import Item
 import models
 
-def get_file_or_404_json(id):
-    username, name, extension = models.File.parse_id(id)
-    return get_object_or_404_json(models.File, user__username=username, name=name, extension=extension)
+def get_document_or_404_json(id):
+    username, name, extension = models.Document.parse_id(id)
+    return get_object_or_404_json(models.Document, user__username=username, name=name, extension=extension)
 
 @login_required_json
-def editFile(request):
+def addDocument(request):
+    '''
+        add document(s) to item
+        takes {
+            item: string
+            id: string
+            or
+            ids: [string]
+        }
+        returns {
+        }
+    '''
+    response = json_response()
+    data = json.loads(request.POST['data'])
+    if 'ids' in data:
+        ids = data['ids']
+    else:
+        ids = [data['id']]
+    item = Item.objects.get(itemId=data['item'])
+    if item.editable(request.user):
+        for id in ids:
+            file = models.Document.get(id)
+            item.documents.add(file)
+    else:
+        response = json_response(status=403, file='permission denied')
+    return render_to_json_response(response)
+actions.register(addDocument, cache=False)
+
+@login_required_json
+def editDocument(request):
     '''
         takes {
             id: string
@@ -32,7 +62,7 @@ def editFile(request):
     response = json_response()
     data = json.loads(request.POST['data'])
     if data['id']:
-        file = models.File.get(data['id'])
+        file = models.Document.get(data['id'])
         if file.editable(request.user):
             file.edit(data, request.user)
             file.save()
@@ -42,7 +72,7 @@ def editFile(request):
     else:
         response = json_response(status=500, file='invalid request')
     return render_to_json_response(response)
-actions.register(editFile, cache=False)
+actions.register(editDocument, cache=False)
 
 
 def _order_query(qs, sort):
@@ -69,11 +99,11 @@ def parse_query(data, user):
     for key in ('keys', 'group', 'file', 'range', 'position', 'positions', 'sort'):
         if key in data:
             query[key] = data[key]
-    query['qs'] = models.File.objects.find(data, user).exclude(name='')
+    query['qs'] = models.Document.objects.find(data, user).exclude(name='')
     return query
 
 
-def findFiles(request):
+def findDocuments(request):
     '''
         takes {
             query: {
@@ -121,35 +151,43 @@ def findFiles(request):
     else:
         response['data']['items'] = qs.count()
     return render_to_json_response(response)
-actions.register(findFiles)
+actions.register(findDocuments)
 
 @login_required_json
-def removeFile(request):
+def removeDocument(request):
     '''
         takes {
             id: string,
+            or
+            ids: [string]
         }
         returns {
         }
     '''
     data = json.loads(request.POST['data'])
     response = json_response()
-    file = models.File.get(data['id'])
-    if file.editable(request.user):
-        file.delete()
-    else:
-        response = json_response(status=403, file='not allowed')
-    return render_to_json_response(response)
-actions.register(removeFile, cache=False)
 
+    if 'ids' in data:
+        ids = data['ids']
+    else:
+        ids = [data['id']]
+    for id in ids:
+        file = models.Document.get(id)
+        if file.editable(request.user):
+            file.delete()
+        else:
+            response = json_response(status=403, file='not allowed')
+            break
+    return render_to_json_response(response)
+actions.register(removeDocument, cache=False)
 
 def file(request, id):
-    file = models.File.get(id)
-    return HttpFileResponse(file.file.path)
+    document = models.Document.get(id)
+    return HttpFileResponse(document.file.path)
 
 def thumbnail(request, id):
-    file = models.File.get(id)
-    return HttpFileResponse(file.thumbnail())
+    document = models.Document.get(id)
+    return HttpFileResponse(document.thumbnail())
 
 class ChunkForm(forms.Form):
     chunk = forms.FileField()
@@ -159,7 +197,7 @@ class ChunkForm(forms.Form):
 @login_required_json
 def upload(request):
     if 'id' in request.GET:
-        file = models.File.get(request.GET['id'])
+        file = models.Document.get(request.GET['id'])
     else:
         extension = request.POST['filename'].split('.')
         name = '.'.join(extension[:-1])
@@ -185,7 +223,7 @@ def upload(request):
         num = 1
         _name = name
         while not created:
-            file, created = models.File.objects.get_or_create(
+            file, created = models.Document.objects.get_or_create(
                 user=request.user, name=name, extension=extension)
             if not created:
                 num += 1

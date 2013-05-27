@@ -1,41 +1,48 @@
 # -*- coding: utf-8 -*-
 import datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
-class Migration(DataMigration):
+from ..migration_utils import was_applied
+
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
-        # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
-        import os
-        from os.path import exists
-        from django.conf import settings
+        if was_applied(__file__, 'file'):
+            return
 
-        media_path = os.path.join(settings.MEDIA_ROOT, 'media')
-        files_path = os.path.join(settings.MEDIA_ROOT, 'files')
-        uploads_path = os.path.join(settings.MEDIA_ROOT, 'uploads')
-        if not exists(media_path) and exists(files_path):
-            os.rename(files_path, media_path)
-        if not exists(files_path) and exists(uploads_path):
-            os.rename(uploads_path, files_path)
-        for f in orm['file.File'].objects.all():
-            f.file.name = f.file.name.replace('uploads/', 'files/')
-            f.save()
+        # Adding model 'File'
+        db.create_table('file_file', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='files', to=orm['auth.User'])),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('extension', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('size', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('matches', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('ratio', self.gf('django.db.models.fields.FloatField')(default=1)),
+            ('description', self.gf('django.db.models.fields.TextField')(default='')),
+            ('oshash', self.gf('django.db.models.fields.CharField')(max_length=16, unique=True, null=True)),
+            ('file', self.gf('django.db.models.fields.files.FileField')(default=None, max_length=100, null=True, blank=True)),
+            ('uploading', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('name_sort', self.gf('django.db.models.fields.CharField')(max_length=255)),
+            ('description_sort', self.gf('django.db.models.fields.CharField')(max_length=512)),
+        ))
+        db.send_create_signal('file', ['File'])
+
+        # Adding unique constraint on 'File', fields ['user', 'name', 'extension']
+        db.create_unique('file_file', ['user_id', 'name', 'extension'])
+
 
     def backwards(self, orm):
-        import os
-        from os.path import exists
-        from django.conf import settings
+        # Removing unique constraint on 'File', fields ['user', 'name', 'extension']
+        db.delete_unique('file_file', ['user_id', 'name', 'extension'])
 
-        media_path = os.path.join(settings.MEDIA_ROOT, 'media')
-        files_path = os.path.join(settings.MEDIA_ROOT, 'files')
-        uploads_path = os.path.join(settings.MEDIA_ROOT, 'uploads')
-        if exists(media_path) and exists(files_path) and not exists(uploads_path):
-            os.rename(files_path, uploads_path)
-        if exists(media_path) and not exists(files_path):
-            os.rename(media_path, files_path)
+        # Deleting model 'File'
+        db.delete_table('file_file')
+
 
     models = {
         'auth.group': {
@@ -95,4 +102,3 @@ class Migration(DataMigration):
     }
 
     complete_apps = ['file']
-    symmetrical = True

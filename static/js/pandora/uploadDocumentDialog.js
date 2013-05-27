@@ -1,7 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
 
-pandora.ui.uploadFileDialog = function(file, callback) {
+pandora.ui.uploadDocumentDialog = function(file, callback) {
 
     var extension = file.name.split('.').pop().toLowerCase(),
 
@@ -65,7 +65,7 @@ pandora.ui.uploadFileDialog = function(file, callback) {
                                 filename: filename
                             },
                             file: file,
-                            url: '/api/upload/file/',
+                            url: '/api/upload/document/',
                         })
                         .bindEvent({
                             done: function(data) {
@@ -89,7 +89,7 @@ pandora.ui.uploadFileDialog = function(file, callback) {
         return errorDialog(Ox._('Supported file types are GIF, JPG, PNG and PDF.'));
     } else {
         Ox.oshash(file, function(oshash) {
-            pandora.api.findFiles({
+            pandora.api.findDocuments({
                 keys: ['id'],
                 query: {
                     conditions: [{key: 'oshash', value: oshash, operator: '=='}],

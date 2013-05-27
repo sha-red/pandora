@@ -16,7 +16,7 @@ import ox
 import managers
 
 
-class File(models.Model):
+class Document(models.Model):
 
     class Meta:
         unique_together = ("user", "name", "extension")
@@ -35,7 +35,7 @@ class File(models.Model):
 
     file = models.FileField(default=None, blank=True,null=True, upload_to=lambda f, x: f.path(x))
 
-    objects = managers.FileManager()
+    objects = managers.DocumentManager()
     uploading = models.BooleanField(default = False)
 
     name_sort = models.CharField(max_length=255)
@@ -51,7 +51,7 @@ class File(models.Model):
         self.name_sort = ox.sort_string(self.name or u'')[:255].lower()
         self.description_sort = ox.sort_string(self.description or u'')[:512].lower()
 
-        super(File, self).save(*args, **kwargs)
+        super(Document, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return self.get_id()
@@ -82,7 +82,7 @@ class File(models.Model):
             return False
         if self.user == user or \
            user.is_staff or \
-           user.get_profile().capability('canEditFiles') == True:
+           user.get_profile().capability('canEditDocuments') == True:
             return True
         return False
 
@@ -94,7 +94,7 @@ class File(models.Model):
                     data['name'] = "Untitled"
                 name = data['name']
                 num = 1
-                while File.objects.filter(name=name, user=self.user, extension=self.extension).exclude(id=self.id).count()>0:
+                while Document.objects.filter(name=name, user=self.user, extension=self.extension).exclude(id=self.id).count()>0:
                     num += 1
                     name = data['name'] + ' [%d]' % num
                 self.name = name
@@ -130,7 +130,7 @@ class File(models.Model):
 
     def path(self, name=''):
         h = "%07d" % self.id
-        return os.path.join('files', h[:2], h[2:4], h[4:6], h[6:], name)
+        return os.path.join('documents', h[:2], h[2:4], h[4:6], h[6:], name)
 
     def save_chunk(self, chunk, chunk_id=-1, done=False):
         if self.uploading:
@@ -189,10 +189,10 @@ class File(models.Model):
             matches += item.models.Item.objects.filter(data__contains=url).count()
             matches += text.models.Text.objects.filter(text__contains=url).count()
         if matches != self.matches:
-            File.objects.filter(id=self.id).update(matches=matches)
+            Document.objects.filter(id=self.id).update(matches=matches)
             self.matches = matches
 
-def delete_file(sender, **kwargs):
+def delete_document(sender, **kwargs):
     t = kwargs['instance']
     if t.file:
         if t.extension == 'pdf':
@@ -200,5 +200,5 @@ def delete_file(sender, **kwargs):
             if os.path.exists(thumb):
                 os.unlink(thumb)
         t.file.delete()
-pre_delete.connect(delete_file, sender=File)
+pre_delete.connect(delete_document, sender=Document)
 

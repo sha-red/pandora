@@ -116,10 +116,10 @@ pandora.ui.item = function() {
                 Ox.Container().append(pandora.$ui.item)
             );
 
-        } else if (pandora.user.ui.itemView == 'files') {
+        } else if (pandora.user.ui.itemView == 'media') {
 
             pandora.$ui.contentPanel.replaceElement(1,
-                pandora.$ui.item = pandora.ui.filesView({
+                pandora.$ui.item = pandora.ui.mediaView({
                     id: result.data.id
                 })
             );
@@ -127,7 +127,7 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'frames' || pandora.user.ui.itemView == 'posters') {
 
             pandora.$ui.contentPanel.replaceElement(1,
-                pandora.$ui.item = pandora.ui.mediaView().bindEvent({
+                pandora.$ui.item = pandora.ui.PostersView().bindEvent({
                     resize: function() {
                         pandora.$ui.item.resize();
                     }

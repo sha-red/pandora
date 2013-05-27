@@ -1,160 +1,582 @@
+// vim: et:ts=4:sw=4:sts=4:ft=javascript
+
 'use strict';
 
-pandora.ui.mediaView = function() {
+pandora.ui.mediaView = function(options, self) {
 
-    var item = pandora.user.ui.item,
-        view = pandora.user.ui.itemView,
-        listWidth = 144 + Ox.UI.SCROLLBAR_SIZE,
-        selectedImage = {};
-        $preview = Ox.Element(),
-        that = Ox.SplitPanel({
-            elements: [
+    var self = self || {},
+        that = Ox.Element({}, self)
+            .defaults({
+                id: ''
+            })
+            .options(options || {});
+
+    self.filesQuery = {
+        conditions: [{
+            key: 'id',
+            value: self.options.id,
+            operator: '=='
+        }]
+    };
+    self.numberOfItems = 0;
+    self.selected = [];
+    self.wasChecked = false;
+
+    self.$toolbar = Ox.Bar({
+        size: 24
+    });
+
+    self.$menu = Ox.MenuButton({
+            items: [
                 {
-                    element: Ox.Element(),
-                    size: listWidth
+                    disabled: true,
+                    id: 'ignore',
+                    title: Ox._('Ignore Selected Media')
+                },
+                {},
+                {
+                    disabled: !pandora.site.capabilities.canRemoveItems[pandora.user.level],
+                    id: 'delete',
+                    title: Ox._('Delete {0}...', [Ox._(pandora.site.itemName.singular)])
+                }
+            ],
+            title: 'set',
+            type: 'image'
+        })
+        .css({
+            float: 'left',
+            margin: '4px'
+        })
+        .bindEvent({
+            click: function(data) {
+                if (data.id == 'ignore') {
+                    ignoreFiles();
+                } else if (data.id == 'delete') {
+                    deleteItem();
+                }
+            }
+        })
+        .appendTo(self.$toolbar);
+
+    self.$saveButton = Ox.Button({
+            disabled: true,
+            title: Ox._('Save Changes'),
+            width: 128
+        })
+        .css({
+            float: 'right',
+            margin: '4px'
+        })
+        .bindEvent({
+            click: saveChanges
+        })
+        .appendTo(self.$toolbar);
+
+    self.$filesList = Ox.TableList({
+            columns: [
+                {
+                    clickable: function(data) {
+                        return !data.encoding;
+                    },
+                    format: function(value, data) {
+                        return $('<img>')
+                            .attr({
+                                src: data.encoding
+                                    ? Ox.UI.getImageURL('symbolSync')
+                                    : data.wanted
+                                    ? Ox.UI.getImageURL('symbolUpload')
+                                    : Ox.UI.getImageURL('symbolCheck')
+                            })
+                            .css({
+                                width: '10px',
+                                height: '10px',
+                                padding: '3px',
+                                opacity: (value || data.wanted) ? 1 : 0
+                            });
+                    },
+                    id: 'selected',
+                    operator: '-',
+                    title: Ox._('Status'),
+                    titleImage: 'check',
+                    tooltip: function (data) {
+                        return data.encoding
+                            ? Ox._('Processing video on server')
+                            : data.instances.filter(function(i) {return i.ignore; }).length > 0
+                            ? Ox._('Use this file')
+                            : Ox._('Dont use this file');
+                    },
+                    visible: true,
+                    width: 16
                 },
                 {
-                    element: $preview
+                    align: 'left',
+                    id: 'users',
+                    operator: '+',
+                    title: Ox._('Users'),
+                    visible: true,
+                    width: 60
+                },
+                {
+                    align: 'left',
+                    id: 'path',
+                    operator: '+',
+                    title: Ox._('Path'),
+                    visible: true,
+                    width: 360
+                },
+                {
+                    editable: true,
+                    id: 'version',
+                    operator: '+',
+                    title: Ox._('Version'),
+                    visible: true,
+                    width: 60
+                },
+                {
+                    editable: true,
+                    id: 'part',
+                    operator: '+',
+                    title: Ox._('Part'),
+                    visible: true,
+                    width: 60
+                },
+                {
+                    editable: true,
+                    id: 'partTitle',
+                    operator: '+',
+                    title: Ox._('Part Title'),
+                    visible: true,
+                    width: 120
+                },
+                {
+                    editable: true,
+                    id: 'language',
+                    operator: '+',
+                    title: Ox._('Language'),
+                    visible: true,
+                    width: 60
+                },
+                {
+                    editable: true,
+                    id: 'extension',
+                    operator: '+',
+                    title: Ox._('Extension'),
+                    visible: true,
+                    width: 60
+                },
+                {
+                    align: 'left',
+                    id: 'type',
+                    operator: '+',
+                    title: Ox._('Type'),
+                    visible: true,
+                    width: 60
+                },
+                {
+                    align: 'right',
+                    format: {type: 'value', args: ['B']},
+                    id: 'size',
+                    operator: '-',
+                    title: Ox._('Size'),
+                    visible: true,
+                    width: 90
+                },
+                {
+                    align: 'right',
+                    format: {type: 'resolution', args: ['px']},
+                    id: 'resolution',
+                    operator: '-',
+                    title: Ox._('Resolution'),
+                    visible: true,
+                    width: 90
+                },
+                {
+                    align: 'right',
+                    format: {type: 'duration', args: [0, 'short']},
+                    id: 'duration',
+                    operator: '-',
+                    title: Ox._('Duration'),
+                    visible: true,
+                    width: 90
+                },
+                {
+                    align: 'left',
+                    id: 'id',
+                    operator: '+',
+                    title: Ox._('ID'),
+                    visible: false,
+                    width: 120
+                },
+                {
+                    align: 'left',
+                    id: 'instances',
+                    operator: '+',
+                    title: Ox._('Instances'),
+                    visible: false,
+                    width: 120
+                }
+            ],
+            columnsMovable: true,
+            columnsRemovable: true,
+            columnsResizable: true,
+            columnsVisible: true,
+            id: 'files',
+            items: function(data, callback) {
+                pandora.api.findMedia(Ox.extend(data, {
+                    query: self.filesQuery
+                }), callback);
+            },
+            keys: ['encoding', 'instances', 'wanted'],
+            scrollbarVisible: true,
+            sort: [{key: 'path', operator: '+'}],
+            unique: 'id'
+        })
+        .bindEvent({
+            click: function(data) {
+                if (data.key == 'selected') {
+                    var ignored = self.$filesList.value(data.id, 'instances')
+                            .filter(function(i) {return i.ignore; }).length > 0;
+                    pandora.api.editMedia({
+                        files: [{
+                            id: data.id,
+                            ignore: !ignored
+                        }]
+                    }, function(result) {
+                        Ox.Request.clearCache();
+                        self.$filesList.reloadList();
+                    });
+                }
+            },
+            'delete': function(data) {
+                var ids = data.ids.filter(function(id) {
+                    return self.$filesList.value(id, 'instances').length == 0;
+                });
+                if (ids.length > 0 && pandora.user.level == 'admin') {
+                    pandora.api.removeMedia({
+                        ids: ids
+                    }, function(result) {
+                        Ox.Request.clearCache();
+                        self.$filesList.reloadList();
+                    });
+                }
+            },
+            init: function(data) {
+                self.numberOfItems = data.items;
+            },
+            select: selectFiles,
+            submit: function(data) {
+                var value = self.$filesList.value(data.id, data.key);
+                if (data.value != value && !(data.value === '' && value === null)) {
+                    self.$saveButton.options({disabled: false});
+                    self.$filesList.value(data.id, data.key, data.value || null);
+                }
+            }
+        });
+
+    self.$instancesList = Ox.TableList({
+            columns: [
+                {
+                    align: 'left',
+                    id: 'user',
+                    operator: '+',
+                    title: Ox._('User'),
+                    visible: true,
+                    width: 120
+                },
+                {
+                    align: 'left',
+                    id: 'volume',
+                    operator: '+',
+                    title: Ox._('Volume'),
+                    visible: true,
+                    width: 120
+                },
+                {
+                    align: 'left',
+                    id: 'path',
+                    operator: '+',
+                    title: Ox._('Path'),
+                    visible: true,
+                    width: 480
+                },
+            ],
+            columnsMovable: true,
+            columnsRemovable: true,
+            columnsResizable: true,
+            columnsVisible: true,
+            id: 'files',
+            items: [],
+            scrollbarVisible: true,
+            sort: [{key: 'user', operator: '+'}],
+            unique: 'path'
+        })
+        .bindEvent({
+            open: openFiles
+        });
+
+    self.$movieLabel = Ox.Label({
+            textAlign: 'center',
+            title: Ox._('Move selected files to another {0}',
+                [Ox._(pandora.site.itemName.singular.toLowerCase())]),
+            width: 240
+        })
+        .css({margin: '8px'});
+
+    ['title', 'director', 'year', 'id'].forEach(function(key) {
+        var itemKey = Ox.getObjectById(pandora.site.itemKeys, key);
+        self['$' + key + 'Input'] = Ox.Input({
+            label: Ox._(key == 'id' ? 'ID'
+                : itemKey ? itemKey.title : Ox.toTitleCase(key)),
+            labelWidth: 64,
+            width: 240
+        })
+        .bindEvent({
+            change: function(data) {
+                var conditions, matches;
+                if (key == 'id' && data.value.substr(0, 2) != '0x') {
+                    if (pandora.site.site.id == '0xdb') {
+                        matches = data.value.match(/\d{7}/);
+                    } else {
+                        matches = data.value.match(/[A-Z]+/);
+                    }
+                    data.value = matches ? matches[0] : '';
+                    self.$idInput.value(data.value);
+                }
+                if (data.value.length) {
+                    conditions = {};
+                    ['id', 'title', 'director', 'year'].map(function(key) {
+                        var value = self['$' + key + 'Input'].value();
+                        if (value.length) {
+                            conditions[key] = key == 'director' ? value.split(', ') : value;
+                        }
+                    });
+                    pandora.api.findId(conditions, function(result) {
+                        var length = result.data.items.length;
+                        if (length == 0) {
+                            if (key != 'id') {
+                                self.$idInput.value('');
+                            }
+                        } else if (result.data.items.length == 1) {
+                            ['title', 'director', 'year', 'id'].forEach(function(key) {
+                                self['$' + key + 'Input'].value(
+                                    key == 'director'
+                                        ? result.data.items[0][key].join(', ')
+                                        : result.data.items[0][key]
+                                );
+                            });
+                        } else {
+                            self.$idInput.value('');
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+    self.$switch = Ox.Checkbox({
+        title: Ox._('Switch to this {0} after moving files',
+            [Ox._(pandora.site.itemName.singular.toLowerCase())]),
+        value: false,
+        width: 240
+    });
+
+    self.$movieForm = Ox.Form({
+            items: [
+                self.$titleInput,
+                self.$directorInput,
+                self.$yearInput,
+                self.$idInput,
+                self.$switch
+            ],
+            width: 240
+        })
+        .css({margin: '8px'});
+
+    self.$clearButton = Ox.Button({
+            title: Ox._('Clear Form'),
+            width: 116
+        })
+        .css({margin: '0 4px 4px 8px'})
+        .bindEvent({
+            click: function() {
+                ['title', 'director', 'year', 'id'].forEach(function(key) {
+                    self['$' + key + 'Input'].value('');
+                });
+            }
+        });
+
+    self.$moveButton = Ox.Button({
+            disabled: true,
+            title: Ox._('Move Media'),
+            width: 116
+        })
+        .css({margin: '0 4px 4px 4px'})
+        .bindEvent({
+            click: moveFiles
+        });
+    
+
+    self.$moviePanel = Ox.Element()
+        .append(self.$movieLabel)
+        .append(self.$movieForm)
+        .append(self.$clearButton)
+        .append(self.$moveButton);
+
+    that.setElement(Ox.SplitPanel({
+            elements: [
+                {
+                    element: Ox.SplitPanel({
+                        elements: [
+                            {
+                                element: self.$toolbar,
+                                size: 24
+                            },
+                            {
+                                element: self.$filesList
+                            },
+                            {
+                                element: self.$instancesList,
+                                size: 80
+                            }
+                        ],
+                        orientation: 'vertical'
+                    })
+                },
+                {
+                    collapsible: true,
+                    element: self.$moviePanel,
+                    size: 256
                 }
             ],
             orientation: 'horizontal'
+        })
+    );
+
+    function deleteItem(data) {
+        pandora.api.get({
+            id: pandora.user.ui.item,
+            keys: ['id', 'title']
+        },function(result) {
+            pandora.ui.deleteItemDialog(result.data).open();
         });
-
-    that.resize = function() {
-        selectedImage.url && renderPreview();
     }
 
-    pandora.api.get({
-        id: item,
-        keys: [view]
-    }, function(result) {
-        var images = result.data[view];
-        selectedImage = images.filter(function(image) {
-            return image.selected;
-        })[0];
-        var $list = Ox.IconList({
-                    item: function(data, sort, size) {
-                        var ratio = data.width / data.height;
-                        size = size || 128;
-                        return {
-                            height: ratio <= 1 ? size : size / ratio,
-                            id: data['id'],
-                            info: data.width + ' x ' + data.height + ' px',
-                            title: view == 'frames' ? Ox.formatDuration(data.position) : data.source,
-                            url: data.url,
-                            width: ratio >= 1 ? size : size * ratio
-                        }
-                    },
-                    items: images,
-                    keys: view == 'frames'
-                        ? ['index', 'position', 'width', 'height', 'url']
-                        : ['index', 'source', 'width', 'height', 'url'],
-                    max: 1,
-                    min: 1,
-                    orientation: 'vertical',
-                    selected: [selectedImage['index']],
-                    size: 128,
-                    sort: [{key: 'index', operator: '+'}],
-                    unique: 'index'
-                })
-                .css({background: 'rgb(16, 16, 16)'})
-                .bindEvent({
-                    select: function(event) {
-                        var index = event.ids[0];
-                        selectedImage = images.filter(function(image) {
-                            return image.index == index;
-                        })[0];
-                        renderPreview(selectedImage);
-                        pandora.api[view == 'frames' ? 'setPosterFrame' : 'setPoster'](Ox.extend({
-                            id: item
-                        }, view == 'frames' ? {
-                            position: selectedImage.index // api slightly inconsistent
-                        } : {
-                            source: selectedImage.source
-                        }), function(result) {
-                            var imageRatio = selectedImage.width / selectedImage.height;
-                            $('img[src*="/' + item + '/poster"]').each(function() {
-                                var $this = $(this),
-                                    size = Math.max($this.width(), $this.height()),
-                                    src = $this.attr('src').split('?')[0] + '?' + Ox.uid();
-                                $('<img>')
-                                    .attr({src: src})
-                                    .load(function() {
-                                        $this.attr({src: src});
-                                        view == 'posters' && $this.css(imageRatio < 1 ? {
-                                            width: Math.round(size * imageRatio) + 'px',
-                                            height: size + 'px'
-                                        } : {
-                                            width: size + 'px',
-                                            height: Math.round(size / imageRatio) + 'px'
-                                        });
-                                    });
-                            });
-                        });
-                    }
-                });
-        that.replaceElement(0, $list);
-        renderPreview();
-    });
+    function ignoreFiles() {
+        pandora.api.editMedia({
+            files: self.selected.map(function(id) {
+                return {id: id, ignore: true};
+            })
+        }, function(result) {
+            Ox.Request.clearCache();
+            self.$filesList.reloadList();
+        });
+    }
 
-    function renderPreview() {
-        var previewWidth = pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1 - listWidth,
-            previewHeight = pandora.$ui.contentPanel.size(1),
-            previewRatio = previewWidth / previewHeight,
-            imageRatio = selectedImage.width / selectedImage.height,
-            imageWidth = imageRatio > previewRatio ? previewWidth : Math.round(previewHeight * imageRatio),
-            imageHeight = imageRatio < previewRatio ? previewHeight : Math.round(previewWidth / imageRatio),
-            imageLeft = Math.floor((previewWidth - imageWidth) / 2),
-            imageTop = Math.floor((previewHeight - imageHeight) / 2);
-        $preview.html(
-            $('<img>')
-                .attr({
-                    src: selectedImage.url
-                })
-                .css({
-                    position: 'absolute',
-                    left: imageLeft + 'px',
-                    top: imageTop + 'px',
-                    width: imageWidth + 'px',
-                    height: imageHeight + 'px'
-                })
+    function moveFiles(data) {
+        var data = {
+            ids: self.selected,
+            itemId: self.$idInput.value()
+        };
+        ['title', 'director', 'year'].forEach(function(key) {
+            data[key] = self['$' + key + 'Input'].value();
+        });
+        self.$moveButton.options(
+            {disabled: true, title: Ox._('Moving Media...')}
         );
-        if (view == 'frames') {
-            var left = Math.floor((imageWidth - imageHeight) / 2),
-                right = Math.ceil((imageWidth - imageHeight) / 2);
-            $('<div>')
-                .addClass('OxPosterMarker OxPosterMarkerLeft')
-                .css({
-                    display: 'block',
-                    left: imageLeft + 'px',
-                    top: imageTop + 'px',
-                    width: left + 'px',
-                    height: imageHeight + 'px'
-                })
-                .appendTo($preview.$element);
-            $('<div>')
-                .addClass('OxPosterMarker OxPosterMarkerCenter')
-                .css({
-                    display: 'block',
-                    left: imageLeft + left + 'px',
-                    top: imageTop + 'px',
-                    width: imageHeight - 2 + 'px',
-                    height: imageHeight - 2 + 'px'
-                })
-                .appendTo($preview.$element);
-            $('<div>')
-                .addClass('OxPosterMarker OxPosterMarkerRight')
-                .css({
-                    display: 'block',
-                    left: imageLeft + left + imageHeight + 'px',
-                    top: imageTop + 'px',
-                    width: right + 'px',
-                    height: imageHeight + 'px'
-                })
-                .appendTo($preview.$element);
-        }
+        pandora.api.moveMedia(data, function(result) {
+            if (
+                pandora.user.ui.item == self.options.id
+                && pandora.user.ui.itemView == 'files'
+            ) {
+                Ox.Request.clearCache(); // fixme: remove
+                if (self.$switch.value()) {
+                    pandora.UI.set({item: result.data.itemId});
+                    pandora.updateItemContext();
+                } else {
+                    self.$filesList.reloadList();
+                    self.$instancesList.reloadList();
+                    self.$moveButton.options(
+                        {disabled: false, title: Ox._('Move Media')}
+                    );
+                }
+            }
+        });
     }
 
+    function openFiles(data) {
+        data.ids.length == 1 && pandora.api.parsePath({
+            path: self.$instancesList.value(data.ids[0], 'path')
+        }, function(result) {
+            ['title', 'director', 'year'].forEach(function(key) {
+                if (result.data[key]) {
+                    self['$' + key + 'Input'].value(
+                        key == 'director'
+                            ? result.data[key].join(', ')
+                            : result.data[key]
+                    );
+                }
+            });
+            updateForm();
+            self.$titleInput.triggerEvent('change', {value: result.data['title']});
+        });
+    }
+
+    function selectFiles(data) {
+        self.selected = data.ids;
+        self.$instancesList.options({
+            items: data.ids.length == 1
+                ? self.$filesList.value(data.ids[0], 'instances') : []
+        });
+        updateForm();
+    }
+
+    function saveChanges() {
+        self.$saveButton.options({disabled: true, title: Ox._('Saving Changes...')});
+        pandora.api.findMedia({
+            keys: ['id'],
+            query: self.filesQuery
+        }, function(result) {
+            pandora.api.editMedia({
+                files: result.data.items.map(function(item) {
+                    [
+                        'version', 'part', 'partTitle', 'language', 'extension'
+                    ].forEach(function(key) {
+                        Ox.extend(item, key, self.$filesList.value(item.id, key));
+                    })
+                    return item;
+                })
+            }, function(result) {
+                self.$saveButton.options({title: Ox._('Save Changes')});
+                Ox.Request.clearCache(); // fixme: remove
+                self.$filesList.reloadList();
+            });
+        });
+    }
+
+    function updateForm() {
+        if (self.selected.length == self.numberOfItems) {
+            self.wasChecked = self.$switch.value();
+            self.$switch.options({
+                disabled: true,
+                value: true
+            });
+        } else {
+            self.$switch.options({
+                disabled: false,
+                value: self.wasChecked
+            });
+        }
+        self.$moveButton.options({
+            disabled: self.selected.length == 0
+        });
+        self.$menu[
+            self.selected.length == 0 ? 'disableItem' : 'enableItem'
+        ]('ignore');
+    }
+
+    that.reload = function() {
+        self.$filesList.reloadList();
+    }
     return that;
 
-}
+};

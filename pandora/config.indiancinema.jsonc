@@ -34,13 +34,13 @@
         "canEditFeaturedEdits": {"student": true, "staff": true, "admin": true},
         "canEditFeaturedLists": {"student": true, "staff": true, "admin": true},
         "canEditFeaturedTexts": {"student": true, "staff": true, "admin": true},
-        "canEditFiles": {"student": true, "staff": true, "admin": true},
+        "canEditMedia": {"student": true, "staff": true, "admin": true},
         "canEditMetadata": {"student": true, "staff": true, "admin": true},
         "canEditPlaces": {"student": true, "staff": true, "admin": true},
         "canEditSitePages": {"staff": true, "admin": true},
         "canEditUsers": {"staff": true, "admin": true},
         "canImportAnnotations": {"student": true, "staff": true, "admin": true},
-        "canManageFiles": {"member": true, "student": true, "staff": true, "admin": true},
+        "canManageDocuments": {"member": true, "student": true, "staff": true, "admin": true},
         "canManagePlacesAndEvents": {"member": true, "student": true, "staff": true, "admin": true},
         "canManageTitlesAndNames": {"member": true, "student": true, "staff": true, "admin": true},
         "canManageUsers": {"staff": true, "admin": true},
@@ -51,7 +51,7 @@
         "canSeeAccessed": {"student": true, "staff": true, "admin": true},
         "canSeeDebugMenu": {"student": true, "staff": true, "admin": true},
         "canSeeExtraItemViews": {"student": true, "staff": true, "admin": true},
-        "canSeeFiles": {"student": true, "staff": true, "admin": true},
+        "canSeeMedia": {"student": true, "staff": true, "admin": true},
         "canSeeItem": {"guest": 3, "member": 3, "student": 3, "staff": 3, "admin": 3},
         "canSeeSize": {"student": true, "staff": true, "admin": true},
         "canSeeSoftwareVersion": {"student": true, "staff": true, "admin": true},
@@ -434,7 +434,7 @@
             "id": "resolution",
             "title": "Resolution",
             "type": ["integer"],
-            "capability": "canSeeFiles",
+            "capability": "canSeeMedia",
             "columnWidth": 90,
             "format": {"type": "resolution", "args": ["px"]},
             "sort": true
@@ -451,7 +451,7 @@
             "id": "pixels",
             "title": "Pixels",
             "type": "integer",
-            "capability": "canSeeFiles",
+            "capability": "canSeeMedia",
             "columnWidth": 90,
             "format": {"type": "value", "args": ["px"]},
             "sort": true
@@ -538,7 +538,7 @@
             "id": "bitrate",
             "title": "Bitrate",
             "type": "integer",
-            "capability": "canSeeFiles",
+            "capability": "canSeeMedia",
             "columnWidth": 60,
             "format": {"type": "value", "args": ["bps"]},
             "sort": true
@@ -547,7 +547,7 @@
             "id": "parts",
             "title": "Number of Parts",
             "type": "integer",
-            "capability": "canSeeFiles",
+            "capability": "canSeeMedia",
             "columnWidth": 60,
             "sort": true
         },
@@ -555,7 +555,7 @@
             "id": "numberoffiles",
             "title": "Number of Files",
             "type": "integer",
-            "capability": "canSeeFiles",
+            "capability": "canSeeMedia",
             "columnWidth": 60,
             "sort": true,
             "value": {"key": "files", "type": "length"}
@@ -564,7 +564,7 @@
             "id": "filename",
             "title": "Filename",
             "type": ["string"],
-            "capability": "canSeeFiles"
+            "capability": "canSeeMedia"
         },
         {
             "id": "created",
@@ -648,7 +648,7 @@
         {"id": "map", "title": "Map"},
         {"id": "calendar", "title": "Calendar"},
         {"id": "data", "title": "Data"},
-        {"id": "files", "title": "Files"}
+        {"id": "media", "title": "Media"}
     ],
     // fixme: should be renamed to annotationLayers
     "layers": [

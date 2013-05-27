@@ -2,7 +2,7 @@
 
 'use strict';
 
-pandora.ui.filesDialog = function() {
+pandora.ui.documentsDialog = function() {
 
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
@@ -19,13 +19,13 @@ pandora.ui.filesDialog = function() {
             .bindEvent({
                 click: function() {
                     $reloadButton.options({disabled: true});
-                    Ox.Request.clearCache('findFiles');
+                    Ox.Request.clearCache('findDocuments');
                     $list.reloadList(true);
                 }
             }),
 
         $userCheckbox = Ox.Checkbox({
-                title: Ox._('Only show my files'),
+                title: Ox._('Only show my documents'),
                 value: false
             })
             .css({float: 'left', margin: '4px 2px'})
@@ -146,7 +146,7 @@ pandora.ui.filesDialog = function() {
                     }
                 ],
                 columnsVisible: true,
-                items: pandora.api.findFiles,
+                items: pandora.api.findDocuments,
                 keys: ['ratio'],
                 query: {conditions: [], operator: '&'},
                 scrollbarVisible: true,
@@ -179,7 +179,7 @@ pandora.ui.filesDialog = function() {
             })
             .bindEvent({
                 click: function() {
-                    pandora.ui.embedFileDialog(
+                    pandora.ui.embedDocumentDialog(
                         $list.options('selected')[0]
                     ).open();
                 }
@@ -209,8 +209,8 @@ pandora.ui.filesDialog = function() {
         $itemToolbar = Ox.Bar({size: 24}),
 
         $deleteButton = Ox.Button({
-                title: Ox._('Delete File...'),
-                width: 96
+                title: Ox._('Delete Document...'),
+                width: 128
             })
             .css({float: 'left', margin: '4px'})
             .hide()
@@ -221,8 +221,8 @@ pandora.ui.filesDialog = function() {
 
         $uploadButton = Ox.FileButton({
                 maxFiles: 1,
-                title: Ox._('Upload File...'),
-                width: 96
+                title: Ox._('Upload Document...'),
+                width: 128
             })
             .css({float: 'right', margin: '4px'})
             .bindEvent({
@@ -284,7 +284,7 @@ pandora.ui.filesDialog = function() {
 
         $itemLabel = Ox.Label({
                 textAlign: 'center',
-                title: Ox._('No file selected'),
+                title: Ox._('No document selected'),
                 width: getLabelWidth()
             })
             .css({
@@ -312,7 +312,7 @@ pandora.ui.filesDialog = function() {
                 minWidth: 512,
                 padding: 0,
                 removeOnClose: true,
-                title: Ox._('Manage Files'),
+                title: Ox._('Manage Documents'),
                 width: dialogWidth
             }),
 
@@ -331,13 +331,13 @@ pandora.ui.filesDialog = function() {
 
     that.superClose = that.close;
     that.close = function() {
-        Ox.Request.clearCache('findFiles');
+        Ox.Request.clearCache('findDocuments');
         that.superClose();
     };
 
     function deleteFile() {
-        pandora.ui.deleteFileDialog($list.options('selected')[0], function() {
-            Ox.Request.clearCache('findFiles');
+        pandora.ui.deleteDocumentDialog($list.options('selected')[0], function() {
+            Ox.Request.clearCache('findDocuments');
             $list.reloadList();
         }).open();
     }
@@ -364,7 +364,7 @@ pandora.ui.filesDialog = function() {
     function renderForm() {
         var file = $list.value(selected),
             editable = file.user == pandora.user.username
-                || pandora.site.capabilities.canEditFiles[pandora.user.level];
+                || pandora.site.capabilities.canEditMedia[pandora.user.level];
         return Ox.Form({
             items: [
                 Ox.Input({
@@ -428,7 +428,7 @@ pandora.ui.filesDialog = function() {
                     if (event.id == 'name') {
                         $list.value(file.id, 'id', result.data.id);
                     }
-                    Ox.Request.clearCache('findFiles');
+                    Ox.Request.clearCache('findDocuments');
                     $list.reloadList();
                 });
             }
@@ -438,7 +438,7 @@ pandora.ui.filesDialog = function() {
     function renderPreview() {
         var isImage = Ox.contains(['jpg', 'png'], selected.split('.').pop()),
             size = getPreviewSize(),
-            src = '/files/' + selected + (isImage ? '' : '.jpg');
+            src = '/documents/' + selected + (isImage ? '' : '.jpg');
         return Ox.ImageElement({
                 height: size.height,
                 src: src,
@@ -453,7 +453,7 @@ pandora.ui.filesDialog = function() {
     function selectFile() {
         var file = $list.value(selected),
             editable = file.user == pandora.user.username
-                || pandora.site.capabilities.canEditFiles[pandora.user.level];
+                || pandora.site.capabilities.canEditMedia[pandora.user.level];
         $embedButton[selected ? 'show' : 'hide']();
         $closeButton[selected ? 'show' : 'hide']();
         setLabel();
@@ -471,7 +471,7 @@ pandora.ui.filesDialog = function() {
         $itemLabel.options({
             title: selected
                 ? selected.split(':').slice(1).join(':')
-                : Ox._('No file selected'),
+                : Ox._('No document selected'),
             width: getLabelWidth()
         });
     }
@@ -517,9 +517,9 @@ pandora.ui.filesDialog = function() {
     }
 
     function uploadFile(data) {
-        pandora.ui.uploadFileDialog(data.files[0], function(file) {
-            Ox.Request.clearCache('findFiles');
-            pandora.api.findFiles({
+        pandora.ui.uploadDocumentDialog(data.files[0], function(file) {
+            Ox.Request.clearCache('findDocuments');
+            pandora.api.findDocuments({
                 positions: [file.id],
                 query: $list.options('query'),
                 sort: $list.options('sort'),

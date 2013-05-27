@@ -7,7 +7,7 @@ pandora.ui.viewSelect = function() {
         sortKey = !ui.item ? 'listSort' : 'itemSort',
         viewKey = !ui.item ? 'listView' : 'itemView',
         items = pandora.site[viewKey + 's'].filter(function(view) {
-            return view.id != 'data' && view.id != 'files';
+            return view.id != 'data' && view.id != 'media';
         }).map(function(view) {
             return {id: view.id, title: Ox._('View {0}', [Ox._(view.title)])};
         }),
@@ -19,7 +19,7 @@ pandora.ui.viewSelect = function() {
         items = items.concat([
             {},
             {id: 'data', title: Ox._('View Data')},
-            {id: 'files', title: Ox._('View Files')}
+            {id: 'media', title: Ox._('View Media')}
         ]);
     }
     that = Ox.Select({

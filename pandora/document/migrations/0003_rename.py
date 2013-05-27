@@ -1,44 +1,34 @@
 # -*- coding: utf-8 -*-
+import os
+from os.path import exists, join
 import datetime
+
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
-
+from django.conf import settings
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'File'
-        db.create_table('file_file', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='files', to=orm['auth.User'])),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('extension', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('size', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('matches', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('ratio', self.gf('django.db.models.fields.FloatField')(default=1)),
-            ('description', self.gf('django.db.models.fields.TextField')(default='')),
-            ('oshash', self.gf('django.db.models.fields.CharField')(max_length=16, unique=True, null=True)),
-            ('file', self.gf('django.db.models.fields.files.FileField')(default=None, max_length=100, null=True, blank=True)),
-            ('uploading', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('name_sort', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('description_sort', self.gf('django.db.models.fields.CharField')(max_length=512)),
-        ))
-        db.send_create_signal('file', ['File'])
-
-        # Adding unique constraint on 'File', fields ['user', 'name', 'extension']
-        db.create_unique('file_file', ['user_id', 'name', 'extension'])
-
+        files_path = join(settings.MEDIA_ROOT, 'files')
+        documents_path = join(settings.MEDIA_ROOT, 'documents')
+        if not exists(documents_path) and exists(files_path):
+            os.rename(files_path, documents_path)
+        db.rename_table('file_file', 'document_document')
+        for f in orm['document.Document'].objects.all():
+            f.file.name = f.file.name.replace('files/', 'documents/')
+            f.save()
 
     def backwards(self, orm):
-        # Removing unique constraint on 'File', fields ['user', 'name', 'extension']
-        db.delete_unique('file_file', ['user_id', 'name', 'extension'])
-
-        # Deleting model 'File'
-        db.delete_table('file_file')
-
+        files_path = join(settings.MEDIA_ROOT, 'files')
+        documents_path = join(settings.MEDIA_ROOT, 'documents')
+        if not exists(files_path) and exists(documents_path):
+            os.rename(documents_path, files_path)
+        for f in orm['document.Document'].objects.all():
+            f.file.name = f.file.name.replace('documents/', 'files/')
+            f.save()
+        db.rename_table('document_document', 'file_file')
 
     models = {
         'auth.group': {
@@ -77,8 +67,8 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'file.file': {
-            'Meta': {'unique_together': "(('user', 'name', 'extension'),)", 'object_name': 'File'},
+        'document.document': {
+            'Meta': {'unique_together': "(('user', 'name', 'extension'),)", 'object_name': 'Document'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'default': "''"}),
             'description_sort': ('django.db.models.fields.CharField', [], {'max_length': '512'}),
@@ -97,4 +87,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['file']
+    complete_apps = ['document']
