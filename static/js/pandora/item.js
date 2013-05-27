@@ -16,6 +16,9 @@ pandora.ui.item = function() {
             'cuts', 'director', 'duration', 'editable', 'layers',
             'parts', 'posterFrame', 'rendered', 'rightslevel',
             'size', 'title', 'videoRatio', 'year'
+        ] : pandora.user.ui.itemView == 'documents' ? [
+            'director', 'documents', 'duration', 'editable',
+            'rightslevel', 'size', 'title', 'videoRatio', 'year'
         ] : []
     }, pandora.user.ui.itemView == 'info' && pandora.site.capabilities.canEditMetadata[pandora.user.level] ? 0 : -1, function(result) {
 
@@ -68,6 +71,12 @@ pandora.ui.item = function() {
                             pandora.$ui.item.resize();
                         }
                     })
+            );
+        
+        } else if (pandora.user.ui.itemView == 'documents') {
+
+            pandora.$ui.contentPanel.replaceElement(1,
+                pandora.$ui.documentsView = pandora.ui.documentsView(result.data)
             );
 
         } else if (pandora.user.ui.itemView == 'player') {
