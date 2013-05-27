@@ -340,17 +340,17 @@ def moveMedia(request):
         change file / item link
         takes {
             ids: ids of files
-            itemId: new itemId
+            item: new itemId
         }
 
         returns {
         }
     '''
     data = json.loads(request.POST['data'])
-    if Item.objects.filter(itemId=data['itemId']).count() == 1:
-        i = Item.objects.get(itemId=data['itemId'])
+    if Item.objects.filter(itemId=data['item']).count() == 1:
+        i = Item.objects.get(itemId=data['item'])
     else:
-        data['itemId'] = data['itemId'].strip()
+        data['itemId'] = data['item'].pop().strip()
         if len(data['itemId']) != 7:
             del data['itemId']
             if 'director' in data and isinstance(data['director'], basestring):
@@ -377,7 +377,7 @@ def moveMedia(request):
             c.save()
             item.tasks.update_timeline.delay(itemId)
     response = json_response(text='updated')
-    response['data']['itemId'] = i.itemId
+    response['data']['item'] = i.itemId
     return render_to_json_response(response)
 actions.register(moveMedia, cache=False)
 

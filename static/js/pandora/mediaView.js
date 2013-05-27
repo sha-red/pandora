@@ -475,7 +475,7 @@ pandora.ui.mediaView = function(options, self) {
     function moveFiles(data) {
         var data = {
             ids: self.selected,
-            itemId: self.$idInput.value()
+            item: self.$idInput.value()
         };
         ['title', 'director', 'year'].forEach(function(key) {
             data[key] = self['$' + key + 'Input'].value();
@@ -490,7 +490,7 @@ pandora.ui.mediaView = function(options, self) {
             ) {
                 Ox.Request.clearCache(); // fixme: remove
                 if (self.$switch.value()) {
-                    pandora.UI.set({item: result.data.itemId});
+                    pandora.UI.set({item: result.data.item});
                     pandora.updateItemContext();
                 } else {
                     self.$filesList.reloadList();
