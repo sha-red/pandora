@@ -39,8 +39,8 @@ def addDocument(request):
     item = Item.objects.get(itemId=data['item'])
     if item.editable(request.user):
         for id in ids:
-            file = models.Document.get(id)
-            item.documents.add(file)
+            document = models.Document.get(id)
+            document.add(item)
     else:
         response = json_response(status=403, file='permission denied')
     return render_to_json_response(response)
@@ -53,6 +53,7 @@ def editDocument(request):
             id: string
             name: string
             description: string
+            item(optional): edit descriptoin per item
         }
         returns {
             id:
@@ -61,16 +62,17 @@ def editDocument(request):
     '''
     response = json_response()
     data = json.loads(request.POST['data'])
+    item = 'item' in data and Item.objects.get(itemId=data['item']) or None
     if data['id']:
-        file = models.Document.get(data['id'])
-        if file.editable(request.user):
-            file.edit(data, request.user)
-            file.save()
-            response['data'] = file.json(user=request.user)
+        document = models.Document.get(data['id'])
+        if document.editable(request.user):
+            document.edit(data, request.user, item=item)
+            document.save()
+            response['data'] = document.json(user=request.user, item=item)
         else:
-            response = json_response(status=403, file='permission denied')
+            response = json_response(status=403, text='permission denied')
     else:
-        response = json_response(status=500, file='invalid request')
+        response = json_response(status=500, text='invalid request')
     return render_to_json_response(response)
 actions.register(editDocument, cache=False)
 
@@ -160,7 +162,11 @@ def removeDocument(request):
             id: string,
             or
             ids: [string]
+            item: string
         }
+
+        if item is passed, remove relation to item
+        otherwise remove document
         returns {
         }
     '''
@@ -171,15 +177,49 @@ def removeDocument(request):
         ids = data['ids']
     else:
         ids = [data['id']]
-    for id in ids:
-        file = models.Document.get(id)
-        if file.editable(request.user):
-            file.delete()
+    item = 'item' in data and Item.objects.get(itemId=data['item']) or None
+    if item:
+        if item.editable(request.user):
+            for id in ids:
+                document = models.Document.get(id)
+                document.remove(item)
         else:
-            response = json_response(status=403, file='not allowed')
-            break
+            response = json_response(status=403, text='not allowed')
+    else:
+        for id in ids:
+            document = models.Document.get(id)
+            if document.editable(request.user):
+                document.delete()
+            else:
+                response = json_response(status=403, text='not allowed')
+                break
     return render_to_json_response(response)
 actions.register(removeDocument, cache=False)
+
+@login_required_json
+def sortDocuments(request):
+    '''
+        takes {
+            item: string
+            ids: [string]
+        }
+        returns {
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    index = 0
+    item = Item.objects.get(itemId=data['item'])
+    ids = data['ids']
+    if item.editable(request.user):
+        for i in ids:
+            document = models.Document.get(i)
+            models.ItemProperties.objects.filter(item=item, document=document).update(index=index)
+            index += 1
+        response = json_response()
+    else:
+        response = json_response(status=403, text='permission denied')
+    return render_to_json_response(response)
+actions.register(sortDocuments, cache=False)
 
 def file(request, id):
     document = models.Document.get(id)

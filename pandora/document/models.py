@@ -7,11 +7,14 @@ import subprocess
 from urllib import quote, unquote
 
 from django.db import models
+from django.db.models import Max
 from django.contrib.auth.models import User
 from django.db.models.signals import pre_delete
 
 import Image
 import ox
+
+from item.models import Item
 
 import managers
 
@@ -41,6 +44,8 @@ class Document(models.Model):
     name_sort = models.CharField(max_length=255)
     description_sort = models.CharField(max_length=512)
 
+    items = models.ManyToManyField(Item, through='ItemProperties', related_name='documents')
+
     def save(self, *args, **kwargs):
         if not self.uploading:
             if self.file:
@@ -55,6 +60,15 @@ class Document(models.Model):
 
     def __unicode__(self):
         return self.get_id()
+
+    def add(self, item):
+        p, created = ItemProperties.objects.get_or_create(item=item, document=self)
+        if created:
+            p.index = ItemProperties.objects.filter(item=item).aggregate(Max('index'))['index__max'] + 1
+            p.save()
+
+    def remove(self, item):
+        ItemProperties.objects.filter(item=item, document=self).delete()
 
     @classmethod
     def get(cls, id):
@@ -86,7 +100,7 @@ class Document(models.Model):
             return True
         return False
 
-    def edit(self, data, user):
+    def edit(self, data, user, item=None):
         for key in data:
             if key == 'name':
                 data['name'] = re.sub(' \[\d+\]$', '', data['name']).strip()
@@ -98,10 +112,15 @@ class Document(models.Model):
                     num += 1
                     name = data['name'] + ' [%d]' % num
                 self.name = name
-            elif key == 'description':
+            elif key == 'description' and not item:
                 self.description = ox.sanitize_html(data['description'])
+        if item:
+            p, created = ItemProperties.objects.get_or_create(item=item, document=self)
+            if 'description' in data:
+                p.description = ox.sanitize_html(data['description'])
+                p.save()
 
-    def json(self, keys=None, user=None):
+    def json(self, keys=None, user=None, item=None):
         if not keys:
              keys=[
                 'description',
@@ -126,6 +145,12 @@ class Document(models.Model):
                 response[key] = self.user.username
             elif hasattr(self, _map.get(key, key)):
                 response[key] = getattr(self, _map.get(key,key))
+        if item:
+            d = self.descriptions.filter(item=item)
+            if d.exists():
+                if 'description' in keys and d[0].description:
+                    response['description'] = d[0].description
+                response['index'] = d[0].index
         return response
 
     def path(self, name=''):
@@ -201,4 +226,17 @@ def delete_document(sender, **kwargs):
                 os.unlink(thumb)
         t.file.delete()
 pre_delete.connect(delete_document, sender=Document)
+
+class ItemProperties(models.Model):
+
+    class Meta:
+        unique_together = ("item", "document")
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    item = models.ForeignKey(Item)
+    document = models.ForeignKey(Document, related_name='descriptions')
+    description = models.TextField(default="")
+    index = models.IntegerField(default=0)
 

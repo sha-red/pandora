@@ -507,6 +507,11 @@ class Item(models.Model):
             for a in qs.order_by('start'):
                 ll.append(a.json(user=user))
         return layers
+    
+    def get_documents(self, user=None):
+        qs = self.documents.all()
+        documents = [d.json(item=self) for d in qs]
+        return sorted(documents, key=lambda d: d['index'])
 
     def get_json(self, keys=None):
         i = {
