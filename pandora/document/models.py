@@ -86,7 +86,7 @@ class Document(models.Model):
         return username, name, extension
 
     def get_absolute_url(self):
-        return ('/files/%s' % quote(self.get_id())).replace('%3A', ':')
+        return ('/documents/%s' % quote(self.get_id())).replace('%3A', ':')
 
     def get_id(self):
         return u'%s:%s.%s' % (self.user.username, self.name, self.extension)
