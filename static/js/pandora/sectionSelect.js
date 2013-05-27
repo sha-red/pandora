@@ -5,9 +5,9 @@ pandora.ui.sectionSelect = function() {
     var that = Ox.Select({
             id: 'sectionSelect',
             items: [
-                {id: 'items', title: pandora.site.itemName.plural},
-                {id: 'edits', title: Ox._('Edits'), disabled: true},
-                {id: 'texts', title: Ox._('Texts'), disabled: true}
+                {id: 'items', title: Ox._(pandora.site.itemName.plural)},
+                {id: 'edits', title: Ox._('Edits'), disabled: pandora.user.level != 'admin'}
+                {id: 'texts', title: Ox._('Texts'), disabled: pandora.user.level != 'admin'}
             ],
             value: pandora.user.ui.section
         }).css({

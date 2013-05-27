@@ -785,6 +785,16 @@ pandora.getItem = function(state, str, callback) {
                 callback();
             }
         });
+    } else if (state.type == 'edits') {
+        pandora.api.getEdit({id: str}, function(result) {
+            if (result.status.code == 200) {
+                state.item = result.data.id;
+                callback();
+            } else {
+                state.item = '';
+                callback();
+            }
+        });
     } else {
         callback();
     }
@@ -1444,9 +1454,10 @@ pandora.selectList = function() {
             });
         }
     } else {
-        var id = pandora.user.ui[pandora.user.ui.section.slice(0,-1)];
+        var id = pandora.user.ui[pandora.user.ui.section.slice(0,-1)],
+            section = Ox.toTitleCase(pandora.user.ui.section.slice(0, -1));
         if (id) {
-            pandora.api.getText({id: id}, function(result) {
+            pandora.api['edit' + section]({id: id}, function(result) {
                 var folder;
                 if (result.data.id) {
                     folder = result.data.status == 'featured' ? 'featured' : (

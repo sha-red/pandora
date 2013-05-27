@@ -713,6 +713,12 @@
             "showMapControls": false,
             "showMapLabels": false,
             "showFolder": {
+                "edits": {
+                    "personal": true,
+                    "favorite": true,
+                    "featured": true,
+                    "volumes": true
+                },
                 "items": {
                     "personal": true,
                     "favorite": true,

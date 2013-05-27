@@ -20,6 +20,9 @@ pandora.ui.mainPanel = function() {
             orientation: 'horizontal'
         })
         .bindEvent({
+            pandora_edit: function(data) {
+                that.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
+            },
             pandora_find: function() {
                 var previousUI = pandora.UI.getPrevious();
                 Ox.Log('FIND', 'handled in mainPanel', previousUI.item, previousUI._list)

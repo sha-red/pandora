@@ -59,6 +59,8 @@ pandora.ui.rightPanel = function() {
         });
     } else if (pandora.user.ui.section == 'texts') {
         that = pandora.$ui.textPanel = pandora.ui.textPanel();
+    } else if (pandora.user.ui.section == 'edits') {
+        that = pandora.$ui.editPanel = pandora.ui.editPanel();
     }
     return that;
 };

@@ -3,8 +3,8 @@
 pandora.ui.sectionButtons = function() {
     var that = Ox.ButtonGroup({
             buttons: [
-                {id: 'items', title: pandora.site.itemName.plural},
-                {id: 'edits', title: Ox._('Edits'), disabled: true},
+                {id: 'items', title: Ox._(pandora.site.itemName.plural)},
+                {id: 'edits', title: Ox._('Edits'), disabled: pandora.user.level != 'admin'},
                 {id: 'texts', title: Ox._('Texts'), disabled: pandora.user.level != 'admin'}
             ],
             id: 'sectionButtons',

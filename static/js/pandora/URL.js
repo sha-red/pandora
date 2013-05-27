@@ -317,6 +317,20 @@ pandora.URL = (function() {
             item: {}
         };
 
+        // Edits
+        views['edits'] = {
+            list: [],
+            item: ['edit']
+        };
+        spanType['edits'] = {
+            list: [],
+            item: {edit: 'number'}
+        };
+        sortKeys['edits'] = {
+            list: {},
+            item: {}
+        };
+
         findKeys = [{id: 'list', type: 'string'}].concat(pandora.site.itemKeys);
 
         self.URL = Ox.URL({

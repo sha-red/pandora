@@ -791,6 +791,11 @@
             "showMapControls": false,
             "showMapLabels": false,
             "showFolder": {
+                "edits": {
+                    "personal": true,
+                    "favorite": true,
+                    "featured": true
+                }
                 "items": {
                     "personal": true,
                     "favorite": true,

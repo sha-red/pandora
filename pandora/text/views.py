@@ -21,8 +21,8 @@ import models
 def get_text_or_404_json(id):
     id = id.split(':')
     username = id[0]
-    textname = ":".join(id[1:])
-    return get_object_or_404_json(models.Text, user__username=username, name=textname)
+    name = ":".join(id[1:])
+    return get_object_or_404_json(models.Text, user__username=username, name=name)
 
 @login_required_json
 def addText(request):
