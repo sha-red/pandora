@@ -72,6 +72,9 @@ if __name__ == "__main__":
             print "\tcd %s" % os.path.abspath(os.curdir)
             print "\t./manage.py migrate --all --fake"
             print "Check http://wiki.0x2620.org/wiki/pandora/DatabaseUpdate for more information"
+    elif len(sys.argv) == 2 and sys.argv[1] == 'static':
+        os.chdir(join(base, 'pandora'))
+        run('./manage.py', 'update_static')
     else:
 
         if len(sys.argv) == 1:
