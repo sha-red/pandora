@@ -1008,7 +1008,8 @@ class Item(models.Model):
         self.files.exclude(id__in=wanted).update(wanted=False)
 
     def update_selected(self):
-        for s in self.sets():
+        sets = self.sets()
+        for s in sets:
             if s.filter(Q(is_video=True)|Q(is_audio=True)).filter(available=False).count() == 0:
                 update = False
                 self.files.exclude(id__in=s).exclude(part=None).update(part=None)
@@ -1024,6 +1025,10 @@ class Item(models.Model):
                     self.save()
                     tasks.update_timeline.delay(self.itemId)
                 break
+        if not sets:
+            self.rendered = False
+            self.files.filter(selected=True).update(selected=False)
+            self.save()
 
     def get_torrent(self, request):
         if self.torrent:
