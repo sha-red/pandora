@@ -486,7 +486,7 @@ pandora.ui.mediaView = function(options, self) {
         pandora.api.moveMedia(data, function(result) {
             if (
                 pandora.user.ui.item == self.options.id
-                && pandora.user.ui.itemView == 'files'
+                && pandora.user.ui.itemView == 'media'
             ) {
                 Ox.Request.clearCache(); // fixme: remove
                 if (self.$switch.value()) {

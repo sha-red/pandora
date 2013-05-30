@@ -350,7 +350,7 @@ def moveMedia(request):
     if Item.objects.filter(itemId=data['item']).count() == 1:
         i = Item.objects.get(itemId=data['item'])
     else:
-        data['itemId'] = data['item'].pop().strip()
+        data['itemId'] = data.pop('item').strip()
         if len(data['itemId']) != 7:
             del data['itemId']
             if 'director' in data and isinstance(data['director'], basestring):
