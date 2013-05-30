@@ -80,7 +80,7 @@ if __name__ == "__main__":
         old = int(sys.argv[2])
         new = int(sys.argv[3])
         if old < 3111:
-            run('bzr', 'resolved', 'pandora/moneky_patch', 'pandora/monkey_patch/migrations')
+            run('bzr', 'resolved', 'pandora/monkey_patch', 'pandora/monkey_patch/migrations')
             if os.path.exists('pandora/monkey_patch'):
                 run('rm', '-r', 'pandora/monkey_patch')
     else:
