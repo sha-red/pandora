@@ -75,6 +75,14 @@ if __name__ == "__main__":
     elif len(sys.argv) == 2 and sys.argv[1] == 'static':
         os.chdir(join(base, 'pandora'))
         run('./manage.py', 'update_static')
+    elif len(sys.argv) == 4 and sys.argv[1] == 'postupdate':
+        os.chdir(base)
+        old = int(sys.argv[2])
+        new = int(sys.argv[3])
+        if old < 3111:
+            run('bzr', 'resolved', 'pandora/moneky_patch', 'pandora/monkey_patch/migrations')
+            if os.path.exists('pandora/monkey_patch'):
+                run('rm', '-r', 'pandora/monkey_patch')
     else:
 
         if len(sys.argv) == 1:
@@ -94,6 +102,8 @@ if __name__ == "__main__":
             if exists(path):
                 os.chdir(path)
                 revno = get('bzr', 'revno')
+                if repo == 'pandora':
+                    pandora_old_revno = revno
                 current += revno
                 url = repos[repo]['url']
                 if 'revision' in repos[repo]:
@@ -103,6 +113,8 @@ if __name__ == "__main__":
                     run('bzr', 'pull', url)
                 revno = get('bzr', 'revno')
                 new += revno
+                if repo == 'pandora':
+                    pandora_new_revno = revno
             else:
                 os.chdir(os.path.dirname(path))
                 cmd = ['bzr', 'branch', repos[repo]['url']]
@@ -124,4 +136,7 @@ if __name__ == "__main__":
         if diff != '-- No differences':
             print 'Database has changed, please make a backup and run ./update.py db'
         elif current != new:
+            if pandora_old_revno != pandora_new_revno:
+                os.chdir(base)
+                run('./update.py', 'postupdate', pandora_old_revno, pandora_new_revno)
             reload_notice(base)
