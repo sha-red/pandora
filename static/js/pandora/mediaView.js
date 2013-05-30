@@ -130,7 +130,7 @@ pandora.ui.mediaView = function(options, self) {
                     operator: '+',
                     title: Ox._('Version'),
                     visible: true,
-                    width: 60
+                    width: 120
                 },
                 {
                     editable: true,
