@@ -58,6 +58,15 @@ appPanel
         });
     });
 
+    function getPandoraVersion() {
+        var i, path, scripts = document.getElementsByTagName('script');
+        for (i = 0;i < scripts.length; i++) {
+            if(/pandora.js/.test(scripts[i].src)) {
+                return scripts[1].src.replace(/.*\?/, '');
+            }
+        }
+    }
+
     function loadImages(callback) {
         // Opera doesn't fire onload for SVGs,
         // so we only wait for the PNG to load.
@@ -167,7 +176,7 @@ appPanel
         } else {
             script.onload = callback;
         }
-        script.src = '/static/oxjs/' + (enableDebugMode ? 'dev' : 'build') + '/Ox.js';
+        script.src = '/static/oxjs/' + (enableDebugMode ? 'dev' : 'build') + '/Ox.js?' + getPandoraVersion();
         script.type = 'text/javascript';
         head.appendChild(script);
     }
