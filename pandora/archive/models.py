@@ -174,22 +174,26 @@ class File(models.Model):
             return path
 
     def normalize_item_path(self):
+        if not self.instances.all().count():
+            return ox.movie.format_path(self.get_path_info())
+
         files = []
-        instance = self.instances.all()[0]
-        for f in self.item.files.filter(instances__volume=instance.volume):
+        volume = self.instances.all()[0].volume
+        for f in self.item.files.filter(instances__volume=volume):
+            instance = f.instances.all()[0]
             files.append(f.get_path_info())
             files[-1].update({
                 'path': instance.path,
+                'normalizedPath': ox.movie.format_path(files[-1]),
                 'time': instance.mtime,
                 'oshash': f.oshash,
                 'size': f.size
             })
-
-        info = ox.movie.parse_item_files(files)
-        for version in info:
+        versions = ox.movie.parse_item_files(files)
+        for version in versions:
             p = filter(lambda f: f['oshash'] == self.oshash, version['files'])
             if p:
-                return p[0]['path']
+                return p[0]['normalizedPath']
 
     def update_info(self, info, user):
         #populate name sort with director if unknown
