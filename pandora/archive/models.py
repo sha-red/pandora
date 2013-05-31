@@ -179,7 +179,7 @@ class File(models.Model):
 
         files = []
         volume = self.instances.all()[0].volume
-        for f in self.item.files.filter(instances__volume=volume):
+        def add_file(f):
             instance = f.instances.all()[0]
             files.append(f.get_path_info())
             files[-1].update({
@@ -189,6 +189,9 @@ class File(models.Model):
                 'oshash': f.oshash,
                 'size': f.size
             })
+        add_file(self)
+        for f in self.item.files.filter(instances__volume=volume).exclude(id=self.id):
+            add_file(f)
         versions = ox.movie.parse_item_files(files)
         for version in versions:
             p = filter(lambda f: f['oshash'] == self.oshash, version['files'])
