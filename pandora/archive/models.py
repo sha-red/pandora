@@ -166,12 +166,30 @@ class File(models.Model):
     def normalize_path(self):
         #FIXME: always use format_path
         if settings.CONFIG['site']['folderdepth'] == 4:
-            return ox.movie.format_path(self.get_path_info())
+            return self.normalize_item_path()
         else:
             path = self.path or ''
             if self.instances.all().count():
                 path = self.instances.all()[0].path
             return path
+
+    def normalize_item_path(self):
+        files = []
+        instance = self.instances.all()[0]
+        for f in self.item.files.filter(instances__volume=instance.volume):
+            files.append(f.get_path_info())
+            files[-1].update({
+                'path': instance.path,
+                'time': instance.mtime,
+                'oshash': f.oshash,
+                'size': f.size
+            })
+
+        info = ox.movie.parse_item_files(files)
+        for version in info:
+            p = filter(lambda f: f['oshash'] == self.oshash, version['files'])
+            if p:
+                return p[0]['path']
 
     def update_info(self, info, user):
         #populate name sort with director if unknown
