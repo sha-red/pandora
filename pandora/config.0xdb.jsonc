@@ -326,7 +326,7 @@
             "title": "Budget",
             "type": "integer",
             "columnWidth": 90,
-            "format": {"type": "unit", "args": ["$"]},
+            "format": {"type": "currency", "args": ["$"]},
             "sort": true
         },
         {
@@ -334,7 +334,7 @@
             "title": "Gross",
             "type": "integer",
             "columnWidth": 90,
-            "format": {"type": "unit", "args": ["$"]},
+            "format": {"type": "currency", "args": ["$"]},
             "sort": true
         },
         {
@@ -342,7 +342,7 @@
             "title": "Profit",
             "type": "integer",
             "columnWidth": 90,
-            "format": {"type": "unit", "args": ["$"]},
+            "format": {"type": "currency", "args": ["$"]},
             "sort": true
         },
         {
