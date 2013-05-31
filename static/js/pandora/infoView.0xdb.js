@@ -262,7 +262,7 @@ pandora.ui.infoView = function(data) {
     data.alternativeTitles && $('<div>')
         .css(css)
         .html(
-            formatKey(Ox.formatCount(data.alternativeTitles, 'Alternative Title'))
+            formatKey('Alternative Title' + (data.alternativeTitles.length == 1 ? '' : 's'))
             + data.alternativeTitles.map(function(value) {
                 return value[0] + (
                     canSeeAllMetadata && Ox.isArray(value[1])
