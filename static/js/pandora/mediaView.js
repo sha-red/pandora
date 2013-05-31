@@ -31,7 +31,7 @@ pandora.ui.mediaView = function(options, self) {
                 {
                     disabled: true,
                     id: 'ignore',
-                    title: Ox._('Ignore Selected Media')
+                    title: Ox._('Ignore Selected Files')
                 },
                 {},
                 {
@@ -407,7 +407,7 @@ pandora.ui.mediaView = function(options, self) {
 
     self.$moveButton = Ox.Button({
             disabled: true,
-            title: Ox._('Move Media'),
+            title: Ox._('Move Files'),
             width: 116
         })
         .css({margin: '0 4px 4px 4px'})
@@ -481,7 +481,7 @@ pandora.ui.mediaView = function(options, self) {
             data[key] = self['$' + key + 'Input'].value();
         });
         self.$moveButton.options(
-            {disabled: true, title: Ox._('Moving Media...')}
+            {disabled: true, title: Ox._('Moving Files...')}
         );
         pandora.api.moveMedia(data, function(result) {
             if (
@@ -496,7 +496,7 @@ pandora.ui.mediaView = function(options, self) {
                     self.$filesList.reloadList();
                     self.$instancesList.reloadList();
                     self.$moveButton.options(
-                        {disabled: false, title: Ox._('Move Media')}
+                        {disabled: false, title: Ox._('Move Files')}
                     );
                 }
             }
