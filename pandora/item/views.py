@@ -1220,7 +1220,7 @@ def item(request, id):
             'data': data,
             'clips': clips,
             'icon': settings.CONFIG['user']['ui']['icons'] == 'frames' and 'icon' or 'poster',
-            'title': item.get('title', ''),
+            'title': ox.decode_html(item.get('title', '')),
             'description': item.get_item_description()
         }
         if not settings.USE_IMDB:
