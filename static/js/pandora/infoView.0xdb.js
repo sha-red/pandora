@@ -677,6 +677,7 @@ pandora.ui.infoView = function(data) {
         } else if (episodeMatch) {
             data.seriesTitle = episodeMatch[1].trim();
             data.episodeTitle = episodeMatch[2].trim();
+            data.season = 1;
         }
         return data;
     }
