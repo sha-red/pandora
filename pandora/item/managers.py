@@ -63,7 +63,7 @@ def parseCondition(condition, user):
     if (not exclude and op == '=' or op in ('$', '^')) and v == '':
         return Q()
     elif k == 'filename' and (user.is_anonymous() or \
-        not user.get_profile().capability('canSeeFiles')):
+        not user.get_profile().capability('canSeeMedia')):
         return Q(id=0)
     elif k == 'oshash':
         return Q(files__oshash=v)
