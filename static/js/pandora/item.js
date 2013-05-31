@@ -29,7 +29,7 @@ pandora.ui.item = function() {
         if (result.status.code == 200) {
             // we want to cache the title in any way, so that after closing
             // a dialog and getting to this item, the title is correct
-            var documentTitle = pandora.getDocumentTitle(Ox.decodeHtml(result.data.title));
+            var documentTitle = pandora.getDocumentTitle(Ox.decodeHTMLEntities(result.data.title));
             document.title = pandora.getPageTitle(document.location.pathname) || documentTitle;
         }
 

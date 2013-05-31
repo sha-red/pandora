@@ -379,7 +379,7 @@ pandora.URL = (function() {
             }
             if (e.state && !Ox.isEmpty(e.state)) {
                 Ox.Log('URL', 'E.STATE', e.state)
-                document.title = e.state.title;
+                document.title = Ox.decodeHTMLEntities(e.state.title);
                 setState(e.state);
             } else if (window.location.pathname == '/') {
                 pandora.$ui.home = pandora.ui.home().fadeInScreen();
