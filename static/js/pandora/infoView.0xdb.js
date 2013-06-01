@@ -390,7 +390,7 @@ pandora.ui.infoView = function(data) {
             .html(
                 formatKey(Ox._('Filming Locations')) + data.filmingLocations.map(function(location) {
                     return  '<a href="/map/@' + location + '">' + location + '</a>'
-                }).join(', ')
+                }).join('; ')
             )
             .appendTo($text);
 
