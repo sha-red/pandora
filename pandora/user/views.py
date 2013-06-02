@@ -13,7 +13,7 @@ from django.db.models import Max
 from django.contrib.auth.models import User, Group
 
 from ox.django.shortcuts import render_to_json_response, json_response, get_object_or_404_json
-from ox.django.decorators import admin_required_json, login_required_json
+from ox.django.decorators import login_required_json
 import ox
 
 
@@ -22,7 +22,7 @@ from item.models import Access, Item
 from item import utils 
 
 import models
-
+from decorators import capability_required_json
 
 def signin(request):
     '''
@@ -303,7 +303,7 @@ def requestToken(request):
 actions.register(requestToken, cache=False)
 
 
-@admin_required_json
+@capability_required_json('canManageUsers')
 def editUser(request):
     '''
         takes {
@@ -356,7 +356,7 @@ def editUser(request):
     return render_to_json_response(response)
 actions.register(editUser, cache=False)
 
-@admin_required_json
+@capability_required_json('canManageUsers')
 def removeUser(request):
     '''
         takes {
@@ -440,7 +440,7 @@ def order_query(qs, sort):
         qs = qs.order_by(*order_by, nulls_last=True)
     return qs
 
-@admin_required_json
+@capability_required_json('canManageUsers')
 def findUsers(request):
     '''
         takes {
