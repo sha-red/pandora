@@ -555,7 +555,7 @@ pandora.ui.home = function() {
                             } else if (key == 'right' && selected < items.length - 1) {
                                 selectItem(selected + 1);
                             } else if (key == 'down' && selected < items.length - 1) {
-                                selectItem(itmes.length - 1);
+                                selectItem(items.length - 1);
                             }
                         }
                     };
