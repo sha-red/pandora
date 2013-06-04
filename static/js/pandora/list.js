@@ -84,7 +84,7 @@ pandora.ui.list = function() {
                 //Ox.Log('', 'data, pandora.Query.toObject', data, pandora.Query.toObject())
                 pandora.api.find(Ox.extend(data, {
                     query: pandora.user.ui.find,
-                    keys: ['modified'].concat(data.keys)
+                    keys: data.keys ? ['modified'].concat(data.keys) : void 0
                 }), callback);
                 return Ox.clone(data, true);
             },
