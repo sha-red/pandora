@@ -82,11 +82,10 @@ pandora.ui.list = function() {
             id: 'list',
             items: function(data, callback) {
                 //Ox.Log('', 'data, pandora.Query.toObject', data, pandora.Query.toObject())
-                pandora.api.find(Ox.extend(data, {
+                return pandora.api.find(Ox.extend(data, {
                     query: pandora.user.ui.find,
                     keys: data.keys ? ['modified'].concat(data.keys) : void 0
                 }), callback);
-                return Ox.clone(data, true);
             },
             scrollbarVisible: true,
             selected: pandora.user.ui.listSelection,
@@ -161,10 +160,9 @@ pandora.ui.list = function() {
                 };
             },
             items: function(data, callback) {
-                pandora.api.find(Ox.extend(data, {
+                return pandora.api.find(Ox.extend(data, {
                     query: pandora.user.ui.find
                 }), callback);
-                return Ox.clone(data, true);
             },
             keys: ['director', 'id', 'modified', 'posterRatio', 'title', 'year'],
             selected: pandora.user.ui.listSelection,
@@ -230,7 +228,7 @@ pandora.ui.list = function() {
                 };
             },
             items: function(data, callback) {
-                pandora.api.find(Ox.extend(data, {
+                return pandora.api.find(Ox.extend(data, {
                     query: pandora.user.ui.find,
                     clips: {
                         query: pandora.getClipsQuery(),
@@ -238,7 +236,6 @@ pandora.ui.list = function() {
                         keys: []
                     }
                 }), callback);
-                return Ox.clone(data, true);
             },
             keys: ['clips', 'director', 'duration', 'id', 'modified', 'posterRatio', 'title', 'videoRatio', 'year'],
             selected: pandora.user.ui.listSelection,
@@ -347,14 +344,13 @@ pandora.ui.list = function() {
             items: function(data, callback) {
                 var clipsQuery = pandora.getClipsQuery(),
                     isClipsQuery = !!clipsQuery.conditions.length;
-                pandora.api.find(Ox.extend(data, Ox.extend({
+                return pandora.api.find(Ox.extend(data, Ox.extend({
                     query: pandora.user.ui.find
                 }, isClipsQuery ? {clips: {
                     query: clipsQuery,
                     items: 1000000,
                     keys: []
                 }} : {})), callback);
-                return Ox.clone(data, true);
             },
             keys: ['clips', 'director', 'duration', 'id', 'modified', 'posterRatio', 'rendered', 'title', 'year'],
             selected: pandora.user.ui.listSelection,
@@ -410,15 +406,15 @@ pandora.ui.list = function() {
                 });
             },
             init: function(data) {
-                var folder, list;
-                if (data.query.conditions.length == 0) {
+                var find = pandora.user.ui.find, folder, list;
+                if (find.conditions.length == 0) {
                     pandora.$ui.allItems.update(data.items);
                 } else if (
-                    data.query.conditions.length == 1
-                    && data.query.conditions[0].key == 'list'
-                    && data.query.conditions[0].operator == '=='
+                    find.conditions.length == 1
+                    && find.conditions[0].key == 'list'
+                    && find.conditions[0].operator == '=='
                 ) {
-                    list = data.query.conditions[0].value;
+                    list = find.conditions[0].value;
                     folder = pandora.getListData(list).folder;
                     if (pandora.$ui.folderList[folder]) {
                         pandora.$ui.folderList[folder].value(
