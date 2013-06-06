@@ -79,7 +79,7 @@ def main():
     else:
         with open(options.data) as f:
             data = json.load(f)
-    render_poster(data, poster)
+    render_poster(data, options.poster)
 
 if __name__ == "__main__":
     main()
