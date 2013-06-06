@@ -16,224 +16,196 @@ import ImageDraw
 import json
 from optparse import OptionParser
 import ox
-from ox.image import getRGB, drawText, wrapText
+from ox.image import drawText, getRGB, getTextSize, wrapText
+from StringIO import StringIO
 import sys
 
 static_root = os.path.join(os.path.dirname(__file__), 'data')
 
 def render_poster(data, poster):
-    
-    title = ox.decode_html(data.get('title', ''))
+
     director = ox.decode_html(u', '.join(data.get('director', [])))
-    year = str(data.get('year', ''))
+    title = ox.decode_html(data.get('title', ''))
     version = data.get('version')
+    year = str(data.get('year', ''))
+    id = data['id']
+    duration = data.get('duration')
     frame = data.get('frame')
     timeline = data.get('timeline')
+    url = 'arsenalberl.in/%s' % id
 
-    poster_width = 704
-    poster_height = 1024
-    frame_height = 512
-    frame_ratio = poster_width / frame_height
-    timeline_height = 64
-    text_margin = 16
-    text_width = poster_width - 2 * text_margin
-    poster_image = Image.new('RGB', (poster_width, poster_height))
+    poster_size = (640, 1024)
+    frame_size = (640, 480)
+    frame_ratio = frame_size[0] / frame_size[1]
+    logo_size = (64, 32)
+    small_frames = 8
+    small_frame_size = (80, 64)
+    small_frame_ratio = small_frame_size[0] / small_frame_size[1]
+    timeline_size = (640, 64)
+    margin = 16
+    font_size_small = 24
+    font_size_medium = 32
+    font_size_large = 48
+    font_file = os.path.join(static_root, 'OpenSansSemibold.ttf')
+    hue = int(hashlib.sha1(director.encode('utf-8')).hexdigest()[:8], 16) / pow(2, 32) * 360
+    image_color = getRGB([hue, 1, 0.2])
+    background_color = getRGB([hue, 1, 0.4])
+    foreground_color = getRGB([hue, 1, 0.8])
+    poster_image = Image.new('RGB', poster_size)
     draw = ImageDraw.Draw(poster_image)
-    font_file = os.path.join(static_root, 'SourceSansProSemibold.ttf')
-    font_size = {'arsenal': 120, 'director': 32, 'title': 48, 'version': 24, 'year': 426}
-    font_lightness = {'arsenal': 0.7, 'director': 0.8, 'title': 0.8, 'version': 0.8, 'year': 0.6}
-    poster_lightness = {'image': 0.2, 'text': 0.4}
-
-    if director:
-        hue = int(hashlib.sha1(director.encode('utf-8')).hexdigest()[:8], 16) / pow(2, 32) * 360
-        saturation = 1
-    else:
-        hue = 0
-        saturation = 0
-
-    # background
-    draw.rectangle(
-        [(0, frame_height), (poster_width, poster_height - timeline_height)],
-        fill=getRGB((hue, saturation, poster_lightness['text']))
-    )
-
-    # year
-    if year:
-        drawText(
-            poster_image,
-            (-93, poster_height - timeline_height - font_size['year'] + 6),
-            year,
-            font_file,
-            font_size['year'],
-            getRGB((hue, saturation, font_lightness['year']))
-        )
-
-    # arsenal
-    for y in [-1, 1]:
-        for x in [-1, 1]:
-            drawText(
-                poster_image,
-                (-9 + x, poster_height - timeline_height - font_size['arsenal'] + 1 + y),
-                'arsenalberl.in',
-                font_file,
-                font_size['arsenal'],
-                getRGB((hue, saturation, poster_lightness['text']))
-            )
-    drawText(
-        poster_image,
-        (-9, poster_height - timeline_height - font_size['arsenal'] + 1),
-        'arsenalberl.in',
-        font_file,
-        font_size['arsenal'],
-        getRGB((hue, saturation, font_lightness['arsenal']))
-    )
-    
-    # text
-    offset_top = frame_height + text_margin
-    if not director:
-        title_max_lines = 7
-    else:
-        title_max_lines = min(len(wrapText(
-            title,
-            text_width,
-            0,
-            font_file,
-            font_size['title']
-        )), 6)
-        director_max_lines = 10 - int((title_max_lines * 3 - 1) / 2)
-
-    # director
-    if director:
-        lines = wrapText(
-            director,
-            text_width,
-            director_max_lines,
-            font_file,
-            font_size['director']
-        )
-        for line in lines:
-            for y in [-1, 1]:
-                for x in [-1, 1]:
-                    drawText(
-                        poster_image,
-                        (text_margin + x, offset_top + y),
-                        line,
-                        font_file,
-                        font_size['director'],
-                        getRGB((hue, saturation, poster_lightness['text']))
-                    )
-            size = drawText(
-                poster_image,
-                (text_margin, offset_top),
-                line,
-                font_file,
-                font_size['director'],
-                getRGB((hue, saturation, font_lightness['director']))
-            )
-            offset_top += font_size['director'] + 2
-        offset_top += size[1] - font_size['director'] - 2
-
-    # title
-    lines = wrapText(
-        title,
-        text_width,
-        title_max_lines,
-        font_file,
-        font_size['title']
-    )
-    for line in lines:
-        for y in [-1, 1]:
-            for x in [-1, 1]:
-                drawText(
-                    poster_image,
-                    (text_margin + x, offset_top + y),
-                    line,
-                    font_file,
-                    font_size['title'],
-                    getRGB((hue, saturation, poster_lightness['text']))
-                )
-        size = drawText(
-            poster_image,
-            (text_margin, offset_top),
-            line,
-            font_file,
-            font_size['title'],
-            getRGB((hue, saturation, font_lightness['title']))
-        )
-        offset_top += font_size['title'] + 3
-    offset_top += size[1] - font_size['title'] + 3
-
-    # version
-    if version:
-        for y in [-1, 1]:
-            for x in [-1, 1]:
-                drawText(
-                    poster_image,
-                    (text_margin + x, offset_top + y),
-                    version,
-                    font_file,
-                    font_size['version'],
-                    getRGB((hue, saturation, poster_lightness['text']))
-                )
-        size = drawText(
-            poster_image,
-            (text_margin, offset_top),
-            version,
-            font_file,
-            font_size['version'],
-            getRGB((hue, saturation, font_lightness['title']))
-        )
 
     # frame
     if frame:
         frame_image = Image.open(frame)
         frame_image_ratio = frame_image.size[0] / frame_image.size[1]
         if frame_ratio < frame_image_ratio:
-            frame_image = frame_image.resize(
-                (int(frame_height * frame_image_ratio), frame_height),
-                Image.ANTIALIAS
-            )
-            left = int((frame_image.size[0] - poster_width) / 2)
-            frame_image = frame_image.crop(
-                (left, 0, left + poster_width, frame_height)
-            )
+            frame_image = frame_image.resize((int(frame_size[1] * frame_image_ratio), frame_size[1]), Image.ANTIALIAS)
+            left = int((frame_image.size[0] - frame_size[0]) / 2)
+            frame_image = frame_image.crop((left, 0, left + frame_size[0], frame_size[1]))
         else:
-            frame_image = frame_image.resize(
-                (poster_width, int(poster_width / frame_image_ratio)),
-                Image.ANTIALIAS
-            )
+            frame_image = frame_image.resize((frame_size[0], int(frame_size[0] / frame_image_ratio)), Image.ANTIALIAS)
             top = int((frame_image.size[1] - frame_height) / 2)
-            frame_image = frame_image.crop(
-                (0, top, poster_width, top + frame_height)
-            )
+            frame_image = frame_image.crop((0, top, frame_size[0], top + frame_size[1]))
         poster_image.paste(frame_image, (0, 0))
     else:
-        draw.rectangle(
-            [(0, 0), (poster_width, frame_height)],
-            fill=getRGB((hue, saturation, poster_lightness['image']))
+        draw.rectangle(((0, 0), frame_size), fill=image_color)
+
+    # small frames
+    if duration and False:
+        for i in range(small_frames):
+            position = duration * (i + 1) / (small_frames + 1)
+            small_frame_url = 'https://arsenalberl.in/%s/96p%f.jpg' % (id, round(position * 25) / 25)
+            small_frame_image = Image.open(StringIO(ox.net.read_url(small_frame_url)))
+            small_frame_image_ratio = small_frame_image.size[0] / small_frame_image.size[1]
+            if small_frame_ratio < small_frame_image_ratio:
+                small_frame_image = small_frame_image.resize((int(small_frame_size[1] * small_frame_image_ratio), small_frame_size[1]), Image.ANTIALIAS)
+                left = int((small_frame_image.size[0] - small_frame_size[0]) / 2)
+                small_frame_image = small_frame_image.crop((left, 0, left + small_frame_size[0], small_frame_size[1]))
+            else:
+                small_frame_image = small_frame_image.resize((small_frame_size[0], int(small_frame_size[0] / small_frame_image_ratio)), Image.ANTIALIAS)
+                top = int((small_frame_image.size[1] - small_frame_height) / 2)
+                small_frame_image = small_frame_image.crop((0, top, small_frame_size[0], top + small_frame_size[1]))
+            poster_image.paste(small_frame_image, (i * small_frame_size[0], frame_size[1]))
+    else:
+        draw.rectangle(((0, frame_size[1]), (poster_size[0], frame_size[1] + small_frame_size[1])), fill=image_color)
+
+    # text
+    draw.rectangle(((0, frame_size[1] + small_frame_size[1]), (poster_size[0], poster_size[1] - timeline_size[1])), fill=background_color)
+    offset_top = frame_size[1] + small_frame_size[1] + margin - 8
+    text_height = poster_size[1] - frame_size[1] - small_frame_size[1] - 3 * margin - font_size_large - timeline_size[1]
+    if not director and not version:
+        title_max_lines = int(text_height / font_size_large)
+    elif not director:
+        title_max_lines = int((text_height - margin - font_size_medium) / font_size_large)
+    elif not version:
+        title_max_lines = int((text_height - margin - font_size_small) / font_size_large)
+    else:
+        title_max_lines = int((text_height - 2 * margin - font_size_medium - font_size_small) / font_size_large)
+    title_max_lines = min(len(wrapText(
+        title,
+        poster_size[0] - 2 * margin,
+        0,
+        font_file,
+        font_size_large
+    )), title_max_lines)
+    if director:
+        if not version:
+            director_max_lines = int((text_height - margin - title_max_lines * font_size_large) / font_size_medium)
+        else:
+            director_max_lines = int((text_height - 2 * margin - title_max_lines * font_size_large - font_size_small) / font_size_medium)
+
+    # director
+    if director:
+        lines = wrapText(
+            director,
+            poster_size[0] - 2 * margin,
+            director_max_lines,
+            font_file,
+            font_size_medium
         )
+        for line in lines:
+            drawText(
+                poster_image,
+                (margin, offset_top),
+                line,
+                font_file,
+                font_size_medium,
+                foreground_color
+            )
+            offset_top += font_size_medium
+        offset_top += margin
+
+    # title
+    lines = wrapText(
+        title,
+        poster_size[0] - 2 * margin,
+        title_max_lines,
+        font_file,
+        font_size_large
+    )
+    for line in lines:
+        drawText(
+            poster_image,
+            (margin, offset_top - 8),
+            line,
+            font_file,
+            font_size_large,
+            foreground_color
+        )
+        offset_top += font_size_large
+    offset_top += margin
+
+    # version
+    if version:
+        drawText(
+            poster_image,
+            (margin, offset_top - 4),
+            version,
+            font_file,
+            font_size_small,
+            foreground_color
+        )
+
+    # year
+    if year:
+        drawText(
+            poster_image,
+            (margin, poster_size[1] - timeline_size[1] - margin - font_size_large - 8),
+            year,
+            font_file,
+            font_size_large,
+            foreground_color
+        )
+
+    # url
+    drawText(
+        poster_image,
+        (
+            poster_size[0] - margin - getTextSize(poster_image, url, font_file, font_size_medium)[0],
+            poster_size[1] - timeline_size[1] - margin - font_size_medium - 6
+        ),
+        url,
+        font_file,
+        font_size_medium,
+        foreground_color
+    )
 
     # timeline
     if timeline:
         timeline_image = Image.open(timeline)
-        timeline_image = timeline_image.resize(
-            (poster_width, timeline_height),
-            Image.ANTIALIAS
-        )
-        poster_image.paste(timeline_image, (0, poster_height - timeline_height))
+        timeline_image = timeline_image.resize(timeline_size, Image.ANTIALIAS)
+        poster_image.paste(timeline_image, (0, poster_size[1] - timeline_size[1]))
     else:
-        draw.rectangle(
-            [(0, poster_height - timeline_height), (poster_width, poster_height)],
-            fill=getRGB((hue, saturation, poster_lightness['image']))
-        )
+        draw.rectangle(((0, poster_size[1] - timeline_size[1]), poster_size), fill=image_color)
 
-    poster_image.save(poster, quality=100)
+    poster_image.save(poster)
 
 def main():
     parser = OptionParser()
     parser.add_option('-d', '--data', dest='data', help='json file with metadata', default=None)
     parser.add_option('-p', '--poster', dest='poster', help='Poster (image file to be written)')
     (options, args) = parser.parse_args()
+
     if None in (options.data, options.poster):
         parser.print_help()
         sys.exit()
@@ -243,7 +215,6 @@ def main():
     else:
         with open(options.data) as f:
             data = json.load(f)
-
     render_poster(data, options.poster)
 
 if __name__ == "__main__":

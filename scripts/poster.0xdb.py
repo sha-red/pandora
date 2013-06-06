@@ -46,16 +46,11 @@ def render_poster(data, poster):
     font_size_large = 48
     font_file = os.path.join(static_root, 'MontserratRegular.ttf')
     hue = int(oxdb_id[2:10], 16) / pow(2, 32) * 360
-    background_color = getRGB([hue, 1, 0.25])
-    foreground_color = getRGB([hue, 1, 0.75])
+    image_color = getRGB([hue, 1, 0.2])
+    background_color = getRGB([hue, 1, 0.4])
+    foreground_color = getRGB([hue, 1, 0.8])
     poster_image = Image.new('RGB', poster_size)
     draw = ImageDraw.Draw(poster_image)
-
-    # background
-    draw.rectangle(
-        ((0, frame_size[1] + small_frame_size[1]), (poster_size[0], poster_size[1] - timeline_size[1])),
-        fill=background_color
-    )
 
     # frame
     if frame:
@@ -70,6 +65,8 @@ def render_poster(data, poster):
             top = int((frame_image.size[1] - frame_height) / 2)
             frame_image = frame_image.crop((0, top, frame_size[0], top + frame_size[1]))
         poster_image.paste(frame_image, (0, 0))
+    else:
+        draw.rectangle(((0, 0), frame_size), fill=image_color)
 
     # logo
     logo_image = Image.open(os.path.join(static_root, 'logo.png'))
@@ -90,7 +87,7 @@ def render_poster(data, poster):
             small_frame_url = 'https://0xdb.org/%s/96p%f.jpg' % (id, round(position * 25) / 25)
             small_frame_image = Image.open(StringIO(ox.net.read_url(small_frame_url)))
             small_frame_image_ratio = small_frame_image.size[0] / small_frame_image.size[1]
-            if frame_ratio < frame_image_ratio:
+            if small_frame_ratio < small_frame_image_ratio:
                 small_frame_image = small_frame_image.resize((int(small_frame_size[1] * small_frame_image_ratio), small_frame_size[1]), Image.ANTIALIAS)
                 left = int((small_frame_image.size[0] - small_frame_size[0]) / 2)
                 small_frame_image = small_frame_image.crop((left, 0, left + small_frame_size[0], small_frame_size[1]))
@@ -99,8 +96,11 @@ def render_poster(data, poster):
                 top = int((small_frame_image.size[1] - small_frame_height) / 2)
                 small_frame_image = small_frame_image.crop((0, top, small_frame_size[0], top + small_frame_size[1]))
             poster_image.paste(small_frame_image, (i * small_frame_size[0], frame_size[1]))
+    else:
+        draw.rectangle(((0, frame_size[1]), (poster_size[0], frame_size[1] + small_frame_size[1])), fill=image_color)
 
     # text
+    draw.rectangle(((0, frame_size[1] + small_frame_size[1]), (poster_size[0], poster_size[1] - timeline_size[1])), fill=background_color)
     offset_top = frame_size[1] + small_frame_size[1] + margin - 8
     text_height = poster_size[1] - frame_size[1] - small_frame_size[1] - 3 * margin - font_size_large - timeline_size[1]
     if not director:
@@ -184,6 +184,8 @@ def render_poster(data, poster):
         timeline_image = Image.open(timeline)
         timeline_image = timeline_image.resize(timeline_size, Image.ANTIALIAS)
         poster_image.paste(timeline_image, (0, poster_size[1] - timeline_size[1]))
+    else:
+        draw.rectangle(((0, poster_size[1] - timeline_size[1]), poster_size), fill=image_color)
 
     poster_image.save(poster)
 
