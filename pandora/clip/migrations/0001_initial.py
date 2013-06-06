@@ -25,7 +25,7 @@ class Migration(SchemaMigration):
             ('lightness', self.gf('django.db.models.fields.FloatField')(default=0, db_index=True)),
             ('volume', self.gf('django.db.models.fields.FloatField')(default=0, null=True, db_index=True)),
             ('sortvalue', self.gf('django.db.models.fields.CharField')(max_length=1000, null=True, db_index=True)),
-            ('findvalue', self.gf('django.db.models.fields.TextField')(null=True, db_index=True)),
+            ('findvalue', self.gf('django.db.models.fields.TextField')(null=True, db_index=False)),
             ('subtitles', self.gf('django.db.models.fields.BooleanField')(default=False, db_index=True)),
         ))
         db.send_create_signal('clip', ['Clip'])

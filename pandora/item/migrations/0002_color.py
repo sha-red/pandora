@@ -104,7 +104,7 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'item': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'find'", 'to': "orm['item.Item']"}),
             'key': ('django.db.models.fields.CharField', [], {'max_length': '200', 'db_index': 'True'}),
-            'value': ('django.db.models.fields.TextField', [], {'db_index': 'True', 'blank': 'True'})
+            'value': ('django.db.models.fields.TextField', [], {'db_index': 'False', 'blank': 'True'})
         },
         'item.itemsort': {
             'Meta': {'object_name': 'ItemSort'},

@@ -51,7 +51,7 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('item', self.gf('django.db.models.fields.related.ForeignKey')(related_name='find', to=orm['item.Item'])),
             ('key', self.gf('django.db.models.fields.CharField')(max_length=200, db_index=True)),
-            ('value', self.gf('django.db.models.fields.TextField')(db_index=True, blank=True)),
+            ('value', self.gf('django.db.models.fields.TextField')(db_index=True, blank=False)),
         ))
         db.send_create_signal('item', ['ItemFind'])
 
