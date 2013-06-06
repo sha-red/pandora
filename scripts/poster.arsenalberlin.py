@@ -39,8 +39,8 @@ def render_poster(data, poster):
     poster_image = Image.new('RGB', (poster_width, poster_height))
     draw = ImageDraw.Draw(poster_image)
     font_file = os.path.join(static_root, 'SourceSansProSemibold.ttf')
-    font_size = {'cinema': 117, 'director': 32, 'title': 48, 'year': 426}
-    font_lightness = {'cinema': 0.7, 'director': 0.8, 'title': 0.8, 'year': 0.6}
+    font_size = {'arsenal': 120, 'director': 32, 'title': 48, 'year': 426}
+    font_lightness = {'arsenal': 0.7, 'director': 0.8, 'title': 0.8, 'year': 0.6}
     poster_lightness = {'image': 0.2, 'text': 0.4}
 
     if year:
@@ -67,24 +67,24 @@ def render_poster(data, poster):
             getRGB((hue, saturation, font_lightness['year']))
         )
 
-    # cinema
+    # arsenal
     for y in [-1, 1]:
         for x in [-1, 1]:
             drawText(
                 poster_image,
-                (-10 + x, poster_height - timeline_height - font_size['cinema'] + 1 + y),
+                (-9 + x, poster_height - timeline_height - font_size['arsenal'] + 1 + y),
                 'Indiancine.ma',
                 font_file,
-                font_size['cinema'],
+                font_size['arsenal'],
                 getRGB((hue, saturation, poster_lightness['text']))
             )
     drawText(
         poster_image,
-        (-10, poster_height - timeline_height - font_size['cinema'] + 1),
+        (-9, poster_height - timeline_height - font_size['arsenal'] + 1),
         'Indiancine.ma',
         font_file,
-        font_size['cinema'],
-        getRGB((hue, saturation, font_lightness['cinema']))
+        font_size['arsenal'],
+        getRGB((hue, saturation, font_lightness['arsenal']))
     )
     
     # director and title

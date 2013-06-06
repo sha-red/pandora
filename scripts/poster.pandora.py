@@ -141,8 +141,8 @@ i   '''
 
 def main():
     parser = OptionParser()
-    parser.add_option('-p', '--poster', dest='poster', help='Poster (image file to be written)')
     parser.add_option('-d', '--data', dest='data', help='json file with metadata', default=None)
+    parser.add_option('-p', '--poster', dest='poster', help='Poster (image file to be written)')
     (options, args) = parser.parse_args()
 
     if None in (options.data, options.poster):
