@@ -71,7 +71,7 @@ def render_poster(data, poster):
         draw.rectangle(((0, 0), frame_size), fill=image_color)
 
     # small frames
-    if duration and False:
+    if duration:
         for i in range(small_frames):
             position = duration * (i + 1) / (small_frames + 1)
             small_frame_url = 'https://arsenalberl.in/%s/96p%f.jpg' % (id, round(position * 25) / 25)
