@@ -74,7 +74,7 @@ def render_poster(data, poster):
     if duration:
         for i in range(small_frames):
             position = duration * (i + 1) / (small_frames + 1)
-            small_frame_url = 'https://arsenalberl.in/%s/96p%f.jpg' % (id, round(position * 25) / 25)
+            small_frame_url = 'http://arsenalberl.in/%s/96p%f.jpg' % (id, round(position * 25) / 25)
             small_frame_image = Image.open(StringIO(ox.net.read_url(small_frame_url)))
             small_frame_image_ratio = small_frame_image.size[0] / small_frame_image.size[1]
             if small_frame_ratio < small_frame_image_ratio:
