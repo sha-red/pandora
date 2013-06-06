@@ -26,8 +26,8 @@ def render_poster(data, poster):
     director = u', '.join(data.get('director', []))
     director = ox.decode_html(director)
     year = str(data.get('year', ''))
-    frame = data['frame']
-    timeline = data['timeline']
+    frame = data.get('frame')
+    timeline = data.get('timeline')
 
     poster_width = 704
     poster_height = 1024

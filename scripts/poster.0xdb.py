@@ -29,8 +29,8 @@ def render_poster(data, poster):
     series = data.get('isSeries', False)
     oxdb_id = data['oxdbId']
     imdb_id = data['id']
-    frame = data['frame']
-    timeline = data['timeline']
+    frame = data.get('frame')
+    timeline = data.get('timeline')
 
     def get_oxdb_color(oxdb_id, series=False):
         i = int(round((int(oxdb_id[2:10], 16) * 762 / pow(2, 32))))
