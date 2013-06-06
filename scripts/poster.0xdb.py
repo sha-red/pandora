@@ -28,10 +28,9 @@ def render_poster(data, poster):
     year = str(data.get('year', ''))
     duration = data.get('duration')
     oxdb_id = data['oxdbId']
-    imdb_id = data['id']
+    id = data['id']
     frame = data.get('frame')
     timeline = data.get('timeline')
-    id = imdb_id or oxdb_id
 
     poster_size = (640, 1024)
     frame_size = (640, 480)
@@ -44,7 +43,7 @@ def render_poster(data, poster):
     margin = 16
     font_size_small = 32
     font_size_large = 48
-    font_file = os.path.join(static_root, 'MontserratRegular.ttf')
+    font_file = os.path.join(static_root, 'MontserratBold.ttf')
     hue = int(oxdb_id[2:10], 16) / pow(2, 32) * 360
     image_color = getRGB([hue, 1, 0.2])
     background_color = getRGB([hue, 1, 0.4])
