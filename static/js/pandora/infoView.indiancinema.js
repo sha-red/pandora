@@ -21,7 +21,7 @@ pandora.ui.infoView = function(data) {
         iconLeft = iconSize == 256 ? Math.floor((iconSize - iconWidth) / 2) : 0,
         borderRadius = ui.icons == 'posters' ? 0 : iconSize / 8,
         isCopyrighted = !data.year || parseInt(data.year) + 60 >= new Date().getFullYear(),
-        listWidth = 144 + Ox.UI.SCROLLBAR_SIZE,
+        listWidth = 0,
         margin = 16,
         nameKeys = [
             'director', 'producer', 'codirector', 'writer', 'cinematographer',
