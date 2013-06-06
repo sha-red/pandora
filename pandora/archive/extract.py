@@ -146,6 +146,7 @@ def stream(video, target, profile, info):
     
     if info['video'] and 'display_aspect_ratio' in info['video'][0]:
         fps = AspectRatio(info['video'][0]['framerate'])
+        fps = min(30, float(fps))
 
         dar = AspectRatio(info['video'][0]['display_aspect_ratio'])
         width = int(dar * height)
