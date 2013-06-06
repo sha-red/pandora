@@ -23,8 +23,7 @@ static_root = os.path.join(os.path.dirname(__file__), 'data')
 def render_poster(data, poster):
     
     title = ox.decode_html(data.get('title', ''))
-    director = u', '.join(data.get('director', []))
-    director = ox.decode_html(director)
+    director = ox.decode_html(u', '.join(data.get('director', [])))
     year = str(data.get('year', ''))
     frame = data.get('frame')
     timeline = data.get('timeline')

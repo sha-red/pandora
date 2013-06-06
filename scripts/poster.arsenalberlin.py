@@ -23,9 +23,9 @@ static_root = os.path.join(os.path.dirname(__file__), 'data')
 def render_poster(data, poster):
     
     title = ox.decode_html(data.get('title', ''))
-    director = u', '.join(data.get('director', []))
-    director = ox.decode_html(director)
+    director = ox.decode_html(u', '.join(data.get('director', [])))
     year = str(data.get('year', ''))
+    version = data.get('version')
     frame = data.get('frame')
     timeline = data.get('timeline')
 
@@ -39,8 +39,8 @@ def render_poster(data, poster):
     poster_image = Image.new('RGB', (poster_width, poster_height))
     draw = ImageDraw.Draw(poster_image)
     font_file = os.path.join(static_root, 'SourceSansProSemibold.ttf')
-    font_size = {'arsenal': 120, 'director': 32, 'title': 48, 'year': 426}
-    font_lightness = {'arsenal': 0.7, 'director': 0.8, 'title': 0.8, 'year': 0.6}
+    font_size = {'arsenal': 120, 'director': 32, 'title': 48, 'version': 24, 'year': 426}
+    font_lightness = {'arsenal': 0.7, 'director': 0.8, 'title': 0.8, 'version': 0.8, 'year': 0.6}
     poster_lightness = {'image': 0.2, 'text': 0.4}
 
     if year:
@@ -73,7 +73,7 @@ def render_poster(data, poster):
             drawText(
                 poster_image,
                 (-9 + x, poster_height - timeline_height - font_size['arsenal'] + 1 + y),
-                'Indiancine.ma',
+                'arsenalberl.in',
                 font_file,
                 font_size['arsenal'],
                 getRGB((hue, saturation, poster_lightness['text']))
@@ -81,16 +81,16 @@ def render_poster(data, poster):
     drawText(
         poster_image,
         (-9, poster_height - timeline_height - font_size['arsenal'] + 1),
-        'Indiancine.ma',
+        'arsenalberl.in',
         font_file,
         font_size['arsenal'],
         getRGB((hue, saturation, font_lightness['arsenal']))
     )
     
-    # director and title
+    # text
     offset_top = frame_height + text_margin
     if not director:
-        title_max_lines = 8
+        title_max_lines = 7
     else:
         title_max_lines = min(len(wrapText(
             title,
@@ -98,8 +98,8 @@ def render_poster(data, poster):
             0,
             font_file,
             font_size['title']
-        )), 7)
-        director_max_lines = 11 - int((title_max_lines * 3 - 1) / 2)
+        )), 6)
+        director_max_lines = 10 - int((title_max_lines * 3 - 1) / 2)
 
     # director
     if director:
@@ -151,7 +151,7 @@ def render_poster(data, poster):
                     font_size['title'],
                     getRGB((hue, saturation, poster_lightness['text']))
                 )
-        drawText(
+        size = drawText(
             poster_image,
             (text_margin, offset_top),
             line,
@@ -160,6 +160,28 @@ def render_poster(data, poster):
             getRGB((hue, saturation, font_lightness['title']))
         )
         offset_top += font_size['title'] + 3
+    offset_top += size[1] - font_size['title'] + 3
+
+    # version
+    if version:
+        for y in [-1, 1]:
+            for x in [-1, 1]:
+                drawText(
+                    poster_image,
+                    (text_margin + x, offset_top + y),
+                    version,
+                    font_file,
+                    font_size['version'],
+                    getRGB((hue, saturation, poster_lightness['text']))
+                )
+        size = drawText(
+            poster_image,
+            (text_margin, offset_top),
+            version,
+            font_file,
+            font_size['version'],
+            getRGB((hue, saturation, font_lightness['title']))
+        )
 
     # frame
     if frame:
