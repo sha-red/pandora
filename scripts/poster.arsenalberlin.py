@@ -10,6 +10,7 @@ root_dir = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file_
 activate_this = os.path.join(root_dir, 'bin', 'activate_this.py')
 execfile(activate_this, dict(__file__=activate_this))
 
+import hashlib
 import Image
 import ImageDraw
 import json
@@ -43,8 +44,8 @@ def render_poster(data, poster):
     font_lightness = {'arsenal': 0.7, 'director': 0.8, 'title': 0.8, 'version': 0.8, 'year': 0.6}
     poster_lightness = {'image': 0.2, 'text': 0.4}
 
-    if year:
-        hue = int(year) % 100 / 100 * 360
+    if director:
+        hue = int(hashlib.sha1(director.encode('utf-8')).hexdigest()[:8], 16) / pow(2, 32) * 360
         saturation = 1
     else:
         hue = 0
