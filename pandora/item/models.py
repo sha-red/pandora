@@ -10,6 +10,7 @@ import shutil
 import uuid
 import unicodedata
 from urllib import quote
+import json
 
 from django.db import models, transaction
 from django.db.models import Q, Sum, Max
@@ -1192,35 +1193,19 @@ class Item(models.Model):
         frame = self.get_poster_frame_path()
         timeline = '%stimelineantialias64p.jpg' % self.timeline_prefix
 
-        director = u', '.join(self.get('director', []))
-        director = ox.decode_html(director)
-        title = self.get('title', '')
-        title = ox.decode_html(title)
-
         cmd = [settings.ITEM_POSTER,
-               '-t', title.encode('utf-8'),
-               '-y', str(self.get('year', '')),
+               '-d', '-',
                '-p', poster
               ]
-        if director:
-            cmd += [
-               '-d', director.encode('utf-8'),
-            ]
+        data = self.json.copy()
         if frame:
-            cmd += [
-               '-f', frame,
-            ]
+            data['frame'] = frame
         if os.path.exists(timeline):
-            cmd += [
-               '-l', timeline,
-            ]
-        cmd += [
-            '-i', self.itemId,
-            '-o', self.oxdbId or self.oxdb_id() or self.itemId
-        ]
+            data['timeline'] = timeline
+        data['oxdbId'] = self.oxdbId or self.oxdb_id() or self.itemId
         ox.makedirs(os.path.join(settings.MEDIA_ROOT,self.path()))
-        p = subprocess.Popen(cmd)
-        p.wait()
+        p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+        p.communicate(json.dumps(data, default=fields.to_json))
         for f in glob(poster.replace('.jpg', '*.jpg')):
             if f != poster:
                 os.unlink(f)

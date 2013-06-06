@@ -12,13 +12,20 @@ execfile(activate_this, dict(__file__=activate_this))
 
 import Image
 import ImageDraw
+import json
 from optparse import OptionParser
+import ox
 from ox.image import drawText, wrapText
 import sys
 
 static_root = os.path.join(os.path.dirname(__file__), 'data')
 
-def render_poster(id, title, frame, timeline, poster):
+def render_poster(data, poster):
+    title = ox.decode_html(data.get('title', ''))
+    id = data['id']
+    frame = data['frame']
+    timeline = data['timeline']
+
     poster_width = 640
     poster_height = 1024
     poster_ratio = poster_width / poster_height
@@ -59,27 +66,20 @@ def render_poster(id, title, frame, timeline, poster):
 
 def main():
     parser = OptionParser()
-    parser.add_option('-o', '--oxdbid', dest='oxdb_id', help='0xDB Id')
-    parser.add_option('-i', '--id', dest='id', help='Item Id')
-    parser.add_option('-t', '--title', dest='title', help='Title', default='')
-    parser.add_option('-d', '--director', dest='director', help='Director', default='')
-    parser.add_option('-y', '--year', dest='year', help='Year', default='')
-    parser.add_option('-f', '--frame', dest='frame', help='Poster frame (image file to be read)')
-    parser.add_option('-l', '--timeline', dest='timeline', help='Timeline (image file to be read)')
     parser.add_option('-p', '--poster', dest='poster', help='Poster (image file to be written)')
+    parser.add_option('-d', '--data', dest='data', help='json file with metadata', default=None)
     (options, args) = parser.parse_args()
-    if options.oxdb_id and not options.id:
-        options.id = options.oxdb_id
-    if None in (options.id, options.poster):
+
+    if None in (options.data, options.poster):
         parser.print_help()
         sys.exit()
-    opt = {}
-    for key in ('id', 'title', 'frame', 'timeline', 'poster'):
-        opt[key] = getattr(options, key)
-        
-    opt['title'] = opt['title'].decode('utf-8')
 
-    render_poster(**opt)
+    if options.data == '-':
+        data = json.load(sys.stdin)
+    else:
+        with open(options.data) as f:
+            data = json.load(f)
+    render_poster(data, poster)
 
 if __name__ == "__main__":
     main()

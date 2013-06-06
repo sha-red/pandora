@@ -6,20 +6,32 @@ import os
 
 root_dir = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-#using virtualenv's activate_this.py to reorder sys.path
+# using virtualenv's activate_this.py to reorder sys.path
 activate_this = os.path.join(root_dir, 'bin', 'activate_this.py')
 execfile(activate_this, dict(__file__=activate_this))
 
 import Image
 import ImageDraw
+import json
 from optparse import OptionParser
+import ox
 from ox.image import drawText, wrapText
 import sys
 
-
 static_root = os.path.join(os.path.dirname(__file__), 'data')
 
-def render_poster(title, director, year, series, oxdb_id, imdb_id, frame, timeline, poster):
+def render_poster(data, poster):
+
+    title = ox.decode_html(data.get('title', ''))
+    director = u', '.join(data.get('director', [])
+    director = ox.decode_html(director)
+    year = str(data.get('year', ''))
+    series = data.get('isSeries', False)
+    oxdb_id = data['oxdbId']
+    imdb_id = data['id']
+    frame = data['frame']
+    timeline = data['timeline']
+
     def get_oxdb_color(oxdb_id, series=False):
         i = int(round((int(oxdb_id[2:10], 16) * 762 / pow(2, 32))))
         if i < 127:
@@ -129,29 +141,20 @@ i   '''
 
 def main():
     parser = OptionParser()
-    parser.add_option('-o', '--oxdbid', dest='oxdb_id', help='0xDB Id')
-    parser.add_option('-i', '--id', dest='imdb_id', help='Item Id')
-    parser.add_option('-t', '--title', dest='title', help='Title')
-    parser.add_option('-d', '--director', dest='director', help='Director(s)', default='')
-    parser.add_option('-y', '--year', dest='year', help='Year')
-    parser.add_option('-s', '--series', dest='series', help='Movie is an episode of a series', action='store_true')
-    parser.add_option('-f', '--frame', dest='frame', help='Poster frame (image file to be read)')
-    parser.add_option('-l', '--timeline', dest='timeline', help='Timeline (image file to be read)')
     parser.add_option('-p', '--poster', dest='poster', help='Poster (image file to be written)')
+    parser.add_option('-d', '--data', dest='data', help='json file with metadata', default=None)
     (options, args) = parser.parse_args()
 
-    if None in (options.oxdb_id, options.title, options.poster):
+    if None in (options.data, options.poster):
         parser.print_help()
         sys.exit()
 
-    opt = {}
-    for key in ('oxdb_id', 'imdb_id', 'title', 'director', 'year', 'series', 'frame', 'timeline', 'poster'):
-        opt[key] = getattr(options, key)
-        
-    opt['title'] = opt['title'].decode('utf-8')
-    opt['director'] = opt['director'].decode('utf-8')
-
-    render_poster(**opt)
+    if options.data == '-':
+        data = json.load(sys.stdin)
+    else:
+        with open(options.data) as f:
+            data = json.load(f)
+    render_poster(data, poster)
 
 if __name__ == "__main__":
     main()
