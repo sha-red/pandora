@@ -84,20 +84,21 @@ def render_poster(data, poster):
             poster_image.putpixel((margin + x, margin + y), color)
 
     # small frames
-    for i in range(small_frames):
-        position = duration * (i + 1) / (small_frames + 1)
-        small_frame_url = 'https://0xdb.org/%s/96p%f.jpg' % (id, round(position * 25) / 25)
-        small_frame_image = Image.open(StringIO(ox.net.read_url(small_frame_url)))
-        small_frame_image_ratio = small_frame_image.size[0] / small_frame_image.size[1]
-        if frame_ratio < frame_image_ratio:
-            small_frame_image = small_frame_image.resize((int(small_frame_size[1] * small_frame_image_ratio), small_frame_size[1]), Image.ANTIALIAS)
-            left = int((small_frame_image.size[0] - small_frame_size[0]) / 2)
-            small_frame_image = small_frame_image.crop((left, 0, left + small_frame_size[0], small_frame_size[1]))
-        else:
-            small_frame_image = small_frame_image.resize((small_frame_size[0], int(small_frame_size[0] / small_frame_image_ratio)), Image.ANTIALIAS)
-            top = int((small_frame_image.size[1] - small_frame_height) / 2)
-            small_frame_image = small_frame_image.crop((0, top, small_frame_size[0], top + small_frame_size[1]))
-        poster_image.paste(small_frame_image, (i * small_frame_size[0], frame_size[1]))
+    if duration:
+        for i in range(small_frames):
+            position = duration * (i + 1) / (small_frames + 1)
+            small_frame_url = 'https://0xdb.org/%s/96p%f.jpg' % (id, round(position * 25) / 25)
+            small_frame_image = Image.open(StringIO(ox.net.read_url(small_frame_url)))
+            small_frame_image_ratio = small_frame_image.size[0] / small_frame_image.size[1]
+            if frame_ratio < frame_image_ratio:
+                small_frame_image = small_frame_image.resize((int(small_frame_size[1] * small_frame_image_ratio), small_frame_size[1]), Image.ANTIALIAS)
+                left = int((small_frame_image.size[0] - small_frame_size[0]) / 2)
+                small_frame_image = small_frame_image.crop((left, 0, left + small_frame_size[0], small_frame_size[1]))
+            else:
+                small_frame_image = small_frame_image.resize((small_frame_size[0], int(small_frame_size[0] / small_frame_image_ratio)), Image.ANTIALIAS)
+                top = int((small_frame_image.size[1] - small_frame_height) / 2)
+                small_frame_image = small_frame_image.crop((0, top, small_frame_size[0], top + small_frame_size[1]))
+            poster_image.paste(small_frame_image, (i * small_frame_size[0], frame_size[1]))
 
     # text
     offset_top = frame_size[1] + small_frame_size[1] + margin - 8
