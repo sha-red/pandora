@@ -113,6 +113,34 @@ pandora.ui.folders = function() {
                             ]('deletetext');
                         })
                     ];
+                } else if(ui.section == 'edits') {
+                    extras = [
+                        pandora.$ui.personalListsMenu = Ox.MenuButton({
+                            items: [
+                                { id: 'newedit', title: Ox._('New Edit') },
+                                {},
+                                { id: 'deleteedit', title: Ox._('Delete Selected Edit...'), disabled: !ui.text }
+                            ],
+                            title: 'edit',
+                            tooltip: Ox._('Manage Personal Edits'),
+                            type: 'image'
+                        })
+                        .bindEvent({
+                            click: function(data) {
+                                var $list = pandora.$ui.folderList[folder.id];
+                                if (data.id == 'newedit') {
+                                    pandora.addEdit();
+                                } else if (data.id == 'deleteedit') {
+                                    pandora.ui.deleteListDialog().open();
+                                }
+                            }
+                        })
+                        .bindEvent('pandora_edit', function(data) {
+                            pandora.$ui.personalListsMenu[
+                                data.value && data.value.length ? 'enableItem' : 'disableItem'
+                            ]('deleteedit');
+                        })
+                    ];
                 } else {
                     extras = [];
                 }

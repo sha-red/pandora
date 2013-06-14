@@ -12,6 +12,26 @@ pandora.addItem = function() {
     });
 };
 
+pandora.addEdit = function(options) {
+    var $folderList = pandora.$ui.folderList.personal;
+    options = options || {};
+    pandora.api.addEdit(options, function(result) {
+        reloadFolder(result.data.id);
+    });
+    function reloadFolder(newId) {
+        pandora.$ui.folder[0].options({collapsed: false});
+        Ox.Request.clearCache('findEdits');
+        $folderList.bindEventOnce({
+            load: function(data) {
+                $folderList.gainFocus()
+                    .options({selected: [newId]})
+                    .editCell(newId, 'name', true);
+                pandora.UI.set(pandora.user.ui.section.slice(0, -1), newId);
+            }
+        }).reloadList();
+    }
+}
+
 pandora.addList = function() {
     // addList(isSmart, isFrom) or addList(list) [=duplicate]
     var $folderList = pandora.$ui.folderList.personal,

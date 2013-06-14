@@ -58,6 +58,9 @@ pandora.UI = (function() {
         if (args.section == 'texts') {
             trigger['section'] = args['section'];
             trigger['text'] = args['text'];
+        } else if (args.section == 'edits') {
+            trigger['section'] = args['section'];
+            trigger['edit'] = args['edit'];
         } else {
             if ('find' in args) {
                 // the challenge here is that find may change list,
