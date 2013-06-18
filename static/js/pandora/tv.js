@@ -56,6 +56,7 @@ pandora.ui.tv = function() {
             $player && $player.remove();
             $player = Ox.VideoPlayer({
                     censored: videoOptions.censored,
+                    censoredIcon: pandora.site.cantPlay.icon,
                     controlsBottom: [
                         'zapPrevious', 'zapHome', 'zapNext',
                         'volume', 'scale', 'timeline', 'position', 'settings'
