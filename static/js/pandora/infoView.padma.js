@@ -158,14 +158,7 @@ pandora.ui.infoView = function(data) {
             Ox.EditableContent({
                     clickLink: pandora.clickLink,
                     format: function(value) {
-                        // FIXME: what??
-                        return listKeys.indexOf(key) >= 0
-                            ? formatValue(value.split(', '), {
-                                'director': 'name',
-                                'cinematographer': 'name',
-                                'features': 'name',
-                            }[key] || key)
-                            : value;
+                        return formatValue(value, key);
                     },
                     placeholder: formatLight(Ox._('unknown')),
                     editable: canEdit,
@@ -475,8 +468,13 @@ pandora.ui.infoView = function(data) {
             ret = value ? Ox.formatDate(value,
                 ['', '%Y', '%B %Y', '%B %e, %Y'][value.split('-').length]
             ) : '';
+        } else if (listKeys.indexOf(key) > -1) {
+            ret = value.split(', ');
         } else {
             ret = value;
+        }
+        if (nameKeys.indexOf(key) > -1) {
+            key = 'name';
         }
         return formatLink(ret, key);
     }
