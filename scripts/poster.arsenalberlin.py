@@ -64,7 +64,7 @@ def render_poster(data, poster):
             frame_image = frame_image.crop((left, 0, left + frame_size[0], frame_size[1]))
         else:
             frame_image = frame_image.resize((frame_size[0], int(frame_size[0] / frame_image_ratio)), Image.ANTIALIAS)
-            top = int((frame_image.size[1] - frame_height) / 2)
+            top = int((frame_image.size[1] - frame_size[1]) / 2)
             frame_image = frame_image.crop((0, top, frame_size[0], top + frame_size[1]))
         poster_image.paste(frame_image, (0, 0))
     else:
