@@ -17,10 +17,22 @@ import json
 from optparse import OptionParser
 import ox
 from ox.image import drawText, getRGB, getTextSize, wrapText
-from StringIO import StringIO
+import subprocess
 import sys
 
 static_root = os.path.join(os.path.dirname(__file__), 'data')
+
+def get_frame(id, height, position):
+    cmd = [
+        os.path.join(root_dir, 'pandora', 'manage.py'), 'get_frame',
+        str(id), str(height), "%f" % (round(position * 25) / 25)
+    ]
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    output = p.communicate()
+    frame_path = output[0].strip()
+    if frame_path:
+        frame_image = Image.open(frame_path)
+        return frame_image
 
 def render_poster(data, poster):
 
@@ -74,18 +86,18 @@ def render_poster(data, poster):
     if duration:
         for i in range(small_frames):
             position = duration * (i + 1) / (small_frames + 1)
-            small_frame_url = 'http://arsenalberl.in/%s/96p%f.jpg' % (id, round(position * 25) / 25)
-            small_frame_image = Image.open(StringIO(ox.net.read_url(small_frame_url)))
-            small_frame_image_ratio = small_frame_image.size[0] / small_frame_image.size[1]
-            if small_frame_ratio < small_frame_image_ratio:
-                small_frame_image = small_frame_image.resize((int(small_frame_size[1] * small_frame_image_ratio), small_frame_size[1]), Image.ANTIALIAS)
-                left = int((small_frame_image.size[0] - small_frame_size[0]) / 2)
-                small_frame_image = small_frame_image.crop((left, 0, left + small_frame_size[0], small_frame_size[1]))
-            else:
-                small_frame_image = small_frame_image.resize((small_frame_size[0], int(small_frame_size[0] / small_frame_image_ratio)), Image.ANTIALIAS)
-                top = int((small_frame_image.size[1] - small_frame_size[1]) / 2)
-                small_frame_image = small_frame_image.crop((0, top, small_frame_size[0], top + small_frame_size[1]))
-            poster_image.paste(small_frame_image, (i * small_frame_size[0], frame_size[1]))
+            small_frame_image = get_frame(id, 96, round(position * 25) / 25)
+            if small_frame_image:
+                small_frame_image_ratio = small_frame_image.size[0] / small_frame_image.size[1]
+                if small_frame_ratio < small_frame_image_ratio:
+                    small_frame_image = small_frame_image.resize((int(small_frame_size[1] * small_frame_image_ratio), small_frame_size[1]), Image.ANTIALIAS)
+                    left = int((small_frame_image.size[0] - small_frame_size[0]) / 2)
+                    small_frame_image = small_frame_image.crop((left, 0, left + small_frame_size[0], small_frame_size[1]))
+                else:
+                    small_frame_image = small_frame_image.resize((small_frame_size[0], int(small_frame_size[0] / small_frame_image_ratio)), Image.ANTIALIAS)
+                    top = int((small_frame_image.size[1] - small_frame_size[1]) / 2)
+                    small_frame_image = small_frame_image.crop((0, top, small_frame_size[0], top + small_frame_size[1]))
+                poster_image.paste(small_frame_image, (i * small_frame_size[0], frame_size[1]))
     else:
         draw.rectangle(((0, frame_size[1]), (poster_size[0], frame_size[1] + small_frame_size[1])), fill=image_color)
 
