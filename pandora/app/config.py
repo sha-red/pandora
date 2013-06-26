@@ -232,6 +232,14 @@ def update_geoip(force=False):
         if os.path.exists(path):
             os.unlink(path)
         os.system('gunzip "%s.gz"' % path)
+    path = os.path.join(settings.GEOIP_PATH, 'GeoLiteCityv6.dat')
+    if not os.path.exists(path) or force:
+        url = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCityv6-beta/GeoLiteCityv6.dat.gz'
+        print 'download', url
+        ox.net.save_url(url, "%s.gz"%path)
+        if os.path.exists(path):
+            os.unlink(path)
+        os.system('gunzip "%s.gz"' % path)
 
 def init():
     if not settings.RELOADER_RUNNING:
