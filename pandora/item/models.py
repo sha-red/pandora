@@ -17,6 +17,7 @@ from django.db.models import Q, Sum, Max
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.db.models.signals import pre_delete
+from django.utils import datetime_safe
 
 import ox
 from ox.django import fields
@@ -805,7 +806,7 @@ class Item(models.Model):
                 elif sort_type == 'date':
                     value = self.get(source)
                     if isinstance(value, basestring):
-                        value = datetime.strptime(value, '%Y-%m-%d')
+                        value = datetime_safe.datetime.strptime(value, '%Y-%m-%d')
                     set_value(s, name, value)
 
         #sort keys based on database, these will always be available
