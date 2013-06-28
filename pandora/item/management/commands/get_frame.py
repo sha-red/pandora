@@ -13,4 +13,5 @@ class Command(BaseCommand):
         position = float(position)
         i = models.Item.objects.get(itemId=id)
         path = i.frame(position, height)
-        print path
+        if path:
+            print path
