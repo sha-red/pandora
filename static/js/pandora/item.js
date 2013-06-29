@@ -14,7 +14,7 @@ pandora.ui.item = function() {
         id: pandora.user.ui.item,
         keys: isVideoView ? [
             'cuts', 'director', 'duration', 'editable', 'layers',
-            'parts', 'posterFrame', 'rendered', 'rightslevel',
+            'modified', 'parts', 'posterFrame', 'rendered', 'rightslevel',
             'size', 'title', 'videoRatio', 'year'
         ] : pandora.user.ui.itemView == 'documents' ? [
             'director', 'documents', 'duration', 'editable',

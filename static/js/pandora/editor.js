@@ -27,13 +27,13 @@ pandora.ui.editor = function(data) {
             enableSubtitles: ui.videoSubtitles,
             find: ui.itemFind,
             getFrameURL: function(position) {
-                return '/' + ui.item + '/' + ui.videoResolution + 'p' + position + '.jpg';
+                return '/' + ui.item + '/' + ui.videoResolution + 'p' + position + '.jpg?' + data.modified;
             },
             getLargeTimelineURL: function(type, i) {
-                return '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg';
+                return '/' + ui.item + '/timeline' + type + '64p' + i + '.jpg?' + data.modified;
             },
             getSmallTimelineURL: function(type, i) {
-                return '/' + ui.item + '/timeline' + type + '16p' + i + '.jpg';
+                return '/' + ui.item + '/timeline' + type + '16p' + i + '.jpg?' + data.modified;
             },
             height: pandora.$ui.contentPanel.size(1),
             id: 'editor',
