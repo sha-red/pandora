@@ -80,7 +80,7 @@ def render_poster(data, poster):
         draw.rectangle(((0, 0), frame_size), fill=image_color)
 
     # logo
-    logo_image = Image.open(os.path.join(static_root, 'logo.png'))
+    logo_image = Image.open(os.path.join(static_root, 'logo.0xdb.png'))
     logo_image = logo_image.resize(logo_size, Image.ANTIALIAS)
     for y in range(logo_size[1]):
         for x in range(logo_size[0]):
