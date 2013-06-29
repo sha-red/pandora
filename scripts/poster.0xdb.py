@@ -51,7 +51,7 @@ def render_poster(data, poster):
     small_frames = 8
     small_frame_size = (80, 64)
     small_frame_ratio = small_frame_size[0] / small_frame_size[1]
-    timeline_size = (640, 64)
+    timeline_size = (640, 32)
     margin = 16
     font_size_small = 32
     font_size_large = 48
@@ -123,7 +123,7 @@ def render_poster(data, poster):
             0,
             font_file,
             font_size_large
-        )), int(text_height - margin - font_size_small) / font_size_large)
+        )), int((text_height - margin - font_size_small - 8) / font_size_large))
         director_max_lines = int((text_height - title_max_lines * font_size_large) / font_size_small)
 
     # title
