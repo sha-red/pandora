@@ -25,7 +25,7 @@ class SessionData(models.Model):
     firstseen = models.DateTimeField(auto_now_add=True, db_index=True)
     lastseen = models.DateTimeField(default=datetime.now, db_index=True)
     username = models.CharField(max_length=255, null=True, db_index=True)
-    level = models.IntegerField(default=0)
+    level = models.IntegerField(default=0, db_index=True)
 
     timesseen = models.IntegerField(default=0)
     ip = models.CharField(max_length=255, null=True)
