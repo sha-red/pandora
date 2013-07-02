@@ -997,6 +997,10 @@ class Item(models.Model):
             files = self.files.filter(instances__volume__user=user, instances__ignore=False)
             if files.count():
                 sets.append(files)
+        if not sets:
+            files = self.files.filter(instances=None, available=True)
+            if files.count():
+                sets.append(files)
         return sets
 
     def update_wanted(self):
