@@ -351,7 +351,7 @@ pandora.ui.listInfo = function() {
 
 pandora.ui.posterInfo = function(data) {
     var $poster = $('<img>')
-            .attr({src: '/' + data.id + '/poster512.jpg' + data.modified})
+            .attr({src: '/' + data.id + '/poster512.jpg?' + data.modified})
             .css(getPosterCSS()),
         $text = $('<div>')
             .css({
