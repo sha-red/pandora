@@ -265,8 +265,8 @@ pandora.ui.metadataDialog = function(data) {
     }
 
     function getTitle(key) {
-        return key == Ox._(
-            'alternativeTitles' ? 'Alternative Titles'
+        return Ox._(
+            key == 'alternativeTitles' ? 'Alternative Titles'
             : Ox.getObjectById(pandora.site.itemKeys, key).title
         );
     }
