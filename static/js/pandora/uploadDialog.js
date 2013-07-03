@@ -177,12 +177,12 @@ pandora.ui.uploadDialog = function(data) {
             done: function(data) {
                 if (data.progress == 1) {
                     Ox.Request.clearCache();
-                    if (pandora.user.ui.item == item && pandora.user.ui.itemView == 'files') {
+                    if (pandora.user.ui.item == item && pandora.user.ui.itemView == 'media') {
                         pandora.$ui.item.reload();
                     } else {
                         pandora.UI.set({
                             item: item,
-                            itemView: 'files'
+                            itemView: 'media'
                         });
                     }
                     delete pandora.firefogg;
@@ -222,12 +222,12 @@ pandora.ui.uploadDialog = function(data) {
                     done: function(data) {
                         if (data.progress == 1) {
                             Ox.Request.clearCache();
-                            if (pandora.user.ui.item == item && pandora.user.ui.itemView == 'files') {
+                            if (pandora.user.ui.item == item && pandora.user.ui.itemView == 'media') {
                                 pandora.$ui.item.reload();
                             } else {
                                 pandora.UI.set({
                                     item: item,
-                                    itemView: 'files'
+                                    itemView: 'media'
                                 });
                             }
                             that.close();
@@ -408,7 +408,7 @@ pandora.ui.uploadDialog = function(data) {
                     }, function(result) {
                         pandora.UI.set({
                             item: result.data.items[0].id,
-                            itemView: 'files'
+                            itemView: 'media'
                         });
                         delete pandora.firefogg;
                         that.close();
