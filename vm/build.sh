@@ -1,15 +1,30 @@
 #!/bin/sh
+size=1048576 #in MB
+arch=amd64   #i368 or amd64
+password=pandora
+
+hypervisor=vbox #vbox or kvm
+
+extra=""
+
+#make available as pandora.local
+extra="--addpkg avahi-daemon"
+
+#to create and include in libvirt:
+#hypervisor=kvm
+#extra="--libvirt qemu:///system"
+
 base=$(pwd)
 sudo  vmbuilder vbox ubuntu --suite=precise \
     --verbose --debug \
-    --arch i386 \
+    --arch $arch \
     --flavour generic \
     --dest $base/pandora \
     --hostname pandora \
     --swapsize 512 \
-    --rootsize 1048576 \
+    --rootsize $size \
     --user pandora \
-    --pass pandora \
+    --pass $password \
     --components main,universe,multiverse \
     --ppa j/pandora \
     --addpkg openssh-server \
@@ -23,7 +38,6 @@ sudo  vmbuilder vbox ubuntu --suite=precise \
     --addpkg git \
     --addpkg subversion \
     --addpkg mercurial \
-    --addpkg avahi-daemon \
     --addpkg update-manager-core \
     --addpkg python-software-properties \
     --addpkg python-setuptools \
@@ -47,6 +61,5 @@ sudo  vmbuilder vbox ubuntu --suite=precise \
     --addpkg libav-tools \
     --addpkg ffmpeg2theora \
     --addpkg imagemagick \
-    --execscript=$base/install.sh \
-    --firstboot=$base/firstboot.sh
-
+    --firstboot=$base/firstboot.sh \
+    $extra

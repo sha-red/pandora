@@ -2,7 +2,7 @@
 #fails in bootstrap
 apt-get -y install ipython ntp
 
-add-apt-repository ppa:j/pandora
+add-apt-repository -y ppa:j/pandora
 
 #postgresql
 apt-get -y install postgresql postgresql-contrib
@@ -17,6 +17,11 @@ rabbitmqctl add_vhost /pandora
 rabbitmqctl set_permissions -p /pandora pandora ".*" ".*" ".*"
 
 #pandora
+bzr branch http://code.0x2620.org/pandora /srv/pandora
+bzr branch http://code.0x2620.org/oxjs /srv/pandora/static/oxjs
+virtualenv --system-site-packages /srv/pandora
+/srv/pandora/bin/pip install -r /srv/pandora/requirements.txt
+
 HOST=$(hostname -s)
 HOST_CONFIG="/srv/pandora/pandora/config.$HOST.jsonc"
 SITE_CONFIG="/srv/pandora/pandora/config.jsonc"
@@ -56,13 +61,10 @@ $MANAGE collectstatic -l --noinput
 
 cp /srv/pandora/etc/init/* /etc/init/
 
-service pandora-cron start
-service pandora-encoding start
-service pandora-tasks start
-service pandora start
+/srv/pandora/ctl start
 
 #logrotate
-cp "/srv/pandora/etc/logrotate.d/pandora" "/etc/logroated.d/pandora"
+cp "/srv/pandora/etc/logrotate.d/pandora" "/etc/logrotate.d/pandora"
 
 #nginx
 cp "/srv/pandora/etc/nginx/pandora" "/etc/nginx/sites-available/default"
@@ -88,6 +90,7 @@ done
 echo
 EOF
 chmod +x /usr/local/bin/genissue
+/usr/local/bin/genissue > /etc/issue
 
 cat > /etc/rc.local << EOF
 #!/bin/sh -e
@@ -101,3 +104,41 @@ rm -f /etc/udev/rules.d/70-persistent-net.rules
 /usr/local/bin/genissue > /etc/issue
 EOF
 chmod +x /etc/rc.local
+
+cat > /home/pandora/.vimrc <<EOF
+set nocompatible
+set encoding=utf-8
+set showcmd
+set autochdir
+
+set tabstop=4 shiftwidth=4
+set expandtab
+
+set si
+set sw=4
+set sts=4
+set backspace=indent,eol,start
+
+set hlsearch
+set incsearch
+set ignorecase
+set smartcase
+
+set modeline
+
+nmap <C-V> "+gP
+imap <C-V> <ESC><C-V>i
+vmap <C-C> "+y
+
+filetype plugin indent on
+syntax on
+
+nmap <C-H> :tabprev<CR>
+nmap <C-L> :tabnext<CR>
+
+hi SpellBad ctermbg=0
+
+nnoremap <F2> :set invpaste paste?<CR>
+set pastetoggle=<F2>
+set showmode
+EOF
