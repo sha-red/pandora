@@ -88,7 +88,7 @@ class Migration(SchemaMigration):
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'duration': ('django.db.models.fields.FloatField', [], {'default': '0', 'db_index': 'True'}),
             'end': ('django.db.models.fields.FloatField', [], {'default': '-1'}),
-            'findvalue': ('django.db.models.fields.TextField', [], {'null': 'True', 'db_index': 'True'}),
+            'findvalue': ('django.db.models.fields.TextField', [], {'null': 'True', 'db_index': 'False'}),
             'hue': ('django.db.models.fields.FloatField', [], {'default': '0', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'item': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'clips'", 'to': "orm['item.Item']"}),
