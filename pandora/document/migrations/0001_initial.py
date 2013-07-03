@@ -30,7 +30,7 @@ class Migration(SchemaMigration):
             ('name_sort', self.gf('django.db.models.fields.CharField')(max_length=255)),
             ('description_sort', self.gf('django.db.models.fields.CharField')(max_length=512)),
         ))
-        db.send_create_signal('file', ['File'])
+        db.send_create_signal('document', ['File'])
 
         # Adding unique constraint on 'File', fields ['user', 'name', 'extension']
         db.create_unique('file_file', ['user_id', 'name', 'extension'])
