@@ -678,6 +678,6 @@
         "previewRatio": 1.3333333333,
         //supported resolutions are
         //1080, 720, 480, 432, 360, 288, 240, 144, 96
-        "resolutions": [96, 240, 480]
+        "resolutions": [240, 480]
     }
 }
