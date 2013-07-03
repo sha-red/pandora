@@ -201,6 +201,7 @@ def addMedia(request):
             }
             i.user = request.user
             i.save()
+            i.make_poster(True)
         f = models.File(oshash=oshash, item=i)
         f.path = data.get('filename', 'Untitled')
         extension = f.path.split('.')
