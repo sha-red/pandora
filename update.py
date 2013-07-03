@@ -97,7 +97,7 @@ if __name__ == "__main__":
         os.chdir(base)
         current = ''
         new = ''
-        for repo in repos:
+        for repo in sorted(repos, key=lambda r: repos[r]['path']):
             path = os.path.join(base, repos[repo]['path'])
             if exists(path):
                 os.chdir(path)
