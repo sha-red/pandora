@@ -52,6 +52,7 @@ $MANAGE syncdb --noinput
 $MANAGE migrate
 echo "DB_GIN_TRGM = True" >> /srv/pandora/pandora/local_settings.py
 $MANAGE sqlfindindex
+$MANAGE sync_itemsort
 echo "UPDATE django_site SET domain = '$HOST.local', name = '$HOST.local' WHERE 1=1;" | $MANAGE dbshell
 
 mkdir /srv/pandora/data
