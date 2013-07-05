@@ -7,8 +7,8 @@ import os
 root_dir = os.path.normpath(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # using virtualenv's activate_this.py to reorder sys.path
-activate_this = os.path.join(root_dir, 'bin', 'activate_this.py')
-execfile(activate_this, dict(__file__=activate_this))
+#activate_this = os.path.join(root_dir, 'bin', 'activate_this.py')
+#execfile(activate_this, dict(__file__=activate_this))
 
 import Image
 import ImageDraw
@@ -35,8 +35,9 @@ def get_frame(id, height, position):
 
 def render_poster(data, poster):
 
-    title = ox.decode_html(data.get('title', '')).upper()
-    director = ox.decode_html(u', '.join(data.get('director', []))).upper()
+    sz = 'ß'.decode('UTF-8')
+    title = ox.decode_html(data.get('title', '')).upper().replace(sz, 'SS')
+    director = ox.decode_html(u', '.join(data.get('director', []))).upper().replace(sz, 'SS')
     year = str(data.get('year', ''))
     duration = data.get('duration')
     oxdb_id = data['oxdbId']
