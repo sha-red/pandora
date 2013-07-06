@@ -1133,8 +1133,7 @@ class Item(models.Model):
         self.select_frame()
         self.make_poster(True)
         self.make_icon()
-        if settings.CONFIG['video']['download']:
-            self.make_torrent()
+        self.make_torrent()
         self.rendered = streams.count() > 0
         self.save()
         if async:

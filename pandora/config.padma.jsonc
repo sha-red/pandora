@@ -753,7 +753,6 @@
     },
     "userLevels": ["guest", "member", "staff", "admin"],
     "video": {
-        "download": true,
         "formats": ["webm", "mp4"],
         "previewRatio": 1.3333333333,
         //supported resolutions are

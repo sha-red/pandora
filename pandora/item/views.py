@@ -29,6 +29,7 @@ import tasks
 from archive.models import File, Stream
 from archive import extract
 from clip.models import Clip 
+from user.models import has_capability
 
 from ox.django.api import actions
 
@@ -475,18 +476,9 @@ def get(request):
         if not data['keys'] or 'groups' in data['keys'] \
            and request.user.get_profile().capability('canEditMetadata'):
             info['groups'] = [g.name for g in item.groups.all()]
-        def check_capability(capability):
-            if request.user.is_anonymous():
-                level = 'guest'
-            else:
-                level = request.user.get_profile().get_level()
-            if request.user == item.user:
-                return True
-            return level in settings.CONFIG['capabilities'][capability] \
-                    and settings.CONFIG['capabilities'][capability][level]
         for k in settings.CONFIG['itemKeys']:
             if 'capability' in k \
-                and not check_capability(k['capability']) \
+                and not (request.user == item.user or can_capability(user, k['capability'])) \
                 and k['id'] in info \
                 and k['id'] not in ('parts', 'durations', 'duration'):
                     del info[k['id']]
@@ -1018,26 +1010,28 @@ def atom_xml(request):
 
         format = ET.SubElement(entry, "format")
         format.attrib['xmlns'] = 'http://transmission.cc/FileFormat'
-        stream = item.streams().filter(source=None).order_by('-id')[0]
-        for key in ('size', 'duration', 'video_codec',
-                    'framerate', 'width', 'height',
-                    'audio_codec', 'samplerate', 'channels'):
-            value = stream.info.get(key)
-            if not value and stream.info.get('video'):
-                value = stream.info['video'][0].get({
-                    'video_codec': 'codec'
-                }.get(key, key))
-            if not value and stream.info.get('audio'):
-                value = stream.info['audio'][0].get({
-                    'audio_codec': 'codec'
-                }.get(key, key))
-            if value and value !=  -1:
-                el = ET.SubElement(format, key)
-                el.text = unicode(value)
+        streams = item.streams().filter(source=None).order_by('-id')
+        if streams.exists():
+            stream = streams[0]
+            for key in ('size', 'duration', 'video_codec',
+                        'framerate', 'width', 'height',
+                        'audio_codec', 'samplerate', 'channels'):
+                value = stream.info.get(key)
+                if not value and stream.info.get('video'):
+                    value = stream.info['video'][0].get({
+                        'video_codec': 'codec'
+                    }.get(key, key))
+                if not value and stream.info.get('audio'):
+                    value = stream.info['audio'][0].get({
+                        'audio_codec': 'codec'
+                    }.get(key, key))
+                if value and value !=  -1:
+                    el = ET.SubElement(format, key)
+                    el.text = unicode(value)
         el = ET.SubElement(format, 'pixel_aspect_ratio')
         el.text = u"1:1"
 
-        if settings.CONFIG['video'].get('download'):
+        if has_capability(request.user, 'canDownloadVideo'):
             if item.torrent:
                 el = ET.SubElement(entry, "link")
                 el.attrib['rel'] = 'enclosure'

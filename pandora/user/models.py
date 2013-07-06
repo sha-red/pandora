@@ -339,3 +339,11 @@ def user_json(user, keys=None):
             if key not in keys:
                 del j[key]
     return j
+
+def has_capability(user, capability):
+    if user.is_anonymous():
+        level = 'guest'
+    else:
+        level = user.get_profile().get_level()
+    return level in settings.CONFIG['capabilities'][capability] \
+            and settings.CONFIG['capabilities'][capability][level]
