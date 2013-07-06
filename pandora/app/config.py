@@ -80,7 +80,8 @@ def load_config():
                 d = d[part]
             for key in d:
                 if key not in c:
-                    print "adding default value for %s.%s" % (section, key), '=', d[key]
+                    sys.stderr.write("adding default value for %s.%s = %s\n" % (
+                        section, key, str(d[key])))
                     c[key] = d[key]
 
         old_formats = getattr(settings, 'CONFIG', {}).get('video', {}).get('formats', [])
