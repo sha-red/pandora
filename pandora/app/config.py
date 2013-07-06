@@ -64,7 +64,10 @@ def load_config():
 
 
         #add missing defaults
-        for section in ('capabilities', 'user.ui', 'user.ui.showFolder'):
+        for section in (
+            'capabilities', 'cantPlay', 'itemName', 'media',
+            'site', 'tv', 'user.ui', 'user.ui.showFolder'
+        ):
             parts = map(lambda p: p.replace('\0', '\\.'), section.replace('\\.', '\0').split('.'))
             #print 'checking', section
             c = config
