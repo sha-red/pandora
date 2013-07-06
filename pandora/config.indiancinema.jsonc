@@ -767,7 +767,9 @@
         "level": "guest",
         "newsletter": true,
         "ui": {
+            "annotationsCalendarSize": 128,
             "annotationsFont": "small",
+            "annotationsMapSize": 128,
             "annotationsRange": "all",
             "annotationsSize": 256,
             "annotationsSort": "position",
@@ -815,6 +817,8 @@
             "sequenceSort": [{"key": "director", "operator": "+"}],
             "showAdvancedEmbedOptions": false,
             "showAnnotations": true,
+            "showAnnotationsCalendar": true,
+            "showAnnotationsMap": true,
             "showBrowser": true,
             "showCalendarControls": true, // fixme: should be false
             "showFilters": true,

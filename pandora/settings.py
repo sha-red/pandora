@@ -181,6 +181,7 @@ XSENDFILE = False
 XACCELREDIRECT = False
 
 SITE_CONFIG = join(PROJECT_ROOT, 'config.jsonc')
+DEFAULT_CONFIG = join(PROJECT_ROOT, 'config.pandora.jsonc')
 
 #used if CONFIG['video']['download'] is set
 TRACKER_URL="udp://tracker.openbittorrent.com:80"

@@ -39,6 +39,12 @@ def load_config():
         except:
             config = None
 
+    with open(settings.DEFAULT_CONFIG) as f:
+        try:
+            default = ox.jsonc.load(f)
+        except:
+            default = None
+
     if config:
         settings.SITENAME = config['site']['name']
         if getattr(settings, 'SITEURL', False):
@@ -55,6 +61,24 @@ def load_config():
         config['keys'] = {}
         for key in config['itemKeys']:
             config['keys'][key['id']] = key
+
+
+        #add missing defaults
+        for section in ('capabilities', 'user.ui', 'user.ui.showFolder'):
+            parts = map(lambda p: p.replace('\0', '\\.'), section.replace('\\.', '\0').split('.'))
+            #print 'checking', section
+            c = config
+            d = default
+            while len(parts):
+                part = parts.pop(0)
+                if part not in c:
+                    c[part] = {}
+                c = c[part]
+                d = d[part]
+            for key in d:
+                if key not in c:
+                    print "adding default value for %s.%s" % (section, key), '=', d[key]
+                    c[key] = d[key]
 
         old_formats = getattr(settings, 'CONFIG', {}).get('video', {}).get('formats', [])
         formats = config.get('video', {}).get('formats')
@@ -110,20 +134,18 @@ def reloader_thread():
     except:
         INOTIFY = False
     if INOTIFY:
-        class ConfigChanges:
-            def __init__(self):
-                name = os.path.realpath(settings.SITE_CONFIG)
-                self.name = name
-                self.wm = pyinotify.WatchManager()
-                self.reload_config()
-                notifier = pyinotify.Notifier(self.wm)
-                notifier.loop()
-    
-            def reload_config(self):
-                load_config()
-                self.wm.add_watch(self.name, pyinotify.IN_CLOSE_WRITE,
-                        lambda event: self.reload_config())
-        ConfigChanges()
+        def add_watch():
+            name = os.path.realpath(settings.SITE_CONFIG)
+            wm.add_watch(name, pyinotify.IN_CLOSE_WRITE, reload_config)
+
+        def reload_config(event):
+            load_config()
+            add_watch()
+
+        wm = pyinotify.WatchManager()
+        add_watch()
+        notifier = pyinotify.Notifier(wm)
+        notifier.loop()
     else:
         while RUN_RELOADER:
             try:
