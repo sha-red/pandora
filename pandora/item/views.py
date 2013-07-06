@@ -478,7 +478,7 @@ def get(request):
             info['groups'] = [g.name for g in item.groups.all()]
         for k in settings.CONFIG['itemKeys']:
             if 'capability' in k \
-                and not (request.user == item.user or can_capability(user, k['capability'])) \
+                and not (request.user == item.user or has_capability(request.user, k['capability'])) \
                 and k['id'] in info \
                 and k['id'] not in ('parts', 'durations', 'duration'):
                     del info[k['id']]
