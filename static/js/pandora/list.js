@@ -445,7 +445,7 @@ pandora.ui.list = function() {
             },
             openpreview: function(data) {
                 if (data.ids.length) {
-                    
+                    // ...
                 }
                 pandora.requests.preview && pandora.api.cancel(pandora.requests.preview);
                 pandora.requests.preview = pandora.api.find({
@@ -467,19 +467,23 @@ pandora.ui.list = function() {
                         ) + (
                             item.year ? ' ' + item.year : ''
                         ),
-                        ratio = item.posterRatio,
+                        ratio = ui.showSitePosters ? 5/8 : item.posterRatio,
                         windowWidth = window.innerWidth * 0.8,
                         windowHeight = window.innerHeight * 0.8,
                         windowRatio = windowWidth / windowHeight,
                         width = Math.round(ratio > windowRatio ? windowWidth : windowHeight * ratio),
                         height = Math.round(ratio < windowRatio ? windowHeight : windowWidth / ratio);
                     pandora.$ui.previewImage = $('<img>')
-                        .attr({src: '/' + item.id + '/poster128.jpg'})
+                        .attr({src: '/' + item.id + '/' + (
+                            ui.showSitePosters ? 'siteposter' : 'poster'
+                        ) + '128.jpg'})
                         .css({width: width + 'px', height: height + 'px'})
                     $('<img>').load(function() {
                             pandora.$ui.previewImage.attr({src: $(this).attr('src')});
                         })
-                        .attr({src: '/' + item.id + '/poster1024.jpg'});
+                        .attr({src: '/' + item.id + '/' + (
+                            ui.showSitePosters ? 'siteposter' : 'poster'
+                        ) + '1024.jpg'});
                     if (!preview) {
                         if (!pandora.$ui.previewDialog) {
                             pandora.$ui.previewDialog = Ox.Dialog({
