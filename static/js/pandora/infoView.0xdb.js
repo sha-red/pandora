@@ -875,11 +875,13 @@ pandora.ui.infoView = function(data) {
                                     });
                                 }
                             }
-                            $browserImages.each(function() {
-                                $(this).attr({src: '/' + data.id + '/' + (
-                                    ui.icons == 'posters' ? 'poster' : 'icon'
-                                ) + '128.jpg?' + Ox.uid()});
-                            });
+                            if (!ui.showSitePosters) {
+                                $browserImages.each(function() {
+                                    $(this).attr({src: '/' + data.id + '/' + (
+                                        ui.icons == 'posters' ? 'poster' : 'icon'
+                                    ) + '128.jpg?' + Ox.uid()});
+                                });
+                            }
                             if (ui.listSort[0].key == 'modified') {
                                 pandora.$ui.browser.reloadList();
                             }
