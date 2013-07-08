@@ -90,9 +90,6 @@ pandora.URL = (function() {
 
         if (Ox.isEmpty(state)) {
 
-            if (pandora.user.ui.showHome && pandora.user.ui.page != 'home') {
-                pandora.$ui.home = pandora.ui.home().showScreen();
-            }
             callback && callback();
 
         } else {
@@ -225,8 +222,6 @@ pandora.URL = (function() {
             }
 
         }
-
-        pandora.user.ui.showHome = false;
 
     }
 

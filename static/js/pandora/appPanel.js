@@ -47,8 +47,11 @@ pandora.ui.appPanel = function() {
             api: ['api']
         };
         if (page === '') {
-            if (pandora.$ui.home && pandora.$ui.appPanel) {
-                // unless we're on page load, remove home screen
+            if (!pandora.$ui.appPanel) {
+                // if we're on page load, show home screen
+                pandora.$ui.home = pandora.ui.home().showScreen();
+            } else {
+                // otherwise, remove home screen
                 pandora.$ui.home.fadeOutScreen();
             }
             Ox.forEach(dialogPages, function(pages, dialog) {
