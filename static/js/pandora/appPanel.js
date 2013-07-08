@@ -24,12 +24,12 @@ pandora.ui.appPanel = function() {
         that.appendTo(pandora.$ui.body);
         animate && pandora.$ui.body.animate({opacity: 1}, 1000);
         return that;
-    }
+    };
     that.reload = function() {
         pandora.$ui.appPanel.remove();
         pandora.$ui.appPanel = pandora.ui.appPanel().appendTo(pandora.$ui.body);
         return that;
-    }
+    };
     that.bindEvent({
         pandora_page: function(data) {
             setPage(data.value);
