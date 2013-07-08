@@ -176,6 +176,12 @@ pandora.ui.editor = function(data) {
             muted: function(data) {
                 pandora.UI.set('videoMuted', data.muted);
             },
+            playing: function(data) {
+                pandora.UI.set(
+                    'videoPoints.' + ui.item + '.position',
+                    data.position
+                );
+            },
             points: function(data) {
                 pandora.UI.set('videoPoints.' + ui.item, {
                     annotation: ui.videoPoints[ui.item].annotation,

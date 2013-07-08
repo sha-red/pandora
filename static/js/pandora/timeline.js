@@ -75,6 +75,12 @@ pandora.ui.timeline = function(data) {
             muted: function(data) {
                 pandora.UI.set('videoMuted', data.muted);
             },
+            playing: function(data) {
+                pandora.UI.set(
+                    'videoPoints.' + pandora.user.ui.item + '.position',
+                    data.position
+                );
+            },
             position: function(data) {
                 pandora.UI.set(
                     'videoPoints.' + pandora.user.ui.item + '.position',
