@@ -66,14 +66,14 @@ pandora.ui.browser = function() {
         var that = Ox.IconList({
             borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 8,
             centered: true,
-            defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
+            defaultRatio: pandora.user.ui.icons == 'posters' ? pandora.site.posters.ratio : 1,
             draggable: true,
             id: 'list',
             item: function(data, sort, size) {
                 size = size || 64;
                 var ui = pandora.user.ui,
                     ratio = ui.icons == 'posters'
-                        ? (ui.showSitePosters ? 5/8 : data.posterRatio) : 1,
+                        ? (ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio) : 1,
                     url = '/' + data.id + '/' + (
                         ui.icons == 'posters'
                         ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
@@ -158,7 +158,7 @@ pandora.ui.browser = function() {
             pandora_icons: function(data) {
                 that.options({
                     borderRadius: data.value == 'posters' ? 0 : 8,
-                    defaultRatio: data.value == 'posters' ? 5/8 : 1
+                    defaultRatio: data.value == 'posters' ? pandora.site.posters.ratio : 1
                 }).reloadList();
             },
             pandora_item: function(data) {

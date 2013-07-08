@@ -703,6 +703,9 @@
         {"title": "Black & White Films", "query": {"conditions": [{"key": "color", "value": "Black and White", "operator": "=="}], "operator": "&"}},
         {"title": "Silent Films", "query": {"conditions": [{"key": "language", "value": "None", "operator": "=="}, {"key": "sound", "value": "Silent", "operator": "=="}], "operator": "|"}}
     ],
+    "posters": {
+        "ratio": 0.6875
+    },
     "rightsLevel": {"member": 3, "student": 3, "staff": 3, "admin": 3},
     "rightsLevels": [
         {"name": "Public", "color": [128, 255, 128]},

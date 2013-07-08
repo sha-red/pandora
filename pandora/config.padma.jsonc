@@ -585,6 +585,9 @@
     "personalLists": [
         {"title": "Favorites"}
     ],
+    "posters": {
+        "ratio": 0.625
+    },
     "rightsLevel": {"member": 2, "staff": 2, "admin": 2},
     "rightsLevels": [
         {"name": "Public", "color": [128, 255, 128]},

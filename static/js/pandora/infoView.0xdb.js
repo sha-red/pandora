@@ -16,7 +16,7 @@ pandora.ui.infoView = function(data) {
             WebkitUserSelect: 'text'
         },
         iconRatio = ui.icons == 'posters' ? (
-            ui.showSitePosters ? 5/8 : data.posterRatio
+            ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio
         ) : 1,
         iconSize = ui.infoIconSize,
         iconWidth = iconRatio > 1 ? iconSize : Math.round(iconSize * iconRatio),
@@ -852,7 +852,7 @@ pandora.ui.infoView = function(data) {
                     return image.selected;
                 })[0];
             $list = Ox.IconList({
-                    defaultRatio: ui.icons == 'posters' || !data.stream ? 5/8 : data.stream.aspectratio,
+                    defaultRatio: ui.icons == 'posters' || !data.stream ? pandora.site.posters.ratio : data.stream.aspectratio,
                     fixedRatio: ui.icons == 'posters' || !data.stream ? false : data.stream.aspectratio,
                     item: function(data, sort, size) {
                         var ratio = data.width / data.height;
@@ -1059,7 +1059,7 @@ pandora.ui.infoView = function(data) {
         $reflectionIcon.attr({src: src});
         iconSize = iconSize == 256 ? 512 : 256;
         iconRatio = ui.icons == 'posters'
-            ? (ui.showSitePosters ? 5/8 : data.posterRatio) : 1;
+            ? (ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio) : 1;
         toggleIconSize();
         pandora.user.level == 'admin' && $list.replaceWith($list = renderList());
     };

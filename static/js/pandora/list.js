@@ -121,13 +121,13 @@ pandora.ui.list = function() {
     } else if (view == 'grid') {
         that = Ox.IconList({
             borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 16,
-            defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
+            defaultRatio: pandora.user.ui.icons == 'posters' ? pandora.site.posters.ratio : 1,
             draggable: true,
             id: 'list',
             item: function(data, sort, size) {
                 var ui = pandora.user.ui,
                     ratio = ui.icons == 'posters'
-                        ? (ui.showSitePosters ? 5/8 : data.posterRatio) : 1,
+                        ? (ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio) : 1,
                     url = '/' + data.id + '/' + (
                         ui.icons == 'posters'
                         ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
@@ -178,14 +178,14 @@ pandora.ui.list = function() {
     } else if (view == 'clips') {
         that = Ox.InfoList({
             borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 16,
-            defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
+            defaultRatio: pandora.user.ui.icons == 'posters' ? pandora.site.posters.ratio : 1,
             draggable: true,
             id: 'list',
             item: function(data, sort, size) {
                 size = 128;
                 var ui = pandora.user.ui,
                     ratio = ui.icons == 'posters'
-                        ? (ui.showSitePosters ? 5/8 : data.posterRatio) : 1,
+                        ? (ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio) : 1,
                     url = '/' + data.id + '/' + (
                         ui.icons == 'posters'
                         ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
@@ -261,7 +261,7 @@ pandora.ui.list = function() {
     } else if (view == 'timelines') {
         that = Ox.InfoList({
             borderRadius: pandora.user.ui.icons == 'posters' ? 0 : 16,
-            defaultRatio: pandora.user.ui.icons == 'posters' ? 5/8 : 1,
+            defaultRatio: pandora.user.ui.icons == 'posters' ? pandora.site.posters.ratio : 1,
             draggable: true,
             id: 'list',
             item: function(data, sort, size) {
@@ -270,7 +270,7 @@ pandora.ui.list = function() {
                     isClipsQuery = !!clipsQuery.conditions.length,
                     ui = pandora.user.ui,
                     ratio = ui.icons == 'posters'
-                        ? (ui.showSitePosters ? 5/8 : data.posterRatio) : 1,
+                        ? (ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio) : 1,
                     url = '/' + data.id + '/' + (
                         ui.icons == 'posters'
                         ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
@@ -467,7 +467,7 @@ pandora.ui.list = function() {
                         ) + (
                             item.year ? ' ' + item.year : ''
                         ),
-                        ratio = ui.showSitePosters ? 5/8 : item.posterRatio,
+                        ratio = ui.showSitePosters ? pandora.site.posters.ratio : item.posterRatio,
                         windowWidth = window.innerWidth * 0.8,
                         windowHeight = window.innerHeight * 0.8,
                         windowRatio = windowWidth / windowHeight,
@@ -606,7 +606,7 @@ pandora.ui.list = function() {
                     } else {
                         that.options({
                             borderRadius: data.value == 'posters' ? 0 : 16,
-                            defaultRatio: data.value == 'posters' ? 5/8 : 1
+                            defaultRatio: data.value == 'posters' ? pandora.site.posters.ratio : 1
                         });
                     }
                     that.reloadList(true);
