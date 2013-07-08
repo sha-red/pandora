@@ -31,7 +31,7 @@ pandora.ui.infoView = function(data) {
         $bar = Ox.Bar({size: 16})
             .bindEvent({
                 doubleclick: function(e) {
-                    if ($(e.target).hasClass('OxBar')) {
+                    if ($(e.target).is('.OxBar')) {
                         $data.animate({scrollTop: 0}, 250);
                     }
                 }
