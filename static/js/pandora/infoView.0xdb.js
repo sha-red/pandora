@@ -574,7 +574,15 @@ pandora.ui.infoView = function(data) {
             )
             .append(
                 Ox.Theme.formatColorPercent(value, 1, true)
-                    .css({textAlign: 'right'})
+                    .css({textAlign: 'right', cursor: 'pointer'})
+                    .bind({
+                        click: function() {
+                            pandora.UI.set('listSort', [{
+                                key: key,
+                                operator: pandora.getSortOperator(key)
+                            }]);
+                        }
+                    })
             )
             .appendTo($statistics);
     });
@@ -589,11 +597,19 @@ pandora.ui.infoView = function(data) {
             .append(formatKey(itemKey.title, true))
             .append(
                 Ox.Theme.formatColor(null, 'gradient')
-                    .css({textAlign: 'right'})
+                    .css({textAlign: 'right', cursor: 'pointer'})
                     .html(
                         Ox['format' + Ox.toTitleCase(itemKey.format.type)]
                             .apply(null, [value].concat(itemKey.format.args))
                     )
+                    .bind({
+                        click: function() {
+                            pandora.UI.set('listSort', [{
+                                key: key,
+                                operator: pandora.getSortOperator(key)
+                            }]);
+                        }
+                    })
             )
             .appendTo($statistics);
     });
@@ -607,7 +623,15 @@ pandora.ui.infoView = function(data) {
             .append(formatKey(key, true))
             .append(
                 Ox.Theme.formatColor(value, key == 'volume' ? 'lightness' : key)
-                    .css({textAlign: 'right'})
+                    .css({textAlign: 'right', cursor: 'pointer'})
+                    .bind({
+                        click: function() {
+                            pandora.UI.set('listSort', [{
+                                key: key,
+                                operator: pandora.getSortOperator(key)
+                            }]);
+                        }
+                    })
             )
             .appendTo($statistics);
     });
@@ -623,8 +647,16 @@ pandora.ui.infoView = function(data) {
             )
             .append(
                 Ox.Theme.formatColor(null, 'gradient')
-                    .css({textAlign: 'right'})
+                    .css({textAlign: 'right', cursor: 'pointer'})
                     .html(Ox.formatNumber(value, 3))
+                    .bind({
+                        click: function() {
+                            pandora.UI.set('listSort', [{
+                                key: key,
+                                operator: pandora.getSortOperator(key)
+                            }]);
+                        }
+                    })
             )
             .appendTo($statistics);
     });
@@ -999,7 +1031,16 @@ pandora.ui.infoView = function(data) {
         } else {
             $rightsLevelElement
                 .css({
-                    marginBottom: '4px'
+                    marginBottom: '4px',
+                    cursor: 'pointer'
+                })
+                .bind({
+                    click: function() {
+                        pandora.UI.set('listSort', [{
+                            key: 'rightslevel',
+                            operator: pandora.getSortOperator('rightslevel')
+                        }]);
+                    }
                 })
                 .appendTo($rightsLevel);
         }
