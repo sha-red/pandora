@@ -7,6 +7,7 @@ pandora.ui.infoView = function(data) {
 
     var ui = pandora.user.ui,
         canEdit = pandora.site.capabilities.canEditMetadata[pandora.user.level],
+        canRemove = pandora.site.capabilities.canRemoveItems[pandora.user.level],
         canSeeAllMetadata = pandora.user.level != 'guest',
         css = {
             marginTop: '4px',
@@ -27,7 +28,90 @@ pandora.ui.infoView = function(data) {
         margin = 16,
         statisticsWidth = 128,
 
-        that = Ox.Element(),
+        $bar = Ox.Bar({size: 16})
+            .bindEvent({
+                doubleclick: function(e) {
+                    if ($(e.target).hasClass('OxBar')) {
+                        $data.animate({scrollTop: 0}, 250);
+                    }
+                }
+            }),
+
+        $options = Ox.MenuButton({
+                items: [
+                    {
+                        id: 'embed',
+                        title: Ox._('Embed...'),
+                    },
+                    {
+                        id: 'update',
+                        title: Ox._('Update Metadata'),
+                        disabled: !canEdit || isEditable
+                    },
+                    {},
+                    {
+                        id: 'delete',
+                        title: Ox._('Delete {0}...', [pandora.site.itemName.singular]),
+                        disabled: !canRemove
+                    }
+                ],
+                style: 'square',
+                title: 'set',
+                tooltip: Ox._('Options'),
+                type: 'image',
+            })
+            .css({
+                float: 'left',
+                borderColor: 'rgba(0, 0, 0, 0)',
+                background: 'rgba(0, 0, 0, 0)'
+            })
+            .bindEvent({
+                click: function(data) {
+                    if (data.id == 'embed') {
+                        // ...
+                    } else if (data.id == 'update') {
+                        updateMetadata();
+                    } else if (data.id == 'delete') {
+                        pandora.$ui.deleteItemDialog = pandora.ui.deleteItemDialog(data).open();
+                    }
+                }
+            })
+            .appendTo($bar),
+
+        $edit = Ox.MenuButton({
+                items: [
+                    {
+                        id: 'insert',
+                        title: Ox._('Insert HTML...'),
+                        disabled: true
+                    }
+                ],
+                style: 'square',
+                title: 'edit',
+                tooltip: Ox._('Edit'),
+                type: 'image',
+            })
+            .css({
+                float: 'right',
+                borderColor: 'rgba(0, 0, 0, 0)',
+                background: 'rgba(0, 0, 0, 0)'
+            })
+            .bindEvent({
+                click: function(data) {
+                    // ...
+                }
+            })
+            .appendTo($bar),
+
+        $main = Ox.Element(),
+
+        that = Ox.SplitPanel({
+            elements: [
+                {element: $bar, size: 16},
+                {element: $main}
+            ],
+            orientation: 'vertical'
+        }),
 
         $list,
 
@@ -38,7 +122,7 @@ pandora.ui.infoView = function(data) {
                 top: 0,
                 right: 0
             })
-            .appendTo(that.$element),
+            .appendTo($main),
 
         $data = Ox.Container()
             .css({
@@ -138,6 +222,14 @@ pandora.ui.infoView = function(data) {
         $capabilities,
 
         $browserImages = [];
+
+    [$options, $edit].forEach(function($element) {
+        $element.find('input').css({
+            borderWidth: 0,
+            borderRadius: 0,
+            padding: '3px'
+        });
+    });
 
     pandora.createLinks($text); // FIXME: this is wrong for editables that already have clickLink
 
@@ -461,18 +553,6 @@ pandora.ui.infoView = function(data) {
 
     $('<div>').css({height: '16px'}).appendTo($text);
 
-    if (canEdit && !isEditable) {
-        $reloadButton = Ox.Button({
-                title: 'Reload Metadata',
-                width: 128
-            })
-            .css({marginBottom: '4px'})
-            .bindEvent({
-                click: reloadMetadata
-            })
-            .appendTo($statistics);
-    }
-
     // Mainstream Score, Arthouse Score ----------------------------------------
 
     ['votes', 'likes'].forEach(function(key) {
@@ -682,23 +762,6 @@ pandora.ui.infoView = function(data) {
         return data;
     }
 
-    function reloadMetadata() {
-        var item = ui.item;
-        // fixme: maybe there's a better method name for this?
-        $reloadButton.options({disabled: true, title: 'Reloading Metadata'});
-        pandora.api.updateExternalData({
-            id: ui.item
-        }, function(result) {
-            pandora.updateItemContext();
-            Ox.Request.clearCache();
-            if (ui.item == item && ui.itemView == 'info') {
-                pandora.$ui.contentPanel.replaceElement(
-                    1, pandora.$ui.item = pandora.ui.item()
-                );
-            }
-        });
-    }
-
     function renderCapabilities(rightsLevel) {
         var capabilities = [].concat(
                 canEdit ? [{name: 'canSeeItem', symbol: 'Find'}] : [],
@@ -823,7 +886,7 @@ pandora.ui.infoView = function(data) {
                     left: 0,
                     top: 0,
                     width: listWidth + 'px',
-                    height: pandora.$ui.contentPanel.size(1) + 'px'
+                    height: pandora.$ui.contentPanel.size(1) - 16 + 'px'
                 })
                 .bindEvent({
                     select: function(event) {
@@ -969,6 +1032,24 @@ pandora.ui.infoView = function(data) {
         pandora.UI.set({infoIconSize: iconSize});
     }
 
+    function updateMetadata() {
+        var item = ui.item;
+        $options.disableItem('update');
+        // fixme: maybe there's a better method name for this?
+        pandora.api.updateExternalData({
+            id: ui.item
+        }, function(result) {
+            pandora.updateItemContext();
+            Ox.Request.clearCache();
+            if (ui.item == item && ui.itemView == 'info') {
+                pandora.$ui.contentPanel.replaceElement(
+                    1, pandora.$ui.item = pandora.ui.item()
+                );
+            }
+            $options.enableItem('update');
+        });
+    }
+
     that.reload = function() {
         var src = src = '/' + data.id + '/' + (
             ui.icons == 'posters'
@@ -984,7 +1065,7 @@ pandora.ui.infoView = function(data) {
     };
 
     that.resize = function() {
-        var height = pandora.$ui.contentPanel.size(1);
+        var height = pandora.$ui.contentPanel.size(1) - 16;
         $list && $list.css({height: height + 'px'});
         $data.css({height: height + 'px'});
     };
