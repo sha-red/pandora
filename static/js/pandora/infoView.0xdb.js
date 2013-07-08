@@ -858,9 +858,27 @@ pandora.ui.infoView = function(data) {
                         type: 'image'
                     })
                     .addClass('OxColor OxColorGradient')
-                    .css({background: $element.css('background')})
+                    .css({
+                        background: $element.css('background'),
+                        cursor: hasCapability ? 'pointer' : 'default'
+                    })
                     .css('margin' + (canEdit ? 'Left' : 'Right'), '4px')
                     .data({OxColor: $element.data('OxColor')})
+                    .bindEvent({
+                        click: function() {
+                            if (hasCapability) {
+                                if (capability.name == 'canSeeItem') {
+                                    $data.animate({scrollTop: 0}, 250);
+                                } else if (capability.name == 'canPlayClips') {
+                                    pandora.UI.set({itemView: 'clips'});
+                                } else if (capability.name == 'canPlayVideo') {
+                                    pandora.UI.set({itemView: ui.videoView});
+                                } else if (capability.name == 'canDownloadVideo') {
+                                    document.location.href = '/' + ui.item + '/torrent/';
+                                }
+                            }
+                        }
+                    })
                     .appendTo($line);
             });
             if (!canEdit) {
