@@ -517,13 +517,13 @@
     "itemRequiresVideo": true,
     "itemViews": [
         {"id": "info", "title": "Info"},
-        {"id": "documents", "title": "Documents"},
         {"id": "player", "title": "Player"},
         {"id": "editor", "title": "Editor"},
         {"id": "timeline", "title": "Timeline"},
         {"id": "clips", "title": "Clips"},
         {"id": "map", "title": "Map"},
         {"id": "calendar", "title": "Calendar"},
+        {"id": "documents", "title": "Documents"},
         {"id": "data", "title": "Data"},
         {"id": "media", "title": "Media"}
     ],
