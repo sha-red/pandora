@@ -2,7 +2,8 @@
 
 'use strict';
 
-pandora.ui.documentsDialog = function() {
+pandora.ui.documentsDialog = function(options) {
+    options = options || {};
 
     var dialogHeight = Math.round((window.innerHeight - 48) * 0.9),
         dialogWidth = Math.round(window.innerWidth * 0.9),
@@ -165,6 +166,9 @@ pandora.ui.documentsDialog = function() {
                 select: function(data) {
                     selected = data.ids[0];
                     selectFile();
+                    options.callback && $doneButton.options({
+                        disabled: !data.ids.length
+                    });
                 }
             }),
 
@@ -218,6 +222,18 @@ pandora.ui.documentsDialog = function() {
                 click: deleteFile
             })
             .appendTo($itemToolbar),
+        
+        $doneButton = Ox.Button({
+                disabled: !!options.callback,
+                id: 'done',
+                title: options.callback ? Ox._('Select') : Ox._('Done'),
+                width: 48
+            }).bindEvent({
+                click: function() {
+                    options.callback && options.callback($list.options('selected'));
+                    that.close();
+                }
+            }),
 
         $uploadButton = Ox.FileButton({
                 maxFiles: 1,
@@ -293,17 +309,7 @@ pandora.ui.documentsDialog = function() {
             }),
 
         that = Ox.Dialog({
-                buttons: [
-                    Ox.Button({
-                            id: 'done',
-                            title: Ox._('Done'),
-                            width: 48
-                        }).bindEvent({
-                            click: function() {
-                                that.close();
-                            }
-                        })
-                ],
+                buttons: [$doneButton],
                 closeButton: true,
                 content: $content,
                 height: dialogHeight,

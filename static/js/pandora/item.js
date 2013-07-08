@@ -76,7 +76,7 @@ pandora.ui.item = function() {
         } else if (pandora.user.ui.itemView == 'documents') {
 
             pandora.$ui.contentPanel.replaceElement(1,
-                pandora.$ui.documentsView = pandora.ui.documentsView(result.data)
+                pandora.$ui.documents = pandora.ui.documentsView(result.data)
             );
 
         } else if (pandora.user.ui.itemView == 'player') {

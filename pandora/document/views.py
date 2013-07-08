@@ -272,7 +272,7 @@ def upload(request):
         file.extension = extension
         file.uploading = True
         file.save()
-        upload_url = request.build_absolute_uri('/api/upload/file?id=%s' % file.get_id())
+        upload_url = request.build_absolute_uri('/api/upload/document?id=%s' % file.get_id())
         return render_to_json_response({
             'uploadUrl': upload_url,
             'url': request.build_absolute_uri(file.get_absolute_url()),

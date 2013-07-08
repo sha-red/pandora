@@ -82,7 +82,22 @@ pandora.ui.documentsView = function(options, self) {
         })
         .bindEvent({
             add: function(data) {
-                pandora.$ui.documentsDialog = pandora.ui.documentsDialog().open();
+                pandora.$ui.documentsDialog = pandora.ui.documentsDialog({
+                    callback: function(ids) {
+                        if (ids) {
+                            pandora.api.addDocument({
+                                item: pandora.user.ui.item,
+                                ids: ids
+                            }, function() {
+                                Ox.Request.clearCache();
+                                //fixme just upload list here
+                                //self.$documentsList.reloadList();
+                                pandora.$ui.contentPanel.replaceElement(1,
+                                    pandora.$ui.item = pandora.ui.item());
+                            });
+                        }
+                    }
+                }).open();
             },
             'delete': function(data) {
                 if (data.ids.length > 0 && options.editable) {
@@ -124,7 +139,8 @@ pandora.ui.documentsView = function(options, self) {
         });
 
     function renderPreview() {
-        var isImage = Ox.contains(['jpg', 'png'], self.selected.split('.').pop()),
+        var isImage = Ox.contains(['jpg', 'png'],
+                self.selected ? self.selected.split('.').pop() : ''),
             size = {width: 256, height: 256},
             src = '/documents/' + self.selected + (isImage ? '' : '.jpg');
         self.$preview.empty();
