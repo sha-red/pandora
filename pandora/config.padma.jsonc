@@ -704,6 +704,7 @@
             "showBrowser": true,
             "showCalendarControls": true, // fixme: should be false
             "showFilters": true,
+            "showHome": true,
             "showIconBrowser": false,
             "showInfo": true,
             "showLayers": {
