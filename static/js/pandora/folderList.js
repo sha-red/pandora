@@ -378,6 +378,8 @@ pandora.ui.folderList = function(id) {
             pandora.api['sort' + folderItems]({
                 section: id,
                 ids: data.ids
+            }, function() {
+                Ox.Requests.clearCache('find' + folderItems);
             });
         },
         paste: function(data) {
