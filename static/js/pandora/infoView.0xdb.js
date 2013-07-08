@@ -301,7 +301,7 @@ pandora.ui.infoView = function(data) {
             .appendTo($text);
     }
 
-    // Country, Year, Language, Runtime ----------------------------------------
+    // Country, Year, Language, Runtime, Color, Sound --------------------------
 
     if (isEditable) {
         var $div = $('<div>')
@@ -332,9 +332,9 @@ pandora.ui.infoView = function(data) {
                 })
                 .appendTo($div);
         });
-    } else if (data.country || data.year || data.language || data.runtime) {
+    } else if (data.country || data.year || data.language || data.runtime || data.color || data.sound) {
         var html = [];
-        ['country', 'year', 'language', 'runtime'].forEach(function(key) {
+        ['country', 'year', 'language', 'runtime', 'color', 'sound'].forEach(function(key) {
             if (data[key]) {
                 html.push(
                     formatKey(key) + (
@@ -422,6 +422,14 @@ pandora.ui.infoView = function(data) {
                         : ''
                     );
             }).join(', ')
+        )
+        .appendTo($text);
+
+    data.productionCompany.length && $('<div>')
+        .css(css)
+        .html(
+            formatKey('studio')
+            + formatValue(data.productionCompany, 'productionCompany')
         )
         .appendTo($text);
 

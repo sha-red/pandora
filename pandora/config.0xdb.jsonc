@@ -81,12 +81,15 @@
         {"id": "country", "title": "Country", "type": "string"},
         {"id": "year", "title": "Year", "type": "integer"},
         {"id": "language", "title": "Language", "type": "string"},
-        {"id": "genre", "title": "Genre", "type": "string"},
+        {"id": "color", "title": "Color", "type": "string"},
+        {"id": "sound", "title": "Sound", "type": "string"},
         {"id": "writer", "title": "Writer", "type": "string"},
         {"id": "producer", "title": "Producer", "type": "string"},
         {"id": "cinematographer", "title": "Cinematographer", "type": "string"},
         {"id": "editor", "title": "Editor", "type": "string"},
         {"id": "actor", "title": "Actor", "type": "string"},
+        {"id": "productionCompany", "title": "Studio", "type": "string"},
+        {"id": "genre", "title": "Genre", "type": "string"},
         {"id": "keyword", "title": "Keyword", "type": "string"}
     ],
     "flags": true,
@@ -204,6 +207,22 @@
             "sort": true
         },
         {
+            "id": "color",
+            "title": "Color",
+            "type": ["string"],
+            "columnWidth": 120,
+            "filter": true,
+            "sort": true
+        },
+        {
+            "id": "sound",
+            "title": "Sound",
+            "type": ["string"],
+            "columnWidth": 120,
+            "filter": true,
+            "sort": true
+        },
+        {
             "id": "writer",
             "title": "Writer",
             "type": ["string"],
@@ -278,6 +297,15 @@
             "type": ["string"],
             "autocomplete": true,
             "find": true
+        },
+        {
+            "id": "productionCompany",
+            "title": "Production Company",
+            "type": ["string"],
+            "autocomplete": true,
+            "columnWidth": 180,
+            "find": true,
+            "sort": true
         },
         {
             "id": "series",
