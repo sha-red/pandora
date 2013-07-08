@@ -8,10 +8,14 @@ pandora.ui.sectionbar = function(mode) {
             mode == 'buttons'
             ? pandora.$ui.sectionButtons = pandora.ui.sectionButtons()
             : pandora.$ui.sectionSelect = pandora.ui.sectionSelect()
-        );
-    that.toggle = function() {
-        
-    };
+        )
+        .bindEvent({
+            doubleclick: function(e) {
+                if ($(e.target).is('.OxBar')) {
+                    pandora.$ui.folders.animate({scrollTop: 0}, 250);
+                }
+            }
+        });
     return that;
 };
 

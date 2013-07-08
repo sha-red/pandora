@@ -17,6 +17,13 @@ pandora.ui.clipsView = function(videoRatio) {
             elements: [
                 {
                     element: Ox.Bar({size: 24})
+                        .bindEvent({
+                            doubleclick: function(e) {
+                                if ($(e.target).is('.OxBar')) {
+                                    pandora.$ui.clipList.animate({scrollTop: 0}, 250);
+                                }
+                            }
+                        })
                         .append(
                             pandora.$ui.sortElement = pandora.ui.sortElement()
                         )

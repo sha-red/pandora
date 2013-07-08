@@ -45,6 +45,15 @@ pandora.ui.toolbar = function() {
             })
             .hide()
     );
+    (!ui.item ? pandora.$ui.listTitle : pandora.$ui.itemTitle).bindEvent({
+        doubleclick: function() {
+            if (!ui.item) {
+                pandora.$ui.list && pandora.$ui.list.animate({scrollTop: 0}, 250);
+            } else {
+                pandora.$ui.browser.scrollToSelection();
+            }
+        }
+    })
     that.append(
         pandora.$ui.findElement = pandora.ui.findElement()
     );
