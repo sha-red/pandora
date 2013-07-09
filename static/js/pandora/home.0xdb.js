@@ -277,7 +277,7 @@ pandora.ui.home = function() {
     };
 
     that.showScreen = function(callback) {
-        var count = 0, $elements = that.find(':not(.logo)');
+        var $elements = that.find(':not(.logo)'), count = 0;
         $logo.css({width: '320px'});
         that.css({opacity: 1}).appendTo(Ox.UI.$body);
         that.find('.logo').css({opacity: 1});

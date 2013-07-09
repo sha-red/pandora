@@ -690,7 +690,7 @@ pandora.ui.home = function() {
     };
 
     that.showScreen = function(callback) {
-        var count = 0, $elements = that.find('*');
+        var $elements = that.find('*'), count = 0;
         $box.css({top: window.innerHeight / 2 - 40 + 'px'});
         that.css({opacity: 1}).appendTo(Ox.UI.$body);
         $findInput.focusInput(true);
