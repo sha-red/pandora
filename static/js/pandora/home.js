@@ -14,6 +14,7 @@ pandora.ui.home = function() {
                 zIndex: 1001
             }),
         $reflectionImage = $('<img>')
+            .addClass('logo')
             .attr({src: '/static/png/logo.png'})
             .css({
                 position: 'absolute',
@@ -30,7 +31,7 @@ pandora.ui.home = function() {
             })
             .appendTo(that),
         $reflectionGradient = $('<div>')
-            .addClass('OxReflection')
+            .addClass('OxReflection logo')
             .css({
                 position: 'absolute',
                 left: 0,
@@ -44,6 +45,7 @@ pandora.ui.home = function() {
             })
             .appendTo(that),
         $logo = $('<img>')
+            .addClass('logo')
             .attr({
                 id: 'logo',
                 src: '/static/png/logo.png'
@@ -274,10 +276,16 @@ pandora.ui.home = function() {
         return that;
     };
 
-    that.showScreen = function() {
+    that.showScreen = function(callback) {
+        var count = 0, $elements = that.find(':not(.logo)');
         $logo.css({width: '320px'});
-        that.find(':not(#logo)').css({opacity: 1});
         that.css({opacity: 1}).appendTo(Ox.UI.$body);
+        that.find(':not(#logo)').css({opacity: 1});
+        $elements.animate({opacity: 1}, 500, function() {
+            if (callback && ++count == $elements.length) {
+                callback();
+            }
+        });
         $findInput.focusInput(true);
         return that;
     };
