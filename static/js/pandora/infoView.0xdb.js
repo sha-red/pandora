@@ -425,7 +425,7 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($text);
 
-    data.productionCompany.length && $('<div>')
+    data.productionCompany && $('<div>')
         .css(css)
         .html(
             formatKey('studio')
