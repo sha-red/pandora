@@ -47,11 +47,8 @@ pandora.ui.appPanel = function() {
             api: ['api']
         };
         if (page === '') {
-            if (!pandora.$ui.appPanel) {
-                // if we're on page load, show home screen
-                pandora.$ui.home = pandora.ui.home().showScreen();
-            } else {
-                // otherwise, remove home screen
+            if (pandora.$ui.appPanel && pandora.$ui.home) {
+                // unless we're on page load, remove home screen
                 pandora.$ui.home.fadeOutScreen();
             }
             Ox.forEach(dialogPages, function(pages, dialog) {
@@ -64,11 +61,12 @@ pandora.ui.appPanel = function() {
                 pandora.$ui.tv.fadeOutScreen();
             }
         } else if (page == 'home') {
-            // if we're on page load, show screen immediately
-            pandora.$ui.home = pandora.ui.home()[
-                !pandora.$ui.appPanel ? 'showScreen' : 'fadeInScreen'
-            ]();
+            if (pandora.$ui.appPanel) {
+                // unless we're on page load, show home screen
+                pandora.$ui.home = pandora.ui.home().fadeInScreen();
+            }
         } else if (page == 'tv') {
+            // if we're on page load, show tv immediately
             pandora.$ui.tv = pandora.ui.tv()[
                 !pandora.$ui.appPanel ? 'showScreen' : 'fadeInScreen'
             ]();
