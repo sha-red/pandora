@@ -22,6 +22,25 @@ pandora.ui.editPanel = function() {
 
                 $editMenu,
 
+                $viewSelect =  Ox.Select({
+                    items: [
+                        {'id': 'list', 'title': Ox._('View as List')},
+                        {'id': 'player', 'title': Ox._('View as Player')},
+                    ],
+                    value: 'list',
+                    width: 128
+                })
+                .css({
+                    float: 'left',
+                    margin: '4px 0 0 4px'
+                })
+                .bindEvent({
+                    change: function(data) {
+                        $panel.replaceElement(0, pandora.$ui.edit = pandora.ui[
+                            data.value == 'player' ? 'editPlayer' : 'editList'
+                        ](edit));
+                    },
+                }).appendTo($toolbar),
 
                 $statusbar = Ox.Bar({size: 16}),
 
@@ -145,7 +164,7 @@ pandora.ui.editList = function(edit) {
                         edit: pandora.user.ui.edit
                     }, function(result) {
                         Ox.Request.clearCache();
-                        pandora.$ui.rightPanel.reload()
+                        pandora.$ui.rightPanel.reload();
                     });
                 }
             },
@@ -197,4 +216,36 @@ pandora.ui.editList = function(edit) {
 
     return that;
 
+};
+pandora.ui.editPlayer = function(edit) {
+    var that = Ox.Element()
+        .css({
+            'overflow-y': 'auto'
+        });
+
+
+    self.$player = Ox.VideoPlayer({
+        controlsBottom: ['play', 'previous', 'next', 'volume', 'position'],
+        controlsTop: ['fullscreen', 'scale'],
+        enableMouse: true,
+        height: getHeight(),
+        paused: true,
+        position: 0,
+        video: Ox.flatten(edit.clips.map(function(clip) {
+            return pandora.getClipVideos(clip);
+        })),
+        width: getWidth()
+    }).appendTo(that);
+
+    function getHeight() {
+        // 24 menu + 24 toolbar + 16 statusbar + 32 title + 32 margins
+        // + 1px to ge trid of scrollbar
+        return window.innerHeight - 128 -1;
+    }
+
+    function getWidth() {
+        return window.innerWidth
+            - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1;
+    }
+    return that;
 };

@@ -377,7 +377,7 @@ pandora.ui.list = function() {
     } else if (view == 'clip') {
         that = pandora.$ui.clipList = pandora.ui.clipList();
     } else if (view == 'video') {
-        that = pandora.ui.clipPlayer();
+        that = pandora.ui.videoView();
     } else if (['map', 'calendar'].indexOf(view) > -1) {
         that = pandora.ui.navigationView(view);
     }

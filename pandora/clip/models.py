@@ -78,7 +78,7 @@ class MetaClip:
                                     for a in annotations]
             for key in keys:
                 if key not in self.clip_keys and key not in j:
-                    value = self.item.get(key)
+                    value = self.item.get(key) or self.item.json.get(key)
                     if not value and hasattr(self.item.sort, key):
                         value = getattr(self.item.sort, key)
                     j[key] = value

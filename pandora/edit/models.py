@@ -297,10 +297,14 @@ class Clip(models.Model):
             data['annotation'] = self.annotation.public_id
             data['in'] = self.annotation.start
             data['out'] = self.annotation.end
+            data['parts'] = self.annotation.item.json['parts']
+            data['durations'] = self.annotation.item.json['durations']
         else:
             data['item'] = self.item.itemId
             data['in'] = self.start
             data['out'] = self.end
+            data['parts'] = self.item.json['parts']
+            data['durations'] = self.item.json['durations']
         data['duration'] = data['out'] - data['in']
         return data
 

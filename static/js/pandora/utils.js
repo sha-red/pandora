@@ -584,6 +584,45 @@ pandora.getClipsQuery = function() {
     return clipsQuery;
 };
 
+pandora.getClipVideos = function(clip, resolution) {
+    var currentTime = 0,
+        start = clip['in'] || 0,
+        end = clip.out;
+    resolution = resolution || pandora.user.ui.videoResolution;
+
+    return Ox.flatten(Ox.range(clip.parts).map(function(i) {
+        var item = {
+            src: pandora.getVideoURL(clip.item, resolution, i + 1)
+        };
+        if(currentTime + clip.durations[i] < start || currentTime > end) {
+            item = null;
+        } else {
+            if(currentTime <= start && currentTime + clip.durations[i] > start) {
+                item['in'] = start - currentTime;
+            }
+            if (currentTime + clip.durations[i] >= end) {
+                item.out = end - currentTime;
+            }
+            if (item['in'] && item.out) {
+                item.duration = item.out - item['in']
+            } else if (item.out) {
+                item.duration = item.out;
+            } else if (!Ox.isUndefined(item['in'])) {
+                item.duration = clip.durations[i] - item['in'];
+                item.out = clip.durations[i];
+            } else {
+                item.duration = clip.durations[i];
+                item['in'] = 0;
+                item.out = item.duration;
+            }
+        }
+        currentTime += clip.durations[i];
+        return item;
+    }).filter(function(c) {
+        return !!c;
+    }));
+};
+
 (function() {
     var itemTitles = {};
     pandora.getDocumentTitle = function(itemTitle) {
@@ -1065,7 +1104,7 @@ pandora.getStatusText = function(data) {
     var ui = pandora.user.ui,
         canSeeMedia = pandora.site.capabilities.canSeeMedia[pandora.user.level],
         canSeeSize = pandora.site.capabilities.canSeeSize[pandora.user.level],
-        itemName = ui.listView == 'clip'
+        itemName = ['clip', 'video'].indexOf(ui.listView) > -1
             ? (data.items == 1 ? Ox._('Clip') : Ox._('Clips'))
             : (pandora.site.itemName[data.items == 1 ? 'singular' : 'plural']),
         parts = [];
@@ -1139,7 +1178,10 @@ pandora.getVideoOptions = function(data) {
     options.video = {};
     pandora.site.video.resolutions.forEach(function(resolution) {
         options.video[resolution] = Ox.range(data.parts).map(function(i) {
-            return pandora.getVideoURL(data.item || pandora.user.ui.item, resolution, i + 1);
+            return {
+                duration: data.durations[i],
+                src: pandora.getVideoURL(data.item || pandora.user.ui.item, resolution, i + 1)
+            };
         });
     });
     options.annotations = [];

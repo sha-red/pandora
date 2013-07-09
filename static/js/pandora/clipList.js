@@ -175,25 +175,23 @@ pandora.ui.clipList = function(videoRatio) {
                         }
                         pandora.api.get({id: item, keys: ['durations', 'rightslevel']}, function(result) {
                             var points = [that.value(id, 'in'), that.value(id, 'out')],
-                                partsAndPoints = pandora.getVideoPartsAndPoints(
-                                    result.data.durations, points
-                                ),
                                 $player = Ox.VideoPlayer({
                                     censored: pandora.site.capabilities.canPlayClips[pandora.user.level] < result.data.rightslevel
-                                        ? [{'in': partsAndPoints.points[0], out: partsAndPoints.points[1]}]
+                                        ? [{'in': 0, out: points[1] - points[0]}]
                                         : [],
                                     censoredIcon: pandora.site.cantPlay.icon,
                                     censoredTooltip: pandora.site.cantPlay.text,
                                     height: height,
-                                    'in': partsAndPoints.points[0],
-                                    out: partsAndPoints.points[1],
                                     paused: true,
-                                    playInToOut: true,
                                     poster: '/' + item + '/' + height + 'p' + points[0] + '.jpg',
                                     rewind: true,
-                                    video: partsAndPoints.parts.map(function(i) {
-                                        return pandora.getVideoURL(item, Ox.min(pandora.site.video.resolutions), i + 1);
-                                    }),
+                                    video: pandora.getClipVideos({
+                                        item: item,
+                                        parts: result.data.durations.length,
+                                        durations: result.data.durations,
+                                        'in': points[0],
+                                        out: points[1]
+                                    }, Ox.min(pandora.site.video.resolutions)),
                                     width: width
                                 })
                                 .addClass('OxTarget')

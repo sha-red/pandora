@@ -27,7 +27,7 @@ pandora.ui.embedPlayer = function() {
         $title, $player, $controls, $timeline, $annotations;
 
     pandora.api.get({id: ui.item, keys: [
-        'duration', 'layers', 'parts', 'posterFrame',
+        'duration', 'durations', 'layers', 'parts', 'posterFrame',
         'rightslevel', 'size', 'title', 'videoRatio'
     ]}, function(result) {
 

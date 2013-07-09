@@ -575,6 +575,7 @@
         {"id": "timelines", "title": "with Timelines"},
         {"id": "clips", "title": "with Clips"},
         {"id": "clip", "title": "as Clips"},
+        {"id": "video", "title": "as Video"},
         {"id": "map", "title": "on Map"},
         {"id": "calendar", "title": "on Calendar"}
     ],

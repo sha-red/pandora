@@ -38,6 +38,8 @@ pandora.ui.rightPanel = function() {
                         pandora.$ui.map.resizeMap();
                     } else if (pandora.user.ui.listView == 'calendar') {
                         pandora.$ui.calendar.resizeCalendar();
+                    } else if (pandora.user.ui.listView == 'video') {
+                        pandora.$ui.list.resize();
                     }
                 } else {
                     pandora.$ui.browser.scrollToSelection();
@@ -53,6 +55,8 @@ pandora.ui.rightPanel = function() {
                         pandora.$ui.map.resizeMap();
                     } else if (pandora.user.ui.listView == 'calendar') {
                         pandora.$ui.calendar.resizeCalendar();
+                    } else if (pandora.user.ui.listView == 'video') {
+                        pandora.$ui.list.size();
                     }
                 }
             }

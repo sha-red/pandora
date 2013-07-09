@@ -13,11 +13,11 @@ pandora.ui.item = function() {
     pandora.api.get({
         id: pandora.user.ui.item,
         keys: isVideoView ? [
-            'cuts', 'director', 'duration', 'editable', 'layers',
+            'cuts', 'director', 'duration', 'durations', 'editable', 'layers',
             'modified', 'parts', 'posterFrame', 'rendered', 'rightslevel',
             'size', 'title', 'videoRatio', 'year'
         ] : pandora.user.ui.itemView == 'documents' ? [
-            'director', 'documents', 'duration', 'editable',
+            'director', 'documents', 'duration', 'durations', 'editable',
             'rightslevel', 'size', 'title', 'videoRatio', 'year'
         ] : []
     }, pandora.user.ui.itemView == 'info' && pandora.site.capabilities.canEditMetadata[pandora.user.level] ? 0 : -1, function(result) {
