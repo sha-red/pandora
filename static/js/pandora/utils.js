@@ -253,7 +253,7 @@ pandora.clickLink = function(e) {
         if (pandora.$ui.home && e.target.pathname != '/home') {
             pandora.$ui.home.fadeOutScreen();
         }
-        pandora.URL.push(e.target.pathname);
+        pandora.URL.push(e.target.pathname, true);
     } else {
         window.open('/url=' + encodeURIComponent(e.target.href), '_blank');
     }
@@ -267,18 +267,20 @@ pandora.createLinks = function($element) {
     $element
         .on({
             click: function(e) {
-                if ($(e.target).is('a') && isExternalLink(e.target)) {
+                var $target = $(e.target);
+                if (
+                    $target.is('a')
+                    && !$($target.parent()).is('.OxEditable')
+                    && !$($target.parent()).is('.OxEditableContent')
+                ) {
                     e.preventDefault();
-                    window.open('/url=' + encodeURIComponent(e.target.href), '_blank');
+                    if (isExternalLink(e.target)) {
+                        window.open('/url=' + encodeURIComponent(e.target.href), '_blank');
+                    } else {
+                        pandora.clickLink(e);
+                    }
                 }
                 return false;
-            }
-        })
-        .bindEvent({
-            singleclick: function(e) {
-                if ($(e.target).is('a') && !isExternalLink(e.target)) {
-                    pandora.clickLink(e);
-                }
             }
         });
 };
