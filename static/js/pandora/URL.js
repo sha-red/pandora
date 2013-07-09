@@ -6,6 +6,7 @@ pandora.URL = (function() {
 
     var self = {}, that = {};
 
+    // translates UI settings to URL state
     function getState() {
 
         Ox.Log('URL', 'getState:, UI', pandora.user.ui)
@@ -60,8 +61,9 @@ pandora.URL = (function() {
         }
 
         if (
-            pandora.user.ui.hash &&
-            (pandora.user.ui.hash.anchor || !Ox.isEmpty(pandora.user.ui.hash.query))
+            pandora.user.ui.hash && (
+                pandora.user.ui.hash.anchor || !Ox.isEmpty(pandora.user.ui.hash.query)
+            )
         ) {
             state.hash = {};
             if (pandora.user.ui.hash.anchor) {
@@ -78,6 +80,7 @@ pandora.URL = (function() {
 
     }
 
+    // translates URL state to UI settings
     function setState(state, callback) {
 
         var set = {};
@@ -187,6 +190,7 @@ pandora.URL = (function() {
                             set.find = pandora.site.user.ui.find;
                         }
                     }
+
                 } else if (state.type == 'texts') {
                     if (state.span) {
                         set['textPositions.' + state.item] = state.span;
@@ -413,11 +417,12 @@ pandora.URL = (function() {
     };
 
     // pushes a new URL (as string or from state)
-    that.push = function(stateOrURL) {
+    that.push = function(stateOrURL, expandURL) {
         var state,
             title = pandora.getPageTitle(stateOrURL)
                 || pandora.getDocumentTitle(),
             url;
+        pandora.expandURL = expandURL;
         if (Ox.isObject(stateOrURL)) {
             state = stateOrURL;
         } else {
@@ -457,6 +462,7 @@ pandora.URL = (function() {
         } else {
             if (
                 !pandora.$ui.appPanel
+                || pandora.expandURL
                 || keys.every(function(key) {
                     return [
                             'listColumnWidth', 'listColumns', 'listSelection',
@@ -475,6 +481,7 @@ pandora.URL = (function() {
                 state,
                 pandora.getPageTitle(state) || pandora.getDocumentTitle()
             );
+            pandora.expandURL = false;
         }
     };
 
