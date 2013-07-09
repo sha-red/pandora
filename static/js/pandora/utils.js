@@ -1266,7 +1266,7 @@ pandora.signin = function(data) {
     // fixme: this is still voodoo
     pandora.user = Ox.extend(data.user, {
         sectionElement: 'buttons',
-        videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
+        videoFormat: Ox.getVideoFormat(pandora.site.video.formats)
     });
     pandora.user.ui._list = pandora.getListState(pandora.user.ui.find);
     pandora.user.ui._filterState = pandora.getFilterState(pandora.user.ui.find);

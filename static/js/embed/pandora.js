@@ -173,7 +173,7 @@ Ox.load('UI', {
                 }
             }
             Ox.extend(pandora.user, {
-                videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
+                videoFormat: Ox.getVideoFormat(pandora.site.video.formats)
             });
             var options = parseQuery();
             if (['video', 'player'].indexOf(options.view) > -1) {

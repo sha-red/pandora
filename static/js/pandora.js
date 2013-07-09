@@ -315,7 +315,7 @@ appPanel
 
         Ox.extend(pandora.user, {
             sectionElement: 'buttons',
-            videoFormat: Ox.UI.getVideoFormat(pandora.site.video.formats)
+            videoFormat: Ox.getVideoFormat(pandora.site.video.formats)
         });
 
         // set locale and initialize url controller
