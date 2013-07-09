@@ -584,7 +584,6 @@ pandora.ui.home = function() {
     }
 
     that.fadeInScreen = function() {
-        // $box.css({marginTop: '80px'});
         that.appendTo(Ox.UI.$body).animate({opacity: 1}, 500, function() {
             that.find('*').animate({opacity: 1}, 250, function() {
                 $findInput.focusInput(true);
@@ -605,21 +604,18 @@ pandora.ui.home = function() {
     };
 
     that.showScreen = function(callback) {
+        var $elements = that.find('*'), count = 0;
+        $box.css({top: window.innerHeight / 2 - 80 + 'px'});
         that.css({opacity: 1}).appendTo(Ox.UI.$body);
-        // $box.css({marginTop: '80px'});
-        that.find('*').css({opacity: 1});
         $findInput.focusInput(true);
-        showLists();
-        /*
-        $box.animate({marginTop: '80px'}, 500);
-        setTimeout(function() {
-            that.find('*').animate({opacity: 1}, 250, function() {
-                $findInput.focusInput(true);
-                showLists();
+        $box.animate({top: '80px'}, 500, function() {
+            $elements.animate({opacity: 1}, 250, function() {
+                if (++count == $elements.length) {
+                    showLists();
+                    callback && callback();
+                }
             });
-        }, 250);
-        */
-        callback && callback();
+        });
         return that;
     };
 
