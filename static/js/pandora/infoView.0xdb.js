@@ -231,7 +231,7 @@ pandora.ui.infoView = function(data) {
         });
     });
 
-    pandora.createLinks($text); // FIXME: this is wrong for editables that already have clickLink
+    pandora.createLinks($text);
 
     // Title -------------------------------------------------------------------
 
