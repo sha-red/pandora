@@ -646,7 +646,7 @@ pandora.ui.home = function() {
         that.appendTo(Ox.UI.$body).animate({opacity: 1}, 500, function() {
             that.find('*').animate({opacity: 1}, 250, function() {
                 $findInput.focusInput(true);
-                showLists();
+                showFeatures();
             });
         });
         return that;
@@ -670,7 +670,7 @@ pandora.ui.home = function() {
         $box.animate({top: '80px'}, 500, function() {
             $elements.animate({opacity: 1}, 250, function() {
                 if (++count == $elements.length) {
-                    showLists();
+                    showFeatures();
                     callback && callback();
                 }
             });
