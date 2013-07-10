@@ -525,6 +525,8 @@ class Item(models.Model):
             i['user'] = self.user.username
         i.update(self.external_data)
         i.update(self.data)
+        if settings.USE_IMDB:
+            i['oxdbId'] = self.oxdbId or self.oxdb_id() or self.itemId
         for k in settings.CONFIG['itemKeys']:
             key = k['id']
             if not keys or key in keys:
