@@ -13,6 +13,7 @@ pandora.ui.home = function() {
                 opacity: 0,
                 zIndex: 1001
             }),
+
         $reflectionImage = $('<img>')
             .addClass('logo')
             .attr({src: '/static/png/logo.png'})
@@ -30,6 +31,7 @@ pandora.ui.home = function() {
                 WebkitTransform: 'scaleY(-1)'
             })
             .appendTo(that),
+
         $reflectionGradient = $('<div>')
             .addClass('OxReflection logo')
             .css({
@@ -44,6 +46,7 @@ pandora.ui.home = function() {
                 margin: 'auto',
             })
             .appendTo(that),
+
         $logo = $('<img>')
             .addClass('logo')
             .attr({
@@ -66,6 +69,7 @@ pandora.ui.home = function() {
                 }
             })
             .appendTo(that),
+
         $findInput = Ox.Input({
                 width: 156
             })
@@ -92,6 +96,7 @@ pandora.ui.home = function() {
                 }
             })
             .appendTo(that),
+
         $findButton = Ox.Button({
                 title: Ox._('Find'),
                 width: 74
@@ -125,6 +130,7 @@ pandora.ui.home = function() {
                 }
             })
             .appendTo(that),
+
         $browseButton = Ox.Button({
                 title: Ox._('Browse'),
                 width: 74
@@ -147,6 +153,7 @@ pandora.ui.home = function() {
                 }
             })
             .appendTo(that),
+
         $signupButton = Ox.Button({
                 title: Ox._('Sign Up'),
                 width: 74
@@ -166,6 +173,7 @@ pandora.ui.home = function() {
                     that.fadeOutScreen();
                 }
             }),
+
         $signinButton = Ox.Button({
                 title: Ox._('Sign In'),
                 width: 74
@@ -185,6 +193,7 @@ pandora.ui.home = function() {
                     that.fadeOutScreen();
                 }
             }),
+
         $preferencesButton = Ox.Button({
                 title: Ox._('Preferences'),
                 width: 156
@@ -204,6 +213,7 @@ pandora.ui.home = function() {
                     that.fadeOutScreen();
                 }
             }),
+
         $aboutButton = Ox.Button({
                 title: Ox._('About {0}', [pandora.site.site.name]),
                 width: 156
@@ -224,6 +234,7 @@ pandora.ui.home = function() {
                 }
             })
             .appendTo(that),
+
         $text = $('<div>')
             .html(Ox._(
                 'A Movie Database. \u2620 2007-{0} 0x2620. All Open Source.',
