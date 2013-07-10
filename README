@@ -106,10 +106,7 @@ Important: "use_your_own" is a password and you have to use the same value here 
 
 4) install init scripts and start daemons
     cp /srv/pandora/etc/init/*.conf /etc/init/
-    service pandora start
-    service pandora-encoding start
-    service pandora-task start
-    service pandora-cron start
+    /sr/pandora/ctl start
 
 5) Setup Webserver
 a) nginx (recommended)
