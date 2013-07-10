@@ -5,9 +5,10 @@
 */
 
 {
+    // FIXME: not a good name
     "additionalSort": [
-        {"key": "director", "operator": "+"},
         {"key": "year", "operator": "+"},
+        {"key": "director", "operator": "+"},
         {"key": "title", "operator": "+"}
     ],
     "annotations": {
