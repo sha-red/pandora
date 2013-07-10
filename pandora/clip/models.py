@@ -81,7 +81,8 @@ class MetaClip:
                     value = self.item.get(key) or self.item.json.get(key)
                     if not value and hasattr(self.item.sort, key):
                         value = getattr(self.item.sort, key)
-                    j[key] = value
+                    if value != None:
+                        j[key] = value
         return j
 
     @classmethod
