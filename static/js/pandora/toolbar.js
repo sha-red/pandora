@@ -31,7 +31,10 @@ pandora.ui.toolbar = function() {
                 left: getListTitleLeft() + 'px',
                 top: '4px',
                 right: (ui._list ? 324 : 310) + 'px',
-                width: 'auto'
+                width: 'auto',
+                MozUserSelect: 'text',
+                OUserSelect: 'text',
+                WebkitUserSelect: 'text'
             })
         : pandora.$ui.itemTitle = Ox.Label({
                 textAlign: 'center'
@@ -41,7 +44,10 @@ pandora.ui.toolbar = function() {
                 left: '236px',
                 top: '4px',
                 right: (ui._list ? 324 : 310) + 'px',
-                width: 'auto'
+                width: 'auto',
+                MozUserSelect: 'text',
+                OUserSelect: 'text',
+                WebkitUserSelect: 'text'
             })
             .hide()
     );
