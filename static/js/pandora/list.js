@@ -382,7 +382,7 @@ pandora.ui.list = function() {
         that = pandora.ui.navigationView(view);
     }
 
-    if (['list', 'grid', 'clips', 'timelines'].indexOf(view) > -1) {
+    if (['list', 'grid', 'clips', 'timelines', 'video'].indexOf(view) > -1) {
 
         pandora.enableDragAndDrop(that, true);
 

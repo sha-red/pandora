@@ -8,6 +8,11 @@ pandora.ui.videoView = function() {
         that = Ox.Element().css({
             width: '100%',
             hegiht: '100%',
+        }).update({
+            sort: function() {
+                //fixme just update player items
+                loadPlayer();
+            }
         }),
         range = [0, 500],
         clips = [],

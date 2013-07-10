@@ -1256,7 +1256,7 @@ pandora.isClipView = function(view, item) {
         item = pandora.user.ui.item;
     }
     return (
-        !item ? ['calendar', 'clip', 'map'] : ['calendar', 'clips', 'map']
+        !item ? ['calendar', 'clip', 'map', 'video'] : ['calendar', 'clips', 'map']
     ).indexOf(view) > -1;
 };
 
