@@ -10,21 +10,15 @@ pandora.ui.news = function(width, height) {
             .css({position: 'absolute', top: '16px', right: '16px', width: '192px'})
             .appendTo(that),
         backgroundColor = Ox.Theme() == 'oxlight' ? 'rgb(224, 224, 224)'
-            : Ox.Theme() == 'oxmedium' ? 'rgb(128, 128, 128)' : 'rgb(32, 32, 32)',        
+            : Ox.Theme() == 'oxmedium' ? 'rgb(128, 128, 128)'
+            : 'rgb(32, 32, 32)',        
         isEditable = pandora.site.capabilities.canEditSitePages[pandora.user.level],
         items = [],
-        selected,
         $text;
 
-    pandora.api.getNews({}, function(result) {
+    pandora.api.getNews(function(result) {
         items = result.data.items;
-        if (items.length) {
-            selected = items[0].id;
-            renderItem();
-            renderList();
-        } else if (isEditable) {
-            addItem();
-        }
+        selectItem();
     });
 
     function addItem() {
@@ -34,99 +28,106 @@ pandora.ui.news = function(width, height) {
             text: ''
         }, function(result) {
             items.splice(0, 0, result.data);
-            selected = result.data.id;
-            renderItem();
-            renderList();
+            pandora.UI.set({'part.news': result.data.id});
         });
     }
 
     function editItem(key, value) {
-        var data = {id: selected},
-            index = Ox.getIndexById(items, selected);
+        var data = {id: pandora.user.ui.part.news},
+            index = Ox.getIndexById(items, pandora.user.ui.part.news);
+        if (index == -1) {
+            index = 0;
+        }
         data[key] = value;
         pandora.api.editNews(data, function(result) {
-            Ox.print('DATA:::', result.data);
             items[index] = result.data;
-            Ox.print('ITEMS:::', items);
             ['title', 'date'].indexOf(key) > -1 && renderList();
         });
     }
 
     function removeItem() {
-        var index = Ox.getIndexById(items, selected);
+        var index = Ox.getIndexById(items, pandora.user.ui.part.news);
+        if (index == -1) {
+            index = 0;
+        }
         items.splice(index, 1);
-        pandora.api.removeNews({id: selected}, function(result) {
-            // ...
+        pandora.api.removeNews({id: pandora.user.ui.part.news}, function(result) {
+            pandora.UI.set({
+                'part.news': items.length == 0 ? ''
+                    : items[Math.min(index, items.length - 1)].id
+            });
         });
-        selected = items[0].id;
-        renderItem();
-        renderList();
     }
 
     function renderItem() {
-        $left.empty();
         var $title, $date,
-            index = Ox.getIndexById(items, selected);
-        $title = Ox.Editable({
-                editable: isEditable,
-                tooltip: isEditable ? pandora.getEditTooltip() : '',
-                value: items[index].title
-            })
-            .css({
-                display: 'inline-block',
-                fontWeight: 'bold',
-                fontSize: '16px',
-                MozUserSelect: 'text',
-                WebkitUserSelect: 'text'
-            })
-            .bindEvent({
-                submit: function(data) {
-                    editItem('title', data.value);
-                }
-            })
-            .appendTo($left);
-        $('<div>').css({height: '2px'}).appendTo($left);
-        $date = Ox.Editable({
-                editable: isEditable,
-                format: function(value) {
-                    return Ox.formatDate(value, '%B %e, %Y');
-                },
-                tooltip: isEditable ? pandora.getEditTooltip() : '',
-                value: items[index].date
-            })
-            .css({
-                display: 'inline-block',
-                fontSize: '9px',
-                MozUserSelect: 'text',
-                WebkitUserSelect: 'text'
-            })
-            .bindEvent({
-                submit: function(data) {
-                    editItem('date', data.value);
-                }
-            })
-            .appendTo($left);
-        $('<div>').css({height: '8px'}).appendTo($left);
-        $text = Ox.Editable({
-                clickLink: pandora.clickLink,
-                editable: isEditable,
-                maxHeight: height - 96,
-                placeholder: Ox._('No text'),
-                tooltip: isEditable ? pandora.getEditTooltip() : '',
-                type: 'textarea',
-                value: items[index].text,
-                width: width - 512
-            })
-            .css({
-                MozUserSelect: 'text',
-                WebkitUserSelect: 'text'
-            })
-            .bindEvent({
-                submit: function(data) {
-                    editItem('text', data.value);
-                }
-            })
-            .appendTo($left);
+            index = Ox.getIndexById(items, pandora.user.ui.part.news);
+        if (index == -1) {
+            index = 0;
+        }
+        $left.empty();
+        if (items.length) {
+            $title = Ox.Editable({
+                    editable: isEditable,
+                    tooltip: isEditable ? pandora.getEditTooltip() : '',
+                    value: items[index].title
+                })
+                .css({
+                    display: 'inline-block',
+                    fontWeight: 'bold',
+                    fontSize: '16px',
+                    MozUserSelect: 'text',
+                    WebkitUserSelect: 'text'
+                })
+                .bindEvent({
+                    submit: function(data) {
+                        editItem('title', data.value);
+                    }
+                })
+                .appendTo($left);
+            $('<div>').css({height: '2px'}).appendTo($left);
+            $date = Ox.Editable({
+                    editable: isEditable,
+                    format: function(value) {
+                        return Ox.formatDate(value, '%B %e, %Y');
+                    },
+                    tooltip: isEditable ? pandora.getEditTooltip() : '',
+                    value: items[index].date
+                })
+                .css({
+                    display: 'inline-block',
+                    fontSize: '9px',
+                    MozUserSelect: 'text',
+                    WebkitUserSelect: 'text'
+                })
+                .bindEvent({
+                    submit: function(data) {
+                        editItem('date', data.value);
+                    }
+                })
+                .appendTo($left);
+            $('<div>').css({height: '8px'}).appendTo($left);
+            $text = Ox.Editable({
+                    clickLink: pandora.clickLink,
+                    editable: isEditable,
+                    maxHeight: height - 96,
+                    placeholder: Ox._('No text'),
+                    tooltip: isEditable ? pandora.getEditTooltip() : '',
+                    type: 'textarea',
+                    value: items[index].text,
+                    width: width - 512
+                })
+                .css({
+                    MozUserSelect: 'text',
+                    WebkitUserSelect: 'text'
+                })
+                .bindEvent({
+                    submit: function(data) {
+                        editItem('text', data.value);
+                    }
+                })
+                .appendTo($left);
+        }
     }
 
     function renderList() {
@@ -159,6 +160,7 @@ pandora.ui.news = function(width, height) {
         items.sort(function(a, b) {
             return a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
         }).forEach(function(item, i) {
+            Ox.print('??', i, item.id)
             Ox.Element()
                 .addClass('item')
                 .css({
@@ -166,7 +168,8 @@ pandora.ui.news = function(width, height) {
                     padding: '4px 8px 5px 8px',
                     borderRadius: '8px',
                     margin: '2px',
-                    backgroundColor: item.id == selected ? backgroundColor : '',
+                    backgroundColor: item.id == pandora.user.ui.part.news
+                        ? backgroundColor : '',
                     cursor: 'pointer'
                 })
                 .html(
@@ -177,14 +180,16 @@ pandora.ui.news = function(width, height) {
                 )
                 .bindEvent({
                     anyclick: function() {
-                        selected = item.id;
-                        $('.item').css({backgroundColor: 'transparent'});
-                        this.css({backgroundColor: backgroundColor});
-                        renderItem();
+                        pandora.UI.set('part.news', item.id);
                     }
                 })
                 .appendTo($right);
         });
+    }
+
+    function selectItem() {
+        renderItem();
+        renderList();
     }
 
     that.resize = function(data) {
@@ -193,6 +198,10 @@ pandora.ui.news = function(width, height) {
         $left.css({width: width - 512});
         $text.css({width: width - 512});
     };
+
+    that.bindEvent({
+        'pandora_part.news': selectItem
+    });
 
     return that;
 
