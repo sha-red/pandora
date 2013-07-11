@@ -699,7 +699,8 @@
                 "api": "",
                 "faq": "",
                 "help": "",
-                "news": ""
+                "news": "",
+                "tv": ""
             },
             "section": "items",
             "sequenceMode": "shape",
