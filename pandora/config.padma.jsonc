@@ -695,6 +695,12 @@
             "mapFind": "",
             "mapSelection": "",
             "page": "",
+            "part": {
+                "api": "",
+                "faq": "",
+                "help": "",
+                "news": ""
+            },
             "section": "items",
             "sequenceMode": "shape",
             "sequenceSort": [{"key": "director", "operator": "+"}],
