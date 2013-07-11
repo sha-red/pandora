@@ -192,7 +192,7 @@ pandora.ui.mainMenu = function() {
                     ] },
                     { id: 'helpMenu', title: Ox._('Help'), items: [
                         { id: 'help', title: Ox._('Help...'), keyboard: 'control ?' },
-                        { id: 'api', title: Ox._('API Documentation...') }
+                        { id: 'api', title: Ox._('API Documentation...'), keyboard: 'shift control ?' }
                     ] }
                 ],
                 pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
@@ -332,7 +332,7 @@ pandora.ui.mainMenu = function() {
             click: function(data) {
                 if ([
                     'home', 'software', 'signup', 'signin', 'signout',
-                    'preferences', 'tv', 'api'
+                    'preferences', 'help', 'api'
                 ].concat(
                     pandora.site.sitePages.map(function(page) {
                         return page.id;
@@ -355,6 +355,9 @@ pandora.ui.mainMenu = function() {
                     pandora.ui.deleteListDialog().open();
                 } else if (data.id == 'print') {
                     window.open(document.location.href + '#?print=true', '_blank');
+                } else if (data.id == 'tv') {
+                    pandora.UI.set({'part.tv': ui._list});
+                    pandora.UI.set({page: 'tv'});
                 } else if (data.id == 'showsidebar') {
                     pandora.UI.set({showSidebar: !ui.showSidebar});
                 } else if (data.id == 'showinfo') {
@@ -402,8 +405,6 @@ pandora.ui.mainMenu = function() {
                         filters: pandora.site.user.ui.filters
                     });
                     pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
-                } else if (data.id == 'help') {
-                    pandora.UI.set({page: 'help', 'hash.anchor': ui.help});
                 } else if (data.id == 'clearcache') {
                     Ox.Request.clearCache();
                 } else if (data.id == 'reloadapplication') {
@@ -470,6 +471,11 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                 }
             },
+            key_control_shift_slash: function() {
+                if (!pandora.hasDialogOrScreen()) {
+                    pandora.UI.set({page: 'api'});
+                }
+            },
             key_control_shift_w: function() {
                 if (!pandora.hasDialogOrScreen() || (ui.item || ui._list)) {
                     pandora.UI.set({find: {conditions: [], operator: '&'}});
@@ -477,11 +483,12 @@ pandora.ui.mainMenu = function() {
             },
             key_control_slash: function() {
                 if (!pandora.hasDialogOrScreen()) {
-                    pandora.UI.set({page: 'help', 'hash.anchor': ui.help});
+                    pandora.UI.set({page: 'help'});
                 }
             },
             key_control_space: function() {
                 if (!pandora.hasDialogOrScreen()) {
+                    pandora.UI.set({'part.tv': ui._list});
                     pandora.UI.set({page: 'tv'});
                 }
             },
