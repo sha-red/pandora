@@ -14,7 +14,7 @@ pandora.ui.helpDialog = function() {
                     title: Ox._('API Documentation...')
                 }).bindEvent({
                     click: function() {
-                        pandora.UI.set({page: 'api', 'hash.anchor': ''});
+                        pandora.UI.set({page: 'api'});
                     }
                 }),
                 {},
@@ -40,10 +40,10 @@ pandora.ui.helpDialog = function() {
         })
         .bindEvent({
             close: function() {
-                pandora.user.ui.page == 'help' && pandora.UI.set({page: '', 'hash.anchor': ''});
+                pandora.user.ui.page == 'help' && pandora.UI.set({page: ''});
             },
             resize: resize,
-            'pandora_help': function(data) {
+            'pandora_part.help': function(data) {
                 if (pandora.user.ui.page == 'help') {
                     that.select(data.value == '' ? 'help' : data.value);
                 }
@@ -87,14 +87,14 @@ pandora.ui.helpDialog = function() {
                 max: 1,
                 min: 1,
                 scrollbarVisible: true,
-                selected: [pandora.user.ui.help || 'help'],
+                selected: [pandora.user.ui.part.help || 'help'],
                 sort: [{key: 'index', operator: '+'}],
                 unique: 'id'
             })
             .bindEvent({
                 select: function(data) {
                     var id = data.ids[0] == 'help' ? '' : data.ids[0];
-                    pandora.UI.set({help: id, 'hash.anchor': id});
+                    pandora.UI.set({'part.help': id});
                 }
             });
 

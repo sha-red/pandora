@@ -3,8 +3,8 @@
 
 pandora.ui.apiDialog = function() {
 
-    var selected = pandora.user.ui.hash && pandora.user.ui.hash.anchor
-            ? pandora.user.ui.hash.anchor : '',
+    var selected = pandora.user.ui.part.api,
+
         actions,
 
         $panel, $list, $text,
@@ -16,7 +16,7 @@ pandora.ui.apiDialog = function() {
                     title: Ox._('Help...')
                 }).bindEvent({
                     click: function() {
-                        pandora.UI.set({page: 'help', 'hash.anchor': ''});
+                        pandora.UI.set({page: 'help'});
                     }
                 }),
                 {},
@@ -42,12 +42,12 @@ pandora.ui.apiDialog = function() {
         })
         .bindEvent({
             close: function() {
-                pandora.user.ui.page == 'api' && pandora.UI.set({page: '', 'hash.anchor': ''});
+                pandora.user.ui.page == 'api' && pandora.UI.set({page: ''});
             },
             resize: function() {
                 $list.size();
             },
-            'pandora_hash.anchor': function(data) {
+            'pandora_part.api': function(data) {
                 pandora.user.ui.page == 'api' && that.select(data.value);
             }
         });
@@ -56,7 +56,7 @@ pandora.ui.apiDialog = function() {
         var items = [{
             id: '',
             title: Ox._('API Documentation'),
-            sort: 'aaa'
+            sort: 'aaa' // FIXME: what's this?
         }];
         actions = results.data.actions;
         Ox.forEach(results.data.actions, function(v, k) {
@@ -87,7 +87,7 @@ pandora.ui.apiDialog = function() {
             .bindEvent({
                 select: function(data) {
                     var id = data.ids[0];
-                    pandora.UI.set({'hash.anchor': id});
+                    pandora.UI.set({'part.api': id});
                 }
             });
 
@@ -199,7 +199,6 @@ pandora.ui.apiDialog = function() {
                 borderWidth: '1px',
             }).appendTo($text);
         } else {
-            Ox.print('ELSE')
             $text.empty().append(getIndex());
         }
         $text.scrollTop(0);
