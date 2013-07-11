@@ -1008,7 +1008,9 @@ pandora.getPart = function(state, str, callback) {
             callback();
         });
     } else if (state.page == 'tv') {
-        var split = str.replace(/%20/g, ' ').split(':'), user, name;
+        // FIXME: decoding shouldn't have to happen here
+        str = str.replace(/%20/g, ' ');
+        var split = str.split(':'), user, name;
         if (split.length >= 2) {
             user = split.shift();
             name = split.join(':');
