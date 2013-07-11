@@ -1010,7 +1010,7 @@ pandora.getPart = function(state, str, callback) {
     } else if (state.page == 'tv') {
         var split = str.replace(/%20/g, ' ').split(':'), user, name;
         if (split.length >= 2) {
-            user = split.unshift();
+            user = split.shift();
             name = split.join(':');
             pandora.api.findLists({
                 keys: ['name', 'user'],
