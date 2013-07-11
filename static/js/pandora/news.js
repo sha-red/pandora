@@ -160,7 +160,6 @@ pandora.ui.news = function(width, height) {
         items.sort(function(a, b) {
             return a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
         }).forEach(function(item, i) {
-            Ox.print('??', i, item.id)
             Ox.Element()
                 .addClass('item')
                 .css({
