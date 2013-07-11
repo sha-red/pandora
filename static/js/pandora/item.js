@@ -68,7 +68,7 @@ pandora.ui.item = function() {
                 pandora.$ui.item = pandora.ui.infoView(result.data)
                     .bindEvent({
                         resize: function() {
-                            pandora.$ui.item.resize();
+                            pandora.$ui.item.resize && pandora.$ui.item.resize();
                         }
                     })
             );
