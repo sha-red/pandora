@@ -12,6 +12,8 @@ pandora.ui.embedPanel = function() {
         if (!ui.item) {
             if (Ox.contains(['grid', 'clip'], view)) {
                 that = pandora.ui.embedError(true);
+            } else if (view == 'video') {
+                that = pandora.ui.videoView(true);
             } else if (Ox.contains(['map', 'calendar'], view)) {
                 that = pandora.ui.embedNavigation(view);
             }

@@ -1,7 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
 
-pandora.ui.videoView = function() {
+pandora.ui.videoView = function(isEmbed) {
     var ui = pandora.user.ui,
         itemsQuery,
         query,
@@ -54,22 +54,20 @@ pandora.ui.videoView = function() {
             range: range,
             sort: pandora.user.ui.listSort
         }, function(result) {
-            pandora.$ui.statusbar.set('total', {
+            pandora.$ui.statusbar && pandora.$ui.statusbar.set('total', {
                 items: result.data.items.length
             });
             player && player.remove();
             player = Ox.VideoPlayer({
                 controlsBottom: ['play', 'previous', 'next', 'volume'],
-                controlsTop: ['fullscreen', 'scale'],
+                controlsTop: (isEmbed ? [] : ['fullscreen']).concat(['scale']),
                 enableMouse: true,
                 height: getHeight(),
                 paused: true,
                 position: 0,
                 video: Ox.flatten(result.data.items.map(function(clip) {
                     clip.item = clip.id.split('/')[0];
-                    var r = pandora.getClipVideos(clip);
-                    console.log(clip, r);
-                    return r;
+                    return pandora.getClipVideos(clip);
                 })),
                 width: getWidth()
             }).appendTo(that);
@@ -77,11 +75,15 @@ pandora.ui.videoView = function() {
     }
 
     function getHeight() {
-        return that.height();
+        return isEmbed
+            ? window.innerHeight
+            : that.height();
     }
 
     function getWidth() {
-        return that.width();
+        return isEmbed
+            ? window.innerWidth
+            : that.width();
     }
 
     that.reloadList = function() {
