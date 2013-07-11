@@ -14,7 +14,7 @@ pandora.ui.tv = function() {
                 zIndex: 1000
             }),
         $player,
-        list = pandora.user.ui._list,
+        list = pandora.user.ui.part.tv,
         lists = [],
         muted;
 
