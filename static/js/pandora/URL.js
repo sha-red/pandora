@@ -16,6 +16,9 @@ pandora.URL = (function() {
         if (pandora.user.ui.page) {
 
             state.page = pandora.user.ui.page;
+            if (Ox.contains(Object.keys(pandora.site.user.ui.part), state.page)) {
+                state.part = pandora.user.ui.part[state.page];
+            }
 
         } else {
 
@@ -122,8 +125,8 @@ pandora.URL = (function() {
             if (state.page) {
 
                 set.page = state.page;
-                if (state.page == 'help') {
-                    set.help = state.hash ? state.hash.anchor : '';
+                if (Ox.contains(Object.keys(pandora.site.user.ui.part), state.page) && state.part) {
+                    set['part.' + state.page] = state.part;
                 }
                 pandora.UI.set(set);
                 callback && callback();
@@ -336,6 +339,7 @@ pandora.URL = (function() {
             findKeys: findKeys,
             getHash: pandora.getHash,
             getItem: pandora.getItem,
+            getPart: pandora.getPart,
             getSpan: pandora.getSpan,
             pages: [].concat(
                 ['home', 'software', 'api', 'help', 'tv'],
