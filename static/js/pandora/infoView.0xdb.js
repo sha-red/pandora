@@ -40,10 +40,6 @@ pandora.ui.infoView = function(data) {
         $options = Ox.MenuButton({
                 items: [
                     {
-                        id: 'embed',
-                        title: Ox._('Embed...'),
-                    },
-                    {
                         id: 'update',
                         title: Ox._('Update Metadata'),
                         disabled: !canEdit || isEditable
@@ -67,9 +63,7 @@ pandora.ui.infoView = function(data) {
             })
             .bindEvent({
                 click: function(data) {
-                    if (data.id == 'embed') {
-                        // ...
-                    } else if (data.id == 'update') {
+                    if (data.id == 'update') {
                         updateMetadata();
                     } else if (data.id == 'delete') {
                         pandora.$ui.deleteItemDialog = pandora.ui.deleteItemDialog(data).open();
@@ -130,7 +124,7 @@ pandora.ui.infoView = function(data) {
                 left: (canEdit ? listWidth : 0) + 'px',
                 top: 0,
                 right: 0,
-                height: pandora.$ui.contentPanel.size(1) + 'px'
+                height: getHeight() + 'px'
             })
             .appendTo($info),
 
@@ -250,7 +244,6 @@ pandora.ui.infoView = function(data) {
                     value: data.title
                 })
                 .css({
-                    display: 'inline-block',
                     marginBottom: '-3px',
                     fontWeight: 'bold',
                     fontSize: '13px',
@@ -262,7 +255,6 @@ pandora.ui.infoView = function(data) {
                         editMetadata('title', event.value);
                     }
                 })
-                .appendTo($text)
         )
         .appendTo($text);
 
@@ -285,7 +277,6 @@ pandora.ui.infoView = function(data) {
                         value: data.director ? data.director.join(', ') : ''
                     })
                     .css({
-                        display: 'inline-block',
                         marginBottom: '-3px',
                         fontWeight: 'bold',
                         fontSize: '13px',
@@ -418,7 +409,7 @@ pandora.ui.infoView = function(data) {
                 return formatValue(value.actor, 'name')
                     + (
                         canSeeAllMetadata && value.character
-                        ? ' ' + formatLight('(' + formatValue(value.character) + ')')
+                        ? ' ' + formatLight('(' + value.character + ')')
                         : ''
                     );
             }).join(', ')
@@ -569,7 +560,8 @@ pandora.ui.infoView = function(data) {
             .css({marginBottom: '4px'})
             .append(
                 formatKey(
-                    key == 'votes' ? 'Mainstream Score' : 'Arthouse Score', true
+                    key == 'votes' ? 'Mainstream Score' : 'Arthouse Score',
+                    'statistics'
                 )
             )
             .append(
@@ -594,7 +586,7 @@ pandora.ui.infoView = function(data) {
             value = data[key] || 0;
         $('<div>')
             .css({marginBottom: '4px'})
-            .append(formatKey(itemKey.title, true))
+            .append(formatKey(itemKey.title, 'statistics'))
             .append(
                 Ox.Theme.formatColor(null, 'gradient')
                     .css({textAlign: 'right', cursor: 'pointer'})
@@ -620,7 +612,7 @@ pandora.ui.infoView = function(data) {
         var value = data[key] || 0;
         $('<div>')
             .css({marginBottom: '4px'})
-            .append(formatKey(key, true))
+            .append(formatKey(key, 'statistics'))
             .append(
                 Ox.Theme.formatColor(value, key == 'volume' ? 'lightness' : key)
                     .css({textAlign: 'right', cursor: 'pointer'})
@@ -643,7 +635,7 @@ pandora.ui.infoView = function(data) {
         $('<div>')
             .css({marginBottom: '4px'})
             .append(
-                formatKey(key.slice(0, -9) + ' per minute', true)
+                formatKey(key.slice(0, -9) + ' per minute', 'statistics')
             )
             .append(
                 Ox.Theme.formatColor(null, 'gradient')
@@ -666,7 +658,7 @@ pandora.ui.infoView = function(data) {
     var $rightsLevel = $('<div>');
     $('<div>')
         .css({marginBottom: '4px'})
-        .append(formatKey('Rights Level', true))
+        .append(formatKey('Rights Level', 'statistics'))
         .append($rightsLevel)
         .appendTo($statistics);
     renderRightsLevel();
@@ -676,7 +668,7 @@ pandora.ui.infoView = function(data) {
     if (canEdit) {
         $('<div>')
             .css({marginBottom: '4px'})
-            .append(formatKey('Notes', true))
+            .append(formatKey('Notes', 'statistics'))
             .append(
                 Ox.EditableContent({
                         clickLink: pandora.clickLink,
@@ -742,11 +734,14 @@ pandora.ui.infoView = function(data) {
         }
     }
 
-    function formatKey(key, isStatistics) {
-        return isStatistics
-            ? $('<div>').css({marginBottom: '4px', fontWeight: 'bold'})
+    function formatKey(key, mode) {
+        var item = Ox.getObjectById(pandora.site.itemKeys, key);
+        key = Ox._(item ? item.title : key);
+        mode = mode || 'text';
+        return mode == 'text'
+            ? '<span style="font-weight: bold">' + Ox._(Ox.toTitleCase(key)) + ':</span> '
+            : $('<div>').css({marginBottom: '4px', fontWeight: 'bold'})
                 .html(Ox._(Ox.toTitleCase(key).replace(' Per ', ' per ')))
-            : '<span style="font-weight: bold">' + Ox._(Ox.toTitleCase(key)) + ':</span> ';
     }
 
     function formatLight(str) {
@@ -772,6 +767,10 @@ pandora.ui.infoView = function(data) {
                 '<a href="/' + key + '=' + value + '">' + value + '</a>'
                 : value;
         }).join(', ');
+    }
+
+    function getHeight() {
+        return pandora.$ui.contentPanel.size(1) - 16;
     }
 
     function getRightsLevelElement(rightsLevel) {
@@ -944,7 +943,7 @@ pandora.ui.infoView = function(data) {
                     left: 0,
                     top: 0,
                     width: listWidth + 'px',
-                    height: pandora.$ui.contentPanel.size(1) - 16 + 'px'
+                    height: getHeight() + 'px'
                 })
                 .bindEvent({
                     select: function(event) {
@@ -1132,9 +1131,7 @@ pandora.ui.infoView = function(data) {
     };
 
     that.resize = function() {
-        var height = pandora.$ui.contentPanel.size(1) - 16;
-        $list && $list.css({height: height + 'px'});
-        $data.css({height: height + 'px'});
+        $list && $list.css({height: getHeight() + 'px'});
     };
 
     that.bindEvent({
@@ -1146,4 +1143,4 @@ pandora.ui.infoView = function(data) {
 
     return that;
 
-}
+};

@@ -38,34 +38,103 @@ pandora.ui.infoView = function(data) {
         },
         statisticsWidth = 128,
 
-        that = Ox.Element(),
+        $bar = Ox.Bar({size: 16})
+            .bindEvent({
+                doubleclick: function(e) {
+                    if ($(e.target).is('.OxBar')) {
+                        $info.animate({scrollTop: 0}, 250);
+                    }
+                }
+            }),
 
-        $info = $('<div>')
-            .css({
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                right: 0
+        $options = Ox.MenuButton({
+                items: [
+                    {
+                        id: 'imdb',
+                        title: Ox._('Update IMDb ID...')
+                    },
+                    {
+                        id: 'metadata',
+                        title: Ox._('Update Metadata...')
+                    },
+                    {},
+                    {
+                        id: 'upload',
+                        title: Ox._('Upload Video...')
+                    },
+                    {},
+                    {
+                        id: 'delete',
+                        title: Ox._('Delete {0}...', [pandora.site.itemName.singular]),
+                        disabled: !canRemove
+                    }
+                ],
+                style: 'square',
+                title: 'set',
+                tooltip: Ox._('Options'),
+                type: 'image',
             })
-            .appendTo(that.$element),
+            .css({
+                float: 'left',
+                borderColor: 'rgba(0, 0, 0, 0)',
+                background: 'rgba(0, 0, 0, 0)'
+            })
+            .bindEvent({
+                click: function(data_) {
+                    if (data_.id == 'imdb') {
+                        pandora.$ui.idDialog = pandora.ui.idDialog(data).open();
+                    } else if (data_.id == 'metadata') {
+                        pandora.$ui.metadataDialog = pandora.ui.metadataDialog(data).open();
+                    } else if (data_.id == 'upload') {
+                        pandora.$ui.uploadDialog = pandora.ui.uploadDialog(data).open();
+                    } else if (data_.id == 'delete') {
+                        pandora.$ui.deleteItemDialog = pandora.ui.deleteItemDialog(data).open();
+                    }
+                }
+            })
+            .appendTo($bar),
 
-        $data = Ox.Container()
-            .css({
-                position: 'absolute',
-                left: (canEdit ? listWidth : 0) + 'px',
-                top: 0,
-                right: 0,
-                height: pandora.$ui.contentPanel.size(1) + 'px'
+        $edit = Ox.MenuButton({
+                items: [
+                    {
+                        id: 'insert',
+                        title: Ox._('Insert HTML...'),
+                        disabled: true
+                    }
+                ],
+                style: 'square',
+                title: 'edit',
+                tooltip: Ox._('Edit'),
+                type: 'image',
             })
-            .appendTo($info),
+            .css({
+                float: 'right',
+                borderColor: 'rgba(0, 0, 0, 0)',
+                background: 'rgba(0, 0, 0, 0)'
+            })
+            .bindEvent({
+                click: function(data) {
+                    // ...
+                }
+            })
+            .appendTo($bar),
+
+        $info = Ox.Element().css({overflowY: 'auto'}),
+
+        that = Ox.SplitPanel({
+            elements: [
+                {element: $bar, size: 16},
+                {element: $info}
+            ],
+            orientation: 'vertical'
+        }),
 
         $icon = Ox.Element({
                 element: '<img>'
             })
             .attr({
                 src: '/' + data.id + '/' + (
-                    ui.icons == 'posters'
-                    ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
+                    ui.icons == 'posters' ? 'poster' : 'icon'
                 ) + '512.jpg?' + data.modified
             })
             .css({
@@ -80,7 +149,7 @@ pandora.ui.infoView = function(data) {
             .bindEvent({
                 singleclick: toggleIconSize
             })
-            .appendTo($data.$element),
+            .appendTo($info),
 
         $reflection = $('<div>')
             .addClass('OxReflection')
@@ -92,7 +161,7 @@ pandora.ui.infoView = function(data) {
                 height: Math.round(iconSize / 2) + 'px',
                 overflow: 'hidden'
             })
-            .appendTo($data.$element),
+            .appendTo($info),
 
         $reflectionIcon = $('<img>')
             .attr({
@@ -126,7 +195,7 @@ pandora.ui.infoView = function(data) {
                 top: margin + 'px',
                 right: margin + statisticsWidth + margin + 'px'
             })
-            .appendTo($data.$element),
+            .appendTo($info),
 
         $alternativeTitles,
 
@@ -145,11 +214,17 @@ pandora.ui.infoView = function(data) {
                 top: margin + 'px',
                 right: margin + 'px'
             })
-            .appendTo($data.$element),
-
-        $editMenu,
+            .appendTo($info),
 
         $capabilities;
+
+    [$options, $edit].forEach(function($element) {
+        $element.find('input').css({
+            borderWidth: 0,
+            borderRadius: 0,
+            padding: '3px'
+        });
+    });
 
     // Title -------------------------------------------------------------------
 
@@ -179,7 +254,6 @@ pandora.ui.infoView = function(data) {
                         editMetadata('title', event.value);
                     }
                 })
-                .appendTo($text)
         )
         .appendTo($text);
 
@@ -304,51 +378,6 @@ pandora.ui.infoView = function(data) {
 
     $('<div>').css({height: '16px'}).appendTo($text);
 
-    // Menu --------------------------------------------------------------------
-
-    if (canEdit) {
-        $editMenu = Ox.MenuButton({
-                items: [
-                    {
-                        id: 'imdb',
-                        title: Ox._('Update IMDb ID...')
-                    },
-                    {
-                        id: 'metadata',
-                        title: Ox._('Update Metadata...')
-                    },
-                    {},
-                    {
-                        id: 'upload',
-                        title: Ox._('Upload Video...')
-                    },
-                    {},
-                    {
-                        id: 'delete',
-                        title: Ox._('Delete {0}...', [pandora.site.itemName.singular]),
-                        disabled: !canRemove
-                    }
-                ],
-                title: Ox._('Edit...'),
-                width: 128
-            })
-            .css({marginBottom: '4px'})
-            .bindEvent({
-                click: function(data_) {
-                    if (data_.id == 'imdb') {
-                        pandora.$ui.idDialog = pandora.ui.idDialog(data).open();
-                    } else if (data_.id == 'metadata') {
-                        pandora.$ui.metadataDialog = pandora.ui.metadataDialog(data).open();
-                    } else if (data_.id == 'upload') {
-                        pandora.$ui.uploadDialog = pandora.ui.uploadDialog(data).open();
-                    } else if (data_.id == 'delete') {
-                        pandora.$ui.deleteItemDialog = pandora.ui.deleteItemDialog(data).open();
-                    }
-                }
-            })
-            .appendTo($statistics);
-    }
-
     // Duration, Aspect Ratio --------------------------------------------------
 
     ['duration', 'aspectratio'].forEach(function(key) {
@@ -412,7 +441,6 @@ pandora.ui.infoView = function(data) {
     // Comments ----------------------------------------------------------------
 
     if (canEdit) {
-
         $('<div>')
             .css({marginBottom: '4px'})
             .append(
@@ -448,7 +476,6 @@ pandora.ui.infoView = function(data) {
                     })
             )
             .appendTo($statistics);
-
     }
 
     $('<div>').css({height: '16px'}).appendTo($statistics);
@@ -486,17 +513,13 @@ pandora.ui.infoView = function(data) {
                 }
                 pandora.updateItemContext();
                 pandora.$ui.browser.value(result.data.id, key, result.data[key]);
-                if (Ox.contains(['title', 'director', 'year'], key)) {
-                    if (ui.icons == 'posters') {
-                        pandora.$ui.browser.find('img[src*="/' + data.id + '/"]').each(function() {
-                            $(this).attr({
-                                src: '/' + data.id + '/poster128.jpg?' + Ox.uid()
-                            });
-                        });
-                        src = '/' + data.id + '/poster512.jpg?' + Ox.uid()
-                        $icon.attr({src: src});
-                        $reflectionIcon.attr({src: src});
-                    }
+                if (
+                    Ox.contains(['title', 'director', 'year'], key)
+                    && ui.icons == 'posters'
+                ) {
+                    src = '/' + data.id + '/poster512.jpg?' + Ox.uid()
+                    $icon.attr({src: src});
+                    $reflectionIcon.attr({src: src});
                 }
                 if (Ox.contains(nameKeys, key)) {
                     data['namedescription'] = result.data['namedescription'];
@@ -516,7 +539,7 @@ pandora.ui.infoView = function(data) {
     function formatKey(key, mode) {
         var item = Ox.getObjectById(pandora.site.itemKeys, key);
         key = Ox._(item ? item.title : key);
-        mode = mode || 'text'
+        mode = mode || 'text';
         if (key == 'alternativeTitles') {
             key = 'alternative title' + (
                 data.alternativeTitles && data.alternativeTitles.length == 1 ? '' : 's'
@@ -541,7 +564,9 @@ pandora.ui.infoView = function(data) {
     function formatLink(value, key) {
         return (Ox.isArray(value) ? value : [value]).map(function(value) {
             return key
-                ? '<a href="/' + key + '=' + value + '">' + value + '</a>'
+                ? '<a href="/' + (
+                    key == 'alternativeTitles' ? 'title' : key
+                ) + '=' + value + '">' + value + '</a>'
                 : value;
         }).join(Ox.contains(specialListKeys, key) ? '; ' : ', ');
     }
@@ -567,14 +592,11 @@ pandora.ui.infoView = function(data) {
             ret = formatLink(value.split(', '), 'name');
         } else if (listKeys.indexOf(key) > -1) {
             ret = formatLink(value.split(', '), key);
-        } else if (key == 'alternativeTitles') {
-            ret = formatLink(
-                Ox.decodeHTMLEntities(value).split('; ').map(Ox.encodeHTMLEntities),
-                'title');
         } else if (specialListKeys.indexOf(key) > -1) {
             ret = formatLink(
                 Ox.decodeHTMLEntities(value).split('; ').map(Ox.encodeHTMLEntities),
-                key);
+                key
+            );
         } else if (key == 'imdbId') {
             ret = '<a href="http://www.imdb.com/title/tt'
                 + value + '">' + value + '</a>';
@@ -1023,20 +1045,14 @@ pandora.ui.infoView = function(data) {
 
     that.reload = function() {
         var src = src = '/' + data.id + '/' + (
-            ui.icons == 'posters'
-            ? (ui.showSitePosters ? 'siteposter' : 'poster') : 'icon'
-        ) + '512.jpg?' + Ox.uid()
+            ui.icons == 'posters' ? 'poster' : 'icon'
+        ) + '512.jpg?' + Ox.uid();
         $icon.attr({src: src});
         $reflectionIcon.attr({src: src});
         iconSize = iconSize == 256 ? 512 : 256;
         iconRatio = ui.icons == 'posters'
             ? (ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio) : 1;
         toggleIconSize();
-    };
-
-    that.resize = function() {
-        var height = pandora.$ui.contentPanel.size(1);
-        $data.css({height: height + 'px'});
     };
 
     that.bindEvent({
