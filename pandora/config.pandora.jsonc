@@ -183,7 +183,7 @@
         },
         {
             "id": "country",
-            "title": "Contry",
+            "title": "Country",
             "type": "string",
             "autocomplete": true,
             "columnWidth": 180,
