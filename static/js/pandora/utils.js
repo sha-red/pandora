@@ -982,10 +982,63 @@ pandora.getPageTitle = function(stateOrURL) {
         : null;
 };
 
+pandora.getPart = function(state, str, callback) {
+    if (state.page == 'api') {
+        pandora.api.api(function(result) {
+            if (Ox.contains(Object.keys(result.data.actions), str)) {
+                state.part = str;
+            }
+            callback();
+        })
+    } else if (state.page == 'faq') {
+        // ...
+        callback();
+    } else if (state.page == 'help') {
+        if (Ox.getObjectById(pandora.site.help, str)) {
+            state.part = str;
+        }
+        callback();
+    } else if (state.page == 'news') {
+        pandora.api.getNews(function(result) {
+            if (Ox.getObjectById(result.data.items, str)) {
+                state.part = str;
+            } else if (result.data.items.length) {
+                state.part = result.data.items[0].id;
+            }
+            callback();
+        });
+    } else if (state.page == 'tv') {
+        var split = str.replace(/%20/g, ' ').split(':'), user, name;
+        if (split.length >= 2) {
+            user = split.unshift();
+            name = split.join(':');
+            pandora.api.findLists({
+                keys: ['name', 'user'],
+                query: {
+                    conditions: [
+                        {key: 'user', operator: '==', value: user},
+                        {key: 'name', operator: '==', value: name}
+                    ],
+                    operator: '&'
+                }
+            }, function(result) {
+                if (result.data.items.length) {
+                    state.part = str;
+                }
+                callback();
+            });
+        } else {
+            callback();
+        }
+    } else {
+        callback();
+    }
+};
+
 pandora.getSortKeyData = function(key) {
     return Ox.getObjectById(pandora.site.itemKeys, key)
         || Ox.getObjectById(pandora.site.clipKeys, key);
-}
+};
 
 pandora.getSortKeys = function() {
     return pandora.site.itemKeys.filter(function(key) {
