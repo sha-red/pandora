@@ -697,15 +697,9 @@ pandora.getHash = function(state, callback) {
             'showAnnotations', 'showCloseButton', 'showLayers', 'showTimeline',
             'timeline', 'title'
         ],
-        isEmbed = state.hash && state.hash.query
-            && Ox.indexOf(state.hash.query, function(condition) {
-                return Ox.isEqual(condition, {key: 'embed', value: true});
-            }) > -1,
-        isPrint = state.hash && state.hash.query
-            && Ox.indexOf(state.hash.query, function(condition) {
-                return Ox.isEqual(condition, {key: 'print', value: true});
-            }) > -1,
-        printKeys = ['print'],
+        isEmbed = state.hash && state.hash.anchor == 'embed',
+        isPrint = state.hash && state.hash.anchor == 'print',
+        printKeys = [],
         removeKeys = [];
     if (state.hash && state.hash.anchor) {
         if (state.page == 'help') {
