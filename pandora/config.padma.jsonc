@@ -657,7 +657,9 @@
             "annotationsSort": "position",
             "calendarFind": "",
             "calendarSelection": "",
-            "clipsColumns": 2,
+            "clipColumns": 2,
+            "clipSort": [{"key": "index", "operator": "+"}],
+            "clipView": "list",
             "columns": {
                 "Colors": {
                     "columns": ["title", "source", "project", "language", "hue", "saturation", "brightness"],
@@ -665,6 +667,7 @@
                 }
             },
             "edit": "",
+            "editPoints": {},
             "embedSize": 256,
             "filters": [
                 {"id": "source", "sort": [{"key": "name", "operator": "+"}]},
@@ -710,6 +713,7 @@
             "showAnnotationsMap": true,
             "showBrowser": true,
             "showCalendarControls": true, // fixme: should be false
+            "showClips": true,
             "showFilters": true,
             "showIconBrowser": false,
             "showInfo": true,
@@ -749,6 +753,7 @@
             "textPositions": {},
             "theme": "oxlight",
             "updateAdvancedFindResults": false,
+            "videoLoop": false,
             "videoMuted": false,
             "videoPoints": {},
             "videoResolution": 240,

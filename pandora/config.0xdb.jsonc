@@ -768,7 +768,9 @@
             "annotationsSort": "position",
             "calendarFind": "",
             "calendarSelection": "",
-            "clipsColumns": 2,
+            "clipColumns": 2,
+            "clipSort": [{"key": "index", "operator": "+"}],
+            "clipView": "list",
             "columns": {
                 "Colors": {
                     "columns": ["title", "director", "country", "year", "hue", "saturation", "brightness"],
@@ -776,6 +778,7 @@
                 }
             },
             "edit": "",
+            "editPoints": {},
             "embedSize": 256,
             "filters": [
                 {"id": "director", "sort": [{"key": "items", "operator": "-"}]},
@@ -820,6 +823,7 @@
             "showAnnotationsMap": true,
             "showBrowser": true,
             "showCalendarControls": true, // fixme: should be false
+            "showClips": true,
             "showFilters": true,
             "showIconBrowser": false,
             "showInfo": true,
@@ -856,6 +860,7 @@
             "textPositions": {},
             "theme": "oxdark",
             "updateAdvancedFindResults": false,
+            "videoLoop": false,
             "videoMuted": false,
             "videoPoints": {},
             "videoResolution": 96,
