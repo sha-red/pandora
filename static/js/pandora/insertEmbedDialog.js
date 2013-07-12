@@ -427,13 +427,13 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
             + (data.annotation || '')
             + '#embed?'
             + Ox.serialize({
-                title: data.title ? JSON.stringify(data.title) : null,
+                title: data.title,
                 showTimeline: data.showTimeline || null,
-                timeline: data.timeline ? JSON.stringify(data.timeline) : '',
+                timeline: data.timeline,
                 showAnnotations: data.showAnnotations || null,
-                showLayers: data.showAnnotations && data.showLayers.length ? JSON.stringify(data.showLayers) : null,
+                showLayers: data.showAnnotations && data.showLayers ? data.showLayers : null,
                 matchRatio: true
-            })
+            }, true));
             $input.url.options({
                 value: data.protocol + '://'
                     + data.site + '/'
@@ -445,13 +445,15 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
                         : []
                     ).join(',')
                     + (data.annotation || '')
-                    + '#?embed=true'
-                    + (data.title ? '&title=' + JSON.stringify(data.title) : '')
-                    + (data.showTimeline ? '&showTimeline=true' : '')
-                    + (data.timeline != 'default' ? '&timeline=' + JSON.stringify(data.timeline) : '')
-                    + (data.showAnnotations ? '&showAnnotations=true' : '')
-                    + (data.showAnnotations && data.showLayers.length ? '&showLayers=' + JSON.stringify(data.showLayers) : '')
-                    + '&matchRatio=true'
+                    + '#embed?'
+                    + Ox.serialize({
+                        title: data.title,
+                        showTimeline: data.showTimeline || null,
+                        timeline: data.timeline,
+                        showAnnotations: data.showAnnotations || null,
+                        showLayers: data.showAnnotations && data.showLayers ? data.showLayers : null,
+                        matchRatio: true
+                    }, true)
             });
         }
 
