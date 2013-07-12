@@ -701,16 +701,7 @@ pandora.getHash = function(state, callback) {
         isPrint = state.hash && state.hash.anchor == 'print',
         printKeys = [],
         removeKeys = [];
-    if (state.hash && state.hash.anchor) {
-        if (state.page == 'help') {
-            if (
-                state.hash.anchor == 'help'
-                || !Ox.getObjectById(pandora.site.help, state.hash.anchor)
-            ) {
-                delete state.hash.anchor;
-            }
-        }
-    } else if (state.hash) {
+    if (state.hash && state.hash.anchor && !isEmbed && !isPrint) {
         delete state.hash.anchor;
     }
     if (state.hash && state.hash.query) {
