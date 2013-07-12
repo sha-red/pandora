@@ -354,7 +354,7 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'deletelist') {
                     pandora.ui.deleteListDialog().open();
                 } else if (data.id == 'print') {
-                    window.open(document.location.href + '#?print=true', '_blank');
+                    window.open(document.location.href + '#print', '_blank');
                 } else if (data.id == 'tv') {
                     pandora.UI.set({'part.tv': ui._list});
                     pandora.UI.set({page: 'tv'});
