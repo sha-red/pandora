@@ -217,17 +217,21 @@ pandora.ui.editList = function(edit) {
     return that;
 
 };
+
 pandora.ui.editPlayer = function(edit) {
+
     var that = Ox.Element()
         .css({
-            'overflow-y': 'auto'
+            overflowY: 'auto'
         });
 
-
     self.$player = Ox.VideoPlayer({
-        controlsBottom: ['play', 'previous', 'next', 'volume', 'position'],
-        controlsTop: ['fullscreen', 'scale'],
+        controlsBottom: ['play', 'volume', 'previous', 'next', 'loop', 'scale', 'space', 'position'],
+        controlsTop: ['fullscreen', 'space', 'open'],
+        enableKeyboard: true,
         enableMouse: true,
+        enablePosition: true,
+        enableTimeline: true,
         height: getHeight(),
         paused: true,
         position: 0,
@@ -247,5 +251,6 @@ pandora.ui.editPlayer = function(edit) {
         return window.innerWidth
             - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1;
     }
+
     return that;
 };
