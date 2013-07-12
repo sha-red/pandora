@@ -62,7 +62,7 @@ pandora.ui.sortElement = function(isNavigationView) {
             .bindEvent('pandora_' + sortKey.toLowerCase(), updateElement);
 
     function getButtonTitle() {
-        return Ox._(pandora.user.ui[sortKey][0].operator == '+' ? 'up' : 'down');
+        return pandora.user.ui[sortKey][0].operator == '+' ? 'up' : 'down';
     }
 
     function getButtonTooltip() {
