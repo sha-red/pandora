@@ -12,7 +12,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
             280 + Ox.UI.SCROLLBAR_SIZE,
             416 + Ox.UI.SCROLLBAR_SIZE
         ],
-        listSize = listSizes[ui.clipsColumns - 1],
+        listSize = listSizes[ui.clipColumns - 1],
 
         $element = Ox.Element(),
 
@@ -85,7 +85,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
                         }, 0);
                     });
                 }
-                pandora.UI.set({clipsColumns: listSizes.indexOf(size) + 1});
+                pandora.UI.set({clipColumns: listSizes.indexOf(size) + 1});
             }
         }),
 
