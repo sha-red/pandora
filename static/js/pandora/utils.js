@@ -1008,8 +1008,6 @@ pandora.getPart = function(state, str, callback) {
             callback();
         });
     } else if (state.page == 'tv') {
-        // FIXME: decoding shouldn't have to happen here
-        str = str.replace(/%20/g, ' ');
         var split = str.split(':'), user, name;
         if (split.length >= 2) {
             user = split.shift();
@@ -1062,53 +1060,63 @@ pandora.getSortOperator = function(key) {
     ) > -1 ? '+' : '-';
 };
 
-pandora.getSpan = function(state, str, callback) {
+pandora.getSpan = function(state, val, callback) {
     // For a given item, or none (state.item), and a given view, or any
-    // (state.view), this takes a string and checks if it is a valid
-    // annotation/event/place id or an event/place name, and in that case sets
-    // state.span, and may modify state.view.
+    // (state.view), this takes a value (array of numbers or string) and checks
+    // if it is a valid video position (numbers) or annotation/event/place id or
+    // event/place name (string), and in that case sets state.span, and may
+    // modify state.view.
     // fixme: "subtitles:23" is still missing
     if (state.type == pandora.site.itemName.plural.toLowerCase()) {
-        var isName = str[0] == '@',
-            canBeAnnotation = (
-                !state.view
-                || Ox.contains(['player', 'editor', 'timeline'], state.view)
-            ) && state.item && !isName,
-            canBeEvent = !state.view || state.view == 'calendar',
-            canBePlace = !state.view || state.view == 'map';
-        str = isName ? str.slice(1) : str;
-        getId(canBeAnnotation ? 'annotation' : '', function(id) {
-            if (id) {
-                Ox.Log('URL', 'id?', id)
-                state.span = id;
-                state.view = pandora.user.ui.videoView;
-                callback();
-            } else {
-                getId(canBePlace ? 'place' : '', function(id) {
-                    if (id) {
-                        Ox.Log('URL', 'found place id', id)
-                        state.span = id;
-                        state.view = 'map';
-                        callback();
-                    } else {
-                        getId(canBeEvent ? 'event' : '', function(id) {
-                            if (id) {
-                                Ox.Log('URL', 'found event id', id)
-                                state.span = id;
-                                state.view = 'calendar';
-                            } else if (canBePlace && isName) {
-                                Ox.Log('URL', 'setting place id', '@' + str)
-                                state.span = '@' + str;
-                                state.view = 'map';
-                            }
-                            callback();
-                        });
-                    }
+        var isArray = Ox.isArray(val),
+            isName, isVideoView, canBeAnnotation, canBeEvent, canBePlace;
+        if (isArray) {
+            pandora.api.get({id: state.item}, keys: ['duration']}, function(result) {
+                state.span = val.map(function(number) {
+                    return Math.min(number, result.data.duration);
                 });
-            }
-        });
+                callback();
+            });
+        } else {
+            isName = val[0] == '@';
+            isVideoView = Ox.contains(['player', 'editor', 'timeline'], state.view);
+            canBeAnnotation = state.item && (!state.view || isVideoView) && !isName;
+            canBeEvent = !state.view || state.view == 'calendar';
+            canBePlace = !state.view || state.view == 'map';
+            val = isName ? val.slice(1) : val;
+            getId(canBeAnnotation ? 'annotation' : '', function(id) {
+                if (id) {
+                    Ox.Log('URL', 'id?', id)
+                    state.span = id;
+                    state.view = pandora.user.ui.videoView;
+                    callback();
+                } else {
+                    getId(canBePlace ? 'place' : '', function(id) {
+                        if (id) {
+                            Ox.Log('URL', 'found place id', id)
+                            state.span = id;
+                            state.view = 'map';
+                            callback();
+                        } else {
+                            getId(canBeEvent ? 'event' : '', function(id) {
+                                if (id) {
+                                    Ox.Log('URL', 'found event id', id)
+                                    state.span = id;
+                                    state.view = 'calendar';
+                                } else if (canBePlace && isName) {
+                                    Ox.Log('URL', 'setting place id', '@' + str)
+                                    state.span = '@' + str;
+                                    state.view = 'map';
+                                }
+                                callback();
+                            });
+                        }
+                    });
+                }
+            });
+        }
     } else if (type == 'texts') {
-        state.span = str;
+        state.span = val;
         callback();
     }
 
@@ -1118,7 +1126,7 @@ pandora.getSpan = function(state, str, callback) {
                 query: {
                     conditions: [{
                         key: isName ? 'name' : 'id',
-                        value: type != 'annotation' ? str : state.item + '/' + str,
+                        value: type != 'annotation' ? val : state.item + '/' + val,
                         operator: '=='
                     }],
                     operator: '&'
