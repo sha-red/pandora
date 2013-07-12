@@ -30,21 +30,21 @@ appPanel
             });
         } catch(e) {}
     };
-    function getLocalStorage(key) {
-        //fails if localStorage does not exist or
-        //if third party cookies are disabled
-        try {
-            return localStorage[key];
-        } catch(e) {}
-    }
+
+    // handle old embed and print URLs
+    document.location.hash = document.location.hash.replace(
+        /^#(embed|print)=true(&)?/,
+        function() {
+            return '#' + arguments[1] + (arguments[2] ? '?' : '');
+        }
+    );
+
     var animationInterval,
         enableDebugMode = getLocalStorage('pandora.enableDebugMode'),
         enableEventLogging = getLocalStorage('pandora.enableEventLogging'),
-        isEmbed = /^#\?/.test(document.location.hash)
-            && /embed=true/.test(document.location.hash),
+        isEmbed = /^#embed(\?.*?)?$/.test(document.location.hash),
         isMSIE = /MSIE/.test(navigator.userAgent),
-        isPrint = /^#\?/.test(document.location.hash)
-            && /print=true/.test(document.location.hash),
+        isPrint = /^#print(\?.*?)?$/.test(document.location.hash),
         legacyThemes = {classic: 'oxlight', modern: 'oxdark'},
         theme = getLocalStorage('Ox.theme')
             && JSON.parse(localStorage['Ox.theme']) || 'oxmedium';
@@ -57,6 +57,14 @@ appPanel
             loadOxUI(loadPandora);
         });
     });
+
+    function getLocalStorage(key) {
+        // fails if localStorage does not exist or if third party cookies are
+        // disabled
+        try {
+            return localStorage[key];
+        } catch(e) {}
+    }
 
     function getPandoraVersion() {
         var i, path, scripts = document.getElementsByTagName('script');
