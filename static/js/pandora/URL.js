@@ -63,6 +63,20 @@ pandora.URL = (function() {
             
         }
 
+        if (
+            pandora.user.ui._hash && (
+                pandora.user.ui._hash.anchor || !Ox.isEmpty(pandora.user.ui._hash.query)
+            )
+        ) {
+            state.hash = {};
+            if (pandora.user.ui._hash.anchor) {
+                state.hash.anchor = pandora.user.ui._hash.anchor;
+            }
+            if (!Ox.isEmpty(pandora.user.ui._hash.query)) {
+                state.hash.query = pandora.user.ui._hash.query;
+            }
+        }
+
         Ox.Log('URL', 'GOT STATE ...', state)
 
         return state;
@@ -86,6 +100,7 @@ pandora.URL = (function() {
 
         } else {
 
+            pandora.user.ui._hash = state.hash;
             if (
                 state.hash
                 && !Ox.contains(['embed', 'print'], state.hash.anchor)

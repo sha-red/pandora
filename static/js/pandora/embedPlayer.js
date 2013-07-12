@@ -259,11 +259,11 @@ pandora.ui.embedPlayer = function() {
 
     function getOptions() {
         var options = {};
-        ui.hash.query.forEach(function(condition) {
-            if (condition.key != 'embed') {
-                options[condition.key] = condition.value;                
-            }
-        });
+        if (ui._hash.query) {
+            ui._hash.query.forEach(function(condition) {
+                options[condition.key] = condition.value;
+            });
+        }
         options = Ox.extend(
             {item: ui.item},
             ui.videoPoints[ui.item] || {},
