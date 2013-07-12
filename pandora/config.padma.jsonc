@@ -678,7 +678,6 @@
             "find": {"conditions": [], "operator": "&"},
             "followPlayer": true,
             "help": "",
-            "hash": {"anchor": "", "query": []},
             "icons": "frames",
             "infoIconSize": 256,
             "item": "",

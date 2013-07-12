@@ -597,7 +597,6 @@
             "find": {"conditions": [], "operator": "&"},
             "followPlayer": true,
             "help": "",
-            "hash": {"anchor": "", "query": []},
             "icons": "posters",
             "infoIconSize": 256,
             "item": "",
