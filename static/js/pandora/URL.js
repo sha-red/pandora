@@ -63,20 +63,6 @@ pandora.URL = (function() {
             
         }
 
-        if (
-            pandora.user.ui.hash && (
-                pandora.user.ui.hash.anchor || !Ox.isEmpty(pandora.user.ui.hash.query)
-            )
-        ) {
-            state.hash = {};
-            if (pandora.user.ui.hash.anchor) {
-                state.hash.anchor = pandora.user.ui.hash.anchor;
-            }
-            if (!Ox.isEmpty(pandora.user.ui.hash.query)) {
-                state.hash.query = pandora.user.ui.hash.query;
-            }
-        }
-
         Ox.Log('URL', 'GOT STATE ...', state)
 
         return state;
@@ -100,26 +86,14 @@ pandora.URL = (function() {
 
         } else {
 
-            if (state.hash) {
-                set.hash = state.hash;
-                if (!state.hash.anchor) {
-                    state.hash.anchor = '';
-                }
-                if (state.hash.query) {
-                    if (state.hash.query.embed === true) {
-                        // ...
-                    } else if (state.hash.query.print == true) {
-                        // ...
-                    } else {
-                        state.hash.query.forEach(function(kv) {
-                            set[kv.key] = kv.value;
-                        });
-                    }
-                } else {
-                    set.hash.query = [];
-                }
-            } else {
-                set.hash = Ox.clone(pandora.site.user.ui.hash, true);
+            if (
+                state.hash
+                && !Ox.contains(['embed', 'print'], state.hash.anchor)
+                && state.hash.query
+            ) {
+                state.hash.query.forEach(function(kv) {
+                    set[kv.key] = kv.value;
+                });
             }
 
             if (state.page) {
