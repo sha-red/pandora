@@ -6,7 +6,7 @@ pandora.ui.embedVideoDialog = function() {
     var width = 640,
         height = 360,
         url = document.location.href + (
-            document.location.hash ? '?embed=true' : '#?embed=true'
+            document.location.hash ? 'embed' : '#embed'
         ),
 
         $content = Ox.Element()
