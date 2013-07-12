@@ -1311,15 +1311,13 @@ pandora.isClipView = function(view, item) {
 pandora.isEmbedURL = function(url) {
     url = url || document.location.href;
     var hash = Ox.parseURL(url).hash;
-    return hash.substr(0, 2) == '#?'
-        && Ox.unserialize(hash.substr(2), true).embed === true
+    return /^#embed(\?.*?)?$/.test(hash);
 };
 
 pandora.isPrintURL = function(url) {
     url = url || document.location.href;
     var hash = Ox.parseURL(url).hash;
-    return hash.substr(0, 2) == '#?'
-        && Ox.unserialize(hash.substr(2), true).print === true
+    return /^#print(\?.*?)?$/.test(hash);
 };
 
 pandora.logEvent = function(data, event, element) {
