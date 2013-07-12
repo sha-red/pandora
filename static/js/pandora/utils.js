@@ -1071,7 +1071,7 @@ pandora.getSpan = function(state, val, callback) {
         var isArray = Ox.isArray(val),
             isName, isVideoView, canBeAnnotation, canBeEvent, canBePlace;
         if (isArray) {
-            pandora.api.get({id: state.item}, keys: ['duration']}, function(result) {
+            pandora.api.get({id: state.item, keys: ['duration']}, function(result) {
                 state.span = val.map(function(number) {
                     return Math.min(number, result.data.duration);
                 });
