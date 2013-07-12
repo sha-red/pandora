@@ -31,7 +31,7 @@ appPanel
         } catch(e) {}
     };
 
-    // handle old embed and print URLs
+    // handle legacy embed and print URLs
     document.location.hash = document.location.hash.replace(
         /^#(embed|print)=true(&)?/,
         function() {
