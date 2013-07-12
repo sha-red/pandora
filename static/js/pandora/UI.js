@@ -161,6 +161,15 @@ pandora.UI = (function() {
             }
         }
 
+        if (args.edit) {
+            if (
+                !pandora.user.ui.editPoints[args.edit]
+                && !args['editPoints.' + args.edit]
+            ) {
+                add['editPoints.' + args.edit] = {clip: '', 'in': 0, out: 0, position: 0};
+            }
+        }
+
         // items in args trigger events, items in add do not
         [args, add].forEach(function(obj, isAdd) {
             Ox.forEach(obj, function(val, key) {
