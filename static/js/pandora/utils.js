@@ -906,6 +906,75 @@ pandora.getItemIdAndPosition = function() {
     return ret;
 }
 
+pandora.getLargeClipTimelineURL = function(item, inPoint, outPoint, type, callback) {
+    var fps = 25,
+        width = Math.floor((outPoint - inPoint) * fps),
+        height = 64,
+        canvas = Ox.$('<canvas>').attr({width: width, height: height})[0],
+        context = canvas.getContext('2d'),
+        inIndex = Math.floor(inPoint / 60),
+        outIndex = Math.floor(outPoint / 60),
+        offset = inPoint % 60 * -fps;
+    Ox.parallelForEach(Ox.range(inIndex, outIndex + 1), function(index, i) {
+        var callback = Ox.last(arguments),
+            image = Ox.$('<img>')
+                .on({
+                    load: function() {
+                        context.drawImage(image, offset + i * 1500, 0);
+                        callback();
+                    }
+                })
+                .attr({
+                    src: '/' + item + '/timeline' + type + '64p' + index + '.jpg'
+                })[0];
+    }, function() {
+        callback(canvas.toDataURL());
+    });
+};
+
+pandora.getLargeEditTimelineURL = function(edit, type, i, callback) {
+    var clips = [],
+        timelineIn = i * 60,
+        timelineOut = Math.min((i + 1) * 60, Math.floor(edit.duration)),
+        fps = 25,
+        width = (timelineOut - timelineIn) * fps,
+        height = 64,
+        canvas = Ox.$('<canvas>').attr({width: width, height: height})[0],
+        context = canvas.getContext('2d');
+    Ox.forEach(edit.clips, function(clip) {
+        var clipIn = clip.position,
+            clipOut = clip.position + clip.duration;
+        if (clipIn >= timelineOut) {
+            return false; // break
+        }
+        if (
+            timelineIn <= clipIn <= timelineOut
+            || timelineIn <= clipOut <= timelineOut
+            || (clipIn <= timelineIn && clipOut >= timelineOut)
+        ) {
+            clips.push(clip);
+        }
+    });
+    Ox.parallelForEach(clips, function(clip) {
+        var callback = Ox.last(arguments);
+        pandora.getLargeClipTimelineURL(clip.item, clip['in'], clip.out, type, function(url) {
+            var image = Ox.$('<img>')
+                .on({
+                    load: function() {
+                        Ox.print('DRAWING TIMELINE', i, 'AT', Math.floor((clip.position - timelineIn) * fps), 'OF', width)
+                        context.drawImage(image, Math.floor((clip.position - timelineIn) * fps), 0);
+                        callback();
+                    }
+                })
+                .attr({
+                    src: url
+                })[0];
+        });
+    }, function() {
+        callback(canvas.toDataURL());
+    });
+};
+
 pandora.getListData = function(list) {
     var data = {}, folder;
     if (pandora.user.ui.section == 'items') {
