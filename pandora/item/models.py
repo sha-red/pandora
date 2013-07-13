@@ -1297,9 +1297,13 @@ class Item(models.Model):
                     pass
         return icon
 
-    def load_subtitles(self):
+    def load_subtitles(self, force=False):
         subtitles = utils.get_by_key(settings.CONFIG['layers'], 'isSubtitles', True)
-        if not settings.USE_IMDB or not subtitles:
+        if not subtitles:
+            return
+        # only import on 0xdb for now or if forced manually
+        # since this will remove all existing subtitles
+        if not force or not settings.USE_IMDB:
             return False
         with transaction.commit_on_success():
             layer = subtitles['id']
