@@ -220,7 +220,7 @@ pandora.ui.editPanel = function() {
         updateSmallTimelineURL();
 
     }
-    that.updateSmallTimelineURL = updateSmallTimelineURL;
+
     function updateSmallTimelineURL() {
         var fps = 25;
         Ox.serialForEach(edit.clips, function(clip) {
