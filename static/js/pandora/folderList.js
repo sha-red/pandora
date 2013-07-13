@@ -382,8 +382,8 @@ pandora.ui.folderList = function(id) {
                 Ox.Requests.clearCache('find' + folderItems);
             });
         },
-        paste: function(data) {
-            pandora.$ui.list.triggerEvent('paste', data);
+        paste: function() {
+            pandora.$ui.list.triggerEvent('paste');
         },
         select: function(data) {
             var list = data.ids.length ? data.ids[0] : '';
