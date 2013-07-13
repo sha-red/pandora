@@ -98,7 +98,7 @@ class Event(models.Model):
             #annotations of type event always need an event
             if a.get_layer().get('type') == 'event' and a.events.count() == 0:
                 a.events.add(Event.get_or_create(a.value))
-                for e in a.events.all():
+                for e in a.events.exclude(id=self.id):
                     e.update_matches()
         for a in matches.exclude(id__in=self.annotations.all()):
             #need to check again since editEvent might have been called again

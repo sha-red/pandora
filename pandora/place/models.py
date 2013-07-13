@@ -110,7 +110,7 @@ class Place(models.Model):
             #annotations of type place always need a place
             if a.get_layer().get('type') == 'place' and a.places.count() == 0:
                 a.places.add(Place.get_or_create(a.value))
-                for p in a.places.all():
+                for p in a.places.exclude(id=self.id):
                     p.update_matches()
         for a in matches.exclude(id__in=self.annotations.all()):
             #need to check again since editEvent might have been called again
