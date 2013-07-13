@@ -49,12 +49,13 @@ def update_poster(itemId):
     item = models.Item.objects.get(itemId=itemId)
     item.make_poster(True)
     item.make_icon()
-    models.Item.objects.filter(pk=item.id).update(
-        poster=item.poster.name,
-        poster_height=item.poster.height,
-        poster_width=item.poster.width,
-        icon=item.icon.name
-    )
+    if item.poster and os.path.exists(item.poster.path):
+        models.Item.objects.filter(pk=item.id).update(
+            poster=item.poster.name,
+            poster_height=item.poster.height,
+            poster_width=item.poster.width,
+            icon=item.icon.name
+        )
 
 @task(ignore_results=True, queue='default')
 def update_file_paths(itemId):

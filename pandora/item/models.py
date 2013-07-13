@@ -463,7 +463,7 @@ class Item(models.Model):
         for service in external_posters:
             p = external_posters[service][0]
             p['source'] = service
-            p['selected'] = p['url'] == url
+            p['selected'] = self.poster_source and self.poster_source == service or False
             p['index'] = index.index(service)
             posters.append(p)
         posters.sort(key=lambda a: a['index'])
