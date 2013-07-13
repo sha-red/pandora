@@ -221,7 +221,9 @@ class Edit(models.Model):
                 'editable',
                 'rightslevel',
                 'id',
+                'items',
                 'clips',
+                'duration',
                 'name',
                 'posterFrames',
                 'status',
@@ -237,8 +239,16 @@ class Edit(models.Model):
         for key in keys:
             if key == 'id':
                 response[key] = self.get_id()
+            elif key == 'items':
+                response[key] = self.clips.all().count()
             elif key == 'clips':
                 response[key] = [c.json(user) for c in self.clips.all().order_by('index')]
+            elif key == 'duration':
+                if 'clips' in response:
+                    clips = response['clips']
+                else:
+                    clips = [c.json(user) for c in self.clips.all().order_by('index')]
+                response[key] = sum([c['duration'] for c in clips])
             elif key == 'editable':
                 response[key] = self.editable(user)
             elif key == 'user':
