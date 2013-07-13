@@ -41,7 +41,10 @@ def addClip(request):
     edit = get_edit_or_404_json(data['edit'])
     if edit.editable(request.user):
         clip = edit.add_clip(data)
-        response['data'] = clip.json(request.user)
+        if not clip:
+            response = json_response(status=500, text='invalid in/out')
+        else:
+            response['data'] = clip.json(request.user)
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
@@ -87,6 +90,7 @@ def editClip(request):
     response = json_response()
     data = json.loads(request.POST['data'])
     clip = get_object_or_404_json(models.Clip, pk=ox.fromAZ(data['id']))
+    valid = False
     if clip.edit.editable(request.user):
         for key in ('in', 'out'):
             if key in data:
@@ -95,8 +99,14 @@ def editClip(request):
                     clip.end = clip.annotation.end
                     clip.annotation = None
                 setattr(clip, {'in': 'start', 'out': 'end'}.get(key), float(data[key]))
-        clip.save()
-        response['data'] = clip.json(user=request.user)
+        if not clip.annotation:
+            duration = clip.item.sort.duration
+            if clip.start >= clip.end or clip.start >= duration or clip.end > duration:
+                response = json_response(status=500, text='invalid in/out')
+                valid = False
+        if valid:
+            clip.save()
+            response['data'] = clip.json(user=request.user)
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)

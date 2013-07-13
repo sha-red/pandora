@@ -65,6 +65,11 @@ class Edit(models.Model):
             clip.index = 0
         else:
             clip.index +=1
+        # dont add clip if in/out are invalid
+        if not clip.annotation:
+            duration = clip.item.sort.duration
+            if clip.start >= clip.end or clip.start >= duration or clip.end > duration:
+                return False
         clip.save()
         return clip
 
