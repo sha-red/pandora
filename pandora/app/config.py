@@ -21,6 +21,7 @@ from archive.extract import supported_formats, AVCONV
 _win = (sys.platform == "win32")
 
 RUN_RELOADER = True
+NOTIFIER = None
 
 def get_version():
     info = os.path.join(os.path.dirname(__file__), '..', '..', '.bzr/branch/last-revision')
@@ -130,6 +131,7 @@ check the README for further details.
 
 
 def reloader_thread():
+    global NOTIFIER
     settings.RELOADER_RUNNING=True
     _config_mtime = 0
     try:
@@ -149,6 +151,7 @@ def reloader_thread():
         wm = pyinotify.WatchManager()
         add_watch()
         notifier = pyinotify.Notifier(wm)
+        NOTIFIER = notifier
         notifier.loop()
     else:
         while RUN_RELOADER:
@@ -271,3 +274,13 @@ def init():
     if not settings.RELOADER_RUNNING:
         load_config()
         thread.start_new_thread(reloader_thread, ())
+
+def shutdown():
+    if settings.RELOADER_RUNNING:
+        RUN_RELOADER = False
+        settings.RELOADER_RUNNING = False
+        if NOTIFIER:
+            NOTIFIER.stop()
+
+
+
