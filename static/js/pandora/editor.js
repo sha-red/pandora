@@ -108,6 +108,16 @@ pandora.ui.editor = function(data) {
             censored: function() {
                 pandora.URL.push(pandora.site.cantPlay.link);
             },
+            copy: function(clips) {
+                Ox.Clipboard.copy(clips.map(function(clip) {
+                    return Ox.extend(clip, {item: ui.item});
+                }), 'clip');
+            },
+            copyadd: function(clip) {
+                Ox.Clipboard.add(clips.map(function(clip) {
+                    return Ox.extend(clip, {item: ui.item});
+                }), 'clip');
+            },
             define: function(data) {
                 var dialog = data.type + 'sDialog';
                 pandora.$ui[dialog] && pandora.$ui[dialog].remove();
