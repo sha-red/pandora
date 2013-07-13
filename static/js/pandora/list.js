@@ -393,12 +393,7 @@ pandora.ui.list = function() {
                 //delete pandora.$ui.previewDialog;
             },
             copy: function(data) {
-                Ox.Clipboard.copy({
-                    items: data.ids,
-                    text: data.ids.map(function(id) {
-                        return pandora.$ui.list.value(id, 'title');
-                    }).join('\n')
-                });
+                Ox.Clipboard.copy(data.ids, 'item');
             },
             'delete': function(data) {
                 pandora.getListData().editable && pandora.api.removeListItems({
@@ -529,10 +524,14 @@ pandora.ui.list = function() {
                 });
             },
             paste: function(data) {
-                data.items && pandora.getListData().editable && pandora.api.addListItems({
-                    list: pandora.user.ui._list,
-                    items: data.items
-                }, pandora.reloadList);
+                var items;
+                if (Ox.Clipboard.type() == 'item') {
+                    items = Ox.Clipboard.paste();
+                    items.length && pandora.getListData().editable && pandora.api.addListItems({
+                        list: pandora.user.ui._list,
+                        items: items
+                    }, pandora.reloadList);
+                }
             },
             select: function(data) {
                 var query;
