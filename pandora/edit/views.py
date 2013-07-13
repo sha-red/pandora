@@ -23,36 +23,41 @@ def get_edit_or_404_json(id):
     return get_object_or_404_json(models.Edit, user__username=username, name=name)
 
 @login_required_json
-def addClip(request):
+def addClips(request):
     '''
         takes {
             edit: string,
-            item: string,
-            in: float,
-            out: float,
-            annotation: string
+            clips: []
+                item: string,
+                in: float,
+                out: float,
+                annotation: string
         }
-        add clip with item/in/out or annotation to edit with id
+        add clips with item/in/out or annotation to edit with id
         returns {
         }
     '''
     response = json_response()
     data = json.loads(request.POST['data'])
     edit = get_edit_or_404_json(data['edit'])
+    clips = []
     if edit.editable(request.user):
-        clip = edit.add_clip(data)
-        if not clip:
-            response = json_response(status=500, text='invalid in/out')
-        else:
-            response['data'] = clip.json(request.user)
+        for c in data['clips']:
+            clip = edit.add_clip(c)
+            if not clip:
+                response = json_response(status=500, text='invalid in/out')
+                return render_to_json_response(response)
+            else:
+                clips.append(clip.json(request.user))
+        response['data']['clips'] = clips
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
-actions.register(addClip, cache=False)
+actions.register(addClips, cache=False)
 
 
 @login_required_json
-def removeClip(request):
+def removeClips(request):
     '''
        takes {
            edit: string
@@ -72,10 +77,11 @@ def removeClip(request):
     if edit.editable(request.user):
         for clip in edit.clips.filter(id__in=ids):
             clip.delete()
+        response['data'] = edit.json(user=request.user)
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
-actions.register(removeClip, cache=False)
+actions.register(removeClips, cache=False)
 
 @login_required_json
 def editClip(request):
@@ -97,6 +103,7 @@ def editClip(request):
                 if clip.annotation:
                     clip.start = clip.annotation.start
                     clip.end = clip.annotation.end
+                    clip.item = clip.annotation.item
                     clip.annotation = None
                 setattr(clip, {'in': 'start', 'out': 'end'}.get(key), float(data[key]))
         if not clip.annotation:

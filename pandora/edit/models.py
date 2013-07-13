@@ -54,7 +54,7 @@ class Edit(models.Model):
 
     def add_clip(self, data):
         clip = Clip(edit=self)
-        if 'annotation' in data:
+        if 'annotation' in data and data['annotation']:
             clip.annotation = Annotation.objects.get(public_id=data['annotation'])
         else:
             clip.item = Item.objects.get(itemId=data['item'])
@@ -309,7 +309,7 @@ class Clip(models.Model):
             'index': self.index
         }
         if self.annotation:
-            data['annotation'] = self.annotation.public_id
+            data['item'], data['annotation'] = self.annotation.public_id.split('/')
             data['in'] = self.annotation.start
             data['out'] = self.annotation.end
             data['parts'] = self.annotation.item.json['parts']
