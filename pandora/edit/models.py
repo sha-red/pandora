@@ -5,6 +5,8 @@ from __future__ import division, with_statement
 import re
 import os
 import shutil
+from glob import glob
+import subprocess
 
 import ox
 from django.conf import settings
@@ -179,7 +181,7 @@ class Edit(models.Model):
                 self.poster_frames = tuple(poster_frames)
                 self.save()
         for i in self.poster_frames:
-            s = Item.objects.filter(itemId=i['item'])
+            qs = Item.objects.filter(itemId=i['item'])
             if qs.count() > 0:
                 frame = qs[0].frame(i['position'])
                 if frame:
