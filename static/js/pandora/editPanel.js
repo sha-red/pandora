@@ -30,9 +30,13 @@ pandora.ui.editPanel = function() {
     }
 
     function getVideos() {
-        return Ox.flatten(edit.clips.map(function(clip) {
-            return pandora.getClipVideos(clip);
-        }));
+        var videos = {};
+        pandora.site.video.resolutions.forEach(function(resolution) {
+            videos[resolution] = Ox.flatten(edit.clips.map(function(clip) {
+                return pandora.getClipVideos(clip, resolution);
+            }));
+        });
+        return videos;
     }
 
     function render() {
