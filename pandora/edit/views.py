@@ -96,7 +96,7 @@ def editClip(request):
     response = json_response()
     data = json.loads(request.POST['data'])
     clip = get_object_or_404_json(models.Clip, pk=ox.fromAZ(data['id']))
-    valid = False
+    valid = True
     if clip.edit.editable(request.user):
         for key in ('in', 'out'):
             if key in data:

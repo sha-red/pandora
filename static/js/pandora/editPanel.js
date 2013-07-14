@@ -116,8 +116,14 @@ pandora.ui.editPanel = function() {
                                 args['in'] = args.out;
                             }
                             pandora.api.editClip(args, function(result) {
-                                edit.clips[index] = result.data;
-                                that.updateClip(data.id, result.data);
+                                if (result.status.code == 200) {
+                                    edit.clips[index] = result.data;
+                                    console.log(index, result.data);
+                                    that.updateClip(data.id, result.data);
+                                    updateVideos();
+                                } else {
+                                    Ox.print('failed to edit clip', result);
+                                }
                             });
                         });
                     },
@@ -127,6 +133,7 @@ pandora.ui.editPanel = function() {
                             ids: data.ids
                         }, function() {
                             Ox.Request.clearCache('getEdit');
+                            sortClips(data.ids);
                         });
                     },
                     muted: function(data) {
@@ -138,6 +145,7 @@ pandora.ui.editPanel = function() {
                                 clips: Ox.Clipboard.paste(),
                                 edit: pandora.user.ui.edit
                             }, function(result) {
+                                Ox.Request.clearCache('getEdit');
                                 updateClips(edit.clips.concat(result.data.clips));
                             });
                         }
@@ -154,6 +162,7 @@ pandora.ui.editPanel = function() {
                                 ids: data.ids,
                                 edit: pandora.user.ui.edit
                             }, function(result) {
+                                Ox.Request.clearCache('getEdit');
                                 updateClips(result.data.clips);
                             });
                         }
@@ -213,8 +222,15 @@ pandora.ui.editPanel = function() {
         });
     }
 
+    function sortClips(ids) {
+        edit.clips.forEach(function(clip) {
+            clip.index = ids.indexOf(clip.id);
+        });
+        edit.clips = Ox.sortBy(edit.clips, 'index');
+        udpateVideos();
+    }
+
     function updateClips(clips) {
-        Ox.Request.clearCache(); // FIXME: too much
         edit.clips = clips;
         edit.duration = 0;
         edit.clips.forEach(function(clip) {
@@ -229,6 +245,20 @@ pandora.ui.editPanel = function() {
         updateSmallTimelineURL();
 
     }
+
+    function updateVideos() {
+        edit.duration = 0;
+        edit.clips.forEach(function(clip) {
+            clip.position = edit.duration;
+            edit.duration += clip.duration;
+        });
+        that.options({
+            smallTimelineURL: getSmallTimelineURL(),
+            video: getVideos()
+        });
+        updateSmallTimelineURL();
+    }
+
 
     function updateSmallTimelineURL() {
         var fps = 25;
