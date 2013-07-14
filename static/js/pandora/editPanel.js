@@ -44,11 +44,10 @@ pandora.ui.editPanel = function() {
                 clip.position = edit.duration;
                 edit.duration += clip.duration;
             });
-            //Ox.print('EDIT', edit)
             pandora.$ui.mainPanel.replaceElement(1,
-                that = Ox.VideoEditPanel({
+                that = pandora.$ui.editPanel = Ox.VideoEditPanel({
                     clips: edit.clips,
-                    clipsSize: listSize,
+                    clipSize: listSize,
                     clipSort: ui.clipSort,
                     clipSortOptions: [/*...*/],
                     clipView: ui.clipView,
@@ -162,6 +161,10 @@ pandora.ui.editPanel = function() {
                             });
                         }
                     },
+                    resize: function(data) {
+                        // sidebar resize
+                        that.options({width: data.size});
+                    },
                     resizeclips: function(data) {
                         pandora.UI.set('clipsSize', data.clipsSize);
                     },
@@ -181,7 +184,7 @@ pandora.ui.editPanel = function() {
                         pandora.UI.set('videoTimeline', data.timeline);
                     },
                     toggleclips: function(data) {
-                        pandora.UI.set('showAnnotations', data.showAnnotations);
+                        pandora.UI.set('showClips', data.showClips);
                     },
                     toggletimeline: function(data) {
                         pandora.UI.set('showTimeline', data.showTimeline);
@@ -189,10 +192,11 @@ pandora.ui.editPanel = function() {
                     volume: function(data) {
                         pandora.UI.set('videoVolume', data.volume);
                     },
-                    pandora_showannotations: function(data) {
-                        that.options({showAnnotations: data.value});
+                    pandora_showclips: function(data) {
+                        that.options({showClips: data.value});
                     },
                     pandora_showtimeline: function(data) {
+                        Ox.print('SHOWTIMELINE', data);
                         that.options({showTimeline: data.value});
                     },
                     pandora_videotimeline: function(data) {
@@ -205,7 +209,7 @@ pandora.ui.editPanel = function() {
     }
 
     function updateClips(clips) {
-        Ox.Request.clearCache();
+        Ox.Request.clearCache(); // FIXME: too much
         edit.clips = clips;
         edit.duration = 0;
         edit.clips.forEach(function(clip) {
