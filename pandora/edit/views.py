@@ -120,7 +120,7 @@ def editClip(request):
 actions.register(editClip, cache=False)
 
 @login_required_json
-def sortClips(request):
+def orderClips(request):
     '''
        takes {
            edit: string
@@ -140,6 +140,48 @@ def sortClips(request):
             index += 1
     else:
         response = json_response(status=403, text='permission denied')
+    return render_to_json_response(response)
+actions.register(orderClips, cache=False)
+
+def _order_clips(qs, sort):
+    order_by = []
+    for e in sort:
+        operator = e['operator']
+        if operator != '-':
+            operator = ''
+        key = e['key']
+        #fixme, random should be clip random
+        if key not in ('in', 'out', 'position', 'hue', 'saturation', 'lightness', 'volume', 'duration', 'text'):
+            key = "item__sort__%s" % key
+        key = {
+            'position': 'start',
+            'in': 'start',
+            'out': 'end',
+            'text': 'annotation__sortvalue',
+            'item__sort__item': 'item__sort__id',
+        }.get(key, key)
+        order = '%s%s' % (operator, key)
+        order_by.append(order)
+    if order_by:
+        qs = qs.order_by(*order_by)
+    qs = qs.distinct()
+    return qs
+
+def sortClips(request):
+    '''
+       takes {
+           edit: string
+           sort: obect
+        }
+        returns {
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    edit = get_edit_or_404_json(data['edit'])
+    response = json_response()
+    clips = models.Clip.objects.filter(edit=edit)
+    clips = _order_clips(clips, data['sort'])
+    response['data']['clips'] = [ox.toAZ(c['id']) for c in clips.values('id')]
     return render_to_json_response(response)
 actions.register(sortClips, cache=False)
 

@@ -56,6 +56,7 @@ class Edit(models.Model):
         clip = Clip(edit=self)
         if 'annotation' in data and data['annotation']:
             clip.annotation = Annotation.objects.get(public_id=data['annotation'])
+            clip.item = clip.annotation.item
         else:
             clip.item = Item.objects.get(itemId=data['item'])
             clip.start = data['in']
@@ -297,15 +298,41 @@ class Clip(models.Model):
     annotation = models.ForeignKey(Annotation, null=True, default=None, related_name='editclip')
     start = models.FloatField(default=0)
     end = models.FloatField(default=0)
+    duration = models.FloatField(default=0)
+    
+    hue = models.FloatField(default=0)
+    saturation= models.FloatField(default=0)
+    lightness= models.FloatField(default=0)
+    volume = models.FloatField(default=0)
 
     def __unicode__(self):
         if self.annotation:
             return u'%s' % self.annotation.public_id
         return u'%s/%0.3f-%0.3f' % (self.item.itemId, self.start, self.end)
+    
+    def get_id(self):
+        return ox.toAZ(self.id)
+    
+    def save(self, *args, **kwargs):
+        if self.duration != self.end - self.start:
+            self.update_calculated_values()
+        super(Clip, self).save(*args, **kwargs)
+
+    def update_calculated_values(self):
+        start = self.start
+        end = self.end
+        self.duration = end - start
+        if int(end*25) - int(start*25) > 0:
+            self.hue, self.saturation, self.lightness = extract.average_color(
+                           self.item.timeline_prefix, self.start, self.end)
+            self.volume = extract.average_volume(self.item.timeline_prefix, self.start, self.end)
+        else:
+            self.hue = self.saturation = self.lightness = 0
+            self.volume = 0
 
     def json(self, user=None):
         data = {
-            'id': ox.toAZ(self.id),
+            'id': self.get_id(),
             'index': self.index
         }
         if self.annotation:

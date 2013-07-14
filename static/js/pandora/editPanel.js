@@ -36,7 +36,7 @@ pandora.ui.editPanel = function() {
     }
 
     function render() {
-        pandora.api.getEdit({id: pandora.user.ui.edit}, function(result) {
+        pandora.api.getEdit({id: ui.edit}, function(result) {
             edit = result.data;
             // fixme: duration should come from backend
             edit.duration = 0;
@@ -128,12 +128,12 @@ pandora.ui.editPanel = function() {
                         });
                     },
                     move: function(data) {
-                        pandora.api.sortClips({
+                        pandora.api.orderClips({
                             edit: edit.id,
                             ids: data.ids
-                        }, function() {
+                        }, function(result) {
                             Ox.Request.clearCache('getEdit');
-                            sortClips(data.ids);
+                            orderClips(data.ids);
                         });
                     },
                     muted: function(data) {
@@ -143,7 +143,7 @@ pandora.ui.editPanel = function() {
                         if (Ox.Clipboard.type() == 'clip') {
                             pandora.api.addClips({
                                 clips: Ox.Clipboard.paste(),
-                                edit: pandora.user.ui.edit
+                                edit: ui.edit
                             }, function(result) {
                                 Ox.Request.clearCache('getEdit');
                                 updateClips(edit.clips.concat(result.data.clips));
@@ -160,7 +160,7 @@ pandora.ui.editPanel = function() {
                         if (edit.editable) {
                             pandora.api.removeClips({
                                 ids: data.ids,
-                                edit: pandora.user.ui.edit
+                                edit: ui.edit
                             }, function(result) {
                                 Ox.Request.clearCache('getEdit');
                                 updateClips(result.data.clips);
@@ -187,7 +187,22 @@ pandora.ui.editPanel = function() {
                         pandora.UI.set('clipSize', data.size);
                     },
                     sort: function(data) {
-                        pandora.UI.set('clipSort', data.sort);
+                        if (data[0] && data[0].key) {
+                            console.log('S!!!sort', data);
+                            pandora.UI.set('clipSort', data);
+                            pandora.api.sortClips({
+                                edit: edit.id,
+                                sort: data
+                            }, function(result) {
+                                Ox.print('sort clips', result.data.clips);
+                                //need to also update ClipList
+                                edit.clips.forEach(function(clip) {
+                                    clip.sort = result.data.clips.indexOf(clip.id);
+                                });
+                                edit.clips = Ox.sortBy(edit.clips, 'sort');
+                                updateVideos();
+                            });
+                        }
                     },
                     subtitles: function(data) {
                         pandora.UI.set('videoSubtitles', data.subtitles);
@@ -222,7 +237,7 @@ pandora.ui.editPanel = function() {
         });
     }
 
-    function sortClips(ids) {
+    function orderClips(ids) {
         edit.clips.forEach(function(clip) {
             clip.index = ids.indexOf(clip.id);
         });
