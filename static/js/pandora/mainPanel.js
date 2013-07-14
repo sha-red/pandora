@@ -14,14 +14,16 @@ pandora.ui.mainPanel = function() {
                         + Ox.SYMBOLS.SHIFT + 'S</span>'
                 },
                 {
-                    element: pandora.$ui.rightPanel = pandora.ui.rightPanel()
+                    element: pandora.user.ui.section == 'items' ? pandora.$ui.rightPanel = pandora.ui.rightPanel()
+                        : pandora.user.ui.section == 'edits' ? pandora.$ui.editPanel = pandora.ui.editPanel()
+                        : pandora.$ui.textPanel = pandora.ui.textPanel()
                 }
             ],
             orientation: 'horizontal'
         })
         .bindEvent({
             pandora_edit: function(data) {
-                that.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
+                that.replaceElement(1, pandora.$ui.editPanel = pandora.ui.editPanel());
             },
             pandora_find: function() {
                 var previousUI = pandora.UI.getPrevious();
@@ -83,7 +85,7 @@ pandora.ui.mainPanel = function() {
                 data.value == that.options('elements')[0].collapsed && that.toggle(0);
             },
             pandora_text: function(data) {
-                that.replaceElement(1, pandora.$ui.rightPanel = pandora.ui.rightPanel());
+                that.replaceElement(1, pandora.$ui.textPanel = pandora.ui.textPanel());
             }
         });
     return that;

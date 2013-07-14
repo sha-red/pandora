@@ -3,9 +3,7 @@
 'use strict';
 
 pandora.ui.rightPanel = function() {
-    var that;
-    if (pandora.user.ui.section == 'items') {
-        that = Ox.SplitPanel({
+    var that = Ox.SplitPanel({
             elements: [
                 {
                     element: pandora.$ui.toolbar = pandora.ui.toolbar(),
@@ -61,11 +59,6 @@ pandora.ui.rightPanel = function() {
                 }
             }
         });
-    } else if (pandora.user.ui.section == 'texts') {
-        that = pandora.$ui.textPanel = pandora.ui.textPanel();
-    } else if (pandora.user.ui.section == 'edits') {
-        that = pandora.$ui.editPanel = pandora.ui.editPanel();
-    }
     return that;
 };
 
