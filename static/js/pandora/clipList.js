@@ -126,6 +126,19 @@ pandora.ui.clipList = function(videoRatio) {
                 })
                 Ox.Clipboard.copy(items, 'clip');
             },
+            copyadd: function(data) {
+                var items = data.ids.map(function(id) {
+                    var item = !ui.item ? id.split('/')[0] : ui.item,
+                        annotation = that.value(id, 'annotations')[0].id;
+                    return {
+                        annotation: annotation,
+                        'in': that.value(id, 'in'),
+                        item: item,
+                        out: that.value(id, 'out')
+                    }
+                })
+                Ox.Clipboard.add(items, 'clip');
+            },
             init: function(data) {
                 if (!ui.item && ui.listView == 'clip'/* && pandora.$ui.statusbar*/) {
                     pandora.$ui.statusbar.set('total', data);
@@ -253,6 +266,7 @@ pandora.ui.clipList = function(videoRatio) {
                 that.options({sort: data.value});
             }
         });
+
     return that;
 
 }
