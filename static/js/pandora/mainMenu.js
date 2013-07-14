@@ -122,36 +122,49 @@ pandora.ui.mainMenu = function() {
                         { 
                             id: 'showsidebar',
                             title: Ox._((ui.showSidebar ? 'Hide' : 'Show') + ' Sidebar'),
-                            keyboard: 'shift s' },
+                            keyboard: 'shift s'
+                        },
                         { 
                             id: 'showinfo',
                             title: Ox._((ui.showInfo ? 'Hide' : 'Show') + ' Info'),
-                            disabled: !ui.showSidebar, keyboard: 'shift i' },
+                            disabled: !ui.showSidebar, keyboard: 'shift i'
+                        },
                         { 
                             id: 'showfilters',
                             title: Ox._((ui.showFilters ? 'Hide' : 'Show') + ' Filters'),
-                            disabled: !!ui.item, keyboard: 'shift f' },
+                            disabled: !!ui.item, keyboard: 'shift f'
+                        },
                         { 
                             id: 'showbrowser',
                             title: Ox._((ui.showBrowser ? 'Hide': 'Show') + ' {0} Browser', [Ox._(pandora.site.itemName.singular)]),
-                            disabled: !ui.item, keyboard: 'shift b' },
-                        { 
-                            id: 'showannotations',
-                            title: Ox._((ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations'),
-                            disabled: !ui.item || ['timeline', 'player', 'editor'].indexOf(ui.itemView) == -1, keyboard: 'shift a' },
+                            disabled: !ui.item, keyboard: 'shift b'
+                        },
                         {
                             id: 'showtimeline',
                             title: Ox._((ui.showTimeline ? 'Hide' : 'Show') + ' Timeline'),
-                            disabled: !ui.item || ui.itemView != 'player', keyboard: 'shift t' },
+                            disabled: !hasTimeline(), keyboard: 'shift t'
+                        },
+                        { 
+                            id: 'showannotations',
+                            title: Ox._((ui.showAnnotations ? 'Hide' : 'Show') + ' Annotations'),
+                            disabled: !hasAnnotations(), keyboard: 'shift a'
+                        },
+                        { 
+                            id: 'showclips',
+                            title: Ox._((ui.showClips ? 'Hide' : 'Show') + ' Clips'),
+                            disabled: !hasClips(), keyboard: 'shift c'
+                        },
                         {},
                         { 
                             id: 'togglefullscreen',
                             title: Ox._((fullscreenState ? 'Exit' : 'Enter') + ' Fullscreen'),
-                            disabled: fullscreenState === void 0, keyboard: 'shift alt control f' },
+                            disabled: fullscreenState === void 0, keyboard: 'shift alt control f'
+                        },
                         { 
                             id: 'entervideofullscreen',
                             title: Ox._('Enter Video Fullscreen'),
-                            disabled: !ui.item || ui.itemView != 'player' },
+                            disabled: !ui.item || ui.itemView != 'player'
+                        },
                         {},
                         { id: 'theme', title: Ox._('Theme'), items: [
                             { group: 'settheme', min: 1, max: 1, items: pandora.site.themes.map(function(theme) {
@@ -366,10 +379,12 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set({showFilters: !ui.showFilters});
                 } else if (data.id == 'showbrowser') {
                     pandora.UI.set({showBrowser: !ui.showBrowser});
-                } else if (data.id == 'showannotations') {
-                    pandora.UI.set({showAnnotations: !ui.showAnnotations});
                 } else if (data.id == 'showtimeline') {
                     pandora.UI.set({showTimeline: !ui.showTimeline});
+                } else if (data.id == 'showannotations') {
+                    pandora.UI.set({showAnnotations: !ui.showAnnotations});
+                } else if (data.id == 'showclips') {
+                    pandora.UI.set({showClips: !ui.showClips});
                 } else if (data.id == 'togglefullscreen') {
                     Ox.Fullscreen.toggle();
                 } else if (data.id == 'entervideofullscreen') {
@@ -502,11 +517,13 @@ pandora.ui.mainMenu = function() {
                 }
             },
             key_shift_a: function() {
-                ui.item && ['timeline', 'player', 'editor'].indexOf(ui.itemView) > -1
-                    && pandora.UI.set({showAnnotations: !ui.showAnnotations});
+                hasAnnotations() && pandora.UI.set({showAnnotations: !ui.showAnnotations});
             },
             key_shift_b: function() {
                 ui.item && pandora.UI.set({showBrowser: !ui.showBrowser});
+            },
+            key_shift_c: function() {
+                hasClips && pandora.UI.set({showClips: !ui.showClips});
             },
             key_shift_backtick: function() {
                 changeFocus(-1);
@@ -521,8 +538,10 @@ pandora.ui.mainMenu = function() {
                 pandora.UI.set({showSidebar: !ui.showSidebar});
             },
             key_shift_t: function() {
-                ui.item && ui.itemView == 'player'
-                    && pandora.UI.set({showTimeline: !ui.showTimeline});
+                hasTimeline() && pandora.UI.set({showTimeline: !ui.showTimeline});
+            },
+            pandora_edit: function() {
+                // ...
             },
             pandora_find: function() {
                 var list = ui._list,
@@ -621,11 +640,17 @@ pandora.ui.mainMenu = function() {
                     pandora.getItemIdAndPosition() ? 'enableItem' : 'disableItem'
                 ]('findsimilar');
             },
+            pandora_section: function() {
+                // ...
+            },
             pandora_showannotations: function(data) {
                 that.setItemTitle('showannotations', Ox._((data.value ? 'Hide' : 'Show') + ' Annotations'));
             },
             pandora_showbrowser: function(data) {
                 that.setItemTitle('showbrowser', Ox._((data.value ? 'Hide' : 'Show') + ' {0} Browser', [Ox._(pandora.site.itemName.singular)]));
+            },
+            pandora_showclips: function(data) {
+                that.setItemTitle('showclips', Ox._((data.value ? 'Hide' : 'Show') + ' Clips'));
             },
             pandora_showfilters: function(data) {
                 that.setItemTitle('showfilters', Ox._((data.value ? 'Hide' : 'Show') + ' Filters'));
@@ -812,6 +837,23 @@ pandora.ui.mainMenu = function() {
                 }
             }) }
         ] };
+    }
+
+    function hasAnnotations() {
+        return ui.section == 'items' && ui.item
+            && Ox.contains(['player', 'editor', 'timeline'], ui.itemView);
+    }
+
+    function hasClips() {
+        return ui.section == 'edits' && ui.edit;
+    }
+
+    function hasTimeline() {
+        return (
+            ui.section == 'items' && ui.item && ui.itemView == 'player'
+        ) || (
+            ui.section == 'edits' && ui.edit
+        );
     }
 
     // fixme: the sidebar makes (almost) the same requests.
