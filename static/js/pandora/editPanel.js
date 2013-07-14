@@ -138,6 +138,9 @@ pandora.ui.editPanel = function() {
                     muted: function(data) {
                         pandora.UI.set('videoMuted', data.muted);
                     },
+                    open: function(data) {
+                        pandora.UI.set(editPointsKey('clip'), data.ids[0]);
+                    },
                     paste: function() {
                         if (Ox.Clipboard.type() == 'clip') {
                             pandora.api.addClips({
@@ -150,10 +153,16 @@ pandora.ui.editPanel = function() {
                         }
                     },
                     playing: function(data) {
-                        pandora.UI.set(editPointsKey('position'), data.position);
+                        var set = {};
+                        set[editPointsKey('clip')] = '';
+                        set[editPointsKey('position')] = data.position;
+                        pandora.UI.set(set);
                     },
                     position: function(data) {
-                        pandora.UI.set(editPointsKey('position'), data.position);
+                        var set = {};
+                        set[editPointsKey('clip')] = '';
+                        set[editPointsKey('position')] = data.position;
+                        pandora.UI.set(set);
                     },
                     remove: function(data) {
                         if (edit.editable) {
@@ -178,9 +187,6 @@ pandora.ui.editPanel = function() {
                     },
                     scale: function(data) {
                         pandora.UI.set('videoScale', data.scale);
-                    },
-                    select: function(data) {
-                        pandora.UI.set(editPointsKey('clip'), data.ids[0]);
                     },
                     size: function(data) {
                         pandora.UI.set('clipSize', data.size);

@@ -1168,12 +1168,21 @@ pandora.getSpan = function(state, val, callback) {
             });
         }
     } else if (state.type == 'edits') {
-        pandora.api.getEdit({id: state.item, keys: ['duration']}, function(result) {
-            state.span = val.map(function(number) {
-                return Math.min(number, result.data.duration);
+        if (isArray) {
+            pandora.api.getEdit({id: state.item, keys: ['duration']}, function(result) {
+                state.span = val.map(function(number) {
+                    return Math.min(number, result.data.duration);
+                });
+                callback();
             });
-            callback();
-        });
+        } else {
+            pandora.api.getEdit({id: state.item, keys: ['clips']}, function(result) {
+                if (Ox.getObjectById(result.data.clips, val)) {
+                    state.span = val;
+                }
+                callback();
+            });
+        }
     } else if (state.type == 'texts') {
         state.span = val;
         callback();
