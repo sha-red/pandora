@@ -105,7 +105,7 @@ pandora.ui.findElement = function() {
                                         operator: '='
                                     }] : []
                                 );
-                            pandora.UI.set('find', {conditions: conditions, operator: '&'});
+                            pandora.UI.set({find: {conditions: conditions, operator: '&'}});
                         }
                     })
             ]),

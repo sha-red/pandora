@@ -94,8 +94,7 @@ pandora.ui.tv = function() {
                     close: that.fadeOutScreen,
                     ended: play,
                     muted: function(data) {
-                        Ox.print('!MUTED', !muted)
-                        !muted && pandora.UI.set('videoMuted', data.muted);
+                        !muted && pandora.UI.set({videoMuted: data.muted});
                     },
                     open: function() {
                         var item = result.data.item,
@@ -115,16 +114,16 @@ pandora.ui.tv = function() {
                         pandora.UI.set(set);
                     },
                     resolution: function(data) {
-                        pandora.UI.set('videoResolution', data.resolution);
+                        pandora.UI.set({videoResolution: data.resolution});
                     },
                     scale: function(data) {
-                        pandora.UI.set('videoScale', data.scale);
+                        pandora.UI.set({videoScale: data.scale});
                     },
                     subtitles: function(data) {
-                        pandora.UI.set('videoSubtitles', data.subtitles);
+                        pandora.UI.set({videoSubtitles: data.subtitles});
                     },
                     volume: function(data) {
-                        pandora.UI.set('videoVolume', data.volume);
+                        pandora.UI.set({videoVolume: data.volume});
                     },
                     zap: function(data) {
                         if (!(data.direction == 0 && list == '')) {
@@ -162,13 +161,13 @@ pandora.ui.tv = function() {
         that.animate({opacity: 0}, 500, function() {
             that.remove();
         });
-        pandora.UI.set('page', '');
+        pandora.UI.set({page: ''});
         return that;
     };
 
     that.hideScreen = function() {
         that.remove();
-        pandora.UI.set('page', '');
+        pandora.UI.set({page: ''});
         return that;
     };
 

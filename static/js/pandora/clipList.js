@@ -238,11 +238,11 @@ pandora.ui.clipList = function(videoRatio) {
                         }, 300);
                         //*/
                     }
-                    !ui.item && pandora.UI.set('listSelection', [item]);
+                    !ui.item && pandora.UI.set({listSelection: [item]});
                     !isEmbed && pandora.$ui.mainMenu.enableItem('findsimilar');
                 } else {
                     $('.OxSelectedVideo').removeClass('OxSelectedVideo');
-                    !ui.item && pandora.UI.set('listSelection', []);
+                    !ui.item && pandora.UI.set({listSelection: []});
                     !isEmbed && pandora.$ui.mainMenu.disableItem('findsimilar');
                 }
             },

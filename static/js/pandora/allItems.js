@@ -15,7 +15,7 @@ pandora.ui.allItems = function() {
                 click: function() {
                     that.gainFocus();
                     if (pandora.user.ui.section == 'items') {
-                        pandora.user.ui._list && pandora.UI.set('find', {conditions: [], operator: '&'});
+                        pandora.user.ui._list && pandora.UI.set({find: {conditions: [], operator: '&'}});
                     } else {
                         pandora.UI.set(pandora.user.ui.section.slice(0, -1), '');
                     }

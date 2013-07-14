@@ -162,7 +162,7 @@ pandora.ui.filter = function(id) {
                         }
                     }
                 }
-                pandora.UI.set('find', find);
+                pandora.UI.set({find: find});
                 pandora.$ui.filters.updateMenus();
             },
             sort: function(data) {

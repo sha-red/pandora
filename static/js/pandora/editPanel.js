@@ -126,6 +126,9 @@ pandora.ui.editPanel = function() {
                             });
                         });
                     },
+                    loop: function(data) {
+                        pandora.UI.set({videoLoop: data.loop});
+                    },
                     move: function(data) {
                         pandora.api.orderClips({
                             edit: edit.id,
@@ -136,7 +139,7 @@ pandora.ui.editPanel = function() {
                         });
                     },
                     muted: function(data) {
-                        pandora.UI.set('videoMuted', data.muted);
+                        pandora.UI.set({videoMuted: data.muted});
                     },
                     open: function(data) {
                         pandora.UI.set(editPointsKey('clip'), data.ids[0]);
@@ -180,19 +183,19 @@ pandora.ui.editPanel = function() {
                         that.options({width: data.size});
                     },
                     resizeclips: function(data) {
-                        pandora.UI.set('clipsSize', data.clipsSize);
+                        pandora.UI.set({clipsSize: data.clipsSize});
                     },
                     resolution: function(data) {
-                        pandora.UI.set('videoResolution', data.resolution);
+                        pandora.UI.set({videoResolution: data.resolution});
                     },
                     scale: function(data) {
-                        pandora.UI.set('videoScale', data.scale);
+                        pandora.UI.set({videoScale: data.scale});
                     },
                     size: function(data) {
-                        pandora.UI.set('clipSize', data.size);
+                        pandora.UI.set({clipSize: data.size});
                     },
                     sort: function(data) {
-                        pandora.UI.set('clipSort', data);
+                        pandora.UI.set({clipSort: data});
                         var key = data[0].key;
                         if (key == 'position') {
                             key = 'in';
@@ -217,22 +220,22 @@ pandora.ui.editPanel = function() {
                         }
                     },
                     subtitles: function(data) {
-                        pandora.UI.set('videoSubtitles', data.subtitles);
+                        pandora.UI.set({videoSubtitles: data.subtitles});
                     },
                     timeline: function(data) {
-                        pandora.UI.set('videoTimeline', data.timeline);
+                        pandora.UI.set({videoTimeline: data.timeline});
                     },
                     toggleclips: function(data) {
-                        pandora.UI.set('showClips', data.showClips);
+                        pandora.UI.set({showClips: data.showClips});
                     },
                     toggletimeline: function(data) {
-                        pandora.UI.set('showTimeline', data.showTimeline);
+                        pandora.UI.set({showTimeline: data.showTimeline});
                     },
                     view: function(data) {
-                        pandora.UI.set('clipView', data.view);
+                        pandora.UI.set({clipView: data.view});
                     },
                     volume: function(data) {
-                        pandora.UI.set('videoVolume', data.volume);
+                        pandora.UI.set({videoVolume: data.volume});
                     },
                     pandora_showclips: function(data) {
                         that.options({showClips: data.value});

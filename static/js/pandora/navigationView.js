@@ -155,10 +155,10 @@ pandora.ui.navigationView = function(type, videoRatio) {
                 },
                 selectplace: selectItem,
                 togglecontrols: function(data) {
-                    pandora.UI.set('showMapControls', data.visible);
+                    pandora.UI.set({showMapControls: data.visible});
                 },
                 togglelabels: function(data) {
-                    pandora.UI.set('showMapLabels', data.visible);
+                    pandora.UI.set({showMapLabels: data.visible});
                 }
             })
         );

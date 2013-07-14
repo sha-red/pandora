@@ -29,15 +29,15 @@ pandora.ui.sortMenu = function() {
             click: function(data) {
                 if (data.checked) {
                     if (['ascending', 'descending'].indexOf(data.id) > -1) {
-                        pandora.UI.set('itemSort', [{
+                        pandora.UI.set({itemSort: [{
                             key: pandora.user.ui.itemSort[0].key,
                             operator: data.id == 'ascending' ? '+' : '-'
-                        }]);
+                        }]});
                     } else {
-                        pandora.UI.set('itemSort', [{
+                        pandora.UI.set({itemSort: [{
                             key: data.id,
                             operator: pandora.getSortOperator(data.id)
-                        }]);
+                        }]});
                     }
                 }
             },

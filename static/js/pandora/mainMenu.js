@@ -230,7 +230,7 @@ pandora.ui.mainMenu = function() {
                 var value = data.checked[0] ? data.checked[0].id : null;
                 if (data.id == 'allitems') {
                     if (data.checked) {
-                        pandora.UI.set('find', {conditions: [], operator: '&'});
+                        pandora.UI.set({find: {conditions: [], operator: '&'}});
                     } else {
                         that.checkItem('allitems');
                     }
@@ -284,14 +284,14 @@ pandora.ui.mainMenu = function() {
                     filters[index].sort[0].operator = operator;
                     pandora.UI.set({filters: filters});
                 } else if (data.id == 'setlocale') {
-                    pandora.UI.set('locale', value);
+                    pandora.UI.set({locale: value});
                     pandora.setLocale(value, function() {
                         pandora.$ui.appPanel.reload();
                     });
                 } else if (data.id == 'settheme') {
                     var iframe, src;
                     Ox.Theme(value);
-                    pandora.UI.set('theme', value);
+                    pandora.UI.set({theme: value});
                     iframe = Ox.UI.elements[$('#embed').data('oxid')];
                     if (iframe) {
                         src = iframe.attr('src');
@@ -300,7 +300,7 @@ pandora.ui.mainMenu = function() {
                         }
                     }
                 } else if (data.id == 'showsiteposters') {
-                    pandora.UI.set('showSitePosters', data.checked)
+                    pandora.UI.set({showSitePosters: data.checked});
                 } else if (Ox.startsWith(data.id, 'sortfilter')) {
                     var filters = Ox.clone(ui.filters),
                         id = data.id.replace('sortfilter', ''),

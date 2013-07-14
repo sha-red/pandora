@@ -92,14 +92,14 @@ pandora.ui.titlesDialog = function() {
             }).bindEvent({
                 click: function() {
                     that.close();
-                    pandora.UI.set('find', {
+                    pandora.UI.set({find: {
                         conditions: [{
                             key: 'title',
                             value: $list.value($list.options('selected'), 'title'),
                             operator: '='
                         }],
                         operator: '&'
-                    });
+                    }});
                     pandora.$ui.findElement.updateElement();
                 }
             }),

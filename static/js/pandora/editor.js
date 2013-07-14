@@ -163,7 +163,7 @@ pandora.ui.editor = function(data) {
                 pandora.$ui.embedVideoDialog = pandora.ui.embedVideoDialog().open();
             },
             find: function(data) {
-                pandora.UI.set('itemFind', data.find);
+                pandora.UI.set({itemFind: data.find});
             },
             findannotations: function(data) {
                 pandora.UI.set({
@@ -184,7 +184,7 @@ pandora.ui.editor = function(data) {
                 ).open();
             },
             muted: function(data) {
-                pandora.UI.set('videoMuted', data.muted);
+                pandora.UI.set({videoMuted: data.muted});
             },
             playing: function(data) {
                 pandora.UI.set(
@@ -244,34 +244,34 @@ pandora.ui.editor = function(data) {
                 that.options({height: data.size});
             },
             resizecalendar: function(data) {
-                pandora.UI.set('annotationsCalendarSize', data.size);
+                pandora.UI.set({annotationsCalendarSize: data.size});
             },
             resizemap: function(data) {
-                pandora.UI.set('annotationsMapSize', data.size);
+                pandora.UI.set({annotationsMapSize: data.size});
             },
             resolution: function(data) {
-                pandora.UI.set('videoResolution', data.resolution);
+                pandora.UI.set({videoResolution: data.resolution});
             },
             select: function(data) {
                 pandora.UI.set('videoPoints.' + ui.item + '.annotation', data.id.split('/')[1]);
             },
             subtitles: function(data) {
-                pandora.UI.set('videoSubtitles', data.subtitles);
+                pandora.UI.set({videoSubtitles: data.subtitles});
             },
             timeline: function(data) {
-                pandora.UI.set('videoTimeline', data.timeline);
+                pandora.UI.set({videoTimeline: data.timeline});
             },
             toggleannotations: function(data) {
-                pandora.UI.set('showAnnotations', data.showAnnotations);
+                pandora.UI.set({showAnnotations: data.showAnnotations});
             },
             togglecalendar: function(data) {
-                pandora.UI.set('showAnnotationsCalendar', !data.collapsed);
+                pandora.UI.set({showAnnotationsCalendar: !data.collapsed});
             },
             togglelayer: function(data) {
                 pandora.UI.set('showLayers.' + data.layer, !data.collapsed);
             },
             togglemap: function(data) {
-                pandora.UI.set('showAnnotationsMap', !data.collapsed);
+                pandora.UI.set({showAnnotationsMap: !data.collapsed});
             },
             togglesize: function(data) {
                 pandora.UI.set({videoSize: data.size});

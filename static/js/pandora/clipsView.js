@@ -38,7 +38,7 @@ pandora.ui.clipsView = function(videoRatio) {
                                 .bindEvent({
                                     submit: function(data) {
                                         $status.html(Ox._('Loading...'));
-                                        pandora.UI.set('itemFind', data.value);
+                                        pandora.UI.set({itemFind: data.value});
                                         // since this is the only way itemFind can change,
                                         // there's no need for an event handler
                                         that.replaceElement(1,

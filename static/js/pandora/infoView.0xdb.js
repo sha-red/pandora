@@ -569,10 +569,10 @@ pandora.ui.infoView = function(data) {
                     .css({textAlign: 'right', cursor: 'pointer'})
                     .bind({
                         click: function() {
-                            pandora.UI.set('listSort', [{
+                            pandora.UI.set({listSort: [{
                                 key: key,
                                 operator: pandora.getSortOperator(key)
-                            }]);
+                            }]});
                         }
                     })
             )
@@ -596,10 +596,10 @@ pandora.ui.infoView = function(data) {
                     )
                     .bind({
                         click: function() {
-                            pandora.UI.set('listSort', [{
+                            pandora.UI.set({listSort: [{
                                 key: key,
                                 operator: pandora.getSortOperator(key)
-                            }]);
+                            }]});
                         }
                     })
             )
@@ -618,10 +618,10 @@ pandora.ui.infoView = function(data) {
                     .css({textAlign: 'right', cursor: 'pointer'})
                     .bind({
                         click: function() {
-                            pandora.UI.set('listSort', [{
+                            pandora.UI.set({listSort: [{
                                 key: key,
                                 operator: pandora.getSortOperator(key)
-                            }]);
+                            }]});
                         }
                     })
             )
@@ -643,10 +643,10 @@ pandora.ui.infoView = function(data) {
                     .html(Ox.formatNumber(value, 3))
                     .bind({
                         click: function() {
-                            pandora.UI.set('listSort', [{
+                            pandora.UI.set({listSort: [{
                                 key: key,
                                 operator: pandora.getSortOperator(key)
-                            }]);
+                            }]});
                         }
                     })
             )
@@ -697,7 +697,7 @@ pandora.ui.infoView = function(data) {
     if (canEdit) {
         $icon.bindEvent({
             doubleclick: function() {
-                pandora.UI.set('showIconBrowser', !ui.showIconBrowser);
+                pandora.UI.set({showIconBrowser: !ui.showIconBrowser});
                 $info.animate({
                     left: ui.showIconBrowser ? 0 : -listWidth + 'px'
                 }, 250);
@@ -1053,10 +1053,10 @@ pandora.ui.infoView = function(data) {
                 })
                 .bind({
                     click: function() {
-                        pandora.UI.set('listSort', [{
+                        pandora.UI.set({listSort: [{
                             key: 'rightslevel',
                             operator: pandora.getSortOperator('rightslevel')
-                        }]);
+                        }]});
                     }
                 })
                 .appendTo($rightsLevel);

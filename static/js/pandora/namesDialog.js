@@ -103,14 +103,14 @@ pandora.ui.namesDialog = function() {
             }).bindEvent({
                 click: function() {
                     that.close();
-                    pandora.UI.set('find', {
+                    pandora.UI.set({find: {
                         conditions: [{
                             key: 'name',
                             value: $list.value($list.options('selected'), 'name'),
                             operator: '='
                         }],
                         operator: '&'
-                    });
+                    }});
                     pandora.$ui.findElement.updateElement();
                 }
             }),

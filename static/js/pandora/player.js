@@ -74,7 +74,7 @@ pandora.ui.player = function(data) {
                 document.location.href = '/' + ui.item + '/torrent/';
             },
             find: function(data) {
-                pandora.UI.set('itemFind', data.find);
+                pandora.UI.set({itemFind: data.find});
             },
             info: function(data) {
                 pandora.ui.annotationDialog(
@@ -82,7 +82,7 @@ pandora.ui.player = function(data) {
                 ).open();
             },
             muted: function(data) {
-                pandora.UI.set('videoMuted', data.muted);
+                pandora.UI.set({videoMuted: data.muted});
             },
             playing: function(data) {
                 pandora.UI.set(
@@ -97,43 +97,43 @@ pandora.ui.player = function(data) {
                 );
             },
             resizeannotations: function(data) {
-                pandora.UI.set('annotationsSize', data.annotationsSize);
+                pandora.UI.set({annotationsSize: data.annotationsSize});
             },
             resizecalendar: function(data) {
-                pandora.UI.set('annotationsCalendarSize', data.size);
+                pandora.UI.set({annotationsCalendarSize: data.size});
             },
             resizemap: function(data) {
-                pandora.UI.set('annotationsMapSize', data.size);
+                pandora.UI.set({annotationsMapSize: data.size});
             },
             resolution: function(data) {
-                pandora.UI.set('videoResolution', data.resolution);
+                pandora.UI.set({videoResolution: data.resolution});
             },
             scale: function(data) {
-                pandora.UI.set('videoScale', data.scale);
+                pandora.UI.set({videoScale: data.scale});
             },
             select: function(data) {
                 pandora.UI.set('videoPoints.' + ui.item + '.annotation', data.id.split('/')[1]);
             },
             subtitles: function(data) {
-                pandora.UI.set('videoSubtitles', data.subtitles);
+                pandora.UI.set({videoSubtitles: data.subtitles});
             },
             toggleannotations: function(data) {
-                pandora.UI.set('showAnnotations', data.showAnnotations);
+                pandora.UI.set({showAnnotations: data.showAnnotations});
             },
             togglelayer: function(data) {
                 pandora.UI.set('showLayers.' + data.layer, !data.collapsed);
             },
             togglemap: function(data) {
-                pandora.UI.set('showAnnotationsMap', !data.collapsed);
+                pandora.UI.set({showAnnotationsMap: !data.collapsed});
             },
             togglesize: function(data) {
                 pandora.UI.set({videoSize: data.size});
             },
             toggletimeline: function(data) {
-                pandora.UI.set('showTimeline', data.showTimeline);
+                pandora.UI.set({showTimeline: data.showTimeline});
             },
             volume: function(data) {
-                pandora.UI.set('videoVolume', data.volume);
+                pandora.UI.set({videoVolume: data.volume});
             },
             pandora_showannotations: function(data) {
                 that.options({showAnnotations: data.value});

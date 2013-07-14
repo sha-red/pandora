@@ -65,7 +65,7 @@ pandora.ui.timeline = function(data) {
                 pandora.URL.push(pandora.site.cantPlay.link);
             },
             follow: function(data) {
-                pandora.UI.set('followPlayer', data.follow);
+                pandora.UI.set({followPlayer: data.follow});
             },
             info: function(data) {
                 pandora.ui.annotationDialog(
@@ -73,7 +73,7 @@ pandora.ui.timeline = function(data) {
                 ).open();
             },
             muted: function(data) {
-                pandora.UI.set('videoMuted', data.muted);
+                pandora.UI.set({videoMuted: data.muted});
             },
             playing: function(data) {
                 pandora.UI.set(
@@ -88,28 +88,28 @@ pandora.ui.timeline = function(data) {
                 );
             },
             resizeannotations: function(data) {
-                pandora.UI.set('annotationsSize', data.annotationsSize);
+                pandora.UI.set({annotationsSize: data.annotationsSize});
             },
             resizecalendar: function(data) {
-                pandora.UI.set('annotationsCalendarSize', data.size);
+                pandora.UI.set({annotationsCalendarSize: data.size});
             },
             resizemap: function(data) {
-                pandora.UI.set('annotationsMapSize', data.size);
+                pandora.UI.set({annotationsMapSize: data.size});
             },
             select: function(data) {
                 pandora.UI.set('videoPoints.' + pandora.user.ui.item + '.annotation', data.id.split('/')[1]);
             },
             timeline: function(data) {
-                pandora.UI.set('videoTimeline', data.timeline);
+                pandora.UI.set({videoTimeline: data.timeline});
             },
             toggleannotations: function(data) {
-                pandora.UI.set('showAnnotations', data.showAnnotations);
+                pandora.UI.set({showAnnotations: data.showAnnotations});
             },
             togglelayer: function(data) {
                 pandora.UI.set('showLayers.' + data.layer, !data.collapsed);
             },
             togglemap: function(data) {
-                pandora.UI.set('showAnnotationsMap', !data.collapsed);
+                pandora.UI.set({showAnnotationsMap: !data.collapsed});
             },
             pandora_showannotations: function(data) {
                 that.options({showAnnotations: data.value});
