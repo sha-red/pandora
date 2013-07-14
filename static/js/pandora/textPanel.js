@@ -149,7 +149,7 @@ pandora.ui.textPanel = function() {
                     })
                     .bindEvent({
                         click: function(data) {
-                            if(data.files.length) {
+                            if (data.files.length) {
                                 pandora.$ui.uploadPDFDialog = pandora.ui.uploadPDFDialog({
                                     file: data.files[0],
                                     id: pandora.user.ui.text
@@ -339,7 +339,7 @@ pandora.ui.textPDF = function(text) {
                 width: '100%'
             })
             .onMessage(function(event, data) {
-                if(event == 'edit') {
+                if (event == 'edit') {
                     pandora.ui.insertEmbedDialog(data.src, function(url) {
                         data.src = url;
                         var embed = text.embeds.filter(function(embed) {
@@ -347,9 +347,8 @@ pandora.ui.textPDF = function(text) {
                                 && embed.type == data.type
                                 && embed.page == data.page;
                         })[0];
-                        if(embed) {
+                        if (embed) {
                             embed.src = url;
-
                         } else {
                             text.embeds.push(data);
                             //fixme sort embeds by page/id
