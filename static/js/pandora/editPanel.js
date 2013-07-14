@@ -187,7 +187,6 @@ pandora.ui.editPanel = function() {
                     },
                     sort: function(data) {
                         if (data[0] && data[0].key) {
-                            console.log('S!!!sort', data);
                             pandora.UI.set('clipSort', data);
                             pandora.api.sortClips({
                                 edit: edit.id,

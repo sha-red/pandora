@@ -54,6 +54,16 @@ pandora.URL = (function() {
                             : []
                     );
                 }
+            } else if (pandora.user.ui.section == 'edits') {
+                var editPoints = pandora.user.ui.editPoints[state.item] || {};
+                state.span = editPoints.clip || [].concat(
+                    editPoints.position
+                        ? editPoints.position
+                        : [],
+                    editPoints['in'] || editPoints.out
+                        ? [editPoints['in'], editPoints.out]
+                        : []
+                );
             } else if (pandora.user.ui.section == 'texts') {
                 var position = pandora.user.ui.textPositions[pandora.user.ui.text];
                 if (position) {
@@ -183,10 +193,30 @@ pandora.URL = (function() {
                         }
                     }
 
+                } else if (state.type == 'edits') {
+
+                    if (state.span) {
+                        if (Ox.isArray(state.span)) {
+                            set['editPoints.' + state.item.replace(/\./g, '\\.')] = {
+                                clip: '',
+                                'in': state.span[state.span.length - 2] || 0,
+                                out: state.span.length == 1 ? 0 : Math.max(
+                                    state.span[state.span.length - 2],
+                                    state.span[state.span.length - 1]
+                                ),
+                                position: state.span[0]
+                            }
+                        } else {
+                            set['editPoints.' + state.item.replace(/\./g, '\\.') + '.clip'] = state.span;
+                        }
+                    }
+
                 } else if (state.type == 'texts') {
+
                     if (state.span) {
                         set['textPositions.' + state.item] = state.span;
                     }
+
                 }
 
                 Ox.Request.cancel();
@@ -294,6 +324,20 @@ pandora.URL = (function() {
             }
         };
 
+        // Edits
+        views['edits'] = {
+            list: [],
+            item: ['edit']
+        };
+        spanType['edits'] = {
+            list: [],
+            item: {edit: 'duration'}
+        };
+        sortKeys['edits'] = {
+            list: {},
+            item: {}
+        };
+
         // Texts
         views['texts'] = {
             list: [],
@@ -304,20 +348,6 @@ pandora.URL = (function() {
             item: {text: 'number'}
         };
         sortKeys['texts'] = {
-            list: {},
-            item: {}
-        };
-
-        // Edits
-        views['edits'] = {
-            list: [],
-            item: ['edit']
-        };
-        spanType['edits'] = {
-            list: [],
-            item: {edit: 'number'}
-        };
-        sortKeys['edits'] = {
             list: {},
             item: {}
         };
