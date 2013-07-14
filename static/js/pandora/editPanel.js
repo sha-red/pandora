@@ -118,7 +118,6 @@ pandora.ui.editPanel = function() {
                             pandora.api.editClip(args, function(result) {
                                 if (result.status.code == 200) {
                                     edit.clips[index] = result.data;
-                                    console.log(index, result.data);
                                     that.updateClip(data.id, result.data);
                                     updateVideos();
                                 } else {
