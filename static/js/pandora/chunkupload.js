@@ -12,9 +12,9 @@
         console.log(data.progress);
       },
       done: function(result) {
-          if(result.progress == 1) {
+          if (result.progress == 1) {
               var response = JSON.parse(result.responseText);
-              if(response.resultUrl) {
+              if (response.resultUrl) {
                 document.location.href = response.resultUrl;
               } else {
                 alert(response.status;
@@ -117,9 +117,9 @@ pandora.chunkupload = function(options) {
 
         if (file.mozSlice) {
             chunk = file.mozSlice(chunkOffset, chunkOffset+chunkSize, file.type);
-        } else if(file.webkitSlice) {
+        } else if (file.webkitSlice) {
             chunk = file.webkitSlice(chunkOffset, chunkOffset+chunkSize, file.type);
-        } else if(file.slice) {
+        } else if (file.slice) {
             chunk = file.slice(chunkOffset, chunkOffset+chunkSize, file.type);
         } else {
             that.status = Ox._('Sorry, your browser is currently not supported.');

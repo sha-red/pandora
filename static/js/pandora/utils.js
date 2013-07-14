@@ -593,10 +593,10 @@ pandora.getClipVideos = function(clip, resolution) {
         var item = {
             src: pandora.getVideoURL(clip.item, resolution, i + 1)
         };
-        if(currentTime + clip.durations[i] <= start || currentTime > end) {
+        if (currentTime + clip.durations[i] <= start || currentTime > end) {
             item = null;
         } else {
-            if(currentTime <= start && currentTime + clip.durations[i] > start) {
+            if (currentTime <= start && currentTime + clip.durations[i] > start) {
                 item['in'] = start - currentTime;
             }
             if (currentTime + clip.durations[i] >= end) {
@@ -1724,7 +1724,7 @@ pandora.wait = function(taskId, callback, timeout) {
     task.timeout = setTimeout(function() {
         pandora.api.taskStatus({taskId: taskId}, function(result) {
             var t;
-            if(result.data.status == 'PENDING') {
+            if (result.data.status == 'PENDING') {
                 t = pandora.wait(taskId, callback);
                 task.timeout = t.timeout;
             } else {

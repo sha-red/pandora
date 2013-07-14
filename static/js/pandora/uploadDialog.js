@@ -62,7 +62,7 @@ pandora.ui.uploadDialog = function(data) {
                     width: 96
                 }).bindEvent({
                     click: function(data) {
-                        if(data.files.length) {
+                        if (data.files.length) {
                             $actionButton.hide();
                             $closeButton.options('title', Ox._('Cancel'));
                             upload(data.files[0]);

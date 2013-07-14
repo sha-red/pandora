@@ -83,7 +83,7 @@ pandora.ui.importAnnotations = function(data) {
                         text: Ox._('Importing {0} annotations...', [srt.length])
                     }));
                     pandora.wait(result.data.taskId, function(result) {
-                        if(result.data.status == 'SUCCESS') {
+                        if (result.data.status == 'SUCCESS') {
                             setStatus(Ox._('{0} annotations imported.', [annotations.length]));
                             Ox.Request.clearCache(pandora.user.ui.item);
                             pandora.$ui.contentPanel.replaceElement(
@@ -147,12 +147,12 @@ pandora.ui.importAnnotations = function(data) {
         })
         .bindEvent({
             click: function(data) {
-                if(data.files.length) {
+                if (data.files.length) {
                     var reader = new FileReader();
                     reader.onloadend = function(event) {
                         srt = parseSRT(this.result);
                         total = srt.length;
-                        if(total && layer) {
+                        if (total && layer) {
                             importButton.options({disabled: false});
                             selectLayer.hide();
                             selectFile.hide();

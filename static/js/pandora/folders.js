@@ -82,7 +82,7 @@ pandora.ui.folders = function() {
                             }
                         })
                     ];
-                } else if(ui.section == 'texts') {
+                } else if (ui.section == 'texts') {
                     extras = [
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [
@@ -113,7 +113,7 @@ pandora.ui.folders = function() {
                             ]('deletetext');
                         })
                     ];
-                } else if(ui.section == 'edits') {
+                } else if (ui.section == 'edits') {
                     extras = [
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [

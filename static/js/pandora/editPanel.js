@@ -206,7 +206,7 @@ pandora.ui.editPanel = function() {
                         }
                         if (['id', 'index', 'in', 'out', 'duration'].indexOf(key) > -1) {
                             edit.clips = Ox.sortBy(edit.clips, key);
-                            if(data[0].operator == '-') {
+                            if (data[0].operator == '-') {
                                 edit.clips.reverse();
                             }
                             updateClips(edit.clips);
