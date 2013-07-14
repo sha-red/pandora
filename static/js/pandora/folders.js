@@ -385,10 +385,6 @@ pandora.ui.folders = function() {
                 Ox.forEach(pandora.$ui.folderList, function($list, id) {
                     $list.options('selected', []);
                 });
-            } else {
-                Ox.forEach(pandora.$ui.folderList, function($list, id) {
-                    $list.options('selected', [pandora.user.ui.edit]);
-                });
             }
         },
         pandora_find: function() {
