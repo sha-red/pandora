@@ -14,7 +14,7 @@ pandora.ui.editPanel = function() {
         smallTimelineContext,
         that = Ox.Element();
 
-    ui.edit ? render() : renderOverview();
+    ui.edit ? renderEdit() : renderEdits();
 
     function editPointsKey(key) {
         return 'editPoints.' + ui.edit.replace(/\./g, '\\.') + '.' + key;
@@ -39,7 +39,7 @@ pandora.ui.editPanel = function() {
         return videos;
     }
 
-    function render() {
+    function renderEdit() {
         pandora.api.getEdit({id: ui.edit}, function(result) {
             edit = result.data;
             // fixme: duration should come from backend
@@ -98,10 +98,12 @@ pandora.ui.editPanel = function() {
                 })
                 .bindEvent({
                     copy: function(data) {
-                        
+                        Ox.Clipboard.copy(data.ids.map(function(id) {
+                            return Ox.getObjectById(edit.clips, id);
+                        }), 'clip');
                     },
                     cut: function(data) {
-                        
+                        // ...
                     },
                     edit: function(data) {
                         var args = {id: data.id},
@@ -255,7 +257,8 @@ pandora.ui.editPanel = function() {
             updateSmallTimelineURL();
         });
     }
-    function renderOverview() {
+
+    function renderEdits() {
         that = Ox.IconList({
             borderRadius: 16,
             defaultRatio: 1,
@@ -312,22 +315,7 @@ pandora.ui.editPanel = function() {
             video: getVideos()
         });
         updateSmallTimelineURL();
-
     }
-
-    function updateVideos() {
-        edit.duration = 0;
-        edit.clips.forEach(function(clip) {
-            clip.position = edit.duration;
-            edit.duration += clip.duration;
-        });
-        that.options({
-            smallTimelineURL: getSmallTimelineURL(),
-            video: getVideos()
-        });
-        updateSmallTimelineURL();
-    }
-
 
     function updateSmallTimelineURL() {
         var fps = 25;
@@ -347,6 +335,19 @@ pandora.ui.editPanel = function() {
                     })[0];
             });
         });
+    }
+
+    function updateVideos() {
+        edit.duration = 0;
+        edit.clips.forEach(function(clip) {
+            clip.position = edit.duration;
+            edit.duration += clip.duration;
+        });
+        that.options({
+            smallTimelineURL: getSmallTimelineURL(),
+            video: getVideos()
+        });
+        updateSmallTimelineURL();
     }
 
     return that;
