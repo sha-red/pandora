@@ -158,7 +158,7 @@ def _order_clips(qs, sort):
             'in': 'start',
             'out': 'end',
             'text': 'annotation__sortvalue',
-            'item__sort__item': 'item__sort__id',
+            'item__sort__item': 'item__sort__itemId',
         }.get(key, key)
         order = '%s%s' % (operator, key)
         order_by.append(order)
