@@ -641,7 +641,7 @@ pandora.ui.mainMenu = function() {
                 ]('findsimilar');
             },
             pandora_section: function() {
-                // ...
+                that.replaceMenu('sortMenu', getSortMenu());
             },
             pandora_showannotations: function(data) {
                 that.setItemTitle('showannotations', Ox._((data.value ? 'Hide' : 'Show') + ' Annotations'));
@@ -778,7 +778,7 @@ pandora.ui.mainMenu = function() {
                 }, key);
             }) : []);
         return { id: 'sortMenu', title: Ox._('Sort'), items: [
-            { id: 'sortitems', title: Ox._('Sort {0} by', [Ox._(pandora.site.itemName.plural)]), disabled: !ui.item && isClipView, items: [
+            { id: 'sortitems', title: Ox._('Sort {0} by', [Ox._(pandora.site.itemName.plural)]), disabled: ui.section != 'items' || (!ui.item && isClipView), items: [
                 { group: 'itemsort', min: 1, max: 1, items: pandora.site.sortKeys.map(function(key) {
                     return Ox.extend({
                         checked: ui.listSort[0].key == key.id
@@ -787,7 +787,7 @@ pandora.ui.mainMenu = function() {
                     });
                 }) }
             ] },
-            { id: 'orderitems', title: Ox._('Order {0}', [Ox._(pandora.site.itemName.plural)]), disabled: !ui.item && isClipView, items: [
+            { id: 'orderitems', title: Ox._('Order {0}', [Ox._(pandora.site.itemName.plural)]), disabled: ui.section != 'items' || (!ui.item && isClipView), items: [
                 { group: 'itemorder', min: 1, max: 1, items: [
                     { id: 'ascending', title: Ox._('Ascending'), checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '+' },
                     { id: 'descending', title: Ox._('Descending'), checked: (ui.listSort[0].operator || pandora.getSortOperator(ui.listSort[0].key)) == '-' }
@@ -812,7 +812,7 @@ pandora.ui.mainMenu = function() {
             ] },
             { id: 'advancedsort', title: Ox._('Advanced Sort...'), keyboard: 'shift control s', disabled: true },
             {},
-            { id: 'sortfilters', title: Ox._('Sort Filters'), items: pandora.user.ui.filters.map(function(filter) {
+            { id: 'sortfilters', title: Ox._('Sort Filters'), disabled: ui.section != 'items', items: pandora.user.ui.filters.map(function(filter) {
                 return {
                     id: 'sortfilter' + filter.id,
                     title: Ox._('Sort {0} Filter by', [Ox._(Ox.getObjectById(pandora.site.filters, filter.id).title)]),
@@ -824,7 +824,7 @@ pandora.ui.mainMenu = function() {
                     ]
                 }
             }) },
-            { id: 'orderfilters', title: Ox._('Order Filters'), items: pandora.user.ui.filters.map(function(filter) {
+            { id: 'orderfilters', title: Ox._('Order Filters'), disabled: ui.section != 'items', items: pandora.user.ui.filters.map(function(filter) {
                 return {
                     id: 'orderfilter' + filter.id,
                     title: Ox._('Order {0} Filter', [Ox._(Ox.getObjectById(pandora.site.filters, filter.id).title)]),
