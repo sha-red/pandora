@@ -380,6 +380,17 @@ pandora.ui.folders = function() {
         });
     }
     that.bindEvent({
+        pandora_edit: function() {
+            if (!pandora.user.ui.edit) {
+                Ox.forEach(pandora.$ui.folderList, function($list, id) {
+                    $list.options('selected', []);
+                });
+            } else {
+                Ox.forEach(pandora.$ui.folderList, function($list, id) {
+                    $list.options('selected', [pandora.user.ui.edit]);
+                });
+            }
+        },
         pandora_find: function() {
             var folder = pandora.getListData().folder,
                 list = pandora.user.ui._list,

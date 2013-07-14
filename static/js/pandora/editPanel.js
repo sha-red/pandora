@@ -14,7 +14,7 @@ pandora.ui.editPanel = function() {
         smallTimelineContext,
         that = Ox.Element();
 
-    ui.edit && render();
+    ui.edit ? render() : renderOverview();
 
     function editPointsKey(key) {
         return 'editPoints.' + ui.edit.replace(/\./g, '\\.') + '.' + key;
@@ -253,6 +253,41 @@ pandora.ui.editPanel = function() {
                 })
             );
             updateSmallTimelineURL();
+        });
+    }
+    function renderOverview() {
+        that = Ox.IconList({
+            borderRadius: 16,
+            defaultRatio: 1,
+            draggable: true,
+            item: function(data, sort, size) {
+                size = size || 128;
+                var ui = pandora.user.ui,
+                    url = '/edit/' + data.id + '/icon'+size+'.jpg?' + data.modified,
+                    info = Ox.formatDuration(data.duration);
+                return {
+                    height: size,
+                    id: data.id,
+                    title: data.name,
+                    info: info,
+                    url: url,
+                    width: size,
+                }
+            },
+            items: function(data, callback) {
+                pandora.api.findEdits(data, callback);
+                return Ox.clone(data, true);
+            },
+            keys: ['id', 'modified', 'name', 'duration'],
+            size: 128,
+            sort: [{key: 'id', operator: '+'}],
+            unique: 'id'
+        })
+        .addClass('OxMedia')
+        .bindEvent({
+            open: function(data) {
+                pandora.UI.set('edit', data.ids[0]);
+            }
         });
     }
 
