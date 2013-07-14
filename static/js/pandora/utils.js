@@ -960,7 +960,6 @@ pandora.getLargeEditTimelineURL = function(edit, type, i, callback) {
             var image = Ox.$('<img>')
                 .on({
                     load: function() {
-                        Ox.print('DRAWING TIMELINE', i, 'AT', Math.floor((clip.position - timelineIn) * fps), 'OF', width)
                         context.drawImage(image, Math.floor((clip.position - timelineIn) * fps), 0);
                         callback();
                     }
@@ -1603,6 +1602,17 @@ pandora.resizeWindow = function() {
                 pandora.$ui.calendar.resizeCalendar();
             }
         }
+    } else if (pandora.user.ui.section == 'edits') {
+        if (!pandora.user.ui.edit) {
+            // ...
+        } else {
+            pandora.$ui.editPanel && pandora.$ui.editPanel.options({
+                height: pandora.$ui.appPanel.size(1),
+                width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
+            });
+        }
+    } else if (pandora.user.ui.section == 'texts') {
+        // ...
     }
 };
 
