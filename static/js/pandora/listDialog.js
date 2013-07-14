@@ -215,7 +215,7 @@ pandora.ui.listGeneralPanel = function(listData) {
                         };
                     }),
                     label: Ox._('Rights Level'),
-                    labelWidth: 90,
+                    labelWidth: 80,
                     value: listData.rightslevel,
                     width: 320
                 })
