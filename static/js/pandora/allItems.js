@@ -22,6 +22,7 @@ pandora.ui.allItems = function() {
                 }
             })
             .bindEvent({
+                pandora_edit: updateSelected,
                 pandora_find: updateSelected,
                 pandora_section: updateSelected,
                 pandora_text: updateSelected
@@ -112,6 +113,7 @@ pandora.ui.allItems = function() {
     function updateSelected() {
         that[
             (pandora.user.ui.section == 'items' && pandora.user.ui._list)
+            || (pandora.user.ui.section == 'edits' && pandora.user.ui.edit)
             || (pandora.user.ui.section == 'texts' && pandora.user.ui.text)
             ? 'removeClass' : 'addClass'
         ]('OxSelected');
