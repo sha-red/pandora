@@ -227,7 +227,7 @@ pandora.ui.editPanel = function() {
             clip.index = ids.indexOf(clip.id);
         });
         edit.clips = Ox.sortBy(edit.clips, 'index');
-        udpateVideos();
+        updateVideos();
     }
 
     function updateClips(clips) {
