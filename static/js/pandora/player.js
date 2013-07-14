@@ -70,6 +70,16 @@ pandora.ui.player = function(data) {
                 });
                 pandora.URL.push(pandora.site.cantPlay.link);
             },
+            copy: function(data) {
+                Ox.Clipboard.copy(data.map(function(clip) {
+                    return Ox.extend(clip, {item: ui.item});
+                }), 'clip');
+            },
+            copyadd: function(data) {
+                Ox.Clipboard.add(data.map(function(clip) {
+                    return Ox.extend(clip, {item: ui.item});
+                }), 'clip');
+            },
             downloadvideo: function(data) {
                 document.location.href = '/' + ui.item + '/torrent/';
             },
@@ -89,6 +99,14 @@ pandora.ui.player = function(data) {
                     'videoPoints.' + ui.item + '.position',
                     data.position
                 );
+            },
+            points: function(data) {
+                pandora.UI.set('videoPoints.' + ui.item, {
+                    annotation: ui.videoPoints[ui.item].annotation,
+                    'in': data['in'],
+                    out: data.out,
+                    position: data.position
+                });
             },
             position: function(data) {
                 pandora.UI.set(

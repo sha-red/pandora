@@ -108,13 +108,13 @@ pandora.ui.editor = function(data) {
             censored: function() {
                 pandora.URL.push(pandora.site.cantPlay.link);
             },
-            copy: function(clips) {
-                Ox.Clipboard.copy(clips.map(function(clip) {
+            copy: function(data) {
+                Ox.Clipboard.copy(data.map(function(clip) {
                     return Ox.extend(clip, {item: ui.item});
                 }), 'clip');
             },
-            copyadd: function(clip) {
-                Ox.Clipboard.add(clips.map(function(clip) {
+            copyadd: function(data) {
+                Ox.Clipboard.add(data.map(function(clip) {
                     return Ox.extend(clip, {item: ui.item});
                 }), 'clip');
             },
