@@ -1530,7 +1530,7 @@ pandora.resizeFolders = function() {
         ),
         userColumnWidth = Math.round(columnWidth * 0.4),
         nameColumnWidth = columnWidth - userColumnWidth;
-    pandora.$ui.allItems.resizeElement(columnWidth - 8);
+    pandora.$ui.allItems && pandora.$ui.allItems.resizeElement(columnWidth - 8);
     Ox.forEach(pandora.$ui.folderList, function($list, id) {
         var pos = Ox.getIndexById(pandora.site.sectionFolders[pandora.user.ui.section], id);
         pandora.$ui.folder[pos].css({width: width + 'px'});
