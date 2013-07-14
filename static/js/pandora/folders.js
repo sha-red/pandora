@@ -153,7 +153,7 @@ pandora.ui.folders = function() {
                 extras = [pandora.$ui.manageListsButton['favorite'] = Ox.Button({
                     selectable: true,
                     style: 'symbol',
-                    title: 'Edit',
+                    title: 'edit',
                     tooltip: Ox._('Manage Favorite {0}', [Ox._(folderItems)]),
                     type: 'image'
                 })
@@ -202,7 +202,7 @@ pandora.ui.folders = function() {
                 extras = [pandora.$ui.manageListsButton['featured'] = Ox.Button({
                     selectable: true,
                     style: 'symbol',
-                    title: 'Edit',
+                    title: 'edit',
                     tooltip: Ox._('Manage Featured {0}', [Ox._(folderItems)]),
                     type: 'image'
                 })
