@@ -93,9 +93,6 @@ pandora.ui.editPanel = function() {
                     width: pandora.$ui.document.width() - pandora.$ui.mainPanel.size(0) - 1
                 })
                 .bindEvent({
-                    clipssort: function(data) {
-                        pandora.UI.set({clipSort: data.sort});
-                    },
                     copy: function(data) {
                         
                     },
@@ -177,6 +174,12 @@ pandora.ui.editPanel = function() {
                     select: function(data) {
                         pandora.UI.set(editPointsKey('clip'), data.ids[0]);
                     },
+                    size: function(data) {
+                        pandora.UI.set('clipSize', data.size);
+                    },
+                    sort: function(data) {
+                        pandora.UI.set('clipSort', data.sort);
+                    },
                     subtitles: function(data) {
                         pandora.UI.set('videoSubtitles', data.subtitles);
                     },
@@ -189,6 +192,9 @@ pandora.ui.editPanel = function() {
                     toggletimeline: function(data) {
                         pandora.UI.set('showTimeline', data.showTimeline);
                     },
+                    view: function(data) {
+                        pandora.UI.set('clipView', data.view);
+                    },
                     volume: function(data) {
                         pandora.UI.set('videoVolume', data.volume);
                     },
@@ -196,7 +202,6 @@ pandora.ui.editPanel = function() {
                         that.options({showClips: data.value});
                     },
                     pandora_showtimeline: function(data) {
-                        Ox.print('SHOWTIMELINE', data);
                         that.options({showTimeline: data.value});
                     },
                     pandora_videotimeline: function(data) {
