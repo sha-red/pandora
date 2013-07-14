@@ -589,12 +589,11 @@ pandora.getClipVideos = function(clip, resolution) {
         start = clip['in'] || 0,
         end = clip.out;
     resolution = resolution || pandora.user.ui.videoResolution;
-
     return Ox.flatten(Ox.range(clip.parts).map(function(i) {
         var item = {
             src: pandora.getVideoURL(clip.item, resolution, i + 1)
         };
-        if(currentTime + clip.durations[i] < start || currentTime > end) {
+        if(currentTime + clip.durations[i] <= start || currentTime > end) {
             item = null;
         } else {
             if(currentTime <= start && currentTime + clip.durations[i] > start) {
