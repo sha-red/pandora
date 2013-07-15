@@ -395,6 +395,9 @@ pandora.ui.list = function() {
             copy: function(data) {
                 Ox.Clipboard.copy(data.ids, 'item');
             },
+            copyadd: function(data) {
+                Ox.Clipboard.add(data.ids, 'item');
+            },
             'delete': function(data) {
                 pandora.getListData().editable && pandora.api.removeListItems({
                     list: pandora.user.ui._list,
