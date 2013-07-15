@@ -41,11 +41,7 @@ pandora.ui.allItems = function(section) {
                 overflow: 'hidden',
                 whiteSpace: 'nowrap'
             })
-            .html(
-                section == 'items'
-                ? Ox._('All {0}', [Ox._(pandora.site.itemName.plural)])
-                : Ox._('{0} ' + Ox.toTitleCase(section), [pandora.site.site.name])
-            )
+            .html(pandora.getAllItemsTitle())
             .appendTo(that),
         $items;
 

@@ -808,6 +808,12 @@ pandora.exitFullscreen = function() {
     pandora.user.ui.showBrowser && pandora.$ui.contentPanel.size(0, 112 + Ox.UI.SCROLLBAR_SIZE);
 };
 
+pandora.getAllItemsTitle = function() {
+    return pandora.user.ui.section == 'items'
+        ? Ox._('All {0}', [Ox._(pandora.site.itemName.plural)])
+        : Ox._('{0} ' + Ox.toTitleCase(pandora.user.ui.section), [pandora.site.site.name]);
+};
+
 pandora.getClipsItems = function(width) {
     width = width || window.innerWidth
         - pandora.user.ui.showSidebar * pandora.user.ui.sidebarSize - 1
