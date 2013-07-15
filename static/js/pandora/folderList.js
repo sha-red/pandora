@@ -1,10 +1,11 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
 
-pandora.ui.folderList = function(id) {
+pandora.ui.folderList = function(id, section) {
+    section = section || pandora.user.section;
     var ui = pandora.user.ui,
-        i = Ox.getIndexById(pandora.site.sectionFolders[ui.section], id),
-        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
+        i = Ox.getIndexById(pandora.site.sectionFolders[section], id),
+        folderItems = section == 'items' ? 'Lists' : Ox.toTitleCase(section),
         folderItem = folderItems.slice(0, -1),
         canEditFeatured = pandora.site.capabilities['canEditFeatured' + folderItems][pandora.user.level],
         that;
@@ -45,7 +46,7 @@ pandora.ui.folderList = function(id) {
                 visible: id == 'favorite',
                 // fixme: user and name are set to the same width here,
                 // but resizeFolders will set them to different widths
-                width: ui.sidebarWidth - (ui.section == 'items' ? 96 : 48)
+                width: ui.sidebarWidth - (section == 'items' ? 96 : 48)
             },
             {
                 editable: function(data) {
@@ -64,19 +65,19 @@ pandora.ui.folderList = function(id) {
                     return Ox.decodeHTMLEntities(value);
                 },
                 visible: id != 'favorite',
-                width: ui.sidebarWidth - (ui.section == 'items' ? 96 : 48)
+                width: ui.sidebarWidth - (section == 'items' ? 96 : 48)
             },
             {
                 align: 'right',
                 id: 'items',
                 format: {type: 'number'},
                 operator: '-',
-                visible: ui.section == 'items',
+                visible: section == 'items',
                 width: 48
             },
             {
                 clickable: function(data) {
-                    return ui.section == 'items' && (
+                    return section == 'items' && (
                         data.type == 'smart' || data.user == pandora.user.username
                     );
                 },
@@ -94,7 +95,7 @@ pandora.ui.folderList = function(id) {
                             width: '10px',
                             height: '10px',
                             padding: '3px',
-                            opacity: ui.section == 'texts' || data.user == pandora.user.username ? 1 : 0.25
+                            opacity: section == 'texts' || data.user == pandora.user.username ? 1 : 0.25
                         });
                 },
                 id: 'type',
@@ -253,7 +254,7 @@ pandora.ui.folderList = function(id) {
     that = Ox.TableList({
         columns: columns,
         items: items,
-        keys: ['modified'].concat(ui.section == 'items' ? ['query'] : ['rightslevel']),
+        keys: ['modified'].concat(section == 'items' ? ['query'] : ['rightslevel']),
         max: 1,
         min: 0,
         pageLength: 1000,
@@ -363,8 +364,8 @@ pandora.ui.folderList = function(id) {
         },
         */
         init: function(data) {
-            if (pandora.site.sectionFolders[ui.section][i]) {
-                pandora.site.sectionFolders[ui.section][i].items = data.items;
+            if (pandora.site.sectionFolders[section][i]) {
+                pandora.site.sectionFolders[section][i].items = data.items;
                 pandora.$ui.folder[i].$content.css({
                     height: data.items * 16 + 'px'
                 });
@@ -392,7 +393,7 @@ pandora.ui.folderList = function(id) {
                     id != id_ && $list.options('selected', []);
                 });
             }
-            if (ui.section == 'items') {
+            if (section == 'items') {
                 pandora.UI.set({
                     find: {
                         conditions: list ? [
@@ -402,7 +403,7 @@ pandora.ui.folderList = function(id) {
                     }
                 });
             } else {
-                pandora.UI.set(ui.section.slice(0, -1), list);
+                pandora.UI.set(section.slice(0, -1), list);
             }
         },
         submit: function(data) {

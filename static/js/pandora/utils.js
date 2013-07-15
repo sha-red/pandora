@@ -527,6 +527,260 @@ pandora.enableDragAndDrop = function($list, canMove) {
     }
 
 };
+pandora.enableDragAndDropClip = function($list, canMove) {
+    var $tooltip = Ox.Tooltip({
+            animate: false
+        }),
+        drag = {},
+        scrollInterval;
+
+    $list.bindEvent({
+        draganddropstart: function(data) {
+            pandora.$ui.mainPanel.replaceElement(0, pandora.$ui.leftPanel = pandora.ui.leftPanel('edits'));
+            drag.action = 'copy';
+            drag.ids = $list.options('selected'),
+            drag.item = drag.ids.length == 1
+                ? $list.value(drag.ids[0], 'title')
+                : drag.ids.length;
+            drag.source = pandora.getListData(),
+            drag.targets = {};
+
+            //fixme instead of a fixed timeout,
+            //bind to lists and update if they get new items
+            setTimeout(function() {
+                Ox.forEach(pandora.$ui.folderList, function($list) {
+                    $list.addClass('OxDroppable').find('.OxItem').each(function() {
+                        var $item = $(this),
+                            id = $item.data('id'),
+                            data = $list.value(id);
+                        drag.targets[id] = Ox.extend({
+                            editable: data.user == pandora.user.username
+                                && data.type == 'static',
+                            selected: $item.is('.OxSelected')
+                        }, data);
+                        if (!drag.targets[id].selected && drag.targets[id].editable) {
+                            $item.addClass('OxDroppable');
+                        }
+                    });
+                });
+            }, 2000);
+
+            $tooltip.options({title: getTitle()}).show(data.event);
+            canMove && Ox.UI.$window.on({
+                keydown: keydown,
+                keyup: keyup
+            });
+        },
+        draganddrop: function(data) {
+            var event = data.event;
+            $tooltip.options({
+                title: getTitle(event)
+            }).show(event);
+            if (scrollInterval && !isAtListsTop(event) && !isAtListsBottom(event)) {
+                clearInterval(scrollInterval);
+                scrollInterval = 0;
+            }
+        },
+        draganddroppause: function(data) {
+            var event = data.event, scroll,
+                $parent, $grandparent, $panel, title;
+            // fixme: should be named showLists in the user ui prefs!
+            if (!pandora.user.ui.showSidebar) {
+                if (event.clientX < 16 && event.clientY >= 44
+                    && event.clientY < window.innerHeight - 16
+                ) {
+                    pandora.$ui.mainPanel.toggle(0);
+                }
+            } else {
+                $parent = $(event.target).parent();
+                $grandparent = $parent.parent();
+                $panel = $parent.is('.OxCollapsePanel') ? $parent
+                    : $grandparent.is('.OxCollapsePanel') ? $grandparent : null;
+                if ($panel) {
+                    title = $panel.children('.OxBar').children('.OxTitle')
+                        .html().split(' ')[0].toLowerCase();
+                    if (!pandora.user.ui.showFolder.items[title]) {
+                        Ox.UI.elements[$panel.data('oxid')].options({collapsed: false});
+                    }
+                }
+                if (!scrollInterval) {
+                    scroll = isAtListsTop(event) ? -16
+                        : isAtListsBottom(event) ? 16 : 0
+                    if (scroll) {
+                        scrollInterval = setInterval(function() {
+                            pandora.$ui.folders.scrollTop(
+                                pandora.$ui.folders.scrollTop() + scroll
+                            );
+                        }, 100);
+                    }
+                }
+            }
+        },
+        draganddropenter: function(data) {
+            var $parent = $(data.event.target).parent(),
+                $item = $parent.is('.OxItem') ? $parent : $parent.parent(),
+                $list = $item.parent().parent().parent().parent();
+            if ($list.is('.OxDroppable')) {
+                $item.addClass('OxDrop');
+                drag.target = drag.targets[$item.data('id')];
+            } else {
+                drag.target = null;
+            }
+        },
+        draganddropleave: function(data) {
+            var $parent = $(data.event.target).parent(),
+                $item = $parent.is('.OxItem') ? $parent : $parent.parent();
+            if ($item.is('.OxDroppable')) {
+                $item.removeClass('OxDrop');
+                drag.target = null;
+            }
+        },
+        draganddropend: function(data) {
+            var clips;
+            Ox.Log('', data, drag, '------------');
+            canMove && Ox.UI.$window.off({
+                keydown: keydown,
+                keyup: keyup
+            });
+            if (drag.target && drag.target.editable && !drag.target.selected) {
+                if (drag.action == 'copy' || (
+                    drag.action == 'move' && drag.source.editable
+                )) {
+                    clips = data.ids.map(function(id) {
+                        var split = id.split('/'),
+                            item = split[0];
+                        split = split[1].split('-');
+                        return {
+                            item: item,
+                            'in': parseFloat(split[0]),
+                            out: parseFloat(split[1]),
+                        }
+                    });
+                    if (drag.action == 'move') {
+                        pandora.api.removeClips({
+                            edit: pandora.user.ui.edit,
+                            items: clips
+                        }, function() {
+                            Ox.print('FIXME, reload clipslist')
+                        });
+                    }
+                    console.log('adding clips', clips);
+                    pandora.api.addClips({
+                        edit: drag.target.id,
+                        clips: clips
+                    }, function() {
+                        Ox.Request.clearCache('Edit');
+                        cleanup(250);
+                    });
+                }
+            } else {
+                cleanup(0);
+            }
+
+            function cleanup(ms) {
+                drag = {};
+                clearInterval(scrollInterval);
+                scrollInterval = 0;
+                setTimeout(function() {
+                    $('.OxDroppable').removeClass('OxDroppable');
+                    $('.OxDrop').removeClass('OxDrop');
+                    $tooltip.hide();
+                    setTimeout(function() {
+                        pandora.$ui.mainPanel.replaceElement(0, pandora.$ui.leftPanel = pandora.ui.leftPanel());
+                    }, 500);
+                }, ms);
+            }
+        }
+    });
+
+    function getTitle() {
+        var image, text;
+        if (drag.action == 'move' && drag.source.user != pandora.user.username) {
+            image = 'symbolClose';
+            text = Ox._('You can only remove {0}<br/>from your own edits.',
+                [pandora.site.itemName.plural.toLowerCase()]);
+        } else if (drag.action == 'move' && drag.source.type == 'smart') {
+            image = 'symbolClose';
+            text = Ox._('You can\'t remove clips<br/>from smart edits.');
+        } else if (drag.target && drag.target.user != pandora.user.username) {
+            image = 'symbolClose';
+            text = Ox._('You can only {0} clips<br/>to your own edits',
+                    [drag.action]);
+        } else if (drag.target && drag.target.type == 'smart') {
+            image = 'symbolClose';
+            text = Ox._('You can\'t {0} clips<br/>to smart lists',
+                    [drag.action]);
+        } else {
+            image = drag.action == 'copy' ? 'symbolAdd' : 'symbolRemove';
+            text = Ox._(Ox.toTitleCase(drag.action)) + ' ' + (
+                Ox.isString(drag.item)
+                ? '"' + drag.item + '"'
+                : drag.item + ' ' + pandora.site.itemName[
+                    drag.item == 1 ? 'singular' : 'plural'
+                ].toLowerCase()
+            ) + '<br/>' + (
+                drag.target && !drag.target.selected
+                ? Ox._('to the edit "{0}"', [Ox.encodeHTMLEntities(drag.target.name)])
+                : Ox._('to an edit')
+            );
+        }
+        return $('<div>')
+            .append(
+                $('<div>')
+                    .css({
+                        float: 'left',
+                        width: '16px',
+                        height: '16px',
+                        padding: '2px',
+                        border: '2px solid rgb(' + Ox.Theme.getThemeData().symbolDefaultColor.join(', ') + ')',
+                        borderRadius: '12px',
+                        margin: '3px 2px 2px 2px'
+                    })
+                    .append(
+                         $('<img>')
+                            .attr({src: Ox.UI.getImageURL(image)})
+                            .css({width: '16px', height: '16px'})
+                    )
+            )
+            .append(
+                $('<div>')
+                    .css({
+                        float: 'left',
+                        margin: '1px 2px 2px 2px',
+                        fontSize: '11px',
+                        whiteSpace: 'nowrap'
+                    })
+                    .html(text)
+            )
+    }
+
+    function isAtListsTop(e) {
+        return pandora.user.ui.showSidebar
+            && e.clientX < pandora.user.ui.sidebarSize
+            && e.clientY >= 44 && e.clientY < 60;
+    }
+
+    function isAtListsBottom(e) {
+        var listsBottom = window.innerHeight - pandora.getInfoHeight();
+        return pandora.user.ui.showSidebar
+            && e.clientX < pandora.user.ui.sidebarSize
+            && e.clientY >= listsBottom - 16 && e.clientY < listsBottom;
+    }
+
+    function keydown(e) {
+        if (e.metaKey) {
+            drag.action = 'move';
+            $tooltip.options({title: getTitle()}).show();
+        }
+    }
+    function keyup(e) {
+        if (drag.action == 'move') {
+            drag.action = 'copy';
+            $tooltip.options({title: getTitle()}).show();
+        }
+    }
+
+};
 
 pandora.enterFullscreen = function() {
     pandora.$ui.appPanel.size(0, 0);

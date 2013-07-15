@@ -1,8 +1,9 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
-pandora.ui.folderBrowserBar = function(id) {
+pandora.ui.folderBrowserBar = function(id, section) {
+    section = section || pandora.user.ui.section;
     var ui = pandora.user.ui,
-        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
+        folderItems = section == 'items' ? 'Lists' : Ox.toTitleCase(section),
         folderItem = folderItems.slice(0, -1),
         that = Ox.Bar({
             size: 24

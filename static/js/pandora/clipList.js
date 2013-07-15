@@ -10,6 +10,7 @@ pandora.ui.clipList = function(videoRatio) {
         isClipView = !ui.item ? ui.listView == 'clip' : ui.itemView == 'clips',
         isEmbed = pandora.isEmbedURL(),
         that = Ox.IconList({
+            draggable: true,
             find: !ui.item ? pandora.getItemFind(ui.find) : ui.itemFind,
             fixedRatio: fixedRatio,
             item: function(data, sort, size) {
@@ -269,6 +270,7 @@ pandora.ui.clipList = function(videoRatio) {
             }
         });
 
+    pandora.enableDragAndDropClip(that, true);
     return that;
 
 }

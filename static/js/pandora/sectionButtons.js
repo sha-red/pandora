@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
-pandora.ui.sectionButtons = function() {
+pandora.ui.sectionButtons = function(section) {
     var that = Ox.ButtonGroup({
             buttons: [
                 {id: 'items', title: Ox._(pandora.site.itemName.plural)},
@@ -9,7 +9,7 @@ pandora.ui.sectionButtons = function() {
             ],
             id: 'sectionButtons',
             selectable: true,
-            value: pandora.user.ui.section
+            value: section || pandora.user.ui.section
         }).css({
             float: 'left',
             margin: '4px'

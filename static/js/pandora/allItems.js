@@ -1,6 +1,7 @@
 'use strict';
 
-pandora.ui.allItems = function() {
+pandora.ui.allItems = function(section) {
+    section = section || pandora.user.ui.section;
 
     var canAddItems = !pandora.site.itemRequiresVideo && pandora.site.capabilities.canAddItems[pandora.user.level],
         canUploadVideo = pandora.site.capabilities.canAddItems[pandora.user.level],
@@ -14,10 +15,10 @@ pandora.ui.allItems = function() {
             .on({
                 click: function() {
                     that.gainFocus();
-                    if (pandora.user.ui.section == 'items') {
+                    if (section == 'items') {
                         pandora.user.ui._list && pandora.UI.set({find: {conditions: [], operator: '&'}});
                     } else {
-                        pandora.UI.set(pandora.user.ui.section.slice(0, -1), '');
+                        pandora.UI.set(section.slice(0, -1), '');
                     }
                 }
             })
@@ -41,14 +42,14 @@ pandora.ui.allItems = function() {
                 whiteSpace: 'nowrap'
             })
             .html(
-                pandora.user.ui.section == 'items'
+                section == 'items'
                 ? Ox._('All {0}', [Ox._(pandora.site.itemName.plural)])
-                : Ox._('{0} ' + Ox.toTitleCase(pandora.user.ui.section), [pandora.site.site.name])
+                : Ox._('{0} ' + Ox.toTitleCase(section), [pandora.site.site.name])
             )
             .appendTo(that),
         $items;
 
-    if (pandora.user.ui.section == 'items') {
+    if (section == 'items') {
         $items = $('<div>')
             .css({
                 float: 'left',
@@ -86,7 +87,7 @@ pandora.ui.allItems = function() {
         }, function(result) {
             that.update(result.data.items);
         });
-    } else if (pandora.user.ui.section == 'texts') {
+    } else if (section == 'texts') {
         Ox.Button({
                 style: 'symbol',
                 title: 'file',
@@ -112,9 +113,9 @@ pandora.ui.allItems = function() {
 
     function updateSelected() {
         that[
-            (pandora.user.ui.section == 'items' && pandora.user.ui._list)
-            || (pandora.user.ui.section == 'edits' && pandora.user.ui.edit)
-            || (pandora.user.ui.section == 'texts' && pandora.user.ui.text)
+            (section == 'items' && pandora.user.ui._list)
+            || (section == 'edits' && pandora.user.ui.edit)
+            || (section == 'texts' && pandora.user.ui.text)
             ? 'removeClass' : 'addClass'
         ]('OxSelected');
     }

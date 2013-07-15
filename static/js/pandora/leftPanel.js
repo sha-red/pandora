@@ -1,14 +1,14 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
-pandora.ui.leftPanel = function() {
+pandora.ui.leftPanel = function(section) {
     var that = Ox.SplitPanel({
             elements: [
                 {
-                    element: pandora.$ui.sectionbar = pandora.ui.sectionbar('buttons'),
+                    element: pandora.$ui.sectionbar = pandora.ui.sectionbar('buttons', section),
                     size: 24
                 },
                 {
-                    element: pandora.$ui.folders = pandora.ui.folders()
+                    element: pandora.$ui.folders = pandora.ui.folders(section)
                 },
                 {
                     collapsed: !pandora.user.ui.showInfo,
@@ -29,11 +29,11 @@ pandora.ui.leftPanel = function() {
                 if (data.size < pandora.site.sectionButtonsWidth && pandora.$ui.sectionButtons) {
                     pandora.$ui.sectionButtons.remove();
                     delete pandora.$ui.sectionButtons;
-                    pandora.$ui.sectionbar.append(pandora.$ui.sectionSelect = pandora.ui.sectionSelect());
+                    pandora.$ui.sectionbar.append(pandora.$ui.sectionSelect = pandora.ui.sectionSelect(section));
                 } else if (data.size >= pandora.site.sectionButtonsWidth && pandora.$ui.sectionSelect) {
                     pandora.$ui.sectionSelect.remove();
                     delete pandora.$ui.sectionSelect;
-                    pandora.$ui.sectionbar.append(pandora.$ui.sectionButtons = pandora.ui.sectionButtons());
+                    pandora.$ui.sectionbar.append(pandora.$ui.sectionButtons = pandora.ui.sectionButtons(section));
                 }
                 pandora.$ui.leftPanel.size(2, infoHeight);
                 !pandora.user.ui.showInfo && pandora.$ui.leftPanel.css({bottom: -infoHeight + 'px'});

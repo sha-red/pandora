@@ -1,6 +1,7 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
-pandora.ui.folders = function() {
+pandora.ui.folders = function(section) {
+    section = section || pandora.user.ui.section;
     var ui = pandora.user.ui,
         counter = 0,
         that = Ox.Element()
@@ -8,11 +9,11 @@ pandora.ui.folders = function() {
             .bindEvent({
                 resize: pandora.resizeFolders
             }),
-        folderItems = ui.section == 'items' ? 'Lists' : Ox.toTitleCase(ui.section),
+        folderItems = section == 'items' ? 'Lists' : Ox.toTitleCase(section),
         folderItem = folderItems.slice(0, -1);
     //var $sections = [];
 
-    pandora.$ui.allItems = pandora.ui.allItems().appendTo(that);
+    pandora.$ui.allItems = pandora.ui.allItems(section).appendTo(that);
     pandora.$ui.folder = [];
     pandora.$ui.folderBrowser = {};
     pandora.$ui.folderList = {};
@@ -20,17 +21,17 @@ pandora.ui.folders = function() {
     pandora.$ui.findListSelect = {};
     pandora.$ui.findListInput = {};
     pandora.$ui.manageListsButton = {};
-    pandora.site.sectionFolders[ui.section].forEach(function(folder, i) {
+    pandora.site.sectionFolders[section].forEach(function(folder, i) {
         var extras, $select;
         if (folder.id == 'personal') {
             if (pandora.user.level == 'guest') {
                 extras = [
                     infoButton(Ox._('Personal {0}', [Ox._(folderItems)]),
                         Ox._('To create and share your own list of {0} please sign up or sign in.', [Ox._(pandora.site.itemName.plural.toLowerCase())]),
-                        Ox._('To create and share your own {0} please sign up or sign in.', [ui.section]))
+                        Ox._('To create and share your own {0} please sign up or sign in.', [section]))
                 ];
             } else {
-                if (ui.section == 'items') {
+                if (section == 'items') {
                     extras = [
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [
@@ -82,7 +83,7 @@ pandora.ui.folders = function() {
                             }
                         })
                     ];
-                } else if (ui.section == 'texts') {
+                } else if (section == 'texts') {
                     extras = [
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [
@@ -113,7 +114,7 @@ pandora.ui.folders = function() {
                             ]('deletetext');
                         })
                     ];
-                } else if (ui.section == 'edits') {
+                } else if (section == 'edits') {
                     extras = [
                         pandora.$ui.personalListsMenu = Ox.MenuButton({
                             items: [
@@ -161,11 +162,11 @@ pandora.ui.folders = function() {
                     change: function(data) {
                         var listData;
                         Ox.Request.clearCache(); // fixme: remove
-                        pandora.site.sectionFolders[ui.section][i].showBrowser = !pandora.site.sectionFolders[ui.section][i].showBrowser;
+                        pandora.site.sectionFolders[section][i].showBrowser = !pandora.site.sectionFolders[section][i].showBrowser;
                         this.options({tooltip: data.value ? Ox._('Done') : Ox._('Manage Favorite {0}', [Ox._(folderItems)])});
-                        if (pandora.site.sectionFolders[ui.section][i].showBrowser) {
+                        if (pandora.site.sectionFolders[section][i].showBrowser) {
                             pandora.$ui.folderList.favorite.replaceWith(
-                                pandora.$ui.folderBrowser.favorite = pandora.ui.folderBrowser('favorite')
+                                pandora.$ui.folderBrowser.favorite = pandora.ui.folderBrowser('favorite', section)
                             );
                         } else {
                             listData = pandora.getListData();
@@ -175,7 +176,7 @@ pandora.ui.folders = function() {
                             ) {
                                 // the selected list in the favorites browser is not in the favorites folder
                                 pandora.$ui.folderList.favorite.options({selected: []});
-                                if (Ox.getObjectById(pandora.site.sectionFolders[ui.section], 'featured').showBrowser) {
+                                if (Ox.getObjectById(pandora.site.sectionFolders[section], 'featured').showBrowser) {
                                     // but in the featured browser
                                     pandora.$ui.folderList.featured.options({selected: [listData.id]});
                                 } else {
@@ -186,7 +187,7 @@ pandora.ui.folders = function() {
                                 }
                             }
                             pandora.$ui.folderBrowser.favorite.replaceWith(
-                                pandora.$ui.folderList.favorite = pandora.ui.folderList('favorite')
+                                pandora.$ui.folderList.favorite = pandora.ui.folderList('favorite', section)
                             );
                         }
                         pandora.resizeFolders();
@@ -210,11 +211,11 @@ pandora.ui.folders = function() {
                     change: function(data) {
                         var listData;
                         Ox.Request.clearCache(); // fixme: remove
-                        pandora.site.sectionFolders[ui.section][i].showBrowser = !pandora.site.sectionFolders[ui.section][i].showBrowser;
+                        pandora.site.sectionFolders[section][i].showBrowser = !pandora.site.sectionFolders[section][i].showBrowser;
                         this.options({tooltip: data.value ? Ox._('Done') : Ox._('Manage Favorite {0}', [Ox._(folderItems)])});
-                        if (pandora.site.sectionFolders[ui.section][i].showBrowser) {
+                        if (pandora.site.sectionFolders[section][i].showBrowser) {
                             pandora.$ui.folderList.featured.replaceWith(
-                                pandora.$ui.folderBrowser.featured = pandora.ui.folderBrowser('featured')
+                                pandora.$ui.folderBrowser.featured = pandora.ui.folderBrowser('featured', section)
                             );
                         } else {
                             listData = pandora.getListData();
@@ -230,7 +231,7 @@ pandora.ui.folders = function() {
                                     pandora.$ui.folderList.personal.options({selected: [listData.id]});
                                 } else if (
                                     listData.subscribed
-                                    || Ox.getObjectById(pandora.site.sectionFolders[ui.section], 'favorite').showBrowser
+                                    || Ox.getObjectById(pandora.site.sectionFolders[section], 'favorite').showBrowser
                                 ) {
                                     // but in the favorites folder or browser
                                     pandora.$ui.folderList.favorite.options({selected: [listData.id]});
@@ -242,7 +243,7 @@ pandora.ui.folders = function() {
                                 }
                             }
                             pandora.$ui.folderBrowser.featured.replaceWith(
-                                pandora.$ui.folderList.featured = pandora.ui.folderList('featured')
+                                pandora.$ui.folderList.featured = pandora.ui.folderList('featured', section)
                             );
                         }
                         pandora.resizeFolders();
@@ -305,7 +306,7 @@ pandora.ui.folders = function() {
                     } else if (data.id == 'browse') {
                         // alert('??')
                         /*
-                        pandora.$ui.sectionList[1].replaceWith(pandora.$ui.publicLists = pandora.ui.publicLists());
+                        pandora.$sectionList[1].replaceWith(pandora.$ui.publicLists = pandora.ui.publicLists());
                         pandora.site.showAllPublicLists = true;
                         */
                     }
@@ -316,8 +317,8 @@ pandora.ui.folders = function() {
                     pandora.resizeFolders();
                 }
             });
-        //$sections.push(pandora.$ui.section[i]);
-        pandora.$ui.folderList[folder.id] = pandora.ui.folderList(folder.id)
+        //$sections.push(pandora.$section[i]);
+        pandora.$ui.folderList[folder.id] = pandora.ui.folderList(folder.id, section)
             .bindEvent({
                 selectnext: function() {
                     // ...
@@ -328,7 +329,7 @@ pandora.ui.folders = function() {
             })
             .bindEventOnce({
                 init: function(data) {
-                    if (++counter == pandora.site.sectionFolders[ui.section].length) {
+                    if (++counter == pandora.site.sectionFolders[section].length) {
                         pandora.$ui.folder.forEach(function($folder) {
                             that.append($folder);
                         });

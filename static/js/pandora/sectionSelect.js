@@ -1,6 +1,6 @@
 // vim: et:ts=4:sw=4:sts=4:ft=javascript
 'use strict';
-pandora.ui.sectionSelect = function() {
+pandora.ui.sectionSelect = function(section) {
     // fixme: duplicated
     var that = Ox.Select({
             id: 'sectionSelect',
@@ -9,7 +9,7 @@ pandora.ui.sectionSelect = function() {
                 {id: 'edits', title: Ox._('Edits'), disabled: pandora.user.level != 'admin'},
                 {id: 'texts', title: Ox._('Texts'), disabled: pandora.user.level != 'admin'}
             ],
-            value: pandora.user.ui.section
+            value: section || pandora.user.ui.section
         }).css({
             float: 'left',
             margin: '4px'
