@@ -536,7 +536,8 @@ pandora.enableDragAndDropClip = function($list, canMove) {
 
     $list.bindEvent({
         draganddropstart: function(data) {
-            pandora.$ui.mainPanel.replaceElement(0, pandora.$ui.leftPanel = pandora.ui.leftPanel('edits'));
+            pandora.user.ui.section != 'edits' && pandora.$ui.mainPanel.replaceElement(0,
+                pandora.$ui.leftPanel = pandora.ui.leftPanel('edits'));
             drag.action = 'copy';
             drag.ids = $list.options('selected'),
             drag.item = drag.ids.length == 1
@@ -686,7 +687,8 @@ pandora.enableDragAndDropClip = function($list, canMove) {
                     $('.OxDrop').removeClass('OxDrop');
                     $tooltip.hide();
                     setTimeout(function() {
-                        pandora.$ui.mainPanel.replaceElement(0, pandora.$ui.leftPanel = pandora.ui.leftPanel());
+                        pandora.user.ui.section != 'edits' && pandora.$ui.mainPanel.replaceElement(0,
+                            pandora.$ui.leftPanel = pandora.ui.leftPanel());
                     }, 500);
                 }, ms);
             }
