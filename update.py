@@ -130,7 +130,7 @@ if __name__ == "__main__":
         if current != new:
             run('./manage.py', 'update_static')
             run('./manage.py', 'compile_pyc')
-        elif not development:
+        if not development:
             print 'pan.do/ra is up to date, run "./update dev" to update to the current development version'
         diff = get('./manage.py', 'sqldiff', '-a').strip()
         if diff != '-- No differences':
