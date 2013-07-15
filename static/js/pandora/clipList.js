@@ -5,6 +5,7 @@
 pandora.ui.clipList = function(videoRatio) {
 
     var ui = pandora.user.ui,
+        // FIXME: don't hardcode 16/9
         fixedRatio = !ui.item ? 16/9 : videoRatio,
         isClipView = !ui.item ? ui.listView == 'clip' : ui.itemView == 'clips',
         isEmbed = pandora.isEmbedURL(),

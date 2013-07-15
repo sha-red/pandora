@@ -60,6 +60,10 @@ pandora.ui.editPanel = function() {
                     editable: edit.editable,
                     enableSubtitles: ui.videoSubtitles,
                     fullscreen: false,
+                    getClipImageURL: function(id, width, height) {
+                        var clip = Ox.getObjectById(edit.clips, id);
+                        return '/' + clip.item + '/' + height + 'p' + clip['in'] + '.jpg';
+                    },
                     getLargeTimelineURL: function(type, i, callback) {
                         pandora.getLargeEditTimelineURL(edit, type, i, callback);
                     },
