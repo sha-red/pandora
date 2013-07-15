@@ -336,7 +336,6 @@ pandora.enableDragAndDrop = function($list, canMove) {
         draganddroppause: function(data) {
             var event = data.event, scroll,
                 $parent, $grandparent, $panel, title;
-            // fixme: should be named showLists in the user ui prefs!
             if (!pandora.user.ui.showSidebar) {
                 if (event.clientX < 16 && event.clientY >= 44
                     && event.clientY < window.innerHeight - 16
@@ -415,7 +414,6 @@ pandora.enableDragAndDrop = function($list, canMove) {
                             }
                         }, function(result) {
                             var folder = drag.target.status != 'featured' ? 'personal' : 'featured';
-                            //Ox.Log('', drag.source.status, '//////', drag.target.status)
                             pandora.$ui.folderList[folder].value(
                                 drag.target.id, 'items',
                                 result.data.items
