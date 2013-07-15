@@ -338,7 +338,7 @@ class Clip(models.Model):
             'index': self.index
         }
         if self.annotation:
-            data['item'], data['annotation'] = self.annotation.public_id.split('/')
+            data['item'], data['annotation'] = self.annotation.public_id
             data['in'] = self.annotation.start
             data['out'] = self.annotation.end
             data['parts'] = self.annotation.item.json['parts']
