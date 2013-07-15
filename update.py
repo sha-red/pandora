@@ -131,7 +131,7 @@ if __name__ == "__main__":
             run('./manage.py', 'update_static')
             run('./manage.py', 'compile_pyc')
         if not development:
-            print 'pan.do/ra is up to date, run "./update dev" to update to the current development version'
+            print 'pan.do/ra is at the latest stable release, you can run "./update dev" to update to the development version'
         diff = get('./manage.py', 'sqldiff', '-a').strip()
         if diff != '-- No differences':
             print 'Database has changed, please make a backup and run ./update.py db'
