@@ -509,10 +509,16 @@ pandora.ui.mainMenu = function() {
             },
             key_control_w: function() {
                 if (!pandora.hasDialogOrScreen()) {
-                    if (ui.item) {
-                        pandora.UI.set({item: ''});
-                    } else if (ui._list) {
-                        pandora.UI.set({find: {conditions: [], operator: '&'}});
+                    if (ui.section == 'items') {
+                        if (ui.item) {
+                            pandora.UI.set({item: ''});
+                        } else if (ui._list) {
+                            pandora.UI.set({find: {conditions: [], operator: '&'}});
+                        }
+                    } else if (ui.section == 'edits') {
+                        pandora.UI.set({edit: ''});
+                    } else if (ui.section == 'texts') {
+                        pandora.UI.set({text: ''});
                     }
                 }
             },
