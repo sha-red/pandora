@@ -670,6 +670,12 @@ pandora.ui.mainMenu = function() {
             }
         });
 
+    Ox.Clipboard.bindEvent(function(data, event) {
+        if (Ox.contains(['add', 'copy'], event)) {
+            that.highlightMenu('editMenu');
+        }
+    });
+
     Ox.Fullscreen.bind('change', function(state) {
         that.setItemTitle('togglefullscreen', Ox._((state ? 'Exit' : 'Enter') + ' Fullscreen'));
     });
