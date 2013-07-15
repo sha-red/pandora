@@ -878,6 +878,8 @@
     "userLevels": ["guest", "member", "friend", "staff", "admin"],
     "video": {
         "formats": ["webm", "mp4"],
+        // fixme: this should be named "ratio" or "defaultRatio",
+        // as it also applies to clip lists (on load)
         "previewRatio": 1.7777777778,
         "resolutions": [96]
     }

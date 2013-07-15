@@ -9,7 +9,7 @@ pandora.ui.sequencesDialog = function() {
             width: Math.round(window.innerWidth * 0.9)
         },
         left = getLeft(),
-        fixedRatio = 16/9,
+        fixedRatio = pandora.site.video.previewRatio,
         fps = 25,
         item = pandora.getItemIdAndPosition(),
         itemWidth = 160,
