@@ -349,6 +349,10 @@ class Clip(models.Model):
             data['out'] = self.end
             data['parts'] = self.item.json['parts']
             data['durations'] = self.item.json['durations']
+        for key in ('title', 'director', 'year', 'videoRatio'):
+            value = self.item.json.get(key)
+            if value:
+                data[key] = value
         data['duration'] = data['out'] - data['in']
         return data
 
