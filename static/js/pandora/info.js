@@ -309,7 +309,7 @@ pandora.ui.listInfo = function() {
                 .css({fontWeight: 'bold'})
                 .html(ui.section == 'items'
                     ? Ox._('All {0}', [Ox._(pandora.site.itemName.plural)])
-                    : Ox._('{} ' + folderItems, [pandora.site.site.name])
+                    : Ox._('{0} ' + folderItems, [pandora.site.site.name])
                 )
         );
     }
