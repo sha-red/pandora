@@ -159,7 +159,14 @@ pandora.ui.editPanel = function() {
                     paste: function() {
                         if (Ox.Clipboard.type() == 'clip') {
                             pandora.api.addClips({
-                                clips: Ox.Clipboard.paste(),
+                                clips: Ox.Clipboard.paste().map(function(clip) {
+                                    return {
+                                        annotation: clip.annotation,
+                                        'in': clip['in'],
+                                        item: clip.item,
+                                        out: clip.out
+                                    };
+                                }),
                                 edit: ui.edit
                             }, function(result) {
                                 Ox.Request.clearCache('getEdit');
@@ -212,7 +219,10 @@ pandora.ui.editPanel = function() {
                         if (key == 'position') {
                             key = 'in';
                         }
-                        if (['id', 'index', 'in', 'out', 'duration'].indexOf(key) > -1) {
+                        if ([
+                            'id', 'index', 'in', 'out', 'duration',
+                            'title', 'director', 'year', 'videoRatio'
+                        ].indexOf(key) > -1) {
                             edit.clips = Ox.sortBy(edit.clips, key);
                             if (data[0].operator == '-') {
                                 edit.clips.reverse();
