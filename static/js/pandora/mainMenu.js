@@ -41,7 +41,7 @@ pandora.ui.mainMenu = function() {
                             : { id: 'signout', title: Ox._('Sign Out...')}
                     ] },
                     getListMenu(),
-                    { id: 'editMenu', title: Ox._('Edit'), items: [
+                    { id: 'itemMenu', title: Ox._('Item'), items: [
                         { id: 'add', title: Ox._('Add {0}', [Ox._(pandora.site.itemName.singular)]), disabled: pandora.site.itemRequiresVideo || !pandora.site.capabilities.canAddItems[pandora.user.level] },
                         { id: 'upload', title: Ox._('Upload Video...'), disabled: !pandora.site.capabilities.canAddItems[pandora.user.level] },
                         {},
@@ -236,9 +236,9 @@ pandora.ui.mainMenu = function() {
                     }
                 } else if (data.id == 'cliporder') {
                     if (!ui.item) {
-                        pandora.UI.set({listSort: [{key: pandora.user.ui.listSort[0].key, operator: value == 'ascending' ? '+' : '-'}]});
+                        pandora.UI.set({listSort: [{key: ui.listSort[0].key, operator: value == 'ascending' ? '+' : '-'}]});
                     } else {
-                        pandora.UI.set({itemSort: [{key: pandora.user.ui.itemSort[0].key, operator: value == 'ascending' ? '+' : '-'}]});
+                        pandora.UI.set({itemSort: [{key: ui.itemSort[0].key, operator: value == 'ascending' ? '+' : '-'}]});
                     }
                 } else if (data.id == 'clipsort') {
                     if (!ui.item) {
@@ -249,7 +249,7 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'find') {
                     if (value) {
                         pandora.$ui.findSelect.value(value);
-                        if (pandora.user.ui._findState.key == 'advanced') {
+                        if (ui._findState.key == 'advanced') {
                             // fixme: autocomplete function doesn't get updated
                             pandora.$ui.findInput.options({placeholder: ''});
                         }
@@ -258,7 +258,7 @@ pandora.ui.mainMenu = function() {
                     }
                     pandora.$ui.findInput.focusInput(true);
                 } else if (data.id == 'itemorder') {
-                    pandora.UI.set({listSort: [{key: pandora.user.ui.listSort[0].key, operator: value == 'ascending' ? '+' : '-'}]});
+                    pandora.UI.set({listSort: [{key: ui.listSort[0].key, operator: value == 'ascending' ? '+' : '-'}]});
                 } else if (data.id == 'itemsort') {
                     pandora.UI.set({listSort: [{key: value, operator: pandora.getSortOperator(value)}]});
                 } else if (data.id == 'itemview') {
@@ -266,14 +266,14 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'listview') {
                     var set = {listView: value};
                     if (
-                        !pandora.isClipView(key, pandora.user.ui.item)
-                        && ['title', 'position'].indexOf(pandora.user.ui.listSort[0].key) > -1
+                        !pandora.isClipView(key, ui.item)
+                        && ['title', 'position'].indexOf(ui.listSort[0].key) > -1
                     ) {
                         set.listSort = pandora.site.user.ui.listSort;
                     }
                     pandora.UI.set(set);
                 } else if (Ox.startsWith(data.id, 'orderfilter')) {
-                    var filters = Ox.clone(pandora.user.ui.filters),
+                    var filters = Ox.clone(ui.filters),
                         id = data.id.replace('orderfilter', ''),
                         index = Ox.getIndexById(filters, id),
                         key = filters[index].sort[0].key,
@@ -357,7 +357,7 @@ pandora.ui.mainMenu = function() {
                 ].indexOf(data.id) > -1) {
                     pandora.addList(data.id.indexOf('smart') > -1, data.id.indexOf('from') > -1);
                 } else if (data.id == 'duplicatelist') {
-                    pandora.addList(pandora.user.ui._list);
+                    pandora.addList(ui._list);
                 } else if (data.id == 'editlist') {
                     pandora.ui.listDialog().open();
                 } else if (data.id == 'add') {
@@ -469,7 +469,7 @@ pandora.ui.mainMenu = function() {
             },
             key_control_f: function() {
                 if (!pandora.hasDialogOrScreen()) {
-                    if (pandora.user.ui._findState.key != 'advanced') {
+                    if (ui._findState.key != 'advanced') {
                         setTimeout(function() {
                             pandora.$ui.findInput.focusInput(true);
                         }, 25);
@@ -619,7 +619,7 @@ pandora.ui.mainMenu = function() {
                 ]('findsimilar');
             },
             pandora_listsort: function(data) {
-                if (pandora.isClipView(pandora.user.ui.listView, false)) {
+                if (pandora.isClipView(ui.listView, false)) {
                     that.checkItem('sortMenu_sortclips_' + data.value[0].key);
                     that.checkItem('sortMenu_orderclips_' + (
                         data.value[0].operator == '+' ? 'ascending' : 'descending')
@@ -641,6 +641,7 @@ pandora.ui.mainMenu = function() {
                 ]('findsimilar');
             },
             pandora_section: function() {
+                that.replaceMenu('listMenu', getListMenu());
                 that.replaceMenu('sortMenu', getSortMenu());
             },
             pandora_showannotations: function(data) {
@@ -672,7 +673,7 @@ pandora.ui.mainMenu = function() {
 
     Ox.Clipboard.bindEvent(function(data, event) {
         if (Ox.contains(['add', 'copy', 'paste'], event)) {
-            that.highlightMenu('editMenu');
+            that.highlightMenu('itemMenu');
         }
     });
 
@@ -732,47 +733,63 @@ pandora.ui.mainMenu = function() {
     }
 
     function getListMenu(lists) {
-        return { id: 'listMenu', title: Ox._('List'), items: [].concat(
-            { id: 'allitems', title: Ox._('All {0}', [Ox._(pandora.site.itemName.plural)]), checked: !ui.item && !ui._list, keyboard: 'shift control w' },
+        var itemNameSingular = ui.section == 'items' ? 'List' : ui.section == 'edits' ? 'Edit' : 'Text',
+            itemNamePlural = ui.section == 'items' ? 'Lists' : ui.section == 'edits' ? 'Edits' : 'Texts';
+        return { id: 'listMenu', title: Ox._(itemNameSingular), items: [].concat(
+            {
+                id: 'allitems',
+                title: pandora.getAllItemsTitle(),
+                checked: ui.section == 'items' ? !ui.item && !ui._list
+                    : ui.section == 'edits' ? !ui.edit
+                    : !ui.text,
+                keyboard: 'shift control w'
+            },
             ['personal', 'favorite', 'featured'].map(function(folder) {
                 return {
                     id: folder + 'lists',
-                    title: Ox._('{0} Lists', [Ox._(Ox.toTitleCase(folder))]),
+                    title: Ox._(Ox.toTitleCase(folder) + ' ' + itemNamePlural),
                     items: Ox.isUndefined(lists)
                         ? [{id: 'loading', title: Ox._('Loading...'), disabled: true}]
                         : lists[folder].length == 0
-                        ? [{id: 'nolists', title: Ox._('No {0} Lists', [Ox._(Ox.toTitleCase(folder))]), disabled: true}]
+                        ? [{id: 'nolists', title: Ox._('No ' + Ox.toTitleCase(folder) + ' ' + itemNamePlural), disabled: true}]
                         : lists[folder].map(function(list) {
                             return {
                                 id: 'viewlist' + list.id,
                                 title: Ox.encodeHTMLEntities((
                                     folder == 'favorite' ? list.user + ': ' : ''
                                 ) + list.name),
-                                checked: list.id == pandora.user.ui._list
+                                checked: ui.section == 'items' ? list.id == ui._list
+                                    : ui.section == 'edits' ? list.id == ui.edit
+                                    : list.id == ui.text
                             };
                         })
                 };
             }),
             [
                 {},
-                { id: 'newlist', title: Ox._('New List'), disabled: isGuest, keyboard: 'control n' },
-                { id: 'newlistfromselection', title: Ox._('New List from Selection'), disabled: isGuest || ui.listSelection.length == 0, keyboard: 'shift control n' },
-                { id: 'newsmartlist', title: Ox._('New Smart List'), disabled: isGuest, keyboard: 'alt control n' },
-                { id: 'newsmartlistfromresults', title: Ox._('New Smart List from Results'), disabled: isGuest, keyboard: 'shift alt control n' },
+                { id: 'newlist', title: Ox._('New ' + itemNameSingular), disabled: isGuest, keyboard: 'control n' },
+            ],
+            ui.section != 'texts' ? [
+                { id: 'newlistfromselection', title: Ox._('New ' + itemNameSingular + ' from Selection'), disabled: isGuest || ui.listSelection.length == 0, keyboard: 'shift control n' },
+                { id: 'newsmartlist', title: Ox._('New Smart ' + itemNameSingular), disabled: isGuest, keyboard: 'alt control n' },
+                { id: 'newsmartlistfromresults', title: Ox._('New Smart ' + itemNameSingular + ' from Results'), disabled: isGuest, keyboard: 'shift alt control n' },
+            ] : [],
+            [
                 {},
-                { id: 'duplicatelist', title: Ox._('Duplicate Selected List'), disabled: isGuest || !pandora.user.ui._list, keyboard: 'control d' },
-                { id: 'editlist', title: Ox._('Edit Selected List...'), disabled: isGuest || !pandora.user.ui._list, keyboard: 'control e' },
-                { id: 'deletelist', title: Ox._('Delete Selected List...'), disabled: isGuest || !pandora.user.ui._list, keyboard: 'delete' },
+                { id: 'duplicatelist', title: Ox._('Duplicate Selected ' + itemNameSingular), disabled: isGuest || !ui._list, keyboard: 'control d' },
+                { id: 'editlist', title: Ox._('Edit Selected ' + itemNameSingular + '...'), disabled: isGuest || !ui._list, keyboard: 'control e' },
+                { id: 'deletelist', title: Ox._('Delete Selected ' + itemNameSingular + '...'), disabled: isGuest || !ui._list, keyboard: 'delete' }
+            ],
+            ui.section == 'items' ? [
                 {},
                 { id: 'print', title: Ox._('Print'), keyboard: 'control p' },
                 { id: 'tv', title: Ox._('TV'), keyboard: 'control space' }
-            ]
+            ] : []
         )};
     };
 
     function getSortMenu() {
-        var ui = pandora.user.ui,
-            isClipView = pandora.isClipView(),
+        var isClipView = pandora.isClipView(),
             clipItems = (isClipView ? pandora.site.clipKeys.map(function(key) {
                 return Ox.extend(Ox.clone(key), {
                     checked: ui.listSort[0].key == key.id,
@@ -818,7 +835,7 @@ pandora.ui.mainMenu = function() {
             ] },
             { id: 'advancedsort', title: Ox._('Advanced Sort...'), keyboard: 'shift control s', disabled: true },
             {},
-            { id: 'sortfilters', title: Ox._('Sort Filters'), disabled: ui.section != 'items', items: pandora.user.ui.filters.map(function(filter) {
+            { id: 'sortfilters', title: Ox._('Sort Filters'), disabled: ui.section != 'items', items: ui.filters.map(function(filter) {
                 return {
                     id: 'sortfilter' + filter.id,
                     title: Ox._('Sort {0} Filter by', [Ox._(Ox.getObjectById(pandora.site.filters, filter.id).title)]),
@@ -830,7 +847,7 @@ pandora.ui.mainMenu = function() {
                     ]
                 }
             }) },
-            { id: 'orderfilters', title: Ox._('Order Filters'), disabled: ui.section != 'items', items: pandora.user.ui.filters.map(function(filter) {
+            { id: 'orderfilters', title: Ox._('Order Filters'), disabled: ui.section != 'items', items: ui.filters.map(function(filter) {
                 return {
                     id: 'orderfilter' + filter.id,
                     title: Ox._('Order {0} Filter', [Ox._(Ox.getObjectById(pandora.site.filters, filter.id).title)]),
@@ -883,7 +900,11 @@ pandora.ui.mainMenu = function() {
         };
 
     Ox.forEach(queries, function(query, folder) {
-        pandora.api.findLists({
+        pandora.api[
+            ui.section == 'items' ? 'findLists'
+            : ui.section == 'edits' ? 'findEdits'
+            : 'findTexts'
+        ]({
             query: query,
             keys: ['id', 'name', 'user'],
             sort: [{key: 'position', operator: '+'}]
