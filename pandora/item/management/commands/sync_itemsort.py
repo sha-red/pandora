@@ -5,7 +5,9 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 from django.db import connection, transaction
 from django.db.models import fields
+from django.conf import settings
 
+settings.RELOAD_CONFIG = False
 import app.monkey_patch
 from ... import models
 import clip.models

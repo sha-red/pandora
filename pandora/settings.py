@@ -172,7 +172,7 @@ BROKER_PORT = 5672
 BROKER_USER = "pandora"
 BROKER_PASSWORD = "box"
 BROKER_VHOST = "/pandora"
-SEND_CELERY_ERROR_EMAILS=False
+SEND_CELERY_ERROR_EMAILS = False
 
 #with apache x-sendfile or lighttpd set this to True
 XSENDFILE = False
@@ -182,6 +182,7 @@ XACCELREDIRECT = False
 
 SITE_CONFIG = join(PROJECT_ROOT, 'config.jsonc')
 DEFAULT_CONFIG = join(PROJECT_ROOT, 'config.pandora.jsonc')
+RELOAD_CONFIG = True
 
 #used if CONFIG['video']['download'] is set
 TRACKER_URL="udp://tracker.openbittorrent.com:80"

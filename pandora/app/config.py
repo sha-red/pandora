@@ -273,7 +273,8 @@ def update_geoip(force=False):
 def init():
     if not settings.RELOADER_RUNNING:
         load_config()
-        thread.start_new_thread(reloader_thread, ())
+        if settings.RELOAD_CONFIG:
+            thread.start_new_thread(reloader_thread, ())
 
 def shutdown():
     if settings.RELOADER_RUNNING:
