@@ -7,6 +7,7 @@ import os
 import shutil
 from glob import glob
 import subprocess
+from urllib import quote
 
 import ox
 from django.conf import settings
@@ -338,7 +339,8 @@ class Clip(models.Model):
             'index': self.index
         }
         if self.annotation:
-            data['item'], data['annotation'] = self.annotation.public_id
+            data['annotation'] = self.annotation.public_id
+            data['item'] = self.item.itemId
             data['in'] = self.annotation.start
             data['out'] = self.annotation.end
             data['parts'] = self.annotation.item.json['parts']
