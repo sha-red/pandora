@@ -671,7 +671,7 @@ pandora.ui.mainMenu = function() {
         });
 
     Ox.Clipboard.bindEvent(function(data, event) {
-        if (Ox.contains(['add', 'copy'], event)) {
+        if (Ox.contains(['add', 'copy', 'paste'], event)) {
             that.highlightMenu('editMenu');
         }
     });
