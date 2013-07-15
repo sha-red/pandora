@@ -102,8 +102,10 @@ pandora.ui.editPanel = function() {
                             return Ox.getObjectById(edit.clips, id);
                         }), 'clip');
                     },
-                    cut: function(data) {
-                        // ...
+                    copyadd: function(data) {
+                        Ox.Clipboard.add(data.ids.map(function(id) {
+                            return Ox.getObjectById(edit.clips, id);
+                        }), 'clip');
                     },
                     edit: function(data) {
                         var args = {id: data.id},
