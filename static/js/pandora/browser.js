@@ -95,7 +95,7 @@ pandora.ui.browser = function() {
                             this, [data[sortKey]].concat(format.args || [])
                         );
                         if (sortKey == 'rightslevel') {
-                            info.css({width: '96px'});
+                            info.css({width: size * 0.75 + 'px'});
                         }
                     } else {
                         info = data[sortKey];
