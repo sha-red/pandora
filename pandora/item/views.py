@@ -474,11 +474,11 @@ def get(request):
         if data['keys'] and 'files' in data['keys']:
             info['files'] = item.get_files(request.user)
         if not data['keys'] or 'groups' in data['keys'] \
-           and request.user.get_profile().capability('canEditMetadata'):
+                and item.editable(request.user):
             info['groups'] = [g.name for g in item.groups.all()]
         for k in settings.CONFIG['itemKeys']:
             if 'capability' in k \
-                and not (request.user == item.user or has_capability(request.user, k['capability'])) \
+                and not (item.editable(request.user) or has_capability(request.user, k['capability'])) \
                 and k['id'] in info \
                 and k['id'] not in ('parts', 'durations', 'duration'):
                     del info[k['id']]

@@ -197,11 +197,7 @@ class Item(models.Model):
         allowed_level = settings.CONFIG['capabilities']['canSeeItem'][level]
         if self.level <= allowed_level:
             return True
-        elif user.is_authenticated() and \
-             (self.user == user or \
-              self.groups.filter(id__in=user.groups.all()).count() > 0):
-                return True
-        return False
+        return self.editable(user)
 
     def editable(self, user):
         if user.is_anonymous():
