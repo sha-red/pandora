@@ -127,6 +127,12 @@ pandora.ui.browser = function() {
         })
         .addClass('OxMedia')
         .bindEvent({
+            copy: function() {
+                Ox.Clipboard.copy(pandora.user.ui.item, 'item');
+            },
+            copyadd: function() {
+                Ox.Clipboard.add(pandora.user.ui.item, 'item');
+            },
             open: function() {
                 that.scrollToSelection();
             },
