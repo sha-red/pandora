@@ -105,7 +105,6 @@ pandora.ui.clipList = function(videoRatio) {
             keys: ['annotations', 'id', 'in', 'out'].concat(
                 !ui.item ? ['videoRatio'] : []
             ),
-            max: 1,
             orientation: isEmbed && !isClipView ? 'horizontal' : 'both',
             size: 128,
             sort: !ui.item ? ui.listSort : ui.itemSort,
@@ -175,16 +174,18 @@ pandora.ui.clipList = function(videoRatio) {
             },
             openpreview: function(data) {
                 // on press space key
-                var $video = that.find('.OxItem.OxSelected > .OxIcon > .OxVideoPlayer');
-                if ($video) {
-                    // trigger singleclick
-                    $video.trigger('mousedown');
-                    Ox.UI.$window.trigger('mouseup');
+                if (data.ids.length == 1) {
+                    var $video = that.find('.OxItem.OxSelected > .OxIcon > .OxVideoPlayer');
+                    if ($video) {
+                        // trigger singleclick
+                        $video.trigger('mousedown');
+                        Ox.UI.$window.trigger('mouseup');
+                    }
                 }
                 that.closePreview();
             },
             select: function(data) {
-                if (data.ids.length) {
+                if (data.ids.length == 1) {
                     var id = data.ids[0],
                         item = id.split('/')[0], width, height,
                         $img = that.find('.OxItem.OxSelected > .OxIcon > img'),
