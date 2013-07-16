@@ -269,7 +269,7 @@ pandora.ui.clipList = function(videoRatio) {
             }
         });
 
-    pandora.enableDragAndDropClip(that, true);
+    pandora.enableDragAndDrop(that, true, 'edits');
     return that;
 
 }
