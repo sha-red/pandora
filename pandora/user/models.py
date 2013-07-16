@@ -112,10 +112,10 @@ class SessionData(models.Model):
         data.info = json.loads(request.POST.get('data', '{}'))
         screen = data.info.get('screen', {})
         if screen and 'height' in screen and 'width' in screen:
-            data.screensize = '%sx%s' % (screen['width'], screen['height'])
+            data.screensize = u'%s\xd7%s' % (screen['width'], screen['height'])
         window = data.info.get('window', {})
         if window and 'outerHeight' in window and 'outerWidth' in window:
-            data.windowsize = '%sx%s' % (window['outerWidth'], window['outerHeight'])
+            data.windowsize = u'%s\xd7%s' % (window['outerWidth'], window['outerHeight'])
         if not data.timesseen:
             data.timesseen = 0
         data.timesseen += 1
