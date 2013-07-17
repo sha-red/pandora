@@ -15,6 +15,7 @@ from ox.utils import json
 
 from itemlist.models import List, Position
 import text
+import edit
 
 import managers
 import tasks
@@ -285,6 +286,27 @@ def get_ui(user_ui, user=None):
             ids.append(t.get_id())
         return ids
 
+    def add_edits(edits, section):
+        P = edit.models.Position
+        ids = []
+        for t in edits:
+            qs = P.objects.filter(section=section)
+            if section == 'featured':
+                try:
+                    pos = P.objects.get(edit=t, section=section)
+                    created = False
+                except P.DoesNotExist:
+                    pos = P(edit=t, section=section, user=t.user)
+                    pos.save()
+                    created = True 
+            else:
+                pos, created = P.objects.get_or_create(edit=t, user=user, section=section)
+                qs = qs.filter(user=user)
+            if created:
+                pos.position = qs.aggregate(Max('position'))['position__max'] + 1
+                pos.save()
+            ids.append(t.get_id())
+        return ids
 
     ids = ['']
     if user:
@@ -299,6 +321,10 @@ def get_ui(user_ui, user=None):
         tids += add_texts(user.texts.exclude(status="featured"), 'personal')
         tids += add_texts(user.subscribed_texts.filter(status='public'), 'public')
     tids += add_texts(text.models.Text.objects.filter(status='featured'), 'featured')
+    if user:
+        tids += add_edits(user.edits.exclude(status="featured"), 'personal')
+        tids += add_edits(user.subscribed_edits.filter(status='public'), 'public')
+    tids += add_edits(edit.models.Edit.objects.filter(status='featured'), 'featured')
     return ui
 
 def init_user(user, request=None):
