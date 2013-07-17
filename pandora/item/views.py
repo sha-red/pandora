@@ -46,8 +46,10 @@ def _order_query(qs, sort, prefix='sort__'):
             operator = ''
         key = {
             'id': 'itemId',
+            'index': 'listitem__index'
         }.get(e['key'], e['key'])
-        key = "%s%s" % (prefix, key)
+        if key not in ('listitem__index', ):
+            key = "%s%s" % (prefix, key)
         order = '%s%s' % (operator, key)
         order_by.append(order)
     if order_by:
