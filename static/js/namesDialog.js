@@ -74,10 +74,7 @@ pandora.ui.namesDialog = function() {
             .bindEvent({
                 init: function(data) {
                     numberOfNames = data.items;
-                    $status.html(
-                        Ox.formatNumber(numberOfNames)
-                        + ' name' + (numberOfNames == 1 ? '' : 's')
-                    );
+                    $status.html(Ox.formatCount(numberOfNames, 'name'));
                 },
                 open: function(data) {
                     $list.find('.OxItem.OxSelected > .OxCell.OxColumnSortname')

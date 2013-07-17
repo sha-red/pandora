@@ -26,7 +26,7 @@ pandora.ui.folders = function(section) {
         if (folder.id == 'personal') {
             if (pandora.user.level == 'guest') {
                 extras = [
-                    infoButton(Ox._('Personal {0}', [Ox._(folderItems)]),
+                    infoButton(Ox._('Personal ' + folderItems),
                         Ox._('To create and share your own list of {0} please sign up or sign in.', [Ox._(pandora.site.itemName.plural.toLowerCase())]),
                         Ox._('To create and share your own {0} please sign up or sign in.', [section]))
                 ];
@@ -148,7 +148,7 @@ pandora.ui.folders = function(section) {
             }
         } else if (folder.id == 'favorite') {
             if (pandora.user.level == 'guest') {
-                extras = [infoButton(Ox._('Favorite ', folderItems),
+                extras = [infoButton(Ox._('Favorite ' + folderItems),
                     Ox._('To browse and subscribe to shared {0} from other users, please sign up or sign in.', [Ox._(folderItems.toLowerCase())]))];
             } else {
                 extras = [pandora.$ui.manageListsButton['favorite'] = Ox.Button({
@@ -196,7 +196,7 @@ pandora.ui.folders = function(section) {
             }
         } else if (folder.id == 'featured') {
             if (pandora.user.level != 'admin') {
-                extras = [infoButton(Ox._('Featured {0}', [Ox._(folderItems)]),
+                extras = [infoButton(Ox._('Featured ' + folderItems),
                     Ox._('Featured {0} are selected public {0}, picked by the {1} staff.',
                         [Ox._(folderItems.toLowerCase()), pandora.site.site.name]))];
             } else {
@@ -279,7 +279,7 @@ pandora.ui.folders = function(section) {
                 collapsed: !ui.showFolder.items[folder.id],
                 extras: extras,
                 size: 16,
-                title: folder.title
+                title: Ox._(folder.title)
             })
             .bindEvent({
                 // fixme: duplicated

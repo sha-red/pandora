@@ -168,7 +168,7 @@ pandora.ui.insertEmbedDialog = function(/*[url, ]callback*/) {
                 .appendTo($form);
 
             $input.item = Ox.Input({
-                    label: pandora.site.itemName.singular,
+                    label: Ox._(pandora.site.itemName.singular),
                     labelWidth: 128,
                     value: item,
                     width: formWidth

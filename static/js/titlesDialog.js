@@ -63,10 +63,7 @@ pandora.ui.titlesDialog = function() {
             .bindEvent({
                 init: function(data) {
                     numberOfTitles = data.items;
-                    $status.html(
-                        Ox.formatNumber(numberOfTitles)
-                        + ' title' + (numberOfTitles == 1 ? '' : 's')
-                    );
+                    $status.html(Ox.formatCount(numberOfTitles, 'title'));
                 },
                 open: function(data) {
                     $list.find('.OxItem.OxSelected > .OxCell.OxColumnSorttitle')

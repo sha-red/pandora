@@ -8,7 +8,10 @@ pandora.ui.siteDialog = function(section) {
         dialogHeight = Math.round((window.innerHeight - 48) * 0.75),
         dialogWidth = Math.round(window.innerWidth * 0.75),
         isEditable = pandora.site.capabilities.canEditSitePages[pandora.user.level],
-        tabs = Ox.clone(pandora.site.sitePages, true).concat([{id: 'software', title: Ox._('Software')}]);
+        tabs = Ox.clone(pandora.site.sitePages, true).map(function(page) {
+            page.title = Ox._(page.title);
+            return page;
+        }).concat([{id: 'software', title: Ox._('Software')}]);
     Ox.getObjectById(tabs, section).selected = true;
     var $tabPanel = Ox.TabPanel({
             content: function(id) {

@@ -82,7 +82,7 @@ pandora.ui.helpDialog = function() {
                     }
                 ],
                 items: pandora.site.help.map(function(value, index) {
-                    return Ox.extend({index: index}, value);
+                    return Ox.extend({index: index}, value, {title: Ox._(value.title)});
                 }),
                 max: 1,
                 min: 1,
