@@ -607,6 +607,7 @@
             "system": "system@pad.ma"
         },
         "https": true,
+        "locale": "en",
         "id": "padma",
         "name": "Pad.ma",
         "url": "pad.ma",
@@ -693,7 +694,7 @@
             "listSort": [{"key": "title", "operator": "+"}],
             "listView": "grid",
             "lists": {},
-            "locale": "en",
+            "locale": "",
             "mapFind": "",
             "mapSelection": "",
             "page": "",

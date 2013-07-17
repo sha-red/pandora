@@ -527,6 +527,7 @@
         },
         "https": false,
         "id": "pandora",
+        "locale": "en",
         "name": "Demo",
         "url": "pandora.local",
         "videoprefix": ""
@@ -612,7 +613,7 @@
             "listSort": [{"key": "title", "operator": "+"}],
             "listView": "grid",
             "lists": {},
-            "locale": "en",
+            "locale": "",
             "mapFind": "",
             "mapSelection": "",
             "page": "",

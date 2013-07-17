@@ -1734,11 +1734,23 @@ pandora.selectList = function() {
 };
 
 pandora.setLocale = function(locale, callback) {
-    Ox.setLocale(
-        locale,
-        locale && locale != 'en' ? '/static/json/locale.' + locale + '.json' : null,
-        callback
-    );
+    var url;
+    // language from http header might not be supported,
+    // fall back to site default
+    if (Ox.isUndefined(Ox.LOCALE_NAMES[locale])) {
+        locale = pandora.site.site.locale;
+    }
+    if (locale != 'en') {
+        if (pandora.localStorage('enableDebugMode')) {
+            url = [
+                '/static/json/locale.pandora.' + locale + '.json',
+                '/static/json/locale.' + pandora.site.site.id + '.' + locale + '.json',
+            ];
+        } else {
+            url = '/static/json/locale.' + locale + '.json'
+        }
+    }
+    Ox.setLocale(locale, url, callback);
 };
 
 pandora.unloadWindow = function() {

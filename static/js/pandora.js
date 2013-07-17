@@ -327,7 +327,8 @@ appPanel
         });
 
         // set locale and initialize url controller
-        pandora.setLocale(pandora.user.ui.locale, function() {
+        // data.locale
+        pandora.setLocale(pandora.user.ui.locale || data.locale, function() {
             pandora.URL.init().parse(function() {
                 var isHome = Ox.contains(['/', '/home'], document.location.pathname);
                 if (data.browserSupported) {
