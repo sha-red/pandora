@@ -75,6 +75,11 @@ class List(models.Model):
             l = ListItem()
             l.list = self
             l.item = item
+            l.index = ListItem.objects.filter(item=self).aggregate(Max('index'))['index__max']
+            if l.index == None:
+                l.index = 0
+            else:
+                l.index += 1
             l.save()
 
     def remove(self, item=None, items=None):
@@ -274,6 +279,7 @@ class ListItem(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     list = models.ForeignKey(List)
+    index = models.IntegerField(default=0)
     item = models.ForeignKey('item.Item')
 
     def __unicode__(self):

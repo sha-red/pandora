@@ -175,6 +175,30 @@ def removeListItems(request):
     return render_to_json_response(response)
 actions.register(removeListItems, cache=False)
 
+@login_required_json
+def orderListItems(request):
+    '''
+       takes {
+           list: string
+           ids: [string]
+        }
+        returns {
+        }
+    '''
+    data = json.loads(request.POST['data'])
+    list = get_list_or_404_json(data['list'])
+    response = json_response()
+    if list.editable(request.user) and list.type == 'static':
+        index = 0
+        with transaction.commit_on_success():
+            for i in data['ids']:
+                models.ListItem.objects.filter(list=list, item__itemId=i).update(index=index)
+                index += 1
+    else:
+        response = json_response(status=403, text='permission denied')
+    return render_to_json_response(response)
+actions.register(orderListItems, cache=False)
+
 
 @login_required_json
 def addList(request):
