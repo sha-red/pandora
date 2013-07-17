@@ -8,6 +8,7 @@ import ox
 from ox.utils import json
 from ox.django.decorators import login_required_json
 from ox.django.shortcuts import render_to_json_response, get_object_or_404_json, json_response
+from django.db import transaction
 from django.db.models import Max
 from ox.django.http import HttpFileResponse
 from ox.django.api import actions
@@ -135,9 +136,10 @@ def orderClips(request):
     ids = map(ox.fromAZ, data['ids'])
     if edit.editable(request.user):
         index = 0
-        for i in ids:
-            models.Clip.objects.filter(edit=edit, id=i).update(index=index)
-            index += 1
+        with transaction.commit_on_success():
+            for i in ids:
+                models.Clip.objects.filter(edit=edit, id=i).update(index=index)
+                index += 1
     else:
         response = json_response(status=403, text='permission denied')
     return render_to_json_response(response)
