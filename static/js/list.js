@@ -465,7 +465,7 @@ pandora.ui.list = function() {
                         ) + (
                             item.year ? ' ' + item.year : ''
                         ),
-                        ratio = ui.showSitePosters ? pandora.site.posters.ratio : item.posterRatio,
+                        ratio = pandora.user.ui.showSitePosters ? pandora.site.posters.ratio : item.posterRatio,
                         windowWidth = window.innerWidth * 0.8,
                         windowHeight = window.innerHeight * 0.8,
                         windowRatio = windowWidth / windowHeight,
@@ -473,14 +473,14 @@ pandora.ui.list = function() {
                         height = Math.round(ratio < windowRatio ? windowHeight : windowWidth / ratio);
                     pandora.$ui.previewImage = $('<img>')
                         .attr({src: '/' + item.id + '/' + (
-                            ui.showSitePosters ? 'siteposter' : 'poster'
+                            pandora.user.ui.showSitePosters ? 'siteposter' : 'poster'
                         ) + '128.jpg'})
                         .css({width: width + 'px', height: height + 'px'})
                     $('<img>').load(function() {
                             pandora.$ui.previewImage.attr({src: $(this).attr('src')});
                         })
                         .attr({src: '/' + item.id + '/' + (
-                            ui.showSitePosters ? 'siteposter' : 'poster'
+                            pandora.user.ui.showSitePosters ? 'siteposter' : 'poster'
                         ) + '1024.jpg'});
                     if (!preview) {
                         if (!pandora.$ui.previewDialog) {

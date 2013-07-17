@@ -1806,7 +1806,6 @@ pandora.wait = function(taskId, callback, timeout) {
     return task;
 };
 
-
 (function() {
 
     // Note: getFindState has to run after getListState and getFilterState
