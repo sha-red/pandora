@@ -97,7 +97,7 @@ pandora.ui.idDialog = function(data) {
                         labelWidth: 128,
                         value: Ox.decodeHTMLEntities(key == 'director' && data[key]
                             ? data[key].join(', ')
-                            : data[key]),
+                            : ('' + data[key])),
                         width: formWidth
                     })
                     .css({display: 'inline-block', margin: '3px'})
