@@ -4,7 +4,6 @@ pandora.ui.titlesDialog = function() {
 
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = 512 + Ox.UI.SCROLLBAR_SIZE,
-        numberOfTitles = 0,
 
         $findInput = Ox.Input({
                 changeOnKeypress: true,
@@ -62,8 +61,9 @@ pandora.ui.titlesDialog = function() {
             })
             .bindEvent({
                 init: function(data) {
-                    numberOfTitles = data.items;
-                    $status.html(Ox.formatCount(numberOfTitles, 'title'));
+                    $status.html(
+                        Ox.toTitleCase(Ox.formatCount(data.items, 'title'))
+                    );
                 },
                 open: function(data) {
                     $list.find('.OxItem.OxSelected > .OxCell.OxColumnSorttitle')

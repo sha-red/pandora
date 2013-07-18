@@ -157,7 +157,7 @@ pandora.ui.documentsDialog = function(options) {
             .bindEvent({
                 init: function(data) {
                     $status.html(
-                        Ox.formatCount(data.items, 'file')
+                        Ox.toTitleCase(Ox.formatCount(data.items, 'file'))
                     );
                 },
                 load: function() {

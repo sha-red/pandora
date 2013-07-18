@@ -922,9 +922,8 @@ pandora.ui.usersDialog = function() {
 
     function setTo() {
         var recipients = getTo().length;
-        //fixme shoule be No not no from formatCount here
         $mailForm.values({
-            to: Ox.formatCount(recipients, 'recipient')
+            to: Ox.formatCount(recipients, 'recipient').replace('no', 'No')
         });
     }
 

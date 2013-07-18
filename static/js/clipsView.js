@@ -66,7 +66,7 @@ pandora.ui.clipsView = function(videoRatio) {
                 init: function(data) {
                     var items = data.items;
                     $status.html(
-                        Ox.toTitleCase(Ox.formatCount(items, 'Clip'))
+                        Ox.toTitleCase(Ox.formatCount(items, 'clip'))
                     );
                 }
             });

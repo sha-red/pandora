@@ -246,7 +246,7 @@ pandora.ui.navigationView = function(type, videoRatio) {
     }
 
     function updateStatusbar(items) {
-        $status.html(Ox.toTitleCase(Ox.formatCount(items, 'Clip')));
+        $status.html(Ox.toTitleCase(Ox.formatCount(items, 'clip')));
     }
 
     if (type == 'map') {

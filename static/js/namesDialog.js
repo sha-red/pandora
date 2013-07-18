@@ -6,7 +6,6 @@ pandora.ui.namesDialog = function() {
 
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = 576 + Ox.UI.SCROLLBAR_SIZE,
-        numberOfNames = 0,
 
         $findInput = Ox.Input({
                 changeOnKeypress: true,
@@ -73,8 +72,9 @@ pandora.ui.namesDialog = function() {
             })
             .bindEvent({
                 init: function(data) {
-                    numberOfNames = data.items;
-                    $status.html(Ox.formatCount(numberOfNames, 'name'));
+                    $status.html(
+                        Ox.toTitleCase(Ox.formatCount(data.items, 'name'))
+                    );
                 },
                 open: function(data) {
                     $list.find('.OxItem.OxSelected > .OxCell.OxColumnSortname')
