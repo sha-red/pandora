@@ -63,7 +63,6 @@ pandora.ui.editPanel = function() {
                     clipSort: ui.clipSort,
                     clipSortOptions: [/*...*/],
                     clipView: ui.clipView,
-                    cuts: [],
                     duration: edit.duration,
                     editable: edit.editable,
                     enableSubtitles: ui.videoSubtitles,
