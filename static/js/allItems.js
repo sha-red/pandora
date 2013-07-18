@@ -1,6 +1,7 @@
 'use strict';
 
 pandora.ui.allItems = function(section) {
+
     section = section || pandora.user.ui.section;
 
     var canAddItems = !pandora.site.itemRequiresVideo && pandora.site.capabilities.canAddItems[pandora.user.level],
@@ -41,7 +42,7 @@ pandora.ui.allItems = function(section) {
                 overflow: 'hidden',
                 whiteSpace: 'nowrap'
             })
-            .html(pandora.getAllItemsTitle())
+            .html(pandora.getAllItemsTitle(section))
             .appendTo(that),
         $items;
 
@@ -83,6 +84,7 @@ pandora.ui.allItems = function(section) {
         }, function(result) {
             that.update(result.data.items);
         });
+    } else if (section == 'edits') {
     } else if (section == 'texts') {
         Ox.Button({
                 style: 'symbol',

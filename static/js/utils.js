@@ -297,8 +297,11 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
 
     $list.bindEvent({
         draganddropstart: function(data) {
-            pandora.user.ui.section != section && pandora.$ui.mainPanel.replaceElement(0,
-                pandora.$ui.leftPanel = pandora.ui.leftPanel(section));
+            if (section != pandora.user.ui.section) {
+                pandora.$ui.mainPanel.replaceElement(0,
+                    pandora.$ui.leftPanel = pandora.ui.leftPanel(section)
+                );
+            }
             drag.action = 'copy';
             drag.ids = $list.options('selected'),
             drag.item = drag.ids.length == 1
@@ -326,7 +329,7 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                         }
                     });
                 });
-            }, pandora.user.ui.section != section ? 2000 : 0);
+            }, section != pandora.user.ui.section ? 2000 : 0);
             $tooltip.options({title: getTitle()}).show(data.event);
             canMove && Ox.UI.$window.on({
                 keydown: keydown,
@@ -471,7 +474,7 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                     $('.OxDroppable').removeClass('OxDroppable');
                     $('.OxDrop').removeClass('OxDrop');
                     $tooltip.hide();
-                    pandora.user.ui.section != section && setTimeout(function() {
+                    section != pandora.user.ui.section && setTimeout(function() {
                         pandora.$ui.mainPanel.replaceElement(0,
                             pandora.$ui.leftPanel = pandora.ui.leftPanel());
                     }, 500);
@@ -630,10 +633,11 @@ pandora.exitFullscreen = function() {
     pandora.user.ui.showBrowser && pandora.$ui.contentPanel.size(0, 112 + Ox.UI.SCROLLBAR_SIZE);
 };
 
-pandora.getAllItemsTitle = function() {
-    return pandora.user.ui.section == 'items'
+pandora.getAllItemsTitle = function(section) {
+    section = section || pandora.user.ui.section;
+    return section == 'items'
         ? Ox._('All {0}', [Ox._(pandora.site.itemName.plural)])
-        : Ox._('{0} ' + Ox.toTitleCase(pandora.user.ui.section), [pandora.site.site.name]);
+        : Ox._('{0} ' + Ox.toTitleCase(section), [pandora.site.site.name]);
 };
 
 pandora.getClipsItems = function(width) {
@@ -746,22 +750,24 @@ pandora.getFilterSizes = function() {
     );
 };
 
-pandora.getFoldersHeight = function() {
+pandora.getFoldersHeight = function(section) {
+    section = section || pandora.user.ui.section;
     var height = 0;
-    pandora.site.sectionFolders[pandora.user.ui.section].forEach(function(folder, i) {
-        height += 16 + pandora.user.ui.showFolder[pandora.user.ui.section][folder.id] * (
+    pandora.site.sectionFolders[section].forEach(function(folder, i) {
+        height += 16 + pandora.user.ui.showFolder[section][folder.id] * (
             !!folder.showBrowser * 40 + folder.items * 16
         );
     });
     return height;
 };
 
-pandora.getFoldersWidth = function() {
+pandora.getFoldersWidth = function(section) {
+    section = section || pandora.user.ui.section;
     var width = pandora.user.ui.sidebarSize;
-    Ox.Log('', 'FOLDERS HEIGHT', pandora.getFoldersHeight(), 'INFO HEIGHT', pandora.getInfoHeight())
     if (
         pandora.$ui.appPanel
-        && pandora.getFoldersHeight() > window.innerHeight - 20 - 24 -16 - 1 - pandora.getInfoHeight()
+        && pandora.getFoldersHeight(section)
+            > window.innerHeight - 20 - 24 -16 - 1 - pandora.getInfoHeight(section)
     ) {
         width -= Ox.UI.SCROLLBAR_SIZE;
     }
@@ -819,11 +825,17 @@ pandora.getHash = function(state, callback) {
     callback();
 };
 
-pandora.getInfoHeight = function(includeHidden) {
+pandora.getInfoHeight = function(section, includeHidden) {
+    // Note: Either argument can be ommitted
     // fixme: new, check if it can be used more
+    section = section || pandora.user.ui.section;
+    if (arguments.length == 1 && Ox.isBoolean(arguments[0])) {
+        section = pandora.user.ui.section;
+        includeHidden = arguments[0];
+    }
     var height = 0, isVideoPreview;
     if (pandora.user.ui.showInfo || includeHidden) {
-        isVideoPreview = pandora.user.ui.section == 'items' && (
+        isVideoPreview = section == 'items' && (
             pandora.user.ui.item || (
                 pandora.user.ui.listSelection.length && !pandora.isClipView()
             )
@@ -1605,19 +1617,18 @@ pandora.resizeFilters = function(width) {
     });
 };
 
-pandora.resizeFolders = function() {
-    var width = pandora.getFoldersWidth(),
-        columnWidth = width - (
-            pandora.user.ui.section == 'items' ? 96 : 48
-        ),
+pandora.resizeFolders = function(section) {
+    section = section || pandora.user.ui.section;
+    var width = pandora.getFoldersWidth(section),
+        columnWidth = width - (section == 'items' ? 96 : 48),
         userColumnWidth = Math.round(columnWidth * 0.4),
         nameColumnWidth = columnWidth - userColumnWidth;
     pandora.$ui.allItems && pandora.$ui.allItems.resizeElement(columnWidth - 8);
     Ox.forEach(pandora.$ui.folderList, function($list, id) {
-        var pos = Ox.getIndexById(pandora.site.sectionFolders[pandora.user.ui.section], id);
+        var pos = Ox.getIndexById(pandora.site.sectionFolders[section], id);
         pandora.$ui.folder[pos].css({width: width + 'px'});
         $list.css({width: width + 'px'});
-        if (pandora.site.sectionFolders[pandora.user.ui.section][pos].showBrowser) {
+        if (pandora.site.sectionFolders[section][pos].showBrowser) {
             pandora.$ui.findListInput[id].options({
                 width: width - 24
             });
@@ -1626,7 +1637,7 @@ pandora.resizeFolders = function() {
         } else {
             $list.resizeColumn(id == 'favorite' ? 'id' : 'name', columnWidth);
         }
-        if (!pandora.user.ui.showFolder[pandora.user.ui.section][id]) {
+        if (!pandora.user.ui.showFolder[section][id]) {
             pandora.$ui.folder[pos].updatePanel();
         }
     });

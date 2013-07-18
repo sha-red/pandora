@@ -11,8 +11,6 @@ pandora.ui.folders = function(section) {
             }),
         folderItems = section == 'items' ? 'Lists' : Ox.toTitleCase(section),
         folderItem = folderItems.slice(0, -1);
-    //var $sections = [];
-
     pandora.$ui.allItems = pandora.ui.allItems(section).appendTo(that);
     pandora.$ui.folder = [];
     pandora.$ui.folderBrowser = {};
@@ -317,7 +315,6 @@ pandora.ui.folders = function(section) {
                     pandora.resizeFolders();
                 }
             });
-        //$sections.push(pandora.$section[i]);
         pandora.$ui.folderList[folder.id] = pandora.ui.folderList(folder.id, section)
             .bindEvent({
                 selectnext: function() {
@@ -333,7 +330,7 @@ pandora.ui.folders = function(section) {
                         pandora.$ui.folder.forEach(function($folder) {
                             that.append($folder);
                         });
-                        pandora.resizeFolders();
+                        pandora.resizeFolders(section);
                         pandora.selectList();
                     }
                 }
