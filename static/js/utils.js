@@ -539,9 +539,12 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                     [targetName.singular, Ox.encodeHTMLEntities(drag.target.name)]
                 )
                 : Ox._(
-                    'to ' + (section == 'items'
-                    ? (pandora.user.ui._list ? 'another' : 'a') + ' ' + targetName.singular
-                    : 'an ' + targetName.singular)
+                    'to ' + (
+                        (section == 'items' && pandora.user.ui._list)
+                        || (section == 'edits' && pandora.user.ui.section == 'edits')
+                        ? 'another' : (section == 'items' ? 'a' : 'an')
+                    ) + ' {0}',
+                    [targetName.singular]
                 )
             );
         }

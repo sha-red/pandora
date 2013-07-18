@@ -20,6 +20,13 @@ pandora.ui.editPanel = function() {
         return 'editPoints.' + ui.edit.replace(/\./g, '\\.') + '.' + key;
     }
 
+    function enableDragAndDrop() {
+        pandora.enableDragAndDrop(
+            Ox.UI.elements[that.find('.OxIconList').data('oxid')],
+            edit.editable
+        );
+    }
+
     function getSmallTimelineURL() {
         var fps = 25,
             width = Math.floor(edit.duration * fps),
@@ -48,6 +55,7 @@ pandora.ui.editPanel = function() {
                 clip.position = edit.duration;
                 edit.duration += clip.duration;
             });
+            updateSmallTimelineURL();
             pandora.$ui.mainPanel.replaceElement(1,
                 that = pandora.$ui.editPanel = Ox.VideoEditPanel({
                     clips: Ox.clone(edit.clips),
@@ -255,6 +263,7 @@ pandora.ui.editPanel = function() {
                     },
                     view: function(data) {
                         pandora.UI.set({clipView: data.view});
+                        data.view == 'grid' && enableDragAndDrop();
                     },
                     volume: function(data) {
                         pandora.UI.set({videoVolume: data.volume});
@@ -270,7 +279,7 @@ pandora.ui.editPanel = function() {
                     }
                 })
             );
-            updateSmallTimelineURL();
+            ui.clipView == 'grid' && enableDragAndDrop();
         });
     }
 
