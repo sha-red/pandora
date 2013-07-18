@@ -11,7 +11,7 @@ from urllib import quote
 
 import ox
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Max
 from django.contrib.auth.models import User
 from ox.django.fields import TupleField
@@ -55,7 +55,8 @@ class Edit(models.Model):
     def get_absolute_url(self):
         return ('/edits/%s' % quote(self.get_id())).replace('%3A', ':')
 
-    def add_clip(self, data):
+    def add_clip(self, data, index):
+        ids = [i['id'] for i in self.clips.order_by('index').values('id')]
         clip = Clip(edit=self)
         if 'annotation' in data and data['annotation']:
             clip.annotation = Annotation.objects.get(public_id=data['annotation'])
@@ -64,17 +65,19 @@ class Edit(models.Model):
             clip.item = Item.objects.get(itemId=data['item'])
             clip.start = data['in']
             clip.end = data['out']
-        clip.index = Clip.objects.filter(edit=self).aggregate(Max('index'))['index__max']
-        if clip.index == None:
-            clip.index = 0
-        else:
-            clip.index += 1
+        clip.index = index
         # dont add clip if in/out are invalid
         if not clip.annotation:
             duration = clip.item.sort.duration
             if clip.start >= clip.end or clip.start >= duration or clip.end > duration:
                 return False
         clip.save()
+        ids.insert(index, clip.id)
+        index = 0
+        with transaction.commit_on_success():
+            for i in ids:
+                Clip.objects.filter(id=i).update(index=index)
+                index += 1
         return clip
 
     def accessible(self, user):

@@ -28,6 +28,7 @@ def addClips(request):
     '''
         takes {
             edit: string,
+            index: int,
             clips: []
                 item: string,
                 in: float,
@@ -35,6 +36,7 @@ def addClips(request):
                 annotation: string
         }
         add clips with item/in/out or annotation to edit with id
+        clips are added at index or end if index is not provided
         returns {
         }
     '''
@@ -43,8 +45,10 @@ def addClips(request):
     edit = get_edit_or_404_json(data['edit'])
     clips = []
     if edit.editable(request.user):
+        index = data.get('index', edit.clips.count())
         for c in data['clips']:
-            clip = edit.add_clip(c)
+            clip = edit.add_clip(c, index)
+            index += 1
             if not clip:
                 response = json_response(status=500, text='invalid in/out')
                 return render_to_json_response(response)
