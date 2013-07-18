@@ -30,7 +30,7 @@ pandora.addEdit = function(options) {
             }
         }).reloadList();
     }
-}
+};
 
 pandora.addList = function() {
     // addList(isSmart, isFrom) or addList(list) [=duplicate]
@@ -286,6 +286,7 @@ pandora.createLinks = function($element) {
 };
 
 pandora.enableDragAndDrop = function($list, canMove, section) {
+
     section = section || pandora.user.ui.section;
 
     var $tooltip = Ox.Tooltip({
@@ -481,48 +482,67 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
 
     function getTitle() {
         var image, text,
-            targetName = section == 'items' ? {
-                plural: Ox._('lists'),
-                singular: Ox._('list')
-            } : {
-                plural: Ox._(section),
-                singular: Ox._(section.slice(0, -1))
-            },
             itemName = section == 'items' ? {
                 plural: Ox._(pandora.site.itemName.plural.toLowerCase()),
                 singular: Ox._(pandora.site.itemName.singular.toLowerCase())
             } : {
                 plural: Ox._('clips'),
                 singular: Ox._('clip')
+            },
+            targetName = section == 'items' ? {
+                plural: Ox._('lists'),
+                singular: Ox._('list')
+            } : {
+                plural: Ox._('edits'),
+                singular: Ox._('edit')
             };
-        if (drag.action == 'move' && drag.source.user != pandora.user.username) {
+        if (drag.action == 'move' && section == 'edits' && pandora.user.ui.section == 'items') {
             image = 'symbolClose';
-            text = Ox._('You can only remove {0}<br/>from your own {1}.',
-                [itemName.plural, targetName.plural]);
+            text = Ox._(
+                'You can only remove {0}<br>from {1}.',
+                [itemName.plural, targetName.plural]
+            );
+        } else if (drag.action == 'move' && drag.source.user != pandora.user.username) {
+            image = 'symbolClose';
+            text = Ox._(
+                'You can only remove {0}<br>from your own {1}.',
+                [itemName.plural, targetName.plural]
+            );
         } else if (drag.action == 'move' && drag.source.type == 'smart') {
             image = 'symbolClose';
-            text = Ox._('You can\'t remove {0}<br/>from smart {1}.',
-                    [itemName.plural, targetName.plural]);
+            text = Ox._(
+                'You can\'t remove {0}<br>from smart {1}.',
+                [itemName.plural, targetName.plural]
+            );
         } else if (drag.target && drag.target.user != pandora.user.username) {
             image = 'symbolClose';
-            text = Ox._('You can only {0} {1}<br/>to your own {2}',
-                    [drag.action, itemName.plural, targetName.plural]);
+            text = Ox._(
+                'You can only {0} {1}<br>to your own {2}',
+                [drag.action, itemName.plural, targetName.plural]
+            );
         } else if (drag.target && drag.target.type == 'smart') {
             image = 'symbolClose';
-            text = Ox._('You can\'t {0} {1}<br/>to smart {2}',
-                    [drag.action, itemName.plural, targetName.plural]);
+            text = Ox._(
+                'You can\'t {0} {1}<br>to smart {2}',
+                [drag.action, itemName.plural, targetName.plural]
+            );
         } else {
             image = drag.action == 'copy' ? 'symbolAdd' : 'symbolRemove';
             text = Ox._(Ox.toTitleCase(drag.action)) + ' ' + (
                 Ox.isString(drag.item)
                 ? '"' + drag.item + '"'
                 : drag.item + ' ' + itemName[drag.item == 1 ? 'singular' : 'plural']
-            ) + '<br/>' + (
+            ) + '<br>' + (
                 drag.target && !drag.target.selected
-                ? Ox._('to the {0} "{1}"', [name.singular, Ox.encodeHTMLEntities(drag.target.name)])
-                : Ox._('to ' + (section == 'items'
+                ? Ox._(
+                    'to the {0} "{1}"',
+                    [targetName.singular, Ox.encodeHTMLEntities(drag.target.name)]
+                )
+                : Ox._(
+                    'to ' + (section == 'items'
                     ? (pandora.user.ui._list ? 'another' : 'a') + ' ' + targetName.singular
-                    : 'an ' + targetName.singular))
+                    : 'an ' + targetName.singular)
+                )
             );
         }
         return $('<div>')
@@ -1306,7 +1326,7 @@ pandora.getStatusText = function(data) {
     }
     if (canSeeMedia) {
         data.files && parts.push(
-            Ox.formatCount(data.files, 'file')
+            Ox.toTitleCase(Ox.formatCount(data.files, 'file'))
         );
         data.duration && parts.push(Ox.formatDuration(data.duration));
     }
