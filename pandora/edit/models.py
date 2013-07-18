@@ -10,11 +10,11 @@ import subprocess
 from urllib import quote
 
 import ox
+from ox.django.fields import TupleField
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Max
 from django.contrib.auth.models import User
-from ox.django.fields import TupleField
 
 from annotation.models import Annotation
 from item.models import Item
@@ -359,6 +359,7 @@ class Clip(models.Model):
             if value:
                 data[key] = value
         data['duration'] = data['out'] - data['in']
+        data['cuts'] = tuple([c for c in self.item.get('cuts') if c > self.start and c < self.end])
         return data
 
 class Position(models.Model):
