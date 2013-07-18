@@ -13,7 +13,8 @@ def get_sequences(itemId):
     models.Sequence.objects.filter(sort=i.sort).delete()
     position = 0
     for stream in i.streams():
-        data, position = extract.get_sequences(stream.timeline_prefix, position)
+        #data, position = extract.get_sequences(stream.timeline_prefix, position)
+        data, position = extract.get_cut_sequences(stream, position)
         keys = None
         values = []
         for mode in data:
