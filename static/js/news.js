@@ -195,7 +195,7 @@ pandora.ui.news = function(width, height) {
         width = data.width;
         height = data.height;
         $left.css({width: width - 512});
-        $text.css({width: width - 512});
+        $text && $text.css({width: width - 512});
     };
 
     that.bindEvent({
