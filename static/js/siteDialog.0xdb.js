@@ -108,10 +108,15 @@ pandora.ui.siteDialog = function(section) {
                                 .css({padding: '16px'})
                                 .append(
                                     $('<img>')
-                                        .attr({src: '/static/png/' + (
-                                            id == 'software' ? 'software' : 'logo'
-                                        ) + '.png'})
-                                        .css({width: '256px'})
+                                        .attr({
+                                            src: '/static/png/' + (
+                                                id == 'software' ? 'software' : 'logo'
+                                            ) + '.png'
+                                        })
+                                        .css({
+                                            width: '256px',
+                                            marginTop: id == 'software' ? '-16px' : 0
+                                        })
                                 ),
                             size: 272
                         },
