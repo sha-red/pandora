@@ -379,10 +379,14 @@ pandora.ui.usersDialog = function() {
                             $guestsCheckbox.value()
                             ? ' (' + Ox.formatNumber(data.users) + ' registered, '
                                 + Ox.formatNumber(data.guests) + ' guest'
-                                + (data.guests == 1 ? '' : 's') + ', '
-                                + Ox.formatNumber(data.robots) + ' robot'
-                                + (data.robots == 1 ? '' : 's')
-                                + ')'
+                                + (data.guests == 1 ? '' : 's')
+                                + (
+                                    $robotsCheckbox.value()
+                                    ? ', '
+                                        + Ox.formatNumber(data.robots) + ' robot'
+                                        + (data.robots == 1 ? '' : 's')
+                                    : ''
+                                ) + ')'
                             : ''
                         )
                     );
