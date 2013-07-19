@@ -3,9 +3,24 @@
 'use strict';
 
 pandora.ui.logsDialog = function() {
+
     var height = Math.round((window.innerHeight - 48) * 0.9),
         width = Math.round(window.innerWidth * 0.9),
-        numberOfLogs = 0,
+
+        $reloadButton = Ox.Button({
+                disabled: true,
+                title: 'redo',
+                tooltip: Ox._('Reload'),
+                type: 'image'
+            })
+            .css({float: 'left', margin: '4px'})
+            .bindEvent({
+                click: function() {
+                    $reloadButton.options({disabled: true});
+                    Ox.Request.clearCache('findLogs');
+                    $list.reloadList(true);
+                }
+            }),
 
         $findSelect = Ox.Select({
                 items: [
@@ -111,17 +126,18 @@ pandora.ui.logsDialog = function() {
             })
             .bindEvent({
                 init: function(data) {
-                    numberOfLogs = data.items;
-                    $status.html(
-                        Ox.formatNumber(numberOfLogs) + ' '
-                        + (numberOfLogs == 1 ? 'entry' : 'entries')
-                    );
+                    $status.html(Ox.toTitleCase(
+                        Ox.formatCount(data.items, 'entry', 'entries')
+                    ));
                 },
                 'delete': function(data) {
                     pandora.api.removeLogs({ids: data.ids}, function(result) {
                         Ox.Request.clearCache('findLogs');
                         $list.reloadList();
                     });
+                },
+                load: function() {
+                    $reloadButton.options({disabled: false});
                 },
                 open: function(data) {
                     var value = $list.value(Ox.last(data.ids)),
@@ -174,10 +190,8 @@ pandora.ui.logsDialog = function() {
                 elements: [
                     {
                         element: Ox.Bar({size: 24})
-                            .append($status)
-                            .append(
-                                $findElement
-                            ),
+                            .append($reloadButton)
+                            .append($findElement),
                         size: 24
                     },
                     {
