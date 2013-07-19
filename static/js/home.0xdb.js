@@ -236,10 +236,8 @@ pandora.ui.home = function() {
             .appendTo(that),
 
         $text = $('<div>')
-            .html(Ox._(
-                'A Movie Database. \u2620 2007-{0} 0x2620. All Open Source.',
-                [Ox.formatDate(new Date(), '%Y')]
-            )).css({
+            .addClass('OxSelectable')
+            .css({
                 position: 'absolute',
                 left: 0,
                 top: '176px',
@@ -251,6 +249,10 @@ pandora.ui.home = function() {
                 opacity: 0,
                 textAlign: 'center'
             })
+            .html(Ox._(
+                'A Movie Database. \u2620 2007-{0} 0x2620. All Open Source.',
+                [Ox.formatDate(new Date(), '%Y')]
+            ))
             .appendTo(that);
 
     if (pandora.user.level == 'guest') {
