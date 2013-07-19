@@ -11,9 +11,7 @@ pandora.ui.infoView = function(data) {
         canSeeAllMetadata = pandora.user.level != 'guest',
         css = {
             marginTop: '4px',
-            textAlign: 'justify',
-            MozUserSelect: 'text',
-            WebkitUserSelect: 'text'
+            textAlign: 'justify'
         },
         iconRatio = ui.icons == 'posters' ? (
             ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio
@@ -246,9 +244,7 @@ pandora.ui.infoView = function(data) {
                 .css({
                     marginBottom: '-3px',
                     fontWeight: 'bold',
-                    fontSize: '13px',
-                    MozUserSelect: 'text',
-                    WebkitUserSelect: 'text'
+                    fontSize: '13px'
                 })
                 .bindEvent({
                     submit: function(event) {
@@ -279,9 +275,7 @@ pandora.ui.infoView = function(data) {
                     .css({
                         marginBottom: '-3px',
                         fontWeight: 'bold',
-                        fontSize: '13px',
-                        MozUserSelect: 'text',
-                        WebkitUserSelect: 'text'
+                        fontSize: '13px'
                     })
                     .bindEvent({
                         submit: function(event) {
@@ -296,6 +290,7 @@ pandora.ui.infoView = function(data) {
 
     if (isEditable) {
         var $div = $('<div>')
+            .addClass('OxSelectable')
             .css(css)
             .appendTo($text);
         ['country', 'year'].forEach(function(key, i) {
@@ -336,13 +331,18 @@ pandora.ui.infoView = function(data) {
                 )
             }
         });
-        $('<div>').css(css).html(html.join('; ')).appendTo($text);
+        $('<div>')
+            .addClass('OxSelectable')
+            .css(css)
+            .html(html.join('; '))
+            .appendTo($text);
     }
 
     // Alternative Titles ------------------------------------------------------
 
     // FIXME: This should be an array of objects {title: '', info: ''}
     data.alternativeTitles && $('<div>')
+        .addClass('OxSelectable')
         .css(css)
         .html(
             formatKey('Alternative Title' + (data.alternativeTitles.length == 1 ? '' : 's'))
@@ -359,6 +359,7 @@ pandora.ui.infoView = function(data) {
     // FIXME: we will want to check for data.seriesId here
     if (isEditable && data.seriesTitle) {
         var $div = $('<div>')
+            .addClass('OxSelectable')
             // FIXME: Don't extend!
             .css(Ox.extend(css, {marginTop: '20px'})) // FIXME: just a guess
             .appendTo($text);
@@ -389,6 +390,7 @@ pandora.ui.infoView = function(data) {
         });
     } else if (data.episodeDirector || data.writer || data.producer || data.cinematographer || data.editor) {
         $div = $('<div>')
+            .addClass('OxSelectable')
             .css(css)
             .appendTo($text);
         html = [];
@@ -401,6 +403,7 @@ pandora.ui.infoView = function(data) {
     }
 
     data.cast && $('<div>')
+        .addClass('OxSelectable')
         .css(css)
         .html(
             formatKey('cast') + data.cast.map(function(value) {
@@ -417,6 +420,7 @@ pandora.ui.infoView = function(data) {
         .appendTo($text);
 
     data.productionCompany && $('<div>')
+        .addClass('OxSelectable')
         .css(css)
         .html(
             formatKey('studio')
@@ -426,6 +430,7 @@ pandora.ui.infoView = function(data) {
 
     if (data.genre || (data.keyword && canSeeAllMetadata)) {
         $div = $('<div>')
+            .addClass('OxSelectable')
             .css(css)
             .appendTo($text);
         html = [];
@@ -439,6 +444,7 @@ pandora.ui.infoView = function(data) {
     }
 
     data.summary && $('<div>')
+        .addClass('OxSelectable')
         .css(css)
         .html(formatKey('summary') + data.summary)
         .appendTo($text);
@@ -461,12 +467,11 @@ pandora.ui.infoView = function(data) {
                 )
                 .append(
                     $('<div>')
+                        .addClass('OxSelectable')
                         .css({
                             display: 'table-cell',
                             paddingTop: '4px',
-                            textAlign: 'justify',
-                            MozUserSelect: 'text',
-                            WebkitUserSelect: 'text'
+                            textAlign: 'justify'
                         })
                         .html(value)
                 )
@@ -477,6 +482,7 @@ pandora.ui.infoView = function(data) {
         });
 
         data.filmingLocations && $('<div>')
+            .addClass('OxSelectable')
             .css(css)
             .html(
                 formatKey(Ox._('Filming Locations')) + data.filmingLocations.map(function(location) {
@@ -486,6 +492,7 @@ pandora.ui.infoView = function(data) {
             .appendTo($text);
 
         data.releasedate && $('<div>')
+            .addClass('OxSelectable')
             .css(css)
             .html(
                 formatKey(Ox._('Release Date')) + Ox.formatDate(data.releasedate, '%A, %B %e, %Y')
@@ -494,6 +501,7 @@ pandora.ui.infoView = function(data) {
 
         if (data.budget || data.gross || data.profit) {
             $div = $('<div>')
+                .addClass('OxSelectable')
                 .css(css)
                 .appendTo($text);
             html = [];
@@ -508,6 +516,7 @@ pandora.ui.infoView = function(data) {
 
         if (data.connections) {
             $div = $('<div>')
+                .addClass('OxSelectable')
                 .css(css)
                 .appendTo($text);
             html = [];
@@ -541,6 +550,7 @@ pandora.ui.infoView = function(data) {
 
     ['reviews', 'links'].forEach(function(key) {
         data[key] && $('<div>')
+            .addClass('OxSelectable')
             .css(css)
             .html(
                 formatKey(key) + data[key].map(function(value) {

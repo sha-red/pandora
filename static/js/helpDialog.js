@@ -99,12 +99,10 @@ pandora.ui.helpDialog = function() {
             });
 
         $text = Ox.Element()
-            .addClass('OxTextPage')
+            .addClass('OxTextPage OxSelectable')
             .css({
                 padding: '16px',
-                overflowY: 'scroll',
-                MozUserSelect: 'text',
-                WebkitUserSelect: 'text'
+                overflowY: 'scroll'
             });
 
         $panel = Ox.SplitPanel({

@@ -7,9 +7,7 @@ pandora.ui.infoView = function(data) {
         canRemove = pandora.site.capabilities.canRemoveItems[pandora.user.level],
         css = {
             marginTop: '4px',
-            textAlign: 'justify',
-            MozUserSelect: 'text',
-            WebkitUserSelect: 'text'
+            textAlign: 'justify'
         },
         descriptions = [],
         html,
@@ -211,7 +209,11 @@ pandora.ui.infoView = function(data) {
 
     ['source', 'project'].forEach(function(key) {
         if (canEdit || data[key]) {
-            var $div = $('<div>').css(css).css({margin: 0}).appendTo($data);
+            var $div = $('<div>')
+                .addClass('OxSelectable')
+                .css(css)
+                .css({margin: 0})
+                .appendTo($data);
             $('<span>')
                 .html(
                     formatKey({
@@ -283,9 +285,7 @@ pandora.ui.infoView = function(data) {
                 })
                 .css({
                     fontWeight: 'bold',
-                    fontSize: '13px',
-                    MozUserSelect: 'text',
-                    WebkitUserSelect: 'text'
+                    fontSize: '13px'
                 })
                 .bindEvent({
                     submit: function(event) {
@@ -345,7 +345,11 @@ pandora.ui.infoView = function(data) {
 
     renderGroup(['license']);
 
-    $('<div>').css(css).css({height: '16px'}).appendTo($text);
+    $('<div>')
+        .addClass('OxSelectable')
+        .css(css)
+        .css({height: '16px'})
+        .appendTo($text);
 
     // Duration, Aspect Ratio --------------------------------------------------
 
@@ -650,7 +654,9 @@ pandora.ui.infoView = function(data) {
         if (canEdit || keys.filter(function(key) {
             return data[key];
         }).length) {
-            $element = $('<div>').css(css);
+            $element = $('<div>')
+                .addClass('OxSelectable')
+                .css(css);
             keys.forEach(function(key, i) {
                 if (canEdit || data[key]) {
                     if ($element.children().length) {

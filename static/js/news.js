@@ -72,12 +72,11 @@ pandora.ui.news = function(width, height) {
                     tooltip: isEditable ? pandora.getEditTooltip() : '',
                     value: items[index].title
                 })
+                .addClass('OxSelectable')
                 .css({
                     display: 'inline-block',
                     fontWeight: 'bold',
                     fontSize: '16px',
-                    MozUserSelect: 'text',
-                    WebkitUserSelect: 'text'
                 })
                 .bindEvent({
                     submit: function(data) {
@@ -94,11 +93,10 @@ pandora.ui.news = function(width, height) {
                     tooltip: isEditable ? pandora.getEditTooltip() : '',
                     value: items[index].date
                 })
+                .addClass('OxSelectable')
                 .css({
                     display: 'inline-block',
-                    fontSize: '9px',
-                    MozUserSelect: 'text',
-                    WebkitUserSelect: 'text'
+                    fontSize: '9px'
                 })
                 .bindEvent({
                     submit: function(data) {
@@ -117,10 +115,7 @@ pandora.ui.news = function(width, height) {
                     value: items[index].text,
                     width: width - 512
                 })
-                .css({
-                    MozUserSelect: 'text',
-                    WebkitUserSelect: 'text'
-                })
+                .addClass('OxSelectable')
                 .bindEvent({
                     submit: function(data) {
                         editItem('text', data.value);

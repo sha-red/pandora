@@ -26,28 +26,24 @@ pandora.ui.toolbar = function() {
                 textAlign: 'center',
                 title: getListName(pandora.user.ui._list)
             })
+            .addClass('OxSelectable')
             .css({
                 position: 'absolute',
                 left: getListTitleLeft() + 'px',
                 top: '4px',
                 right: (ui._list ? 324 : 310) + 'px',
-                width: 'auto',
-                MozUserSelect: 'text',
-                OUserSelect: 'text',
-                WebkitUserSelect: 'text'
+                width: 'auto'
             })
         : pandora.$ui.itemTitle = Ox.Label({
                 textAlign: 'center'
             })
+            .addClass('OxSelectable')
             .css({
                 position: 'absolute',
                 left: '236px',
                 top: '4px',
                 right: (ui._list ? 324 : 310) + 'px',
-                width: 'auto',
-                MozUserSelect: 'text',
-                OUserSelect: 'text',
-                WebkitUserSelect: 'text'
+                width: 'auto'
             })
             .hide()
     );

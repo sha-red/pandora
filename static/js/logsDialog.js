@@ -156,11 +156,12 @@ pandora.ui.logsDialog = function() {
                                 })
                             ],
                             closeButton: true,
-                            content: $('<code>').append($('<pre>').css({
-                                margin: '16px',
-                                MozUserSelect: 'text',
-                                WebkitUserSelect: 'text'
-                            }).text(value.text)),
+                            content: $('<code>').append(
+                                $('<pre>')
+                                    .addClass('OxSelectable')
+                                    .css({margin: '16px'})
+                                    .text(value.text)
+                            ),
                             height: height - 48,
                             keys: {enter: 'close', escape: 'close'},
                             maximizeButton: true,

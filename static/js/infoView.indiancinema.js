@@ -8,9 +8,7 @@ pandora.ui.infoView = function(data) {
         canSeeAllMetadata = pandora.user.level != 'guest',
         css = {
             marginTop: '4px',
-            textAlign: 'justify',
-            MozUserSelect: 'text',
-            WebkitUserSelect: 'text'
+            textAlign: 'justify'
         },
         iconRatio = ui.icons == 'posters' ? (
             ui.showSitePosters ? pandora.site.posters.ratio : data.posterRatio
@@ -245,9 +243,7 @@ pandora.ui.infoView = function(data) {
                 .css({
                     marginBottom: '-3px',
                     fontWeight: 'bold',
-                    fontSize: '13px',
-                    MozUserSelect: 'text',
-                    WebkitUserSelect: 'text'
+                    fontSize: '13px'
                 })
                 .bindEvent({
                     submit: function(event) {
@@ -278,9 +274,7 @@ pandora.ui.infoView = function(data) {
                     .css({
                         marginBottom: '-3px',
                         fontWeight: 'bold',
-                        fontSize: '13px',
-                        MozUserSelect: 'text',
-                        WebkitUserSelect: 'text'
+                        fontSize: '13px'
                     })
                     .bindEvent({
                         submit: function(event) {
@@ -317,7 +311,7 @@ pandora.ui.infoView = function(data) {
     // Encyclopedia and Wiki ---------------------------------------------------
 
     if ((data.encyclopedia || data.wiki) && canEdit) {
-        $links = Ox.Element().css(css);
+        $links = Ox.Element().addClass('OxSelectable').css(css);
         if (data.encyclopedia) {
             $links
                 .append(formatKey('encyclopedia'))
@@ -803,6 +797,7 @@ pandora.ui.infoView = function(data) {
                 if (canEdit || value.description) {
                     var filmography = key == 'studios' ? Ox._('Films') : Ox._('Filmography'),
                         $name = Ox.Element()
+                            .addClass('OxSelectable')
                             .css(css)
                             .css({marginTop: '12px', fontWeight: 'bold'})
                             .html(
@@ -847,6 +842,7 @@ pandora.ui.infoView = function(data) {
                             })
                             .appendTo($name),
                         $text = $('<div>')
+                            .addClass('OxSelectable')
                             .css(css)
                             .hide()
                             .appendTo($descriptions);
@@ -890,7 +886,7 @@ pandora.ui.infoView = function(data) {
         if (canEdit || keys.filter(function(key) {
             return data[key];
         }).length) {
-            $element = $('<div>').css(css);
+            $element = $('<div>').addClass('OxSelectable').css(css);
             keys.forEach(function(key, i) {
                 if (canEdit || data[key]) {
                     if ($element.children().length) {

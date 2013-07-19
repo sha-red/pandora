@@ -8,9 +8,7 @@ pandora.ui.infoView = function(data) {
         canRemove = pandora.site.capabilities.canRemoveItems[pandora.user.level],
         css = {
             marginTop: '4px',
-            textAlign: 'justify',
-            MozUserSelect: 'text',
-            WebkitUserSelect: 'text'
+            textAlign: 'justify'
         },
         html,
         iconRatio = ui.icons == 'posters' ? data.posterRatio : 1,
@@ -200,9 +198,7 @@ pandora.ui.infoView = function(data) {
                 .css({
                     marginBottom: '-3px',
                     fontWeight: 'bold',
-                    fontSize: '13px',
-                    MozUserSelect: 'text',
-                    WebkitUserSelect: 'text'
+                    fontSize: '13px'
                 })
                 .bindEvent({
                     submit: function(event) {
@@ -520,7 +516,7 @@ pandora.ui.infoView = function(data) {
         if (canEdit || keys.filter(function(key) {
             return data[key];
         }).length) {
-            $element = $('<div>').css(css);
+            $element = $('<div>').addClass('OxSelectable').css(css);
             keys.forEach(function(key, i) {
                 if (canEdit || data[key]) {
                     if ($element.children().length) {
