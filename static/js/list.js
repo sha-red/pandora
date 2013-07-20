@@ -59,6 +59,7 @@ pandora.ui.list = function() {
             }).map(function(key) {
                 var position = pandora.user.ui.listColumns.indexOf(key.id);
                 return {
+                    addable: key.id != 'random',
                     align: ['string', 'text'].indexOf(
                         Ox.isArray(key.type) ? key.type[0]: key.type
                     ) > -1 ? 'left' : key.type == 'list' ? 'center' : 'right',
