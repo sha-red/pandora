@@ -2,6 +2,8 @@
 
 pandora.ui.allItems = function(section) {
 
+    // FIXME: Why is this not a list?
+
     section = section || pandora.user.ui.section;
 
     var canAddItems = !pandora.site.itemRequiresVideo && pandora.site.capabilities.canAddItems[pandora.user.level],
@@ -44,7 +46,8 @@ pandora.ui.allItems = function(section) {
             })
             .html(pandora.getAllItemsTitle(section))
             .appendTo(that),
-        $items;
+        $items,
+        $buttons = [];
 
     if (section == 'items') {
         $items = $('<div>')
@@ -55,24 +58,26 @@ pandora.ui.allItems = function(section) {
                 textAlign: 'right'
             })
             .appendTo(that);
-        Ox.Button({
+        $buttons[0] = Ox.Button({
                 style: 'symbol',
                 title: 'add',
                 tooltip: canAddItems ? Ox._('Add {0}', [Ox._(pandora.site.itemName.singular)]) : '',
                 type: 'image'
             })
             .css({opacity: canAddItems ? 1 : 0.25})
+            .hide()
             .bindEvent({
                 click: pandora.addItem
             })
             .appendTo(that);
-        Ox.Button({
+        $buttons[1] = Ox.Button({
                 style: 'symbol',
                 title: 'upload',
                 tooltip: canUploadVideo ? Ox._('Upload Video...') : '',
                 type: 'image'
             })
             .css({opacity: canUploadVideo ? 1 : 0.25})
+            .hide()
             .bindEvent({
                 click: function() {
                     pandora.$ui.uploadDialog = pandora.ui.uploadDialog().open();
@@ -86,19 +91,21 @@ pandora.ui.allItems = function(section) {
         });
     } else if (section == 'edits') {
     } else if (section == 'texts') {
-        Ox.Button({
+        $buttons[0] = Ox.Button({
                 style: 'symbol',
                 title: 'file',
                 tooltip: Ox._('HTML'),
                 type: 'image'
             })
+            .hide()
             .appendTo(that);
-        Ox.Button({
+        $buttons[1] = Ox.Button({
                 style: 'symbol',
                 title: 'help',
                 tooltip: Ox._('Help'),
                 type: 'image'
             })
+            .hide()
             .bindEvent({
                 click: function() {
                     pandora.UI.set({page: 'help'});
@@ -124,6 +131,9 @@ pandora.ui.allItems = function(section) {
 
     that.resizeElement = function(width) {
         $name.css({width: width + 'px'});
+        $buttons.forEach(function($button) {
+            $button.show();
+        });
     };
 
     return that;
