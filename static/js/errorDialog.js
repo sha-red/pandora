@@ -42,7 +42,6 @@ pandora.ui.errorDialog = function(data) {
                 that = pandora.ui.iconDialog({
                     buttons: (showLogsButton ? [
                         Ox.Button({
-                                id: 'close',
                                 title: Ox._('View Error Logs...')
                             })
                             .bindEvent({
