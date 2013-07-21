@@ -35,9 +35,11 @@ def get_frame(id, height, position):
 
 def render_poster(data, poster):
 
-    sz = 'ß'.decode('UTF-8')
-    title = ox.decode_html(data.get('title', '')).upper().replace(sz, 'SS')
-    director = ox.decode_html(u', '.join(data.get('director', []))).upper().replace(sz, 'SS')
+    title = ox.decode_html(data.get('title', '')).upper()
+    director = ox.decode_html(u', '.join(data.get('director', []))).upper()
+    for key, value in {'π': 'PI', 'ß': 'SS'}.iteritems():
+        title = title.replace(key, value)
+        director = director.replace(key, value)
     year = str(data.get('year', ''))
     duration = data.get('duration')
     oxdb_id = data['oxdbId']
