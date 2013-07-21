@@ -3,8 +3,7 @@
 
 pandora.ui.list = function() {
 
-    var preview = false,
-        that,
+    var that,
         view = pandora.user.ui.listView;
 
     if (view == 'list') {
@@ -390,8 +389,7 @@ pandora.ui.list = function() {
         that.bindEvent({
             closepreview: function(data) {
                 pandora.$ui.previewDialog.close();
-                preview = false;
-                //delete pandora.$ui.previewDialog;
+                delete pandora.$ui.previewDialog;
             },
             copy: function(data) {
                 Ox.Clipboard.copy(data.ids, 'item');
@@ -443,89 +441,18 @@ pandora.ui.list = function() {
                 pandora.UI.set(set);
             },
             openpreview: function(data) {
-                if (data.ids.length) {
-                    // ...
+                if (!pandora.$ui.previewDialog) {
+                    pandora.$ui.previewDialog = pandora.ui.previewDialog()
+                        .open()
+                        .bindEvent({
+                            close: function() {
+                                that.closePreview();
+                                delete pandora.$ui.previewDialog;
+                            }
+                        });
+                } else {
+                    pandora.$ui.previewDialog.update();
                 }
-                pandora.requests.preview && pandora.api.cancel(pandora.requests.preview);
-                pandora.requests.preview = pandora.api.find({
-                    keys: ['director', 'id', 'modified', 'posterRatio', 'title', 'year'],
-                    query: {
-                        conditions: data.ids.map(function(id) {
-                            return {
-                                key: 'id',
-                                value: id,
-                                operator: '=='
-                            };
-                        }),
-                        operator: '|'
-                    }
-                }, function(result) {
-                    var item = result.data.items[0],
-                        title = item.title + (
-                            item.director ? ' (' + item.director.join(', ') + ')' : ''
-                        ) + (
-                            item.year ? ' ' + item.year : ''
-                        ),
-                        ratio = pandora.user.ui.showSitePosters ? pandora.site.posters.ratio : item.posterRatio,
-                        windowWidth = window.innerWidth * 0.8,
-                        windowHeight = window.innerHeight * 0.8,
-                        windowRatio = windowWidth / windowHeight,
-                        width = Math.round(ratio > windowRatio ? windowWidth : windowHeight * ratio),
-                        height = Math.round(ratio < windowRatio ? windowHeight : windowWidth / ratio);
-                    pandora.$ui.previewImage = $('<img>')
-                        .attr({src: '/' + item.id + '/' + (
-                            pandora.user.ui.showSitePosters ? 'siteposter' : 'poster'
-                        ) + '128.jpg'})
-                        .css({width: width + 'px', height: height + 'px'})
-                    $('<img>').load(function() {
-                            pandora.$ui.previewImage.attr({src: $(this).attr('src')});
-                        })
-                        .attr({src: '/' + item.id + '/' + (
-                            pandora.user.ui.showSitePosters ? 'siteposter' : 'poster'
-                        ) + '1024.jpg'});
-                    if (!preview) {
-                        if (!pandora.$ui.previewDialog) {
-                            pandora.$ui.previewDialog = Ox.Dialog({
-                                    closeButton: true,
-                                    content: pandora.$ui.previewImage,
-                                    fixedRatio: true,
-                                    focus: false,
-                                    height: height,
-                                    maximizeButton: true,
-                                    title: title,
-                                    width: width
-                                })
-                                .bindEvent({
-                                    close: function() {
-                                        that.closePreview();
-                                        preview = false;
-                                    },
-                                    resize: function(data) {
-                                        pandora.$ui.previewImage.css({
-                                            width: data.width + 'px',
-                                            height: data.height + 'px'
-                                        });
-                                    }
-                                })
-                                .open();
-                        } else {
-                            pandora.$ui.previewDialog.options({
-                                    content: pandora.$ui.previewImage,
-                                    height: height,
-                                    title: title,
-                                    width: width
-                                })
-                                .open();
-                        }
-                        preview = true;
-                    } else {
-                        pandora.$ui.previewDialog.options({
-                                content: pandora.$ui.previewImage,
-                                title: title
-                            })
-                            .setSize(width, height);
-                    }
-                });
             },
             paste: function(data) {
                 var items;
