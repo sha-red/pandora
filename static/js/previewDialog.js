@@ -34,6 +34,9 @@ pandora.ui.previewDialog = function() {
                 pandora_item: function() {
                     that.close();
                 },
+                pandora_page: function() {
+                    that.close();
+                },
                 pandora_section: function() {
                     that.close();
                 },
