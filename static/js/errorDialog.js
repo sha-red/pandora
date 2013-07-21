@@ -2,7 +2,8 @@
 'use strict';
 
 pandora.ui.errorDialog = function(data) {
-    var that, error;
+
+    var that, error, showLogsButton;
 
     //dont open dialog on unload or if antoher error is open
     //fixme: error dialog should updated instead
@@ -36,8 +37,22 @@ pandora.ui.errorDialog = function(data) {
         // in order to keep the dialog from appearing, delay it
         setTimeout(function() {
             if ($('.OxErrorDialog').length == 0 && !pandora.isUnloading) {
+                showLogsButton = error == 'error'
+                    && pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
                 that = pandora.ui.iconDialog({
-                    buttons: [
+                    buttons: (showLogsButton ? [
+                        Ox.Button({
+                                id: 'close',
+                                title: Ox._('View Error Logs...')
+                            })
+                            .bindEvent({
+                                click: function() {
+                                    that.close();
+                                    pandora.$ui.logsDialog = pandora.ui.logsDialog().open();
+                                }
+                            }),
+                        {}
+                    ] : []).concat([
                         Ox.Button({
                                 id: 'close',
                                 title: Ox._('Close')
@@ -47,7 +62,7 @@ pandora.ui.errorDialog = function(data) {
                                     that.close();
                                 }
                             })
-                    ],
+                    ]),
                     keys: {enter: 'close', escape: 'close'},
                     text: Ox._('Sorry, a server {0}'
                         + ' occured while handling your request.'
