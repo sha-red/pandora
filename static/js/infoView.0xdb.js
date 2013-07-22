@@ -927,7 +927,7 @@ pandora.ui.infoView = function(data) {
                         return {
                             height: ratio <= 1 ? size : size / ratio,
                             id: data['id'],
-                            info: data.width + ' x ' + data.height + ' px',
+                            info: data.width + ' × ' + data.height + ' px',
                             title: ui.icons == 'posters' ? data.source : Ox.formatDuration(data.position),
                             url: data.url.replace('http://', '//'),
                             width: ratio >= 1 ? size : size * ratio
