@@ -458,8 +458,9 @@ class Item(models.Model):
 
         for service in external_posters:
             p = external_posters[service][0]
+            selected = True if self.poster_source and self.poster_source == service or url == p['url'] else False
             p['source'] = service
-            p['selected'] = self.poster_source and self.poster_source == service or False
+            p['selected'] = selected
             p['index'] = index.index(service)
             posters.append(p)
         posters.sort(key=lambda a: a['index'])
@@ -563,7 +564,7 @@ class Item(models.Model):
             i['resolution'] = (streams[0].file.width, streams[0].file.height)
 
         #only needed by admins
-        if keys and 'posters' in keys:
+        if 'posters' in i or (keys and 'posters' in keys):
             i['posters'] = self.get_posters()
 
         frames = self.get_frames()
