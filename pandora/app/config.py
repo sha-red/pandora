@@ -16,6 +16,7 @@ import ox.jsonc
 from ox.utils import json
 
 from archive.extract import supported_formats, AVCONV
+from item.utils import get_by_id
 
 
 _win = (sys.platform == "win32")
@@ -84,6 +85,11 @@ def load_config():
                     sys.stderr.write("adding default value for %s.%s = %s\n" % (
                         section, key, str(d[key])))
                     c[key] = d[key]
+
+        key = get_by_id(config['itemKeys'], 'title')
+        if not 'autocompleteSort' in key:
+            key['autocompleteSort'] = get_by_id(default['itemKeys'], 'title')['autocompleteSort']
+            sys.stderr.write("adding default value for itemKeys.title.autocompleteSort = %r\n" % key['autocompleteSort'])
 
         old_formats = getattr(settings, 'CONFIG', {}).get('video', {}).get('formats', [])
         formats = config.get('video', {}).get('formats')
