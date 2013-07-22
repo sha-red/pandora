@@ -15,7 +15,7 @@ pandora.ui.leftPanel = function(section) {
                     collapsible: true,
                     element: pandora.$ui.info = pandora.ui.info(),
                     size: pandora.getInfoHeight(true),
-                    tooltip: Ox('info') + ' <span class="OxBright">'
+                    tooltip: Ox._('info') + ' <span class="OxBright">'
                         + Ox.SYMBOLS.SHIFT + 'I</span>'
                 }
             ],
