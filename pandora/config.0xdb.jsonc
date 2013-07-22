@@ -118,7 +118,7 @@
             type: text, string, float, integer, or array of any of these
         and can have any of the following properties:
             autocomplete: If true, find element will autocomplete
-            autocompleteSortKey: The key that suggestions will be sorted by
+            autocompleteSort: Sort order of autocomplete suggestions
             capability: A capability required to see this key
             columnRequired: If true, the column can't be removed
             columnWidth: Default column width in px
@@ -147,7 +147,7 @@
             "type": "string",
             "additionalSort": [{"key": "year", "operator": "-"}, {"key": "director", "operator": "+"}],
             "autocomplete": true,
-            "autocompleteSortKey": "votes",
+            "autocompleteSort": [{"key": "likes", "operator": "-"}],
             "columnRequired": true,
             "columnWidth": 180,
             "find": true,
