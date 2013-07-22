@@ -37,7 +37,7 @@ def render_poster(data, poster):
 
     title = ox.decode_html(data.get('title', '')).upper()
     director = ox.decode_html(u', '.join(data.get('director', []))).upper()
-    for key, value in {u'π': u'PI', u'ß': u'SS'}.iteritems():
+    for key, value in {u'\u03a0': 'PI', u'ß': u'SS'}.iteritems():
         title = title.replace(key, value)
         director = director.replace(key, value)
     year = str(data.get('year', ''))
