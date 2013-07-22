@@ -564,7 +564,7 @@ class Item(models.Model):
             i['resolution'] = (streams[0].file.width, streams[0].file.height)
 
         #only needed by admins
-        if 'posters' in i or (keys and 'posters' in keys):
+        if keys and 'posters' in keys:
             i['posters'] = self.get_posters()
 
         frames = self.get_frames()
