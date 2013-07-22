@@ -47,7 +47,7 @@ class Edit(models.Model):
     subscribed_users = models.ManyToManyField(User, related_name='subscribed_edits')
 
     def __unicode__(self):
-        return u'%s (%s)' % (self.title, self.user)
+        return u'%s (%s)' % (self.name, self.user)
     
     def get_id(self):
         return u'%s:%s' % (self.user.username, self.name)
