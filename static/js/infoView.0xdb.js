@@ -1141,7 +1141,9 @@ pandora.ui.infoView = function(data) {
     };
 
     that.resize = function() {
-        $list && $list.css({height: getHeight() + 'px'});
+        var height = getHeight() + 'px';
+        $data.css({height: height});
+        $list && $list.css({height: height});
     };
 
     that.bindEvent({
