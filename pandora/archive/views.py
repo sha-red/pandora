@@ -131,7 +131,7 @@ def upload(request):
     f = get_object_or_404_json(models.File, oshash=request.POST['id'])
     if 'frame' in request.FILES:
         if f.editable(request.user):
-            f.frames.delete()
+            f.frames.all().delete()
             for frame in request.FILES.getlist('frame'):
                 name = frame.name
                 #float required?

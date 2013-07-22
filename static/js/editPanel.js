@@ -241,9 +241,9 @@ pandora.ui.editPanel = function() {
                                 sort: data
                             }, function(result) {
                                 edit.clips.forEach(function(clip) {
-                                    clip[key] = result.data.clips.indexOf(clip.id);
+                                    clip['sort'] = result.data.clips.indexOf(clip.id);
                                 });
-                                edit.clips = Ox.sortBy(edit.clips, key);
+                                edit.clips = Ox.sortBy(edit.clips, 'sort');
                                 updateClips(edit.clips);
                             });
                         }
