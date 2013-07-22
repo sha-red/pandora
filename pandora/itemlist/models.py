@@ -127,8 +127,7 @@ class List(models.Model):
                 if value == 'private':
                     for user in self.subscribed_users.all():
                         self.subscribed_users.remove(user)
-                    qs = Position.objects.filter(user=user,
-                                                        section='section', list=self)
+                    qs = Position.objects.filter(user=user, list=self)
                     if qs.count() > 1:
                         pos = qs[0]
                         pos.section = 'personal'
@@ -148,8 +147,7 @@ class List(models.Model):
                     Position.objects.filter(list=self).delete()
                     pos, created = Position.objects.get_or_create(list=self,
                                                   user=self.user, section='personal')
-                    qs = Position.objects.filter(user=self.user,
-                                                        section='personal')
+                    qs = Position.objects.filter(user=self.user, section='personal')
                     pos.position = qs.aggregate(Max('position'))['position__max'] + 1
                     pos.save()
                     for u in self.subscribed_users.all():

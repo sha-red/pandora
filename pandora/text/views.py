@@ -319,6 +319,9 @@ def sortTexts(request):
     data = json.loads(request.POST['data'])
     position = 0
     section = data['section']
+    section = {
+        'favorite': 'public'
+    }.get(section,section)
     #ids = list(set(data['ids']))
     ids = data['ids']
     if section == 'featured' and not request.user.get_profile().capability('canEditFeaturedTexts'):
