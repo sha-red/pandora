@@ -318,9 +318,9 @@ def autocomplete(request):
     op = data.get('operator', '=')
 
     key = settings.CONFIG['keys'][data['key']]
-    order_by = key.get('autocompleteSortKey', False)
+    order_by = key.get('autocompleteSort', False)
     if order_by:
-        order_by = '-sort__%s' % order_by
+        order_by = ','.join(['%(operator)ssort__%(key)s' % o for o in order_by])
     else:
         order_by = '-items'
     sort_type = key.get('sortType', key.get('type', 'string'))
