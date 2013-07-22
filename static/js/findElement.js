@@ -132,7 +132,9 @@ pandora.ui.findElement = function() {
                 sort: findKey.autocompleteSort,
                 value: value
             }, function(result) {
-                callback(result.data.items);
+                callback(result.data.items.map(function(item) {
+                    return Ox.decodeHTMLEntities(item);
+                }));
             });
         } : null;
     }
