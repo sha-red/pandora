@@ -130,7 +130,8 @@ def upload(request):
     response = json_response({})
     f = get_object_or_404_json(models.File, oshash=request.POST['id'])
     if 'frame' in request.FILES:
-        if f.frames.count() == 0:
+        if f.editable(request.user):
+            f.frames.delete()
             for frame in request.FILES.getlist('frame'):
                 name = frame.name
                 #float required?
@@ -143,8 +144,6 @@ def upload(request):
             f.item.select_frame()
             f.item.save()
             item.tasks.update_poster.delay(f.item.itemId)
-        else:
-            response = json_response(status=403, text='permissino denied')
     if 'file' in request.FILES:
         if not f.available:
             if f.data:
