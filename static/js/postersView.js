@@ -1,3 +1,5 @@
+// FIXME: unused
+
 'use strict';
 
 pandora.ui.posterView = function() {
