@@ -19,9 +19,7 @@ pandora.ui.findElement = function() {
                         })
                         .bindEvent({
                             change: function(data) {
-                                pandora.$ui.findInput.options({
-                                    autocomplete: autocompleteFunction()
-                                }).focusInput(true);
+                                pandora.$ui.findInput.focusInput(true);
                             }
                         }),
                 ] : [], [
@@ -116,38 +114,36 @@ pandora.ui.findElement = function() {
             margin: '4px'
         });
     function autocompleteFunction() {
-        return pandora.user.ui.find.conditions.length ? function(value, callback) {
-            var elementValue = that.value(),
-                key = elementValue[pandora.user.ui._list ? 1 : 0],
-                findKey = Ox.getObjectById(pandora.site.findKeys, key);
+        var key = !that
+                ? pandora.user.ui._findState.key
+                : that.value()[pandora.user.ui._list ? 1 : 0],
+            findKey = Ox.getObjectById(pandora.site.findKeys, key);
+        return findKey.autocomplete ? function(value, callback) {
             value === '' && Ox.Log('', 'Warning: autocomplete function should never be called with empty value');
-            if (findKey.autocomplete) {
-                pandora.api.autocomplete({
-                    key: key,
-                    query: {
-                        conditions: pandora.user.ui._list
-                                 && pandora.$ui.findListSelect.value() == 'list'
-                            ? [{key: 'list', value: pandora.user.ui._list, operator: '=='}] : [],
-                        operator: '&'
-                    },
-                    range: [0, 20],
-                    sort: [{key: 'votes', operator: '-'}],
-                    value: value
-                }, function(result) {
-                    callback(result.data.items);
-                });
-            } else {
-                callback([]);
-            }
+            pandora.api.autocomplete({
+                key: key,
+                query: {
+                    conditions: pandora.user.ui._list
+                             && pandora.$ui.findListSelect.value() == 'list'
+                        ? [{key: 'list', value: pandora.user.ui._list, operator: '=='}] : [],
+                    operator: '&'
+                },
+                range: [0, 20],
+                sort: findKey.autocompleteSort,
+                value: value
+            }, function(result) {
+                callback(result.data.items);
+            });
         } : null;
     }
     that.updateElement = function() {
         var findState = pandora.user.ui._findState;
         pandora.$ui.findSelect.value(findState.key);
         pandora.$ui.findInput.options(
-            findState.key == 'advanced'
-            ? {placeholder: Ox._('Edit Query...'), value: ''}
-            : {
+            findState.key == 'advanced' ? {
+                placeholder: Ox._('Edit Query...'),
+                value: ''
+            } : {
                 autocomplete: autocompleteFunction(),
                 placeholder: '',
                 value: findState.value
