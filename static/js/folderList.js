@@ -380,7 +380,7 @@ pandora.ui.folderList = function(id, section) {
                 section: id,
                 ids: data.ids
             }, function() {
-                Ox.Requests.clearCache('find' + folderItems);
+                Ox.Request.clearCache('find' + folderItems);
             });
         },
         paste: function() {
