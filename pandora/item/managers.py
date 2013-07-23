@@ -313,14 +313,20 @@ class ItemManager(Manager):
         
         #anonymous can only see public items
         if not user or user.is_anonymous():
-            allowed_level = settings.CONFIG['capabilities']['canSeeItem']['guest']
+            level = 'guest'
+            allowed_level = settings.CONFIG['capabilities']['canSeeItem'][level]
             qs = qs.filter(level__lte=allowed_level)
+            rendered_q = Q(rendered=True)
         #users can see public items, there own items and items of there groups
         else:
-            allowed_level = settings.CONFIG['capabilities']['canSeeItem'][user.get_profile().get_level()]
+            level = user.get_profile().get_level()
+            allowed_level = settings.CONFIG['capabilities']['canSeeItem'][level]
             q = Q(level__lte=allowed_level)|Q(user=user)
+            rendered_q = Q(rendered=True)|Q(user=user)
             if user.groups.count():
                 q |= Q(groups__in=user.groups.all())
+                rendered_q |= Q(groups__in=user.groups.all())
             qs = qs.filter(q)
-        #admins can see all available items
+        if settings.CONFIG.get('itemRequiresVideo') and level != 'admin':
+            qs = qs.filter(rendered_q)
         return qs

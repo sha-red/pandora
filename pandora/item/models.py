@@ -194,10 +194,15 @@ class Item(models.Model):
             level = 'guest'
         else:
             level = user.get_profile().get_level()
+        editable = self.editable(user)
+        if editable:
+            return True
+        if not self.rendered and settings.CONFIG.get('itemRequiresVideo'):
+            return False
         allowed_level = settings.CONFIG['capabilities']['canSeeItem'][level]
         if self.level <= allowed_level:
             return True
-        return self.editable(user)
+        return False
 
     def editable(self, user):
         if user.is_anonymous():
