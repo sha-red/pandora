@@ -249,11 +249,6 @@ pandora.ui.navigationView = function(type, videoRatio) {
         $status.html(Ox.toTitleCase(Ox.formatCount(items, 'clip')));
     }
 
-    if (type == 'map') {
-        pandora.user.ui.mapFind = '';
-        pandora.user.ui.mapSelection = '';
-    }
-
     // needed to it can recieve events from UI module
     pandora.$ui.clipList = $list;
 
