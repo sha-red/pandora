@@ -507,6 +507,7 @@ pandora.ui.mediaView = function(options, self) {
         data.ids.length == 1 && pandora.api.parsePath({
             path: self.$instancesList.value(data.ids[0], 'path')
         }, function(result) {
+            self.$idInput.value('');
             ['title', 'director', 'year'].forEach(function(key) {
                 if (result.data[key]) {
                     self['$' + key + 'Input'].value(
