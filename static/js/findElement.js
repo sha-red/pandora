@@ -118,7 +118,7 @@ pandora.ui.findElement = function() {
                 ? pandora.user.ui._findState.key
                 : that.value()[pandora.user.ui._list ? 1 : 0],
             findKey = Ox.getObjectById(pandora.site.findKeys, key);
-        return findKey.autocomplete ? function(value, callback) {
+        return findKey && findKey.autocomplete ? function(value, callback) {
             value === '' && Ox.Log('', 'Warning: autocomplete function should never be called with empty value');
             pandora.api.autocomplete({
                 key: key,
