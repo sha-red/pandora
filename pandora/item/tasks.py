@@ -36,8 +36,7 @@ def update_random_clip_sort():
             cursor.execute('DROP TABLE clip_random;')
             cursor.execute('CREATE TABLE "clip_random" AS SELECT id AS clip_id, row_number() OVER (ORDER BY random()) AS random FROM "clip_clip"')
             cursor.execute('ALTER TABLE "clip_random" ADD UNIQUE ("clip_id")')
-            cursor.execute('CREATE INDEX "clip_random_clip_id_idx" ON "clip_random" ("clip_id")')
-            cursor.execute('CREATE INDEX "clip_random_random_idx" ON "clip_random" ("random")')
+            cursor.execute('CREATE INDEX "clip_random_random" ON "clip_random" ("random")')
 
 @task(ignore_results=True, queue='default')
 def update_clips(itemId):
