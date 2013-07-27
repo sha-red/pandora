@@ -372,7 +372,10 @@ pandora.ui.infoView = function(data) {
             Ox.Editable({
                     clickLink: pandora.clickLink,
                     format: function(value) {
-                        return formatValue(value.split(', '), key)
+                        return formatValue(
+                            value.split(', '),
+                            key == 'episodeDirector' ? 'name' : 'year'
+                        );
                     },
                     placeholder: formatLight('unknown'),
                     tooltip: pandora.getEditTooltip(),
