@@ -1305,7 +1305,7 @@ class Item(models.Model):
             return
         # only import on 0xdb for now or if forced manually
         # since this will remove all existing subtitles
-        if not force or not settings.USE_IMDB:
+        if not settings.USE_IMDB and not force:
             return False
         with transaction.commit_on_success():
             layer = subtitles['id']
