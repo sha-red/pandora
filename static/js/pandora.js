@@ -367,12 +367,12 @@ appPanel
     function initPandoraApp() {
         pandora.$ui.appPanel = pandora.ui.appPanel().display();
         Ox.Request.requests() && pandora.$ui.loadingIcon.start();
-        pandora.$ui.body.ajaxStart(pandora.$ui.loadingIcon.start);
-        pandora.$ui.body.ajaxStop(pandora.$ui.loadingIcon.stop);
         Ox.Request.bindEvent({
             error: pandora.ui.errorDialog,
             request: function(data) {
-                pandora.$ui.loadingIcon.options({
+                pandora.$ui.loadingIcon[
+                    data.requests ? 'start' : 'stop'
+                ]().options({
                     tooltip: (data.requests || 'No')
                         + ' request'
                         + (data.requests == 1 ? '' : 's')
