@@ -207,8 +207,11 @@ class File(models.Model):
                 get_name_sort(name, sortname)
         #add all files in one folder to same item
         if self.instances.all().count():
-            folder = os.path.dirname(self.instances.all()[0].path) + '/'
-            qs = item.models.Item.objects.filter(files__instances__path__startswith=folder)
+            if info.get('isEpisode'):
+                prefix = os.path.splitext(self.instances.all()[0].path)[0]
+            else:
+                prefix = os.path.dirname(self.instances.all()[0].path) + '/'
+            qs = item.models.Item.objects.filter(files__instances__path__startswith=prefix)
             if qs.exists():
                 self.item = qs[0]
         if not self.item:
