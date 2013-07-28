@@ -162,7 +162,8 @@ pandora.ui.news = function(width, height) {
                     padding: '4px 8px 5px 8px',
                     borderRadius: '8px',
                     margin: '2px',
-                    backgroundColor: item.id == pandora.user.ui.part.news
+                    backgroundColor: (item.id == pandora.user.ui.part.news)
+                        || (!pandora.user.ui.part.news && i == 0)
                         ? backgroundColor : '',
                     cursor: 'pointer'
                 })
