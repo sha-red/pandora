@@ -366,17 +366,11 @@ appPanel
 
     function initPandoraApp() {
         pandora.$ui.appPanel = pandora.ui.appPanel().display();
-        Ox.Request.requests() && pandora.$ui.loadingIcon.start();
+        pandora.$ui.loadingIcon.update(Ox.Request.requests());
         Ox.Request.bindEvent({
             error: pandora.ui.errorDialog,
             request: function(data) {
-                pandora.$ui.loadingIcon[
-                    data.requests ? 'start' : 'stop'
-                ]().options({
-                    tooltip: (data.requests || 'No')
-                        + ' request'
-                        + (data.requests == 1 ? '' : 's')
-                });
+                pandora.$ui.loadingIcon.update(data.requests);
             }
         });
         pandora.site.sectionButtonsWidth = pandora.$ui.sectionButtons.width() + 8;
