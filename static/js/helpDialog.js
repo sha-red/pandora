@@ -113,7 +113,7 @@ pandora.ui.helpDialog = function() {
             orientation: 'horizontal'
         });
 
-        that.select(pandora.user.ui.help).options({content: $panel});
+        that.select(pandora.user.ui.part.help).options({content: $panel});
         $list.gainFocus();
         
     });
