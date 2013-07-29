@@ -9,7 +9,8 @@ pandora.ui.mainMenu = function() {
         fullscreenState = Ox.Fullscreen.getState(),
         that = Ox.MainMenu({
             extras: [
-                pandora.$ui.loadingIcon = pandora.ui.loadingIcon()
+                pandora.$ui.loadingIcon = pandora.ui.loadingIcon(),
+                pandora.$ui.reloadButton = pandora.ui.reloadButton()
             ],
             id: 'mainMenu',
             menus: [].concat(
