@@ -15,7 +15,7 @@ pandora.ui.usersDialog = function() {
         numberOfUsers = 0,
         systems = [
             'Android', 'BlackBerry', 'BSD', 'iOS', 'Java', 'Linux', 'Mac OS X',
-            'Nokia', 'PlayStation', 'Unix', 'Windows'
+            'Nokia', 'PlayStation', 'RIM Tablet OS', 'Unix', 'Wii', 'Windows'
         ],
         userLevels = pandora.site.userLevels.map(function(userLevel) {
             return Ox.toTitleCase(userLevel);

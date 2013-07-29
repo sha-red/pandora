@@ -15,7 +15,9 @@ pandora.ui.statisticsDialog = function() {
                 'Mac OS X': [0, 255, 255],
                 'Nokia': [255, 0, 255],
                 'PlayStation': [192, 192, 192],
+                'RIM Tablet OS': [64, 64, 64],
                 'Unix': [255, 255, 0],
+                'Wii': [192, 192, 192],
                 'Windows': [0, 0, 255]
             },
             browser: {
