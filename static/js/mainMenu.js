@@ -9,8 +9,7 @@ pandora.ui.mainMenu = function() {
         fullscreenState = Ox.Fullscreen.getState(),
         that = Ox.MainMenu({
             extras: [
-                pandora.$ui.loadingIcon = pandora.ui.loadingIcon(),
-                pandora.$ui.reloadButton = pandora.ui.reloadButton()
+                pandora.$ui.loadingIcon = pandora.ui.loadingIcon()
             ],
             id: 'mainMenu',
             menus: [].concat(
@@ -211,7 +210,6 @@ pandora.ui.mainMenu = function() {
                     ? [
                         { id: 'debugMenu', title: Ox._('Debug'), items: [
                             { id: 'clearcache', title: Ox._('Clear Cache')},
-                            { id: 'reloadapplication', title: Ox._('Reload Application')},
                             {},
                             { id: 'debugmode', title: Ox._((pandora.localStorage('enableDebugMode') ? 'Disable' : 'Enable') + ' Debug Mode') },
                             { id: 'eventlogging', title: Ox._((pandora.localStorage('enableEventLogging') ? 'Disable' : 'Enable') + ' Event Logging')},
@@ -421,8 +419,6 @@ pandora.ui.mainMenu = function() {
                     pandora.$ui.contentPanel.replaceElement(0, pandora.$ui.browser = pandora.ui.browser());
                 } else if (data.id == 'clearcache') {
                     Ox.Request.clearCache();
-                } else if (data.id == 'reloadapplication') {
-                    pandora.$ui.appPanel.reload();
                 } else if (data.id == 'debugmode') {
                     if (pandora.localStorage('enableDebugMode')) {
                         pandora.localStorage['delete']('enableDebugMode');
