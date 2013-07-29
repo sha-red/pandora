@@ -26,6 +26,8 @@ pandora.ui.appPanel = function() {
         return that;
     };
     that.reload = function() {
+        Ox.Request.cancel();
+        Ox.Request.clearCache();
         pandora.$ui.appPanel.remove();
         pandora.$ui.appPanel = pandora.ui.appPanel().appendTo(pandora.$ui.body);
         return that;

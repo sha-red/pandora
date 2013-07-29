@@ -421,7 +421,6 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'clearcache') {
                     Ox.Request.clearCache();
                 } else if (data.id == 'reloadapplication') {
-                    Ox.Request.clearCache();
                     pandora.$ui.appPanel.reload();
                 } else if (data.id == 'debugmode') {
                     if (pandora.localStorage('enableDebugMode')) {

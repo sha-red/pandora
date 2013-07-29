@@ -1540,7 +1540,6 @@ pandora.signin = function(data) {
     pandora.URL.init();
     pandora.URL.update();
     Ox.Theme(pandora.user.ui.theme);
-    Ox.Request.clearCache();
     pandora.$ui.appPanel.reload();
 };
 
@@ -1554,7 +1553,6 @@ pandora.signout = function(data) {
     pandora.URL.init();
     pandora.URL.update();
     Ox.Theme(pandora.user.ui.theme);
-    Ox.Request.clearCache();
     pandora.$ui.appPanel.reload();
 };
 
