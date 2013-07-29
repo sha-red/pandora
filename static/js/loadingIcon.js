@@ -4,7 +4,7 @@ pandora.ui.loadingIcon = function() {
 
     var self = {},
         that = Ox.LoadingIcon({
-            tooltip: Ox._('Reload Application')
+            tooltip: Ox._('Reload {0}', [pandora.site.site.name])
         }, self)
         .attr({
             src: Ox.UI.getImageURL('symbolRedo')
@@ -32,12 +32,10 @@ pandora.ui.loadingIcon = function() {
     that.stop = function() {
         if (self.loadingInterval) {
             that.superStop(function() {
-                if (!self.loadingInterval) {
-                    that.css(getCSS('stop'))
-                        .attr({
-                            src: Ox.UI.getImageURL('symbolRedo')
-                        });
-                }
+                that.css(getCSS('stop'))
+                    .attr({
+                        src: Ox.UI.getImageURL('symbolRedo')
+                    });
             });
         }
     };
