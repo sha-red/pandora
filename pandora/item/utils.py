@@ -10,6 +10,8 @@ def safe_filename(filename):
     filename = filename.replace(': ', '_ ')
     filename = filename.replace('/', '_')
     filename = filename.replace('\\', '_')
+    if filename.startswith('.'):
+        filename = '_' + filename[1:]
     if filename.endswith('.'):
         filename = filename[:-1] + '_'
     return filename
