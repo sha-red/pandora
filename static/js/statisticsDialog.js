@@ -18,7 +18,8 @@ pandora.ui.statisticsDialog = function() {
                 'RIM Tablet OS': [64, 64, 64],
                 'Unix': [255, 255, 0],
                 'Wii': [192, 192, 192],
-                'Windows': [0, 0, 255]
+                'Windows': [0, 0, 255],
+                'Windows Phone': [0, 0, 128]
             },
             browser: {
                 'Camino': [192, 192, 192],
