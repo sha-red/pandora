@@ -422,14 +422,16 @@ pandora.ui.infoView = function(data) {
         )
         .appendTo($text);
 
-    data.productionCompany && $('<div>')
-        .addClass('OxSelectable')
-        .css(css)
-        .html(
-            formatKey('studio')
-            + formatValue(data.productionCompany, 'productionCompany')
-        )
-        .appendTo($text);
+    if (data.productionCompany && canSeeAllMetadata) {
+        $('<div>')
+            .addClass('OxSelectable')
+            .css(css)
+            .html(
+                formatKey('studio')
+                + formatValue(data.productionCompany, 'productionCompany')
+            )
+            .appendTo($text);
+    }
 
     if (data.genre || (data.keyword && canSeeAllMetadata)) {
         $div = $('<div>')
