@@ -472,6 +472,11 @@ pandora.ui.mainMenu = function() {
                     }
                 }
             },
+            key_control_m: function() {
+                if (!pandora.hasDialogOrScreen() && !that.isSelected()) {
+                    that.options('menus')[0].element.trigger('click');
+                }
+            },
             key_control_p: function() {
                 window.open(document.location.href + '#?print=true', '_blank');
             },
