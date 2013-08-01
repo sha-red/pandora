@@ -60,10 +60,10 @@ pandora.ui.infoView = function(data) {
                 background: 'rgba(0, 0, 0, 0)'
             })
             .bindEvent({
-                click: function(data) {
-                    if (data.id == 'update') {
+                click: function(data_) {
+                    if (data_.id == 'update') {
                         updateMetadata();
-                    } else if (data.id == 'delete') {
+                    } else if (data_.id == 'delete') {
                         pandora.$ui.deleteItemDialog = pandora.ui.deleteItemDialog(data).open();
                     }
                 }
