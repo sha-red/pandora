@@ -30,6 +30,7 @@ pandora.ui.player = function(data) {
             height: pandora.$ui.contentPanel.size(1),
             'in': ui.videoPoints[ui.item]['in'],
             layers: data.annotations,
+            loop: ui.videoLoop,
             muted: ui.videoMuted,
             out: ui.videoPoints[ui.item].out,
             position: ui.videoPoints[ui.item].position,
@@ -90,6 +91,9 @@ pandora.ui.player = function(data) {
                 pandora.ui.annotationDialog(
                     Ox.getObjectById(pandora.site.layers, data.layer).title
                 ).open();
+            },
+            loop: function(data) {
+                pandora.UI.set({videoLoop: data.loop});
             },
             muted: function(data) {
                 pandora.UI.set({videoMuted: data.muted});
