@@ -584,6 +584,7 @@
             "type": "integer",
             "capability": "canSeeAccessed",
             "columnWidth": 60,
+            "format": {"type": "number", "args": []},
             "sort": true
         },
         {

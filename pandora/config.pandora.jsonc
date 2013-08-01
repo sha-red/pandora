@@ -411,7 +411,7 @@
             "type": "integer",
             "capability": "canSeeAccessed",
             "columnWidth": 60,
-            "format": {"type": "date", "args": ["%Y-%m-%d %H:%M:%S"]},
+            "format": {"type": "number", "args": []},
             "sort": true
         },
         {
