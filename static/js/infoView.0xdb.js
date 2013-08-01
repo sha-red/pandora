@@ -922,7 +922,8 @@ pandora.ui.infoView = function(data) {
                 }),
                 selectedImage = images.filter(function(image) {
                     return image.selected;
-                })[0];
+                })[0],
+                modified = data.modified;
             $list = Ox.IconList({
                     defaultRatio: ui.icons == 'posters' || !data.stream ? pandora.site.posters.ratio : data.stream.aspectratio,
                     fixedRatio: ui.icons == 'posters' || !data.stream ? false : data.stream.aspectratio,
@@ -931,10 +932,12 @@ pandora.ui.infoView = function(data) {
                         size = size || 128;
                         return {
                             height: ratio <= 1 ? size : size / ratio,
-                            id: data['id'],
+                            id: data.id,
                             info: data.width + ' × ' + data.height + ' px',
                             title: ui.icons == 'posters' ? data.source : Ox.formatDuration(data.position),
-                            url: data.url.replace('http://', '//'),
+                            url: data.url.replace('http://', '//') + (
+                                ui.icons == 'posters' && data.source == pandora.site.site.url ? '?' + modified : ''
+                            ),
                             width: ratio >= 1 ? size : size * ratio
                         }
                     },
