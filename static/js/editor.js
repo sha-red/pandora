@@ -175,6 +175,9 @@ pandora.ui.editor = function(data) {
                     listView: 'clip'
                 });
             },
+            gainfocus: function() {
+                pandora.$ui.mainMenu.replaceItemMenu();
+            },
             importannotations: function(data) {
                 pandora.ui.importAnnotations().open();
             },
@@ -182,6 +185,9 @@ pandora.ui.editor = function(data) {
                 pandora.ui.annotationDialog(
                     Ox.getObjectById(pandora.site.layers, data.layer).title
                 ).open();
+            },
+            losefocus: function() {
+                pandora.$ui.mainMenu.replaceItemMenu();
             },
             muted: function(data) {
                 pandora.UI.set({videoMuted: data.muted});

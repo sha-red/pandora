@@ -87,6 +87,9 @@ pandora.ui.player = function(data) {
             find: function(data) {
                 pandora.UI.set({itemFind: data.find});
             },
+            gainfocus: function() {
+                pandora.$ui.mainMenu.replaceItemMenu();
+            },
             info: function(data) {
                 pandora.ui.annotationDialog(
                     Ox.getObjectById(pandora.site.layers, data.layer).title
@@ -94,6 +97,9 @@ pandora.ui.player = function(data) {
             },
             loop: function(data) {
                 pandora.UI.set({videoLoop: data.loop});
+            },
+            losefocus: function() {
+                pandora.$ui.mainMenu.replaceItemMenu();
             },
             muted: function(data) {
                 pandora.UI.set({videoMuted: data.muted});

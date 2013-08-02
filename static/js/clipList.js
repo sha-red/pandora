@@ -139,10 +139,16 @@ pandora.ui.clipList = function(videoRatio) {
                 })
                 Ox.Clipboard.add(items, 'clip');
             },
+            gainfocus: function() {
+                pandora.$ui.mainMenu.replaceItemMenu();
+            },
             init: function(data) {
                 if (!ui.item && ui.listView == 'clip'/* && pandora.$ui.statusbar*/) {
                     pandora.$ui.statusbar.set('total', data);
                 }
+            },
+            losefocus: function() {
+                pandora.$ui.mainMenu.replaceItemMenu();
             },
             open: function(data) {
                 var id = data.ids[0],
@@ -260,6 +266,7 @@ pandora.ui.clipList = function(videoRatio) {
                     !ui.item && pandora.UI.set({listSelection: []});
                     !isEmbed && pandora.$ui.mainMenu.disableItem('findsimilar');
                 }
+                pandora.$ui.mainMenu.replaceItemMenu();
             },
             pandora_itemsort: function(data) {
                 that.options({sort: data.value});
