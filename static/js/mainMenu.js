@@ -209,6 +209,7 @@ pandora.ui.mainMenu = function() {
                 pandora.site.capabilities.canSeeDebugMenu[pandora.user.level]
                     ? [
                         { id: 'debugMenu', title: Ox._('Debug'), items: [
+                            { id: 'cache', title: Ox._('Disable Cache'), disabled: true},
                             { id: 'clearcache', title: Ox._('Clear Cache')},
                             {},
                             { id: 'debugmode', title: Ox._((pandora.localStorage('enableDebugMode') ? 'Disable' : 'Enable') + ' Debug Mode') },
