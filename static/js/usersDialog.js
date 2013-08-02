@@ -398,13 +398,6 @@ pandora.ui.usersDialog = function() {
                 select: selectUsers
             }),
 
-        $formLabel = Ox.Label({
-                textAlign: 'center',
-                title: Ox._('No user selected'),
-                width: 212
-            })
-            .css({float: 'left', margin: '4px 2px 4px 4px'}),
-
         $formButton = Ox.ButtonGroup({
                 buttons: [
                     {
@@ -422,9 +415,30 @@ pandora.ui.usersDialog = function() {
                 selectable: true,
                 type: 'image'
             })
-            .css({float: 'left', margin: '4px 4px 4px 2px'})
+            .css({float: 'left', margin: '4px 2px 4px 4px'})
             .bindEvent({
                 change: selectForm
+            }),
+
+        $formLabel = Ox.Label({
+                textAlign: 'center',
+                title: Ox._('No user selected'),
+                width: 192
+            })
+            .css({float: 'left', margin: '4px 2px'}),
+
+        $deselectButton = Ox.Button({
+                disabled: true,
+                title: 'close',
+                tooltip: Ox._('Done'),
+                type: 'image'
+            })
+            .css({float: 'left', margin: '4px 4px 4px 2px'})
+            .bindEvent({
+                click: function() {
+                    $list.options({selected: []});
+                    selectUsers({ids: []});
+                }
             }),
 
         $form = Ox.Element(),
@@ -468,8 +482,9 @@ pandora.ui.usersDialog = function() {
                             elements: [
                                 {
                                     element: Ox.Bar({size: 24})
+                                        .append($formButton)
                                         .append($formLabel)
-                                        .append($formButton),
+                                        .append($deselectButton),
                                     size: 24
                                 },
                                 {
@@ -847,6 +862,7 @@ pandora.ui.usersDialog = function() {
             return $list.value(id);
         });
         setLabel();
+        $deselectButton.options({disabled: data.ids.length == 0});
         if ($formButton.value() == 'edit') {
             $form.empty();
             if (
@@ -935,7 +951,7 @@ pandora.ui.usersDialog = function() {
     function setWidth() {
         var $form = $formButton.value() == 'edit' ? $editForm : $mailForm;
         formWidth = $content.size(1);
-        $formLabel.options({width: formWidth - 44});
+        $formLabel.options({width: formWidth - 64});
         $form && $form.options('items').forEach(function($item) {
             if ($item.options('id') != 'send') {
                 $item.options({width: formWidth - 16});
