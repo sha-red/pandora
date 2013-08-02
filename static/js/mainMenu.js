@@ -356,11 +356,13 @@ pandora.ui.mainMenu = function() {
                     pandora.UI.set({'part.tv': ui._list});
                     pandora.UI.set({page: 'tv'});
                 } else if (data.id == 'selectall') {
-                    pandora.$ui.list.selectAll();
+                    pandora.$ui[!ui.item ? 'list' : 'clipList'].selectAll();
                 } else if (data.id == 'selectnone') {
-                    pandora.UI.set({listSelection: []});
+                    !ui.item
+                        ? pandora.UI.set({listSelection: []})
+                        : pandora.$ui.clipList.options({selected: []});
                 } else if (data.id == 'invertselection') {
-                    pandora.$ui.list.invertSelection();
+                    pandora.$ui[!ui.item ? 'list' : 'clipList'].invertSelection();
                 } else if (data.id == 'cut' || data.id == 'cutadd') {
                     var action = data.id == 'cut' ? 'copy' : 'add';
                     fromMenu = true;
@@ -821,7 +823,7 @@ pandora.ui.mainMenu = function() {
                     : clipboardType == 'clip' ? (clipboardItems == 1 ? 'Clip' : 'Clips')
                     : ''
                 ),
-            canSelect = ui.section != 'texts' && !ui.item,
+            canSelect = !ui.item || isClipView,
             canCopy = isVideoView ? ui.videoPoints[ui.item]['in'] != ui.videoPoints[ui.item].out
                 : isClipView ? pandora.$ui.clipList.options('selected').length
                 : !!ui.listSelection.length,
