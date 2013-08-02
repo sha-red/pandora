@@ -389,7 +389,7 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'advancedfind') {
                     pandora.$ui.filterDialog = pandora.ui.filterDialog().open();
                 } else if (data.id == 'findsimilar') {
-                    pandora.$ui.sequencesDialog = pandora.ui.sequencesDialog().open();
+                    pandora.$ui.similarClipsDialog = pandora.ui.similarClipsDialog().open();
                 } else if (data.id == 'documents') {
                     pandora.$ui.documentsDialog = pandora.ui.documentsDialog().open();
                 } else if (data.id == 'titles') {
@@ -442,7 +442,7 @@ pandora.ui.mainMenu = function() {
             },
             key_alt_control_f: function() {
                 if (!pandora.hasDialogOrScreen() && pandora.getItemIdAndPosition()) {
-                    pandora.$ui.sequencesDialog = pandora.ui.sequencesDialog().open();
+                    pandora.$ui.similarClipsDialog = pandora.ui.similarClipsDialog().open();
                 }
             },
             key_alt_control_shift_a: function() {

@@ -2,7 +2,7 @@
 
 'use strict';
 
-pandora.ui.sequencesDialog = function() {
+pandora.ui.similarClipsDialog = function() {
 
     var dialogSize = {
             height: Math.round((window.innerHeight - 48) * 0.9),
@@ -69,24 +69,6 @@ pandora.ui.sequencesDialog = function() {
             })
             .appendTo($toolbar),
 
-        $orderButton = Ox.Button({
-                title: getTitle(),
-                tooltip: getTooltip(),
-                type: 'image'
-            })
-            .bindEvent({
-                click: function() {
-                    pandora.UI.set({sequenceSort: [{
-                        key: pandora.user.ui.sequenceSort[0].key,
-                        operator: pandora.user.ui.sequenceSort[0].operator == '+' ? '-' : '+'
-                    }]});
-                    updateOrderButton();
-                    $list.options({sort: pandora.user.ui.sequenceSort});
-                }
-            })
-            .css({float: 'right', margin: '4px 4px 4px 2px'})
-            .appendTo($toolbar),
-
         $sortSelect = Ox.Select({
                 items: ['title', 'director', 'position', 'duration'].map(function(id) {
                     var item = Ox.getObjectById(pandora.site.itemKeys, id)
@@ -110,8 +92,33 @@ pandora.ui.sequencesDialog = function() {
                     updateOrderButton();
                     $list.options({sort: pandora.user.ui.sequenceSort});
                 }
+            }),
+
+        $orderButton = Ox.Button({
+                overlap: 'left',
+                title: getTitle(),
+                tooltip: getTooltip(),
+                type: 'image'
             })
-            .css({float: 'right', margin: '4px 2px'})
+            .bindEvent({
+                click: function() {
+                    pandora.UI.set({sequenceSort: [{
+                        key: pandora.user.ui.sequenceSort[0].key,
+                        operator: pandora.user.ui.sequenceSort[0].operator == '+' ? '-' : '+'
+                    }]});
+                    updateOrderButton();
+                    $list.options({sort: pandora.user.ui.sequenceSort});
+                }
+            }),
+
+        $sortElement = Ox.FormElementGroup({
+                elements: [$sortSelect, $orderButton],
+                float: 'right'
+            })
+            .css({
+                float: 'right',
+                margin: '4px'
+            })
             .appendTo($toolbar),
 
         $outerPanel = Ox.SplitPanel({
