@@ -43,17 +43,19 @@ pandora.ui.mainMenu = function() {
                         { id: 'add', title: Ox._('Add {0}', [Ox._(pandora.site.itemName.singular)]), disabled: pandora.site.itemRequiresVideo || !pandora.site.capabilities.canAddItems[pandora.user.level] },
                         { id: 'upload', title: Ox._('Upload Video...'), disabled: !pandora.site.capabilities.canAddItems[pandora.user.level] },
                         {},
-                        { id: 'undo', title: Ox._('Undo'), disabled: true, keyboard: 'control z' },
-                        { id: 'redo', title: Ox._('Redo'), disabled: true, keyboard: 'shift control z' },
-                        {},
-                        { id: 'cut', title: Ox._('Cut{control_x}', {control_x:''}), disabled: true, keyboard: 'control x' },
-                        { id: 'copy', title: Ox._('Copy'), disabled: true, keyboard: 'control c' },
-                        { id: 'paste', title: Ox._('Paste'), disabled: true, keyboard: 'control v' },
-                        { id: 'delete', title: Ox._('Delete'), disabled: true, keyboard: 'delete' },
-                        {},
                         { id: 'selectall', title: Ox._('Select All'), disabled: true, keyboard: 'control a' },
                         { id: 'selectnone', title: Ox._('Select None'), disabled: true, keyboard: 'shift control a' },
-                        { id: 'invertselection', title: Ox._('Invert Selection'), disabled: true, keyboard: 'alt control a' }
+                        { id: 'invertselection', title: Ox._('Invert Selection'), disabled: true, keyboard: 'alt control a' },
+                        {},
+                        { id: 'cut', title: Ox._('Cut and Replace Clipboard'), disabled: true, keyboard: 'control x' },
+                        { id: 'cutadd', title: Ox._('Cut and Add to Clipboard'), disabled: true, keyboard: 'shift control x' },
+                        { id: 'copy', title: Ox._('Copy and Replace Clipboard'), disabled: true, keyboard: 'control c' },
+                        { id: 'copyadd', title: Ox._('Copy and Add to Clipboard'), disabled: true, keyboard: 'shift control c' },
+                        { id: 'paste', title: Ox._('Paste from Clipboard'), disabled: true, keyboard: 'control v' },
+                        { id: 'delete', title: Ox._('Delete'), disabled: true, keyboard: 'delete' },
+                        {},
+                        { id: 'undo', title: Ox._('Undo'), disabled: true, keyboard: 'control z' },
+                        { id: 'redo', title: Ox._('Redo'), disabled: true, keyboard: 'shift control z' }
                     ] },
                     { id: 'viewMenu', title: Ox._('View'), items: [
                         { id: 'items', title: Ox._('View {0}', [Ox._(pandora.site.itemName.plural)]), items: [
