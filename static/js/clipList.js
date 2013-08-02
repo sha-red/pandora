@@ -147,9 +147,6 @@ pandora.ui.clipList = function(videoRatio) {
                     pandora.$ui.statusbar.set('total', data);
                 }
             },
-            losefocus: function() {
-                pandora.$ui.mainMenu.replaceItemMenu();
-            },
             open: function(data) {
                 var id = data.ids[0],
                     item = !ui.item ? id.split('/')[0] : ui.item,

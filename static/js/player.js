@@ -98,9 +98,6 @@ pandora.ui.player = function(data) {
             loop: function(data) {
                 pandora.UI.set({videoLoop: data.loop});
             },
-            losefocus: function() {
-                pandora.$ui.mainMenu.replaceItemMenu();
-            },
             muted: function(data) {
                 pandora.UI.set({videoMuted: data.muted});
             },

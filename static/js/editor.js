@@ -186,9 +186,6 @@ pandora.ui.editor = function(data) {
                     Ox.getObjectById(pandora.site.layers, data.layer).title
                 ).open();
             },
-            losefocus: function() {
-                pandora.$ui.mainMenu.replaceItemMenu();
-            },
             muted: function(data) {
                 pandora.UI.set({videoMuted: data.muted});
             },

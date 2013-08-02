@@ -817,7 +817,8 @@ pandora.ui.mainMenu = function() {
                 : !!ui.listSelection.length,
             canPaste = !ui.item && !isClipView && !isVideoView
                 && listData.editable && listData.type == 'static' && Ox.Clipboard.type() == 'item',
-            canCut = canCopy && canPaste;
+            canCut = canCopy && !ui.item && !isClipView && !isVideoView
+                && listData.editable && listData.type == 'static';
         return { id: 'itemMenu', title: Ox._('Item'), items: [
             { id: 'add', title: Ox._('Add {0}', [Ox._(pandora.site.itemName.singular)]), disabled: pandora.site.itemRequiresVideo || !pandora.site.capabilities.canAddItems[pandora.user.level] },
             { id: 'upload', title: Ox._('Upload Video...'), disabled: !pandora.site.capabilities.canAddItems[pandora.user.level] },
@@ -987,8 +988,7 @@ pandora.ui.mainMenu = function() {
     }
 
     that.replaceItemMenu = function() {
-        // FIXME: on opening the menu, this throws in Ox.Focus
-        // that.replaceMenu('itemMenu', getItemMenu());
+        that.replaceMenu('itemMenu', getItemMenu());
         return that;
     };
 

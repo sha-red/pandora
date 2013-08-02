@@ -133,6 +133,9 @@ pandora.ui.browser = function() {
             copyadd: function() {
                 Ox.Clipboard.add(pandora.user.ui.item, 'item');
             },
+            gainfocus: function() {
+                pandora.$ui.mainMenu.replaceItemMenu();
+            },
             open: function() {
                 that.scrollToSelection();
             },
