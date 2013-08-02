@@ -110,12 +110,12 @@ pandora.ui.editor = function(data) {
             },
             copy: function(data) {
                 Ox.Clipboard.copy(data.map(function(clip) {
-                    return Ox.extend(clip, {item: ui.item});
+                    return clip.annotation || ui.item + '/' + clip['in'] + '-' + clip.out
                 }), 'clip');
             },
             copyadd: function(data) {
                 Ox.Clipboard.add(data.map(function(clip) {
-                    return Ox.extend(clip, {item: ui.item});
+                    return clip.annotation || ui.item + '/' + clip['in'] + '-' + clip.out
                 }), 'clip');
             },
             define: function(data) {
