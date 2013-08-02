@@ -137,8 +137,7 @@ pandora.ui.browser = function() {
                 that.scrollToSelection();
             },
             openpreview: function() {
-                var itemView = pandora.user.ui.itemView;
-                if (['player', 'editor', 'timeline'].indexOf(itemView) > -1) {
+                if (pandora.isVideoView()) {
                     pandora.$ui[itemView].gainFocus().triggerEvent('key_space');
                 }
             },
