@@ -815,7 +815,8 @@ pandora.ui.mainMenu = function() {
             canCopy = isVideoView ? ui.videoPoints[ui.item]['in'] != ui.videoPoints[ui.item].out
                 : isClipView ? pandora.$ui.clipList.options('selected').length
                 : !!ui.listSelection.length,
-            canPaste = !isClipView && !isVideoView && listData.editable && listData.type == 'static' && Ox.Clipboard.type() == 'item',
+            canPaste = !ui.item && !isClipView && !isVideoView
+                && listData.editable && listData.type == 'static' && Ox.Clipboard.type() == 'item',
             canCut = canCopy && canPaste;
         return { id: 'itemMenu', title: Ox._('Item'), items: [
             { id: 'add', title: Ox._('Add {0}', [Ox._(pandora.site.itemName.singular)]), disabled: pandora.site.itemRequiresVideo || !pandora.site.capabilities.canAddItems[pandora.user.level] },
