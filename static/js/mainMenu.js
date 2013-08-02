@@ -393,6 +393,8 @@ pandora.ui.mainMenu = function() {
                         pandora.UI.set({listSelection: items});
                         pandora.reloadList();
                     });
+                } else if (data.id == 'clearclipboard') {
+                    Ox.Clipboard.clear();
                 } else if (data.id == 'delete') {
                     pandora.api.removeListItems({
                         list: ui._list,
@@ -813,7 +815,7 @@ pandora.ui.mainMenu = function() {
             canCopy = isVideoView ? ui.videoPoints[ui.item]['in'] != ui.videoPoints[ui.item].out
                 : isClipView ? pandora.$ui.clipList.options('selected').length
                 : !!ui.listSelection.length,
-            canPaste = !ui.item && listData.editable && listData.type == 'static' && Ox.Clipboard.type() == 'item',
+            canPaste = !isClipView && !isVideoView && listData.editable && listData.type == 'static' && Ox.Clipboard.type() == 'item',
             canCut = canCopy && canPaste;
         return { id: 'itemMenu', title: Ox._('Item'), items: [
             { id: 'add', title: Ox._('Add {0}', [Ox._(pandora.site.itemName.singular)]), disabled: pandora.site.itemRequiresVideo || !pandora.site.capabilities.canAddItems[pandora.user.level] },
@@ -828,6 +830,8 @@ pandora.ui.mainMenu = function() {
             { id: 'copy', title: Ox._('Copy {0} and Replace Clipboard', [itemName]), disabled: !canCopy, keyboard: 'control c' },
             { id: 'copyadd', title: Ox._('Copy {0} and Add to Clipboard', [itemName]), disabled: !canCopy, keyboard: 'shift control c' },
             { id: 'paste', title: Ox._('Paste {0} from Clipboard', [clipboardItemName]), disabled: !canPaste, keyboard: 'control v' },
+            { id: 'clearclipboard', title: Ox._('Clear Clipboard'), disabled: !clipboardItems},
+            {},
             { id: 'delete', title: Ox._('Delete {0}', [itemName]), disabled: !canCut, keyboard: 'delete' },
             {},
             { id: 'undo', title: Ox._('Undo'), disabled: true, keyboard: 'control z' },
