@@ -381,7 +381,9 @@ pandora.ui.mainMenu = function() {
                             item: ui.item,
                             out: ui.videoPoints[ui.item].out
                         }], 'clip')
-                        : pandora.isClipView() ? Ox.Clipboard[action](pandora.$ui.clipList.options('selected'), 'clip')
+                        : pandora.isClipView() && !pandora.$ui.browser.hasFocus() ? Ox.Clipboard[action](
+                            pandora.$ui.clipList.options('selected'), 'clip'
+                        )
                         : Ox.Clipboard[action](ui.listSelection, 'item');
                 } else if (data.id == 'paste') {
                     fromMenu = true;
@@ -602,6 +604,7 @@ pandora.ui.mainMenu = function() {
             },
             pandora_item: function(data) {
                 if (!!data.value != !!data.previousValue) {
+                    that.replaceMenu('itemMenu', getItemMenu());
                     that[data.value ? 'disableItem' : 'enableItem']('showfilters');
                     that[data.value ? 'enableItem' : 'disableItem']('showbrowser');
                     that.replaceMenu('sortMenu', getSortMenu());
@@ -799,22 +802,30 @@ pandora.ui.mainMenu = function() {
             isVideoView = pandora.isVideoView()
                 && pandora.$ui[ui.itemView]
                 && pandora.$ui[ui.itemView].hasFocus(),
-            itemName = Ox._(
+            listItemsName = Ox._(
+                isVideoView || isClipView ? 'Clips' : pandora.site.itemName.plural
+            ),
+            selectionItems = isVideoView ? 1
+                : isClipView ? pandora.$ui.clipList.options('selected').length
+                : ui.listSelection.length,
+            selectionItemName = (selectionItems > 1 ? Ox.formatNumber(selectionItems) + ' ' : '') + Ox._(
                 isVideoView ? 'Clip'
-                : isClipView ? (pandora.$ui.clipList.options('selected').length == 1 ? 'Clip' : 'Clips')
-                : pandora.site.itemName[ui.listSelection.length == 1 ? 'singular' : 'plural']
+                : isClipView ? (selectionItems == 1 ? 'Clip' : 'Clips')
+                : pandora.site.itemName[selectionItems == 1 ? 'singular' : 'plural']
             ),
             clipboardItems = Ox.Clipboard.items(),
             clipboardType = Ox.Clipboard.type(),
-            clipboardItemName = Ox._(
-                clipboardType == 'item' ? pandora.site.itemName[clipboardItems == 1 ? 'singular' : 'plural']
-                : clipboardType == 'clip' ? (clipboardItems == 1 ? 'Clip' : 'Clips')
-                : 'Items'
-            ),
+            clipboardItemName = clipboardItems == 0 ? ''
+                : (clipboardItems > 1 ? Ox.formatNumber(clipboardItems) + ' ' : '') + Ox._(
+                    clipboardType == 'item' ? pandora.site.itemName[clipboardItems == 1 ? 'singular' : 'plural']
+                    : clipboardType == 'clip' ? (clipboardItems == 1 ? 'Clip' : 'Clips')
+                    : ''
+                ),
             canSelect = ui.section != 'texts' && !ui.item,
             canCopy = isVideoView ? ui.videoPoints[ui.item]['in'] != ui.videoPoints[ui.item].out
                 : isClipView ? pandora.$ui.clipList.options('selected').length
                 : !!ui.listSelection.length,
+            canAdd = canCopy && clipboardItems > 0 && ((clipboardType == 'item') == (!isVideoView && !isClipView)),
             canPaste = !ui.item && !isClipView && !isVideoView
                 && listData.editable && listData.type == 'static' && Ox.Clipboard.type() == 'item',
             canCut = canCopy && !ui.item && !isClipView && !isVideoView
@@ -823,18 +834,18 @@ pandora.ui.mainMenu = function() {
             { id: 'add', title: Ox._('Add {0}', [Ox._(pandora.site.itemName.singular)]), disabled: pandora.site.itemRequiresVideo || !pandora.site.capabilities.canAddItems[pandora.user.level] },
             { id: 'upload', title: Ox._('Upload Video...'), disabled: !pandora.site.capabilities.canAddItems[pandora.user.level] },
             {},
-            { id: 'selectall', title: Ox._('Select All'), disabled: !canSelect, keyboard: 'control a' },
+            { id: 'selectall', title: Ox._('Select All {0}', [listItemsName]), disabled: !canSelect, keyboard: 'control a' },
             { id: 'selectnone', title: Ox._('Select None'), disabled: !canSelect, keyboard: 'shift control a' },
             { id: 'invertselection', title: Ox._('Invert Selection'), disabled: !canSelect, keyboard: 'alt control a' },
             {},
-            { id: 'cut', title: Ox._('Cut {0} and Replace Clipboard', [itemName]), disabled: !canCut, keyboard: 'control x' },
-            { id: 'cutadd', title: Ox._('Cut {0} and Add to Clipboard', [itemName]), disabled: !canCut, keyboard: 'shift control x' },
-            { id: 'copy', title: Ox._('Copy {0} and Replace Clipboard', [itemName]), disabled: !canCopy, keyboard: 'control c' },
-            { id: 'copyadd', title: Ox._('Copy {0} and Add to Clipboard', [itemName]), disabled: !canCopy, keyboard: 'shift control c' },
-            { id: 'paste', title: Ox._('Paste {0} from Clipboard', [clipboardItemName]), disabled: !canPaste, keyboard: 'control v' },
+            { id: 'cut', title: Ox._('Cut {0}', [selectionItemName]), disabled: !canCut, keyboard: 'control x' },
+            { id: 'cutadd', title: Ox._('Cut and Add to Clipboard'), disabled: !canCut || !canAdd, keyboard: 'shift control x' },
+            { id: 'copy', title: Ox._('Copy {0}', [selectionItemName]), disabled: !canCopy, keyboard: 'control c' },
+            { id: 'copyadd', title: Ox._('Copy and Add to Clipboard'), disabled: !canCopy || !canAdd, keyboard: 'shift control c' },
+            { id: 'paste', title: clipboardItems == 0 ? Ox._('Paste') : Ox._('Paste {0}', [clipboardItemName]), disabled: !canPaste, keyboard: 'control v' },
             { id: 'clearclipboard', title: Ox._('Clear Clipboard'), disabled: !clipboardItems},
             {},
-            { id: 'delete', title: Ox._('Delete {0}', [itemName]), disabled: !canCut, keyboard: 'delete' },
+            { id: 'delete', title: Ox._('Delete {0} from List', [selectionItemName]), disabled: !canCut, keyboard: 'delete' },
             {},
             { id: 'undo', title: Ox._('Undo'), disabled: true, keyboard: 'control z' },
             { id: 'redo', title: Ox._('Redo'), disabled: true, keyboard: 'shift control z' }
