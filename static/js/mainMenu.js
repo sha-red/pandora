@@ -845,7 +845,7 @@ pandora.ui.mainMenu = function() {
             { id: 'paste', title: clipboardItems == 0 ? Ox._('Paste') : Ox._('Paste {0}', [clipboardItemName]), disabled: !canPaste, keyboard: 'control v' },
             { id: 'clearclipboard', title: Ox._('Clear Clipboard'), disabled: !clipboardItems},
             {},
-            { id: 'delete', title: Ox._('Delete {0} from List', [selectionItemName]), disabled: !canCut, keyboard: 'delete' },
+            { id: 'delete', title: Ox._('Delete {0}' + (!isVideoView && !isClipView ? ' from List' : ''), [selectionItemName]), disabled: !canCut, keyboard: 'delete' },
             {},
             { id: 'undo', title: Ox._('Undo'), disabled: true, keyboard: 'control z' },
             { id: 'redo', title: Ox._('Redo'), disabled: true, keyboard: 'shift control z' }
