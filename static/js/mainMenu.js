@@ -382,7 +382,7 @@ pandora.ui.mainMenu = function() {
                             out: ui.videoPoints[ui.item].out
                         }], 'clip')
                         : pandora.isClipView() ? Ox.Clipboard[action](pandora.$ui.clipList.options('selected'), 'clip')
-                        : Ox.Clipboard['action'](ui.listSelection, 'item');
+                        : Ox.Clipboard[action](ui.listSelection, 'item');
                 } else if (data.id == 'paste') {
                     fromMenu = true;
                     var items = Ox.Clipboard.paste();
