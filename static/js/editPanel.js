@@ -120,6 +120,38 @@ pandora.ui.editPanel = function() {
                             return clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out;
                         }), 'clip');
                     },
+                    cut: function(data) {
+                        if (edit.editable) {
+                            Ox.Clipboard.copy(data.ids.map(function(id) {
+                                var clip = Ox.getObjectById(edit.clips, id);
+                                return clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out;
+                            }), 'clip');
+                            pandora.doHistory('cut', data.ids, ui.edit, function(result) {
+                                Ox.Request.clearCache('getEdit');
+                                updateClips(result.data.clips);
+                            });
+                        }
+                    },
+                    cutadd: function(data) {
+                        if (edit.editable) {
+                            Ox.Clipboard.add(data.ids.map(function(id) {
+                                var clip = Ox.getObjectById(edit.clips, id);
+                                return clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out;
+                            }), 'clip');
+                            pandora.doHistory('cut', data.ids, ui.edit, function(result) {
+                                Ox.Request.clearCache('getEdit');
+                                updateClips(result.data.clips);
+                            });
+                        }
+                    },
+                    'delete': function(data) {
+                        if (edit.editable) {
+                            pandora.doHistory('delete', data.ids, ui.edit, function(result) {
+                                Ox.Request.clearCache('getEdit');
+                                updateClips(result.data.clips);
+                            });
+                        }                        
+                    },
                     edit: function(data) {
                         var args = {id: data.id},
                             index = Ox.getIndexById(edit.clips, data.id),
@@ -166,23 +198,22 @@ pandora.ui.editPanel = function() {
                         pandora.UI.set(editPointsKey('clip'), data.ids[0]);
                     },
                     paste: function() {
+                        var clips;
                         if (Ox.Clipboard.type() == 'clip') {
-                            pandora.api.addClips({
-                                clips: Ox.Clipboard.paste().map(function(clip) {
-                                    var split = clip.split('/'),
-                                        item = split[0],
-                                        points = split[1].split('-');
-                                    return Ox.extend({
-                                        item: item
-                                    }, points.length == 1 ? {
-                                        annotation: clip
-                                    } : {
-                                        'in': parseFloat(points[0]),
-                                        out: parseFloat(points[1])
-                                    });
-                                }),
-                                edit: ui.edit
-                            }, function(result) {
+                            clips = Ox.Clipboard.paste().map(function(clip) {
+                                var split = clip.split('/'),
+                                    item = split[0],
+                                    points = split[1].split('-');
+                                return Ox.extend({
+                                    item: item
+                                }, points.length == 1 ? {
+                                    annotation: clip
+                                } : {
+                                    'in': parseFloat(points[0]),
+                                    out: parseFloat(points[1])
+                                });
+                            });
+                            pandora.doHistory('paste', clips, ui.edit, function(result) {
                                 Ox.Request.clearCache('getEdit');
                                 updateClips(edit.clips.concat(result.data.clips));
                             });
@@ -199,17 +230,6 @@ pandora.ui.editPanel = function() {
                         set[editPointsKey('clip')] = '';
                         set[editPointsKey('position')] = data.position;
                         pandora.UI.set(set);
-                    },
-                    remove: function(data) {
-                        if (edit.editable) {
-                            pandora.api.removeClips({
-                                ids: data.ids,
-                                edit: ui.edit
-                            }, function(result) {
-                                Ox.Request.clearCache('getEdit');
-                                updateClips(result.data.clips);
-                            });
-                        }
                     },
                     resize: function(data) {
                         // sidebar resize
