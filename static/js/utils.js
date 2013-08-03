@@ -836,7 +836,7 @@ pandora.getClipVideos = function(clip, resolution) {
         } else if (pandora.user.ui.section == 'texts') {
             parts.push(pandora.user.ui.text ? pandora.user.ui.text : Ox._('Texts'));
         }
-        return parts.join(' - ');
+        return parts.join(' – ');
     };
 }());
 
@@ -1233,7 +1233,7 @@ pandora.getPageTitle = function(stateOrURL) {
         );
     return page
         ? pandora.site.site.name
-        + (page.title ? ' - ' + page.title : '')
+        + (page.title ? ' – ' + page.title : '')
         : null;
 };
 
