@@ -300,8 +300,8 @@ pandora.createLinks = function($element) {
             type = getType(items),
             text = Ox._(actions[action]) + ' ' + Ox.formatCount(
                 items.length,
-                type == 'items' ? pandora.site.itemName.singular : 'Clip',
-                type == 'items' ? pandora.site.itemName.plural : 'Clips'
+                type == 'item' ? pandora.site.itemName.singular : 'Clip',
+                type == 'item' ? pandora.site.itemName.plural : 'Clips'
             );
         if (action == 'copy' || action == 'paste') {
             addItems(items, targets[0], addToHistory);
