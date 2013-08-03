@@ -393,7 +393,8 @@ pandora.createLinks = function($element) {
         }
         if (object.action != 'copy') {
             if (type == 'item' && ui.section == 'items' && Ox.contains(object.targets, ui._list)) {
-                pandora.reloadList();
+                // FIXME: Why is this timeout needed?
+                setTimeout(pandora.reloadList, 250);
             } else if (type == 'clip' && ui.section == 'edits' && Ox.contains(object.targets, ui.edit)) {
                 // FIXME: reload clip list
             }
