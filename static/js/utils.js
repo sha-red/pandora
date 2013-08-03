@@ -543,7 +543,6 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                         var targets = drag.action == 'copy' ? drag.target.id
                             : [pandora.user.ui._list, drag.target.id];
                         pandora.doHistory(drag.action, data.ids, targets, function() {
-                            drag.action == 'move' && pandora.reloadList();
                             Ox.Request.clearCache('find');
                             pandora.api.find({
                                 query: {
@@ -557,6 +556,7 @@ pandora.enableDragAndDrop = function($list, canMove, section) {
                                 );
                                 cleanup(250);
                             });
+                            drag.action == 'move' && pandora.reloadList();
                         });
                     } else if (section == 'edits') {
                         var clips = data.ids.map(function(id) {
