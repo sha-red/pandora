@@ -374,7 +374,6 @@ pandora.createLinks = function($element) {
             ui = pandora.user.ui;
         if (object.action != 'copy') {
             if (type == 'item' && ui.section == 'items' && Ox.contains(object.targets, ui._list)) {
-                Ox.print('RELOADING LIST');
                 pandora.reloadList();
             } else if (type == 'clip' && ui.section == 'edits' && Ox.contains(object.targets, ui.edit)) {
                 // FIXME: reload clip list
