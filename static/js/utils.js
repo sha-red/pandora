@@ -819,26 +819,34 @@ pandora.getClipVideos = function(clip, resolution) {
 
 (function() {
     var itemTitles = {};
-    pandora.getDocumentTitle = function(itemTitle) {
-        Ox.Log('', 'ITEM TITLES', itemTitles)
-        if (itemTitle) {
-            itemTitles[pandora.user.ui.item] = itemTitle
-        }
+    pandora.getDocumentTitle = function(itemData) {
         var parts = [pandora.site.site.name];
+        if (itemData) {
+            itemTitles[pandora.user.ui.item] = Ox.decodeHTMLEntities(
+                (itemData.title || Ox._('Untitled')) + (
+                    itemData.director || itemData.year
+                    ? ' (' + (itemData.director || [Ox._('Unknown Director')]).join(', ') + ')'
+                    : ''
+                ) + (itemData.year ? ' ' + itemData.year : '')
+            );
+        }
         if (pandora.user.ui.section == 'items') {
             if (!pandora.user.ui.item) {
-                pandora.user.ui._list && parts.push(Ox._('List {0}', [pandora.user.ui._list]));
+                pandora.user.ui._list && parts.push(Ox._('List') + ' ' + pandora.user.ui._list);
                 parts.push(Ox._(Ox.toTitleCase(pandora.user.ui.listView) + ' View'));
             } else {
                 parts.push(itemTitles[pandora.user.ui.item] || pandora.user.ui.item);
                 parts.push(Ox._(Ox.toTitleCase(pandora.user.ui.itemView) + ' View'));
             }
+        } else if (pandora.user.ui.section == 'edits') {
+            parts.push(pandora.user.ui.edit ? Ox._('Edit{noun}', {noun: ''}) + ' ' + pandora.user.ui.edit : Ox._('Edits'));
         } else if (pandora.user.ui.section == 'texts') {
-            parts.push(pandora.user.ui.text ? pandora.user.ui.text : Ox._('Texts'));
+            parts.push(pandora.user.ui.text ? Ox._('Text') + ' ' + pandora.user.ui.text : Ox._('Texts'));
         }
         return parts.join(' – ');
     };
 }());
+
 
 pandora.getEditTooltip = function(title) {
     return function(e) {
