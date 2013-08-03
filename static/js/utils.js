@@ -388,16 +388,12 @@ pandora.createLinks = function($element) {
                     );
                 });
             });
-        } else if (type == 'clip' && ui.section == 'edits') {
-            // FIXME: update edit list
-        }
-        if (object.action != 'copy') {
-            if (type == 'item' && ui.section == 'items' && Ox.contains(object.targets, ui._list)) {
+            if (Ox.contains(object.targets, ui._list)) {
                 // FIXME: Why is this timeout needed?
                 setTimeout(pandora.reloadList, 250);
-            } else if (type == 'clip' && ui.section == 'edits' && Ox.contains(object.targets, ui.edit)) {
-                // FIXME: reload clip list
             }
+        } else if (type == 'clip' && ui.section == 'edits') {
+            // FIXME: update edit list and reload clip list
         }
         callback && callback();
     }
