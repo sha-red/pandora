@@ -175,7 +175,7 @@ pandora.ui.editPanel = function() {
                                     return Ox.extend({
                                         item: item
                                     }, points.length == 1 ? {
-                                        annotation: points[0]
+                                        annotation: clip
                                     } : {
                                         'in': parseFloat(points[0]),
                                         out: parseFloat(points[1])
