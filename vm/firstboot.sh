@@ -1,4 +1,5 @@
 #!/bin/sh
+export DEBIAN_FRONTEND=noninteractive
 #fails in bootstrap
 apt-get -y install ipython ntp
 
