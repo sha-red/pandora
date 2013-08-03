@@ -72,12 +72,12 @@ pandora.ui.player = function(data) {
                 pandora.URL.push(pandora.site.cantPlay.link);
             },
             copy: function(data) {
-                Ox.Clipboard.copy(data.map(function(clip) {
+                pandora.clipboard.copy(data.map(function(clip) {
                     return clip.annotation || ui.item + '/' + clip['in'] + '-' + clip.out;
                 }), 'clip');
             },
             copyadd: function(data) {
-                Ox.Clipboard.add(data.map(function(clip) {
+                pandora.clipboard.add(data.map(function(clip) {
                     return clip.annotation || ui.item + '/' + clip['in'] + '-' + clip.out;
                 }), 'clip');
             },

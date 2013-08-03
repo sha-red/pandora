@@ -109,20 +109,20 @@ pandora.ui.editPanel = function() {
                 })
                 .bindEvent({
                     copy: function(data) {
-                        Ox.Clipboard.copy(data.ids.map(function(id) {
+                        pandora.clipboard.copy(data.ids.map(function(id) {
                             var clip = Ox.getObjectById(edit.clips, id);
                             return clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out;
                         }), 'clip');
                     },
                     copyadd: function(data) {
-                        Ox.Clipboard.add(data.ids.map(function(id) {
+                        pandora.clipboard.add(data.ids.map(function(id) {
                             var clip = Ox.getObjectById(edit.clips, id);
                             return clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out;
                         }), 'clip');
                     },
                     cut: function(data) {
                         if (edit.editable) {
-                            Ox.Clipboard.copy(data.ids.map(function(id) {
+                            pandora.clipboard.copy(data.ids.map(function(id) {
                                 var clip = Ox.getObjectById(edit.clips, id);
                                 return clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out;
                             }), 'clip');
@@ -134,7 +134,7 @@ pandora.ui.editPanel = function() {
                     },
                     cutadd: function(data) {
                         if (edit.editable) {
-                            Ox.Clipboard.add(data.ids.map(function(id) {
+                            pandora.clipboard.add(data.ids.map(function(id) {
                                 var clip = Ox.getObjectById(edit.clips, id);
                                 return clip.annotation || clip.item + '/' + clip['in'] + '-' + clip.out;
                             }), 'clip');
@@ -199,8 +199,8 @@ pandora.ui.editPanel = function() {
                     },
                     paste: function() {
                         var clips;
-                        if (Ox.Clipboard.type() == 'clip') {
-                            clips = Ox.Clipboard.paste().map(function(clip) {
+                        if (pandora.clipboard.type() == 'clip') {
+                            clips = pandora.clipboard.paste().map(function(clip) {
                                 var split = clip.split('/'),
                                     item = split[0],
                                     points = split[1].split('-');

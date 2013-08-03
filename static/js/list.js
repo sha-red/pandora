@@ -392,15 +392,15 @@ pandora.ui.list = function() {
                 delete pandora.$ui.previewDialog;
             },
             copy: function(data) {
-                Ox.Clipboard.copy(data.ids, 'item');
+                pandora.clipboard.copy(data.ids, 'item');
             },
             copyadd: function(data) {
-                Ox.Clipboard.add(data.ids, 'item');
+                pandora.clipboard.add(data.ids, 'item');
             },
             cut: function(data) {
                 var listData = pandora.getListData();
                 if (listData.editable && listData.type == 'static') {
-                    Ox.Clipboard.copy(data.ids, 'item');
+                    pandora.clipboard.copy(data.ids, 'item');
                     pandora.doHistory('cut', data.ids, pandora.user.ui._list, function() {
                         pandora.UI.set({listSelection: []});
                         pandora.reloadList();
@@ -410,7 +410,7 @@ pandora.ui.list = function() {
             cutadd: function(data) {
                 var listData = pandora.getListData();
                 if (listData.editable && listData.type == 'static') {
-                    Ox.Clipboard.add(data.ids, 'item');
+                    pandora.clipboard.add(data.ids, 'item');
                     pandora.doHistory('cut', data.ids, pandora.user.ui._list, function() {
                         pandora.UI.set({listSelection: []});
                         pandora.reloadList();
@@ -475,8 +475,8 @@ pandora.ui.list = function() {
                 }
             },
             paste: function(data) {
-                var items = Ox.Clipboard.paste();
-                if (items.length && Ox.Clipboard.type() == 'item' && pandora.getListData().editable) {
+                var items = pandora.clipboard.paste();
+                if (items.length && pandora.clipboard.type() == 'item' && pandora.getListData().editable) {
                     pandora.doHistory('paste', items, pandora.user.ui._list, function() {
                         pandora.UI.set({listSelection: items});
                         pandora.reloadList();

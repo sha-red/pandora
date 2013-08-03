@@ -119,7 +119,7 @@ pandora.ui.clipList = function(videoRatio) {
                         annotation = that.value(id, 'annotations')[0].id;
                     return annotation || item + '/' + that.value(id, 'in') + '-' + that.value(id, 'out');
                 })
-                Ox.Clipboard.copy(items, 'clip');
+                pandora.clipboard.copy(items, 'clip');
             },
             copyadd: function(data) {
                 var items = data.ids.map(function(id) {
@@ -127,7 +127,7 @@ pandora.ui.clipList = function(videoRatio) {
                         annotation = that.value(id, 'annotations')[0].id;
                     return annotation || item + '/' + that.value(id, 'in') + '-' + that.value(id, 'out');
                 })
-                Ox.Clipboard.add(items, 'clip');
+                pandora.clipboard.add(items, 'clip');
             },
             gainfocus: function() {
                 pandora.$ui.mainMenu.replaceItemMenu();

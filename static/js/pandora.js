@@ -366,6 +366,7 @@ appPanel
     }
 
     function initPandoraApp() {
+        pandora.clipboard = Ox.Clipboard();
         pandora.history = Ox.History();
         pandora.$ui.appPanel = pandora.ui.appPanel().display();
         pandora.$ui.loadingIcon.update(Ox.Request.requests());

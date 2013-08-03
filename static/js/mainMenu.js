@@ -366,7 +366,7 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'cut' || data.id == 'cutadd') {
                     var action = data.id == 'cut' ? 'copy' : 'add';
                     fromMenu = true;
-                    Ox.Clipboard[action](ui.listSelection, 'item');
+                    pandora.clipboard[action](ui.listSelection, 'item');
                     pandora.doHistory('cut', ui.listSelection, ui._list, function() {
                         pandora.UI.set({listSelection: []});
                         pandora.reloadList();
@@ -374,25 +374,25 @@ pandora.ui.mainMenu = function() {
                 } else if (data.id == 'copy' || data.id == 'copyadd') {
                     var action = data.id == 'copy' ? 'copy' : 'add';
                     fromMenu = true;
-                    pandora.isVideoView() && !pandora.$ui.browser.hasFocus() ? Ox.Clipboard[action]([{
+                    pandora.isVideoView() && !pandora.$ui.browser.hasFocus() ? pandora.clipboard[action]([{
                             annotation: ui.videoPoints[ui.item].annotation,
                             'in': pandora.user.ui.videoPoints[ui.item]['in'],
                             item: ui.item,
                             out: ui.videoPoints[ui.item].out
                         }], 'clip')
-                        : pandora.isClipView() && !pandora.$ui.browser.hasFocus() ? Ox.Clipboard[action](
+                        : pandora.isClipView() && !pandora.$ui.browser.hasFocus() ? pandora.clipboard[action](
                             pandora.$ui.clipList.options('selected'), 'clip'
                         )
-                        : Ox.Clipboard[action](ui.listSelection, 'item');
+                        : pandora.clipboard[action](ui.listSelection, 'item');
                 } else if (data.id == 'paste') {
                     fromMenu = true;
-                    var items = Ox.Clipboard.paste();
+                    var items = pandora.clipboard.paste();
                     pandora.doHistory('paste', items, ui._list, function() {
                         pandora.UI.set({listSelection: items});
                         pandora.reloadList();
                     });
                 } else if (data.id == 'clearclipboard') {
-                    Ox.Clipboard.clear();
+                    pandora.clipboard.clear();
                 } else if (data.id == 'delete') {
                     pandora.doHistory('delete', ui.listSelection, ui._list, function() {
                         pandora.UI.set({listSelection: []});
@@ -735,7 +735,7 @@ pandora.ui.mainMenu = function() {
             }
         });
 
-    Ox.Clipboard.bindEvent(function(data, event) {
+    pandora.clipboard.bindEvent(function(data, event) {
         if (Ox.contains(['add', 'copy', 'paste'], event) && !fromMenu) {
             that.highlightMenu('itemMenu');
         }
@@ -819,8 +819,8 @@ pandora.ui.mainMenu = function() {
                 : isClipView ? (selectionItems == 1 ? 'Clip' : 'Clips')
                 : pandora.site.itemName[selectionItems == 1 ? 'singular' : 'plural']
             ),
-            clipboardItems = Ox.Clipboard.items(),
-            clipboardType = Ox.Clipboard.type(),
+            clipboardItems = pandora.clipboard.items(),
+            clipboardType = pandora.clipboard.type(),
             clipboardItemName = clipboardItems == 0 ? ''
                 : (clipboardItems > 1 ? Ox.formatNumber(clipboardItems) + ' ' : '') + Ox._(
                     clipboardType == 'item' ? pandora.site.itemName[clipboardItems == 1 ? 'singular' : 'plural']
@@ -833,7 +833,7 @@ pandora.ui.mainMenu = function() {
                 : !!ui.listSelection.length,
             canAdd = canCopy && clipboardItems > 0 && ((clipboardType == 'item') == (!isVideoView && !isClipView)),
             canPaste = !ui.item && !isClipView && !isVideoView
-                && listData.editable && listData.type == 'static' && Ox.Clipboard.type() == 'item',
+                && listData.editable && listData.type == 'static' && pandora.clipboard.type() == 'item',
             canCut = canCopy && !ui.item && !isClipView && !isVideoView
                 && listData.editable && listData.type == 'static',
             historyItems = pandora.history.items(),
